@@ -8,6 +8,7 @@
 
 * Config can now be loaded by the app using an `owntracks:///` URI, either pointing at a remote config location or encoded inline in base64.
 * Multiple MQTT topics (space-delimited) are now supported under the `subTopic` preference
+* Minor UI changes separating the About screen from the rest of the preferences
 
 ### Bug fixes
 

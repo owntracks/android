@@ -1,21 +1,23 @@
 package org.owntracks.android.injection.modules;
 
-import org.owntracks.android.ui.preferences.connection.ConnectionActivityModule;
-import org.owntracks.android.ui.contacts.ContactsActivityModule;
-import org.owntracks.android.ui.preferences.editor.EditorActivityModule;
-import org.owntracks.android.ui.preferences.load.LoadActivityModule;
-import org.owntracks.android.ui.status.LogViewerActivityModule;
-import org.owntracks.android.ui.map.MapActivityModule;
-import org.owntracks.android.ui.preferences.PreferencesActivityModule;
-import org.owntracks.android.ui.region.RegionActivityModule;
-import org.owntracks.android.ui.regions.RegionsActivityModule;
-import org.owntracks.android.ui.welcome.StatusActivityModule;
-import org.owntracks.android.services.BackgroundServiceModule;
 import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.injection.scopes.PerReceiver;
 import org.owntracks.android.injection.scopes.PerService;
+import org.owntracks.android.services.BackgroundServiceModule;
 import org.owntracks.android.support.receiver.StartBackgroundServiceReceiver;
+import org.owntracks.android.ui.contacts.ContactsActivityModule;
+import org.owntracks.android.ui.map.MapActivityModule;
+import org.owntracks.android.ui.preferences.about.AboutActivity;
+import org.owntracks.android.ui.preferences.about.AboutActivityModule;
+import org.owntracks.android.ui.preferences.PreferencesActivityModule;
+import org.owntracks.android.ui.preferences.connection.ConnectionActivityModule;
+import org.owntracks.android.ui.preferences.editor.EditorActivityModule;
+import org.owntracks.android.ui.preferences.load.LoadActivityModule;
+import org.owntracks.android.ui.region.RegionActivityModule;
+import org.owntracks.android.ui.regions.RegionsActivityModule;
 import org.owntracks.android.ui.status.LogViewerActivity;
+import org.owntracks.android.ui.status.LogViewerActivityModule;
+import org.owntracks.android.ui.welcome.StatusActivityModule;
 import org.owntracks.android.ui.welcome.WelcomeActivityModule;
 
 import dagger.Module;
@@ -34,6 +36,10 @@ public abstract class AndroidBindingModule {
     @PerActivity
     @ContributesAndroidInjector(modules = {PreferencesActivityModule.class})
     abstract org.owntracks.android.ui.preferences.PreferencesActivity bindPreferencesActivity();
+
+    @PerActivity
+    @ContributesAndroidInjector(modules = {AboutActivityModule.class})
+    abstract AboutActivity bindAboutActivity();
 
     @PerActivity
     @ContributesAndroidInjector(modules = {ConnectionActivityModule.class})

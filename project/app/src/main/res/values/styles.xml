@@ -8,6 +8,7 @@
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:textColor">@color/textPrimary</item>
         <item name="android:textColorSecondary">@color/textSecondary</item>
+        <item name="android:tint">@color/primary</item>
 
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/secondary</item>

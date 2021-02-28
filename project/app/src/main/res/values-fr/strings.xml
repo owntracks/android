@@ -19,13 +19,13 @@
     <string name="preferencesNotificationLocationSummary">Afficher le dernier lieu et l\'heure signalés</string>
     <string name="preferencesNotificationLocation">Dernier emplacement signalé</string>
     <string name="preferencesAdvanced">Avancé</string>
-    <string name="preferencesVersion">Version</string>
+    <string name="version">Version</string>
     <string name="preferencesReporting">Rapports</string>
     <string name="preferencesTrackerId">Tracker ID</string>
     <string name="preferencesLocatorInterval">Intervalle de localisation</string>
     <string name="preferencesLocatorIntervalSummary">Intervalle entre les mises à jour de position</string>
     <string name="preferencesLocatorIntervalDialog">Intervalle en secondes pendant lequel l\'appareil doit se déplacer entre les mises à jour d\'emplacement en mode de changements d\'emplacement importants.</string>
-    <string name="preferencesInfo">Information</string>
+    <string name="title_activity_about">Information</string>
     <string name="preferencesRepository">Code Source</string>
     <string name="preferencesDocumentation">Documentation</string>
     <string name="preferencesEncryptionKeySummary">Clé symétrique pour le chiffrement de la charge utile</string>

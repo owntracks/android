@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:title="@string/title_activity_about">
+    <Preference
+        android:icon="@drawable/ic_baseline_insert_drive_file_24"
+        android:key="documentation"
+        android:summary="@string/documentationUrl"
+        android:title="@string/preferencesDocumentation">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="@string/documentationUrl" />
+    </Preference>
+    <Preference
+        android:icon="@drawable/ic_baseline_domain_verification_24"
+        android:key="license"
+        android:summary="Eclipse Public License 1.0 (EPL 1.0)"
+        android:title="License">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="@string/licenseUrl" />
+    </Preference>
+
+    <Preference
+        android:icon="@drawable/ic_baseline_code_24"
+        android:key="repo"
+        android:summary="on GitHub"
+        android:title="@string/preferencesRepository">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="@string/repoUrl" />
+    </Preference>
+
+    <Preference
+        android:icon="@drawable/ic_baseline_library_books_24"
+        android:key="licensesScreen"
+        android:summary="@string/preferencesLicensesSummary"
+        android:title="@string/preferencesLicenses"
+        app:fragment="org.owntracks.android.ui.preferences.LicenseFragment" />
+
+    <Preference
+        android:icon="@drawable/ic_baseline_info_24"
+        android:key="version"
+        android:title="@string/preferencesChangelog">
+        <intent android:action="android.intent.action.VIEW" />
+    </Preference>
+
+    <PreferenceCategory app:title="Feedback">
+        <Preference
+            android:key="issue"
+            android:summary="File on GitHub"
+            android:title="Report an issue"
+            app:icon="@drawable/ic_baseline_bug_report_24"
+            app:iconSpaceReserved="true"
+            app:tint="@color/primary">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/issueUrl" />
+        </Preference>
+        <Preference
+            android:icon="@drawable/ic_baseline_email_24"
+            android:key="email"
+            android:summary="@string/supportEmailSummary"
+            android:tint="@color/primary"
+            android:title="Get in touch">
+            <intent
+                android:action="android.intent.action.SENDTO"
+                android:data="@string/supportEmail" />
+        </Preference>
+        <Preference
+            android:icon="@drawable/twitter_24"
+            android:key="twitter"
+            android:summary="@string/twitterUrl"
+            android:title="@string/preferencesTwitter">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/twitterUrl" />
+        </Preference>
+    </PreferenceCategory>
+
+</PreferenceScreen>

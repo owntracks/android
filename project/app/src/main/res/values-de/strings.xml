@@ -16,9 +16,8 @@
     <string name="preferencesNotificationLocationSummary">Letzten gemeldeten Standort und Zeitpunkt anzeigen</string>
     <string name="preferencesNotificationLocation">Letzter gemeldeter Standort</string>
     <string name="preferencesAdvanced">Erweitert</string>
-    <string name="preferencesVersion">Version</string>
+    <string name="version">Version</string>
     <string name="preferencesReporting">Berichte</string>
-    <string name="preferencesInfo">Information</string>
     <string name="preferencesRepository">Quelltext</string>
     <string name="preferencesDocumentation">Handbuch</string>
     <string name="preferencesEncryptionKeySummary">Symmetrischer Schlüssel für Inhalts-Verschlüsselung</string>

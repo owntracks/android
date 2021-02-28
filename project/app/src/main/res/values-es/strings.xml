@@ -19,10 +19,10 @@
     <string name="preferencesNotificationLocationSummary">Mostrar la última ubicación y fecha</string>
     <string name="preferencesNotificationLocation">Última ubicación</string>
     <string name="preferencesAdvanced">Avanzado</string>
-    <string name="preferencesVersion">Versión</string>
+    <string name="version">Versión</string>
     <string name="preferencesReporting">Reportando</string>
     <string name="preferencesTrackerId">Tracker ID</string>
-    <string name="preferencesInfo">Información</string>
+    <string name="title_activity_about">Información</string>
     <string name="preferencesRepository">Código fuente</string>
     <string name="preferencesDocumentation">Documentación</string>
     <string name="preferencesEncryptionKeySummary">Clave simétrica para encriptación del payload </string>

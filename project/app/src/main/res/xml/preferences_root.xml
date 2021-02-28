@@ -26,9 +26,4 @@
         android:key="configuration"
         android:title="@string/configurationManagement"
         app:iconSpaceReserved="false" />
-    <Preference
-        android:key="informationScreen"
-        android:title="@string/preferencesInfo"
-        app:fragment="org.owntracks.android.ui.preferences.InfoFragment"
-        app:iconSpaceReserved="false" />
 </PreferenceScreen>

@@ -19,10 +19,10 @@
     <string name="preferencesNotificationLocationSummary">Показывать последнее известное местоположение и время</string>
     <string name="preferencesNotificationLocation">Последнее известное местоположение</string>
     <string name="preferencesAdvanced">Расширенные</string>
-    <string name="preferencesVersion">Версия</string>
+    <string name="version">Версия</string>
     <string name="preferencesReporting">Отчеты</string>
     <string name="preferencesTrackerId">Tracker ID</string>
-    <string name="preferencesInfo">Информация</string>
+    <string name="title_activity_about">Информация</string>
     <string name="preferencesRepository">Исходный код</string>
     <string name="preferencesDocumentation">Документация</string>
     <string name="preferencesTwitter" translatable="false">Twitter</string>
