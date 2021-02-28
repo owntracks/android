@@ -71,13 +71,13 @@ class PreferencesActivityTests {
         assertDisplayed(R.string.preferencesNotification)
         assertDisplayed(R.string.preferencesAdvanced)
         assertDisplayed(R.string.configurationManagement)
-        assertDisplayed(R.string.preferencesInfo)
+        assertDisplayed(R.string.title_activity_about)
     }
 
     @Test
     @AllowFlaky(attempts = 1)
     fun documentationLinkOpensSite() {
-        clickOn(R.string.preferencesInfo)
+        clickOn(R.string.title_activity_about)
         clickOn(R.string.preferencesDocumentation)
         intended(allOf(hasAction(Intent.ACTION_VIEW), hasData(baristaRule.activityTestRule.activity.getString(R.string.documentationUrl))))
     }
@@ -85,7 +85,7 @@ class PreferencesActivityTests {
     @Test
     @AllowFlaky(attempts = 1)
     fun twitterLinkOpensSite() {
-        clickOn(R.string.preferencesInfo)
+        clickOn(R.string.title_activity_about)
         clickOn(R.string.preferencesTwitter)
         intended(allOf(hasAction(Intent.ACTION_VIEW), hasData(baristaRule.activityTestRule.activity.getString(R.string.twitterUrl))))
     }
@@ -93,7 +93,7 @@ class PreferencesActivityTests {
     @Test
     @AllowFlaky(attempts = 1)
     fun sourceLinkOpensSite() {
-        clickOn(R.string.preferencesInfo)
+        clickOn(R.string.title_activity_about)
         clickOn(R.string.preferencesRepository)
         intended(allOf(hasAction(Intent.ACTION_VIEW), hasData(baristaRule.activityTestRule.activity.getString(R.string.repoUrl))))
     }
@@ -101,7 +101,7 @@ class PreferencesActivityTests {
     @Test
     @AllowFlaky(attempts = 1)
     fun librariesLinkListsLibraries() {
-        clickOn(R.string.preferencesInfo)
+        clickOn(R.string.title_activity_about)
         clickOn(R.string.preferencesLicenses)
         assertDisplayed(R.string.preferencesLicenses)
     }

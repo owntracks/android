@@ -21,6 +21,7 @@ import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.contacts.ContactsActivity;
 import org.owntracks.android.ui.map.MapActivity;
+import org.owntracks.android.ui.preferences.about.AboutActivity;
 import org.owntracks.android.ui.preferences.PreferencesActivity;
 import org.owntracks.android.ui.regions.RegionsActivity;
 import org.owntracks.android.ui.status.StatusActivity;
@@ -95,8 +96,9 @@ public class DrawerProvider {
                         drawerItemForClass(activity, ContactsActivity.class, R.string.title_activity_contacts, R.drawable.ic_baseline_supervisor_account_24),
                         drawerItemForClass(activity, RegionsActivity.class, R.string.title_activity_regions, R.drawable.ic_baseline_adjust_24))
                 .addStickyDrawerItems(
-                        secondaryDrawerItemForClass(activity, StatusActivity.class, R.string.title_activity_status, R.drawable.ic_baseline_info_24),
+                        secondaryDrawerItemForClass(activity, StatusActivity.class, R.string.title_activity_status, R.drawable.ic_baseline_beenhere_24),
                         secondaryDrawerItemForClass(activity, PreferencesActivity.class, R.string.title_activity_preferences, R.drawable.ic_baseline_settings_24),
+                        secondaryDrawerItemForClass(activity, AboutActivity.class, R.string.title_activity_about, R.drawable.ic_baseline_info_24),
                         secondaryDrawerItemForClass(activity, null, R.string.title_exit, R.drawable.ic_baseline_power_settings_new_24)
                 )
                 .withOnDrawerItemClickListener((view, position, drawerItem) -> {

@@ -16,6 +16,10 @@ import org.owntracks.android.ui.base.viewmodel.NoOpViewModel;
 
 public class PreferencesActivity extends BaseActivity<UiPreferencesBinding, NoOpViewModel> implements MvvmView, PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
 
+    protected Fragment getStartFragment() {
+        return new PreferencesFragment();
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,7 +38,7 @@ public class PreferencesActivity extends BaseActivity<UiPreferencesBinding, NoOp
                 }
         );
 
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, new PreferencesFragment(), null);
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, getStartFragment(), null);
         fragmentTransaction.commit();
         getSupportFragmentManager().executePendingTransactions();
     }

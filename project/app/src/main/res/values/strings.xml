@@ -19,10 +19,10 @@
     <string name="preferencesNotificationLocationSummary">Display last reported location and time</string>
     <string name="preferencesNotificationLocation">Last reported location</string>
     <string name="preferencesAdvanced">Advanced</string>
-    <string name="preferencesVersion">Version</string>
+    <string name="preferencesChangelog">Changelog</string>
+    <string name="version">Version</string>
     <string name="preferencesReporting">Reporting</string>
     <string name="preferencesTrackerId">Tracker ID</string>
-    <string name="preferencesInfo">Information</string>
     <string name="preferencesRepository">Source Code</string>
     <string name="preferencesDocumentation">Documentation</string>
     <string name="preferencesTwitter" translatable="false">Twitter</string>
@@ -72,6 +72,7 @@
     <string name="title_activity_contacts">Friends</string>
     <string name="title_activity_status">Status</string>
     <string name="title_activity_preferences">Preferences</string>
+    <string name="title_activity_about">About</string>
     <string name="title_exit">Exit app</string>
     <string name="unableToCopyCertificate">Unable to copy certificate to internal storage</string>
     <string name="preferencesCategoryNotificationOngoing">Ongoing notification</string>
