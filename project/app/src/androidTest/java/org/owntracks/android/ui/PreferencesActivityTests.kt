@@ -1,15 +1,11 @@
 package org.owntracks.android.ui
 
-import android.content.Intent
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
 import androidx.test.espresso.action.ViewActions.scrollTo
 import androidx.test.espresso.contrib.RecyclerViewActions.actionOnItem
 import androidx.test.espresso.intent.Intents
-import androidx.test.espresso.intent.Intents.intended
-import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
-import androidx.test.espresso.intent.matcher.IntentMatchers.hasData
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -22,7 +18,6 @@ import com.schibsted.spain.barista.interaction.BaristaDialogInteractions.clickDi
 import com.schibsted.spain.barista.interaction.BaristaEditTextInteractions.writeTo
 import com.schibsted.spain.barista.rule.BaristaRule
 import com.schibsted.spain.barista.rule.flaky.AllowFlaky
-import org.hamcrest.CoreMatchers.allOf
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -71,39 +66,6 @@ class PreferencesActivityTests {
         assertDisplayed(R.string.preferencesNotification)
         assertDisplayed(R.string.preferencesAdvanced)
         assertDisplayed(R.string.configurationManagement)
-        assertDisplayed(R.string.title_activity_about)
-    }
-
-    @Test
-    @AllowFlaky(attempts = 1)
-    fun documentationLinkOpensSite() {
-        clickOn(R.string.title_activity_about)
-        clickOn(R.string.preferencesDocumentation)
-        intended(allOf(hasAction(Intent.ACTION_VIEW), hasData(baristaRule.activityTestRule.activity.getString(R.string.documentationUrl))))
-    }
-
-    @Test
-    @AllowFlaky(attempts = 1)
-    fun twitterLinkOpensSite() {
-        clickOn(R.string.title_activity_about)
-        clickOn(R.string.preferencesTwitter)
-        intended(allOf(hasAction(Intent.ACTION_VIEW), hasData(baristaRule.activityTestRule.activity.getString(R.string.twitterUrl))))
-    }
-
-    @Test
-    @AllowFlaky(attempts = 1)
-    fun sourceLinkOpensSite() {
-        clickOn(R.string.title_activity_about)
-        clickOn(R.string.preferencesRepository)
-        intended(allOf(hasAction(Intent.ACTION_VIEW), hasData(baristaRule.activityTestRule.activity.getString(R.string.repoUrl))))
-    }
-
-    @Test
-    @AllowFlaky(attempts = 1)
-    fun librariesLinkListsLibraries() {
-        clickOn(R.string.title_activity_about)
-        clickOn(R.string.preferencesLicenses)
-        assertDisplayed(R.string.preferencesLicenses)
     }
 
     @Test

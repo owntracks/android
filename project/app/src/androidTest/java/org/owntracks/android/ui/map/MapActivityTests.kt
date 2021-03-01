@@ -114,8 +114,7 @@ class MapActivityTests {
                 R.string.preferencesReporting,
                 R.string.preferencesNotification,
                 R.string.preferencesAdvanced,
-                R.string.configurationManagement,
-                R.string.title_activity_about
+                R.string.configurationManagement
         ).forEach {
             assertDisplayed(it)
         }
