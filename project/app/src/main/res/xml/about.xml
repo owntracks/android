@@ -3,6 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:title="@string/title_activity_about">
     <Preference
+        android:icon="@drawable/ic_baseline_info_24"
+        android:key="version"
+        android:title="@string/preferencesChangelog">
+        <intent android:action="android.intent.action.VIEW" />
+    </Preference>
+
+    <Preference
         android:icon="@drawable/ic_baseline_insert_drive_file_24"
         android:key="documentation"
         android:summary="@string/documentationUrl"
@@ -11,6 +18,7 @@
             android:action="android.intent.action.VIEW"
             android:data="@string/documentationUrl" />
     </Preference>
+
     <Preference
         android:icon="@drawable/ic_baseline_domain_verification_24"
         android:key="license"
@@ -37,13 +45,6 @@
         android:summary="@string/preferencesLicensesSummary"
         android:title="@string/preferencesLicenses"
         app:fragment="org.owntracks.android.ui.preferences.LicenseFragment" />
-
-    <Preference
-        android:icon="@drawable/ic_baseline_info_24"
-        android:key="version"
-        android:title="@string/preferencesChangelog">
-        <intent android:action="android.intent.action.VIEW" />
-    </Preference>
 
     <PreferenceCategory app:title="Feedback">
         <Preference
@@ -77,5 +78,4 @@
                 android:data="@string/twitterUrl" />
         </Preference>
     </PreferenceCategory>
-
 </PreferenceScreen>
