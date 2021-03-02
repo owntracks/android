@@ -519,29 +519,29 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel<Ma
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_navigate:
-
-                FusedContact c = viewModel.getActiveContact();
-                if (c != null && c.hasLocation()) {
-                    try {
-                        LatLng l = c.getLatLng();
-                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("google.navigation:q=" + l.latitude + "," + l.longitude));
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
-                    } catch (ActivityNotFoundException e) {
-                        Toast.makeText(this, getString(R.string.noNavigationApp), Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Toast.makeText(this, getString(R.string.contactLocationUnknown), Toast.LENGTH_SHORT).show();
+        int itemId = item.getItemId();
+        if (itemId == R.id.menu_navigate) {
+            FusedContact c = viewModel.getActiveContact();
+            if (c != null && c.hasLocation()) {
+                try {
+                    LatLng l = c.getLatLng();
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("google.navigation:q=" + l.latitude + "," + l.longitude));
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                } catch (ActivityNotFoundException e) {
+                    Toast.makeText(this, getString(R.string.noNavigationApp), Toast.LENGTH_SHORT).show();
                 }
+            } else {
+                Toast.makeText(this, getString(R.string.contactLocationUnknown), Toast.LENGTH_SHORT).show();
+            }
 
-                return true;
-            case R.id.menu_clear:
-                viewModel.onClearContactClicked();
-            default:
-                return false;
+            return true;
+        } else if (itemId == R.id.menu_clear) {
+            viewModel.onClearContactClicked();
+
+            return false;
         }
+        return false;
     }
 
     @Override

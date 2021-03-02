@@ -63,17 +63,15 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.save:
-                viewModel.saveConfiguration();
-                return true;
-            case R.id.close:
-            case android.R.id.home:
-                finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        int itemId = item.getItemId();
+        if (itemId == R.id.save) {
+            viewModel.saveConfiguration();
+            return true;
+        } else if (itemId == R.id.close || itemId == android.R.id.home) {
+            finish();
+            return true;
         }
+        return super.onOptionsItemSelected(item);
 
     }
 

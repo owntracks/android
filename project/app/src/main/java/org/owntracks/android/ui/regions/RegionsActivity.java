@@ -54,16 +54,13 @@ public class RegionsActivity extends BaseActivity<UiRegionsBinding, RegionsMvvm.
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.add:
-                navigator.startActivity(RegionActivity.class);
-                return true;
-            case R.id.exportWaypointsService:
-                viewModel.exportWaypoints();
-                return true;
-
-
-
+        int itemId = item.getItemId();
+        if (itemId == R.id.add) {
+            navigator.startActivity(RegionActivity.class);
+            return true;
+        } else if (itemId == R.id.exportWaypointsService) {
+            viewModel.exportWaypoints();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
