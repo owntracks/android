@@ -101,11 +101,9 @@
     <string name="done_heading">Hecho</string>
     <string name="icon_description_done">Hecho</string>
     <string name="title_activity_load">Importar</string>
-    <string name="errorPreferencesImportFailedParseException">No se puede parsear el fichero</string>
     <string name="preferencesIgnoreInaccurateLocations">Ubicación imprecisa</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">Ignorar ubicaciones imprecisas</string>
     <string name="preferencesIgnoreInaccurateLocationsDialog">Ignorar ubicación por encima del umbral</string>
-    <string name="errorPreferencesImportFailedMemory">Tu dispositivo se ha quedado sin memoria</string>
     <string name="noNavigationApp">No hay aplicaciones compatibles</string>
     <string name="menuClear">Borrar</string>
     <string name="configurationManagement">Configuration management</string>

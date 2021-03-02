@@ -108,7 +108,6 @@
     <string name="done_heading">Done</string>
     <string name="icon_description_done">Done</string>
     <string name="title_activity_load">Import</string>
-    <string name="errorPreferencesImportFailedParseException">Unable to parse configuration</string>
     <string name="preferencesIgnoreInaccurateLocations">Inaccurate locations</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">Ignore inaccurate locations</string>
     <string name="preferencesIgnoreInaccurateLocationsDialog">Ignore location, if the accuracy is greater than the given meters</string>
@@ -119,7 +118,6 @@
     <string name="preferencesMoveModeLocatorIntervalSummary">Interval between location updates in Move mode</string>
     <string name="preferencesMoveModeLocatorIntervalDialog">How often should locations be requested from the device whilst in Move mode (seconds)</string>
 
-    <string name="errorPreferencesImportFailedMemory">Your device ran out of memory</string>
     <string name="noNavigationApp">no suitable app installed</string>
     <string name="menuClear">Clear</string>
     <string name="configurationManagement">Configuration management</string>

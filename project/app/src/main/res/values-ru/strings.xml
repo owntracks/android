@@ -107,7 +107,6 @@
     <string name="done_heading">Готово</string>
     <string name="icon_description_done">Готово</string>
     <string name="title_activity_load">Испорт</string>
-    <string name="errorPreferencesImportFailedParseException">Не удалось прочитать файл</string>
     <string name="preferencesIgnoreInaccurateLocations">Неточные местоположения</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">Игнорировать неточные местоположения</string>
     <string name="preferencesIgnoreInaccurateLocationsDialog">Игнорировать местоположение, если неточность его определения превышает указанное количество метров</string>
@@ -118,7 +117,6 @@
     <string name="preferencesMoveModeLocatorIntervalSummary">Интервал между обновлениями местоположения в режиме отслеживания перемещения</string>
     <string name="preferencesMoveModeLocatorIntervalDialog">Как часто должно запрашиваться текущее местоположение у устройства в режиме отслеживания перемещения (в секундах)</string>
 
-    <string name="errorPreferencesImportFailedMemory">На вашем устройстве закончилась память</string>
     <string name="noNavigationApp">подходящее приложение не установлено</string>
     <string name="menuClear">Очистить</string>
     <string name="configurationManagement">Управление конфигурацией</string>
