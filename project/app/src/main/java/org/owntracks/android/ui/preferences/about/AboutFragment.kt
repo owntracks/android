@@ -13,7 +13,7 @@ class AboutFragment : PreferenceFragmentCompat() {
         setPreferencesFromResource(R.xml.about, rootKey)
         val versionPreference = findPreference<Preference>(UI_PREFERENCE_VERSION)
         val versionName = requireActivity().packageManager.getPackageInfo(requireActivity().packageName, 0).versionName
-        versionPreference?.intent?.data = Uri.parse(getString(R.string.changelogUrl).format(versionName))
+        versionPreference?.intent?.data = Uri.parse(getString(R.string.changelogUrl))
         versionPreference?.setSummaryProvider { _ ->
             try {
                 val pm = requireActivity().packageManager
