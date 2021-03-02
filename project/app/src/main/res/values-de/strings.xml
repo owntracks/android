@@ -79,8 +79,6 @@
     <string name="transitionEntering">betritt</string>
     <string name="transitionLeaving">verlässt</string>
     <string name="errorPreferencesImportFailed">Import fehlgeschlagen</string>
-    <string name="errorPreferencesImportFailedParseException">Konfiguration fehlerhaft</string>
-    <string name="errorPreferencesImportFailedMemory">Nicht genug Speicher verfügbar</string>
     <string name="welcome_play_description">OwnTracks benötigt die Google Play-Dienste</string>
     <string name="icon_description_warning">Warnung</string>
     <string name="welcome_play_heading">Google Play-Dienste</string>

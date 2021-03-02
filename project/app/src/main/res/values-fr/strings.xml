@@ -103,11 +103,9 @@
     <string name="done_heading">Terminé</string>
     <string name="icon_description_done">Terminé</string>
     <string name="title_activity_load">importer</string>
-    <string name="errorPreferencesImportFailedParseException">Impossible d\'analyser le fichier</string>
     <string name="preferencesIgnoreInaccurateLocations">Emplacements inexacts</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">Ignorer les emplacements inexacts</string>
     <string name="preferencesIgnoreInaccurateLocationsDialog">Ignorer l\'emplacement, si la précision est supérieure aux mètres donnés</string>
-    <string name="errorPreferencesImportFailedMemory">Votre appareil n\'a plus de mémoire</string>
     <string name="noNavigationApp">Aucune application appropriée installée</string>
     <string name="menuClear">Nettoyer</string>
     <string name="configurationManagement">Gestion de la configuration</string>
