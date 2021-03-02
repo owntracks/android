@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:title="@string/title_activity_about">
     <Preference
-        android:icon="@drawable/ic_baseline_info_24"
+        android:icon="@drawable/ic_baseline_refresh_24"
         android:key="version"
         android:title="@string/preferencesChangelog">
         <intent android:action="android.intent.action.VIEW" />
@@ -57,16 +57,6 @@
             <intent
                 android:action="android.intent.action.VIEW"
                 android:data="@string/issueUrl" />
-        </Preference>
-        <Preference
-            android:icon="@drawable/ic_baseline_email_24"
-            android:key="email"
-            android:summary="@string/supportEmailSummary"
-            android:tint="@color/primary"
-            android:title="Get in touch">
-            <intent
-                android:action="android.intent.action.SENDTO"
-                android:data="@string/supportEmail" />
         </Preference>
         <Preference
             android:icon="@drawable/twitter_24"
