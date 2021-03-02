@@ -48,13 +48,10 @@ public class ConnectionModeDialogViewModel extends BaseDialogViewModel {
     }
 
     private int resIdToMode(int resId) {
-        switch (resId) {
-            case R.id.radioModeHttpPrivate:
-                return MessageProcessorEndpointHttp.MODE_ID;
-            case R.id.radioModeMqttPrivate:
-            default:
-                return MessageProcessorEndpointMqtt.MODE_ID;
+        if (resId == R.id.radioModeHttpPrivate) {
+            return MessageProcessorEndpointHttp.MODE_ID;
         }
+        return MessageProcessorEndpointMqtt.MODE_ID;
     }
 }
 

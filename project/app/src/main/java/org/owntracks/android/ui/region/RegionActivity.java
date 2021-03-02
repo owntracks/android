@@ -63,17 +63,16 @@ public class RegionActivity extends BaseActivity<UiRegionBinding, RegionMvvm.Vie
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.save:
-                viewModel.saveWaypoint();
-                finish();
-                return true;
-            case android.R.id.home:
-                finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        int itemId = item.getItemId();
+        if (itemId == R.id.save) {
+            viewModel.saveWaypoint();
+            finish();
+            return true;
+        } else if (itemId == android.R.id.home) {
+            finish();
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     private void conditionallyEnableSaveButton() {

@@ -192,19 +192,19 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.connect:
-                if (messageProcessor.isEndpointConfigurationComplete()) {
-                    messageProcessor.reconnect();
-                } else {
-                    Toast.makeText(this, R.string.ERROR_CONFIGURATION, Toast.LENGTH_SHORT).show();
-                }
-                return true;
+        int itemId = item.getItemId();
+        if (itemId == R.id.connect) {
+            if (messageProcessor.isEndpointConfigurationComplete()) {
+                messageProcessor.reconnect();
+            } else {
+                Toast.makeText(this, R.string.ERROR_CONFIGURATION, Toast.LENGTH_SHORT).show();
+            }
+            return true;
+        } else if (itemId == R.id.status) {
+            startActivity(new Intent(this, StatusActivity.class));
 
-            case R.id.status:
-                startActivity(new Intent(this, StatusActivity.class));
-            default:
-                return false;
+            return false;
         }
+        return false;
     }
 }

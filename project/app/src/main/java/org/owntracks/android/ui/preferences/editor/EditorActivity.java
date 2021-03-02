@@ -75,21 +75,22 @@ public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, Edi
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.exportConfigurationFile:
-                new ExportTask(this).execute();
-                return true;
-            case R.id.importConfigurationFile:
-                showImportConfigurationFilePickerView();
-                return true;
-            case R.id.importConfigurationSingleValue:
-                showEditorView();
-                return true;
-            case R.id.restart:
-                eventBus.post(new Events.RestartApp());
-            default:
-                return false;
+        int itemId = item.getItemId();
+        if (itemId == R.id.exportConfigurationFile) {
+            new ExportTask(this).execute();
+            return true;
+        } else if (itemId == R.id.importConfigurationFile) {
+            showImportConfigurationFilePickerView();
+            return true;
+        } else if (itemId == R.id.importConfigurationSingleValue) {
+            showEditorView();
+            return true;
+        } else if (itemId == R.id.restart) {
+            eventBus.post(new Events.RestartApp());
+
+            return false;
         }
+        return false;
     }
 
     @Override
