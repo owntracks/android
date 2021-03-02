@@ -42,6 +42,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="16dp"
+            android:contentDescription="@string/exportConfiguration"
             app:srcCompat="@drawable/ic_baseline_share_24" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

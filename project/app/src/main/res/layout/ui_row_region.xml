@@ -1,19 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <data>
-        <import type="android.view.View"/>
-        <variable name="waypoint" type="org.owntracks.android.data.WaypointModel" />
+
+        <import type="android.view.View" />
+
+        <variable
+            name="waypoint"
+            type="org.owntracks.android.data.WaypointModel" />
     </data>
 
     <LinearLayout
-        android:background="?android:attr/selectableItemBackground"
         android:id="@+id/textview_container"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:background="?android:attr/selectableItemBackground"
 
-        android:padding="16dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="16dp">
 
 
         <RelativeLayout
@@ -36,24 +41,25 @@
                 style="@style/ListItemSecondary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
                 android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:textSize="12sp"
-                app:relativeTimeSpanString="@{waypoint.lastTriggered}"
-                android:visibility="@{waypoint.lastTriggered > 0}" />
+                android:visibility="@{waypoint.lastTriggered > 0}"
+                app:relativeTimeSpanString="@{waypoint.lastTriggered}" />
         </RelativeLayout>
 
 
         <TextView
             android:id="@+id/text"
+            style="@style/ListItemSecondary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:lastTransition="@{waypoint.lastTransition}"
             android:ellipsize="none"
             android:singleLine="false"
-            style="@style/ListItemSecondary"/>
+            android:textIsSelectable="true"
+            app:lastTransition="@{waypoint.lastTransition}" />
 
     </LinearLayout>
 </layout>

@@ -122,6 +122,9 @@ android {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
     buildToolsVersion = "29.0.3"
+    lintOptions {
+        disable.addAll(setOf("UnsafeExperimentalUsageError", "UnsafeExperimentalUsageWarning"))
+    }
 }
 
 kapt {

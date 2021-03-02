@@ -122,9 +122,8 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
                     try {
                         viewModel.extractPreferences(getContentFromURI(uri));
                     } catch (IOException e) {
-                        String msg = String.format("Could not extract content from %s", uri);
-                        viewModel.setError(new Exception(msg, e));
-                        Timber.e(e, msg);
+                        Timber.e(e, "URI extract failure: %s", uri);
+                        viewModel.setError(new Exception(String.format("Could not extract content from %s", uri), e));
                     }
                 } else {
                     try {
