@@ -56,7 +56,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
     private static OkHttpClient mHttpClient;
     private static final MediaType JSON  = MediaType.parse("application/json; charset=utf-8");
 
-    public static final String USERAGENT = "Owntracks/"+ BuildConfig.VERSION_CODE;
+    public static final String USERAGENT = "Owntracks-Android/"+ BuildConfig.VERSION_CODE;
     private static final String HTTPTOPIC = "owntracks/http/";
 
     private Preferences preferences;
