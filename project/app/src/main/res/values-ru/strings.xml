@@ -25,7 +25,6 @@
     <string name="title_activity_about">Информация</string>
     <string name="preferencesRepository">Исходный код</string>
     <string name="preferencesDocumentation">Документация</string>
-    <string name="preferencesTwitter" translatable="false">Twitter</string>
     <string name="preferencesEncryptionKeySummary">Ключ симметрического шифрования данных</string>
     <string name="preferencesEncryptionKey">Ключ шифрования</string>
     <string name="preferencesEncryptionKeyDialogMessage">Ключ шифрования обрезается после 32 символов.</string>
@@ -54,7 +53,6 @@
     <string name="contactDetailsTopic">Идентификатор</string>
     <string name="waypointListPlaceholder">Места еще не определены</string>
     <string name="importConfig">Импорт</string>
-    <string name="tls" translatable="false">TLS</string>
     <string name="preferencesSecurity">Безопасность</string>
     <string name="accept">Сохранить</string>
     <string name="preferencesIdentification">Идентификация</string>
@@ -80,7 +78,6 @@
     <string name="preferencesCategoryAdvancedLocator">Локатор</string>
     <string name="preferencesCategoryAdvancedEncryption">Шифрование</string>
     <string name="preferencesCategoryAdvancedMisc">Прочее</string>
-    <string name="contactDetailsTrackerId" translatable="false">Tracker ID</string>
     <string name="exportWaypointsToEndpoint">Опубликовать места</string>
     <string name="preferencesExportFailed">Не удалось экспортировать настройки</string>
     <string name="preferencesExportSuccess">Настройки экспортированы</string>
@@ -88,7 +85,6 @@
     <string name="play_services_now_available">Сервисы Google Play доступны</string>
     <string name="play_services_not_available">Сервисы Google Play недоступны</string>
     <string name="play_services_update_required">Необходимо обновить сервисы Google Play</string>
-    <string name="preferencesUrl" translatable="false">URL</string>
     <string name="mode_http_private_label">HTTP</string>
     <string name="transitionEntering">прибыл(а) в</string>
     <string name="transitionLeaving">покинул(а)</string>

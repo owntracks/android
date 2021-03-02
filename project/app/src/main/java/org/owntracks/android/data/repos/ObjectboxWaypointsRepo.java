@@ -12,6 +12,7 @@ import org.owntracks.android.data.WaypointModel_;
 import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.support.Preferences;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -66,17 +67,19 @@ public class ObjectboxWaypointsRepo extends WaypointsRepo  {
 
             String table = "WAYPOINT";
             String[] columns = {"DATE", "DESCRIPTION", "GEOFENCE_RADIUS", "GEOFENCE_LATITUDE", "GEOFENCE_LONGITUDE"};
+            List<String> columnList = Arrays.asList(columns);
 
             Cursor cursor = db.query(table, columns, null, null, null, null, null, null);
+
             try {
                 if (cursor.moveToFirst()) {
                     do {
                         try {
-                            WaypointModel w = new WaypointModel(0, cursor.getLong(cursor.getColumnIndex("DATE")),
-                                    cursor.getString(cursor.getColumnIndex("DESCRIPTION")),
-                                    cursor.getDouble(cursor.getColumnIndex("GEOFENCE_LATITUDE")),
-                                    cursor.getDouble(cursor.getColumnIndex("GEOFENCE_LONGITUDE")),
-                                    cursor.getInt(cursor.getColumnIndex("GEOFENCE_RADIUS")), 0, 0);
+                            WaypointModel w = new WaypointModel(0, cursor.getLong(columnList.indexOf("DATE")),
+                                    cursor.getString(columnList.indexOf("DESCRIPTION")),
+                                    cursor.getDouble(columnList.indexOf("GEOFENCE_LATITUDE")),
+                                    cursor.getDouble(columnList.indexOf("GEOFENCE_LONGITUDE")),
+                                    cursor.getInt(columnList.indexOf("GEOFENCE_RADIUS")), 0, 0);
 
                             Timber.v("Migration for model %s", w.toString());
                             insert_impl(w);

@@ -81,8 +81,8 @@ public class MessageProcessor {
             Scheduler scheduler,
             ServiceBridge serviceBridge,
             RunThingsOnOtherThreads runThingsOnOtherThreads,
-            Lazy<LocationProcessor> locationProcessorLazy,
-            CountingIdlingResource outgoingQueueIdlingResource
+            CountingIdlingResource outgoingQueueIdlingResource,
+            Lazy<LocationProcessor> locationProcessorLazy
     ) {
         this.applicationContext = applicationContext;
         this.preferences = preferences;

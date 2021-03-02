@@ -50,10 +50,10 @@ public class DrawerProvider {
         return activity;
     }
 
-    private PrimaryDrawerItem drawerItemForClass(AppCompatActivity activeActivity, Class<?> targetActivityClass, @StringRes int targetActivityTitleRessource, @DrawableRes int iconResource) {
+    private PrimaryDrawerItem drawerItemForClass(AppCompatActivity activeActivity, Class<?> targetActivityClass, @StringRes int targetActivityTitleResource, @DrawableRes int iconResource) {
 
         return new PrimaryDrawerItem()
-                .withName(activeActivity.getString(targetActivityTitleRessource))
+                .withName(activeActivity.getString(targetActivityTitleResource))
                 .withSelectable(false)
                 .withSelectedTextColorRes(COLOR_ICON_PRIMARY_ACTIVE)
                 .withIcon(iconResource)
