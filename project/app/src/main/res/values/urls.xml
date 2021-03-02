@@ -2,8 +2,6 @@
 <resources>
     <string name="repoUrl" translatable="false">https://github.com/owntracks/android</string>
     <string name="issueUrl" translatable="false">https://github.com/owntracks/android/issues/new</string>
-    <string name="supportEmailSummary" translatable="false">Email support@owntracks.org</string>
-    <string name="supportEmail" translatable="false">mailto:support@owntracks.org</string>
     <string name="twitterUrl" translatable="false">https://twitter.com/owntracks</string>
     <string name="documentationUrl" translatable="false">https://owntracks.org/booklet</string>
     <string name="documentationUrlAndroid" translatable="false">https://owntracks.org/booklet/features/android/</string>
