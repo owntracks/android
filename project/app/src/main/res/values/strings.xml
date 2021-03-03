@@ -182,4 +182,7 @@
     <string name="contact_image">Contact Image</string>
     <string name="preferencesRemoteConfiguration">Remote configuration</string>
     <string name="preferencesRemoteConfigurationSummary">Enable configuration to be updated remotely (requires remote commands)</string>
+    <string name="aboutLicense">License</string>
+    <string name="aboutTranslationsSummary">Currently available in 5 languages!</string>
+    <string name="aboutTranslations">Help translate this app</string>
 </resources>

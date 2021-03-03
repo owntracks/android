@@ -23,7 +23,7 @@
         android:icon="@drawable/ic_baseline_domain_verification_24"
         android:key="license"
         android:summary="Eclipse Public License 1.0 (EPL 1.0)"
-        android:title="License">
+        android:title="@string/aboutLicense">
         <intent
             android:action="android.intent.action.VIEW"
             android:data="@string/licenseUrl" />
@@ -45,6 +45,16 @@
         android:summary="@string/preferencesLicensesSummary"
         android:title="@string/preferencesLicenses"
         app:fragment="org.owntracks.android.ui.preferences.LicenseFragment" />
+
+    <Preference
+        android:icon="@drawable/ic_baseline_translate_24"
+        android:key="translation"
+        android:summary="@string/aboutTranslationsSummary"
+        android:title="@string/aboutTranslations">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="@string/translationContributionUrl" />
+    </Preference>
 
     <PreferenceCategory app:title="Feedback">
         <Preference
