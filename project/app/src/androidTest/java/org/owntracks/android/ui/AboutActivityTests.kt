@@ -74,6 +74,13 @@ class AboutActivityTests {
 
     @Test
     @AllowFlaky(attempts = 1)
+    fun translationLinkOpensSite() {
+        clickOn(R.string.aboutTranslations)
+        intended(allOf(hasAction(Intent.ACTION_VIEW), hasData(baristaRule.activityTestRule.activity.getString(R.string.translationContributionUrl))))
+    }
+    
+    @Test
+    @AllowFlaky(attempts = 1)
     fun librariesLinkListsLibraries() {
         clickOn(R.string.preferencesLicenses)
         assertDisplayed(R.string.preferencesLicenses)

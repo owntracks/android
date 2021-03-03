@@ -5,6 +5,7 @@
     <string name="twitterUrl" translatable="false">https://twitter.com/owntracks</string>
     <string name="documentationUrl" translatable="false">https://owntracks.org/booklet</string>
     <string name="documentationUrlAndroid" translatable="false">https://owntracks.org/booklet/features/android/</string>
+    <string name="translationContributionUrl" translatable="false">https://poeditor.com/join/project?hash=xe6LPP0Jnx</string>
     <string name="licenseUrl" translatable="false">https://opensource.org/licenses/EPL-1.0</string>
     <string name="changelogUrl" translatable="false">https://github.com/owntracks/android/blob/master/CHANGELOG.md</string>
 </resources>
