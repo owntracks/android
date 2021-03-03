@@ -7,5 +7,5 @@
     <string name="documentationUrlAndroid" translatable="false">https://owntracks.org/booklet/features/android/</string>
     <string name="translationContributionUrl" translatable="false">https://poeditor.com/join/project?hash=xe6LPP0Jnx</string>
     <string name="licenseUrl" translatable="false">https://opensource.org/licenses/EPL-1.0</string>
-    <string name="changelogUrl" translatable="false">https://github.com/owntracks/android/blob/master/CHANGELOG.md</string>
+    <string name="changelogUrl" translatable="false">https://raw.githubusercontent.com/owntracks/android/master/CHANGELOG.md</string>
 </resources>
