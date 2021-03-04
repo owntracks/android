@@ -94,7 +94,7 @@ android {
         isCheckAllWarnings = true
         isWarningsAsErrors = false
         isAbortOnError = false
-        disable("TypographyFractions", "TypographyQuotes", "Typos")
+        disable("TypographyFractions", "TypographyQuotes", "Typos", "UnsafeExperimentalUsageError", "UnsafeExperimentalUsageWarning")
     }
     testOptions {
         animationsDisabled = true
@@ -122,9 +122,6 @@ android {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
     buildToolsVersion = "29.0.3"
-    lintOptions {
-        disable.addAll(setOf("UnsafeExperimentalUsageError", "UnsafeExperimentalUsageWarning"))
-    }
 }
 
 kapt {
