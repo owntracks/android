@@ -9,6 +9,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.schibsted.spain.barista.interaction.BaristaClickInteractions.clickOn
+import com.schibsted.spain.barista.interaction.BaristaScrollInteractions.scrollTo
 import com.schibsted.spain.barista.rule.BaristaRule
 import com.schibsted.spain.barista.rule.flaky.AllowFlaky
 import org.hamcrest.CoreMatchers.allOf
@@ -61,6 +62,7 @@ class AboutActivityTests {
     @Test
     @AllowFlaky(attempts = 1)
     fun twitterLinkOpensSite() {
+        scrollTo(R.string.preferencesTwitter)
         clickOn(R.string.preferencesTwitter)
         intended(allOf(hasAction(Intent.ACTION_VIEW), hasData(baristaRule.activityTestRule.activity.getString(R.string.twitterUrl))))
     }
