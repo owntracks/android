@@ -115,6 +115,7 @@ android {
     }
 
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
@@ -156,14 +157,20 @@ dependencies {
 
     implementation("org.greenrobot:eventbus:3.2.0")
     implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
+
     implementation("com.squareup.okhttp3:okhttp:${okHttpVersion}")
     implementation("com.squareup.okhttp3:logging-interceptor:${okHttpVersion}")
+
     implementation("com.fasterxml.jackson.core:jackson-core:${jacksonVersion}")
     implementation("com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
-    implementation("com.jakewharton.timber:timber:4.7.1")
-    implementation("com.github.joshjdevl.libsodiumjni:libsodium-jni-aar:2.0.2")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:${jacksonVersion}")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}")
+
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${kotlinCoroutinesVersion}")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:${kotlinCoroutinesVersion}")
+
+    implementation("com.jakewharton.timber:timber:4.7.1")
+    implementation("com.github.joshjdevl.libsodiumjni:libsodium-jni-aar:2.0.2")
     implementation("org.apache.httpcomponents.core5:httpcore5:5.0.3")
     implementation("commons-codec:commons-codec:1.15")
 
@@ -207,6 +214,9 @@ dependencies {
     androidTestImplementation("androidx.test:rules:${androidxTestVersion}")
     androidTestImplementation("androidx.test:runner:${androidxTestVersion}")
     androidTestUtil("androidx.test:orchestrator:${androidxTestVersion}")
+
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.1.5")
+
 }
 
 

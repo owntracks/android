@@ -3,15 +3,19 @@ package org.owntracks.android.geocoding
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.owntracks.android.services.MessageProcessorEndpointHttp
 import timber.log.Timber
 import java.math.BigDecimal
+import java.time.Instant
 
 class OpenCageGeocoder @JvmOverloads internal constructor(private val apiKey: String, private val httpClient: OkHttpClient = OkHttpClient()) : CachingGeocoder() {
-    private val jsonMapper: ObjectMapper = ObjectMapper()
+    private val jsonMapper: ObjectMapper = ObjectMapper().registerKotlinModule().registerModule(JavaTimeModule())
+    private var quotaResetTimestamp: Instant = Instant.MIN
     override fun doLookup(latitude: BigDecimal, longitude: BigDecimal): GeocodeResult {
         val url = HttpUrl.Builder()
                 .scheme("http")
@@ -34,19 +38,33 @@ class OpenCageGeocoder @JvmOverloads internal constructor(private val apiKey: St
                 .build()
         try {
             httpClient.newCall(request).execute().use { response ->
-                if (!response.isSuccessful || response.body == null) {
-                    Timber.e("Unexpected response from Opencage: %s", response)
+                return response.body?.let {
+                    val deserializedOpenCageResponse = jsonMapper.readValue(it.string(), OpenCageResponse::class.java)
+                    Timber.d("Opencage HTTP response: %s", it.toString())
+                    when (response.code) {
+                        200 -> {
+                            return if (deserializedOpenCageResponse.formatted != null) {
+                                Timber.d("Formatted location: %s", deserializedOpenCageResponse.formatted)
+                                deserializedOpenCageResponse.formatted
+                            } else {
+                                Timber.e("No reverse geocode was received. Results in response: ${deserializedOpenCageResponse.results}")
+                                null
+                            }
+                        }
+                        402 -> {
+                            Timber.w("Opencage quota exceeded")
+                            deserializedOpenCageResponse.rate?.let { rate ->
+                                Timber.w("Not retrying Opencage requests until ${rate.reset}")
+                                quotaResetTimestamp = rate.reset
+                            }
+                            return null
+                        }
+                        else -> {
+                            Timber.e("Unexpected response from Opencage: %s", response)
+                            return null
+                        }
+                    }
                 }
-                val rs = response.body!!.string()
-                Timber.d("Opencage HTTP response: %s", rs)
-                val deserializedOpenCageResponse = jsonMapper.readValue(rs, OpenCageResponse::class.java)
-                if (deserializedOpenCageResponse.formatted == null) {
-                    Timber.e("No reverse geocode was received. Results in response: ${deserializedOpenCageResponse.results}")
-                    return GeocodeResult.Empty
-                }
-                val formattedLocation = deserializedOpenCageResponse.formatted!!
-                Timber.d("Formatted location: %s", formattedLocation)
-                return GeocodeResult.Formatted(formattedLocation)
             }
         } catch (e: Exception) {
             Timber.e(e, "Error reverse geocoding from opencage")
@@ -68,8 +86,13 @@ class OpenCageGeocoder @JvmOverloads internal constructor(private val apiKey: St
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     internal class OpenCageResponse {
+        val rate: Rate? = null
         val results: List<OpenCageResult>? = null
         val formatted: String?
             get() = if (results != null && results.isNotEmpty()) results[0].formatted else null
+
+
     }
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    internal data class Rate(val limit: Int, val remaining: Int, val reset: Instant)
 }

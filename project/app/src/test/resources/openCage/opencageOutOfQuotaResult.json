@@ -1,0 +1,30 @@
+{
+  "documentation": "https://opencagedata.com/api",
+  "licenses": [
+    {
+      "name": "see attribution guide",
+      "url": "https://opencagedata.com/credits"
+    }
+  ],
+  "rate": {
+    "limit": 2500,
+    "remaining": 0,
+    "reset": 1614902400
+  },
+  "results": [],
+  "status": {
+    "become_a_customer": "https://opencagedata.com/pricing",
+    "code": 402,
+    "message": "quota exceeded"
+  },
+  "stay_informed": {
+    "blog": "https://blog.opencagedata.com",
+    "twitter": "https://twitter.com/OpenCage"
+  },
+  "thanks": "For using an OpenCage API",
+  "timestamp": {
+    "created_http": "Thu, 04 Mar 2021 18:50:46 GMT",
+    "created_unix": 1614883846
+  },
+  "total_results": 0
+}
