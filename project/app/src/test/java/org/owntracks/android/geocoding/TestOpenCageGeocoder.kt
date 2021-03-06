@@ -30,6 +30,7 @@ class TestOpenCageGeocoder {
         val geocoder = OpenCageGeocoder("", httpClient)
 
         val response = geocoder.reverse(0.0, 0.0)
-        assertEquals("Friedrich-Ebert-Straße 7, 48153 Münster, Germany", response)
+        assert(response is GeocodeResult.Formatted)
+        assertEquals("Friedrich-Ebert-Straße 7, 48153 Münster, Germany", (response as GeocodeResult.Formatted).text)
     }
 }

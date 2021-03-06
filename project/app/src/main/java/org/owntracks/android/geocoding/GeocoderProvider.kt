@@ -9,13 +9,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.owntracks.android.R
 import org.owntracks.android.injection.qualifier.AppContext
-import javax.inject.Singleton
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.support.Preferences
 import org.owntracks.android.support.preferences.OnModeChangedPreferenceChangedListener
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 class GeocoderProvider @Inject constructor(@AppContext val context: Context, val preferences: Preferences) {
@@ -30,7 +30,7 @@ class GeocoderProvider @Inject constructor(@AppContext val context: Context, val
         }
     }
 
-    private suspend fun geocoderResolve(messageLocation: MessageLocation): String? {
+    private suspend fun geocoderResolve(messageLocation: MessageLocation): GeocodeResult {
         return withContext(Dispatchers.IO) {
             return@withContext geocoder.reverse(messageLocation.latitude, messageLocation.longitude)
         }
@@ -42,7 +42,11 @@ class GeocoderProvider @Inject constructor(@AppContext val context: Context, val
         }
         GlobalScope.launch {
             val result = geocoderResolve(messageLocation)
-            messageLocation.geocode = result
+            messageLocation.geocode = when(result) {
+                GeocodeResult.Empty -> null
+                is GeocodeResult.Error -> null
+                is GeocodeResult.Formatted -> result.text
+            }
         }
     }
 
@@ -53,7 +57,11 @@ class GeocoderProvider @Inject constructor(@AppContext val context: Context, val
         }
         GlobalScope.launch {
             val result = geocoderResolve(messageLocation)
-            messageLocation.geocode = result
+            messageLocation.geocode = when(result) {
+                GeocodeResult.Empty -> null
+                is GeocodeResult.Error -> null
+                is GeocodeResult.Formatted -> result.text
+            }
             backgroundService.onGeocodingProviderResult(messageLocation)
         }
     }
@@ -66,7 +74,11 @@ class GeocoderProvider @Inject constructor(@AppContext val context: Context, val
         textView.text = messageLocation.fallbackGeocode // will print lat, lon until GeocodingProvider is available
         GlobalScope.launch {
             val result = geocoderResolve(messageLocation)
-            messageLocation.geocode = result
+            messageLocation.geocode = when(result) {
+                GeocodeResult.Empty -> null
+                is GeocodeResult.Error -> null
+                is GeocodeResult.Formatted -> result.text
+            }
             textView.text = messageLocation.geocode
         }
     }
@@ -85,4 +97,10 @@ class GeocoderProvider @Inject constructor(@AppContext val context: Context, val
             }
         })
     }
+}
+
+sealed class GeocodeResult {
+    data class Formatted(val text: String) : GeocodeResult()
+    object Empty : GeocodeResult()
+    data class Error(val text: String) : GeocodeResult()
 }
