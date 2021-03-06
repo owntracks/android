@@ -12,7 +12,7 @@ import java.math.BigDecimal
 
 class OpenCageGeocoder @JvmOverloads internal constructor(private val apiKey: String, private val httpClient: OkHttpClient = OkHttpClient()) : CachingGeocoder() {
     private val jsonMapper: ObjectMapper = ObjectMapper()
-    override fun doLookup(latitude: BigDecimal, longitude: BigDecimal): String? {
+    override fun doLookup(latitude: BigDecimal, longitude: BigDecimal): GeocodeResult {
         val url = HttpUrl.Builder()
                 .scheme("http")
                 .host(OPENCAGE_HOST)
@@ -42,15 +42,15 @@ class OpenCageGeocoder @JvmOverloads internal constructor(private val apiKey: St
                 val deserializedOpenCageResponse = jsonMapper.readValue(rs, OpenCageResponse::class.java)
                 if (deserializedOpenCageResponse.formatted == null) {
                     Timber.e("No reverse geocode was received. Results in response: ${deserializedOpenCageResponse.results}")
-                    return null
+                    return GeocodeResult.Empty
                 }
                 val formattedLocation = deserializedOpenCageResponse.formatted!!
                 Timber.d("Formatted location: %s", formattedLocation)
-                return formattedLocation
+                return GeocodeResult.Formatted(formattedLocation)
             }
         } catch (e: Exception) {
             Timber.e(e, "Error reverse geocoding from opencage")
-            return null
+            return GeocodeResult.Error("Error reverse geocoding from opencage")
         }
     }
 

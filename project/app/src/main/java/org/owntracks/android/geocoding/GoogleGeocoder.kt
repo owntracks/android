@@ -10,15 +10,14 @@ import java.util.*
 class GoogleGeocoder internal constructor(@AppContext context: Context?) : CachingGeocoder() {
     private val geocoder: android.location.Geocoder = android.location.Geocoder(context, Locale.getDefault())
 
-    override fun reverse(latitude: Double, longitude: Double): String? {
+    override fun reverse(latitude: Double, longitude: Double): GeocodeResult {
         if (!geocoderAvailable()) {
-            Timber.e("geocoder is not present")
-            return null
+            return GeocodeResult.Error("Google geocoder is not available")
         }
         return super.reverse(latitude, longitude)
     }
 
-    override fun doLookup(latitude: BigDecimal, longitude: BigDecimal): String? {
+    override fun doLookup(latitude: BigDecimal, longitude: BigDecimal): GeocodeResult {
         val addresses: List<Address>?
         return try {
             addresses = geocoder.getFromLocation(latitude.toDouble(), longitude.toDouble(), 1)
@@ -27,12 +26,12 @@ class GoogleGeocoder internal constructor(@AppContext context: Context?) : Cachi
                 val a = addresses[0]
                 if (a.getAddressLine(0) != null) g.append(a.getAddressLine(0))
                 Timber.d("Resolved $latitude,$longitude to $g")
-                g.toString()
+                GeocodeResult.Formatted(g.toString())
             } else {
-                "not available"
+                GeocodeResult.Empty
             }
         } catch (e: Exception) {
-            null
+            GeocodeResult.Error(e.toString())
         }
     }
 
