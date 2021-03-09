@@ -1,7 +1,6 @@
 package org.owntracks.android.services;
 
 import android.location.Location;
-import android.os.Build;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -11,7 +10,6 @@ import com.google.android.gms.location.Geofence;
 import org.owntracks.android.data.WaypointModel;
 import org.owntracks.android.data.repos.LocationRepo;
 import org.owntracks.android.data.repos.WaypointsRepo;
-import javax.inject.Singleton;
 import org.owntracks.android.model.messages.MessageLocation;
 import org.owntracks.android.model.messages.MessageTransition;
 import org.owntracks.android.model.messages.MessageWaypoint;
@@ -25,6 +23,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import timber.log.Timber;
 
@@ -88,20 +87,8 @@ public class LocationProcessor {
             return;
         }
 
-        MessageLocation message = new MessageLocation();
-        message.setLatitude(currentLocation.getLatitude());
-        message.setLongitude(currentLocation.getLongitude());
-        message.setAltitude((int)currentLocation.getAltitude());
-        message.setAccuracy(Math.round(currentLocation.getAccuracy()));
-        if (currentLocation.hasSpeed()) {
-            message.setVelocity((int)(currentLocation.getSpeed() * 3.6)); // Convert m/s to km/h
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && currentLocation.hasVerticalAccuracy()) {
-            message.setVerticalAccuracy((int)currentLocation.getVerticalAccuracyMeters());
-        }
+        MessageLocation message = MessageLocation.fromLocation(currentLocation);
         message.setTrigger(trigger);
-
-        message.setTimestamp(TimeUnit.MILLISECONDS.toSeconds(currentLocation.getTime()));
 
         message.setTrackerId(preferences.getTrackerId(true));
         message.setInregions(calculateInregions(loadedWaypoints));

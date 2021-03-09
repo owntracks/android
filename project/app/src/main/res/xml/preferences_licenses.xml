@@ -4,8 +4,8 @@
     app:title="@string/preferencesLicenses">
     <Preference
         android:key="dagger"
-        android:title="Dagger"
         android:summary="Google"
+        android:title="Dagger"
         app:iconSpaceReserved="false">
         <intent
             android:action="android.intent.action.VIEW"
@@ -13,8 +13,8 @@
     </Preference>
     <Preference
         android:key="eclipse-paho"
-        android:title="Paho MQTTv3.1 Java Client"
         android:summary="Eclipse Foundation"
+        android:title="Paho MQTTv3.1 Java Client"
         app:iconSpaceReserved="false">
         <intent
             android:action="android.intent.action.VIEW"
@@ -22,8 +22,8 @@
     </Preference>
     <Preference
         android:key="greenrobot-eventbus"
-        android:title="EventBus"
         android:summary="Greenrobot"
+        android:title="EventBus"
         app:iconSpaceReserved="false">
         <intent
             android:action="android.intent.action.VIEW"
@@ -31,8 +31,8 @@
     </Preference>
     <Preference
         android:key="greenrobot-greendao"
-        android:title="GreenDao"
         android:summary="Greenrobot"
+        android:title="GreenDao"
         app:iconSpaceReserved="false">
         <intent
             android:action="android.intent.action.VIEW"
@@ -40,8 +40,8 @@
     </Preference>
     <Preference
         android:key="jackson"
-        android:title="Jackson"
         android:summary="Fasterxml"
+        android:title="Jackson"
         app:iconSpaceReserved="false">
         <intent
             android:action="android.intent.action.VIEW"
@@ -49,8 +49,8 @@
     </Preference>
     <Preference
         android:key="libsodium-jno"
-        android:title="Libsodium cryptography library JNI bindings"
         android:summary="joshjdevl"
+        android:title="Libsodium cryptography library JNI bindings"
         app:iconSpaceReserved="false">
         <intent
             android:action="android.intent.action.VIEW"
@@ -58,8 +58,8 @@
     </Preference>
     <Preference
         android:key="mikepenz-materialdrawer"
-        android:title="MaterialDrawer"
         android:summary="Mikepenz"
+        android:title="MaterialDrawer"
         app:iconSpaceReserved="false">
         <intent
             android:action="android.intent.action.VIEW"
@@ -67,8 +67,8 @@
     </Preference>
     <Preference
         android:key="mikepenz-materialize"
-        android:title="Materialize"
         android:summary="Mikepenz"
+        android:title="Materialize"
         app:iconSpaceReserved="false">
         <intent
             android:action="android.intent.action.VIEW"
@@ -76,8 +76,8 @@
     </Preference>
     <Preference
         android:key="objectbox"
-        android:title="ObjectBox"
         android:summary="ObjectBox"
+        android:title="ObjectBox"
         app:iconSpaceReserved="false">
         <intent
             android:action="android.intent.action.VIEW"
@@ -85,8 +85,8 @@
     </Preference>
     <Preference
         android:key="okhttp"
-        android:title="Okhttp3"
         android:summary="Square"
+        android:title="Okhttp3"
         app:iconSpaceReserved="false">
         <intent
             android:action="android.intent.action.VIEW"
@@ -94,8 +94,8 @@
     </Preference>
     <Preference
         android:key="rengwuxian-materialedittext"
-        android:title="MaterialEditText"
         android:summary="Rengwuxian"
+        android:title="MaterialEditText"
         app:iconSpaceReserved="false">
         <intent
             android:action="android.intent.action.VIEW"
@@ -103,11 +103,20 @@
     </Preference>
     <Preference
         android:key="timber"
-        android:title="Timber"
         android:summary="Jacke Wharton"
+        android:title="Timber"
         app:iconSpaceReserved="false">
         <intent
             android:action="android.intent.action.VIEW"
             android:data="https://github.com/JakeWharton/timber" />
+    </Preference>
+    <Preference
+        android:key="opencage"
+        android:summary="Reverse Geocoding API"
+        android:title="OpenCage Geocoder"
+        app:iconSpaceReserved="false">
+        <Intent
+            android:action="android.intent.action.VIEW"
+            android:data="https://opencagedata.com/credits" />
     </Preference>
 </PreferenceScreen>

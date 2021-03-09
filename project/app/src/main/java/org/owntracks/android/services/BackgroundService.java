@@ -47,13 +47,13 @@ import org.owntracks.android.data.WaypointModel;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.data.repos.LocationRepo;
 import org.owntracks.android.data.repos.WaypointsRepo;
+import org.owntracks.android.geocoding.GeocoderProvider;
+import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.model.messages.MessageLocation;
 import org.owntracks.android.model.messages.MessageTransition;
-import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.DateFormatter;
 import org.owntracks.android.support.Events;
-import org.owntracks.android.geocoding.GeocoderProvider;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.ServiceBridge;
@@ -644,12 +644,16 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
 
     @SuppressWarnings("unused")
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void onEvent(MessageLocation m) {
-        Timber.d("MessageLocation received %s, %s, outgoing: %s", m, lastLocationMessage, !m.isIncoming());
-        if (lastLocationMessage == null || lastLocationMessage.getTimestamp() <= m.getTimestamp()) {
-            this.lastLocationMessage = m;
+    public void onEvent(MessageLocation messageLocation) {
+
+    }
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    public void onEvent(Location location) {
+        MessageLocation messageLocation = MessageLocation.fromLocation(location);
+        if (lastLocationMessage == null || lastLocationMessage.getTimestamp() < messageLocation.getTimestamp()) {
+            this.lastLocationMessage = messageLocation;
             updateOngoingNotification();
-            geocoderProvider.resolve(m, this);
+            geocoderProvider.resolve(messageLocation, this);
         }
     }
 

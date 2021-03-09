@@ -1,0 +1,25 @@
+{
+  "documentation": "https://opencagedata.com/api",
+  "licenses": [
+    {
+      "name": "see attribution guide",
+      "url": "https://opencagedata.com/credits"
+    }
+  ],
+  "results": [],
+  "status": {
+    "code": 403,
+    "message": "disabled"
+  },
+  "stay_informed": {
+    "blog": "https://blog.opencagedata.com",
+    "twitter": "https://twitter.com/OpenCage"
+  },
+  "thanks": "For using an OpenCage API",
+  "timestamp": {
+    "created_http": "Mon, 08 Mar 2021 15:31:00 GMT",
+    "created_unix": 1615217460
+  },
+  "total_results": 0
+}
+
