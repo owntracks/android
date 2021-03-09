@@ -115,7 +115,7 @@
         android:summary="Reverse Geocoding API"
         android:title="OpenCage Geocoder"
         app:iconSpaceReserved="false">
-        <Intent
+        <intent
             android:action="android.intent.action.VIEW"
             android:data="https://opencagedata.com/credits" />
     </Preference>
