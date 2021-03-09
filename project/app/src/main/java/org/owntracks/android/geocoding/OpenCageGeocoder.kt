@@ -50,6 +50,12 @@ class OpenCageGeocoder @JvmOverloads internal constructor(private val apiKey: St
                         return deserializedOpenCageResponse.formatted?.let { GeocodeResult.Formatted(it) }
                                 ?: GeocodeResult.Empty
                     }
+                    401 -> {
+                        val deserializedOpenCageResponse = jsonMapper.readValue(responseBody, OpenCageResponse::class.java)
+                        quotaResetTimestamp = Instant.now().plus(1, ChronoUnit.MINUTES)
+                        GeocodeResult.Error(deserializedOpenCageResponse.status?.message
+                                ?: "No error message provided")
+                    }
                     402 -> {
                         val deserializedOpenCageResponse = jsonMapper.readValue(responseBody, OpenCageResponse::class.java)
                         Timber.d("Opencage HTTP response: %s", responseBody)
@@ -62,6 +68,8 @@ class OpenCageGeocoder @JvmOverloads internal constructor(private val apiKey: St
                     }
                     403 -> {
                         val deserializedOpenCageResponse = jsonMapper.readValue(responseBody, OpenCageResponse::class.java)
+                        Timber.e(responseBody)
+                        quotaResetTimestamp = Instant.now().plus(1, ChronoUnit.MINUTES)
                         if (deserializedOpenCageResponse.status?.message == "IP address rejected") {
                             GeocodeResult.IPAddressRejected
                         } else {
