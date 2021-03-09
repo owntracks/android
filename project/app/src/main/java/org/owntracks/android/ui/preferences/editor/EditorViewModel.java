@@ -19,6 +19,8 @@ import java.io.IOException;
 
 import javax.inject.Inject;
 
+import timber.log.Timber;
+
 
 @PerActivity
 public class EditorViewModel extends BaseViewModel<EditorMvvm.View> implements EditorMvvm.ViewModel<EditorMvvm.View> {
@@ -48,6 +50,7 @@ public class EditorViewModel extends BaseViewModel<EditorMvvm.View> implements E
             message.set(preferences.getPreferenceKey(R.string.preferenceKeyPassword), "********");
             setEffectiveConfiguration(parser.toJsonPlainPretty(message));
         } catch (IOException e) {
+            Timber.e(e);
             getView().displayLoadFailed();
         }
     }

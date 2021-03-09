@@ -238,7 +238,7 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
     var openCageGeocoderApiKey: String
         get() = getStringOrDefault(R.string.preferenceKeyOpencageGeocoderApiKey, R.string.valEmpty)
         set(key) {
-            setString(R.string.preferenceKeyOpencageGeocoderApiKey, key.trim { it <= ' ' })
+            setString(R.string.preferenceKeyOpencageGeocoderApiKey, key.trim())
         }
 
     @get:Export(keyResId = R.string.preferenceKeyRemoteCommand, exportModeMqtt = true, exportModeHttp = true)

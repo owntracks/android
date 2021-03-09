@@ -32,9 +32,16 @@ class AdvancedFragment : AbstractPreferenceFragment() {
         geocoderDropDownPreference?.setOnPreferenceChangeListener { _, newValue ->
             preferences.reverseGeocodeProvider = newValue.toString()
             setOpenCageAPIKeyPreferenceVisibility()
-            true
+            false
         }
         setOpenCageAPIKeyPreferenceVisibility()
+
+        findPreference<EditTextPreference>(getString(R.string.preferenceKeyOpencageGeocoderApiKey))?.setOnPreferenceChangeListener { preference, newValue ->
+            val trimmed = (newValue as String).trim()
+            preferences.openCageGeocoderApiKey = trimmed
+            (preference as EditTextPreference).text = trimmed
+            false
+        }
     }
 
     private fun setOpenCageAPIKeyPreferenceVisibility() {
