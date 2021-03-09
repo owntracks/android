@@ -1,8 +1,14 @@
 package org.owntracks.android.geocoding
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.widget.TextView
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -13,12 +19,18 @@ import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.support.Preferences
 import org.owntracks.android.support.preferences.OnModeChangedPreferenceChangedListener
+import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber
+import java.time.Instant
+import java.time.ZoneOffset.UTC
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class GeocoderProvider @Inject constructor(@AppContext val context: Context, val preferences: Preferences) {
+    private var lastRateLimitedNotificationTime: Instant? = null
+    private var notificationManager: NotificationManagerCompat
     private lateinit var geocoder: Geocoder
 
     private fun setGeocoderProvider(@AppContext context: Context, preferences: Preferences) {
@@ -42,13 +54,50 @@ class GeocoderProvider @Inject constructor(@AppContext val context: Context, val
         }
         GlobalScope.launch {
             val result = geocoderResolve(messageLocation)
-            messageLocation.geocode = when(result) {
-                GeocodeResult.Empty -> null
-                is GeocodeResult.Error -> null
-                is GeocodeResult.Formatted -> result.text
-            }
+            messageLocation.geocode = geocodeResultToText(result)
+            maybeCreateErrorNotification(result)
         }
     }
+
+    private fun maybeCreateErrorNotification(result: GeocodeResult) {
+        if (result is GeocodeResult.Formatted || result is GeocodeResult.Empty) {
+            return
+        }
+        val errorNotificationText = when (result) {
+            is GeocodeResult.Error -> context.getString(R.string.geocoderError).format(result.message)
+            GeocodeResult.Disabled -> context.getString(R.string.geocoderDisabled)
+            GeocodeResult.IPAddressRejected -> context.getString(R.string.geocoderIPAddressRejected)
+            is GeocodeResult.RateLimited -> context.getString(R.string.geocoderRateLimited).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(UTC).format(result.until))
+            else -> ""
+        }
+
+        if (result is GeocodeResult.RateLimited && result.until == lastRateLimitedNotificationTime) {
+            return
+        }
+        if (result is GeocodeResult.RateLimited) {
+            lastRateLimitedNotificationTime = result.until
+        }
+
+        val activityLaunchIntent = Intent(this.context, MapActivity::class.java)
+        activityLaunchIntent.action = "android.intent.action.MAIN"
+        activityLaunchIntent.addCategory("android.intent.category.LAUNCHER")
+        activityLaunchIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+        val notification = NotificationCompat.Builder(context, ERROR_NOTIFICATION_CHANNEL_ID)
+                .setContentTitle(context.getString(R.string.geocoderProblemNotificationTitle))
+                .setContentText(errorNotificationText)
+                .setAutoCancel(true)
+                .setSmallIcon(R.drawable.ic_owntracks_80)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(errorNotificationText))
+                .setContentIntent(PendingIntent.getActivity(context, 0, activityLaunchIntent, PendingIntent.FLAG_UPDATE_CURRENT))
+                .build()
+        notificationManager.notify(0, notification)
+    }
+
+    private fun geocodeResultToText(result: GeocodeResult) =
+            when (result) {
+                is GeocodeResult.Formatted -> result.text
+                else -> null
+            }
 
     fun resolve(messageLocation: MessageLocation, backgroundService: BackgroundService) {
         if (messageLocation.hasGeocode) {
@@ -57,12 +106,9 @@ class GeocoderProvider @Inject constructor(@AppContext val context: Context, val
         }
         GlobalScope.launch {
             val result = geocoderResolve(messageLocation)
-            messageLocation.geocode = when(result) {
-                GeocodeResult.Empty -> null
-                is GeocodeResult.Error -> null
-                is GeocodeResult.Formatted -> result.text
-            }
+            messageLocation.geocode = geocodeResultToText(result)
             backgroundService.onGeocodingProviderResult(messageLocation)
+            maybeCreateErrorNotification(result)
         }
     }
 
@@ -74,12 +120,9 @@ class GeocoderProvider @Inject constructor(@AppContext val context: Context, val
         textView.text = messageLocation.fallbackGeocode // will print lat, lon until GeocodingProvider is available
         GlobalScope.launch {
             val result = geocoderResolve(messageLocation)
-            messageLocation.geocode = when(result) {
-                GeocodeResult.Empty -> null
-                is GeocodeResult.Error -> null
-                is GeocodeResult.Formatted -> result.text
-            }
+            messageLocation.geocode = geocodeResultToText(result)
             textView.text = messageLocation.geocode
+            maybeCreateErrorNotification(result)
         }
     }
 
@@ -96,11 +139,16 @@ class GeocoderProvider @Inject constructor(@AppContext val context: Context, val
                 }
             }
         })
+        notificationManager = NotificationManagerCompat.from(context)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            notificationManager.createNotificationChannel(
+                    NotificationChannel(ERROR_NOTIFICATION_CHANNEL_ID, context.getString(R.string.notificationChannelErrors), NotificationManager.IMPORTANCE_DEFAULT)
+            )
+        }
+    }
+
+    companion object {
+        const val ERROR_NOTIFICATION_CHANNEL_ID = "Errors"
     }
 }
 
-sealed class GeocodeResult {
-    data class Formatted(val text: String) : GeocodeResult()
-    object Empty : GeocodeResult()
-    data class Error(val text: String) : GeocodeResult()
-}

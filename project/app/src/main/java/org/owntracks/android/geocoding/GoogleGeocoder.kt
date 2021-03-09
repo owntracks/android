@@ -11,10 +11,11 @@ class GoogleGeocoder internal constructor(@AppContext context: Context?) : Cachi
     private val geocoder: android.location.Geocoder = android.location.Geocoder(context, Locale.getDefault())
 
     override fun reverse(latitude: Double, longitude: Double): GeocodeResult {
-        if (!geocoderAvailable()) {
-            return GeocodeResult.Error("Google geocoder is not available")
+        return if (geocoderAvailable()) {
+            super.reverse(latitude, longitude)
+        } else {
+            GeocodeResult.Unavailable
         }
-        return super.reverse(latitude, longitude)
     }
 
     override fun doLookup(latitude: BigDecimal, longitude: BigDecimal): GeocodeResult {

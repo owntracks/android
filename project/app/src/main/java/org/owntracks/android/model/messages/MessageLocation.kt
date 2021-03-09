@@ -1,10 +1,14 @@
 package org.owntracks.android.model.messages
 
+import android.location.Location
+import android.os.Build
 import com.fasterxml.jackson.annotation.*
 import org.owntracks.android.model.BatteryStatus
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.support.Preferences
 import java.lang.ref.WeakReference
+import java.util.concurrent.TimeUnit
+import kotlin.math.roundToInt
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -104,6 +108,23 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
     }
 
     companion object {
+        @JvmStatic
+        fun fromLocation(location: Location): MessageLocation {
+            val message = MessageLocation()
+            message.latitude = location.latitude
+            message.longitude = location.longitude
+            message.altitude = location.altitude.roundToInt()
+            message.accuracy = location.accuracy.roundToInt()
+            if (location.hasSpeed()) {
+                message.velocity = ((location.speed * 3.6).toInt()) // Convert m/s to km/h
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && location.hasVerticalAccuracy()) {
+                message.verticalAccuracy = location.verticalAccuracyMeters.toInt()
+            }
+            message.timestamp = TimeUnit.MILLISECONDS.toSeconds(location.time)
+            return message
+        }
+
         const val TYPE = "location"
         const val REPORT_TYPE_USER = "u"
         const val REPORT_TYPE_RESPONSE = "r"
