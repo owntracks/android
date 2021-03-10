@@ -69,7 +69,7 @@
             app:key="@string/preferenceKeyAutostartOnBoot"
             app:summary="@string/preferencesAutostartSummary"
             app:title="@string/preferencesAutostart" />
-        <DropDownPreference
+        <androidx.preference.ListPreference
             app:key="@string/preferenceKeyReverseGeocodeProvider"
             app:iconSpaceReserved="false"
             app:title="@string/preferencesReverseGeocodeProvider"

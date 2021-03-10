@@ -1,10 +1,7 @@
 package org.owntracks.android.ui.preferences
 
 import android.os.Bundle
-import androidx.preference.DropDownPreference
-import androidx.preference.EditTextPreference
-import androidx.preference.Preference
-import androidx.preference.SwitchPreferenceCompat
+import androidx.preference.*
 import org.owntracks.android.R
 import org.owntracks.android.injection.scopes.PerFragment
 import org.owntracks.android.support.Preferences
@@ -28,7 +25,7 @@ class AdvancedFragment : AbstractPreferenceFragment() {
         remoteConfigurationPreference?.onPreferenceChangeListener = remoteCommandAndConfigurationChangeListener
         remoteCommandPreference?.onPreferenceChangeListener = remoteCommandAndConfigurationChangeListener
 
-        val geocoderDropDownPreference = findPreference<DropDownPreference>(getString(R.string.preferenceKeyReverseGeocodeProvider))
+        val geocoderDropDownPreference = findPreference<ListPreference>(getString(R.string.preferenceKeyReverseGeocodeProvider))
         geocoderDropDownPreference?.setOnPreferenceChangeListener { _, newValue ->
             preferences.reverseGeocodeProvider = newValue.toString()
             setOpenCageAPIKeyPreferenceVisibility()
