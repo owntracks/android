@@ -115,7 +115,6 @@ android {
     }
 
     compileOptions {
-        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
@@ -214,9 +213,6 @@ dependencies {
     androidTestImplementation("androidx.test:rules:${androidxTestVersion}")
     androidTestImplementation("androidx.test:runner:${androidxTestVersion}")
     androidTestUtil("androidx.test:orchestrator:${androidxTestVersion}")
-
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.1.5")
-
 }
 
 
