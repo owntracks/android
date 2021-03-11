@@ -9,6 +9,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -280,11 +281,11 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel<Ma
             checkAndRequestLocationPermissions();
         }
         fusedLocationClient.requestLocationUpdates(
-                new LocationRequest()
+                LocationRequest.create()
                         .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                         .setInterval(TimeUnit.SECONDS.toMillis(5)),
                 locationRepoUpdaterCallback,
-                null
+                Looper.getMainLooper()
         ).addOnCompleteListener(task ->
                 Timber.i("Requested foreground location updates. isSuccessful: %s isCancelled: %s", task.isSuccessful(), task.isCanceled())
         );
