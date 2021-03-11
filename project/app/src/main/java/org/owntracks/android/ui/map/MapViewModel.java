@@ -246,7 +246,6 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
 
     @Subscribe(threadMode = ThreadMode.MAIN, priority = 1, sticky = true)
     public void onEvent(@NonNull Location location) {
-        Timber.v("location source updated");
         this.location = location;
         getView().enableLocationMenus();
         locationIdlingResource.setIdleState(true);

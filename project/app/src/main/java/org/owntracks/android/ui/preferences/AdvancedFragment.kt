@@ -1,7 +1,10 @@
 package org.owntracks.android.ui.preferences
 
 import android.os.Bundle
-import androidx.preference.*
+import androidx.preference.EditTextPreference
+import androidx.preference.ListPreference
+import androidx.preference.Preference
+import androidx.preference.SwitchPreferenceCompat
 import org.owntracks.android.R
 import org.owntracks.android.injection.scopes.PerFragment
 import org.owntracks.android.support.Preferences
@@ -29,7 +32,7 @@ class AdvancedFragment : AbstractPreferenceFragment() {
         geocoderDropDownPreference?.setOnPreferenceChangeListener { _, newValue ->
             preferences.reverseGeocodeProvider = newValue.toString()
             setOpenCageAPIKeyPreferenceVisibility()
-            false
+            true
         }
         setOpenCageAPIKeyPreferenceVisibility()
 
