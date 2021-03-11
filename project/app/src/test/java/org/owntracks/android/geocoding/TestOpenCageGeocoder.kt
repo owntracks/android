@@ -9,8 +9,8 @@ import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Test
-import java.time.Instant
-import java.time.temporal.ChronoUnit
+import org.threeten.bp.Instant
+import org.threeten.bp.temporal.ChronoUnit
 
 class TestOpenCageGeocoder {
     @Test

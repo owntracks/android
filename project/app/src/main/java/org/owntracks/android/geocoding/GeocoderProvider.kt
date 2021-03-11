@@ -20,10 +20,10 @@ import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.support.Preferences
 import org.owntracks.android.support.preferences.OnModeChangedPreferenceChangedListener
 import org.owntracks.android.ui.map.MapActivity
+import org.threeten.bp.Instant
+import org.threeten.bp.ZoneOffset.UTC
+import org.threeten.bp.format.DateTimeFormatter
 import timber.log.Timber
-import java.time.Instant
-import java.time.ZoneOffset.UTC
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -61,21 +61,28 @@ class GeocoderProvider @Inject constructor(@AppContext val context: Context, val
 
     private fun maybeCreateErrorNotification(result: GeocodeResult) {
         if (result is GeocodeResult.Formatted || result is GeocodeResult.Empty) {
+            notificationManager.cancel(GEOCODE_ERROR_NOTIFICATION_TAG, 0)
             return
         }
         val errorNotificationText = when (result) {
             is GeocodeResult.Error -> context.getString(R.string.geocoderError).format(result.message)
-            GeocodeResult.Disabled -> context.getString(R.string.geocoderDisabled)
-            GeocodeResult.IPAddressRejected -> context.getString(R.string.geocoderIPAddressRejected)
+            is GeocodeResult.Disabled -> context.getString(R.string.geocoderDisabled)
+            is GeocodeResult.IPAddressRejected -> context.getString(R.string.geocoderIPAddressRejected)
             is GeocodeResult.RateLimited -> context.getString(R.string.geocoderRateLimited).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(UTC).format(result.until))
             else -> ""
         }
-
-        if (result is GeocodeResult.RateLimited && result.until == lastRateLimitedNotificationTime) {
-            return
+        val until = when (result) {
+            is GeocodeResult.Error -> result.until
+            is GeocodeResult.Disabled -> result.until
+            is GeocodeResult.IPAddressRejected -> result.until
+            is GeocodeResult.RateLimited -> result.until
+            else -> Instant.MIN
         }
-        if (result is GeocodeResult.RateLimited) {
-            lastRateLimitedNotificationTime = result.until
+
+        if (until == lastRateLimitedNotificationTime) {
+            return
+        } else {
+            lastRateLimitedNotificationTime = until
         }
 
         val activityLaunchIntent = Intent(this.context, MapActivity::class.java)
@@ -90,7 +97,8 @@ class GeocoderProvider @Inject constructor(@AppContext val context: Context, val
                 .setStyle(NotificationCompat.BigTextStyle().bigText(errorNotificationText))
                 .setContentIntent(PendingIntent.getActivity(context, 0, activityLaunchIntent, PendingIntent.FLAG_UPDATE_CURRENT))
                 .build()
-        notificationManager.notify(0, notification)
+
+        notificationManager.notify(GEOCODE_ERROR_NOTIFICATION_TAG, 0, notification)
     }
 
     private fun geocodeResultToText(result: GeocodeResult) =
@@ -149,6 +157,7 @@ class GeocoderProvider @Inject constructor(@AppContext val context: Context, val
 
     companion object {
         const val ERROR_NOTIFICATION_CHANNEL_ID = "Errors"
+        const val GEOCODE_ERROR_NOTIFICATION_TAG = "GeocoderError"
     }
 }
 

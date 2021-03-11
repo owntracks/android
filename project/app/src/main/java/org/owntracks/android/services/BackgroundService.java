@@ -652,7 +652,6 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         MessageLocation messageLocation = MessageLocation.fromLocation(location);
         if (lastLocationMessage == null || lastLocationMessage.getTimestamp() < messageLocation.getTimestamp()) {
             this.lastLocationMessage = messageLocation;
-            updateOngoingNotification();
             geocoderProvider.resolve(messageLocation, this);
         }
     }

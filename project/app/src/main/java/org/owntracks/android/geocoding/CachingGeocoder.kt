@@ -9,6 +9,7 @@ import java.math.RoundingMode
 abstract class CachingGeocoder : Geocoder {
     private val cache = GeocoderLRUCache(40)
 
+    @Synchronized
     override fun reverse(latitude: Double, longitude: Double): GeocodeResult {
         val result = cache.computeAndOnlyStoreNonErrors(
                 Pair(

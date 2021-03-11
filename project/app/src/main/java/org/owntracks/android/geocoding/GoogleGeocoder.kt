@@ -3,22 +3,29 @@ package org.owntracks.android.geocoding
 import android.content.Context
 import android.location.Address
 import org.owntracks.android.injection.qualifier.AppContext
+import org.threeten.bp.Instant
+import org.threeten.bp.temporal.ChronoUnit
 import timber.log.Timber
 import java.math.BigDecimal
 import java.util.*
 
 class GoogleGeocoder internal constructor(@AppContext context: Context?) : CachingGeocoder() {
     private val geocoder: android.location.Geocoder = android.location.Geocoder(context, Locale.getDefault())
-
+    private var tripResetTimestamp: Instant = Instant.MIN
     override fun reverse(latitude: Double, longitude: Double): GeocodeResult {
         return if (geocoderAvailable()) {
             super.reverse(latitude, longitude)
         } else {
-            GeocodeResult.Unavailable
+            tripResetTimestamp = Instant.now().plus(1, ChronoUnit.MINUTES)
+            GeocodeResult.Unavailable(tripResetTimestamp)
         }
     }
 
     override fun doLookup(latitude: BigDecimal, longitude: BigDecimal): GeocodeResult {
+        if (tripResetTimestamp > Instant.now()) {
+            Timber.w("Rate-limited, not querying")
+            return GeocodeResult.RateLimited(tripResetTimestamp)
+        }
         val addresses: List<Address>?
         return try {
             addresses = geocoder.getFromLocation(latitude.toDouble(), longitude.toDouble(), 1)
@@ -32,7 +39,8 @@ class GoogleGeocoder internal constructor(@AppContext context: Context?) : Cachi
                 GeocodeResult.Empty
             }
         } catch (e: Exception) {
-            GeocodeResult.Error(e.toString())
+            tripResetTimestamp = Instant.now().plus(1, ChronoUnit.MINUTES)
+            GeocodeResult.Error(e.toString(),tripResetTimestamp)
         }
     }
 

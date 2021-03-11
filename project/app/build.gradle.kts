@@ -173,6 +173,9 @@ dependencies {
     implementation("org.apache.httpcomponents.core5:httpcore5:5.0.3")
     implementation("commons-codec:commons-codec:1.15")
 
+    implementation("org.threeten:threetenbp:1.5.0")
+    implementation("com.github.joschi.jackson:jackson-datatype-threetenbp:$jacksonVersion")
+
     // Widget libraries
     implementation("com.rengwuxian.materialedittext:library:2.1.4")
     implementation("com.mikepenz:materialdrawer:6.1.2@aar") { isTransitive = true }
