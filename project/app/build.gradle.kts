@@ -130,7 +130,7 @@ kapt {
 
 val daggerVersion = "2.33"
 val okHttpVersion = "4.9.1"
-val jacksonVersion = "2.12.1"
+val jacksonVersion = "2.12.2"
 val materialDialogsVersion = "0.9.6.0"
 val espressoVersion = "3.3.0"
 val androidxTestVersion = "1.3.0"
