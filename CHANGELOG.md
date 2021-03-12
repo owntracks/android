@@ -2,8 +2,6 @@
 
 ## Version 2.3.0
 
-* Dependency updates
-
 ### New features
 
 * Config can now be loaded by the app using an `owntracks:///` URI, either pointing at a remote config location or encoded inline in base64.
@@ -12,6 +10,7 @@
 * Geocoder will now handle errors from the Geocoding service more gracefully, showing a notification and respecting rate-limiting / backing off.
 * Minor UI changes separating the About screen from the rest of the preferences
 * HTTP Useragent changed from "Owntracks/<build number>" to "Owntracks-Android/<build number>" to better indicate to servers which OT client it is
+* Catalan language support (thanks Rafroset!)
 
 ### Bug fixes
 
