@@ -9,6 +9,7 @@
 * Config can now be loaded by the app using an `owntracks:///` URI, either pointing at a remote config location or encoded inline in base64.
 * Multiple MQTT topics (space-delimited) are now supported under the `subTopic` preference
 * Message sending is now retried on failure up to 10 times, or 10,000 times for location messages to be better resilient against transient failures, but to also not block the queue for messages that upstream can't handle.
+* Geocoder will now handle errors from the Geocoding service more gracefully, showing a notification and respecting rate-limiting / backing off.
 * Minor UI changes separating the About screen from the rest of the preferences
 * HTTP Useragent changed from "Owntracks/<build number>" to "Owntracks-Android/<build number>" to better indicate to servers which OT client it is
 
@@ -18,6 +19,8 @@
 * Geocoder now only considers first 4dp of location lat/lng to prevent too many requests resulting from tiny location drift
 * Background location permission no longer needed, so removed
 * Fix for regression introduced in 2.2 where self-signed certificates supplied as the CA were doing more restrictive hostname checking (#896). Hostnames are no longer matched if the CA cert is the same as the MQTT leaf cert.
+* Geocoder preference should now work properly on API<24
+* Initial location fix should now also work better on API<24
 
 ## Version 2.2.2
 
