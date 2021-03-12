@@ -177,4 +177,13 @@
     <string name="contact_image">"Bild"</string>
     <string name="preferencesRemoteConfiguration">"Fernkonfiguration"</string>
     <string name="preferencesRemoteConfigurationSummary">"Fernkonfiguration ermöglichen (benötigt remote Kommandos)"</string>
+    <string name="aboutLicense">"Lizenz"</string>
+    <string name="aboutTranslationsSummary">"Jetzt in sechs Sprachen verfügbar!"</string>
+    <string name="aboutTranslations">"Übersetzungshilfe"</string>
+    <string name="geocoderDisabled">"Der Geocoding Dienst ist ausgeschaltet"</string>
+    <string name="geocoderRateLimited">"Geocoding Duchstatz ist limitiert worden. Nächster Versuch wenn %s"</string>
+    <string name="geocoderError">"Der Fehler %s ist vom Geocoding Dienst geliefert worden"</string>
+    <string name="notificationChannelErrors">"Fehler"</string>
+    <string name="geocoderProblemNotificationTitle">"Geocoding Problem"</string>
+    <string name="geocoderIPAddressRejected">"Die Client IP-Adresse ist zurueckgewiesen worden"</string>
 </resources>
