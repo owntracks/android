@@ -185,8 +185,8 @@ Es mostrarà una notificació permanent per continuar executant-se en segon pla.
     <string name="aboutTranslationsSummary">"Actualment disponible en 5 idiomes!"</string>
     <string name="aboutTranslations">"Ajudeu a traduir aquesta aplicació"</string>
     <string name="geocoderDisabled"></string>
-    <string name="geocoderRateLimited"></string>
-    <string name="geocoderError"></string>
+    <string name="geocoderRateLimited">%s</string>
+    <string name="geocoderError">%s</string>
     <string name="notificationChannelErrors"></string>
     <string name="geocoderProblemNotificationTitle"></string>
     <string name="geocoderIPAddressRejected"></string>

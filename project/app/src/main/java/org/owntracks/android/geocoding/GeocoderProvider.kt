@@ -65,10 +65,10 @@ class GeocoderProvider @Inject constructor(@AppContext val context: Context, val
             return
         }
         val errorNotificationText = when (result) {
-            is GeocodeResult.Error -> context.getString(R.string.geocoderError).format(result.message)
+            is GeocodeResult.Error -> context.getString(R.string.geocoderError, result.message)
             is GeocodeResult.Disabled -> context.getString(R.string.geocoderDisabled)
             is GeocodeResult.IPAddressRejected -> context.getString(R.string.geocoderIPAddressRejected)
-            is GeocodeResult.RateLimited -> context.getString(R.string.geocoderRateLimited).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(UTC).format(result.until))
+            is GeocodeResult.RateLimited -> context.getString(R.string.geocoderRateLimited ,DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(UTC).format(result.until))
             else -> ""
         }
         val until = when (result) {
@@ -149,8 +149,9 @@ class GeocoderProvider @Inject constructor(@AppContext val context: Context, val
         })
         notificationManager = NotificationManagerCompat.from(context)
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            val channelName = if (context.getString(R.string.notificationChannelErrors).trim().isNotEmpty()) context.getString(R.string.notificationChannelErrors) else "Errors"
             notificationManager.createNotificationChannel(
-                    NotificationChannel(ERROR_NOTIFICATION_CHANNEL_ID, context.getString(R.string.notificationChannelErrors), NotificationManager.IMPORTANCE_DEFAULT)
+                    NotificationChannel(ERROR_NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_DEFAULT)
             )
         }
     }
