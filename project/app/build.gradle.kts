@@ -208,7 +208,7 @@ dependencies {
 
     androidTestImplementation("androidx.test.ext:junit:1.1.2")
     androidTestImplementation("androidx.test:core-ktx:${androidxTestVersion}")
-    androidTestImplementation("com.schibsted.spain:barista:3.8.0") {
+    androidTestImplementation("com.schibsted.spain:barista:3.9.0") {
         exclude("org.jetbrains.kotlin")
     }
     androidTestImplementation("com.squareup.okhttp3:mockwebserver:${okHttpVersion}")
