@@ -73,7 +73,7 @@
             app:key="@string/preferenceKeyReverseGeocodeProvider"
             app:iconSpaceReserved="false"
             app:title="@string/preferencesReverseGeocodeProvider"
-            app:defaultValue="None"
+            app:defaultValue="Google"
             app:entries="@array/geocoders"
             app:entryValues="@array/geocoders"
             app:useSimpleSummaryProvider="true"
