@@ -193,6 +193,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     public void onDestroy() {
         stopForeground(true);
         preferences.unregisterOnPreferenceChangedListener(this);
+        messageProcessor.stopSendingMessages();
         super.onDestroy();
     }
 

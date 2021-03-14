@@ -28,6 +28,9 @@ import org.owntracks.android.ui.status.StatusActivity;
 
 import javax.inject.Inject;
 
+import static android.os.Process.killProcess;
+import static android.os.Process.myPid;
+
 @PerActivity
 public class DrawerProvider {
     private static final int COLOR_ICON_PRIMARY = R.color.md_light_primary_icon;
@@ -116,6 +119,7 @@ public class DrawerProvider {
                         activity.finishAffinity();
                         // Kill scheduled tasks
                         scheduler.cancelAllTasks();
+                        killProcess(myPid());
                         return true;
                     }
 

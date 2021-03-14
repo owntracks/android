@@ -20,6 +20,7 @@
 * Fix for regression introduced in 2.2 where self-signed certificates supplied as the CA were doing more restrictive hostname checking (#896). Hostnames are no longer matched if the CA cert is the same as the MQTT leaf cert.
 * Geocoder preference should now work properly on API<24
 * Initial location fix should now also work better on API<24
+* Fix an issue where trying to exit the app wouldn't work if there were outstanding messages queued to be sent (#954)
 
 ## Version 2.2.2
 

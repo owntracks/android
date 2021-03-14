@@ -425,6 +425,11 @@ public class MessageProcessor {
         eventBus.post(message);
     }
 
+    public void stopSendingMessages() {
+        Timber.d("Interrupting background sending thread");
+        backgroundDequeueThread.interrupt();
+    }
+
     public enum EndpointState {
         INITIAL,
         IDLE,

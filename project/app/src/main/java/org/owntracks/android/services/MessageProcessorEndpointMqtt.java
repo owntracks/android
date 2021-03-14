@@ -116,7 +116,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         try {
             connectToBroker();
         } catch (MqttConnectionException e) {
-            Timber.w("failed connection attempts :%s", sendMessageConnectPressure);
+            Timber.w("failed connection attempts: %s", sendMessageConnectPressure);
             messageProcessor.onMessageDeliveryFailed(messageId);
             throw new OutgoingMessageSendingException(e);
         } catch (ConfigurationIncompleteException e) {
