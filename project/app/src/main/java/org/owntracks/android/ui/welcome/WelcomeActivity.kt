@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
+import androidx.viewpager2.widget.ViewPager2
+import androidx.viewpager2.widget.ViewPager2.SCROLL_STATE_DRAGGING
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiWelcomeBinding
 import org.owntracks.android.support.RequirementsChecker
@@ -44,8 +46,16 @@ class WelcomeActivity : BaseActivity<UiWelcomeBinding?, WelcomeViewModel?>(), We
         playFragment = PlayFragment()
         welcomeAdapter!!.setupFragments(IntroFragment(), VersionFragment(), playFragment!!, PermissionFragment(), FinishFragment())
 
-        binding!!.viewPager.isUserInputEnabled = false
+        binding!!.viewPager.isUserInputEnabled = true
         binding!!.viewPager.adapter = welcomeAdapter
+        binding!!.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                binding!!.vm!!.currentFragmentPosition.value=position
+                setPagerIndicator(position)
+                refreshNextDoneButtons()
+                super.onPageSelected(position)
+            }
+        })
 
         binding!!.vm!!.currentFragmentPosition.observe({ this.lifecycle }, { fragmentPosition: Int ->
             showFragment(fragmentPosition)
@@ -57,13 +67,7 @@ class WelcomeActivity : BaseActivity<UiWelcomeBinding?, WelcomeViewModel?>(), We
     }
 
     override fun showNextFragment() {
-        val currentItem = binding!!.viewPager.currentItem
-        if (currentItem == welcomeAdapter!!.lastItemPosition) {
-            Timber.e("viewPager is at the end")
-            setNextEnabled(false)
-            return
-        }
-        showFragment(currentItem + 1)
+        showFragment(binding!!.viewPager.currentItem + 1)
     }
 
     override fun setPagerIndicator(index: Int) {
@@ -79,25 +83,16 @@ class WelcomeActivity : BaseActivity<UiWelcomeBinding?, WelcomeViewModel?>(), We
         }
     }
 
-    private fun setNextEnabled(enabled: Boolean) {
-        viewModel!!.nextEnabled = enabled
-    }
-
-    private fun setDoneEnabled(enabled: Boolean) {
-        viewModel!!.doneEnabled = enabled
-    }
-
     private fun showFragment(position: Int) {
         binding!!.viewPager.currentItem = position
         welcomeAdapter!!.getFragment(binding!!.viewPager.currentItem).onShowFragment()
-        refreshNextDoneButtons()
-        setPagerIndicator(position)
     }
 
     // TODO I really feel like we can replace this to auto refresh when the VM changes. Somehow.
     override fun refreshNextDoneButtons() {
-        setNextEnabled(welcomeAdapter!!.getFragment(binding!!.viewPager.currentItem).isNextEnabled)
-        setDoneEnabled(binding!!.viewPager.currentItem == welcomeAdapter!!.lastItemPosition)
+        viewModel!!.nextEnabled = welcomeAdapter!!.getFragment(binding!!.viewPager.currentItem).isNextEnabled
+        binding!!.viewPager.isUserInputEnabled = viewModel!!.nextEnabled
+        viewModel!!.doneEnabled = binding!!.viewPager.currentItem == welcomeAdapter!!.lastItemPosition
     }
 
     private fun buildPagerIndicator() {

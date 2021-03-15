@@ -1,10 +1,12 @@
 package org.owntracks.android.ui.welcome.permission
 
 import android.Manifest
+import android.content.Context
 import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +19,7 @@ import org.owntracks.android.databinding.UiWelcomePermissionsBinding
 import org.owntracks.android.support.Events.PermissionGranted
 import org.owntracks.android.ui.base.BaseSupportFragment
 import org.owntracks.android.ui.welcome.WelcomeMvvm
+import timber.log.Timber
 import javax.inject.Inject
 
 class PermissionFragment : BaseSupportFragment<UiWelcomePermissionsBinding?, PermissionFragmentViewModel>(), PermissionFragmentMvvm.View {
@@ -76,6 +79,6 @@ class PermissionFragment : BaseSupportFragment<UiWelcomePermissionsBinding?, Per
     override fun onShowFragment() {}
 
     companion object {
-        private  const val PERMISSIONS_REQUEST_CODE = 1
+        private const val PERMISSIONS_REQUEST_CODE = 1
     }
 }
