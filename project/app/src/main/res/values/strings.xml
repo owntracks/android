@@ -150,7 +150,8 @@
     <string name="notificationChannelOngoingDescription">Required to receive location updates in the background</string>
     <string name="notificationChannelEventsDescription">Region transmissions</string>
     <string name="preferencesOpencageGeocoderApiKey">OpenCage API Key</string>
-    <string name="preferencesOpencageGeocoderApiKeySummary">API key for OpenCage Reverse Geocoder</string>p
+    <string name="preferencesOpencageGeocoderApiKeySummary">API key for OpenCage Reverse Geocoder</string>
+    p
     <string name="preferencesOpencageGeocoderApiKeyDialog">If set OpenCage is used to resolve location adresses instead of Google. Requires restart.</string>
     <string name="region_unknown">Status unknown</string>
     <string name="region_inside">Currently inside</string>
@@ -192,4 +193,9 @@
     <string name="notificationChannelErrors">Errors</string>
     <string name="geocoderProblemNotificationTitle">Geocoder problem</string>
     <string name="geocoderIPAddressRejected">The client IP address was rejected</string>
+    <string-array name="geocoders">
+        <item>None</item>
+        <item>Google</item>
+        <item>OpenCage</item>
+    </string-array>
 </resources>

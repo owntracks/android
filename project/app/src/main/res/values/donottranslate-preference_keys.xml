@@ -53,4 +53,9 @@
     <string name="preferenceKeyUsername">username</string>
     <string name="preferenceKeyVersion">_build</string>
     <string name="preferenceKeyWS">ws</string>
+    <string-array name="geocoderValues" translatable="false">
+        <item>None</item>
+        <item>Google</item>
+        <item>OpenCage</item>
+    </string-array>
 </resources>

@@ -177,4 +177,9 @@
     <string name="reconnect">Переподключение</string>
     <string name="select">Выбрать</string>
     <string name="contact_image">Изображение контакта</string>
+    <string-array name="geocoders" >
+        <item>Не используется</item>
+        <item>Google</item>
+        <item>OpenCage</item>
+    </string-array>
 </resources>

@@ -75,7 +75,7 @@
             app:title="@string/preferencesReverseGeocodeProvider"
             app:defaultValue="Google"
             app:entries="@array/geocoders"
-            app:entryValues="@array/geocoders"
+            app:entryValues="@array/geocoderValues"
             app:useSimpleSummaryProvider="true"
             />
         <EditTextPreference
