@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 2.3.1
+
+### Bug fixes
+
+* Lower notification priority of geocoder error notifications to make them a bit less present / shouty
+
 ## Version 2.3.0
 
 ### New features
