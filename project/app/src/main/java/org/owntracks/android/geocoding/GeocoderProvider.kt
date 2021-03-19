@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.widget.TextView
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationCompat.PRIORITY_LOW
 import androidx.core.app.NotificationManagerCompat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -96,6 +97,8 @@ class GeocoderProvider @Inject constructor(@AppContext val context: Context, val
                 .setSmallIcon(R.drawable.ic_owntracks_80)
                 .setStyle(NotificationCompat.BigTextStyle().bigText(errorNotificationText))
                 .setContentIntent(PendingIntent.getActivity(context, 0, activityLaunchIntent, PendingIntent.FLAG_UPDATE_CURRENT))
+                .setPriority(PRIORITY_LOW)
+                .setNotificationSilent()
                 .build()
 
         notificationManager.notify(GEOCODE_ERROR_NOTIFICATION_TAG, 0, notification)
@@ -151,7 +154,7 @@ class GeocoderProvider @Inject constructor(@AppContext val context: Context, val
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             val channelName = if (context.getString(R.string.notificationChannelErrors).trim().isNotEmpty()) context.getString(R.string.notificationChannelErrors) else "Errors"
             notificationManager.createNotificationChannel(
-                    NotificationChannel(ERROR_NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_DEFAULT)
+                    NotificationChannel(ERROR_NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_LOW)
             )
         }
     }
