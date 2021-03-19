@@ -2,6 +2,10 @@
 
 ## Version 2.3.1
 
+### New features
+
+* The welcome screen is now swipey!
+
 ### Bug fixes
 
 * Lower notification priority of geocoder error notifications to make them a bit less present / shouty
