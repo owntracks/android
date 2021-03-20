@@ -24,7 +24,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Marker;
 
 import org.owntracks.android.injection.qualifier.AppContext;
+
 import javax.inject.Singleton;
+
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.support.widgets.TextDrawable;
 
@@ -33,6 +35,96 @@ import java.lang.ref.WeakReference;
 import javax.inject.Inject;
 
 import timber.log.Timber;
+
+class ContactDrawableWorkerTaskForImageView extends AsyncTask<FusedContact, Void, Bitmap> {
+    final WeakReference<ImageView> target;
+    private final ContactImageProvider contactImageProvider;
+
+    ContactDrawableWorkerTaskForImageView(ImageView imageView, ContactImageProvider contactImageProvider) {
+        target = new WeakReference<>(imageView);
+        this.contactImageProvider = contactImageProvider;
+    }
+
+    @Override
+    protected Bitmap doInBackground(FusedContact... params) {
+        return contactImageProvider.getBitmapFromCache(params[0]);
+    }
+
+    protected void onPostExecute(Bitmap result) {
+        if (result == null)
+            return;
+
+        ImageView imageView = target.get();
+        if (imageView != null)
+            imageView.setImageBitmap(result);
+    }
+
+}
+
+class ContactDrawableWorkerTaskForMarker extends AsyncTask<FusedContact, Void, BitmapDescriptor> {
+    final WeakReference<Marker> target;
+    private final ContactImageProvider contactImageProvider;
+
+    ContactDrawableWorkerTaskForMarker(Marker marker, ContactImageProvider contactImageProvider) {
+        target = new WeakReference<>(marker);
+        this.contactImageProvider = contactImageProvider;
+    }
+
+    @Override
+    protected BitmapDescriptor doInBackground(FusedContact... params) {
+        return BitmapDescriptorFactory.fromBitmap(contactImageProvider.getBitmapFromCache(params[0]));
+    }
+
+    @Override
+    protected void onPostExecute(BitmapDescriptor result) {
+        Marker marker = target.get();
+        if (marker != null) {
+            try {
+                marker.setIcon(result);
+                marker.setVisible(true);
+            } catch (IllegalArgumentException e) {
+                Timber.e(e, "Error setting marker icon");
+            }
+        }
+    }
+}
+
+class ContactBitmapMemoryCache {
+    private final ArrayMap<String, Bitmap> cacheLevelCard;
+    private final ArrayMap<String, TidBitmap> cacheLevelTid;
+
+    ContactBitmapMemoryCache() {
+        cacheLevelCard = new ArrayMap<>();
+        cacheLevelTid = new ArrayMap<>();
+    }
+
+    synchronized void putLevelCard(String key, Bitmap value) {
+        cacheLevelCard.put(key, value);
+        cacheLevelTid.remove(key);
+    }
+
+    synchronized void putLevelTid(String key, TidBitmap value) {
+        cacheLevelTid.put(key, value);
+    }
+
+    synchronized Bitmap getLevelCard(String key) {
+        return cacheLevelCard.get(key);
+    }
+
+    synchronized TidBitmap getLevelTid(String key) {
+        return cacheLevelTid.get(key);
+    }
+
+    synchronized void clear() {
+        cacheLevelCard.clear();
+        cacheLevelTid.clear();
+    }
+
+    synchronized void clearLevelCard(String key) {
+        cacheLevelCard.remove(key);
+    }
+
+}
 
 @Singleton
 public class ContactImageProvider {
@@ -45,66 +137,17 @@ public class ContactImageProvider {
     }
 
 
-    private static class ContactDrawableWorkerTaskForImageView extends AsyncTask<FusedContact, Void, Bitmap> {
-        final WeakReference<ImageView> target;
-
-        ContactDrawableWorkerTaskForImageView(ImageView imageView) {
-            target = new WeakReference<>(imageView);
-        }
-
-        @Override
-        protected Bitmap doInBackground(FusedContact... params) {
-            return getBitmapFromCache(params[0]);
-        }
-
-        protected void onPostExecute(Bitmap result) {
-            if (result == null)
-                return;
-
-            ImageView imageView = target.get();
-            if (imageView != null)
-                imageView.setImageBitmap(result);
-        }
-
-    }
-
-    private static class ContactDrawableWorkerTaskForMarker extends AsyncTask<FusedContact, Void, BitmapDescriptor> {
-        final WeakReference<Marker> target;
-
-        ContactDrawableWorkerTaskForMarker(Marker marker) {
-            target = new WeakReference<>(marker);
-        }
-
-        @Override
-        protected BitmapDescriptor doInBackground(FusedContact... params) {
-            return BitmapDescriptorFactory.fromBitmap(getBitmapFromCache(params[0]));
-        }
-
-        @Override
-        protected void onPostExecute(BitmapDescriptor result) {
-            Marker marker = target.get();
-            if (marker != null) {
-                try {
-                    marker.setIcon(result);
-                    marker.setVisible(true);
-                } catch (IllegalArgumentException e) {
-                    Timber.e(e, "Error setting marker icon");
-                }
-            }
-        }
-    }
-
     public void setMarkerAsync(Marker marker, FusedContact contact) {
-        (new ContactDrawableWorkerTaskForMarker(marker)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, contact);
+        (new ContactDrawableWorkerTaskForMarker(marker,this)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, contact);
     }
 
-    public static void setImageViewAsync(ImageView imageView, FusedContact contact) {
+    public void setImageViewAsync(ImageView imageView, FusedContact contact) {
         //imageView.setImageDrawable(placeholder);
-        (new ContactDrawableWorkerTaskForImageView(imageView)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, contact);
+        (new ContactDrawableWorkerTaskForImageView(imageView,this)).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, contact);
     }
 
     @Nullable
-    private static Bitmap getBitmapFromCache(@Nullable FusedContact contact) {
+    Bitmap getBitmapFromCache(@Nullable FusedContact contact) {
         Bitmap d;
 
         if (contact == null)
@@ -152,48 +195,11 @@ public class ContactImageProvider {
         FACE_DIMENSIONS = (int) (48 * (context.getResources().getDisplayMetrics().densityDpi / 160f));
     }
 
-    private static class ContactBitmapMemoryCache {
-        private final ArrayMap<String, Bitmap> cacheLevelCard;
-        private final ArrayMap<String, TidBitmap> cacheLevelTid;
-
-        ContactBitmapMemoryCache() {
-            cacheLevelCard = new ArrayMap<>();
-            cacheLevelTid = new ArrayMap<>();
-        }
-
-        synchronized void putLevelCard(String key, Bitmap value) {
-            cacheLevelCard.put(key, value);
-            cacheLevelTid.remove(key);
-        }
-
-        synchronized void putLevelTid(String key, TidBitmap value) {
-            cacheLevelTid.put(key, value);
-        }
-
-        synchronized Bitmap getLevelCard(String key) {
-            return cacheLevelCard.get(key);
-        }
-
-        synchronized TidBitmap getLevelTid(String key) {
-            return cacheLevelTid.get(key);
-        }
-
-        synchronized void clear() {
-            cacheLevelCard.clear();
-            cacheLevelTid.clear();
-        }
-
-        synchronized void clearLevelCard(String key) {
-            cacheLevelCard.remove(key);
-        }
-
-    }
-
     public void invalidateCache() {
         memoryCache.clear();
     }
 
-    private static Bitmap getRoundedShape(Bitmap bitmap) {
+    private  Bitmap getRoundedShape(Bitmap bitmap) {
         Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(output);
 
@@ -214,7 +220,7 @@ public class ContactImageProvider {
         return output;
     }
 
-    private static Bitmap drawableToBitmap(Drawable drawable) {
+    private  Bitmap drawableToBitmap(Drawable drawable) {
         if (drawable instanceof BitmapDrawable) {
             return ((BitmapDrawable) drawable).getBitmap();
         }
@@ -234,6 +240,6 @@ public class ContactImageProvider {
 
     @BindingAdapter({"imageProvider", "contact"})
     public static void displayFaceInViewAsync(ImageView view, Integer imageProvider, FusedContact c) {
-        setImageViewAsync(view, c);
+//        setImageViewAsync(view, c);
     }
 }
