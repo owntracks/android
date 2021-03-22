@@ -124,7 +124,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel<Ma
             finish();
         }
 
-        bindAndAttachContentView(R.layout.ui_map, savedInstanceState);
+        bindAndAttachContentView(R.layout.ui_map, savedInstanceState, contactImageProvider);
 
         setSupportToolbar(this.binding.toolbar, false, true);
         setDrawer(this.binding.toolbar);

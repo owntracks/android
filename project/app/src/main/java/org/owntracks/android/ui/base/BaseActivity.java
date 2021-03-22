@@ -11,6 +11,7 @@ import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
+import androidx.databinding.DataBindingComponent;
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ViewDataBinding;
 
@@ -48,10 +49,14 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
     /* Use this method to set the content view on your Activity. This method also handles
      * creating the binding, setting the view model on the binding and attaching the view. */
     protected final void bindAndAttachContentView(@LayoutRes int layoutResId, @Nullable Bundle savedInstanceState) {
+        bindAndAttachContentView(layoutResId, savedInstanceState, null);
+    }
+
+    protected final void bindAndAttachContentView(@LayoutRes int layoutResId, @Nullable Bundle savedInstanceState, @Nullable androidx.databinding.DataBindingComponent dataBindingComponent) {
         if (viewModel == null) {
             throw new IllegalStateException("viewModel must not be null and should be injected via activityComponent().inject(this)");
         }
-        binding = DataBindingUtil.setContentView(this, layoutResId);
+        binding = DataBindingUtil.setContentView(this, layoutResId, dataBindingComponent);
         binding.setVariable(BR.vm, viewModel);
         binding.setLifecycleOwner(this);
 

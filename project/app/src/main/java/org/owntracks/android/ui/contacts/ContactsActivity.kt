@@ -9,19 +9,24 @@ import org.owntracks.android.databinding.UiContactsBinding
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.model.messages.MessageLocation
+import org.owntracks.android.support.ContactImageProvider
 import org.owntracks.android.ui.base.BaseActivity
 import org.owntracks.android.ui.base.BaseAdapter
 import org.owntracks.android.ui.map.MapActivity
 import javax.inject.Inject
 
 class ContactsActivity : BaseActivity<UiContactsBinding?, ContactsMvvm.ViewModel<*>?>(), ContactsMvvm.View, BaseAdapter.ClickListener<FusedContact?> {
-    private val contactsAdapter = ContactsAdapter(this)
+
+    @Inject
+    lateinit var contactImageProvider: ContactImageProvider
+    private lateinit var contactsAdapter: ContactsAdapter
 
     @JvmField
     @Inject
     var geocoderProvider: GeocoderProvider? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        contactsAdapter = ContactsAdapter(this, contactImageProvider)
         setHasEventBus(false)
         bindAndAttachContentView(R.layout.ui_contacts, savedInstanceState)
         setSupportToolbar(binding!!.toolbar)

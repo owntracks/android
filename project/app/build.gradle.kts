@@ -5,7 +5,6 @@ plugins {
     kotlin("kapt")
     id("io.objectbox")
     id("com.hiya.jacoco-android")
-    id("scabbard.gradle") version "0.4.0"
 }
 
 val versionMajor = 2
@@ -307,11 +306,4 @@ tasks.whenTaskAdded {
     if (name == "connectedDebugAndroidTest") {
         finalizedBy(fetchScreenshotsTask)
     }
-}
-
-scabbard {
-    enabled = !gradle.startParameter.toString().contains("assembleRelease")
-    fullBindingGraphValidation = true
-    failOnError = true
-    outputFormat = "svg"
 }
