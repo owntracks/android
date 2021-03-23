@@ -41,7 +41,7 @@ jobs:
       working-directory: project
       timeout-minutes: 10
     - name: Run unit tests
-      run: ./gradlew check jacocoTestDebugUnitTestReport
+      run: ./gradlew check jacocoTestGmsDebugUnitTestReport
       working-directory: project
       timeout-minutes: 10
     - name: Test with Gradle on the emulator
@@ -51,7 +51,7 @@ jobs:
         working-directory: project
         script: |
             adb emu geo fix 0 51
-            ./gradlew createDebugCoverageReport --no-build-cache
+            ./gradlew createGmsDebugCoverageReport --no-build-cache
         profile: pixel_3a
         target: google_apis
         disable-animations: true
@@ -59,14 +59,14 @@ jobs:
     - name: Gather xunit files into a single dir
       run: | 
           mkdir -p ./project/app/build/test-results/collected/
-          cp -v ./project/app/build/test-results/testDebugUnitTest/*.xml ./project/app/build/test-results/collected/ || true
-          cp -v ./project/app/build/outputs/androidTest-results/connected/*.xml ./project/app/build/test-results/collected/ || true
+          cp -v ./project/app/build/test-results/testGmsDebugUnitTest/*.xml ./project/app/build/test-results/collected/ || true
+          cp -v ./project/app/build/outputs/androidTest-results/connected/flavors/gmsDebugAndroidTest/*.xml ./project/app/build/test-results/collected/ || true
       if: always()
     - name: Upload unit test result artifact
       uses: actions/upload-artifact@v2
       with:
         name: unit-test-results
-        path: project/app/build/test-results/testDebugUnitTest
+        path: project/app/build/test-results/testGmsDebugUnitTest
       if: always()
     - name: Upload connected test result artifact
       uses: actions/upload-artifact@v2
@@ -88,7 +88,7 @@ jobs:
     - uses: codecov/codecov-action@v1
       name: Upload espresso coverage to codecov
       with:
-        file: ./project/app/build/reports/coverage/debug/report.xml
+        file: ./project/app/build/reports/coverage/gms/debug/report.xml
         flags: uitests
     - uses: codecov/codecov-action@v1
       name: Upload unit coverage to codecov
@@ -122,7 +122,7 @@ jobs:
             echo -n $KEYSTORE_BASE64 | base64 -d > project/owntracks.release.keystore.jks
       - name: Publish play store bundle
         timeout-minutes: 10
-        run: ./gradlew publishBundle
+        run: ./gradlew publishGmsReleaseBundle
         working-directory: project
         env:
             KEYSTORE_PASSPHRASE: ${{ secrets.KEYSTORE_PASSPHRASE }}

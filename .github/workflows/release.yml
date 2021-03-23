@@ -12,7 +12,7 @@ jobs:
     name: Create GH release and promote Play store beta to release
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2      
+    - uses: actions/checkout@v2
     - uses: octokit/request-action@v2.x
       name: Find beta tags
       id: get_beta_tags
@@ -51,28 +51,37 @@ jobs:
           ~/.gradle/wrapper
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
         restore-keys: |
-          ${{ runner.os }}-gradle-        
+          ${{ runner.os }}-gradle-
     - name: Decrypt secrets
       env:
-        GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}          
+        GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
         KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
       run: |
         echo -n $GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS > project/app/owntracks-android-7a8e1517bde3.json
         echo -n $KEYSTORE_BASE64 | base64 -d > project/owntracks.release.keystore.jks
     - name: Build APK
-      run: ./gradlew assemble
+      run: ./gradlew assembleRelease
       working-directory: project
       env:
         KEYSTORE_PASSPHRASE: ${{ secrets.KEYSTORE_PASSPHRASE }}
         ORG_GRADLE_PROJECT_google_maps_api_key: ${{ secrets.GOOGLE_MAPS_API_KEY }}
-    - name: Upload Release Asset
+    - name: Upload GMS Release Asset
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: ./project/app/build/outputs/apk/release/app-release.apk
-        asset_name: owntracks-release.apk
+        asset_path: ./project/app/build/outputs/apk/gms/release/app-gms-release.apk
+        asset_name: owntracks-release-gms.apk
+        asset_content_type: application/vnd.android.package-archive
+    - name: Upload OSS Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        asset_path: ./project/app/build/outputs/apk/oss/release/app-oss-release.apk
+        asset_name: owntracks-release-oss.apk
         asset_content_type: application/vnd.android.package-archive
     - name: Promote play store production from beta
       run: ./gradlew promoteArtifact --from-track beta --promote-track production --release-status completed
