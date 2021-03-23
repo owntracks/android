@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.Bundle
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import org.owntracks.android.BuildConfig.FLAVOR
 import org.owntracks.android.BuildConfig.TRANSLATION_ARRAY
 import org.owntracks.android.R
 
@@ -19,8 +20,9 @@ class AboutFragment : PreferenceFragmentCompat() {
             try {
                 val pm = requireActivity().packageManager
                 val versionCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) pm.getPackageInfo(requireActivity().packageName, 0).longVersionCode else pm.getPackageInfo(requireActivity().packageName, 0).versionCode
+                val flavor = if (FLAVOR == "gms") "Google Play" else "OSS"
                 @Suppress("DEPRECATION")
-                "${getString(R.string.version)} $versionName ($versionCode)"
+                "${getString(R.string.version)} $versionName ($versionCode) - $flavor"
             } catch (e: PackageManager.NameNotFoundException) {
                 getString(R.string.na)
             }

@@ -123,6 +123,23 @@ android {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
     buildToolsVersion = "29.0.3"
+    flavorDimensions("locationProvider")
+    productFlavors {
+        create("gms") {
+            dimension = "locationProvider"
+            sourceSets {
+                getByName("main").java.srcDirs("src/gms/java")
+            }
+            dependencies {
+                // Play Services libraries
+                implementation("com.google.android.gms:play-services-maps:17.0.0")
+                implementation("com.google.android.gms:play-services-location:18.0.0")
+            }
+        }
+        create("oss") {
+            dimension = "locationProvider"
+        }
+    }
 }
 
 kapt {

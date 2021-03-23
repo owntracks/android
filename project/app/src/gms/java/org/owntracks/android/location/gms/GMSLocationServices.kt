@@ -1,10 +1,10 @@
-package org.owntracks.android.location
+package org.owntracks.android.location.gms
 
 import android.content.Context
 import com.google.android.gms.location.LocationServices
-import org.owntracks.android.location.gms.GMSLocationProviderClient
+import org.owntracks.android.location.LocationProviderClient
 
-class LocationServices {
+class GMSLocationServices {
     companion object {
         fun getLocationProviderClient(context: Context): LocationProviderClient {
             return GMSLocationProviderClient(LocationServices.getFusedLocationProviderClient(context))
