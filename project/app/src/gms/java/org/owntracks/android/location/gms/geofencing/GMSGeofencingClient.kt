@@ -1,0 +1,24 @@
+package org.owntracks.android.location.gms.geofencing
+
+import android.annotation.SuppressLint
+import android.app.PendingIntent
+import android.content.Context
+import org.owntracks.android.location.geofencing.GeofencingClient
+import org.owntracks.android.location.geofencing.GeofencingRequest
+
+class GMSGeofencingClient(private val geofencingClient: com.google.android.gms.location.GeofencingClient) : GeofencingClient {
+    override fun removeGeofences(GeofencePendingIntent: PendingIntent) {
+        this.geofencingClient.removeGeofences(GeofencePendingIntent)
+    }
+
+    @SuppressLint("MissingPermission")
+    override fun addGeofences(request: GeofencingRequest, GeofencePendingIntent: PendingIntent) {
+        this.geofencingClient.addGeofences(request.toGMSGeofencingRequest(), GeofencePendingIntent)
+    }
+
+    companion object {
+        fun create(context: Context): GeofencingClient {
+            return GMSGeofencingClient(com.google.android.gms.location.GeofencingClient(context))
+        }
+    }
+}

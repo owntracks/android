@@ -1,10 +1,12 @@
 package org.owntracks.android.location.gms
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Looper
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
 import org.owntracks.android.location.LocationCallback
 import org.owntracks.android.location.LocationProviderClient
 import org.owntracks.android.location.LocationRequest
@@ -33,10 +35,16 @@ class GMSLocationProviderClient(private val fusedLocationProviderClient: FusedLo
     }
 
     override fun removeLocationUpdates(clientCallBack: LocationCallback) {
-        callbackMap[clientCallBack]?.let {  fusedLocationProviderClient.removeLocationUpdates(it)}
+        callbackMap[clientCallBack]?.let { fusedLocationProviderClient.removeLocationUpdates(it) }
     }
 
     override fun flushLocations() {
         fusedLocationProviderClient.flushLocations();
+    }
+
+    companion object {
+        fun create(context: Context): GMSLocationProviderClient {
+            return GMSLocationProviderClient(LocationServices.getFusedLocationProviderClient(context))
+        }
     }
 }

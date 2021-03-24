@@ -18,3 +18,4 @@ fun LocationRequest.toGMSLocationRequest(): com.google.android.gms.location.Loca
             .setExpirationDuration(expirationDuration)
 
 }
+
