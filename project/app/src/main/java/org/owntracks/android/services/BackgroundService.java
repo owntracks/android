@@ -27,18 +27,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.Geofence;
-import com.google.android.gms.location.GeofencingClient;
-import com.google.android.gms.location.GeofencingEvent;
-import com.google.android.gms.location.GeofencingRequest;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -48,6 +36,15 @@ import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.data.repos.LocationRepo;
 import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.geocoding.GeocoderProvider;
+import org.owntracks.android.location.LocationCallback;
+import org.owntracks.android.location.LocationProviderClient;
+import org.owntracks.android.location.LocationRequest;
+import org.owntracks.android.location.LocationResult;
+import org.owntracks.android.location.LocationServices;
+import org.owntracks.android.location.geofencing.Geofence;
+import org.owntracks.android.location.geofencing.GeofencingClient;
+import org.owntracks.android.location.geofencing.GeofencingEvent;
+import org.owntracks.android.location.geofencing.GeofencingRequest;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.model.messages.MessageLocation;
 import org.owntracks.android.model.messages.MessageTransition;
@@ -69,7 +66,7 @@ import javax.inject.Inject;
 import dagger.android.DaggerService;
 import timber.log.Timber;
 
-public class BackgroundService extends DaggerService implements OnCompleteListener<Location>, OnModeChangedPreferenceChangedListener, ServiceBridge.ServiceBridgeInterface {
+public class BackgroundService extends DaggerService implements OnModeChangedPreferenceChangedListener, ServiceBridge.ServiceBridgeInterface {
     private static final int INTENT_REQUEST_CODE_LOCATION = 1263;
     private static final int INTENT_REQUEST_CODE_GEOFENCE = 1264;
     private static final int INTENT_REQUEST_CODE_CLEAR_EVENTS = 1263;
@@ -92,8 +89,8 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     private static final String INTENT_ACTION_CHANGE_MONITORING = "org.owntracks.android.CHANGE_MONITORING";
     private static final String INTENT_ACTION_BOOT_COMPLETED = "android.intent.action.BOOT_COMPLETED";
 
-    private FusedLocationProviderClient fusedLocationClient;
-    private GeofencingClient mGeofencingClient;
+    private LocationProviderClient locationProviderClient;
+    private GeofencingClient geofencingClient;
 
     private LocationCallback locationCallback;
     private LocationCallback locationCallbackOnDemand;
@@ -149,8 +146,8 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         super.onCreate();
         Timber.v("Background service onCreate. ThreadID: %s", Thread.currentThread());
         serviceBridge.bind(this);
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        mGeofencingClient = LocationServices.getGeofencingClient(this);
+        locationProviderClient = LocationServices.INSTANCE.getLocationProviderClient(this);
+        geofencingClient = LocationServices.INSTANCE.getGeofencingClient(this);
         notificationManagerCompat = NotificationManagerCompat.from(this);
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -489,7 +486,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         request.setExpirationDuration(TimeUnit.MINUTES.toMillis(1));
 
         Timber.d("On demand location request");
-        FusedLocationProviderClient client = LocationServices.getFusedLocationProviderClient(this);
+        LocationProviderClient client = LocationServices.INSTANCE.getLocationProviderClient(this);
         client.requestLocationUpdates(request, locationCallbackOnDemand,  runThingsOnOtherThreads.getBackgroundLooper());
     }
 
@@ -500,7 +497,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
             return;
         }
 
-        if (fusedLocationClient == null) {
+        if (locationProviderClient == null) {
             Timber.e("FusedLocationClient not available");
             return;
         }
@@ -526,11 +523,8 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
                 break;
         }
         Timber.d("Location update request params: mode %s, interval (s):%s, fastestInterval (s):%s, priority:%s, displacement (m):%s", monitoring, TimeUnit.MILLISECONDS.toSeconds(request.getInterval()), TimeUnit.MILLISECONDS.toSeconds(request.getFastestInterval()), request.getPriority(), request.getSmallestDisplacement());
-        fusedLocationClient.flushLocations();
-        fusedLocationClient.requestLocationUpdates(request, locationCallback, runThingsOnOtherThreads.getBackgroundLooper())
-                .addOnSuccessListener(_void -> Timber.d("Location update request success"))
-                .addOnFailureListener(throwable -> Timber.e(throwable, "Location update request failure"))
-                .addOnCanceledListener(() -> Timber.w("Location update request cancelled"));
+        locationProviderClient.flushLocations();
+        locationProviderClient.requestLocationUpdates(request, locationCallback, runThingsOnOtherThreads.getBackgroundLooper());
     }
 
     private int getLocationRequestPriority() {
@@ -571,21 +565,23 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
 
             try {
                 geofences.add(new Geofence.Builder()
-                        .setRequestId(Long.toString(w.getId()))
-                        .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
-                        .setNotificationResponsiveness((int) TimeUnit.MINUTES.toMillis(2))
-                        .setCircularRegion(w.getGeofenceLatitude(), w.getGeofenceLongitude(), w.getGeofenceRadius())
-                        .setExpirationDuration(Geofence.NEVER_EXPIRE).build());
+                        .requestId(Long.toString(w.getId()))
+                        .transitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
+                        .notificationResponsiveness((int) TimeUnit.MINUTES.toMillis(2))
+                        .circularRegion(w.getGeofenceLatitude(), w.getGeofenceLongitude(), w.getGeofenceRadius())
+                        .expirationDuration(Geofence.NEVER_EXPIRE)
+                        .build());
             } catch (IllegalArgumentException e) {
                 Timber.e(e, "Invalid geofence parameter");
             }
         }
 
         if (geofences.size() > 0) {
-            GeofencingRequest.Builder b = new GeofencingRequest.Builder();
-            b.setInitialTrigger(Geofence.GEOFENCE_TRANSITION_ENTER);
-            GeofencingRequest request = b.addGeofences(geofences).build();
-            mGeofencingClient.addGeofences(request, getGeofencePendingIntent());
+            GeofencingRequest request = new GeofencingRequest.Builder()
+                    .setInitialTrigger(Geofence.GEOFENCE_TRANSITION_ENTER)
+                    .addGeofences(geofences)
+                    .build();
+            geofencingClient.addGeofences(request, getGeofencePendingIntent());
         }
     }
 
@@ -594,7 +590,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     }
 
     private void removeGeofences() {
-        mGeofencingClient.removeGeofences(getGeofencePendingIntent());
+        geofencingClient.removeGeofences(getGeofencePendingIntent());
     }
 
     @SuppressWarnings("unused")
@@ -692,7 +688,8 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
 
         try {
             Timber.d("Getting last location");
-            fusedLocationClient.getLastLocation().addOnCompleteListener(this);
+//            locationProviderClient.getLastLocation().
+                    //.addOnCompleteListener(this); //TODO abstraction refactor
         } catch (SecurityException ignored) {
         }
 
@@ -728,10 +725,10 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
         return eventsNotificationCompatBuilder;
     }
 
-    @Override
-    public void onComplete(@NonNull Task<Location> task) {
-        onLocationChanged(task.getResult(),MessageLocation.REPORT_TYPE_DEFAULT);
-    }
+//    @Override
+//    public void onComplete(@NonNull Task<Location> task) {
+//        onLocationChanged(task.getResult(),MessageLocation.REPORT_TYPE_DEFAULT);
+//    } //TODO abstraction refactor
 
     private final IBinder mBinder = new LocalBinder();
 
