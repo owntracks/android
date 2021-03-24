@@ -65,6 +65,7 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
             notifyContactPropertyChanged()
         }
 
+
     @get:JsonIgnore
     internal val fallbackGeocode: String
         get() = "$latitude, $longitude"
