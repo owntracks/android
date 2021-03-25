@@ -137,7 +137,7 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
         liveBottomSheetHidden.postValue(false);
 
         if (center)
-            liveCamera.postValue(c.getLatLng());
+            liveCamera.postValue(c.getLatLng().toGMSLatLng());
 
     }
 
@@ -229,7 +229,7 @@ public class MapViewModel extends BaseViewModel<MapMvvm.View> implements MapMvvm
         getView().updateMarker(c);
         if (c == activeContact) {
             liveContact.postValue(c);
-            liveCamera.postValue(c.getLatLng());
+            liveCamera.postValue(c.getLatLng().toGMSLatLng());
         }
     }
 
