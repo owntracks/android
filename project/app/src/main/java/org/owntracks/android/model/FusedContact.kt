@@ -3,8 +3,8 @@ package org.owntracks.android.model
 import androidx.databinding.BaseObservable
 import androidx.databinding.Bindable
 import androidx.lifecycle.MutableLiveData
-import com.google.android.gms.maps.model.LatLng
 import org.owntracks.android.BR
+import org.owntracks.android.location.LatLng
 import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageLocation
 import timber.log.Timber
@@ -33,12 +33,6 @@ class FusedContact(id: String?) : BaseObservable(), Comparable<FusedContact> {
         tst = messageLocation.timestamp
         notifyMessageLocationPropertyChanged()
         return true
-    }
-
-    private fun notifyMessageCardPropertyChanged() {
-        notifyPropertyChanged(BR.fusedName)
-        notifyPropertyChanged(BR.imageProvider)
-        notifyPropertyChanged(BR.id)
     }
 
     fun notifyMessageLocationPropertyChanged() {
@@ -70,7 +64,7 @@ class FusedContact(id: String?) : BaseObservable(), Comparable<FusedContact> {
 
     @get:Bindable
     val fusedLocationAccuracy: String
-        get() = Integer.toString(if (hasLocation()) messageLocation.value!!.accuracy else 0)
+        get() = if (hasLocation()) messageLocation.value!!.accuracy.toString() else 0.toString()
 
     fun hasLocation(): Boolean {
         return messageLocation.value != null
@@ -97,8 +91,8 @@ class FusedContact(id: String?) : BaseObservable(), Comparable<FusedContact> {
         isDeleted = true
     }
 
-    override fun compareTo(o: FusedContact): Int {
-        return java.lang.Long.compare(o.tst, tst)
+    override fun compareTo(other: FusedContact): Int {
+        return other.tst.compareTo(tst)
     }
 
 }

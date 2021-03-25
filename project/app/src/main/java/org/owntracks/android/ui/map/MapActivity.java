@@ -216,7 +216,7 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel<Ma
                     binding.distanceLabel.setVisibility(View.VISIBLE);
 
                     float[] distance = new float[2];
-                    Location.distanceBetween(viewModel.getCurrentLocation().latitude, viewModel.getCurrentLocation().longitude, c.getLatLng().latitude, c.getLatLng().longitude, distance);
+                    Location.distanceBetween(viewModel.getCurrentLocation().latitude, viewModel.getCurrentLocation().longitude, c.getLatLng().getLatitude(), c.getLatLng().getLongitude(), distance);
 
                     binding.distance.setText(String.format(Locale.getDefault(), "%d m", Math.round(distance[0])));
                 } else {
@@ -504,13 +504,13 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel<Ma
         Marker marker = markers.get(contact.getId());
 
         if (marker != null && marker.getTag() != null) {
-            marker.setPosition(contact.getLatLng());
+            marker.setPosition(contact.getLatLng().toGMSLatLng());
         } else {
             // If a marker has been removed, its tag will be null. Doing anything with it will make it explode
             if (marker != null) {
                 markers.remove(contact.getId());
             }
-            marker = googleMap.addMarker(new MarkerOptions().position(contact.getLatLng()).anchor(0.5f, 0.5f).visible(false));
+            marker = googleMap.addMarker(new MarkerOptions().position(contact.getLatLng().toGMSLatLng()).anchor(0.5f, 0.5f).visible(false));
             marker.setTag(contact.getId());
             markers.put(contact.getId(), marker);
         }
@@ -525,7 +525,8 @@ public class MapActivity extends BaseActivity<UiMapBinding, MapMvvm.ViewModel<Ma
             FusedContact c = viewModel.getActiveContact();
             if (c != null && c.hasLocation()) {
                 try {
-                    LatLng l = c.getLatLng();
+
+                    LatLng l = c.getLatLng().toGMSLatLng();
                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("google.navigation:q=" + l.latitude + "," + l.longitude));
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);

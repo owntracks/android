@@ -58,7 +58,7 @@ internal class ContactBitmapMemoryCache {
 }
 
 @Singleton
-class ContactImageProvider @Inject constructor(@AppContext context: Context): DataBindingComponent {
+class ContactImageProvider @Inject constructor(@AppContext context: Context) : DataBindingComponent {
     private val faceDimensions = (48 * (context.resources.displayMetrics.densityDpi / 160f)).toInt()
     fun invalidateCacheLevelCard(key: String?) {
         memoryCache.clearLevelCard(key)
@@ -91,8 +91,8 @@ class ContactImageProvider @Inject constructor(@AppContext context: Context): Da
                 if (bitmap != null) {
                     return@withContext bitmap
                 }
-                if (contact.messageCard.hasFace()) {
-                    val imageAsBytes = Base64.decode(contact.messageCard.face!!.toByteArray(), Base64.DEFAULT)
+                if (contact.messageCard != null && contact.messageCard!!.hasFace()) {
+                    val imageAsBytes = Base64.decode(contact.messageCard!!.face!!.toByteArray(), Base64.DEFAULT)
                     val b = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.size)
                     if (b == null) {
                         Timber.e("Decoding card bitmap failed")
