@@ -2,8 +2,8 @@ package org.owntracks.android.location
 
 import org.owntracks.android.BuildConfig.FLAVOR
 import org.owntracks.android.location.geofencing.GeofencingClient
-import org.owntracks.android.location.gms.GMSLocationProviderClient
-import org.owntracks.android.location.gms.geofencing.GMSGeofencingClient
+import org.owntracks.android.gms.location.GMSLocationProviderClient
+import org.owntracks.android.gms.location.geofencing.GMSGeofencingClient
 import org.owntracks.android.services.BackgroundService
 
 object LocationServices {

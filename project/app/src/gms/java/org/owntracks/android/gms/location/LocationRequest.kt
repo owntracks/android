@@ -1,4 +1,4 @@
-package org.owntracks.android.location.gms
+package org.owntracks.android.gms.location
 
 import org.owntracks.android.location.LocationRequest
 

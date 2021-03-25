@@ -19,7 +19,6 @@ class SingletonModule {
     }
 
     @Provides
-    @Singleton
     fun provideContactsRepo(eventBus: EventBus?, contactImageProvider: ContactImageProvider?): ContactsRepo {
         return MemoryContactsRepo(eventBus!!, contactImageProvider!!)
     }
