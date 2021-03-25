@@ -24,6 +24,7 @@ interface WorkerModule {
     @IntoMap
     @WorkerKey(MQTTReconnectWorker::class)
     fun bindMQTTReconnectWorkerFactory(factory: MQTTReconnectWorker.Factory): ChildWorkerFactory
+
     @Binds
     @IntoMap
     @WorkerKey(SendLocationPingWorker::class)

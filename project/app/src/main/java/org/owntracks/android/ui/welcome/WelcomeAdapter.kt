@@ -8,15 +8,16 @@ import org.owntracks.android.support.RequirementsChecker
 import timber.log.Timber
 import java.util.*
 
-@PerActivity class WelcomeAdapter constructor(welcomeActivity: WelcomeActivity, private val requirementsChecker: RequirementsChecker) : FragmentStateAdapter(welcomeActivity) {
+@PerActivity
+class WelcomeAdapter constructor(welcomeActivity: WelcomeActivity, private val requirementsChecker: RequirementsChecker) : FragmentStateAdapter(welcomeActivity) {
     private val fragments = ArrayList<Fragment>()
     fun setupFragments(introFragment: Fragment, versionFragment: Fragment, playFragment: Fragment, permissionFragment: Fragment, finishFragment: Fragment) {
         fragments.add(introFragment)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) fragments.add(versionFragment)
-        if (!requirementsChecker.isPlayCheckPassed) {
+        if (!requirementsChecker.isPlayServicesCheckPassed()) {
             fragments.add(playFragment)
         }
-        if (!requirementsChecker.isPermissionCheckPassed) {
+        if (!requirementsChecker.isPermissionCheckPassed()) {
             fragments.add(permissionFragment)
         }
         fragments.add(finishFragment)

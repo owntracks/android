@@ -11,6 +11,7 @@ import org.owntracks.android.data.repos.ObjectboxWaypointsModule
 import org.owntracks.android.injection.modules.AndroidBindingModule
 import org.owntracks.android.injection.modules.SingletonModule
 import org.owntracks.android.services.worker.WorkerModule
+import org.owntracks.android.support.RequirementsCheckerModule
 import org.owntracks.android.support.preferences.SharedPreferencesStoreModule
 import javax.inject.Singleton
 
@@ -22,7 +23,8 @@ import javax.inject.Singleton
     AndroidSupportInjectionModule::class,
     AndroidBindingModule::class,
     SharedPreferencesStoreModule::class,
-    WorkerModule::class
+    WorkerModule::class,
+    RequirementsCheckerModule::class
 ])
 interface AppComponent : AndroidInjector<DaggerApplication> {
     @Component.Builder
