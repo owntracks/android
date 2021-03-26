@@ -32,8 +32,9 @@ class Geofence private constructor(
     }
 
     companion object {
-        const val GEOFENCE_TRANSITION_ENTER: Int = 0
-        const val GEOFENCE_TRANSITION_EXIT: Int = 1
+        const val GEOFENCE_TRANSITION_ENTER: Int = 1
+        const val GEOFENCE_TRANSITION_EXIT: Int = 2
+        const val GEOFENCE_TRANSITION_DWELL: Int = 4
         const val NEVER_EXPIRE: Int = Int.MAX_VALUE
     }
 }

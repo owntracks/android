@@ -12,8 +12,8 @@ import org.owntracks.android.ui.welcome.intro.IntroFragment
 import org.owntracks.android.ui.welcome.intro.IntroFragmentModule
 import org.owntracks.android.ui.welcome.permission.PermissionFragment
 import org.owntracks.android.ui.welcome.permission.PermissionFragmentModule
-import org.owntracks.android.ui.welcome.play.PlayFragment
-import org.owntracks.android.ui.welcome.play.PlayFragmentModule
+import org.owntracks.android.ui.welcome.permission.PlayFragment
+import org.owntracks.android.ui.welcome.permission.PlayFragmentModule
 import org.owntracks.android.ui.welcome.version.VersionFragment
 import org.owntracks.android.ui.welcome.version.VersionFragmentModule
 
@@ -26,10 +26,6 @@ abstract class WelcomeActivityModule {
     @Binds
     @PerActivity
     abstract fun bindViewModel(viewModel: WelcomeViewModel?): BaseViewModel<WelcomeMvvm.View?>?
-
-    @ContributesAndroidInjector(modules = [PlayFragmentModule::class])
-    @PerFragment
-    abstract fun bindPlayFragment(): PlayFragment?
 
     @ContributesAndroidInjector(modules = [IntroFragmentModule::class])
     @PerFragment
@@ -46,4 +42,8 @@ abstract class WelcomeActivityModule {
     @ContributesAndroidInjector(modules = [FinishFragmentModule::class])
     @PerFragment
     abstract fun bindFinishFragment(): FinishFragment?
+
+    @ContributesAndroidInjector(modules = [PlayFragmentModule::class])
+    @PerFragment
+    abstract fun bindPlayFragment(): PlayFragment?
 }

@@ -1,4 +1,4 @@
-package org.owntracks.android.ui.welcome.play
+package org.owntracks.android.ui.welcome.permission
 
 import androidx.fragment.app.Fragment
 import dagger.Binds

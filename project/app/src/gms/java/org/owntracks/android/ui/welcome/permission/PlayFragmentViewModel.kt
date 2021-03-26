@@ -1,4 +1,4 @@
-package org.owntracks.android.ui.welcome.play
+package org.owntracks.android.ui.welcome.permission
 
 import androidx.databinding.Bindable
 import org.owntracks.android.injection.scopes.PerFragment

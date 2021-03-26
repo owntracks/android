@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.viewpager2.widget.ViewPager2
-import androidx.viewpager2.widget.ViewPager2.SCROLL_STATE_DRAGGING
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiWelcomeBinding
 import org.owntracks.android.support.RequirementsChecker
@@ -16,7 +15,7 @@ import org.owntracks.android.ui.map.MapActivity
 import org.owntracks.android.ui.welcome.finish.FinishFragment
 import org.owntracks.android.ui.welcome.intro.IntroFragment
 import org.owntracks.android.ui.welcome.permission.PermissionFragment
-import org.owntracks.android.ui.welcome.play.PlayFragment
+import org.owntracks.android.ui.welcome.permission.PlayFragment
 import org.owntracks.android.ui.welcome.version.VersionFragment
 import timber.log.Timber
 import javax.inject.Inject

@@ -9,10 +9,10 @@ import androidx.databinding.BindingAdapter;
 import androidx.databinding.BindingConversion;
 import androidx.databinding.InverseMethod;
 
-import com.google.android.gms.location.Geofence;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
 import org.owntracks.android.R;
+import org.owntracks.android.location.geofencing.Geofence;
 import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.services.MessageProcessorEndpointHttp;
 import org.owntracks.android.services.MessageProcessorEndpointMqtt;
