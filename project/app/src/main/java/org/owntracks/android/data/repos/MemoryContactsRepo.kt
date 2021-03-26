@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import javax.inject.Singleton
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageLocation
@@ -14,7 +13,6 @@ import org.owntracks.android.support.Events.*
 import timber.log.Timber
 import javax.inject.Inject
 
-@Singleton
 class MemoryContactsRepo @Inject constructor(private val eventBus: EventBus, private val contactImageProvider: ContactImageProvider) : ContactsRepo {
     override val all = MutableLiveData<MutableMap<String, FusedContact>>(mutableMapOf())
     private var majorRevision: Long = 0
