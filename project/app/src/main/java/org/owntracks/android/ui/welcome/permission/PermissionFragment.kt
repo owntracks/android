@@ -1,12 +1,10 @@
 package org.owntracks.android.ui.welcome.permission
 
 import android.Manifest
-import android.content.Context
 import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,7 +17,6 @@ import org.owntracks.android.databinding.UiWelcomePermissionsBinding
 import org.owntracks.android.support.Events.PermissionGranted
 import org.owntracks.android.ui.base.BaseSupportFragment
 import org.owntracks.android.ui.welcome.WelcomeMvvm
-import timber.log.Timber
 import javax.inject.Inject
 
 class PermissionFragment : BaseSupportFragment<UiWelcomePermissionsBinding?, PermissionFragmentViewModel>(), PermissionFragmentMvvm.View {
@@ -40,16 +37,16 @@ class PermissionFragment : BaseSupportFragment<UiWelcomePermissionsBinding?, Per
                             .setCancelable(true)
                             .setMessage(R.string.permissions_description)
                             .setPositiveButton("OK"
-                            ) { _: DialogInterface?, _: Int -> requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), Companion.PERMISSIONS_REQUEST_CODE) }
+                            ) { _: DialogInterface?, _: Int -> requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), PERMISSIONS_REQUEST_CODE) }
                             .show()
                 } else {
                     Toast.makeText(this.context, "Unable to proceed without location permissions.", Toast.LENGTH_SHORT).show()
                 }
             } else {
-                requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), Companion.PERMISSIONS_REQUEST_CODE)
+                requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), PERMISSIONS_REQUEST_CODE)
             }
         } else {
-            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), Companion.PERMISSIONS_REQUEST_CODE)
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), PERMISSIONS_REQUEST_CODE)
         }
     }
 

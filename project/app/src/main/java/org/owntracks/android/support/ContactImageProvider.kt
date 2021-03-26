@@ -9,8 +9,6 @@ import android.widget.ImageView
 import androidx.collection.ArrayMap
 import androidx.databinding.BindingAdapter
 import androidx.databinding.DataBindingComponent
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.Marker
 import kotlinx.coroutines.*
 import org.owntracks.android.injection.qualifier.AppContext
 import org.owntracks.android.model.FusedContact
@@ -64,25 +62,7 @@ class ContactImageProvider @Inject constructor(@AppContext context: Context) : D
         memoryCache.clearLevelCard(key)
     }
 
-    fun setMarkerAsync(marker: Marker, contact: FusedContact?) {
-        GlobalScope.launch(Dispatchers.Main) {
-            contact?.let {
-                val bitmap = BitmapDescriptorFactory.fromBitmap(getBitmapFromCache(it))
-                marker.setIcon(bitmap)
-                marker.isVisible = true
-            }
-        }
-    }
-
-    fun setImageViewAsync(imageView: ImageView, contact: FusedContact?) {
-        GlobalScope.launch(Dispatchers.Main) {
-            contact?.let {
-                imageView.setImageBitmap(getBitmapFromCache(it))
-            }
-        }
-    }
-
-    private suspend fun getBitmapFromCache(contact: FusedContact?): Bitmap? {
+    suspend fun getBitmapFromCache(contact: FusedContact?): Bitmap? {
         return withContext(Dispatchers.IO) {
             var bitmap: Bitmap?
             if (contact == null) return@withContext null
@@ -158,7 +138,9 @@ class ContactImageProvider @Inject constructor(@AppContext context: Context) : D
 
     @BindingAdapter("imageProvider", "contact")
     fun displayFaceInViewAsync(view: ImageView, imageProvider: Int?, c: FusedContact?) {
-        setImageViewAsync(view, c);
+        GlobalScope.launch(Dispatchers.Main) {
+            view.setImageBitmap(getBitmapFromCache(c))
+        }
     }
 
     companion object {
