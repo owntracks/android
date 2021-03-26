@@ -23,7 +23,7 @@ class MessageCard : MessageBase() {
         return name != null
     }
 
-    override val baseTopicSuffix: String?
+    override val baseTopicSuffix: String
         get() = BASETOPIC_SUFFIX
 
     companion object {
