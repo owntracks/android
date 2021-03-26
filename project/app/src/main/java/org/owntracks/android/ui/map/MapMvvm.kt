@@ -15,7 +15,7 @@ interface MapMvvm {
         fun setBottomSheetCollapsed()
         fun setBottomSheetHidden()
         fun updateMarker(contact: FusedContact?)
-        fun removeMarker(c: FusedContact?)
+        fun removeMarker(contact: FusedContact?)
         fun clearMarkers()
         fun enableLocationMenus()
         fun updateMonitoringModeMenu()

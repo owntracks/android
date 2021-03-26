@@ -253,8 +253,8 @@ play {
     resolutionStrategy.set(com.github.triplet.gradle.androidpublisher.ResolutionStrategy.AUTO)
 }
 
-// Espresso test  screenshot gathering
-val reportsDirectory = File("$buildDir/reports/androidTests/connected/flavors/debugAndroidTest")
+// Espresso test screenshot gathering
+val reportsDirectory = File("$buildDir/reports/androidTests/connected/flavors/gmsDebugAndroidTest")
 val screenshotsDeviceFolder = "/storage/emulated/0/Download/testscreenshots"
 
 val createScreenshotDirectoryTask = tasks.register<Exec>("createScreenshotDirectory") {
