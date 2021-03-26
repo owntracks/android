@@ -1,7 +1,7 @@
 package org.owntracks.android.model.messages
 
 import com.fasterxml.jackson.annotation.*
-import com.google.android.gms.location.Geofence
+import org.owntracks.android.location.geofencing.Geofence
 import org.owntracks.android.support.Preferences
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")

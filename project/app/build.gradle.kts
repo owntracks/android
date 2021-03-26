@@ -129,6 +129,7 @@ android {
             dimension = "locationProvider"
             sourceSets {
                 getByName("main").java.srcDirs("src/gms/java")
+                getByName("main").res.srcDirs("src/gms/res")
             }
             dependencies {
                 // Play Services libraries
