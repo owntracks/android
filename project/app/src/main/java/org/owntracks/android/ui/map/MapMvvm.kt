@@ -37,9 +37,9 @@ interface MapMvvm {
         val onMapClickListener: GoogleMap.OnMapClickListener?
         val onMarkerClickListener: GoogleMap.OnMarkerClickListener?
         val onMapCameraMoveStartedListener: GoogleMap.OnCameraMoveStartedListener?
-        val contact: LiveData<FusedContact?>?
-        val bottomSheetHidden: LiveData<Boolean?>?
-        val center: LiveData<LatLng?>?
+        val contact: LiveData<FusedContact>
+        val bottomSheetHidden: LiveData<Boolean>
+        val center: LiveData<LatLng>
         fun sendLocation()
     }
 }

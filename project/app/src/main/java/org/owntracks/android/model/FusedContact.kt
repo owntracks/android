@@ -11,7 +11,7 @@ import timber.log.Timber
 
 class FusedContact(id: String?) : BaseObservable(), Comparable<FusedContact> {
     @get:Bindable
-    val id: String = if (id != null && !id.isEmpty()) id else "NOID"
+    val id: String = if (id != null && id.isNotEmpty()) id else "NOID"
 
     @get:Bindable
     val messageLocation = MutableLiveData<MessageLocation?>()
