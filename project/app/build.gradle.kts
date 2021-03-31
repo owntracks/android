@@ -142,7 +142,7 @@ dependencies {
     implementation("androidx.work:work-runtime:2.5.0")
 
     // Explicit dependency on conscrypt to give up-to-date TLS support on all devices
-    implementation("org.conscrypt:conscrypt-android:2.5.1")
+    implementation("org.conscrypt:conscrypt-android:2.5.2")
 
     // Play Services libraries
     implementation("com.google.android.gms:play-services-maps:17.0.0")
