@@ -90,6 +90,7 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     private static final String INTENT_ACTION_SEND_EVENT_CIRCULAR = "org.owntracks.android.SEND_EVENT_CIRCULAR";
     private static final String INTENT_ACTION_REREQUEST_LOCATION_UPDATES = "org.owntracks.android.REREQUEST_LOCATION_UPDATES";
     private static final String INTENT_ACTION_CHANGE_MONITORING = "org.owntracks.android.CHANGE_MONITORING";
+    private static final String INTENT_ACTION_BOOT_COMPLETED = "android.intent.action.BOOT_COMPLETED";
 
     private FusedLocationProviderClient fusedLocationClient;
     private GeofencingClient mGeofencingClient;
@@ -209,7 +210,6 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
     }
 
     private void handleIntent(@NonNull Intent intent) {
-
         if (intent.getAction() != null) {
             Timber.v("intent received with action:%s", intent.getAction());
 
@@ -232,6 +232,11 @@ public class BackgroundService extends DaggerService implements OnCompleteListen
                     } else {
                         // Step monitoring mode if no mode is specified
                         preferences.setMonitoringNext();
+                    }
+                    return;
+                case INTENT_ACTION_BOOT_COMPLETED:
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        // TODO: 02/04/2021 Raise a notification that we're not going to get locations until the user has actually opened the app.
                     }
                     return;
                 default:

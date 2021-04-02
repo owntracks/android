@@ -21,7 +21,9 @@ class StartBackgroundServiceReceiver : DaggerBroadcastReceiver() {
             Timber.v("android.intent.action.BOOT_COMPLETED received")
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 Timber.v("running startForegroundService")
-                context.startForegroundService(Intent(context, BackgroundService::class.java))
+                val startIntent = Intent(context, BackgroundService::class.java)
+                startIntent.action = intent.action
+                context.startForegroundService(startIntent)
             } else {
                 Timber.v("running legacy startService")
                 context.startService(Intent(context, BackgroundService::class.java))
