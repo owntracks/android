@@ -1,7 +1,6 @@
 package org.owntracks.android.ui.map
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.DialogInterface
@@ -23,16 +22,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.PopupMenu
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
+import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
 import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.idling.CountingIdlingResource
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.Behavior.DragCallback
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -64,13 +57,14 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
-class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>?>(), MapMvvm.View, View.OnClickListener, View.OnLongClickListener, PopupMenu.OnMenuItemClickListener, OnMapReadyCallback, Observer<Any?> {
-    private val markers: MutableMap<String, Marker?> = HashMap()
-    private var googleMap: GoogleMap? = null
+class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>?>(), MapMvvm.View, View.OnClickListener, View.OnLongClickListener, PopupMenu.OnMenuItemClickListener, Observer<Any?> {
+
+
     private var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>? = null
-    private var isMapReady = false
-    private var mMenu: Menu? = null
+
+    private var menu: Menu? = null
     private var locationProviderClient: LocationProviderClient? = null
+    private val mapFragment: MapFragment = GoogleMapFragment()
     var locationRepoUpdaterCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
             Timber.d("Foreground location result received: %s", locationResult)
@@ -120,13 +114,13 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         setSupportToolbar(binding!!.toolbar, false, true)
         setDrawer(binding!!.toolbar)
 
-        // Workaround for Google Maps crash on Android 6
-        try {
-            binding!!.mapView.onCreate(savedInstanceState)
-        } catch (e: Exception) {
-            Timber.e(e, "Failed to bind map to view.")
-            isMapReady = false
+        if (savedInstanceState == null) {
+            supportFragmentManager.commit {
+                setReorderingAllowed(true)
+                add(R.id.mapFragment, mapFragment)
+            }
         }
+
         bottomSheetBehavior = BottomSheetBehavior.from(binding!!.bottomSheetLayout)
         binding!!.contactPeek.contactRow.setOnClickListener(this)
         binding!!.contactPeek.contactRow.setOnLongClickListener(this)
@@ -141,17 +135,17 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
             }
         })
         params.behavior = behavior
-        viewModel!!.contact!!.observe(this, this)
-        viewModel!!.bottomSheetHidden!!.observe(this, { o: Boolean? ->
+        viewModel!!.contact.observe(this, this)
+        viewModel!!.bottomSheetHidden.observe(this, { o: Boolean? ->
             if (o == null || o) {
                 setBottomSheetHidden()
             } else {
                 setBottomSheetCollapsed()
             }
         })
-        viewModel!!.center!!.observe(this, { o: LatLng? ->
+        viewModel!!.center.observe(this, { o: LatLng? ->
             if (o != null) {
-                updateCamera(o)
+                mapFragment.updateCamera(o)
             }
         })
         checkAndRequestLocationPermissions()
@@ -217,42 +211,8 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         }
     }
 
-    public override fun onSaveInstanceState(bundle: Bundle) {
-        super.onSaveInstanceState(bundle)
-        try {
-            binding!!.mapView.onSaveInstanceState(bundle)
-        } catch (ignored: Exception) {
-            isMapReady = false
-        }
-    }
-
-    public override fun onDestroy() {
-        try {
-            binding!!.mapView.onDestroy()
-        } catch (ignored: Exception) {
-            isMapReady = false
-        }
-        super.onDestroy()
-    }
-
     override fun onResume() {
         super.onResume()
-        isMapReady = false
-        try {
-            binding!!.mapView.onResume()
-            if (googleMap == null) {
-                Timber.v("map not ready. Running initDelayed()")
-                isMapReady = false
-                initMapDelayed()
-            } else {
-                Timber.v("map ready. Running onMapReady()")
-                isMapReady = true
-                viewModel!!.onMapReady()
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Not showing map due to crash in Google Maps library")
-            isMapReady = false
-        }
         handleIntentExtras(intent)
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -270,11 +230,6 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
 
     override fun onPause() {
         super.onPause()
-        try {
-            binding!!.mapView.onPause()
-        } catch (e: Exception) {
-            isMapReady = false
-        }
         locationProviderClient!!.removeLocationUpdates(locationRepoUpdaterCallback)
     }
 
@@ -290,52 +245,25 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         }
     }
 
-    override fun onLowMemory() {
-        super.onLowMemory()
-        try {
-            binding!!.mapView.onLowMemory()
-        } catch (ignored: Exception) {
-            isMapReady = false
-        }
-    }
-
     public override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         handleIntentExtras(intent)
-        try {
-            binding!!.mapView.onLowMemory()
-        } catch (ignored: Exception) {
-            isMapReady = false
-        }
-    }
-
-    private fun initMapDelayed() {
-        isMapReady = false
-        runThingsOnOtherThreads!!.postOnMainHandlerDelayed({ initMap() }, 500)
-    }
-
-    private fun initMap() {
-        isMapReady = false
-        try {
-            binding!!.mapView.getMapAsync(this)
-        } catch (ignored: Exception) {
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val inflater = menuInflater
         inflater.inflate(R.menu.activity_map, menu)
-        mMenu = menu
+        this.menu = menu
         if (viewModel!!.hasLocation()) enableLocationMenus() else disableLocationMenus()
         updateMonitoringModeMenu()
         return true
     }
 
     override fun updateMonitoringModeMenu() {
-        if (mMenu == null) {
+        if (menu == null) {
             return
         }
-        val item = mMenu!!.findItem(R.id.menu_monitoring)
+        val item = menu!!.findItem(R.id.menu_monitoring)
         when (preferences.monitoring) {
             LocationProcessor.MONITORING_QUIET -> {
                 item.setIcon(R.drawable.ic_baseline_stop_36)
@@ -396,86 +324,49 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
     }
 
     private fun disableLocationMenus() {
-        if (mMenu != null) {
-            mMenu!!.findItem(R.id.menu_mylocation).setEnabled(false).icon.alpha = 128
-            mMenu!!.findItem(R.id.menu_report).setEnabled(false).icon.alpha = 128
+        if (menu != null) {
+            menu!!.findItem(R.id.menu_mylocation).setEnabled(false).icon.alpha = 128
+            menu!!.findItem(R.id.menu_report).setEnabled(false).icon.alpha = 128
         }
     }
 
     override fun enableLocationMenus() {
-        if (mMenu != null) {
-            mMenu!!.findItem(R.id.menu_mylocation).setEnabled(true).icon.alpha = 255
-            mMenu!!.findItem(R.id.menu_report).setEnabled(true).icon.alpha = 255
+        if (menu != null) {
+            menu!!.findItem(R.id.menu_mylocation).setEnabled(true).icon.alpha = 255
+            menu!!.findItem(R.id.menu_report).setEnabled(true).icon.alpha = 255
         }
-    }
-
-    // MAP CALLBACKS
-    @SuppressLint("MissingPermission")
-    override fun onMapReady(googleMap: GoogleMap) {
-        this.googleMap = googleMap
-        this.googleMap!!.isIndoorEnabled = false
-        this.googleMap!!.setLocationSource(viewModel!!.mapLocationSource)
-        this.googleMap!!.isMyLocationEnabled = true
-        this.googleMap!!.uiSettings.isMyLocationButtonEnabled = false
-        this.googleMap!!.setOnMapClickListener(viewModel!!.onMapClickListener)
-        this.googleMap!!.setOnCameraMoveStartedListener(viewModel!!.onMapCameraMoveStartedListener)
-        this.googleMap!!.setOnMarkerClickListener(viewModel!!.onMarkerClickListener)
-//        this.googleMap!!.setInfoWindowAdapter(object : InfoWindowAdapter {
-//            override fun getInfoWindow(marker: Marker): View {
-//                return null
-//            }
-//
-//            override fun getInfoContents(marker: Marker): View {
-//                return null
-//            }
-//        })
-        isMapReady = true
-        viewModel!!.onMenuCenterDeviceClicked()
-        viewModel!!.onMapReady()
-    }
-
-    private fun updateCamera(latLng: LatLng) {
-        if (isMapReady) googleMap!!.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOM_LEVEL_STREET.toFloat()))
     }
 
     override fun clearMarkers() {
-        if (isMapReady) googleMap!!.clear()
-        markers.clear()
+        mapFragment.clearMarkers()
     }
 
-    override fun removeMarker(contact: FusedContact?) {
-        if (contact == null) return
-        val m = markers[contact.id]
-        m?.remove()
+    override fun removeMarker(contact: FusedContact) {
+        mapFragment.removeMarker(contact.id)
     }
 
-    override fun updateMarker(contact: FusedContact?) {
-        if (contact == null || !contact.hasLocation() || !isMapReady) {
-            Timber.v("unable to update marker. null:%s, location:%s, mapReady:%s", contact == null, contact == null || contact.hasLocation(), isMapReady)
+    override fun updateMarker(contact: FusedContact) {
+        if (!contact.hasLocation()) {
+            Timber.i("unable to update marker. no location")
             return
         }
         Timber.v("updating marker for contact: %s", contact.id)
-        var marker = markers[contact.id]
-        if (marker != null && marker.tag != null) {
-            marker.position = contact.latLng.toGMSLatLng()
-        } else {
-            // If a marker has been removed, its tag will be null. Doing anything with it will make it explode
-            if (marker != null) {
-                markers.remove(contact.id)
-            }
-            marker = googleMap!!.addMarker(MarkerOptions().position(contact.latLng.toGMSLatLng()).anchor(0.5f, 0.5f).visible(false))
-            marker.tag = contact.id
-            markers[contact.id] = marker
-        }
+        mapFragment.updateMarker(contact.id, contact.latLng)
         GlobalScope.launch(Dispatchers.Main) {
             contactImageProvider?.run {
-                val bitmap = BitmapDescriptorFactory.fromBitmap(getBitmapFromCache(contact))
-                marker?.let {
-                    it.setIcon(bitmap)
-                    it.isVisible = true
+                getBitmapFromCache(contact)?.let {
+                    mapFragment.setMarkerImage(contact.id, it)
                 }
             }
         }
+    }
+
+    fun onMarkerClicked(id: String) {
+        viewModel?.onMarkerClick(id)
+    }
+
+    fun onMapClick() {
+        viewModel?.onMapClick()
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
@@ -485,7 +376,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
             if (c != null && c.hasLocation()) {
                 try {
                     val l = c.latLng.toGMSLatLng()
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("google.navigation:q=" + l.latitude + "," + l.longitude))
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("google.navigation:q=${l.latitude},${l.longitude}"))
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     startActivity(intent)
                 } catch (e: ActivityNotFoundException) {
@@ -523,7 +414,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
 
     override fun setBottomSheetHidden() {
         bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_HIDDEN
-        if (mMenu != null) mMenu!!.close()
+        if (menu != null) menu!!.close()
     }
 
     private fun showPopupMenu(v: View) {
@@ -551,7 +442,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
 
     companion object {
         const val BUNDLE_KEY_CONTACT_ID = "BUNDLE_KEY_CONTACT_ID"
-        private const val ZOOM_LEVEL_STREET: Long = 15
+
         private const val PERMISSIONS_REQUEST_CODE = 1
     }
 }
