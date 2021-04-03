@@ -26,7 +26,6 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
 import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.idling.CountingIdlingResource
-import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -34,7 +33,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.tasks.Task
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.Behavior.DragCallback
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -47,6 +45,7 @@ import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.databinding.UiMapBinding
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.gms.location.toGMSLatLng
+import org.owntracks.android.location.*
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.services.LocationProcessor
@@ -71,7 +70,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
     private var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>? = null
     private var isMapReady = false
     private var mMenu: Menu? = null
-    private var fusedLocationClient: FusedLocationProviderClient? = null
+    private var locationProviderClient: LocationProviderClient? = null
     var locationRepoUpdaterCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
             Timber.d("Foreground location result received: %s", locationResult)
@@ -162,7 +161,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         } else {
             startService(Intent(this, BackgroundService::class.java))
         }
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        locationProviderClient = LocationServices.getLocationProviderClient(this)
     }
 
     private fun checkAndRequestLocationPermissions() {
@@ -259,13 +258,13 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             checkAndRequestLocationPermissions()
         }
-        fusedLocationClient!!.requestLocationUpdates(
-                LocationRequest.create()
+        locationProviderClient!!.requestLocationUpdates(
+                LocationRequest()
                         .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                         .setInterval(TimeUnit.SECONDS.toMillis(5)),
                 locationRepoUpdaterCallback,
                 Looper.getMainLooper()
-        ).addOnCompleteListener { task: Task<Void?> -> Timber.i("Requested foreground location updates. isSuccessful: %s isCancelled: %s", task.isSuccessful, task.isCanceled) }
+        )
         updateMonitoringModeMenu()
     }
 
@@ -276,7 +275,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         } catch (e: Exception) {
             isMapReady = false
         }
-        fusedLocationClient!!.removeLocationUpdates(locationRepoUpdaterCallback).addOnCompleteListener { task: Task<Void?> -> Timber.i("Removed foreground location updates. isSuccessful: %s isCancelled: %s", task.isSuccessful, task.isCanceled) }
+        locationProviderClient!!.removeLocationUpdates(locationRepoUpdaterCallback)
     }
 
     private fun handleIntentExtras(intent: Intent) {
