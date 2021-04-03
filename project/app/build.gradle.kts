@@ -159,7 +159,11 @@ dependencies {
     implementation("androidx.preference:preference:1.1.1")
     implementation("com.takisoft.preferencex:preferencex:1.1.0")
     implementation("com.google.android.material:material:1.3.0")
+
     implementation("androidx.work:work-runtime:2.5.0")
+    implementation("androidx.fragment:fragment-ktx:1.3.2")
+    implementation("androidx.core:core-ktx:1.3.2")
+    implementation("androidx.test.espresso:espresso-idling-resource:${espressoVersion}")
 
     // Explicit dependency on conscrypt to give up-to-date TLS support on all devices
     implementation("org.conscrypt:conscrypt-android:2.5.2")
@@ -199,10 +203,6 @@ dependencies {
     implementation("com.rengwuxian.materialedittext:library:2.1.4")
     implementation("com.mikepenz:materialdrawer:6.1.2@aar") { isTransitive = true }
     implementation("com.mikepenz:materialize:1.2.1@aar")
-
-    implementation("androidx.core:core-ktx:1.3.2")
-
-    implementation("androidx.test.espresso:espresso-idling-resource:${espressoVersion}")
 
     // These Java EE libs are no longer included in JDKs, so we include explicitly
     kapt("javax.xml.bind:jaxb-api:2.3.1")

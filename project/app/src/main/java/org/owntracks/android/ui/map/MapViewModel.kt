@@ -5,16 +5,12 @@ import android.os.Bundle
 import androidx.databinding.Bindable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.google.android.gms.maps.GoogleMap.*
-import com.google.android.gms.maps.LocationSource
 import com.google.android.gms.maps.LocationSource.OnLocationChangedListener
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import org.owntracks.android.data.repos.ContactsRepo
-import org.owntracks.android.gms.location.toGMSLatLng
 import org.owntracks.android.injection.scopes.PerActivity
+import org.owntracks.android.location.LatLng
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.model.messages.MessageClear
 import org.owntracks.android.model.messages.MessageLocation
@@ -27,7 +23,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @PerActivity
-class MapViewModel @Inject constructor(contactsRepo: ContactsRepo, locationRepo: LocationProcessor, messageProcessor: MessageProcessor) : BaseViewModel<MapMvvm.View>(), MapMvvm.ViewModel<MapMvvm.View>, LocationSource, OnMapClickListener, OnMarkerClickListener, OnCameraMoveStartedListener {
+class MapViewModel @Inject constructor(contactsRepo: ContactsRepo, locationRepo: LocationProcessor, messageProcessor: MessageProcessor) : BaseViewModel<MapMvvm.View>(), MapMvvm.ViewModel<MapMvvm.View>{
     private val contactsRepo: ContactsRepo
     private val locationProcessor: LocationProcessor
 
@@ -37,18 +33,12 @@ class MapViewModel @Inject constructor(contactsRepo: ContactsRepo, locationRepo:
     private var onLocationChangedListener: OnLocationChangedListener? = null
     private val messageProcessor: MessageProcessor
     private var location: Location? = null
-    private val liveContact = MutableLiveData<FusedContact>()
+    private val liveContact = MutableLiveData<FusedContact?>()
     private val liveBottomSheetHidden = MutableLiveData<Boolean>()
     private val liveCamera = MutableLiveData<LatLng>()
     val locationIdlingResource = SimpleIdlingResource("locationIdlingResource", false)
     override fun saveInstanceState(outState: Bundle) {}
     override fun restoreInstanceState(savedInstanceState: Bundle) {}
-    override val mapLocationSource: LocationSource
-        get() = this
-    override val onMapClickListener: OnMapClickListener
-        get() = this
-    override val onMarkerClickListener: OnMarkerClickListener
-        get() = this
 
     override fun onMapReady() {
         for (c in contactsRepo.all.value!!.values) {
@@ -61,7 +51,7 @@ class MapViewModel @Inject constructor(contactsRepo: ContactsRepo, locationRepo:
         }
     }
 
-    override val contact: LiveData<FusedContact>
+    override val contact: LiveData<FusedContact?>
         get() = liveContact
     override val bottomSheetHidden: LiveData<Boolean>
         get() = liveBottomSheetHidden
@@ -83,7 +73,7 @@ class MapViewModel @Inject constructor(contactsRepo: ContactsRepo, locationRepo:
         activeContact = c
         liveContact.postValue(c)
         liveBottomSheetHidden.postValue(false)
-        if (center) liveCamera.postValue(c.latLng.toGMSLatLng())
+        if (center) liveCamera.postValue(c.latLng)
     }
 
     private fun setViewModeFree() {
@@ -158,7 +148,7 @@ class MapViewModel @Inject constructor(contactsRepo: ContactsRepo, locationRepo:
         view!!.updateMarker(c)
         if (c == activeContact) {
             liveContact.postValue(c)
-            liveCamera.postValue(c.latLng.toGMSLatLng())
+            liveCamera.postValue(c.latLng)
         }
     }
 
@@ -186,42 +176,16 @@ class MapViewModel @Inject constructor(contactsRepo: ContactsRepo, locationRepo:
         }
     }
 
-    // Map Callback
-    override fun activate(onLocationChangedListener: OnLocationChangedListener) {
-        Timber.v("location source activated")
-        this.onLocationChangedListener = onLocationChangedListener
-        if (location != null) this.onLocationChangedListener!!.onLocationChanged(location)
-    }
-
-    // Map Callback
-    override fun deactivate() {
-        onLocationChangedListener = null
-    }
-
-    // Map Callback
-    override fun onMapClick(latLng: LatLng) {
+    override fun onMapClick() {
         setViewModeFree()
     }
 
-    // Map Callback
-    override fun onMarkerClick(marker: Marker): Boolean {
-        if (marker.tag != null) {
-            setViewModeContact((marker.tag as String?)!!, false)
-        }
-        return true
+    override fun onMarkerClick(id: String) {
+        setViewModeContact(id, false)
     }
 
     override fun onBottomSheetLongClick() {
         setViewModeContact(activeContact!!.id, true)
-    }
-
-    override val onMapCameraMoveStartedListener: OnCameraMoveStartedListener
-        get() = this
-
-    override fun onCameraMoveStarted(reason: Int) {
-        if (reason == OnCameraMoveStartedListener.REASON_GESTURE) {
-            setViewModeFree()
-        }
     }
 
     companion object {
