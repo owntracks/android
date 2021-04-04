@@ -81,7 +81,7 @@ class MemoryContactsRepoTest {
     @Test
     fun repoCorrectlyHandlesEventModeChanged() {
         contactsRepo!!.update(CONTACT_ID, messageLocation)
-        (contactsRepo as MemoryContactsRepo?)!!.onEventMainThread(ModeChanged(0, 1))
+        (contactsRepo as MemoryContactsRepo?)!!.onEventMainThread(ModeChanged(1))
         assertTrue(contactsRepo!!.all.value!!.isEmpty())
     }
 
