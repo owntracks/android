@@ -33,6 +33,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
+import org.owntracks.android.BuildConfig.FLAVOR
 import org.owntracks.android.R
 import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.databinding.UiMapBinding
@@ -50,6 +51,7 @@ import org.owntracks.android.support.RunThingsOnOtherThreads
 import org.owntracks.android.support.widgets.BindingConversions
 import org.owntracks.android.ui.base.BaseActivity
 import org.owntracks.android.ui.base.navigator.Navigator
+import org.owntracks.android.ui.map.osm.OSMMapFragment
 import org.owntracks.android.ui.welcome.WelcomeActivity
 import timber.log.Timber
 import java.util.*
@@ -64,7 +66,10 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
 
     private var menu: Menu? = null
     private var locationProviderClient: LocationProviderClient? = null
-    private val mapFragment: MapFragment = GoogleMapFragment()
+    private val mapFragment: MapFragment = when (FLAVOR) {
+        "gms" -> GoogleMapFragment()
+        else -> OSMMapFragment()
+    }
     var locationRepoUpdaterCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
             Timber.d("Foreground location result received: %s", locationResult)

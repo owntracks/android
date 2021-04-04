@@ -168,9 +168,8 @@ dependencies {
     // Explicit dependency on conscrypt to give up-to-date TLS support on all devices
     implementation("org.conscrypt:conscrypt-android:2.5.2")
 
-    // Play Services libraries
-    implementation("com.google.android.gms:play-services-maps:17.0.0")
-    implementation("com.google.android.gms:play-services-location:18.0.0")
+    // Mapping
+    implementation("org.osmdroid:osmdroid-android:6.1.10")
 
     // Utility libraries
     implementation("com.google.dagger:dagger:${daggerVersion}")

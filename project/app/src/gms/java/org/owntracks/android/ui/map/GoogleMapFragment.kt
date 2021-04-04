@@ -15,12 +15,10 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import org.greenrobot.eventbus.EventBus
 import org.owntracks.android.R
 import org.owntracks.android.databinding.GoogleMapFragmentBinding
 import org.owntracks.android.gms.location.toGMSLatLng
 import java.util.*
-import javax.inject.Inject
 
 
 class GoogleMapFragment : MapFragment(), OnMapReadyCallback {
@@ -28,10 +26,7 @@ class GoogleMapFragment : MapFragment(), OnMapReadyCallback {
     private var binding: GoogleMapFragmentBinding? = null
     private val markers: MutableMap<String, Marker?> = HashMap()
 
-    @Inject
-    lateinit var eventBus: EventBus
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.google_map_fragment, container, false)
         MapsInitializer.initialize(requireContext())
         val mapView = this.binding!!.googleMapView
@@ -64,7 +59,7 @@ class GoogleMapFragment : MapFragment(), OnMapReadyCallback {
     }
 
     override fun updateCamera(latLng: org.owntracks.android.location.LatLng) {
-        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng.toGMSLatLng(), ZOOM_LEVEL_STREET.toFloat()))
+        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng.toGMSLatLng(), ZOOM_LEVEL_STREET))
     }
 
     override fun clearMarkers() {
@@ -133,6 +128,6 @@ class GoogleMapFragment : MapFragment(), OnMapReadyCallback {
     }
 
     companion object {
-        private const val ZOOM_LEVEL_STREET: Long = 15
+        private const val ZOOM_LEVEL_STREET: Float = 15f
     }
 }
