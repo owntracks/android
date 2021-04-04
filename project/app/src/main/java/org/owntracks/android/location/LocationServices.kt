@@ -18,7 +18,7 @@ object LocationServices {
     fun getLocationProviderClient(context: Context): LocationProviderClient {
         return when (FLAVOR) {
             "gms" -> GMSLocationProviderClient.create(context)
-            else -> AospLocationProviderClient()
+            else -> AospLocationProviderClient(context)
         }
     }
 }

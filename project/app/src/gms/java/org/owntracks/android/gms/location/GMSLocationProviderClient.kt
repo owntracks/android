@@ -26,8 +26,8 @@ class GMSLocationProviderClient(private val fusedLocationProviderClient: FusedLo
                 clientCallBack.onLocationResult(org.owntracks.android.location.LocationResult(locationResult.lastLocation))
             }
 
-            override fun onLocationAvailability(p0: LocationAvailability) {
-                clientCallBack.onLocationAvailability(org.owntracks.android.location.LocationAvailability(p0.isLocationAvailable))
+            override fun onLocationAvailability(locationAvailability: LocationAvailability) {
+                clientCallBack.onLocationAvailability(org.owntracks.android.location.LocationAvailability(locationAvailability.isLocationAvailable))
             }
         }
         callbackMap[clientCallBack] = gmsCallBack
@@ -35,7 +35,10 @@ class GMSLocationProviderClient(private val fusedLocationProviderClient: FusedLo
     }
 
     override fun removeLocationUpdates(clientCallBack: LocationCallback) {
-        callbackMap[clientCallBack]?.let { fusedLocationProviderClient.removeLocationUpdates(it) }
+        callbackMap[clientCallBack]?.run {
+            fusedLocationProviderClient.removeLocationUpdates(this)
+            callbackMap.remove(clientCallBack)
+        }
     }
 
     override fun flushLocations() {
