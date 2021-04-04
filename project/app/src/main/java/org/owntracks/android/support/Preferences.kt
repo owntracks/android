@@ -8,7 +8,6 @@ import org.greenrobot.eventbus.EventBus
 import org.owntracks.android.BuildConfig
 import org.owntracks.android.R
 import org.owntracks.android.injection.qualifier.AppContext
-import javax.inject.Singleton
 import org.owntracks.android.model.messages.MessageConfiguration
 import org.owntracks.android.services.LocationProcessor
 import org.owntracks.android.services.MessageProcessorEndpointHttp
@@ -26,6 +25,7 @@ import java.lang.reflect.Type
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 class Preferences @Inject constructor(@AppContext c: Context, private val eventBus: EventBus?, private val preferencesStore: PreferencesStore) {
@@ -186,7 +186,7 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
         currentMode = requestedMode
         if (!init && eventBus != null) {
             Timber.v("broadcasting mode change event")
-            eventBus.post(ModeChanged(oldModeId, currentMode))
+            eventBus.post(ModeChanged(currentMode))
         }
     }
 
@@ -221,7 +221,7 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
             }
             if (newMode != this.monitoring) {
                 setInt(R.string.preferenceKeyMonitoring, newMode)
-                eventBus?.post(MonitoringChanged(newMode))
+                eventBus?.post(MonitoringChanged())
             }
         }
 

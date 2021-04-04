@@ -98,37 +98,37 @@ class GoogleMapFragment : MapFragment(), OnMapReadyCallback {
     }
 
     override fun onResume() {
-        binding!!.googleMapView.onResume()
+        binding?.googleMapView?.onResume()
         super.onResume()
     }
 
     override fun onLowMemory() {
-        binding!!.googleMapView.onLowMemory()
+        binding?.googleMapView?.onLowMemory()
         super.onLowMemory()
     }
 
     override fun onPause() {
-        binding!!.googleMapView.onPause()
+        binding?.googleMapView?.onPause()
         super.onPause()
     }
 
     override fun onDestroy() {
-        binding!!.googleMapView.onDestroy()
+        binding?.googleMapView?.onDestroy()
         super.onDestroy()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        binding!!.googleMapView.onSaveInstanceState(outState)
+        binding?.googleMapView?.onSaveInstanceState(outState)
         super.onSaveInstanceState(outState)
     }
 
     override fun onStart() {
-        binding!!.googleMapView.onStart()
+        binding?.googleMapView?.onStart()
         super.onStart()
     }
 
     override fun onStop() {
-        binding!!.googleMapView.onStop()
+        binding?.googleMapView?.onStop()
         super.onStop()
     }
 
