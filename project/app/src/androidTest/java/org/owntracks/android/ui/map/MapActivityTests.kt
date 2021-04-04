@@ -139,7 +139,7 @@ class MapActivityTests {
                 .putBoolean(context.getString(R.string.preferenceKeySetupNotCompleted), false)
                 .apply()
         baristaRule.launchActivity()
-        assertDisplayed(R.id.mapView)
+        assertDisplayed(R.id.google_map_view)
     }
 
     private fun doWelcomeProcess() {
