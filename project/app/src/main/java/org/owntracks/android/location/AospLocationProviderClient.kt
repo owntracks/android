@@ -2,37 +2,40 @@ package org.owntracks.android.location
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.location.LocationListener
-import android.location.LocationManager
 import android.os.Looper
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
+import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer
 import timber.log.Timber
 
 class AospLocationProviderClient(val context: Context) : LocationProviderClient {
-    private val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-    private val callbackMap = mutableMapOf<LocationCallback, LocationListener>()
+    private val callbackMap = mutableMapOf<LocationCallback, IMyLocationConsumer>()
+    private val gpsMyLocationProvider = GpsMyLocationProvider(context)
 
     @SuppressLint("MissingPermission")
     override fun requestLocationUpdates(locationRequest: LocationRequest, clientCallBack: LocationCallback) {
-        val listener = LocationListener { location -> clientCallBack.onLocationResult(LocationResult(location)) }
-        locationManager.requestLocationUpdates("gps", locationRequest.interval, locationRequest.smallestDisplacement, listener)
+        val listener = IMyLocationConsumer { location, _ -> clientCallBack.onLocationResult(LocationResult(location)) }
+        gpsMyLocationProvider.startLocationProvider(listener)
         callbackMap[clientCallBack] = listener
     }
 
     @SuppressLint("MissingPermission")
     override fun requestLocationUpdates(locationRequest: LocationRequest, clientCallBack: LocationCallback, looper: Looper?) {
-        val listener = LocationListener { location -> clientCallBack.onLocationResult(LocationResult(location)) }
-        locationManager.requestLocationUpdates("gps", locationRequest.interval, locationRequest.smallestDisplacement, listener, looper)
-        callbackMap[clientCallBack] = listener
+        requestLocationUpdates(locationRequest, clientCallBack)
     }
 
     override fun removeLocationUpdates(clientCallBack: LocationCallback) {
         callbackMap[clientCallBack]?.run {
-            locationManager.removeUpdates(this)
+            gpsMyLocationProvider.stopLocationProvider()
             callbackMap.remove(clientCallBack)
+            callbackMap.forEach { entry -> gpsMyLocationProvider.startLocationProvider(entry.value) }
         }
     }
 
     override fun flushLocations() {
         Timber.d("Flush locations noop on AOSP")
+    }
+
+    init {
+        Timber.i("Using AOSP as a location provider")
     }
 }
