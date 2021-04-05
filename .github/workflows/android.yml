@@ -74,8 +74,12 @@ jobs:
         name: test-reports
         path: project/app/build/reports/
       if: always()
+    - name: Setup Python for unit test result publishing
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3
     - name: Publish Unit Test Results
-      uses: EnricoMi/publish-unit-test-result-action@v1.10
+      uses: EnricoMi/publish-unit-test-result-action@branch-composite-action
       if: ${{ github.event_name == 'pull_request' }}
       with:
         files: "./project/app/build/test-results/collected/*.xml"
