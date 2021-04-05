@@ -146,7 +146,7 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
         super.onCreate();
         Timber.v("Background service onCreate. ThreadID: %s", Thread.currentThread());
         serviceBridge.bind(this);
-        locationProviderClient = LocationServices.INSTANCE.getLocationProviderClient(this);
+        locationProviderClient = LocationServices.INSTANCE.getLocationProviderClient(this, preferences);
         geofencingClient = LocationServices.INSTANCE.getGeofencingClient(this);
         notificationManagerCompat = NotificationManagerCompat.from(this);
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -156,7 +156,7 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
             public void onLocationResult(LocationResult locationResult) {
                 Timber.i("Locationresult received: %s", locationResult);
                 super.onLocationResult(locationResult);
-                onLocationChanged(locationResult.getLastLocation(),MessageLocation.REPORT_TYPE_DEFAULT);
+                onLocationChanged(locationResult.getLastLocation(), MessageLocation.REPORT_TYPE_DEFAULT);
             }
         };
 
@@ -165,7 +165,7 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
             public void onLocationResult(LocationResult locationResult) {
                 Timber.i("Ondemand Locationresult received: %s", locationResult);
                 super.onLocationResult(locationResult);
-                onLocationChanged(locationResult.getLastLocation(),MessageLocation.REPORT_TYPE_RESPONSE);
+                onLocationChanged(locationResult.getLastLocation(), MessageLocation.REPORT_TYPE_RESPONSE);
             }
         };
 
@@ -224,7 +224,7 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
                     setupLocationRequest();
                     return;
                 case INTENT_ACTION_CHANGE_MONITORING:
-                    if(intent.hasExtra(preferences.getPreferenceKey(R.string.preferenceKeyMonitoring))) {
+                    if (intent.hasExtra(preferences.getPreferenceKey(R.string.preferenceKeyMonitoring))) {
                         preferences.setMonitoring(intent.getIntExtra(preferences.getPreferenceKey(R.string.preferenceKeyMonitoring), preferences.getMonitoring()));
                     } else {
                         // Step monitoring mode if no mode is specified
@@ -249,7 +249,7 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
 
         // Importance min will show normal priority notification for foreground service. See https://developer.android.com/reference/android/app/NotificationManager#IMPORTANCE_MIN
         // User has to actively configure this in the notification channel settings.
-        NotificationChannel ongoingChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ONGOING, getString(R.string.notificationChannelOngoing), NotificationManager.IMPORTANCE_DEFAULT );
+        NotificationChannel ongoingChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ONGOING, getString(R.string.notificationChannelOngoing), NotificationManager.IMPORTANCE_DEFAULT);
         ongoingChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
         ongoingChannel.setDescription(getString(R.string.notificationChannelOngoingDescription));
         ongoingChannel.enableLights(false);
@@ -325,12 +325,12 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
         }
 
         // Show monitoring mode if endpoint state is not interesting
-        if(lastEndpointState == MessageProcessor.EndpointState.CONNECTED || lastEndpointState == MessageProcessor.EndpointState.IDLE) {
+        if (lastEndpointState == MessageProcessor.EndpointState.CONNECTED || lastEndpointState == MessageProcessor.EndpointState.IDLE) {
             builder.setContentText(getMonitoringLabel(preferences.getMonitoring()));
         } else if (lastEndpointState == MessageProcessor.EndpointState.ERROR && lastEndpointState.getMessage() != null) {
             builder.setContentText(lastEndpointState.getLabel(this) + ": " + lastEndpointState.getMessage());
         } else {
-            builder.setContentText( lastEndpointState.getLabel(this));
+            builder.setContentText(lastEndpointState.getLabel(this));
         }
         return builder.build();
     }
@@ -450,7 +450,7 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
         final int transition = event.getGeofenceTransition();
         for (int index = 0; index < event.getTriggeringGeofences().size(); index++) {
             WaypointModel w = waypointsRepo.get(Long.parseLong(event.getTriggeringGeofences().get(index).getRequestId()));
-            if(w == null) {
+            if (w == null) {
                 Timber.e("waypoint id %s not found for geofence event", event.getTriggeringGeofences().get(index).getRequestId());
                 continue;
             }
@@ -459,14 +459,14 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
     }
 
     void onLocationChanged(@Nullable Location location, @Nullable String reportType) {
-        if(location == null) {
+        if (location == null) {
             Timber.e("no location provided");
             return;
         }
         Timber.v("location update received: tst:%s, acc:%s, lat:%s, lon:%s type:%s", location.getTime(), location.getAccuracy(), location.getLatitude(), location.getLongitude(), reportType);
 
         if (location.getTime() > locationRepo.getCurrentLocationTime()) {
-            locationProcessor.onLocationChanged(location,reportType);
+            locationProcessor.onLocationChanged(location, reportType);
         } else {
             Timber.v("Not re-sending message with same timestamp as last");
         }
@@ -486,8 +486,8 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
         request.setExpirationDuration(TimeUnit.MINUTES.toMillis(1));
 
         Timber.d("On demand location request");
-        LocationProviderClient client = LocationServices.INSTANCE.getLocationProviderClient(this);
-        client.requestLocationUpdates(request, locationCallbackOnDemand,  runThingsOnOtherThreads.getBackgroundLooper());
+        LocationProviderClient client = LocationServices.INSTANCE.getLocationProviderClient(this, preferences);
+        client.requestLocationUpdates(request, locationCallbackOnDemand, runThingsOnOtherThreads.getBackgroundLooper());
     }
 
     @SuppressWarnings("MissingPermission")
@@ -560,7 +560,7 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
         List<WaypointModel> loadedWaypoints = waypointsRepo.getAllWithGeofences();
 
 
-        for (WaypointModel w : loadedWaypoints){
+        for (WaypointModel w : loadedWaypoints) {
             Timber.d("id:%s, desc:%s, lat:%s, lon:%s, rad:%s", w.getId(), w.getDescription(), w.getGeofenceLatitude(), w.getGeofenceLongitude(), w.getGeofenceRadius());
 
             try {
@@ -597,7 +597,7 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(Events.WaypointAdded e) {
         locationProcessor.publishWaypointMessage(e.getWaypointModel()); // TODO: move to waypointsRepo
-        if(e.getWaypointModel().hasGeofence()) {
+        if (e.getWaypointModel().hasGeofence()) {
             removeGeofences();
             setupGeofences();
         }
@@ -614,7 +614,7 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
     @SuppressWarnings("unused")
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(Events.WaypointRemoved e) {
-        if(e.getWaypointModel().hasGeofence()) {
+        if (e.getWaypointModel().hasGeofence()) {
             removeGeofences();
             setupGeofences();
         }
@@ -649,6 +649,7 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
     public void onEvent(MessageLocation messageLocation) {
 
     }
+
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(Location location) {
         MessageLocation messageLocation = MessageLocation.fromLocation(location);
@@ -689,7 +690,7 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
         try {
             Timber.d("Getting last location");
 //            locationProviderClient.getLastLocation().
-                    //.addOnCompleteListener(this); //TODO abstraction refactor
+            //.addOnCompleteListener(this); //TODO abstraction refactor
         } catch (SecurityException ignored) {
         }
 
