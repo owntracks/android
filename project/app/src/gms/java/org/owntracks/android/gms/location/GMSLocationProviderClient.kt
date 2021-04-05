@@ -10,6 +10,7 @@ import com.google.android.gms.location.LocationServices
 import org.owntracks.android.location.LocationCallback
 import org.owntracks.android.location.LocationProviderClient
 import org.owntracks.android.location.LocationRequest
+import timber.log.Timber
 
 class GMSLocationProviderClient(private val fusedLocationProviderClient: FusedLocationProviderClient) : LocationProviderClient {
     private val callbackMap = mutableMapOf<LocationCallback, com.google.android.gms.location.LocationCallback>()
@@ -49,5 +50,9 @@ class GMSLocationProviderClient(private val fusedLocationProviderClient: FusedLo
         fun create(context: Context): GMSLocationProviderClient {
             return GMSLocationProviderClient(LocationServices.getFusedLocationProviderClient(context))
         }
+    }
+
+    init {
+        Timber.i("Using Google Play Services as a location provider")
     }
 }
