@@ -67,14 +67,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
 
     private var menu: Menu? = null
     private var locationProviderClient: LocationProviderClient? = null
-    private val mapFragment: MapFragment = if (preferences.isExperimentalFeatureEnabled(EXPERIMENTAL_FEATURE_USE_OSM_MAP)) {
-        OSMMapFragment()
-    } else {
-        when (FLAVOR) {
-            "gms" -> GoogleMapFragment()
-            else -> OSMMapFragment()
-        }
-    }
+    private lateinit var mapFragment: MapFragment
     var locationRepoUpdaterCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
             Timber.d("Foreground location result received: %s", locationResult)
@@ -123,6 +116,15 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         bindAndAttachContentView(R.layout.ui_map, savedInstanceState, contactImageProvider)
         setSupportToolbar(binding!!.toolbar, false, true)
         setDrawer(binding!!.toolbar)
+
+        mapFragment = if (preferences.isExperimentalFeatureEnabled(EXPERIMENTAL_FEATURE_USE_OSM_MAP)) {
+            OSMMapFragment()
+        } else {
+            when (FLAVOR) {
+                "gms" -> GoogleMapFragment()
+                else -> OSMMapFragment()
+            }
+        }
 
         if (savedInstanceState == null) {
             supportFragmentManager.commit {

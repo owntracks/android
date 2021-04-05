@@ -1,6 +1,7 @@
 package org.owntracks.android.ui.map.osm
 
 import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -81,10 +82,17 @@ class OSMMapFragment : MapFragment() {
     }
 
     override fun removeMarker(id: String) {
+        mapView?.run {
+            overlays.removeAll { it is Marker && it.id == id }
+        }
     }
 
     override fun setMarkerImage(id: String, bitmap: Bitmap) {
-
+        mapView?.run {
+            overlays.firstOrNull { it is Marker && it.id == id }?.run {
+                (this as Marker).icon = BitmapDrawable(resources, bitmap)
+            }
+        }
     }
 
     override fun onResume() {
