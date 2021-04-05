@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MotionEvent.ACTION_BUTTON_RELEASE
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
@@ -20,7 +21,6 @@ import org.owntracks.android.location.LatLng
 import org.owntracks.android.location.toGeoPoint
 import org.owntracks.android.ui.map.MapActivity
 import org.owntracks.android.ui.map.MapFragment
-import timber.log.Timber
 
 class OSMMapFragment : MapFragment() {
     private var mapView: MapView? = null
@@ -31,25 +31,22 @@ class OSMMapFragment : MapFragment() {
         mapView = this.binding!!.osmMapView.apply {
             setTileSource(TileSourceFactory.MAPNIK)
             zoomController.setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
-            controller.setZoom(9.0)
+            controller.setZoom(ZOOM_STREET_LEVEL)
 
             overlays.add(MyLocationNewOverlay(this))
 
             setMultiTouchControls(true)
             setOnClickListener {
-                Timber.i("CLCIKY")
                 (activity as MapActivity).onMapClick()
             }
-            setOnTouchListener { v, _ ->
-                v.performClick()
-                false
-            }
-            setOnDragListener { _, _ ->
+            setOnTouchListener { v, motionEvent ->
+                if (motionEvent.action == ACTION_BUTTON_RELEASE) {
+                    v.performClick()
+                }
                 (activity as MapActivity).onMapClick()
                 false
             }
         }
-
 
         return binding!!.root
     }
@@ -61,7 +58,6 @@ class OSMMapFragment : MapFragment() {
     override fun updateCamera(latLng: LatLng) {
         mapView?.controller?.run {
             setCenter(latLng.toGeoPoint())
-            setZoom(ZOOM_STREET_LEVEL)
         }
     }
 
@@ -74,7 +70,11 @@ class OSMMapFragment : MapFragment() {
                 overlays.add(Marker(this).apply {
                     this.id = id
                     position = latLng.toGeoPoint()
-                    setOnClickListener { (activity as MapActivity).onMarkerClicked(id) }
+                    infoWindow = null
+                    setOnMarkerClickListener { marker, _ ->
+                        (activity as MapActivity).onMarkerClicked(marker.id)
+                        true
+                    }
                     setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                 })
             }
