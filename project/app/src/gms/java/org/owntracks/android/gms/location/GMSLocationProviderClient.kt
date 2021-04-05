@@ -15,13 +15,15 @@ import timber.log.Timber
 class GMSLocationProviderClient(private val fusedLocationProviderClient: FusedLocationProviderClient) : LocationProviderClient {
     private val callbackMap = mutableMapOf<LocationCallback, com.google.android.gms.location.LocationCallback>()
 
-
     override fun requestLocationUpdates(locationRequest: LocationRequest, clientCallBack: LocationCallback) {
         requestLocationUpdates(locationRequest, clientCallBack, null)
     }
 
     @SuppressLint("MissingPermission")
     override fun requestLocationUpdates(locationRequest: LocationRequest, clientCallBack: LocationCallback, looper: Looper?) {
+        removeLocationUpdates(clientCallBack)
+
+        Timber.i("Requesting location updates $locationRequest ${clientCallBack.hashCode()}")
         val gmsCallBack = object : com.google.android.gms.location.LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
                 clientCallBack.onLocationResult(org.owntracks.android.location.LocationResult(locationResult.lastLocation))
@@ -37,6 +39,7 @@ class GMSLocationProviderClient(private val fusedLocationProviderClient: FusedLo
 
     override fun removeLocationUpdates(clientCallBack: LocationCallback) {
         callbackMap[clientCallBack]?.run {
+            Timber.i("Removing location updates ${clientCallBack.hashCode()}")
             fusedLocationProviderClient.removeLocationUpdates(this)
             callbackMap.remove(clientCallBack)
         }
