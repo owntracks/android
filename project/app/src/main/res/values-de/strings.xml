@@ -178,7 +178,7 @@
     <string name="preferencesRemoteConfiguration">"Fernkonfiguration"</string>
     <string name="preferencesRemoteConfigurationSummary">"Fernkonfiguration ermöglichen (benötigt remote Kommandos)"</string>
     <string name="aboutLicense">"Lizenz"</string>
-    <string name="aboutTranslationsSummary">"Jetzt in sechs Sprachen verfügbar!"</string>
+    <string name="aboutTranslationsSummary">"Jetzt in %d Sprachen verfügbar!"</string>
     <string name="aboutTranslations">"Übersetzungshilfe"</string>
     <string name="geocoderDisabled">"Der Geocoding Dienst ist ausgeschaltet"</string>
     <string name="geocoderRateLimited">"Geocoding Duchstatz ist limitiert worden. Nächster Versuch wenn %s"</string>

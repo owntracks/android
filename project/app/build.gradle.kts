@@ -30,7 +30,9 @@ android {
                 arguments(mapOf("eventBusIndex" to "org.owntracks.android.EventBusIndex"))
             }
         }
-        resConfigs("en", "de", "fr", "es", "ru", "ca")
+        val locales = listOf("en", "de", "fr", "es", "ru", "ca")
+        buildConfigField("String[]", "TRANSLATION_ARRAY", "new String[]{\"" + locales.joinToString("\",\"") + "\"}")
+        resConfigs(locales)
         testInstrumentationRunner("androidx.test.runner.AndroidJUnitRunner")
 /* TODO Get this lot sorted when the orchestrator / coverage / clearPackageData bug gets fixed */
 //        testInstrumentationRunnerArguments clearPackageData: "true"

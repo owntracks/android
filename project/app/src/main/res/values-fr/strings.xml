@@ -178,7 +178,7 @@
     <string name="preferencesRemoteConfiguration">"Configuration à distance"</string>
     <string name="preferencesRemoteConfigurationSummary">"Activer la mise à jour de la configuration à distance (nécessite les commandes à distance)"</string>
     <string name="aboutLicense">"Licence"</string>
-    <string name="aboutTranslationsSummary">"Actuellement disponible en 6 langues!"</string>
+    <string name="aboutTranslationsSummary">"Actuellement disponible en %d langues!"</string>
     <string name="aboutTranslations">"Aidez à traduire cette application"</string>
     <string name="geocoderDisabled">"Le géocodeur est désactivé"</string>
     <string name="geocoderRateLimited">"Le géocodeur a été limité. Ne pas réessayer avant %s"</string>

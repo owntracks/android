@@ -180,7 +180,7 @@ Una notificación permanente se mostrará para mantener la aplicación funcionan
     <string name="preferencesRemoteConfiguration">"Configuración remota"</string>
     <string name="preferencesRemoteConfigurationSummary">"Permitir que la configuración se actualice de forma remota (requiere comandos remotos)"</string>
     <string name="aboutLicense">"Licencia"</string>
-    <string name="aboutTranslationsSummary">"¡Actualmente disponible en 6 idiomas!"</string>
+    <string name="aboutTranslationsSummary">"¡Actualmente disponible en %d idiomas!"</string>
     <string name="aboutTranslations">"Ayude a traducir esta aplicación"</string>
     <string name="geocoderDisabled">"El servicio de geocodificador está deshabilitado"</string>
     <string name="geocoderRateLimited">"El servicio de geocodificador tiene tasa limitada. No lo intente hasta %s"</string>

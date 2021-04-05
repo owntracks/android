@@ -49,7 +49,6 @@
     <Preference
         android:icon="@drawable/ic_baseline_translate_24"
         android:key="translation"
-        android:summary="@string/aboutTranslationsSummary"
         android:title="@string/aboutTranslations">
         <intent
             android:action="android.intent.action.VIEW"

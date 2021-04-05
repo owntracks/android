@@ -182,7 +182,7 @@ Es mostrarà una notificació permanent per continuar executant-se en segon pla.
     <string name="preferencesRemoteConfiguration">"Configuració remota"</string>
     <string name="preferencesRemoteConfigurationSummary">"Activa la configuració per actualitzar-se remotament (requereix comandes remotes) "</string>
     <string name="aboutLicense">"LLicència"</string>
-    <string name="aboutTranslationsSummary">"Actualment disponible en 5 idiomes!"</string>
+    <string name="aboutTranslationsSummary">"Actualment disponible en %d idiomes!"</string>
     <string name="aboutTranslations">"Ajudeu a traduir aquesta aplicació"</string>
     <string name="geocoderDisabled"></string>
     <string name="geocoderRateLimited">%s</string>
