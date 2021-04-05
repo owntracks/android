@@ -61,10 +61,7 @@ import javax.inject.Inject
 import kotlin.math.roundToInt
 
 class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>?>(), MapMvvm.View, View.OnClickListener, View.OnLongClickListener, PopupMenu.OnMenuItemClickListener, Observer<Any?> {
-
-
     private var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>? = null
-
     private var menu: Menu? = null
     private var locationProviderClient: LocationProviderClient? = null
     private lateinit var mapFragment: MapFragment
