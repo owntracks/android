@@ -50,7 +50,6 @@ class LocationRequest {
         return this
     }
 
-
     companion object {
         const val PRIORITY_HIGH_ACCURACY: Int = 0
         const val PRIORITY_BALANCED_POWER_ACCURACY: Int = 1

@@ -43,7 +43,7 @@ class GoogleMapFragment : MapFragment(), OnMapReadyCallback {
             isMyLocationEnabled = true
             uiSettings.isMyLocationButtonEnabled = false
             uiSettings.setAllGesturesEnabled(true)
-
+            moveCamera(CameraUpdateFactory.zoomTo(ZOOM_LEVEL_STREET))
             setOnMarkerClickListener {
                 it.tag?.run { (activity as MapActivity).onMarkerClicked(this as String) }
                 true
@@ -59,7 +59,7 @@ class GoogleMapFragment : MapFragment(), OnMapReadyCallback {
     }
 
     override fun updateCamera(latLng: org.owntracks.android.location.LatLng) {
-        googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng.toGMSLatLng(), ZOOM_LEVEL_STREET))
+        googleMap?.moveCamera(CameraUpdateFactory.newLatLng(latLng.toGMSLatLng()))
     }
 
     override fun clearMarkers() {

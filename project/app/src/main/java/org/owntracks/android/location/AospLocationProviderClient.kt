@@ -3,8 +3,14 @@ package org.owntracks.android.location
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Looper
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer
+import org.owntracks.android.location.LocationRequest.Companion.PRIORITY_BALANCED_POWER_ACCURACY
+import org.owntracks.android.location.LocationRequest.Companion.PRIORITY_HIGH_ACCURACY
 import timber.log.Timber
 
 class AospLocationProviderClient(val context: Context) : LocationProviderClient {
@@ -13,9 +19,31 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient 
 
     @SuppressLint("MissingPermission")
     override fun requestLocationUpdates(locationRequest: LocationRequest, clientCallBack: LocationCallback) {
-        val listener = IMyLocationConsumer { location, _ -> clientCallBack.onLocationResult(LocationResult(location)) }
-        gpsMyLocationProvider.startLocationProvider(listener)
-        callbackMap[clientCallBack] = listener
+        GlobalScope.launch {
+            withContext(Dispatchers.Main) {
+                gpsMyLocationProvider.stopLocationProvider()
+                val listener = IMyLocationConsumer { location, _ -> clientCallBack.onLocationResult(LocationResult(location)) }
+                when (locationRequest.priority) {
+                    PRIORITY_HIGH_ACCURACY -> {
+                        gpsMyLocationProvider.addLocationSource("gps")
+                        gpsMyLocationProvider.addLocationSource("network")
+                        gpsMyLocationProvider.addLocationSource("passive")
+                    }
+                    PRIORITY_BALANCED_POWER_ACCURACY -> {
+                        gpsMyLocationProvider.clearLocationSources()
+                        gpsMyLocationProvider.addLocationSource("network")
+                        gpsMyLocationProvider.addLocationSource("passive")
+                    }
+                    else -> {
+                        gpsMyLocationProvider.addLocationSource("network")
+                    }
+                }
+                gpsMyLocationProvider.locationUpdateMinTime = locationRequest.interval
+                gpsMyLocationProvider.locationUpdateMinDistance = locationRequest.smallestDisplacement
+                gpsMyLocationProvider.startLocationProvider(listener)
+                callbackMap[clientCallBack] = listener
+            }
+        }
     }
 
     @SuppressLint("MissingPermission")
@@ -32,7 +60,7 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient 
     }
 
     override fun flushLocations() {
-        Timber.d("Flush locations noop on AOSP")
+        gpsMyLocationProvider
     }
 
     init {
