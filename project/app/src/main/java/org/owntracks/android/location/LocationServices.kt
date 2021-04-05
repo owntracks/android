@@ -6,6 +6,8 @@ import org.owntracks.android.gms.location.GMSLocationProviderClient
 import org.owntracks.android.gms.location.geofencing.GMSGeofencingClient
 import org.owntracks.android.location.geofencing.GeofencingClient
 import org.owntracks.android.services.BackgroundService
+import org.owntracks.android.support.Preferences
+import org.owntracks.android.support.Preferences.Companion.EXPERIMENTAL_FEATURE_USE_AOSP_LOCATION_PROVIDER
 
 object LocationServices {
     fun getGeofencingClient(backgroundService: BackgroundService): GeofencingClient {
@@ -15,10 +17,14 @@ object LocationServices {
         }
     }
 
-    fun getLocationProviderClient(context: Context): LocationProviderClient {
-        return when (FLAVOR) {
-            "gms" -> GMSLocationProviderClient.create(context)
-            else -> AospLocationProviderClient(context)
+    fun getLocationProviderClient(context: Context, preferences: Preferences): LocationProviderClient {
+        return if (preferences.isExperimentalFeatureEnabled(EXPERIMENTAL_FEATURE_USE_AOSP_LOCATION_PROVIDER)) {
+            AospLocationProviderClient(context)
+        } else {
+            when (FLAVOR) {
+                "gms" -> GMSLocationProviderClient.create(context)
+                else -> AospLocationProviderClient(context)
+            }
         }
     }
 }

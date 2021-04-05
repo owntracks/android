@@ -46,6 +46,7 @@ import org.owntracks.android.services.LocationProcessor
 import org.owntracks.android.services.MessageProcessorEndpointHttp
 import org.owntracks.android.support.ContactImageProvider
 import org.owntracks.android.support.Events.PermissionGranted
+import org.owntracks.android.support.Preferences.Companion.EXPERIMENTAL_FEATURE_USE_OSM_MAP
 import org.owntracks.android.support.RequirementsChecker
 import org.owntracks.android.support.RunThingsOnOtherThreads
 import org.owntracks.android.support.widgets.BindingConversions
@@ -66,9 +67,13 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
 
     private var menu: Menu? = null
     private var locationProviderClient: LocationProviderClient? = null
-    private val mapFragment: MapFragment = when (FLAVOR) {
-        "gms" -> GoogleMapFragment()
-        else -> OSMMapFragment()
+    private val mapFragment: MapFragment = if (preferences.isExperimentalFeatureEnabled(EXPERIMENTAL_FEATURE_USE_OSM_MAP)) {
+        OSMMapFragment()
+    } else {
+        when (FLAVOR) {
+            "gms" -> GoogleMapFragment()
+            else -> OSMMapFragment()
+        }
     }
     var locationRepoUpdaterCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
@@ -160,7 +165,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         } else {
             startService(Intent(this, BackgroundService::class.java))
         }
-        locationProviderClient = LocationServices.getLocationProviderClient(this)
+        locationProviderClient = LocationServices.getLocationProviderClient(this, preferences)
     }
 
     private fun checkAndRequestLocationPermissions() {
