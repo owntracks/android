@@ -14,8 +14,9 @@ fun LocationRequest.toGMSLocationRequest(): com.google.android.gms.location.Loca
             .create()
             .setPriority(gmsPriority)
             .setInterval(interval)
+            .setFastestInterval(fastestInterval)
             .setNumUpdates(numUpdates)
             .setExpirationDuration(expirationDuration)
-
+            .setSmallestDisplacement(smallestDisplacement)
 }
 

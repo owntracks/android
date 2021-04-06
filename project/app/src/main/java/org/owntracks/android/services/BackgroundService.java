@@ -564,23 +564,25 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
             Timber.d("id:%s, desc:%s, lat:%s, lon:%s, rad:%s", w.getId(), w.getDescription(), w.getGeofenceLatitude(), w.getGeofenceLongitude(), w.getGeofenceRadius());
 
             try {
-                geofences.add(new Geofence.Builder()
-                        .requestId(Long.toString(w.getId()))
-                        .transitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
-                        .notificationResponsiveness((int) TimeUnit.MINUTES.toMillis(2))
-                        .circularRegion(w.getGeofenceLatitude(), w.getGeofenceLongitude(), w.getGeofenceRadius())
-                        .expirationDuration(Geofence.NEVER_EXPIRE)
-                        .build());
+                geofences.add(
+                        new Geofence(
+                                Long.toString(w.getId()),
+                                Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT,
+                                (int) TimeUnit.MINUTES.toMillis(2),
+                                w.getGeofenceLatitude(),
+                                w.getGeofenceLongitude(),
+                                (float) w.getGeofenceRadius(),
+                                Geofence.NEVER_EXPIRE,
+                                null
+                        )
+                );
             } catch (IllegalArgumentException e) {
                 Timber.e(e, "Invalid geofence parameter");
             }
         }
 
         if (geofences.size() > 0) {
-            GeofencingRequest request = new GeofencingRequest.Builder()
-                    .setInitialTrigger(Geofence.GEOFENCE_TRANSITION_ENTER)
-                    .addGeofences(geofences)
-                    .build();
+            GeofencingRequest request = new GeofencingRequest(Geofence.GEOFENCE_TRANSITION_ENTER, geofences);
             geofencingClient.addGeofences(request, getGeofencePendingIntent());
         }
     }
