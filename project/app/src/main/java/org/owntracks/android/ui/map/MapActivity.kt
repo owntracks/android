@@ -114,14 +114,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         setSupportToolbar(binding!!.toolbar, false, true)
         setDrawer(binding!!.toolbar)
 
-        mapFragment = if (preferences.isExperimentalFeatureEnabled(EXPERIMENTAL_FEATURE_USE_OSM_MAP)) {
-            OSMMapFragment()
-        } else {
-            when (FLAVOR) {
-                "gms" -> GoogleMapFragment()
-                else -> OSMMapFragment()
-            }
-        }
+        mapFragment = getMapFragment()
 
         if (savedInstanceState == null) {
             supportFragmentManager.commit {
@@ -166,6 +159,16 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         }
         locationProviderClient = LocationServices.getLocationProviderClient(this, preferences)
     }
+
+    private fun getMapFragment() =
+            if (preferences.isExperimentalFeatureEnabled(EXPERIMENTAL_FEATURE_USE_OSM_MAP)) {
+                OSMMapFragment()
+            } else {
+                when (FLAVOR) {
+                    "gms" -> GoogleMapFragment()
+                    else -> OSMMapFragment()
+                }
+            }
 
     private fun checkAndRequestLocationPermissions() {
         if (!requirementsChecker!!.isPermissionCheckPassed()) {
@@ -221,6 +224,19 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
     }
 
     override fun onResume() {
+        if (FLAVOR == "gms") {
+            if (mapFragment is GoogleMapFragment && preferences.isExperimentalFeatureEnabled(EXPERIMENTAL_FEATURE_USE_OSM_MAP)) {
+                mapFragment = OSMMapFragment()
+                supportFragmentManager.commit {
+                    this.replace(R.id.mapFragment, mapFragment)
+                }
+            } else if (mapFragment is OSMMapFragment && !preferences.isExperimentalFeatureEnabled(EXPERIMENTAL_FEATURE_USE_OSM_MAP)) {
+                mapFragment = GoogleMapFragment()
+                supportFragmentManager.commit {
+                    this.replace(R.id.mapFragment, mapFragment)
+                }
+            }
+        }
         super.onResume()
         handleIntentExtras(intent)
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
