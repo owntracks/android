@@ -29,6 +29,7 @@ class OSMMapFragment : MapFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         Configuration.getInstance().load(context, PreferenceManager.getDefaultSharedPreferences(context))
         binding = DataBindingUtil.inflate(inflater, R.layout.osm_map_fragment, container, false)
+        ((requireActivity() as MapActivity).checkAndRequestLocationPermissions())
         mapView = this.binding!!.osmMapView.apply {
             setTileSource(TileSourceFactory.MAPNIK)
             zoomController.setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
