@@ -40,6 +40,7 @@ class GoogleMapFragment : MapFragment(), OnMapReadyCallback {
         if ((requireActivity() as MapActivity).checkAndRequestLocationPermissions()) {
             initMap()
         }
+        ((requireActivity()) as MapActivity).onMapReady()
     }
 
     @SuppressLint("MissingPermission")

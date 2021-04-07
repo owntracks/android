@@ -49,7 +49,7 @@ class OSMMapFragment : MapFragment() {
                 false
             }
         }
-
+        ((requireActivity()) as MapActivity).onMapReady()
         return binding!!.root
     }
 
