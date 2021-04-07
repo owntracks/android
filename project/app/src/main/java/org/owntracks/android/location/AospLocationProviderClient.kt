@@ -2,6 +2,7 @@ package org.owntracks.android.location
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.location.Location
 import android.os.Looper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -60,7 +61,11 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient 
     }
 
     override fun flushLocations() {
-        gpsMyLocationProvider
+        Timber.i("Flush locations NOOP on AOSP location provider")
+    }
+
+    override fun getLastLocation(): Location {
+        return gpsMyLocationProvider.lastKnownLocation
     }
 
     init {

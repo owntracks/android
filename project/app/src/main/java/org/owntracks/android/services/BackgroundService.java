@@ -605,7 +605,6 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
         }
     }
 
-    @SuppressWarnings("unused")
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(Events.WaypointUpdated e) {
         locationProcessor.publishWaypointMessage(e.getWaypointModel()); // TODO: move to waypointsRepo
@@ -613,7 +612,6 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
         setupGeofences();
     }
 
-    @SuppressWarnings("unused")
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(Events.WaypointRemoved e) {
         if (e.getWaypointModel().hasGeofence()) {
@@ -622,7 +620,6 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
         }
     }
 
-    @SuppressWarnings("unused")
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(Events.ModeChanged e) {
         removeGeofences();
@@ -631,14 +628,12 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
         updateOngoingNotification();
     }
 
-    @SuppressWarnings("unused")
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(Events.MonitoringChanged e) {
         setupLocationRequest();
         updateOngoingNotification();
     }
 
-    @SuppressWarnings("unused")
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(MessageTransition message) {
         Timber.d("transition isIncoming:%s topic:%s", message.isIncoming(), message.getTopic());
@@ -646,7 +641,6 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
             sendEventNotification(message);
     }
 
-    @SuppressWarnings("unused")
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(MessageLocation messageLocation) {
 
@@ -667,7 +661,6 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
         }
     }
 
-    @SuppressWarnings("unused")
     @Subscribe(sticky = true)
     public void onEvent(MessageProcessor.EndpointState state) {
         Timber.d(state.getError(), "endpoint state changed %s. Message: %s", state.getLabel(this), state.getMessage());
@@ -675,27 +668,20 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
         updateOngoingNotification();
     }
 
-    @SuppressWarnings("unused")
     @Subscribe(sticky = true)
     public void onEvent(Events.QueueChanged e) {
         this.lastQueueLength = e.getNewLength();
         updateOngoingNotification();
     }
 
-    @SuppressWarnings("unused")
-    @Subscribe(sticky = true)
+    @Subscribe(sticky = true,threadMode = ThreadMode.BACKGROUND)
     public void onEvent(Events.PermissionGranted event) {
         Timber.d("location permission granted");
         removeGeofences();
         setupGeofences();
-
-        try {
-            Timber.d("Getting last location");
-//            locationProviderClient.getLastLocation().
-            //.addOnCompleteListener(this); //TODO abstraction refactor
-        } catch (SecurityException ignored) {
-        }
-
+        Timber.d("Getting last location");
+        Location lastLocation = locationProviderClient.getLastLocation();
+        onLocationChanged(lastLocation, MessageLocation.REPORT_TYPE_DEFAULT);
     }
 
     private NotificationCompat.Builder getEventsNotificationBuilder() {
@@ -727,11 +713,6 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
 
         return eventsNotificationCompatBuilder;
     }
-
-//    @Override
-//    public void onComplete(@NonNull Task<Location> task) {
-//        onLocationChanged(task.getResult(),MessageLocation.REPORT_TYPE_DEFAULT);
-//    } //TODO abstraction refactor
 
     private final IBinder mBinder = new LocalBinder();
 

@@ -114,13 +114,14 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         setSupportToolbar(binding!!.toolbar, false, true)
         setDrawer(binding!!.toolbar)
 
-        mapFragment = getMapFragment()
-
         if (savedInstanceState == null) {
+            mapFragment = getMapFragment()
             supportFragmentManager.commit {
                 setReorderingAllowed(true)
-                add(R.id.mapFragment, mapFragment)
+                add(R.id.mapFragment, mapFragment, "map")
             }
+        } else {
+            mapFragment = supportFragmentManager.findFragmentByTag("map") as MapFragment
         }
 
         bottomSheetBehavior = BottomSheetBehavior.from(binding!!.bottomSheetLayout)
@@ -150,7 +151,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
                 mapFragment.updateCamera(o)
             }
         })
-        checkAndRequestLocationPermissions()
+
         Timber.v("starting BackgroundService")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(Intent(this, BackgroundService::class.java))
@@ -170,7 +171,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
                 }
             }
 
-    private fun checkAndRequestLocationPermissions() {
+    internal fun checkAndRequestLocationPermissions(): Boolean {
         if (!requirementsChecker!!.isPermissionCheckPassed()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
@@ -187,6 +188,9 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
             } else {
                 ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), PERMISSIONS_REQUEST_CODE)
             }
+            return false
+        } else {
+            return true
         }
     }
 
@@ -239,10 +243,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         }
         super.onResume()
         handleIntentExtras(intent)
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            checkAndRequestLocationPermissions()
-        }
+        if (viewModel!!.hasLocation()) enableLocationMenus() else disableLocationMenus()
         locationProviderClient!!.requestLocationUpdates(
                 LocationRequest()
                         .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
@@ -453,6 +454,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == PERMISSIONS_REQUEST_CODE && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            mapFragment.locationPermissionGranted()
             eventBus!!.postSticky(PermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION))
         }
     }

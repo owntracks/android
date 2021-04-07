@@ -469,11 +469,6 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     }
 
     private void disconnect(boolean fromUser) {
-        try {
-            throw new Exception();
-        } catch (Exception e) {
-            Timber.tag("MQTT").i(e);
-        }
         Timber.tag("MQTT").d("disconnect. Manually triggered? %s. ThreadID: %s", fromUser, Thread.currentThread());
         if (isConnecting()) {
             return;

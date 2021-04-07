@@ -35,9 +35,15 @@ class GoogleMapFragment : MapFragment(), OnMapReadyCallback {
         return binding!!.root
     }
 
-    @SuppressLint("MissingPermission")
-    override fun onMapReady(googleMap: GoogleMap?) {
+    override fun onMapReady(googleMap: GoogleMap) {
         this.googleMap = googleMap
+        if ((requireActivity() as MapActivity).checkAndRequestLocationPermissions()) {
+            initMap()
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun initMap() {
         this.googleMap?.run {
             isIndoorEnabled = false
             isMyLocationEnabled = true
@@ -88,13 +94,17 @@ class GoogleMapFragment : MapFragment(), OnMapReadyCallback {
         }
     }
 
+    override fun locationPermissionGranted() {
+        initMap()
+    }
+
     override fun removeMarker(id: String) {
         markers[id]?.remove()
     }
 
     override fun onResume() {
-        binding?.googleMapView?.onResume()
         super.onResume()
+        binding?.googleMapView?.onResume()
     }
 
     override fun onLowMemory() {
@@ -118,8 +128,8 @@ class GoogleMapFragment : MapFragment(), OnMapReadyCallback {
     }
 
     override fun onStart() {
-        binding?.googleMapView?.onStart()
         super.onStart()
+        binding?.googleMapView?.onStart()
     }
 
     override fun onStop() {
