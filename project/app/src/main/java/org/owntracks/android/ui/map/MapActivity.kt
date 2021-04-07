@@ -459,6 +459,10 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         }
     }
 
+    fun onMapReady() {
+        viewModel?.onMapReady()
+    }
+
     @get:VisibleForTesting
     val locationIdlingResource: IdlingResource
         get() = binding!!.vm!!.locationIdlingResource
