@@ -15,7 +15,7 @@ class LatLngGMSConversion {
         val long = 0.5763
         val latLng = LatLng(lat, long)
         val gmsLatLng = latLng.toGMSLatLng()
-        assertEquals(lat, gmsLatLng.latitude, 0.000)
-        assertEquals(long, gmsLatLng.longitude, 0.000)
+        assertEquals(lat, gmsLatLng.latitude, 0.0001)
+        assertEquals(long, gmsLatLng.longitude, 0.0001)
     }
 }
