@@ -9,7 +9,7 @@ import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageLocation
 import timber.log.Timber
 
-class FusedContact(id: String?) : BaseObservable(), Comparable<FusedContact> {
+class FusedContact(id: String?) : BaseObservable() {
     @get:Bindable
     val id: String = if (id != null && id.isNotEmpty()) id else "NOID"
 
@@ -90,9 +90,4 @@ class FusedContact(id: String?) : BaseObservable(), Comparable<FusedContact> {
     fun setDeleted() {
         isDeleted = true
     }
-
-    override fun compareTo(other: FusedContact): Int {
-        return other.tst.compareTo(tst)
-    }
-
 }
