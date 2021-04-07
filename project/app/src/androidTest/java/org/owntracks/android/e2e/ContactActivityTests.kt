@@ -10,6 +10,7 @@ import androidx.test.filters.LargeTest
 import com.schibsted.spain.barista.assertion.BaristaRecyclerViewAssertions.assertRecyclerViewItemCount
 import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertContains
 import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
+import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
 import com.schibsted.spain.barista.interaction.BaristaClickInteractions.clickBack
 import com.schibsted.spain.barista.interaction.BaristaDialogInteractions.clickDialogPositiveButton
 import com.schibsted.spain.barista.interaction.BaristaDrawerInteractions.openDrawer
@@ -106,6 +107,11 @@ class ContactActivityTests {
         assertDisplayed(R.id.bottomSheetLayout)
         assertDisplayed(R.id.contactPeek)
         assertContains(R.id.name, "aa")
+
+        clickOnAndWait(R.id.menu_mylocation)
+
+        assertNotDisplayed(R.id.bottomSheetLayout)
+        assertNotDisplayed(R.id.contactPeek)
     }
 
     class MockWebserverLocationDispatcher(private val config: String) : Dispatcher() {
