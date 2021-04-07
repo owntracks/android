@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.StrictMode
-import android.os.StrictMode.VmPolicy
 import androidx.work.Configuration
 import androidx.work.WorkManager
 import androidx.work.WorkerFactory
@@ -65,11 +64,14 @@ class App : DaggerApplication() {
             Timber.plant(TimberDebugLogTree())
             Timber.e("StrictMode enabled in DEBUG build")
             StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder()
-                    .detectAll()
-                    .penaltyLog()
+                    .detectNetwork()
+                    .penaltyFlashScreen()
+                    .penaltyDialog()
                     .build())
-            StrictMode.setVmPolicy(VmPolicy.Builder()
-                    .detectAll()
+            StrictMode.setVmPolicy(StrictMode.VmPolicy.Builder()
+                    .detectLeakedSqlLiteObjects()
+                    .detectLeakedClosableObjects()
+                    .detectFileUriExposure()
                     .penaltyLog()
                     .build())
         } else {

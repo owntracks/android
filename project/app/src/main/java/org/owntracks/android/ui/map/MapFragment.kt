@@ -10,4 +10,5 @@ abstract class MapFragment : Fragment() {
     abstract fun updateMarker(id:String, latLng: LatLng)
     abstract fun removeMarker(id:String)
     abstract fun setMarkerImage(id: String, bitmap: Bitmap)
+    abstract fun locationPermissionGranted()
 }

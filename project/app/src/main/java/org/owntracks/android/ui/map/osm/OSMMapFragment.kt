@@ -21,6 +21,7 @@ import org.owntracks.android.location.LatLng
 import org.owntracks.android.location.toGeoPoint
 import org.owntracks.android.ui.map.MapActivity
 import org.owntracks.android.ui.map.MapFragment
+import timber.log.Timber
 
 class OSMMapFragment : MapFragment() {
     private var mapView: MapView? = null
@@ -93,6 +94,10 @@ class OSMMapFragment : MapFragment() {
                 (this as Marker).icon = BitmapDrawable(resources, bitmap)
             }
         }
+    }
+
+    override fun locationPermissionGranted() {
+        Timber.i("OSM Location permission granted")
     }
 
     override fun onResume() {

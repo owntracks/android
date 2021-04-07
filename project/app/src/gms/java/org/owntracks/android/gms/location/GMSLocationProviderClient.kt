@@ -2,11 +2,13 @@ package org.owntracks.android.gms.location
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.location.Location
 import android.os.Looper
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.tasks.Tasks
 import org.owntracks.android.location.LocationCallback
 import org.owntracks.android.location.LocationProviderClient
 import org.owntracks.android.location.LocationRequest
@@ -46,7 +48,12 @@ class GMSLocationProviderClient(private val fusedLocationProviderClient: FusedLo
     }
 
     override fun flushLocations() {
-        fusedLocationProviderClient.flushLocations();
+        fusedLocationProviderClient.flushLocations()
+    }
+
+    @SuppressLint("MissingPermission")
+    override fun getLastLocation(): Location {
+        return Tasks.await(fusedLocationProviderClient.lastLocation)
     }
 
     companion object {
