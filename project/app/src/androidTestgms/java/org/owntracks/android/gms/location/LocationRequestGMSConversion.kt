@@ -1,6 +1,7 @@
 package org.owntracks.android.gms.location
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.SmallTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -9,6 +10,7 @@ import org.owntracks.android.location.LocationRequest
 import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
+@SmallTest
 class LocationRequestGMSConversion {
 
     @Test

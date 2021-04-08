@@ -1,6 +1,7 @@
 package org.owntracks.android.gms.location.geofencing
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.SmallTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Test
@@ -9,6 +10,7 @@ import org.owntracks.android.location.geofencing.Geofence
 import org.owntracks.android.location.geofencing.GeofencingRequest
 
 @RunWith(AndroidJUnit4::class)
+@SmallTest
 class GeofencingRequestGMSConversion {
 
     @Test
