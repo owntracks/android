@@ -88,6 +88,7 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
     private static final String INTENT_ACTION_REREQUEST_LOCATION_UPDATES = "org.owntracks.android.REREQUEST_LOCATION_UPDATES";
     private static final String INTENT_ACTION_CHANGE_MONITORING = "org.owntracks.android.CHANGE_MONITORING";
     private static final String INTENT_ACTION_BOOT_COMPLETED = "android.intent.action.BOOT_COMPLETED";
+    private static final String INTENT_ACTION_PACKAGE_REPLACED = "android.intent.action.MY_PACKAGE_REPLACED";
 
     private LocationProviderClient locationProviderClient;
     private GeofencingClient geofencingClient;
@@ -232,6 +233,7 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
                     }
                     return;
                 case INTENT_ACTION_BOOT_COMPLETED:
+                case INTENT_ACTION_PACKAGE_REPLACED:
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                         // TODO: 02/04/2021 Raise a notification that we're not going to get locations until the user has actually opened the app.
                     }
