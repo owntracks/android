@@ -51,7 +51,7 @@ jobs:
         working-directory: project
         script: |
             adb emu geo fix 0 51
-            ./gradlew createGmsDebugCoverageReport --no-build-cache
+            ./gradlew createGmsDebugCoverageReport createOssDebugCoverageReport --no-build-cache
         profile: pixel_3a
         target: google_apis
         disable-animations: true
@@ -61,6 +61,7 @@ jobs:
           mkdir -p ./project/app/build/test-results/collected/
           cp -v ./project/app/build/test-results/testGmsDebugUnitTest/*.xml ./project/app/build/test-results/collected/ || true
           cp -v ./project/app/build/outputs/androidTest-results/connected/flavors/gmsDebugAndroidTest/*.xml ./project/app/build/test-results/collected/ || true
+          cp -v ./project/app/build/outputs/androidTest-results/connected/flavors/ossDebugAndroidTest/*.xml ./project/app/build/test-results/collected/ || true
       if: always()
     - name: Upload unit test result artifact
       uses: actions/upload-artifact@v2
@@ -92,7 +93,7 @@ jobs:
     - uses: codecov/codecov-action@v1
       name: Upload espresso coverage to codecov
       with:
-        file: ./project/app/build/reports/coverage/gms/debug/report.xml
+        file: ./project/app/build/reports/coverage/gms/debug/report.xml,./project/app/build/reports/coverage/oss/debug/report.xml
         flags: uitests
     - uses: codecov/codecov-action@v1
       name: Upload unit coverage to codecov

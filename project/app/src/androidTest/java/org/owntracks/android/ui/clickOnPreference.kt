@@ -1,4 +1,4 @@
-package org.owntracks.android.ui.preferences
+package org.owntracks.android.ui
 
 import com.schibsted.spain.barista.interaction.BaristaClickInteractions.clickOn
 import com.schibsted.spain.barista.interaction.BaristaSleepInteractions.sleep
