@@ -27,7 +27,6 @@ import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.ScreenshotTakingOnTestEndRule
 import org.owntracks.android.ui.preferences.PreferencesActivity
-import org.owntracks.android.ui.preferences.clickOnAndWait
 
 
 @LargeTest

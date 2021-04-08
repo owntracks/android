@@ -29,8 +29,8 @@ import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.ScreenshotTakingOnTestEndRule
+import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.map.MapActivity
-import org.owntracks.android.ui.preferences.clickOnAndWait
 
 
 @LargeTest
