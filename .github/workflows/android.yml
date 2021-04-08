@@ -93,7 +93,7 @@ jobs:
     - uses: codecov/codecov-action@v1
       name: Upload espresso coverage to codecov
       with:
-        file: ./project/app/build/reports/coverage/gms/debug/report.xml,./project/app/build/reports/coverage/oss/debug/report.xml
+        files: ./project/app/build/reports/coverage/gms/debug/report.xml,./project/app/build/reports/coverage/oss/debug/report.xml
         flags: uitests
     - uses: codecov/codecov-action@v1
       name: Upload unit coverage to codecov
