@@ -674,14 +674,16 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
         updateOngoingNotification();
     }
 
-    @Subscribe(sticky = true,threadMode = ThreadMode.BACKGROUND)
+    @Subscribe(sticky = true, threadMode = ThreadMode.BACKGROUND)
     public void onEvent(Events.PermissionGranted event) {
         Timber.d("location permission granted");
         removeGeofences();
         setupGeofences();
         Timber.d("Getting last location");
         Location lastLocation = locationProviderClient.getLastLocation();
-        onLocationChanged(lastLocation, MessageLocation.REPORT_TYPE_DEFAULT);
+        if (lastLocation != null) {
+            onLocationChanged(lastLocation, MessageLocation.REPORT_TYPE_DEFAULT);
+        }
     }
 
     private NotificationCompat.Builder getEventsNotificationBuilder() {

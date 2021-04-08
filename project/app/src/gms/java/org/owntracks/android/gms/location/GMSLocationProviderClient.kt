@@ -52,7 +52,7 @@ class GMSLocationProviderClient(private val fusedLocationProviderClient: FusedLo
     }
 
     @SuppressLint("MissingPermission")
-    override fun getLastLocation(): Location {
+    override fun getLastLocation(): Location? {
         return Tasks.await(fusedLocationProviderClient.lastLocation)
     }
 

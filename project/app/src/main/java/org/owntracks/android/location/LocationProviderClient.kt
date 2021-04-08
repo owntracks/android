@@ -8,5 +8,5 @@ interface LocationProviderClient {
     fun requestLocationUpdates(locationRequest: LocationRequest, clientCallBack: LocationCallback, looper: Looper?)
     fun removeLocationUpdates(clientCallBack: LocationCallback)
     fun flushLocations()
-    fun getLastLocation(): Location
+    fun getLastLocation(): Location?
 }

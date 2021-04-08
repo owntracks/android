@@ -64,7 +64,7 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient 
         Timber.i("Flush locations NOOP on AOSP location provider")
     }
 
-    override fun getLastLocation(): Location {
+    override fun getLastLocation(): Location? {
         return gpsMyLocationProvider.lastKnownLocation
     }
 
