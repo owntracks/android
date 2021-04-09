@@ -231,12 +231,12 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         if (FLAVOR == "gms") {
             if (mapFragment is GoogleMapFragment && preferences.isExperimentalFeatureEnabled(EXPERIMENTAL_FEATURE_USE_OSM_MAP)) {
                 mapFragment = OSMMapFragment()
-                supportFragmentManager.commit {
+                supportFragmentManager.commit(true) {
                     this.replace(R.id.mapFragment, mapFragment)
                 }
             } else if (mapFragment is OSMMapFragment && !preferences.isExperimentalFeatureEnabled(EXPERIMENTAL_FEATURE_USE_OSM_MAP)) {
                 mapFragment = GoogleMapFragment()
-                supportFragmentManager.commit {
+                supportFragmentManager.commit(true) {
                     this.replace(R.id.mapFragment, mapFragment)
                 }
             }
@@ -464,12 +464,12 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
     }
 
     @get:VisibleForTesting
-    val locationIdlingResource: IdlingResource
-        get() = binding!!.vm!!.locationIdlingResource
+    val locationIdlingResource: IdlingResource?
+        get() = binding?.vm?.locationIdlingResource
 
     @get:VisibleForTesting
-    val outgoingQueueIdlingResource: IdlingResource
-        get() = countingIdlingResource!!
+    val outgoingQueueIdlingResource: IdlingResource?
+        get() = countingIdlingResource
 
     companion object {
         const val BUNDLE_KEY_CONTACT_ID = "BUNDLE_KEY_CONTACT_ID"

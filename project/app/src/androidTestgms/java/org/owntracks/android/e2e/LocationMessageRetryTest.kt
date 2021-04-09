@@ -72,7 +72,7 @@ class LocationMessageRetryTest {
 
     @Test
     @AllowFlaky(attempts = 1)
-    fun testClickingOnContactLoadsContactOnMap() {
+    fun testReportingLocationSucceedsAfterSomeFailures() {
         baristaRule.launchActivity()
 
         val httpPort = mockWebServer.port

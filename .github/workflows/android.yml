@@ -56,6 +56,7 @@ jobs:
         target: google_apis
         disable-animations: true
         arch: x86_64
+        sdcard-path-or-size: 1000M
     - name: Gather xunit files into a single dir
       run: | 
           mkdir -p ./project/app/build/test-results/collected/

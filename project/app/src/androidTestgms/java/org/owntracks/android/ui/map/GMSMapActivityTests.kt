@@ -28,6 +28,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 import org.owntracks.android.R
 import org.owntracks.android.ScreenshotTakingOnTestEndRule
+import org.owntracks.android.e2e.doWelcomeProcess
 import org.owntracks.android.support.Preferences
 import org.owntracks.android.ui.clickOnAndWait
 
@@ -159,15 +160,5 @@ class GMSMapActivityTests {
         doWelcomeProcess()
 
         assertDisplayed(R.id.menu_monitoring)
-    }
-
-    private fun doWelcomeProcess() {
-        clickOn(R.id.btn_next)
-/* TODO Once test isolation is possible we'll have to grant the priv each test */
-//        clickOn(R.id.btn_next)
-//        clickOn(R.id.fix_permissions_button)
-//        LocationPermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
-        clickOn(R.id.btn_next)
-        clickOn(R.id.done)
     }
 }
