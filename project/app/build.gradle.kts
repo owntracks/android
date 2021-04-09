@@ -254,7 +254,7 @@ play {
 
 // Espresso test screenshot gathering
 val reportsDirectoryPath = "$buildDir/reports/androidTests/connected/flavors/%sDebugAndroidTest"
-val screenshotsDeviceFolder = "/storage/emulated/0/Download/testscreenshots"
+val screenshotsDeviceFolder = "/sdcard/Download/testscreenshots"
 
 android.productFlavors.all { productFlavor ->
     tasks.register<Exec>("create${productFlavor.name.capitalize()}ScreenshotDirectory") {
