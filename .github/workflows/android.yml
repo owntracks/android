@@ -203,7 +203,7 @@ jobs:
       - run: find test-results
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action@v1
-        if: ${{ github.event_name == 'pull_request' }}
+        if: ${{ github.event_name == 'pull_request' && github.event.workflow_run.head_repository.full_name == github.repository}}
         with:
           files: "test-results/**/*.xml"
       - name: Report Test results to Mattermost
