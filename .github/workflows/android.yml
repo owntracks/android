@@ -91,6 +91,9 @@ jobs:
     name: "Espresso test GMS flavor"
     runs-on: macos-latest
     needs: build
+    strategy:
+      matrix:
+        api-level: [ 21 ]
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 11
@@ -104,40 +107,76 @@ jobs:
       - name: Espresso Test for GMS flavor
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 29
+          api-level: ${{ matrix.api-level }}
           working-directory: project
           script: |
             adb emu geo fix 0 51
+            sleep 10
+            adb shell screencap /sdcard/Download/out1.png
             adb shell settings put secure location_providers_allowed +gps
+            sleep 10
+            adb shell screencap /sdcard/Download/out2.png
             adb shell settings put secure location_providers_allowed +network
+            sleep 10
+            adb shell screencap /sdcard/Download/out3.png
+            adb shell input keyevent 61
+            sleep 10
+            adb shell screencap /sdcard/Download/out4.png
+            adb shell input keyevent 61
+            sleep 10
+            adb shell screencap /sdcard/Download/out5.png
+            adb shell input keyevent 66
+            sleep 10
+            adb shell screencap /sdcard/Download/out6.png
+            adb shell input keyevent 61
+            sleep 10
+            adb shell screencap /sdcard/Download/out7.png
+            adb shell input keyevent 66
+            sleep 10
+            adb shell screencap /sdcard/Download/out8.png
             adb shell settings put secure location_mode 3
+            sleep 10
+            adb shell screencap /sdcard/Download/out9.png
+            mkdir tempscreenshots
+            adb pull /sdcard/Download/
+            mv Download/out*.png tempscreenshots/
             ./gradlew createGmsDebugCoverageReport
           profile: pixel_3a
           target: google_apis
           disable-animations: true
           arch: x86_64
           sdcard-path-or-size: 1000M
+
+      - name: Upload temp screenshots
+        uses: actions/upload-artifact@v2
+        with:
+          name: tempscreenshots-${{ matrix.api-level }}
+          path: project/tempscreenshots
+        if: always()
       - name: Upload gms connected test result artifact
         uses: actions/upload-artifact@v2
         with:
-          name: gms-espresso-test-reports
+          name: gms-espresso-test-reports-${{ matrix.api-level }}
           path: project/app/build/reports/androidTests/connected/flavors/gms/
         if: always()
       - name: Upload gms connected test XML
         uses: actions/upload-artifact@v2
         with:
-          name: gms-espresso-test-xml
+          name: gms-espresso-test-xml-${{ matrix.api-level }}
           path: project/app/build/outputs/androidTest-results/connected/flavors/gms/*.xml
       - name: Upload gms connected test coverage artifact
         uses: actions/upload-artifact@v2
         with:
-          name: gms-espresso-test-coverage
+          name: gms-espresso-test-coverage-${{ matrix.api-level }}
           path: project/app/build/reports/coverage/gms/debug/report.xml
         if: always()
   espresso-test-oss:
     name: "Espresso test OSS flavor"
     runs-on: macos-latest
     needs: build
+    strategy:
+      matrix:
+        api-level: [ 21, 23, 29 ]
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 11
@@ -151,13 +190,27 @@ jobs:
       - name: Espresso Test for OSS flavor
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 29
+          api-level: ${{ matrix.api-level }}
           working-directory: project
           script: |
             adb emu geo fix 0 51
+            sleep 1
             adb shell settings put secure location_providers_allowed +gps
+            sleep 1
             adb shell settings put secure location_providers_allowed +network
+            sleep 1
+            adb shell input keyevent 61
+            sleep 1
+            adb shell input keyevent 61
+            sleep 1
+            adb shell input keyevent 66
+            sleep 1
+            adb shell input keyevent 61
+            sleep 1
+            adb shell input keyevent 66
+            sleep 1
             adb shell settings put secure location_mode 3
+            sleep 1
             ./gradlew createOssDebugCoverageReport
           profile: pixel_3a
           target: default
@@ -167,18 +220,18 @@ jobs:
       - name: Upload OSS connected test result artifact
         uses: actions/upload-artifact@v2
         with:
-          name: oss-espresso-test-reports
+          name: oss-espresso-test-reports-${{ matrix.api-level }}
           path: project/app/build/reports/androidTests/connected/flavors/oss/
         if: always()
       - name: Upload OSS connected test XML
         uses: actions/upload-artifact@v2
         with:
-          name: oss-espresso-test-xml
+          name: oss-espresso-test-xml-${{ matrix.api-level }}
           path: project/app/build/outputs/androidTest-results/connected/flavors/oss/*.xml
       - name: Upload OSS connected test coverage artifact
         uses: actions/upload-artifact@v2
         with:
-          name: oss-espresso-test-coverage
+          name: oss-espresso-test-coverage-${{ matrix.api-level }}
           path: project/app/build/reports/coverage/oss/debug/report.xml
         if: always()
   publish-test-results:
@@ -192,56 +245,30 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
-        name: "Download OSS Espresso test report"
+        name: "Download Artifacts"
         with:
-          path: test-results/oss-espresso-test-xml
-          name: oss-espresso-test-xml
-      - uses: actions/download-artifact@v2
-        name: "Download GMS Espresso test report"
-        with:
-          path: test-results/gms-espresso-test-xml
-          name: gms-espresso-test-xml
-      - uses: actions/download-artifact@v2
-        name: "Download unit test report"
-        with:
-          path: test-results/unit-test-results
-          name: unit-test-results
-      - run: find test-results
+          path: artifacts
+      - run: find artifacts
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action@v1
         if: ${{ github.event_name == 'pull_request' && github.event.workflow_run.head_repository.full_name == github.repository}}
         with:
-          files: "test-results/**/*.xml"
+          files: "artifacts/**/*.xml"
       - name: Report Test results to Mattermost
         uses: growse/xunit-mattermost-reporter@v1
         if: ${{ github.event_name == 'pull_request' && github.event.workflow_run.head_repository.full_name == github.repository}}
         with:
           mattermostWebhookUrl: ${{ secrets.MATTERMOST_WEBHOOK }}
-          xUnitTestPath: "test-results"
-      - uses: actions/download-artifact@v2
-        name: "Download OSS Espresso test coverage report"
-        with:
-          path: coverage/oss/
-          name: oss-espresso-test-coverage
-      - uses: actions/download-artifact@v2
-        name: "Download GMS Espresso test coverage report"
-        with:
-          path: coverage/gms
-          name: gms-espresso-test-coverage
-      - uses: actions/download-artifact@v2
-        name: "Download unit test coverage report"
-        with:
-          path: coverage/unit
-          name: unit-test-coverage
+          xUnitTestPath: "artifacts"
       - uses: codecov/codecov-action@v1
         name: Upload espresso coverage to codecov
         with:
-          files: coverage/gms/report.xml,coverage/oss/report.xml
+          files: artifacts/oss-espresso-test-coverage-21/report.xml,artifacts/oss-espresso-test-coverage-23/report.xml,artifacts/oss-espresso-test-coverage-29/report.xml,artifacts/gms-espresso-test-coverage-21/report.xml,artifacts/gms-espresso-test-coverage-23/report.xml,artifacts/gms-espresso-test-coverage-29/report.xml
           flags: uitests
       - uses: codecov/codecov-action@v1
         name: Upload unit coverage to codecov
         with:
-          file: coverage/unit/jacoco.xml
+          file: artifacts/unit-test-coverage/jacoco.xml
           flags: unittests
   publish:
     name: Publish
