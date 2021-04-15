@@ -239,7 +239,7 @@ dependencies {
 
 
 // Publishing
-val serviceAccountCreds = file("owntracks-android-7a8e1517bde3.json")
+val serviceAccountCreds = file("owntracks-android-gcloud-creds.json")
 
 play {
     if (serviceAccountCreds.exists()) {
