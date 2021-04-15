@@ -54,7 +54,7 @@ jobs:
       - name: Android Lint
         run: ./gradlew lint
         working-directory: project
-        timeout-minutes: 10
+        timeout-minutes: 30
 
   unit-test:
     name: "Unit test"
@@ -108,6 +108,9 @@ jobs:
           working-directory: project
           script: |
             adb emu geo fix 0 51
+            adb shell settings put secure location_providers_allowed +gps
+            adb shell settings put secure location_providers_allowed +network
+            adb shell settings put secure location_mode 3
             ./gradlew createGmsDebugCoverageReport
           profile: pixel_3a
           target: google_apis
@@ -152,6 +155,9 @@ jobs:
           working-directory: project
           script: |
             adb emu geo fix 0 51
+            adb shell settings put secure location_providers_allowed +gps
+            adb shell settings put secure location_providers_allowed +network
+            adb shell settings put secure location_mode 3
             ./gradlew createOssDebugCoverageReport
           profile: pixel_3a
           target: default

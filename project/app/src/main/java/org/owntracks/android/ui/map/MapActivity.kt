@@ -17,15 +17,22 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.ActivityResultRegistry
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.PopupMenu
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.commit
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.idling.CountingIdlingResource
+import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.Behavior.DragCallback
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -61,15 +68,21 @@ import javax.inject.Inject
 import kotlin.math.roundToInt
 
 class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>?>(), MapMvvm.View, View.OnClickListener, View.OnLongClickListener, PopupMenu.OnMenuItemClickListener, Observer<Any?> {
+    lateinit var locationLifecycleObserver: LocationLifecycleObserver
     private var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>? = null
     private var menu: Menu? = null
     private var locationProviderClient: LocationProviderClient? = null
     private lateinit var mapFragment: MapFragment
     var locationRepoUpdaterCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
-            Timber.d("Foreground location result received: %s", locationResult)
+            Timber.d("Foreground location result received: $locationResult")
             locationRepo!!.setCurrentLocation(locationResult.lastLocation)
             super.onLocationResult(locationResult)
+        }
+
+        override fun onLocationAvailability(locationAvailability: LocationAvailability) {
+            Timber.d("Foreground location availability: ${locationAvailability.locationAvailable}")
+            super.onLocationAvailability(locationAvailability)
         }
     }
 
@@ -124,6 +137,10 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
             mapFragment = supportFragmentManager.findFragmentByTag("map") as MapFragment
         }
 
+        locationLifecycleObserver = LocationLifecycleObserver(activityResultRegistry)
+        lifecycle.addObserver(locationLifecycleObserver)
+
+
         bottomSheetBehavior = BottomSheetBehavior.from(binding!!.bottomSheetLayout)
         binding!!.contactPeek.contactRow.setOnClickListener(this)
         binding!!.contactPeek.contactRow.setOnLongClickListener(this)
@@ -152,7 +169,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
             }
         })
 
-        Timber.v("starting BackgroundService")
+        Timber.d("starting BackgroundService")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(Intent(this, BackgroundService::class.java))
         } else {
@@ -475,5 +492,24 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         const val BUNDLE_KEY_CONTACT_ID = "BUNDLE_KEY_CONTACT_ID"
 
         private const val PERMISSIONS_REQUEST_CODE = 1
+    }
+}
+
+class LocationLifecycleObserver(private val registry: ActivityResultRegistry) : DefaultLifecycleObserver {
+    lateinit var resultLauncher: ActivityResultLauncher<IntentSenderRequest>
+    lateinit var callback: (Boolean) -> Unit
+    override fun onCreate(owner: LifecycleOwner) {
+        resultLauncher = registry.register("key", owner, ActivityResultContracts.StartIntentSenderForResult()) {
+            when (it.resultCode) {
+                Activity.RESULT_OK -> callback(true)
+                else -> callback(false)
+            }
+        }
+    }
+
+    fun resolveException(exception: ResolvableApiException, callback: (Boolean) -> Unit) {
+        this.callback = callback
+        val intentSenderRequest = IntentSenderRequest.Builder(exception.resolution).build()
+        resultLauncher.launch(intentSenderRequest)
     }
 }
