@@ -214,6 +214,7 @@ jobs:
           files: "test-results/**/*.xml"
       - name: Report Test results to Mattermost
         uses: growse/xunit-mattermost-reporter@v1
+        if: ${{ github.event_name == 'pull_request' && github.event.workflow_run.head_repository.full_name == github.repository}}
         with:
           mattermostWebhookUrl: ${{ secrets.MATTERMOST_WEBHOOK }}
           xUnitTestPath: "test-results"
