@@ -28,8 +28,22 @@ class WelcomeActivity : BaseActivity<UiWelcomeBinding?, WelcomeViewModel?>(), We
     @Inject
     lateinit var requirementsChecker: RequirementsChecker
 
+    @Inject
+    lateinit var introFragment: IntroFragment
+
+    @Inject
+    lateinit var versionFragment: VersionFragment
+
+    @Inject
+    lateinit var playFragment: PlayFragment
+
+    @Inject
+    lateinit var permissionFragment: PermissionFragment
+
+    @Inject
+    lateinit var finishFragment: FinishFragment
+
     private var welcomeAdapter: WelcomeAdapter? = null
-    private var playFragment: PlayFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,38 +56,30 @@ class WelcomeActivity : BaseActivity<UiWelcomeBinding?, WelcomeViewModel?>(), We
         bindAndAttachContentView(R.layout.ui_welcome, savedInstanceState)
         setHasEventBus(false)
 
-        playFragment = PlayFragment()
-        welcomeAdapter!!.setupFragments(IntroFragment(), VersionFragment(), playFragment!!, PermissionFragment(), FinishFragment())
+        welcomeAdapter!!.setupFragments(introFragment, versionFragment, playFragment, permissionFragment, finishFragment)
 
-        binding!!.viewPager.isUserInputEnabled = true
         binding!!.viewPager.adapter = welcomeAdapter
         binding!!.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
-                binding!!.vm!!.currentFragmentPosition.value=position
-                setPagerIndicator(position)
-                refreshNextDoneButtons()
                 super.onPageSelected(position)
+                binding!!.vm!!.currentFragmentPosition.value = position
             }
         })
 
-        binding!!.vm!!.currentFragmentPosition.observe({ this.lifecycle }, { fragmentPosition: Int ->
-            showFragment(fragmentPosition)
+        binding!!.vm!!.currentFragmentPosition.observe({ this.lifecycle }, { position: Int ->
+            binding!!.viewPager.currentItem = position
+            setPagerIndicator(position)
         })
 
         Timber.v("pager setup with %s fragments", welcomeAdapter!!.itemCount)
         buildPagerIndicator()
-        showFragment(0)
     }
 
-    override fun showNextFragment() {
-        showFragment(binding!!.viewPager.currentItem + 1)
-    }
-
-    override fun setPagerIndicator(index: Int) {
-        if (index < welcomeAdapter!!.itemCount) {
+    override fun setPagerIndicator(position: Int) {
+        if (position < welcomeAdapter!!.itemCount) {
             for (i in 0 until welcomeAdapter!!.itemCount) {
                 val circle = binding!!.circles.getChildAt(i) as ImageView
-                if (i == index) {
+                if (i == position) {
                     circle.alpha = 1f
                 } else {
                     circle.alpha = 0.5f
@@ -82,17 +88,6 @@ class WelcomeActivity : BaseActivity<UiWelcomeBinding?, WelcomeViewModel?>(), We
         }
     }
 
-    private fun showFragment(position: Int) {
-        binding!!.viewPager.currentItem = position
-        welcomeAdapter!!.getFragment(binding!!.viewPager.currentItem).onShowFragment()
-    }
-
-    // TODO I really feel like we can replace this to auto refresh when the VM changes. Somehow.
-    override fun refreshNextDoneButtons() {
-        viewModel!!.nextEnabled = welcomeAdapter!!.getFragment(binding!!.viewPager.currentItem).isNextEnabled
-        binding!!.viewPager.isUserInputEnabled = viewModel!!.nextEnabled
-        viewModel!!.doneEnabled = binding!!.viewPager.currentItem == welcomeAdapter!!.lastItemPosition
-    }
 
     private fun buildPagerIndicator() {
         val scale = resources.displayMetrics.density
@@ -121,5 +116,10 @@ class WelcomeActivity : BaseActivity<UiWelcomeBinding?, WelcomeViewModel?>(), We
         if (requestCode == PlayFragment.PLAY_SERVICES_RESOLUTION_REQUEST) {
             playFragment!!.onPlayServicesResolutionResult()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel?.onResume()
     }
 }

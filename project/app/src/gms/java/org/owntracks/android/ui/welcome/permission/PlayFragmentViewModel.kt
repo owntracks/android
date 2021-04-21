@@ -1,11 +1,11 @@
 package org.owntracks.android.ui.welcome.permission
 
 import androidx.databinding.Bindable
-import org.owntracks.android.injection.scopes.PerFragment
+import org.owntracks.android.injection.scopes.PerActivity
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel
 import javax.inject.Inject
 
-@PerFragment
+@PerActivity
 class PlayFragmentViewModel @Inject constructor() : BaseViewModel<PlayFragmentMvvm.View?>() {
     @get:Bindable
     @set:Bindable

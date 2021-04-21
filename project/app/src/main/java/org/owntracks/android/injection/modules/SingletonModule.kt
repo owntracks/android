@@ -15,7 +15,11 @@ class SingletonModule {
     @Provides
     @Singleton
     fun provideEventbus(): EventBus {
-        return EventBus.builder().addIndex(EventBusIndex()).sendNoSubscriberEvent(false).logNoSubscriberMessages(false).build()
+        return EventBus.builder()
+                .addIndex(EventBusIndex())
+                .sendNoSubscriberEvent(false)
+                .logNoSubscriberMessages(true)
+                .build()
     }
 
     @Provides

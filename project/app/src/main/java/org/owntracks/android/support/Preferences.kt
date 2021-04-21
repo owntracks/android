@@ -176,7 +176,6 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
             Timber.v("Invalid mode requested: %s", requestedMode)
             return
         }
-        val oldModeId = currentMode
         if (!init && currentMode == requestedMode) {
             Timber.v("mode is already set to requested mode")
             return

@@ -23,9 +23,6 @@ class WelcomeAdapter constructor(welcomeActivity: WelcomeActivity, private val r
         fragments.add(finishFragment)
     }
 
-    val lastItemPosition: Int
-        get() = fragments.size - 1
-
     fun getFragment(position: Int): WelcomeFragmentMvvm.View {
         return getItem(position) as WelcomeFragmentMvvm.View
     }

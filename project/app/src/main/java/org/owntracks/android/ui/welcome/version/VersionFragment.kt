@@ -8,13 +8,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import org.greenrobot.eventbus.EventBus
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiWelcomeVersionBinding
+import org.owntracks.android.support.Events
 import org.owntracks.android.ui.base.BaseSupportFragment
 import org.owntracks.android.ui.base.viewmodel.NoOpViewModel
 import org.owntracks.android.ui.welcome.WelcomeFragmentMvvm
+import javax.inject.Inject
 
-class VersionFragment : BaseSupportFragment<UiWelcomeVersionBinding?, NoOpViewModel?>(), WelcomeFragmentMvvm.View, View.OnClickListener {
+class VersionFragment @Inject constructor(private val eventBus: EventBus) : BaseSupportFragment<UiWelcomeVersionBinding?, NoOpViewModel?>(), WelcomeFragmentMvvm.View, View.OnClickListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val v = setAndBindContentView(inflater, container, R.layout.ui_welcome_version, savedInstanceState)
         binding!!.uiFragmentWelcomeVersionButtonLearnMore.setOnClickListener(this)
@@ -30,9 +33,8 @@ class VersionFragment : BaseSupportFragment<UiWelcomeVersionBinding?, NoOpViewMo
         }
     }
 
-    override fun isNextEnabled(): Boolean {
-        return true
+    override fun onResume() {
+        super.onResume()
+        eventBus.post(Events.WelcomeNextDoneButtonsEnableToggle())
     }
-
-    override fun onShowFragment() {}
 }

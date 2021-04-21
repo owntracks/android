@@ -29,4 +29,6 @@ class Events {
     class FusedContactAdded(val contact: FusedContact) : E()
     class FusedContactRemoved(val contact: FusedContact) : E()
     class RestartApp : E()
+
+    class WelcomeNextDoneButtonsEnableToggle(val nextEnabled: Boolean = true, val doneEnabled: Boolean = false) : E()
 }

@@ -7,12 +7,13 @@ import android.view.ViewGroup
 import android.widget.Toast
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
+import org.greenrobot.eventbus.EventBus
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiWelcomePlayBinding
 import org.owntracks.android.ui.base.BaseSupportFragment
-import org.owntracks.android.ui.welcome.WelcomeMvvm
+import javax.inject.Inject
 
-class PlayFragment : BaseSupportFragment<UiWelcomePlayBinding?, PlayFragmentViewModel>(), PlayFragmentMvvm.View {
+class PlayFragment @Inject constructor(private val eventBus: EventBus) : BaseSupportFragment<UiWelcomePlayBinding?, PlayFragmentViewModel>(), PlayFragmentMvvm.View {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return setAndBindContentView(inflater, container, R.layout.ui_welcome_play, savedInstanceState)
     }
@@ -34,35 +35,28 @@ class PlayFragment : BaseSupportFragment<UiWelcomePlayBinding?, PlayFragmentView
     private fun checkAvailability() {
         val googleAPI = GoogleApiAvailability.getInstance()
         val result = googleAPI.isGooglePlayServicesAvailable(requireContext())
-        var fixAvailable = false
-        val playServicesStatusMessage: String
+
         when (result) {
             ConnectionResult.SUCCESS -> {
                 canProceed = true
-                playServicesStatusMessage = getString(R.string.play_services_now_available)
+                viewModel.message = getString(R.string.play_services_now_available)
             }
             ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED, ConnectionResult.SERVICE_UPDATING -> {
                 canProceed = false
-                fixAvailable = true
-                playServicesStatusMessage = getString(R.string.play_services_update_required)
+                viewModel.fixAvailable = true
+                viewModel.message = getString(R.string.play_services_update_required)
             }
             else -> {
                 canProceed = false
-                fixAvailable = googleAPI.isUserResolvableError(result)
-                playServicesStatusMessage = getString(R.string.play_services_not_available)
+                viewModel.fixAvailable = googleAPI.isUserResolvableError(result)
+                viewModel.message = getString(R.string.play_services_not_available)
             }
         }
-        viewModel.fixAvailable= fixAvailable
-        viewModel.message = playServicesStatusMessage
-        (activity as WelcomeMvvm.View?)!!.refreshNextDoneButtons()
         binding!!.invalidateAll()
     }
 
-    override fun isNextEnabled(): Boolean {
-        return canProceed
-    }
-
-    override fun onShowFragment() {
+    override fun onResume() {
+        super.onResume()
         checkAvailability()
     }
 

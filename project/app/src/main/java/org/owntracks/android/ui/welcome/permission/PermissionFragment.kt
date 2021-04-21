@@ -9,24 +9,29 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import org.greenrobot.eventbus.EventBus
 import org.owntracks.android.R
-import org.owntracks.android.databinding.UiWelcomePermissionsBinding
-import org.owntracks.android.support.Events.PermissionGranted
+import org.owntracks.android.databinding.UiWelcomeIntroBinding
+import org.owntracks.android.support.Events
 import org.owntracks.android.ui.base.BaseSupportFragment
-import org.owntracks.android.ui.welcome.WelcomeMvvm
 import javax.inject.Inject
 
-class PermissionFragment : BaseSupportFragment<UiWelcomePermissionsBinding?, PermissionFragmentViewModel>(), PermissionFragmentMvvm.View {
+class PermissionFragment @Inject constructor(private val eventBus: EventBus) : BaseSupportFragment<UiWelcomeIntroBinding?, PermissionFragmentViewModel>(), PermissionFragmentMvvm.View {
     private var askedForPermission = false
-
-    @Inject
-    lateinit var eventBus: EventBus
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return setAndBindContentView(inflater, container, R.layout.ui_welcome_permissions, savedInstanceState)
+    }
+
+    private val requestLocationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        askedForPermission = true
+        if (isGranted) {
+            viewModel.isPermissionGranted = true
+            eventBus.post(Events.WelcomeNextDoneButtonsEnableToggle())
+            eventBus.postSticky(Events.PermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION))
+        }
     }
 
     override fun requestFix() {
@@ -37,45 +42,26 @@ class PermissionFragment : BaseSupportFragment<UiWelcomePermissionsBinding?, Per
                             .setCancelable(true)
                             .setMessage(R.string.permissions_description)
                             .setPositiveButton("OK"
-                            ) { _: DialogInterface?, _: Int -> requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), PERMISSIONS_REQUEST_CODE) }
+                            ) { _: DialogInterface?, _: Int -> requestLocationPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION) }
                             .show()
                 } else {
                     Toast.makeText(this.context, "Unable to proceed without location permissions.", Toast.LENGTH_SHORT).show()
                 }
             } else {
-                requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), PERMISSIONS_REQUEST_CODE)
+                requestLocationPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION)
             }
         } else {
-            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), PERMISSIONS_REQUEST_CODE)
+            requestLocationPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        askedForPermission = true
-        if (requestCode == PERMISSIONS_REQUEST_CODE && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            eventBus.postSticky(PermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION))
+    private fun checkPermission() = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+
+    override fun onResume() {
+        super.onResume()
+        checkPermission().run {
+            eventBus.post(Events.WelcomeNextDoneButtonsEnableToggle(this))
+            viewModel.isPermissionGranted = this
         }
-        (activity as WelcomeMvvm.View?)!!.refreshNextDoneButtons()
-    }
-
-    private fun checkPermission() {
-        if (context != null) {
-            viewModel!!.isPermissionGranted = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-        }
-    }
-
-    override fun isNextEnabled(): Boolean {
-        checkPermission()
-        return if (viewModel != null) {
-            viewModel!!.isPermissionGranted
-        } else {
-            false
-        }
-    }
-
-    override fun onShowFragment() {}
-
-    companion object {
-        private const val PERMISSIONS_REQUEST_CODE = 1
     }
 }

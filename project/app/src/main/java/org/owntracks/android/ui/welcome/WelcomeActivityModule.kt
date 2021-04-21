@@ -1,4 +1,5 @@
 package org.owntracks.android.ui.welcome
+
 import androidx.appcompat.app.AppCompatActivity
 import dagger.Binds
 import dagger.Module
