@@ -10,6 +10,7 @@ import com.google.android.gms.common.GoogleApiAvailability
 import org.greenrobot.eventbus.EventBus
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiWelcomePlayBinding
+import org.owntracks.android.support.Events
 import org.owntracks.android.ui.base.BaseSupportFragment
 import javax.inject.Inject
 
@@ -31,28 +32,29 @@ class PlayFragment @Inject constructor(private val eventBus: EventBus) : BaseSup
         checkAvailability()
     }
 
-    private var canProceed = false
     private fun checkAvailability() {
         val googleAPI = GoogleApiAvailability.getInstance()
-        val result = googleAPI.isGooglePlayServicesAvailable(requireContext())
-
-        when (result) {
+        when (val result = googleAPI.isGooglePlayServicesAvailable(requireContext())) {
             ConnectionResult.SUCCESS -> {
-                canProceed = true
+                viewModel.fixAvailable = false
                 viewModel.message = getString(R.string.play_services_now_available)
+                true
             }
             ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED, ConnectionResult.SERVICE_UPDATING -> {
-                canProceed = false
                 viewModel.fixAvailable = true
                 viewModel.message = getString(R.string.play_services_update_required)
+                false
             }
             else -> {
-                canProceed = false
                 viewModel.fixAvailable = googleAPI.isUserResolvableError(result)
                 viewModel.message = getString(R.string.play_services_not_available)
+                false
             }
+        }.run {
+            eventBus.post(Events.WelcomeNextDoneButtonsEnableToggle(this))
         }
-        binding!!.invalidateAll()
+        binding?.invalidateAll()
+
     }
 
     override fun onResume() {
