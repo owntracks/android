@@ -196,7 +196,7 @@ dependencies {
     implementation("org.apache.httpcomponents.core5:httpcore5:5.1")
     implementation("commons-codec:commons-codec:1.15")
 
-    implementation("org.threeten:threetenbp:1.5.0")
+    implementation("org.threeten:threetenbp:1.5.1")
     implementation("com.github.joschi.jackson:jackson-datatype-threetenbp:$jacksonVersion")
 
     // Widget libraries
