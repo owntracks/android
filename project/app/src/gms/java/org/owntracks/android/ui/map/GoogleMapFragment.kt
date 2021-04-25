@@ -18,10 +18,11 @@ import com.google.android.gms.maps.model.MarkerOptions
 import org.owntracks.android.R
 import org.owntracks.android.databinding.GoogleMapFragmentBinding
 import org.owntracks.android.gms.location.toGMSLatLng
+import org.owntracks.android.gms.location.toGMSLocationSource
 import java.util.*
 
 
-class GoogleMapFragment : MapFragment(), OnMapReadyCallback {
+class GoogleMapFragment internal constructor(private val locationSource: org.owntracks.android.location.LocationSource) : MapFragment(), OnMapReadyCallback {
     private var googleMap: GoogleMap? = null
     private var binding: GoogleMapFragmentBinding? = null
     private val markers: MutableMap<String, Marker?> = HashMap()
@@ -48,6 +49,7 @@ class GoogleMapFragment : MapFragment(), OnMapReadyCallback {
         this.googleMap?.run {
             isIndoorEnabled = false
             isMyLocationEnabled = true
+            setLocationSource(locationSource.toGMSLocationSource())
             uiSettings.isMyLocationButtonEnabled = false
             uiSettings.setAllGesturesEnabled(true)
             moveCamera(CameraUpdateFactory.zoomTo(ZOOM_LEVEL_STREET))
@@ -62,6 +64,7 @@ class GoogleMapFragment : MapFragment(), OnMapReadyCallback {
                     (activity as MapActivity).onMapClick()
                 }
             }
+
         }
     }
 
@@ -142,3 +145,4 @@ class GoogleMapFragment : MapFragment(), OnMapReadyCallback {
         private const val ZOOM_LEVEL_STREET: Float = 15f
     }
 }
+

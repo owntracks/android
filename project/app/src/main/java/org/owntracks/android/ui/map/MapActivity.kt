@@ -10,17 +10,12 @@ import android.location.Location
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Looper
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.ActivityResultRegistry
-import androidx.activity.result.IntentSenderRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.PopupMenu
@@ -28,12 +23,9 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.commit
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.idling.CountingIdlingResource
-import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.Behavior.DragCallback
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -47,7 +39,10 @@ import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.databinding.UiMapBinding
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.gms.location.toGMSLatLng
-import org.owntracks.android.location.*
+import org.owntracks.android.location.LatLng
+import org.owntracks.android.location.LocationProviderClient
+import org.owntracks.android.location.LocationServices
+import org.owntracks.android.location.LocationSource
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.services.BackgroundService.BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG
@@ -65,7 +60,6 @@ import org.owntracks.android.ui.map.osm.OSMMapFragment
 import org.owntracks.android.ui.welcome.WelcomeActivity
 import timber.log.Timber
 import java.util.*
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
@@ -75,18 +69,8 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
     private var menu: Menu? = null
     private var locationProviderClient: LocationProviderClient? = null
     private lateinit var mapFragment: MapFragment
-    var locationRepoUpdaterCallback: LocationCallback = object : LocationCallback() {
-        override fun onLocationResult(locationResult: LocationResult) {
-            Timber.d("Foreground location result received: $locationResult")
-            locationRepo!!.setCurrentLocation(locationResult.lastLocation)
-            super.onLocationResult(locationResult)
-        }
 
-        override fun onLocationAvailability(locationAvailability: LocationAvailability) {
-            Timber.d("Foreground location availability: ${locationAvailability.locationAvailable}")
-            super.onLocationAvailability(locationAvailability)
-        }
-    }
+    private lateinit var mapLocationSource: LocationSource
 
     @JvmField
     @Inject
@@ -129,6 +113,10 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         setSupportToolbar(binding!!.toolbar, false, true)
         setDrawer(binding!!.toolbar)
 
+        locationProviderClient = LocationServices.getLocationProviderClient(this, preferences)
+
+        mapLocationSource = MapLocationSource(locationProviderClient!!, viewModel!!.mapLocationUpdateCallback)
+
         if (savedInstanceState == null) {
             mapFragment = getMapFragment()
             supportFragmentManager.commit {
@@ -141,7 +129,6 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
 
         locationLifecycleObserver = LocationLifecycleObserver(activityResultRegistry)
         lifecycle.addObserver(locationLifecycleObserver)
-
 
         bottomSheetBehavior = BottomSheetBehavior.from(binding!!.bottomSheetLayout)
         binding!!.contactPeek.contactRow.setOnClickListener(this)
@@ -165,7 +152,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
                 setBottomSheetCollapsed()
             }
         })
-        viewModel!!.center.observe(this, { o: LatLng? ->
+        viewModel!!.mapCenter.observe(this, { o: LatLng? ->
             if (o != null) {
                 mapFragment.updateCamera(o)
             }
@@ -177,10 +164,9 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         } else {
             startService(Intent(this, BackgroundService::class.java))
         }
-        locationProviderClient = LocationServices.getLocationProviderClient(this, preferences)
 
         // Cancel the background restriction notification
-        NotificationManagerCompat.from(this).cancel(BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG,0)
+        NotificationManagerCompat.from(this).cancel(BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG, 0)
     }
 
     private fun getMapFragment() =
@@ -188,7 +174,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
                 OSMMapFragment()
             } else {
                 when (FLAVOR) {
-                    "gms" -> GoogleMapFragment()
+                    "gms" -> GoogleMapFragment(mapLocationSource)
                     else -> OSMMapFragment()
                 }
             }
@@ -257,7 +243,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
                     this.replace(R.id.mapFragment, mapFragment)
                 }
             } else if (mapFragment is OSMMapFragment && !preferences.isExperimentalFeatureEnabled(EXPERIMENTAL_FEATURE_USE_OSM_MAP)) {
-                mapFragment = GoogleMapFragment()
+                mapFragment = GoogleMapFragment(mapLocationSource)
                 supportFragmentManager.commit(true) {
                     this.replace(R.id.mapFragment, mapFragment)
                 }
@@ -265,20 +251,10 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         }
         super.onResume()
         handleIntentExtras(intent)
-        if (viewModel!!.hasLocation()) enableLocationMenus() else disableLocationMenus()
-        locationProviderClient!!.requestLocationUpdates(
-                LocationRequest()
-                        .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                        .setInterval(TimeUnit.SECONDS.toMillis(5)),
-                locationRepoUpdaterCallback,
-                Looper.getMainLooper()
-        )
+        viewModel?.run {
+            if (hasLocation()) enableLocationMenus() else disableLocationMenus()
+        }
         updateMonitoringModeMenu()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        locationProviderClient!!.removeLocationUpdates(locationRepoUpdaterCallback)
     }
 
     private fun handleIntentExtras(intent: Intent) {
@@ -497,24 +473,5 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         const val BUNDLE_KEY_CONTACT_ID = "BUNDLE_KEY_CONTACT_ID"
 
         private const val PERMISSIONS_REQUEST_CODE = 1
-    }
-}
-
-class LocationLifecycleObserver(private val registry: ActivityResultRegistry) : DefaultLifecycleObserver {
-    lateinit var resultLauncher: ActivityResultLauncher<IntentSenderRequest>
-    lateinit var callback: (Boolean) -> Unit
-    override fun onCreate(owner: LifecycleOwner) {
-        resultLauncher = registry.register("key", owner, ActivityResultContracts.StartIntentSenderForResult()) {
-            when (it.resultCode) {
-                Activity.RESULT_OK -> callback(true)
-                else -> callback(false)
-            }
-        }
-    }
-
-    fun resolveException(exception: ResolvableApiException, callback: (Boolean) -> Unit) {
-        this.callback = callback
-        val intentSenderRequest = IntentSenderRequest.Builder(exception.resolution).build()
-        resultLauncher.launch(intentSenderRequest)
     }
 }

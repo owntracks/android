@@ -3,6 +3,7 @@ package org.owntracks.android.ui.map
 import androidx.databinding.Bindable
 import androidx.lifecycle.LiveData
 import org.owntracks.android.location.LatLng
+import org.owntracks.android.location.LocationCallback
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.ui.base.view.MvvmView
 import org.owntracks.android.ui.base.viewmodel.MvvmViewModel
@@ -20,6 +21,7 @@ interface MapMvvm {
     }
 
     interface ViewModel<V : MvvmView?> : MvvmViewModel<V> {
+        val mapLocationUpdateCallback: LocationCallback
         val currentLocation: LatLng?
 
         @get:Bindable
@@ -36,7 +38,7 @@ interface MapMvvm {
         fun onMapReady()
         val contact: LiveData<FusedContact?>
         val bottomSheetHidden: LiveData<Boolean>
-        val center: LiveData<LatLng>
+        val mapCenter: LiveData<LatLng>
         fun sendLocation()
 
     }

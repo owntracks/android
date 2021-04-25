@@ -11,6 +11,9 @@ import org.greenrobot.eventbus.ThreadMode
 import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.injection.scopes.PerActivity
 import org.owntracks.android.location.LatLng
+import org.owntracks.android.location.LocationAvailability
+import org.owntracks.android.location.LocationCallback
+import org.owntracks.android.location.LocationResult
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.model.messages.MessageClear
 import org.owntracks.android.model.messages.MessageLocation
@@ -23,7 +26,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @PerActivity
-class MapViewModel @Inject constructor(contactsRepo: ContactsRepo, locationRepo: LocationProcessor, messageProcessor: MessageProcessor) : BaseViewModel<MapMvvm.View>(), MapMvvm.ViewModel<MapMvvm.View>{
+class MapViewModel @Inject constructor(contactsRepo: ContactsRepo, locationRepo: LocationProcessor, messageProcessor: MessageProcessor) : BaseViewModel<MapMvvm.View>(), MapMvvm.ViewModel<MapMvvm.View> {
     private val contactsRepo: ContactsRepo
     private val locationProcessor: LocationProcessor
 
@@ -55,8 +58,27 @@ class MapViewModel @Inject constructor(contactsRepo: ContactsRepo, locationRepo:
         get() = liveContact
     override val bottomSheetHidden: LiveData<Boolean>
         get() = liveBottomSheetHidden
-    override val center: LiveData<LatLng>
+    override val mapCenter: LiveData<LatLng>
         get() = liveCamera
+
+    override val mapLocationUpdateCallback: LocationCallback = object : LocationCallback {
+        override fun onLocationResult(locationResult: LocationResult) {
+            Timber.d("Map location result received: $locationResult")
+            location = locationResult.lastLocation
+            view!!.enableLocationMenus() // TODO use an observable
+            locationIdlingResource.setIdleState(true)
+            if (mode == VIEW_DEVICE) {
+                liveCamera.postValue(currentLocation)
+            }
+            if (onLocationChangedListener != null) {
+                onLocationChangedListener!!.onLocationChanged(location)
+            }
+        }
+
+        override fun onLocationAvailability(locationAvailability: LocationAvailability) {
+            Timber.d("Map location availability: ${locationAvailability.locationAvailable}")
+        }
+    }
 
     override fun sendLocation() {
         locationProcessor.publishLocationMessage(MessageLocation.REPORT_TYPE_USER)
@@ -114,7 +136,7 @@ class MapViewModel @Inject constructor(contactsRepo: ContactsRepo, locationRepo:
     }
 
     override fun onBottomSheetClick() {
-        view!!.setBottomSheetExpanded()
+        view!!.setBottomSheetExpanded() // TODO use an observable
     }
 
     override fun onMenuCenterDeviceClicked() {
@@ -161,19 +183,6 @@ class MapViewModel @Inject constructor(contactsRepo: ContactsRepo, locationRepo:
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onEvent(e: MonitoringChanged?) {
         view!!.updateMonitoringModeMenu()
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN, priority = 1, sticky = true)
-    fun onEvent(location: Location) {
-        this.location = location
-        view!!.enableLocationMenus()
-        locationIdlingResource.setIdleState(true)
-        if (mode == VIEW_DEVICE) {
-            liveCamera.postValue(currentLocation)
-        }
-        if (onLocationChangedListener != null) {
-            onLocationChangedListener!!.onLocationChanged(this.location)
-        }
     }
 
     override fun onMapClick() {

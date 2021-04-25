@@ -15,8 +15,7 @@ class LocationRequestGMSConversion {
 
     @Test
     fun canConvertLocationRequestToGMS() {
-        val locationRequest = LocationRequest()
-                .setFastestInterval(1000)
+        val locationRequest = LocationRequest(1_000)
                 .setInterval(30_000)
                 .setNumUpdates(50)
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)

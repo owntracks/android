@@ -29,12 +29,14 @@ import androidx.core.app.NotificationManagerCompat;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.jetbrains.annotations.NotNull;
 import org.owntracks.android.R;
 import org.owntracks.android.data.WaypointModel;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.data.repos.LocationRepo;
 import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.geocoding.GeocoderProvider;
+import org.owntracks.android.location.LocationAvailability;
 import org.owntracks.android.location.LocationCallback;
 import org.owntracks.android.location.LocationProviderClient;
 import org.owntracks.android.location.LocationRequest;
@@ -157,18 +159,26 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
 
         locationCallback = new LocationCallback() {
             @Override
+            public void onLocationAvailability(@NotNull LocationAvailability locationAvailability) {
+
+            }
+
+            @Override
             public void onLocationResult(LocationResult locationResult) {
                 Timber.i("Locationresult received: %s", locationResult);
-                super.onLocationResult(locationResult);
                 onLocationChanged(locationResult.getLastLocation(), MessageLocation.REPORT_TYPE_DEFAULT);
             }
         };
 
         locationCallbackOnDemand = new LocationCallback() {
             @Override
+            public void onLocationAvailability(@NotNull LocationAvailability locationAvailability) {
+
+            }
+
+            @Override
             public void onLocationResult(LocationResult locationResult) {
                 Timber.i("Ondemand Locationresult received: %s", locationResult);
-                super.onLocationResult(locationResult);
                 onLocationChanged(locationResult.getLastLocation(), MessageLocation.REPORT_TYPE_RESPONSE);
             }
         };
