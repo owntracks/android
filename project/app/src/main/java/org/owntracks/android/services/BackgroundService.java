@@ -2,7 +2,6 @@ package org.owntracks.android.services;
 
 import android.Manifest;
 import android.app.Notification;
-import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -66,16 +65,18 @@ import javax.inject.Inject;
 import dagger.android.DaggerService;
 import timber.log.Timber;
 
+import static androidx.core.app.NotificationCompat.PRIORITY_LOW;
+import static org.owntracks.android.App.NOTIFICATION_CHANNEL_EVENTS;
+import static org.owntracks.android.App.NOTIFICATION_CHANNEL_ONGOING;
+import static org.owntracks.android.geocoding.GeocoderProvider.ERROR_NOTIFICATION_CHANNEL_ID;
+
 public class BackgroundService extends DaggerService implements OnModeChangedPreferenceChangedListener, ServiceBridge.ServiceBridgeInterface {
-    private static final int INTENT_REQUEST_CODE_LOCATION = 1263;
     private static final int INTENT_REQUEST_CODE_GEOFENCE = 1264;
     private static final int INTENT_REQUEST_CODE_CLEAR_EVENTS = 1263;
 
     private static final int NOTIFICATION_ID_ONGOING = 1;
-    private static final String NOTIFICATION_CHANNEL_ONGOING = "O";
-
     private static final int NOTIFICATION_ID_EVENT_GROUP = 2;
-    public static final String NOTIFICATION_CHANNEL_EVENTS = "E";
+    public static final String BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG = "backgroundRestrictionNotification";
 
     private static int notificationEventsID = 3;
 
@@ -108,6 +109,8 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
     private final LinkedList<Spannable> activeNotifications = new LinkedList<>();
     private int lastQueueLength = 0;
     private Notification stackNotification;
+
+    private boolean hasBeenStartedExplicitly = false;
 
     @Inject
     Preferences preferences;
@@ -170,7 +173,6 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
             }
         };
 
-        setupNotificationChannels();
         startForeground(NOTIFICATION_ID_ONGOING, getOngoingNotification());
 
         setupLocationRequest();
@@ -231,43 +233,43 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
                         // Step monitoring mode if no mode is specified
                         preferences.setMonitoringNext();
                     }
+                    hasBeenStartedExplicitly = true;
+                    notificationManager.cancel(BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG, 0);
                     return;
                 case INTENT_ACTION_BOOT_COMPLETED:
                 case INTENT_ACTION_PACKAGE_REPLACED:
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                        // TODO: 02/04/2021 Raise a notification that we're not going to get locations until the user has actually opened the app.
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !hasBeenStartedExplicitly) {
+                        notifyUserOfBackgroundLocationRestriction();
                     }
                     return;
                 default:
                     Timber.v("unhandled intent action received: %s", intent.getAction());
             }
+        } else {
+            hasBeenStartedExplicitly = true;
         }
     }
 
-    private void setupNotificationChannels() {
-        if (Build.VERSION.SDK_INT < 26) {
-            return;
-        }
+    private void notifyUserOfBackgroundLocationRestriction() {
+        Intent activityLaunchIntent = new Intent(getApplicationContext(), MapActivity.class);
+        activityLaunchIntent.setAction("android.intent.action.MAIN");
+        activityLaunchIntent.addCategory("android.intent.category.LAUNCHER");
+        activityLaunchIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        String notificationText = getString(R.string.backgroundLocationRestrictionNotificationText);
+        String notificationTitle = getString(R.string.backgroundLocationRestrictionNotificationTitle);
 
-        // Importance min will show normal priority notification for foreground service. See https://developer.android.com/reference/android/app/NotificationManager#IMPORTANCE_MIN
-        // User has to actively configure this in the notification channel settings.
-        NotificationChannel ongoingChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ONGOING, getString(R.string.notificationChannelOngoing), NotificationManager.IMPORTANCE_DEFAULT);
-        ongoingChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-        ongoingChannel.setDescription(getString(R.string.notificationChannelOngoingDescription));
-        ongoingChannel.enableLights(false);
-        ongoingChannel.enableVibration(false);
-        ongoingChannel.setShowBadge(false);
-        ongoingChannel.setSound(null, null);
-        notificationManager.createNotificationChannel(ongoingChannel);
+        Notification notification = new NotificationCompat.Builder(getApplicationContext(), ERROR_NOTIFICATION_CHANNEL_ID)
+                .setContentTitle(notificationTitle)
+                .setContentText(notificationText)
+                .setAutoCancel(true)
+                .setSmallIcon(R.drawable.ic_owntracks_80)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(notificationText))
+                .setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, activityLaunchIntent, PendingIntent.FLAG_UPDATE_CURRENT))
+                .setPriority(PRIORITY_LOW)
+                .setNotificationSilent()
+                .build();
 
-        NotificationChannel eventsChannel = new NotificationChannel(NOTIFICATION_CHANNEL_EVENTS, getString(R.string.events), NotificationManager.IMPORTANCE_HIGH);
-        eventsChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-        eventsChannel.setDescription(getString(R.string.notificationChannelEventsDescription));
-        eventsChannel.enableLights(false);
-        eventsChannel.enableVibration(false);
-        eventsChannel.setShowBadge(true);
-        eventsChannel.setSound(null, null);
-        notificationManager.createNotificationChannel(eventsChannel);
+        notificationManager.notify(BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG, 0, notification);
     }
 
     @Nullable

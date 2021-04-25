@@ -151,7 +151,6 @@
     <string name="notificationChannelEventsDescription">Region transmissions</string>
     <string name="preferencesOpencageGeocoderApiKey">OpenCage API Key</string>
     <string name="preferencesOpencageGeocoderApiKeySummary">API key for OpenCage Reverse Geocoder</string>
-    p
     <string name="preferencesOpencageGeocoderApiKeyDialog">If set OpenCage is used to resolve location adresses instead of Google. Requires restart.</string>
     <string name="region_unknown">Status unknown</string>
     <string name="region_inside">Currently inside</string>
@@ -186,13 +185,14 @@
     <string name="aboutLicense">License</string>
     <string name="aboutTranslationsSummary">Currently available in %d languages!</string>
     <string name="aboutTranslations">Help translate this app</string>
-
     <string name="geocoderDisabled">Geocoder service is disabled</string>
     <string name="geocoderRateLimited">Geocoder service has been rate limited. Not retrying until %s</string>
     <string name="geocoderError">An error was received from the geocoder service: %s</string>
     <string name="notificationChannelErrors">Errors</string>
     <string name="geocoderProblemNotificationTitle">Geocoder problem</string>
     <string name="geocoderIPAddressRejected">The client IP address was rejected</string>
+    <string name="backgroundLocationRestrictionNotificationTitle">Background Location Restricted</string>
+    <string name="backgroundLocationRestrictionNotificationText">This version of Android restricts OwnTracks from receiving locations when started in the background until the app is opened. Click this notification to open the app and start tracking location.</string>
     <string-array name="geocoders">
         <item>None</item>
         <item>Google</item>

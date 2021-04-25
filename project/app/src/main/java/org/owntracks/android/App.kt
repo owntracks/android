@@ -1,9 +1,13 @@
 package org.owntracks.android
 
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.StrictMode
+import androidx.core.app.NotificationManagerCompat
 import androidx.work.Configuration
 import androidx.work.WorkManager
 import androidx.work.WorkerFactory
@@ -14,6 +18,7 @@ import dagger.android.support.DaggerApplication
 import org.conscrypt.Conscrypt
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
+import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.injection.components.DaggerAppComponent
 import org.owntracks.android.injection.qualifier.AppContext
 import org.owntracks.android.services.MessageProcessor
@@ -86,6 +91,45 @@ class App : DaggerApplication() {
         // Initialize will call Scheduler to connect off the main thread anyway.
         runThingsOnOtherThreads.postOnMainHandlerDelayed(Runnable { messageProcessor.initialize() }, 510)
         eventBus.register(this)
+
+        // Notifications can be sent from multiple places, so let's make sure we've got the channels in place
+        createNotificationChannels()
+
+    }
+
+    private fun createNotificationChannels() {
+        val notificationManager = NotificationManagerCompat.from(this)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+            // Importance min will show normal priority notification for foreground service. See https://developer.android.com/reference/android/app/NotificationManager#IMPORTANCE_MIN
+            // User has to actively configure this in the notification channel settings.
+            val ongoingNotificationChannelName = if (getString(R.string.notificationChannelOngoing).trim().isNotEmpty()) getString(R.string.notificationChannelOngoing) else "Ongoing"
+            NotificationChannel(NOTIFICATION_CHANNEL_ONGOING, ongoingNotificationChannelName, NotificationManager.IMPORTANCE_DEFAULT).apply {
+                lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+                description = getString(R.string.notificationChannelOngoingDescription)
+                enableLights(false)
+                enableVibration(false)
+                setShowBadge(false)
+                setSound(null, null)
+            }.run { notificationManager.createNotificationChannel(this) }
+
+
+            val eventsNotificationChannelName = if (getString(R.string.events).trim().isNotEmpty()) getString(R.string.events) else "Events"
+            NotificationChannel(NOTIFICATION_CHANNEL_EVENTS, eventsNotificationChannelName, NotificationManager.IMPORTANCE_HIGH).apply {
+                lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+                description = getString(R.string.notificationChannelEventsDescription)
+                enableLights(false)
+                enableVibration(false)
+                setShowBadge(true)
+                setSound(null, null)
+            }.run { notificationManager.createNotificationChannel(this) }
+
+            val errorNotificationChannelName = if (getString(R.string.notificationChannelErrors).trim().isNotEmpty()) getString(R.string.notificationChannelErrors) else "Errors"
+            NotificationChannel(GeocoderProvider.ERROR_NOTIFICATION_CHANNEL_ID, errorNotificationChannelName, NotificationManager.IMPORTANCE_LOW).apply {
+                lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+            }.run { notificationManager.createNotificationChannel(this) }
+
+        }
     }
 
     @Subscribe
@@ -100,6 +144,11 @@ class App : DaggerApplication() {
         val appComponent = DaggerAppComponent.builder().app(this).build()
         appComponent.inject(this)
         return appComponent
+    }
+
+    companion object {
+        const val NOTIFICATION_CHANNEL_ONGOING = "O"
+        const val NOTIFICATION_CHANNEL_EVENTS = "E"
     }
 }
 

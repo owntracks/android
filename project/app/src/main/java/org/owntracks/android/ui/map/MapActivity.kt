@@ -26,6 +26,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.PopupMenu
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.commit
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -49,6 +50,7 @@ import org.owntracks.android.gms.location.toGMSLatLng
 import org.owntracks.android.location.*
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.services.BackgroundService
+import org.owntracks.android.services.BackgroundService.BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG
 import org.owntracks.android.services.LocationProcessor
 import org.owntracks.android.services.MessageProcessorEndpointHttp
 import org.owntracks.android.support.ContactImageProvider
@@ -176,6 +178,9 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
             startService(Intent(this, BackgroundService::class.java))
         }
         locationProviderClient = LocationServices.getLocationProviderClient(this, preferences)
+
+        // Cancel the background restriction notification
+        NotificationManagerCompat.from(this).cancel(BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG,0)
     }
 
     private fun getMapFragment() =

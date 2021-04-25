@@ -1,7 +1,5 @@
 package org.owntracks.android.geocoding
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -151,12 +149,6 @@ class GeocoderProvider @Inject constructor(@AppContext val context: Context, val
             }
         })
         notificationManager = NotificationManagerCompat.from(context)
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            val channelName = if (context.getString(R.string.notificationChannelErrors).trim().isNotEmpty()) context.getString(R.string.notificationChannelErrors) else "Errors"
-            notificationManager.createNotificationChannel(
-                    NotificationChannel(ERROR_NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_LOW)
-            )
-        }
     }
 
     companion object {
