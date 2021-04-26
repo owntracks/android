@@ -179,16 +179,10 @@ public class MessageProcessor {
 
         switch (preferences.getMode()) {
             case MessageProcessorEndpointHttp.MODE_ID:
-                if (preferences.getUrl().isEmpty()) {
-                    return;
-                }
                 this.endpoint = new MessageProcessorEndpointHttp(this, this.parser, this.preferences, this.scheduler, this.applicationContext);
                 break;
             case MessageProcessorEndpointMqtt.MODE_ID:
             default:
-                if (preferences.getHost().isEmpty()) {
-                    return;
-                }
                 this.endpoint = new MessageProcessorEndpointMqtt(this, this.parser, this.preferences, this.scheduler, this.eventBus, this.runThingsOnOtherThreads, this.applicationContext);
 
         }
