@@ -41,7 +41,6 @@ class LocationRequestGMSConversion {
                 interval = 30_000)
 
         val gmsLocationRequest = locationRequest.toGMSLocationRequest()
-        assertEquals(1000, gmsLocationRequest.fastestInterval)
         assertFalse(gmsLocationRequest.isFastestIntervalExplicitlySet)
     }
 }

@@ -19,6 +19,7 @@ class LocationSourceConversion {
         val locationSource = object : LocationSource {
             override fun activate(onLocationChangedListener: LocationSource.OnLocationChangedListener) {
                 activateCalled = true
+                onLocationChangedListener.onLocationChanged(null)
             }
 
             override fun deactivate() {
@@ -29,8 +30,8 @@ class LocationSourceConversion {
         val gmsLocationSource = locationSource.toGMSLocationSource()
         gmsLocationSource.activate { gmsActivateCalled = true }
         gmsLocationSource.deactivate()
-        assertTrue("Activate was called",activateCalled)
-        assertTrue("GMS activation was called",gmsActivateCalled)
-        assertTrue("Deactivate called",deactivateCalled)
+        assertTrue("Activate was called", activateCalled)
+        assertTrue("GMS activation was called", gmsActivateCalled)
+        assertTrue("Deactivate called", deactivateCalled)
     }
 }
