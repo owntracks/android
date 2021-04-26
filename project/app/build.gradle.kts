@@ -8,8 +8,8 @@ plugins {
 }
 
 val versionMajor = 2
-val versionMinor = 3
-val versionPatch = 1
+val versionMinor = 4
+val versionPatch = 0
 //TODO need to increment this manually at the moment, as GPP is broken
 val versionBuild = 0 // This value is managed by the gradle publisher plugin. Build numbers get incremented on publish
 val googleMapsAPIKey = extra.get("google_maps_api_key")?.toString() ?: "PLACEHOLDER_API_KEY"
