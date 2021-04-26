@@ -19,10 +19,17 @@ import org.owntracks.android.R
 import org.owntracks.android.databinding.GoogleMapFragmentBinding
 import org.owntracks.android.gms.location.toGMSLatLng
 import org.owntracks.android.gms.location.toGMSLocationSource
+import org.owntracks.android.location.LocationSource
+import timber.log.Timber
 import java.util.*
 
 
-class GoogleMapFragment internal constructor(private val locationSource: org.owntracks.android.location.LocationSource) : MapFragment(), OnMapReadyCallback {
+class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallback {
+    constructor(locationSource: LocationSource) : this() {
+        this.locationSource = locationSource
+    }
+
+    private var locationSource: LocationSource? = null
     private var googleMap: GoogleMap? = null
     private var binding: GoogleMapFragmentBinding? = null
     private val markers: MutableMap<String, Marker?> = HashMap()
@@ -49,7 +56,11 @@ class GoogleMapFragment internal constructor(private val locationSource: org.own
         this.googleMap?.run {
             isIndoorEnabled = false
             isMyLocationEnabled = true
-            setLocationSource(locationSource.toGMSLocationSource())
+            if (locationSource == null) {
+                Timber.e("No location source set, falling back to Google internal")
+            } else {
+                setLocationSource(locationSource!!.toGMSLocationSource())
+            }
             uiSettings.isMyLocationButtonEnabled = false
             uiSettings.setAllGesturesEnabled(true)
             moveCamera(CameraUpdateFactory.zoomTo(ZOOM_LEVEL_STREET))
