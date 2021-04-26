@@ -1,7 +1,7 @@
 package org.owntracks.android.location
 
 data class LocationRequest(
-        var fastestInterval: Long = 20000L,
+        var fastestInterval: Long = -1L,
         var smallestDisplacement: Float = 0F,
         var numUpdates: Int = Int.MAX_VALUE,
         var expirationDuration: Long = Long.MAX_VALUE,

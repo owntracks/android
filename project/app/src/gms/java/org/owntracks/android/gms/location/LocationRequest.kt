@@ -10,13 +10,16 @@ fun LocationRequest.toGMSLocationRequest(): com.google.android.gms.location.Loca
         LocationRequest.PRIORITY_NO_POWER -> com.google.android.gms.location.LocationRequest.PRIORITY_NO_POWER
         else -> com.google.android.gms.location.LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
     }
-    return com.google.android.gms.location.LocationRequest
+    val gmsLocationRequest = com.google.android.gms.location.LocationRequest
             .create()
             .setPriority(gmsPriority)
             .setInterval(interval)
-            .setFastestInterval(fastestInterval)
             .setNumUpdates(numUpdates)
             .setExpirationDuration(expirationDuration)
             .setSmallestDisplacement(smallestDisplacement)
+    if (fastestInterval >= 0) {
+        gmsLocationRequest.fastestInterval = fastestInterval
+    }
+    return gmsLocationRequest
 }
 
