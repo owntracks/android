@@ -16,7 +16,7 @@ import org.owntracks.android.location.LocationCallback
 import org.owntracks.android.location.LocationResult
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.model.messages.MessageClear
-import org.owntracks.android.model.messages.MessageLocation
+import org.owntracks.android.model.messages.MessageLocation.Companion.REPORT_TYPE_USER
 import org.owntracks.android.services.LocationProcessor
 import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.support.Events.*
@@ -26,19 +26,18 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @PerActivity
-class MapViewModel @Inject constructor(contactsRepo: ContactsRepo, locationRepo: LocationProcessor, messageProcessor: MessageProcessor) : BaseViewModel<MapMvvm.View>(), MapMvvm.ViewModel<MapMvvm.View> {
+class MapViewModel @Inject constructor(contactsRepo: ContactsRepo, private val locationProcessor: LocationProcessor, messageProcessor: MessageProcessor) : BaseViewModel<MapMvvm.View>(), MapMvvm.ViewModel<MapMvvm.View> {
     private val contactsRepo: ContactsRepo
-    private val locationProcessor: LocationProcessor
 
     @get:Bindable
     override var activeContact: FusedContact? = null
         private set
     private var onLocationChangedListener: OnLocationChangedListener? = null
     private val messageProcessor: MessageProcessor
-    private var location: Location? = null
     private val liveContact = MutableLiveData<FusedContact?>()
     private val liveBottomSheetHidden = MutableLiveData<Boolean>()
     private val liveCamera = MutableLiveData<LatLng>()
+    private val liveLocation = MutableLiveData<Location?>()
     val locationIdlingResource = SimpleIdlingResource("locationIdlingResource", false)
     override fun saveInstanceState(outState: Bundle) {}
     override fun restoreInstanceState(savedInstanceState: Bundle) {}
@@ -60,18 +59,18 @@ class MapViewModel @Inject constructor(contactsRepo: ContactsRepo, locationRepo:
         get() = liveBottomSheetHidden
     override val mapCenter: LiveData<LatLng>
         get() = liveCamera
+    override val currentLocation: LiveData<Location?>
+        get() = liveLocation
 
     override val mapLocationUpdateCallback: LocationCallback = object : LocationCallback {
         override fun onLocationResult(locationResult: LocationResult) {
-            Timber.d("Map location result received: $locationResult")
-            location = locationResult.lastLocation
-            view!!.enableLocationMenus() // TODO use an observable
+            liveLocation.value = locationResult.lastLocation
             locationIdlingResource.setIdleState(true)
             if (mode == VIEW_DEVICE) {
-                liveCamera.postValue(currentLocation)
+                liveCamera.postValue(locationResult.lastLocation.toLatLng())
             }
             if (onLocationChangedListener != null) {
-                onLocationChangedListener!!.onLocationChanged(location)
+                onLocationChangedListener!!.onLocationChanged(locationResult.lastLocation)
             }
         }
 
@@ -81,7 +80,9 @@ class MapViewModel @Inject constructor(contactsRepo: ContactsRepo, locationRepo:
     }
 
     override fun sendLocation() {
-        locationProcessor.publishLocationMessage(MessageLocation.REPORT_TYPE_USER)
+        currentLocation.value?.run {
+            locationProcessor.onLocationChanged(this, REPORT_TYPE_USER)
+        }
     }
 
     private fun setViewModeContact(contactId: String, center: Boolean) {
@@ -108,25 +109,18 @@ class MapViewModel @Inject constructor(contactsRepo: ContactsRepo, locationRepo:
         Timber.v("setting view mode: VIEW_DEVICE")
         mode = VIEW_DEVICE
         clearActiveContact()
-        if (hasLocation()) {
-            liveCamera.postValue(currentLocation)
+        if (liveLocation.value != null) {
+            liveCamera.postValue(liveLocation.value!!.toLatLng())
         } else {
             Timber.e("no location available")
         }
     }
-
-    override val currentLocation: LatLng?
-        get() = if (location != null) LatLng(location!!.latitude, location!!.longitude) else null
 
     override fun restore(contactId: String?) {
         contactId?.let {
             Timber.v("restoring contact id:%s", it)
             setViewModeContact(it, true)
         }
-    }
-
-    override fun hasLocation(): Boolean {
-        return location != null
     }
 
     private fun clearActiveContact() {
@@ -208,6 +202,7 @@ class MapViewModel @Inject constructor(contactsRepo: ContactsRepo, locationRepo:
         Timber.v("onCreate")
         this.contactsRepo = contactsRepo
         this.messageProcessor = messageProcessor
-        locationProcessor = locationRepo
     }
 }
+
+private fun Location.toLatLng(): LatLng = LatLng(this.latitude, this.longitude)

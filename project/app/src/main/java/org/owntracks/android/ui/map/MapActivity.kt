@@ -19,15 +19,12 @@ import android.widget.Toast
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.PopupMenu
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
 import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.idling.CountingIdlingResource
-import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.appbar.AppBarLayout.Behavior.DragCallback
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -110,11 +107,20 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
             finish()
         }
         bindAndAttachContentView(R.layout.ui_map, savedInstanceState, contactImageProvider)
-        setSupportToolbar(binding!!.toolbar, false, true)
-        setDrawer(binding!!.toolbar)
+        binding?.also {
+            setSupportToolbar(binding!!.toolbar, false, true)
+            setDrawer(it.toolbar)
+            bottomSheetBehavior = BottomSheetBehavior.from(binding!!.bottomSheetLayout)
+            it.contactPeek.contactRow.setOnClickListener(this)
+            it.contactPeek.contactRow.setOnLongClickListener(this)
+            it.moreButton.setOnClickListener { v: View -> showPopupMenu(v) }
+            setBottomSheetHidden()
+        }
+
+        locationLifecycleObserver = LocationLifecycleObserver(activityResultRegistry)
+        lifecycle.addObserver(locationLifecycleObserver)
 
         locationProviderClient = LocationServices.getLocationProviderClient(this, preferences)
-
         mapLocationSource = MapLocationSource(locationProviderClient!!, viewModel!!.mapLocationUpdateCallback)
 
         if (savedInstanceState == null) {
@@ -127,36 +133,29 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
             mapFragment = supportFragmentManager.findFragmentByTag("map") as MapFragment
         }
 
-        locationLifecycleObserver = LocationLifecycleObserver(activityResultRegistry)
-        lifecycle.addObserver(locationLifecycleObserver)
-
-        bottomSheetBehavior = BottomSheetBehavior.from(binding!!.bottomSheetLayout)
-        binding!!.contactPeek.contactRow.setOnClickListener(this)
-        binding!!.contactPeek.contactRow.setOnLongClickListener(this)
-        binding!!.moreButton.setOnClickListener { v: View -> showPopupMenu(v) }
-        setBottomSheetHidden()
-        val appBarLayout = binding!!.appBarLayout
-        val params = appBarLayout.layoutParams as CoordinatorLayout.LayoutParams
-        val behavior = AppBarLayout.Behavior()
-        behavior.setDragCallback(object : DragCallback() {
-            override fun canDrag(appBarLayout: AppBarLayout): Boolean {
-                return false
-            }
-        })
-        params.behavior = behavior
-        viewModel!!.contact.observe(this, this)
-        viewModel!!.bottomSheetHidden.observe(this, { o: Boolean? ->
-            if (o == null || o) {
-                setBottomSheetHidden()
-            } else {
-                setBottomSheetCollapsed()
-            }
-        })
-        viewModel!!.mapCenter.observe(this, { o: LatLng? ->
-            if (o != null) {
-                mapFragment.updateCamera(o)
-            }
-        })
+        // Watch various things that the viewModel owns
+        viewModel?.also {
+            it.contact.observe(this, this)
+            it.bottomSheetHidden.observe(this, { o: Boolean? ->
+                if (o == null || o) {
+                    setBottomSheetHidden()
+                } else {
+                    setBottomSheetCollapsed()
+                }
+            })
+            it.mapCenter.observe(this, { o: LatLng? ->
+                if (o != null) {
+                    mapFragment.updateCamera(o)
+                }
+            })
+            it.currentLocation.observe(this, { latLng ->
+                if (latLng == null) {
+                    disableLocationMenus()
+                } else {
+                    enableLocationMenus()
+                }
+            })
+        }
 
         Timber.d("starting BackgroundService")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -165,7 +164,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
             startService(Intent(this, BackgroundService::class.java))
         }
 
-        // Cancel the background restriction notification
+        // We've been started in the foreground, so cancel the background restriction notification
         NotificationManagerCompat.from(this).cancel(BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG, 0)
     }
 
@@ -218,11 +217,16 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
                 binding!!.acc.text = String.format(Locale.getDefault(), "%s m", fusedContact.fusedLocationAccuracy)
                 binding!!.tid.text = fusedContact.trackerId
                 binding!!.id.text = fusedContact.id
-                if (viewModel!!.hasLocation()) {
+                if (viewModel!!.currentLocation.value != null) {
                     binding!!.distance.visibility = View.VISIBLE
                     binding!!.distanceLabel.visibility = View.VISIBLE
                     val distance = FloatArray(2)
-                    Location.distanceBetween(viewModel!!.currentLocation!!.latitude, viewModel!!.currentLocation!!.longitude, fusedContact.latLng.latitude, fusedContact.latLng.longitude, distance)
+                    Location.distanceBetween(
+                            viewModel!!.currentLocation.value!!.latitude,
+                            viewModel!!.currentLocation.value!!.longitude,
+                            fusedContact.latLng.latitude,
+                            fusedContact.latLng.longitude,
+                            distance)
                     binding!!.distance.text = String.format(Locale.getDefault(), "%d m", distance[0].roundToInt())
                 } else {
                     binding!!.distance.visibility = View.GONE
@@ -251,9 +255,6 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         }
         super.onResume()
         handleIntentExtras(intent)
-        viewModel?.run {
-            if (hasLocation()) enableLocationMenus() else disableLocationMenus()
-        }
         updateMonitoringModeMenu()
     }
 
@@ -278,7 +279,6 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         val inflater = menuInflater
         inflater.inflate(R.menu.activity_map, menu)
         this.menu = menu
-        if (viewModel!!.hasLocation()) enableLocationMenus() else disableLocationMenus()
         updateMonitoringModeMenu()
         return true
     }
@@ -354,7 +354,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         }
     }
 
-    override fun enableLocationMenus() {
+    private fun enableLocationMenus() {
         if (menu != null) {
             menu!!.findItem(R.id.menu_mylocation).setEnabled(true).icon.alpha = 255
             menu!!.findItem(R.id.menu_report).setEnabled(true).icon.alpha = 255

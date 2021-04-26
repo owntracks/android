@@ -1,5 +1,6 @@
 package org.owntracks.android.ui.map
 
+import android.location.Location
 import androidx.databinding.Bindable
 import androidx.lifecycle.LiveData
 import org.owntracks.android.location.LatLng
@@ -16,13 +17,12 @@ interface MapMvvm {
         fun updateMarker(contact: FusedContact)
         fun removeMarker(contact: FusedContact)
         fun clearMarkers()
-        fun enableLocationMenus()
         fun updateMonitoringModeMenu()
     }
 
     interface ViewModel<V : MvvmView?> : MvvmViewModel<V> {
         val mapLocationUpdateCallback: LocationCallback
-        val currentLocation: LatLng?
+        val currentLocation: LiveData<Location?>
 
         @get:Bindable
         val activeContact: FusedContact?
@@ -34,7 +34,6 @@ interface MapMvvm {
         fun onMapClick()
         fun onMarkerClick(id: String)
         fun restore(contactId: String?)
-        fun hasLocation(): Boolean
         fun onMapReady()
         val contact: LiveData<FusedContact?>
         val bottomSheetHidden: LiveData<Boolean>
