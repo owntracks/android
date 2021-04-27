@@ -143,10 +143,8 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
                     setBottomSheetCollapsed()
                 }
             })
-            it.mapCenter.observe(this, { o: LatLng? ->
-                if (o != null) {
-                    mapFragment.updateCamera(o)
-                }
+            it.mapCenter.observe(this, { o: LatLng ->
+                mapFragment.updateCamera(o)
             })
             it.currentLocation.observe(this, { latLng ->
                 if (latLng == null) {
@@ -471,7 +469,8 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
 
     companion object {
         const val BUNDLE_KEY_CONTACT_ID = "BUNDLE_KEY_CONTACT_ID"
-
+        const val STARTING_LATITUDE = 48.856826
+        const val STARTING_LONGITUDE = 2.292713
         private const val PERMISSIONS_REQUEST_CODE = 1
     }
 }

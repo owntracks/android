@@ -16,6 +16,7 @@
 * Lower notification priority of geocoder error notifications to make them a bit less present / shouty
 * If location is disabled on-device, OT will now prompt the user to enable on startup.
 * Fix crash on opening contact list where there's a card for a user but no location yet (#984)
+* Map view will now start on a recognizable map location (Paris) rather than at 0,0
 
 ## Version 2.3.0
 

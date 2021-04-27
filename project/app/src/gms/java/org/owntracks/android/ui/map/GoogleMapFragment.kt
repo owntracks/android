@@ -13,6 +13,7 @@ import com.google.android.gms.maps.GoogleMap.OnCameraMoveStartedListener.REASON_
 import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import org.owntracks.android.R
@@ -20,6 +21,8 @@ import org.owntracks.android.databinding.GoogleMapFragmentBinding
 import org.owntracks.android.gms.location.toGMSLatLng
 import org.owntracks.android.gms.location.toGMSLocationSource
 import org.owntracks.android.location.LocationSource
+import org.owntracks.android.ui.map.MapActivity.Companion.STARTING_LATITUDE
+import org.owntracks.android.ui.map.MapActivity.Companion.STARTING_LONGITUDE
 import timber.log.Timber
 import java.util.*
 
@@ -63,7 +66,7 @@ class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallba
             }
             uiSettings.isMyLocationButtonEnabled = false
             uiSettings.setAllGesturesEnabled(true)
-            moveCamera(CameraUpdateFactory.zoomTo(ZOOM_LEVEL_STREET))
+            moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(STARTING_LATITUDE, STARTING_LONGITUDE), ZOOM_LEVEL_STREET))
             setOnMarkerClickListener {
                 it.tag?.run { (activity as MapActivity).onMarkerClicked(this as String) }
                 true
