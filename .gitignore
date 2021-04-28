@@ -58,3 +58,5 @@ project/app/owntracks-*.json
 project/app/libobjectbox-*.so
 project/app/libobjectbox-*.dylib
 project/app/objectbox-*.dll
+
+project/localscripts
