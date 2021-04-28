@@ -11,6 +11,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.preference.PreferenceManager
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
@@ -20,6 +21,8 @@ import org.owntracks.android.databinding.OsmMapFragmentBinding
 import org.owntracks.android.location.LatLng
 import org.owntracks.android.location.toGeoPoint
 import org.owntracks.android.ui.map.MapActivity
+import org.owntracks.android.ui.map.MapActivity.Companion.STARTING_LATITUDE
+import org.owntracks.android.ui.map.MapActivity.Companion.STARTING_LONGITUDE
 import org.owntracks.android.ui.map.MapFragment
 import timber.log.Timber
 
@@ -34,7 +37,7 @@ class OSMMapFragment : MapFragment() {
             setTileSource(TileSourceFactory.MAPNIK)
             zoomController.setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
             controller.setZoom(ZOOM_STREET_LEVEL)
-
+            controller.setCenter(GeoPoint(STARTING_LATITUDE, STARTING_LONGITUDE))
             overlays.add(MyLocationNewOverlay(this))
 
             setMultiTouchControls(true)
