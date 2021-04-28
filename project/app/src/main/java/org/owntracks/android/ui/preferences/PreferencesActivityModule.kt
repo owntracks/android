@@ -28,4 +28,8 @@ abstract class PreferencesActivityModule {
     @ContributesAndroidInjector
     @PerFragment
     abstract fun bindAdvancedPreferencesFragment(): AdvancedFragment?
+
+    @ContributesAndroidInjector
+    @PerFragment
+    abstract fun bindAdvancedExperimentalFragment(): ExperimentalFragment?
 }

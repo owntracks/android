@@ -23,6 +23,11 @@
         app:fragment="org.owntracks.android.ui.preferences.AdvancedFragment"
         app:iconSpaceReserved="false" />
     <Preference
+        android:key="experimentalScreen"
+        android:title="@string/preferencesExperimental"
+        app:fragment="org.owntracks.android.ui.preferences.ExperimentalFragment"
+        app:iconSpaceReserved="false" />
+    <Preference
         android:key="configuration"
         android:title="@string/configurationManagement"
         app:iconSpaceReserved="false" />

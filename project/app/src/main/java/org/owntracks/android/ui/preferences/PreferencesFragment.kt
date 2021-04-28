@@ -6,6 +6,7 @@ import androidx.preference.Preference
 import org.owntracks.android.R
 import org.owntracks.android.services.MessageProcessorEndpointHttp
 import org.owntracks.android.services.MessageProcessorEndpointMqtt
+import org.owntracks.android.support.Preferences.Companion.EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI
 import org.owntracks.android.ui.preferences.connection.ConnectionActivity
 import org.owntracks.android.ui.preferences.editor.EditorActivity
 
@@ -23,6 +24,9 @@ class PreferencesFragment : AbstractPreferenceFragment() {
     override fun onResume() {
         super.onResume()
         findPreference<Preference>(UI_PREFERENCE_SCREEN_CONNECTION)!!.summary = connectionMode
+        findPreference<Preference>(UI_PREFERENCE_SCREEN_EXPERIMENTAL)?.run {
+            this.isVisible = preferences.isExperimentalFeatureEnabled(EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI)
+        }
     }
 
     private val connectionMode: String
@@ -35,5 +39,6 @@ class PreferencesFragment : AbstractPreferenceFragment() {
     companion object {
         private const val UI_PREFERENCE_SCREEN_CONNECTION = "connectionScreen"
         private const val UI_SCREEN_CONFIGURATION = "configuration"
+        private const val UI_PREFERENCE_SCREEN_EXPERIMENTAL = "experimentalScreen"
     }
 }
