@@ -39,8 +39,9 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient 
                         gpsMyLocationProvider.addLocationSource("network")
                     }
                 }
-                gpsMyLocationProvider.locationUpdateMinTime = locationRequest.interval
+                gpsMyLocationProvider.locationUpdateMinTime = locationRequest.interval ?: 30_000
                 gpsMyLocationProvider.locationUpdateMinDistance = locationRequest.smallestDisplacement
+                        ?: 10f
                 gpsMyLocationProvider.startLocationProvider(listener)
                 callbackMap[clientCallBack] = listener
             }

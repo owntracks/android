@@ -13,13 +13,11 @@ fun LocationRequest.toGMSLocationRequest(): com.google.android.gms.location.Loca
     val gmsLocationRequest = com.google.android.gms.location.LocationRequest
             .create()
             .setPriority(gmsPriority)
-            .setInterval(interval)
-            .setNumUpdates(numUpdates)
-            .setExpirationDuration(expirationDuration)
-            .setSmallestDisplacement(smallestDisplacement)
-    if (fastestInterval >= 0) {
-        gmsLocationRequest.fastestInterval = fastestInterval
-    }
+    interval?.run { gmsLocationRequest.interval = this }
+    numUpdates?.run { gmsLocationRequest.numUpdates = this }
+    expirationDuration?.run { gmsLocationRequest.setExpirationDuration(this) }
+    smallestDisplacement?.run { gmsLocationRequest.smallestDisplacement = this }
+    fastestInterval?.run { gmsLocationRequest.fastestInterval = this }
     return gmsLocationRequest
 }
 

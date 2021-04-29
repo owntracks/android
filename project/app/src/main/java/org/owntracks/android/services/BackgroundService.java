@@ -523,12 +523,12 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
             case LocationProcessor.MONITORING_QUIET:
             case LocationProcessor.MONITORING_MANUAL:
                 request.setInterval(TimeUnit.SECONDS.toMillis(preferences.getLocatorInterval()));
-                request.setSmallestDisplacement(preferences.getLocatorDisplacement());
+                request.setSmallestDisplacement((float) preferences.getLocatorDisplacement());
                 request.setPriority(LocationRequest.PRIORITY_LOW_POWER);
                 break;
             case LocationProcessor.MONITORING_SIGNIFICANT:
                 request.setInterval(TimeUnit.SECONDS.toMillis(preferences.getLocatorInterval()));
-                request.setSmallestDisplacement(preferences.getLocatorDisplacement());
+                request.setSmallestDisplacement((float) preferences.getLocatorDisplacement());
                 request.setPriority(getLocationRequestPriority());
                 break;
             case LocationProcessor.MONITORING_MOVE:
