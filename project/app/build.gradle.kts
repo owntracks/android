@@ -154,6 +154,7 @@ val materialDialogsVersion = "0.9.6.0"
 val espressoVersion = "3.3.0"
 val androidxTestVersion = "1.3.0"
 val kotlinCoroutinesVersion = "1.4.1"
+val jaxbVersion = "3.0.1"
 
 dependencies {
     implementation("androidx.preference:preference:1.1.1")
@@ -206,8 +207,8 @@ dependencies {
 
     // These Java EE libs are no longer included in JDKs, so we include explicitly
     kapt("javax.xml.bind:jaxb-api:2.3.1")
-    kapt("com.sun.xml.bind:jaxb-core:2.3.0.1")
-    kapt("com.sun.xml.bind:jaxb-impl:2.3.2")
+    kapt("com.sun.xml.bind:jaxb-core:$jaxbVersion")
+    kapt("com.sun.xml.bind:jaxb-impl:$jaxbVersion")
 
     // Preprocessors
     kapt("org.greenrobot:eventbus-annotation-processor:3.2.0")
