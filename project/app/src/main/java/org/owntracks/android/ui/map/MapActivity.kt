@@ -19,12 +19,14 @@ import android.widget.Toast
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.PopupMenu
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
 import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.idling.CountingIdlingResource
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -107,14 +109,24 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
             finish()
         }
         bindAndAttachContentView(R.layout.ui_map, savedInstanceState, contactImageProvider)
+
         binding?.also {
-            setSupportToolbar(binding!!.toolbar, false, true)
+            setSupportToolbar(it.toolbar, false, true)
             setDrawer(it.toolbar)
-            bottomSheetBehavior = BottomSheetBehavior.from(binding!!.bottomSheetLayout)
+            bottomSheetBehavior = BottomSheetBehavior.from(it.bottomSheetLayout)
             it.contactPeek.contactRow.setOnClickListener(this)
             it.contactPeek.contactRow.setOnLongClickListener(this)
             it.moreButton.setOnClickListener { v: View -> showPopupMenu(v) }
             setBottomSheetHidden()
+
+            // Need to set the appbar layout behaviour to be non-drag, so that we can drag the map
+            val behavior = AppBarLayout.Behavior()
+            behavior.setDragCallback(object : AppBarLayout.Behavior.DragCallback() {
+                override fun canDrag(appBarLayout: AppBarLayout): Boolean {
+                    return false
+                }
+            })
+            (it.appBarLayout.layoutParams as CoordinatorLayout.LayoutParams).behavior = behavior
         }
 
         locationLifecycleObserver = LocationLifecycleObserver(activityResultRegistry)
