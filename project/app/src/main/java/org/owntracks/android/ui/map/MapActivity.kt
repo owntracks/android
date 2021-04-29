@@ -171,7 +171,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
                 OSMMapFragment()
             } else {
                 when (FLAVOR) {
-                    "gms" -> GoogleMapFragment(mapLocationSource)
+                    "gms" -> GoogleMapFragment(mapLocationSource, locationRepo)
                     else -> OSMMapFragment()
                 }
             }
@@ -245,7 +245,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
                     this.replace(R.id.mapFragment, mapFragment)
                 }
             } else if (mapFragment is OSMMapFragment && !preferences.isExperimentalFeatureEnabled(EXPERIMENTAL_FEATURE_USE_OSM_MAP)) {
-                mapFragment = GoogleMapFragment(mapLocationSource)
+                mapFragment = GoogleMapFragment(mapLocationSource, locationRepo)
                 supportFragmentManager.commit(true) {
                     this.replace(R.id.mapFragment, mapFragment)
                 }

@@ -66,7 +66,7 @@ class MapViewModel @Inject constructor(contactsRepo: ContactsRepo, private val l
         override fun onLocationResult(locationResult: LocationResult) {
             liveLocation.value = locationResult.lastLocation
             locationIdlingResource.setIdleState(true)
-            if (mode == VIEW_DEVICE) {
+            if (mode == VIEW_DEVICE && liveCamera.value != locationResult.lastLocation.toLatLng()) {
                 liveCamera.postValue(locationResult.lastLocation.toLatLng())
             }
             if (onLocationChangedListener != null) {
@@ -203,6 +203,7 @@ class MapViewModel @Inject constructor(contactsRepo: ContactsRepo, private val l
         this.contactsRepo = contactsRepo
         this.messageProcessor = messageProcessor
     }
+
+    private fun Location.toLatLng(): LatLng = LatLng(this.latitude, this.longitude)
 }
 
-private fun Location.toLatLng(): LatLng = LatLng(this.latitude, this.longitude)

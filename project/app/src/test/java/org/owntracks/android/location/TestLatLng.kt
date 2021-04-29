@@ -5,6 +5,27 @@ import org.junit.Test
 
 class TestLatLng {
     @Test
+    fun `given two LatLngs with the same lat and lng, when comparing for equality, they are equal`() {
+        val latLng1 = LatLng(58.3584, 2.4857)
+        val latLng2 = LatLng(58.3584, 2.4857)
+        assertEquals(latLng1, latLng2)
+    }
+
+    @Test
+    fun `given two LatLngs with the same lat and different but equivalent lng, when comparing for equality, they are equal`() {
+        val latLng1 = LatLng(58.3584, 2.4857)
+        val latLng2 = LatLng(58.3584, 362.4857)
+        assertEquals(latLng1, latLng2)
+    }
+
+    @Test
+    fun `given two LatLngs with the same lng and different but equivalent lat, when comparing for equality, they are equal`() {
+        val latLng1 = LatLng(58.3584, 2.4857)
+        val latLng2 = LatLng(418.3584, 2.4857)
+        assertEquals(latLng1, latLng2)
+    }
+
+    @Test
     fun `given a LatLng, when converting to a GeoPoint, then the resulting latlng values are the same as the input`() {
         val lat = 58.3584
         val long = 2.4857
