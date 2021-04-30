@@ -19,6 +19,10 @@ class PreferencesFragment : AbstractPreferenceFragment() {
 
         //TODO move this to a preferences fragment rather than its own activity.
         findPreference<Preference>(UI_PREFERENCE_SCREEN_CONNECTION)!!.intent = Intent(context, ConnectionActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
+
+        findPreference<Preference>(UI_PREFERENCE_SCREEN_EXPERIMENTAL)?.run {
+            this.isVisible = preferences.isExperimentalFeatureEnabled(EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI)
+        }
     }
 
     override fun onResume() {
