@@ -53,7 +53,14 @@ class ContactImageProvider @Inject constructor(@AppContext context: Context) : D
             var td = memoryCache.getLevelTid(contact.id)
             // if cache doesn't contain a bitmap for a contact or if the cached bitmap was for an old tid, create a new one and cache it
             if (td == null || !td.isBitmapFor(contact.trackerId)) {
-                td = TidBitmap(contact.trackerId, drawableToBitmap(TextDrawable.builder().buildRoundRect(contact.trackerId, TextDrawable.ColorGenerator.MATERIAL.getColor(contact.id), faceDimensions)))
+                td = TidBitmap(
+                        contact.trackerId,
+                        drawableToBitmap(
+                                TextDrawable
+                                        .Builder()
+                                        .buildRoundRect(contact.trackerId, TextDrawable.ColorGenerator.MATERIAL.getColor(contact.id), faceDimensions)
+                        )
+                )
                 memoryCache.putLevelTid(contact.id, td)
             }
             return@withContext td.bitmap
