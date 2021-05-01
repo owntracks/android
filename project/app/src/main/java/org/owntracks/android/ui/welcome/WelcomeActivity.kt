@@ -49,7 +49,7 @@ class WelcomeActivity : BaseActivity<UiWelcomeBinding?, WelcomeViewModel?>(), We
         super.onCreate(savedInstanceState)
         welcomeAdapter = WelcomeAdapter(this, requirementsChecker)
         if (requirementsChecker.areRequirementsMet()) {
-            navigator.startActivity(MapActivity::class.java, null, Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+            navigator.startActivity(MapActivity::class.java, null, Intent.FLAG_ACTIVITY_NEW_TASK)
             finish()
             return
         }
