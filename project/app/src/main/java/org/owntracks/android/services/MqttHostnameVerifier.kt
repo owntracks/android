@@ -13,7 +13,7 @@ import javax.net.ssl.SSLSession
  * certificates where the CA is the same as the leaf cert presented by the MQTT endpoint.
  */
 class MqttHostnameVerifier(caCertificate: Certificate) : HostnameVerifier {
-    private val caFingerprint: ByteArray = MessageDigest.getInstance("SHA-1").digest(caCertificate.encoded);
+    private val caFingerprint: ByteArray = MessageDigest.getInstance("SHA-1").digest(caCertificate.encoded)
 
     override fun verify(hostname: String?, session: SSLSession?): Boolean {
         val peerCertificates = session?.peerCertificates

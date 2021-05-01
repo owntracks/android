@@ -15,6 +15,6 @@ enum class CommandAction(val value: String) {
 
     @JsonValue
     fun getVal(): String {
-        return value;
+        return value
     }
 }

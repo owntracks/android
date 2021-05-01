@@ -392,8 +392,8 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
     // Empty trackerId won't be included in the message.
     private val trackerIdDefault: String
         get() {
-            val deviceId: String? = deviceId
-            return if (deviceId != null && deviceId.length >= 2) deviceId.substring(deviceId.length - 2) // defaults to the last two characters of configured deviceId.
+            val deviceId: String = deviceId
+            return if (deviceId.length >= 2) deviceId.substring(deviceId.length - 2) // defaults to the last two characters of configured deviceId.
             else "na" // Empty trackerId won't be included in the message.
         }
 

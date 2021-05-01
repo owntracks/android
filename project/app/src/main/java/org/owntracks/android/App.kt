@@ -89,7 +89,7 @@ class App : DaggerApplication() {
 
         // Running this on a background thread will deadlock FirebaseJobDispatcher.
         // Initialize will call Scheduler to connect off the main thread anyway.
-        runThingsOnOtherThreads.postOnMainHandlerDelayed(Runnable { messageProcessor.initialize() }, 510)
+        runThingsOnOtherThreads.postOnMainHandlerDelayed({ messageProcessor.initialize() }, 510)
         eventBus.register(this)
 
         // Notifications can be sent from multiple places, so let's make sure we've got the channels in place

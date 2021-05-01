@@ -114,7 +114,7 @@ class WelcomeActivity : BaseActivity<UiWelcomeBinding?, WelcomeViewModel?>(), We
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PlayFragment.PLAY_SERVICES_RESOLUTION_REQUEST) {
-            playFragment!!.onPlayServicesResolutionResult()
+            playFragment.onPlayServicesResolutionResult()
         }
     }
 

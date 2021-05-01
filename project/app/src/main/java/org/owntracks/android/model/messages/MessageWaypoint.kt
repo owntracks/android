@@ -36,7 +36,7 @@ class MessageWaypoint : MessageBase() {
         retained = preferences.pubRetainWaypoints
     }
 
-    override val baseTopicSuffix: String?
+    override val baseTopicSuffix: String
         get() = BASETOPIC_SUFFIX
 
     companion object {

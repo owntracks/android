@@ -6,6 +6,6 @@ interface LocationSource {
     fun activate(onLocationChangedListener: OnLocationChangedListener)
     fun deactivate()
     interface OnLocationChangedListener {
-        fun onLocationChanged(location: Location?)
+        fun onLocationChanged(location: Location)
     }
 }

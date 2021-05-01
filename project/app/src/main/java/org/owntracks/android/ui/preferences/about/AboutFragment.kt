@@ -19,9 +19,12 @@ class AboutFragment : PreferenceFragmentCompat() {
         versionPreference?.setSummaryProvider { _ ->
             try {
                 val pm = requireActivity().packageManager
-                val versionCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) pm.getPackageInfo(requireActivity().packageName, 0).longVersionCode else pm.getPackageInfo(requireActivity().packageName, 0).versionCode
-                val flavor = if (FLAVOR == "gms") "Google Play" else "OSS"
                 @Suppress("DEPRECATION")
+                val versionCode =
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
+                            pm.getPackageInfo(requireActivity().packageName, 0).longVersionCode
+                        else pm.getPackageInfo(requireActivity().packageName, 0).versionCode
+                val flavor = if (FLAVOR == "gms") "Google Play" else "OSS"
                 "${getString(R.string.version)} $versionName ($versionCode) - $flavor"
             } catch (e: PackageManager.NameNotFoundException) {
                 getString(R.string.na)

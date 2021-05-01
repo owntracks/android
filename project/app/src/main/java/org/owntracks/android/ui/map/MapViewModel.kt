@@ -169,11 +169,13 @@ class MapViewModel @Inject constructor(contactsRepo: ContactsRepo, private val l
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
+    @Suppress("UNUSED_PARAMETER")
     fun onEvent(e: ModeChanged?) {
         view!!.clearMarkers()
         clearActiveContact()
     }
 
+    @Suppress("UNUSED_PARAMETER")
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onEvent(e: MonitoringChanged?) {
         view!!.updateMonitoringModeMenu()

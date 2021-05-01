@@ -1,11 +1,14 @@
 package org.owntracks.android.model.messages
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
 interface MessageWithCreatedAt {
-    val created_at: Long
+    @get:JsonProperty("created_at")
+    val createdAt: Long
 }
 
 class MessageCreatedAtNow(clock: Clock) : MessageWithCreatedAt {
-    override val created_at: Long = clock.time
+    override val createdAt: Long = clock.time
 }
 
 interface Clock {

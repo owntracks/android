@@ -6,7 +6,6 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.util.Base64
 import android.widget.ImageView
-import androidx.collection.ArrayMap
 import androidx.databinding.BindingAdapter
 import androidx.databinding.DataBindingComponent
 import kotlinx.coroutines.*
@@ -16,44 +15,6 @@ import org.owntracks.android.support.widgets.TextDrawable
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
-
-internal class ContactBitmapMemoryCache {
-    private val cacheLevelCard: ArrayMap<String, Bitmap?> = ArrayMap()
-    private val cacheLevelTid: ArrayMap<String, TidBitmap> = ArrayMap()
-
-    @Synchronized
-    fun putLevelCard(key: String, value: Bitmap?) {
-        cacheLevelCard[key] = value
-        cacheLevelTid.remove(key)
-    }
-
-    @Synchronized
-    fun putLevelTid(key: String, value: TidBitmap) {
-        cacheLevelTid[key] = value
-    }
-
-    @Synchronized
-    fun getLevelCard(key: String?): Bitmap? {
-        return cacheLevelCard[key]
-    }
-
-    @Synchronized
-    fun getLevelTid(key: String?): TidBitmap? {
-        return cacheLevelTid[key]
-    }
-
-    @Synchronized
-    fun clear() {
-        cacheLevelCard.clear()
-        cacheLevelTid.clear()
-    }
-
-    @Synchronized
-    fun clearLevelCard(key: String?) {
-        cacheLevelCard.remove(key)
-    }
-
-}
 
 @Singleton
 class ContactImageProvider @Inject constructor(@AppContext context: Context) : DataBindingComponent {
@@ -137,7 +98,7 @@ class ContactImageProvider @Inject constructor(@AppContext context: Context) : D
     }
 
     @BindingAdapter("imageProvider", "contact")
-    fun displayFaceInViewAsync(view: ImageView, imageProvider: Int?, c: FusedContact?) {
+    fun displayFaceInViewAsync(view: ImageView, @Suppress("UNUSED_PARAMETER") imageProvider: Int?, c: FusedContact?) {
         GlobalScope.launch(Dispatchers.Main) {
             view.setImageBitmap(getBitmapFromCache(c))
         }

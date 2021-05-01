@@ -10,7 +10,7 @@ class MapLocationSource internal constructor(private val locationProviderClient:
                 LocationRequest(fastestInterval = 0, smallestDisplacement = 0f, priority = LocationRequest.PRIORITY_HIGH_ACCURACY, interval = TimeUnit.SECONDS.toMillis(1)),
                 object : LocationCallback {
                     override fun onLocationResult(locationResult: LocationResult) {
-                        onLocationChangedListener?.onLocationChanged(locationResult.lastLocation)
+                        onLocationChangedListener.onLocationChanged(locationResult.lastLocation)
                         locationUpdateCallback.onLocationResult(locationResult)
                     }
 

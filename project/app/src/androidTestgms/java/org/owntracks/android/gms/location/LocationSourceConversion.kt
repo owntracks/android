@@ -1,5 +1,6 @@
 package org.owntracks.android.gms.location
 
+import android.location.Location
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import org.junit.Assert.assertTrue
@@ -19,7 +20,7 @@ class LocationSourceConversion {
         val locationSource = object : LocationSource {
             override fun activate(onLocationChangedListener: LocationSource.OnLocationChangedListener) {
                 activateCalled = true
-                onLocationChangedListener.onLocationChanged(null)
+                onLocationChangedListener.onLocationChanged(Location("test"))
             }
 
             override fun deactivate() {

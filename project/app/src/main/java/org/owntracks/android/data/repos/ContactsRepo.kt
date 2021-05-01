@@ -4,7 +4,6 @@ import androidx.lifecycle.MutableLiveData
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageLocation
-import javax.inject.Singleton
 
 interface ContactsRepo {
     val all: MutableLiveData<MutableMap<String, FusedContact>>

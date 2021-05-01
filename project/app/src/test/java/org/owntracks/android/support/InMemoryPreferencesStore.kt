@@ -42,6 +42,7 @@ class InMemoryPreferencesStore : PreferencesStore {
     }
 
     override fun getStringSet(key: String): Set<String> {
+        @Suppress("UNCHECKED_CAST")
         return (valueMap[key] ?: setOf<String>()) as Set<String>
     }
 

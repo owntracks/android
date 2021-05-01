@@ -9,6 +9,6 @@ enum class BatteryStatus(val value: Int) {
     UNKNOWN(0), UNPLUGGED(1), CHARGING(2), FULL(3);
     @JsonValue
     fun getVal(): Int {
-        return value;
+        return value
     }
 }

@@ -340,7 +340,7 @@ class LogViewerActivity : BaseActivity<UiPreferencesLogsBinding, NoOpViewModel>(
             return 0
         }
 
-        override fun getType(uri: Uri): String? = "text/plain"
+        override fun getType(uri: Uri): String = "text/plain"
         override fun openFile(uri: Uri, mode: String): ParcelFileDescriptor? {
             if (mode != "r") return null
             val log = logForUri(uri) ?: return null

@@ -22,7 +22,7 @@ class MessageCmd : MessageBase() {
         topic = preferences.pubTopicCommands
     }
 
-    override val baseTopicSuffix: String?
+    override val baseTopicSuffix: String
         get() = BASETOPIC_SUFFIX
 
     companion object {

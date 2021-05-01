@@ -63,7 +63,7 @@ class GMSLocationProviderClient(private val fusedLocationProviderClient: FusedLo
 
     @SuppressLint("MissingPermission")
     private fun actuallyRequestLocationUpdates(locationRequest: LocationRequest, clientCallBack: LocationCallback, looper: Looper?) {
-        Timber.i("Requesting location updates ${locationRequest.toString()} ${clientCallBack.hashCode()}")
+        Timber.i("Requesting location updates $locationRequest ${clientCallBack.hashCode()}")
         val gmsCallBack = object : com.google.android.gms.location.LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
                 clientCallBack.onLocationResult(org.owntracks.android.location.LocationResult(locationResult.lastLocation))
@@ -95,7 +95,6 @@ class GMSLocationProviderClient(private val fusedLocationProviderClient: FusedLo
     }
 
     companion object {
-        private const val REQUEST_CHECK_SETTINGS = 1
         fun create(context: Context): GMSLocationProviderClient {
             return GMSLocationProviderClient(LocationServices.getFusedLocationProviderClient(context), context)
         }

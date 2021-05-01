@@ -110,7 +110,6 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
 
     private final LinkedList<Spannable> activeNotifications = new LinkedList<>();
     private int lastQueueLength = 0;
-    private Notification stackNotification;
 
     private boolean hasBeenStartedExplicitly = false;
 
@@ -440,7 +439,7 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
                 .setContentIntent(PendingIntent.getActivity(this, (int) System.currentTimeMillis() / 1000, new Intent(this, MapActivity.class), PendingIntent.FLAG_ONE_SHOT))
                 .setDeleteIntent(PendingIntent.getService(this, INTENT_REQUEST_CODE_CLEAR_EVENTS, (new Intent(this, BackgroundService.class)).setAction(INTENT_ACTION_CLEAR_NOTIFICATIONS), PendingIntent.FLAG_ONE_SHOT));
 
-        stackNotification = builder.build();
+        Notification stackNotification = builder.build();
         notificationManagerCompat.notify(NOTIFICATION_GROUP_EVENTS, NOTIFICATION_ID_EVENT_GROUP, stackNotification);
 
     }
@@ -609,7 +608,6 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
         geofencingClient.removeGeofences(getGeofencePendingIntent());
     }
 
-    @SuppressWarnings("unused")
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(Events.WaypointAdded e) {
         locationProcessor.publishWaypointMessage(e.getWaypointModel()); // TODO: move to waypointsRepo

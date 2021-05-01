@@ -5,7 +5,6 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import org.owntracks.android.injection.scopes.PerActivity
 import org.owntracks.android.support.RequirementsChecker
-import timber.log.Timber
 import java.util.*
 
 @PerActivity
@@ -21,19 +20,6 @@ class WelcomeAdapter constructor(welcomeActivity: WelcomeActivity, private val r
             fragments.add(permissionFragment)
         }
         fragments.add(finishFragment)
-    }
-
-    fun getFragment(position: Int): WelcomeFragmentMvvm.View {
-        return getItem(position) as WelcomeFragmentMvvm.View
-    }
-
-    private fun getItem(position: Int): Fragment {
-        if (position >= fragments.size) {
-            Timber.e("Welcome position %d is out of bounds for fragment list length %d", position, fragments.size)
-            throw IndexOutOfBoundsException()
-        }
-        Timber.v("position:%s fragment:%s", position, fragments[position].toString())
-        return fragments[position]
     }
 
     override fun getItemCount(): Int {

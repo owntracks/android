@@ -10,7 +10,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.google.android.gms.common.api.ResolvableApiException
 
 class LocationLifecycleObserver(private val registry: ActivityResultRegistry) : DefaultLifecycleObserver {
-    lateinit var resultLauncher: ActivityResultLauncher<IntentSenderRequest>
+    private lateinit var resultLauncher: ActivityResultLauncher<IntentSenderRequest>
     lateinit var callback: (Boolean) -> Unit
     override fun onCreate(owner: LifecycleOwner) {
         resultLauncher = registry.register("key", owner, ActivityResultContracts.StartIntentSenderForResult()) {

@@ -8,7 +8,7 @@ fun org.owntracks.android.location.LocationSource.toGMSLocationSource(): Locatio
     return object : LocationSource {
         override fun activate(gmsLocationChangedListener: LocationSource.OnLocationChangedListener?) {
             this@toGMSLocationSource.activate(object : org.owntracks.android.location.LocationSource.OnLocationChangedListener {
-                override fun onLocationChanged(location: Location?) {
+                override fun onLocationChanged(location: Location) {
                     gmsLocationChangedListener?.onLocationChanged(location)
                 }
             })
