@@ -66,7 +66,7 @@ public class MessageProcessor {
     private Thread backgroundDequeueThread;
 
     private static final long SEND_FAILURE_BACKOFF_INITIAL_WAIT = TimeUnit.SECONDS.toMillis(1);
-    private static final long SEND_FAILURE_BACKOFF_MAX_WAIT = TimeUnit.SECONDS.toMillis(10);
+    private static final long SEND_FAILURE_BACKOFF_MAX_WAIT = TimeUnit.MINUTES.toMillis(2);
 
     private boolean initialized = false;
 
