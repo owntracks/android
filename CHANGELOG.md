@@ -7,6 +7,7 @@
 * The welcome screen is now swipey!
 * On Android API>=30, when the service is started in the background (e.g. after a boot or upgrade), it'll now notify the user that locations won't be received unless the app has been explicitly interacted with (via the activity, or changing the monitoring mode etc). This is because of the new [Android background location limits](https://developer.android.com/about/versions/oreo/background-location-limits). (See #976, #969, #967)
 * Polish translation (thanks Robert!)
+* You should now be able to exit the app by sending an intent (e.g. from other apps like Tasker etc.). Sending a "startservice" intent with `org.owntracks.android.EXIT` should stop the service as well as quit the app.
 * Split the app into two Android flavors - OSS and GMS. GMS is what will continue to be published to the play store, but the OSS will now be published on the GitHub releases as well. The OSS version looks to remove dependencies on Google's Play Services and closed-source maps libraries. Ultmiate aim is to have a version we can distribute via F-Droid, giving users the option for a version that's more open.
 * [Experimental] Added the ability to use [OpenStreetMap](https://www.openstreetmap.org) instead of Google Maps as a mapping layer. Can be enabled by adding `useOSMMap` to the `experimentalFeatures` config key.
 * [Experimental] Added the ability to use a pure AOSP location provider instead of the Google Play Services `FusedLocationProviderClient`. Can be enabled by adding `useAospLocationProvider` to the `experimentalFeatures` config key.

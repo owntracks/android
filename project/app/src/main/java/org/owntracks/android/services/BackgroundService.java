@@ -67,6 +67,8 @@ import javax.inject.Inject;
 import dagger.android.DaggerService;
 import timber.log.Timber;
 
+import static android.os.Process.killProcess;
+import static android.os.Process.myPid;
 import static androidx.core.app.NotificationCompat.PRIORITY_LOW;
 import static org.owntracks.android.App.NOTIFICATION_CHANNEL_EVENTS;
 import static org.owntracks.android.App.NOTIFICATION_CHANNEL_ONGOING;
@@ -90,6 +92,8 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
     private static final String INTENT_ACTION_SEND_EVENT_CIRCULAR = "org.owntracks.android.SEND_EVENT_CIRCULAR";
     private static final String INTENT_ACTION_REREQUEST_LOCATION_UPDATES = "org.owntracks.android.REREQUEST_LOCATION_UPDATES";
     private static final String INTENT_ACTION_CHANGE_MONITORING = "org.owntracks.android.CHANGE_MONITORING";
+    private static final String INTENT_ACTION_EXIT = "org.owntracks.android.EXIT";
+
     private static final String INTENT_ACTION_BOOT_COMPLETED = "android.intent.action.BOOT_COMPLETED";
     private static final String INTENT_ACTION_PACKAGE_REPLACED = "android.intent.action.MY_PACKAGE_REPLACED";
 
@@ -250,6 +254,11 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !hasBeenStartedExplicitly) {
                         notifyUserOfBackgroundLocationRestriction();
                     }
+                    return;
+                case INTENT_ACTION_EXIT:
+                    stopSelf();
+                    scheduler.cancelAllTasks();
+                    killProcess(myPid());
                     return;
                 default:
                     Timber.v("unhandled intent action received: %s", intent.getAction());
