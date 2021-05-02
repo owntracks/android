@@ -33,7 +33,8 @@
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:itemCount="20"
+            android:paddingTop="?attr/actionBarSize"
+            android:scrollbars="vertical"
             tools:listitem="@layout/log_viewer_entry" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton

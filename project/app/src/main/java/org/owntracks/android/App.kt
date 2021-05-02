@@ -21,15 +21,14 @@ import org.greenrobot.eventbus.Subscribe
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.injection.components.DaggerAppComponent
 import org.owntracks.android.injection.qualifier.AppContext
+import org.owntracks.android.logging.TimberInMemoryLogTree
 import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.Events.RestartApp
 import org.owntracks.android.support.Preferences
 import org.owntracks.android.support.RunThingsOnOtherThreads
-import org.owntracks.android.support.TimberDebugLogTree
 import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber
-import timber.log.Timber.DebugTree
 import java.security.Security
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -65,8 +64,8 @@ class App : DaggerApplication() {
         super.onCreate()
         WorkManager.initialize(this, Configuration.Builder().setWorkerFactory(workerFactory).build())
         scheduler.cancelAllTasks()
+        Timber.plant(TimberInMemoryLogTree(BuildConfig.DEBUG))
         if (BuildConfig.DEBUG) {
-            Timber.plant(TimberDebugLogTree())
             Timber.e("StrictMode enabled in DEBUG build")
             StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder()
                     .detectNetwork()
@@ -79,8 +78,6 @@ class App : DaggerApplication() {
                     .detectFileUriExposure()
                     .penaltyLog()
                     .build())
-        } else {
-            Timber.plant(DebugTree())
         }
         for (t in Timber.forest()) {
             Timber.v("Planted trees :%s", t)

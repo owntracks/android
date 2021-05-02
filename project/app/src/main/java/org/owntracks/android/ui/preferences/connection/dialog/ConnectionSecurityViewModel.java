@@ -130,7 +130,6 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
     }
 
     public void onTlsClientCrtNameClick(final View v) {
-
         PopupMenu popup = new PopupMenu(v.getContext(), v);
         popup.getMenuInflater().inflate(R.menu.picker, popup.getMenu());
         popup.setOnMenuItemClickListener(item -> {
@@ -151,9 +150,6 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
         });
         popup.show();
     }
-
-
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

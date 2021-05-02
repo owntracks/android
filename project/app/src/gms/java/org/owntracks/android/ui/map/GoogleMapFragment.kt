@@ -107,7 +107,7 @@ class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallba
                 markers.remove(id)
                 marker.remove()
             }
-            markers[id] = googleMap!!.addMarker(MarkerOptions().position(latLng.toGMSLatLng()).anchor(0.5f, 0.5f).visible(false)).also { it.tag = id }
+            markers[id] = googleMap!!.addMarker(MarkerOptions().position(latLng.toGMSLatLng()).anchor(0.5f, 0.5f).visible(false)).also { it?.tag = id }
         }
     }
 

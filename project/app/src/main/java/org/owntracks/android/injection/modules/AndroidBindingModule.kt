@@ -26,8 +26,8 @@ import org.owntracks.android.ui.region.RegionActivity
 import org.owntracks.android.ui.region.RegionActivityModule
 import org.owntracks.android.ui.regions.RegionsActivity
 import org.owntracks.android.ui.regions.RegionsActivityModule
-import org.owntracks.android.ui.status.LogViewerActivity
-import org.owntracks.android.ui.status.LogViewerActivityModule
+import org.owntracks.android.ui.status.logs.LogViewerActivity
+import org.owntracks.android.ui.status.logs.LogViewerActivityModule
 import org.owntracks.android.ui.status.StatusActivity
 import org.owntracks.android.ui.welcome.StatusActivityModule
 import org.owntracks.android.ui.welcome.WelcomeActivity

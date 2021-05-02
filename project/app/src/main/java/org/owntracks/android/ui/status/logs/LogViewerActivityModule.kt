@@ -1,4 +1,4 @@
-package org.owntracks.android.ui.status
+package org.owntracks.android.ui.status.logs
 
 import androidx.appcompat.app.AppCompatActivity
 import dagger.Binds

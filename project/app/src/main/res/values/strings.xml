@@ -194,6 +194,7 @@
     <string name="backgroundLocationRestrictionNotificationTitle">Background Location Restricted</string>
     <string name="backgroundLocationRestrictionNotificationText">This version of Android restricts OwnTracks from receiving locations when started in the background until the app is opened. Click this notification to open the app and start tracking location.</string>
     <string name="preferencesExperimental">Experimental</string>
+    <string name="refresh_log">Refresh</string>
     <string-array name="geocoders">
         <item>None</item>
         <item>Google</item>

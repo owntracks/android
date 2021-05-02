@@ -75,7 +75,7 @@ class MapViewModel @Inject constructor(contactsRepo: ContactsRepo, private val l
         }
 
         override fun onLocationAvailability(locationAvailability: LocationAvailability) {
-            Timber.d("Map location availability: ${locationAvailability.locationAvailable}")
+
         }
     }
 

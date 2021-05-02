@@ -3,9 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/show_debug_logs"
-        android:title="@string/preferencesDebugLog"
         android:checkable="true"
-         />
+        android:title="@string/preferencesDebugLog" />
+    <item
+        android:id="@+id/refresh_log"
+        android:title="@string/refresh_log" />
     <item
         android:id="@+id/clear_log"
         android:title="@string/clear_log"

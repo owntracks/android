@@ -271,6 +271,7 @@ public class MessageProcessor {
                 }
 
                 if (lastFailedMessageToBeRetried != null) {
+                    Timber.d("Waiting for %s s before retrying", retryWait / 1000);
                     Thread.sleep(retryWait);
                     retryWait = Math.min(2 * retryWait, SEND_FAILURE_BACKOFF_MAX_WAIT);
                 } else {
