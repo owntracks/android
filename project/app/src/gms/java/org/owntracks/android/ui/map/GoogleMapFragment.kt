@@ -67,6 +67,15 @@ class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallba
             }
             uiSettings.isMyLocationButtonEnabled = false
             uiSettings.setAllGesturesEnabled(true)
+            if (activity is MapActivity) {
+                if (locationRepo == null) {
+                    locationRepo = (activity as MapActivity).locationRepo
+                }
+                if (locationSource == null) {
+                    locationSource = (activity as MapActivity).mapLocationSource
+                }
+            }
+
             if (locationRepo?.currentLocation != null) {
                 moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(locationRepo!!.currentLocation!!.latitude, locationRepo!!.currentLocation!!.longitude), ZOOM_LEVEL_STREET))
             } else {

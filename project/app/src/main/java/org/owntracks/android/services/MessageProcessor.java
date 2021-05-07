@@ -170,7 +170,7 @@ public class MessageProcessor {
     }
 
     private void loadOutgoingMessageProcessor() {
-        Timber.tag("MQTT").d("Reloading outgoing message processor. ThreadID: %s", Thread.currentThread());
+        Timber.d("Reloading outgoing message processor. ThreadID: %s", Thread.currentThread());
         if (endpoint != null) {
             endpoint.onDestroy();
         }

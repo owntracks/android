@@ -87,7 +87,6 @@ public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, Edi
             return true;
         } else if (itemId == R.id.restart) {
             eventBus.post(new Events.RestartApp());
-
             return false;
         }
         return false;

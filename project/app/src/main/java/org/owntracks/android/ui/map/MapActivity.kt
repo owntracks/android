@@ -69,7 +69,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
     private var locationProviderClient: LocationProviderClient? = null
     private lateinit var mapFragment: MapFragment
 
-    private lateinit var mapLocationSource: LocationSource
+    internal lateinit var mapLocationSource: LocationSource
 
     @JvmField
     @Inject
