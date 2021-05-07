@@ -4,7 +4,6 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.content.Intent
 import android.os.Build
 import android.os.StrictMode
 import androidx.core.app.NotificationManagerCompat
@@ -16,18 +15,14 @@ import dagger.Module
 import dagger.android.AndroidInjector
 import dagger.android.support.DaggerApplication
 import org.conscrypt.Conscrypt
-import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.injection.components.DaggerAppComponent
 import org.owntracks.android.injection.qualifier.AppContext
 import org.owntracks.android.logging.TimberInMemoryLogTree
 import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.services.worker.Scheduler
-import org.owntracks.android.support.Events.RestartApp
 import org.owntracks.android.support.Preferences
 import org.owntracks.android.support.RunThingsOnOtherThreads
-import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber
 import java.security.Security
 import javax.inject.Inject
@@ -42,9 +37,6 @@ class App : DaggerApplication() {
 
     @Inject
     lateinit var messageProcessor: MessageProcessor
-
-    @Inject
-    lateinit var eventBus: EventBus
 
     @Inject
     lateinit var workerFactory: WorkerFactory
@@ -79,15 +71,11 @@ class App : DaggerApplication() {
                     .penaltyLog()
                     .build())
         }
-        for (t in Timber.forest()) {
-            Timber.v("Planted trees :%s", t)
-        }
         preferences.checkFirstStart()
 
         // Running this on a background thread will deadlock FirebaseJobDispatcher.
         // Initialize will call Scheduler to connect off the main thread anyway.
         runThingsOnOtherThreads.postOnMainHandlerDelayed({ messageProcessor.initialize() }, 510)
-        eventBus.register(this)
 
         // Notifications can be sent from multiple places, so let's make sure we've got the channels in place
         createNotificationChannels()
@@ -127,14 +115,6 @@ class App : DaggerApplication() {
             }.run { notificationManager.createNotificationChannel(this) }
 
         }
-    }
-
-    @Subscribe
-    fun onEvent(@Suppress("UNUSED_PARAMETER") e: RestartApp?) {
-        val intent = Intent(this.applicationContext, MapActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        this.applicationContext.startActivity(intent)
-        Runtime.getRuntime().exit(0)
     }
 
     override fun applicationInjector(): AndroidInjector<out DaggerApplication> {

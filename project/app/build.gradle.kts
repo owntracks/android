@@ -205,6 +205,8 @@ dependencies {
     implementation("com.mikepenz:materialdrawer:6.1.2@aar") { isTransitive = true }
     implementation("com.mikepenz:materialize:1.2.1@aar")
 
+    implementation("com.jakewharton:process-phoenix:2.0.0")
+
     // These Java EE libs are no longer included in JDKs, so we include explicitly
     kapt("javax.xml.bind:jaxb-api:2.3.1")
     kapt("com.sun.xml.bind:jaxb-core:$jaxbVersion")

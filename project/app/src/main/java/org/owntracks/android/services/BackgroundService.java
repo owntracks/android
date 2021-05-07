@@ -26,6 +26,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import com.jakewharton.processphoenix.ProcessPhoenix;
+
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -256,9 +258,7 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
                     }
                     return;
                 case INTENT_ACTION_EXIT:
-                    stopSelf();
-                    scheduler.cancelAllTasks();
-                    killProcess(myPid());
+                    exit();
                     return;
                 default:
                     Timber.v("unhandled intent action received: %s", intent.getAction());
@@ -266,6 +266,12 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
         } else {
             hasBeenStartedExplicitly = true;
         }
+    }
+
+    private void exit() {
+        stopSelf();
+        scheduler.cancelAllTasks();
+        killProcess(myPid());
     }
 
     private void notifyUserOfBackgroundLocationRestriction() {
@@ -705,6 +711,12 @@ public class BackgroundService extends DaggerService implements OnModeChangedPre
         if (lastLocation != null) {
             onLocationChanged(lastLocation, MessageLocation.REPORT_TYPE_DEFAULT);
         }
+    }
+
+    @Subscribe
+    public void onEvent(Events.RestartApp e) {
+        scheduler.cancelAllTasks();
+        ProcessPhoenix.triggerRebirth(this);
     }
 
     private NotificationCompat.Builder getEventsNotificationBuilder() {
