@@ -76,7 +76,7 @@ class PreferencesGettersAndSetters(
                     arrayOf("DebugLog", "debugLog", true, true, Boolean::class, false),
                     arrayOf("DeviceId", "deviceId", "deviceId", "deviceId", String::class, false),
                     arrayOf("DontReuseHttpClient", "dontReuseHttpClient", true, true, Boolean::class, true),
-                    arrayOf("ExperimentalFeatures", "experimentalFeatures", setOf("this", "that", "other"), setOf("this", "that", "other"), Set::class, false),
+                    arrayOf("ExperimentalFeatures", "experimentalFeatures", setOf("this", "that", "other"), setOf("this", "that", "other"), Collection::class, false),
                     arrayOf("FusedRegionDetection", "fusedRegionDetection", true, true, Boolean::class, false),
                     arrayOf("ReverseGeocodeProvider", "reverseGeocodeProvider", "Google", "Google", String::class, false),
                     arrayOf("ReverseGeocodeProvider", "reverseGeocodeProvider", "OpenCage", "OpenCage", String::class, false),

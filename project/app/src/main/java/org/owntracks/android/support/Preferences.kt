@@ -651,10 +651,10 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
 
     @get:Export(keyResId = R.string.preferenceKeyExperimentalFeatures, exportModeMqtt = true, exportModeHttp = true)
     @set:Import(keyResId = R.string.preferenceKeyExperimentalFeatures)
-    var experimentalFeatures: Set<String>
+    var experimentalFeatures: Collection<String>
         get() = getStringSet(R.string.preferenceKeyExperimentalFeatures).toSortedSet()
         set(value) {
-            setStringSet(R.string.preferenceKeyExperimentalFeatures, value)
+            setStringSet(R.string.preferenceKeyExperimentalFeatures, value.toSet())
         }
 
 
