@@ -4,11 +4,10 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        jcenter()
         maven("https://plugins.gradle.org/m2/")
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:4.1.3")
+        classpath("com.android.tools.build:gradle:4.2.0")
         classpath("com.hiya:jacoco-android:0.2")
         classpath("io.objectbox:objectbox-gradle-plugin:2.9.1")
         //noinspection DifferentKotlinGradleVersion

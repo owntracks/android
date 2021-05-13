@@ -121,13 +121,13 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: gms-espresso-test-reports
-          path: project/app/build/reports/androidTests/connected/flavors/gmsDebugAndroidTest/
+          path: project/app/build/reports/androidTests/connected/flavors/gms/
         if: always()
       - name: Upload gms connected test XML
         uses: actions/upload-artifact@v2
         with:
           name: gms-espresso-test-xml
-          path: project/app/build/outputs/androidTest-results/connected/flavors/gmsDebugAndroidTest/*.xml
+          path: project/app/build/outputs/androidTest-results/connected/flavors/gms/*.xml
       - name: Upload gms connected test coverage artifact
         uses: actions/upload-artifact@v2
         with:
@@ -168,13 +168,13 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: oss-espresso-test-reports
-          path: project/app/build/reports/androidTests/connected/flavors/ossDebugAndroidTest/
+          path: project/app/build/reports/androidTests/connected/flavors/oss/
         if: always()
       - name: Upload OSS connected test XML
         uses: actions/upload-artifact@v2
         with:
           name: oss-espresso-test-xml
-          path: project/app/build/outputs/androidTest-results/connected/flavors/ossDebugAndroidTest/*.xml
+          path: project/app/build/outputs/androidTest-results/connected/flavors/oss/*.xml
       - name: Upload OSS connected test coverage artifact
         uses: actions/upload-artifact@v2
         with:

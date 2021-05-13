@@ -35,7 +35,6 @@
     <application
         android:name=".App"
         android:allowBackup="true"
-        android:extractNativeLibs="false"
         android:fullBackupContent="@xml/backup_descriptor"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"

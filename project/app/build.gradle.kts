@@ -1,6 +1,6 @@
 plugins {
     id("com.android.application")
-    id("com.github.triplet.play") version "3.4.0"
+    id("com.github.triplet.play") version "3.4.0-agp4.2"
     kotlin("android")
     kotlin("kapt")
     id("io.objectbox")
@@ -11,7 +11,8 @@ val versionMajor = 2
 val versionMinor = 4
 val versionPatch = 0
 //TODO need to increment this manually at the moment, as GPP is broken
-val versionBuild = 0 // This value is managed by the gradle publisher plugin. Build numbers get incremented on publish
+val versionBuild =
+    0 // This value is managed by the gradle publisher plugin. Build numbers get incremented on publish
 val googleMapsAPIKey = extra.get("google_maps_api_key")?.toString() ?: "PLACEHOLDER_API_KEY"
 
 android {
@@ -31,7 +32,11 @@ android {
             }
         }
         val locales = listOf("en", "de", "fr", "es", "ru", "ca", "pl")
-        buildConfigField("String[]", "TRANSLATION_ARRAY", "new String[]{\"" + locales.joinToString("\",\"") + "\"}")
+        buildConfigField(
+            "String[]",
+            "TRANSLATION_ARRAY",
+            "new String[]{\"" + locales.joinToString("\",\"") + "\"}"
+        )
         resConfigs(locales)
         testInstrumentationRunner("androidx.test.runner.AndroidJUnitRunner")
 /* TODO Get this lot sorted when the orchestrator / coverage / clearPackageData bug gets fixed */
@@ -54,8 +59,10 @@ android {
         named("release") {
             isMinifyEnabled = true
             isShrinkResources = true
-            isZipAlignEnabled = true
-            proguardFiles = mutableListOf(getDefaultProguardFile("proguard-android.txt"), file("proguard-rules.pro"))
+            proguardFiles = mutableListOf(
+                getDefaultProguardFile("proguard-android.txt"),
+                file("proguard-rules.pro")
+            )
             resValue("string", "GOOGLE_MAPS_API_KEY", googleMapsAPIKey)
             signingConfig = signingConfigs.findByName("release")
         }
@@ -63,8 +70,10 @@ android {
         named("debug") {
             isMinifyEnabled = false
             isShrinkResources = false
-            isZipAlignEnabled = true
-            proguardFiles = mutableListOf(getDefaultProguardFile("proguard-android.txt"), file("proguard-rules.pro"))
+            proguardFiles = mutableListOf(
+                getDefaultProguardFile("proguard-android.txt"),
+                file("proguard-rules.pro")
+            )
             resValue("string", "GOOGLE_MAPS_API_KEY", googleMapsAPIKey)
             applicationIdSuffix = ".debug"
             isTestCoverageEnabled = true
@@ -88,6 +97,7 @@ android {
         exclude("META-INF/dependencies.txt")
         exclude("META-INF/LGPL2.1")
         exclude("META-INF/proguard/androidx-annotations.pro")
+        jniLibs.useLegacyPackaging = false
     }
 
     lintOptions {
@@ -95,7 +105,13 @@ android {
         isCheckAllWarnings = true
         isWarningsAsErrors = false
         isAbortOnError = false
-        disable("TypographyFractions", "TypographyQuotes", "Typos", "UnsafeExperimentalUsageError", "UnsafeExperimentalUsageWarning")
+        disable(
+            "TypographyFractions",
+            "TypographyQuotes",
+            "Typos",
+            "UnsafeExperimentalUsageError",
+            "UnsafeExperimentalUsageWarning"
+        )
     }
     testOptions {
         animationsDisabled = true
@@ -122,7 +138,6 @@ android {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
-    buildToolsVersion = "29.0.3"
     flavorDimensions("locationProvider")
     productFlavors {
         create("gms") {
@@ -165,7 +180,7 @@ dependencies {
     implementation("androidx.fragment:fragment-ktx:1.3.3")
     implementation("androidx.core:core-ktx:1.3.2")
     implementation("androidx.test.espresso:espresso-idling-resource:${espressoVersion}")
-    implementation( "androidx.lifecycle:lifecycle-common-java8:2.3.1")
+    implementation("androidx.lifecycle:lifecycle-common-java8:2.3.1")
 
     // Explicit dependency on conscrypt to give up-to-date TLS support on all devices
     implementation("org.conscrypt:conscrypt-android:2.5.2")
@@ -257,13 +272,14 @@ play {
 }
 
 // Espresso test screenshot gathering
-val reportsDirectoryPath = "$buildDir/reports/androidTests/connected/flavors/%sDebugAndroidTest"
+val reportsDirectoryPath = "$buildDir/reports/androidTests/connected/flavors/%s"
 val screenshotsDeviceFolder = "/sdcard/Download/testscreenshots"
 
 android.productFlavors.all { productFlavor ->
     tasks.register<Exec>("create${productFlavor.name.capitalize()}ScreenshotDirectory") {
         group = "reporting"
-        description = "Creates ${productFlavor.name.capitalize()} screenshot directory on connected device"
+        description =
+            "Creates ${productFlavor.name.capitalize()} screenshot directory on connected device"
         executable = "${android.adbExecutable}"
         args(mutableListOf("shell", "mkdir", "-p", screenshotsDeviceFolder))
     }
@@ -275,7 +291,8 @@ android.productFlavors.all { productFlavor ->
     }
     tasks.register<Exec>("fetch${productFlavor.name.capitalize()}Screenshots") {
         group = "reporting"
-        description = "Fetches ${productFlavor.name.capitalize()} espresso screenshots from the device"
+        description =
+            "Fetches ${productFlavor.name.capitalize()} espresso screenshots from the device"
         executable = "${android.adbExecutable}"
         args("pull", screenshotsDeviceFolder, reportsDirectoryPath.format(productFlavor.name))
         dependsOn("create${productFlavor.name.capitalize()}ScreenshotDirectory")
@@ -296,31 +313,35 @@ android.productFlavors.all { productFlavor ->
                 return@doFirst
             }
             screenshotsDirectory
-                    .listFiles()!!
-                    .forEach { testClassDirectory ->
-                        val testClassName = testClassDirectory.name
-                        testClassDirectory.listFiles()?.forEach failedFile@{
-                            val testName = it.name
-                            val testNameWithoutExtension = it.nameWithoutExtension
-                            val testClassJunitReportFile = File(reportsPath, "${testClassName}.html")
-                            if (!testClassJunitReportFile.exists()) {
-                                println("Could not find JUnit report file for test class '${testClassJunitReportFile}'")
-                                return@failedFile
-                            }
-                            val testJunitReportContent = testClassJunitReportFile.readText()
-
-                            val failedHeaderPatternToFind = "<h3 class=\"failures\">${testNameWithoutExtension}</h3>"
-
-                            val failedPatternToReplace = "$failedHeaderPatternToFind <img src=\"testscreenshots/${testClassName}/${testName}\" width =\"360\" />"
-                            val successRecordPatternToFind = "<td>${testNameWithoutExtension}</td>"
-                            val successPatternToReplace = "<td>${testNameWithoutExtension} <a href=\"testscreenshots/${testClassName}/${testName}\">(screenshot)</a></td>"
-
-                            testClassJunitReportFile.writeText(testJunitReportContent
-                                    .replace(failedHeaderPatternToFind, failedPatternToReplace)
-                                    .replace(successRecordPatternToFind, successPatternToReplace)
-                            )
+                .listFiles()!!
+                .forEach { testClassDirectory ->
+                    val testClassName = testClassDirectory.name
+                    testClassDirectory.listFiles()?.forEach failedFile@{
+                        val testName = it.name
+                        val testNameWithoutExtension = it.nameWithoutExtension
+                        val testClassJunitReportFile = File(reportsPath, "${testClassName}.html")
+                        if (!testClassJunitReportFile.exists()) {
+                            println("Could not find JUnit report file for test class '${testClassJunitReportFile}'")
+                            return@failedFile
                         }
+                        val testJunitReportContent = testClassJunitReportFile.readText()
+
+                        val failedHeaderPatternToFind =
+                            "<h3 class=\"failures\">${testNameWithoutExtension}</h3>"
+
+                        val failedPatternToReplace =
+                            "$failedHeaderPatternToFind <img src=\"testscreenshots/${testClassName}/${testName}\" width =\"360\" />"
+                        val successRecordPatternToFind = "<td>${testNameWithoutExtension}</td>"
+                        val successPatternToReplace =
+                            "<td>${testNameWithoutExtension} <a href=\"testscreenshots/${testClassName}/${testName}\">(screenshot)</a></td>"
+
+                        testClassJunitReportFile.writeText(
+                            testJunitReportContent
+                                .replace(failedHeaderPatternToFind, failedPatternToReplace)
+                                .replace(successRecordPatternToFind, successPatternToReplace)
+                        )
                     }
+                }
         }
     }
     true

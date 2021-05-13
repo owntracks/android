@@ -123,7 +123,7 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
         } catch (e: NumberFormatException) {
             throw IllegalArgumentException()
         }
-        if (t is ParameterizedType && Set::class.java.isAssignableFrom(t.rawType as Class<*>))
+        if (t is ParameterizedType && Collection::class.java.isAssignableFrom(t.rawType as Class<*>))
             return value.split(",").map { it.trim() }.filter { it.isNotBlank() }.toSortedSet()
         return value
     }
