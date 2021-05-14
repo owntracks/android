@@ -190,7 +190,7 @@ public class EditorActivity extends BaseActivity<UiPreferencesEditorBinding, Edi
     private String getExportString() throws IOException {
         MessageConfiguration message = preferences.exportToMessage();
         message.setWaypoints(waypointsRepo.exportToMessage());
-        return parser.toJsonPlain(message);
+        return parser.toJsonPlainPretty(message);
     }
 
     static class ExportTask extends AsyncTask<Void, Void, Boolean> {
