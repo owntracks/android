@@ -173,6 +173,9 @@ dependencies {
     // Mapping
     implementation("org.osmdroid:osmdroid-android:6.1.10")
 
+    // Geocoding
+    implementation("com.github.MKergall:osmbonuspack:6.7.0")
+
     // Utility libraries
     implementation("com.google.dagger:dagger:${daggerVersion}")
     implementation("com.google.dagger:dagger-android-support:${daggerVersion}")

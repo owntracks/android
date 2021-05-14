@@ -181,5 +181,6 @@
         <item>Не используется</item>
         <item>Google</item>
         <item>OpenCage</item>
+        <item>Nominatim</item>
     </string-array>
 </resources>

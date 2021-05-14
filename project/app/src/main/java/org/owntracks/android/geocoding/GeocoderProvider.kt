@@ -35,6 +35,7 @@ class GeocoderProvider @Inject constructor(@AppContext val context: Context, val
     private fun setGeocoderProvider(@AppContext context: Context, preferences: Preferences) {
         Timber.i("Setting geocoding provider to ${preferences.reverseGeocodeProvider}")
         geocoder = when (preferences.reverseGeocodeProvider) {
+            Preferences.REVERSE_GEOCODE_PROVIDER_NOMINATIM -> NominatimGeocoder()
             Preferences.REVERSE_GEOCODE_PROVIDER_OPENCAGE -> OpenCageGeocoder(preferences.openCageGeocoderApiKey)
             Preferences.REVERSE_GEOCODE_PROVIDER_GOOGLE -> GoogleGeocoder(context)
             else -> GeocoderNone()

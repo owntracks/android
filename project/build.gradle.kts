@@ -21,5 +21,6 @@ allprojects {
         google()
         mavenCentral()
         jcenter()
+        maven("https://jitpack.io")
     }
 }
