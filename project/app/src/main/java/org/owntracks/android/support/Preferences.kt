@@ -639,7 +639,13 @@ class Preferences @Inject constructor(@AppContext c: Context, private val eventB
     @get:Export(keyResId = R.string.preferenceKeyReverseGeocodeProvider, exportModeMqtt = true, exportModeHttp = true)
     @set:Import(keyResId = R.string.preferenceKeyReverseGeocodeProvider)
     var reverseGeocodeProvider: String
-        get() = getStringOrDefault(R.string.preferenceKeyReverseGeocodeProvider, R.string.valDefaultGeocoder)
+        get() {
+            val default = when (BuildConfig.FLAVOR) {
+                "gms" -> R.string.valDefaultGMSGeocoder
+                else -> R.string.valDefaultOSSGeocoder
+            }
+            return getStringOrDefault(R.string.preferenceKeyReverseGeocodeProvider, default)
+        }
         set(newValue) {
             if (REVERSE_GEOCODE_PROVIDERS.contains(newValue)) {
                 setString(R.string.preferenceKeyReverseGeocodeProvider, newValue)

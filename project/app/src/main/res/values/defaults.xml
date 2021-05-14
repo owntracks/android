@@ -2,7 +2,8 @@
 <resources>
     <string name="valPubTopic" formatted="false" translatable="false">owntracks/%u/%d</string>
     <string name="defaultSubTopic" translatable="false">owntracks/+/+</string>
-    <string name="valDefaultGeocoder" translatable="false">Google</string>
+    <string name="valDefaultGMSGeocoder" translatable="false">Google</string>
+    <string name="valDefaultOSSGeocoder" translatable="false">Nominatim</string>
 
     <integer name="valPort">8883</integer>
     <integer name="valPubQos">1</integer>
