@@ -2,7 +2,7 @@
 
     <style name="Theme.Owntracks" parent="Theme.Owntracks.Base" />
 
-    <style name="Theme.Owntracks.Base" parent="@style/Theme.AppCompat.Light.NoActionBar">
+    <style name="Theme.Owntracks.Base" parent="@style/Theme.MaterialComponents.Light.NoActionBar">
         <item name="android:windowBackground">@color/background</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowIsTranslucent">true</item>
@@ -52,10 +52,12 @@
 
     <color name="textPrimary">#de000000</color>
     <color name="textSecondary">#8a000000</color>
+    <color name="snackbarText">#fffafafa</color>
     <color name="buttonTint">@color/textSecondary</color>
     <color name="background">#fffafafa</color>
 
     <color name="primary">#3f72b5</color>
     <color name="secondary">#305e9f</color>
-    <color name="accent">@color/primary</color>
+    <color name="accent">#bfff00</color>
+
 </resources>

@@ -154,6 +154,7 @@ class GMSMapActivityTests {
             .putBoolean(context.getString(R.string.preferenceKeySetupNotCompleted), false)
             .apply()
         baristaRule.launchActivity()
+        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
         assertDisplayed(R.id.google_map_view)
 
         openDrawer()

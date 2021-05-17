@@ -1,10 +1,8 @@
-package org.owntracks.android.ui.base.viewmodel;
+package org.owntracks.android.ui.base.viewmodel
 
-import androidx.databinding.Observable;
-import android.os.Bundle;
-import androidx.annotation.NonNull;
-
-import org.owntracks.android.ui.base.view.MvvmView;
+import android.os.Bundle
+import androidx.databinding.Observable
+import org.owntracks.android.ui.base.view.MvvmView
 
 /* Copyright 2016 Patrick Löwenstein
  *
@@ -19,11 +17,9 @@ import org.owntracks.android.ui.base.view.MvvmView;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License. */
-public interface MvvmViewModel<V extends MvvmView> extends Observable {
-    void attachView(Bundle savedInstanceState, V view);
-    void detachView();
-
-    void saveInstanceState(@NonNull Bundle outState);
-    void restoreInstanceState(@NonNull Bundle savedInstanceState);
-
+interface MvvmViewModel<V : MvvmView?> : Observable {
+    fun attachView(savedInstanceState: Bundle?, view: V)
+    fun detachView()
+    fun saveInstanceState(outState: Bundle)
+    fun restoreInstanceState(savedInstanceState: Bundle)
 }
