@@ -2,7 +2,6 @@ package org.owntracks.android.ui
 
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
 import androidx.test.espresso.action.ViewActions.scrollTo
 import androidx.test.espresso.contrib.RecyclerViewActions.actionOnItem
 import androidx.test.espresso.intent.Intents
@@ -13,7 +12,6 @@ import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertC
 import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertNotContains
 import com.schibsted.spain.barista.interaction.BaristaClickInteractions.clickBack
-import com.schibsted.spain.barista.interaction.BaristaClickInteractions.clickOn
 import com.schibsted.spain.barista.interaction.BaristaDialogInteractions.clickDialogPositiveButton
 import com.schibsted.spain.barista.interaction.BaristaEditTextInteractions.writeTo
 import com.schibsted.spain.barista.rule.BaristaRule
@@ -67,54 +65,10 @@ class PreferencesActivityTests {
         assertDisplayed(R.string.configurationManagement)
     }
 
-    @Test
-    @AllowFlaky(attempts = 3)
-    fun configurationManagementCanEditASetType() {
-        clickOn(R.string.configurationManagement)
-        openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
-        clickOn(R.string.preferencesEditor)
-        writeTo(R.id.inputKey, baristaRule.activityTestRule.activity.getString(R.string.preferenceKeyExperimentalFeatures))
-        writeTo(R.id.inputValue, "this, that,    other")
-        clickDialogPositiveButton()
-        assertContains(R.id.effectiveConfiguration, "\"experimentalFeatures\" : [ \"other\", \"that\", \"this\" ]")
-    }
 
     @Test
     @AllowFlaky(attempts = 3)
-    fun configurationManagementCanEditAStringType() {
-        clickOn(R.string.configurationManagement)
-        openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
-
-        clickOn(R.string.preferencesEditor)
-        writeTo(R.id.inputKey, baristaRule.activityTestRule.activity.getString(R.string.preferenceKeyModeId))
-        writeTo(R.id.inputValue, "0")
-        clickDialogPositiveButton()
-
-        openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
-        clickOn(R.string.preferencesEditor)
-        writeTo(R.id.inputKey, baristaRule.activityTestRule.activity.getString(R.string.preferenceKeyHost))
-        writeTo(R.id.inputValue, "example.com")
-        clickDialogPositiveButton()
-
-        assertContains(R.id.effectiveConfiguration, "\"host\" : \"example.com\"")
-    }
-
-    @Test
-    @AllowFlaky(attempts = 3)
-    fun configurationManagementCanEditABooleanType() {
-        clickOn(R.string.configurationManagement)
-        openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
-        clickOn(R.string.preferencesEditor)
-        writeTo(R.id.inputKey, baristaRule.activityTestRule.activity.getString(R.string.preferenceKeyRemoteCommand))
-        writeTo(R.id.inputValue, "false")
-        clickDialogPositiveButton()
-
-        assertContains(R.id.effectiveConfiguration, "\"cmd\" : false")
-    }
-
-    @Test
-    @AllowFlaky(attempts = 3)
-    fun settingSimpleHTTPConfigSettingsCanBeExported() {
+    fun settingSimpleHTTPConfigSettingsCanBeShownInEditor() {
 
         clickOnAndWait(R.string.preferencesServer)
         clickOnAndWait(R.string.mode_heading)

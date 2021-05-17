@@ -35,8 +35,8 @@ class LogViewerActivityTests {
 
     @get:Rule
     val ruleChain: RuleChain = RuleChain
-            .outerRule(baristaRule.activityTestRule)
-            .around(screenshotRule)
+        .outerRule(baristaRule.activityTestRule)
+        .around(screenshotRule)
 
     @Before
     fun setUp() {
@@ -59,21 +59,25 @@ class LogViewerActivityTests {
             sleep(1, TimeUnit.SECONDS)
             clickOn(R.id.share_fab)
             intended(
-                    allOf(
-                            hasAction(ACTION_CHOOSER),
-                            hasExtras(
-                                    allOf(
-                                            hasEntry(EXTRA_TITLE, baristaRule.activityTestRule.activity.getString(R.string.exportLogFilePrompt)),
-                                            hasEntry(`is`(EXTRA_INTENT),
-                                                    allOf(
-                                                            hasAction(ACTION_SEND),
-                                                            hasFlag(FLAG_GRANT_READ_URI_PERMISSION),
-                                                            hasType("text/plain")
-                                                    )
-                                            )
-                                    )
+                allOf(
+                    hasAction(ACTION_CHOOSER),
+                    hasExtras(
+                        allOf(
+                            hasEntry(
+                                EXTRA_TITLE,
+                                baristaRule.activityTestRule.activity.getString(R.string.exportLogFilePrompt)
+                            ),
+                            hasEntry(
+                                `is`(EXTRA_INTENT),
+                                allOf(
+                                    hasAction(ACTION_SEND),
+                                    hasFlag(FLAG_GRANT_READ_URI_PERMISSION),
+                                    hasType("text/plain")
+                                )
                             )
+                        )
                     )
+                )
             )
         } finally {
             Intents.release()
