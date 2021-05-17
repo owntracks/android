@@ -10,6 +10,7 @@ abstract class ContactsActivityModule {
     @Binds
     @PerActivity
     abstract fun bindActivity(a: ContactsActivity?): AppCompatActivity?
+
     @Binds
     abstract fun bindViewModel(viewModel: ContactsViewModel?): ContactsMvvm.ViewModel<*>?
 }

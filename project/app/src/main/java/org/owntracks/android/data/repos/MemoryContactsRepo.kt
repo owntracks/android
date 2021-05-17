@@ -12,7 +12,9 @@ import org.owntracks.android.support.ContactImageProvider
 import org.owntracks.android.support.Events.*
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class MemoryContactsRepo @Inject constructor(private val eventBus: EventBus, private val contactImageProvider: ContactImageProvider) : ContactsRepo {
     override val all = MutableLiveData<MutableMap<String, FusedContact>>(mutableMapOf())
     private var majorRevision: Long = 0

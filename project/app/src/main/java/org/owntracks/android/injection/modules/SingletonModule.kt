@@ -5,9 +5,6 @@ import dagger.Module
 import dagger.Provides
 import org.greenrobot.eventbus.EventBus
 import org.owntracks.android.EventBusIndex
-import org.owntracks.android.data.repos.ContactsRepo
-import org.owntracks.android.data.repos.MemoryContactsRepo
-import org.owntracks.android.support.ContactImageProvider
 import javax.inject.Singleton
 
 @Module
@@ -16,17 +13,12 @@ class SingletonModule {
     @Singleton
     fun provideEventbus(): EventBus {
         return EventBus.builder()
-                .addIndex(EventBusIndex())
-                .sendNoSubscriberEvent(false)
-                .logNoSubscriberMessages(true)
-                .build()
+            .addIndex(EventBusIndex())
+            .sendNoSubscriberEvent(false)
+            .logNoSubscriberMessages(true)
+            .build()
     }
 
-    @Provides
-    @Singleton
-    fun provideContactsRepo(eventBus: EventBus?, contactImageProvider: ContactImageProvider?): ContactsRepo {
-        return MemoryContactsRepo(eventBus!!, contactImageProvider!!)
-    }
 
     @Provides
     @Singleton

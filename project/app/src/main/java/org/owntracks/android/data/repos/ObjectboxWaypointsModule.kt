@@ -8,3 +8,4 @@ abstract class ObjectboxWaypointsModule {
     @Binds
     abstract fun bindWaypointsRepo(objectboxWaypointsRepo: ObjectboxWaypointsRepo): WaypointsRepo
 }
+
