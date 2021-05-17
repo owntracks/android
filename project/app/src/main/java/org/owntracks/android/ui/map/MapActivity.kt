@@ -381,7 +381,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
 
     override fun updateMarker(contact: FusedContact) {
         if (!contact.hasLocation()) {
-            Timber.i("unable to update marker. no location")
+            Timber.w("unable to update marker for $contact. no location")
             return
         }
         Timber.v("updating marker for contact: %s", contact.id)

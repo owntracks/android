@@ -90,4 +90,8 @@ class FusedContact(id: String?) : BaseObservable() {
     fun setDeleted() {
         isDeleted = true
     }
+
+    override fun toString(): String {
+        return "FusedContact $id ($fusedName)"
+    }
 }
