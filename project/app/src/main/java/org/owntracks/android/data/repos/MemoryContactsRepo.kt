@@ -52,6 +52,7 @@ class MemoryContactsRepo @Inject constructor(private val eventBus: EventBus, pri
         }
     }
 
+    @Synchronized
     override fun update(id: String, messageCard: MessageCard) {
         var c = getById(id)
         if (c != null) {
