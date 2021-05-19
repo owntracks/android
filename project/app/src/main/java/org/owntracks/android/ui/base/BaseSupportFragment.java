@@ -52,5 +52,4 @@ public abstract class BaseSupportFragment<B extends ViewDataBinding, V extends M
         binding = null;
         viewModel = null;
     }
-
 }

@@ -13,9 +13,22 @@ import org.owntracks.android.ui.base.viewmodel.NoOpViewModel
 import org.owntracks.android.ui.welcome.WelcomeFragmentMvvm
 import javax.inject.Inject
 
-class IntroFragment @Inject constructor(private val eventBus: EventBus) : BaseSupportFragment<UiWelcomeIntroBinding?, NoOpViewModel?>(), WelcomeFragmentMvvm.View {
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return setAndBindContentView(inflater, container, R.layout.ui_welcome_intro, savedInstanceState)
+class IntroFragment @Inject constructor() :
+    BaseSupportFragment<UiWelcomeIntroBinding?, NoOpViewModel?>(),
+    WelcomeFragmentMvvm.View {
+    @Inject
+    lateinit var eventBus: EventBus
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return setAndBindContentView(
+            inflater,
+            container,
+            R.layout.ui_welcome_intro,
+            savedInstanceState
+        )
     }
 
     override fun onResume() {

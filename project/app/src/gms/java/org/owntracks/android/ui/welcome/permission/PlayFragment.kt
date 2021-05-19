@@ -14,9 +14,22 @@ import org.owntracks.android.support.Events
 import org.owntracks.android.ui.base.BaseSupportFragment
 import javax.inject.Inject
 
-class PlayFragment @Inject constructor(private val eventBus: EventBus) : BaseSupportFragment<UiWelcomePlayBinding?, PlayFragmentViewModel>(), PlayFragmentMvvm.View {
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return setAndBindContentView(inflater, container, R.layout.ui_welcome_play, savedInstanceState)
+class PlayFragment @Inject constructor() :
+    BaseSupportFragment<UiWelcomePlayBinding?, PlayFragmentViewModel>(),
+    PlayFragmentMvvm.View {
+    @Inject
+    lateinit var eventBus: EventBus
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return setAndBindContentView(
+            inflater,
+            container,
+            R.layout.ui_welcome_play,
+            savedInstanceState
+        )
     }
 
     fun onPlayServicesResolutionResult() {
@@ -26,8 +39,17 @@ class PlayFragment @Inject constructor(private val eventBus: EventBus) : BaseSup
     override fun requestFix() {
         val googleAPI = GoogleApiAvailability.getInstance()
         val result = googleAPI.isGooglePlayServicesAvailable(requireContext())
-        if (!googleAPI.showErrorDialogFragment(requireActivity(), result, PLAY_SERVICES_RESOLUTION_REQUEST)) {
-            Toast.makeText(this.context, "Unable to update Google Play Services", Toast.LENGTH_SHORT).show()
+        if (!googleAPI.showErrorDialogFragment(
+                requireActivity(),
+                result,
+                PLAY_SERVICES_RESOLUTION_REQUEST
+            )
+        ) {
+            Toast.makeText(
+                this.context,
+                "Unable to update Google Play Services",
+                Toast.LENGTH_SHORT
+            ).show()
         }
         checkAvailability()
     }

@@ -13,13 +13,30 @@ import org.owntracks.android.ui.base.viewmodel.NoOpViewModel
 import org.owntracks.android.ui.welcome.WelcomeFragmentMvvm
 import javax.inject.Inject
 
-class FinishFragment @Inject constructor(private val eventBus: EventBus) : BaseSupportFragment<UiWelcomeFinishBinding?, NoOpViewModel?>(), WelcomeFragmentMvvm.View {
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return setAndBindContentView(inflater, container, R.layout.ui_welcome_finish, savedInstanceState)
+class FinishFragment @Inject constructor() : BaseSupportFragment<UiWelcomeFinishBinding?, NoOpViewModel?>(),
+    WelcomeFragmentMvvm.View {
+    @Inject
+    lateinit var eventBus: EventBus
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return setAndBindContentView(
+            inflater,
+            container,
+            R.layout.ui_welcome_finish,
+            savedInstanceState
+        )
     }
 
     override fun onResume() {
         super.onResume()
-        eventBus.post(Events.WelcomeNextDoneButtonsEnableToggle(nextEnabled = false, doneEnabled = true))
+        eventBus.post(
+            Events.WelcomeNextDoneButtonsEnableToggle(
+                nextEnabled = false,
+                doneEnabled = true
+            )
+        )
     }
 }
