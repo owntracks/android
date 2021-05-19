@@ -19,33 +19,52 @@ import org.owntracks.android.support.Events
 import org.owntracks.android.ui.base.BaseSupportFragment
 import javax.inject.Inject
 
-class PermissionFragment @Inject constructor(private val eventBus: EventBus) : BaseSupportFragment<UiWelcomeIntroBinding?, PermissionFragmentViewModel>(), PermissionFragmentMvvm.View {
+class PermissionFragment @Inject constructor() :
+    BaseSupportFragment<UiWelcomeIntroBinding?, PermissionFragmentViewModel>(),
+    PermissionFragmentMvvm.View {
+    @Inject
+    lateinit var eventBus: EventBus
     private var askedForPermission = false
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return setAndBindContentView(inflater, container, R.layout.ui_welcome_permissions, savedInstanceState)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return setAndBindContentView(
+            inflater,
+            container,
+            R.layout.ui_welcome_permissions,
+            savedInstanceState
+        )
     }
 
-    private val requestLocationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-        askedForPermission = true
-        if (isGranted) {
-            viewModel.isPermissionGranted = true
-            eventBus.post(Events.WelcomeNextDoneButtonsEnableToggle())
-            eventBus.postSticky(Events.PermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION))
+    private val requestLocationPermission =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            askedForPermission = true
+            if (isGranted) {
+                viewModel.isPermissionGranted = true
+                eventBus.post(Events.WelcomeNextDoneButtonsEnableToggle())
+                eventBus.postSticky(Events.PermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION))
+            }
         }
-    }
 
     override fun requestFix() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (askedForPermission) {
                 if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
                     AlertDialog.Builder(requireContext())
-                            .setCancelable(true)
-                            .setMessage(R.string.permissions_description)
-                            .setPositiveButton("OK"
-                            ) { _: DialogInterface?, _: Int -> requestLocationPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION) }
-                            .show()
+                        .setCancelable(true)
+                        .setMessage(R.string.permissions_description)
+                        .setPositiveButton(
+                            "OK"
+                        ) { _: DialogInterface?, _: Int -> requestLocationPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION) }
+                        .show()
                 } else {
-                    Toast.makeText(this.context, "Unable to proceed without location permissions.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this.context,
+                        "Unable to proceed without location permissions.",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             } else {
                 requestLocationPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -55,7 +74,10 @@ class PermissionFragment @Inject constructor(private val eventBus: EventBus) : B
         }
     }
 
-    private fun checkPermission() = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+    private fun checkPermission() = ContextCompat.checkSelfPermission(
+        requireContext(),
+        Manifest.permission.ACCESS_FINE_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED
 
     override fun onResume() {
         super.onResume()

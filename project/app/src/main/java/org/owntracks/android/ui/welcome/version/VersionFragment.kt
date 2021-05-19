@@ -17,16 +17,29 @@ import org.owntracks.android.ui.base.viewmodel.NoOpViewModel
 import org.owntracks.android.ui.welcome.WelcomeFragmentMvvm
 import javax.inject.Inject
 
-class VersionFragment @Inject constructor(private val eventBus: EventBus) : BaseSupportFragment<UiWelcomeVersionBinding?, NoOpViewModel?>(), WelcomeFragmentMvvm.View, View.OnClickListener {
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val v = setAndBindContentView(inflater, container, R.layout.ui_welcome_version, savedInstanceState)
+class VersionFragment @Inject constructor() : BaseSupportFragment<UiWelcomeVersionBinding?, NoOpViewModel?>(),
+    WelcomeFragmentMvvm.View, View.OnClickListener {
+    @Inject
+    lateinit var eventBus: EventBus
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val v = setAndBindContentView(
+            inflater,
+            container,
+            R.layout.ui_welcome_version,
+            savedInstanceState
+        )
         binding!!.uiFragmentWelcomeVersionButtonLearnMore.setOnClickListener(this)
         return v
     }
 
     override fun onClick(view: View) {
         try {
-            val i = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.documentationUrlAndroid)))
+            val i =
+                Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.documentationUrlAndroid)))
             startActivity(i)
         } catch (e: ActivityNotFoundException) {
             Toast.makeText(context, "No suitable browser installed", Toast.LENGTH_SHORT).show()
