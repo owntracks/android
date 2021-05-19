@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.*
 import org.owntracks.android.support.Parser
 import org.owntracks.android.support.Preferences
 import java.io.IOException
+import java.util.*
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type", defaultImpl = MessageUnknown::class)
 @JsonSubTypes(JsonSubTypes.Type(value = MessageLocation::class, name = MessageLocation.TYPE), JsonSubTypes.Type(value = MessageTransition::class, name = MessageTransition.TYPE), JsonSubTypes.Type(value = MessageCard::class, name = MessageCard.TYPE), JsonSubTypes.Type(value = MessageCmd::class, name = MessageCmd.TYPE), JsonSubTypes.Type(value = MessageConfiguration::class, name = MessageConfiguration.TYPE), JsonSubTypes.Type(value = MessageEncrypted::class, name = MessageEncrypted.TYPE), JsonSubTypes.Type(value = MessageWaypoint::class, name = MessageWaypoint.TYPE), JsonSubTypes.Type(value = MessageWaypoints::class, name = MessageWaypoints.TYPE), JsonSubTypes.Type(value = MessageLwt::class, name = MessageLwt.TYPE))
@@ -15,7 +16,7 @@ abstract class MessageBase : BaseObservable() {
 
     @get:JsonIgnore
     @JsonIgnore
-    val messageId = System.currentTimeMillis()
+    val messageId = "${System.currentTimeMillis()}-${Random().nextInt(0X1000000)}"
 
     @JsonIgnore
     open var topic: String = ""

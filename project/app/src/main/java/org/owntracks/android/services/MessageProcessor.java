@@ -33,7 +33,6 @@ import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -62,7 +61,7 @@ public class MessageProcessor {
     private MessageProcessorEndpoint endpoint;
 
     private boolean acceptMessages = false;
-    private final BlockingDeque<MessageBase> outgoingQueue = new LinkedBlockingDeque<>(10000);
+    private final BlockingDeque<MessageBase> outgoingQueue;
     private Thread backgroundDequeueThread;
 
     private static final long SEND_FAILURE_BACKOFF_INITIAL_WAIT = TimeUnit.SECONDS.toMillis(1);
@@ -96,6 +95,13 @@ public class MessageProcessor {
         this.outgoingQueueIdlingResource = outgoingQueueIdlingResource;
         this.eventBus.register(this);
         this.runThingsOnOtherThreads = runThingsOnOtherThreads;
+
+        outgoingQueue = new BlockingDequeThatAlsoSometimesPersistsThingsToDiskMaybe(10000, applicationContext.getFilesDir(), parser);
+        synchronized (outgoingQueue) {
+            for (int i = 0; i < outgoingQueue.size(); i++) {
+                outgoingQueueIdlingResource.increment();
+            }
+        }
 
     }
 
@@ -204,7 +210,7 @@ public class MessageProcessor {
         synchronized (outgoingQueue) {
             if (!outgoingQueue.offer(message)) {
                 MessageBase droppedMessage = outgoingQueue.poll();
-                Timber.e("Outoing queue full. Dropping oldest message: %s", droppedMessage);
+                Timber.e("Outgoing queue full. Dropping oldest message: %s", droppedMessage);
                 if (!outgoingQueue.offer(message)) {
                     Timber.e("Still can't put message onto the queue. Dropping: %s", message);
                 }
@@ -216,17 +222,15 @@ public class MessageProcessor {
     // Should be on the background thread here, because we block
     private void sendAvailableMessages() {
         Timber.d("Starting outbound message loop. ThreadID: %s", Thread.currentThread());
-        MessageBase lastFailedMessageToBeRetried = null;
+        boolean previousMessageFailed = false;
         int retriesToGo = 0;
         long retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT;
         while (true) {
             try {
                 MessageBase message;
-                if (lastFailedMessageToBeRetried == null) {
-                    message = this.outgoingQueue.take(); // <--- blocks
+                message = this.outgoingQueue.take(); // <--- blocks
+                if (!previousMessageFailed) {
                     retriesToGo = message.getNumberOfRetries();
-                } else {
-                    message = lastFailedMessageToBeRetried;
                 }
 
                 /*
@@ -251,27 +255,28 @@ public class MessageProcessor {
                             throw new Exception("sendMessage failed, but no exception actually given");
                         }
                     }
-                    lastFailedMessageToBeRetried = null;
+                    previousMessageFailed = false;
                     retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT;
                 } catch (OutgoingMessageSendingException | ConfigurationIncompleteException e) {
                     Timber.w(("Error sending message. Re-queueing"));
-                    lastFailedMessageToBeRetried = message;
+                    this.outgoingQueue.addFirst(message);
+                    previousMessageFailed = true;
                     retriesToGo -= 1;
                 } catch (IOException e) {
                     retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT;
-                    lastFailedMessageToBeRetried = null;
+                    previousMessageFailed = false;
                     // Deserialization failure, drop and move on
                 } catch (Throwable e) {
                     Timber.e(e, "Unhandled exception in sending message");
-                    lastFailedMessageToBeRetried = null;
+                    previousMessageFailed = false;
                 }
 
-                if (lastFailedMessageToBeRetried != null && retriesToGo <= 0) {
-                    lastFailedMessageToBeRetried = null;
+                if (previousMessageFailed && retriesToGo <= 0) {
+                    previousMessageFailed = false;
                 }
 
-                if (lastFailedMessageToBeRetried != null) {
-                    Timber.d("Waiting for %s s before retrying. %s", retryWait / 1000, Thread.currentThread());
+                if (previousMessageFailed) {
+                    Timber.i("Waiting for %s s before retrying", retryWait / 1000);
                     Thread.sleep(retryWait);
                     retryWait = Math.min(2 * retryWait, SEND_FAILURE_BACKOFF_MAX_WAIT);
                 } else {
@@ -305,14 +310,14 @@ public class MessageProcessor {
         eventBus.post(messageBase);
     }
 
-    void onMessageDeliveryFailedFinal(Long messageId) {
+    void onMessageDeliveryFailedFinal(String messageId) {
         Timber.e("Message delivery failed, not retryable. :%s", messageId);
         eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
     }
 
-    void onMessageDeliveryFailed(Long messageId) {
-        Timber.e("Message delivery failed. queueLength: %s, messageId: %s", outgoingQueue.size(), messageId);
-        eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
+    void onMessageDeliveryFailed(String messageId) {
+        Timber.e("Message delivery failed. queueLength: %s, messageId: %s", outgoingQueue.size() + 1, messageId);
+        eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size() + 1)); // Failed message hasn't been re-queued yet, so add 1
     }
 
     void onEndpointStateChanged(EndpointState newState) {
@@ -377,49 +382,53 @@ public class MessageProcessor {
             Timber.e("Invalid action message received");
             return;
         }
+        if (message.getAction() != null) {
+            switch (message.getAction()) {
+                case REPORT_LOCATION:
+                    if (message.getModeId() != MessageProcessorEndpointMqtt.MODE_ID) {
+                        Timber.e("command not supported in HTTP mode: %s", message.getAction());
+                        break;
+                    }
+                    serviceBridge.requestOnDemandLocationFix();
 
-        switch (message.getAction()) {
-            case REPORT_LOCATION:
-                if (message.getModeId() != MessageProcessorEndpointMqtt.MODE_ID) {
-                    Timber.e("command not supported in HTTP mode: %s", message.getAction());
                     break;
-                }
-                serviceBridge.requestOnDemandLocationFix();
+                case WAYPOINTS:
+                    locationProcessorLazy.get().publishWaypointsMessage();
+                    break;
+                case SET_WAYPOINTS:
+                    if (message.getWaypoints() != null) {
+                        waypointsRepo.importFromMessage(message.getWaypoints().getWaypoints());
+                    }
 
-                break;
-            case WAYPOINTS:
-                locationProcessorLazy.get().publishWaypointsMessage();
-                break;
-            case SET_WAYPOINTS:
-                if (message.getWaypoints() != null) {
-                    waypointsRepo.importFromMessage(message.getWaypoints().getWaypoints());
-                }
-
-                break;
-            case SET_CONFIGURATION:
-                if (!preferences.getRemoteConfiguration()) {
-                    Timber.w("Received a remote configuration command but remote config setting is disabled");
                     break;
-                }
-                preferences.importFromMessage(message.getConfiguration());
-                if (message.getWaypoints() != null) {
-                    waypointsRepo.importFromMessage(message.getWaypoints().getWaypoints());
-                }
-                break;
-            case RECONNECT:
-                if (message.getModeId() != MessageProcessorEndpointHttp.MODE_ID) {
-                    Timber.e("command not supported in HTTP mode: %s", message.getAction());
+                case SET_CONFIGURATION:
+                    if (!preferences.getRemoteConfiguration()) {
+                        Timber.w("Received a remote configuration command but remote config setting is disabled");
+                        break;
+                    }
+                    if (message.getConfiguration() != null) {
+                        preferences.importFromMessage(message.getConfiguration());
+                    } else {
+                        Timber.w("No configuration provided");
+                    }
+                    if (message.getWaypoints() != null) {
+                        waypointsRepo.importFromMessage(message.getWaypoints().getWaypoints());
+                    }
                     break;
-                }
-                reconnect();
-                break;
-            case RESTART:
-                eventBus.post(new Events.RestartApp());
-                break;
-            default:
-                break;
+                case RECONNECT:
+                    if (message.getModeId() != MessageProcessorEndpointHttp.MODE_ID) {
+                        Timber.e("command not supported in HTTP mode: %s", message.getAction());
+                        break;
+                    }
+                    reconnect();
+                    break;
+                case RESTART:
+                    eventBus.post(new Events.RestartApp());
+                    break;
+                default:
+                    break;
+            }
         }
-
     }
 
     private void processIncomingMessage(MessageTransition message) {

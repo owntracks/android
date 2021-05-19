@@ -112,7 +112,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
     synchronized void sendMessage(MessageBase m) throws ConfigurationIncompleteException, OutgoingMessageSendingException, IOException {
         m.addMqttPreferences(preferences);
-        long messageId = m.getMessageId();
+        String messageId = m.getMessageId();
         try {
             connectToBroker();
         } catch (MqttConnectionException e) {
@@ -131,7 +131,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
             pubToken.waitForCompletion(TimeUnit.SECONDS.toMillis(30));
             long endTime = System.nanoTime();
             long duration = (endTime - startTime);
-            Timber.d("message id %s sent in %dms", messageId, TimeUnit.NANOSECONDS.toMillis(duration));
+            Timber.i("Message id=%s sent in %dms", messageId, TimeUnit.NANOSECONDS.toMillis(duration));
             messageProcessor.onMessageDelivered(m);
         } catch (MqttException e) {
             Timber.e(e, "MQTT Exception delivering message");

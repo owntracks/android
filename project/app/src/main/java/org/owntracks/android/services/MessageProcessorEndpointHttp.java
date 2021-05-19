@@ -226,7 +226,8 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
     }
 
     void sendMessage(MessageBase message) throws OutgoingMessageSendingException {
-        long messageId = message.getMessageId();
+        String messageId = message.getMessageId();
+        long startTime = System.nanoTime();
         Request request = getRequest(message);
         if(request == null) {
             messageProcessor.onMessageDeliveryFailedFinal(message.getMessageId());
@@ -235,7 +236,9 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
         try(Response response = getHttpClient().newCall(request).execute()) {
             // Message was send. Handle delivered message
             if((response.isSuccessful())) {
-                Timber.d("request was successful: %s",response);
+                long endTime = System.nanoTime();
+                long duration = (endTime - startTime);
+                Timber.i("Message id=%s sent in %dms", messageId, TimeUnit.NANOSECONDS.toMillis(duration));
                 // Handle response
                 if(response.body() != null ) {
                     try {
