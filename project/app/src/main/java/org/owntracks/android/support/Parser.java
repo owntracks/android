@@ -74,7 +74,7 @@ public class Parser {
             throw new IOException("null array");
 
         if (a.length == 1 && a[0] instanceof MessageEncrypted) {
-            if (!encryptionProvider.isPayloadEncryptionEnabled())
+            if (encryptionProvider==null || !encryptionProvider.isPayloadEncryptionEnabled())
                 throw new EncryptionException("received encrypted message but payload encryption is not enabled");
             return defaultMapper.readValue(encryptionProvider.decrypt(((MessageEncrypted) a[0]).getData()), MessageBase[].class);
         } else { // single message wrapped in array by mapper or array of messages
@@ -84,7 +84,7 @@ public class Parser {
 
     private MessageBase decrypt(MessageBase m) throws IOException, EncryptionException {
         if (m instanceof MessageEncrypted) {
-            if (!encryptionProvider.isPayloadEncryptionEnabled())
+            if (encryptionProvider==null || !encryptionProvider.isPayloadEncryptionEnabled())
                 throw new EncryptionException("received encrypted message but payload encryption is not enabled");
             return defaultMapper.readValue(encryptionProvider.decrypt(((MessageEncrypted) m).getData()), MessageBase.class);
         }
@@ -93,7 +93,7 @@ public class Parser {
 
 
     private String encryptString(@NonNull String input) throws IOException {
-        if (encryptionProvider.isPayloadEncryptionEnabled()) {
+        if (encryptionProvider!=null && encryptionProvider.isPayloadEncryptionEnabled()) {
             MessageEncrypted m = new MessageEncrypted();
             m.setData(encryptionProvider.encrypt(input));
             return defaultMapper.writeValueAsString(m);
@@ -102,7 +102,7 @@ public class Parser {
     }
 
     private byte[] encryptBytes(@NonNull byte[] input) throws IOException {
-        if (encryptionProvider.isPayloadEncryptionEnabled()) {
+        if (encryptionProvider!=null && encryptionProvider.isPayloadEncryptionEnabled()) {
             MessageEncrypted m = new MessageEncrypted();
             m.setData(encryptionProvider.encrypt(input));
             return defaultMapper.writeValueAsBytes(m);

@@ -28,7 +28,7 @@ public class BindingConversions {
     @BindingConversion
     @InverseMethod("convertToInteger")
     public static String convertToString(@Nullable Integer d) {
-        return d != null ? d.toString() : EMPTY_STRING;
+        return d != null ? java.text.NumberFormat.getIntegerInstance().format(d) : EMPTY_STRING;
     }
 
     @BindingConversion

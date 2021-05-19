@@ -32,7 +32,7 @@ class SingletonModule {
     @Provides
     @Singleton
     fun provideOutgoingQueueIdlingResource(): CountingIdlingResource {
-        return CountingIdlingResource("outgoingQueueIdlingResource", true)
+        return CountingIdlingResource("outgoingQueueIdlingResource", false)
     }
 
     @Provides

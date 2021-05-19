@@ -224,6 +224,7 @@ dependencies {
     implementation("com.mikepenz:materialize:1.2.1@aar")
 
     implementation("com.jakewharton:process-phoenix:2.0.0")
+    implementation("com.squareup.tape2:tape:2.0.0-beta1")
 
     // These Java EE libs are no longer included in JDKs, so we include explicitly
     kapt("javax.xml.bind:jaxb-api:2.3.1")
