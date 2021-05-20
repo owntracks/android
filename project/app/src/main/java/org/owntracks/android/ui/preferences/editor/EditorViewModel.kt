@@ -2,10 +2,10 @@ package org.owntracks.android.ui.preferences.editor
 
 import android.os.Bundle
 import androidx.databinding.Bindable
+import dagger.hilt.android.scopes.ActivityScoped
 import org.owntracks.android.BR
 import org.owntracks.android.R
 import org.owntracks.android.data.repos.WaypointsRepo
-import org.owntracks.android.injection.scopes.PerActivity
 import org.owntracks.android.support.Parser
 import org.owntracks.android.support.Preferences
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel
@@ -13,7 +13,7 @@ import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
 
-@PerActivity
+@ActivityScoped
 class EditorViewModel @Inject constructor(
     private val preferences: Preferences,
     private val parser: Parser

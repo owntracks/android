@@ -2,19 +2,20 @@ package org.owntracks.android.ui.region;
 
 import android.os.Bundle;
 
-import org.owntracks.android.data.WaypointModel;
-import org.owntracks.android.data.repos.LocationRepo;
-import org.owntracks.android.data.repos.WaypointsRepo;
-import org.owntracks.android.injection.scopes.PerActivity;
-import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
-
-import javax.inject.Inject;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.Bindable;
 
-@PerActivity
+import org.owntracks.android.data.WaypointModel;
+import org.owntracks.android.data.repos.LocationRepo;
+import org.owntracks.android.data.repos.WaypointsRepo;
+import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
+
+import javax.inject.Inject;
+
+import dagger.hilt.android.scopes.ActivityScoped;
+
+@ActivityScoped
 public class RegionViewModel extends BaseViewModel<RegionMvvm.View> implements RegionMvvm.ViewModel<RegionMvvm.View> {
     private final LocationRepo locationRepo;
     private WaypointsRepo waypointsRepo;

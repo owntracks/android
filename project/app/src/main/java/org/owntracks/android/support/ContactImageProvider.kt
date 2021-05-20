@@ -8,16 +8,26 @@ import android.util.Base64
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import androidx.databinding.DataBindingComponent
+import dagger.hilt.DefineComponent
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.*
-import org.owntracks.android.injection.qualifier.AppContext
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.support.widgets.TextDrawable
 import timber.log.Timber
 import javax.inject.Inject
-import javax.inject.Singleton
+import javax.inject.Scope
 
-@Singleton
-class ContactImageProvider @Inject constructor(@AppContext context: Context) : DataBindingComponent {
+class ContactImageBindingAdapter @Inject constructor(@ApplicationContext context: Context) {
+    @BindingAdapter(value = ["contact"])
+    fun ImageView.displayFaceInViewAsync(c: FusedContact?) {
+        GlobalScope.launch(Dispatchers.Main) {
+            setImageBitmap(getBitmapFromCache(c))
+        }
+    }
+
     private val faceDimensions = (48 * (context.resources.displayMetrics.densityDpi / 160f)).toInt()
     fun invalidateCacheLevelCard(key: String?) {
         memoryCache.clearLevelCard(key)
@@ -104,18 +114,7 @@ class ContactImageProvider @Inject constructor(@AppContext context: Context) : D
         return bitmap
     }
 
-    @BindingAdapter("imageProvider", "contact")
-    fun displayFaceInViewAsync(view: ImageView, @Suppress("UNUSED_PARAMETER") imageProvider: Int?, c: FusedContact?) {
-        GlobalScope.launch(Dispatchers.Main) {
-            view.setImageBitmap(getBitmapFromCache(c))
-        }
-    }
-
     companion object {
         private val memoryCache: ContactBitmapMemoryCache = ContactBitmapMemoryCache()
-    }
-
-    override fun getContactImageProvider(): ContactImageProvider {
-        return this
     }
 }

@@ -8,8 +8,6 @@ import androidx.annotation.Nullable;
 import androidx.databinding.Bindable;
 
 import org.greenrobot.eventbus.Subscribe;
-import org.owntracks.android.injection.qualifier.AppContext;
-import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
@@ -22,9 +20,11 @@ import org.owntracks.android.ui.preferences.connection.dialog.ConnectionSecurity
 
 import javax.inject.Inject;
 
+import dagger.hilt.android.qualifiers.ApplicationContext;
+import dagger.hilt.android.scopes.ActivityScoped;
 import timber.log.Timber;
 
-@PerActivity
+@ActivityScoped
 public class ConnectionViewModel extends BaseViewModel<ConnectionMvvm.View> implements ConnectionMvvm.ViewModel<ConnectionMvvm.View> {
 
     private final Preferences preferences;
@@ -33,7 +33,7 @@ public class ConnectionViewModel extends BaseViewModel<ConnectionMvvm.View> impl
 
 
     @Inject
-    ConnectionViewModel(Preferences preferences,@AppContext Context context) {
+    ConnectionViewModel(Preferences preferences, @ApplicationContext Context context) {
         this.preferences = preferences;
         this.context = context;
     }
@@ -109,7 +109,7 @@ public class ConnectionViewModel extends BaseViewModel<ConnectionMvvm.View> impl
 
     @Override
     public ConnectionSecurityViewModel getConnectionSecurityViewModel() {
-        return new ConnectionSecurityViewModel(preferences, navigator,context);
+        return new ConnectionSecurityViewModel(preferences, navigator, context);
     }
 
     @Override

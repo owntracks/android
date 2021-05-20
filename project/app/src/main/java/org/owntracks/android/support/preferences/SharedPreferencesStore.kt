@@ -5,13 +5,15 @@ import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 import dagger.Binds
 import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import org.owntracks.android.R
-import org.owntracks.android.injection.qualifier.AppContext
-import javax.inject.Singleton
 import org.owntracks.android.services.MessageProcessorEndpointHttp
 import org.owntracks.android.services.MessageProcessorEndpointMqtt
 import java.util.*
 import javax.inject.Inject
+import javax.inject.Singleton
 
 private const val FILENAME_PRIVATE = "org.owntracks.android.preferences.private"
 private const val FILENAME_HTTP = "org.owntracks.android.preferences.http"
@@ -20,7 +22,7 @@ private const val FILENAME_HTTP = "org.owntracks.android.preferences.http"
  * Implements a PreferencesStore that uses a SharedPreferecnces as a backend.
  */
 @Singleton
-class SharedPreferencesStore @Inject constructor(@AppContext context: Context) : PreferencesStore {
+class SharedPreferencesStore @Inject constructor(@ApplicationContext context: Context) : PreferencesStore {
     private lateinit var sharedPreferencesName: String
     private val activeSharedPreferencesChangeListener = LinkedList<OnModeChangedPreferenceChangedListener>()
 
@@ -124,6 +126,7 @@ class SharedPreferencesStore @Inject constructor(@AppContext context: Context) :
     }
 }
 
+@InstallIn(SingletonComponent::class)
 @Module
 abstract class SharedPreferencesStoreModule {
     @Binds

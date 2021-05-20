@@ -10,6 +10,7 @@ import androidx.annotation.CallSuper;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ViewDataBinding;
@@ -24,9 +25,7 @@ import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
 
 import javax.inject.Inject;
 
-import dagger.android.support.DaggerAppCompatActivity;
-
-public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmViewModel> extends DaggerAppCompatActivity {
+public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmViewModel> extends AppCompatActivity {
 
     protected B binding;
     @Inject
@@ -55,7 +54,7 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
         if (viewModel == null) {
             throw new IllegalStateException("viewModel must not be null and should be injected via activityComponent().inject(this)");
         }
-        binding = DataBindingUtil.setContentView(this, layoutResId, dataBindingComponent);
+        binding = DataBindingUtil.setContentView(this, layoutResId);
         binding.setVariable(BR.vm, viewModel);
         binding.setLifecycleOwner(this);
 

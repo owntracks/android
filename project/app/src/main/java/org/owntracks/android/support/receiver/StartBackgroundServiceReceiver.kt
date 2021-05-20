@@ -1,20 +1,19 @@
 package org.owntracks.android.support.receiver
 
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import dagger.android.DaggerBroadcastReceiver
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.support.Preferences
 import timber.log.Timber
 import javax.inject.Inject
 
-class StartBackgroundServiceReceiver : DaggerBroadcastReceiver() {
+class StartBackgroundServiceReceiver : BroadcastReceiver() {
     @JvmField
     @Inject
     var preferences: Preferences? = null
     override fun onReceive(context: Context, intent: Intent) {
-        super.onReceive(context, intent)
         if (("android.intent.action.MY_PACKAGE_REPLACED" == intent.action ||
                         "android.intent.action.BOOT_COMPLETED" == intent.action)
                 && preferences!!.autostartOnBoot) {

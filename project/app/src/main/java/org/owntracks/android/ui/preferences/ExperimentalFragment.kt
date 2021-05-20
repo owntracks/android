@@ -2,12 +2,13 @@ package org.owntracks.android.ui.preferences
 
 import android.os.Bundle
 import androidx.preference.SwitchPreferenceCompat
+import dagger.hilt.android.AndroidEntryPoint
 import org.owntracks.android.R
-import org.owntracks.android.injection.scopes.PerFragment
 import org.owntracks.android.support.Preferences.Companion.EXPERIMENTAL_FEATURES
+import javax.inject.Inject
 
-@PerFragment
-class ExperimentalFragment : AbstractPreferenceFragment() {
+@AndroidEntryPoint
+class ExperimentalFragment @Inject constructor() : AbstractPreferenceFragment() {
     override fun onCreatePreferencesFix(savedInstanceState: Bundle?, rootKey: String?) {
         super.onCreatePreferencesFix(savedInstanceState, rootKey)
         setPreferencesFromResource(R.xml.preferences_experimental, rootKey)

@@ -6,14 +6,14 @@ import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.BatteryManager
-import org.owntracks.android.injection.qualifier.AppContext
-import javax.inject.Singleton
+import dagger.hilt.android.qualifiers.ApplicationContext
 import org.owntracks.android.model.BatteryStatus
 import org.owntracks.android.model.messages.MessageLocation
 import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
-class DeviceMetricsProvider @Inject internal constructor(@param:AppContext private val context: Context) {
+class DeviceMetricsProvider @Inject internal constructor(@ApplicationContext private val context: Context) {
     val batteryLevel: Int
         get() {
             val intentFilter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)

@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
+import dagger.hilt.android.AndroidEntryPoint
 import org.greenrobot.eventbus.EventBus
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiWelcomePlayBinding
@@ -14,6 +15,7 @@ import org.owntracks.android.support.Events
 import org.owntracks.android.ui.base.BaseSupportFragment
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class PlayFragment @Inject constructor() :
     BaseSupportFragment<UiWelcomePlayBinding?, PlayFragmentViewModel>(),
     PlayFragmentMvvm.View {

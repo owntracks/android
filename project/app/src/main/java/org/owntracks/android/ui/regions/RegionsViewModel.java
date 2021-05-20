@@ -2,16 +2,16 @@ package org.owntracks.android.ui.regions;
 
 import org.owntracks.android.data.WaypointModel;
 import org.owntracks.android.data.repos.WaypointsRepo;
-import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.services.LocationProcessor;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
 
 import javax.inject.Inject;
 
+import dagger.hilt.android.scopes.ActivityScoped;
 import io.objectbox.query.Query;
 import timber.log.Timber;
 
-@PerActivity
+@ActivityScoped
 public class RegionsViewModel extends BaseViewModel<RegionsMvvm.View> implements RegionsMvvm.ViewModel<RegionsMvvm.View> {
     private final LocationProcessor locationProcessor;
     private WaypointsRepo waypointsRepo;

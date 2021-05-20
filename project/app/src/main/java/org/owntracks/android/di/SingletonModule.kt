@@ -1,12 +1,15 @@
-package org.owntracks.android.injection.modules
+package org.owntracks.android.di
 
 import androidx.test.espresso.idling.CountingIdlingResource
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import org.greenrobot.eventbus.EventBus
 import org.owntracks.android.EventBusIndex
 import javax.inject.Singleton
 
+@InstallIn(SingletonComponent::class)
 @Module
 class SingletonModule {
     @Provides
@@ -18,7 +21,6 @@ class SingletonModule {
             .logNoSubscriberMessages(true)
             .build()
     }
-
 
     @Provides
     @Singleton

@@ -1,16 +1,13 @@
 package org.owntracks.android.services
 
-import android.app.Service
-import android.content.Context
-import dagger.Binds
 import dagger.Module
-import org.owntracks.android.injection.qualifier.ServiceContext
-import org.owntracks.android.injection.scopes.PerService
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ServiceComponent
 
+@InstallIn(ServiceComponent::class)
 @Module
 abstract class BackgroundServiceModule {
-    @Binds
-    @PerService
-    @ServiceContext
-    abstract fun bindServiceContext(service: Service): Context
+//    @Binds
+//    @ServiceScoped
+//    abstract fun bindServiceContext(service: Service): Context
 }

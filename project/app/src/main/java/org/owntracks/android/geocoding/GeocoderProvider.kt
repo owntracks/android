@@ -8,12 +8,12 @@ import android.widget.TextView
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_LOW
 import androidx.core.app.NotificationManagerCompat
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.owntracks.android.R
-import org.owntracks.android.injection.qualifier.AppContext
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.support.Preferences
@@ -27,12 +27,12 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class GeocoderProvider @Inject constructor(@AppContext val context: Context, val preferences: Preferences) {
+class GeocoderProvider @Inject constructor(@ApplicationContext val context: Context, val preferences: Preferences) {
     private var lastRateLimitedNotificationTime: Instant? = null
     private var notificationManager: NotificationManagerCompat
     private lateinit var geocoder: Geocoder
 
-    private fun setGeocoderProvider(@AppContext context: Context, preferences: Preferences) {
+    private fun setGeocoderProvider( context: Context, preferences: Preferences) {
         Timber.i("Setting geocoding provider to ${preferences.reverseGeocodeProvider}")
         geocoder = when (preferences.reverseGeocodeProvider) {
             Preferences.REVERSE_GEOCODE_PROVIDER_OPENCAGE -> OpenCageGeocoder(preferences.openCageGeocoderApiKey)

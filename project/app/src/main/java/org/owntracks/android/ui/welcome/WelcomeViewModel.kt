@@ -3,18 +3,18 @@ package org.owntracks.android.ui.welcome
 import android.content.Intent
 import androidx.databinding.Bindable
 import androidx.lifecycle.MutableLiveData
+import dagger.hilt.android.scopes.ActivityScoped
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import org.owntracks.android.BR
-import org.owntracks.android.injection.scopes.PerActivity
 import org.owntracks.android.support.Events
 import org.owntracks.android.support.Preferences
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel
 import org.owntracks.android.ui.map.MapActivity
 import javax.inject.Inject
 
-@PerActivity
+@ActivityScoped
 class WelcomeViewModel @Inject constructor(private val preferences: Preferences, private val eventBus: EventBus) : BaseViewModel<WelcomeMvvm.View?>() {
     var currentFragmentPosition: MutableLiveData<Int> = MutableLiveData(0)
 

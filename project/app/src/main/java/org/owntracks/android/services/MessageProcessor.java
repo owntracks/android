@@ -11,7 +11,6 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.data.repos.WaypointsRepo;
-import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.model.messages.MessageBase;
 import org.owntracks.android.model.messages.MessageCard;
 import org.owntracks.android.model.messages.MessageClear;
@@ -42,6 +41,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import dagger.Lazy;
+import dagger.hilt.android.qualifiers.ApplicationContext;
 import timber.log.Timber;
 
 @Singleton
@@ -72,7 +72,7 @@ public class MessageProcessor {
 
     @Inject
     public MessageProcessor(
-            @AppContext Context applicationContext,
+            @ApplicationContext Context applicationContext,
             EventBus eventBus,
             ContactsRepo contactsRepo,
             Preferences preferences,

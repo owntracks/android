@@ -3,11 +3,11 @@ package org.owntracks.android.support
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
+import dagger.hilt.android.qualifiers.ApplicationContext
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions
 import org.greenrobot.eventbus.EventBus
 import org.owntracks.android.BuildConfig
 import org.owntracks.android.R
-import org.owntracks.android.injection.qualifier.AppContext
 import org.owntracks.android.model.messages.MessageConfiguration
 import org.owntracks.android.services.LocationProcessor
 import org.owntracks.android.services.MessageProcessorEndpointHttp
@@ -28,8 +28,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class Preferences @Inject constructor(@AppContext c: Context, private val eventBus: EventBus?, private val preferencesStore: PreferencesStore) {
-    private val context: Context = c
+class Preferences @Inject constructor(@ApplicationContext applicationContext: Context, private val eventBus: EventBus?, private val preferencesStore: PreferencesStore) {
+    private val context: Context = applicationContext
     private var isFirstStart = false
     private var currentMode = MessageProcessorEndpointMqtt.MODE_ID
 

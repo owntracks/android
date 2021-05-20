@@ -13,6 +13,7 @@ import androidx.core.app.ShareCompat
 import com.google.android.material.snackbar.Snackbar
 import com.rengwuxian.materialedittext.MaterialAutoCompleteTextView
 import com.rengwuxian.materialedittext.MaterialEditText
+import dagger.hilt.android.AndroidEntryPoint
 import org.greenrobot.eventbus.EventBus
 import org.owntracks.android.BuildConfig
 import org.owntracks.android.R
@@ -25,6 +26,7 @@ import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class EditorActivity :
     BaseActivity<UiPreferencesEditorBinding?, EditorMvvm.ViewModel<EditorMvvm.View?>?>(),
     EditorMvvm.View {
