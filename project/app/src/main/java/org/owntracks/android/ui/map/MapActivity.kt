@@ -28,6 +28,7 @@ import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.idling.CountingIdlingResource
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -47,7 +48,7 @@ import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.services.BackgroundService.BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG
 import org.owntracks.android.services.LocationProcessor
 import org.owntracks.android.services.MessageProcessorEndpointHttp
-import org.owntracks.android.support.ContactImageProvider
+import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.support.Events.PermissionGranted
 import org.owntracks.android.support.Preferences.Companion.EXPERIMENTAL_FEATURE_USE_OSM_MAP
 import org.owntracks.android.support.RequirementsChecker
@@ -62,7 +63,10 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
-class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>?>(), MapMvvm.View, View.OnClickListener, View.OnLongClickListener, PopupMenu.OnMenuItemClickListener, Observer<Any?> {
+@AndroidEntryPoint
+class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>?>(), MapMvvm.View,
+    View.OnClickListener, View.OnLongClickListener, PopupMenu.OnMenuItemClickListener,
+    Observer<Any?> {
     lateinit var locationLifecycleObserver: LocationLifecycleObserver
     private var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>? = null
     private var menu: Menu? = null
@@ -71,44 +75,37 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
 
     internal lateinit var mapLocationSource: LocationSource
 
-    @JvmField
     @Inject
-    var locationRepo: LocationRepo? = null
+    lateinit var locationRepo: LocationRepo
 
-    @JvmField
     @Inject
-    var runThingsOnOtherThreads: RunThingsOnOtherThreads? = null
+    lateinit var runThingsOnOtherThreads: RunThingsOnOtherThreads
 
-    @JvmField
     @Inject
-    var contactImageProvider: ContactImageProvider? = null
+    lateinit var contactImageBindingAdapter: ContactImageBindingAdapter
 
-    @JvmField
     @Inject
-    var eventBus: EventBus? = null
+    lateinit var eventBus: EventBus
 
-    @JvmField
     @Inject
-    var geocoderProvider: GeocoderProvider? = null
+    lateinit var geocoderProvider: GeocoderProvider
 
-    @JvmField
     @Inject
-    var countingIdlingResource: CountingIdlingResource? = null
+    lateinit var countingIdlingResource: CountingIdlingResource
 
-    @JvmField
     @Inject
-    var navigator: Navigator? = null
+    lateinit var navigator: Navigator
 
-    @JvmField
     @Inject
-    var requirementsChecker: RequirementsChecker? = null
+    lateinit var requirementsChecker: RequirementsChecker
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (!preferences.isSetupCompleted) {
-            navigator!!.startActivity(WelcomeActivity::class.java)
+            navigator.startActivity(WelcomeActivity::class.java)
             finish()
         }
-        bindAndAttachContentView(R.layout.ui_map, savedInstanceState, contactImageProvider)
+        bindAndAttachContentView(R.layout.ui_map, savedInstanceState)
 
         binding?.also {
             setSupportToolbar(it.toolbar, false, true)
@@ -133,7 +130,8 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         lifecycle.addObserver(locationLifecycleObserver)
 
         locationProviderClient = LocationServices.getLocationProviderClient(this, preferences)
-        mapLocationSource = MapLocationSource(locationProviderClient!!, viewModel!!.mapLocationUpdateCallback)
+        mapLocationSource =
+            MapLocationSource(locationProviderClient!!, viewModel!!.mapLocationUpdateCallback)
 
         if (savedInstanceState == null) {
             mapFragment = getMapFragment()
@@ -175,35 +173,51 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         }
 
         // We've been started in the foreground, so cancel the background restriction notification
-        NotificationManagerCompat.from(this).cancel(BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG, 0)
+        NotificationManagerCompat.from(this)
+            .cancel(BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG, 0)
     }
 
     private fun getMapFragment() =
-            if (preferences.isExperimentalFeatureEnabled(EXPERIMENTAL_FEATURE_USE_OSM_MAP)) {
-                OSMMapFragment()
-            } else {
-                when (FLAVOR) {
-                    "gms" -> GoogleMapFragment(mapLocationSource, locationRepo)
-                    else -> OSMMapFragment()
-                }
+        if (preferences.isExperimentalFeatureEnabled(EXPERIMENTAL_FEATURE_USE_OSM_MAP)) {
+            OSMMapFragment()
+        } else {
+            when (FLAVOR) {
+                "gms" -> GoogleMapFragment(mapLocationSource, locationRepo)
+                else -> OSMMapFragment()
             }
+        }
 
     internal fun checkAndRequestLocationPermissions(): Boolean {
-        if (!requirementsChecker!!.isPermissionCheckPassed()) {
+        if (!requirementsChecker.isPermissionCheckPassed()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
                     val currentActivity: Activity = this
                     AlertDialog.Builder(this)
-                            .setCancelable(true)
-                            .setMessage(R.string.permissions_description)
-                            .setPositiveButton("OK"
-                            ) { _: DialogInterface?, _: Int -> ActivityCompat.requestPermissions(currentActivity, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), PERMISSIONS_REQUEST_CODE) }
-                            .show()
+                        .setCancelable(true)
+                        .setMessage(R.string.permissions_description)
+                        .setPositiveButton(
+                            "OK"
+                        ) { _: DialogInterface?, _: Int ->
+                            ActivityCompat.requestPermissions(
+                                currentActivity,
+                                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                                PERMISSIONS_REQUEST_CODE
+                            )
+                        }
+                        .show()
                 } else {
-                    ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), PERMISSIONS_REQUEST_CODE)
+                    ActivityCompat.requestPermissions(
+                        this,
+                        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                        PERMISSIONS_REQUEST_CODE
+                    )
                 }
             } else {
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), PERMISSIONS_REQUEST_CODE)
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                    PERMISSIONS_REQUEST_CODE
+                )
             }
             return false
         } else {
@@ -218,13 +232,22 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
             binding!!.contactPeek.name.text = fusedContact.fusedName
             if (fusedContact.hasLocation()) {
                 GlobalScope.launch(Dispatchers.Main) {
-                    contactImageProvider?.run {
+                    contactImageBindingAdapter.run {
                         binding!!.contactPeek.image.setImageBitmap(getBitmapFromCache(fusedContact))
                     }
                 }
-                geocoderProvider!!.resolve(fusedContact.messageLocation.value!!, binding!!.contactPeek.location)
-                BindingConversions.setRelativeTimeSpanString(binding!!.contactPeek.locationDate, fusedContact.tst)
-                binding!!.acc.text = String.format(Locale.getDefault(), "%s m", fusedContact.fusedLocationAccuracy)
+                geocoderProvider.resolve(
+                    fusedContact.messageLocation.value!!,
+                    binding!!.contactPeek.location
+                )
+                BindingConversions.setRelativeTimeSpanString(
+                    binding!!.contactPeek.locationDate,
+                    fusedContact.tst
+                )
+                binding!!.acc.text = getString(
+                    R.string.contactDetailsAccuracyValue,
+                    fusedContact.fusedLocationAccuracy
+                )
                 binding!!.tid.text = fusedContact.trackerId
                 binding!!.id.text = fusedContact.id
                 if (viewModel!!.currentLocation.value != null) {
@@ -232,12 +255,16 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
                     binding!!.distanceLabel.visibility = View.VISIBLE
                     val distance = FloatArray(2)
                     Location.distanceBetween(
-                            viewModel!!.currentLocation.value!!.latitude,
-                            viewModel!!.currentLocation.value!!.longitude,
-                            fusedContact.latLng.latitude,
-                            fusedContact.latLng.longitude,
-                            distance)
-                    binding!!.distance.text = String.format(Locale.getDefault(), "%d m", distance[0].roundToInt())
+                        viewModel!!.currentLocation.value!!.latitude,
+                        viewModel!!.currentLocation.value!!.longitude,
+                        fusedContact.latLng.latitude,
+                        fusedContact.latLng.longitude,
+                        distance
+                    )
+                    binding!!.distance.text = getString(
+                        R.string.contactDetailsDistanceValue,
+                        distance[0].roundToInt()
+                    )
                 } else {
                     binding!!.distance.visibility = View.GONE
                     binding!!.distanceLabel.visibility = View.GONE
@@ -251,12 +278,18 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
 
     override fun onResume() {
         if (FLAVOR == "gms") {
-            if (mapFragment is GoogleMapFragment && preferences.isExperimentalFeatureEnabled(EXPERIMENTAL_FEATURE_USE_OSM_MAP)) {
+            if (mapFragment is GoogleMapFragment && preferences.isExperimentalFeatureEnabled(
+                    EXPERIMENTAL_FEATURE_USE_OSM_MAP
+                )
+            ) {
                 mapFragment = OSMMapFragment()
                 supportFragmentManager.commit(true) {
                     this.replace(R.id.mapFragment, mapFragment)
                 }
-            } else if (mapFragment is OSMMapFragment && !preferences.isExperimentalFeatureEnabled(EXPERIMENTAL_FEATURE_USE_OSM_MAP)) {
+            } else if (mapFragment is OSMMapFragment && !preferences.isExperimentalFeatureEnabled(
+                    EXPERIMENTAL_FEATURE_USE_OSM_MAP
+                )
+            ) {
                 mapFragment = GoogleMapFragment(mapLocationSource, locationRepo)
                 supportFragmentManager.commit(true) {
                     this.replace(R.id.mapFragment, mapFragment)
@@ -270,7 +303,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
 
     private fun handleIntentExtras(intent: Intent) {
         Timber.v("handleIntentExtras")
-        val b = navigator!!.getExtrasBundle(intent)
+        val b = navigator.getExtrasBundle(intent)
         if (b != null) {
             Timber.v("intent has extras from drawerProvider")
             val contactId = b.getString(BUNDLE_KEY_CONTACT_ID)
@@ -387,7 +420,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         Timber.v("updating marker for contact: %s", contact.id)
         mapFragment.updateMarker(contact.id, contact.latLng)
         GlobalScope.launch(Dispatchers.Main) {
-            contactImageProvider?.run {
+            contactImageBindingAdapter.run {
                 getBitmapFromCache(contact)?.let {
                     mapFragment.setMarkerImage(contact.id, it)
                 }
@@ -410,14 +443,19 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
             if (c != null && c.hasLocation()) {
                 try {
                     val l = c.latLng.toGMSLatLng()
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("google.navigation:q=${l.latitude},${l.longitude}"))
+                    val intent = Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("google.navigation:q=${l.latitude},${l.longitude}")
+                    )
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     startActivity(intent)
                 } catch (e: ActivityNotFoundException) {
-                    Toast.makeText(this, getString(R.string.noNavigationApp), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.noNavigationApp), Toast.LENGTH_SHORT)
+                        .show()
                 }
             } else {
-                Toast.makeText(this, getString(R.string.contactLocationUnknown), Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.contactLocationUnknown), Toast.LENGTH_SHORT)
+                    .show()
             }
             return true
         } else if (itemId == R.id.menu_clear) {
@@ -459,11 +497,15 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         popupMenu.show()
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == PERMISSIONS_REQUEST_CODE && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             mapFragment.locationPermissionGranted()
-            eventBus!!.postSticky(PermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION))
+            eventBus.postSticky(PermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION))
         }
     }
 
@@ -476,7 +518,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         get() = binding?.vm?.locationIdlingResource
 
     @get:VisibleForTesting
-    val outgoingQueueIdlingResource: IdlingResource?
+    val outgoingQueueIdlingResource: IdlingResource
         get() = countingIdlingResource
 
     companion object {

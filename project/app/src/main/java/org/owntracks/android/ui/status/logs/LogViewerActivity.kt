@@ -22,6 +22,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ShareCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -35,6 +36,7 @@ import org.owntracks.android.ui.base.viewmodel.NoOpViewModel
 import timber.log.Timber
 import java.util.*
 
+@AndroidEntryPoint
 class LogViewerActivity : BaseActivity<UiPreferencesLogsBinding, NoOpViewModel>(), MvvmView {
     private val shareIntentActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         revokeExportUriPermissions()
@@ -137,10 +139,6 @@ class LogViewerActivity : BaseActivity<UiPreferencesLogsBinding, NoOpViewModel>(
             revokeUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
             logExportUri = null
         }
-    }
-
-    companion object {
-        private const val SHARE_ACTIVITY_REQUEST = 45043
     }
 }
 

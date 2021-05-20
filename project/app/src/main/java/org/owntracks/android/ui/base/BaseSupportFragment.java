@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ViewDataBinding;
+import androidx.fragment.app.Fragment;
 
 import org.owntracks.android.BR;
 import org.owntracks.android.ui.base.navigator.Navigator;
@@ -19,9 +20,7 @@ import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
 
 import javax.inject.Inject;
 
-import dagger.android.support.DaggerFragment;
-
-public abstract class BaseSupportFragment<B extends ViewDataBinding, V extends MvvmViewModel> extends DaggerFragment {
+public abstract class BaseSupportFragment<B extends ViewDataBinding, V extends MvvmViewModel> extends Fragment {
 
     protected B binding;
     @Inject protected V viewModel;

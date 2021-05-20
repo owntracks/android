@@ -8,14 +8,14 @@ import org.greenrobot.eventbus.ThreadMode
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageLocation
-import org.owntracks.android.support.ContactImageProvider
+import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.support.Events.*
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class MemoryContactsRepo @Inject constructor(private val eventBus: EventBus, private val contactImageProvider: ContactImageProvider) : ContactsRepo {
+class MemoryContactsRepo @Inject constructor(private val eventBus: EventBus, private val contactImageBindingAdapter: ContactImageBindingAdapter) : ContactsRepo {
     override val all = MutableLiveData<MutableMap<String, FusedContact>>(mutableMapOf())
     private var majorRevision: Long = 0
     override var revision: Long = 0
@@ -39,7 +39,7 @@ class MemoryContactsRepo @Inject constructor(private val eventBus: EventBus, pri
         all.value!!.clear()
         majorRevision -= MAJOR_STEP
         revision = 0
-        contactImageProvider.invalidateCache()
+        contactImageBindingAdapter.invalidateCache()
     }
 
     @Synchronized
@@ -59,13 +59,13 @@ class MemoryContactsRepo @Inject constructor(private val eventBus: EventBus, pri
         var c = getById(id)
         if (c != null) {
             c.messageCard = messageCard
-            contactImageProvider.invalidateCacheLevelCard(c.id)
+            contactImageBindingAdapter.invalidateCacheLevelCard(c.id)
             revision++
             eventBus.post(c)
         } else {
             c = FusedContact(id)
             c.messageCard = messageCard
-            contactImageProvider.invalidateCacheLevelCard(c.id)
+            contactImageBindingAdapter.invalidateCacheLevelCard(c.id)
             put(id, c)
             revision++
             eventBus.post(FusedContactAdded(c))

@@ -10,7 +10,6 @@ import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 
-import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.support.Preferences;
 
 import java.util.concurrent.TimeUnit;
@@ -18,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import dagger.hilt.android.qualifiers.ApplicationContext;
 import timber.log.Timber;
 
 @Singleton
@@ -36,7 +36,7 @@ public class Scheduler {
     Preferences preferences;
 
     @Inject
-    public Scheduler(@AppContext Context context) {
+    public Scheduler(@ApplicationContext Context context) {
         this.context = context;
     }
 

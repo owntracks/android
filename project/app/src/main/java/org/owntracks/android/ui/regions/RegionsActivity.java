@@ -18,10 +18,12 @@ import org.owntracks.android.ui.region.RegionActivity;
 
 import javax.inject.Inject;
 
+import dagger.hilt.android.AndroidEntryPoint;
 import io.objectbox.android.AndroidScheduler;
 import io.objectbox.reactive.DataSubscription;
 import timber.log.Timber;
 
+@AndroidEntryPoint
 public class RegionsActivity extends BaseActivity<UiRegionsBinding, RegionsMvvm.ViewModel<RegionsMvvm.View>> implements RegionsMvvm.View, RegionsAdapter.ClickListener {
 
     @Inject

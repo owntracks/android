@@ -1,5 +1,6 @@
 plugins {
     id("com.android.application")
+    id("dagger.hilt.android.plugin")
     id("com.github.triplet.play") version "3.4.0-agp4.2"
     kotlin("android")
     kotlin("kapt")
@@ -97,6 +98,9 @@ android {
         exclude("META-INF/dependencies.txt")
         exclude("META-INF/LGPL2.1")
         exclude("META-INF/proguard/androidx-annotations.pro")
+        exclude("META-INF/metadata.kotlin_module")
+        exclude("META-INF/metadata.jvm.kotlin_module")
+        exclude("META-INF/gradle/incremental.annotation.processors")
         jniLibs.useLegacyPackaging = false
     }
 
@@ -189,9 +193,8 @@ dependencies {
     implementation("org.osmdroid:osmdroid-android:6.1.10")
 
     // Utility libraries
-    implementation("com.google.dagger:dagger:${daggerVersion}")
-    implementation("com.google.dagger:dagger-android-support:${daggerVersion}")
-    implementation("com.google.dagger:dagger-android:${daggerVersion}")
+    implementation("com.google.dagger:hilt-compiler:${daggerVersion}")
+    implementation("com.google.dagger:hilt-android:${daggerVersion}")
 
     implementation("org.greenrobot:eventbus:3.2.0")
     implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
@@ -229,11 +232,9 @@ dependencies {
 
     // Preprocessors
     kapt("org.greenrobot:eventbus-annotation-processor:3.2.0")
-    kapt("com.google.dagger:dagger-compiler:${daggerVersion}")
-    kapt("com.google.dagger:dagger-android-processor:${daggerVersion}")
+    kapt("com.google.dagger:hilt-compiler:$daggerVersion")
 
-    kaptTest("com.google.dagger:dagger-compiler:${daggerVersion}")
-    kaptTest("com.google.dagger:dagger-android-processor:${daggerVersion}")
+    kaptTest("com.google.dagger:hilt-compiler:${daggerVersion}")
 
     testImplementation("androidx.test:core:${androidxTestVersion}")
     testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")

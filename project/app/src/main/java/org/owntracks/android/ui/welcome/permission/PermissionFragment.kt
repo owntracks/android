@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import dagger.hilt.android.AndroidEntryPoint
 import org.greenrobot.eventbus.EventBus
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiWelcomeIntroBinding
@@ -19,6 +20,7 @@ import org.owntracks.android.support.Events
 import org.owntracks.android.ui.base.BaseSupportFragment
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class PermissionFragment @Inject constructor() :
     BaseSupportFragment<UiWelcomeIntroBinding?, PermissionFragmentViewModel>(),
     PermissionFragmentMvvm.View {

@@ -1,13 +1,13 @@
 package org.owntracks.android.ui.preferences.about
 
-import androidx.appcompat.app.AppCompatActivity
-import dagger.Binds
 import dagger.Module
-import org.owntracks.android.injection.scopes.PerActivity
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ActivityComponent
 
+@InstallIn(ActivityComponent::class)
 @Module
 abstract class AboutActivityModule {
-    @Binds
-    @PerActivity
-    abstract fun bindActivity(a: AboutActivity?): AppCompatActivity?
+//    @Binds
+//    @ActivityScoped
+//    abstract fun bindActivity(a: AboutActivity?): AppCompatActivity?
 }

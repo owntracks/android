@@ -8,31 +8,30 @@ import android.net.Uri
 import android.os.ParcelFileDescriptor
 import android.provider.OpenableColumns
 import android.widget.Toast
-import dagger.android.AndroidInjection
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
 import org.owntracks.android.R
 import org.owntracks.android.data.repos.WaypointsRepo
 import org.owntracks.android.support.Parser
 import org.owntracks.android.support.Preferences
 import timber.log.Timber
 import java.io.FileOutputStream
-import javax.inject.Inject
 
 class ExportedConfigContentProvider : ContentProvider() {
     private var exportedConfigJson: String = "{}"
 
-    @Inject
-    lateinit var preferences: Preferences
-
-    @Inject
-    lateinit var waypointsRepo: WaypointsRepo
-
-    @Inject
-    lateinit var parser: Parser
-
-    override fun onCreate(): Boolean {
-        AndroidInjection.inject(this)
-        return true
+    @EntryPoint
+    @InstallIn(SingletonComponent::class)
+    interface ExportedConfigContentProviderEntryPoint {
+        fun preferences(): Preferences
+        fun waypointsRepo(): WaypointsRepo
+        fun parser(): Parser
     }
+
+
+    override fun onCreate(): Boolean = true
 
     override fun query(
         uri: Uri,
@@ -41,6 +40,15 @@ class ExportedConfigContentProvider : ContentProvider() {
         selectionArgs: Array<out String>?,
         sortOrder: String?
     ): Cursor {
+        val appContext = context?.applicationContext ?: throw IllegalStateException()
+        val hiltEntryPoint = EntryPointAccessors.fromApplication(
+            appContext,
+            ExportedConfigContentProviderEntryPoint::class.java
+        )
+        val preferences = hiltEntryPoint.preferences()
+        val waypointsRepo = hiltEntryPoint.waypointsRepo()
+        val parser = hiltEntryPoint.parser()
+
         val configurationMessage = preferences.exportToMessage()
         configurationMessage.waypoints = waypointsRepo.exportToMessage()
         exportedConfigJson = parser.toJsonPlainPretty(configurationMessage)

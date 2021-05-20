@@ -16,6 +16,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import dagger.hilt.android.AndroidEntryPoint
 import org.owntracks.android.R
 import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.databinding.GoogleMapFragmentBinding
@@ -25,7 +26,7 @@ import org.owntracks.android.location.LocationSource
 import timber.log.Timber
 import java.util.*
 
-
+@AndroidEntryPoint
 class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallback {
     constructor(locationSource: LocationSource, locationRepo: LocationRepo?) : this() {
         this.locationSource = locationSource

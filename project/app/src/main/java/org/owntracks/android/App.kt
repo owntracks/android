@@ -1,5 +1,6 @@
 package org.owntracks.android
 
+import android.app.Application
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -7,17 +8,20 @@ import android.content.Context
 import android.os.Build
 import android.os.StrictMode
 import androidx.core.app.NotificationManagerCompat
+import androidx.databinding.DataBindingUtil
 import androidx.work.Configuration
 import androidx.work.WorkManager
 import androidx.work.WorkerFactory
 import dagger.Binds
 import dagger.Module
-import dagger.android.AndroidInjector
-import dagger.android.support.DaggerApplication
+import dagger.hilt.EntryPoints
+import dagger.hilt.InstallIn
+import dagger.hilt.android.HiltAndroidApp
+import dagger.hilt.components.SingletonComponent
 import org.conscrypt.Conscrypt
+import org.owntracks.android.di.CustomBindingComponentBuilder
+import org.owntracks.android.di.CustomBindingEntryPoint
 import org.owntracks.android.geocoding.GeocoderProvider
-import org.owntracks.android.injection.components.DaggerAppComponent
-import org.owntracks.android.injection.qualifier.AppContext
 import org.owntracks.android.logging.TimberInMemoryLogTree
 import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.services.worker.Scheduler
@@ -26,9 +30,13 @@ import org.owntracks.android.support.RunThingsOnOtherThreads
 import timber.log.Timber
 import java.security.Security
 import javax.inject.Inject
+import javax.inject.Provider
 import javax.inject.Singleton
 
-class App : DaggerApplication() {
+@HiltAndroidApp
+class App : Application() {
+
+    // STOPSHIP: 20/05/2021 uncomment this lot
     @Inject
     lateinit var preferences: Preferences
 
@@ -44,6 +52,9 @@ class App : DaggerApplication() {
     @Inject
     lateinit var scheduler: Scheduler
 
+    @Inject
+    lateinit var bindingComponentProvider: Provider<CustomBindingComponentBuilder>
+
     override fun onCreate() {
         // Make sure we use Conscrypt for advanced TLS features on all devices.
         // X509ExtendedTrustManager not available pre-24, fall back to device. https://github.com/google/conscrypt/issues/603
@@ -54,6 +65,14 @@ class App : DaggerApplication() {
         }
 
         super.onCreate()
+
+        val dataBindingComponent = bindingComponentProvider.get().build()
+        val dataBindingEntryPoint = EntryPoints.get(
+            dataBindingComponent, CustomBindingEntryPoint::class.java
+        )
+
+        DataBindingUtil.setDefaultComponent(dataBindingEntryPoint)
+
         WorkManager.initialize(this, Configuration.Builder().setWorkerFactory(workerFactory).build())
         scheduler.cancelAllTasks()
         Timber.plant(TimberInMemoryLogTree(BuildConfig.DEBUG))
@@ -117,22 +136,8 @@ class App : DaggerApplication() {
         }
     }
 
-    override fun applicationInjector(): AndroidInjector<out DaggerApplication> {
-        val appComponent = DaggerAppComponent.builder().app(this).build()
-        appComponent.inject(this)
-        return appComponent
-    }
-
     companion object {
         const val NOTIFICATION_CHANNEL_ONGOING = "O"
         const val NOTIFICATION_CHANNEL_EVENTS = "E"
     }
-}
-
-@Module
-abstract class AppContextModule {
-    @Binds
-    @AppContext
-    @Singleton
-    abstract fun provideContext(app: App): Context
 }

@@ -1,15 +1,16 @@
 package org.owntracks.android.ui.preferences.load
 
-import androidx.appcompat.app.AppCompatActivity
 import dagger.Binds
 import dagger.Module
-import org.owntracks.android.injection.scopes.PerActivity
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ActivityComponent
 
+@InstallIn(ActivityComponent::class)
 @Module
 abstract class LoadActivityModule {
-    @Binds
-    @PerActivity
-    abstract fun bindActivity(a: LoadActivity?): AppCompatActivity?
+//    @Binds
+//    @ActivityScoped
+//    abstract fun bindActivity(a: LoadActivity?): AppCompatActivity?
 
     @Binds
     abstract fun bindViewModel(viewModel: LoadViewModel): LoadMvvm.ViewModel<LoadMvvm.View>?

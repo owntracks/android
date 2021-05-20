@@ -13,7 +13,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.owntracks.android.model.messages.MessageLocation
-import org.owntracks.android.support.ContactImageProvider
+import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.support.Events.EndpointChanged
 import org.owntracks.android.support.Events.ModeChanged
 
@@ -41,7 +41,7 @@ class MemoryContactsRepoTest {
             on { resources } doReturn mockResources
             on { packageName } doReturn javaClass.canonicalName
         }
-        val contactImageProvider = ContactImageProvider(mockContext)
+        val contactImageBindingAdapter = ContactImageBindingAdapter(mockContext)
 
         messageLocation = MessageLocation()
         messageLocation.accuracy = 10
@@ -51,7 +51,7 @@ class MemoryContactsRepoTest {
         messageLocation.latitude = 50.1
         messageLocation.longitude = 60.2
         messageLocation.timestamp = 123456789
-        contactsRepo = MemoryContactsRepo(eventBus, contactImageProvider)
+        contactsRepo = MemoryContactsRepo(eventBus, contactImageBindingAdapter)
     }
 
     @Test

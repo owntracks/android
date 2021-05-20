@@ -1,7 +1,6 @@
 package org.owntracks.android.geocoding
 
 
-import androidx.collection.LruCache
 import timber.log.Timber
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -25,15 +24,3 @@ abstract class CachingGeocoder : Geocoder {
     protected abstract fun doLookup(latitude: BigDecimal, longitude: BigDecimal): GeocodeResult
 }
 
-class GeocoderLRUCache(maxSize: Int) : LruCache<Pair<BigDecimal, BigDecimal>, GeocodeResult>(maxSize) {
-    fun computeAndOnlyStoreNonErrors(key: Pair<BigDecimal, BigDecimal>, resolverFunction: ((BigDecimal, BigDecimal) -> GeocodeResult)): GeocodeResult {
-        if (this[key] != null) {
-            return this[key]!!
-        }
-        val result = resolverFunction(key.first, key.second)
-        if (result is GeocodeResult.Formatted || result is GeocodeResult.Empty) {
-            this.put(key, result)
-        }
-        return result
-    }
-}

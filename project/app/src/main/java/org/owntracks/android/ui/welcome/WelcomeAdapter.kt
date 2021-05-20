@@ -3,11 +3,11 @@ package org.owntracks.android.ui.welcome
 import android.os.Build
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import org.owntracks.android.injection.scopes.PerActivity
+import dagger.hilt.android.scopes.ActivityScoped
 import org.owntracks.android.support.RequirementsChecker
 import java.util.*
 
-@PerActivity
+@ActivityScoped
 class WelcomeAdapter constructor(welcomeActivity: WelcomeActivity, private val requirementsChecker: RequirementsChecker) : FragmentStateAdapter(welcomeActivity) {
     private val fragments = ArrayList<Fragment>()
     fun setupFragments(introFragment: Fragment, versionFragment: Fragment, playFragment: Fragment, permissionFragment: Fragment, finishFragment: Fragment) {

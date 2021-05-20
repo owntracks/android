@@ -1,28 +1,29 @@
 package org.owntracks.android.ui.map
 
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import dagger.Binds
 import dagger.Module
-import dagger.android.ContributesAndroidInjector
-import org.owntracks.android.injection.scopes.PerActivity
-import org.owntracks.android.injection.scopes.PerFragment
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.scopes.ActivityScoped
 import org.owntracks.android.ui.map.osm.OSMMapFragment
-import org.owntracks.android.ui.map.osm.OSMMapFragmentModule
 
+@InstallIn(ActivityComponent::class)
 @Module
 abstract class MapActivityModule {
-    @Binds
-    @PerActivity
-    abstract fun bindActivity(a: MapActivity?): AppCompatActivity?
+//    @Binds
+//    @ActivityScoped
+//    abstract fun bindActivity(a: MapActivity?): AppCompatActivity?
 
     @Binds
+    @ActivityScoped
     abstract fun bindViewModel(viewModel: MapViewModel): MapMvvm.ViewModel<MapMvvm.View>
 
-    @PerFragment
-    @ContributesAndroidInjector(modules = [GoogleMapFragmentModule::class])
-    abstract fun bindGoogleMapFragment(): GoogleMapFragment?
+    @Binds
+    @ActivityScoped
+    abstract fun bindGoogleMapFragment(googleMapFragment: GoogleMapFragment): Fragment
 
-    @PerFragment
-    @ContributesAndroidInjector(modules = [OSMMapFragmentModule::class])
-    abstract fun bindOSMMapFragment(): OSMMapFragment?
+    @Binds
+    @ActivityScoped
+    abstract fun bindOSMMapFragment(osmMapFragment: OSMMapFragment): Fragment
 }

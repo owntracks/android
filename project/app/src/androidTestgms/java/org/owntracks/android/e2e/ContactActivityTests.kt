@@ -62,7 +62,7 @@ class ContactActivityTests {
     @After
     fun unregisterIdlingResource() {
         baristaRule.activityTestRule.activity.locationIdlingResource?.run { IdlingRegistry.getInstance().unregister(this) }
-        baristaRule.activityTestRule.activity.outgoingQueueIdlingResource?.run { IdlingRegistry.getInstance().unregister(this) }
+        baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.run { IdlingRegistry.getInstance().unregister(this) }
     }
 
     private val locationResponse = """

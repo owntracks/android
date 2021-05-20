@@ -4,12 +4,12 @@ import android.content.Context
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.Looper
-import org.owntracks.android.injection.qualifier.AppContext
-import javax.inject.Singleton
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
-class RunThingsOnOtherThreads @Inject constructor(@AppContext appContext: Context) {
+class RunThingsOnOtherThreads @Inject constructor(@ApplicationContext appContext: Context) {
     private val backgroundHandler: Handler
     private val mainHandler: Handler
     private val networkHandler: Handler

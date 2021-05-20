@@ -15,6 +15,9 @@ import org.owntracks.android.ui.base.navigator.Navigator;
 
 import javax.inject.Inject;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class RegionActivity extends BaseActivity<UiRegionBinding, RegionMvvm.ViewModel<RegionMvvm.View>> implements RegionMvvm.View {
     @Inject
     Navigator navigator;

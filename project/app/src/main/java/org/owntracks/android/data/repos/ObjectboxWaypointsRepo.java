@@ -9,7 +9,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.data.MyObjectBox;
 import org.owntracks.android.data.WaypointModel;
 import org.owntracks.android.data.WaypointModel_;
-import org.owntracks.android.injection.qualifier.AppContext;
 import org.owntracks.android.support.Preferences;
 
 import java.util.Arrays;
@@ -18,6 +17,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import dagger.hilt.android.qualifiers.ApplicationContext;
 import io.objectbox.Box;
 import io.objectbox.BoxStore;
 import io.objectbox.android.ObjectBoxLiveData;
@@ -26,17 +26,17 @@ import io.objectbox.query.Query;
 import timber.log.Timber;
 
 @Singleton
-public class ObjectboxWaypointsRepo extends WaypointsRepo  {
+public class ObjectboxWaypointsRepo extends WaypointsRepo {
     private final Preferences preferences;
     private Box<org.owntracks.android.data.WaypointModel> box;
 
     @Inject
-    public ObjectboxWaypointsRepo(@AppContext Context context, EventBus eventBus, Preferences preferences) {
+    public ObjectboxWaypointsRepo(@ApplicationContext Context context, EventBus eventBus, Preferences preferences) {
         super(eventBus);
         BoxStore boxStore = MyObjectBox.builder().androidContext(context).build();
         this.box = boxStore.boxFor(org.owntracks.android.data.WaypointModel.class);
         this.preferences = preferences;
-        if(!preferences.isObjectboxMigrated()) {
+        if (!preferences.isObjectboxMigrated()) {
             migrateLegacyData(context);
         }
     }
@@ -103,7 +103,7 @@ public class ObjectboxWaypointsRepo extends WaypointsRepo  {
 
     @Override
     public org.owntracks.android.data.WaypointModel get(long tst) {
-        return this.box.query().equal(WaypointModel_.tst,tst).build().findUnique();
+        return this.box.query().equal(WaypointModel_.tst, tst).build().findUnique();
     }
 
     @Override
@@ -113,7 +113,7 @@ public class ObjectboxWaypointsRepo extends WaypointsRepo  {
 
     @Override
     public List<WaypointModel> getAllWithGeofences() {
-        return this.box.query().greater(WaypointModel_.geofenceRadius,0L).and().between(WaypointModel_.geofenceLatitude,-90, 90).and().between(WaypointModel_.geofenceLongitude,-180, 180).build().find();
+        return this.box.query().greater(WaypointModel_.geofenceRadius, 0L).and().between(WaypointModel_.geofenceLatitude, -90, 90).and().between(WaypointModel_.geofenceLongitude, -180, 180).build().find();
     }
 
     @Override

@@ -6,10 +6,10 @@ import androidx.databinding.Bindable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.maps.LocationSource.OnLocationChangedListener
+import dagger.hilt.android.scopes.ActivityScoped
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import org.owntracks.android.data.repos.ContactsRepo
-import org.owntracks.android.injection.scopes.PerActivity
 import org.owntracks.android.location.LatLng
 import org.owntracks.android.location.LocationAvailability
 import org.owntracks.android.location.LocationCallback
@@ -25,7 +25,7 @@ import org.owntracks.android.ui.base.viewmodel.BaseViewModel
 import timber.log.Timber
 import javax.inject.Inject
 
-@PerActivity
+@ActivityScoped
 class MapViewModel @Inject constructor(contactsRepo: ContactsRepo, private val locationProcessor: LocationProcessor, messageProcessor: MessageProcessor) : BaseViewModel<MapMvvm.View>(), MapMvvm.ViewModel<MapMvvm.View> {
     private val contactsRepo: ContactsRepo
 

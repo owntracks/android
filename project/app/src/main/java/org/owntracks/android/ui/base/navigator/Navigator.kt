@@ -1,16 +1,17 @@
 package org.owntracks.android.ui.base.navigator
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
-import androidx.appcompat.app.AppCompatActivity
-import org.owntracks.android.injection.scopes.PerActivity
+import dagger.hilt.android.qualifiers.ActivityContext
+import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
 
-@PerActivity
-class Navigator @Inject constructor(private val activity: AppCompatActivity) {
+@ActivityScoped
+class Navigator @Inject constructor(@ActivityContext private val activity: Context) {
     fun startActivity(intent: Intent) {
         activity.startActivity(intent)
     }
@@ -51,7 +52,7 @@ class Navigator @Inject constructor(private val activity: AppCompatActivity) {
     }
 
     fun startActivityForResult(intent: Intent?, requestCode: Int) {
-        activity.startActivityForResult(intent, requestCode)
+        (activity as Activity).startActivityForResult(intent, requestCode)
     }
 
     companion object {

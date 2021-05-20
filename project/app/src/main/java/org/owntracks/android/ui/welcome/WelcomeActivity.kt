@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.viewpager2.widget.ViewPager2
+import dagger.hilt.android.AndroidEntryPoint
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiWelcomeBinding
 import org.owntracks.android.support.RequirementsChecker
@@ -20,6 +21,7 @@ import org.owntracks.android.ui.welcome.version.VersionFragment
 import timber.log.Timber
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class WelcomeActivity : BaseActivity<UiWelcomeBinding?, WelcomeViewModel?>(), WelcomeMvvm.View {
 
     @Inject
@@ -56,10 +58,17 @@ class WelcomeActivity : BaseActivity<UiWelcomeBinding?, WelcomeViewModel?>(), We
         bindAndAttachContentView(R.layout.ui_welcome, savedInstanceState)
         setHasEventBus(false)
 
-        welcomeAdapter!!.setupFragments(introFragment, versionFragment, playFragment, permissionFragment, finishFragment)
+        welcomeAdapter!!.setupFragments(
+            introFragment,
+            versionFragment,
+            playFragment,
+            permissionFragment,
+            finishFragment
+        )
 
         binding!!.viewPager.adapter = welcomeAdapter
-        binding!!.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+        binding!!.viewPager.registerOnPageChangeCallback(object :
+            ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 binding!!.vm!!.currentFragmentPosition.value = position
@@ -94,8 +103,16 @@ class WelcomeActivity : BaseActivity<UiWelcomeBinding?, WelcomeViewModel?>(), We
         val padding = (5 * scale + 0.5f).toInt()
         for (i in 0 until welcomeAdapter!!.itemCount) {
             val circle = ImageView(this)
-            circle.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_baseline_fiber_manual_record_24))
-            circle.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            circle.setImageDrawable(
+                ContextCompat.getDrawable(
+                    this,
+                    R.drawable.ic_baseline_fiber_manual_record_24
+                )
+            )
+            circle.layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
             circle.adjustViewBounds = true
             circle.setPadding(padding, 0, padding, 0)
             binding!!.circles.addView(circle)

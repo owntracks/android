@@ -1,6 +1,7 @@
 package org.owntracks.android.support;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 
 import androidx.annotation.DrawableRes;
@@ -15,23 +16,25 @@ import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondarySwitchDrawerItem;
 
 import org.owntracks.android.R;
-import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.services.BackgroundService;
 import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.contacts.ContactsActivity;
 import org.owntracks.android.ui.map.MapActivity;
-import org.owntracks.android.ui.preferences.about.AboutActivity;
 import org.owntracks.android.ui.preferences.PreferencesActivity;
+import org.owntracks.android.ui.preferences.about.AboutActivity;
 import org.owntracks.android.ui.regions.RegionsActivity;
 import org.owntracks.android.ui.status.StatusActivity;
 
 import javax.inject.Inject;
 
+import dagger.hilt.android.qualifiers.ActivityContext;
+import dagger.hilt.android.scopes.ActivityScoped;
+
 import static android.os.Process.killProcess;
 import static android.os.Process.myPid;
 
-@PerActivity
+@ActivityScoped
 public class DrawerProvider {
     private static final int COLOR_ICON_PRIMARY = R.color.md_light_primary_icon;
     private static final int COLOR_ICON_PRIMARY_ACTIVE = R.color.md_blue_600;
@@ -44,12 +47,12 @@ public class DrawerProvider {
     private final Scheduler scheduler;
 
     @Inject
-    public DrawerProvider(AppCompatActivity activity, Scheduler scheduler) {
-        this.activity = activity;
+    public DrawerProvider(@ActivityContext Context activity, Scheduler scheduler) {
+        this.activity = (AppCompatActivity)activity;
         this.scheduler = scheduler;
     }
 
-    private AppCompatActivity getActivity() {
+    private Activity getActivity() {
         return activity;
     }
 
@@ -137,7 +140,7 @@ public class DrawerProvider {
     }
 
     private void startActivity(@NonNull Class<? extends Activity> activityClass) {
-        Activity activity = getActivity();
+        Context activity = getActivity();
         Intent intent = new Intent(activity, activityClass);
         activity.startActivity(intent);
     }

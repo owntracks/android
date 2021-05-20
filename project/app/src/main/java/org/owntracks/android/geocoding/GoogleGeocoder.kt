@@ -2,14 +2,13 @@ package org.owntracks.android.geocoding
 
 import android.content.Context
 import android.location.Address
-import org.owntracks.android.injection.qualifier.AppContext
 import org.threeten.bp.Instant
 import org.threeten.bp.temporal.ChronoUnit
 import timber.log.Timber
 import java.math.BigDecimal
 import java.util.*
 
-class GoogleGeocoder internal constructor(@AppContext context: Context?) : CachingGeocoder() {
+class GoogleGeocoder internal constructor( context: Context?) : CachingGeocoder() {
     private val geocoder: android.location.Geocoder = android.location.Geocoder(context, Locale.getDefault())
     private var tripResetTimestamp: Instant = Instant.MIN
     override fun reverse(latitude: Double, longitude: Double): GeocodeResult {

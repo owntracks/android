@@ -30,7 +30,6 @@
             android:layout_marginTop="16dp"
             android:contentDescription="@string/contact_image"
             app:contact="@{contact}"
-            app:imageProvider="@{contact.imageProvider}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

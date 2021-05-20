@@ -10,7 +10,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.net.URLEncodedUtils;
 import org.owntracks.android.data.repos.WaypointsRepo;
-import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.model.messages.MessageBase;
 import org.owntracks.android.model.messages.MessageConfiguration;
 import org.owntracks.android.support.Parser;
@@ -29,6 +28,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import dagger.hilt.android.scopes.ActivityScoped;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -38,7 +38,7 @@ import okhttp3.ResponseBody;
 import timber.log.Timber;
 
 
-@PerActivity
+@ActivityScoped
 public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadMvvm.ViewModel<LoadMvvm.View> {
     private final Preferences preferences;
     private final Parser parser;

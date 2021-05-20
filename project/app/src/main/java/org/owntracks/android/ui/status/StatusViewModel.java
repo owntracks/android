@@ -13,8 +13,6 @@ import androidx.databinding.Bindable;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.owntracks.android.BR;
-import org.owntracks.android.injection.qualifier.AppContext;
-import org.owntracks.android.injection.scopes.PerActivity;
 import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
@@ -25,10 +23,12 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
+import dagger.hilt.android.qualifiers.ApplicationContext;
+import dagger.hilt.android.scopes.ActivityScoped;
 import timber.log.Timber;
 
 
-@PerActivity
+@ActivityScoped
 public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements StatusMvvm.ViewModel<StatusMvvm.View> {
     private final Context context;
     private MessageProcessor.EndpointState endpointState;
@@ -39,7 +39,7 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
     private int queueLength;
 
     @Inject
-    public StatusViewModel(@AppContext Context context) {
+    public StatusViewModel(@ApplicationContext Context context) {
         this.context = context;
     }
 

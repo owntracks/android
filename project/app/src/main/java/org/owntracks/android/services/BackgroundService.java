@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -66,7 +67,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
-import dagger.android.DaggerService;
+import dagger.hilt.android.AndroidEntryPoint;
 import timber.log.Timber;
 
 import static android.os.Process.killProcess;
@@ -76,7 +77,8 @@ import static org.owntracks.android.App.NOTIFICATION_CHANNEL_EVENTS;
 import static org.owntracks.android.App.NOTIFICATION_CHANNEL_ONGOING;
 import static org.owntracks.android.geocoding.GeocoderProvider.ERROR_NOTIFICATION_CHANNEL_ID;
 
-public class BackgroundService extends DaggerService implements OnModeChangedPreferenceChangedListener, ServiceBridge.ServiceBridgeInterface {
+@AndroidEntryPoint
+public class BackgroundService extends Service implements OnModeChangedPreferenceChangedListener, ServiceBridge.ServiceBridgeInterface {
     private static final int INTENT_REQUEST_CODE_GEOFENCE = 1264;
     private static final int INTENT_REQUEST_CODE_CLEAR_EVENTS = 1263;
 

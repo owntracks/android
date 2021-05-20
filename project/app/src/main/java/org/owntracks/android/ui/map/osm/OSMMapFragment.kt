@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.preference.PreferenceManager
+import dagger.hilt.android.AndroidEntryPoint
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -26,7 +27,8 @@ import org.owntracks.android.ui.map.MapActivity.Companion.STARTING_LONGITUDE
 import org.owntracks.android.ui.map.MapFragment
 import timber.log.Timber
 
-class OSMMapFragment : MapFragment() {
+@AndroidEntryPoint
+class OSMMapFragment internal constructor() : MapFragment() {
     private var mapView: MapView? = null
     private var binding: OsmMapFragmentBinding? = null
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

@@ -1,35 +1,32 @@
 package org.owntracks.android.ui.preferences
 
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import dagger.Binds
 import dagger.Module
-import dagger.android.ContributesAndroidInjector
-import org.owntracks.android.injection.scopes.PerActivity
-import org.owntracks.android.injection.scopes.PerFragment
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.scopes.FragmentScoped
 
+@InstallIn(ActivityComponent::class)
 @Module
 abstract class PreferencesActivityModule {
     @Binds
-    @PerActivity
-    abstract fun bindActivity(a: PreferencesActivity?): AppCompatActivity?
+    @FragmentScoped
+    abstract fun bindPreferencesFragment(preferencesFragment: PreferencesFragment): Fragment
 
-    @ContributesAndroidInjector
-    @PerFragment
-    abstract fun bindPreferencesFragment(): PreferencesFragment?
+    @Binds
+    @FragmentScoped
+    abstract fun bindReportingPreferencesFragment(reportingFragment: ReportingFragment): Fragment
 
-    @ContributesAndroidInjector
-    @PerFragment
-    abstract fun bindReportingPreferencesFragment(): ReportingFragment?
+    @Binds
+    @FragmentScoped
+    abstract fun bindNotificationPreferencesFragment(notificationFragment: NotificationFragment): Fragment
 
-    @ContributesAndroidInjector
-    @PerFragment
-    abstract fun bindNotificationPreferencesFragment(): NotificationFragment?
+    @Binds
+    @FragmentScoped
+    abstract fun bindAdvancedPreferencesFragment(advancedFragment: AdvancedFragment): Fragment
 
-    @ContributesAndroidInjector
-    @PerFragment
-    abstract fun bindAdvancedPreferencesFragment(): AdvancedFragment?
-
-    @ContributesAndroidInjector
-    @PerFragment
-    abstract fun bindAdvancedExperimentalFragment(): ExperimentalFragment?
+    @Binds
+    @FragmentScoped
+    abstract fun bindAdvancedExperimentalFragment(experimentalFragment: ExperimentalFragment): Fragment
 }

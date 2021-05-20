@@ -27,9 +27,11 @@ import java.net.URISyntaxException;
 
 import javax.inject.Inject;
 
+import dagger.hilt.android.AndroidEntryPoint;
 import timber.log.Timber;
 
 @SuppressLint("GoogleAppIndexingApiWarning")
+@AndroidEntryPoint
 public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvvm.ViewModel<LoadMvvm.View>> implements LoadMvvm.View {
     private static final int REQUEST_CODE = 1;
     public static final String FLAG_IN_APP = "INAPP";
