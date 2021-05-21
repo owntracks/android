@@ -16,6 +16,16 @@ val versionBuild =
     0 // This value is managed by the gradle publisher plugin. Build numbers get incremented on publish
 val googleMapsAPIKey = extra.get("google_maps_api_key")?.toString() ?: "PLACEHOLDER_API_KEY"
 
+jacoco {
+    version = "0.8.7"
+    toolVersion="0.8.7"
+}
+tasks.withType(Test::class).configureEach {
+    jacoco {
+        setExcludes(mutableSetOf("*"))
+    }
+}
+
 android {
     compileSdkVersion(30)
 
