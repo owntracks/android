@@ -15,26 +15,14 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
 
-        <com.google.android.material.appbar.AppBarLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:elevation="4dp"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
-
-        </com.google.android.material.appbar.AppBarLayout>
+        <include layout="@layout/appbar" android:id="@+id/appbar"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingTop="?attr/actionBarSize"
             android:scrollbars="vertical"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
             tools:listitem="@layout/log_viewer_entry" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton

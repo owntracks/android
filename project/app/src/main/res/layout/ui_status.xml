@@ -19,20 +19,9 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
 
-
-        <com.google.android.material.appbar.AppBarLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:elevation="4dp"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?android:attr/actionBarSize"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
-
-        </com.google.android.material.appbar.AppBarLayout>
+        <include
+            android:id="@+id/appbar"
+            layout="@layout/appbar" />
 
         <ScrollView
             android:layout_width="match_parent"

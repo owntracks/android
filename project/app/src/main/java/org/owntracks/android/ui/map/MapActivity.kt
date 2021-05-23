@@ -108,8 +108,8 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         bindAndAttachContentView(R.layout.ui_map, savedInstanceState)
 
         binding?.also {
-            setSupportToolbar(it.toolbar, false, true)
-            setDrawer(it.toolbar)
+            setSupportToolbar(it.appbar.toolbar, false, true)
+            setDrawer(it.appbar.toolbar)
             bottomSheetBehavior = BottomSheetBehavior.from(it.bottomSheetLayout)
             it.contactPeek.contactRow.setOnClickListener(this)
             it.contactPeek.contactRow.setOnLongClickListener(this)
@@ -123,7 +123,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
                     return false
                 }
             })
-            (it.appBarLayout.layoutParams as CoordinatorLayout.LayoutParams).behavior = behavior
+//            (it.appbar.appBarLayout.layoutParams as CoordinatorLayout.LayoutParams).behavior = behavior
         }
 
         locationLifecycleObserver = LocationLifecycleObserver(activityResultRegistry)

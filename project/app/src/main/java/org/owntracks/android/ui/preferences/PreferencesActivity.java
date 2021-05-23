@@ -29,8 +29,8 @@ public class PreferencesActivity extends BaseActivity<UiPreferencesBinding, NoOp
         setContentView(R.layout.ui_preferences);
         bindAndAttachContentView(R.layout.ui_preferences, savedInstanceState);
         setHasEventBus(false);
-        setSupportToolbar(this.binding.toolbar, true, true);
-        setDrawer(binding.toolbar);
+        setSupportToolbar(this.binding.appbar.toolbar, true, true);
+        setDrawer(binding.appbar.toolbar);
         getSupportFragmentManager().addOnBackStackChangedListener(() -> {
                     if (getSupportFragmentManager().getFragments().isEmpty()) {
                         setToolbarTitle(getTitle());
@@ -47,7 +47,7 @@ public class PreferencesActivity extends BaseActivity<UiPreferencesBinding, NoOp
     }
 
     private void setToolbarTitle(CharSequence text) {
-        binding.toolbar.setTitle(text);
+        binding.appbar.toolbar.setTitle(text);
     }
 
     @Override

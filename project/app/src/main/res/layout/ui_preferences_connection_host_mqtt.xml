@@ -13,13 +13,11 @@
 
     <LinearLayout
         android:id="@+id/content_frame"
+        style="@style/DialogView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        style="@style/DialogView"
-        >
-
-
+        android:orientation="vertical">
+        
         <com.rengwuxian.materialedittext.MaterialEditText
             android:id="@+id/host"
             android:layout_width="match_parent"
@@ -44,8 +42,8 @@
             android:text="@={vm.portText}"
             app:met_baseColor="@color/textPrimary"
             app:met_floatingLabel="highlight"
-            app:met_primaryColor="@color/accent"
-            />
+            app:met_primaryColor="@color/accent" />
+
         <com.rengwuxian.materialedittext.MaterialEditText
 
             android:id="@+id/clientId"
@@ -57,8 +55,7 @@
             android:text="@={vm.clientId}"
             app:met_baseColor="@color/textPrimary"
             app:met_floatingLabel="highlight"
-            app:met_primaryColor="@color/accent"
-            />
+            app:met_primaryColor="@color/accent" />
 
         <RelativeLayout
             android:id="@+id/tlsWrapper"

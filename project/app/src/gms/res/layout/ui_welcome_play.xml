@@ -15,7 +15,6 @@
         android:id="@+id/welcome_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/primary"
         android:clipChildren="false">
 
         <ImageView
@@ -25,10 +24,10 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:gravity="center_horizontal"
             android:layout_marginTop="48dp"
             android:layout_marginBottom="48dp"
             android:contentDescription="@string/icon_description_warning"
+            android:gravity="center_horizontal"
 
             android:scaleType="centerInside"
             android:src="@drawable/ic_baseline_assignment_late_48" />
@@ -43,7 +42,6 @@
             android:paddingLeft="24dp"
             android:paddingRight="24dp"
             android:text="@string/welcome_play_heading"
-            android:textColor="#ffffff"
             android:textSize="24sp" />
 
 
@@ -59,7 +57,6 @@
             android:paddingLeft="24dp"
             android:paddingRight="24dp"
             android:text="@string/welcome_play_description"
-            android:textColor="#ffffff"
             android:textSize="16sp" />
 
 
@@ -73,7 +70,6 @@
             android:paddingLeft="24dp"
             android:paddingRight="24dp"
             android:text="@{vm.getMessage}"
-            android:textColor="#ffffff"
             android:textSize="16sp"
             android:visibility="visible"
             tools:text="@{vm.getMessage}" />

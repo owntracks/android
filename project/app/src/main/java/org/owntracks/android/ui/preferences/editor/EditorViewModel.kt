@@ -23,9 +23,10 @@ class EditorViewModel @Inject constructor(
     override var effectiveConfiguration: String? = null
         private set
 
-    @JvmField
+
     @Inject
-    var waypointsRepo: WaypointsRepo? = null
+    lateinit var waypointsRepo: WaypointsRepo
+
     override fun attachView(savedInstanceState: Bundle?, view: EditorMvvm.View?) {
         super.attachView(savedInstanceState, view!!)
         updateEffectiveConfiguration()

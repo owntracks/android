@@ -1,29 +1,54 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="Theme.Owntracks" parent="Theme.Owntracks.Base" />
-
-    <style name="Theme.Owntracks.Base" parent="@style/Theme.MaterialComponents.Light.NoActionBar">
-        <item name="android:windowBackground">@color/background</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowIsTranslucent">true</item>
+    <style name="Theme.Owntracks" parent="@style/Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:textColor">@color/textPrimary</item>
         <item name="android:textColorSecondary">@color/textSecondary</item>
+        <item name="colorPrimary">@color/OTPrimaryBlue</item>
+        <item name="colorPrimaryDark">@color/OTDarkerBlue</item>
+        <item name="colorOnPrimary">@color/md_white_1000</item>
+        <item name="colorSecondary">@color/OTPrimaryBlue</item>
+        <item name="colorOnSecondary">@color/md_white_1000</item>
+        <item name="colorAccent">@color/OTPrimaryBlue</item>
 
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/secondary</item>
-        <item name="colorAccent">@color/accent</item>
-        <item name="windowActionModeOverlay">true</item>
-        <item name="popupMenuStyle">@style/PopupMenu</item>
-        <item name="android:actionModeBackground">@color/primary</item>
         <item name="preferenceTheme">@style/Theme.Owntracks.Preferences</item>
+        <item name="toolbarStyle">@style/Theme.Owntracks.Toolbar</item>
+        <item name="toolbarNavigationButtonStyle">
+            @style/Theme.Owntracks.ToolbarNavigationButton
+        </item>
+        <item name="drawerArrowStyle">@style/Theme.Owntracks.ToolbarDrawerArrowStyle</item>
+        <item name="actionOverflowButtonStyle">@style/Theme.Owntracks.Overflow</item>
+    </style>
+
+    <!-- Hamburger theme -->
+    <style name="Theme.Owntracks.ToolbarDrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
+        <item name="color">?attr/colorOnPrimary</item>
+    </style>
+
+    <!-- Navigation Arrow Theme theme -->
+    <style name="Theme.Owntracks.ToolbarNavigationButton" parent="Widget.AppCompat.Toolbar.Button.Navigation">
+        <item name="tint">?attr/colorOnPrimary</item>
+    </style>
+
+    <!-- Toolbar Text -->
+    <style name="Theme.Owntracks.Toolbar" parent="@style/Widget.MaterialComponents.Toolbar.Primary">
+        <item name="titleTextColor">?attr/colorOnPrimary</item>
+    </style>
+
+    <!-- Overflow menu button -->
+    <style name="Theme.Owntracks.Overflow" parent="Widget.AppCompat.Light.ActionButton.Overflow">
+        <item name="tint">?attr/colorOnPrimary</item>
+    </style>
+
+
+    <style name="Theme.Owntracks.Welcome">
+        <item name="android:windowBackground">@color/OTPrimaryBlue</item>
+        <item name="android:textColor">@color/md_white_1000</item>
+        <item name="colorPrimary">@color/OTAccent</item>
+        <item name="colorOnPrimary">@color/md_white_1000</item>
     </style>
 
     <style name="Theme.Owntracks.Preferences" parent="@style/PreferenceThemeOverlay">
-        <item name="android:tint">@color/primary</item>
-    </style>
-
-    <style name="PopupMenu" parent="@style/Widget.AppCompat.Light.PopupMenu">
-        <item name="overlapAnchor">true</item>
+        <item name="android:tint">?attr/colorPrimary</item>
     </style>
 
     <style name="ListItemPrimary" parent="@style/TextAppearance.AppCompat.Subhead">
@@ -50,13 +75,13 @@
         <item name="android:paddingBottom">8dp</item>
     </style>
 
+    <!-- https://paletton.com/#uid=53D0n0kmN-+hrHfkdDlptylsRwF -->
     <color name="textPrimary">#de000000</color>
     <color name="textSecondary">#8a000000</color>
     <color name="snackbarText">#fffafafa</color>
-    <color name="buttonTint">@color/textSecondary</color>
     <color name="background">#fffafafa</color>
 
-    <color name="primary">#3f72b5</color>
-    <color name="secondary">#305e9f</color>
-    <color name="accent">@color/primary</color>
+    <color name="OTPrimaryBlue">#3f72b5</color>
+    <color name="OTDarkerBlue">#305e9f</color>
+    <color name="OTAccent">#31aba6</color>
 </resources>

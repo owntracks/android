@@ -53,7 +53,7 @@ class LogViewerActivity : BaseActivity<UiPreferencesLogsBinding, NoOpViewModel>(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         bindAndAttachContentView(R.layout.ui_preferences_logs, savedInstanceState)
-        setSupportToolbar(binding.toolbar)
+        setSupportToolbar(binding.appbar.toolbar)
         setHasEventBus(false)
         @Suppress("DEPRECATION")
         logAdapter = LogEntryAdapter(

@@ -48,7 +48,7 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
         bindAndAttachContentView(R.layout.ui_preferences_load, savedInstanceState);
 
         setHasEventBus(false);
-        setSupportToolbar(binding.toolbar, true, false);
+        setSupportToolbar(binding.appbar.toolbar, true, false);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(R.string.title_activity_load);
         }

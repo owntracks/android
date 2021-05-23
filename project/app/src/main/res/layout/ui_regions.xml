@@ -1,39 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <data>
-        <variable name="vm" type="org.owntracks.android.ui.regions.RegionsViewModel" />
+
+        <variable
+            name="vm"
+            type="org.owntracks.android.ui.regions.RegionsViewModel" />
     </data>
 
     <LinearLayout
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-        <com.google.android.material.appbar.AppBarLayout
-            android:elevation="4dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?android:attr/actionBarSize"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
-        </com.google.android.material.appbar.AppBarLayout>
+        <include
+            android:id="@+id/appbar"
+            layout="@layout/appbar" />
 
         <org.owntracks.android.support.widgets.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            />
-        <TextView android:id="@+id/placeholder"
-            android:gravity="center"
-            android:visibility="gone"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+        <TextView
+            android:id="@+id/placeholder"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="@string/waypointListPlaceholder" />
+            android:gravity="center"
+            android:text="@string/waypointListPlaceholder"
+            android:visibility="gone" />
     </LinearLayout>
 </layout>

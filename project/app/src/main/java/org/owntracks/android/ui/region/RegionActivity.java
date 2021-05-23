@@ -29,7 +29,7 @@ public class RegionActivity extends BaseActivity<UiRegionBinding, RegionMvvm.Vie
         super.onCreate(savedInstanceState);
         setHasEventBus(false);
         bindAndAttachContentView(R.layout.ui_region, savedInstanceState);
-        setSupportToolbar(binding.toolbar);
+        setSupportToolbar(binding.appbar.toolbar);
 
         Bundle b = navigator.getExtrasBundle(getIntent());
         if (b != null) {

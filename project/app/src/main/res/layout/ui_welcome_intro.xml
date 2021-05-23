@@ -10,7 +10,6 @@
         android:id="@+id/welcome_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/primary"
         android:clipChildren="false">
 
         <ImageView
@@ -37,7 +36,6 @@
             android:paddingLeft="24dp"
             android:paddingRight="24dp"
             android:text="@string/welcome_heading"
-            android:textColor="#ffffff"
             android:textSize="24sp" />
 
         <TextView
@@ -50,7 +48,6 @@
             android:paddingLeft="24dp"
             android:paddingRight="24dp"
             android:text="@string/welcome_description"
-            android:textColor="#ffffff"
             android:textSize="16sp" />
 
     </RelativeLayout>

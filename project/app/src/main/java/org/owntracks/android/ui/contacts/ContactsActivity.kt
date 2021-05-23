@@ -16,25 +16,30 @@ import org.owntracks.android.ui.map.MapActivity
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ContactsActivity : BaseActivity<UiContactsBinding?, ContactsMvvm.ViewModel<*>?>(), ContactsMvvm.View, BaseAdapter.ClickListener<FusedContact?> {
+class ContactsActivity : BaseActivity<UiContactsBinding?, ContactsMvvm.ViewModel<*>?>(),
+    ContactsMvvm.View, BaseAdapter.ClickListener<FusedContact?> {
 
     private lateinit var contactsAdapter: ContactsAdapter
 
-    @JvmField
     @Inject
-    var geocoderProvider: GeocoderProvider? = null
+    lateinit var geocoderProvider: GeocoderProvider
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         contactsAdapter = ContactsAdapter(this)
         setHasEventBus(false)
         bindAndAttachContentView(R.layout.ui_contacts, savedInstanceState)
-        setSupportToolbar(binding!!.toolbar)
-        setDrawer(binding!!.toolbar)
+        setSupportToolbar(binding!!.appbar.toolbar)
+        setDrawer(binding!!.appbar.toolbar)
         binding!!.vm!!.contacts.observe({ this.lifecycle }, { contacts: Map<String, FusedContact> ->
             contactsAdapter.setContactList(contacts.values)
             for (contact in contacts.values) {
                 contact.messageLocation.removeObservers(this)
-                contact.messageLocation.observe({ this.lifecycle }, { messageLocation: MessageLocation? -> geocoderProvider!!.resolve(messageLocation!!) })
+                contact.messageLocation.observe(
+                    { this.lifecycle },
+                    { messageLocation: MessageLocation? ->
+                        geocoderProvider.resolve(messageLocation!!)
+                    })
             }
         })
         binding!!.recyclerView.layoutManager = LinearLayoutManager(this)

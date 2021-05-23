@@ -37,8 +37,8 @@ public class RegionsActivity extends BaseActivity<UiRegionsBinding, RegionsMvvm.
         super.onCreate(savedInstanceState);
         setHasEventBus(false);
         bindAndAttachContentView(R.layout.ui_regions, savedInstanceState);
-        setSupportToolbar(binding.toolbar);
-        setDrawer(binding.toolbar);
+        setSupportToolbar(binding.appbar.toolbar);
+        setDrawer(binding.appbar.toolbar);
 
         recyclerViewAdapter = new RegionsAdapter(this);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));

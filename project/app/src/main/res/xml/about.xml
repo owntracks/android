@@ -61,8 +61,7 @@
             android:summary="File on GitHub"
             android:title="Report an issue"
             app:icon="@drawable/ic_baseline_bug_report_24"
-            app:iconSpaceReserved="true"
-            app:tint="@color/primary">
+            app:iconSpaceReserved="true">
             <intent
                 android:action="android.intent.action.VIEW"
                 android:data="@string/issueUrl" />
