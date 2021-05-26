@@ -65,7 +65,7 @@
             android:layout_centerHorizontal="true"
             android:onClick="@{() -> vm.onFixClicked()}"
             android:text="@string/welcomeFixIssue"
-            android:visibility="@{!vm.permissionGranted}" />
+            android:visibility="@{vm.permissionRequired}" />
 
         <TextView
             android:id="@+id/screen_desc"

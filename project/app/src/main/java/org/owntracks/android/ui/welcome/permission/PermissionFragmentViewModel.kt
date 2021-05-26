@@ -16,6 +16,13 @@ class PermissionFragmentViewModel @Inject internal constructor() :
             notifyPropertyChanged(BR.permissionGranted)
         }
 
+    @get:Bindable
+    var isPermissionRequired = false
+        set(permissionRequired) {
+            field = permissionRequired
+            notifyPropertyChanged(BR.permissionRequired)
+        }
+
     fun onFixClicked() {
         view!!.requestFix()
     }

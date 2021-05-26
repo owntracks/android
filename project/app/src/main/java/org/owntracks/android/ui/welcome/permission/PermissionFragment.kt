@@ -86,6 +86,7 @@ class PermissionFragment @Inject constructor() :
         checkPermission().run {
             eventBus.post(Events.WelcomeNextDoneButtonsEnableToggle(this))
             viewModel.isPermissionGranted = this
+            viewModel.isPermissionRequired = !this
         }
     }
 }
