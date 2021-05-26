@@ -14,6 +14,11 @@ val versionPatch = 0
 
 val googleMapsAPIKey = extra.get("google_maps_api_key")?.toString() ?: "PLACEHOLDER_API_KEY"
 
+jacoco {
+    version = "0.8.7"
+    toolVersion = "0.8.7"
+}
+
 android {
     compileSdkVersion(30)
 

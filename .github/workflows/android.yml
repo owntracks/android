@@ -71,14 +71,14 @@ jobs:
         with:
           build-root-directory: project/
       - name: Run unit tests
-        run: ./gradlew jacocoTestGmsDebugUnitTestReport
+        run: ./gradlew jacocoTestGmsReleaseUnitTestReport
         working-directory: project
         timeout-minutes: 10
       - name: Upload unit test result artifact
         uses: actions/upload-artifact@v2
         with:
           name: unit-test-results
-          path: project/app/build/test-results/testGmsDebugUnitTest/*.xml
+          path: project/app/build/test-results/testGmsReleaseUnitTest/*.xml
         if: always()
       - name: Upload unit test coverage artifact
         uses: actions/upload-artifact@v2
