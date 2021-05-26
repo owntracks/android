@@ -5,13 +5,13 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.DataBindingUtil;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.rengwuxian.materialedittext.validation.METValidator;
 
@@ -200,7 +200,10 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
             if (messageProcessor.isEndpointConfigurationComplete()) {
                 messageProcessor.reconnect();
             } else {
-                Toast.makeText(this, R.string.ERROR_CONFIGURATION, Toast.LENGTH_SHORT).show();
+                Snackbar.make(findViewById(R.id.scrollView),
+                        R.string.ERROR_CONFIGURATION,
+                        Snackbar.LENGTH_SHORT
+                ).show();
             }
             return true;
         } else if (itemId == R.id.status) {
