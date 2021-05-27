@@ -1,6 +1,7 @@
 package org.owntracks.android.ui.map
 
 import android.annotation.SuppressLint
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,10 +13,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE
 import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import dagger.hilt.android.AndroidEntryPoint
 import org.owntracks.android.R
 import org.owntracks.android.data.repos.LocationRepo
@@ -39,7 +37,11 @@ class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallba
     private var binding: GoogleMapFragmentBinding? = null
     private val markers: MutableMap<String, Marker?> = HashMap()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.google_map_fragment, container, false)
         MapsInitializer.initialize(requireContext())
         val mapView = this.binding!!.googleMapView
@@ -54,6 +56,17 @@ class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallba
             initMap()
         }
         ((requireActivity()) as MapActivity).onMapReady()
+    }
+
+    fun setMapStyle() {
+        if (resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) {
+            googleMap?.setMapStyle(
+                MapStyleOptions.loadRawResourceStyle(
+                    requireContext(),
+                    R.raw.google_maps_night_theme
+                )
+            )
+        }
     }
 
     @SuppressLint("MissingPermission")
@@ -77,10 +90,26 @@ class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallba
                 }
             }
 
+            setMapStyle()
+
             if (locationRepo?.currentLocation != null) {
-                moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(locationRepo!!.currentLocation!!.latitude, locationRepo!!.currentLocation!!.longitude), ZOOM_LEVEL_STREET))
+                moveCamera(
+                    CameraUpdateFactory.newLatLngZoom(
+                        LatLng(
+                            locationRepo!!.currentLocation!!.latitude,
+                            locationRepo!!.currentLocation!!.longitude
+                        ), ZOOM_LEVEL_STREET
+                    )
+                )
             } else {
-                moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(MapActivity.STARTING_LATITUDE, MapActivity.STARTING_LONGITUDE), ZOOM_LEVEL_STREET))
+                moveCamera(
+                    CameraUpdateFactory.newLatLngZoom(
+                        LatLng(
+                            MapActivity.STARTING_LATITUDE,
+                            MapActivity.STARTING_LONGITUDE
+                        ), ZOOM_LEVEL_STREET
+                    )
+                )
             }
 
             setOnMarkerClickListener {
@@ -117,7 +146,9 @@ class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallba
                 markers.remove(id)
                 marker.remove()
             }
-            markers[id] = googleMap!!.addMarker(MarkerOptions().position(latLng.toGMSLatLng()).anchor(0.5f, 0.5f).visible(false)).also { it?.tag = id }
+            markers[id] = googleMap!!.addMarker(
+                MarkerOptions().position(latLng.toGMSLatLng()).anchor(0.5f, 0.5f).visible(false)
+            ).also { it?.tag = id }
         }
     }
 
@@ -139,6 +170,7 @@ class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallba
     override fun onResume() {
         super.onResume()
         binding?.googleMapView?.onResume()
+        setMapStyle()
     }
 
     override fun onLowMemory() {

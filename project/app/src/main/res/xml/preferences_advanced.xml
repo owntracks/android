@@ -70,21 +70,20 @@
             app:summary="@string/preferencesAutostartSummary"
             app:title="@string/preferencesAutostart" />
         <androidx.preference.ListPreference
-            app:key="@string/preferenceKeyReverseGeocodeProvider"
-            app:iconSpaceReserved="false"
-            app:title="@string/preferencesReverseGeocodeProvider"
             app:defaultValue="Google"
             app:entries="@array/geocoders"
             app:entryValues="@array/geocoderValues"
-            app:useSimpleSummaryProvider="true"
-            />
+            app:iconSpaceReserved="false"
+            app:key="@string/preferenceKeyReverseGeocodeProvider"
+            app:title="@string/preferencesReverseGeocodeProvider"
+            app:useSimpleSummaryProvider="true" />
         <EditTextPreference
             app:dialogMessage="@string/preferencesOpencageGeocoderApiKeyDialog"
             app:iconSpaceReserved="false"
+            app:isPreferenceVisible="false"
             app:key="@string/preferenceKeyOpencageGeocoderApiKey"
             app:summary="@string/preferencesOpencageGeocoderApiKeySummary"
-            app:title="@string/preferencesOpencageGeocoderApiKey"
-            app:isPreferenceVisible="false"/>
+            app:title="@string/preferencesOpencageGeocoderApiKey" />
     </PreferenceCategory>
 
 </PreferenceScreen>

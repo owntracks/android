@@ -36,11 +36,6 @@ import static android.os.Process.myPid;
 
 @ActivityScoped
 public class DrawerProvider {
-    private static final int COLOR_ICON_PRIMARY = R.color.md_light_primary_icon;
-    private static final int COLOR_ICON_PRIMARY_ACTIVE = R.color.md_blue_600;
-    private static final int COLOR_ICON_SECONDARY = R.color.md_light_secondary;
-    private static final int COLOR_ICON_SECONDARY_ACTIVE = COLOR_ICON_PRIMARY_ACTIVE;
-
     private static final int EXIT_OPERATION_ID = 88296;
 
     private final AppCompatActivity activity;
@@ -48,7 +43,7 @@ public class DrawerProvider {
 
     @Inject
     public DrawerProvider(@ActivityContext Context activity, Scheduler scheduler) {
-        this.activity = (AppCompatActivity)activity;
+        this.activity = (AppCompatActivity) activity;
         this.scheduler = scheduler;
     }
 
@@ -61,23 +56,18 @@ public class DrawerProvider {
         return new PrimaryDrawerItem()
                 .withName(activeActivity.getString(targetActivityTitleResource))
                 .withSelectable(false)
-                .withSelectedTextColorRes(COLOR_ICON_PRIMARY_ACTIVE)
                 .withIcon(iconResource)
-                .withIconColorRes(COLOR_ICON_PRIMARY)
                 .withIconTintingEnabled(true)
-                .withSelectedIconColorRes(COLOR_ICON_PRIMARY_ACTIVE)
                 .withTag(targetActivityClass)
                 .withIdentifier(targetActivityClass.hashCode());
-
     }
 
     private SecondaryDrawerItem secondaryDrawerItemForClass(AppCompatActivity activeActivity, Class<?> targetActivityClass, @StringRes int targetActivityTitleResource, @DrawableRes int iconResource) {
-        SecondaryDrawerItem sdi = new SecondaryDrawerItem();
-        sdi.withName(activeActivity.getString(targetActivityTitleResource));
-        sdi.withIcon(iconResource);
-        sdi.withIconColorRes(COLOR_ICON_SECONDARY);
-        sdi.withSelectedIconColorRes(COLOR_ICON_SECONDARY_ACTIVE);
-        sdi.withIconTintingEnabled(true);
+        SecondaryDrawerItem sdi = new SecondaryDrawerItem()
+                .withName(activeActivity.getString(targetActivityTitleResource))
+                .withIcon(iconResource)
+                .withIconTintingEnabled(true)
+                .withSelectable(false);
         // The exit operation has no target class
         if (targetActivityClass != null) {
             sdi.withTag(targetActivityClass);
@@ -85,13 +75,13 @@ public class DrawerProvider {
         } else {
             sdi.withIdentifier(EXIT_OPERATION_ID);
         }
-        sdi.withSelectable(false);
 
         return sdi;
 
     }
 
     public void attach(@NonNull Toolbar toolbar) {
+
         new DrawerBuilder()
                 .withActivity(activity)
                 .withToolbar(toolbar)
@@ -144,7 +134,4 @@ public class DrawerProvider {
         Intent intent = new Intent(activity, activityClass);
         activity.startActivity(intent);
     }
-
 }
-
-

@@ -9,6 +9,7 @@
     <string name="preferenceKeyDontReuseHttpClient">dontReuseHttpClient</string>
     <string name="preferenceKeyEncryptionKey">encryptionKey</string>
     <string name="preferenceKeyExperimentalFeatures">experimentalFeatures</string>
+    <string name="preferenceKeyTheme">theme</string>
     <string name="preferenceKeyFirstStart">firstStart</string>
     <string name="preferenceKeyFusedRegionDetection">fusedRegionDetection</string>
     <string name="preferenceKeyGeocodeEnabled">geocodeEnabled</string>
@@ -57,5 +58,10 @@
         <item>None</item>
         <item>Google</item>
         <item>OpenCage</item>
+    </string-array>
+    <string-array name="themeValues" translatable="false">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
     </string-array>
 </resources>

@@ -20,6 +20,7 @@
     <string name="preferencesNotificationLocation">Last reported location</string>
     <string name="preferencesAdvanced">Advanced</string>
     <string name="preferencesChangelog">Changelog</string>
+    <string name="preferencesTheme">Theme</string>
     <string name="version">Version</string>
     <string name="preferencesReporting">Reporting</string>
     <string name="preferencesTrackerId">Tracker ID</string>
@@ -201,5 +202,10 @@
         <item>None</item>
         <item>Google</item>
         <item>OpenCage</item>
+    </string-array>
+    <string-array name="themeLabels">
+        <item>Always in light theme</item>
+        <item>Always in dark theme</item>
+        <item>Same as device</item>
     </string-array>
 </resources>

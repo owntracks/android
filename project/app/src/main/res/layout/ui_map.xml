@@ -33,7 +33,7 @@
             android:id="@+id/bottomSheetLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/background"
+            android:background="?android:attr/windowBackground"
             android:clickable="true"
             android:elevation="6dp"
             android:focusable="true"

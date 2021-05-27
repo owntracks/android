@@ -3,6 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:key="root"
     app:title="@string/title_activity_preferences">
+    <IntListPreference
+        app:entries="@array/themeLabels"
+        app:entryValues="@array/themeValues"
+        app:iconSpaceReserved="false"
+        app:key="@string/preferenceKeyTheme"
+        app:title="@string/preferencesTheme"
+        app:defaultValue="@integer/defaultTheme"
+        app:useSimpleSummaryProvider="true" />
     <Preference
         android:key="connectionScreen"
         android:title="@string/preferencesServer"
@@ -15,7 +23,7 @@
     <Preference
         android:key="notificationScreen"
         android:title="@string/preferencesNotification"
-        app:fragment="org.owntracks.android.ui.preferences.NotificationFragment"
+        app:fragment="org.owntracks.android.ui.preferences.UserInterfacePreferenceFragment"
         app:iconSpaceReserved="false" />
     <Preference
         android:key="advancedScreen"

@@ -2,6 +2,7 @@ package org.owntracks.android.ui.preferences
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.preference.IntListPreference
 import androidx.preference.Preference
 import dagger.hilt.android.AndroidEntryPoint
 import org.owntracks.android.R
@@ -24,6 +25,11 @@ class PreferencesFragment : AbstractPreferenceFragment() {
 
         findPreference<Preference>(UI_PREFERENCE_SCREEN_EXPERIMENTAL)?.run {
             this.isVisible = preferences.isExperimentalFeatureEnabled(EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI)
+        }
+
+        findPreference<IntListPreference>(getString(R.string.preferenceKeyTheme))?.setOnPreferenceChangeListener { _, newValue ->
+            preferences.theme = newValue.toString().toInt()
+            true
         }
     }
 

@@ -119,4 +119,13 @@
             android:action="android.intent.action.VIEW"
             android:data="https://opencagedata.com/credits" />
     </Preference>
+    <Preference
+        android:key="osmdroid"
+        android:summary="OSM Map Provider"
+        android:title="OSMDroid"
+        app:iconSpaceReserved="false">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="https://github.com/osmdroid/osmdroid" />
+    </Preference>
 </PreferenceScreen>

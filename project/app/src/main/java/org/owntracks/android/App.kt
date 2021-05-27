@@ -4,20 +4,16 @@ import android.app.Application
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.Context
 import android.os.Build
 import android.os.StrictMode
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NotificationManagerCompat
 import androidx.databinding.DataBindingUtil
 import androidx.work.Configuration
 import androidx.work.WorkManager
 import androidx.work.WorkerFactory
-import dagger.Binds
-import dagger.Module
 import dagger.hilt.EntryPoints
-import dagger.hilt.InstallIn
 import dagger.hilt.android.HiltAndroidApp
-import dagger.hilt.components.SingletonComponent
 import org.conscrypt.Conscrypt
 import org.owntracks.android.di.CustomBindingComponentBuilder
 import org.owntracks.android.di.CustomBindingEntryPoint
@@ -31,7 +27,6 @@ import timber.log.Timber
 import java.security.Security
 import javax.inject.Inject
 import javax.inject.Provider
-import javax.inject.Singleton
 
 @HiltAndroidApp
 class App : Application() {
@@ -95,6 +90,15 @@ class App : Application() {
         // Running this on a background thread will deadlock FirebaseJobDispatcher.
         // Initialize will call Scheduler to connect off the main thread anyway.
         runThingsOnOtherThreads.postOnMainHandlerDelayed({ messageProcessor.initialize() }, 510)
+
+
+        when (preferences.theme) {
+            Preferences.NIGHT_MODE_AUTO -> AppCompatDelegate.setDefaultNightMode(Preferences.SYSTEM_NIGHT_AUTO_MODE)
+            Preferences.NIGHT_MODE_ENABLE -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            Preferences.NIGHT_MODE_DISABLE -> AppCompatDelegate.setDefaultNightMode(
+                AppCompatDelegate.MODE_NIGHT_NO
+            )
+        }
 
         // Notifications can be sent from multiple places, so let's make sure we've got the channels in place
         createNotificationChannels()
