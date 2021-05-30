@@ -152,8 +152,8 @@
     <string name="region_outside">"Actuellement à l'extérieur"</string>
     <string name="monitoring_quiet">"Mode de surveillance arrêté"</string>
     <string name="monitoring_manual">"Mode de surveillance manuel"</string>
-    <string name="monitoring_significant">"Modifications importantes du mode de surveillance"</string>
-    <string name="monitoring_move">"Déplacer le mode de surveillance"</string>
+    <string name="monitoring_significant">"Mode de surveillance passif"</string>
+    <string name="monitoring_move">"Mode de surveillance déplacement"</string>
     <string name="notificationChangeMonitoring">"Changer mode de surveillance"</string>
     <string name="preferencesDebugLog">"Débogage du journal"</string>
     <string name="monitoring_mode">"Monitoring"</string>
