@@ -717,7 +717,9 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
 
     @Subscribe
     public void onEvent(Events.RestartApp e) {
+        Timber.i("Triggering restart");
         scheduler.cancelAllTasks();
+        messageProcessor.stopSendingMessages();
         ProcessPhoenix.triggerRebirth(this);
     }
 

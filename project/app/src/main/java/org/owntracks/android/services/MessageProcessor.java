@@ -189,7 +189,7 @@ public class MessageProcessor {
 
         if (backgroundDequeueThread == null || !backgroundDequeueThread.isAlive()) {
             // Create the background thread that will handle outbound msgs
-            backgroundDequeueThread = new Thread(this::sendAvailableMessages);
+            backgroundDequeueThread = new Thread(this::sendAvailableMessages, "backgroundDequeueThread");
             backgroundDequeueThread.start();
         }
 
@@ -271,7 +271,7 @@ public class MessageProcessor {
                 }
 
                 if (lastFailedMessageToBeRetried != null) {
-                    Timber.d("Waiting for %s s before retrying", retryWait / 1000);
+                    Timber.d("Waiting for %s s before retrying. %s", retryWait / 1000, Thread.currentThread());
                     Thread.sleep(retryWait);
                     retryWait = Math.min(2 * retryWait, SEND_FAILURE_BACKOFF_MAX_WAIT);
                 } else {
