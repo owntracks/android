@@ -23,7 +23,7 @@
     <Preference
         android:key="notificationScreen"
         android:title="@string/preferencesNotification"
-        app:fragment="org.owntracks.android.ui.preferences.UserInterfacePreferenceFragment"
+        app:fragment="org.owntracks.android.ui.preferences.NotificationFragment"
         app:iconSpaceReserved="false" />
     <Preference
         android:key="advancedScreen"

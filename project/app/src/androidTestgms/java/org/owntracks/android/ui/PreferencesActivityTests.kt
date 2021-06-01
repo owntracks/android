@@ -11,7 +11,6 @@ import androidx.test.filters.LargeTest
 import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertContains
 import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertNotContains
-import com.schibsted.spain.barista.interaction.BaristaClickInteractions.clickBack
 import com.schibsted.spain.barista.interaction.BaristaDialogInteractions.clickDialogPositiveButton
 import com.schibsted.spain.barista.interaction.BaristaEditTextInteractions.writeTo
 import com.schibsted.spain.barista.rule.BaristaRule
@@ -83,16 +82,16 @@ class PreferencesActivityTests {
         writeTo(R.id.deviceId, "testDeviceId")
         writeTo(R.id.trackerId, "t1")
         clickDialogPositiveButton()
-        clickBack()
+        clickBackAndWait()
 
 
         clickOnAndWait(R.string.preferencesReporting)
         clickOnAndWait(R.string.preferencesPubExtendedData)
-        clickBack()
+        clickBackAndWait()
 
         clickOnAndWait(R.string.preferencesNotification)
         clickOnAndWait(R.string.preferencesNotificationEvents)
-        clickBack()
+        clickBackAndWait()
 
         // This is an ugly hack, but there's some race conditions on underpowered hardware
         // causing the test to move on before the view has been fully built/rendered.
@@ -121,19 +120,17 @@ class PreferencesActivityTests {
         scrollToText(R.string.preferencesAutostart)
         clickOnAndWait(R.string.preferencesAutostart)
 
-        /* TODO: Espresso doesn't work with dropdowns. Which is a bit silly. Restore this section once fixed */
-//        scrollToText(R.string.preferencesReverseGeocodeProvider)
-//        clickOnAndWait(R.string.preferencesReverseGeocodeProvider)
-//        val something = onView(allOf(withId(android.R.id.text1), withText("OpenCage")))
-//
-//        something.perform(longClick())
-//
-//        scrollToText(R.string.preferencesOpencageGeocoderApiKey)
-//        clickOnAndWait(R.string.preferencesOpencageGeocoderApiKey)
-//        writeTo(android.R.id.edit, "geocodeAPIKey")
-//        clickDialogPositiveButton()
+        scrollToText(R.string.preferencesReverseGeocodeProvider)
+        clickOnAndWait(R.string.preferencesReverseGeocodeProvider)
 
-        clickBack()
+        clickOnAndWait("OpenCage")
+
+        scrollToText(R.string.preferencesOpencageGeocoderApiKey)
+        clickOnAndWait(R.string.preferencesOpencageGeocoderApiKey)
+        writeTo(android.R.id.edit, "geocodeAPIKey")
+        clickDialogPositiveButton()
+
+        clickBackAndWait()
 
         clickOnAndWait(R.string.configurationManagement)
 
