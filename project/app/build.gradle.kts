@@ -217,7 +217,7 @@ dependencies {
 
     // Widget libraries
     implementation("com.rengwuxian.materialedittext:library:2.1.4")
-    implementation("com.mikepenz:materialdrawer:6.1.2@aar") { isTransitive = true }
+    implementation("com.mikepenz:materialdrawer:8.4.1@aar") { isTransitive = true }
     implementation("com.mikepenz:materialize:1.2.1@aar")
 
     implementation("com.jakewharton:process-phoenix:2.0.0")
