@@ -40,10 +40,12 @@ android {
         )
         resConfigs(locales)
         testInstrumentationRunner("androidx.test.runner.AndroidJUnitRunner")
-/* TODO Get this lot sorted when the orchestrator / coverage / clearPackageData bug gets fixed */
-//        testInstrumentationRunnerArguments clearPackageData: "true"
-//        testInstrumentationRunnerArguments coverageFilePath: "/sdcard/"
-//        testInstrumentationRunnerArguments coverage: "true"
+        testInstrumentationRunnerArguments.putAll(
+            mapOf(
+                "clearPackageData" to "false",
+                "coverageFilePath" to "/storage/emulated/0/coverage"
+            )
+        )
     }
 
     signingConfigs {
@@ -123,7 +125,7 @@ android {
             isIncludeAndroidResources = true
             isIncludeAndroidResources = true
         }
-//        execution "ANDROIDX_TEST_ORCHESTRATOR"
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
     }
 
     tasks.withType<Test> {

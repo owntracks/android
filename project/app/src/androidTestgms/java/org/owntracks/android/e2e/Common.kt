@@ -6,6 +6,7 @@ import androidx.test.espresso.NoMatchingViewException
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility
+import com.schibsted.spain.barista.interaction.BaristaClickInteractions.clickOn
 import com.schibsted.spain.barista.interaction.BaristaSleepInteractions
 import com.schibsted.spain.barista.interaction.PermissionGranter
 import com.schibsted.spain.barista.internal.util.resourceMatcher
@@ -23,7 +24,7 @@ internal fun doWelcomeProcess() {
                 )
             )
         )
-        clickOnAndWait(R.id.fix_permissions_button)
+        clickOn(R.id.fix_permissions_button)
         PermissionGranter.allowPermissionsIfNeeded(ACCESS_FINE_LOCATION)
         BaristaSleepInteractions.sleep(1000)
         clickOnAndWait(R.id.btn_next)
