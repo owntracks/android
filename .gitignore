@@ -60,3 +60,5 @@ project/app/libobjectbox-*.dylib
 project/app/objectbox-*.dll
 
 project/localscripts
+
+jacoco.exec
