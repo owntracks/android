@@ -16,6 +16,7 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.TilesOverlay
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import org.owntracks.android.R
 import org.owntracks.android.databinding.OsmMapFragmentBinding
@@ -31,8 +32,13 @@ import timber.log.Timber
 class OSMMapFragment internal constructor() : MapFragment() {
     private var mapView: MapView? = null
     private var binding: OsmMapFragmentBinding? = null
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        Configuration.getInstance().load(context, PreferenceManager.getDefaultSharedPreferences(context))
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        Configuration.getInstance()
+            .load(context, PreferenceManager.getDefaultSharedPreferences(context))
         binding = DataBindingUtil.inflate(inflater, R.layout.osm_map_fragment, container, false)
         ((requireActivity() as MapActivity).checkAndRequestLocationPermissions())
         mapView = this.binding!!.osmMapView.apply {
@@ -54,8 +60,21 @@ class OSMMapFragment internal constructor() : MapFragment() {
                 false
             }
         }
+        setMapStyle()
         ((requireActivity()) as MapActivity).onMapReady()
         return binding!!.root
+    }
+
+    fun setMapStyle() {
+        if (resources.configuration.uiMode.and(android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES) {
+            mapView?.run {
+                overlayManager.tilesOverlay.setColorFilter(TilesOverlay.INVERT_COLORS)
+            }
+        } else {
+            mapView?.run {
+                overlayManager.tilesOverlay.setColorFilter(null)
+            }
+        }
     }
 
     override fun clearMarkers() {
@@ -70,7 +89,8 @@ class OSMMapFragment internal constructor() : MapFragment() {
 
     override fun updateMarker(id: String, latLng: LatLng) {
         mapView?.run {
-            val existingMarker: Marker? = overlays.firstOrNull { it is Marker && it.id == id } as Marker?
+            val existingMarker: Marker? =
+                overlays.firstOrNull { it is Marker && it.id == id } as Marker?
             if (existingMarker != null) {
                 existingMarker.position = latLng.toGeoPoint()
             } else {
@@ -107,8 +127,9 @@ class OSMMapFragment internal constructor() : MapFragment() {
     }
 
     override fun onResume() {
-        mapView?.onResume()
         super.onResume()
+        mapView?.onResume()
+        setMapStyle()
     }
 
     override fun onPause() {
