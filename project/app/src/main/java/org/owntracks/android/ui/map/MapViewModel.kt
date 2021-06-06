@@ -64,6 +64,7 @@ class MapViewModel @Inject constructor(contactsRepo: ContactsRepo, private val l
 
     override val mapLocationUpdateCallback: LocationCallback = object : LocationCallback {
         override fun onLocationResult(locationResult: LocationResult) {
+            Timber.tag("873432").d("Foreground location result $locationResult")
             liveLocation.value = locationResult.lastLocation
             locationIdlingResource.setIdleState(true)
             if (mode == VIEW_DEVICE && liveCamera.value != locationResult.lastLocation.toLatLng()) {
@@ -75,7 +76,7 @@ class MapViewModel @Inject constructor(contactsRepo: ContactsRepo, private val l
         }
 
         override fun onLocationAvailability(locationAvailability: LocationAvailability) {
-            Timber.d("MapViewModel location availability: $locationAvailability")
+            Timber.tag("873432").d("MapViewModel location availability: $locationAvailability")
         }
     }
 

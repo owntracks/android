@@ -75,7 +75,7 @@ class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallba
             isIndoorEnabled = false
             isMyLocationEnabled = true
             if (locationSource == null) {
-                Timber.e("No location source set, falling back to Google internal")
+                Timber.tag("873432").e("No location source set, falling back to Google internal")
             } else {
                 setLocationSource(locationSource!!.toGMSLocationSource())
             }
