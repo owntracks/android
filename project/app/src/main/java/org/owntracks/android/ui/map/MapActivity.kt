@@ -19,7 +19,6 @@ import android.widget.Toast
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.PopupMenu
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.commit
@@ -123,7 +122,6 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
                     return false
                 }
             })
-//            (it.appbar.appBarLayout.layoutParams as CoordinatorLayout.LayoutParams).behavior = behavior
         }
 
         locationLifecycleObserver = LocationLifecycleObserver(activityResultRegistry)
@@ -133,11 +131,11 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         mapLocationSource =
             MapLocationSource(locationProviderClient!!, viewModel!!.mapLocationUpdateCallback)
 
-        if (savedInstanceState == null) {
+        if (savedInstanceState == null || supportFragmentManager.findFragmentByTag("map") == null) {
             mapFragment = getMapFragment()
             supportFragmentManager.commit {
                 setReorderingAllowed(true)
-                add(R.id.mapFragment, mapFragment, "map")
+                replace(R.id.mapFragment, mapFragment, "map")
             }
         } else {
             mapFragment = supportFragmentManager.findFragmentByTag("map") as MapFragment
