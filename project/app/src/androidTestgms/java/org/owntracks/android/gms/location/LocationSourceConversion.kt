@@ -23,6 +23,10 @@ class LocationSourceConversion {
                 onLocationChangedListener.onLocationChanged(Location("test"))
             }
 
+            override fun reactivate() {
+                
+            }
+
             override fun deactivate() {
                 deactivateCalled = true
             }

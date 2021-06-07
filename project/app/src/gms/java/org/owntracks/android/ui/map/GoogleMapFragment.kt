@@ -74,13 +74,9 @@ class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallba
         this.googleMap?.run {
             isIndoorEnabled = false
             isMyLocationEnabled = true
-            if (locationSource == null) {
-                Timber.tag("873432").e("No location source set, falling back to Google internal")
-            } else {
-                setLocationSource(locationSource!!.toGMSLocationSource())
-            }
             uiSettings.isMyLocationButtonEnabled = false
             uiSettings.setAllGesturesEnabled(true)
+
             if (activity is MapActivity) {
                 if (locationRepo == null) {
                     locationRepo = (activity as MapActivity).locationRepo
@@ -88,6 +84,12 @@ class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallba
                 if (locationSource == null) {
                     locationSource = (activity as MapActivity).mapLocationSource
                 }
+            }
+
+            if (locationSource == null) {
+                Timber.tag("873432").e("No location source set")
+            } else {
+                setLocationSource(locationSource!!.toGMSLocationSource())
             }
 
             setMapStyle()
@@ -169,6 +171,7 @@ class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallba
 
     override fun onResume() {
         super.onResume()
+        locationSource?.reactivate()
         binding?.googleMapView?.onResume()
         setMapStyle()
     }
@@ -180,6 +183,7 @@ class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallba
 
     override fun onPause() {
         binding?.googleMapView?.onPause()
+        locationSource?.deactivate()
         super.onPause()
     }
 

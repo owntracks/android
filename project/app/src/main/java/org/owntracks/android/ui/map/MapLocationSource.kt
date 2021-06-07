@@ -9,9 +9,11 @@ class MapLocationSource internal constructor(
     private val locationProviderClient: LocationProviderClient,
     private val locationUpdateCallback: LocationCallback
 ) : LocationSource {
+    private lateinit var cachedOnLocationChangedListener: LocationSource.OnLocationChangedListener
     private lateinit var callbackWrapper: LocationCallback
     override fun activate(onLocationChangedListener: LocationSource.OnLocationChangedListener) {
         Timber.tag("873432").d("Activating mapLocationSource with client=${locationProviderClient}")
+        cachedOnLocationChangedListener = onLocationChangedListener
         callbackWrapper = object : LocationCallback {
             override fun onLocationResult(locationResult: LocationResult) {
                 Timber.tag("873432").d("MapLocationSource recevied locationResult $locationResult")
@@ -34,6 +36,14 @@ class MapLocationSource internal constructor(
             callbackWrapper,
             Looper.getMainLooper()
         )
+    }
+
+    override fun reactivate() {
+        if (this::cachedOnLocationChangedListener.isInitialized) {
+            Timber.tag("873432")
+                .d("Reactivating MapLocationSource with cached locationChangedListener=${cachedOnLocationChangedListener.hashCode()}")
+            activate(this.cachedOnLocationChangedListener)
+        }
     }
 
     override fun deactivate() {

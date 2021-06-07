@@ -167,12 +167,12 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
         locationCallback = new LocationCallback() {
             @Override
             public void onLocationAvailability(@NotNull LocationAvailability locationAvailability) {
-
+                Timber.tag("873432").d("BackgroundService location availability %s", locationAvailability);
             }
 
             @Override
-            public void onLocationResult(LocationResult locationResult) {
-                Timber.i("Locationresult received: %s", locationResult);
+            public void onLocationResult(@NotNull LocationResult locationResult) {
+                Timber.tag("873432").d("BackgroundService Location result received: %s", locationResult);
                 onLocationChanged(locationResult.getLastLocation(), MessageLocation.REPORT_TYPE_DEFAULT);
             }
         };
@@ -184,8 +184,8 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
             }
 
             @Override
-            public void onLocationResult(LocationResult locationResult) {
-                Timber.i("Ondemand Locationresult received: %s", locationResult);
+            public void onLocationResult(@NotNull LocationResult locationResult) {
+                Timber.tag("873432").d("BackgroundService Ondemand Locationresult received: %s", locationResult);
                 onLocationChanged(locationResult.getLastLocation(), MessageLocation.REPORT_TYPE_RESPONSE);
             }
         };
@@ -572,9 +572,9 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
     }
 
     private PendingIntent getGeofencePendingIntent() {
-        Intent geofeneIntent = new Intent(this, BackgroundService.class);
-        geofeneIntent.setAction(INTENT_ACTION_SEND_EVENT_CIRCULAR);
-        return PendingIntent.getBroadcast(this, INTENT_REQUEST_CODE_GEOFENCE, geofeneIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent geofenceIntent = new Intent(this, BackgroundService.class);
+        geofenceIntent.setAction(INTENT_ACTION_SEND_EVENT_CIRCULAR);
+        return PendingIntent.getBroadcast(this, INTENT_REQUEST_CODE_GEOFENCE, geofenceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     @SuppressWarnings("MissingPermission")
