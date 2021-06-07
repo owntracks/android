@@ -19,9 +19,12 @@ import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.TilesOverlay
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import org.owntracks.android.R
+import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.databinding.OsmMapFragmentBinding
 import org.owntracks.android.location.LatLng
+import org.owntracks.android.location.LocationSource
 import org.owntracks.android.location.toGeoPoint
+import org.owntracks.android.location.toOSMLocationSource
 import org.owntracks.android.ui.map.MapActivity
 import org.owntracks.android.ui.map.MapActivity.Companion.STARTING_LATITUDE
 import org.owntracks.android.ui.map.MapActivity.Companion.STARTING_LONGITUDE
@@ -30,6 +33,13 @@ import timber.log.Timber
 
 @AndroidEntryPoint
 class OSMMapFragment internal constructor() : MapFragment() {
+    constructor(locationSource: LocationSource, locationRepo: LocationRepo?) : this() {
+        this.locationSource = locationSource
+        this.locationRepo = locationRepo
+    }
+
+    private var locationRepo: LocationRepo? = null
+    private var locationSource: LocationSource? = null
     private var mapView: MapView? = null
     private var binding: OsmMapFragmentBinding? = null
     override fun onCreateView(
@@ -41,12 +51,29 @@ class OSMMapFragment internal constructor() : MapFragment() {
             .load(context, PreferenceManager.getDefaultSharedPreferences(context))
         binding = DataBindingUtil.inflate(inflater, R.layout.osm_map_fragment, container, false)
         ((requireActivity() as MapActivity).checkAndRequestLocationPermissions())
+        if (requireActivity() is MapActivity) {
+            if (locationRepo == null) {
+                locationRepo = (activity as MapActivity).locationRepo
+            }
+            if (locationSource == null) {
+                locationSource = (activity as MapActivity).mapLocationSource
+            }
+        }
         mapView = this.binding!!.osmMapView.apply {
             setTileSource(TileSourceFactory.MAPNIK)
             zoomController.setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
             controller.setZoom(ZOOM_STREET_LEVEL)
             controller.setCenter(GeoPoint(STARTING_LATITUDE, STARTING_LONGITUDE))
-            overlays.add(MyLocationNewOverlay(this))
+
+            locationSource?.also {
+                overlays.add(
+                    MyLocationNewOverlay(
+                        it.toOSMLocationSource(),
+                        this
+                    )
+                )
+            }
+
 
             setMultiTouchControls(true)
             setOnClickListener {

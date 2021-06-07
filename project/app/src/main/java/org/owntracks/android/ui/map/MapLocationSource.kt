@@ -1,5 +1,6 @@
 package org.owntracks.android.ui.map
 
+import android.location.Location
 import android.os.Looper
 import org.owntracks.android.location.*
 import timber.log.Timber
@@ -11,12 +12,14 @@ class MapLocationSource internal constructor(
 ) : LocationSource {
     private lateinit var cachedOnLocationChangedListener: LocationSource.OnLocationChangedListener
     private lateinit var callbackWrapper: LocationCallback
+    private var lastKnownLocation: Location? = null
     override fun activate(onLocationChangedListener: LocationSource.OnLocationChangedListener) {
         Timber.tag("873432").d("Activating mapLocationSource with client=${locationProviderClient}")
         cachedOnLocationChangedListener = onLocationChangedListener
         callbackWrapper = object : LocationCallback {
             override fun onLocationResult(locationResult: LocationResult) {
                 Timber.tag("873432").d("MapLocationSource recevied locationResult $locationResult")
+                lastKnownLocation = locationResult.lastLocation
                 onLocationChangedListener.onLocationChanged(locationResult.lastLocation)
                 locationUpdateCallback.onLocationResult(locationResult)
             }
@@ -50,4 +53,6 @@ class MapLocationSource internal constructor(
         Timber.tag("873432").d("Deactivating mapLocationSource with client=$locationProviderClient")
         locationProviderClient.removeLocationUpdates(callbackWrapper)
     }
+
+    override fun getLastKnownLocation(): Location? = lastKnownLocation
 }
