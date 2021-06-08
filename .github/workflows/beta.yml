@@ -7,7 +7,7 @@ name: Android CI Beta release
 on:
   push:
     tags:
-      - Android-v.[0-9]+.[0-9]+.[0-9]+-beta[0-9]+
+      - v[0-9]+.[0-9]+.[0-9]+-beta[0-9]+
 
 jobs:
   promote:

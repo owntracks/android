@@ -24,12 +24,13 @@ class LocationSourceConversion {
             }
 
             override fun reactivate() {
-                
             }
 
             override fun deactivate() {
                 deactivateCalled = true
             }
+
+            override fun getLastKnownLocation(): Location? = null
         }
 
         val gmsLocationSource = locationSource.toGMSLocationSource()
