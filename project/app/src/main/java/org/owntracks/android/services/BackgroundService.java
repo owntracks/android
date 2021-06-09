@@ -671,11 +671,6 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
     }
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void onEvent(MessageLocation messageLocation) {
-
-    }
-
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(Location location) {
         MessageLocation messageLocation = MessageLocation.fromLocation(location);
         if (lastLocationMessage == null || lastLocationMessage.getTimestamp() < messageLocation.getTimestamp()) {

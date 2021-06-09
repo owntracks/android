@@ -1,5 +1,6 @@
 package org.owntracks.android.services;
 
+import android.content.Context;
 import android.location.Location;
 
 import androidx.annotation.NonNull;
@@ -33,20 +34,22 @@ public class LocationProcessor {
     private final LocationRepo locationRepo;
     private final WaypointsRepo waypointsRepo;
     private final DeviceMetricsProvider deviceMetricsProvider;
+    private final WifiInfoProvider wifiInfoProvider;
 
     public static final int MONITORING_QUIET = -1;
     public static final int MONITORING_MANUAL = 0;
     public static final int MONITORING_SIGNIFICANT = 1;
     public static final int MONITORING_MOVE = 2;
 
+
     @Inject
-    public LocationProcessor(MessageProcessor messageProcessor, Preferences preferences, LocationRepo locationRepo, WaypointsRepo waypointsRepo, DeviceMetricsProvider deviceMetricsProvider) {
+    public LocationProcessor(MessageProcessor messageProcessor, Preferences preferences, LocationRepo locationRepo, WaypointsRepo waypointsRepo, DeviceMetricsProvider deviceMetricsProvider, WifiInfoProvider wifiInfoProvider) {
         this.messageProcessor = messageProcessor;
         this.preferences = preferences;
         this.deviceMetricsProvider = deviceMetricsProvider;
         this.locationRepo = locationRepo;
         this.waypointsRepo = waypointsRepo;
-
+        this.wifiInfoProvider = wifiInfoProvider;
     }
 
     private boolean ignoreLowAccuracy(@NonNull Location l) {
@@ -70,13 +73,13 @@ public class LocationProcessor {
         }
 
         // Check if publish would trigger a region if fusedRegionDetection is enabled
-        if(loadedWaypoints.size() > 0 && preferences.getFusedRegionDetection() && !MessageLocation.REPORT_TYPE_CIRCULAR.equals(trigger)) {
-            for(WaypointModel waypoint : loadedWaypoints) {
+        if (loadedWaypoints.size() > 0 && preferences.getFusedRegionDetection() && !MessageLocation.REPORT_TYPE_CIRCULAR.equals(trigger)) {
+            for (WaypointModel waypoint : loadedWaypoints) {
                 onWaypointTransition(waypoint, currentLocation, currentLocation.distanceTo(waypoint.getLocation()) <= waypoint.getGeofenceRadius() ? Geofence.GEOFENCE_TRANSITION_ENTER : Geofence.GEOFENCE_TRANSITION_EXIT, MessageTransition.TRIGGER_LOCATION);
             }
         }
 
-        if (preferences.getMonitoring() == MONITORING_QUIET && !MessageLocation.REPORT_TYPE_USER.equals(trigger) ) {
+        if (preferences.getMonitoring() == MONITORING_QUIET && !MessageLocation.REPORT_TYPE_USER.equals(trigger)) {
             Timber.v("message suppressed by monitoring settings: quiet");
             return;
         }
@@ -86,7 +89,8 @@ public class LocationProcessor {
             return;
         }
 
-        MessageLocation message = MessageLocation.fromLocation(currentLocation);
+        MessageLocation message = MessageLocation.fromLocationAndWifiInfo(currentLocation, wifiInfoProvider);
+
         message.setTrigger(trigger);
 
         message.setTrackerId(preferences.getTrackerId(true));
@@ -104,8 +108,8 @@ public class LocationProcessor {
     //TODO: refactor to use ObjectBox query directly
     private List<String> calculateInregions(List<WaypointModel> loadedWaypoints) {
         LinkedList<String> l = new LinkedList<>();
-        for(WaypointModel w : loadedWaypoints) {
-            if(w.getLastTransition() == Geofence.GEOFENCE_TRANSITION_ENTER )
+        for (WaypointModel w : loadedWaypoints) {
+            if (w.getLastTransition() == Geofence.GEOFENCE_TRANSITION_ENTER)
                 l.add(w.getDescription());
 
         }
@@ -139,7 +143,7 @@ public class LocationProcessor {
         waypointModel.setLastTriggeredNow();
         waypointsRepo.update(waypointModel, false);
 
-        if(preferences.getMonitoring() ==MONITORING_QUIET) {
+        if (preferences.getMonitoring() == MONITORING_QUIET) {
             Timber.v("message suppressed by monitoring settings: %s", preferences.getMonitoring());
             return;
         }
@@ -171,7 +175,7 @@ public class LocationProcessor {
     public void publishWaypointsMessage() {
         MessageWaypoints message = new MessageWaypoints();
         MessageWaypointCollection collection = new MessageWaypointCollection();
-        for(WaypointModel w : waypointsRepo.getAllWithGeofences()) {
+        for (WaypointModel w : waypointsRepo.getAllWithGeofences()) {
             MessageWaypoint m = new MessageWaypoint();
             m.setDescription(w.getDescription());
             m.setLatitude(w.getGeofenceLatitude());
