@@ -2,6 +2,7 @@ package org.owntracks.android.model.messages
 
 import androidx.databinding.BaseObservable
 import com.fasterxml.jackson.annotation.*
+import okhttp3.internal.toHexString
 import org.owntracks.android.support.Parser
 import org.owntracks.android.support.Preferences
 import java.io.IOException
@@ -16,7 +17,7 @@ abstract class MessageBase : BaseObservable() {
 
     @get:JsonIgnore
     @JsonIgnore
-    val messageId = "${System.currentTimeMillis()}-${Random().nextInt(0X1000000)}"
+    val messageId = "${System.currentTimeMillis()}-${Random().nextInt(0X1000000).toHexString()}"
 
     @JsonIgnore
     open var topic: String = ""
