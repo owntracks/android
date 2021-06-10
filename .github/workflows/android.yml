@@ -90,7 +90,7 @@ jobs:
   espresso-test-gms:
     name: "Espresso test GMS flavor"
     runs-on: macos-latest
-    needs: build
+    needs: unit-test
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 11
@@ -137,7 +137,7 @@ jobs:
   espresso-test-oss:
     name: "Espresso test OSS flavor"
     runs-on: macos-latest
-    needs: build
+    needs: unit-test
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 11
