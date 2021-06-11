@@ -166,7 +166,10 @@ kapt {
     correctErrorTypes = true
 }
 
-val daggerVersion = "2.36"
+hilt {
+    enableAggregatingTask = true
+}
+
 val okHttpVersion = "4.9.1"
 val jacksonVersion = "2.12.2"
 val materialDialogsVersion = "0.9.6.0"
@@ -193,8 +196,8 @@ dependencies {
     implementation("org.osmdroid:osmdroid-android:6.1.10")
 
     // Utility libraries
-    implementation("com.google.dagger:hilt-compiler:${daggerVersion}")
-    implementation("com.google.dagger:hilt-android:${daggerVersion}")
+    implementation("com.google.dagger:hilt-compiler:${rootProject.extra["dagger-version"]}")
+    implementation("com.google.dagger:hilt-android:${rootProject.extra["dagger-version"]}")
 
     implementation("org.greenrobot:eventbus:3.2.0")
     implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
@@ -233,9 +236,9 @@ dependencies {
 
     // Preprocessors
     kapt("org.greenrobot:eventbus-annotation-processor:3.2.0")
-    kapt("com.google.dagger:hilt-compiler:$daggerVersion")
+    kapt("com.google.dagger:hilt-compiler:${rootProject.extra["dagger-version"]}")
 
-    kaptTest("com.google.dagger:hilt-compiler:${daggerVersion}")
+    kaptTest("com.google.dagger:hilt-compiler:${rootProject.extra["dagger-version"]}")
 
     testImplementation("androidx.test:core:${androidxTestVersion}")
     testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
