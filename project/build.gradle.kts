@@ -2,7 +2,7 @@
 
 buildscript {
     extra.apply {
-        set("dagger-version","2.37")
+        set("dagger-version","2.36")
     }
     repositories {
         google()
