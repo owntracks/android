@@ -167,7 +167,7 @@ kapt {
 }
 
 hilt {
-    enableAggregatingTask = true
+    enableAggregatingTask = false
 }
 
 val okHttpVersion = "4.9.1"

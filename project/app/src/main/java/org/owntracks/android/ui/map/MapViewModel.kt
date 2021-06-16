@@ -139,11 +139,11 @@ class MapViewModel @Inject constructor(contactsRepo: ContactsRepo, private val l
     }
 
     override fun onClearContactClicked() {
-        val m = MessageClear()
-        if (activeContact != null) {
-            m.topic = activeContact!!.id
-            messageProcessor.queueMessageForSending(m)
+        activeContact?.also {
+            messageProcessor.queueMessageForSending(MessageClear().apply { topic = it.id })
+            contactsRepo.remove(it.id)
         }
+        clearActiveContact()
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
