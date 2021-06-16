@@ -59,37 +59,22 @@ class FusedContact(id: String?) : BaseObservable() {
     }
 
     @get:Bindable
-    val fusedName: String?
-        get() = if (hasCard() && getMessageCard()!!.hasName()) getMessageCard()!!.name else trackerId
+    val fusedName: String
+        get() = messageCard?.name ?: trackerId
 
     @get:Bindable
-    val fusedLocationAccuracy: String
-        get() = if (hasLocation()) messageLocation.value!!.accuracy.toString() else 0.toString()
-
-    fun hasLocation(): Boolean {
-        return messageLocation.value != null
-    }
-
-    fun hasCard(): Boolean {
-        return messageCard != null
-    }
+    val fusedLocationAccuracy: Int
+        get() = messageLocation.value?.accuracy ?: 0
 
     @get:Bindable
     val trackerId: String
-        get() = if (hasLocation() && messageLocation.value!!.hasTrackerId()) messageLocation.value!!.trackerId!! else {
-            val id = id.replace("/", "")
-            if (id.length > 2) {
-                id.substring(id.length - 2)
-            } else id
+        get() = messageLocation.value?.trackerId ?: id.replace("/", "").apply {
+            if (length > 2) {
+                substring(length - 2)
+            }
         }
-    val latLng: LatLng
-        get() = LatLng(messageLocation.value!!.latitude, messageLocation.value!!.longitude)
-    var isDeleted = false
-        private set
-
-    fun setDeleted() {
-        isDeleted = true
-    }
+    val latLng: LatLng?
+        get() = messageLocation.value?.run { LatLng(latitude, longitude) }
 
     override fun toString(): String {
         return "FusedContact $id ($fusedName)"

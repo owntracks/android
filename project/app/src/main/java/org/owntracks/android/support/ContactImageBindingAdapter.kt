@@ -7,79 +7,97 @@ import android.graphics.drawable.Drawable
 import android.util.Base64
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
-import androidx.databinding.DataBindingComponent
-import dagger.hilt.DefineComponent
-import dagger.hilt.EntryPoint
-import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.*
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.support.widgets.TextDrawable
 import timber.log.Timber
 import javax.inject.Inject
-import javax.inject.Scope
 
-class ContactImageBindingAdapter @Inject constructor(@ApplicationContext context: Context) {
+class ContactImageBindingAdapter @Inject constructor(
+    @ApplicationContext context: Context,
+    private val memoryCache: ContactBitmapAndNameMemoryCache
+) {
     @BindingAdapter(value = ["contact"])
     fun ImageView.displayFaceInViewAsync(c: FusedContact?) {
-        GlobalScope.launch(Dispatchers.Main) {
-            setImageBitmap(getBitmapFromCache(c))
+        c?.also { contact ->
+            GlobalScope.launch(Dispatchers.Main) {
+                setImageBitmap(getBitmapFromCache(contact))
+            }
         }
     }
 
     private val faceDimensions = (48 * (context.resources.displayMetrics.densityDpi / 160f)).toInt()
-    fun invalidateCacheLevelCard(key: String?) {
-        memoryCache.clearLevelCard(key)
-    }
 
-    suspend fun getBitmapFromCache(contact: FusedContact?): Bitmap? {
+    suspend fun getBitmapFromCache(contact: FusedContact): Bitmap {
         return withContext(Dispatchers.IO) {
-            var bitmap: Bitmap?
-            if (contact == null) return@withContext null
-            if (contact.hasCard()) {
-                bitmap = memoryCache.getLevelCard(contact.id)
-                if (bitmap != null) {
-                    return@withContext bitmap
-                }
-                if (contact.messageCard != null && contact.messageCard!!.hasFace()) {
-                    val imageAsBytes = Base64.decode(contact.messageCard!!.face!!.toByteArray(), Base64.DEFAULT)
+            val contactBitMapAndName = memoryCache[contact.id]
+
+            if (contactBitMapAndName != null && contactBitMapAndName is ContactBitmapAndName.CardBitmap && contactBitMapAndName.bitmap != null) {
+                return@withContext contactBitMapAndName.bitmap
+            }
+            contact.messageCard?.run {
+                face?.also { face ->
+                    val imageAsBytes =
+                        Base64.decode(face.toByteArray(), Base64.DEFAULT)
                     val b = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.size)
+                    val bitmap: Bitmap
                     if (b == null) {
                         Timber.e("Decoding card bitmap failed")
-                        val fallbackBitmap = Bitmap.createBitmap(faceDimensions, faceDimensions, Bitmap.Config.ARGB_8888)
+                        val fallbackBitmap = Bitmap.createBitmap(
+                            faceDimensions,
+                            faceDimensions,
+                            Bitmap.Config.ARGB_8888
+                        )
                         val canvas = Canvas(fallbackBitmap)
                         val paint = Paint()
                         paint.color = -0x1
-                        canvas.drawRect(0f, 0f, faceDimensions.toFloat(), faceDimensions.toFloat(), paint)
+                        canvas.drawRect(
+                            0f,
+                            0f,
+                            faceDimensions.toFloat(),
+                            faceDimensions.toFloat(),
+                            paint
+                        )
                         bitmap = getRoundedShape(fallbackBitmap)
                     } else {
-                        bitmap = getRoundedShape(Bitmap.createScaledBitmap(b, faceDimensions, faceDimensions, true))
-                        memoryCache.putLevelCard(contact.id, bitmap)
+                        bitmap = getRoundedShape(
+                            Bitmap.createScaledBitmap(
+                                b,
+                                faceDimensions,
+                                faceDimensions,
+                                true
+                            )
+                        )
+                        memoryCache.put(
+                            contact.id,
+                            ContactBitmapAndName.CardBitmap(name, bitmap)
+                        )
                     }
                     return@withContext bitmap
                 }
             }
-            var td = memoryCache.getLevelTid(contact.id)
-            // if cache doesn't contain a bitmap for a contact or if the cached bitmap was for an old tid, create a new one and cache it
-            if (td == null || !td.isBitmapFor(contact.trackerId)) {
-                td = TidBitmap(
-                        contact.trackerId,
-                        drawableToBitmap(
-                                TextDrawable
-                                        .Builder()
-                                        .buildRoundRect(contact.trackerId, TextDrawable.ColorGenerator.MATERIAL.getColor(contact.id), faceDimensions)
+            if (contactBitMapAndName !is ContactBitmapAndName.TrackerIdBitmap || contactBitMapAndName.trackerId != contact.trackerId) {
+                val bitmap = drawableToBitmap(
+                    TextDrawable
+                        .Builder()
+                        .buildRoundRect(
+                            contact.trackerId,
+                            TextDrawable.ColorGenerator.MATERIAL.getColor(contact.id),
+                            faceDimensions
                         )
                 )
-                memoryCache.putLevelTid(contact.id, td)
+                memoryCache.put(
+                    contact.id,
+                    ContactBitmapAndName.TrackerIdBitmap(contact.trackerId, bitmap)
+                )
+
+                return@withContext bitmap
+            } else {
+                return@withContext contactBitMapAndName.bitmap
             }
-            return@withContext td.bitmap
         }
 
-    }
-
-    fun invalidateCache() {
-        memoryCache.clear()
     }
 
     private fun getRoundedShape(bitmap: Bitmap): Bitmap {
@@ -112,9 +130,5 @@ class ContactImageBindingAdapter @Inject constructor(@ApplicationContext context
         drawable.setBounds(0, 0, canvas.width, canvas.height)
         drawable.draw(canvas)
         return bitmap
-    }
-
-    companion object {
-        private val memoryCache: ContactBitmapMemoryCache = ContactBitmapMemoryCache()
     }
 }

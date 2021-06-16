@@ -15,13 +15,6 @@ class MessageCard : MessageBase() {
 
     @set:JsonSetter
     var face: String? = null
-    fun hasFace(): Boolean {
-        return face != null
-    }
-
-    fun hasName(): Boolean {
-        return name != null
-    }
 
     override val baseTopicSuffix: String
         get() = BASETOPIC_SUFFIX

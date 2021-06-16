@@ -35,6 +35,7 @@ interface MapMvvm {
         fun onMarkerClick(id: String)
         fun restore(contactId: String?)
         fun onMapReady()
+        fun refreshMarkers()
         val contact: LiveData<FusedContact?>
         val bottomSheetHidden: LiveData<Boolean>
         val mapCenter: LiveData<LatLng>

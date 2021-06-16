@@ -8,18 +8,19 @@ import org.greenrobot.eventbus.ThreadMode
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageLocation
-import org.owntracks.android.support.ContactImageBindingAdapter
+import org.owntracks.android.support.ContactBitmapAndName
+import org.owntracks.android.support.ContactBitmapAndNameMemoryCache
 import org.owntracks.android.support.Events.*
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class MemoryContactsRepo @Inject constructor(private val eventBus: EventBus, private val contactImageBindingAdapter: ContactImageBindingAdapter) : ContactsRepo {
+class MemoryContactsRepo @Inject constructor(
+    private val eventBus: EventBus,
+    private val contactsBitmapAndNameMemoryCache: ContactBitmapAndNameMemoryCache
+) : ContactsRepo {
     override val all = MutableLiveData<MutableMap<String, FusedContact>>(mutableMapOf())
-    private var majorRevision: Long = 0
-    override var revision: Long = 0
-        get() = majorRevision + field
 
     override fun getById(id: String): FusedContact? {
         return all.value!![id]
@@ -37,21 +38,13 @@ class MemoryContactsRepo @Inject constructor(private val eventBus: EventBus, pri
     @Synchronized
     override fun clearAll() {
         all.value!!.clear()
-        majorRevision -= MAJOR_STEP
-        revision = 0
-        contactImageBindingAdapter.invalidateCache()
+        contactsBitmapAndNameMemoryCache.evictAll()
     }
 
     @Synchronized
     override fun remove(id: String) {
         Timber.v("removing contact: %s", id)
-        val c = all.value!!.remove(id)
-        if (c != null) {
-            c.setDeleted()
-            eventBus.post(FusedContactRemoved(c))
-            majorRevision -= MAJOR_STEP
-            revision = 0
-        }
+        all.value!!.remove(id)?.run { eventBus.post(FusedContactRemoved(this)) }
     }
 
     @Synchronized
@@ -59,15 +52,19 @@ class MemoryContactsRepo @Inject constructor(private val eventBus: EventBus, pri
         var c = getById(id)
         if (c != null) {
             c.messageCard = messageCard
-            contactImageBindingAdapter.invalidateCacheLevelCard(c.id)
-            revision++
+            contactsBitmapAndNameMemoryCache.put(
+                c.id,
+                ContactBitmapAndName.CardBitmap(messageCard.name, null)
+            )
             eventBus.post(c)
         } else {
             c = FusedContact(id)
             c.messageCard = messageCard
-            contactImageBindingAdapter.invalidateCacheLevelCard(c.id)
+            contactsBitmapAndNameMemoryCache.put(
+                c.id,
+                ContactBitmapAndName.CardBitmap(messageCard.name, null)
+            )
             put(id, c)
-            revision++
             eventBus.post(FusedContactAdded(c))
         }
     }
@@ -78,14 +75,20 @@ class MemoryContactsRepo @Inject constructor(private val eventBus: EventBus, pri
         if (fusedContact != null) {
             // If timestamp of last location message is <= the new location message, skip update. We either received an old or already known message.
             if (fusedContact.setMessageLocation(messageLocation)) {
-                revision++
                 eventBus.post(fusedContact)
             }
         } else {
-            fusedContact = FusedContact(id)
-            fusedContact.setMessageLocation(messageLocation)
+            fusedContact = FusedContact(id).apply {
+                setMessageLocation(messageLocation)
+                // We may have seen this contact id before, and it may have been removed from the repo
+                // Check the cache to see if we have a name
+                contactsBitmapAndNameMemoryCache[id]?.also {
+                    if (it is ContactBitmapAndName.CardBitmap && it.name != null) {
+                        this.messageCard = MessageCard().apply { name = it.name }
+                    }
+                }
+            }
             put(id, fusedContact)
-            revision++
             eventBus.post(FusedContactAdded(fusedContact))
         }
     }
@@ -99,10 +102,6 @@ class MemoryContactsRepo @Inject constructor(private val eventBus: EventBus, pri
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     fun onEventMainThread(@Suppress("UNUSED_PARAMETER") e: EndpointChanged?) {
         clearAll()
-    }
-
-    companion object {
-        const val MAJOR_STEP: Long = 1000000
     }
 
     init {

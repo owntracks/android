@@ -52,8 +52,8 @@
     <string name="menuContactNavigate">Navigate</string>
     <string name="menuCurrentLocation">Current location</string>
     <string name="contactDetailsAccuracy">Accuracy</string>
-    <string name="contactDetailsAccuracyValue" translatable="false">%s m</string>
-    <string name="contactDetailsDistanceValue" translatable="false">%s m</string>
+    <string name="contactDetailsAccuracyValue" translatable="false">%d m</string>
+    <string name="contactDetailsDistanceValue" translatable="false">%d m</string>
     <string name="contactDetailsTopic">Identifier</string>
     <string name="waypointListPlaceholder">No regions defined yet</string>
     <string name="importConfig">Import</string>

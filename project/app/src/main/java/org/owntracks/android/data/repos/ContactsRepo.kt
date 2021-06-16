@@ -12,5 +12,4 @@ interface ContactsRepo {
     fun remove(id: String)
     fun update(id: String, messageLocation: MessageLocation)
     fun update(id: String, messageCard: MessageCard)
-    val revision: Long
 }

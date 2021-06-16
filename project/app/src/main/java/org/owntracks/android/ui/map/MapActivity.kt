@@ -27,6 +27,7 @@ import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.idling.CountingIdlingResource
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -58,14 +59,13 @@ import org.owntracks.android.ui.base.navigator.Navigator
 import org.owntracks.android.ui.map.osm.OSMMapFragment
 import org.owntracks.android.ui.welcome.WelcomeActivity
 import timber.log.Timber
-import java.util.*
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
 @AndroidEntryPoint
 class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>?>(), MapMvvm.View,
     View.OnClickListener, View.OnLongClickListener, PopupMenu.OnMenuItemClickListener,
-    Observer<Any?> {
+    Observer<FusedContact?> {
     lateinit var locationLifecycleObserver: LocationLifecycleObserver
     private var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>? = null
     private var menu: Menu? = null
@@ -223,53 +223,55 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         }
     }
 
-    override fun onChanged(activeContact: Any?) {
-        if (activeContact != null) {
-            val fusedContact = activeContact as FusedContact
-            Timber.v("for contact: %s", fusedContact.id)
-            binding!!.contactPeek.name.text = fusedContact.fusedName
-            if (fusedContact.hasLocation()) {
-                GlobalScope.launch(Dispatchers.Main) {
-                    contactImageBindingAdapter.run {
-                        binding!!.contactPeek.image.setImageBitmap(getBitmapFromCache(fusedContact))
+    override fun onChanged(activeContact: FusedContact?) {
+        binding?.run {
+            activeContact?.let { contact ->
+                Timber.v("contact changed: $contact.id")
+                contactPeek.name.text = contact.fusedName
+                if (contact.messageLocation.value != null) {
+                    GlobalScope.launch(Dispatchers.Main) {
+                        contactImageBindingAdapter.run {
+                            contactPeek.image.setImageBitmap(
+                                getBitmapFromCache(contact)
+                            )
+                        }
                     }
-                }
-                geocoderProvider.resolve(
-                    fusedContact.messageLocation.value!!,
-                    binding!!.contactPeek.location
-                )
-                BindingConversions.setRelativeTimeSpanString(
-                    binding!!.contactPeek.locationDate,
-                    fusedContact.tst
-                )
-                binding!!.acc.text = getString(
-                    R.string.contactDetailsAccuracyValue,
-                    fusedContact.fusedLocationAccuracy
-                )
-                binding!!.tid.text = fusedContact.trackerId
-                binding!!.id.text = fusedContact.id
-                if (viewModel!!.currentLocation.value != null) {
-                    binding!!.distance.visibility = View.VISIBLE
-                    binding!!.distanceLabel.visibility = View.VISIBLE
-                    val distance = FloatArray(2)
-                    Location.distanceBetween(
-                        viewModel!!.currentLocation.value!!.latitude,
-                        viewModel!!.currentLocation.value!!.longitude,
-                        fusedContact.latLng.latitude,
-                        fusedContact.latLng.longitude,
-                        distance
+                    geocoderProvider.resolve(
+                        contact.messageLocation.value!!, contactPeek.location
                     )
-                    binding!!.distance.text = getString(
-                        R.string.contactDetailsDistanceValue,
-                        distance[0].roundToInt()
+                    BindingConversions.setRelativeTimeSpanString(
+                        contactPeek.locationDate,
+                        contact.tst
                     )
+                    acc.text = getString(
+                        R.string.contactDetailsAccuracyValue,
+                        contact.fusedLocationAccuracy
+                    )
+                    tid.text = contact.trackerId
+                    id.text = contact.id
+                    if (viewModel?.currentLocation?.value != null) {
+                        distance.visibility = View.VISIBLE
+                        distanceLabel.visibility = View.VISIBLE
+                        val distanceBetween = FloatArray(2)
+                        Location.distanceBetween(
+                            viewModel!!.currentLocation.value!!.latitude,
+                            viewModel!!.currentLocation.value!!.longitude,
+                            contact.latLng!!.latitude,
+                            contact.latLng!!.longitude,
+                            distanceBetween
+                        )
+                        this.distance.text = getString(
+                            R.string.contactDetailsDistanceValue,
+                            distanceBetween[0].roundToInt()
+                        )
+                    } else {
+                        distance.visibility = View.GONE
+                        distanceLabel.visibility = View.GONE
+                    }
                 } else {
-                    binding!!.distance.visibility = View.GONE
-                    binding!!.distanceLabel.visibility = View.GONE
+                    contactPeek.location.setText(R.string.na)
+                    contactPeek.locationDate.setText(R.string.na)
                 }
-            } else {
-                binding!!.contactPeek.location.setText(R.string.na)
-                binding!!.contactPeek.locationDate.setText(R.string.na)
             }
         }
     }
@@ -297,6 +299,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         super.onResume()
         handleIntentExtras(intent)
         updateMonitoringModeMenu()
+        viewModel?.refreshMarkers()
     }
 
     private fun handleIntentExtras(intent: Intent) {
@@ -380,7 +383,8 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
                 Toast.makeText(this, R.string.monitoring_manual, Toast.LENGTH_SHORT).show()
             }
             LocationProcessor.MONITORING_SIGNIFICANT -> {
-                Toast.makeText(this, R.string.monitoring_significant, Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, R.string.monitoring_significant, Toast.LENGTH_SHORT)
+                    .show()
             }
             else -> {
                 Toast.makeText(this, R.string.monitoring_move, Toast.LENGTH_SHORT).show()
@@ -411,17 +415,15 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
     }
 
     override fun updateMarker(contact: FusedContact) {
-        if (!contact.hasLocation()) {
+        if (contact.latLng == null) {
             Timber.w("unable to update marker for $contact. no location")
             return
         }
         Timber.v("updating marker for contact: %s", contact.id)
-        mapFragment.updateMarker(contact.id, contact.latLng)
+        mapFragment.updateMarker(contact.id, contact.latLng!!)
         GlobalScope.launch(Dispatchers.Main) {
             contactImageBindingAdapter.run {
-                getBitmapFromCache(contact)?.let {
-                    mapFragment.setMarkerImage(contact.id, it)
-                }
+                mapFragment.setMarkerImage(contact.id, getBitmapFromCache(contact))
             }
         }
     }
@@ -438,22 +440,30 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         val itemId = item.itemId
         if (itemId == R.id.menu_navigate) {
             val c = viewModel!!.activeContact
-            if (c != null && c.hasLocation()) {
-                try {
-                    val l = c.latLng.toGMSLatLng()
-                    val intent = Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse("google.navigation:q=${l.latitude},${l.longitude}")
-                    )
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    startActivity(intent)
-                } catch (e: ActivityNotFoundException) {
-                    Toast.makeText(this, getString(R.string.noNavigationApp), Toast.LENGTH_SHORT)
-                        .show()
+            if (c?.latLng != null) {
+                c.latLng?.also {
+                    try {
+                        val l = it.toGMSLatLng()
+                        val intent = Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse("google.navigation:q=${l.latitude},${l.longitude}")
+                        )
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        startActivity(intent)
+                    } catch (e: ActivityNotFoundException) {
+                        Snackbar.make(
+                            binding!!.coordinatorLayout,
+                            getString(R.string.noNavigationApp),
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             } else {
-                Toast.makeText(this, getString(R.string.contactLocationUnknown), Toast.LENGTH_SHORT)
-                    .show()
+                Snackbar.make(
+                    binding!!.coordinatorLayout,
+                    getString(R.string.contactLocationUnknown),
+                    Snackbar.LENGTH_SHORT
+                ).show()
             }
             return true
         } else if (itemId == R.id.menu_clear) {
@@ -491,7 +501,9 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         val popupMenu = PopupMenu(this, v, Gravity.START)
         popupMenu.menuInflater.inflate(R.menu.menu_popup_contacts, popupMenu.menu)
         popupMenu.setOnMenuItemClickListener(this)
-        if (preferences.mode == MessageProcessorEndpointHttp.MODE_ID) popupMenu.menu.removeItem(R.id.menu_clear)
+        if (preferences.mode == MessageProcessorEndpointHttp.MODE_ID) popupMenu.menu.removeItem(
+            R.id.menu_clear
+        )
         popupMenu.show()
     }
 

@@ -26,7 +26,11 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @ActivityScoped
-class MapViewModel @Inject constructor(contactsRepo: ContactsRepo, private val locationProcessor: LocationProcessor, messageProcessor: MessageProcessor) : BaseViewModel<MapMvvm.View>(), MapMvvm.ViewModel<MapMvvm.View> {
+class MapViewModel @Inject constructor(
+    contactsRepo: ContactsRepo,
+    private val locationProcessor: LocationProcessor,
+    messageProcessor: MessageProcessor
+) : BaseViewModel<MapMvvm.View>(), MapMvvm.ViewModel<MapMvvm.View> {
     private val contactsRepo: ContactsRepo
 
     @get:Bindable
@@ -43,13 +47,20 @@ class MapViewModel @Inject constructor(contactsRepo: ContactsRepo, private val l
     override fun restoreInstanceState(savedInstanceState: Bundle) {}
 
     override fun onMapReady() {
-        for (c in contactsRepo.all.value!!.values) {
-            view!!.updateMarker(c)
-        }
-        if (mode == VIEW_CONTACT && activeContact != null) setViewModeContact(activeContact!!, true) else if (mode == VIEW_FREE) {
+        refreshMarkers()
+        if (mode == VIEW_CONTACT && activeContact != null) setViewModeContact(
+            activeContact!!,
+            true
+        ) else if (mode == VIEW_FREE) {
             setViewModeFree()
         } else {
             setViewModeDevice()
+        }
+    }
+
+    override fun refreshMarkers() {
+        for (c in contactsRepo.all.value!!.values) {
+            view!!.updateMarker(c)
         }
     }
 
@@ -88,7 +99,10 @@ class MapViewModel @Inject constructor(contactsRepo: ContactsRepo, private val l
 
     private fun setViewModeContact(contactId: String, center: Boolean) {
         val c = contactsRepo.getById(contactId)
-        if (c != null) setViewModeContact(c, center) else Timber.e("contact not found %s, ", contactId)
+        if (c != null) setViewModeContact(c, center) else Timber.e(
+            "contact not found %s, ",
+            contactId
+        )
     }
 
     private fun setViewModeContact(c: FusedContact, center: Boolean) {

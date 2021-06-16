@@ -35,7 +35,7 @@ class EditorViewModel @Inject constructor(
     private fun updateEffectiveConfiguration() {
         try {
             val message = preferences.exportToMessage()
-            message.waypoints = waypointsRepo!!.exportToMessage()
+            message.waypoints = waypointsRepo.exportToMessage()
             message[preferences.getPreferenceKey(R.string.preferenceKeyPassword)] = "********"
             setEffectiveConfiguration(parser.toJsonPlainPretty(message))
         } catch (e: IOException) {
