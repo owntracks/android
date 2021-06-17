@@ -68,9 +68,11 @@ class FusedContact(id: String?) : BaseObservable() {
 
     @get:Bindable
     val trackerId: String
-        get() = messageLocation.value?.trackerId ?: id.replace("/", "").apply {
-            if (length > 2) {
-                substring(length - 2)
+        get() = messageLocation.value?.trackerId ?: id.replace("/", "").let {
+            return if (it.length > 2) {
+                it.substring(it.length - 2)
+            } else {
+                it
             }
         }
     val latLng: LatLng?

@@ -52,8 +52,13 @@
     <string name="menuContactNavigate">Navigate</string>
     <string name="menuCurrentLocation">Current location</string>
     <string name="contactDetailsAccuracy">Accuracy</string>
+    <string name="contactDetailsAltitude">Altitude</string>
+    <string name="contactDetailsBearing">Bearing</string>
+    <string name="contactDetailsDistance">Distance</string>
     <string name="contactDetailsAccuracyValue" translatable="false">%d m</string>
-    <string name="contactDetailsDistanceValue" translatable="false">%d m</string>
+    <string name="contactDetailsDistanceValue" translatable="false">%,.2f %s</string>
+    <string name="contactDetailsBearingValue" translatable="false">%,.0f°</string>
+    <string name="contactDetailsAltitudeValue" translatable="false">%,d m</string>
     <string name="contactDetailsTopic">Identifier</string>
     <string name="waypointListPlaceholder">No regions defined yet</string>
     <string name="importConfig">Import</string>
@@ -165,7 +170,6 @@
     <string name="notificationChangeMonitoring">Change Monitoring</string>
     <string name="preferencesDebugLog">Debug log</string>
     <string name="monitoring_mode">Monitoring</string>
-    <string name="distance_label">Distance</string>
     <string name="preferencesClientId">Client ID</string>
     <string name="status_endpoint_state_hint">Endpoint state</string>
     <string name="status_endpoint_state_message_hint">Endpoint state message</string>

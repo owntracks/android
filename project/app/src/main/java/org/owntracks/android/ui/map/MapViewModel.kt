@@ -111,7 +111,7 @@ class MapViewModel @Inject constructor(
         activeContact = c
         liveContact.postValue(c)
         liveBottomSheetHidden.postValue(false)
-        if (center) liveCamera.postValue(c.latLng)
+        if (center && c.latLng != null) liveCamera.postValue(c.latLng)
     }
 
     private fun setViewModeFree() {
@@ -179,7 +179,9 @@ class MapViewModel @Inject constructor(
         view!!.updateMarker(c)
         if (c == activeContact) {
             liveContact.postValue(c)
-            liveCamera.postValue(c.latLng)
+            if (c.latLng != null) {
+                liveCamera.postValue(c.latLng)
+            }
         }
     }
 

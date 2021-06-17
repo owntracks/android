@@ -161,7 +161,7 @@ Es mostrarà una notificació permanent per continuar executant-se en segon pla.
     <string name="notificationChangeMonitoring">"Canvia el mode control"</string>
     <string name="preferencesDebugLog">"Registre de depuració"</string>
     <string name="monitoring_mode">"Seguiment"</string>
-    <string name="distance_label">"Distància"</string>
+    <string name="contactDetailsDistance">"Distància"</string>
     <string name="preferencesClientId">"ID Client"</string>
     <string name="status_endpoint_state_hint">"Estat del punt final"</string>
     <string name="status_endpoint_state_message_hint">"Missatge de l'estat del punt final"</string>

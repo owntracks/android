@@ -157,7 +157,7 @@
     <string name="notificationChangeMonitoring">"Bewegungs Modus"</string>
     <string name="preferencesDebugLog">"Debug Log"</string>
     <string name="monitoring_mode">"Monitoring"</string>
-    <string name="distance_label">"Abstand"</string>
+    <string name="contactDetailsDistance">"Abstand"</string>
     <string name="preferencesClientId">"Client ID"</string>
     <string name="status_endpoint_state_hint">"Endpunktstatus"</string>
     <string name="status_endpoint_state_message_hint">"Endpunkt Statusnachricht"</string>

@@ -14,10 +14,10 @@ import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
@@ -67,7 +67,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
     View.OnClickListener, View.OnLongClickListener, PopupMenu.OnMenuItemClickListener,
     Observer<FusedContact?> {
     lateinit var locationLifecycleObserver: LocationLifecycleObserver
-    private var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>? = null
+    private var bottomSheetBehavior: BottomSheetBehavior<LinearLayoutCompat>? = null
     private var menu: Menu? = null
     private var locationProviderClient: LocationProviderClient? = null
     private lateinit var mapFragment: MapFragment
@@ -228,17 +228,23 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
             activeContact?.let { contact ->
                 Timber.v("contact changed: $contact.id")
                 contactPeek.name.text = contact.fusedName
-                if (contact.messageLocation.value != null) {
-                    GlobalScope.launch(Dispatchers.Main) {
-                        contactImageBindingAdapter.run {
-                            contactPeek.image.setImageBitmap(
-                                getBitmapFromCache(contact)
-                            )
-                        }
+
+                contactPeek.image.setImageResource(0)
+                GlobalScope.launch(Dispatchers.Main) {
+                    contactImageBindingAdapter.run {
+                        contactPeek.image.setImageBitmap(
+                            getBitmapFromCache(contact)
+                        )
                     }
-                    geocoderProvider.resolve(
-                        contact.messageLocation.value!!, contactPeek.location
-                    )
+                }
+
+                tid.text = contact.trackerId
+                id.text = contact.id
+
+                val contactLocation = contact.messageLocation.value
+                if (contactLocation != null) {
+                    contactLocationDetails.visibility = View.VISIBLE
+                    geocoderProvider.resolve(contactLocation, contactPeek.location)
                     BindingConversions.setRelativeTimeSpanString(
                         contactPeek.locationDate,
                         contact.tst
@@ -247,31 +253,41 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
                         R.string.contactDetailsAccuracyValue,
                         contact.fusedLocationAccuracy
                     )
-                    tid.text = contact.trackerId
-                    id.text = contact.id
-                    if (viewModel?.currentLocation?.value != null) {
-                        distance.visibility = View.VISIBLE
-                        distanceLabel.visibility = View.VISIBLE
+
+                    alt.text =
+                        getString(R.string.contactDetailsAltitudeValue, contactLocation.altitude)
+
+                    val currentLocation = viewModel?.currentLocation?.value
+                    if (currentLocation != null) {
+                        contactRelativeLocationDetails.visibility = View.VISIBLE
+
                         val distanceBetween = FloatArray(2)
                         Location.distanceBetween(
-                            viewModel!!.currentLocation.value!!.latitude,
-                            viewModel!!.currentLocation.value!!.longitude,
-                            contact.latLng!!.latitude,
-                            contact.latLng!!.longitude,
+                            currentLocation.latitude,
+                            currentLocation.longitude,
+                            contactLocation.latitude,
+                            contactLocation.longitude,
                             distanceBetween
                         )
                         this.distance.text = getString(
                             R.string.contactDetailsDistanceValue,
-                            distanceBetween[0].roundToInt()
+                            if (distanceBetween[0].roundToInt() > 1000) (distanceBetween[0] / 1000) else distanceBetween[0],
+                            if (distanceBetween[0] > 1000) "km" else "m"
                         )
+
+                        this.bearing.text =
+                            getString(R.string.contactDetailsBearingValue, distanceBetween[1])
+
                     } else {
-                        distance.visibility = View.GONE
-                        distanceLabel.visibility = View.GONE
+                        contactRelativeLocationDetails.visibility = View.GONE
                     }
                 } else {
                     contactPeek.location.setText(R.string.na)
                     contactPeek.locationDate.setText(R.string.na)
+                    contactLocationDetails.visibility = View.GONE
                 }
+                moreButton.visibility =
+                    if (shouldShowContactPeekPopupMenu()) View.VISIBLE else View.GONE
             }
         }
     }
@@ -501,11 +517,17 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         val popupMenu = PopupMenu(this, v, Gravity.START)
         popupMenu.menuInflater.inflate(R.menu.menu_popup_contacts, popupMenu.menu)
         popupMenu.setOnMenuItemClickListener(this)
-        if (preferences.mode == MessageProcessorEndpointHttp.MODE_ID) popupMenu.menu.removeItem(
-            R.id.menu_clear
-        )
+        if (preferences.mode == MessageProcessorEndpointHttp.MODE_ID) {
+            popupMenu.menu.removeItem(R.id.menu_clear)
+        }
+        if (viewModel?.activeContact?.latLng == null) {
+            popupMenu.menu.removeItem(R.id.menu_navigate)
+        }
         popupMenu.show()
     }
+
+    private fun shouldShowContactPeekPopupMenu(): Boolean =
+        viewModel?.activeContact?.latLng != null && preferences.mode != MessageProcessorEndpointHttp.MODE_ID
 
     override fun onRequestPermissionsResult(
         requestCode: Int,

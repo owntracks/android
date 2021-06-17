@@ -161,7 +161,7 @@ Aby utrzymać działanie aplikacji w tle, będzie wyświetlana permanentna notyf
     <string name="notificationChangeMonitoring">"Zmień monitorowanie"</string>
     <string name="preferencesDebugLog">"Informacje debugowania"</string>
     <string name="monitoring_mode">"Monitorowanie"</string>
-    <string name="distance_label">"Odległość"</string>
+    <string name="contactDetailsDistance">"Odległość"</string>
     <string name="preferencesClientId">"ID Klienta"</string>
     <string name="status_endpoint_state_hint">"Stan endpointa"</string>
     <string name="status_endpoint_state_message_hint">"Komunikat stanu endpointa"</string>

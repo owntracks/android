@@ -159,7 +159,7 @@ Una notificación permanente se mostrará para mantener la aplicación funcionan
     <string name="notificationChangeMonitoring">"Cambio modo"</string>
     <string name="preferencesDebugLog">"Registro de depuración"</string>
     <string name="monitoring_mode">"Monitorización"</string>
-    <string name="distance_label">"Distancia"</string>
+    <string name="contactDetailsDistance">"Distancia"</string>
     <string name="preferencesClientId">"ID de cliente"</string>
     <string name="status_endpoint_state_hint">"Estado del punto de conexión"</string>
     <string name="status_endpoint_state_message_hint">"Mensaje de estado del punto de conexión"</string>
