@@ -239,7 +239,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
                 }
 
                 tid.text = contact.trackerId
-                id.text = contact.id
+                topic.value.text = contact.id
 
                 val contactLocation = contact.messageLocation.value
                 if (contactLocation != null) {
@@ -249,18 +249,18 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
                         contactPeek.locationDate,
                         contact.tst
                     )
-                    acc.text = getString(
+                    accuracy.value.text = getString(
                         R.string.contactDetailsAccuracyValue,
                         contact.fusedLocationAccuracy
                     )
 
-                    alt.text =
+                    altitude.value.text =
                         getString(R.string.contactDetailsAltitudeValue, contactLocation.altitude)
 
-                    battery.text =
+                    battery.value.text =
                         getString(R.string.contactDetailsBatteryValue, contactLocation.battery)
 
-                    speed.text =
+                    speed.value.text =
                         getString(R.string.contactDetailsSpeedValue, contactLocation.velocity)
 
                     val currentLocation = viewModel?.currentLocation?.value
@@ -275,14 +275,17 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
                             contactLocation.longitude,
                             distanceBetween
                         )
-                        this.distance.text = getString(
+
+                        distance.value.text = getString(
                             R.string.contactDetailsDistanceValue,
                             if (distanceBetween[0].roundToInt() > 1000) (distanceBetween[0] / 1000) else distanceBetween[0],
                             if (distanceBetween[0] > 1000) "km" else "m"
                         )
 
-                        this.bearing.text =
+                        bearing.value.text =
                             getString(R.string.contactDetailsBearingValue, distanceBetween[1])
+
+                        bearing.image.rotation = distanceBetween[1]
 
                     } else {
                         contactRelativeLocationDetails.visibility = View.GONE

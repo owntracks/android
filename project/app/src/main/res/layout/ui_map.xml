@@ -62,57 +62,16 @@
                     android:layout_gravity="start"
                     android:layout_weight="1"
                     android:orientation="vertical">
-                    <!-- Accuracy -->
-                    <TextView
-                        android:id="@+id/acc"
-                        style="@style/ListItemPrimary"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:paddingStart="0dp"
-                        android:paddingTop="@dimen/activity_horizontal_margin"
-                        android:paddingEnd="@dimen/activity_horizontal_margin"
-                        android:singleLine="true"
-                        android:textIsSelectable="true"
-                        android:textSize="16sp" />
 
-                    <TextView
-                        android:id="@+id/accLabel"
-                        style="@style/ListItemSecondary"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:paddingStart="0dp"
-                        android:paddingEnd="@dimen/activity_horizontal_margin"
-                        android:paddingBottom="@dimen/activity_horizontal_margin"
-                        android:singleLine="true"
-                        android:text="@string/contactDetailsAccuracy" />
+                    <include
+                        android:id="@+id/accuracy"
+                        layout="@layout/ui_contactsheet_parameter"
+                        app:label="@{@string/contactDetailsAccuracy}" />
 
-                    <!-- Altitude -->
-                    <TextView
-                        android:id="@+id/alt"
-                        style="@style/ListItemPrimary"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:paddingStart="0dp"
-                        android:paddingTop="@dimen/activity_horizontal_margin"
-                        android:paddingEnd="@dimen/activity_horizontal_margin"
-                        android:singleLine="true"
-                        android:textIsSelectable="true"
-                        android:textSize="16sp" />
-
-                    <TextView
-                        android:id="@+id/altLabel"
-                        style="@style/ListItemSecondary"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:paddingStart="0dp"
-                        android:paddingEnd="@dimen/activity_horizontal_margin"
-                        android:paddingBottom="@dimen/activity_horizontal_margin"
-                        android:singleLine="true"
-                        android:text="@string/contactDetailsAltitude" />
+                    <include
+                        android:id="@+id/altitude"
+                        layout="@layout/ui_contactsheet_parameter"
+                        app:label="@{@string/contactDetailsAltitude}" />
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
                 <androidx.appcompat.widget.LinearLayoutCompat
@@ -121,56 +80,16 @@
                     android:layout_gravity="start"
                     android:layout_weight="1"
                     android:orientation="vertical">
-                    <!-- Battery -->
-                    <TextView
+
+                    <include
                         android:id="@+id/battery"
-                        style="@style/ListItemPrimary"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:paddingStart="0dp"
-                        android:paddingTop="@dimen/activity_horizontal_margin"
-                        android:paddingEnd="@dimen/activity_horizontal_margin"
-                        android:singleLine="true"
-                        android:textIsSelectable="true"
-                        android:textSize="16sp" />
+                        layout="@layout/ui_contactsheet_parameter"
+                        app:label="@{@string/contactDetailsBattery}" />
 
-                    <TextView
-                        android:id="@+id/batteryLabel"
-                        style="@style/ListItemSecondary"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:paddingStart="0dp"
-                        android:paddingEnd="@dimen/activity_horizontal_margin"
-                        android:paddingBottom="@dimen/activity_horizontal_margin"
-                        android:singleLine="true"
-                        android:text="@string/contactDetailsBattery" />
-                    <!-- Speed -->
-                    <TextView
+                    <include
                         android:id="@+id/speed"
-                        style="@style/ListItemPrimary"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:paddingStart="0dp"
-                        android:paddingTop="@dimen/activity_horizontal_margin"
-                        android:paddingEnd="@dimen/activity_horizontal_margin"
-                        android:singleLine="true"
-                        android:textIsSelectable="true"
-                        android:textSize="16sp" />
-
-                    <TextView
-                        android:id="@+id/speedLabel"
-                        style="@style/ListItemSecondary"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:paddingStart="0dp"
-                        android:paddingEnd="@dimen/activity_horizontal_margin"
-                        android:paddingBottom="@dimen/activity_horizontal_margin"
-                        android:singleLine="true"
-                        android:text="@string/contactDetailsSpeed" />
+                        layout="@layout/ui_contactsheet_parameter"
+                        app:label="@{@string/contactDetailsSpeed}" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -181,59 +100,16 @@
                     android:layout_gravity="end"
                     android:layout_weight="1"
                     android:orientation="vertical">
-                    <!-- Distance -->
-                    <TextView
+
+                    <include
                         android:id="@+id/distance"
-                        style="@style/ListItemPrimary"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:paddingStart="0dp"
-                        android:paddingTop="@dimen/activity_horizontal_margin"
-                        android:paddingEnd="@dimen/activity_horizontal_margin"
-                        android:singleLine="true"
-                        android:textIsSelectable="true"
-                        android:textSize="16sp" />
+                        layout="@layout/ui_contactsheet_parameter"
+                        app:label="@{@string/contactDetailsDistance}" />
 
-                    <TextView
-                        android:id="@+id/distanceLabel"
-                        style="@style/ListItemSecondary"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:paddingStart="0dp"
-                        android:paddingEnd="@dimen/activity_horizontal_margin"
-                        android:paddingBottom="@dimen/activity_horizontal_margin"
-                        android:singleLine="true"
-                        android:text="@string/contactDetailsDistance"
-                        android:textIsSelectable="true" />
-
-                    <!-- Bearing -->
-                    <TextView
+                    <include
                         android:id="@+id/bearing"
-                        style="@style/ListItemPrimary"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:paddingStart="0dp"
-                        android:paddingTop="@dimen/activity_horizontal_margin"
-                        android:paddingEnd="@dimen/activity_horizontal_margin"
-                        android:singleLine="true"
-                        android:textIsSelectable="true"
-                        android:textSize="16sp" />
-
-                    <TextView
-                        android:id="@+id/bearingLabel"
-                        style="@style/ListItemSecondary"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:paddingStart="0dp"
-                        android:paddingEnd="@dimen/activity_horizontal_margin"
-                        android:paddingBottom="@dimen/activity_horizontal_margin"
-                        android:singleLine="true"
-                        android:text="@string/contactDetailsBearing"
-                        android:textIsSelectable="true" />
+                        layout="@layout/ui_contactsheet_parameter"
+                        app:label="@{@string/contactDetailsBearing}" app:icon="@{@drawable/ic_baseline_arrow_upward_24}" />
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
             </androidx.appcompat.widget.LinearLayoutCompat>
@@ -242,8 +118,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingEnd="0dp"
-                android:paddingStart="72dp">
+                android:paddingStart="72dp"
+                android:paddingEnd="0dp">
 
                 <TextView
                     android:id="@+id/tid"
@@ -269,29 +145,10 @@
                     android:singleLine="true"
                     android:text="@string/contactDetailsTrackerId" />
 
-                <TextView
-                    android:id="@+id/id"
-                    style="@style/ListItemPrimary"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:paddingStart="0dp"
-                    android:paddingTop="@dimen/activity_horizontal_margin"
-                    android:paddingEnd="@dimen/activity_horizontal_margin"
-                    android:singleLine="true"
-                    android:textIsSelectable="true" />
-
-                <TextView
-                    android:id="@+id/topicLabel"
-                    style="@style/ListItemSecondary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:paddingStart="0dp"
-                    android:paddingEnd="@dimen/activity_horizontal_margin"
-                    android:paddingBottom="@dimen/activity_horizontal_margin"
-                    android:singleLine="true"
-                    android:text="@string/contactDetailsTopic" />
+                <include
+                    android:id="@+id/topic"
+                    layout="@layout/ui_contactsheet_parameter"
+                    app:label="@{@string/contactDetailsTopic}" />
 
                 <ImageView
                     android:id="@+id/moreButton"
