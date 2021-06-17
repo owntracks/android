@@ -257,6 +257,12 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
                     alt.text =
                         getString(R.string.contactDetailsAltitudeValue, contactLocation.altitude)
 
+                    battery.text =
+                        getString(R.string.contactDetailsBatteryValue, contactLocation.battery)
+
+                    speed.text =
+                        getString(R.string.contactDetailsSpeedValue, contactLocation.velocity)
+
                     val currentLocation = viewModel?.currentLocation?.value
                     if (currentLocation != null) {
                         contactRelativeLocationDetails.visibility = View.VISIBLE

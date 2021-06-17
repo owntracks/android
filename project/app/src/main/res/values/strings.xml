@@ -55,10 +55,14 @@
     <string name="contactDetailsAltitude">Altitude</string>
     <string name="contactDetailsBearing">Bearing</string>
     <string name="contactDetailsDistance">Distance</string>
+    <string name="contactDetailsBattery">Battery</string>
+    <string name="contactDetailsSpeed">Speed</string>
     <string name="contactDetailsAccuracyValue" translatable="false">%d m</string>
     <string name="contactDetailsDistanceValue" translatable="false">%,.2f %s</string>
     <string name="contactDetailsBearingValue" translatable="false">%,.0f°</string>
     <string name="contactDetailsAltitudeValue" translatable="false">%,d m</string>
+    <string name="contactDetailsBatteryValue" translatable="false">%d %%</string>
+    <string name="contactDetailsSpeedValue" translatable="false">%d kph</string>
     <string name="contactDetailsTopic">Identifier</string>
     <string name="waypointListPlaceholder">No regions defined yet</string>
     <string name="importConfig">Import</string>
