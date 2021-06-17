@@ -140,7 +140,7 @@ class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallba
 
     override fun updateMarker(id: String, latLng: org.owntracks.android.location.LatLng) {
         val marker = markers[id]
-        if (marker != null && marker.tag != null) {
+        if (marker?.tag != null) {
             marker.position = latLng.toGMSLatLng()
         } else {
             // If a marker has been removed, its tag will be null. Doing anything with it will make it explode
@@ -148,9 +148,11 @@ class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallba
                 markers.remove(id)
                 marker.remove()
             }
-            markers[id] = googleMap!!.addMarker(
-                MarkerOptions().position(latLng.toGMSLatLng()).anchor(0.5f, 0.5f).visible(false)
-            ).also { it?.tag = id }
+            markers[id] = googleMap?.run {
+                addMarker(
+                    MarkerOptions().position(latLng.toGMSLatLng()).anchor(0.5f, 0.5f).visible(false)
+                ).also { it?.tag = id }
+            }
         }
     }
 
