@@ -3,9 +3,14 @@ package org.owntracks.android.ui.map
 import android.Manifest
 import android.app.Activity
 import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.location.Location
 import android.net.Uri
 import android.os.Build
@@ -48,6 +53,8 @@ import org.owntracks.android.services.LocationProcessor
 import org.owntracks.android.services.MessageProcessorEndpointHttp
 import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.support.Events.PermissionGranted
+import org.owntracks.android.support.Preferences
+import org.owntracks.android.support.Preferences.Companion.EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION
 import org.owntracks.android.support.Preferences.Companion.EXPERIMENTAL_FEATURE_USE_OSM_MAP
 import org.owntracks.android.support.RequirementsChecker
 import org.owntracks.android.support.RunThingsOnOtherThreads
@@ -58,6 +65,7 @@ import org.owntracks.android.ui.map.osm.OSMMapFragment
 import org.owntracks.android.ui.welcome.WelcomeActivity
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.math.asin
 import kotlin.math.roundToInt
 
 @AndroidEntryPoint
@@ -69,6 +77,8 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
     private var menu: Menu? = null
     private var locationProviderClient: LocationProviderClient? = null
     private lateinit var mapFragment: MapFragment
+    private var sensorManager: SensorManager? = null
+    private var orientationSensor: Sensor? = null
 
     internal lateinit var mapLocationSource: LocationSource
 
@@ -182,6 +192,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         // We've been started in the foreground, so cancel the background restriction notification
         NotificationManagerCompat.from(this)
             .cancel(BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG, 0)
+
     }
 
     private fun getMapFragment() =
@@ -287,6 +298,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
                             currentLocation.toLatLng(),
                             contactLocation.toLatLng()
                         )
+
                     } else {
                         contactRelativeLocationDetails.visibility = View.GONE
                     }
@@ -347,6 +359,20 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
                     this.replace(R.id.mapFragment, mapFragment)
                 }
             }
+        }
+        if (preferences.isExperimentalFeatureEnabled(
+                EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION
+            )
+        ) {
+            sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+            sensorManager?.let {
+                orientationSensor = it.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
+                orientationSensor?.run { Timber.d("Got a rotation vector sensor") }
+            }
+        } else {
+            sensorManager?.unregisterListener(orientationSensorEventListener)
+            sensorManager = null
+            orientationSensor = null
         }
         super.onResume()
         handleIntentExtras(intent)
@@ -532,6 +558,9 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
 
     override fun setBottomSheetExpanded() {
         bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_EXPANDED
+        orientationSensor?.let {
+            sensorManager?.registerListener(orientationSensorEventListener, it, 500_000)
+        }
     }
 
     // BOTTOM SHEET CALLBACKS
@@ -540,13 +569,14 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
     }
 
     override fun setBottomSheetCollapsed() {
-        Timber.v("vm contact: %s", binding!!.vm!!.activeContact)
         bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_COLLAPSED
+        sensorManager?.unregisterListener(orientationSensorEventListener)
     }
 
     override fun setBottomSheetHidden() {
         bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_HIDDEN
-        if (menu != null) menu!!.close()
+        menu?.run { close() }
+        sensorManager?.unregisterListener(orientationSensorEventListener)
     }
 
     private fun showPopupMenu(v: View) {
@@ -579,6 +609,33 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
 
     fun onMapReady() {
         viewModel?.onMapReady()
+    }
+
+    private val orientationSensorEventListener = object : SensorEventListener {
+        override fun onSensorChanged(event: SensorEvent?) {
+            event?.run {
+                //Orientation is angle around the Z axis
+                val azimuth = (180 / Math.PI) * 2 * asin(values[2])
+                val contactLatLng = viewModel!!.activeContact!!.latLng!!
+                val currentLocation = viewModel!!.currentLocation.value!!
+                val image = binding!!.bearing.image
+
+                val distanceBetween = FloatArray(2)
+                Location.distanceBetween(
+                    currentLocation.latitude,
+                    currentLocation.longitude,
+                    contactLatLng.latitude,
+                    contactLatLng.longitude,
+                    distanceBetween
+                )
+                image.rotation = distanceBetween[1] + azimuth.toFloat()
+            }
+        }
+
+
+        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+            //noop
+        }
     }
 
     @get:VisibleForTesting
