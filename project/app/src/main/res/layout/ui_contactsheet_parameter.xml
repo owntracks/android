@@ -20,6 +20,19 @@
         android:layout_height="match_parent"
         android:orientation="horizontal">
 
+        <ImageView
+            android:id="@+id/image"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:contentDescription="@{label}"
+            android:rotation="0"
+            android:src="@{icon}"
+            android:visibility="@{icon !=null ? View.VISIBLE : View.GONE}"
+            app:tint="@color/primary" />
+
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -32,38 +45,35 @@
                 style="@style/ListItemPrimary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ellipsize="end"
+                android:ellipsize="none"
                 android:paddingStart="0dp"
                 android:paddingTop="@dimen/activity_horizontal_margin"
-                android:paddingEnd="@dimen/activity_horizontal_margin"
+                android:paddingEnd="0dp"
                 android:singleLine="true"
                 android:textIsSelectable="true"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                app:autoSizeMaxTextSize="16sp"
+                app:autoSizeMinTextSize="10sp"
+                app:autoSizeStepGranularity="1sp"
+                app:autoSizeTextType="uniform" />
 
             <TextView
                 style="@style/ListItemSecondary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ellipsize="end"
+                android:ellipsize="none"
                 android:paddingStart="0dp"
                 android:paddingEnd="@dimen/activity_horizontal_margin"
                 android:paddingBottom="@dimen/activity_horizontal_margin"
                 android:singleLine="true"
                 android:text="@{label}"
-                android:textIsSelectable="true" />
+                android:textIsSelectable="true"
+                app:autoSizeMaxTextSize="16sp"
+                app:autoSizeMinTextSize="10sp"
+                app:autoSizeStepGranularity="1sp"
+                app:autoSizeTextType="uniform" />
         </androidx.appcompat.widget.LinearLayoutCompat>
 
-        <ImageView
-            android:id="@+id/image"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="end"
-            android:layout_weight="1"
-            android:contentDescription="@{label}"
-            android:rotation="0"
-            android:src="@{icon}"
-            android:layout_marginEnd="16dp"
-            android:visibility="@{icon !=null ? View.VISIBLE : View.GONE}"
-            app:tint="@color/primary" />
+
     </androidx.appcompat.widget.LinearLayoutCompat>
 </layout>

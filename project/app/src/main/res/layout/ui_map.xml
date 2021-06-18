@@ -53,7 +53,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingStart="72dp"
+                android:paddingStart="36dp"
                 android:paddingEnd="0dp">
 
                 <androidx.appcompat.widget.LinearLayoutCompat
@@ -66,11 +66,13 @@
                     <include
                         android:id="@+id/accuracy"
                         layout="@layout/ui_contactsheet_parameter"
+                        app:icon="@{@drawable/ic_baseline_my_location_24}"
                         app:label="@{@string/contactDetailsAccuracy}" />
 
                     <include
                         android:id="@+id/altitude"
                         layout="@layout/ui_contactsheet_parameter"
+                        app:icon="@{@drawable/ic_baseline_airplanemode_active_24}"
                         app:label="@{@string/contactDetailsAltitude}" />
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -90,6 +92,7 @@
                     <include
                         android:id="@+id/speed"
                         layout="@layout/ui_contactsheet_parameter"
+                        app:icon="@{@drawable/ic_baseline_speed_24}"
                         app:label="@{@string/contactDetailsSpeed}" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -105,6 +108,7 @@
                     <include
                         android:id="@+id/distance"
                         layout="@layout/ui_contactsheet_parameter"
+                        app:icon="@{@drawable/ic_baseline_architecture_24}"
                         app:label="@{@string/contactDetailsDistance}" />
 
                     <include
