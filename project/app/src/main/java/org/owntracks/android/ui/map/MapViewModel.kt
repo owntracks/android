@@ -10,10 +10,7 @@ import dagger.hilt.android.scopes.ActivityScoped
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import org.owntracks.android.data.repos.ContactsRepo
-import org.owntracks.android.location.LatLng
-import org.owntracks.android.location.LocationAvailability
-import org.owntracks.android.location.LocationCallback
-import org.owntracks.android.location.LocationResult
+import org.owntracks.android.location.*
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.model.messages.MessageClear
 import org.owntracks.android.model.messages.MessageLocation.Companion.REPORT_TYPE_USER
@@ -214,7 +211,5 @@ class MapViewModel @Inject constructor(
         private const val VIEW_DEVICE = 2
         private var mode = VIEW_DEVICE
     }
-
-    private fun Location.toLatLng(): LatLng = LatLng(this.latitude, this.longitude)
 }
 

@@ -39,10 +39,7 @@ import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.databinding.UiMapBinding
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.gms.location.toGMSLatLng
-import org.owntracks.android.location.LatLng
-import org.owntracks.android.location.LocationProviderClient
-import org.owntracks.android.location.LocationServices
-import org.owntracks.android.location.LocationSource
+import org.owntracks.android.location.*
 import org.owntracks.android.model.BatteryStatus
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.services.BackgroundService
@@ -155,11 +152,22 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
             it.mapCenter.observe(this, { o: LatLng ->
                 mapFragment.updateCamera(o)
             })
-            it.currentLocation.observe(this, { latLng ->
-                if (latLng == null) {
+            it.currentLocation.observe(this, { location ->
+                if (location == null) {
                     disableLocationMenus()
+                    binding?.contactRelativeLocationDetails?.visibility = View.GONE
                 } else {
                     enableLocationMenus()
+                    binding?.contactRelativeLocationDetails?.visibility = View.VISIBLE
+                    binding?.run {
+                        it.activeContact?.latLng?.let { contactLatLng ->
+                            updateContactPeekRelativeAttributes(
+                                this,
+                                location.toLatLng(),
+                                contactLatLng
+                            )
+                        }
+                    }
                 }
             })
         }
@@ -274,27 +282,11 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
                     val currentLocation = viewModel?.currentLocation?.value
                     if (currentLocation != null) {
                         contactRelativeLocationDetails.visibility = View.VISIBLE
-
-                        val distanceBetween = FloatArray(2)
-                        Location.distanceBetween(
-                            currentLocation.latitude,
-                            currentLocation.longitude,
-                            contactLocation.latitude,
-                            contactLocation.longitude,
-                            distanceBetween
+                        updateContactPeekRelativeAttributes(
+                            this,
+                            currentLocation.toLatLng(),
+                            contactLocation.toLatLng()
                         )
-
-                        distance.value.text = getString(
-                            R.string.contactDetailsDistanceValue,
-                            if (distanceBetween[0].roundToInt() > 1000) (distanceBetween[0] / 1000) else distanceBetween[0],
-                            if (distanceBetween[0] > 1000) "km" else "m"
-                        )
-
-                        bearing.value.text =
-                            getString(R.string.contactDetailsBearingValue, distanceBetween[1])
-
-                        bearing.image.rotation = distanceBetween[1]
-
                     } else {
                         contactRelativeLocationDetails.visibility = View.GONE
                     }
@@ -307,6 +299,33 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
                     if (shouldShowContactPeekPopupMenu()) View.VISIBLE else View.GONE
             }
         }
+    }
+
+
+    private fun updateContactPeekRelativeAttributes(
+        binding: UiMapBinding,
+        currentLocation: LatLng,
+        contactLocation: LatLng
+    ) {
+        val distanceBetween = FloatArray(2)
+        Location.distanceBetween(
+            currentLocation.latitude,
+            currentLocation.longitude,
+            contactLocation.latitude,
+            contactLocation.longitude,
+            distanceBetween
+        )
+
+        binding.distance.value.text = getString(
+            R.string.contactDetailsDistanceValue,
+            if (distanceBetween[0].roundToInt() > 1000) (distanceBetween[0] / 1000) else distanceBetween[0],
+            if (distanceBetween[0] > 1000) "km" else "m"
+        )
+
+        binding.bearing.value.text =
+            getString(R.string.contactDetailsBearingValue, distanceBetween[1])
+
+        binding.bearing.image.rotation = distanceBetween[1]
     }
 
     override fun onResume() {
@@ -426,16 +445,16 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
     }
 
     private fun disableLocationMenus() {
-        if (menu != null) {
-            menu!!.findItem(R.id.menu_mylocation).setEnabled(false).icon.alpha = 128
-            menu!!.findItem(R.id.menu_report).setEnabled(false).icon.alpha = 128
+        menu?.run {
+            findItem(R.id.menu_mylocation).setEnabled(false).icon.alpha = 128
+            findItem(R.id.menu_report).setEnabled(false).icon.alpha = 128
         }
     }
 
     private fun enableLocationMenus() {
-        if (menu != null) {
-            menu!!.findItem(R.id.menu_mylocation).setEnabled(true).icon.alpha = 255
-            menu!!.findItem(R.id.menu_report).setEnabled(true).icon.alpha = 255
+        menu?.run {
+            findItem(R.id.menu_mylocation).setEnabled(true).icon.alpha = 255
+            findItem(R.id.menu_report).setEnabled(true).icon.alpha = 255
         }
     }
 
@@ -544,7 +563,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
     }
 
     private fun shouldShowContactPeekPopupMenu(): Boolean =
-        viewModel?.activeContact?.latLng != null && preferences.mode != MessageProcessorEndpointHttp.MODE_ID
+        viewModel?.activeContact?.latLng != null || preferences.mode != MessageProcessorEndpointHttp.MODE_ID
 
     override fun onRequestPermissionsResult(
         requestCode: Int,

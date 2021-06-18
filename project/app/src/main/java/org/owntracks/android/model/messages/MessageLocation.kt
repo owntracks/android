@@ -3,6 +3,7 @@ package org.owntracks.android.model.messages
 import android.location.Location
 import android.os.Build
 import com.fasterxml.jackson.annotation.*
+import org.owntracks.android.location.LatLng
 import org.owntracks.android.model.BatteryStatus
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.support.Preferences
@@ -79,6 +80,9 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
     @get:JsonIgnore
     var hasGeocode: Boolean = false
         private set
+
+
+    fun toLatLng() = LatLng(latitude,longitude)
 
 
     fun setContact(contact: FusedContact?) {

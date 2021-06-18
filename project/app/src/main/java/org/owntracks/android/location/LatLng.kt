@@ -1,5 +1,6 @@
 package org.owntracks.android.location
 
+import android.location.Location
 import org.osmdroid.util.GeoPoint
 import kotlin.math.abs
 
@@ -45,3 +46,5 @@ fun LatLng.toGeoPoint(): GeoPoint {
 
 
 fun Double.equalsDelta(other: Double) = abs(this/other - 1) < 0.00000001
+
+fun Location.toLatLng() = LatLng(latitude,longitude)
