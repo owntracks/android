@@ -43,6 +43,7 @@ import org.owntracks.android.location.LatLng
 import org.owntracks.android.location.LocationProviderClient
 import org.owntracks.android.location.LocationServices
 import org.owntracks.android.location.LocationSource
+import org.owntracks.android.model.BatteryStatus
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.services.BackgroundService.BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG
@@ -259,6 +260,13 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
 
                     battery.value.text =
                         getString(R.string.contactDetailsBatteryValue, contactLocation.battery)
+
+                    when (contactLocation.batteryStatus) {
+                        BatteryStatus.FULL -> battery.image.setImageResource(R.drawable.ic_baseline_battery_charging_full_24)
+                        BatteryStatus.CHARGING -> battery.image.setImageResource(R.drawable.ic_baseline_battery_charging_full_24)
+                        BatteryStatus.UNKNOWN -> battery.image.setImageResource(R.drawable.ic_baseline_battery_unknown_24)
+                        BatteryStatus.UNPLUGGED -> battery.image.setImageResource(R.drawable.ic_baseline_battery_std_24)
+                    }
 
                     speed.value.text =
                         getString(R.string.contactDetailsSpeedValue, contactLocation.velocity)

@@ -84,6 +84,7 @@
                     <include
                         android:id="@+id/battery"
                         layout="@layout/ui_contactsheet_parameter"
+                        app:icon="@{@drawable/ic_baseline_battery_std_24}"
                         app:label="@{@string/contactDetailsBattery}" />
 
                     <include
@@ -109,7 +110,8 @@
                     <include
                         android:id="@+id/bearing"
                         layout="@layout/ui_contactsheet_parameter"
-                        app:label="@{@string/contactDetailsBearing}" app:icon="@{@drawable/ic_baseline_arrow_upward_24}" />
+                        app:icon="@{@drawable/ic_baseline_arrow_upward_24}"
+                        app:label="@{@string/contactDetailsBearing}" />
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
             </androidx.appcompat.widget.LinearLayoutCompat>

@@ -10,10 +10,15 @@ import java.lang.ref.WeakReference
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.EXTERNAL_PROPERTY,
+    property = "_type"
+)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreatedAtNow(RealClock())) : MessageBase(), MessageWithCreatedAt by dep {
+open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreatedAtNow(RealClock())) :
+    MessageBase(), MessageWithCreatedAt by dep {
     @JsonIgnore
     override val numberOfRetries: Int = 10_080 // This should last a week at 1 attempt per minute
 
