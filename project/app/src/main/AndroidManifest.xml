@@ -221,6 +221,7 @@
         <activity
             android:name=".ui.map.MapActivity"
             android:clearTaskOnLaunch="true"
+            android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/app_name"
             android:launchMode="singleTask">
             <intent-filter>

@@ -27,17 +27,15 @@ import javax.inject.Inject
 
 @ActivityScoped
 class MapViewModel @Inject constructor(
-    contactsRepo: ContactsRepo,
+    private val contactsRepo: ContactsRepo,
     private val locationProcessor: LocationProcessor,
-    messageProcessor: MessageProcessor
+    private val messageProcessor: MessageProcessor
 ) : BaseViewModel<MapMvvm.View>(), MapMvvm.ViewModel<MapMvvm.View> {
-    private val contactsRepo: ContactsRepo
 
     @get:Bindable
     override var activeContact: FusedContact? = null
         private set
     private var onLocationChangedListener: OnLocationChangedListener? = null
-    private val messageProcessor: MessageProcessor
     private val liveContact = MutableLiveData<FusedContact?>()
     private val liveBottomSheetHidden = MutableLiveData<Boolean>()
     private val liveCamera = MutableLiveData<LatLng>()
@@ -215,12 +213,6 @@ class MapViewModel @Inject constructor(
         private const val VIEW_CONTACT = 1
         private const val VIEW_DEVICE = 2
         private var mode = VIEW_DEVICE
-    }
-
-    init {
-        Timber.v("onCreate")
-        this.contactsRepo = contactsRepo
-        this.messageProcessor = messageProcessor
     }
 
     private fun Location.toLatLng(): LatLng = LatLng(this.latitude, this.longitude)
