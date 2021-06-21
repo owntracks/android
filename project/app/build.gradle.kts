@@ -123,7 +123,6 @@ android {
             isIncludeAndroidResources = true
             isIncludeAndroidResources = true
         }
-        execution = "ANDROIDX_TEST_ORCHESTRATOR"
     }
 
     tasks.withType<Test> {
@@ -253,7 +252,6 @@ dependencies {
 
     androidTestImplementation("androidx.test:rules:${androidxTestVersion}")
     androidTestImplementation("androidx.test:runner:${androidxTestVersion}")
-    androidTestUtil("androidx.test:orchestrator:${androidxTestVersion}")
 }
 
 

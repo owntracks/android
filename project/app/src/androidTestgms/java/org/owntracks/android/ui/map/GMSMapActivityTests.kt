@@ -6,22 +6,18 @@ import androidx.test.espresso.Espresso
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
-import com.schibsted.spain.barista.assertion.BaristaClickableAssertions.assertClickable
 import com.schibsted.spain.barista.assertion.BaristaDrawerAssertions.assertDrawerIsClosed
 import com.schibsted.spain.barista.assertion.BaristaEnabledAssertions.assertEnabled
 import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
-import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
 import com.schibsted.spain.barista.interaction.BaristaClickInteractions.clickBack
 import com.schibsted.spain.barista.interaction.BaristaClickInteractions.clickOn
 import com.schibsted.spain.barista.interaction.BaristaDialogInteractions.clickDialogPositiveButton
 import com.schibsted.spain.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.schibsted.spain.barista.interaction.BaristaEditTextInteractions.writeTo
-import com.schibsted.spain.barista.interaction.BaristaSleepInteractions.sleep
 import com.schibsted.spain.barista.interaction.PermissionGranter
 import com.schibsted.spain.barista.rule.BaristaRule
 import com.schibsted.spain.barista.rule.flaky.AllowFlaky
 import org.junit.FixMethodOrder
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
@@ -35,7 +31,6 @@ import org.owntracks.android.ui.clickOnAndWait
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-/* TODO the android orchestrator doesn't work with coverage, so until it does we need to run tests in order */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class GMSMapActivityTests {
     @get:Rule
@@ -47,42 +42,6 @@ class GMSMapActivityTests {
     val ruleChain: RuleChain = RuleChain
         .outerRule(baristaRule.activityTestRule)
         .around(screenshotRule)
-
-
-    @Test
-    @Ignore("With the current test runner, permissions carry over between tests. So we need to figure out a way of running this one first.")
-    @AllowFlaky(attempts = 1)
-    fun aaa_onFirstStartTheWelcomeActivityIsLoadedAndCanBeClickedThroughToTheEnd() {
-        baristaRule.launchActivity()
-        assertDisplayed(R.string.welcome_heading)
-        assertDisplayed(R.string.welcome_description)
-
-        assertDisplayed(R.id.btn_next)
-        assertClickable(R.id.btn_next)
-
-        assertNotDisplayed(R.id.done)
-
-        clickOn(R.id.btn_next)
-        clickOn(R.id.btn_next)
-
-        assertNotDisplayed(R.id.btn_next)
-
-        assertDisplayed(R.id.fix_permissions_button)
-        assertClickable(R.id.fix_permissions_button)
-
-        clickOn(R.id.fix_permissions_button)
-        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
-        sleep(2000)
-        assertDisplayed(R.id.btn_next)
-
-        clickOn(R.id.btn_next)
-
-        assertDisplayed(R.string.done_heading)
-
-        assertDisplayed(R.id.done)
-        assertClickable(R.id.done)
-        assertNotDisplayed(R.id.btn_next)
-    }
 
     @Test
     @AllowFlaky(attempts = 1)
