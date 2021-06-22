@@ -53,7 +53,6 @@ import org.owntracks.android.services.LocationProcessor
 import org.owntracks.android.services.MessageProcessorEndpointHttp
 import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.support.Events.PermissionGranted
-import org.owntracks.android.support.Preferences
 import org.owntracks.android.support.Preferences.Companion.EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION
 import org.owntracks.android.support.Preferences.Companion.EXPERIMENTAL_FEATURE_USE_OSM_MAP
 import org.owntracks.android.support.RequirementsChecker
@@ -635,6 +634,32 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
 
         override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
             //noop
+        }
+    }
+
+    override fun onBackPressed() {
+        if (bottomSheetBehavior == null) {
+            super.onBackPressed()
+
+        } else {
+            when (bottomSheetBehavior?.state) {
+                BottomSheetBehavior.STATE_HIDDEN -> super.onBackPressed()
+                BottomSheetBehavior.STATE_COLLAPSED -> {
+                    setBottomSheetHidden()
+                }
+                BottomSheetBehavior.STATE_DRAGGING -> {
+                    //Noop
+                }
+                BottomSheetBehavior.STATE_EXPANDED -> {
+                    setBottomSheetCollapsed()
+                }
+                BottomSheetBehavior.STATE_HALF_EXPANDED -> {
+                    setBottomSheetCollapsed()
+                }
+                BottomSheetBehavior.STATE_SETTLING -> {
+                    //Noop
+                }
+            }
         }
     }
 
