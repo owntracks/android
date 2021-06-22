@@ -60,18 +60,15 @@ public class ObjectboxWaypointsRepo extends WaypointsRepo {
 
     private void migrateLegacyData(Context context) {
         try {
-
-            LegacyOpenHelper helper = new LegacyOpenHelper(context);
-
-            SQLiteDatabase db = helper.getReadableDatabase();
-
             String table = "WAYPOINT";
             String[] columns = {"DATE", "DESCRIPTION", "GEOFENCE_RADIUS", "GEOFENCE_LATITUDE", "GEOFENCE_LONGITUDE"};
             List<String> columnList = Arrays.asList(columns);
 
-            Cursor cursor = db.query(table, columns, null, null, null, null, null, null);
-
-            try {
+            try (
+                    LegacyOpenHelper helper = new LegacyOpenHelper(context);
+                    SQLiteDatabase db = helper.getReadableDatabase();
+                    Cursor cursor = db.query(table, columns, null, null, null, null, null, null)
+            ) {
                 if (cursor.moveToFirst()) {
                     do {
                         try {
@@ -90,9 +87,6 @@ public class ObjectboxWaypointsRepo extends WaypointsRepo {
                 }
             } catch (Exception e) {
                 Timber.e(e, "Error during migration");
-            } finally {
-                cursor.close();
-                db.close();
             }
         } catch (Exception e) {
             Timber.e(e, "Error during migration");
