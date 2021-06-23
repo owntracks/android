@@ -1,6 +1,5 @@
 package org.owntracks.android.services;
 
-import android.content.Context;
 import android.location.Location;
 
 import androidx.annotation.NonNull;
@@ -89,18 +88,19 @@ public class LocationProcessor {
             return;
         }
 
-        MessageLocation message = MessageLocation.fromLocationAndWifiInfo(currentLocation, wifiInfoProvider);
-
-        message.setTrigger(trigger);
-
-        message.setTrackerId(preferences.getTrackerId(true));
-        message.setInregions(calculateInregions(loadedWaypoints));
+        MessageLocation message;
 
         if (preferences.getPubLocationExtendedData()) {
+            message = MessageLocation.fromLocationAndWifiInfo(currentLocation, wifiInfoProvider);
             message.setBattery(deviceMetricsProvider.getBatteryLevel());
             message.setBatteryStatus(deviceMetricsProvider.getBatteryStatus());
             message.setConn(deviceMetricsProvider.getConnectionType());
+        } else {
+            message = MessageLocation.fromLocation(currentLocation);
         }
+        message.setTrigger(trigger);
+        message.setTrackerId(preferences.getTrackerId(true));
+        message.setInregions(calculateInregions(loadedWaypoints));
 
         messageProcessor.queueMessageForSending(message);
     }
