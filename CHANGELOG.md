@@ -5,12 +5,19 @@
 ### New features
 
 * The welcome screen is now swipey!
+* Dark theme! (thanks to all who suggested, closes #787 #788 and #789)
 * On Android API>=30, when the service is started in the background (e.g. after a boot or upgrade), it'll now notify the user that locations won't be received unless the app has been explicitly interacted with (via the activity, or changing the monitoring mode etc). This is because of the new [Android background location limits](https://developer.android.com/about/versions/oreo/background-location-limits). (See #976, #969, #967)
 * Polish translation (thanks Robert!)
-* You should now be able to exit the app by sending an intent (e.g. from other apps like Tasker etc.). Sending a "startservice" intent with `org.owntracks.android.EXIT` should stop the service as well as quit the app.
+* You should now be able to exit the app by sending an intent (e.g. from other apps like Tasker etc.). Sending a "startservice" intent with `org.owntracks.android.EXIT` should stop the service as well as quit the app. Closes #982.
 * Split the app into two Android flavors - OSS and GMS. GMS is what will continue to be published to the play store, but the OSS will now be published on the GitHub releases as well. The OSS version looks to remove dependencies on Google's Play Services and closed-source maps libraries. Ultmiate aim is to have a version we can distribute via F-Droid, giving users the option for a version that's more open.
+* Log screen will now only display actual application logs, rather than just a dump from `adb logcat` which wasn't that useful.
+* Exported configurations are now pretty printed (thanks @nycex)
+* The outgoing message queue is now persisted to device storage, so it should survive both app and device restars (closes #994)
+* Contact bottom sheet now includes details about their battery, speed, altitude, and bearing
+* Location messages now also include the BSSID and SSID if available. Closes #871
 * [Experimental] Added the ability to use [OpenStreetMap](https://www.openstreetmap.org) instead of Google Maps as a mapping layer. Can be enabled by adding `useOSMMap` to the `experimentalFeatures` config key.
 * [Experimental] Added the ability to use a pure AOSP location provider instead of the Google Play Services `FusedLocationProviderClient`. Can be enabled by adding `useAospLocationProvider` to the `experimentalFeatures` config key.
+* [Experimental] Have the contact peek bearing arrow rotate depending on the current devices orientation
 
 ### Bug fixes
 
@@ -18,6 +25,9 @@
 * If location is disabled on-device, OT will now prompt the user to enable on startup.
 * Fix crash on opening contact list where there's a card for a user but no location yet (#984)
 * Map view will now start on a recognizable map location (Paris) rather than at 0,0
+* Clicking "back" with a contact sheet open will now close the sheet rather than minimize the activity
+* Retry backoff for messages now goes up to 2 minutes
+* Messagecards are cached, so if a contact is cleared and then re-appears on the broker, the image and name are correct
 
 ## Version 2.3.0
 
