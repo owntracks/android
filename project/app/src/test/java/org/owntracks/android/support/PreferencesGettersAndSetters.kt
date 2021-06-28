@@ -22,12 +22,13 @@ import kotlin.reflect.KClass
 
 @RunWith(Parameterized::class)
 class PreferencesGettersAndSetters(
-        private val preferenceMethodName: String,
-        private val preferenceName: String,
-        private val preferenceValue: Any,
-        private val preferenceValueExpected: Any,
-        private val preferenceType: KClass<Any>,
-        private val httpOnlyMode: Boolean) {
+    private val preferenceMethodName: String,
+    private val preferenceName: String,
+    private val preferenceValue: Any,
+    private val preferenceValueExpected: Any,
+    private val preferenceType: KClass<Any>,
+    private val httpOnlyMode: Boolean
+) {
     private lateinit var mockResources: Resources
     private lateinit var mockContext: Context
     private lateinit var preferencesStore: PreferencesStore
@@ -46,7 +47,8 @@ class PreferencesGettersAndSetters(
     @Test
     fun `when setting a preference ensure that the preference is set correctly on export`() {
         val preferences = Preferences(mockContext, null, preferencesStore)
-        val setter = Preferences::class.java.getMethod("set$preferenceMethodName", preferenceType.java)
+        val setter =
+            Preferences::class.java.getMethod("set$preferenceMethodName", preferenceType.java)
         if (httpOnlyMode) {
             preferences.mode = MessageProcessorEndpointHttp.MODE_ID
         }
@@ -104,6 +106,7 @@ class PreferencesGettersAndSetters(
                     arrayOf("NotificationEvents", "notificationEvents", true, true, Boolean::class, false),
                     arrayOf("NotificationHigherPriority", "notificationHigherPriority", true, true, Boolean::class, false),
                     arrayOf("NotificationLocation", "notificationLocation", true, true, Boolean::class, false),
+                    arrayOf("NotificationGeocoderErrors", "notificationGeocoderErrors", false, false, Boolean::class, false),
                     arrayOf("OpenCageGeocoderApiKey", "opencageApiKey", "testOpencageAPIKey", "testOpencageAPIKey", String::class, false),
                     arrayOf("Password", "password", "testPassword!\"£", "testPassword!\"£", String::class, false),
                     arrayOf("Ping", "ping", 400, 400, Int::class, false),
@@ -163,6 +166,7 @@ class PreferencesGettersAndSetters(
                 on { getString(eq(R.string.preferenceKeyNotificationEvents)) } doReturn "notificationEvents"
                 on { getString(eq(R.string.preferenceKeyNotificationHigherPriority)) } doReturn "notificationHigherPriority"
                 on { getString(eq(R.string.preferenceKeyNotificationLocation)) } doReturn "notificationLocation"
+                on { getString(eq(R.string.preferenceKeyNotificationGeocoderErrors)) } doReturn "notificationGeocoderErrors"
                 on { getString(eq(R.string.preferenceKeyObjectboxMigrated)) } doReturn "_objectboxMigrated"
                 on { getString(eq(R.string.preferenceKeyOpencageGeocoderApiKey)) } doReturn "opencageApiKey"
                 on { getString(eq(R.string.preferenceKeyPassword)) } doReturn "password"

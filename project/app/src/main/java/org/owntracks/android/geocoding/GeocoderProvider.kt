@@ -27,12 +27,15 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class GeocoderProvider @Inject constructor(@ApplicationContext val context: Context, val preferences: Preferences) {
+class GeocoderProvider @Inject constructor(
+    @ApplicationContext val context: Context,
+    val preferences: Preferences
+) {
     private var lastRateLimitedNotificationTime: Instant? = null
     private var notificationManager: NotificationManagerCompat
     private lateinit var geocoder: Geocoder
 
-    private fun setGeocoderProvider( context: Context, preferences: Preferences) {
+    private fun setGeocoderProvider(context: Context, preferences: Preferences) {
         Timber.i("Setting geocoding provider to ${preferences.reverseGeocodeProvider}")
         geocoder = when (preferences.reverseGeocodeProvider) {
             Preferences.REVERSE_GEOCODE_PROVIDER_OPENCAGE -> OpenCageGeocoder(preferences.openCageGeocoderApiKey)
@@ -59,7 +62,7 @@ class GeocoderProvider @Inject constructor(@ApplicationContext val context: Cont
     }
 
     private fun maybeCreateErrorNotification(result: GeocodeResult) {
-        if (result is GeocodeResult.Formatted || result is GeocodeResult.Empty) {
+        if (result is GeocodeResult.Formatted || result is GeocodeResult.Empty || !preferences.notificationGeocoderErrors) {
             notificationManager.cancel(GEOCODE_ERROR_NOTIFICATION_TAG, 0)
             return
         }
@@ -67,7 +70,10 @@ class GeocoderProvider @Inject constructor(@ApplicationContext val context: Cont
             is GeocodeResult.Error -> context.getString(R.string.geocoderError, result.message)
             is GeocodeResult.Disabled -> context.getString(R.string.geocoderDisabled)
             is GeocodeResult.IPAddressRejected -> context.getString(R.string.geocoderIPAddressRejected)
-            is GeocodeResult.RateLimited -> context.getString(R.string.geocoderRateLimited ,DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(UTC).format(result.until))
+            is GeocodeResult.RateLimited -> context.getString(
+                R.string.geocoderRateLimited,
+                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(UTC).format(result.until)
+            )
             else -> ""
         }
         val until = when (result) {
@@ -89,24 +95,31 @@ class GeocoderProvider @Inject constructor(@ApplicationContext val context: Cont
         activityLaunchIntent.addCategory("android.intent.category.LAUNCHER")
         activityLaunchIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
         val notification = NotificationCompat.Builder(context, ERROR_NOTIFICATION_CHANNEL_ID)
-                .setContentTitle(context.getString(R.string.geocoderProblemNotificationTitle))
-                .setContentText(errorNotificationText)
-                .setAutoCancel(true)
-                .setSmallIcon(R.drawable.ic_owntracks_80)
-                .setStyle(NotificationCompat.BigTextStyle().bigText(errorNotificationText))
-                .setContentIntent(PendingIntent.getActivity(context, 0, activityLaunchIntent, PendingIntent.FLAG_UPDATE_CURRENT))
-                .setPriority(PRIORITY_LOW)
-                .setNotificationSilent()
-                .build()
+            .setContentTitle(context.getString(R.string.geocoderProblemNotificationTitle))
+            .setContentText(errorNotificationText)
+            .setAutoCancel(true)
+            .setSmallIcon(R.drawable.ic_owntracks_80)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(errorNotificationText))
+            .setContentIntent(
+                PendingIntent.getActivity(
+                    context,
+                    0,
+                    activityLaunchIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT
+                )
+            )
+            .setPriority(PRIORITY_LOW)
+            .setNotificationSilent()
+            .build()
 
         notificationManager.notify(GEOCODE_ERROR_NOTIFICATION_TAG, 0, notification)
     }
 
     private fun geocodeResultToText(result: GeocodeResult) =
-            when (result) {
-                is GeocodeResult.Formatted -> result.text
-                else -> null
-            }
+        when (result) {
+            is GeocodeResult.Formatted -> result.text
+            else -> null
+        }
 
     fun resolve(messageLocation: MessageLocation, backgroundService: BackgroundService) {
         if (messageLocation.hasGeocode) {
@@ -126,7 +139,8 @@ class GeocoderProvider @Inject constructor(@ApplicationContext val context: Cont
             textView.text = messageLocation.geocode
             return
         }
-        textView.text = messageLocation.fallbackGeocode // will print lat, lon until GeocodingProvider is available
+        textView.text =
+            messageLocation.fallbackGeocode // will print lat, lon until GeocodingProvider is available
         GlobalScope.launch {
             val result = geocoderResolve(messageLocation)
             messageLocation.geocode = geocodeResultToText(result)
@@ -137,13 +151,20 @@ class GeocoderProvider @Inject constructor(@ApplicationContext val context: Cont
 
     init {
         setGeocoderProvider(context, preferences)
-        preferences.registerOnPreferenceChangedListener(object : OnModeChangedPreferenceChangedListener {
+        preferences.registerOnPreferenceChangedListener(object :
+            OnModeChangedPreferenceChangedListener {
             override fun onAttachAfterModeChanged() {
 
             }
 
-            override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-                if (key == preferences.getPreferenceKey(R.string.preferenceKeyReverseGeocodeProvider) || key == preferences.getPreferenceKey(R.string.preferenceKeyOpencageGeocoderApiKey)) {
+            override fun onSharedPreferenceChanged(
+                sharedPreferences: SharedPreferences?,
+                key: String?
+            ) {
+                if (key == preferences.getPreferenceKey(R.string.preferenceKeyReverseGeocodeProvider) || key == preferences.getPreferenceKey(
+                        R.string.preferenceKeyOpencageGeocoderApiKey
+                    )
+                ) {
                     setGeocoderProvider(context, preferences)
                 }
             }

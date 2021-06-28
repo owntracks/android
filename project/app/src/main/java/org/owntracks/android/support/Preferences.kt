@@ -803,6 +803,21 @@ class Preferences @Inject constructor(
     }
 
     @get:Export(
+        keyResId = R.string.preferenceKeyNotificationGeocoderErrors,
+        exportModeMqtt = true,
+        exportModeHttp = true
+    )
+    @set:Import(keyResId = R.string.preferenceKeyNotificationGeocoderErrors)
+    var notificationGeocoderErrors: Boolean
+        get() = getBooleanOrDefault(
+            R.string.preferenceKeyNotificationGeocoderErrors,
+            R.bool.valNotificationGeocoderErrors
+        )
+        set(newValue) {
+            setBoolean(R.string.preferenceKeyNotificationGeocoderErrors, newValue)
+        }
+
+    @get:Export(
         keyResId = R.string.preferenceKeyReverseGeocodeProvider,
         exportModeMqtt = true,
         exportModeHttp = true
@@ -1081,11 +1096,13 @@ class Preferences @Inject constructor(
     }
 
     companion object {
-        const val EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI = "showExperimentalPreferenceUI"
+        const val EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI =
+            "showExperimentalPreferenceUI"
         const val EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE = "allowSmallKeepalive"
         const val EXPERIMENTAL_FEATURE_USE_AOSP_LOCATION_PROVIDER = "useAospLocationProvider"
         const val EXPERIMENTAL_FEATURE_USE_OSM_MAP = "useOSMMap"
-        const val EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION = "bearingArrowFollowsDeviceOrientation"
+        const val EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION =
+            "bearingArrowFollowsDeviceOrientation"
 
         internal val EXPERIMENTAL_FEATURES = setOf(
             EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI,

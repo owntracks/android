@@ -11,11 +11,11 @@ abstract class CachingGeocoder : Geocoder {
     @Synchronized
     override fun reverse(latitude: Double, longitude: Double): GeocodeResult {
         val result = cache.computeAndOnlyStoreNonErrors(
-                Pair(
-                        latitude.toBigDecimal().setScale(4, RoundingMode.HALF_EVEN),
-                        longitude.toBigDecimal().setScale(4, RoundingMode.HALF_EVEN)
-                ),
-                ::doLookup
+            Pair(
+                latitude.toBigDecimal().setScale(4, RoundingMode.HALF_EVEN),
+                longitude.toBigDecimal().setScale(4, RoundingMode.HALF_EVEN)
+            ),
+            ::doLookup
         )
         Timber.d("Geocode cache: hits=${cache.hitCount()}, misses=${cache.missCount()}")
         return result

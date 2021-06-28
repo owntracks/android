@@ -15,6 +15,7 @@
 * The outgoing message queue is now persisted to device storage, so it should survive both app and device restars (closes #994)
 * Contact bottom sheet now includes details about their battery, speed, altitude, and bearing
 * Location messages now also include the BSSID and SSID if available. Closes #871
+* The Geocoder error notification can now be enabled/disabled in the preferences
 * [Experimental] Added the ability to use [OpenStreetMap](https://www.openstreetmap.org) instead of Google Maps as a mapping layer. Can be enabled by adding `useOSMMap` to the `experimentalFeatures` config key.
 * [Experimental] Added the ability to use a pure AOSP location provider instead of the Google Play Services `FusedLocationProviderClient`. Can be enabled by adding `useAospLocationProvider` to the `experimentalFeatures` config key.
 * [Experimental] Have the contact peek bearing arrow rotate depending on the current devices orientation

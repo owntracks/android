@@ -8,8 +8,9 @@ import timber.log.Timber
 import java.math.BigDecimal
 import java.util.*
 
-class GoogleGeocoder internal constructor( context: Context?) : CachingGeocoder() {
-    private val geocoder: android.location.Geocoder = android.location.Geocoder(context, Locale.getDefault())
+class GoogleGeocoder internal constructor(context: Context?) : CachingGeocoder() {
+    private val geocoder: android.location.Geocoder =
+        android.location.Geocoder(context, Locale.getDefault())
     private var tripResetTimestamp: Instant = Instant.MIN
     override fun reverse(latitude: Double, longitude: Double): GeocodeResult {
         return if (geocoderAvailable()) {
@@ -39,7 +40,7 @@ class GoogleGeocoder internal constructor( context: Context?) : CachingGeocoder(
             }
         } catch (e: Exception) {
             tripResetTimestamp = Instant.now().plus(1, ChronoUnit.MINUTES)
-            GeocodeResult.Error(e.toString(),tripResetTimestamp)
+            GeocodeResult.Error(e.toString(), tripResetTimestamp)
         }
     }
 

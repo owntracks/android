@@ -22,4 +22,14 @@
             app:summary="@string/preferencesNotificationEventsSummary"
             app:title="@string/preferencesNotificationEvents" />
     </PreferenceCategory>
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="@string/preferencesCategoryNotificationErrors">
+        <SwitchPreferenceCompat
+            android:defaultValue="@bool/valNotificationGeocoderErrors"
+            app:iconSpaceReserved="false"
+            app:key="@string/preferenceKeyNotificationGeocoderErrors"
+            app:summary="@string/preferencesNotificationGeocoderErrorsSummary"
+            app:title="@string/preferencesNotificationGeocoderErrors" />
+    </PreferenceCategory>
 </PreferenceScreen>
