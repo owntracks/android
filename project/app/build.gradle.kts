@@ -170,6 +170,12 @@ kapt {
     correctErrorTypes = true
 }
 
+tasks.withType<Test> {
+    systemProperties["junit.jupiter.execution.parallel.enabled"] = true
+    systemProperties["junit.jupiter.execution.parallel.mode.default"] = "concurrent"
+    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
+}
+
 val okHttpVersion = "4.9.1"
 val jacksonVersion = "2.12.2"
 val materialDialogsVersion = "0.9.6.0"
