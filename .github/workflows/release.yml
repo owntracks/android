@@ -57,7 +57,7 @@ jobs:
         GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
         KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
       run: |
-        echo -n $GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS > project/app/owntracks-android-7a8e1517bde3.json
+        echo -n $GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS > project/app/owntracks-android-gcloud-creds.json
         echo -n $KEYSTORE_BASE64 | base64 -d > project/owntracks.release.keystore.jks
     - name: Build APK
       run: ./gradlew assembleRelease
