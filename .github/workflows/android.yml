@@ -111,12 +111,18 @@ jobs:
             adb shell settings put secure location_providers_allowed +gps
             adb shell settings put secure location_providers_allowed +network
             adb shell settings put secure location_mode 3
-            ./gradlew createGmsDebugCoverageReport
+            ./gradlew createGmsDebugCoverageReport || { adb logcat -t 10000 > logcat; exit 1; }
           profile: pixel_3a
           target: google_apis
           disable-animations: true
           arch: x86_64
           sdcard-path-or-size: 1000M
+      - name: Upload logcat
+        uses: actions/upload-artifact@v2
+        with:
+          name: gms-logcat
+          path: logcat
+        if: ${{ failure() }}
       - name: Upload gms connected test result artifact
         uses: actions/upload-artifact@v2
         with:
@@ -158,12 +164,18 @@ jobs:
             adb shell settings put secure location_providers_allowed +gps
             adb shell settings put secure location_providers_allowed +network
             adb shell settings put secure location_mode 3
-            ./gradlew createOssDebugCoverageReport
+            ./gradlew createOssDebugCoverageReport || { adb logcat -t 10000 > logcat; exit 1; }
           profile: pixel_3a
           target: default
           disable-animations: true
           arch: x86_64
           sdcard-path-or-size: 1000M
+      - name: Upload logcat
+        uses: actions/upload-artifact@v2
+        with:
+          name: oss-logcat
+          path: logcat
+        if: ${{ failure() }}
       - name: Upload OSS connected test result artifact
         uses: actions/upload-artifact@v2
         with:

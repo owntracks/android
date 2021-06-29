@@ -170,7 +170,7 @@ class PreferencesActivityTests {
     fun defaultGeocoderIsSelected() {
         clickOnAndWait(R.string.preferencesAdvanced)
         scrollToText(R.string.preferencesReverseGeocodeProvider)
-        assertDisplayed(R.string.valDefaultGeocoder)
+        assertDisplayed(baristaRule.activityTestRule.activity.resources.getStringArray(R.array.geocoders)[1])
     }
 
     private fun scrollToText(textResource: Int) {
