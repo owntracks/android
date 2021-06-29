@@ -799,7 +799,7 @@ class Preferences @Inject constructor(
     @Import(keyResId = R.string.preferenceKeyGeocodeEnabled)
     fun setGeocodeEnabled(newValue: Boolean) {
         reverseGeocodeProvider =
-            if (newValue) REVERSE_GEOCODE_PROVIDER_GOOGLE else REVERSE_GEOCODE_PROVIDER_NONE
+            if (newValue) REVERSE_GEOCODE_PROVIDER_DEVICE else REVERSE_GEOCODE_PROVIDER_NONE
     }
 
     @get:Export(
@@ -1085,7 +1085,7 @@ class Preferences @Inject constructor(
             )
 
             reverseGeocodeProvider = if (oldEnabledValue && opencageApiKey.isNullOrBlank()) {
-                REVERSE_GEOCODE_PROVIDER_GOOGLE
+                REVERSE_GEOCODE_PROVIDER_DEVICE
             } else if (oldEnabledValue && !opencageApiKey.isNullOrBlank()) {
                 REVERSE_GEOCODE_PROVIDER_OPENCAGE
             } else {
@@ -1113,11 +1113,11 @@ class Preferences @Inject constructor(
 
         )
         const val REVERSE_GEOCODE_PROVIDER_NONE = "None"
-        const val REVERSE_GEOCODE_PROVIDER_GOOGLE = "Google"
+        const val REVERSE_GEOCODE_PROVIDER_DEVICE = "Google"
         const val REVERSE_GEOCODE_PROVIDER_OPENCAGE = "OpenCage"
         val REVERSE_GEOCODE_PROVIDERS = setOf(
             REVERSE_GEOCODE_PROVIDER_NONE,
-            REVERSE_GEOCODE_PROVIDER_GOOGLE,
+            REVERSE_GEOCODE_PROVIDER_DEVICE,
             REVERSE_GEOCODE_PROVIDER_OPENCAGE
         )
 

@@ -39,7 +39,7 @@ class GeocoderProvider @Inject constructor(
         Timber.i("Setting geocoding provider to ${preferences.reverseGeocodeProvider}")
         geocoder = when (preferences.reverseGeocodeProvider) {
             Preferences.REVERSE_GEOCODE_PROVIDER_OPENCAGE -> OpenCageGeocoder(preferences.openCageGeocoderApiKey)
-            Preferences.REVERSE_GEOCODE_PROVIDER_GOOGLE -> GoogleGeocoder(context)
+            Preferences.REVERSE_GEOCODE_PROVIDER_DEVICE -> DeviceGeocoder(context)
             else -> GeocoderNone()
         }
     }
