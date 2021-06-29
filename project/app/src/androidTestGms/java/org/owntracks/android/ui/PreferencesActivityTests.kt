@@ -165,6 +165,14 @@ class PreferencesActivityTests {
         assertNotContains(R.id.effectiveConfiguration, "\"clientId\"")
     }
 
+    @Test
+    @AllowFlaky(attempts = 1)
+    fun defaultGeocoderIsSelected() {
+        clickOnAndWait(R.string.preferencesAdvanced)
+        scrollToText(R.string.preferencesReverseGeocodeProvider)
+        assertDisplayed(R.string.valDefaultGeocoder)
+    }
+
     private fun scrollToText(textResource: Int) {
         onView(withId(androidx.preference.R.id.recycler_view))
                 .perform(actionOnItem<RecyclerView.ViewHolder>(

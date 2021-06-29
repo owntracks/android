@@ -70,7 +70,7 @@
             app:summary="@string/preferencesAutostartSummary"
             app:title="@string/preferencesAutostart" />
         <androidx.preference.ListPreference
-            app:defaultValue="Google"
+            app:defaultValue="@string/valDefaultGeocoder"
             app:entries="@array/geocoders"
             app:entryValues="@array/geocoderValues"
             app:iconSpaceReserved="false"

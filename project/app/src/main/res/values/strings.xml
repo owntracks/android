@@ -212,7 +212,7 @@
     <string name="preferencesNotificationGeocoderErrorsSummary">Display geocoder errors, rate limits &amp; quota exceeded events </string>
     <string-array name="geocoders">
         <item>None</item>
-        <item>Google</item>
+        <item>Device (Google)</item>
         <item>OpenCage</item>
     </string-array>
     <string-array name="themeLabels">

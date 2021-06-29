@@ -824,17 +824,26 @@ class Preferences @Inject constructor(
     )
     @set:Import(keyResId = R.string.preferenceKeyReverseGeocodeProvider)
     var reverseGeocodeProvider: String
-        get() = getStringOrDefault(
-            R.string.preferenceKeyReverseGeocodeProvider,
-            R.string.valDefaultGeocoder
-        )
+        get() {
+            val currentValue = getStringOrDefault(
+                R.string.preferenceKeyReverseGeocodeProvider,
+                R.string.valDefaultGeocoder
+            )
+            return if (!REVERSE_GEOCODE_PROVIDERS.contains(currentValue)) {
+                val default = getStringResource(R.string.valDefaultGeocoder)
+                reverseGeocodeProvider = default
+                default
+            } else {
+                currentValue
+            }
+        }
         set(newValue) {
             if (REVERSE_GEOCODE_PROVIDERS.contains(newValue)) {
                 setString(R.string.preferenceKeyReverseGeocodeProvider, newValue)
             } else {
                 setString(
                     R.string.preferenceKeyReverseGeocodeProvider,
-                    REVERSE_GEOCODE_PROVIDER_NONE
+                    getStringResource(R.string.valDefaultGeocoder)
                 )
             }
         }
@@ -1093,6 +1102,17 @@ class Preferences @Inject constructor(
             }
             preferencesStore.remove(getPreferenceKey(R.string.preferenceKeyGeocodeEnabled))
         }
+        // Migrate old "google" reverse geocoder value to "device"
+        if (preferencesStore.hasKey(getPreferenceKey(R.string.preferencesReverseGeocodeProvider)) && preferencesStore.getString(
+                getPreferenceKey(R.string.preferencesReverseGeocodeProvider),
+                ""
+            ) == "Google"
+        ) {
+            preferencesStore.putString(
+                getPreferenceKey(R.string.preferencesReverseGeocodeProvider),
+                REVERSE_GEOCODE_PROVIDER_DEVICE
+            )
+        }
     }
 
     companion object {
@@ -1113,7 +1133,7 @@ class Preferences @Inject constructor(
 
         )
         const val REVERSE_GEOCODE_PROVIDER_NONE = "None"
-        const val REVERSE_GEOCODE_PROVIDER_DEVICE = "Google"
+        const val REVERSE_GEOCODE_PROVIDER_DEVICE = "Device"
         const val REVERSE_GEOCODE_PROVIDER_OPENCAGE = "OpenCage"
         val REVERSE_GEOCODE_PROVIDERS = setOf(
             REVERSE_GEOCODE_PROVIDER_NONE,

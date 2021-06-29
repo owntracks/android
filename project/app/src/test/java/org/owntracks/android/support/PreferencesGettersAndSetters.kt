@@ -80,7 +80,7 @@ class PreferencesGettersAndSetters(
                     arrayOf("DontReuseHttpClient", "dontReuseHttpClient", true, true, Boolean::class, true),
                     arrayOf("ExperimentalFeatures", "experimentalFeatures", setOf("this", "that", "other"), setOf("this", "that", "other"), Collection::class, false),
                     arrayOf("FusedRegionDetection", "fusedRegionDetection", true, true, Boolean::class, false),
-                    arrayOf("ReverseGeocodeProvider", "reverseGeocodeProvider", "Google", "Google", String::class, false),
+                    arrayOf("ReverseGeocodeProvider", "reverseGeocodeProvider", "Device", "Device", String::class, false),
                     arrayOf("ReverseGeocodeProvider", "reverseGeocodeProvider", "OpenCage", "OpenCage", String::class, false),
                     arrayOf("ReverseGeocodeProvider", "reverseGeocodeProvider", "None", "None", String::class, false),
                     arrayOf("ReverseGeocodeProvider", "reverseGeocodeProvider", "Nonsense", "None", String::class, false),
@@ -196,6 +196,7 @@ class PreferencesGettersAndSetters(
                 on { getString(eq(R.string.valIgnoreStaleLocations)) } doReturn "0"
                 on { getString(eq(R.string.defaultSubTopic)) } doReturn "owntracks/+/+"
                 on { getString(eq(R.string.valPubTopic)) } doReturn "owntracks/%u/%d"
+                on { getString(eq(R.string.valDefaultGeocoder)) } doReturn "None"
                 on { getInteger(any()) } doReturn 0
                 on { getBoolean(any()) } doReturn false
             }
