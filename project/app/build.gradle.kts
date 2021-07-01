@@ -179,7 +179,7 @@ tasks.withType<Test> {
 val okHttpVersion = "4.9.1"
 val jacksonVersion = "2.12.2"
 val materialDialogsVersion = "0.9.6.0"
-val espressoVersion = "3.3.0"
+val espressoVersion = "3.4.0"
 val androidxTestVersion = "1.3.0"
 val kotlinCoroutinesVersion = "1.4.1"
 val jaxbVersion = "3.0.1"
