@@ -13,7 +13,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.data.repos.LocationRepo
-import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.location.*
 import org.owntracks.android.model.FusedContact
