@@ -1,6 +1,6 @@
 package org.owntracks.android.ui.contacts
 
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.LiveData
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.ui.base.view.MvvmView
 import org.owntracks.android.ui.base.viewmodel.MvvmViewModel
@@ -21,6 +21,6 @@ import org.owntracks.android.ui.base.viewmodel.MvvmViewModel
 interface ContactsMvvm {
     interface View : MvvmView
     interface ViewModel<V : MvvmView?> : MvvmViewModel<V> {
-        val contacts: MutableLiveData<MutableMap<String, FusedContact>>
+        val contacts: LiveData<MutableMap<String, FusedContact>>
     }
 }

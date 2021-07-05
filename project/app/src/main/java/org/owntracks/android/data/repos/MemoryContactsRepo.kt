@@ -20,31 +20,31 @@ class MemoryContactsRepo @Inject constructor(
     private val eventBus: EventBus,
     private val contactsBitmapAndNameMemoryCache: ContactBitmapAndNameMemoryCache
 ) : ContactsRepo {
-    override val all = MutableLiveData<MutableMap<String, FusedContact>>(mutableMapOf())
+
+    private val contacts = mutableMapOf<String,FusedContact>()
+    override val all = MutableLiveData(contacts)
 
     override fun getById(id: String): FusedContact? {
-        return all.value!![id]
+        return contacts[id]
     }
 
     @Synchronized
     private fun put(id: String, contact: FusedContact) {
         Timber.v("new contact allocated id:%s, tid:%s", id, contact.trackerId)
-        val map = all.value!!
-        map[id] = contact
-        all.postValue(map)
+        contacts[id] = contact
     }
 
     @MainThread
     @Synchronized
     override fun clearAll() {
-        all.value!!.clear()
+        contacts.clear()
         contactsBitmapAndNameMemoryCache.evictAll()
     }
 
     @Synchronized
     override fun remove(id: String) {
         Timber.v("removing contact: %s", id)
-        all.value!!.remove(id)?.run { eventBus.post(FusedContactRemoved(this)) }
+        contacts.remove(id)?.run { eventBus.post(FusedContactRemoved(this)) }
     }
 
     @Synchronized

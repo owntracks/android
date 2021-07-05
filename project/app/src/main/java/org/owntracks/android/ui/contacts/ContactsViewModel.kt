@@ -1,7 +1,7 @@
 package org.owntracks.android.ui.contacts
 
 import android.os.Bundle
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.LiveData
 import dagger.hilt.android.scopes.ActivityScoped
 import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.model.FusedContact
@@ -14,6 +14,6 @@ class ContactsViewModel @Inject constructor(private val contactsRepo: ContactsRe
         super.attachView(savedInstanceState, view!!)
     }
 
-    override val contacts: MutableLiveData<MutableMap<String, FusedContact>>
+    override val contacts: LiveData<MutableMap<String, FusedContact>>
         get() = contactsRepo.all
 }

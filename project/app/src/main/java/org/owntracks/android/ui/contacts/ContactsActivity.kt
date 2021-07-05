@@ -33,9 +33,10 @@ class ContactsActivity : BaseActivity<UiContactsBinding?, ContactsMvvm.ViewModel
         setDrawer(binding!!.appbar.toolbar)
         binding!!.vm!!.contacts.observe({ this.lifecycle }, { contacts: Map<String, FusedContact> ->
             contactsAdapter.setContactList(contacts.values)
-            for (contact in contacts.values) {
-                contact.messageLocation.removeObservers(this)
-                contact.messageLocation.observe(
+            contacts.values.forEach {
+
+                it.messageLocation.removeObservers(this)
+                it.messageLocation.observe(
                     { this.lifecycle },
                     { messageLocation: MessageLocation? ->
                         geocoderProvider.resolve(messageLocation!!)
