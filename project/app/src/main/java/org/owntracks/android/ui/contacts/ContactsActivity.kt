@@ -7,22 +7,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiContactsBinding
-import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.model.FusedContact
-import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.ui.base.BaseActivity
 import org.owntracks.android.ui.base.BaseAdapter
 import org.owntracks.android.ui.map.MapActivity
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class ContactsActivity : BaseActivity<UiContactsBinding?, ContactsMvvm.ViewModel<*>?>(),
     ContactsMvvm.View, BaseAdapter.ClickListener<FusedContact?> {
 
     private lateinit var contactsAdapter: ContactsAdapter
-
-    @Inject
-    lateinit var geocoderProvider: GeocoderProvider
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,15 +27,7 @@ class ContactsActivity : BaseActivity<UiContactsBinding?, ContactsMvvm.ViewModel
         setDrawer(binding!!.appbar.toolbar)
         binding!!.vm!!.contacts.observe({ this.lifecycle }, { contacts: Map<String, FusedContact> ->
             contactsAdapter.setContactList(contacts.values)
-            contacts.values.forEach {
-
-                it.messageLocation.removeObservers(this)
-                it.messageLocation.observe(
-                    { this.lifecycle },
-                    { messageLocation: MessageLocation? ->
-                        geocoderProvider.resolve(messageLocation!!)
-                    })
-            }
+            binding!!.vm!!.refreshGeocodes()
         })
         binding!!.recyclerView.layoutManager = LinearLayoutManager(this)
         binding!!.recyclerView.adapter = contactsAdapter

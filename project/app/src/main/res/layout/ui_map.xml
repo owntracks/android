@@ -46,15 +46,16 @@
 
             <include
                 android:id="@+id/contactPeek"
-                layout="@layout/ui_row_contact" />
+                layout="@layout/ui_row_contact"
+                app:contact="@{vm.contact}" />
 
             <androidx.appcompat.widget.LinearLayoutCompat
-                android:id="@+id/contactLocationDetails"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:paddingStart="36dp"
-                android:paddingEnd="0dp">
+                android:paddingEnd="0dp"
+                android:visibility="@{vm.contact.messageLocation!=null ? View.VISIBLE : View.GONE}">
 
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="0dp"
@@ -64,16 +65,16 @@
                     android:orientation="vertical">
 
                     <include
-                        android:id="@+id/accuracy"
                         layout="@layout/ui_contactsheet_parameter"
                         app:icon="@{@drawable/ic_baseline_my_location_24}"
-                        app:label="@{@string/contactDetailsAccuracy}" />
+                        app:label="@{@string/contactDetailsAccuracy}"
+                        app:value="@{String.format(@string/contactDetailsAccuracyValue,vm.contact.messageLocation.accuracy)}" />
 
                     <include
-                        android:id="@+id/altitude"
                         layout="@layout/ui_contactsheet_parameter"
                         app:icon="@{@drawable/ic_baseline_airplanemode_active_24}"
-                        app:label="@{@string/contactDetailsAltitude}" />
+                        app:label="@{@string/contactDetailsAltitude}"
+                        app:value="@{String.format(@string/contactDetailsAltitudeValue, vm.contact.messageLocation.altitude)}" />
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
                 <androidx.appcompat.widget.LinearLayoutCompat
@@ -84,38 +85,39 @@
                     android:orientation="vertical">
 
                     <include
-                        android:id="@+id/battery"
                         layout="@layout/ui_contactsheet_parameter"
                         app:icon="@{@drawable/ic_baseline_battery_std_24}"
-                        app:label="@{@string/contactDetailsBattery}" />
+                        app:label="@{@string/contactDetailsBattery}"
+                        app:value="@{String.format(@string/contactDetailsBatteryValue,vm.contact.messageLocation.battery)}" />
 
                     <include
-                        android:id="@+id/speed"
                         layout="@layout/ui_contactsheet_parameter"
                         app:icon="@{@drawable/ic_baseline_speed_24}"
-                        app:label="@{@string/contactDetailsSpeed}" />
+                        app:label="@{@string/contactDetailsSpeed}"
+                        app:value="@{String.format(@string/contactDetailsSpeedValue,vm.contact.messageLocation.velocity)}" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
                 <androidx.appcompat.widget.LinearLayoutCompat
-                    android:id="@+id/contactRelativeLocationDetails"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
                     android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:visibility="@{vm.currentLocation!=null ? View.VISIBLE : View.GONE}">
 
                     <include
-                        android:id="@+id/distance"
                         layout="@layout/ui_contactsheet_parameter"
                         app:icon="@{@drawable/ic_baseline_architecture_24}"
-                        app:label="@{@string/contactDetailsDistance}" />
+                        app:label="@{@string/contactDetailsDistance}"
+                        app:value="@{String.format(@string/contactDetailsDistanceValue, vm.contactDistance, vm.contactDistanceUnit)}" />
 
                     <include
-                        android:id="@+id/bearing"
                         layout="@layout/ui_contactsheet_parameter"
                         app:icon="@{@drawable/ic_baseline_arrow_upward_24}"
-                        app:label="@{@string/contactDetailsBearing}" />
+                        app:iconRotation="@{vm.relativeContactBearing}"
+                        app:label="@{@string/contactDetailsBearing}"
+                        app:value="@{String.format(@string/contactDetailsBearingValue, vm.contactBearing)}" />
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
             </androidx.appcompat.widget.LinearLayoutCompat>
@@ -128,7 +130,6 @@
                 android:paddingEnd="0dp">
 
                 <TextView
-                    android:id="@+id/tid"
                     style="@style/ListItemPrimary"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -137,10 +138,10 @@
                     android:paddingTop="@dimen/activity_horizontal_margin"
                     android:paddingEnd="@dimen/activity_horizontal_margin"
                     android:singleLine="true"
+                    android:text="@{vm.contact.trackerId}"
                     android:textIsSelectable="true" />
 
                 <TextView
-                    android:id="@+id/tidLabel"
                     style="@style/ListItemSecondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -152,9 +153,9 @@
                     android:text="@string/contactDetailsTrackerId" />
 
                 <include
-                    android:id="@+id/topic"
                     layout="@layout/ui_contactsheet_parameter"
-                    app:label="@{@string/contactDetailsTopic}" />
+                    app:label="@{@string/contactDetailsTopic}"
+                    app:value="@{vm.contact.id}" />
 
                 <ImageView
                     android:id="@+id/moreButton"
@@ -169,7 +170,8 @@
                     android:padding="12dp"
                     android:scaleType="fitCenter"
                     android:src="@drawable/ic_baseline_more_horiz_24"
-                    android:tintMode="src_in" />
+                    android:tintMode="src_in"
+                    android:visibility="@{vm.contactPeekPopupmenuVisibility() ? View.VISIBLE : View.GONE}" />
             </androidx.appcompat.widget.LinearLayoutCompat>
 
 

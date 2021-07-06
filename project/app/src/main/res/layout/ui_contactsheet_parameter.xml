@@ -8,11 +8,19 @@
 
         <variable
             name="label"
-            type="java.lang.String" />
+            type="String" />
+
+        <variable
+            name="value"
+            type="String" />
 
         <variable
             name="icon"
             type="android.graphics.drawable.Drawable" />
+
+        <variable
+            name="iconRotation"
+            type="Float" />
     </data>
 
     <androidx.appcompat.widget.LinearLayoutCompat
@@ -28,7 +36,7 @@
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
             android:contentDescription="@{label}"
-            android:rotation="0"
+            android:rotation="@{iconRotation}"
             android:src="@{icon}"
             android:visibility="@{icon !=null ? View.VISIBLE : View.GONE}"
             app:tint="@color/primary" />
@@ -50,6 +58,7 @@
                 android:paddingTop="@dimen/activity_horizontal_margin"
                 android:paddingEnd="0dp"
                 android:singleLine="true"
+                android:text="@{value}"
                 android:textIsSelectable="true"
                 android:textSize="16sp"
                 app:autoSizeMaxTextSize="16sp"

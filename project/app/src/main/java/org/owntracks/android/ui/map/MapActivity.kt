@@ -8,10 +8,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.location.Location
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -27,7 +24,6 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.commit
-import androidx.lifecycle.Observer
 import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.idling.CountingIdlingResource
 import com.google.android.material.appbar.AppBarLayout
@@ -44,8 +40,10 @@ import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.databinding.UiMapBinding
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.gms.location.toGMSLatLng
-import org.owntracks.android.location.*
-import org.owntracks.android.model.BatteryStatus
+import org.owntracks.android.location.LatLng
+import org.owntracks.android.location.LocationProviderClient
+import org.owntracks.android.location.LocationServices
+import org.owntracks.android.location.LocationSource
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.services.BackgroundService.BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG
@@ -57,20 +55,16 @@ import org.owntracks.android.support.Preferences.Companion.EXPERIMENTAL_FEATURE_
 import org.owntracks.android.support.Preferences.Companion.EXPERIMENTAL_FEATURE_USE_OSM_MAP
 import org.owntracks.android.support.RequirementsChecker
 import org.owntracks.android.support.RunThingsOnOtherThreads
-import org.owntracks.android.support.widgets.BindingConversions
 import org.owntracks.android.ui.base.BaseActivity
 import org.owntracks.android.ui.base.navigator.Navigator
 import org.owntracks.android.ui.map.osm.OSMMapFragment
 import org.owntracks.android.ui.welcome.WelcomeActivity
 import timber.log.Timber
 import javax.inject.Inject
-import kotlin.math.asin
-import kotlin.math.roundToInt
 
 @AndroidEntryPoint
 class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>?>(), MapMvvm.View,
-    View.OnClickListener, View.OnLongClickListener, PopupMenu.OnMenuItemClickListener,
-    Observer<FusedContact?> {
+    View.OnClickListener, View.OnLongClickListener, PopupMenu.OnMenuItemClickListener {
     lateinit var locationLifecycleObserver: LocationLifecycleObserver
     private var bottomSheetBehavior: BottomSheetBehavior<LinearLayoutCompat>? = null
     private var menu: Menu? = null
@@ -149,33 +143,41 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         }
 
         // Watch various things that the viewModel owns
-        viewModel?.also {
-            it.contact.observe(this, this)
-            it.bottomSheetHidden.observe(this, { o: Boolean? ->
+        viewModel?.also { vm ->
+            vm.contact.observe(this, { contact: FusedContact? ->
+                contact?.let {
+                    binding?.contactPeek?.run {
+                        Timber.v("contact changed: $it.id")
+                        name.text = it.fusedName
+                        image.setImageResource(0)
+                        GlobalScope.launch(Dispatchers.Main) {
+                            contactImageBindingAdapter.run {
+                                image.setImageBitmap(
+                                    getBitmapFromCache(it)
+                                )
+                            }
+                        }
+                        vm.refreshGeocodeForActiveContact()
+                    }
+                }
+            })
+            vm.bottomSheetHidden.observe(this, { o: Boolean? ->
                 if (o == null || o) {
                     setBottomSheetHidden()
                 } else {
                     setBottomSheetCollapsed()
                 }
             })
-            it.mapCenter.observe(this, { o: LatLng ->
+            vm.mapCenter.observe(this, { o: LatLng ->
                 mapFragment.updateCamera(o)
             })
-            it.currentLocation.observe(this, { location ->
+            vm.currentLocation.observe(this, { location ->
                 if (location == null) {
                     disableLocationMenus()
-                    binding?.contactRelativeLocationDetails?.visibility = View.GONE
                 } else {
                     enableLocationMenus()
-                    binding?.contactRelativeLocationDetails?.visibility = View.VISIBLE
-                    binding?.run {
-                        it.activeContact?.latLng?.let { contactLatLng ->
-                            updateContactPeekRelativeAttributes(
-                                this,
-                                location.toLatLng(),
-                                contactLatLng
-                            )
-                        }
+                    binding?.vm?.run {
+                        updateActiveContactDistanceAndBearing(location)
                     }
                 }
             })
@@ -242,103 +244,6 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         }
     }
 
-    override fun onChanged(activeContact: FusedContact?) {
-        binding?.run {
-            activeContact?.let { contact ->
-                Timber.v("contact changed: $contact.id")
-                contactPeek.name.text = contact.fusedName
-
-                contactPeek.image.setImageResource(0)
-                GlobalScope.launch(Dispatchers.Main) {
-                    contactImageBindingAdapter.run {
-                        contactPeek.image.setImageBitmap(
-                            getBitmapFromCache(contact)
-                        )
-                    }
-                }
-
-                tid.text = contact.trackerId
-                topic.value.text = contact.id
-
-                val contactLocation = contact.messageLocation.value
-                if (contactLocation != null) {
-                    contactLocationDetails.visibility = View.VISIBLE
-                    geocoderProvider.resolve(contactLocation, contactPeek.location)
-                    BindingConversions.setRelativeTimeSpanString(
-                        contactPeek.locationDate,
-                        contact.tst
-                    )
-                    accuracy.value.text = getString(
-                        R.string.contactDetailsAccuracyValue,
-                        contact.fusedLocationAccuracy
-                    )
-
-                    altitude.value.text =
-                        getString(R.string.contactDetailsAltitudeValue, contactLocation.altitude)
-
-                    battery.value.text =
-                        getString(R.string.contactDetailsBatteryValue, contactLocation.battery)
-
-                    when (contactLocation.batteryStatus) {
-                        BatteryStatus.FULL -> battery.image.setImageResource(R.drawable.ic_baseline_battery_charging_full_24)
-                        BatteryStatus.CHARGING -> battery.image.setImageResource(R.drawable.ic_baseline_battery_charging_full_24)
-                        BatteryStatus.UNKNOWN -> battery.image.setImageResource(R.drawable.ic_baseline_battery_unknown_24)
-                        BatteryStatus.UNPLUGGED -> battery.image.setImageResource(R.drawable.ic_baseline_battery_std_24)
-                    }
-
-                    speed.value.text =
-                        getString(R.string.contactDetailsSpeedValue, contactLocation.velocity)
-
-                    val currentLocation = viewModel?.currentLocation?.value
-                    if (currentLocation != null) {
-                        contactRelativeLocationDetails.visibility = View.VISIBLE
-                        updateContactPeekRelativeAttributes(
-                            this,
-                            currentLocation.toLatLng(),
-                            contactLocation.toLatLng()
-                        )
-
-                    } else {
-                        contactRelativeLocationDetails.visibility = View.GONE
-                    }
-                } else {
-                    contactPeek.location.setText(R.string.na)
-                    contactPeek.locationDate.setText(R.string.na)
-                    contactLocationDetails.visibility = View.GONE
-                }
-                moreButton.visibility =
-                    if (shouldShowContactPeekPopupMenu()) View.VISIBLE else View.GONE
-            }
-        }
-    }
-
-
-    private fun updateContactPeekRelativeAttributes(
-        binding: UiMapBinding,
-        currentLocation: LatLng,
-        contactLocation: LatLng
-    ) {
-        val distanceBetween = FloatArray(2)
-        Location.distanceBetween(
-            currentLocation.latitude,
-            currentLocation.longitude,
-            contactLocation.latitude,
-            contactLocation.longitude,
-            distanceBetween
-        )
-
-        binding.distance.value.text = getString(
-            R.string.contactDetailsDistanceValue,
-            if (distanceBetween[0].roundToInt() > 1000) (distanceBetween[0] / 1000) else distanceBetween[0],
-            if (distanceBetween[0] > 1000) "km" else "m"
-        )
-
-        binding.bearing.value.text =
-            getString(R.string.contactDetailsBearingValue, distanceBetween[1])
-
-        binding.bearing.image.rotation = distanceBetween[1]
-    }
-
     override fun onResume() {
         if (FLAVOR == "gms") {
             if (mapFragment is GoogleMapFragment && preferences.isExperimentalFeatureEnabled(
@@ -369,7 +274,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
                 orientationSensor?.run { Timber.d("Got a rotation vector sensor") }
             }
         } else {
-            sensorManager?.unregisterListener(orientationSensorEventListener)
+            sensorManager?.unregisterListener(viewModel?.orientationSensorEventListener)
             sensorManager = null
             orientationSensor = null
         }
@@ -516,26 +421,24 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
     override fun onMenuItemClick(item: MenuItem): Boolean {
         val itemId = item.itemId
         if (itemId == R.id.menu_navigate) {
-            val c = viewModel!!.activeContact
-            if (c?.latLng != null) {
-                c.latLng?.also {
-                    try {
-                        val l = it.toGMSLatLng()
-                        val intent = Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse("google.navigation:q=${l.latitude},${l.longitude}")
-                        )
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        startActivity(intent)
-                    } catch (e: ActivityNotFoundException) {
-                        Snackbar.make(
-                            binding!!.coordinatorLayout,
-                            getString(R.string.noNavigationApp),
-                            Snackbar.LENGTH_SHORT
-                        ).show()
-                    }
+            val c = viewModel!!.contact
+            c.value?.latLng?.run {
+                try {
+                    val l = this.toGMSLatLng()
+                    val intent = Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("google.navigation:q=${l.latitude},${l.longitude}")
+                    )
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    startActivity(intent)
+                } catch (e: ActivityNotFoundException) {
+                    Snackbar.make(
+                        binding!!.coordinatorLayout,
+                        getString(R.string.noNavigationApp),
+                        Snackbar.LENGTH_SHORT
+                    ).show()
                 }
-            } else {
+            } ?: run {
                 Snackbar.make(
                     binding!!.coordinatorLayout,
                     getString(R.string.contactLocationUnknown),
@@ -558,7 +461,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
     override fun setBottomSheetExpanded() {
         bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_EXPANDED
         orientationSensor?.let {
-            sensorManager?.registerListener(orientationSensorEventListener, it, 500_000)
+            sensorManager?.registerListener(viewModel?.orientationSensorEventListener, it, 500_000)
         }
     }
 
@@ -569,13 +472,13 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
 
     override fun setBottomSheetCollapsed() {
         bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_COLLAPSED
-        sensorManager?.unregisterListener(orientationSensorEventListener)
+        sensorManager?.unregisterListener(viewModel?.orientationSensorEventListener)
     }
 
     override fun setBottomSheetHidden() {
         bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_HIDDEN
         menu?.run { close() }
-        sensorManager?.unregisterListener(orientationSensorEventListener)
+        sensorManager?.unregisterListener(viewModel?.orientationSensorEventListener)
     }
 
     private fun showPopupMenu(v: View) {
@@ -585,14 +488,11 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         if (preferences.mode == MessageProcessorEndpointHttp.MODE_ID) {
             popupMenu.menu.removeItem(R.id.menu_clear)
         }
-        if (viewModel?.activeContact?.latLng == null) {
+        if (viewModel?.contactHasLocation() == null) {
             popupMenu.menu.removeItem(R.id.menu_navigate)
         }
         popupMenu.show()
     }
-
-    private fun shouldShowContactPeekPopupMenu(): Boolean =
-        viewModel?.activeContact?.latLng != null || preferences.mode != MessageProcessorEndpointHttp.MODE_ID
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -608,33 +508,6 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
 
     fun onMapReady() {
         viewModel?.onMapReady()
-    }
-
-    private val orientationSensorEventListener = object : SensorEventListener {
-        override fun onSensorChanged(event: SensorEvent?) {
-            event?.run {
-                //Orientation is angle around the Z axis
-                val azimuth = (180 / Math.PI) * 2 * asin(values[2])
-                val contactLatLng = viewModel!!.activeContact!!.latLng!!
-                val currentLocation = viewModel!!.currentLocation.value!!
-                val image = binding!!.bearing.image
-
-                val distanceBetween = FloatArray(2)
-                Location.distanceBetween(
-                    currentLocation.latitude,
-                    currentLocation.longitude,
-                    contactLatLng.latitude,
-                    contactLatLng.longitude,
-                    distanceBetween
-                )
-                image.rotation = distanceBetween[1] + azimuth.toFloat()
-            }
-        }
-
-
-        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-            //noop
-        }
     }
 
     override fun onBackPressed() {

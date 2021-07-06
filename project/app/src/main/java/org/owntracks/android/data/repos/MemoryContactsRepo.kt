@@ -32,6 +32,7 @@ class MemoryContactsRepo @Inject constructor(
     private fun put(id: String, contact: FusedContact) {
         Timber.v("new contact allocated id:%s, tid:%s", id, contact.trackerId)
         contacts[id] = contact
+        all.postValue(contacts)
     }
 
     @MainThread
@@ -39,12 +40,14 @@ class MemoryContactsRepo @Inject constructor(
     override fun clearAll() {
         contacts.clear()
         contactsBitmapAndNameMemoryCache.evictAll()
+        all.postValue(contacts)
     }
 
     @Synchronized
     override fun remove(id: String) {
         Timber.v("removing contact: %s", id)
         contacts.remove(id)?.run { eventBus.post(FusedContactRemoved(this)) }
+        all.postValue(contacts)
     }
 
     @Synchronized
@@ -75,6 +78,7 @@ class MemoryContactsRepo @Inject constructor(
         if (fusedContact != null) {
             // If timestamp of last location message is <= the new location message, skip update. We either received an old or already known message.
             if (fusedContact.setMessageLocation(messageLocation)) {
+                all.postValue(contacts)
                 eventBus.post(fusedContact)
             }
         } else {

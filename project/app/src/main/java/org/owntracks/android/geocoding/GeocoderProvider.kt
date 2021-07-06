@@ -4,14 +4,11 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.widget.TextView
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_LOW
 import androidx.core.app.NotificationManagerCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlinx.coroutines.withContext
 import org.owntracks.android.R
 import org.owntracks.android.model.messages.MessageLocation
@@ -28,9 +25,11 @@ import javax.inject.Singleton
 
 @Singleton
 class GeocoderProvider @Inject constructor(
-    @ApplicationContext val context: Context,
-    val preferences: Preferences
+    @ApplicationContext private val context: Context,
+    private val preferences: Preferences
 ) {
+
+    private val ioDispatcher = Dispatchers.IO
     private var lastRateLimitedNotificationTime: Instant? = null
     private var notificationManager: NotificationManagerCompat
     private lateinit var geocoder: Geocoder
@@ -45,20 +44,19 @@ class GeocoderProvider @Inject constructor(
     }
 
     private suspend fun geocoderResolve(messageLocation: MessageLocation): GeocodeResult {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             return@withContext geocoder.reverse(messageLocation.latitude, messageLocation.longitude)
         }
     }
 
-    fun resolve(messageLocation: MessageLocation) {
+    suspend fun resolve(messageLocation: MessageLocation) {
         if (messageLocation.hasGeocode) {
             return
         }
-        GlobalScope.launch {
-            val result = geocoderResolve(messageLocation)
-            messageLocation.geocode = geocodeResultToText(result)
-            maybeCreateErrorNotification(result)
-        }
+        Timber.tag("399845").d("Resolving geocode for $messageLocation")
+        val result = geocoderResolve(messageLocation)
+        messageLocation.geocode = geocodeResultToText(result)
+        maybeCreateErrorNotification(result)
     }
 
     private fun maybeCreateErrorNotification(result: GeocodeResult) {
@@ -126,25 +124,10 @@ class GeocoderProvider @Inject constructor(
             backgroundService.onGeocodingProviderResult(messageLocation)
             return
         }
-        GlobalScope.launch {
+        MainScope().launch {
             val result = geocoderResolve(messageLocation)
             messageLocation.geocode = geocodeResultToText(result)
             backgroundService.onGeocodingProviderResult(messageLocation)
-            maybeCreateErrorNotification(result)
-        }
-    }
-
-    fun resolve(messageLocation: MessageLocation, textView: TextView) {
-        if (messageLocation.hasGeocode) {
-            textView.text = messageLocation.geocode
-            return
-        }
-        textView.text =
-            messageLocation.fallbackGeocode // will print lat, lon until GeocodingProvider is available
-        GlobalScope.launch {
-            val result = geocoderResolve(messageLocation)
-            messageLocation.geocode = geocodeResultToText(result)
-            textView.text = messageLocation.geocode
             maybeCreateErrorNotification(result)
         }
     }

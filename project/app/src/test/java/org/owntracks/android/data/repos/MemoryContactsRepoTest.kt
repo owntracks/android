@@ -63,7 +63,7 @@ class MemoryContactsRepoTest {
     fun `given an empty repo, when updating a contact with a location, then the contact is created with the location`() {
         contactsRepo!!.update(CONTACT_ID, messageLocation)
         val c = contactsRepo!!.getById(CONTACT_ID)
-        assertEquals(messageLocation, c!!.messageLocation.value)
+        assertEquals(messageLocation, c!!.messageLocation)
         assertEquals(messageLocation.timestamp, c.tst)
         assertEquals(CONTACT_ID, c.id)
     }

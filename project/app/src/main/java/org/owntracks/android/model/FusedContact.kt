@@ -2,7 +2,6 @@ package org.owntracks.android.model
 
 import androidx.databinding.BaseObservable
 import androidx.databinding.Bindable
-import androidx.lifecycle.MutableLiveData
 import org.owntracks.android.BR
 import org.owntracks.android.location.LatLng
 import org.owntracks.android.model.messages.MessageCard
@@ -14,7 +13,7 @@ class FusedContact(id: String?) : BaseObservable() {
     val id: String = if (id != null && id.isNotEmpty()) id else "NOID"
 
     @get:Bindable
-    val messageLocation = MutableLiveData<MessageLocation?>()
+    var messageLocation: MessageLocation? = null
     internal var messageCard: MessageCard? = null
 
     @get:Bindable
@@ -29,15 +28,15 @@ class FusedContact(id: String?) : BaseObservable() {
         if (tst > messageLocation.timestamp) return false
         Timber.v("update contact:%s, tst:%s", id, messageLocation.timestamp)
         messageLocation.setContact(this) // Allows to update fusedLocation if geocoder of messageLocation changed
-        this.messageLocation.postValue(messageLocation)
+        this.messageLocation = messageLocation
         tst = messageLocation.timestamp
         notifyMessageLocationPropertyChanged()
         return true
     }
 
     fun notifyMessageLocationPropertyChanged() {
-        if (messageLocation.value != null) {
-            Timber.d("Geocode location updated for %s: %s", id, messageLocation.value!!.geocode)
+        if (messageLocation != null) {
+            Timber.d("Geocode location updated for %s: %s", id, messageLocation!!.geocode)
         }
         notifyPropertyChanged(BR.fusedName)
         notifyPropertyChanged(BR.messageLocation)
@@ -50,7 +49,7 @@ class FusedContact(id: String?) : BaseObservable() {
 
     @get:Bindable
     val geocodedLocation: String?
-        get() = messageLocation.value?.geocode
+        get() = messageLocation?.geocode
 
 
     @Bindable
@@ -64,11 +63,11 @@ class FusedContact(id: String?) : BaseObservable() {
 
     @get:Bindable
     val fusedLocationAccuracy: Int
-        get() = messageLocation.value?.accuracy ?: 0
+        get() = messageLocation?.accuracy ?: 0
 
     @get:Bindable
     val trackerId: String
-        get() = messageLocation.value?.trackerId ?: id.replace("/", "").let {
+        get() = messageLocation?.trackerId ?: id.replace("/", "").let {
             return if (it.length > 2) {
                 it.substring(it.length - 2)
             } else {
@@ -76,7 +75,7 @@ class FusedContact(id: String?) : BaseObservable() {
             }
         }
     val latLng: LatLng?
-        get() = messageLocation.value?.run { LatLng(latitude, longitude) }
+        get() = messageLocation?.run { LatLng(latitude, longitude) }
 
     override fun toString(): String {
         return "FusedContact $id ($fusedName)"

@@ -1,7 +1,7 @@
 package org.owntracks.android.ui.map
 
+import android.hardware.SensorEventListener
 import android.location.Location
-import androidx.databinding.Bindable
 import androidx.lifecycle.LiveData
 import org.owntracks.android.location.LatLng
 import org.owntracks.android.location.LocationCallback
@@ -21,11 +21,9 @@ interface MapMvvm {
     }
 
     interface ViewModel<V : MvvmView?> : MvvmViewModel<V> {
+        val orientationSensorEventListener: SensorEventListener
         val mapLocationUpdateCallback: LocationCallback
         val currentLocation: LiveData<Location?>
-
-        @get:Bindable
-        val activeContact: FusedContact?
 
         fun onBottomSheetLongClick()
         fun onBottomSheetClick()
@@ -40,6 +38,7 @@ interface MapMvvm {
         val bottomSheetHidden: LiveData<Boolean>
         val mapCenter: LiveData<LatLng>
         fun sendLocation()
-
+        fun contactHasLocation(): Boolean
+        fun refreshGeocodeForActiveContact()
     }
 }
