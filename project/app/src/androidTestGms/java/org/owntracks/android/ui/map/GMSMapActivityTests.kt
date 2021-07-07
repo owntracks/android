@@ -18,37 +18,23 @@ import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickD
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
 import com.adevinta.android.barista.interaction.PermissionGranter
-import com.adevinta.android.barista.rule.BaristaRule
 import com.adevinta.android.barista.rule.flaky.AllowFlaky
 import org.junit.Before
 import org.junit.FixMethodOrder
-import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 import org.owntracks.android.R
-import org.owntracks.android.testutils.rules.ScreenshotTakingOnTestEndRule
+import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.e2e.setNotFirstStartPreferences
 import org.owntracks.android.support.Preferences
 import org.owntracks.android.ui.clickOnAndWait
 import java.util.concurrent.TimeUnit
 
-
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-class GMSMapActivityTests {
-    @get:Rule
-    var baristaRule = BaristaRule.create(MapActivity::class.java)
-
-    private val screenshotRule = ScreenshotTakingOnTestEndRule()
-
-    @get:Rule
-    val ruleChain: RuleChain = RuleChain
-        .outerRule(baristaRule.activityTestRule)
-        .around(screenshotRule)
-
+class GMSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.java) {
     @Before
     fun setIdlingTimeout() {
         IdlingPolicies.setIdlingResourceTimeout(10, TimeUnit.SECONDS)

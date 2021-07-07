@@ -7,35 +7,16 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotExist
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.longClickOn
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
-import com.adevinta.android.barista.rule.BaristaRule
 import com.adevinta.android.barista.rule.flaky.AllowFlaky
-import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.owntracks.android.R
-import org.owntracks.android.testutils.rules.ScreenshotTakingOnTestEndRule
+import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.ui.regions.RegionsActivity
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class RegionsActivityTests {
-    @get:Rule
-    var baristaRule = BaristaRule.create(RegionsActivity::class.java)
-
-    private val screenshotRule = ScreenshotTakingOnTestEndRule()
-
-    @get:Rule
-    val ruleChain: RuleChain = RuleChain
-        .outerRule(baristaRule.activityTestRule)
-        .around(screenshotRule)
-
-    @Before
-    fun setUp() {
-        baristaRule.launchActivity()
-    }
-
+class RegionsActivityTests : TestWithAnActivity<RegionsActivity>(RegionsActivity::class.java) {
     @Test
     @AllowFlaky(attempts = 1)
     fun initialRegionsActivityIsEmpty() {

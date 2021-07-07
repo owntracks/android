@@ -15,35 +15,23 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotExist
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import com.adevinta.android.barista.interaction.PermissionGranter.allowPermissionsIfNeeded
-import com.adevinta.android.barista.rule.BaristaRule
 import com.adevinta.android.barista.rule.flaky.AllowFlaky
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.junit.After
-import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.owntracks.android.R
-import org.owntracks.android.testutils.rules.ScreenshotTakingOnTestEndRule
+import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import java.io.File
 import java.io.FileWriter
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class LoadActivityTests {
-    @get:Rule
-    var baristaRule = BaristaRule.create(LoadActivity::class.java)
-
-    private val screenshotRule = ScreenshotTakingOnTestEndRule()
-
-    @get:Rule
-    val ruleChain: RuleChain = RuleChain
-        .outerRule(baristaRule.activityTestRule)
-        .around(screenshotRule)
+class LoadActivityTests  : TestWithAnActivity<LoadActivity>(LoadActivity::class.java, false){
 
     private var mockWebServer = MockWebServer()
 

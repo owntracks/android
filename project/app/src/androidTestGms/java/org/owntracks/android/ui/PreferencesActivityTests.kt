@@ -1,6 +1,5 @@
 package org.owntracks.android.ui
 
-import androidx.test.espresso.intent.Intents
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
@@ -14,42 +13,16 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.owntracks.android.R
-import org.owntracks.android.testutils.rules.ScreenshotTakingOnTestEndRule
+import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.e2e.scrollToPreferenceWithText
 import org.owntracks.android.ui.preferences.PreferencesActivity
 
-
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class PreferencesActivityTests {
-    @get:Rule
-    var baristaRule = BaristaRule.create(PreferencesActivity::class.java)
-
-    private val screenshotRule = ScreenshotTakingOnTestEndRule()
-
-    @get:Rule
-    val ruleChain: RuleChain = RuleChain
-        .outerRule(baristaRule.activityTestRule)
-        .around(screenshotRule)
-
-    @Before
-    fun setUp() {
-        baristaRule.launchActivity()
-    }
-
-    @Before
-    fun initIntents() {
-        Intents.init()
-    }
-
-    @After
-    fun releaseIntents() {
-        Intents.release()
-    }
-
+class PreferencesActivityTests :
+    TestWithAnActivity<PreferencesActivity>(PreferencesActivity::class.java) {
     @Test
     @AllowFlaky
     fun initialViewShowsTopLevelMenu() {

@@ -8,30 +8,14 @@ import com.adevinta.android.barista.rule.flaky.AllowFlaky
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.owntracks.android.R
-import org.owntracks.android.testutils.rules.ScreenshotTakingOnTestEndRule
+import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.ui.status.StatusActivity
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class StatusActivityTests {
-    @get:Rule
-    var baristaRule = BaristaRule.create(StatusActivity::class.java)
-
-    private val screenshotRule = ScreenshotTakingOnTestEndRule()
-
-    @get:Rule
-    val ruleChain: RuleChain = RuleChain
-        .outerRule(baristaRule.activityTestRule)
-        .around(screenshotRule)
-
-    @Before
-    fun setUp() {
-        baristaRule.launchActivity()
-    }
-
+class StatusActivityTests : TestWithAnActivity<StatusActivity>(StatusActivity::class.java) {
     @Test
     @AllowFlaky
     fun statusActivityShowsEndpointState() {

@@ -26,31 +26,17 @@ import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.junit.After
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.owntracks.android.R
-import org.owntracks.android.testutils.rules.ScreenshotTakingOnTestEndRule
+import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.map.MapActivity
 import java.util.concurrent.TimeUnit
 
-
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class ContactActivityTests {
-    @get:Rule
-    var baristaRule =
-        BaristaRule.create(MapActivity::class.java) // We always start e2e at the main entrypoint
-
-    private val screenshotRule = ScreenshotTakingOnTestEndRule()
-
-    @get:Rule
-    val ruleChain: RuleChain = RuleChain
-        .outerRule(baristaRule.activityTestRule)
-        .around(screenshotRule)
-
+class ContactActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.java) {
     private var mockWebServer = MockWebServer()
 
     @Before
