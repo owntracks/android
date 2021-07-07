@@ -254,7 +254,7 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-contrib:${espressoVersion}")
     androidTestImplementation("androidx.test.espresso:espresso-intents:${espressoVersion}")
 
-    androidTestImplementation("androidx.test.ext:junit:1.1.2")
+    androidTestImplementation("androidx.test.ext:junit:1.1.3")
     androidTestImplementation("androidx.test:core-ktx:${androidxTestVersion}")
     androidTestImplementation("com.schibsted.spain:barista:3.9.0") {
         exclude("org.jetbrains.kotlin")
