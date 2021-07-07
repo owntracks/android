@@ -2,6 +2,7 @@
 name: Android CI
 
 on:
+  workflow_dispatch: 
   push:
     branches:
       - master
@@ -22,56 +23,32 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: macos-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2
-      - name: Set up JDK 11
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11
-      - uses: burrunan/gradle-cache-action@v1
-        name: Gradle cache
-        with:
-          build-root-directory: project/
       - name: Assemble
         run: ./gradlew assembleDebug --scan
         working-directory: project
-        timeout-minutes: 10
+        #timeout-minutes: 10
   lint:
     name: "Lint"
-    runs-on: macos-latest
+    runs-on: self-hosted
     needs: build
     steps:
       - uses: actions/checkout@v2
-      - name: Set up JDK 11
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11
-      - uses: burrunan/gradle-cache-action@v1
-        name: Gradle cache
-        with:
-          build-root-directory: project/
       - name: Android Lint
-        run: ./gradlew lint
+        run: ./gradlew lint --scan
         working-directory: project
         timeout-minutes: 30
 
   unit-test:
     name: "Unit test"
-    runs-on: macos-latest
+    runs-on: self-hosted
     needs: build
     steps:
       - uses: actions/checkout@v2
-      - name: Set up JDK 11
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11
-      - uses: burrunan/gradle-cache-action@v1
-        name: Gradle cache
-        with:
-          build-root-directory: project/
       - name: Run unit tests
-        run: ./gradlew jacocoTestGmsReleaseUnitTestReport
+        run: ./gradlew jacocoTestGmsReleaseUnitTestReport --scan
         working-directory: project
         timeout-minutes: 10
       - name: Upload unit test result artifact
@@ -89,34 +66,30 @@ jobs:
 
   espresso-test-gms:
     name: "Espresso test GMS flavor"
-    runs-on: macos-latest
+    runs-on: self-hosted
     needs: unit-test
+    strategy:
+      matrix:
+        api-level: [ 29 ]
     steps:
       - uses: actions/checkout@v2
-      - name: Set up JDK 11
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11
-      - uses: burrunan/gradle-cache-action@v1
-        name: Gradle cache
-        with:
-          build-root-directory: project/
       - name: Espresso Test for GMS flavor
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 29
+          api-level: ${{ matrix.api-level }}
           working-directory: project
           script: |
-            adb emu geo fix 0 51
-            adb shell settings put secure location_providers_allowed +gps
-            adb shell settings put secure location_providers_allowed +network
-            adb shell settings put secure location_mode 3
-            ./gradlew createGmsDebugCoverageReport || { adb logcat -t 10000 > logcat; exit 1; }
+            ./emulator-setup-scripts/setup-$API_LEVEL.sh
+            ./gradlew createGmsDebugCoverageReport --scan || { adb logcat -t 10000 > logcat; exit 1; }
           profile: pixel_3a
           target: google_apis
           disable-animations: true
           arch: x86_64
           sdcard-path-or-size: 1000M
+          disable-linux-hw-accel: false
+          emulator-options: -no-window -gpu auto -no-snapshot -noaudio -no-boot-anim
+        env:
+          API_LEVEL: "${{ matrix.api-level }}"          
       - name: Upload logcat
         uses: actions/upload-artifact@v2
         with:
@@ -142,34 +115,30 @@ jobs:
         if: always()
   espresso-test-oss:
     name: "Espresso test OSS flavor"
-    runs-on: macos-latest
+    runs-on: self-hosted
     needs: unit-test
+    strategy:
+      matrix:
+        api-level: [ 29 ]    
     steps:
       - uses: actions/checkout@v2
-      - name: Set up JDK 11
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11
-      - uses: burrunan/gradle-cache-action@v1
-        name: Gradle cache
-        with:
-          build-root-directory: project/
       - name: Espresso Test for OSS flavor
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 29
+          api-level: ${{ matrix.api-level }}
           working-directory: project
           script: |
-            adb emu geo fix 0 51
-            adb shell settings put secure location_providers_allowed +gps
-            adb shell settings put secure location_providers_allowed +network
-            adb shell settings put secure location_mode 3
-            ./gradlew createOssDebugCoverageReport || { adb logcat -t 10000 > logcat; exit 1; }
+            ./emulator-setup-scripts/setup-$API_LEVEL.sh
+            ./gradlew createOssDebugCoverageReport --scan || { adb logcat -t 10000 > logcat; exit 1; }
           profile: pixel_3a
           target: default
           disable-animations: true
           arch: x86_64
           sdcard-path-or-size: 1000M
+          disable-linux-hw-accel: false
+          emulator-options: -no-window -gpu auto -no-snapshot -noaudio -no-boot-anim
+        env:
+          API_LEVEL: "${{ matrix.api-level }}"          
       - name: Upload logcat
         uses: actions/upload-artifact@v2
         with:
@@ -257,7 +226,7 @@ jobs:
           flags: unittests
   publish:
     name: Publish
-    runs-on: macos-latest
+    runs-on: self-hosted
     if: github.event_name != 'pull_request'
     needs:
       - build
@@ -268,14 +237,6 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v1
-      - name: Set up JDK 11
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11
-      - uses: burrunan/gradle-cache-action@v1
-        name: Gradle cache
-        with:
-          build-root-directory: project/
       - name: Decrypt secrets
         env:
           GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
