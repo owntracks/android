@@ -36,7 +36,7 @@ class FusedContact(id: String?) : BaseObservable() {
 
     fun notifyMessageLocationPropertyChanged() {
         if (messageLocation != null) {
-            Timber.d("Geocode location updated for %s: %s", id, messageLocation!!.geocode)
+            Timber.d("Location updated for contact $id")
         }
         notifyPropertyChanged(BR.fusedName)
         notifyPropertyChanged(BR.messageLocation)

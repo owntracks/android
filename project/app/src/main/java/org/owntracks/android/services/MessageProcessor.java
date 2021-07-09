@@ -149,7 +149,7 @@ public class MessageProcessor {
                 // that's complete.
                 Timber.d("Waiting for reconnect worker to complete");
                 lock.acquire();
-                Timber.d("Waiting done");
+                Timber.d("Completed");
                 return true;
             } catch (InterruptedException e) {
                 Timber.w(e, "Interrupted waiting for reconnect future to complete");

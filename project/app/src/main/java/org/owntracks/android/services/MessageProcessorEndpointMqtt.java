@@ -408,6 +408,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     }
 
     private void onConnect() {
+
         Timber.d("MQTT connected!. Running onconnect handler (threadID %s)", Thread.currentThread());
         scheduler.scheduleMqttMaybeReconnectAndPing(preferences.getKeepalive());
 
@@ -416,6 +417,8 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         changeState(EndpointState.CONNECTED);
 
         sendMessageConnectPressure = 0; // allow new connection attempts from queueMessageForSending
+        Timber.d("MQTT connected!. Running onconnect handler (threadID %s)", Thread.currentThread());
+
         scheduler.cancelMqttReconnect();
         // Check if we're connecting to the same broker that we were already connected to
         String connectionId = String.format("%s/%s", mqttClient.getServerURI(), mqttClient.getClientId());
@@ -479,6 +482,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         Arrays.fill(qos, preferences.getSubQos());
         return qos;
     }
+
 
     private void disconnect() {
         Timber.d("disconnect. ThreadID: %s", Thread.currentThread());

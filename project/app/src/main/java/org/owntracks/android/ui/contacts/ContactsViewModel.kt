@@ -19,7 +19,7 @@ class ContactsViewModel @Inject constructor(
         BaseViewModel<ContactsMvvm.View>(), ContactsMvvm.ViewModel<ContactsMvvm.View> {
     private val mainScope = MainScope()
     fun refreshGeocodes() {
-        Timber.i("Refreshing contacts geocodes")
+        Timber.d("Refreshing contacts geocodes")
         mainScope.launch {
             contactsRepo.all.value?.run {
                 map { it.value.messageLocation }

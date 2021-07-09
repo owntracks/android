@@ -84,10 +84,11 @@ class GoogleMapFragment internal constructor(
             setMapStyle()
 
             val zoomLocation =
-                locationRepo?.currentPublishedLocation?.value?.run { LatLng(latitude, longitude) } ?: LatLng(
-                    MapActivity.STARTING_LATITUDE,
-                    MapActivity.STARTING_LONGITUDE
-                )
+                locationRepo?.currentPublishedLocation?.value?.run { LatLng(latitude, longitude) }
+                    ?: LatLng(
+                        MapActivity.STARTING_LATITUDE,
+                        MapActivity.STARTING_LONGITUDE
+                    )
 
             moveCamera(
                 CameraUpdateFactory.newLatLngZoom(zoomLocation, ZOOM_LEVEL_STREET)
