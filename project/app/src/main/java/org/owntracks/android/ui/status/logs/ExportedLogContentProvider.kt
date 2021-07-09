@@ -32,7 +32,13 @@ class ExportedLogContentProvider : ContentProvider() {
         return null
     }
 
-    override fun query(uri: Uri, projection: Array<out String>?, selection: String?, selectionArgs: Array<out String>?, sortOrder: String?): Cursor? =
+    override fun query(
+            uri: Uri,
+            projection: Array<out String>?,
+            selection: String?,
+            selectionArgs: Array<out String>?,
+            sortOrder: String?
+    ): Cursor? =
             logForUri(uri)?.let {
                 val m = MatrixCursor(arrayOf(OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE), 1)
                 m.addRow(arrayOf("owntracks-log.txt", it.size.toLong()))
@@ -42,7 +48,12 @@ class ExportedLogContentProvider : ContentProvider() {
 
     override fun onCreate(): Boolean = true
 
-    override fun update(uri: Uri, values: ContentValues?, selection: String?, selectionArgs: Array<out String>?): Int {
+    override fun update(
+            uri: Uri,
+            values: ContentValues?,
+            selection: String?,
+            selectionArgs: Array<out String>?
+    ): Int {
         return 0
     }
 

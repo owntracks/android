@@ -3,25 +3,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-
-        <import type="android.view.View" />
-
-        <import type="org.owntracks.android.support.widgets.BindingConversions" />
-    </data>
-
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/frame"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
 
-        <include layout="@layout/appbar" android:id="@+id/appbar"/>
+        <include
+            android:id="@+id/appbar"
+            layout="@layout/appbar" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scrollbars="vertical"
+
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             tools:listitem="@layout/log_viewer_entry" />
 

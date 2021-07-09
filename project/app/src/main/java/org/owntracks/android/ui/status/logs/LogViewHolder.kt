@@ -8,7 +8,8 @@ import org.owntracks.android.R
  * RecyclerView holder for the log line
  */
 class LogViewHolder(val layout: View) : RecyclerView.ViewHolder(layout) {
-    private val scrollview: HorizontalScrollViewWithOnScrollHandler = layout.findViewById(R.id.log_item_scroll_view)
+    private val scrollview: HorizontalScrollViewWithOnScrollHandler =
+            layout.findViewById(R.id.log_item_scroll_view)
 
     fun bind(scrollNotifier: HorizontalScrollNotifier) {
         scrollview.setOnScrollHandler { oldLeft, newLeft ->

@@ -26,8 +26,12 @@ class LogEntryAdapter(private val logPalette: LogPalette) : RecyclerView.Adapter
         logLines.clear()
         val expandedForMultiline = lines
                 .filter { (it.priority >= Log.DEBUG && showDebugLogs) || it.priority >= Log.INFO }
-                .flatMap { logEntry -> logEntry.message.split("\n").map { LogEntry(logEntry.priority, logEntry.tag, it, logEntry.time) } }
-        longestLogEntry = expandedForMultiline.maxByOrNull { it.toString().length }.toString().length
+                .flatMap { logEntry ->
+                    logEntry.message.split("\n")
+                            .map { LogEntry(logEntry.priority, logEntry.tag, it, logEntry.time) }
+                }
+        longestLogEntry =
+                expandedForMultiline.maxByOrNull { it.toString().length }.toString().length
         logLines.addAll(expandedForMultiline)
         notifyDataSetChanged()
         scrollNotifier.notify(0)
@@ -46,19 +50,31 @@ class LogEntryAdapter(private val logPalette: LogPalette) : RecyclerView.Adapter
     override fun getItemCount() = logLines.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LogViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.log_viewer_entry, parent, false)
+        val view =
+                LayoutInflater.from(parent.context).inflate(R.layout.log_viewer_entry, parent, false)
         return LogViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: LogViewHolder, position: Int) {
         val line = logLines[position]
-        val spannable = if (position > 0 && logLines[position - 1].tag == line.tag && line.message.startsWith("\tat "))
-            SpannableString(line.message.prependIndent().padEnd(longestLogEntry))
-        else
-            SpannableString(line.toString().padEnd(longestLogEntry)).apply {
-                setSpan(StyleSpan(Typeface.BOLD), line.time.length, line.time.length + "${line.priorityChar} ${line.tag}:".length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                setSpan(ForegroundColorSpan(levelToColor(line.priority)), line.time.length, line.time.length + "${line.priorityChar} ${line.tag}:".length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            }
+        val spannable =
+                if (position > 0 && logLines[position - 1].tag == line.tag && line.message.startsWith("\tat "))
+                    SpannableString(line.message.prependIndent().padEnd(longestLogEntry))
+                else
+                    SpannableString(line.toString().padEnd(longestLogEntry)).apply {
+                        setSpan(
+                                StyleSpan(Typeface.BOLD),
+                                line.time.length,
+                                line.time.length + "${line.priorityChar} ${line.tag}:".length,
+                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                        )
+                        setSpan(
+                                ForegroundColorSpan(levelToColor(line.priority)),
+                                line.time.length,
+                                line.time.length + "${line.priorityChar} ${line.tag}:".length,
+                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                        )
+                    }
         holder.layout.apply {
             findViewById<TextView>(R.id.log_msg).apply {
                 setSingleLine()
