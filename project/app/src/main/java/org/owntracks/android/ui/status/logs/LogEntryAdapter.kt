@@ -25,7 +25,6 @@ class LogEntryAdapter(
     val showDebugLogs = false
 
     fun setLogLines(lines: Collection<LogEntry>) {
-
         logLines.clear()
         val expandedForMultiline = lines
 

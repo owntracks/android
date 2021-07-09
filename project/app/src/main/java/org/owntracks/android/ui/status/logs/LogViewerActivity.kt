@@ -33,13 +33,11 @@ class LogViewerActivity : AppCompatActivity() {
     private var logExportUri: Uri? = null
     private var recyclerView: RecyclerView? = null
     private var clearButton: MenuItem? = null
-
+    private lateinit var binding: UiPreferencesLogsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val binding: UiPreferencesLogsBinding =
-                DataBindingUtil.setContentView(this, R.layout.ui_preferences_logs)
+        binding = DataBindingUtil.setContentView(this, R.layout.ui_preferences_logs)
         binding.lifecycleOwner = this
 
         setSupportActionBar(binding.appbar.toolbar)
@@ -82,9 +80,13 @@ class LogViewerActivity : AppCompatActivity() {
     }
 
     private fun updateAdapterWithLogLines(logEntries: List<LogEntry>) {
+        val atTheBottom = !binding.recyclerView.canScrollVertically(1)
         logAdapter.setLogLines(logEntries.filter {
             (it.priority >= Log.DEBUG && viewModel.isDebugEnabled()) || it.priority >= Log.INFO
         })
+        if (atTheBottom) {
+            binding.recyclerView.scrollToPosition(logAdapter.itemCount - 1)
+        }
     }
 
     override fun onResume() {
