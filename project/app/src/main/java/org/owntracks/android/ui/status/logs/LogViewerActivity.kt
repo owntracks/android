@@ -1,21 +1,9 @@
-/*
- * Copyright © 2020 WireGuard LLC. All Rights Reserved.
- * SPDX-License-Identifier: Apache-2.0
- */
-
-/*
-Derived and adapted from the wireguard implementation taken from: https://github.com/WireGuard/wireguard-android/blob/1.0.20200724/ui/src/main/java/com/wireguard/android/activity/LogViewerActivity.kt
-
-Adaptations include:
-* Allowing option to clear logs
-* Removing or simplifying  wireguard-specific implementation details
-*/
-
 package org.owntracks.android.ui.status.logs
 
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContracts
@@ -29,6 +17,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import org.owntracks.android.BuildConfig
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiPreferencesLogsBinding
+import org.owntracks.android.logging.LogEntry
 import java.util.*
 
 @AndroidEntryPoint
@@ -69,14 +58,13 @@ class LogViewerActivity : AppCompatActivity() {
                         resources.getColor(R.color.log_error_tag_color)
                 )
         )
-        logAdapter.setLogLines(viewModel.logLines(), viewModel.isDebugEnabled())
+        viewModel.logLines().observe(this, ::updateAdapterWithLogLines)
 
         binding.recyclerView.apply {
             recyclerView = this
             layoutManager = LinearLayoutManager(context)
             adapter = logAdapter
         }
-
         binding.shareFab.setOnClickListener {
             revokeExportUriPermissions()
             val key = "${getRandomHexString()}/debug=${viewModel.isDebugEnabled()}/owntracks-debug.txt"
@@ -91,6 +79,12 @@ class LogViewerActivity : AppCompatActivity() {
             grantUriPermission("android", logExportUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
             shareIntentActivityLauncher.launch(shareIntent)
         }
+    }
+
+    private fun updateAdapterWithLogLines(logEntries: List<LogEntry>) {
+        logAdapter.setLogLines(logEntries.filter {
+            (it.priority >= Log.DEBUG && viewModel.isDebugEnabled()) || it.priority >= Log.INFO
+        })
     }
 
     override fun onResume() {
@@ -117,17 +111,12 @@ class LogViewerActivity : AppCompatActivity() {
             }
             R.id.clear_log -> {
                 viewModel.clearLog()
-                logAdapter.setLogLines(viewModel.logLines(), viewModel.isDebugEnabled())
-                true
-            }
-            R.id.refresh_log -> {
-                logAdapter.setLogLines(viewModel.logLines(), viewModel.isDebugEnabled())
                 true
             }
             R.id.show_debug_logs -> {
                 item.isChecked = !item.isChecked
                 viewModel.enableDebugLogs(item.isChecked)
-                logAdapter.setLogLines(viewModel.logLines(), viewModel.isDebugEnabled())
+                viewModel.logLines().value?.run(::updateAdapterWithLogLines)
                 true
             }
             else -> super.onOptionsItemSelected(item)

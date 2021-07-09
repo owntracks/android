@@ -9,11 +9,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LogViewerViewModel @Inject constructor(private val preferences: Preferences) : ViewModel() {
-
     private val timberInMemoryLogTree =
             Timber.forest().filterIsInstance(TimberInMemoryLogTree::class.java).first()
 
-    fun logLines() = timberInMemoryLogTree.logLines()
+    fun logLines() = timberInMemoryLogTree.liveLogs
 
     fun clearLog() {
         timberInMemoryLogTree.clear()
@@ -24,5 +23,4 @@ class LogViewerViewModel @Inject constructor(private val preferences: Preference
     fun enableDebugLogs(enabled: Boolean) {
         preferences.debugLog = enabled
     }
-
 }
