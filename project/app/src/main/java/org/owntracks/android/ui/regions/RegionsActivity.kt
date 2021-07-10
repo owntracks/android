@@ -6,7 +6,10 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import io.objectbox.android.AndroidScheduler
@@ -14,23 +17,25 @@ import io.objectbox.reactive.DataSubscription
 import org.owntracks.android.R
 import org.owntracks.android.data.WaypointModel
 import org.owntracks.android.databinding.UiRegionsBinding
-import org.owntracks.android.ui.base.BaseActivity
-import org.owntracks.android.ui.base.view.MvvmView
+import org.owntracks.android.support.DrawerProvider
 import org.owntracks.android.ui.region.RegionActivity
+import javax.inject.Inject
 
 @AndroidEntryPoint
-class RegionsActivity : BaseActivity<UiRegionsBinding, RegionsViewModel>(),
-        RegionsAdapter.ClickListener, MvvmView {
-
+class RegionsActivity : AppCompatActivity(), RegionsAdapter.ClickListener {
+    @Inject
+    lateinit var drawerProvider: DrawerProvider
+    private val viewModel: RegionsViewModel by viewModels()
     private var recyclerViewAdapter: RegionsAdapter? = null
     private var subscription: DataSubscription? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setHasEventBus(false)
-        bindAndAttachContentView(R.layout.ui_regions, savedInstanceState)
-        setSupportToolbar(binding.appbar.toolbar)
-        setDrawer(binding.appbar.toolbar)
+        val binding: UiRegionsBinding = DataBindingUtil.setContentView(this, R.layout.ui_regions)
+        binding.vm = viewModel
+        binding.lifecycleOwner = this
+        setSupportActionBar(binding.appbar.toolbar)
+        drawerProvider.attach(binding.appbar.toolbar)
 
         recyclerViewAdapter = RegionsAdapter(this)
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
@@ -57,14 +62,14 @@ class RegionsActivity : BaseActivity<UiRegionsBinding, RegionsViewModel>(),
         }
     }
 
-    override fun onClick(model: WaypointModel, view: View, longClick: Boolean) {
+    override fun onClick(`object`: WaypointModel, view: View, longClick: Boolean) {
         if (longClick) {
 
             AlertDialog.Builder(this) //set message, title, and icon
                     .setTitle("Delete")
                     .setMessage("Do you want to Delete")
                     .setPositiveButton("Delete") { dialog: DialogInterface, _: Int ->
-                        viewModel.delete(model)
+                        viewModel.delete(`object`)
                         dialog.dismiss()
                     }
                     .setNegativeButton("cancel") { dialog: DialogInterface, _: Int -> dialog.dismiss() }
@@ -72,7 +77,7 @@ class RegionsActivity : BaseActivity<UiRegionsBinding, RegionsViewModel>(),
                     .show()
         } else {
             val intent = Intent(this, RegionActivity::class.java)
-            intent.putExtra("waypointId", model.tst)
+            intent.putExtra("waypointId", `object`.tst)
             startActivity(intent)
         }
     }
