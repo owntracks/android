@@ -218,6 +218,7 @@
     <string name="dozeWhitelistedNo">No</string>
     <string name="deleteRegionConfirmation">Do you want to Delete</string>
     <string name="deleteRegionTitle">Delete</string>
+    <string name="contactListPlaceholder">No friends found yet</string>
     <string name="workmanagerInitializationErrorDialogTitle">Initialization Error</string>
     <string name="workmanagerInitializationErrorDialogOpenSettingsLabel">Open Application Settings</string>
     <string name="workmanagerInitializationErrorDialogMessage">Some components failed to initialize properly, so OwnTracks may not work properly. It may be necessary to re-install the application or clear the user data.\n\nPlease check the logs for more details.</string>
