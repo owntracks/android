@@ -2,7 +2,6 @@ package org.owntracks.android.ui.regions
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.objectbox.query.Query
 import org.owntracks.android.data.WaypointModel
 import org.owntracks.android.data.repos.WaypointsRepo
 import org.owntracks.android.services.LocationProcessor
@@ -13,9 +12,7 @@ class RegionsViewModel @Inject constructor(
         private val waypointsRepo: WaypointsRepo,
         private val locationProcessor: LocationProcessor
 ) : ViewModel() {
-
-    val waypointsList: Query<WaypointModel>
-        get() = waypointsRepo.allQuery
+    val waypointsList = waypointsRepo.allLive
 
     fun delete(model: WaypointModel?) {
         waypointsRepo.delete(model)
@@ -24,5 +21,4 @@ class RegionsViewModel @Inject constructor(
     fun exportWaypoints() {
         locationProcessor.publishWaypointsMessage()
     }
-
 }

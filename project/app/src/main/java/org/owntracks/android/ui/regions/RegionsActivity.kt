@@ -12,8 +12,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
-import io.objectbox.android.AndroidScheduler
-import io.objectbox.reactive.DataSubscription
 import org.owntracks.android.R
 import org.owntracks.android.data.WaypointModel
 import org.owntracks.android.databinding.UiRegionsBinding
@@ -26,8 +24,7 @@ class RegionsActivity : AppCompatActivity(), RegionsAdapter.ClickListener {
     @Inject
     lateinit var drawerProvider: DrawerProvider
     private val viewModel: RegionsViewModel by viewModels()
-    private var recyclerViewAdapter: RegionsAdapter? = null
-    private var subscription: DataSubscription? = null
+    private lateinit var recyclerViewAdapter: RegionsAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -41,6 +38,8 @@ class RegionsActivity : AppCompatActivity(), RegionsAdapter.ClickListener {
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         binding.recyclerView.adapter = recyclerViewAdapter
         binding.recyclerView.setEmptyView(binding.placeholder)
+
+        viewModel.waypointsList.observe(this, recyclerViewAdapter::setData)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -64,7 +63,6 @@ class RegionsActivity : AppCompatActivity(), RegionsAdapter.ClickListener {
 
     override fun onClick(`object`: WaypointModel, view: View, longClick: Boolean) {
         if (longClick) {
-
             AlertDialog.Builder(this) //set message, title, and icon
                     .setTitle("Delete")
                     .setMessage("Do you want to Delete")
@@ -80,18 +78,5 @@ class RegionsActivity : AppCompatActivity(), RegionsAdapter.ClickListener {
             intent.putExtra("waypointId", `object`.tst)
             startActivity(intent)
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        if (subscription == null || subscription!!.isCanceled) {
-            subscription = viewModel.waypointsList.subscribe().on(AndroidScheduler.mainThread())
-                    .observer(recyclerViewAdapter)
-        }
-    }
-
-    override fun onStop() {
-        super.onStop()
-        subscription?.cancel()
     }
 }

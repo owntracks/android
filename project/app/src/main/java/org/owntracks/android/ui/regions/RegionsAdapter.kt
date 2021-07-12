@@ -13,6 +13,11 @@ internal class RegionsAdapter(clickListener: ClickListener?) : BaseAdapter<Waypo
                 BR.waypoint, R.layout.ui_row_region
         )
 ), DataObserver<List<WaypointModel?>> {
+
+    fun setData(data: List<WaypointModel>) {
+        setItems(data)
+    }
+
     override fun onData(data: List<WaypointModel?>) {
         setItems(data)
     }
