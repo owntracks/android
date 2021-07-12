@@ -16,11 +16,14 @@ import org.owntracks.android.R
 import org.owntracks.android.data.WaypointModel
 import org.owntracks.android.databinding.UiRegionsBinding
 import org.owntracks.android.support.DrawerProvider
+import org.owntracks.android.ui.base.BaseRecyclerViewAdapterWithClickHandler
+import org.owntracks.android.ui.base.ClickHasBeenHandled
 import org.owntracks.android.ui.region.RegionActivity
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class RegionsActivity : AppCompatActivity(), RegionsAdapter.ClickListener {
+class RegionsActivity : AppCompatActivity(),
+        BaseRecyclerViewAdapterWithClickHandler.ClickListener<WaypointModel> {
     @Inject
     lateinit var drawerProvider: DrawerProvider
     private val viewModel: RegionsViewModel by viewModels()
@@ -61,7 +64,11 @@ class RegionsActivity : AppCompatActivity(), RegionsAdapter.ClickListener {
         }
     }
 
-    override fun onClick(`object`: WaypointModel, view: View, longClick: Boolean) {
+    override fun onClick(
+            `object`: WaypointModel,
+            view: View,
+            longClick: Boolean
+    ): ClickHasBeenHandled {
         if (longClick) {
             AlertDialog.Builder(this) //set message, title, and icon
                     .setTitle("Delete")
@@ -78,5 +85,7 @@ class RegionsActivity : AppCompatActivity(), RegionsAdapter.ClickListener {
             intent.putExtra("waypointId", `object`.tst)
             startActivity(intent)
         }
+        return true
     }
 }
+

@@ -9,12 +9,13 @@ import org.owntracks.android.R
 import org.owntracks.android.databinding.UiContactsBinding
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.ui.base.BaseActivity
-import org.owntracks.android.ui.base.BaseAdapter
+import org.owntracks.android.ui.base.BaseRecyclerViewAdapterWithClickHandler
+import org.owntracks.android.ui.base.ClickHasBeenHandled
 import org.owntracks.android.ui.map.MapActivity
 
 @AndroidEntryPoint
 class ContactsActivity : BaseActivity<UiContactsBinding?, ContactsMvvm.ViewModel<*>?>(),
-        ContactsMvvm.View, BaseAdapter.ClickListener<FusedContact?> {
+        ContactsMvvm.View, BaseRecyclerViewAdapterWithClickHandler.ClickListener<FusedContact> {
 
     private lateinit var contactsAdapter: ContactsAdapter
 
@@ -26,18 +27,23 @@ class ContactsActivity : BaseActivity<UiContactsBinding?, ContactsMvvm.ViewModel
         setSupportToolbar(binding!!.appbar.toolbar)
         setDrawer(binding!!.appbar.toolbar)
         binding!!.vm!!.contacts.observe({ this.lifecycle }, { contacts: Map<String, FusedContact> ->
-            contactsAdapter.setContactList(contacts.values)
+            contactsAdapter.setData(contacts.values)
             binding!!.vm!!.refreshGeocodes()
         })
         binding!!.recyclerView.layoutManager = LinearLayoutManager(this)
         binding!!.recyclerView.adapter = contactsAdapter
     }
 
-    override fun onClick(fusedContact: FusedContact, view: View, longClick: Boolean) {
+    override fun onClick(
+            `object`: FusedContact,
+            view: View,
+            longClick: Boolean
+    ): ClickHasBeenHandled {
         val bundle = Bundle()
-        bundle.putString(MapActivity.BUNDLE_KEY_CONTACT_ID, fusedContact.id)
+        bundle.putString(MapActivity.BUNDLE_KEY_CONTACT_ID, `object`.id)
         val intent = Intent(this, MapActivity::class.java)
         intent.putExtra("_args", bundle)
         startActivity(intent)
+        return true
     }
 }
