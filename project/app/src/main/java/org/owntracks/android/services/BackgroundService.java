@@ -69,6 +69,7 @@ import org.owntracks.android.support.ServiceBridge;
 import org.owntracks.android.support.preferences.OnModeChangedPreferenceChangedListener;
 import org.owntracks.android.ui.map.MapActivity;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -403,7 +404,6 @@ public class BackgroundService extends LifecycleService implements OnModeChanged
 
         FusedContact c = contactsRepo.getById(message.getContactKey());
 
-        long when = TimeUnit.SECONDS.toMillis(message.getTimestamp());
         String location = message.getDescription();
 
         if (location == null) {
@@ -418,27 +418,28 @@ public class BackgroundService extends LifecycleService implements OnModeChanged
 
         String text = String.format("%s %s", getString(message.getTransition() == Geofence.GEOFENCE_TRANSITION_ENTER ? R.string.transitionEntering : R.string.transitionLeaving), location);
 
+        long timestampInMs = TimeUnit.SECONDS.toMillis(message.getTimestamp());
 
         eventsNotificationCompatBuilder.setContentTitle(title);
         eventsNotificationCompatBuilder.setContentText(text);
-        eventsNotificationCompatBuilder.setWhen(TimeUnit.SECONDS.toMillis(message.getTimestamp()));
+        eventsNotificationCompatBuilder.setWhen(timestampInMs);
         eventsNotificationCompatBuilder.setShowWhen(true);
         eventsNotificationCompatBuilder.setGroup(NOTIFICATION_GROUP_EVENTS);
         // Deliver notification
         Notification n = eventsNotificationCompatBuilder.build();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            sendEventStackNotification(title, text, when);
+            sendEventStackNotification(title, text, new Date(timestampInMs));
         } else {
             notificationManagerCompat.notify(notificationEventsID++, n);
         }
     }
 
     @RequiresApi(23)
-    private void sendEventStackNotification(String title, String text, long when) {
+    private void sendEventStackNotification(String title, String text, Date timestamp) {
         Timber.v("SDK_INT >= 23, building stack notification");
 
-        String whenStr = DateFormatter.formatDate(TimeUnit.MILLISECONDS.toSeconds((when)));
+        String whenStr = DateFormatter.formatDate(timestamp);
 
         Spannable newLine = new SpannableString(String.format("%s %s %s", whenStr, title, text));
         newLine.setSpan(new StyleSpan(Typeface.BOLD), 0, whenStr.length() + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
