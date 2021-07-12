@@ -71,13 +71,13 @@ class RegionsActivity : AppCompatActivity(),
     ): ClickHasBeenHandled {
         if (longClick) {
             AlertDialog.Builder(this) //set message, title, and icon
-                    .setTitle("Delete")
-                    .setMessage("Do you want to Delete")
-                    .setPositiveButton("Delete") { dialog: DialogInterface, _: Int ->
+                    .setTitle(R.string.deleteRegionTitle)
+                    .setMessage(R.string.deleteRegionConfirmation)
+                    .setPositiveButton(R.string.deleteRegionTitle) { dialog: DialogInterface, _: Int ->
                         viewModel.delete(`object`)
                         dialog.dismiss()
                     }
-                    .setNegativeButton("cancel") { dialog: DialogInterface, _: Int -> dialog.dismiss() }
+                    .setNegativeButton(R.string.cancel) { dialog: DialogInterface, _: Int -> dialog.dismiss() }
                     .create()
                     .show()
         } else {
