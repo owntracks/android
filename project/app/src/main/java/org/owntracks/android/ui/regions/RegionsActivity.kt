@@ -26,8 +26,10 @@ class RegionsActivity : AppCompatActivity(),
         BaseRecyclerViewAdapterWithClickHandler.ClickListener<WaypointModel> {
     @Inject
     lateinit var drawerProvider: DrawerProvider
+
     private val viewModel: RegionsViewModel by viewModels()
     private lateinit var recyclerViewAdapter: RegionsAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

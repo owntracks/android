@@ -31,7 +31,7 @@ import java.io.FileWriter
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class LoadActivityTests  : TestWithAnActivity<LoadActivity>(LoadActivity::class.java, false){
+class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.java, false) {
 
     private var mockWebServer = MockWebServer()
 
@@ -160,7 +160,7 @@ class LoadActivityTests  : TestWithAnActivity<LoadActivity>(LoadActivity::class.
             )
         )
         sleep(1000)
-        assertContains(R.id.effectiveConfiguration, expectedConfig)
+        assertDisplayed(expectedConfig)
         assertDisplayed(R.id.save)
         assertDisplayed(R.id.close)
     }
@@ -178,7 +178,8 @@ class LoadActivityTests  : TestWithAnActivity<LoadActivity>(LoadActivity::class.
             )
         )
         sleep(1000)
-        assertContains(R.id.effectiveConfiguration, "Unexpected status code")
+        assertDisplayed(R.id.importError)
+        assertContains(R.id.importError, "Unexpected status code")
         assertNotExist(R.id.save)
         assertDisplayed(R.id.close)
     }
@@ -187,73 +188,87 @@ class LoadActivityTests  : TestWithAnActivity<LoadActivity>(LoadActivity::class.
     fun loadActivityCanLoadConfigFromFileURL() {
         val dir =
             InstrumentationRegistry.getInstrumentation().targetContext.getExternalFilesDir(null)
-        val localConfig = File(dir, "espresso-testconfig.otrc")
-        localConfig.writeText(servedConfig)
-        baristaRule.launchActivity(
-            Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse("file://${localConfig.absoluteFile}")
+        val localConfig = File(dir, "espresso-testconfig-fileurl.otrc")
+        try {
+            localConfig.writeText(servedConfig)
+            baristaRule.launchActivity(
+                Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("file://${localConfig.absoluteFile}")
+                )
             )
-        )
-        assertContains(R.id.effectiveConfiguration, expectedConfig)
-        assertDisplayed(R.id.save)
-        assertDisplayed(R.id.close)
+            assertDisplayed(expectedConfig)
+            assertDisplayed(R.id.save)
+            assertDisplayed(R.id.close)
+        } finally {
+            localConfig.deleteOnExit()
+        }
     }
 
     @Test
     @AllowFlaky
     fun loadActivityCanLoadConfigFromContentURL() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val configFilename = "espresso-testconfig.otrc"
-        if (android.os.Build.VERSION.SDK_INT >= 29) {
-            context.contentResolver.delete(
-                MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY),
-                "${MediaStore.Downloads.DISPLAY_NAME}=?",
-                arrayOf(configFilename)
-            )
-            val contentValues = ContentValues().apply {
-                put(MediaStore.Downloads.DISPLAY_NAME, configFilename)
-                put(MediaStore.Downloads.IS_PENDING, 1)
-            }
-            val contentUri = context.contentResolver.insert(
-                MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY),
-                contentValues
-            )
-            contentUri?.let {
-                context.contentResolver.openFileDescriptor(it, "w").use { parcelFileDescriptor ->
-                    ParcelFileDescriptor.AutoCloseOutputStream(parcelFileDescriptor)
-                        .write(servedConfig.toByteArray())
+        val configFilename = "espresso-testconfig-contenturl.otrc"
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= 29) {
+                context.contentResolver.delete(
+                    MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY),
+                    "${MediaStore.Downloads.DISPLAY_NAME}=?",
+                    arrayOf(configFilename)
+                )
+                val contentValues = ContentValues().apply {
+                    put(MediaStore.Downloads.DISPLAY_NAME, configFilename)
+                    put(MediaStore.Downloads.IS_PENDING, 1)
                 }
-                contentValues.clear()
-                contentValues.put(MediaStore.Downloads.IS_PENDING, 0)
-                context.contentResolver.update(it, contentValues, null, null)
+                val contentUri = context.contentResolver.insert(
+                    MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY),
+                    contentValues
+                )
+                contentUri?.let {
+                    context.contentResolver.openFileDescriptor(it, "w")
+                        .use { parcelFileDescriptor ->
+                            ParcelFileDescriptor.AutoCloseOutputStream(parcelFileDescriptor)
+                                .write(servedConfig.toByteArray())
+                        }
+                    contentValues.clear()
+                    contentValues.put(MediaStore.Downloads.IS_PENDING, 0)
+                    context.contentResolver.update(it, contentValues, null, null)
+                }
+                baristaRule.launchActivity(Intent(Intent.ACTION_VIEW, contentUri))
+            } else {
+                allowPermissionsIfNeeded(WRITE_EXTERNAL_STORAGE)
+                @Suppress("DEPRECATION")
+                val downloadsDir =
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                val configFile = downloadsDir.resolve(configFilename)
+                configFile.deleteOnExit()
+                FileWriter(configFile).use {
+                    it.write(servedConfig)
+                }
+                baristaRule.launchActivity(Intent(Intent.ACTION_VIEW, Uri.fromFile(configFile)))
             }
-            baristaRule.launchActivity(Intent(Intent.ACTION_VIEW, contentUri))
-        } else {
-            allowPermissionsIfNeeded(WRITE_EXTERNAL_STORAGE)
-            @Suppress("DEPRECATION")
-            val downloadsDir =
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-            val configFile = downloadsDir.resolve(configFilename)
-            FileWriter(configFile).use {
-                it.write(servedConfig)
-            }
-            baristaRule.launchActivity(Intent(Intent.ACTION_VIEW, Uri.fromFile(configFile)))
-        }
 
-        assertContains(R.id.effectiveConfiguration, expectedConfig)
-        assertDisplayed(R.id.save)
-        assertDisplayed(R.id.close)
+            assertDisplayed(expectedConfig)
+            assertDisplayed(R.id.save)
+            assertDisplayed(R.id.close)
+        } finally {
+            if (android.os.Build.VERSION.SDK_INT >= 29) {
+                context.contentResolver.delete(
+                    MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY),
+                    "${MediaStore.Downloads.DISPLAY_NAME}=?",
+                    arrayOf(configFilename)
+                )
+            }
+        }
     }
 
     @Test
     @AllowFlaky
     fun loadActivityErrorsCorrectlyFromInvalidContentURL() {
         baristaRule.launchActivity(Intent(Intent.ACTION_VIEW, null))
-        assertContains(
-            R.id.effectiveConfiguration,
-            "Import failed: No URI given for importing configuration"
-        )
+        assertDisplayed(R.id.importError)
+        assertContains(R.id.importError, R.string.preferencesImportNoURIGiven)
         assertNotExist(R.id.save)
         assertDisplayed(R.id.close)
     }

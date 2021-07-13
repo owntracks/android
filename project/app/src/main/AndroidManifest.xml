@@ -101,8 +101,8 @@
         <activity
             android:name=".ui.preferences.load.LoadActivity"
             android:configChanges="orientation"
-            android:label="@string/app_name"
             android:exported="true"
+            android:label="@string/title_activity_load"
             android:launchMode="singleTask">
 
             <!-- Support two dots in file name: -->
@@ -218,8 +218,8 @@
             android:name=".ui.map.MapActivity"
             android:clearTaskOnLaunch="true"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/app_name"
             android:exported="true"
+            android:label="@string/app_name"
             android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

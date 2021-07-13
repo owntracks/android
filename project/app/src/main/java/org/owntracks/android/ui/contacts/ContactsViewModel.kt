@@ -1,22 +1,21 @@
 package org.owntracks.android.ui.contacts
 
 import androidx.lifecycle.LiveData
-import dagger.hilt.android.scopes.ActivityScoped
+import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.model.FusedContact
-import org.owntracks.android.ui.base.viewmodel.BaseViewModel
 import timber.log.Timber
 import javax.inject.Inject
 
-@ActivityScoped
+@HiltViewModel
 class ContactsViewModel @Inject constructor(
         private val contactsRepo: ContactsRepo,
         private val geocoderProvider: GeocoderProvider
-) :
-        BaseViewModel<ContactsMvvm.View>(), ContactsMvvm.ViewModel<ContactsMvvm.View> {
+) : ViewModel() {
     private val mainScope = MainScope()
     fun refreshGeocodes() {
         Timber.d("Refreshing contacts geocodes")
@@ -30,8 +29,6 @@ class ContactsViewModel @Inject constructor(
         }
     }
 
-    override val contacts: LiveData<MutableMap<String, FusedContact>>
+    val contacts: LiveData<MutableMap<String, FusedContact>>
         get() = contactsRepo.all
-
-
 }

@@ -109,7 +109,7 @@
     <string name="mode_http_private_label">HTTP</string>
     <string name="transitionEntering">enters</string>
     <string name="transitionLeaving">leaves</string>
-    <string name="errorPreferencesImportFailed">Import failed</string>
+    <string name="errorPreferencesImportFailed">Import failed: %s</string>
     <string name="welcome_play_heading">Google Play Services</string>
     <string name="welcome_play_description">OwnTracks requires Google Play Services</string>
     <string name="icon_description_warning">Warning</string>
@@ -219,6 +219,9 @@
     <string name="deleteRegionConfirmation">Do you want to Delete</string>
     <string name="deleteRegionTitle">Delete</string>
     <string name="contactListPlaceholder">No friends found yet</string>
+    <string name="preferencesImportNoURIGiven">No URI given for importing configuration</string>
+    <string name="loadActivityNoFileExplorerFound">No file explorer app found</string>
+    <string name="loadActivitySelectAFile">Select a file</string>
     <string name="workmanagerInitializationErrorDialogTitle">Initialization Error</string>
     <string name="workmanagerInitializationErrorDialogOpenSettingsLabel">Open Application Settings</string>
     <string name="workmanagerInitializationErrorDialogMessage">Some components failed to initialize properly, so OwnTracks may not work properly. It may be necessary to re-install the application or clear the user data.\n\nPlease check the logs for more details.</string>
