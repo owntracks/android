@@ -365,3 +365,42 @@ tasks.whenTaskAdded {
         finalizedBy("embedOssScreenshots")
     }
 }
+
+
+// From  https://github.com/Triple-T/gradle-play-publisher/issues/974
+// We need a way to get the *current* release code on GP, so that we can make an APK with the same
+// code for the GH release. GPP has a way of getting the *next* release, so we can get that and
+// subtract one
+
+abstract class GetLatestVersionCodeMinusOne : DefaultTask() {
+    @get:InputFile
+    abstract val codes: RegularFileProperty
+
+    @get:OutputFile
+    abstract val outCode: RegularFileProperty
+
+    @TaskAction
+    fun read() {
+        val code = codes.get().asFile.readLines().first().toInt() - 1
+        outCode.get().asFile.writeText(code.toString())
+    }
+}
+
+val codesTask = tasks.register<GetLatestVersionCodeMinusOne>("getLatestVersionCodeMinusOne") {
+    dependsOn("processGmsReleaseVersionCodes")
+
+    codes.set(file("build/intermediates/gpp/gmsRelease/available-version-codes.txt"))
+    outCode.set(file("build/intermediates/version-code-minus-one.txt"))
+}
+
+androidComponents {
+    onVariants { variant ->
+        val minusOne = System.getenv("MAKE_APK_SAME_VERSION_CODE_AS_GOOGLE_PLAY")
+        if (!minusOne.isNullOrEmpty()) {
+            for (output in variant.outputs) {
+                output.versionCode.set(codesTask.flatMap { it.outCode }
+                    .map { it.asFile.readText().toInt() })
+            }
+        }
+    }
+}

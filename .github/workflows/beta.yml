@@ -46,11 +46,12 @@ jobs:
         echo -n $GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS > project/app/owntracks-android-gcloud-creds.json
         echo -n $KEYSTORE_BASE64 | base64 -d > project/owntracks.release.keystore.jks
     - name: Build APK
-      run: ./gradlew assembleRelease
+      run: ./gradlew clean :app:getLatestVersionCodeMinusOne assembleRelease
       working-directory: project
       env:
         KEYSTORE_PASSPHRASE: ${{ secrets.KEYSTORE_PASSPHRASE }}
         ORG_GRADLE_PROJECT_google_maps_api_key: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+        MAKE_APK_SAME_VERSION_CODE_AS_GOOGLE_PLAY: yes
     - name: Upload GMS Release Asset
       uses: actions/upload-release-asset@v1
       env:

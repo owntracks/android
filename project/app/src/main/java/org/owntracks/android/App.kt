@@ -30,8 +30,6 @@ import javax.inject.Provider
 
 @HiltAndroidApp
 class App : Application() {
-
-    // STOPSHIP: 20/05/2021 uncomment this lot
     @Inject
     lateinit var preferences: Preferences
 

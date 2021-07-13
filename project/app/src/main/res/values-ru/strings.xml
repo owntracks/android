@@ -161,7 +161,6 @@
     <string name="notificationChangeMonitoring">"Изменить режим"</string>
     <string name="preferencesDebugLog">"Журнал отладки"</string>
     <string name="monitoring_mode">"Режим отслеживания"</string>
-    <string name="distance_label">"Расстояние"</string>
     <string name="preferencesClientId">"ID клиента"</string>
     <string name="status_endpoint_state_hint">"Состояние конечной точки"</string>
     <string name="status_endpoint_state_message_hint">"Сообщение о состоянии конечной точки"</string>
