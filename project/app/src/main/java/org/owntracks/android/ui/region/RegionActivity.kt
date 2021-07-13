@@ -5,20 +5,28 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
 import dagger.hilt.android.AndroidEntryPoint
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiRegionBinding
-import org.owntracks.android.ui.base.BaseActivity
-import org.owntracks.android.ui.base.view.MvvmView
 
 @AndroidEntryPoint
-class RegionActivity : BaseActivity<UiRegionBinding, RegionViewModel>(), MvvmView {
+class RegionActivity : AppCompatActivity() {
     private var saveButton: MenuItem? = null
+    private val viewModel: RegionViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setHasEventBus(false)
-        bindAndAttachContentView(R.layout.ui_region, savedInstanceState)
-        setSupportToolbar(binding.appbar.toolbar)
+
+        val binding: UiRegionBinding = DataBindingUtil.setContentView(this, R.layout.ui_region)
+        binding.vm = viewModel
+        binding.lifecycleOwner = this
+        setSupportActionBar((binding.appbar.toolbar))
+        supportActionBar?.run {
+            setDisplayShowHomeEnabled(true)
+            setDisplayHomeAsUpEnabled(true)
+        }
 
         if (intent.hasExtra("waypointId")) {
             viewModel.loadWaypoint(intent.getLongExtra("waypointId", 0))

@@ -1,20 +1,19 @@
 package org.owntracks.android.ui.region
 
 import androidx.lifecycle.MutableLiveData
-import dagger.hilt.android.scopes.ActivityScoped
+import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import org.owntracks.android.data.WaypointModel
 import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.data.repos.WaypointsRepo
-import org.owntracks.android.ui.base.view.MvvmView
-import org.owntracks.android.ui.base.viewmodel.BaseViewModel
 import timber.log.Timber
 import javax.inject.Inject
 
-@ActivityScoped
+@HiltViewModel
 class RegionViewModel @Inject constructor(
         private val waypointsRepo: WaypointsRepo,
         private val locationRepo: LocationRepo
-) : BaseViewModel<MvvmView>() {
+) : ViewModel() {
     val waypoint = MutableLiveData(getEmptyWaypoint())
 
     private fun getEmptyWaypoint(): WaypointModel =
