@@ -36,7 +36,6 @@ class AboutFragment : PreferenceFragmentCompat() {
             val langCount = TRANSLATION_ARRAY.size
             resources.getQuantityString(R.plurals.aboutTranslationsSummary, langCount, langCount)
         }
-
     }
 
     companion object {
