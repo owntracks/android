@@ -36,6 +36,7 @@ class LoadActivity : AppCompatActivity() {
 
         viewModel.displayedConfiguration.observe(this, { invalidateOptionsMenu() })
         viewModel.configurationImportStatus.observe(this, {
+            invalidateOptionsMenu()
             if (it == ImportStatus.SAVED) {
                 showFinishDialog()
             }

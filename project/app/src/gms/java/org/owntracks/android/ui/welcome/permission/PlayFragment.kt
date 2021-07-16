@@ -4,9 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
@@ -14,23 +11,22 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiWelcomePlayBinding
-import org.owntracks.android.ui.welcome.WelcomeViewModel
+import org.owntracks.android.ui.welcome.BaseWelcomeFragment
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class PlayFragment @Inject constructor() : Fragment() {
+class PlayFragment @Inject constructor() :
+    BaseWelcomeFragment<UiWelcomePlayBinding>(R.layout.ui_welcome_play) {
     private val viewModel: PlayFragmentViewModel by viewModels()
-    private val activityViewModel: WelcomeViewModel by activityViewModels()
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding: UiWelcomePlayBinding =
-            DataBindingUtil.inflate(inflater, R.layout.ui_welcome_play, container, false)
+        super.onCreateView(inflater, container, savedInstanceState)
         binding.vm = viewModel
-        binding.lifecycleOwner = this
 
         binding.recover.setOnClickListener {
             val googleAPI = GoogleApiAvailability.getInstance()

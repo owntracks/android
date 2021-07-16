@@ -7,26 +7,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiWelcomeVersionBinding
-import org.owntracks.android.ui.welcome.WelcomeViewModel
+import org.owntracks.android.ui.welcome.BaseWelcomeFragment
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class VersionFragment @Inject constructor() : Fragment() {
-    private lateinit var binding: UiWelcomeVersionBinding
-    private val activityViewModel: WelcomeViewModel by activityViewModels()
+class VersionFragment @Inject constructor() :
+        BaseWelcomeFragment<UiWelcomeVersionBinding>(R.layout.ui_welcome_version) {
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View {
-        binding = DataBindingUtil.inflate(inflater, R.layout.ui_welcome_version, container, false)
+        super.onCreateView(inflater, container, savedInstanceState)
         binding.uiFragmentWelcomeVersionButtonLearnMore.setOnClickListener {
             try {
                 val i =
