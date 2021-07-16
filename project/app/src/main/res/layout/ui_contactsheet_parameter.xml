@@ -48,7 +48,6 @@
             android:paddingStart="8dp">
 
             <TextView
-                android:id="@+id/value"
                 style="@style/ListItemPrimary"
                 android:layout_width="match_parent"
                 android:layout_height="42dp"

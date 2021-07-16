@@ -34,7 +34,7 @@
             android:paddingRight="16dp"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_baseline_keyboard_arrow_right_24"
-            android:visibility="@{vm.nextEnabled}"
+            android:visibility="@{vm.nextEnabled ? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent" />
 
@@ -48,7 +48,7 @@
             android:background="?selectableItemBackgroundBorderless"
             android:contentDescription="@string/done_heading"
             android:gravity="center"
-            android:onClick="@{() -> vm.onDoneClicked()}"
+
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:src="@drawable/ic_baseline_done_24"

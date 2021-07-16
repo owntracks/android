@@ -18,10 +18,11 @@ open class OSSRequirementsChecker @Inject constructor(
         return isLocationPermissionCheckPassed() && preferences.isSetupCompleted
     }
 
-    override fun isLocationPermissionCheckPassed(): Boolean = ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_FINE_LOCATION
-    ) == PackageManager.PERMISSION_GRANTED
+    override fun isLocationPermissionCheckPassed(): Boolean =
+            ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
 
     override fun isLocationServiceEnabled(): Boolean =
             (context.getSystemService(Context.LOCATION_SERVICE) as LocationManager?)?.run {

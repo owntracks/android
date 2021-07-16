@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
 
@@ -71,8 +70,7 @@
             android:paddingRight="24dp"
             android:text="@{vm.getMessage}"
             android:textSize="16sp"
-            android:visibility="visible"
-            tools:text="@{vm.getMessage}" />
+            android:visibility="visible" />
 
         <Button
             android:id="@+id/recover"
@@ -80,9 +78,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:onClick="@{() -> vm.onFixClicked()}"
             android:text="@string/welcomeFixIssue"
-            android:visibility="@{vm.fixAvailable }" />
+            android:visibility="@{vm.fixAvailable ? View.VISIBLE : View.GONE}" />
 
     </RelativeLayout>
 </layout>

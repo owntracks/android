@@ -4,37 +4,31 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import dagger.hilt.android.AndroidEntryPoint
-import org.greenrobot.eventbus.EventBus
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiWelcomeIntroBinding
-import org.owntracks.android.support.Events
-import org.owntracks.android.ui.base.BaseSupportFragment
-import org.owntracks.android.ui.base.viewmodel.NoOpViewModel
-import org.owntracks.android.ui.welcome.WelcomeFragmentMvvm
+import org.owntracks.android.ui.welcome.WelcomeViewModel
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class IntroFragment @Inject constructor() :
-        BaseSupportFragment<UiWelcomeIntroBinding?, NoOpViewModel?>(),
-        WelcomeFragmentMvvm.View {
-    @Inject
-    lateinit var eventBus: EventBus
+class IntroFragment @Inject constructor() : Fragment() {
+    private val activityViewModel: WelcomeViewModel by activityViewModels()
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
-    ): View? {
-        return setAndBindContentView(
-                inflater,
-                container,
-                R.layout.ui_welcome_intro,
-                savedInstanceState
-        )
+    ): View {
+        val binding: UiWelcomeIntroBinding =
+                DataBindingUtil.inflate(inflater, R.layout.ui_welcome_intro, container, false)
+        return binding.root
     }
 
     override fun onResume() {
         super.onResume()
-        eventBus.post(Events.WelcomeNextDoneButtonsEnableToggle())
+        activityViewModel.nextEnabled.postValue(true)
+        activityViewModel.doneEnabled.postValue(false)
     }
 }

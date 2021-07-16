@@ -7,49 +7,48 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import org.greenrobot.eventbus.EventBus
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiWelcomeVersionBinding
-import org.owntracks.android.support.Events
-import org.owntracks.android.ui.base.BaseSupportFragment
-import org.owntracks.android.ui.base.viewmodel.NoOpViewModel
-import org.owntracks.android.ui.welcome.WelcomeFragmentMvvm
+import org.owntracks.android.ui.welcome.WelcomeViewModel
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class VersionFragment @Inject constructor() : BaseSupportFragment<UiWelcomeVersionBinding?, NoOpViewModel?>(),
-        WelcomeFragmentMvvm.View, View.OnClickListener {
-    @Inject
-    lateinit var eventBus: EventBus
+class VersionFragment @Inject constructor() : Fragment() {
+    private lateinit var binding: UiWelcomeVersionBinding
+    private val activityViewModel: WelcomeViewModel by activityViewModels()
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
-    ): View? {
-        val v = setAndBindContentView(
-                inflater,
-                container,
-                R.layout.ui_welcome_version,
-                savedInstanceState
-        )
-        binding!!.uiFragmentWelcomeVersionButtonLearnMore.setOnClickListener(this)
-        return v
-    }
-
-    override fun onClick(view: View) {
-        try {
-            val i =
-                    Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.documentationUrlAndroid)))
-            startActivity(i)
-        } catch (e: ActivityNotFoundException) {
-            Toast.makeText(context, "No suitable browser installed", Toast.LENGTH_SHORT).show()
+    ): View {
+        binding = DataBindingUtil.inflate(inflater, R.layout.ui_welcome_version, container, false)
+        binding.uiFragmentWelcomeVersionButtonLearnMore.setOnClickListener {
+            try {
+                val i =
+                        Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse(getString(R.string.documentationUrlAndroid))
+                        )
+                startActivity(i)
+            } catch (e: ActivityNotFoundException) {
+                Snackbar.make(
+                        binding.root,
+                        R.string.welcomeVersionNoSuitableBrowserInstalled,
+                        Snackbar.LENGTH_SHORT
+                ).show()
+            }
         }
+        return binding.root
     }
 
     override fun onResume() {
         super.onResume()
-        eventBus.post(Events.WelcomeNextDoneButtonsEnableToggle())
+        activityViewModel.nextEnabled.postValue(true)
+        activityViewModel.doneEnabled.postValue(false)
     }
 }
