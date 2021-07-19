@@ -19,5 +19,4 @@ class Events {
     class WaypointRemoved(m: WaypointModel) : WaypointEvent(m)
     class FusedContactAdded(val contact: FusedContact) : E()
     class FusedContactRemoved(val contact: FusedContact) : E()
-    class RestartApp : E()
 }

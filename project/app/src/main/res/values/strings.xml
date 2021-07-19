@@ -226,6 +226,8 @@
     <string name="welcomePermissionUnableToProceedWithoutPermissions">Unable to proceed without location permissions.</string>
     <string name="welcomeVersionNoSuitableBrowserInstalled">No suitable browser installed</string>
     <string name="welcomePlayUnableToUpdateGooglePlayServices">Unable to update Google Play Services</string>
+    <string name="importConfigurationSuccessTitle">Import successful</string>
+    <string name="importConfigurationSuccessMessage">It is recommended to restart the app to apply all imported values</string>
     <string name="workmanagerInitializationErrorDialogTitle">Initialization Error</string>
     <string name="workmanagerInitializationErrorDialogOpenSettingsLabel">Open Application Settings</string>
     <string name="workmanagerInitializationErrorDialogMessage">Some components failed to initialize properly, so OwnTracks may not work properly. It may be necessary to re-install the application or clear the user data.\n\nPlease check the logs for more details.</string>

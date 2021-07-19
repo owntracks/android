@@ -6,7 +6,7 @@
 
         <variable
             name="vm"
-            type="org.owntracks.android.ui.preferences.editor.EditorMvvm.ViewModel" />
+            type="org.owntracks.android.ui.preferences.editor.EditorViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -28,7 +28,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="@dimen/default_spacing"
-                android:text="@{vm.effectiveConfiguration, default=Configuration}" />
+                android:text="@{vm.effectiveConfiguration}" />
 
         </ScrollView>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>

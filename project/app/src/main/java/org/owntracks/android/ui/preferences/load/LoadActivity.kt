@@ -18,15 +18,21 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiPreferencesLoadBinding
+import org.owntracks.android.support.AppRestarter
 import timber.log.Timber
 import java.io.IOException
 import java.net.URI
+import javax.inject.Inject
 
 @SuppressLint("GoogleAppIndexingApiWarning")
 @AndroidEntryPoint
 class LoadActivity : AppCompatActivity() {
     private val viewModel: LoadViewModel by viewModels()
     private lateinit var binding: UiPreferencesLoadBinding
+
+    @Inject
+    lateinit var appRestarter: AppRestarter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.ui_preferences_load)
@@ -63,7 +69,7 @@ class LoadActivity : AppCompatActivity() {
     }
 
     private fun setHasBack(hasBackArrow: Boolean) {
-        if (supportActionBar != null) supportActionBar!!.setDisplayHomeAsUpEnabled(hasBackArrow)
+        supportActionBar?.run { setDisplayHomeAsUpEnabled(hasBackArrow) }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -148,12 +154,13 @@ class LoadActivity : AppCompatActivity() {
 
     private fun showFinishDialog() {
         AlertDialog.Builder(this)
-                .setTitle("Import successful")
-                .setMessage("It is recommended to restart the app to apply all imported values")
-                .setPositiveButton("Restart") { _: DialogInterface?, _: Int ->
-                    Timber.e("RESTART")
+                .setTitle(getString(R.string.importConfigurationSuccessTitle))
+                .setMessage(getString(R.string.importConfigurationSuccessMessage))
+                .setPositiveButton(getString(R.string.restart)) { _: DialogInterface?, _: Int ->
+                    appRestarter.restart()
                 }
-                .setNegativeButton("Cancel") { _: DialogInterface?, _: Int -> finish() }.show()
+                .setNegativeButton(getString(R.string.cancel)) { _: DialogInterface?, _: Int -> finish() }
+                .show()
     }
 
     companion object {
