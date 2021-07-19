@@ -23,6 +23,7 @@ open class BaseWelcomeFragment<VB : ViewDataBinding> constructor(@LayoutRes priv
             savedInstanceState: Bundle?
     ): View {
         binding = DataBindingUtil.inflate(inflater, layout, container, false)
+        binding.lifecycleOwner = this
         return binding.root
     }
 }
