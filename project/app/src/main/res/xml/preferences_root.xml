@@ -7,36 +7,30 @@
         app:defaultValue="@integer/defaultTheme"
         app:entries="@array/themeLabels"
         app:entryValues="@array/themeValues"
-        app:iconSpaceReserved="false"
         app:key="@string/preferenceKeyTheme"
         app:title="@string/preferencesTheme"
         app:useSimpleSummaryProvider="true" />
     <Preference
         android:key="connectionScreen"
         android:title="@string/preferencesServer"
-        app:iconSpaceReserved="false" />
+        app:fragment="org.owntracks.android.ui.preferences.connection.ConnectionFragment" />
     <Preference
         android:key="reportingScreen"
         android:title="@string/preferencesReporting"
-        app:fragment="org.owntracks.android.ui.preferences.ReportingFragment"
-        app:iconSpaceReserved="false" />
+        app:fragment="org.owntracks.android.ui.preferences.ReportingFragment" />
     <Preference
         android:key="notificationScreen"
         android:title="@string/preferencesNotification"
-        app:fragment="org.owntracks.android.ui.preferences.NotificationFragment"
-        app:iconSpaceReserved="false" />
+        app:fragment="org.owntracks.android.ui.preferences.NotificationFragment" />
     <Preference
         android:key="advancedScreen"
         android:title="@string/preferencesAdvanced"
-        app:fragment="org.owntracks.android.ui.preferences.AdvancedFragment"
-        app:iconSpaceReserved="false" />
+        app:fragment="org.owntracks.android.ui.preferences.AdvancedFragment" />
     <Preference
         android:key="experimentalScreen"
         android:title="@string/preferencesExperimental"
-        app:fragment="org.owntracks.android.ui.preferences.ExperimentalFragment"
-        app:iconSpaceReserved="false" />
+        app:fragment="org.owntracks.android.ui.preferences.ExperimentalFragment" />
     <Preference
         android:key="configuration"
-        android:title="@string/configurationManagement"
-        app:iconSpaceReserved="false" />
+        android:title="@string/configurationManagement" />
 </PreferenceScreen>

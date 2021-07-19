@@ -2,14 +2,6 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <data>
-
-        <import type="android.view.View" />
-
-        <variable
-            name="vm"
-            type="org.owntracks.android.ui.preferences.connection.dialog.ConnectionHostMqttDialogViewModel" />
-    </data>
 
     <LinearLayout
         android:id="@+id/content_frame"
@@ -17,14 +9,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-        
+
         <com.rengwuxian.materialedittext.MaterialEditText
             android:id="@+id/host"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/preferencesHost"
             android:inputType="textVisiblePassword|textNoSuggestions"
-            android:text="@={vm.hostText}"
             app:met_baseColor="@color/textPrimary"
             app:met_floatingLabel="highlight"
             app:met_floatingLabelText="@string/preferencesHost"
@@ -39,7 +30,6 @@
             android:hint="@string/preferencesPort"
             android:inputType="number|textNoSuggestions"
             android:maxLength="5"
-            android:text="@={vm.portText}"
             app:met_baseColor="@color/textPrimary"
             app:met_floatingLabel="highlight"
             app:met_primaryColor="@color/accent" />
@@ -52,7 +42,6 @@
             android:hint="@string/preferencesClientId"
 
             android:inputType="textNoSuggestions"
-            android:text="@={vm.clientId}"
             app:met_baseColor="@color/textPrimary"
             app:met_floatingLabel="highlight"
             app:met_primaryColor="@color/accent" />
@@ -76,8 +65,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:layout_gravity="end"
-                android:checked="@={vm.ws}" />
+                android:layout_gravity="end" />
         </RelativeLayout>
 
     </LinearLayout>

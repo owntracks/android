@@ -85,7 +85,6 @@ class LocationMessageRetryTest : TestWithAnActivity<MapActivity>(MapActivity::cl
         clickOnAndWait(R.string.preferencesServer)
         clickOnAndWait(R.string.mode_heading)
         clickOnAndWait(R.string.mode_http_private_label)
-        clickDialogPositiveButton()
         clickOnAndWait(R.string.preferencesHost)
         writeTo(R.id.url, "http://localhost:${httpPort}/")
         clickDialogPositiveButton()

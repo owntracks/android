@@ -9,10 +9,9 @@ import androidx.preference.SwitchPreferenceCompat
 import dagger.hilt.android.AndroidEntryPoint
 import org.owntracks.android.R
 import org.owntracks.android.support.Preferences
-import javax.inject.Inject
 
 @AndroidEntryPoint
-class AdvancedFragment @Inject constructor() : AbstractPreferenceFragment() {
+class AdvancedFragment : AbstractPreferenceFragment() {
     override fun onCreatePreferencesFix(savedInstanceState: Bundle?, rootKey: String?) {
         super.onCreatePreferencesFix(savedInstanceState, rootKey)
         setPreferencesFromResource(R.xml.preferences_advanced, rootKey)

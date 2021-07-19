@@ -41,7 +41,6 @@ class PreferencesActivityTests :
         clickOnAndWait(R.string.preferencesServer)
         clickOnAndWait(R.string.mode_heading)
         clickOnAndWait(R.string.mode_http_private_label)
-        clickDialogPositiveButton()
         clickOnAndWait(R.string.preferencesHost)
         writeTo(R.id.url, "https://www.example.com:8080/")
         clickDialogPositiveButton()

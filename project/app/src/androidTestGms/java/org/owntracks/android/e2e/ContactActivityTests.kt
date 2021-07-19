@@ -37,7 +37,7 @@ import java.util.concurrent.TimeUnit
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class ContactActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.java) {
-    private var mockWebServer = MockWebServer()
+    private val mockWebServer = MockWebServer()
 
     @Before
     fun setIdlingTimeout() {
@@ -91,7 +91,6 @@ class ContactActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.
         clickOnAndWait(R.string.preferencesServer)
         clickOnAndWait(R.string.mode_heading)
         clickOnAndWait(R.string.mode_http_private_label)
-        clickDialogPositiveButton()
         clickOnAndWait(R.string.preferencesHost)
         writeTo(R.id.url, "http://localhost:${httpPort}/")
         clickDialogPositiveButton()

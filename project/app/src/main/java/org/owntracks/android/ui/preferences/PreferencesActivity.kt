@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import dagger.hilt.android.AndroidEntryPoint
 import org.owntracks.android.R
@@ -13,8 +12,7 @@ import org.owntracks.android.support.DrawerProvider
 import javax.inject.Inject
 
 @AndroidEntryPoint
-open class PreferencesActivity : AppCompatActivity(),
-        PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
+open class PreferencesActivity : AppCompatActivity() {
     @Inject
     lateinit var drawerProvider: DrawerProvider
     protected open val startFragment: Fragment = PreferencesFragment()
@@ -40,25 +38,5 @@ open class PreferencesActivity : AppCompatActivity(),
                 .replace(R.id.content_frame, startFragment, null)
         fragmentTransaction.commit()
         supportFragmentManager.executePendingTransactions()
-    }
-
-
-    override fun onPreferenceStartFragment(
-            caller: PreferenceFragmentCompat,
-            pref: Preference
-    ): Boolean {
-        val args = pref.extras
-        val fragment = supportFragmentManager.fragmentFactory.instantiate(
-                classLoader,
-                pref.fragment
-        )
-        fragment.arguments = args
-        fragment.setTargetFragment(caller, 0)
-        // Replace the existing Fragment with the new Fragment
-        supportFragmentManager.beginTransaction()
-                .replace(R.id.content_frame, fragment)
-                .addToBackStack(pref.key)
-                .commit()
-        return true
     }
 }

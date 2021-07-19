@@ -2,32 +2,22 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <data>
-
-        <import type="android.view.View" />
-
-        <variable
-            name="vm"
-            type="org.owntracks.android.ui.preferences.connection.dialog.ConnectionHostHttpDialogViewModel" />
-    </data>
-
     <LinearLayout
         android:id="@+id/content_frame"
+        style="@style/DialogView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        style="@style/DialogView"
-    >
+        android:orientation="vertical">
 
         <EditText
-            style="@style/Widget.AppCompat.EditText"
             android:id="@+id/url"
+            style="@style/Widget.AppCompat.EditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/preferencesUrl"
-            android:inputType="textUri|textNoSuggestions"
-            android:text="@={vm.urlText}"
             android:importantForAutofill="no"
+            android:inputType="textUri|textNoSuggestions"
+            android:text=""
             app:met_baseColor="@color/textPrimary"
             app:met_floatingLabel="highlight"
             app:met_floatingLabelText="@string/preferencesUrl"

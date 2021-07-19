@@ -231,13 +231,6 @@
 
         </activity>
 
-
-        <activity
-            android:name=".ui.preferences.connection.ConnectionActivity"
-            android:clearTaskOnLaunch="true"
-            android:label="@string/preferencesServer"
-            android:launchMode="singleTask" />
-
         <activity
             android:name=".ui.status.logs.LogViewerActivity"
             android:clearTaskOnLaunch="true"

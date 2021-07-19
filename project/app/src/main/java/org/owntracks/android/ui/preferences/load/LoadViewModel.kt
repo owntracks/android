@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import okhttp3.*
 import org.apache.commons.codec.binary.Base64
-import org.apache.hc.core5.net.URLEncodedUtils
+import org.apache.hc.core5.net.URIBuilder
 import org.owntracks.android.data.repos.WaypointsRepo
 import org.owntracks.android.model.messages.MessageConfiguration
 import org.owntracks.android.support.Parser
@@ -91,7 +91,8 @@ class LoadViewModel @Inject constructor(
                 setConfiguration(total.toString())
             } else if ("owntracks" == uri.scheme && "/config" == uri.path) {
                 Timber.v("Importing config using owntracks: scheme")
-                val queryParams = URLEncodedUtils.parse(uri, StandardCharsets.UTF_8)
+
+                val queryParams = URIBuilder(uri, Charsets.UTF_8).queryParams
                 val urlQueryParam: MutableList<String> = ArrayList()
                 val configQueryParam: MutableList<String> = ArrayList()
                 for (queryParam in queryParams) {
