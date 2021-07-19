@@ -45,7 +45,8 @@ open class MapLocationSource internal constructor(
                     LocationRequest(
                             smallestDisplacement = 1f,
                             priority = LocationRequest.PRIORITY_HIGH_ACCURACY,
-                            interval = TimeUnit.SECONDS.toMillis(2)
+                            interval = TimeUnit.SECONDS.toMillis(2),
+                            waitForAccurateLocation = false
                     ),
                     this,
                     Looper.getMainLooper()
