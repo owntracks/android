@@ -226,6 +226,10 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
     }
 
     void sendMessage(MessageBase message) throws OutgoingMessageSendingException {
+        message.addMqttPreferences(preferences);
+        // HTTP messages carry the topic field in the body of the message, rather than MQTT which
+        // simply publishes the message to that topic.
+        message.setTopicVisible();
         String messageId = message.getMessageId();
         long startTime = System.nanoTime();
         Request request = getRequest(message);

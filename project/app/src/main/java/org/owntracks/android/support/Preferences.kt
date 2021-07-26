@@ -434,7 +434,10 @@ class Preferences @Inject constructor(
         }
 
     val pubTopicBase: String
-        get() = pubTopicBaseFormatString.replace("%u", username).replace("%d", deviceId)
+        get() = pubTopicBaseFormatString.replace(
+            "%u",
+            if (username.isNotBlank()) username else "user"
+        ).replace("%d", deviceId)
 
     @get:Export(keyResId = R.string.preferenceKeySubTopic, exportModeMqtt = true)
     @set:Import(keyResId = R.string.preferenceKeySubTopic)

@@ -8,8 +8,23 @@ import org.owntracks.android.support.Preferences
 import java.io.IOException
 import java.util.*
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type", defaultImpl = MessageUnknown::class)
-@JsonSubTypes(JsonSubTypes.Type(value = MessageLocation::class, name = MessageLocation.TYPE), JsonSubTypes.Type(value = MessageTransition::class, name = MessageTransition.TYPE), JsonSubTypes.Type(value = MessageCard::class, name = MessageCard.TYPE), JsonSubTypes.Type(value = MessageCmd::class, name = MessageCmd.TYPE), JsonSubTypes.Type(value = MessageConfiguration::class, name = MessageConfiguration.TYPE), JsonSubTypes.Type(value = MessageEncrypted::class, name = MessageEncrypted.TYPE), JsonSubTypes.Type(value = MessageWaypoint::class, name = MessageWaypoint.TYPE), JsonSubTypes.Type(value = MessageWaypoints::class, name = MessageWaypoints.TYPE), JsonSubTypes.Type(value = MessageLwt::class, name = MessageLwt.TYPE))
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.EXTERNAL_PROPERTY,
+    property = "_type",
+    defaultImpl = MessageUnknown::class
+)
+@JsonSubTypes(
+    JsonSubTypes.Type(value = MessageLocation::class, name = MessageLocation.TYPE),
+    JsonSubTypes.Type(value = MessageTransition::class, name = MessageTransition.TYPE),
+    JsonSubTypes.Type(value = MessageCard::class, name = MessageCard.TYPE),
+    JsonSubTypes.Type(value = MessageCmd::class, name = MessageCmd.TYPE),
+    JsonSubTypes.Type(value = MessageConfiguration::class, name = MessageConfiguration.TYPE),
+    JsonSubTypes.Type(value = MessageEncrypted::class, name = MessageEncrypted.TYPE),
+    JsonSubTypes.Type(value = MessageWaypoint::class, name = MessageWaypoint.TYPE),
+    JsonSubTypes.Type(value = MessageWaypoints::class, name = MessageWaypoints.TYPE),
+    JsonSubTypes.Type(value = MessageLwt::class, name = MessageLwt.TYPE)
+)
 @JsonPropertyOrder(alphabetic = true)
 abstract class MessageBase : BaseObservable() {
     @JsonIgnore
@@ -26,8 +41,17 @@ abstract class MessageBase : BaseObservable() {
             topicBase = getBaseTopic(value) // Normalized topic for all message types
         }
 
+    @JsonProperty("topic")
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @set:JsonIgnore
+    var visibleTopic: String = ""
+
     @JsonIgnore
     private var topicBase: String? = null
+
+    fun setTopicVisible() {
+        visibleTopic = topic
+    }
 
     @get:JsonIgnore
     @set:JsonIgnore

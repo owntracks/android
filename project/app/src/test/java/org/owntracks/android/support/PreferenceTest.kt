@@ -4,9 +4,7 @@ import android.content.Context
 import android.content.res.Resources
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
-import org.junit.Assert
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.owntracks.android.model.messages.MessageConfiguration
@@ -68,9 +66,53 @@ class PreferenceTest {
         assertEquals("", preferences.host)
     }
 
-    private val preferenceKeys = listOf("autostartOnBoot", "cleanSession", "debugLog", "deviceId", "fusedRegionDetection", "reverseGeocodeProvider", "ignoreInaccurateLocations", "ignoreStaleLocations", "locatorDisplacement", "locatorInterval", "locatorPriority", "mode", "monitoring", "moveModeLocatorInterval", "notificationEvents", "notificationHigherPriority", "notificationLocation", "opencageApiKey", "password", "ping", "pubExtendedData", "cmd", "remoteConfiguration", "tid", "username", "_build")
+    private val preferenceKeys = listOf(
+        "autostartOnBoot",
+        "cleanSession",
+        "debugLog",
+        "deviceId",
+        "fusedRegionDetection",
+        "reverseGeocodeProvider",
+        "ignoreInaccurateLocations",
+        "ignoreStaleLocations",
+        "locatorDisplacement",
+        "locatorInterval",
+        "locatorPriority",
+        "mode",
+        "monitoring",
+        "moveModeLocatorInterval",
+        "notificationEvents",
+        "notificationHigherPriority",
+        "notificationLocation",
+        "opencageApiKey",
+        "password",
+        "ping",
+        "pubExtendedData",
+        "cmd",
+        "remoteConfiguration",
+        "tid",
+        "username",
+        "_build"
+    )
     private val httpOnlyPreferenceKeys = listOf("dontReuseHttpClient", "url")
-    private val mqttOnlyPreferenceKeys = listOf("clientId", "host", "info", "keepalive", "mqttProtocolLevel", "pubQos", "pubRetain", "sub", "subQos", "subTopic", "port", "pubTopicBase", "tls", "tlsCaCrt", "tlsClientCrt", "tlsClientCrtPassword")
+    private val mqttOnlyPreferenceKeys = listOf(
+        "clientId",
+        "host",
+        "info",
+        "keepalive",
+        "mqttProtocolLevel",
+        "pubQos",
+        "pubRetain",
+        "sub",
+        "subQos",
+        "subTopic",
+        "port",
+        "pubTopicBase",
+        "tls",
+        "tlsCaCrt",
+        "tlsClientCrt",
+        "tlsClientCrtPassword"
+    )
 
     @Test
     fun `given an MQTT configuration message, when imported and then exported, the config is merged and all the preference keys are present`() {
@@ -83,9 +125,24 @@ class PreferenceTest {
         preferences.importFromMessage(messageConfiguration)
 
         val exportedMessageConfiguration = preferences.exportToMessage()
-        preferenceKeys.forEach { Assert.assertTrue("Exported message contains $it", exportedMessageConfiguration.containsKey(it)) }
-        mqttOnlyPreferenceKeys.forEach { Assert.assertTrue("Exported message contains $it", exportedMessageConfiguration.containsKey(it)) }
-        httpOnlyPreferenceKeys.forEach { assertFalse("Exported message doesn't contain $it", exportedMessageConfiguration.containsKey(it)) }
+        preferenceKeys.forEach {
+            assertTrue(
+                "Exported message contains $it",
+                exportedMessageConfiguration.containsKey(it)
+            )
+        }
+        mqttOnlyPreferenceKeys.forEach {
+            assertTrue(
+                "Exported message contains $it",
+                exportedMessageConfiguration.containsKey(it)
+            )
+        }
+        httpOnlyPreferenceKeys.forEach {
+            assertFalse(
+                "Exported message doesn't contain $it",
+                exportedMessageConfiguration.containsKey(it)
+            )
+        }
     }
 
     @Test
@@ -99,8 +156,33 @@ class PreferenceTest {
         preferences.importFromMessage(messageConfiguration)
 
         val exportedMessageConfiguration = preferences.exportToMessage()
-        preferenceKeys.forEach { Assert.assertTrue("Exported message contains $it", exportedMessageConfiguration.containsKey(it)) }
-        httpOnlyPreferenceKeys.forEach { Assert.assertTrue("Exported message contains $it", exportedMessageConfiguration.containsKey(it)) }
-        mqttOnlyPreferenceKeys.forEach { assertFalse("Exported message doesn't contain $it", exportedMessageConfiguration.containsKey(it)) }
+        preferenceKeys.forEach {
+            assertTrue(
+                "Exported message contains $it",
+                exportedMessageConfiguration.containsKey(it)
+            )
+        }
+        httpOnlyPreferenceKeys.forEach {
+            assertTrue(
+                "Exported message contains $it",
+                exportedMessageConfiguration.containsKey(it)
+            )
+        }
+        mqttOnlyPreferenceKeys.forEach {
+            assertFalse(
+                "Exported message doesn't contain $it",
+                exportedMessageConfiguration.containsKey(it)
+            )
+        }
+    }
+
+    @Test
+    fun `given a Preferences object with no username set, when asking for the topic, the correct username placeholder is populated`() {
+        val preferences = Preferences(mockContext, null, preferencesStore)
+        preferences.username = ""
+        preferences.deviceId = "myDevice"
+
+        assertEquals("owntracks/user/myDevice", preferences.pubTopicLocations)
+
     }
 }

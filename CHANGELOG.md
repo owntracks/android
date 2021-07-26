@@ -16,6 +16,7 @@
 * Contact bottom sheet now includes details about their battery, speed, altitude, and bearing
 * Location messages now also include the BSSID and SSID if available. Closes #871
 * The Geocoder error notification can now be enabled/disabled in the preferences
+* Added topic key to HTTP messages. Closes #1047
 * [Experimental] Added the ability to use [OpenStreetMap](https://www.openstreetmap.org) instead of Google Maps as a mapping layer. Can be enabled by adding `useOSMMap` to the `experimentalFeatures` config key.
 * [Experimental] Added the ability to use a pure AOSP location provider instead of the Google Play Services `FusedLocationProviderClient`. Can be enabled by adding `useAospLocationProvider` to the `experimentalFeatures` config key.
 * [Experimental] Have the contact peek bearing arrow rotate depending on the current devices orientation
@@ -29,6 +30,7 @@
 * Clicking "back" with a contact sheet open will now close the sheet rather than minimize the activity
 * Retry backoff for messages now goes up to 2 minutes
 * Messagecards are cached, so if a contact is cleared and then re-appears on the broker, the image and name are correct
+* If the username is not specified, the topic username is correctly set to be "user"
 
 ## Version 2.3.0
 
