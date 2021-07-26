@@ -69,6 +69,11 @@
             app:key="@string/preferenceKeyAutostartOnBoot"
             app:summary="@string/preferencesAutostartSummary"
             app:title="@string/preferencesAutostart" />
+        <Preference
+            android:icon="@drawable/ic_outline_info_24"
+            app:iconSpaceReserved="true"
+            app:key="autostartWarning"
+            app:summary="@string/preferencesAdvancedAutostartWarning" />
         <androidx.preference.ListPreference
             app:defaultValue="@string/valDefaultGeocoder"
             app:entries="@array/geocoders"
