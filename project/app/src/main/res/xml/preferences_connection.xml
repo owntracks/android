@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     app:title="@string/preferencesServer">
     <IntListPreference
         app:defaultValue="0"
@@ -8,19 +9,81 @@
         app:key="@string/preferenceKeyModeId"
         app:title="@string/preferencesProfileId"
         app:useSimpleSummaryProvider="true" />
-    <org.owntracks.android.ui.preferences.connection.DialogPreferenceCompat
-        app:key="@string/preferenceKeyHost"
-        app:title="@string/preferencesHost" />
-    <org.owntracks.android.ui.preferences.connection.DialogPreferenceCompat
-        app:dialogLayout="@layout/ui_preferences_connection_identification"
-        app:key="@string/preferencesIdentification"
-        app:title="@string/preferencesIdentification" />
-    <org.owntracks.android.ui.preferences.connection.DialogPreferenceCompat
-        app:dialogLayout="@layout/ui_preferences_connection_security"
+    <PreferenceCategory app:title="@string/preferencesCategoryConnectionEndpoint">
+        <com.takisoft.preferencex.EditTextPreference
+            android:inputType="textUri"
+            app:key="@string/preferenceKeyURL"
+            app:title="@string/preferencesUrl"
+            app:useSimpleSummaryProvider="true" />
+        <com.takisoft.preferencex.EditTextPreference
+            android:inputType="textUri"
+            app:key="@string/preferenceKeyHost"
+            app:title="@string/preferencesHost"
+            app:useSimpleSummaryProvider="true" />
+        <org.owntracks.android.support.widgets.EditIntegerPreference
+            android:inputType="number"
+            app:key="@string/preferenceKeyPort"
+            app:title="@string/preferencesPort"
+            app:useSimpleSummaryProvider="true" />
+        <com.takisoft.preferencex.EditTextPreference
+            app:key="@string/preferenceKeyClientId"
+            app:title="@string/preferencesClientId"
+            app:useSimpleSummaryProvider="true" />
+        <SwitchPreferenceCompat
+            app:key="@string/preferenceKeyWS"
+            app:title="@string/preferencesWebsocket" />
+    </PreferenceCategory>
+    <PreferenceCategory app:title="@string/preferencesIdentification">
+        <com.takisoft.preferencex.EditTextPreference
+            app:key="@string/preferenceKeyUsername"
+            app:title="@string/preferencesUserUsername"
+            app:useSimpleSummaryProvider="true" />
+        <com.takisoft.preferencex.EditTextPreference
+            android:inputType="textPassword"
+            app:key="@string/preferenceKeyPassword"
+            app:title="@string/preferencesBrokerPassword" />
+        <com.takisoft.preferencex.EditTextPreference
+            app:key="@string/preferenceKeyDeviceId"
+            app:title="@string/preferencesDeviceName"
+            app:useSimpleSummaryProvider="true" />
+        <com.takisoft.preferencex.EditTextPreference
+            app:key="@string/preferenceKeyTrackerId"
+            app:title="@string/preferencesTrackerId"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+    <PreferenceCategory
         app:key="@string/preferencesSecurity"
-        app:title="@string/preferencesSecurity" />
-    <org.owntracks.android.ui.preferences.connection.DialogPreferenceCompat
-        app:dialogLayout="@layout/ui_preferences_connection_parameters"
+        app:title="@string/preferencesSecurity">
+        <SwitchPreferenceCompat
+            app:defaultValue="@bool/valTls"
+            app:key="@string/preferenceKeyTLS"
+            app:title="@string/tls" />
+        <Preference
+            app:dependency="@string/preferenceKeyTLS"
+            app:key="@string/preferenceKeyTLSCaCrt"
+            app:title="@string/preferencesCaCrtPath" />
+        <Preference
+            app:dependency="@string/preferenceKeyTLS"
+            app:key="@string/preferenceKeyTLSClientCrt"
+            app:title="@string/preferencesClientCrtPath" />
+        <com.takisoft.preferencex.EditTextPreference
+            android:inputType="textPassword"
+            app:dependency="@string/preferenceKeyTLS"
+            app:key="@string/preferenceKeyTLSClientCrtPassword"
+            app:title="@string/preferencesClientCrtPassword" />
+    </PreferenceCategory>
+    <PreferenceCategory
         app:key="@string/preferencesParameters"
-        app:title="@string/preferencesParameters" />
+        app:title="@string/preferencesParameters">
+        <SwitchPreferenceCompat
+            app:key="@string/preferenceKeyCleanSession"
+            app:title="@string/preferencesCleanSessionEnabled" />
+        <org.owntracks.android.support.widgets.EditIntegerPreference
+            android:inputType="number"
+            app:defaultValue="@integer/valKeepalive"
+            app:key="@string/preferenceKeyKeepalive"
+            app:title="@string/preferencesKeepalive"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
 </PreferenceScreen>

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
 
     <LinearLayout
@@ -10,63 +9,56 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/host"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/preferencesHost"
-            android:inputType="textVisiblePassword|textNoSuggestions"
-            app:met_baseColor="@color/textPrimary"
-            app:met_floatingLabel="highlight"
-            app:met_floatingLabelText="@string/preferencesHost"
-            app:met_primaryColor="@color/accent" />
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:hint="@string/preferencesHost">
 
-        <com.rengwuxian.materialedittext.MaterialEditText
-
-            android:id="@+id/port"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:digits="0123456789"
-            android:hint="@string/preferencesPort"
-            android:inputType="number|textNoSuggestions"
-            android:maxLength="5"
-            app:met_baseColor="@color/textPrimary"
-            app:met_floatingLabel="highlight"
-            app:met_primaryColor="@color/accent" />
-
-        <com.rengwuxian.materialedittext.MaterialEditText
-
-            android:id="@+id/clientId"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/preferencesClientId"
-
-            android:inputType="textNoSuggestions"
-            app:met_baseColor="@color/textPrimary"
-            app:met_floatingLabel="highlight"
-            app:met_primaryColor="@color/accent" />
-
-        <RelativeLayout
-            android:id="@+id/tlsWrapper"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical"
-                android:text="@string/preferencesWebsocket"
-                android:textSize="18sp" />
-
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/ws"
-                android:layout_width="wrap_content"
+            <org.owntracks.android.ui.preferences.ValidatingEditText
+                android:id="@+id/host"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:layout_gravity="end" />
-        </RelativeLayout>
+
+                android:inputType="textVisiblePassword|textNoSuggestions" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:hint="@string/preferencesPort">
+
+            <org.owntracks.android.ui.preferences.ValidatingEditText
+                android:id="@+id/port"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:digits="0123456789"
+
+                android:inputType="number|textNoSuggestions"
+                android:maxLength="5" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:hint="@string/preferencesClientId">
+
+            <org.owntracks.android.ui.preferences.ValidatingEditText
+                android:id="@+id/clientId"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:inputType="textNoSuggestions" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/ws"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/preferencesWebsocket" />
+
 
     </LinearLayout>
 </layout>

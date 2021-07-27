@@ -11,7 +11,7 @@
     <string name="preferencesDeviceName">Device ID</string>
     <string name="preferencesBrokerPassword">Password</string>
     <string name="preferencesCaCrtPath">CA certificate</string>
-    <string name="preferencesClientCrtPath">Client certificate</string>
+    <string name="preferencesClientCrtPath">Client certificate (PKCS12)</string>
     <string name="preferencesClientCrtPassword">Client certificate password</string>
     <string name="preferencesLicenses">Libraries</string>
     <string name="preferencesLicensesSummary">Thanks to the authors of included libraries</string>
@@ -75,8 +75,9 @@
     <string name="accept">Accept</string>
     <string name="preferencesIdentification">Identification</string>
     <string name="preferencesParameters">Parameters</string>
-    <string name="preferencesKeepalive">Keepalive</string>
+    <string name="preferencesKeepalive">Keepalive (seconds)</string>
     <string name="preferencesKeepaliveValidationError" formatted="true">Keepalive should be a minimum of %d</string>
+    <string name="preferencesUrlValidationError">Invalid URL</string>
     <string name="seconds">Seconds</string>
     <string name="preferencesProfileId">Mode</string>
     <string name="mode_mqtt_private_label">MQTT</string>
@@ -132,7 +133,6 @@
     <string name="preferencesMoveModeLocatorInterval">Location interval (Move mode)</string>
     <string name="preferencesMoveModeLocatorIntervalSummary">Interval between location updates in Move mode</string>
     <string name="preferencesMoveModeLocatorIntervalDialog">How often should locations be requested from the device whilst in Move mode (seconds)</string>
-
     <string name="noNavigationApp">no suitable app installed</string>
     <string name="menuClear">Clear</string>
     <string name="configurationManagement">Configuration management</string>
@@ -228,6 +228,12 @@
     <string name="welcomePlayUnableToUpdateGooglePlayServices">Unable to update Google Play Services</string>
     <string name="importConfigurationSuccessTitle">Import successful</string>
     <string name="importConfigurationSuccessMessage">It is recommended to restart the app to apply all imported values</string>
+    <string name="tlsEnabled">TLS Enabled</string>
+    <string name="tlsEnabledWithClientCertificates">TLS Enabled with client certificate</string>
+    <string name="tlsDisabled">TLS Disabled</string>
+    <string name="preferencesCategoryConnectionEndpoint">Endpoint</string>
+    <string name="preferencesTLSClientCrtPasswordSetSummary">Password Set</string>
+    <string name="preferencesPortValidationError">Port must be between 1 and 65535</string>
     <string name="workmanagerInitializationErrorDialogTitle">Initialization Error</string>
     <string name="workmanagerInitializationErrorDialogOpenSettingsLabel">Open Application Settings</string>
     <string name="workmanagerInitializationErrorDialogMessage">Some components failed to initialize properly, so OwnTracks may not work properly. It may be necessary to re-install the application or clear the user data.\n\nPlease check the logs for more details.</string>

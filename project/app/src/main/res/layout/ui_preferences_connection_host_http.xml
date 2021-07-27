@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <LinearLayout
         android:id="@+id/content_frame"
@@ -9,19 +8,19 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <EditText
-            android:id="@+id/url"
-            style="@style/Widget.AppCompat.EditText"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
             android:hint="@string/preferencesUrl"
             android:importantForAutofill="no"
-            android:inputType="textUri|textNoSuggestions"
-            android:text=""
-            app:met_baseColor="@color/textPrimary"
-            app:met_floatingLabel="highlight"
-            app:met_floatingLabelText="@string/preferencesUrl"
-            app:met_primaryColor="@color/accent" />
+            android:inputType="textUri|textNoSuggestions">
+
+            <org.owntracks.android.ui.preferences.ValidatingEditText
+                android:id="@+id/url"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </com.google.android.material.textfield.TextInputLayout>
 
     </LinearLayout>
 </layout>

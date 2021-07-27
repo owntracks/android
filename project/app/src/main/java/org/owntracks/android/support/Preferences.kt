@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
+import androidx.annotation.IntegerRes
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
@@ -433,12 +435,14 @@ class Preferences @Inject constructor(
     @set:Import(keyResId = R.string.preferenceKeyClientId)
     var clientId: String
         get() {
-            var clientId = getStringOrDefault(R.string.preferenceKeyClientId, R.string.valEmpty)
-            if ("" == clientId) clientId = clientIdDefault
-            return clientId
+            val clientId = getStringOrDefault(R.string.preferenceKeyClientId, R.string.valEmpty)
+            return if ("" == clientId) clientIdDefault else clientId
         }
         set(clientId) {
-            setString(R.string.preferenceKeyClientId, clientId)
+            if (clientId.isBlank())
+                setString(R.string.preferenceKeyClientId, clientIdDefault)
+            else
+                setString(R.string.preferenceKeyClientId, clientId)
         }
 
     @get:Export(keyResId = R.string.preferenceKeyPubTopicBase, exportModeMqtt = true)
@@ -573,10 +577,10 @@ class Preferences @Inject constructor(
             }
         }
 
+    val minimumKeepalive = TimeUnit.MILLISECONDS.toSeconds(Scheduler.MIN_PERIODIC_INTERVAL_MILLIS)
+
     fun keepAliveInRange(i: Int): Boolean =
             i >= TimeUnit.MILLISECONDS.toSeconds(Scheduler.MIN_PERIODIC_INTERVAL_MILLIS)
-
-    val minimumKeepalive = TimeUnit.MILLISECONDS.toSeconds(Scheduler.MIN_PERIODIC_INTERVAL_MILLIS)
 
     val keepaliveWithHintSupport: String
         get() = getIntWithHintSupport(R.string.preferenceKeyKeepalive)
@@ -918,7 +922,7 @@ class Preferences @Inject constructor(
 
 
     private val clientIdDefault: String
-        get() = (username + deviceId).replace("\\W".toRegex(), "").lowercase(Locale.getDefault())
+        get() = "OwnTracks-Android-$deviceId-${Random().nextInt(0X1000000).toString(16)}"
 
     val pubTopicLocations: String
         get() = pubTopicBase
@@ -1024,11 +1028,11 @@ class Preferences @Inject constructor(
         }
     }
 
-    private fun getIntResource(resId: Int): Int {
+    private fun getIntResource(@IntegerRes resId: Int): Int {
         return context.resources.getInteger(resId)
     }
 
-    private fun getIntWithHintSupport(resKeyId: Int): String {
+    private fun getIntWithHintSupport(@StringRes resKeyId: Int): String {
         val i = getIntOrDefault(resKeyId, R.integer.valInvalid)
         return if (i == -1) {
             ""
@@ -1037,7 +1041,7 @@ class Preferences @Inject constructor(
         }
     }
 
-    private fun getStringOrDefault(resKeyId: Int, defId: Int): String {
+    private fun getStringOrDefault(@StringRes resKeyId: Int, defId: Int): String {
         val key = getPreferenceKey(resKeyId)
         return try {
             val s = preferencesStore.getString(key, "")
@@ -1048,27 +1052,27 @@ class Preferences @Inject constructor(
         }
     }
 
-    private fun getStringResource(resId: Int): String {
+    private fun getStringResource(@StringRes resId: Int): String {
         return context.resources.getString(resId)
     }
 
-    private fun setString(resKeyId: Int, value: String) {
+    private fun setString(@StringRes resKeyId: Int, value: String) {
         preferencesStore.putString(getPreferenceKey(resKeyId), value)
     }
 
-    private fun setInt(resKeyId: Int, value: Int) {
+    private fun setInt(@StringRes resKeyId: Int, value: Int) {
         preferencesStore.putInt(getPreferenceKey(resKeyId), value)
     }
 
-    private fun setBoolean(resKeyId: Int, value: Boolean) {
+    private fun setBoolean(@StringRes resKeyId: Int, value: Boolean) {
         preferencesStore.putBoolean(getPreferenceKey(resKeyId), value)
     }
 
-    private fun setStringSet(resKeyId: Int, value: Set<String>) {
+    private fun setStringSet(@StringRes resKeyId: Int, value: Set<String>) {
         preferencesStore.putStringSet(getPreferenceKey(resKeyId), value)
     }
 
-    private fun getStringSet(resKeyId: Int): Set<String> {
+    private fun getStringSet(@StringRes resKeyId: Int): Set<String> {
         return preferencesStore.getStringSet(getPreferenceKey(resKeyId))
     }
 
@@ -1076,7 +1080,7 @@ class Preferences @Inject constructor(
         preferencesStore.remove(key!!)
     }
 
-    private fun clearKey(resKeyId: Int) {
+    private fun clearKey(@StringRes resKeyId: Int) {
         clearKey(getPreferenceKey(resKeyId))
     }
 
@@ -1110,6 +1114,24 @@ class Preferences @Inject constructor(
         return getStringResource(res)
     }
 
+    fun getPreference(@StringRes res: Int): Any? =
+            Preferences::class.java
+                    .parentClasses()
+                    .flatMap { it.declaredMethods.asSequence() }
+                    .filter { it.isAnnotationPresent(Export::class.java) && it.getAnnotation(Export::class.java) != null }
+                    .first {
+                        it.getAnnotation(Export::class.java)!!.keyResId == res
+                    }.invoke(this)
+
+    fun setPreference(@StringRes res: Int, value: Any): Any? = Preferences::class.java
+            .parentClasses()
+            .flatMap { it.declaredMethods.asSequence() }
+            .filter { it.isAnnotationPresent(Import::class.java) && it.getAnnotation(Import::class.java) != null }
+            .first {
+                it.getAnnotation(Import::class.java)!!.keyResId == res
+            }.invoke(this, value)
+
+
     init {
         val modePreferenceKey = getPreferenceKey(R.string.preferenceKeyModeId)
         val initMode = preferencesStore.getInitMode(
@@ -1117,6 +1139,29 @@ class Preferences @Inject constructor(
                 getIntResource(R.integer.valModeId)
         )
         setMode(initMode, true)
+
+        // Defaults
+        mapOf(
+                R.string.preferenceKeyClientId to clientIdDefault,
+                R.string.preferenceKeyDeviceId to deviceIdDefault
+        ).forEach { (key, default) ->
+            if (!preferencesStore.hasKey(getPreferenceKey(key)) || preferencesStore.getString(
+                            getPreferenceKey(key), ""
+                    ).isNullOrBlank()
+            ) {
+                preferencesStore.putString(getPreferenceKey(key), default)
+            }
+        }
+
+        if (!preferencesStore.hasKey(getPreferenceKey(R.string.preferenceKeyPort)) || preferencesStore.getInt(
+                        getPreferenceKey(R.string.preferenceKeyPort), 0
+                ) == 0
+        ) {
+            preferencesStore.putInt(
+                    getPreferenceKey(R.string.preferenceKeyPort),
+                    getIntResource(R.integer.valPort)
+            )
+        }
 
         // Migrations
         if (preferencesStore.hasKey(getPreferenceKey(R.string.preferenceKeyGeocodeEnabled))) {
