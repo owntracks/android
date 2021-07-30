@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
 
@@ -31,54 +30,70 @@
                 android:layout_marginEnd="@dimen/default_spacing"
                 android:orientation="vertical">
 
-                <EditText
-                    android:id="@+id/description"
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/default_spacing"
-                    android:layout_marginTop="20dp"
-                    android:gravity="bottom"
-                    android:hint="@string/description"
-                    android:inputType="textVisiblePassword"
-                    android:text="@={vm.waypoint.description}"
+                    android:layout_marginTop="@dimen/default_spacing"
+                    android:hint="@string/description">
 
-                    />
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/description"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textVisiblePassword"
+                        android:text="@={vm.waypoint.description}" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-                <EditText
-                    android:id="@+id/latitude"
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/default_spacing"
-                    android:layout_marginTop="20dp"
-                    android:enabled="true"
-                    android:hint="@string/latitude"
-                    android:inputType="numberDecimal|numberSigned"
-                    android:text="@={vm.waypoint.geofenceLatitudeAsStr}"
-                    app:met_baseColor="@color/textPrimary"
-                    app:met_floatingLabel="normal"
-                    app:met_primaryColor="@color/accent" />
+                    android:layout_marginTop="@dimen/default_spacing"
+                    android:hint="@string/latitude">
 
-                <EditText
-                    android:id="@+id/longitude"
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/latitude"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="numberDecimal|numberSigned"
+                        android:text="@={vm.waypoint.geofenceLatitudeAsStr}" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/default_spacing"
-                    android:layout_marginTop="20dp"
-                    android:enabled="true"
-                    android:hint="@string/longitude"
-                    android:inputType="numberDecimal|numberSigned"
-                    android:text="@={vm.waypoint.geofenceLongitudeAsStr}" />
+                    android:layout_marginTop="@dimen/default_spacing"
+                    android:hint="@string/longitude">
 
-                <EditText
-                    android:id="@+id/radius"
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/longitude"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:enabled="true"
+                        android:inputType="numberDecimal|numberSigned"
+                        android:text="@={vm.waypoint.geofenceLongitudeAsStr}" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/default_spacing"
-                    android:layout_marginTop="20dp"
-                    android:digits="0123456789"
-                    android:hint="@string/radius"
-                    android:inputType="numberDecimal"
-                    android:text='@={org.owntracks.android.support.widgets.BindingConversions.convertToStringZeroIsEmpty(vm.waypoint.geofenceRadius)}' />
+                    android:layout_marginTop="@dimen/default_spacing"
+                    android:hint="@string/radius">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/radius"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:digits="0123456789"
+                        android:inputType="numberDecimal"
+                        android:text='@={org.owntracks.android.support.widgets.BindingConversions.convertToStringZeroIsEmpty(vm.waypoint.geofenceRadius)}' />
+                </com.google.android.material.textfield.TextInputLayout>
+
+
             </LinearLayout>
         </ScrollView>
     </LinearLayout>
