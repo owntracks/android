@@ -1,7 +1,7 @@
 plugins {
     id("com.android.application")
     id("dagger.hilt.android.plugin")
-    id("com.github.triplet.play") version "3.5.0"
+    id("com.github.triplet.play") version "3.6.0"
     kotlin("android")
     kotlin("kapt")
     id("io.objectbox")
