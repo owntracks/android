@@ -1,14 +1,10 @@
 package org.owntracks.android.support.preferences
 
 import android.content.Context
-import android.content.SharedPreferences
+import android.os.Build
 import androidx.preference.PreferenceManager
 import dagger.hilt.android.qualifiers.ApplicationContext
-import org.owntracks.android.R
-import org.owntracks.android.services.MessageProcessorEndpointHttp
-import org.owntracks.android.services.MessageProcessorEndpointMqtt
-import org.owntracks.android.support.Preferences
-import java.util.*
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -16,141 +12,97 @@ import javax.inject.Singleton
  * Implements a PreferencesStore that uses a SharedPreferecnces as a backend.
  */
 @Singleton
-class SharedPreferencesStore @Inject constructor(@ApplicationContext context: Context) :
-        PreferencesStore {
-    private lateinit var sharedPreferencesName: String
-    private val activeSharedPreferencesChangeListener =
-            LinkedList<OnModeChangedPreferenceChangedListener>()
+class SharedPreferencesStore @Inject constructor(@ApplicationContext private val context: Context) :
+        PreferenceDataStoreShim() {
 
-    private lateinit var activeSharedPreferences: SharedPreferences
-    private val commonSharedPreferences: SharedPreferences =
-            PreferenceManager.getDefaultSharedPreferences(context)
+    private val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
-    private val privateSharedPreferences: SharedPreferences =
-            context.getSharedPreferences(FILENAME_PRIVATE, Context.MODE_PRIVATE)
-    private val httpSharedPreferences: SharedPreferences =
-            context.getSharedPreferences(FILENAME_HTTP, Context.MODE_PRIVATE)
-
-    // Some preferences are always read from commonSharedPreferences. We list these out so that we can use the right store when these keys are requested.
-    private val commonPreferenceKeys: Set<String> = setOf(
-            context.getString(R.string.preferenceKeyFirstStart),
-            context.getString(R.string.preferenceKeySetupNotCompleted),
-            context.getString(R.string.preferenceKeyObjectboxMigrated),
-            Preferences.preferenceKeyUserDeclinedEnableLocationPermissions,
-            Preferences.preferenceKeyUserDeclinedEnableLocationServices
-    )
-
-    override fun putString(key: String, value: String) {
-        activeSharedPreferences.edit().putString(key, value).apply()
+    init {
+        migrateToSingleSharedPreferences()
     }
 
-    override fun getString(key: String, default: String): String? =
-            activeSharedPreferences.getString(key, default)
+    private fun migrateToSingleSharedPreferences() {
 
-    override fun remove(key: String) {
-        activeSharedPreferences.edit().remove(key).apply()
+        // Some preferences are always read from commonSharedPreferences. We list these out so that we can use the right store when these keys are requested.
+
+        val oldSharedPreferenceNames = listOf(
+                "org.owntracks.android.preferences.private",
+                "org.owntracks.android.preferences.http"
+        )
+
+        with(sharedPreferences.edit()) {
+            oldSharedPreferenceNames
+                    .map { context.getSharedPreferences(it, Context.MODE_PRIVATE) }
+                    .forEach {
+                        it.all.forEach { (key, value) ->
+                            Timber.d("Migrating legacy preference $key from $it")
+                            when (value) {
+                                is String -> putString(key, value)
+                                is Set<*> -> putStringSet(key, value as Set<String>)
+                                is Boolean -> putBoolean(key, value)
+                                is Int -> putInt(key, value)
+                                is Long -> putLong(key, value)
+                                is Float -> putFloat(key, value)
+                            }
+                        }
+                    }
+            if (commit()) {
+                oldSharedPreferenceNames.forEach {
+                    context.getSharedPreferences(it, Context.MODE_PRIVATE).edit().clear().apply()
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    oldSharedPreferenceNames.forEach {
+                        context.deleteSharedPreferences(it)
+                    }
+                }
+            }
+        }
     }
+
+
+    override fun putString(key: String, value: String?) =
+            sharedPreferences.edit().putString(key, value).apply()
+
+
+    override fun getString(key: String, default: String?): String? =
+            sharedPreferences.getString(key, default)
+
+    override fun remove(key: String) =
+            sharedPreferences.edit().remove(key).apply()
+
 
     override fun getBoolean(key: String, default: Boolean): Boolean =
-            if (commonPreferenceKeys.contains(key)) commonSharedPreferences.getBoolean(
-                    key,
-                    default
-            ) else activeSharedPreferences.getBoolean(key, default)
+            sharedPreferences.getBoolean(key, default)
 
 
-    override fun putBoolean(key: String, value: Boolean) {
-        if (commonPreferenceKeys.contains(key)) commonSharedPreferences.edit()
-                .putBoolean(key, value).apply() else activeSharedPreferences.edit()
-                .putBoolean(key, value).apply()
-    }
+    override fun putBoolean(key: String, value: Boolean) =
+            sharedPreferences.edit().putBoolean(key, value).apply()
 
     override fun getInt(key: String, default: Int): Int =
-            activeSharedPreferences.getInt(key, default)
+            sharedPreferences.getInt(key, default)
 
 
     override fun putInt(key: String, value: Int) {
-        activeSharedPreferences.edit().putInt(key, value).apply()
+        sharedPreferences.edit().putInt(key, value).apply()
     }
 
-    override fun getSharedPreferencesName(): String = sharedPreferencesName
-
-    override fun putStringSet(key: String, values: Set<String>) {
-        activeSharedPreferences.edit().putStringSet(key, values).apply()
+    override fun putStringSet(key: String, values: Set<String>?) {
+        sharedPreferences.edit().putStringSet(key, values).apply()
     }
 
-    override fun getStringSet(key: String): Set<String> {
-        return activeSharedPreferences.getStringSet(key, setOf()) ?: setOf()
+    override fun getStringSet(key: String, defValues: Set<String>?): Set<String>? {
+        return sharedPreferences.getStringSet(key, defValues) ?: defValues
     }
 
-    override fun hasKey(key: String): Boolean {
-        return this::activeSharedPreferences.isInitialized && activeSharedPreferences.contains(key)
-    }
-
-    override fun getInitMode(key: String, default: Int): Int {
-        val initMode = commonSharedPreferences.getInt(key, default)
-        return if (initMode in listOf(
-                        MessageProcessorEndpointMqtt.MODE_ID,
-                        MessageProcessorEndpointHttp.MODE_ID
-                )
-        ) {
-            initMode
-        } else {
-            default
-        }
-    }
-
-    override fun setMode(key: String, mode: Int) {
-        detachAllActivePreferenceChangeListeners()
-        when (mode) {
-            MessageProcessorEndpointMqtt.MODE_ID -> {
-                activeSharedPreferences = privateSharedPreferences
-                sharedPreferencesName = FILENAME_PRIVATE
-            }
-            MessageProcessorEndpointHttp.MODE_ID -> {
-                activeSharedPreferences = httpSharedPreferences
-                sharedPreferencesName = FILENAME_HTTP
-            }
-        }
-        commonSharedPreferences.edit().putInt(key, mode).apply()
-        // Mode switcher reads from currently active sharedPreferences, so we commit the value to all
-        privateSharedPreferences.edit().putInt(key, mode).apply()
-        httpSharedPreferences.edit().putInt(key, mode).apply()
-
-        attachAllActivePreferenceChangeListeners()
+    override fun contains(key: String): Boolean {
+        return sharedPreferences.contains(key)
     }
 
     override fun registerOnSharedPreferenceChangeListener(listenerModeChanged: OnModeChangedPreferenceChangedListener) {
-        if (this::activeSharedPreferences.isInitialized) {
-            activeSharedPreferences.registerOnSharedPreferenceChangeListener(listenerModeChanged)
-        }
-        activeSharedPreferencesChangeListener.push(listenerModeChanged)
+        sharedPreferences.registerOnSharedPreferenceChangeListener(listenerModeChanged)
     }
 
     override fun unregisterOnSharedPreferenceChangeListener(listenerModeChanged: OnModeChangedPreferenceChangedListener) {
-        if (this::activeSharedPreferences.isInitialized) {
-            activeSharedPreferences.unregisterOnSharedPreferenceChangeListener(listenerModeChanged)
-        }
-        activeSharedPreferencesChangeListener.remove(listenerModeChanged)
-    }
-
-    private fun detachAllActivePreferenceChangeListeners() {
-        activeSharedPreferencesChangeListener.forEach {
-            activeSharedPreferences.unregisterOnSharedPreferenceChangeListener(
-                    it
-            )
-        }
-    }
-
-    private fun attachAllActivePreferenceChangeListeners() {
-        activeSharedPreferencesChangeListener.forEach {
-            activeSharedPreferences.registerOnSharedPreferenceChangeListener(it)
-            it.onAttachAfterModeChanged()
-        }
-    }
-
-    companion object {
-        private const val FILENAME_PRIVATE = "org.owntracks.android.preferences.private"
-        private const val FILENAME_HTTP = "org.owntracks.android.preferences.http"
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(listenerModeChanged)
     }
 }
-

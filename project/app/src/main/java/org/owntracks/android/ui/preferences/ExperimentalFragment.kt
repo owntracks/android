@@ -9,7 +9,6 @@ import org.owntracks.android.support.Preferences.Companion.EXPERIMENTAL_FEATURES
 @AndroidEntryPoint
 class ExperimentalFragment : AbstractPreferenceFragment() {
     override fun onCreatePreferencesFix(savedInstanceState: Bundle?, rootKey: String?) {
-        super.onCreatePreferencesFix(savedInstanceState, rootKey)
         setPreferencesFromResource(R.xml.preferences_experimental, rootKey)
 
         EXPERIMENTAL_FEATURES.forEach { feature ->

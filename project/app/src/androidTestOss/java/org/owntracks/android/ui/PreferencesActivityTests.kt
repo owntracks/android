@@ -1,19 +1,12 @@
 package org.owntracks.android.ui
 
-import androidx.annotation.StringRes
-import androidx.recyclerview.widget.RecyclerView
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.scrollTo
-import androidx.test.espresso.contrib.RecyclerViewActions.actionOnItem
-import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotContains
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotExist
-import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickDialogPositiveButton
-import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
+import com.adevinta.android.barista.interaction.BaristaSleepInteractions
 import com.adevinta.android.barista.rule.flaky.AllowFlaky
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -106,6 +99,8 @@ class PreferencesActivityTests :
         clickBackAndWait()
         clickOnAndWait(R.string.configurationManagement)
 
+        BaristaSleepInteractions.sleep(1000)
+
         assertContains(R.id.effectiveConfiguration, "\"_type\" : \"configuration\"")
         assertContains(R.id.effectiveConfiguration, " \"waypoints\" : [ ]")
 
@@ -145,7 +140,6 @@ class PreferencesActivityTests :
         writeToEditTextDialog(R.string.preferencesDeviceName, "testDeviceId")
         writeToEditTextDialog(R.string.preferencesTrackerId, "t1")
         clickBackAndWait()
-
 
         clickOnAndWait(R.string.preferencesReporting)
         clickOnAndWait(R.string.preferencesPubExtendedData)
@@ -213,21 +207,5 @@ class PreferencesActivityTests :
         clickOnAndWait(R.string.preferencesAdvanced)
         scrollToText(R.string.preferencesReverseGeocodeProvider)
         assertDisplayed(R.string.valDefaultGeocoder)
-    }
-
-    private fun scrollToText(textResource: Int) {
-        onView(withId(androidx.preference.R.id.recycler_view))
-            .perform(
-                actionOnItem<RecyclerView.ViewHolder>(
-                    hasDescendant(withText(textResource)), scrollTo()
-                )
-            )
-    }
-
-    private fun writeToEditTextDialog(@StringRes name: Int, value: String) {
-        scrollToText(name)
-        clickOnAndWait(name)
-        writeTo(android.R.id.edit, value)
-        clickDialogPositiveButton()
     }
 }

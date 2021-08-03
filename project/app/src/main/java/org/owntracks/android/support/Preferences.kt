@@ -22,7 +22,7 @@ import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.Events.ModeChanged
 import org.owntracks.android.support.Events.MonitoringChanged
 import org.owntracks.android.support.preferences.OnModeChangedPreferenceChangedListener
-import org.owntracks.android.support.preferences.PreferencesStore
+import org.owntracks.android.support.preferences.PreferenceDataStoreShim
 import timber.log.Timber
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
@@ -37,14 +37,11 @@ import javax.inject.Singleton
 class Preferences @Inject constructor(
         @ApplicationContext applicationContext: Context,
         private val eventBus: EventBus?,
-        private val preferencesStore: PreferencesStore
+        private val preferencesStore: PreferenceDataStoreShim
 ) {
     private val context: Context = applicationContext
     private var isFirstStart = false
     private var currentMode = MessageProcessorEndpointMqtt.MODE_ID
-
-    val sharedPreferencesName: String
-        get() = preferencesStore.getSharedPreferencesName()
 
     // need to iterated thought hierarchy in order to retrieve methods from above the current instance
     // iterate though the list of methods declared in the class represented by klass variable, and insert those annotated with the specified annotation
@@ -202,7 +199,7 @@ class Preferences @Inject constructor(
             return
         }
         Timber.v("setting mode to: %s", requestedMode)
-        preferencesStore.setMode(getPreferenceKey(R.string.preferenceKeyModeId), requestedMode)
+        preferencesStore.putInt(getPreferenceKey(R.string.preferenceKeyModeId), requestedMode)
         currentMode = requestedMode
         if (!init && eventBus != null) {
             Timber.v("broadcasting mode change event")
@@ -524,10 +521,7 @@ class Preferences @Inject constructor(
             if (port in 1..65535) setInt(R.string.preferenceKeyPort, port) else setPortDefault()
         }
 
-    val portWithHintSupport: String
-        get() = getIntWithHintSupport(R.string.preferenceKeyPort)
-
-    fun setPortDefault() {
+    private fun setPortDefault() {
         clearKey(R.string.preferenceKeyPort)
     }
 
@@ -788,8 +782,13 @@ class Preferences @Inject constructor(
     @get:Export(keyResId = R.string.preferenceKeyURL, exportModeHttp = true)
     @set:Import(keyResId = R.string.preferenceKeyURL)
     var url: String
-        get() = getStringOrDefault(R.string.preferenceKeyURL, R.string.valEmpty)
+        get() {
+            val url = getStringOrDefault(R.string.preferenceKeyURL, R.string.valEmpty)
+            Timber.e("Getting URL value = $url, pref hashcode = ${this.hashCode()}")
+            return url
+        }
         set(url) {
+            Timber.e("Setting URL value = $url, pref hashcode = ${this.hashCode()}")
             setString(R.string.preferenceKeyURL, url)
         }
 
@@ -1073,7 +1072,7 @@ class Preferences @Inject constructor(
     }
 
     private fun getStringSet(@StringRes resKeyId: Int): Set<String> {
-        return preferencesStore.getStringSet(getPreferenceKey(resKeyId))
+        return preferencesStore.getStringSet(getPreferenceKey(resKeyId), emptySet()) ?: emptySet()
     }
 
     private fun clearKey(key: String?) {
@@ -1134,7 +1133,7 @@ class Preferences @Inject constructor(
 
     init {
         val modePreferenceKey = getPreferenceKey(R.string.preferenceKeyModeId)
-        val initMode = preferencesStore.getInitMode(
+        val initMode = preferencesStore.getInt(
                 modePreferenceKey,
                 getIntResource(R.integer.valModeId)
         )
@@ -1145,7 +1144,7 @@ class Preferences @Inject constructor(
                 R.string.preferenceKeyClientId to clientIdDefault,
                 R.string.preferenceKeyDeviceId to deviceIdDefault
         ).forEach { (key, default) ->
-            if (!preferencesStore.hasKey(getPreferenceKey(key)) || preferencesStore.getString(
+            if (!preferencesStore.contains(getPreferenceKey(key)) || preferencesStore.getString(
                             getPreferenceKey(key), ""
                     ).isNullOrBlank()
             ) {
@@ -1153,7 +1152,7 @@ class Preferences @Inject constructor(
             }
         }
 
-        if (!preferencesStore.hasKey(getPreferenceKey(R.string.preferenceKeyPort)) || preferencesStore.getInt(
+        if (!preferencesStore.contains(getPreferenceKey(R.string.preferenceKeyPort)) || preferencesStore.getInt(
                         getPreferenceKey(R.string.preferenceKeyPort), 0
                 ) == 0
         ) {
@@ -1164,7 +1163,7 @@ class Preferences @Inject constructor(
         }
 
         // Migrations
-        if (preferencesStore.hasKey(getPreferenceKey(R.string.preferenceKeyGeocodeEnabled))) {
+        if (preferencesStore.contains(getPreferenceKey(R.string.preferenceKeyGeocodeEnabled))) {
             val oldEnabledValue = preferencesStore.getBoolean(
                     getPreferenceKey(R.string.preferenceKeyGeocodeEnabled),
                     false
@@ -1185,7 +1184,7 @@ class Preferences @Inject constructor(
             preferencesStore.remove(getPreferenceKey(R.string.preferenceKeyGeocodeEnabled))
         }
         // Migrate old "google" reverse geocoder value to "device"
-        if (preferencesStore.hasKey(getPreferenceKey(R.string.preferencesReverseGeocodeProvider)) && preferencesStore.getString(
+        if (preferencesStore.contains(getPreferenceKey(R.string.preferencesReverseGeocodeProvider)) && preferencesStore.getString(
                         getPreferenceKey(R.string.preferencesReverseGeocodeProvider),
                         ""
                 ) == "Google"

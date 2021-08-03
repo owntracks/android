@@ -14,12 +14,8 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickBack
-import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickDialogPositiveButton
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
-import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
 import com.adevinta.android.barista.interaction.PermissionGranter
-import com.adevinta.android.barista.rule.BaristaRule
-import com.adevinta.android.barista.rule.flaky.AllowFlaky
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -32,6 +28,7 @@ import org.owntracks.android.R
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.map.MapActivity
+import org.owntracks.android.ui.writeToEditTextDialog
 import java.util.concurrent.TimeUnit
 
 @LargeTest
@@ -91,9 +88,7 @@ class ContactActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.
         clickOnAndWait(R.string.preferencesServer)
         clickOnAndWait(R.string.mode_heading)
         clickOnAndWait(R.string.mode_http_private_label)
-        clickOnAndWait(R.string.preferencesHost)
-        writeTo(R.id.url, "http://localhost:${httpPort}/")
-        clickDialogPositiveButton()
+        writeToEditTextDialog(R.string.preferencesUrl,"http://localhost:${httpPort}/")
         clickBack()
 
         openDrawer()

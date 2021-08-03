@@ -27,7 +27,7 @@
         android:title="@string/preferencesAdvanced"
         app:fragment="org.owntracks.android.ui.preferences.AdvancedFragment" />
     <Preference
-        android:key="experimentalScreen"
+        android:key="experimentalFeatures"
         android:title="@string/preferencesExperimental"
         app:fragment="org.owntracks.android.ui.preferences.ExperimentalFragment" />
     <Preference

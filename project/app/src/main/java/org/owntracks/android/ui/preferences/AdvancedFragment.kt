@@ -13,7 +13,6 @@ import org.owntracks.android.support.Preferences
 @AndroidEntryPoint
 class AdvancedFragment : AbstractPreferenceFragment() {
     override fun onCreatePreferencesFix(savedInstanceState: Bundle?, rootKey: String?) {
-        super.onCreatePreferencesFix(savedInstanceState, rootKey)
         setPreferencesFromResource(R.xml.preferences_advanced, rootKey)
         val remoteConfigurationPreference =
                 findPreference<SwitchPreferenceCompat>(getString(R.string.preferenceKeyRemoteConfiguration))

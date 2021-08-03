@@ -10,7 +10,7 @@ import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.data.repos.MemoryContactsRepo
 import org.owntracks.android.data.repos.ObjectboxWaypointsRepo
 import org.owntracks.android.data.repos.WaypointsRepo
-import org.owntracks.android.support.preferences.PreferencesStore
+import org.owntracks.android.support.preferences.PreferenceDataStoreShim
 import org.owntracks.android.support.preferences.SharedPreferencesStore
 import javax.inject.Singleton
 
@@ -22,7 +22,7 @@ abstract class ReposAndContextModule {
     abstract fun provideContext(app: App): Context
 
     @Binds
-    abstract fun bindSharedPreferencesStoreModule(sharedPreferencesStore: SharedPreferencesStore): PreferencesStore
+    abstract fun bindSharedPreferencesStoreModule(sharedPreferencesStore: SharedPreferencesStore): PreferenceDataStoreShim
 
     @Binds
     abstract fun bindWaypointsRepo(objectboxWaypointsRepo: ObjectboxWaypointsRepo): WaypointsRepo

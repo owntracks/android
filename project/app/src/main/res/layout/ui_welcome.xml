@@ -66,6 +66,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginBottom="8dp"
+            android:focusable="false"
             app:layout_constraintBottom_toTopOf="@+id/circles"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintLeft_toLeftOf="parent"

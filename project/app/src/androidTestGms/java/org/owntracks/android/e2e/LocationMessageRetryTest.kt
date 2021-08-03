@@ -7,7 +7,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickBack
-import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickDialogPositiveButton
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
 import com.adevinta.android.barista.interaction.PermissionGranter
@@ -24,13 +23,14 @@ import org.owntracks.android.R
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.map.MapActivity
+import org.owntracks.android.ui.writeToEditTextDialog
 import java.util.concurrent.TimeUnit
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class LocationMessageRetryTest : TestWithAnActivity<MapActivity>(MapActivity::class.java, false) {
 
-    private var mockWebServer = MockWebServer()
+    private val mockWebServer = MockWebServer()
 
     @Before
     fun setIdlingTimeout() {
@@ -85,9 +85,7 @@ class LocationMessageRetryTest : TestWithAnActivity<MapActivity>(MapActivity::cl
         clickOnAndWait(R.string.preferencesServer)
         clickOnAndWait(R.string.mode_heading)
         clickOnAndWait(R.string.mode_http_private_label)
-        clickOnAndWait(R.string.preferencesHost)
-        writeTo(R.id.url, "http://localhost:${httpPort}/")
-        clickDialogPositiveButton()
+        writeToEditTextDialog(R.string.preferencesUrl, "http://localhost:${httpPort}/")
         clickBack()
 
         openDrawer()

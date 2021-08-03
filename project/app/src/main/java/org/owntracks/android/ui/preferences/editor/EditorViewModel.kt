@@ -38,19 +38,16 @@ class EditorViewModel @Inject constructor(
             mutableConfiguration.postValue(parser.toUnencryptedJsonPretty(message))
         } catch (e: IOException) {
             Timber.e(e)
-//            view?.displayLoadFailed()
         }
     }
-
 
     override fun onCleared() {
         preferences.unregisterOnPreferenceChangedListener(this)
         super.onCleared()
-
     }
 
     override fun onAttachAfterModeChanged() {
-        TODO("Not yet implemented")
+        // NOOP
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {

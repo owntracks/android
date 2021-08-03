@@ -17,7 +17,7 @@ import org.owntracks.android.R
 import org.owntracks.android.model.messages.MessageConfiguration
 import org.owntracks.android.services.MessageProcessorEndpointHttp
 import org.owntracks.android.services.MessageProcessorEndpointMqtt
-import org.owntracks.android.support.preferences.PreferencesStore
+import org.owntracks.android.support.preferences.PreferenceDataStoreShim
 import kotlin.reflect.KClass
 
 @RunWith(Parameterized::class)
@@ -31,7 +31,7 @@ class PreferencesGettersAndSetters(
 ) {
     private lateinit var mockResources: Resources
     private lateinit var mockContext: Context
-    private lateinit var preferencesStore: PreferencesStore
+    private lateinit var preferencesStore: PreferenceDataStoreShim
 
     @Before
     fun createMocks() {

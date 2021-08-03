@@ -7,7 +7,6 @@ import org.owntracks.android.R
 @AndroidEntryPoint
 class NotificationFragment : AbstractPreferenceFragment() {
     override fun onCreatePreferencesFix(savedInstanceState: Bundle?, rootKey: String?) {
-        super.onCreatePreferencesFix(savedInstanceState, rootKey)
         setPreferencesFromResource(R.xml.preferences_notification, rootKey)
     }
 }

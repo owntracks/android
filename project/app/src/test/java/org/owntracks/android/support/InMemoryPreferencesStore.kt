@@ -1,21 +1,10 @@
 package org.owntracks.android.support
 
 import org.owntracks.android.support.preferences.OnModeChangedPreferenceChangedListener
-import org.owntracks.android.support.preferences.PreferencesStore
+import org.owntracks.android.support.preferences.PreferenceDataStoreShim
 
-class InMemoryPreferencesStore : PreferencesStore {
+class InMemoryPreferencesStore : PreferenceDataStoreShim() {
     private val valueMap: MutableMap<String, Any> = HashMap()
-    override fun getSharedPreferencesName(): String {
-        return ""
-    }
-
-    override fun setMode(key: String, mode: Int) {
-        valueMap[key] = mode
-    }
-
-    override fun getInitMode(key: String, default: Int): Int {
-        return getInt(key, default)
-    }
 
     override fun getBoolean(key: String, default: Boolean): Boolean {
         return valueMap[key] as Boolean? ?: default
@@ -33,25 +22,33 @@ class InMemoryPreferencesStore : PreferencesStore {
         return valueMap[key] as Int? ?: default
     }
 
-    override fun putString(key: String, value: String) {
-        valueMap[key] = value
+    override fun putString(key: String, value: String?) {
+        if (value == null) {
+            valueMap.remove(key)
+        } else {
+            valueMap[key] = value
+        }
     }
 
-    override fun getString(key: String, default: String): String? {
+    override fun getString(key: String?, default: String?): String? {
         return valueMap[key] as String? ?: default
     }
 
-    override fun getStringSet(key: String): Set<String> {
+    override fun getStringSet(key: String, defValues: MutableSet<String>?): Set<String> {
         @Suppress("UNCHECKED_CAST")
         return (valueMap[key] ?: setOf<String>()) as Set<String>
     }
 
-    override fun hasKey(key: String): Boolean {
+    override fun contains(key: String): Boolean {
         return (valueMap.keys.contains(key))
     }
 
-    override fun putStringSet(key: String, values: Set<String>) {
-        valueMap[key] = values
+    override fun putStringSet(key: String, values: Set<String>?) {
+        if (values == null) {
+            valueMap.remove(key)
+        } else {
+            valueMap[key] = values
+        }
     }
 
     override fun remove(key: String) {
@@ -59,7 +56,7 @@ class InMemoryPreferencesStore : PreferencesStore {
     }
 
     override fun registerOnSharedPreferenceChangeListener(listenerModeChanged: OnModeChangedPreferenceChangedListener) {
-
+        TODO("Not yet implemented")
     }
 
     override fun unregisterOnSharedPreferenceChangeListener(listenerModeChanged: OnModeChangedPreferenceChangedListener) {

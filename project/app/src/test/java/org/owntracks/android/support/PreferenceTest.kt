@@ -8,12 +8,12 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.owntracks.android.model.messages.MessageConfiguration
-import org.owntracks.android.support.preferences.PreferencesStore
+import org.owntracks.android.support.preferences.PreferenceDataStoreShim
 
 class PreferenceTest {
     private lateinit var mockResources: Resources
     private lateinit var mockContext: Context
-    private lateinit var preferencesStore: PreferencesStore
+    private lateinit var preferencesStore: PreferenceDataStoreShim
 
     @Before
     fun createMocks() {
