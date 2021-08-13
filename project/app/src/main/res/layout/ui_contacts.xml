@@ -21,7 +21,7 @@
             layout="@layout/appbar" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_view"
+            android:id="@+id/contactsRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="@{vm.contacts.empty ? View.GONE : View.VISIBLE}"

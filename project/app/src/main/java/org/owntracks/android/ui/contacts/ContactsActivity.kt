@@ -36,8 +36,8 @@ class ContactsActivity : AppCompatActivity(),
         setSupportActionBar(binding.appbar.toolbar)
         drawerProvider.attach(binding.appbar.toolbar)
 
-        binding.recyclerView.layoutManager = LinearLayoutManager(this)
-        binding.recyclerView.adapter = contactsAdapter
+        binding.contactsRecyclerView.layoutManager = LinearLayoutManager(this)
+        binding.contactsRecyclerView.adapter = contactsAdapter
 
         viewModel.contacts.observe({ this.lifecycle }, { contacts: Map<String, FusedContact> ->
             contactsAdapter.setData(contacts.values)

@@ -88,7 +88,7 @@ class ContactActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.
         clickOnAndWait(R.string.preferencesServer)
         clickOnAndWait(R.string.mode_heading)
         clickOnAndWait(R.string.mode_http_private_label)
-        writeToEditTextDialog(R.string.preferencesUrl,"http://localhost:${httpPort}/")
+        writeToEditTextDialog(R.string.preferencesUrl, "http://localhost:${httpPort}/")
         clickBack()
 
         openDrawer()
@@ -105,7 +105,7 @@ class ContactActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.
 
         openDrawer()
         clickOnAndWait(R.string.title_activity_contacts)
-        assertRecyclerViewItemCount(R.id.recycler_view, 1)
+        assertRecyclerViewItemCount(R.id.contactsRecyclerView, 1)
 
         clickOnAndWait("aa")
         assertDisplayed(R.id.bottomSheetLayout)

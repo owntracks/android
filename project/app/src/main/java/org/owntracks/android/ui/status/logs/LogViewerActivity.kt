@@ -58,7 +58,7 @@ class LogViewerActivity : AppCompatActivity() {
         )
         viewModel.logLines().observe(this, ::updateAdapterWithLogLines)
 
-        binding.recyclerView.apply {
+        binding.logsRecyclerView.apply {
             recyclerView = this
             layoutManager = LinearLayoutManager(context)
             adapter = logAdapter
@@ -80,12 +80,12 @@ class LogViewerActivity : AppCompatActivity() {
     }
 
     private fun updateAdapterWithLogLines(logEntries: List<LogEntry>) {
-        val atTheBottom = !binding.recyclerView.canScrollVertically(1)
+        val atTheBottom = !binding.logsRecyclerView.canScrollVertically(1)
         logAdapter.setLogLines(logEntries.filter {
             (it.priority >= Log.DEBUG && viewModel.isDebugEnabled()) || it.priority >= Log.INFO
         })
         if (atTheBottom) {
-            binding.recyclerView.scrollToPosition(logAdapter.itemCount - 1)
+            binding.logsRecyclerView.scrollToPosition(logAdapter.itemCount - 1)
         }
     }
 
