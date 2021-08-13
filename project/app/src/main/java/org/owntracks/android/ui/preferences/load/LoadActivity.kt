@@ -3,7 +3,6 @@ package org.owntracks.android.ui.preferences.load
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.ContentResolver
-import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -11,27 +10,21 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiPreferencesLoadBinding
-import org.owntracks.android.support.AppRestarter
 import timber.log.Timber
 import java.io.IOException
 import java.net.URI
-import javax.inject.Inject
 
 @SuppressLint("GoogleAppIndexingApiWarning")
 @AndroidEntryPoint
 class LoadActivity : AppCompatActivity() {
     private val viewModel: LoadViewModel by viewModels()
     private lateinit var binding: UiPreferencesLoadBinding
-
-    @Inject
-    lateinit var appRestarter: AppRestarter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +37,7 @@ class LoadActivity : AppCompatActivity() {
         viewModel.configurationImportStatus.observe(this, {
             invalidateOptionsMenu()
             if (it == ImportStatus.SAVED) {
-                showFinishDialog()
+                finish()
             }
         })
         handleIntent(intent)
@@ -150,17 +143,6 @@ class LoadActivity : AppCompatActivity() {
         val bytesRead = stream.read(output)
         Timber.d("Read %d bytes from content URI", bytesRead)
         return output
-    }
-
-    private fun showFinishDialog() {
-        AlertDialog.Builder(this)
-                .setTitle(getString(R.string.importConfigurationSuccessTitle))
-                .setMessage(getString(R.string.importConfigurationSuccessMessage))
-                .setPositiveButton(getString(R.string.restart)) { _: DialogInterface?, _: Int ->
-                    appRestarter.restart()
-                }
-                .setNegativeButton(getString(R.string.cancel)) { _: DialogInterface?, _: Int -> finish() }
-                .show()
     }
 
     companion object {

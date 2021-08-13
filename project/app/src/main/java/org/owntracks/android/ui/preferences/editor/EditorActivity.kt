@@ -20,7 +20,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import org.owntracks.android.BuildConfig
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiPreferencesEditorBinding
-import org.owntracks.android.support.AppRestarter
 import org.owntracks.android.support.Preferences
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import timber.log.Timber
@@ -34,9 +33,6 @@ class EditorActivity : AppCompatActivity() {
 
     @Inject
     lateinit var preferences: Preferences
-
-    @Inject
-    lateinit var appRestarter: AppRestarter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,24 +53,20 @@ class EditorActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
+        return when (item.itemId) {
             R.id.exportConfigurationFile -> {
                 exportConfigurationToFile()
-                return true
+                true
             }
             R.id.importConfigurationFile -> {
                 showImportConfigurationFilePickerView()
-                return true
+                true
             }
             R.id.importConfigurationSingleValue -> {
                 showEditorView()
-                return true
+                true
             }
-            R.id.restart -> {
-                appRestarter.restart()
-                return false
-            }
-            else -> return false
+            else -> false
         }
     }
 

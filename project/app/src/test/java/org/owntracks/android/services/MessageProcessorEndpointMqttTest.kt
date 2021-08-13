@@ -23,7 +23,6 @@ class MessageProcessorEndpointMqttTest {
             null,
             null,
             null,
-            null,
             applicationContext,
             mockContactsRepo
         )
@@ -48,7 +47,6 @@ class MessageProcessorEndpointMqttTest {
             null,
             null,
             null,
-            null,
             applicationContext,
             mockContactsRepo
         )
@@ -63,7 +61,6 @@ class MessageProcessorEndpointMqttTest {
     @Test
     fun `MQTT Endpoint generates correct topics to subscribe to from multiple subTopics`() {
         val endpoint = MessageProcessorEndpointMqtt(
-            null,
             null,
             null,
             null,
@@ -91,7 +88,6 @@ class MessageProcessorEndpointMqttTest {
             null,
             null,
             null,
-            null,
             applicationContext,
             mockContactsRepo
         )
@@ -109,7 +105,6 @@ class MessageProcessorEndpointMqttTest {
     @Test
     fun `MQTT Endpoint generates correct topics to subscribe to from wildcard topic`() {
         val endpoint = MessageProcessorEndpointMqtt(
-            null,
             null,
             null,
             null,

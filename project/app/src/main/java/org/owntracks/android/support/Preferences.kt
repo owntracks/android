@@ -10,6 +10,7 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+import androidx.preference.PreferenceManagerFix
 import dagger.hilt.android.qualifiers.ApplicationContext
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions
 import org.greenrobot.eventbus.EventBus
@@ -42,6 +43,18 @@ class Preferences @Inject constructor(
 
     private val context: Context = applicationContext
     private var isFirstStart = false
+
+    fun setDefaultPreferencesFromResources() {
+        listOf(
+                R.xml.preferences_root,
+                R.xml.preferences_advanced,
+                R.xml.preferences_notification,
+                R.xml.preferences_reporting,
+                R.xml.preferences_connection
+        ).forEach {
+            PreferenceManagerFix.setDefaultValues(context, it, false)
+        }
+    }
 
     // need to iterated thought hierarchy in order to retrieve methods from above the current instance
     // iterate though the list of methods declared in the class represented by klass variable, and insert those annotated with the specified annotation
@@ -1141,16 +1154,6 @@ class Preferences @Inject constructor(
             ) {
                 preferencesStore.putString(getPreferenceKey(key), default)
             }
-        }
-
-        if (!preferencesStore.contains(getPreferenceKey(R.string.preferenceKeyPort)) || preferencesStore.getInt(
-                        getPreferenceKey(R.string.preferenceKeyPort), 0
-                ) == 0
-        ) {
-            preferencesStore.putInt(
-                    getPreferenceKey(R.string.preferenceKeyPort),
-                    getIntResource(R.integer.valPort)
-            )
         }
 
         // Migrations

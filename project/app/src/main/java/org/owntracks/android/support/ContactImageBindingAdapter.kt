@@ -9,6 +9,8 @@ import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
+import org.owntracks.android.di.IoDispatcher
+import org.owntracks.android.di.MainDispatcher
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.support.widgets.TextDrawable
 import timber.log.Timber
@@ -16,12 +18,14 @@ import javax.inject.Inject
 
 class ContactImageBindingAdapter @Inject constructor(
         @ApplicationContext context: Context,
-        private val memoryCache: ContactBitmapAndNameMemoryCache
+        private val memoryCache: ContactBitmapAndNameMemoryCache,
+        @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+        @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
 ) {
     @BindingAdapter(value = ["contact"])
     fun ImageView.displayFaceInViewAsync(c: FusedContact?) {
         c?.also { contact ->
-            GlobalScope.launch(Dispatchers.Main) {
+            GlobalScope.launch(mainDispatcher) {
                 setImageBitmap(getBitmapFromCache(contact))
             }
         }
@@ -30,7 +34,7 @@ class ContactImageBindingAdapter @Inject constructor(
     private val faceDimensions = (48 * (context.resources.displayMetrics.densityDpi / 160f)).toInt()
 
     suspend fun getBitmapFromCache(contact: FusedContact): Bitmap {
-        return withContext(Dispatchers.IO) {
+        return withContext(ioDispatcher) {
             val contactBitMapAndName = memoryCache[contact.id]
 
             if (contactBitMapAndName != null && contactBitMapAndName is ContactBitmapAndName.CardBitmap && contactBitMapAndName.bitmap != null) {

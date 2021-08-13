@@ -52,7 +52,6 @@
     <string name="preferenceKeyTLSClientCrtPassword">tlsClientCrtPassword</string>
     <string name="preferenceKeyTrackerId">tid</string>
     <string name="preferenceKeyURL">url</string>
-    <string name="preferenceKeyUsepassword">usePassword</string>
     <string name="preferenceKeyUsername">username</string>
     <string name="preferenceKeyVersion">_build</string>
     <string name="preferenceKeyWS">ws</string>

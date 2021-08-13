@@ -103,6 +103,9 @@ class App : Application() {
                             .build()
             )
         }
+        // Need to set the preferences to their default values
+        // From https://stackoverflow.com/a/2877795/352740
+        preferences.setDefaultPreferencesFromResources()
         preferences.checkFirstStart()
 
         when (preferences.theme) {

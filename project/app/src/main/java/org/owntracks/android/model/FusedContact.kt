@@ -78,6 +78,6 @@ class FusedContact(id: String?) : BaseObservable() {
         get() = messageLocation?.run { LatLng(latitude, longitude) }
 
     override fun toString(): String {
-        return "FusedContact $id ($fusedName)"
+        return "{FusedContact:id=$id,name=$fusedName,location=${messageLocation?.toLatLng()}}"
     }
 }

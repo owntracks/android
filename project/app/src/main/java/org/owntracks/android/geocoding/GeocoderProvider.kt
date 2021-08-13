@@ -12,6 +12,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
 import kotlinx.coroutines.withContext
 import org.owntracks.android.R
+import org.owntracks.android.di.IoDispatcher
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.perfLog
 import org.owntracks.android.services.BackgroundService
@@ -27,10 +28,9 @@ import javax.inject.Singleton
 @Singleton
 class GeocoderProvider @Inject constructor(
         @ApplicationContext private val context: Context,
-        private val preferences: Preferences
+        private val preferences: Preferences,
+        @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : SharedPreferences.OnSharedPreferenceChangeListener {
-
-    private val ioDispatcher = Dispatchers.IO
     private var lastRateLimitedNotificationTime: Instant? = null
     private var notificationManager: NotificationManagerCompat
     private var geocoder: Geocoder = GeocoderNone()

@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Looper;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.WorkerThread;
 
 import org.eclipse.paho.client.mqttv3.IMqttAsyncClient;
@@ -18,6 +19,8 @@ import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
+import org.eclipse.paho.client.mqttv3.MqttPersistable;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.greenrobot.eventbus.EventBus;
 import org.jetbrains.annotations.NotNull;
@@ -51,8 +54,11 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -64,7 +70,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     private IMqttAsyncClient mqttClient;
 
     private String lastConnectionId;
-    private static EndpointState state;
+    private EndpointState state;
 
     private final MessageProcessor messageProcessor;
     private final RunThingsOnOtherThreads runThingsOnOtherThreads;
@@ -74,16 +80,17 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     private final Parser parser;
     private final Preferences preferences;
     private final Scheduler scheduler;
-    private final EventBus eventBus;
 
     private final Semaphore connectingLock = new Semaphore(1);
 
-    MessageProcessorEndpointMqtt(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus, RunThingsOnOtherThreads runThingsOnOtherThreads, Context applicationContext, ContactsRepo contactsRepo) {
+    private final BlockingQueue<Semaphore> reconnectQueue = new LinkedBlockingQueue<>(1);
+    private final Thread reconnectQueueHandler;
+
+    MessageProcessorEndpointMqtt(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, RunThingsOnOtherThreads runThingsOnOtherThreads, Context applicationContext, ContactsRepo contactsRepo) {
         super(messageProcessor);
         this.parser = parser;
         this.preferences = preferences;
         this.scheduler = scheduler;
-        this.eventBus = eventBus;
         this.messageProcessor = messageProcessor;
         this.runThingsOnOtherThreads = runThingsOnOtherThreads;
         this.applicationContext = applicationContext;
@@ -91,9 +98,47 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         if (preferences != null) {
             preferences.registerOnPreferenceChangedListener(this);
         }
+
+        /*
+        This interesting hack is needed because the Android Handler (API 21) doesn't support removing
+        runnables or tasks from the queue. *Every* MQTT-relevant settings change will trigger a
+        reconnect, so in the case where lots of MQTT settings change at once, you end up queueing a lot
+        of reconnect events (because they can take a non-zero amount of time to complete.
+
+        A reconnect task is simply a runnable of `() -> reconnect(Semaphore)`, so the task is just
+        defined by the semaphore.
+
+        To get around the limitations of the android Handler queue, we instead enqueue reconnect semaphores
+        on a 1-length blocking queue which is consumed by this thread. Any enqueue action should clear
+        the queue first, so that the queue slot always contains the most recent semaphore. Once the
+        reconnect process completes (as indicated by the ability of this thread to lock the semaphore),
+        the thread waits for the next to appear.
+        */
+
+        reconnectQueueHandler = new Thread(() -> {
+            Timber.d("MQTT reconnect queue handler started! %s", Thread.currentThread());
+            while (true) {
+                try {
+                    Timber.d("Waiting for a MQTT reconnect task %s", Thread.currentThread());
+                    Semaphore completionNotifier = reconnectQueue.take();
+                    Timber.d("Got an MQTT reconnect task %s", completionNotifier);
+                    runThingsOnOtherThreads.postOnNetworkHandlerDelayed(() -> reconnect(completionNotifier), 0);
+                    // Wait for the reconnect to complete
+                    completionNotifier.acquire();
+                    completionNotifier.release();
+                    Timber.d("MQTT reconnect task completed %s", completionNotifier);
+                } catch (InterruptedException e) {
+                    Timber.w(e, "MQTT Reconnect task queue interrupted");
+                    break;
+                }
+            }
+            Timber.d("MQTT reconnect queue handler stopping %s", Thread.currentThread());
+        }, "reconnectQueueHandler");
+        Timber.d("Starting MQTT reconnect queue handler %s", Thread.currentThread());
+        reconnectQueueHandler.start();
     }
 
-    void reconnectAndSendKeepalive(Semaphore completionNotifier) {
+    void reconnectAndSendKeepalive(@NonNull Semaphore completionNotifier) {
         if (!Thread.currentThread().getName().equals(NETWORK_HANDLER_THREAD_NAME)) {
             runThingsOnOtherThreads.postOnNetworkHandlerDelayed(() -> reconnectAndSendKeepalive(completionNotifier), 0);
             return;
@@ -103,9 +148,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
                 reconnect();
             }
         } finally {
-            if (completionNotifier != null) {
-                completionNotifier.release();
-            }
+            completionNotifier.release();
         }
     }
 
@@ -126,6 +169,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         }
 
         try {
+            Timber.d("Publishing %s message to MQTT on %s", m.getClass(), m.getTopic());
             IMqttDeliveryToken pubToken = this.mqttClient.publish(m.getTopic(), m.toJsonBytes(parser), m.getQos(), m.getRetained());
             long startTime = System.nanoTime();
             pubToken.waitForCompletion(TimeUnit.SECONDS.toMillis(30));
@@ -159,7 +203,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
         @Override
         public void connectionLost(Throwable cause) {
-            Timber.e(cause, "connectionLost error");
+            Timber.e(cause, "connectionLost handler %s", Thread.currentThread());
             scheduler.cancelMqttPing();
             changeState(EndpointState.DISCONNECTED.withError(cause));
             Timber.d("Releasing connectinglock");
@@ -217,10 +261,10 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         String cid = preferences.getClientId();
 
         String connectString = new URI(scheme, null, preferences.getHost(), preferences.getPort(), null, null, null).toString();
-        Timber.d("client id :%s, connect string: %s", cid, connectString);
+        Timber.d("client id: %s, connect string: %s", cid, connectString);
         try {
 
-            IMqttAsyncClient mqttClient = new MqttAsyncClient(connectString, cid, new MemoryPersistence());
+            IMqttAsyncClient mqttClient = new MqttAsyncClient(connectString, cid, new MqttDefaultFilePersistence(applicationContext.getFilesDir().toString()));
             mqttClient.setCallback(iCallbackClient);
             return mqttClient;
         } catch (IllegalArgumentException e) {
@@ -237,7 +281,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
         if (isConnected()) {
             Timber.d("already connected to broker");
-            changeState(getState()); // Background service might be restarted and not get the connection state
+            changeState(state); // Background service might be restarted and not get the connection state
             return;
         }
 
@@ -408,8 +452,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     }
 
     private void onConnect() {
-
-        Timber.d("MQTT connected!. Running onconnect handler (threadID %s)", Thread.currentThread());
+        Timber.d("Running onconnect handler %s", Thread.currentThread());
         scheduler.scheduleMqttMaybeReconnectAndPing(preferences.getKeepalive());
 
         Timber.d("Releasing connectinglock");
@@ -417,9 +460,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         changeState(EndpointState.CONNECTED);
 
         sendMessageConnectPressure = 0; // allow new connection attempts from queueMessageForSending
-        Timber.d("MQTT connected!. Running onconnect handler (threadID %s)", Thread.currentThread());
 
-        scheduler.cancelMqttReconnect();
         // Check if we're connecting to the same broker that we were already connected to
         String connectionId = String.format("%s/%s", mqttClient.getServerURI(), mqttClient.getClientId());
         if (lastConnectionId != null && !connectionId.equals(lastConnectionId)) {
@@ -496,36 +537,46 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
                     Timber.d("Disconnecting");
                     this.mqttClient.disconnect().waitForCompletion();
                 }
+                Timber.d("Closing mqtt Client");
+                this.mqttClient.close();
             }
         } catch (MqttException | IllegalArgumentException e) {
             Timber.e(e, "Error disconnecting from broker");
         } finally {
             changeState(EndpointState.DISCONNECTED);
             scheduler.cancelMqttPing();
-            scheduler.cancelMqttReconnect();
         }
     }
 
     public void reconnect() {
-        reconnect(null);
+        Semaphore lock = new Semaphore(1);
+        lock.acquireUninterruptibly();
+        reconnect(lock);
     }
 
-    public void reconnect(Semaphore completionNotifier) {
+    public void reconnect(@NonNull Semaphore completionNotifier) {
         if (!Thread.currentThread().getName().equals(NETWORK_HANDLER_THREAD_NAME)) {
-            runThingsOnOtherThreads.postOnNetworkHandlerDelayed(() -> reconnect(completionNotifier), 0);
+            Timber.d("Reconnecting on networkhandler");
+            synchronized (reconnectQueue) {
+                Semaphore existing = reconnectQueue.poll();
+                if (existing != null) {
+                    Timber.d("Cancelling and releasing previous reconnect attempt %s", existing);
+                    existing.release();
+                }
+                reconnectQueue.add(completionNotifier);
+            }
             return;
         }
-        if (isConnected() || isConnecting()) {
-            disconnect();
-        }
         try {
+            if (isConnected() || isConnecting()) {
+                Timber.d("We're already connected, so let's disconnect first");
+                disconnect();
+            }
             connectToBroker();
         } catch (MqttConnectionException | ConfigurationIncompleteException | AlreadyConnectingToBrokerException e) {
             Timber.e(e, "Failed to reconnect to MQTT broker");
         } finally {
-            if (completionNotifier != null) {
-                completionNotifier.release();
-            }
+            completionNotifier.release();
         }
     }
 
@@ -569,12 +620,11 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         }
     }
 
-    private static EndpointState getState() {
-        return state;
-    }
 
     @Override
     public void onDestroy() {
+        Timber.d("onDestroy called. Disconnecting");
+        reconnectQueueHandler.interrupt();
         disconnect();
         scheduler.cancelMqttTasks();
     }
@@ -583,7 +633,6 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     public void onCreateFromProcessor() {
         try {
             checkConfigurationComplete();
-            scheduler.scheduleMqttReconnect();
         } catch (ConfigurationIncompleteException e) {
             changeState(EndpointState.ERROR_CONFIGURATION.withError(e));
         }
@@ -607,7 +656,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
                 preferences.getPreferenceKey(R.string.preferenceKeyWS).equals(key) ||
                 preferences.getPreferenceKey(R.string.preferenceKeyDeviceId).equals(key)
         ) {
-            Timber.d("MQTT preferences changed. Clearing contact repo & Reconnecting to broker. ThreadId: %s", Thread.currentThread());
+            Timber.d("MQTT preferences changed (%s). Clearing contact repo & Reconnecting to broker. ThreadId: %s", key, Thread.currentThread());
             contactsRepo.clearAll();
             reconnect();
         }

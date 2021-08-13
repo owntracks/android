@@ -3,6 +3,7 @@ package org.owntracks.android.services;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import androidx.annotation.NonNull;
 import androidx.test.espresso.idling.CountingIdlingResource;
 
 import org.greenrobot.eventbus.EventBus;
@@ -18,7 +19,7 @@ import org.owntracks.android.model.messages.MessageCmd;
 import org.owntracks.android.model.messages.MessageLocation;
 import org.owntracks.android.model.messages.MessageTransition;
 import org.owntracks.android.services.worker.Scheduler;
-import org.owntracks.android.support.AppRestarter;
+
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.RunThingsOnOtherThreads;
@@ -115,23 +116,24 @@ public class MessageProcessor implements SharedPreferences.OnSharedPreferenceCha
     }
 
     public void reconnect() {
-        reconnect(null);
+        Semaphore lock = new Semaphore(1);
+        lock.acquireUninterruptibly();
+        reconnect(lock);
     }
 
-    public void reconnect(Semaphore completionNotifier) {
+    public void reconnect(@NonNull Semaphore completionNotifier) {
         if (endpoint == null) {
-            loadOutgoingMessageProcessor(); // The processor should take care of the reconnect on init
+            loadOutgoingMessageProcessor(preferences.getMode()); // The processor should take care of the reconnect on init
         } else if (endpoint instanceof MessageProcessorEndpointMqtt) {
             ((MessageProcessorEndpointMqtt) endpoint).reconnect(completionNotifier);
-        } else if (completionNotifier != null) {
-            // This is not an MQTT endpoint, but we've been given a notifier. Just release it.
+        } else {
             completionNotifier.release();
         }
     }
 
     public boolean statefulReconnectAndSendKeepalive() {
         if (endpoint == null)
-            loadOutgoingMessageProcessor();
+            loadOutgoingMessageProcessor(preferences.getMode());
 
         if (endpoint instanceof MessageProcessorEndpointMqtt) {
             Semaphore lock = new Semaphore(1);
@@ -155,7 +157,7 @@ public class MessageProcessor implements SharedPreferences.OnSharedPreferenceCha
 
     public boolean statefulCheckConnection() {
         if (endpoint == null)
-            loadOutgoingMessageProcessor();
+            loadOutgoingMessageProcessor(preferences.getMode());
 
         if (endpoint instanceof StatefulServiceMessageProcessor)
             return ((StatefulServiceMessageProcessor) endpoint).checkConnection();
@@ -175,7 +177,15 @@ public class MessageProcessor implements SharedPreferences.OnSharedPreferenceCha
         return false;
     }
 
-    private void loadOutgoingMessageProcessor() {
+    private void loadOutgoingMessageProcessor(int mode) {
+
+        if (this.endpoint != null) {
+            if ((mode == MessageProcessorEndpointHttp.MODE_ID && endpoint instanceof MessageProcessorEndpointHttp)
+                    || (mode == MessageProcessorEndpointMqtt.MODE_ID && endpoint instanceof MessageProcessorEndpointMqtt)) {
+                Timber.i("New requested mode is same as current endpoint. Not reloading.");
+                return;
+            }
+        }
         Timber.d("Reloading outgoing message processor to %s. ThreadID: %s", preferences.getMode(), Thread.currentThread());
         if (endpoint != null) {
             endpoint.onDestroy();
@@ -183,13 +193,13 @@ public class MessageProcessor implements SharedPreferences.OnSharedPreferenceCha
 
         endpointStateRepo.setQueueLength(outgoingQueue.size());
 
-        switch (preferences.getMode()) {
+        switch (mode) {
             case MessageProcessorEndpointHttp.MODE_ID:
                 this.endpoint = new MessageProcessorEndpointHttp(this, this.parser, this.preferences, this.scheduler, this.applicationContext);
                 break;
             case MessageProcessorEndpointMqtt.MODE_ID:
             default:
-                this.endpoint = new MessageProcessorEndpointMqtt(this, this.parser, this.preferences, this.scheduler, this.eventBus, this.runThingsOnOtherThreads, this.applicationContext, this.contactsRepo);
+                this.endpoint = new MessageProcessorEndpointMqtt(this, this.parser, this.preferences, this.scheduler, this.runThingsOnOtherThreads, this.applicationContext, this.contactsRepo);
 
         }
 
@@ -343,7 +353,7 @@ public class MessageProcessor implements SharedPreferences.OnSharedPreferenceCha
     }
 
     void onEndpointStateChanged(EndpointState newState) {
-        Timber.d("message:%s, ", newState.getMessage());
+        Timber.d("message: %s %s %s", newState, newState.getMessage(), Thread.currentThread());
         endpointStateRepo.setState(newState);
     }
 
@@ -436,9 +446,6 @@ public class MessageProcessor implements SharedPreferences.OnSharedPreferenceCha
                     }
                     reconnect();
                     break;
-                case RESTART:
-                    new AppRestarter(applicationContext, scheduler, this).restart();
-                    break;
                 default:
                     break;
             }
@@ -457,7 +464,7 @@ public class MessageProcessor implements SharedPreferences.OnSharedPreferenceCha
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (Objects.equals(key, applicationContext.getString(R.string.preferenceKeyModeId))) {
-            loadOutgoingMessageProcessor();
+            loadOutgoingMessageProcessor(preferences.getMode());
         }
     }
 }

@@ -260,17 +260,6 @@ class ParserTest {
     }
 
     @Test
-    fun `Parser can deserialize a restart cmd message`() {
-        val parser = Parser(encryptionProvider)
-        val input = "{\"_type\":\"cmd\", \"action\":\"restart\"}"
-        val messageBase = parser.fromJson(input)
-        assertEquals(MessageCmd::class.java, messageBase.javaClass)
-        val messageCmd = messageBase as MessageCmd
-        assertTrue(messageCmd.isValidMessage())
-        assertEquals(CommandAction.RESTART, messageCmd.action)
-    }
-
-    @Test
     fun `Parser can deserialize a setWaypoints cmd message`() {
         val parser = Parser(encryptionProvider)
         val input =

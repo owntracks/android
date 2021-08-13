@@ -103,9 +103,4 @@ public class Scheduler {
         WorkManager.getInstance(this.context).cancelAllWorkByTag(ONETIME_TASK_MQTT_RECONNECT);
         WorkManager.getInstance(this.context).enqueue(mqttReconnectWorkRequest);
     }
-
-    public void cancelMqttReconnect() {
-        Timber.d("Cancelling task tag %s threadID: %s", ONETIME_TASK_MQTT_RECONNECT, Thread.currentThread());
-        WorkManager.getInstance(this.context).cancelAllWorkByTag(ONETIME_TASK_MQTT_RECONNECT);
-    }
 }

@@ -254,6 +254,7 @@ dependencies {
 
     testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
     testImplementation("androidx.arch.core:core-testing:2.1.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${kotlinCoroutinesVersion}")
 
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
     androidTestImplementation("androidx.test:core-ktx:${androidxTestVersion}")
@@ -261,6 +262,7 @@ dependencies {
         exclude("org.jetbrains.kotlin")
     }
     androidTestImplementation("com.squareup.okhttp3:mockwebserver:${okHttpVersion}")
+    androidTestImplementation("com.github.davidepianca98.KMQTT:kmqtt:0.2.9")
 
     androidTestImplementation("androidx.test:rules:${androidxTestVersion}")
     androidTestImplementation("androidx.test:runner:${androidxTestVersion}")

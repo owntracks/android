@@ -192,7 +192,6 @@ class PreferencesGettersAndSetters(
                 on { getString(eq(R.string.preferenceKeyTLSClientCrtPassword)) } doReturn "tlsClientCrtPassword"
                 on { getString(eq(R.string.preferenceKeyTrackerId)) } doReturn "tid"
                 on { getString(eq(R.string.preferenceKeyURL)) } doReturn "url"
-                on { getString(eq(R.string.preferenceKeyUsepassword)) } doReturn "usePassword"
                 on { getString(eq(R.string.preferenceKeyUsername)) } doReturn "username"
                 on { getString(eq(R.string.preferenceKeyVersion)) } doReturn "_build"
                 on { getString(eq(R.string.preferenceKeyWS)) } doReturn "ws"

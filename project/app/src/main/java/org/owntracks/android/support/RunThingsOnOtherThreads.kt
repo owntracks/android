@@ -1,17 +1,14 @@
 package org.owntracks.android.support
 
-import android.content.Context
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.Looper
-import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class RunThingsOnOtherThreads @Inject constructor(@ApplicationContext appContext: Context) {
+class RunThingsOnOtherThreads @Inject constructor() {
     private val backgroundHandler: Handler
-    private val mainHandler: Handler
     private val networkHandler: Handler
 
     init {
@@ -23,18 +20,13 @@ class RunThingsOnOtherThreads @Inject constructor(@ApplicationContext appContext
 
         networkHandler = Handler(networkHandlerThread.looper)
         backgroundHandler = Handler(serviceHandlerThread.looper)
-        mainHandler = Handler(appContext.mainLooper)
     }
 
     fun getBackgroundLooper(): Looper {
         return backgroundHandler.looper
     }
 
-    fun postOnMainHandlerDelayed(r: Runnable, delayMilliseconds: Long = 0) {
-        mainHandler.postDelayed(r, delayMilliseconds)
-    }
-
-    fun postOnNetworkHandlerDelayed(r: Runnable, delayMilliseconds: Long = 0) {
+    fun postOnNetworkHandlerDelayed(r: Runnable, delayMilliseconds: Long) {
         networkHandler.postDelayed(r, delayMilliseconds)
     }
 

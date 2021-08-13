@@ -22,6 +22,7 @@
             app:useSimpleSummaryProvider="true" />
         <org.owntracks.android.support.widgets.EditIntegerPreference
             android:inputType="number"
+            android:defaultValue="@integer/valPort"
             app:key="@string/preferenceKeyPort"
             app:title="@string/preferencesPort"
             app:useSimpleSummaryProvider="true" />
@@ -59,16 +60,13 @@
             app:key="@string/preferenceKeyTLS"
             app:title="@string/tls" />
         <Preference
-            app:dependency="@string/preferenceKeyTLS"
             app:key="@string/preferenceKeyTLSCaCrt"
             app:title="@string/preferencesCaCrtPath" />
         <Preference
-            app:dependency="@string/preferenceKeyTLS"
             app:key="@string/preferenceKeyTLSClientCrt"
             app:title="@string/preferencesClientCrtPath" />
         <com.takisoft.preferencex.EditTextPreference
             android:inputType="textPassword"
-            app:dependency="@string/preferenceKeyTLS"
             app:key="@string/preferenceKeyTLSClientCrtPassword"
             app:title="@string/preferencesClientCrtPassword" />
     </PreferenceCategory>

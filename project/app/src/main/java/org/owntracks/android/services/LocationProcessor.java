@@ -57,7 +57,6 @@ public class LocationProcessor {
     }
 
     public void publishLocationMessage(@Nullable String trigger) {
-        Timber.v("trigger: %s. ThreadID: %s", trigger, Thread.currentThread());
         if (locationRepo.getCurrentPublishedLocation().getValue() == null) {
             Timber.e("no location available");
             return;
@@ -68,6 +67,7 @@ public class LocationProcessor {
 
         assert currentLocation != null;
         if (ignoreLowAccuracy(currentLocation)) {
+            Timber.d("Ignoring location %s,%s as below accuracy threshold: %s", currentLocation.getLatitude(), currentLocation.getLongitude(), currentLocation.getAccuracy());
             return;
         }
 

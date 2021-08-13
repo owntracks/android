@@ -13,16 +13,20 @@ class MQTTReconnectWorker(context: Context, workerParams: WorkerParameters, priv
     override fun doWork(): Result {
         Timber.i("MQTTReconnectWorker started on threadID: %s", Thread.currentThread())
         if (!messageProcessor.isEndpointConfigurationComplete) return Result.failure()
-        // We're going to try and call messagePrcessor.reconnect() here, which may reinvoke itself on
-        // a different thread. One option here was to faff around with futures, but it seems easier just to
-        // Create a semaphore, pass it to the method and then just wait for it to be released, no matter where from.
+        /*
+        We're going to try and call messageProcessor.reconnect() here, which may re-invoke itself on
+        a different thread. One option here was to faff around with futures, but it seems easier just to
+        Create a semaphore, pass it to the method and then just wait for it to be released, no matter where from.
+         */
         val lock = Semaphore(1)
         lock.acquireUninterruptibly()
         messageProcessor.reconnect(lock)
         return try {
             lock.acquire()
+            lock.release()
             if (messageProcessor.statefulCheckConnection()) Result.success() else Result.retry()
         } catch (e: InterruptedException) {
+            lock.release()
             Result.failure()
         }
     }

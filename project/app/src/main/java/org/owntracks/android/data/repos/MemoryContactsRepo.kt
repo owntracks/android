@@ -74,14 +74,18 @@ class MemoryContactsRepo @Inject constructor(
 
     @Synchronized
     override fun update(id: String, messageLocation: MessageLocation) {
+        Timber.d("Updating contacts repo with cohtact $id with a location message $messageLocation")
         var fusedContact = getById(id)
         if (fusedContact != null) {
+            Timber.d("Contact $id already exists")
             // If timestamp of last location message is <= the new location message, skip update. We either received an old or already known message.
             if (fusedContact.setMessageLocation(messageLocation)) {
+                Timber.d("Location is new for contact $id. Updating")
                 all.postValue(contacts)
                 eventBus.post(fusedContact)
             }
         } else {
+            Timber.d("Contact $id is new")
             fusedContact = FusedContact(id).apply {
                 setMessageLocation(messageLocation)
                 // We may have seen this contact id before, and it may have been removed from the repo

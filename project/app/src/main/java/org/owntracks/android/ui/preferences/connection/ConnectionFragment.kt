@@ -13,30 +13,41 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import org.owntracks.android.R
+import org.owntracks.android.di.IoDispatcher
+import org.owntracks.android.di.MainDispatcher
 import org.owntracks.android.services.MessageProcessorEndpointHttp
 import org.owntracks.android.support.Preferences
 import org.owntracks.android.ui.preferences.AbstractPreferenceFragment
 import timber.log.Timber
 import java.net.MalformedURLException
 import java.net.URL
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class ConnectionFragment : AbstractPreferenceFragment() {
     private var filePickerPreferenceKey: Int = 0
     private val hiddenHTTPModePreferences =
-            listOf(
-                    R.string.preferenceKeyHost,
-                    R.string.preferenceKeyPort,
-                    R.string.preferenceKeyClientId,
-                    R.string.preferenceKeyWS,
-                    R.string.preferencesSecurity,
-                    R.string.preferencesParameters
-            )
+        listOf(
+            R.string.preferenceKeyHost,
+            R.string.preferenceKeyPort,
+            R.string.preferenceKeyClientId,
+            R.string.preferenceKeyWS,
+            R.string.preferencesSecurity,
+            R.string.preferencesParameters
+        )
     private val hiddenMQTTModePreferences = listOf(R.string.preferenceKeyURL)
+
+    @Inject
+    @IoDispatcher
+    lateinit var ioDispatcher: CoroutineDispatcher
+
+    @Inject
+    @MainDispatcher
+    lateinit var mainDispatcher: CoroutineDispatcher
 
     @SuppressLint("ResourceType")
     override fun onCreatePreferencesFix(savedInstanceState: Bundle?, rootKey: String?) {
@@ -70,13 +81,13 @@ class ConnectionFragment : AbstractPreferenceFragment() {
             }
             setOnPreferenceClickListener {
                 this@ConnectionFragment.view?.findViewById<View>(preferenceKey)
-                        ?.run {
-                            certificateFieldPopupMenu(
-                                    this,
-                                    preferenceKey,
-                                    copyFileToPrivateStorageActivityResult
-                            ).show()
-                        }
+                    ?.run {
+                        certificateFieldPopupMenu(
+                            this,
+                            preferenceKey,
+                            copyFileToPrivateStorageActivityResult
+                        ).show()
+                    }
                 true
             }
         }
@@ -88,13 +99,13 @@ class ConnectionFragment : AbstractPreferenceFragment() {
             }
             setOnPreferenceClickListener {
                 this@ConnectionFragment.view?.findViewById<View>(preferenceKey)
-                        ?.run {
-                            certificateFieldPopupMenu(
-                                    this,
-                                    preferenceKey,
-                                    copyFileToPrivateStorageActivityResult
-                            ).show()
-                        }
+                    ?.run {
+                        certificateFieldPopupMenu(
+                            this,
+                            preferenceKey,
+                            copyFileToPrivateStorageActivityResult
+                        ).show()
+                    }
                 true
             }
         }
@@ -114,11 +125,11 @@ class ConnectionFragment : AbstractPreferenceFragment() {
     private fun setPreferenceVisibilityBasedOnMode(mode: Int) {
         hiddenHTTPModePreferences.forEach {
             findPreference<Preference>(getString(it))?.isVisible =
-                    mode != MessageProcessorEndpointHttp.MODE_ID
+                mode != MessageProcessorEndpointHttp.MODE_ID
         }
         hiddenMQTTModePreferences.forEach {
             findPreference<Preference>(getString(it))?.isVisible =
-                    mode == MessageProcessorEndpointHttp.MODE_ID
+                mode == MessageProcessorEndpointHttp.MODE_ID
         }
     }
 
@@ -126,55 +137,56 @@ class ConnectionFragment : AbstractPreferenceFragment() {
         when (preference?.key) {
             getString(R.string.preferenceKeyURL) -> {
                 displayPreferenceDialog(
-                        ValidatingEditTextPreferenceDialogFragmentCompat(
-                                R.string.preferencesUrlValidationError
-                        ) { url ->
-                            try {
-                                URL(url)
-                                true
-                            } catch (e: MalformedURLException) {
-                                false
-                            }
-                        }, preference.key
+                    ValidatingEditTextPreferenceDialogFragmentCompat(
+                        R.string.preferencesUrlValidationError
+                    ) { url ->
+                        try {
+                            URL(url)
+                            true
+                        } catch (e: MalformedURLException) {
+                            false
+                        }
+                    }, preference.key
                 )
             }
             getString(R.string.preferenceKeyPort) -> {
                 displayPreferenceDialog(
-                        ValidatingEditTextPreferenceDialogFragmentCompat(
-                                errorMessage = R.string.preferencesPortValidationError,
-                                maxLength = 5
-                        ) { port ->
-                            try {
-                                port.toInt() in 1..65535
-                            } catch (e: NumberFormatException) {
-                                true
-                            }
-                        }, preference.key
+                    ValidatingEditTextPreferenceDialogFragmentCompat(
+                        errorMessage = R.string.preferencesPortValidationError,
+                        maxLength = 5
+                    ) { port ->
+                        try {
+                            port.toInt() in 1..65535
+                        } catch (e: NumberFormatException) {
+                            true
+                        }
+                    }, preference.key
                 )
             }
             getString(R.string.preferenceKeyTrackerId) -> {
                 displayPreferenceDialog(
-                        ValidatingEditTextPreferenceDialogFragmentCompat(
-                                errorMessage = R.string.valEmpty,
-                                maxLength = 2
-                        ), preference.key
+                    ValidatingEditTextPreferenceDialogFragmentCompat(
+                        errorMessage = R.string.valEmpty,
+                        maxLength = 2
+                    ), preference.key
                 )
             }
             getString(R.string.preferenceKeyKeepalive) -> {
-                val minimumKeepalive = if (preferences.isExperimentalFeatureEnabled(Preferences.EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE)) 1 else preferences.minimumKeepalive
+                val minimumKeepalive =
+                    if (preferences.isExperimentalFeatureEnabled(Preferences.EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE)) 1 else preferences.minimumKeepalive
                 displayPreferenceDialog(
-                        ValidatingEditTextPreferenceDialogFragmentCompat(
-                                errorMessage = R.string.preferencesKeepaliveValidationError,
-                                errorArgs = minimumKeepalive
-                        )
-                        { keepalive ->
-                            try {
-                                keepalive.toInt() >= minimumKeepalive
-                            } catch (e: NumberFormatException) {
-                                false
-                            }
-                        },
-                        preference.key
+                    ValidatingEditTextPreferenceDialogFragmentCompat(
+                        errorMessage = R.string.preferencesKeepaliveValidationError,
+                        errorArgs = minimumKeepalive
+                    )
+                    { keepalive ->
+                        try {
+                            keepalive.toInt() >= minimumKeepalive
+                        } catch (e: NumberFormatException) {
+                            false
+                        }
+                    },
+                    preference.key
                 )
             }
             else -> super.onDisplayPreferenceDialog(preference)
@@ -185,63 +197,63 @@ class ConnectionFragment : AbstractPreferenceFragment() {
     private fun uriToFilename(uri: Uri): String {
         if (uri.scheme.equals("content")) {
             requireContext().applicationContext.contentResolver.query(uri, null, null, null, null)
-                    .use { cursor ->
-                        if (cursor != null && cursor.moveToFirst()) {
-                            val index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-                            if (index < 0) {
-                                throw IndexOutOfBoundsException("DISPLAY_NAME column not present in data store")
-                            }
-                            return cursor.getString(index)
+                .use { cursor ->
+                    if (cursor != null && cursor.moveToFirst()) {
+                        val index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                        if (index < 0) {
+                            throw IndexOutOfBoundsException("DISPLAY_NAME column not present in data store")
                         }
+                        return cursor.getString(index)
                     }
+                }
         }
         return ""
     }
 
     private val copyFileToPrivateStorageActivityResult =
-            registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-                lifecycleScope.launch(Dispatchers.IO) {
-                    uri?.run {
-                        Timber.v("CopyTask with URI: %s", this)
-                        val filename: String = uriToFilename(this)
-                        Timber.v("filename for save is: %s", filename)
-                        requireContext().applicationContext.contentResolver.openInputStream(this)
-                                .use { inputStream ->
-                                    requireContext().applicationContext.openFileOutput(
-                                            filename,
-                                            Context.MODE_PRIVATE
-                                    )
-                                            .use { outputStream ->
-                                                val buffer = ByteArray(256)
-                                                var bytesRead: Int
-                                                while (inputStream!!.read(buffer)
-                                                                .also { bytesRead = it } != -1
-                                                ) {
-                                                    outputStream.write(buffer, 0, bytesRead)
-                                                }
-                                            }
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            lifecycleScope.launch(ioDispatcher) {
+                uri?.run {
+                    Timber.v("CopyTask with URI: %s", this)
+                    val filename: String = uriToFilename(this)
+                    Timber.v("filename for save is: %s", filename)
+                    requireContext().applicationContext.contentResolver.openInputStream(this)
+                        .use { inputStream ->
+                            requireContext().applicationContext.openFileOutput(
+                                filename,
+                                Context.MODE_PRIVATE
+                            )
+                                .use { outputStream ->
+                                    val buffer = ByteArray(256)
+                                    var bytesRead: Int
+                                    while (inputStream!!.read(buffer)
+                                            .also { bytesRead = it } != -1
+                                    ) {
+                                        outputStream.write(buffer, 0, bytesRead)
+                                    }
                                 }
-                        Timber.v("copied file to private storage: %s", filename)
-                        lifecycleScope.launch(Dispatchers.Main) {
-                            preferences.setPreference(filePickerPreferenceKey, filename)
-                            findPreference<Preference>(getString(filePickerPreferenceKey))?.run {
-                                summaryProvider = summaryProvider
-                            }
+                        }
+                    Timber.v("copied file to private storage: %s", filename)
+                    lifecycleScope.launch(mainDispatcher) {
+                        preferences.setPreference(filePickerPreferenceKey, filename)
+                        findPreference<Preference>(getString(filePickerPreferenceKey))?.run {
+                            summaryProvider = summaryProvider
                         }
                     }
                 }
             }
+        }
 
     private fun certificateFieldPopupMenu(
-            view: View,
-            @StringRes preferenceKey: Int,
-            activityResultLauncher: ActivityResultLauncher<String>
+        view: View,
+        @StringRes preferenceKey: Int,
+        activityResultLauncher: ActivityResultLauncher<String>
     ) = PopupMenu(requireContext(), view).apply {
         menuInflater.inflate(R.menu.picker, menu)
         setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.clear -> {
-                    lifecycleScope.launch(Dispatchers.IO) {
+                    lifecycleScope.launch(ioDispatcher) {
                         val filename = preferences.getPreference(preferenceKey) as String
                         try {
                             Timber.v("Deleting certificate: $filename")
@@ -250,7 +262,7 @@ class ConnectionFragment : AbstractPreferenceFragment() {
                         } catch (e: Exception) {
                             Timber.w(e, "Unable to remove certificate file $filename")
                         }
-                        lifecycleScope.launch(Dispatchers.Main) {
+                        lifecycleScope.launch(mainDispatcher) {
                             preferences.setPreference(preferenceKey, "")
                             findPreference<Preference>(getString(preferenceKey))?.run {
                                 summaryProvider = summaryProvider

@@ -11,7 +11,7 @@
     <integer name="valLocatorInterval">900</integer>
     <integer name="valMoveModeLocatorInterval">10</integer>
     <string name="valIgnoreStaleLocations" translatable="false">0</string>
-    <integer name="valIgnoreInaccurateLocations">0</integer>
+    <integer name="valIgnoreInaccurateLocations">500</integer>
     <integer name="valModeId">0</integer>
     <integer name="valMonitoring">1</integer>
     <integer name="valMqttProtocolLevel">4</integer>

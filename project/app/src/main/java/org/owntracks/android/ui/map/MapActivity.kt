@@ -36,6 +36,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.owntracks.android.App
@@ -43,6 +44,7 @@ import org.owntracks.android.BR
 import org.owntracks.android.R
 import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.databinding.UiMapBinding
+import org.owntracks.android.di.MainDispatcher
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.location.*
 import org.owntracks.android.model.FusedContact
@@ -101,6 +103,10 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
     @Inject
     lateinit var requirementsChecker: RequirementsChecker
 
+    @Inject
+    @MainDispatcher
+    lateinit var mainDispatcher: CoroutineDispatcher
+
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             Timber.d("Service connected to MapActivity")
@@ -123,6 +129,8 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
             }
 
             super.onCreate(savedInstanceState)
+
+            preferences.setDefaultPreferencesFromResources()
 
             if (!preferences.isSetupCompleted) {
                 navigator.startActivity(WelcomeActivity::class.java)

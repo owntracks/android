@@ -5,6 +5,8 @@ import android.content.res.Resources
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestCoroutineDispatcher
 import org.greenrobot.eventbus.EventBus
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -38,11 +40,15 @@ class LoadViewModelTest {
 
     }
 
+    @ExperimentalCoroutinesApi
     @Test
     fun `When invalid JSON on an inline owntracks config URL, then the error is correctly set`() {
         val parser = Parser(null)
         val preferences = Preferences(mockContext, null, preferencesStore)
-        val vm = LoadViewModel(preferences, parser, InMemoryWaypointsRepo(eventBus))
+        val vm = LoadViewModel(
+            preferences, parser, InMemoryWaypointsRepo(eventBus),
+            TestCoroutineDispatcher()
+        )
 
         vm.extractPreferences(URI("owntracks:///config?inline=e30k"))
         assertEquals("", vm.displayedConfiguration.value)
