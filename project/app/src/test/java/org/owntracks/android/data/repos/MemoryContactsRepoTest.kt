@@ -16,7 +16,6 @@ import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.support.ContactBitmapAndName
 import org.owntracks.android.support.ContactBitmapAndNameMemoryCache
-import org.owntracks.android.support.Events.EndpointChanged
 import org.owntracks.android.support.Events.ModeChanged
 
 class MemoryContactsRepoTest {
@@ -114,13 +113,6 @@ class MemoryContactsRepoTest {
     fun `given a non-empty repo, when the mode change event is called, the repo is emptied`() {
         contactsRepo!!.update(CONTACT_ID, messageLocation)
         (contactsRepo as MemoryContactsRepo?)!!.onEventMainThread(ModeChanged(1))
-        assertTrue(contactsRepo!!.all.value!!.isEmpty())
-    }
-
-    @Test
-    fun `given a non-empty repo, when the endpoint change event is called, the repo is emptied`() {
-        contactsRepo!!.update(CONTACT_ID, messageLocation)
-        (contactsRepo as MemoryContactsRepo?)!!.onEventMainThread(EndpointChanged())
         assertTrue(contactsRepo!!.all.value!!.isEmpty())
     }
 
