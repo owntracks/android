@@ -1,6 +1,6 @@
 package org.owntracks.android.support
 
-import org.owntracks.android.support.preferences.OnModeChangedPreferenceChangedListener
+import android.content.SharedPreferences
 import org.owntracks.android.support.preferences.PreferenceDataStoreShim
 
 class InMemoryPreferencesStore : PreferenceDataStoreShim() {
@@ -55,11 +55,11 @@ class InMemoryPreferencesStore : PreferenceDataStoreShim() {
         valueMap.remove(key)
     }
 
-    override fun registerOnSharedPreferenceChangeListener(listenerModeChanged: OnModeChangedPreferenceChangedListener) {
-        TODO("Not yet implemented")
+    override fun registerOnSharedPreferenceChangeListener(listenerModeChanged: SharedPreferences.OnSharedPreferenceChangeListener) {
+
     }
 
-    override fun unregisterOnSharedPreferenceChangeListener(listenerModeChanged: OnModeChangedPreferenceChangedListener) {
-        TODO("Not yet implemented")
+    override fun unregisterOnSharedPreferenceChangeListener(listenerModeChanged: SharedPreferences.OnSharedPreferenceChangeListener) {
+
     }
 }

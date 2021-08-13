@@ -1,12 +1,12 @@
 package org.owntracks.android.services;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import androidx.test.espresso.idling.CountingIdlingResource;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
+import org.owntracks.android.R;
 import org.owntracks.android.data.EndpointState;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.data.repos.EndpointStateRepo;
@@ -19,7 +19,6 @@ import org.owntracks.android.model.messages.MessageLocation;
 import org.owntracks.android.model.messages.MessageTransition;
 import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.AppRestarter;
-import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.RunThingsOnOtherThreads;
@@ -28,12 +27,14 @@ import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -46,7 +47,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext;
 import timber.log.Timber;
 
 @Singleton
-public class MessageProcessor {
+public class MessageProcessor implements SharedPreferences.OnSharedPreferenceChangeListener {
     private final EventBus eventBus;
     private final ContactsRepo contactsRepo;
     private final WaypointsRepo waypointsRepo;
@@ -58,19 +59,15 @@ public class MessageProcessor {
 
     private final ServiceBridge serviceBridge;
     private final CountingIdlingResource outgoingQueueIdlingResource;
-    private EndpointStateRepo endpointStateRepo;
-    private AppRestarter appRestarter;
+    private final EndpointStateRepo endpointStateRepo;
     private final RunThingsOnOtherThreads runThingsOnOtherThreads;
     private MessageProcessorEndpoint endpoint;
 
-    private boolean acceptMessages = false;
     private final BlockingDeque<MessageBase> outgoingQueue;
     private Thread backgroundDequeueThread;
 
     private static final long SEND_FAILURE_BACKOFF_INITIAL_WAIT = TimeUnit.SECONDS.toMillis(1);
     private static final long SEND_FAILURE_BACKOFF_MAX_WAIT = TimeUnit.MINUTES.toMillis(2);
-
-    private boolean initialized = false;
 
     private final Object locker = new Object();
     private ScheduledFuture<?> waitFuture = null;
@@ -102,8 +99,9 @@ public class MessageProcessor {
         this.serviceBridge = serviceBridge;
         this.outgoingQueueIdlingResource = outgoingQueueIdlingResource;
         this.endpointStateRepo = endpointStateRepo;
-        this.eventBus.register(this);
         this.runThingsOnOtherThreads = runThingsOnOtherThreads;
+
+        preferences.registerOnPreferenceChangedListener(this);
 
         outgoingQueue = new BlockingDequeThatAlsoSometimesPersistsThingsToDiskMaybe(10000, applicationContext.getFilesDir(), parser);
         synchronized (outgoingQueue) {
@@ -112,15 +110,8 @@ public class MessageProcessor {
             }
             Timber.d("Initializing the outgoingqueueidlingresource at %s", outgoingQueue.size());
         }
-    }
-
-    synchronized public void initialize() {
-        if (!initialized) {
-            Timber.d("Initializing MessageProcessor");
-            onEndpointStateChanged(EndpointState.INITIAL);
-            reconnect();
-            initialized = true;
-        }
+        onEndpointStateChanged(EndpointState.INITIAL);
+        reconnect();
     }
 
     public void reconnect() {
@@ -185,7 +176,7 @@ public class MessageProcessor {
     }
 
     private void loadOutgoingMessageProcessor() {
-        Timber.d("Reloading outgoing message processor. ThreadID: %s", Thread.currentThread());
+        Timber.d("Reloading outgoing message processor to %s. ThreadID: %s", preferences.getMode(), Thread.currentThread());
         if (endpoint != null) {
             endpoint.onDestroy();
         }
@@ -198,7 +189,7 @@ public class MessageProcessor {
                 break;
             case MessageProcessorEndpointMqtt.MODE_ID:
             default:
-                this.endpoint = new MessageProcessorEndpointMqtt(this, this.parser, this.preferences, this.scheduler, this.eventBus, this.runThingsOnOtherThreads, this.applicationContext, this.endpointStateRepo);
+                this.endpoint = new MessageProcessorEndpointMqtt(this, this.parser, this.preferences, this.scheduler, this.eventBus, this.runThingsOnOtherThreads, this.applicationContext, this.contactsRepo);
 
         }
 
@@ -209,11 +200,9 @@ public class MessageProcessor {
         }
 
         this.endpoint.onCreateFromProcessor();
-        acceptMessages = true;
     }
 
     public void queueMessageForSending(MessageBase message) {
-        if (!acceptMessages) return;
         outgoingQueueIdlingResource.increment();
         Timber.d("Queueing messageId:%s, queueLength:%s, ThreadID: %s", message.getMessageId(), outgoingQueue.size(), Thread.currentThread());
         synchronized (outgoingQueue) {
@@ -296,7 +285,6 @@ public class MessageProcessor {
                 if (previousMessageFailed && retriesToGo <= 0) {
                     previousMessageFailed = false;
                 }
-
                 if (previousMessageFailed) {
                     Timber.i("Waiting for %s s before retrying", retryWait / 1000);
                     waitFuture = scheduler.schedule(() -> {
@@ -336,20 +324,6 @@ public class MessageProcessor {
                 locker.notify();
             }
         }
-    }
-
-    @SuppressWarnings("UnusedParameters")
-    @Subscribe(priority = 10, threadMode = ThreadMode.ASYNC)
-    public void onEvent(Events.ModeChanged event) {
-        acceptMessages = false;
-        loadOutgoingMessageProcessor();
-    }
-
-    @SuppressWarnings("UnusedParameters")
-    @Subscribe(priority = 10, threadMode = ThreadMode.ASYNC)
-    public void onEvent(Events.EndpointChanged event) {
-        acceptMessages = false;
-        loadOutgoingMessageProcessor();
     }
 
     void onMessageDelivered(MessageBase messageBase) {
@@ -478,5 +452,12 @@ public class MessageProcessor {
     public void stopSendingMessages() {
         Timber.d("Interrupting background sending thread");
         backgroundDequeueThread.interrupt();
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (Objects.equals(key, applicationContext.getString(R.string.preferenceKeyModeId))) {
+            loadOutgoingMessageProcessor();
+        }
     }
 }

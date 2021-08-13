@@ -6,14 +6,14 @@ import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import org.junit.Assert
 import org.junit.Test
-import org.owntracks.android.data.repos.EndpointStateRepo
+import org.owntracks.android.data.repos.ContactsRepo
 
 class MessageProcessorEndpointMqttTest {
     private val applicationContext: Context = mock {
         on { getString(any()) } doReturn "owntracks/+/+"
     }
 
-    private val mockEndpointStateRepo: EndpointStateRepo = mock {}
+    private val mockContactsRepo: ContactsRepo = mock {}
 
     @Test
     fun `MQTT Endpoint generates correct topics to subscribe to from single default subTopic`() {
@@ -25,7 +25,7 @@ class MessageProcessorEndpointMqttTest {
             null,
             null,
             applicationContext,
-            mockEndpointStateRepo
+            mockContactsRepo
         )
         val subTopic = "owntracks/+/+"
         val topics =
@@ -50,7 +50,7 @@ class MessageProcessorEndpointMqttTest {
             null,
             null,
             applicationContext,
-            mockEndpointStateRepo
+            mockContactsRepo
         )
         val subTopic = "othertopic/+/+"
         val topics =
@@ -70,7 +70,7 @@ class MessageProcessorEndpointMqttTest {
             null,
             null,
             applicationContext,
-            mockEndpointStateRepo
+            mockContactsRepo
         )
         val subTopic = "owntracks/+/+ othertopic/+"
         val topics =
@@ -93,7 +93,7 @@ class MessageProcessorEndpointMqttTest {
             null,
             null,
             applicationContext,
-            mockEndpointStateRepo
+            mockContactsRepo
         )
         val subTopic = "owntracks/+/+ othertopic/+"
         val topics =
@@ -116,7 +116,7 @@ class MessageProcessorEndpointMqttTest {
             null,
             null,
             applicationContext,
-            mockEndpointStateRepo
+            mockContactsRepo
         )
         val subTopic = "owntracks/#"
         val topics =

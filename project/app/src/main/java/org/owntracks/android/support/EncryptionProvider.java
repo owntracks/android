@@ -1,6 +1,9 @@
 package org.owntracks.android.support;
 
 
+import static org.libsodium.jni.SodiumConstants.XSALSA20_POLY1305_SECRETBOX_KEYBYTES;
+import static org.libsodium.jni.SodiumConstants.XSALSA20_POLY1305_SECRETBOX_NONCEBYTES;
+
 import android.content.SharedPreferences;
 import android.util.Base64;
 
@@ -10,19 +13,13 @@ import org.libsodium.jni.crypto.Random;
 import org.libsodium.jni.crypto.SecretBox;
 import org.owntracks.android.R;
 
-import javax.inject.Singleton;
-
-import org.owntracks.android.support.preferences.OnModeChangedPreferenceChangedListener;
-
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import timber.log.Timber;
 
-import static org.libsodium.jni.SodiumConstants.XSALSA20_POLY1305_SECRETBOX_KEYBYTES;
-import static org.libsodium.jni.SodiumConstants.XSALSA20_POLY1305_SECRETBOX_NONCEBYTES;
-
 @Singleton
-public class EncryptionProvider {
+public class EncryptionProvider implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final int crypto_secretbox_NONCEBYTES = XSALSA20_POLY1305_SECRETBOX_NONCEBYTES;
     private static final int crypto_secretbox_KEYBYTES = XSALSA20_POLY1305_SECRETBOX_KEYBYTES;
 
@@ -66,7 +63,7 @@ public class EncryptionProvider {
     @Inject
     public EncryptionProvider(Preferences preferences) {
         this.preferences = preferences;
-        preferences.registerOnPreferenceChangedListener(new SecretBoxManager());
+        preferences.registerOnPreferenceChangedListener(this);
         initializeSecretBox();
     }
 
@@ -98,20 +95,9 @@ public class EncryptionProvider {
         return Base64.encodeToString(out, Base64.NO_WRAP);
     }
 
-    private class SecretBoxManager implements OnModeChangedPreferenceChangedListener {
-        SecretBoxManager() {
-            preferences.registerOnPreferenceChangedListener(this);
-        }
-
-        @Override
-        public void onAttachAfterModeChanged() {
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (preferences.getPreferenceKey(R.string.preferenceKeyEncryptionKey).equals(key))
             initializeSecretBox();
-        }
-
-        @Override
-        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            if (preferences.getPreferenceKey(R.string.preferenceKeyEncryptionKey).equals(key))
-                initializeSecretBox();
-        }
     }
 }

@@ -16,7 +16,6 @@ import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.perfLog
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.support.Preferences
-import org.owntracks.android.support.preferences.OnModeChangedPreferenceChangedListener
 import org.owntracks.android.ui.map.MapActivity
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneOffset.UTC
@@ -29,7 +28,7 @@ import javax.inject.Singleton
 class GeocoderProvider @Inject constructor(
         @ApplicationContext private val context: Context,
         private val preferences: Preferences
-) {
+) : SharedPreferences.OnSharedPreferenceChangeListener {
 
     private val ioDispatcher = Dispatchers.IO
     private var lastRateLimitedNotificationTime: Instant? = null
@@ -147,30 +146,22 @@ class GeocoderProvider @Inject constructor(
 
     init {
         setGeocoderProvider(context, preferences)
-        preferences.registerOnPreferenceChangedListener(object :
-                OnModeChangedPreferenceChangedListener {
-            override fun onAttachAfterModeChanged() {
-
-            }
-
-            override fun onSharedPreferenceChanged(
-                    sharedPreferences: SharedPreferences?,
-                    key: String?
-            ) {
-                if (key == preferences.getPreferenceKey(R.string.preferenceKeyReverseGeocodeProvider) || key == preferences.getPreferenceKey(
-                                R.string.preferenceKeyOpencageGeocoderApiKey
-                        )
-                ) {
-                    setGeocoderProvider(context, preferences)
-                }
-            }
-        })
+        preferences.registerOnPreferenceChangedListener(this)
         notificationManager = NotificationManagerCompat.from(context)
     }
 
     companion object {
         const val ERROR_NOTIFICATION_CHANNEL_ID = "Errors"
         const val GEOCODE_ERROR_NOTIFICATION_TAG = "GeocoderError"
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        if (key == preferences.getPreferenceKey(R.string.preferenceKeyReverseGeocodeProvider) || key == preferences.getPreferenceKey(
+                        R.string.preferenceKeyOpencageGeocoderApiKey
+                )
+        ) {
+            setGeocoderProvider(context, preferences)
+        }
     }
 }
 

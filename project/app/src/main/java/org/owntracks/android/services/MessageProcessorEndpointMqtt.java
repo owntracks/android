@@ -25,19 +25,17 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.owntracks.android.R;
 import org.owntracks.android.data.EndpointState;
-import org.owntracks.android.data.repos.EndpointStateRepo;
+import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.model.messages.MessageBase;
 import org.owntracks.android.model.messages.MessageCard;
 import org.owntracks.android.model.messages.MessageClear;
 import org.owntracks.android.services.worker.Scheduler;
-import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.SocketFactory;
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException;
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
-import org.owntracks.android.support.preferences.OnModeChangedPreferenceChangedListener;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -60,7 +58,7 @@ import java.util.concurrent.TimeUnit;
 
 import timber.log.Timber;
 
-public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint implements StatefulServiceMessageProcessor, OnModeChangedPreferenceChangedListener {
+public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint implements StatefulServiceMessageProcessor, SharedPreferences.OnSharedPreferenceChangeListener {
     public static final int MODE_ID = 0;
 
     private IMqttAsyncClient mqttClient;
@@ -71,6 +69,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     private final MessageProcessor messageProcessor;
     private final RunThingsOnOtherThreads runThingsOnOtherThreads;
     private final Context applicationContext;
+    private final ContactsRepo contactsRepo;
 
     private final Parser parser;
     private final Preferences preferences;
@@ -79,7 +78,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
     private final Semaphore connectingLock = new Semaphore(1);
 
-    MessageProcessorEndpointMqtt(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus, RunThingsOnOtherThreads runThingsOnOtherThreads, Context applicationContext, EndpointStateRepo endpointStateRepo) {
+    MessageProcessorEndpointMqtt(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus, RunThingsOnOtherThreads runThingsOnOtherThreads, Context applicationContext, ContactsRepo contactsRepo) {
         super(messageProcessor);
         this.parser = parser;
         this.preferences = preferences;
@@ -88,6 +87,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         this.messageProcessor = messageProcessor;
         this.runThingsOnOtherThreads = runThingsOnOtherThreads;
         this.applicationContext = applicationContext;
+        this.contactsRepo = contactsRepo;
         if (preferences != null) {
             preferences.registerOnPreferenceChangedListener(this);
         }
@@ -423,7 +423,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         // Check if we're connecting to the same broker that we were already connected to
         String connectionId = String.format("%s/%s", mqttClient.getServerURI(), mqttClient.getClientId());
         if (lastConnectionId != null && !connectionId.equals(lastConnectionId)) {
-            eventBus.post(new Events.EndpointChanged());
+            contactsRepo.clearAll();
             lastConnectionId = connectionId;
             Timber.v("lastConnectionId changed to: %s", lastConnectionId);
         }
@@ -531,8 +531,6 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
     @Override
     public void checkConfigurationComplete() throws ConfigurationIncompleteException {
-        // Required to connect: host, username (only send when auth is enabled)
-        // When auth is enabled, password (unless usePassword is set to false which only sends username)
         if (preferences.getHost().trim().isEmpty()) {
             throw new ConfigurationIncompleteException("Host missing");
         }
@@ -592,11 +590,6 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     }
 
     @Override
-    public void onAttachAfterModeChanged() {
-        //NOOP
-    }
-
-    @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (preferences.getMode() != MessageProcessorEndpointMqtt.MODE_ID) {
             return;
@@ -604,6 +597,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         if (preferences.getPreferenceKey(R.string.preferenceKeyMqttProtocolLevel).equals(key) ||
                 preferences.getPreferenceKey(R.string.preferenceKeyHost).equals(key) ||
                 preferences.getPreferenceKey(R.string.preferenceKeyPassword).equals(key) ||
+                preferences.getPreferenceKey(R.string.preferenceKeyUsername).equals(key) ||
                 preferences.getPreferenceKey(R.string.preferenceKeyPort).equals(key) ||
                 preferences.getPreferenceKey(R.string.preferenceKeyClientId).equals(key) ||
                 preferences.getPreferenceKey(R.string.preferenceKeyTLS).equals(key) ||
@@ -613,7 +607,8 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
                 preferences.getPreferenceKey(R.string.preferenceKeyWS).equals(key) ||
                 preferences.getPreferenceKey(R.string.preferenceKeyDeviceId).equals(key)
         ) {
-            Timber.d("MQTT preferences changed. Reconnecting to broker. ThreadId: %s", Thread.currentThread());
+            Timber.d("MQTT preferences changed. Clearing contact repo & Reconnecting to broker. ThreadId: %s", Thread.currentThread());
+            contactsRepo.clearAll();
             reconnect();
         }
     }

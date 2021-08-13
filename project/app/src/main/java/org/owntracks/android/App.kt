@@ -21,7 +21,6 @@ import org.owntracks.android.di.CustomBindingComponentBuilder
 import org.owntracks.android.di.CustomBindingEntryPoint
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.logging.TimberInMemoryLogTree
-import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.Preferences
 import org.owntracks.android.support.RunThingsOnOtherThreads
@@ -39,9 +38,6 @@ class App : Application() {
 
     @Inject
     lateinit var runThingsOnOtherThreads: RunThingsOnOtherThreads
-
-    @Inject
-    lateinit var messageProcessor: MessageProcessor
 
     @Inject
     lateinit var workerFactory: WorkerFactory
@@ -108,11 +104,6 @@ class App : Application() {
             )
         }
         preferences.checkFirstStart()
-
-        // Running this on a background thread will deadlock FirebaseJobDispatcher.
-        // Initialize will call Scheduler to connect off the main thread anyway.
-        runThingsOnOtherThreads.postOnMainHandlerDelayed({ messageProcessor.initialize() }, 510)
-
 
         when (preferences.theme) {
             Preferences.NIGHT_MODE_AUTO -> AppCompatDelegate.setDefaultNightMode(Preferences.SYSTEM_NIGHT_AUTO_MODE)

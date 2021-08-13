@@ -1,5 +1,6 @@
 package org.owntracks.android.support.preferences
 
+import android.content.SharedPreferences
 import androidx.preference.PreferenceDataStore
 
 /***
@@ -10,6 +11,6 @@ abstract class PreferenceDataStoreShim : PreferenceDataStore() {
 
     abstract fun remove(key: String)
 
-    abstract fun registerOnSharedPreferenceChangeListener(listenerModeChanged: OnModeChangedPreferenceChangedListener)
-    abstract fun unregisterOnSharedPreferenceChangeListener(listenerModeChanged: OnModeChangedPreferenceChangedListener)
+    abstract fun registerOnSharedPreferenceChangeListener(listenerModeChanged: SharedPreferences.OnSharedPreferenceChangeListener)
+    abstract fun unregisterOnSharedPreferenceChangeListener(listenerModeChanged: SharedPreferences.OnSharedPreferenceChangeListener)
 }

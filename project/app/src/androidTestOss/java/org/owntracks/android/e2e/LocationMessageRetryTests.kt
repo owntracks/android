@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class LocationMessageRetryTest : TestWithAnActivity<MapActivity>(MapActivity::class.java, false) {
+class LocationMessageRetryTests : TestWithAnActivity<MapActivity>(MapActivity::class.java, false) {
 
     private val mockWebServer = MockWebServer()
 
@@ -95,9 +95,9 @@ class LocationMessageRetryTest : TestWithAnActivity<MapActivity>(MapActivity::cl
         IdlingRegistry.getInstance().register(locationIdlingResource)
         clickOnAndWait(R.id.menu_report)
 
-        val networkIdlingResource =
+        val outgoingQueueIdlingResource =
             baristaRule.activityTestRule.activity.outgoingQueueIdlingResource
-        IdlingRegistry.getInstance().register(networkIdlingResource)
+        IdlingRegistry.getInstance().register(outgoingQueueIdlingResource)
 
         openDrawer()
         clickOnAndWait(R.string.title_activity_status)
