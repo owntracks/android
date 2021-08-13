@@ -49,7 +49,9 @@ class MapLocationSource internal constructor(
 
     override fun deactivate() {
         Timber.d("Deactivating mapLocationSource with client=$locationProviderClient")
-        locationProviderClient.removeLocationUpdates(callbackWrapper)
+        if (this::callbackWrapper.isInitialized) {
+            locationProviderClient.removeLocationUpdates(callbackWrapper)
+        }
     }
 
     override fun getLastKnownLocation(): Location? = lastKnownLocation
