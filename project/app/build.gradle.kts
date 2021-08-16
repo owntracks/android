@@ -232,7 +232,7 @@ dependencies {
     implementation("com.mikepenz:materialdrawer:6.1.2@aar") { isTransitive = true }
     implementation("com.mikepenz:materialize:1.2.1@aar")
 
-    implementation("com.jakewharton:process-phoenix:2.1.1")
+    implementation("com.jakewharton:process-phoenix:2.1.2")
     implementation("com.squareup.tape2:tape:2.0.0-beta1")
 
     // These Java EE libs are no longer included in JDKs, so we include explicitly
