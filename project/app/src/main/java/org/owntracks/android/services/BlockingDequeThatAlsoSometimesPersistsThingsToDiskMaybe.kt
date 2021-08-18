@@ -43,8 +43,12 @@ class BlockingDequeThatAlsoSometimesPersistsThingsToDiskMaybe(
             headQueueFile?.run { ObjectQueue.create(this, messageBaseConverter) }
                 ?: ObjectQueue.createInMemory()
 
-        super.addAll(parallelDiskQueueHead.asList())
-        super.addAll(parallelDiskQueue.asList())
+        (parallelDiskQueueHead.asList() + parallelDiskQueue.asList()).forEach {
+            if (!offerLast(it)) {
+                Timber.w("On-disk queue contains message that won't fit into queue. Dropping: $it")
+            }
+        }
+        resyncQueueToDisk()
     }
 
     private fun diskBackedQueueOrNull(file: File) = try {
@@ -108,11 +112,15 @@ class BlockingDequeThatAlsoSometimesPersistsThingsToDiskMaybe(
         }
     }
 
-    override fun addFirst(messageBase: MessageBase?) {
-        super.addFirst(messageBase)
-        messageBase?.run {
-            parallelDiskQueueHead.clear()
-            parallelDiskQueueHead.add(this)
+    override fun offerFirst(messageBase: MessageBase?): Boolean {
+        return if (super.offerFirst(messageBase)) {
+            messageBase?.run {
+                parallelDiskQueueHead.clear()
+                parallelDiskQueueHead.add(this)
+            }
+            true
+        } else {
+            false
         }
     }
 

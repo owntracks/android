@@ -259,7 +259,18 @@ public class MessageProcessor {
                     retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT;
                 } catch (OutgoingMessageSendingException | ConfigurationIncompleteException e) {
                     Timber.w(("Error sending message. Re-queueing"));
-                    this.outgoingQueue.addFirst(message);
+                    // Let's do a little dance to hammer this failed message back onto the head of the
+                    // queue. If someone's queued something on the tail in the meantime and the queue
+                    // is now empty, then throw that latest message away.
+                    synchronized (this.outgoingQueue) {
+                        if (!this.outgoingQueue.offerFirst(message)) {
+                            MessageBase tailMessage = this.outgoingQueue.removeLast();
+                            Timber.w("Queue full when trying to re-queue failed message. Dropping last message: %s", tailMessage);
+                            if (!this.outgoingQueue.offerFirst(message)) {
+                                Timber.e("Couldn't restore failed message back onto the head of the queue, dropping: %s", message);
+                            }
+                        }
+                    }
                     previousMessageFailed = true;
                     retriesToGo -= 1;
                 } catch (IOException e) {
