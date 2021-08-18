@@ -102,7 +102,6 @@ public class MessageProcessor {
                 outgoingQueueIdlingResource.increment();
             }
         }
-
     }
 
     synchronized public void initialize() {
@@ -291,7 +290,15 @@ public class MessageProcessor {
                     Thread.sleep(retryWait);
                     retryWait = Math.min(2 * retryWait, SEND_FAILURE_BACKOFF_MAX_WAIT);
                 } else {
-                    outgoingQueueIdlingResource.decrement();
+                    synchronized (outgoingQueueIdlingResource) {
+                        try {
+                            if (!outgoingQueueIdlingResource.isIdleNow()) {
+                                outgoingQueueIdlingResource.decrement();
+                            }
+                        } catch (IllegalStateException e) {
+                            Timber.w(e, "outgoingQueueIdlingResource is invalid");
+                        }
+                    }
                 }
             } catch (InterruptedException e) {
                 Timber.i(e, "Outgoing message loop interrupted");
