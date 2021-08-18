@@ -65,7 +65,7 @@ public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadM
             this.configuration = (MessageConfiguration) parser.fromJson(json.getBytes());
             String prettyConfiguration;
             try {
-                prettyConfiguration = parser.toJsonPlainPretty(this.configuration);
+                prettyConfiguration = parser.toUnencryptedJsonPretty(this.configuration);
             } catch (IOException e) {
                 Timber.e(e);
                 prettyConfiguration = "Unable to parse configuration";

@@ -51,7 +51,7 @@ class ExportedConfigContentProvider : ContentProvider() {
 
         val configurationMessage = preferences.exportToMessage()
         configurationMessage.waypoints = waypointsRepo.exportToMessage()
-        exportedConfigJson = parser.toJsonPlainPretty(configurationMessage)
+        exportedConfigJson = parser.toUnencryptedJsonPretty(configurationMessage)
         val matrixCursor =
             MatrixCursor(arrayOf(OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE), 1)
         matrixCursor.addRow(arrayOf("config.otrc", exportedConfigJson.length.toLong()))

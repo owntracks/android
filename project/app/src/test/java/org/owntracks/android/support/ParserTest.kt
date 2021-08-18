@@ -84,7 +84,7 @@ class ParserTest {
               "vel" : 5
             }
         """.trimIndent()
-        assertEquals(expected, parser.toJsonPlainPretty(messageLocation))
+        assertEquals(expected, parser.toUnencryptedJsonPretty(messageLocation))
     }
 
     @Test

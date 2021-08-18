@@ -3,6 +3,7 @@ package org.owntracks.android.services
 import com.squareup.tape2.ObjectQueue
 import com.squareup.tape2.QueueFile
 import org.owntracks.android.model.messages.MessageBase
+import org.owntracks.android.model.messages.MessageEncrypted
 import org.owntracks.android.support.Parser
 import timber.log.Timber
 import java.io.File
@@ -28,13 +29,12 @@ class BlockingDequeThatAlsoSometimesPersistsThingsToDiskMaybe(
         val headQueueFile = diskBackedQueueOrNull(headSlotFile)
 
         val messageBaseConverter = object : ObjectQueue.Converter<MessageBase> {
-            override fun from(source: ByteArray): MessageBase = parser.fromJson(source)
+            override fun from(source: ByteArray): MessageBase = parser.fromUnencryptedJson(source)
 
             override fun toStream(value: MessageBase, sink: OutputStream) {
-                sink.write(parser.toJsonBytes(value))
+                sink.write(parser.toUnencryptedJsonBytes(value))
             }
         }
-
 
         parallelDiskQueue = queueFile?.run { ObjectQueue.create(this, messageBaseConverter) }
             ?: ObjectQueue.createInMemory()
@@ -43,11 +43,13 @@ class BlockingDequeThatAlsoSometimesPersistsThingsToDiskMaybe(
             headQueueFile?.run { ObjectQueue.create(this, messageBaseConverter) }
                 ?: ObjectQueue.createInMemory()
 
-        (parallelDiskQueueHead.asList() + parallelDiskQueue.asList()).forEach {
-            if (!offerLast(it)) {
-                Timber.w("On-disk queue contains message that won't fit into queue. Dropping: $it")
+        (parallelDiskQueueHead.asList() + parallelDiskQueue.asList())
+            .filter { it !is MessageEncrypted }
+            .forEach {
+                if (!offerLast(it)) {
+                    Timber.w("On-disk queue contains message that won't fit into queue. Dropping: $it")
+                }
             }
-        }
         resyncQueueToDisk()
     }
 

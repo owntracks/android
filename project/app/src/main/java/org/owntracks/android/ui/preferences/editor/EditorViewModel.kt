@@ -37,7 +37,7 @@ class EditorViewModel @Inject constructor(
             val message = preferences.exportToMessage()
             message.waypoints = waypointsRepo.exportToMessage()
             message[preferences.getPreferenceKey(R.string.preferenceKeyPassword)] = "********"
-            setEffectiveConfiguration(parser.toJsonPlainPretty(message))
+            setEffectiveConfiguration(parser.toUnencryptedJsonPretty(message))
         } catch (e: IOException) {
             Timber.e(e)
             view!!.displayLoadFailed()
