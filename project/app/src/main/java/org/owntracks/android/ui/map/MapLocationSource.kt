@@ -14,19 +14,18 @@ class MapLocationSource internal constructor(
     private lateinit var callbackWrapper: LocationCallback
     private var lastKnownLocation: Location? = null
     override fun activate(onLocationChangedListener: LocationSource.OnLocationChangedListener) {
-        Timber.tag("873432").d("Activating mapLocationSource with client=${locationProviderClient}")
+        Timber.d("Activating mapLocationSource with client=${locationProviderClient}")
         cachedOnLocationChangedListener = onLocationChangedListener
         callbackWrapper = object : LocationCallback {
             override fun onLocationResult(locationResult: LocationResult) {
-                Timber.tag("873432").d("MapLocationSource recevied locationResult $locationResult")
+                Timber.d("MapLocationSource recevied locationResult $locationResult")
                 lastKnownLocation = locationResult.lastLocation
                 onLocationChangedListener.onLocationChanged(locationResult.lastLocation)
                 locationUpdateCallback.onLocationResult(locationResult)
             }
 
             override fun onLocationAvailability(locationAvailability: LocationAvailability) {
-                Timber.tag("873432")
-                    .d("MapLocationSource calling onLocationAvailability with $locationAvailability")
+                Timber.d("MapLocationSource calling onLocationAvailability with $locationAvailability")
                 locationUpdateCallback.onLocationAvailability(locationAvailability)
             }
         }
@@ -43,14 +42,13 @@ class MapLocationSource internal constructor(
 
     override fun reactivate() {
         if (this::cachedOnLocationChangedListener.isInitialized) {
-            Timber.tag("873432")
-                .d("Reactivating MapLocationSource with cached locationChangedListener=${cachedOnLocationChangedListener.hashCode()}")
+            Timber.d("Reactivating MapLocationSource with cached locationChangedListener=${cachedOnLocationChangedListener.hashCode()}")
             activate(this.cachedOnLocationChangedListener)
         }
     }
 
     override fun deactivate() {
-        Timber.tag("873432").d("Deactivating mapLocationSource with client=$locationProviderClient")
+        Timber.d("Deactivating mapLocationSource with client=$locationProviderClient")
         locationProviderClient.removeLocationUpdates(callbackWrapper)
     }
 

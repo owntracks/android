@@ -87,7 +87,7 @@ class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallba
             }
 
             if (locationSource == null) {
-                Timber.tag("873432").e("No location source set")
+                Timber.e("No location source set")
             } else {
                 setLocationSource(locationSource!!.toGMSLocationSource())
             }
