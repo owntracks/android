@@ -12,7 +12,6 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.MutableLiveData
 import androidx.work.Configuration
-import androidx.work.WorkManager
 import androidx.work.WorkerFactory
 import dagger.hilt.EntryPoints
 import dagger.hilt.android.HiltAndroidApp
@@ -32,7 +31,7 @@ import javax.inject.Provider
 import kotlin.system.measureNanoTime
 
 @HiltAndroidApp
-class App : Application() {
+class App : Application(), Configuration.Provider {
     @Inject
     lateinit var preferences: Preferences
 
@@ -73,16 +72,6 @@ class App : Application() {
 
         DataBindingUtil.setDefaultComponent(dataBindingEntryPoint)
 
-        WorkManager.initialize(
-                this,
-                Configuration.Builder()
-                        .setWorkerFactory(workerFactory)
-                        .setInitializationExceptionHandler { throwable ->
-                            Timber.e(throwable, "Exception thrown when initializing WorkManager")
-                            workManagerFailedToInitialize.postValue(true)
-                        }
-                        .build()
-        )
         scheduler.cancelAllTasks()
         Timber.plant(TimberInMemoryLogTree(BuildConfig.DEBUG))
         if (BuildConfig.DEBUG) {
@@ -174,6 +163,16 @@ class App : Application() {
         const val NOTIFICATION_CHANNEL_ONGOING = "O"
         const val NOTIFICATION_CHANNEL_EVENTS = "E"
     }
+
+    @SuppressLint("RestrictedApi")
+    override fun getWorkManagerConfiguration(): Configuration =
+            Configuration.Builder()
+                    .setWorkerFactory(workerFactory)
+                    .setInitializationExceptionHandler { throwable ->
+                        Timber.e(throwable, "Exception thrown when initializing WorkManager")
+                        workManagerFailedToInitialize.postValue(true)
+                    }
+                    .build()
 }
 
 inline fun perfLog(description: String, block: () -> Unit) {

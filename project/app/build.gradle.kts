@@ -210,6 +210,8 @@ dependencies {
 
     // Utility libraries
     implementation("com.google.dagger:hilt-android:${rootProject.extra["dagger-version"]}")
+    implementation("androidx.hilt:hilt-work:1.0.0")
+
     implementation("org.greenrobot:eventbus:3.2.0")
 
     // Connectivity
