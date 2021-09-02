@@ -14,13 +14,6 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import com.adevinta.android.barista.rule.flaky.AllowFlaky
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import mqtt.broker.Broker
-import mqtt.broker.interfaces.Authentication
-import mqtt.broker.interfaces.PacketInterceptor
-import mqtt.packets.MQTTPacket
 import mqtt.packets.Qos
 import mqtt.packets.mqtt.MQTTPublish
 import mqtt.packets.mqttv5.MQTT5Properties
@@ -32,69 +25,39 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.model.BatteryStatus
-import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.support.Parser
 import org.owntracks.android.support.SimpleIdlingResource
+import org.owntracks.android.testutils.GPSMockDeviceLocation
+import org.owntracks.android.testutils.MockDeviceLocation
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.map.MapActivity
-import org.owntracks.android.ui.scrollToText
-import org.owntracks.android.ui.writeToEditTextDialog
 import timber.log.Timber
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 
-
 @ExperimentalUnsignedTypes
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class MQTTMessagePublishTests : TestWithAnActivity<MapActivity>(MapActivity::class.java, false) {
-    private val mqttTestUsername = "testUser"
-    private val mqttTestPassword = "testPassword"
-    private val mqttPacketsReceived: MutableList<MQTTPacket> = mutableListOf()
-    private val broker =
-        Broker(host = "127.0.0.1",
-            port = 18883,
-            authentication = object : Authentication {
-                override fun authenticate(
-                    clientId: String,
-                    username: String?,
-                    password: UByteArray?
-                ): Boolean {
-                    return username == mqttTestUsername && password.contentEquals(
-                        mqttTestPassword.toByteArray().toUByteArray()
-                    )
-                }
-            },
-            packetInterceptor = object : PacketInterceptor {
-                override fun packetReceived(
-                    clientId: String,
-                    username: String?,
-                    password: UByteArray?,
-                    packet: MQTTPacket
-                ) {
-                    Timber.d("MQTT Packet received $packet")
-                    mqttPacketsReceived.add(packet)
-                }
-            })
-
-    @DelicateCoroutinesApi
-    @Before
-    fun startMQTTBroker() {
-        mqttPacketsReceived.clear()
-        GlobalScope.launch { broker.listen() }
-    }
+class MQTTMessagePublishTests : TestWithAnActivity<MapActivity>(MapActivity::class.java, false),
+    TestWithAnMQTTBroker by TestWithMQTTBrokerImpl(),
+    MockDeviceLocation by GPSMockDeviceLocation() {
 
     @Before
-    fun setupEmulator() {
-        InstrumentationRegistry.getInstrumentation().uiAutomation.executeShellCommand("adb emu geo fix 0 51");
+    fun mqttBefore() {
+        startBroker()
     }
 
     @After
-    fun stopMQTTBroker() {
-        broker.stop()
+    fun mqttAfter() {
+        stopBroker()
+    }
+
+    @After
+    fun uninitMockLocation() {
+        unInitializeMockLocationProvider()
     }
 
     @After
@@ -111,18 +74,40 @@ class MQTTMessagePublishTests : TestWithAnActivity<MapActivity>(MapActivity::cla
     @AllowFlaky(attempts = 1)
     fun given_an_MQTT_configured_client_when_the_report_button_is_pressed_then_the_broker_receives_a_packet_with_the_correct_location_message_in() {
         setNotFirstStartPreferences()
+        val mockLatitude = 51.0
+        val mockLongitude = 1.0
+
         baristaRule.launchActivity()
-        configureMQTTConnectionToLocal()
+
+        initializeMockLocationProvider(InstrumentationRegistry.getInstrumentation().targetContext)
+
+        configureMQTTConnectionToLocal(
+            1000L * baristaRule.activityTestRule.activity.resources.getInteger(
+                R.string.preferenceKeyConnectionTimeoutSeconds
+            )
+        )
         assertContains(R.id.connectedStatus, R.string.CONNECTED)
-        reportLocationFromMap()
-        assertTrue("Packet has been received that is a location packet with the correct latlng in it",
+
+        openDrawer()
+        clickOnAndWait(R.string.title_activity_map)
+        setMockLocation(mockLatitude, mockLongitude)
+        IdlingPolicies.setIdlingResourceTimeout(1, TimeUnit.MINUTES)
+        Timber.d("Waiting for location")
+        (baristaRule.activityTestRule.activity.locationIdlingResource as SimpleIdlingResource?).run {
+            IdlingRegistry.getInstance().register(this)
+        }
+        clickOnAndWait(R.id.menu_mylocation)
+        Timber.d("location now available")
+        clickOnAndWait(R.id.menu_report)
+
+        assertTrue("Packet has been received that is a location message with the correct latlng in it",
             mqttPacketsReceived
                 .filterIsInstance<MQTTPublish>()
                 .map {
                     Parser(null).fromJson((it.payload)!!.toByteArray())
                 }
                 .any {
-                    it is MessageLocation && it.latitude == 51.0 && it.longitude == 0.0
+                    it is MessageLocation && it.latitude == mockLatitude && it.longitude == mockLongitude
                 })
     }
 
@@ -131,9 +116,13 @@ class MQTTMessagePublishTests : TestWithAnActivity<MapActivity>(MapActivity::cla
     fun given_an_MQTT_configured_client_when_the_broker_sends_a_message_card_without_a_location_then_a_new_contact_appears() {
         setNotFirstStartPreferences()
         baristaRule.launchActivity()
-        configureMQTTConnectionToLocal()
+        configureMQTTConnectionToLocal(
+            1000L * baristaRule.activityTestRule.activity.resources.getInteger(
+                R.string.preferenceKeyConnectionTimeoutSeconds
+            )
+        )
         assertContains(R.id.connectedStatus, R.string.CONNECTED)
-        reportLocationFromMap()
+        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource as SimpleIdlingResource?)
 
         openDrawer()
         clickOnAndWait(R.string.title_activity_contacts)
@@ -163,9 +152,13 @@ class MQTTMessagePublishTests : TestWithAnActivity<MapActivity>(MapActivity::cla
     fun given_an_MQTT_configured_client_when_the_broker_sends_a_message_card_with_a_location_then_a_new_contact_appears() {
         setNotFirstStartPreferences()
         baristaRule.launchActivity()
-        configureMQTTConnectionToLocal()
+        configureMQTTConnectionToLocal(
+            1000L * baristaRule.activityTestRule.activity.resources.getInteger(
+                R.integer.defaultConnectionTimeoutSeconds
+            )
+        )
         assertContains(R.id.connectedStatus, R.string.CONNECTED)
-        reportLocationFromMap()
+        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource as SimpleIdlingResource?)
 
         openDrawer()
         clickOnAndWait(R.string.title_activity_contacts)
@@ -207,9 +200,13 @@ class MQTTMessagePublishTests : TestWithAnActivity<MapActivity>(MapActivity::cla
     fun given_an_MQTT_configured_client_when_the_broker_sends_a_location_for_a_cleared_contact_then_a_the_contact_returns_with_the_correct_details() {
         setNotFirstStartPreferences()
         baristaRule.launchActivity()
-        configureMQTTConnectionToLocal()
+        configureMQTTConnectionToLocal(
+            1000L * baristaRule.activityTestRule.activity.resources.getInteger(
+                R.integer.defaultConnectionTimeoutSeconds
+            )
+        )
         assertContains(R.id.connectedStatus, R.string.CONNECTED)
-        reportLocationFromMap()
+        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource as SimpleIdlingResource?)
 
         openDrawer()
         clickOnAndWait(R.string.title_activity_contacts)
@@ -245,7 +242,7 @@ class MQTTMessagePublishTests : TestWithAnActivity<MapActivity>(MapActivity::cla
         clickOnAndWait(R.string.title_activity_contacts)
 
         assertRecyclerViewItemCount(R.id.contactsRecyclerView, 1)
-        assertDisplayedAtPosition(R.id.contactsRecyclerView, 0, R.id.name, "64")
+        assertDisplayedAtPosition(R.id.contactsRecyclerView, 0, R.id.name, deviceId)
 
         listOf(MessageLocation().apply {
             latitude = 52.123
@@ -272,54 +269,13 @@ class MQTTMessagePublishTests : TestWithAnActivity<MapActivity>(MapActivity::cla
     fun given_an_MQTT_configured_client_when_the_wrong_credentials_are_used_then_the_status_screen_shows_that_the_broker_is_not_connected() {
         setNotFirstStartPreferences()
         baristaRule.launchActivity()
-        configureMQTTConnectionToLocal("not the right password")
+        configureMQTTConnectionToLocal(
+            "not the right password",
+            1000L * baristaRule.activityTestRule.activity.resources.getInteger(
+                R.string.preferenceKeyConnectionTimeoutSeconds
+            )
+        )
         assertContains(R.id.connectedStatus, R.string.ERROR)
         assertContains(R.id.connectedStatusMessage, "Connection lost")
-    }
-
-    private fun reportLocationFromMap() {
-        openDrawer()
-        clickOnAndWait(R.string.title_activity_map)
-
-        val locationIdlingResource =
-            baristaRule.activityTestRule.activity.locationIdlingResource as SimpleIdlingResource?
-
-        IdlingPolicies.setIdlingResourceTimeout(2, TimeUnit.MINUTES)
-        Timber.d("Waiting for location")
-        IdlingRegistry.getInstance().register(locationIdlingResource)
-        clickOnAndWait(R.id.menu_mylocation)
-        Timber.d("location now available")
-        clickOnAndWait(R.id.menu_report)
-    }
-
-    private fun configureMQTTConnectionToLocal(password: String = mqttTestPassword) {
-        openDrawer()
-        clickOnAndWait(R.string.title_activity_preferences)
-        clickOnAndWait(R.string.preferencesServer)
-        clickOnAndWait(R.string.mode_heading)
-        clickOnAndWait(R.string.mode_mqtt_private_label)
-        writeToEditTextDialog(R.string.preferencesHost, "127.0.0.1")
-        writeToEditTextDialog(R.string.preferencesPort, "18883")
-        writeToEditTextDialog(R.string.preferencesClientId, "testClientId")
-        writeToEditTextDialog(R.string.preferencesUserUsername, mqttTestUsername)
-        writeToEditTextDialog(R.string.preferencesBrokerPassword, password)
-        scrollToText(R.string.tls)
-        clickOnAndWait(R.string.tls)
-        openDrawer()
-        clickOnAndWait(R.string.title_activity_status)
-        sleep(1000L * baristaRule.activityTestRule.activity.resources.getInteger(R.integer.defaultConnectionTimeoutSeconds))
-    }
-
-    private fun List<MessageBase>.sendFromBroker(broker: Broker) {
-        map(Parser(null)::toJsonBytes)
-            .forEach {
-                broker.publish(
-                    false,
-                    "owntracks/someuser/somedevice",
-                    Qos.AT_LEAST_ONCE,
-                    MQTT5Properties(),
-                    it.toUByteArray()
-                )
-            }
     }
 }

@@ -143,6 +143,8 @@ class PreferencesActivityTests :
 
         clickOnAndWait(R.string.preferencesReporting)
         clickOnAndWait(R.string.preferencesPubExtendedData)
+        clickOnAndWait(R.id.switchWidget)
+        clickBackAndWait()
         clickBackAndWait()
 
         clickOnAndWait(R.string.preferencesNotification)
@@ -158,6 +160,8 @@ class PreferencesActivityTests :
 
         scrollToText(R.string.preferencesAutostart)
         clickOnAndWait(R.string.preferencesAutostart)
+        clickOnAndWait(R.id.switchWidget)
+        clickBackAndWait()
 
         scrollToText(R.string.preferencesReverseGeocodeProvider)
         clickOnAndWait(R.string.preferencesReverseGeocodeProvider)
@@ -179,11 +183,11 @@ class PreferencesActivityTests :
         assertContains(R.id.effectiveConfiguration, "\"deviceId\" : \"testDeviceId\"")
         assertContains(R.id.effectiveConfiguration, "\"tid\" : \"t1\"")
         assertContains(R.id.effectiveConfiguration, "\"notificationEvents\" : false")
-        assertContains(R.id.effectiveConfiguration, "\"pubExtendedData\" : false")
+        assertContains(R.id.effectiveConfiguration, "\"pubExtendedData\" : true")
         assertContains(R.id.effectiveConfiguration, "\"ignoreInaccurateLocations\" : 950")
         assertContains(R.id.effectiveConfiguration, "\"locatorInterval\" : 123")
         assertContains(R.id.effectiveConfiguration, "\"moveModeLocatorInterval\" : 5")
-        assertContains(R.id.effectiveConfiguration, "\"autostartOnBoot\" : false")
+        assertContains(R.id.effectiveConfiguration, "\"autostartOnBoot\" : true")
         assertContains(R.id.effectiveConfiguration, "\"reverseGeocodeProvider\" : \"OpenCage\"")
         assertContains(R.id.effectiveConfiguration, "\"opencageApiKey\" : \"geocodeAPIKey\"")
 

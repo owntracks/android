@@ -52,7 +52,7 @@ class Preferences @Inject constructor(
                 R.xml.preferences_reporting,
                 R.xml.preferences_connection
         ).forEach {
-            PreferenceManagerFix.setDefaultValues(context, it, false)
+            PreferenceManagerFix.setDefaultValues(context, it, true)
         }
     }
 

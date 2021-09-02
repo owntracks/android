@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<declare-styleable name="RelativeLayout">
-    <attr name="onLongClick" format="string"/>
-</declare-styleable>
+    <attr name="pref_masterSwitchStyle" format="reference" />
+    <attr name="pref_masterSwitchTextAppearance" format="reference" />
+    <attr name="pref_masterSwitchBackgroundOn" format="color" />
+    <attr name="pref_masterSwitchBackgroundOff" format="color" />
+    <declare-styleable name="RelativeLayout">
+        <attr name="onLongClick" format="string" />
+    </declare-styleable>
 </resources>

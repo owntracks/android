@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
     app:title="@string/preferencesReporting">
-    <androidx.preference.SwitchPreferenceCompat
+    <Preference
         app:defaultValue="@bool/valPubExtendedData"
+        app:fragment="org.owntracks.android.ui.preferences.ReportExtendedDataIndividualPreferenceFragment"
         app:key="pubExtendedData"
-        app:summary="@string/preferencesPubExtendedDataSummary"
         app:title="@string/preferencesPubExtendedData" />
 </PreferenceScreen>

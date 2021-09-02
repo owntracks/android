@@ -1,6 +1,5 @@
 package org.owntracks.android.ui.preferences
 
-import android.os.Build
 import android.os.Bundle
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
@@ -49,8 +48,12 @@ class AdvancedFragment : AbstractPreferenceFragment() {
             false
         }
 
-        findPreference<Preference>("autostartWarning")?.isVisible =
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+        findPreference<Preference>(getString(R.string.preferenceKeyAutostartOnBoot))?.setSummaryProvider {
+            if (preferences.autostartOnBoot)
+                getString(R.string.preferenceOn)
+            else
+                getString(R.string.preferenceOff)
+        }
     }
 
     private fun setOpenCageAPIKeyPreferenceVisibility() {

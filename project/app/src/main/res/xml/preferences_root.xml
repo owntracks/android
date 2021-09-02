@@ -17,7 +17,7 @@
         app:title="@string/preferencesServer" />
     <Preference
         app:fragment="org.owntracks.android.ui.preferences.ReportingFragment"
-        app:icon="@drawable/ic_baseline_add_location_24"
+        app:icon="@drawable/ic_baseline_send_24"
         app:key="reportingScreen"
         app:title="@string/preferencesReporting" />
     <Preference

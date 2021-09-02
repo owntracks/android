@@ -103,7 +103,7 @@
     </Preference>
     <Preference
         android:key="timber"
-        android:summary="Jacke Wharton"
+        android:summary="Jake Wharton"
         android:title="Timber"
         app:iconSpaceReserved="false">
         <intent
@@ -127,5 +127,14 @@
         <intent
             android:action="android.intent.action.VIEW"
             android:data="https://github.com/osmdroid/osmdroid" />
+    </Preference>
+    <Preference
+        android:key="preferencex-android"
+        android:title="AndroidX Preference eXtended"
+        android:summary="takisoft"
+        app:iconSpaceReserved="false">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="https://github.com/takisoft/preferencex-android" />
     </Preference>
 </PreferenceScreen>

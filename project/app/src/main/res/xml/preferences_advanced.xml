@@ -5,7 +5,6 @@
     <androidx.preference.PreferenceCategory app:title="@string/preferencesCategoryAdvancedServices">
         <androidx.preference.SwitchPreferenceCompat
             app:defaultValue="@bool/valRemoteCommand"
-            app:iconSpaceReserved="false"
             app:key="@string/preferenceKeyRemoteCommand"
             app:summary="@string/preferencesRemoteCommandSummary"
             app:title="@string/preferencesRemoteCommand" />
@@ -15,9 +14,7 @@
             app:summary="@string/preferencesRemoteConfigurationSummary"
             app:title="@string/preferencesRemoteConfiguration" />
     </androidx.preference.PreferenceCategory>
-    <androidx.preference.PreferenceCategory
-        app:iconSpaceReserved="false"
-        app:title="@string/preferencesCategoryAdvancedLocator">
+    <androidx.preference.PreferenceCategory app:title="@string/preferencesCategoryAdvancedLocator">
         <org.owntracks.android.support.widgets.EditIntegerPreference
             android:digits="0123456789"
             android:inputType="number"
@@ -51,17 +48,11 @@
             app:title="@string/preferencesEncryptionKey" />
     </androidx.preference.PreferenceCategory>
     <androidx.preference.PreferenceCategory app:title="@string/preferencesCategoryAdvancedMisc">
-
-        <androidx.preference.SwitchPreferenceCompat
+        <androidx.preference.Preference
             app:defaultValue="@bool/valAutostartOnBoot"
+            app:fragment="org.owntracks.android.ui.preferences.AutoStartOnBootIndividualPreferenceFragment"
             app:key="@string/preferenceKeyAutostartOnBoot"
-            app:summary="@string/preferencesAutostartSummary"
             app:title="@string/preferencesAutostart" />
-        <Preference
-            android:icon="@drawable/ic_outline_info_24"
-            app:iconSpaceReserved="true"
-            app:key="autostartWarning"
-            app:summary="@string/preferencesAdvancedAutostartWarning" />
         <androidx.preference.ListPreference
             app:defaultValue="@string/valDefaultGeocoder"
             app:entries="@array/geocoders"
