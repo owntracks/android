@@ -1,36 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:key="root"
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:key="root"
     app:title="@string/title_activity_preferences">
     <IntListPreference
         app:defaultValue="@integer/defaultTheme"
         app:entries="@array/themeLabels"
         app:entryValues="@array/themeValues"
+        app:icon="@drawable/ic_baseline_palette_24"
         app:key="@string/preferenceKeyTheme"
         app:title="@string/preferencesTheme"
         app:useSimpleSummaryProvider="true" />
     <Preference
-        android:key="connectionScreen"
-        android:title="@string/preferencesServer"
-        app:fragment="org.owntracks.android.ui.preferences.connection.ConnectionFragment" />
+        app:fragment="org.owntracks.android.ui.preferences.connection.ConnectionFragment"
+        app:icon="@drawable/ic_baseline_settings_ethernet_24"
+        app:key="connectionScreen"
+        app:title="@string/preferencesServer" />
     <Preference
-        android:key="reportingScreen"
-        android:title="@string/preferencesReporting"
-        app:fragment="org.owntracks.android.ui.preferences.ReportingFragment" />
+        app:fragment="org.owntracks.android.ui.preferences.ReportingFragment"
+        app:icon="@drawable/ic_baseline_add_location_24"
+        app:key="reportingScreen"
+        app:title="@string/preferencesReporting" />
     <Preference
-        android:key="notificationScreen"
-        android:title="@string/preferencesNotification"
-        app:fragment="org.owntracks.android.ui.preferences.NotificationFragment" />
+        app:fragment="org.owntracks.android.ui.preferences.NotificationFragment"
+        app:icon="@drawable/ic_baseline_notifications_24"
+        app:key="notificationScreen"
+        app:title="@string/preferencesNotification" />
     <Preference
-        android:key="advancedScreen"
-        android:title="@string/preferencesAdvanced"
-        app:fragment="org.owntracks.android.ui.preferences.AdvancedFragment" />
+        app:fragment="org.owntracks.android.ui.preferences.AdvancedFragment"
+        app:key="advancedScreen"
+        app:title="@string/preferencesAdvanced" />
     <Preference
-        android:key="experimentalFeatures"
-        android:title="@string/preferencesExperimental"
-        app:fragment="org.owntracks.android.ui.preferences.ExperimentalFragment" />
+        app:fragment="org.owntracks.android.ui.preferences.ExperimentalFragment"
+        app:key="experimentalFeatures"
+        app:title="@string/preferencesExperimental" />
     <Preference
-        android:key="configuration"
-        android:title="@string/configurationManagement" />
+        app:icon="@drawable/ic_baseline_edit_24"
+        app:key="configuration"
+        app:title="@string/configurationManagement" />
 </PreferenceScreen>

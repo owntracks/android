@@ -2,9 +2,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:title="@string/preferencesAdvanced">
-    <androidx.preference.PreferenceCategory
-        app:iconSpaceReserved="false"
-        app:title="@string/preferencesCategoryAdvancedServices">
+    <androidx.preference.PreferenceCategory app:title="@string/preferencesCategoryAdvancedServices">
         <androidx.preference.SwitchPreferenceCompat
             app:defaultValue="@bool/valRemoteCommand"
             app:iconSpaceReserved="false"
@@ -13,7 +11,6 @@
             app:title="@string/preferencesRemoteCommand" />
         <androidx.preference.SwitchPreferenceCompat
             app:defaultValue="@bool/valRemoteConfiguration"
-            app:iconSpaceReserved="false"
             app:key="@string/preferenceKeyRemoteConfiguration"
             app:summary="@string/preferencesRemoteConfigurationSummary"
             app:title="@string/preferencesRemoteConfiguration" />
@@ -26,7 +23,6 @@
             android:inputType="number"
             app:defaultValue="@integer/valIgnoreInaccurateLocations"
             app:dialogMessage="@string/preferencesIgnoreInaccurateLocationsDialog"
-            app:iconSpaceReserved="false"
             app:key="@string/preferenceKeyIgnoreInaccurateLocations"
             app:summary="@string/preferencesIgnoreInaccurateLocationsSummary"
             app:title="@string/preferencesIgnoreInaccurateLocations" />
@@ -35,7 +31,6 @@
             android:inputType="number"
             app:defaultValue="@integer/valLocatorInterval"
             app:dialogMessage="@string/preferencesLocatorIntervalDialog"
-            app:iconSpaceReserved="false"
             app:key="@string/preferenceKeyLocatorInterval"
             app:summary="@string/preferencesLocatorIntervalSummary"
             app:title="@string/preferencesLocatorInterval" />
@@ -44,28 +39,21 @@
             android:inputType="number"
             app:defaultValue="@integer/valMoveModeLocatorInterval"
             app:dialogMessage="@string/preferencesMoveModeLocatorIntervalDialog"
-            app:iconSpaceReserved="false"
             app:key="@string/preferenceKeyMoveModeLocatorInterval"
             app:summary="@string/preferencesMoveModeLocatorIntervalSummary"
             app:title="@string/preferencesMoveModeLocatorInterval" />
     </androidx.preference.PreferenceCategory>
-    <androidx.preference.PreferenceCategory
-        app:iconSpaceReserved="false"
-        app:title="@string/preferencesCategoryAdvancedEncryption">
-        <androidx.preference.EditTextPreference
+    <androidx.preference.PreferenceCategory app:title="@string/preferencesCategoryAdvancedEncryption">
+        <EditTextPreference
             app:dialogMessage="@string/preferencesEncryptionKeyDialogMessage"
-            app:iconSpaceReserved="false"
             app:key="@string/preferenceKeyEncryptionKey"
             app:summary="@string/preferencesEncryptionKeySummary"
             app:title="@string/preferencesEncryptionKey" />
     </androidx.preference.PreferenceCategory>
-    <androidx.preference.PreferenceCategory
-        app:iconSpaceReserved="false"
-        app:title="@string/preferencesCategoryAdvancedMisc">
+    <androidx.preference.PreferenceCategory app:title="@string/preferencesCategoryAdvancedMisc">
 
         <androidx.preference.SwitchPreferenceCompat
             app:defaultValue="@bool/valAutostartOnBoot"
-            app:iconSpaceReserved="false"
             app:key="@string/preferenceKeyAutostartOnBoot"
             app:summary="@string/preferencesAutostartSummary"
             app:title="@string/preferencesAutostart" />
@@ -78,13 +66,11 @@
             app:defaultValue="@string/valDefaultGeocoder"
             app:entries="@array/geocoders"
             app:entryValues="@array/geocoderValues"
-            app:iconSpaceReserved="false"
             app:key="@string/preferenceKeyReverseGeocodeProvider"
             app:title="@string/preferencesReverseGeocodeProvider"
             app:useSimpleSummaryProvider="true" />
         <androidx.preference.EditTextPreference
             app:dialogMessage="@string/preferencesOpencageGeocoderApiKeyDialog"
-            app:iconSpaceReserved="false"
             app:isPreferenceVisible="false"
             app:key="@string/preferenceKeyOpencageGeocoderApiKey"
             app:summary="@string/preferencesOpencageGeocoderApiKeySummary"
