@@ -701,9 +701,9 @@ class Preferences @Inject constructor(
     @get:Export(keyResId = R.string.preferenceKeyPubQos, exportModeMqtt = true)
     @set:Import(keyResId = R.string.preferenceKeyPubQos)
     var pubQos: Int
-        get() = getIntOrDefault(R.string.preferenceKeyPubQos, R.integer.valPubQos)
+        get() = getIntOrDefault(R.string.preferenceKeyPubQos, R.integer.valPubQos).coerceAtMost(MQTT_MAX_QOS).coerceAtLeast(MQTT_MIN_QOS)
         set(anInt) {
-            setInt(R.string.preferenceKeyPubQos, anInt.coerceAtMost(2))
+            setInt(R.string.preferenceKeyPubQos, anInt.coerceAtMost(MQTT_MAX_QOS).coerceAtLeast(MQTT_MIN_QOS))
         }
 
 
@@ -719,9 +719,9 @@ class Preferences @Inject constructor(
     @get:Export(keyResId = R.string.preferenceKeySubQos, exportModeMqtt = true)
     @set:Import(keyResId = R.string.preferenceKeySubQos)
     var subQos: Int
-        get() = getIntOrDefault(R.string.preferenceKeySubQos, R.integer.valSubQos)
+        get() = getIntOrDefault(R.string.preferenceKeySubQos, R.integer.valSubQos).coerceAtMost(MQTT_MAX_QOS).coerceAtLeast(MQTT_MIN_QOS)
         set(anInt) {
-            setInt(R.string.preferenceKeySubQos, anInt.coerceAtMost(2))
+            setInt(R.string.preferenceKeySubQos, anInt.coerceAtMost(MQTT_MAX_QOS).coerceAtLeast(MQTT_MIN_QOS))
         }
 
     @get:Export(
@@ -1153,5 +1153,8 @@ class Preferences @Inject constructor(
             NIGHT_MODE_ENABLE
         )
         val SYSTEM_NIGHT_AUTO_MODE by lazy { if (SDK_INT > Build.VERSION_CODES.Q) MODE_NIGHT_FOLLOW_SYSTEM else MODE_NIGHT_AUTO_BATTERY }
+
+        const val MQTT_MIN_QOS = 0
+        const val MQTT_MAX_QOS = 2
     }
 }
