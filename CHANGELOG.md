@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 2.4.1
+
+### Bug fixes
+
+* Fix a race condition between activating and deactivating a map location source causing a crash on startup (#1081)
+
 ## Version 2.4.0
 
 ### New features
