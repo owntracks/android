@@ -591,6 +591,9 @@ class Preferences @Inject constructor(
         clearKey(R.string.preferenceKeyKeepalive)
     }
 
+    private fun keepAliveInRange(i: Int): Boolean =
+            i >= minimumKeepalive
+
     @get:Export(
             keyResId = R.string.preferenceKeyNotificationEvents,
             exportModeMqtt = true,
@@ -1228,8 +1231,6 @@ class Preferences @Inject constructor(
 
         const val MQTT_MIN_QOS = 0
         const val MQTT_MAX_QOS = 2
-        fun keepAliveInRange(i: Int): Boolean =
-                i >= TimeUnit.MILLISECONDS.toSeconds(Scheduler.MIN_PERIODIC_INTERVAL_MILLIS)
 
         // Preference Keys
         const val preferenceKeyUserDeclinedEnableLocationPermissions =

@@ -39,4 +39,8 @@ class InMemoryWaypointsRepo(eventBus: EventBus?) : WaypointsRepo(eventBus) {
         TODO("Not yet implemented")
     }
 
+    override fun reset() {
+        TODO("Not yet implemented")
+    }
+
 }
