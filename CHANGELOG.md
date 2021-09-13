@@ -5,6 +5,7 @@
 ### Bug fixes
 
 * Fix crash on startup where shared preferences has some invalid values
+* Fix crash on being prompted to enable device location because of a callback not being initialized properly
 
 ## Version 2.4.1
 
