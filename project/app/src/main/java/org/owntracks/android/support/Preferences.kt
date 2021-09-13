@@ -441,7 +441,6 @@ class Preferences @Inject constructor(
             setInt(R.string.preferenceKeyIgnoreInaccurateLocations, meters)
         }
 
-
     @get:Export(keyResId = R.string.preferenceKeyClientId, exportModeMqtt = true)
     @set:Import(keyResId = R.string.preferenceKeyClientId)
     var clientId: String
@@ -1144,7 +1143,16 @@ class Preferences @Inject constructor(
                 modePreferenceKey,
                 getIntResource(R.integer.valModeId)
         )
-        setMode(initMode, true)
+        if (initMode in listOf(
+                        MessageProcessorEndpointMqtt.MODE_ID,
+                        MessageProcessorEndpointHttp.MODE_ID
+                )
+        ) {
+            setMode(initMode, true)
+        } else {
+            preferencesStore.putInt(modePreferenceKey, getIntResource(R.integer.valModeId))
+            setMode(getIntResource(R.integer.valModeId), true)
+        }
 
         // Defaults
         mapOf(
