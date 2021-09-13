@@ -83,8 +83,18 @@ class SharedPreferencesStore @Inject constructor(@ApplicationContext context: Co
         return activeSharedPreferences.contains(key)
     }
 
-    override fun getInitMode(key: String, default: Int): Int =
-        commonSharedPreferences.getInt(key, default)
+    override fun getInitMode(key: String, default: Int): Int {
+        val initMode = commonSharedPreferences.getInt(key, default)
+        return if (initMode in listOf(
+                MessageProcessorEndpointMqtt.MODE_ID,
+                MessageProcessorEndpointHttp.MODE_ID
+            )
+        ) {
+            initMode
+        } else {
+            default
+        }
+    }
 
     override fun setMode(key: String, mode: Int) {
         detachAllActivePreferenceChangeListeners()

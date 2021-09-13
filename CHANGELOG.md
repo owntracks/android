@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 2.4.2
+
+### Bug fixes
+
+* Fix crash on startup where shared preferences has some invalid values
+
 ## Version 2.4.1
 
 ### Bug fixes
