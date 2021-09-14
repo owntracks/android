@@ -110,7 +110,7 @@ class App : Application() {
             // Importance min will show normal priority notification for foreground service. See https://developer.android.com/reference/android/app/NotificationManager#IMPORTANCE_MIN
             // User has to actively configure this in the notification channel settings.
             val ongoingNotificationChannelName = if (getString(R.string.notificationChannelOngoing).trim().isNotEmpty()) getString(R.string.notificationChannelOngoing) else "Ongoing"
-            NotificationChannel(NOTIFICATION_CHANNEL_ONGOING, ongoingNotificationChannelName, NotificationManager.IMPORTANCE_DEFAULT).apply {
+            NotificationChannel(NOTIFICATION_CHANNEL_ONGOING, ongoingNotificationChannelName, NotificationManager.IMPORTANCE_LOW).apply {
                 lockscreenVisibility = Notification.VISIBILITY_PUBLIC
                 description = getString(R.string.notificationChannelOngoingDescription)
                 enableLights(false)

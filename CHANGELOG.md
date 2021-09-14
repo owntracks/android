@@ -2,6 +2,10 @@
 
 ## Version 2.4.2
 
+### New features
+
+* The ongoing notification should now not wake up the lock screen if the content changes.
+
 ### Bug fixes
 
 * Fix crash on startup where shared preferences has some invalid values
