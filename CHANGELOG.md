@@ -10,6 +10,7 @@
 
 * Fix crash on startup where shared preferences has some invalid values
 * Fix crash on being prompted to enable device location because of a callback not being initialized properly
+* Fix crash due to a race when reverse geocoding the contacts
 
 ## Version 2.4.1
 

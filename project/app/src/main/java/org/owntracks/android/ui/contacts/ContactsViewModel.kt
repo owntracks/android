@@ -23,11 +23,13 @@ class ContactsViewModel @Inject constructor(
     }
 
     fun refreshGeocodes() {
-
         Timber.i("Refreshing contacts geocodes")
         mainScope.launch {
-            contactsRepo.all.value?.forEach {
-                it.value.messageLocation?.run { geocoderProvider.resolve(this) }
+            contactsRepo.all.value?.run {
+                map { it.value.messageLocation }
+                    .filterNotNull()
+                    .iterator()
+                    .forEach { geocoderProvider.resolve(it) }
             }
         }
     }
