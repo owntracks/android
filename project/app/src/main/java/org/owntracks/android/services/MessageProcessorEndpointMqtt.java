@@ -100,7 +100,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
                 reconnect();
             }
             if (checkConnection()) {
-                Timber.tag("MQTT").d("PING!");
+                Timber.d("PING!");
                 mqttClient.ping();
             }
         } finally {
@@ -159,7 +159,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
         @Override
         public void connectionLost(Throwable cause) {
-            Timber.tag("MQTT").e(cause, "connectionLost error");
+            Timber.e(cause, "connectionLost error");
             scheduler.cancelMqttPing();
             changeState(EndpointState.DISCONNECTED.withError(cause));
             scheduler.scheduleMqttReconnect();
@@ -385,7 +385,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     }
 
     private void onConnect() {
-        Timber.tag("MQTT").d("MQTT connected!. Running onconnect handler (threadID %s)", Thread.currentThread());
+        Timber.d("MQTT connected!. Running onconnect handler (threadID %s)", Thread.currentThread());
         scheduler.cancelMqttReconnect();
         // Check if we're connecting to the same broker that we were already connected to
         String connectionId = getConnectionId();
@@ -469,14 +469,14 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     }
 
     private void disconnect(boolean fromUser) {
-        Timber.tag("MQTT").d("disconnect. Manually triggered? %s. ThreadID: %s", fromUser, Thread.currentThread());
+        Timber.d("disconnect. Manually triggered? %s. ThreadID: %s", fromUser, Thread.currentThread());
         if (isConnecting()) {
             return;
         }
 
         try {
             if (isConnected()) {
-                Timber.tag("MQTT").d("Disconnecting");
+                Timber.d("Disconnecting");
                 this.mqttClient.disconnect(0);
             }
 

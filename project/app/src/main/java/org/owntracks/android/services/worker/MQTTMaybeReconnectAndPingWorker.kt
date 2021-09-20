@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 class MQTTMaybeReconnectAndPingWorker @Inject constructor(context: Context, workerParams: WorkerParameters, private val messageProcessor: MessageProcessor) : Worker(context, workerParams) {
     override fun doWork(): Result {
-        Timber.tag("MQTT").d("MQTTMaybeReconnectAndPingWorker doing work on threadID: %s", Thread.currentThread())
+        Timber.d("MQTTMaybeReconnectAndPingWorker doing work on threadID: %s", Thread.currentThread())
         if (!messageProcessor.isEndpointConfigurationComplete) return Result.failure()
         return if (messageProcessor.statefulReconnectAndSendKeepalive()) Result.success() else Result.retry()
     }

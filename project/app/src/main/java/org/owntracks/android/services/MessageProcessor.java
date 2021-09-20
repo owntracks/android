@@ -139,9 +139,9 @@ public class MessageProcessor {
             try {
                 // Above method may re-trigger itself on a different thread, so we want to wait until
                 // that's complete.
-                Timber.tag("MQTT").d("Waiting for reconnect worker to complete");
+                Timber.d("Waiting for reconnect worker to complete");
                 lock.acquire();
-                Timber.tag("MQTT").d("Waiting done");
+                Timber.d("Waiting done");
                 return true;
             } catch (InterruptedException e) {
                 Timber.w(e, "Interrupted waiting for reconnect future to complete");

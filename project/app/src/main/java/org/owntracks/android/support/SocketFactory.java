@@ -73,14 +73,14 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
     private final TrustManagerFactory tmf;
 
     public SocketFactory(SocketFactoryOptions options) throws KeyStoreException, NoSuchAlgorithmException, IOException, KeyManagementException, java.security.cert.CertificateException, UnrecoverableKeyException {
-        Timber.tag(this.toString()).v("initializing CustomSocketFactory");
+        Timber.v("initializing CustomSocketFactory");
 
         tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
 
         KeyManagerFactory kmf = KeyManagerFactory.getInstance("X509");
 
         if(options.hasCaCrt()) {
-            Timber.tag(this.toString()).v("options.hasCaCrt(): true");
+            Timber.v("options.hasCaCrt(): true");
 
             KeyStore caKeyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             caKeyStore.load(null, null);
@@ -111,21 +111,21 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
         }
 
         if (options.hasClientP12Crt()) {
-            Timber.tag(this.toString()).v("options.hasClientP12Crt(): true");
+            Timber.v("options.hasClientP12Crt(): true");
 
             KeyStore clientKeyStore = KeyStore.getInstance("PKCS12");
 
             clientKeyStore.load(options.getCaClientP12InputStream(), options.hasClientP12Password() ? options.getCaClientP12Password().toCharArray() : new char[0]);
             kmf.init(clientKeyStore, options.hasClientP12Password() ? options.getCaClientP12Password().toCharArray() : new char[0]);
 
-            Timber.tag(this.toString()).v("Client .p12 Keystore content: ");
+            Timber.v("Client .p12 Keystore content: ");
             Enumeration<String> aliasesClientCert = clientKeyStore.aliases();
             while (aliasesClientCert.hasMoreElements()) {
                 String o = aliasesClientCert.nextElement();
                 Timber.v("Alias: %s", o);
             }
         } else {
-            Timber.tag(this.toString()).v("Client .p12 sideload: false, using null client cert");
+            Timber.v("Client .p12 sideload: false, using null client cert");
             kmf.init(null,null);
         }
 

@@ -24,7 +24,7 @@ class ContactsViewModel @Inject constructor(
 
     fun refreshGeocodes() {
 
-        Timber.tag("399845").i("Refreshing contacts geocodes")
+        Timber.i("Refreshing contacts geocodes")
         mainScope.launch {
             contactsRepo.all.value?.forEach {
                 it.value.messageLocation?.run { geocoderProvider.resolve(this) }

@@ -47,22 +47,22 @@ public class Scheduler {
     }
 
     public void cancelHttpTasks() {
-        Timber.tag("MQTT").d("canceling tasks");
+        Timber.d("canceling tasks");
         WorkManager.getInstance(this.context).cancelAllWorkByTag(ONEOFF_TASK_SEND_MESSAGE_HTTP);
     }
 
     public void cancelMqttTasks() {
-        Timber.tag("MQTT").d("Cancelling task tag (all mqtt tasks) %s", ONEOFF_TASK_SEND_MESSAGE_MQTT);
+        Timber.d("Cancelling task tag (all mqtt tasks) %s", ONEOFF_TASK_SEND_MESSAGE_MQTT);
         WorkManager.getInstance(this.context).cancelAllWorkByTag(ONEOFF_TASK_SEND_MESSAGE_MQTT);
-        Timber.tag("MQTT").d("Cancelling task tag (all mqtt tasks) %s", PERIODIC_TASK_MQTT_KEEPALIVE);
+        Timber.d("Cancelling task tag (all mqtt tasks) %s", PERIODIC_TASK_MQTT_KEEPALIVE);
         WorkManager.getInstance(this.context).cancelAllWorkByTag(PERIODIC_TASK_MQTT_KEEPALIVE);
-        Timber.tag("MQTT").d("Cancelling task tag (all mqtt tasks) %s", ONETIME_TASK_MQTT_RECONNECT);
+        Timber.d("Cancelling task tag (all mqtt tasks) %s", ONETIME_TASK_MQTT_RECONNECT);
         WorkManager.getInstance(this.context).cancelAllWorkByTag(ONETIME_TASK_MQTT_RECONNECT);
     }
 
     public void scheduleMqttMaybeReconnectAndPing(long keepAliveSeconds) {
         if (keepAliveSeconds < TimeUnit.MILLISECONDS.toSeconds(MIN_PERIODIC_INTERVAL_MILLIS)) {
-            Timber.tag("MQTT").i("MQTT Keepalive interval is smaller than most granular workmanager interval, setting to 900 seconds");
+            Timber.i("MQTT Keepalive interval is smaller than most granular workmanager interval, setting to 900 seconds");
             keepAliveSeconds = TimeUnit.MILLISECONDS.toSeconds(MIN_PERIODIC_INTERVAL_MILLIS);
         }
         WorkRequest mqttPingWorkRequest = new PeriodicWorkRequest.Builder(MQTTMaybeReconnectAndPingWorker.class, keepAliveSeconds, TimeUnit.SECONDS)
@@ -70,13 +70,13 @@ public class Scheduler {
                 .setConstraints(anyNetworkConstraint)
                 .setBackoffCriteria(BackoffPolicy.LINEAR, 30, TimeUnit.SECONDS)
                 .build();
-        Timber.tag("MQTT").d("WorkManager queue task %s as %s with interval %s", PERIODIC_TASK_MQTT_KEEPALIVE, mqttPingWorkRequest.getId(), keepAliveSeconds);
+        Timber.d("WorkManager queue task %s as %s with interval %s", PERIODIC_TASK_MQTT_KEEPALIVE, mqttPingWorkRequest.getId(), keepAliveSeconds);
         WorkManager.getInstance(this.context).cancelAllWorkByTag(PERIODIC_TASK_MQTT_KEEPALIVE);
         WorkManager.getInstance(this.context).enqueue(mqttPingWorkRequest);
     }
 
     public void cancelMqttPing() {
-        Timber.tag("MQTT").d("Cancelling task tag %s threadID: %s", PERIODIC_TASK_MQTT_KEEPALIVE, Thread.currentThread());
+        Timber.d("Cancelling task tag %s threadID: %s", PERIODIC_TASK_MQTT_KEEPALIVE, Thread.currentThread());
         WorkManager.getInstance(this.context).cancelAllWorkByTag(PERIODIC_TASK_MQTT_KEEPALIVE);
     }
 
@@ -86,7 +86,7 @@ public class Scheduler {
                         .addTag(PERIODIC_TASK_SEND_LOCATION_PING)
                         .setConstraints(anyNetworkConstraint)
                         .build();
-        Timber.tag("MQTT").d("WorkManager queue task %s as %s with interval %s minutes", PERIODIC_TASK_SEND_LOCATION_PING, pingWorkRequest.getId(), preferences.getPing());
+        Timber.d("WorkManager queue task %s as %s with interval %s minutes", PERIODIC_TASK_SEND_LOCATION_PING, pingWorkRequest.getId(), preferences.getPing());
         WorkManager.getInstance(this.context).cancelAllWorkByTag(PERIODIC_TASK_SEND_LOCATION_PING);
         WorkManager.getInstance(this.context).enqueue(pingWorkRequest);
     }
@@ -99,13 +99,13 @@ public class Scheduler {
                         .setConstraints(anyNetworkConstraint)
                         .build();
 
-        Timber.tag("MQTT").d("WorkManager queue task %s as %s", ONETIME_TASK_MQTT_RECONNECT, mqttReconnectWorkRequest.getId());
+        Timber.d("WorkManager queue task %s as %s", ONETIME_TASK_MQTT_RECONNECT, mqttReconnectWorkRequest.getId());
         WorkManager.getInstance(this.context).cancelAllWorkByTag(ONETIME_TASK_MQTT_RECONNECT);
         WorkManager.getInstance(this.context).enqueue(mqttReconnectWorkRequest);
     }
 
     public void cancelMqttReconnect() {
-        Timber.tag("MQTT").d("Cancelling task tag %s threadID: %s", ONETIME_TASK_MQTT_RECONNECT, Thread.currentThread());
+        Timber.d("Cancelling task tag %s threadID: %s", ONETIME_TASK_MQTT_RECONNECT, Thread.currentThread());
         WorkManager.getInstance(this.context).cancelAllWorkByTag(ONETIME_TASK_MQTT_RECONNECT);
     }
 }

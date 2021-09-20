@@ -53,7 +53,7 @@ class GeocoderProvider @Inject constructor(
         if (messageLocation.hasGeocode) {
             return
         }
-        Timber.tag("399845").d("Resolving geocode for $messageLocation")
+        Timber.d("Resolving geocode for $messageLocation")
         val result = geocoderResolve(messageLocation)
         messageLocation.geocode = geocodeResultToText(result)
         maybeCreateErrorNotification(result)
