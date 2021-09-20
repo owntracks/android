@@ -192,6 +192,9 @@
             </intent-filter>
         </service>
 
+        <service android:name="org.eclipse.paho.android.service.MqttService">
+        </service>
+
         <receiver
             android:name=".support.receiver.StartBackgroundServiceReceiver"
             android:enabled="true"

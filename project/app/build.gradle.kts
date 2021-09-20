@@ -207,6 +207,7 @@ dependencies {
 
     implementation("org.greenrobot:eventbus:3.2.0")
     implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
+    implementation("org.eclipse.paho:org.eclipse.paho.android.service:1.1.1")
 
     implementation("com.squareup.okhttp3:okhttp:${okHttpVersion}")
     implementation("com.squareup.okhttp3:logging-interceptor:${okHttpVersion}")
