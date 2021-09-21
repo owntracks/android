@@ -12,6 +12,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.withContext
 import org.owntracks.android.R
 import org.owntracks.android.model.messages.MessageLocation
+import org.owntracks.android.perfLog
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.support.Preferences
 import org.owntracks.android.support.preferences.OnModeChangedPreferenceChangedListener
@@ -32,19 +33,30 @@ class GeocoderProvider @Inject constructor(
     private val ioDispatcher = Dispatchers.IO
     private var lastRateLimitedNotificationTime: Instant? = null
     private var notificationManager: NotificationManagerCompat
-    private lateinit var geocoder: Geocoder
+    private var geocoder: Geocoder = GeocoderNone()
+
+    private var job: Job? = null
 
     private fun setGeocoderProvider(context: Context, preferences: Preferences) {
         Timber.i("Setting geocoding provider to ${preferences.reverseGeocodeProvider}")
-        geocoder = when (preferences.reverseGeocodeProvider) {
-            Preferences.REVERSE_GEOCODE_PROVIDER_OPENCAGE -> OpenCageGeocoder(preferences.openCageGeocoderApiKey)
-            Preferences.REVERSE_GEOCODE_PROVIDER_DEVICE -> DeviceGeocoder(context)
-            else -> GeocoderNone()
+        job = GlobalScope.launch {
+            withContext(ioDispatcher) {
+                perfLog {
+                    geocoder = when (preferences.reverseGeocodeProvider) {
+                        Preferences.REVERSE_GEOCODE_PROVIDER_OPENCAGE -> OpenCageGeocoder(
+                            preferences.openCageGeocoderApiKey
+                        )
+                        Preferences.REVERSE_GEOCODE_PROVIDER_DEVICE -> DeviceGeocoder(context)
+                        else -> GeocoderNone()
+                    }
+                }
+            }
         }
     }
 
     private suspend fun geocoderResolve(messageLocation: MessageLocation): GeocodeResult {
         return withContext(ioDispatcher) {
+            job?.run { join() }
             return@withContext geocoder.reverse(messageLocation.latitude, messageLocation.longitude)
         }
     }
@@ -107,7 +119,7 @@ class GeocoderProvider @Inject constructor(
                 )
             )
             .setPriority(PRIORITY_LOW)
-            .setNotificationSilent()
+            .setSilent(true)
             .build()
 
         notificationManager.notify(GEOCODE_ERROR_NOTIFICATION_TAG, 0, notification)

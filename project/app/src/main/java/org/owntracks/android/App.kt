@@ -27,6 +27,7 @@ import timber.log.Timber
 import java.security.Security
 import javax.inject.Inject
 import javax.inject.Provider
+import kotlin.system.measureNanoTime
 
 @HiltAndroidApp
 class App : Application() {
@@ -52,9 +53,13 @@ class App : Application() {
         // Make sure we use Conscrypt for advanced TLS features on all devices.
         // X509ExtendedTrustManager not available pre-24, fall back to device. https://github.com/google/conscrypt/issues/603
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            Security.insertProviderAt(Conscrypt.newProviderBuilder().provideTrustManager(true).build(), 1)
+            Security.insertProviderAt(
+                Conscrypt.newProviderBuilder().provideTrustManager(true).build(), 1
+            )
         } else {
-            Security.insertProviderAt(Conscrypt.newProviderBuilder().provideTrustManager(false).build(), 1)
+            Security.insertProviderAt(
+                Conscrypt.newProviderBuilder().provideTrustManager(false).build(), 1
+            )
         }
 
         super.onCreate()
@@ -66,22 +71,29 @@ class App : Application() {
 
         DataBindingUtil.setDefaultComponent(dataBindingEntryPoint)
 
-        WorkManager.initialize(this, Configuration.Builder().setWorkerFactory(workerFactory).build())
+        WorkManager.initialize(
+            this,
+            Configuration.Builder().setWorkerFactory(workerFactory).build()
+        )
         scheduler.cancelAllTasks()
         Timber.plant(TimberInMemoryLogTree(BuildConfig.DEBUG))
         if (BuildConfig.DEBUG) {
             Timber.e("StrictMode enabled in DEBUG build")
-            StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder()
+            StrictMode.setThreadPolicy(
+                StrictMode.ThreadPolicy.Builder()
                     .detectNetwork()
                     .penaltyFlashScreen()
                     .penaltyDialog()
-                    .build())
-            StrictMode.setVmPolicy(StrictMode.VmPolicy.Builder()
+                    .build()
+            )
+            StrictMode.setVmPolicy(
+                StrictMode.VmPolicy.Builder()
                     .detectLeakedSqlLiteObjects()
                     .detectLeakedClosableObjects()
                     .detectFileUriExposure()
                     .penaltyLog()
-                    .build())
+                    .build()
+            )
         }
         preferences.checkFirstStart()
 
@@ -109,8 +121,15 @@ class App : Application() {
 
             // Importance min will show normal priority notification for foreground service. See https://developer.android.com/reference/android/app/NotificationManager#IMPORTANCE_MIN
             // User has to actively configure this in the notification channel settings.
-            val ongoingNotificationChannelName = if (getString(R.string.notificationChannelOngoing).trim().isNotEmpty()) getString(R.string.notificationChannelOngoing) else "Ongoing"
-            NotificationChannel(NOTIFICATION_CHANNEL_ONGOING, ongoingNotificationChannelName, NotificationManager.IMPORTANCE_LOW).apply {
+            val ongoingNotificationChannelName =
+                if (getString(R.string.notificationChannelOngoing).trim()
+                        .isNotEmpty()
+                ) getString(R.string.notificationChannelOngoing) else "Ongoing"
+            NotificationChannel(
+                NOTIFICATION_CHANNEL_ONGOING,
+                ongoingNotificationChannelName,
+                NotificationManager.IMPORTANCE_LOW
+            ).apply {
                 lockscreenVisibility = Notification.VISIBILITY_PUBLIC
                 description = getString(R.string.notificationChannelOngoingDescription)
                 enableLights(false)
@@ -120,8 +139,14 @@ class App : Application() {
             }.run { notificationManager.createNotificationChannel(this) }
 
 
-            val eventsNotificationChannelName = if (getString(R.string.events).trim().isNotEmpty()) getString(R.string.events) else "Events"
-            NotificationChannel(NOTIFICATION_CHANNEL_EVENTS, eventsNotificationChannelName, NotificationManager.IMPORTANCE_HIGH).apply {
+            val eventsNotificationChannelName = if (getString(R.string.events).trim()
+                    .isNotEmpty()
+            ) getString(R.string.events) else "Events"
+            NotificationChannel(
+                NOTIFICATION_CHANNEL_EVENTS,
+                eventsNotificationChannelName,
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
                 lockscreenVisibility = Notification.VISIBILITY_PUBLIC
                 description = getString(R.string.notificationChannelEventsDescription)
                 enableLights(false)
@@ -130,8 +155,15 @@ class App : Application() {
                 setSound(null, null)
             }.run { notificationManager.createNotificationChannel(this) }
 
-            val errorNotificationChannelName = if (getString(R.string.notificationChannelErrors).trim().isNotEmpty()) getString(R.string.notificationChannelErrors) else "Errors"
-            NotificationChannel(GeocoderProvider.ERROR_NOTIFICATION_CHANNEL_ID, errorNotificationChannelName, NotificationManager.IMPORTANCE_LOW).apply {
+            val errorNotificationChannelName =
+                if (getString(R.string.notificationChannelErrors).trim()
+                        .isNotEmpty()
+                ) getString(R.string.notificationChannelErrors) else "Errors"
+            NotificationChannel(
+                GeocoderProvider.ERROR_NOTIFICATION_CHANNEL_ID,
+                errorNotificationChannelName,
+                NotificationManager.IMPORTANCE_LOW
+            ).apply {
                 lockscreenVisibility = Notification.VISIBILITY_PRIVATE
             }.run { notificationManager.createNotificationChannel(this) }
 
@@ -141,5 +173,20 @@ class App : Application() {
     companion object {
         const val NOTIFICATION_CHANNEL_ONGOING = "O"
         const val NOTIFICATION_CHANNEL_EVENTS = "E"
+    }
+}
+
+inline fun perfLog(description: String, block: () -> Unit) {
+    if (BuildConfig.DEBUG) {
+        val elapsed = measureNanoTime { block() }
+        Timber.e("$description: ${elapsed / 1_000_000}ms")
+    }
+}
+
+inline fun perfLog(block: () -> Unit) {
+    if (BuildConfig.DEBUG) {
+        val caller =
+            Thread.currentThread().stackTrace[2].let { "${it.className}/ ${it.methodName}" }
+        perfLog(caller, block)
     }
 }

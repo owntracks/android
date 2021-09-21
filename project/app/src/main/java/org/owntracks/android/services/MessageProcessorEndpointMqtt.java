@@ -77,6 +77,8 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     private final Scheduler scheduler;
     private final EventBus eventBus;
 
+    private final Semaphore connectingLock = new Semaphore(1);
+
     MessageProcessorEndpointMqtt(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus, RunThingsOnOtherThreads runThingsOnOtherThreads, Context applicationContext) {
         super(messageProcessor);
         this.parser = parser;
@@ -108,11 +110,12 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     }
 
     synchronized void sendMessage(MessageBase m) throws ConfigurationIncompleteException, OutgoingMessageSendingException, IOException {
+        Timber.d("Sending message %s. Thread: %s", m, Thread.currentThread());
         m.addMqttPreferences(preferences);
         String messageId = m.getMessageId();
         try {
             connectToBroker();
-        } catch (MqttConnectionException e) {
+        } catch (MqttConnectionException | AlreadyConnectingToBrokerException e) {
             Timber.w("failed connection attempts: %s", sendMessageConnectPressure);
             messageProcessor.onMessageDeliveryFailed(messageId);
             throw new OutgoingMessageSendingException(e);
@@ -159,6 +162,8 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
             Timber.e(cause, "connectionLost error");
             scheduler.cancelMqttPing();
             changeState(EndpointState.DISCONNECTED.withError(cause));
+            Timber.d("Releasing connectinglock");
+            connectingLock.release();
             scheduler.scheduleMqttReconnect();
         }
 
@@ -220,9 +225,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     private int sendMessageConnectPressure = 0;
 
     @WorkerThread
-    private synchronized void connectToBroker() throws MqttConnectionException, ConfigurationIncompleteException {
-        Timber.d("Connecting to broker. ThreadId: %s", Thread.currentThread());
-        sendMessageConnectPressure++;
+    private synchronized void connectToBroker() throws MqttConnectionException, ConfigurationIncompleteException, AlreadyConnectingToBrokerException {
         boolean isUiThread = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? Looper.getMainLooper().isCurrentThread()
                 : Thread.currentThread() == Looper.getMainLooper().getThread();
 
@@ -232,10 +235,8 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
             return;
         }
 
-        if (isConnecting()) {
-            Timber.d("already connecting");
-            return;
-        }
+        Timber.d("Connecting to broker. ThreadId: %s", Thread.currentThread());
+        sendMessageConnectPressure++;
 
         try {
             checkConfigurationComplete();
@@ -249,12 +250,19 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         } else {
             Timber.d("Connecting on non-ui worker thread: %s", Thread.currentThread());
         }
+        if (!connectingLock.tryAcquire()) {
+            Timber.w("already connecting to broker");
+            throw new AlreadyConnectingToBrokerException();
+        }
+        Timber.tag("6234567").d("Acquired connecting lock");
         changeState(EndpointState.CONNECTING);
 
         try {
             this.mqttClient = buildMqttClient();
         } catch (URISyntaxException | MqttException e) {
             Timber.e(e, "Error creating MQTT client");
+            Timber.d("Releasing connectinglock");
+            connectingLock.release();
             changeState(EndpointState.ERROR.withError(e));
             throw new MqttConnectionException(e);
         }
@@ -263,10 +271,15 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
         try {
             Timber.v("MQTT connecting synchronously");
-            this.mqttClient.connect(mqttConnectOptions);
+            this.mqttClient.connect(mqttConnectOptions).waitForCompletion();
+
         } catch (MqttException e) {
+            Timber.d("Releasing connectinglock");
             changeState(EndpointState.ERROR.withError(e));
             throw new MqttConnectionException(e);
+        }
+        finally {
+            connectingLock.release();
         }
     }
 
@@ -351,6 +364,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
         setWill(connectOptions);
 
+        connectOptions.setAutomaticReconnect(true);
         connectOptions.setKeepAliveInterval(preferences.getKeepalive());
         connectOptions.setConnectionTimeout(30);
 
@@ -380,6 +394,8 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         Timber.d("MQTT connected!. Running onconnect handler (threadID %s)", Thread.currentThread());
         scheduler.scheduleMqttMaybeReconnectAndPing(preferences.getKeepalive());
 
+        Timber.d("Releasing connectinglock");
+        connectingLock.release();
         changeState(EndpointState.CONNECTED);
 
         sendMessageConnectPressure = 0; // allow new connection attempts from queueMessageForSending
@@ -430,9 +446,6 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         if (!isConnected()) {
             Timber.e("subscribe when not connected");
             return;
-        }
-        for (String s : topics) {
-            Timber.v("subscribe() - Will subscribe to: %s", s);
         }
         try {
             int[] qos = getSubTopicsQos(topics);
@@ -488,7 +501,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         }
         try {
             connectToBroker();
-        } catch (MqttConnectionException | ConfigurationIncompleteException e) {
+        } catch (MqttConnectionException | ConfigurationIncompleteException | AlreadyConnectingToBrokerException e) {
             Timber.e(e, "Failed to reconnect to MQTT broker");
         } finally {
             if (completionNotifier != null) {
@@ -530,7 +543,13 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     }
 
     private boolean isConnecting() {
-        return (this.mqttClient != null) && (state == EndpointState.CONNECTING);
+        if (connectingLock.tryAcquire()) {
+            Timber.d("Releasing connectinglock");
+            connectingLock.release();
+            return false;
+        } else {
+            return true;
+        }
     }
 
     private static EndpointState getState() {
@@ -642,4 +661,7 @@ class MqttConnectionException extends Exception {
     MqttConnectionException(Exception e) {
         super(e);
     }
+}
+
+class AlreadyConnectingToBrokerException extends Exception {
 }

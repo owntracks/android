@@ -45,6 +45,7 @@ import org.owntracks.android.location.LocationProviderClient
 import org.owntracks.android.location.LocationServices
 import org.owntracks.android.location.LocationSource
 import org.owntracks.android.model.FusedContact
+import org.owntracks.android.perfLog
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.services.BackgroundService.BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG
 import org.owntracks.android.services.LocationProcessor
@@ -100,100 +101,101 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
     lateinit var requirementsChecker: RequirementsChecker
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        if (!preferences.isSetupCompleted) {
-            navigator.startActivity(WelcomeActivity::class.java)
-            finish()
-        }
-        bindAndAttachContentView(R.layout.ui_map, savedInstanceState)
-
-        binding?.also {
-            setSupportToolbar(it.appbar.toolbar, false, true)
-            setDrawer(it.appbar.toolbar)
-            bottomSheetBehavior = BottomSheetBehavior.from(it.bottomSheetLayout)
-            it.contactPeek.contactRow.setOnClickListener(this)
-            it.contactPeek.contactRow.setOnLongClickListener(this)
-            it.moreButton.setOnClickListener { v: View -> showPopupMenu(v) }
-            setBottomSheetHidden()
-
-            // Need to set the appbar layout behaviour to be non-drag, so that we can drag the map
-            val behavior = AppBarLayout.Behavior()
-            behavior.setDragCallback(object : AppBarLayout.Behavior.DragCallback() {
-                override fun canDrag(appBarLayout: AppBarLayout): Boolean {
-                    return false
-                }
-            })
-        }
-
-        locationLifecycleObserver = LocationLifecycleObserver(activityResultRegistry)
-        lifecycle.addObserver(locationLifecycleObserver)
-
-        locationProviderClient = LocationServices.getLocationProviderClient(this, preferences)
-        mapLocationSource =
-            MapLocationSource(locationProviderClient!!, viewModel!!.mapLocationUpdateCallback)
-
-        if (savedInstanceState == null || supportFragmentManager.findFragmentByTag("map") == null) {
-            mapFragment = getMapFragment()
-            supportFragmentManager.commit {
-                setReorderingAllowed(true)
-                replace(R.id.mapFragment, mapFragment, "map")
+        perfLog {
+            super.onCreate(savedInstanceState)
+            if (!preferences.isSetupCompleted) {
+                navigator.startActivity(WelcomeActivity::class.java)
+                finish()
             }
-        } else {
-            mapFragment = supportFragmentManager.findFragmentByTag("map") as MapFragment
-        }
+            bindAndAttachContentView(R.layout.ui_map, savedInstanceState)
 
-        // Watch various things that the viewModel owns
-        viewModel?.also { vm ->
-            vm.contact.observe(this, { contact: FusedContact? ->
-                contact?.let {
-                    binding?.contactPeek?.run {
-                        Timber.v("contact changed: $it.id")
-                        name.text = it.fusedName
-                        image.setImageResource(0)
-                        GlobalScope.launch(Dispatchers.Main) {
-                            contactImageBindingAdapter.run {
-                                image.setImageBitmap(
-                                    getBitmapFromCache(it)
-                                )
+            binding?.also {
+                setSupportToolbar(it.appbar.toolbar, false, true)
+                setDrawer(it.appbar.toolbar)
+                bottomSheetBehavior = BottomSheetBehavior.from(it.bottomSheetLayout)
+                it.contactPeek.contactRow.setOnClickListener(this)
+                it.contactPeek.contactRow.setOnLongClickListener(this)
+                it.moreButton.setOnClickListener { v: View -> showPopupMenu(v) }
+                setBottomSheetHidden()
+
+                // Need to set the appbar layout behaviour to be non-drag, so that we can drag the map
+                val behavior = AppBarLayout.Behavior()
+                behavior.setDragCallback(object : AppBarLayout.Behavior.DragCallback() {
+                    override fun canDrag(appBarLayout: AppBarLayout): Boolean {
+                        return false
+                    }
+                })
+            }
+
+            locationLifecycleObserver = LocationLifecycleObserver(activityResultRegistry)
+            lifecycle.addObserver(locationLifecycleObserver)
+
+            locationProviderClient = LocationServices.getLocationProviderClient(this, preferences)
+            mapLocationSource =
+                MapLocationSource(locationProviderClient!!, viewModel!!.mapLocationUpdateCallback)
+
+            if (savedInstanceState == null || supportFragmentManager.findFragmentByTag("map") == null) {
+                mapFragment = getMapFragment()
+                supportFragmentManager.commit {
+                    setReorderingAllowed(true)
+                    replace(R.id.mapFragment, mapFragment, "map")
+                }
+            } else {
+                mapFragment = supportFragmentManager.findFragmentByTag("map") as MapFragment
+            }
+
+            // Watch various things that the viewModel owns
+            viewModel?.also { vm ->
+                vm.contact.observe(this, { contact: FusedContact? ->
+                    contact?.let {
+                        binding?.contactPeek?.run {
+                            Timber.v("contact changed: $it.id")
+                            name.text = it.fusedName
+                            image.setImageResource(0)
+                            GlobalScope.launch(Dispatchers.Main) {
+                                contactImageBindingAdapter.run {
+                                    image.setImageBitmap(
+                                        getBitmapFromCache(it)
+                                    )
+                                }
                             }
+                            vm.refreshGeocodeForActiveContact()
                         }
-                        vm.refreshGeocodeForActiveContact()
                     }
-                }
-            })
-            vm.bottomSheetHidden.observe(this, { o: Boolean? ->
-                if (o == null || o) {
-                    setBottomSheetHidden()
-                } else {
-                    setBottomSheetCollapsed()
-                }
-            })
-            vm.mapCenter.observe(this, { o: LatLng ->
-                mapFragment.updateCamera(o)
-            })
-            vm.currentLocation.observe(this, { location ->
-                if (location == null) {
-                    disableLocationMenus()
-                } else {
-                    enableLocationMenus()
-                    binding?.vm?.run {
-                        updateActiveContactDistanceAndBearing(location)
+                })
+                vm.bottomSheetHidden.observe(this, { o: Boolean? ->
+                    if (o == null || o) {
+                        setBottomSheetHidden()
+                    } else {
+                        setBottomSheetCollapsed()
                     }
-                }
-            })
+                })
+                vm.mapCenter.observe(this, { o: LatLng ->
+                    mapFragment.updateCamera(o)
+                })
+                vm.currentLocation.observe(this, { location ->
+                    if (location == null) {
+                        disableLocationMenus()
+                    } else {
+                        enableLocationMenus()
+                        binding?.vm?.run {
+                            updateActiveContactDistanceAndBearing(location)
+                        }
+                    }
+                })
+            }
+
+            Timber.d("starting BackgroundService")
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(Intent(this, BackgroundService::class.java))
+            } else {
+                startService(Intent(this, BackgroundService::class.java))
+            }
+
+            // We've been started in the foreground, so cancel the background restriction notification
+            NotificationManagerCompat.from(this)
+                .cancel(BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG, 0)
         }
-
-        Timber.d("starting BackgroundService")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(Intent(this, BackgroundService::class.java))
-        } else {
-            startService(Intent(this, BackgroundService::class.java))
-        }
-
-        // We've been started in the foreground, so cancel the background restriction notification
-        NotificationManagerCompat.from(this)
-            .cancel(BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG, 0)
-
     }
 
     private fun getMapFragment() =

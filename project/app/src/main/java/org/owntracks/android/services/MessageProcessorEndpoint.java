@@ -23,7 +23,7 @@ public abstract class MessageProcessorEndpoint implements OutgoingMessageProcess
 
     abstract int getModeId();
 
-    abstract void sendMessage(MessageBase m) throws ConfigurationIncompleteException, OutgoingMessageSendingException, IOException;
+    abstract void sendMessage(MessageBase m) throws ConfigurationIncompleteException, OutgoingMessageSendingException, IOException, AlreadyConnectingToBrokerException;
 }
 
 class OutgoingMessageSendingException extends Exception {

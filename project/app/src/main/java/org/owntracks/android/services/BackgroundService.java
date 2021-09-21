@@ -1,5 +1,12 @@
 package org.owntracks.android.services;
 
+import static android.os.Process.killProcess;
+import static android.os.Process.myPid;
+import static androidx.core.app.NotificationCompat.PRIORITY_LOW;
+import static org.owntracks.android.App.NOTIFICATION_CHANNEL_EVENTS;
+import static org.owntracks.android.App.NOTIFICATION_CHANNEL_ONGOING;
+import static org.owntracks.android.geocoding.GeocoderProvider.ERROR_NOTIFICATION_CHANNEL_ID;
+
 import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -69,13 +76,6 @@ import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import timber.log.Timber;
-
-import static android.os.Process.killProcess;
-import static android.os.Process.myPid;
-import static androidx.core.app.NotificationCompat.PRIORITY_LOW;
-import static org.owntracks.android.App.NOTIFICATION_CHANNEL_EVENTS;
-import static org.owntracks.android.App.NOTIFICATION_CHANNEL_ONGOING;
-import static org.owntracks.android.geocoding.GeocoderProvider.ERROR_NOTIFICATION_CHANNEL_ID;
 
 @AndroidEntryPoint
 public class BackgroundService extends Service implements OnModeChangedPreferenceChangedListener, ServiceBridge.ServiceBridgeInterface {
@@ -312,7 +312,6 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
         publishIntent.setAction(INTENT_ACTION_SEND_LOCATION_USER);
         PendingIntent publishPendingIntent = PendingIntent.getService(this, 0, publishIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Intent changeMonitoringIntent = new Intent();
         publishIntent.setAction(INTENT_ACTION_CHANGE_MONITORING);
         PendingIntent changeMonitoringPendingIntent = PendingIntent.getService(this, 0, publishIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
