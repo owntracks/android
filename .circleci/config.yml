@@ -1,0 +1,232 @@
+version: 2.1
+
+orbs:
+  android: circleci/android@1.0.3
+
+jobs:
+  build:
+    # These next lines define the Android machine image executor: https://circleci.com/docs/2.0/executor-types/
+    executor:
+      name: android/android
+      sdk-version: '30'
+    resource_class: large
+
+    steps:
+      # Checkout the code as the first step.
+      - checkout
+      - android/accept-licenses
+      - android/restore-build-cache
+      - android/restore-gradle-cache:
+          find-args: ". -name 'build.gradle.kts'"
+
+      - run:
+          name: Build
+          command: |
+            ./project/gradlew -p ./project assembleDebug assembleAndroidTest :app:compileOssReleaseSources :app:compileGmsReleaseSources app:bundleGmsReleaseClasses --scan
+
+      - android/save-gradle-cache
+      - android/save-build-cache
+
+  unit-test:
+    executor:
+      name: android/android
+      sdk-version: '30'
+    resource_class: large
+
+    steps:
+      - checkout
+      - android/accept-licenses
+      - android/restore-build-cache
+      - android/restore-gradle-cache:
+          find-args: ". -name 'build.gradle.kts'"
+      - run:
+          name: Unit Test
+          command: |
+            ./project/gradlew -p ./project jacocoTestGmsReleaseUnitTestReport --scan
+      - store_test_results:
+          path: project/app/build/test-results/testGmsReleaseUnitTest
+      - persist_to_workspace:
+          root: project/app/build/
+          paths:
+          - jacoco/jacoco.xml
+
+  lint:
+    executor:
+      name: android/android
+      sdk-version: '30'
+    resource_class: large
+
+    steps:
+      - checkout
+      - android/accept-licenses
+      - android/restore-build-cache
+      - android/restore-gradle-cache:
+          find-args: ". -name 'build.gradle.kts'"
+      - run:
+          name: Lint
+          command: |
+            ./project/gradlew -p ./project lint --scan
+      - store_artifacts:
+          path: project/app/build/reports/lint-results.html
+          destination: lint-report
+
+
+  oss-ui-tests:
+    executor:
+      name: android/android-machine
+      resource-class: large
+
+    steps:
+      - checkout
+      - android/accept-licenses
+      - android/restore-build-cache
+      - android/start-emulator-and-run-tests:
+          additional-avd-args: "-d pixel_3a -c 1G"
+          test-command: ./gradlew createOssDebugCoverageReport --scan
+          system-image: system-images;android-29;default;x86_64
+          restore-gradle-cache-post-emulator-launch: true
+          restore-gradle-cache-find-args: ". -name 'build.gradle.kts'"
+          run-tests-working-directory: ./project
+          post-emulator-wait-steps:
+            - run: adb shell settings put secure location_providers_allowed +gps
+            - run: adb shell settings put secure location_providers_allowed +network
+            - run: adb shell settings put secure location_mode 3
+          post-emulator-launch-assemble-command: ""
+          run-logcat: true
+          max-tries: 1
+      - store_test_results:
+          path: project/app/build/outputs/androidTest-results/connected/flavors/oss/
+      - persist_to_workspace:
+          root: project/app/build/
+          paths:
+          - reports/coverage/oss/debug/report.xml
+      - store_artifacts:
+          path: project/app/build/reports/androidTests
+          destination: espresso-report-oss
+
+  gms-ui-tests:
+    executor:
+      name: android/android-machine
+      resource-class: large
+
+    steps:
+      - checkout
+      - android/accept-licenses
+      - android/restore-build-cache
+      - android/start-emulator-and-run-tests:
+          additional-avd-args: "-d pixel_3a -c 1G"
+          test-command: ./gradlew createGmsDebugCoverageReport --scan
+          system-image: system-images;android-29;google_apis;x86_64
+          restore-gradle-cache-post-emulator-launch: true
+          restore-gradle-cache-find-args: ". -name 'build.gradle.kts'"
+          run-tests-working-directory: ./project
+          post-emulator-wait-steps:
+            - run: adb shell settings put secure location_providers_allowed +gps
+            - run: adb shell settings put secure location_providers_allowed +network
+            - run: adb shell settings put secure location_mode 3
+          post-emulator-launch-assemble-command: ""
+          run-logcat: true
+          max-tries: 1
+      - run:
+          name: Debug
+          command: |
+            find -name report.xml
+
+      - store_test_results:
+          path: project/app/build/outputs/androidTest-results/connected/flavors/gms/
+      - persist_to_workspace:
+          root: project/app/build/
+          paths:
+            - reports/coverage/gms/debug/report.xml
+      - store_artifacts:
+          path: project/app/build/reports/androidTests
+          destination: espresso-report-gms
+
+  publish-coverage:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - attach_workspace:
+          at: project/app/build/
+      - run:
+          command: curl -Os "https://uploader.codecov.io/latest/linux/codecov"
+          name: Download Codecov Uploader
+      - run:
+          command: |
+            curl https://keybase.io/codecovsecurity/pgp_keys.asc | gpg --no-default-keyring --import # One-time step
+            curl -Os "https://uploader.codecov.io/latest/linux/codecov.SHA256SUM"
+            curl -Os "https://uploader.codecov.io/latest/linux/codecov.SHA256SUM.sig"
+            gpg --verify codecov.SHA256SUM.sig codecov.SHA256SUM
+            shasum -a 256 -c codecov.SHA256SUM || sha256sum -c codecov.SHA256SUM
+            chmod +x codecov
+          name: Validate Codecov Uploader
+      - run:
+          name: Upload Codecov coverage for espresso tests
+          command: |
+            ./codecov \
+              -Q CircleCI \
+              -n ${CIRCLE_BUILD_NUM} \
+              -F uitests \
+              -v \
+              -Z \
+              -f reports/coverage/**/report.xml
+      - run:
+          name: Upload Codecov coverage for unit tests
+          command: |
+            ./codecov \
+              -Q CircleCI \
+              -n ${CIRCLE_BUILD_NUM} \
+              -v \
+              -Z \
+              -F unittests \
+              -f project/app/build/jacoco/jacoco.xml
+  publish-to-play-store:
+    executor:
+      name: android/android
+      sdk-version: '30'
+    resource_class: large
+
+    steps:
+      # Checkout the code as the first step.
+      - checkout
+      - android/accept-licenses
+      - android/restore-build-cache
+      - android/restore-gradle-cache:
+          find-args: ". -name 'build.gradle.kts'"
+
+      - run:
+          name: Build
+          command: |
+            ./project/gradlew -p ./project publishGmsReleaseBundle --scan
+
+workflows:
+  build-and-test:
+    jobs:
+      - build
+      - unit-test:
+          requires:
+            - build
+      - lint:
+          requires:
+            - build
+      - oss-ui-tests:
+          requires:
+            - unit-test
+      - gms-ui-tests:
+          requires:
+            - unit-test
+      - publish-coverage:
+          requires:
+            - unit-test
+            - oss-ui-tests
+            - gms-ui-tests
+      - publish-to-play-store:
+          requires:
+            - unit-test
+            - oss-ui-tests
+            - gms-ui-tests
+            - lint
+          filters:
+            branches:
+              only: master

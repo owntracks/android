@@ -23,6 +23,7 @@ import org.junit.Test
 import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
+import org.owntracks.android.App
 import org.owntracks.android.R
 import org.owntracks.android.ScreenshotTakingOnTestEndRule
 import org.owntracks.android.e2e.doWelcomeProcess
@@ -44,10 +45,10 @@ class GMSMapActivityTests {
         .around(screenshotRule)
 
     @Test
-    @AllowFlaky(attempts = 1)
+    @AllowFlaky
     fun statusActivityCanBeLaunchedFromMapActivityDrawer() {
         baristaRule.launchActivity()
-        doWelcomeProcess()
+        doWelcomeProcess(baristaRule.activityTestRule.activity.application as App)
         assertDrawerIsClosed()
         openDrawer()
 
@@ -65,10 +66,10 @@ class GMSMapActivityTests {
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
+    @AllowFlaky
     fun preferencesActivityCanBeLaunchedFromMapActivityDrawer() {
         baristaRule.launchActivity()
-        doWelcomeProcess()
+        doWelcomeProcess(baristaRule.activityTestRule.activity.application as App)
         assertDrawerIsClosed()
 
         openDrawer()
@@ -90,7 +91,7 @@ class GMSMapActivityTests {
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
+    @AllowFlaky
     fun welcomeActivityShouldNotRunWhenFirstStartPreferencesSet() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         PreferenceManager.getDefaultSharedPreferences(context)
@@ -104,7 +105,7 @@ class GMSMapActivityTests {
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
+    @AllowFlaky
     fun enablingOSMMapSwitchesFromGMSMapToOSMMap() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         PreferenceManager.getDefaultSharedPreferences(context)
@@ -133,10 +134,10 @@ class GMSMapActivityTests {
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
+    @AllowFlaky
     fun modeButtonOnMapActivityCyclesThroughModes() {
         baristaRule.launchActivity()
-        doWelcomeProcess()
+        doWelcomeProcess(baristaRule.activityTestRule.activity.application as App)
 
         assertDisplayed(R.id.menu_monitoring)
     }

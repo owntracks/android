@@ -20,6 +20,7 @@ import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.ScreenshotTakingOnTestEndRule
+import org.owntracks.android.e2e.scrollToPreferenceWithText
 import org.owntracks.android.ui.preferences.about.AboutActivity
 
 
@@ -33,8 +34,8 @@ class AboutActivityTests {
 
     @get:Rule
     val ruleChain: RuleChain = RuleChain
-            .outerRule(baristaRule.activityTestRule)
-            .around(screenshotRule)
+        .outerRule(baristaRule.activityTestRule)
+        .around(screenshotRule)
 
     @Before
     fun setUp() {
@@ -52,36 +53,61 @@ class AboutActivityTests {
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
+    @AllowFlaky
     fun documentationLinkOpensSite() {
+        scrollToPreferenceWithText(R.string.preferencesDocumentation)
         clickOn(R.string.preferencesDocumentation)
-        intended(allOf(hasAction(Intent.ACTION_VIEW), hasData(baristaRule.activityTestRule.activity.getString(R.string.documentationUrl))))
+        intended(
+            allOf(
+                hasAction(Intent.ACTION_VIEW),
+                hasData(baristaRule.activityTestRule.activity.getString(R.string.documentationUrl))
+            )
+        )
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
+    @AllowFlaky
     fun twitterLinkOpensSite() {
+        scrollToPreferenceWithText(R.string.preferencesTwitter)
         clickOn(R.string.preferencesTwitter)
-        intended(allOf(hasAction(Intent.ACTION_VIEW), hasData(baristaRule.activityTestRule.activity.getString(R.string.twitterUrl))))
+        intended(
+            allOf(
+                hasAction(Intent.ACTION_VIEW),
+                hasData(baristaRule.activityTestRule.activity.getString(R.string.twitterUrl))
+            )
+        )
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
+    @AllowFlaky
     fun sourceLinkOpensSite() {
+        scrollToPreferenceWithText(R.string.preferencesRepository)
         clickOn(R.string.preferencesRepository)
-        intended(allOf(hasAction(Intent.ACTION_VIEW), hasData(baristaRule.activityTestRule.activity.getString(R.string.repoUrl))))
+        intended(
+            allOf(
+                hasAction(Intent.ACTION_VIEW),
+                hasData(baristaRule.activityTestRule.activity.getString(R.string.repoUrl))
+            )
+        )
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
+    @AllowFlaky
     fun translationLinkOpensSite() {
+        scrollToPreferenceWithText(R.string.aboutTranslations)
         clickOn(R.string.aboutTranslations)
-        intended(allOf(hasAction(Intent.ACTION_VIEW), hasData(baristaRule.activityTestRule.activity.getString(R.string.translationContributionUrl))))
+        intended(
+            allOf(
+                hasAction(Intent.ACTION_VIEW),
+                hasData(baristaRule.activityTestRule.activity.getString(R.string.translationContributionUrl))
+            )
+        )
     }
-    
+
     @Test
-    @AllowFlaky(attempts = 1)
+    @AllowFlaky
     fun librariesLinkListsLibraries() {
+        scrollToPreferenceWithText(R.string.preferencesLicenses)
         clickOn(R.string.preferencesLicenses)
         assertDisplayed(R.string.preferencesLicenses)
     }

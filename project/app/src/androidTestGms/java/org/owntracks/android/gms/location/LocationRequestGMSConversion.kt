@@ -15,18 +15,22 @@ class LocationRequestGMSConversion {
     @Test
     fun canConvertLocationRequestToGMS() {
         val locationRequest = LocationRequest(
-                fastestInterval = 1_000,
-                smallestDisplacement = 50f,
-                numUpdates = 50,
-                expirationDuration = TimeUnit.MINUTES.toMillis(2),
-                priority = LocationRequest.PRIORITY_HIGH_ACCURACY,
-                interval = 30_000)
+            fastestInterval = 1_000,
+            smallestDisplacement = 50f,
+            numUpdates = 50,
+            expirationDuration = TimeUnit.MINUTES.toMillis(2),
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY,
+            interval = 30_000
+        )
 
         val gmsLocationRequest = locationRequest.toGMSLocationRequest()
         assertEquals(1000, gmsLocationRequest.fastestInterval)
         assertEquals(30_000, gmsLocationRequest.interval)
         assertEquals(50, gmsLocationRequest.numUpdates)
-        assertEquals(com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY, gmsLocationRequest.priority)
+        assertEquals(
+            com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY,
+            gmsLocationRequest.priority
+        )
         assertEquals(50f, gmsLocationRequest.smallestDisplacement)
         assertTrue(gmsLocationRequest.isFastestIntervalExplicitlySet)
     }
@@ -34,11 +38,12 @@ class LocationRequestGMSConversion {
     @Test
     fun canConvertLocationRequestToGMSWithoutFastestIntervalSet() {
         val locationRequest = LocationRequest(
-                smallestDisplacement = 50f,
-                numUpdates = 50,
-                expirationDuration = TimeUnit.MINUTES.toMillis(2),
-                priority = LocationRequest.PRIORITY_HIGH_ACCURACY,
-                interval = 30_000)
+            smallestDisplacement = 50f,
+            numUpdates = 50,
+            expirationDuration = TimeUnit.MINUTES.toMillis(2),
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY,
+            interval = 30_000
+        )
 
         val gmsLocationRequest = locationRequest.toGMSLocationRequest()
         assertFalse(gmsLocationRequest.isFastestIntervalExplicitlySet)

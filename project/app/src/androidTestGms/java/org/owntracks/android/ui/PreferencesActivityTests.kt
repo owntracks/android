@@ -1,11 +1,6 @@
 package org.owntracks.android.ui
 
-import androidx.recyclerview.widget.RecyclerView
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.scrollTo
-import androidx.test.espresso.contrib.RecyclerViewActions.actionOnItem
 import androidx.test.espresso.intent.Intents
-import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertContains
@@ -23,6 +18,7 @@ import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.ScreenshotTakingOnTestEndRule
+import org.owntracks.android.e2e.scrollToPreferenceWithText
 import org.owntracks.android.ui.preferences.PreferencesActivity
 
 
@@ -36,8 +32,8 @@ class PreferencesActivityTests {
 
     @get:Rule
     val ruleChain: RuleChain = RuleChain
-            .outerRule(baristaRule.activityTestRule)
-            .around(screenshotRule)
+        .outerRule(baristaRule.activityTestRule)
+        .around(screenshotRule)
 
     @Before
     fun setUp() {
@@ -55,7 +51,7 @@ class PreferencesActivityTests {
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
+    @AllowFlaky
     fun initialViewShowsTopLevelMenu() {
         assertDisplayed(R.string.preferencesServer)
         assertDisplayed(R.string.preferencesReporting)
@@ -110,22 +106,22 @@ class PreferencesActivityTests {
 
         clickDialogPositiveButton()
 
-        scrollToText(R.string.preferencesMoveModeLocatorInterval)
+        scrollToPreferenceWithText(R.string.preferencesMoveModeLocatorInterval)
         clickOnAndWait(R.string.preferencesMoveModeLocatorInterval)
 
         writeTo(android.R.id.edit, "5")
 
         clickDialogPositiveButton()
 
-        scrollToText(R.string.preferencesAutostart)
+        scrollToPreferenceWithText(R.string.preferencesAutostart)
         clickOnAndWait(R.string.preferencesAutostart)
 
-        scrollToText(R.string.preferencesReverseGeocodeProvider)
+        scrollToPreferenceWithText(R.string.preferencesReverseGeocodeProvider)
         clickOnAndWait(R.string.preferencesReverseGeocodeProvider)
 
         clickOnAndWait("OpenCage")
 
-        scrollToText(R.string.preferencesOpencageGeocoderApiKey)
+        scrollToPreferenceWithText(R.string.preferencesOpencageGeocoderApiKey)
         clickOnAndWait(R.string.preferencesOpencageGeocoderApiKey)
         writeTo(android.R.id.edit, "geocodeAPIKey")
         clickDialogPositiveButton()
@@ -166,16 +162,10 @@ class PreferencesActivityTests {
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
+    @AllowFlaky
     fun defaultGeocoderIsSelected() {
         clickOnAndWait(R.string.preferencesAdvanced)
-        scrollToText(R.string.preferencesReverseGeocodeProvider)
+        scrollToPreferenceWithText(R.string.preferencesReverseGeocodeProvider)
         assertDisplayed(baristaRule.activityTestRule.activity.resources.getStringArray(R.array.geocoders)[1])
-    }
-
-    private fun scrollToText(textResource: Int) {
-        onView(withId(androidx.preference.R.id.recycler_view))
-                .perform(actionOnItem<RecyclerView.ViewHolder>(
-                        hasDescendant(withText(textResource)), scrollTo()))
     }
 }

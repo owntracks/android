@@ -44,7 +44,7 @@ class LogViewerActivityTests {
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
+    @AllowFlaky
     fun logViewerActivityShowsTitle() {
         // Wait for the logviewer coroutine to start
         sleep(5, TimeUnit.SECONDS)
@@ -52,7 +52,7 @@ class LogViewerActivityTests {
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
+    @AllowFlaky
     fun logViewerActivityExportFiresIntent() {
         try {
             Intents.init()

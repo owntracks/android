@@ -21,6 +21,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
+import org.owntracks.android.App
 import org.owntracks.android.R
 import org.owntracks.android.ScreenshotTakingOnTestEndRule
 import org.owntracks.android.ui.clickOnAndWait
@@ -31,20 +32,25 @@ import java.util.concurrent.TimeUnit
 @RunWith(AndroidJUnit4::class)
 class LocationMessageRetryTest {
     @get:Rule
-    var baristaRule = BaristaRule.create(MapActivity::class.java) // We always start e2e at the main entrypoint
+    var baristaRule =
+        BaristaRule.create(MapActivity::class.java) // We always start e2e at the main entrypoint
 
     private val screenshotRule = ScreenshotTakingOnTestEndRule()
 
     @get:Rule
     val ruleChain: RuleChain = RuleChain
-            .outerRule(baristaRule.activityTestRule)
-            .around(screenshotRule)
+        .outerRule(baristaRule.activityTestRule)
+        .around(screenshotRule)
 
     private var mockWebServer = MockWebServer()
 
     @Before
     fun startMockWebserver() {
-        mockWebServer.start()
+        try {
+            mockWebServer.start()
+        } catch (e: IllegalArgumentException) {
+            // Already started
+        }
         mockWebServer.dispatcher = MockWebserverLocationDispatcher(locationResponse)
     }
 
@@ -56,12 +62,14 @@ class LocationMessageRetryTest {
     @After
     fun unregisterIdlingResource() {
         try {
-            IdlingRegistry.getInstance().unregister(baristaRule.activityTestRule.activity.locationIdlingResource)
+            IdlingRegistry.getInstance()
+                .unregister(baristaRule.activityTestRule.activity.locationIdlingResource)
         } catch (_: NullPointerException) {
             // Happens when the vm is already gone from the MapActivity
         }
         try {
-            IdlingRegistry.getInstance().unregister(baristaRule.activityTestRule.activity.outgoingQueueIdlingResource)
+            IdlingRegistry.getInstance()
+                .unregister(baristaRule.activityTestRule.activity.outgoingQueueIdlingResource)
         } catch (_: NullPointerException) {
         }
     }
@@ -71,12 +79,12 @@ class LocationMessageRetryTest {
     """.trimIndent()
 
     @Test
-    @AllowFlaky(attempts = 1)
+    @AllowFlaky
     fun testReportingLocationSucceedsAfterSomeFailures() {
         baristaRule.launchActivity()
 
         val httpPort = mockWebServer.port
-        doWelcomeProcess()
+        doWelcomeProcess(baristaRule.activityTestRule.activity.application as App)
 
         openDrawer()
         clickOnAndWait(R.string.title_activity_preferences)
@@ -93,11 +101,12 @@ class LocationMessageRetryTest {
         clickOnAndWait(R.string.title_activity_map)
 
         val locationIdlingResource = baristaRule.activityTestRule.activity.locationIdlingResource
-        IdlingPolicies.setIdlingResourceTimeout(2,TimeUnit.MINUTES)
+        IdlingPolicies.setIdlingResourceTimeout(2, TimeUnit.MINUTES)
         IdlingRegistry.getInstance().register(locationIdlingResource)
         clickOnAndWait(R.id.menu_report)
 
-        val networkIdlingResource = baristaRule.activityTestRule.activity.outgoingQueueIdlingResource
+        val networkIdlingResource =
+            baristaRule.activityTestRule.activity.outgoingQueueIdlingResource
         IdlingRegistry.getInstance().register(networkIdlingResource)
 
         openDrawer()
@@ -113,7 +122,8 @@ class LocationMessageRetryTest {
             return if (request.path == "/") {
                 requestCounter += 1
                 if (requestCounter >= 3) {
-                    MockResponse().setResponseCode(200).setHeader("Content-type", "application/json").setBody(config)
+                    MockResponse().setResponseCode(200)
+                        .setHeader("Content-type", "application/json").setBody(config)
                 } else {
                     errorResponse
                 }

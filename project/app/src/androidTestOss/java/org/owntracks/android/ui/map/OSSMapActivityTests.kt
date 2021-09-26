@@ -30,7 +30,7 @@ class OSSMapActivityTests {
             .around(screenshotRule)
 
     @Test
-    @AllowFlaky(attempts = 1)
+    @AllowFlaky
     fun welcomeActivityShouldNotRunWhenFirstStartPreferencesSet() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         PreferenceManager.getDefaultSharedPreferences(context)
