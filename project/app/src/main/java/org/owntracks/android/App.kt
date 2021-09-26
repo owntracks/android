@@ -180,6 +180,8 @@ inline fun perfLog(description: String, block: () -> Unit) {
     if (BuildConfig.DEBUG) {
         val elapsed = measureNanoTime { block() }
         Timber.tag("PERF").e("$description: ${elapsed / 1_000_000}ms")
+    } else {
+        block()
     }
 }
 
@@ -188,5 +190,7 @@ inline fun perfLog(block: () -> Unit) {
         val caller =
             Thread.currentThread().stackTrace[2].let { "${it.className}/ ${it.methodName}" }
         perfLog(caller, block)
+    } else {
+        block()
     }
 }
