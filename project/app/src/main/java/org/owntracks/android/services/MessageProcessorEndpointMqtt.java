@@ -9,9 +9,10 @@ import android.os.Looper;
 
 import androidx.annotation.WorkerThread;
 
-import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.IMqttToken;
+import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttClientPersistence;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -214,7 +215,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         Timber.d("client id :%s, connect string: %s", cid, connectString);
         try {
 
-            IMqttAsyncClient mqttClient = new MqttAndroidClient(applicationContext, connectString, cid, new MqttClientMemoryPersistence());
+            IMqttAsyncClient mqttClient = new MqttAsyncClient(connectString, cid, new MqttClientMemoryPersistence());
             mqttClient.setCallback(iCallbackClient);
             return mqttClient;
         } catch (IllegalArgumentException e) {
@@ -254,10 +255,14 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
             Timber.w("already connecting to broker");
             throw new AlreadyConnectingToBrokerException();
         }
-        Timber.tag("6234567").d("Acquired connecting lock");
+        Timber.d("Acquired connecting lock");
         changeState(EndpointState.CONNECTING);
 
         try {
+            if (this.mqttClient != null) {
+                Timber.d("Closing mqtt Client");
+                this.mqttClient.close();
+            }
             this.mqttClient = buildMqttClient();
         } catch (URISyntaxException | MqttException e) {
             Timber.e(e, "Error creating MQTT client");
@@ -271,14 +276,16 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
         try {
             Timber.v("MQTT connecting synchronously");
-            this.mqttClient.connect(mqttConnectOptions).waitForCompletion();
-
+            IMqttToken token = this.mqttClient.connect(mqttConnectOptions);
+            token.waitForCompletion();
         } catch (MqttException e) {
-            Timber.d("Releasing connectinglock");
-            changeState(EndpointState.ERROR.withError(e));
-            throw new MqttConnectionException(e);
-        }
-        finally {
+            if (e.getReasonCode() != 32100) {
+                // Client is not already connected
+                Timber.d("Releasing connectinglock");
+                changeState(EndpointState.ERROR.withError(e));
+                throw new MqttConnectionException(e);
+            }
+        } finally {
             connectingLock.release();
         }
     }
@@ -386,10 +393,6 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         }
     }
 
-    private String getConnectionId() {
-        return String.format("%s/%s", mqttClient.getServerURI(), mqttClient.getClientId());
-    }
-
     private void onConnect() {
         Timber.d("MQTT connected!. Running onconnect handler (threadID %s)", Thread.currentThread());
         scheduler.scheduleMqttMaybeReconnectAndPing(preferences.getKeepalive());
@@ -401,7 +404,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         sendMessageConnectPressure = 0; // allow new connection attempts from queueMessageForSending
         scheduler.cancelMqttReconnect();
         // Check if we're connecting to the same broker that we were already connected to
-        String connectionId = getConnectionId();
+        String connectionId = String.format("%s/%s", mqttClient.getServerURI(), mqttClient.getClientId());
         if (lastConnectionId != null && !connectionId.equals(lastConnectionId)) {
             eventBus.post(new Events.EndpointChanged());
             lastConnectionId = connectionId;
@@ -461,27 +464,25 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         return qos;
     }
 
-    private void disconnect(boolean fromUser) {
-        Timber.d("disconnect. Manually triggered? %s. ThreadID: %s", fromUser, Thread.currentThread());
+    private void disconnect() {
+        Timber.d("disconnect. ThreadID: %s", Thread.currentThread());
         if (isConnecting()) {
             return;
         }
 
         try {
-            if (isConnected()) {
-                Timber.d("Disconnecting");
-                this.mqttClient.disconnect(0);
+            if (mqttClient != null) {
+                if (mqttClient.isConnected()) {
+                    Timber.d("Disconnecting");
+                    this.mqttClient.disconnect(0);
+                }
+                Timber.d("Closing mqtt Client");
+                this.mqttClient.close();
             }
-
-        } catch (MqttException e) {
+        } catch (MqttException | IllegalArgumentException e) {
             Timber.e(e, "Error disconnecting from broker");
         } finally {
-            this.mqttClient = null;
-
-            if (fromUser)
-                changeState(EndpointState.DISCONNECTED_USERDISCONNECT);
-            else
-                changeState(EndpointState.DISCONNECTED);
+            changeState(EndpointState.DISCONNECTED);
             scheduler.cancelMqttPing();
             scheduler.cancelMqttReconnect();
         }
@@ -497,7 +498,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
             return;
         }
         if (isConnected() || isConnecting()) {
-            disconnect(false);
+            disconnect();
         }
         try {
             connectToBroker();
@@ -508,11 +509,6 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
                 completionNotifier.release();
             }
         }
-    }
-
-    @Override
-    public void disconnect() {
-        disconnect(true);
     }
 
     @Override
@@ -539,15 +535,20 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     }
 
     private boolean isConnected() {
-        return this.mqttClient != null && this.mqttClient.isConnected();
+        try {
+            return mqttClient != null && mqttClient.isConnected();
+        } catch (IllegalArgumentException e) { // The MQTT library can throw this if the clientHandle is invalid, apparently
+            return false;
+        }
     }
 
     private boolean isConnecting() {
         if (connectingLock.tryAcquire()) {
-            Timber.d("Releasing connectinglock");
+            Timber.d("MQTT not current connecting");
             connectingLock.release();
             return false;
         } else {
+            Timber.d("MQTT already connecting");
             return true;
         }
     }
@@ -558,7 +559,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
     @Override
     public void onDestroy() {
-        disconnect(false);
+        disconnect();
         scheduler.cancelMqttTasks();
     }
 
