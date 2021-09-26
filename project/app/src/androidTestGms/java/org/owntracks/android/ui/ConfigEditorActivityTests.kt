@@ -56,7 +56,7 @@ class ConfigEditorActivityTests {
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
+    @AllowFlaky
     fun configurationManagementCanEditASetType() {
         openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
         clickOn(R.string.preferencesEditor)
@@ -73,7 +73,7 @@ class ConfigEditorActivityTests {
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
+    @AllowFlaky
     fun configurationManagementCanEditAStringType() {
         openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
         clickOn(R.string.preferencesEditor)
@@ -100,7 +100,7 @@ class ConfigEditorActivityTests {
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
+    @AllowFlaky
     fun configurationManagementCanEditABooleanType() {
         openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
         clickOn(R.string.preferencesEditor)
@@ -114,7 +114,7 @@ class ConfigEditorActivityTests {
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
+    @AllowFlaky
     fun editorActivityShowsDefaultConfig() {
         assertContains(
             R.id.effectiveConfiguration,
@@ -123,7 +123,7 @@ class ConfigEditorActivityTests {
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
+    @AllowFlaky
     fun editorCanExportConfig() {
         val chooserIntentMatcher = allOf(
             hasAction(Intent.ACTION_CHOOSER),

@@ -51,7 +51,7 @@ class PreferencesActivityTests {
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
+    @AllowFlaky
     fun defaultGeocoderIsSelected() {
         clickOnAndWait(R.string.preferencesAdvanced)
         scrollToText(R.string.preferencesReverseGeocodeProvider)

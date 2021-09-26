@@ -23,6 +23,7 @@ import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.Preferences
 import org.owntracks.android.support.RunThingsOnOtherThreads
+import org.owntracks.android.support.SimpleIdlingResource
 import timber.log.Timber
 import java.security.Security
 import javax.inject.Inject
@@ -169,6 +170,8 @@ class App : Application() {
 
         }
     }
+
+    val permissionIdlingResource: SimpleIdlingResource = SimpleIdlingResource("location", true)
 
     companion object {
         const val NOTIFICATION_CHANNEL_ONGOING = "O"

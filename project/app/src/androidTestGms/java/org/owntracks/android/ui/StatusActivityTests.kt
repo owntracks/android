@@ -24,8 +24,8 @@ class StatusActivityTests {
 
     @get:Rule
     val ruleChain: RuleChain = RuleChain
-            .outerRule(baristaRule.activityTestRule)
-            .around(screenshotRule)
+        .outerRule(baristaRule.activityTestRule)
+        .around(screenshotRule)
 
     @Before
     fun setUp() {
@@ -33,13 +33,13 @@ class StatusActivityTests {
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
+    @AllowFlaky
     fun statusActivityShowsEndpointState() {
         assertDisplayed(R.string.status_endpoint_state_hint)
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
+    @AllowFlaky
     fun statusActivityShowsLogsLauncher() {
         assertDisplayed(R.string.viewLogs)
     }

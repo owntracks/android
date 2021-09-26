@@ -14,10 +14,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.AndroidEntryPoint
 import org.greenrobot.eventbus.EventBus
+import org.owntracks.android.App
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiWelcomeIntroBinding
 import org.owntracks.android.support.Events
 import org.owntracks.android.ui.base.BaseSupportFragment
+import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -84,9 +86,11 @@ class PermissionFragment @Inject constructor() :
     override fun onResume() {
         super.onResume()
         checkPermission().run {
+            Timber.e("Permission Checks complete. Result: $this")
             eventBus.post(Events.WelcomeNextDoneButtonsEnableToggle(this))
             viewModel.isPermissionGranted = this
             viewModel.isPermissionRequired = !this
+            (activity?.application as App).permissionIdlingResource.setIdleState(this)
         }
     }
 }

@@ -16,18 +16,19 @@ class GeofencingRequestGMSConversion {
     @Test
     fun canConvertGeofenceRequestToGMS() {
         val geofences = listOf(
-                Geofence(
-                        requestId = "first",
-                        expirationDuration = 1000L,
-                        circularLatitude = 51.0, circularLongitude = 0.0, circularRadius = 100f,
-                        transitionTypes = Geofence.GEOFENCE_TRANSITION_DWELL,
-                        loiteringDelay = 20
-                ),
-                Geofence(requestId = "second",
-                        expirationDuration = 500000L,
-                        circularLatitude = 53.8573, circularLongitude = 4.83487, circularRadius = 20.5f,
-                        transitionTypes = Geofence.GEOFENCE_TRANSITION_ENTER
-                )
+            Geofence(
+                requestId = "first",
+                expirationDuration = 1000L,
+                circularLatitude = 51.0, circularLongitude = 0.0, circularRadius = 100f,
+                transitionTypes = Geofence.GEOFENCE_TRANSITION_DWELL,
+                loiteringDelay = 20
+            ),
+            Geofence(
+                requestId = "second",
+                expirationDuration = 500000L,
+                circularLatitude = 53.8573, circularLongitude = 4.83487, circularRadius = 20.5f,
+                transitionTypes = Geofence.GEOFENCE_TRANSITION_ENTER
+            )
 
         )
         val geofencingRequest = GeofencingRequest(geofences = geofences, initialTrigger = 5)
@@ -42,11 +43,11 @@ class GeofencingRequestGMSConversion {
     @Test
     fun canConvertGeofenceToGMS() {
         val geofence = Geofence(
-                requestId = "first",
-                expirationDuration = 1000L,
-                circularLatitude = 51.0, circularLongitude = 0.0, circularRadius = 100f,
-                transitionTypes = Geofence.GEOFENCE_TRANSITION_DWELL,
-                loiteringDelay = 20
+            requestId = "first",
+            expirationDuration = 1000L,
+            circularLatitude = 51.0, circularLongitude = 0.0, circularRadius = 100f,
+            transitionTypes = Geofence.GEOFENCE_TRANSITION_DWELL,
+            loiteringDelay = 20
         )
         val gmsGeofence = geofence.toGMSGeofence()
         assertEquals("first", gmsGeofence.requestId)
