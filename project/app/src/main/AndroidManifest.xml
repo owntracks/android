@@ -191,10 +191,7 @@
                 <action android:name="org.owntracks.android.EXIT" /> <!-- INTENT_ACTION_CHANGE_MONITORING -->
             </intent-filter>
         </service>
-
-        <service android:name="org.eclipse.paho.android.service.MqttService">
-        </service>
-
+        
         <receiver
             android:name=".support.receiver.StartBackgroundServiceReceiver"
             android:enabled="true"
