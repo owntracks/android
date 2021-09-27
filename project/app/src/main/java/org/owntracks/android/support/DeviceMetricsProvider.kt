@@ -9,6 +9,7 @@ import android.os.BatteryManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import org.owntracks.android.model.BatteryStatus
 import org.owntracks.android.model.messages.MessageLocation
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -32,26 +33,32 @@ class DeviceMetricsProvider @Inject internal constructor(@ApplicationContext pri
                 else -> BatteryStatus.UNKNOWN
             }
         }
-    @Suppress("DEPRECATION")
+
     val connectionType: String?
         get() {
             val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
                 cm.run {
-                    cm.getNetworkCapabilities(cm.activeNetwork)?.run {
-                        if (!hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
-                            return MessageLocation.CONN_TYPE_OFFLINE
+                    try {
+                        cm.getNetworkCapabilities(cm.activeNetwork)?.run {
+                            if (!hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
+                                return MessageLocation.CONN_TYPE_OFFLINE
+                            }
+                            if (hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                                return MessageLocation.CONN_TYPE_MOBILE
+                            }
+                            if (hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                                return MessageLocation.CONN_TYPE_WIFI
+                            }
                         }
-                        if (hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
-                            return MessageLocation.CONN_TYPE_MOBILE
-                        }
-                        if (hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-                            return MessageLocation.CONN_TYPE_WIFI
-                        }
+                        // Android bug: https://issuetracker.google.com/issues/175055271
+                        // ConnectivityManager::getNetworkCapabilities apparently throws a SecurityException
+                    } catch (e: SecurityException) {
+                        Timber.e(e, "Exception fetching networkcapabilities")
                     }
                 }
                 return null
-            } else {
+            } else @Suppress("DEPRECATION") {
 
                 val activeNetworkInfo = cm.activeNetworkInfo ?: return null
                 if (!activeNetworkInfo.isConnected) {
