@@ -80,7 +80,7 @@ class SharedPreferencesStore @Inject constructor(@ApplicationContext context: Co
     }
 
     override fun hasKey(key: String): Boolean {
-        return activeSharedPreferences.contains(key)
+        return this::activeSharedPreferences.isInitialized && activeSharedPreferences.contains(key)
     }
 
     override fun getInitMode(key: String, default: Int): Int {
