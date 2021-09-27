@@ -179,7 +179,7 @@ class App : Application() {
 inline fun perfLog(description: String, block: () -> Unit) {
     if (BuildConfig.DEBUG) {
         val elapsed = measureNanoTime { block() }
-        Timber.tag("PERF").e("$description: ${elapsed / 1_000_000}ms")
+        Timber.tag("PERF").d("$description: ${elapsed / 1_000_000}ms")
     } else {
         block()
     }

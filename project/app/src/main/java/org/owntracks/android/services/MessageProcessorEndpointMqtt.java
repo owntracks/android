@@ -19,6 +19,7 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistable;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.greenrobot.eventbus.EventBus;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
@@ -215,7 +216,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         Timber.d("client id :%s, connect string: %s", cid, connectString);
         try {
 
-            IMqttAsyncClient mqttClient = new MqttAsyncClient(connectString, cid, new MqttClientMemoryPersistence());
+            IMqttAsyncClient mqttClient = new MqttAsyncClient(connectString, cid, new MemoryPersistence());
             mqttClient.setCallback(iCallbackClient);
             return mqttClient;
         } catch (IllegalArgumentException e) {
@@ -597,52 +598,6 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         ) {
             Timber.d("MQTT preferences changed. Reconnecting to broker. ThreadId: %s", Thread.currentThread());
             reconnect();
-        }
-    }
-
-    private static final class MqttClientMemoryPersistence implements MqttClientPersistence {
-        private static Hashtable<String, MqttPersistable> data;
-
-        @Override
-        public void open(String s, String s2) {
-            if (data == null) {
-                data = new Hashtable<>();
-            }
-        }
-
-        @Override
-        public void close() {
-
-        }
-
-        @Override
-        public void put(String key, MqttPersistable persistable) {
-            data.put(key, persistable);
-        }
-
-        @Override
-        public MqttPersistable get(String key) {
-            return data.get(key);
-        }
-
-        @Override
-        public void remove(String key) {
-            data.remove(key);
-        }
-
-        @Override
-        public Enumeration keys() {
-            return data.keys();
-        }
-
-        @Override
-        public void clear() {
-            data.clear();
-        }
-
-        @Override
-        public boolean containsKey(String key) {
-            return data.containsKey(key);
         }
     }
 
