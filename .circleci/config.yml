@@ -196,7 +196,11 @@ jobs:
       - android/restore-build-cache
       - android/restore-gradle-cache:
           find-args: ". -name 'build.gradle.kts'"
-
+      - run:
+          name: Set credentials
+          command: |
+            echo -n $GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS_BASE64 | base64 -d > project/app/owntracks-android-gcloud-creds.json
+            echo -n $KEYSTORE_BASE64 | base64 -d > project/owntracks.release.keystore.jks
       - run:
           name: Build
           command: |
@@ -224,6 +228,7 @@ workflows:
             - oss-ui-tests
             - gms-ui-tests
       - publish-to-play-store:
+          context: Android Deploy Credentials
           requires:
             - unit-test
             - oss-ui-tests
