@@ -82,6 +82,7 @@ jobs:
       - android/restore-build-cache
       - android/start-emulator-and-run-tests:
           additional-avd-args: "-d pixel_3a -c 1G"
+          additional-emulator-args: "-memory 4096"
           test-command: ./gradlew createOssDebugCoverageReport --scan
           system-image: system-images;android-29;default;x86_64
           restore-gradle-cache-post-emulator-launch: true
@@ -115,6 +116,7 @@ jobs:
       - android/restore-build-cache
       - android/start-emulator-and-run-tests:
           additional-avd-args: "-d pixel_3a -c 1G"
+          additional-emulator-args: "-memory 4096"
           test-command: ./gradlew createGmsDebugCoverageReport --scan
           system-image: system-images;android-29;google_apis;x86_64
           restore-gradle-cache-post-emulator-launch: true
