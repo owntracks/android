@@ -8,9 +8,9 @@ import androidx.test.espresso.NoMatchingViewException
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
-import androidx.test.espresso.matcher.ViewMatchers
-import androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility
+import androidx.test.espresso.matcher.ViewMatchers.*
 import com.schibsted.spain.barista.interaction.BaristaClickInteractions.clickOn
+import com.schibsted.spain.barista.interaction.BaristaSleepInteractions.sleepThread
 import com.schibsted.spain.barista.interaction.PermissionGranter
 import com.schibsted.spain.barista.internal.util.resourceMatcher
 import org.owntracks.android.App
@@ -24,13 +24,14 @@ internal fun doWelcomeProcess(app: App) {
         onView(R.id.fix_permissions_button.resourceMatcher()).check(
             matches(
                 withEffectiveVisibility(
-                    ViewMatchers.Visibility.VISIBLE
+                    Visibility.VISIBLE
                 )
             )
         )
         clickOn(R.id.fix_permissions_button)
         IdlingRegistry.getInstance().register(app.permissionIdlingResource)
         PermissionGranter.allowPermissionsIfNeeded(ACCESS_FINE_LOCATION)
+        sleepThread(1000)
         clickOnAndWait(R.id.btn_next)
     } catch (e: NoMatchingViewException) {
 
@@ -39,10 +40,10 @@ internal fun doWelcomeProcess(app: App) {
 }
 
 fun scrollToPreferenceWithText(textResource: Int) {
-    onView(ViewMatchers.withId(androidx.preference.R.id.recycler_view))
+    onView(withId(androidx.preference.R.id.recycler_view))
         .perform(
             RecyclerViewActions.actionOnItem<RecyclerView.ViewHolder>(
-                ViewMatchers.hasDescendant(ViewMatchers.withText(textResource)),
+                hasDescendant(withText(textResource)),
                 ViewActions.scrollTo()
             )
         )

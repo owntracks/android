@@ -379,7 +379,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
         connectOptions.setAutomaticReconnect(true);
         connectOptions.setKeepAliveInterval(preferences.getKeepalive());
-        connectOptions.setConnectionTimeout(30);
+        connectOptions.setConnectionTimeout(5);
 
         connectOptions.setCleanSession(preferences.getCleanSession());
         return connectOptions;
@@ -431,6 +431,8 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         topics.add(preferences.getPubTopicBase() + preferences.getPubTopicCommandsPart());
 
         subscribe(topics.toArray(new String[0]));
+
+        messageProcessor.resetMessageSleepBlock();
     }
 
     @NotNull

@@ -3,6 +3,7 @@ package org.owntracks.android.ui.map
 import android.Manifest
 import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso
+import androidx.test.espresso.IdlingPolicies
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -17,6 +18,7 @@ import com.schibsted.spain.barista.interaction.BaristaEditTextInteractions.write
 import com.schibsted.spain.barista.interaction.PermissionGranter
 import com.schibsted.spain.barista.rule.BaristaRule
 import com.schibsted.spain.barista.rule.flaky.AllowFlaky
+import org.junit.Before
 import org.junit.FixMethodOrder
 import org.junit.Rule
 import org.junit.Test
@@ -29,6 +31,7 @@ import org.owntracks.android.ScreenshotTakingOnTestEndRule
 import org.owntracks.android.e2e.doWelcomeProcess
 import org.owntracks.android.support.Preferences
 import org.owntracks.android.ui.clickOnAndWait
+import java.util.concurrent.TimeUnit
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -43,6 +46,11 @@ class GMSMapActivityTests {
     val ruleChain: RuleChain = RuleChain
         .outerRule(baristaRule.activityTestRule)
         .around(screenshotRule)
+
+    @Before
+    fun setIdlingTimeout() {
+        IdlingPolicies.setIdlingResourceTimeout(10, TimeUnit.SECONDS)
+    }
 
     @Test
     @AllowFlaky

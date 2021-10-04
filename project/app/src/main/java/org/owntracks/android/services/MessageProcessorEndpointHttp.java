@@ -296,18 +296,19 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
                 preferences.getPreferenceKey(R.string.preferenceKeyURL).equals(key)
                         || preferences.getPreferenceKey(R.string.preferenceKeyUsername).equals(key)
                         || preferences.getPreferenceKey(R.string.preferenceKeyPassword).equals(key)
-                        || preferences.getPreferenceKey(R.string.preferenceKeyDeviceId).equals(key))
+                        || preferences.getPreferenceKey(R.string.preferenceKeyDeviceId).equals(key)) {
+            messageProcessor.resetMessageSleepBlock();
             loadEndpointUrl();
-        else if (preferences.getPreferenceKey(R.string.preferenceKeyTLSClientCrt).equals(key)
+        } else if (preferences.getPreferenceKey(R.string.preferenceKeyTLSClientCrt).equals(key)
                 || preferences.getPreferenceKey(R.string.preferenceKeyTLSClientCrtPassword).equals(key)
-                || preferences.getPreferenceKey(R.string.preferenceKeyTLSCaCrt).equals(key))
+                || preferences.getPreferenceKey(R.string.preferenceKeyTLSCaCrt).equals(key)) {
             mHttpClient = null;
+        }
     }
 
     @Override
     public void checkConfigurationComplete() throws ConfigurationIncompleteException {
-        if (this.httpEndpoint==null)
-        {
+        if (this.httpEndpoint == null) {
             throw new ConfigurationIncompleteException("HTTP Endpoint is missing");
         }
     }

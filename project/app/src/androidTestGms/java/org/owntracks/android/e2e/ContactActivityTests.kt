@@ -2,6 +2,7 @@ package org.owntracks.android.e2e
 
 import android.view.View
 import android.view.animation.Animation
+import androidx.test.espresso.IdlingPolicies
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.IdlingResource.ResourceCallback
@@ -32,6 +33,7 @@ import org.owntracks.android.R
 import org.owntracks.android.ScreenshotTakingOnTestEndRule
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.map.MapActivity
+import java.util.concurrent.TimeUnit
 
 
 @LargeTest
@@ -49,6 +51,11 @@ class ContactActivityTests {
         .around(screenshotRule)
 
     private var mockWebServer = MockWebServer()
+
+    @Before
+    fun setIdlingTimeout() {
+        IdlingPolicies.setIdlingResourceTimeout(30, TimeUnit.SECONDS)
+    }
 
     @Before
     fun startMockWebserver() {

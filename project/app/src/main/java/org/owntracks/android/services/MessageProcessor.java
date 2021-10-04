@@ -32,7 +32,10 @@ import java.util.Locale;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -69,6 +72,10 @@ public class MessageProcessor {
 
     private boolean initialized = false;
 
+    private final Object locker = new Object();
+    private ScheduledFuture<?> waitFuture = null;
+    private long retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT;
+
     @Inject
     public MessageProcessor(
             @ApplicationContext Context applicationContext,
@@ -101,6 +108,7 @@ public class MessageProcessor {
             for (int i = 0; i < outgoingQueue.size(); i++) {
                 outgoingQueueIdlingResource.increment();
             }
+            Timber.d("Initializing the outgoingqueueidlingresource at %s",outgoingQueue.size());
         }
     }
 
@@ -223,7 +231,9 @@ public class MessageProcessor {
         Timber.d("Starting outbound message loop. ThreadID: %s", Thread.currentThread());
         boolean previousMessageFailed = false;
         int retriesToGo = 0;
-        long retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT;
+
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+
         while (true) {
             try {
                 MessageBase message;
@@ -287,7 +297,14 @@ public class MessageProcessor {
 
                 if (previousMessageFailed) {
                     Timber.i("Waiting for %s s before retrying", retryWait / 1000);
-                    Thread.sleep(retryWait);
+                     waitFuture = scheduler.schedule(() -> {
+                        synchronized (locker) {
+                            locker.notify();
+                        }
+                    }, retryWait, TimeUnit.MILLISECONDS);
+                    synchronized (locker) {
+                        locker.wait();
+                    }
                     retryWait = Math.min(2 * retryWait, SEND_FAILURE_BACKOFF_MAX_WAIT);
                 } else {
                     synchronized (outgoingQueueIdlingResource) {
@@ -305,7 +322,18 @@ public class MessageProcessor {
                 break;
             }
         }
+        scheduler.shutdown();
         Timber.w("Exiting outgoingmessage loop");
+    }
+
+    public void resetMessageSleepBlock() {
+        if (waitFuture!=null && waitFuture.cancel(false)) {
+            Timber.d("Resetting message send loop wait. Thread: %s", Thread.currentThread());
+            retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT;
+            synchronized (locker) {
+                locker.notify();
+            }
+        }
     }
 
     @SuppressWarnings("UnusedParameters")

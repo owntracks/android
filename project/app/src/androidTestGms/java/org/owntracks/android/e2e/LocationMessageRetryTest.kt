@@ -6,9 +6,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertContains
 import com.schibsted.spain.barista.interaction.BaristaClickInteractions.clickBack
-import com.schibsted.spain.barista.interaction.BaristaDialogInteractions
+import com.schibsted.spain.barista.interaction.BaristaDialogInteractions.clickDialogPositiveButton
 import com.schibsted.spain.barista.interaction.BaristaDrawerInteractions.openDrawer
-import com.schibsted.spain.barista.interaction.BaristaEditTextInteractions
+import com.schibsted.spain.barista.interaction.BaristaEditTextInteractions.writeTo
 import com.schibsted.spain.barista.rule.BaristaRule
 import com.schibsted.spain.barista.rule.flaky.AllowFlaky
 import okhttp3.mockwebserver.Dispatcher
@@ -43,6 +43,12 @@ class LocationMessageRetryTest {
         .around(screenshotRule)
 
     private var mockWebServer = MockWebServer()
+
+    @Before
+    fun setIdlingTimeout() {
+        // We're going to fail to respond in this test for a bit, so need to slacken the idle timeout
+        IdlingPolicies.setIdlingResourceTimeout(2, TimeUnit.MINUTES)
+    }
 
     @Before
     fun startMockWebserver() {
@@ -91,17 +97,16 @@ class LocationMessageRetryTest {
         clickOnAndWait(R.string.preferencesServer)
         clickOnAndWait(R.string.mode_heading)
         clickOnAndWait(R.string.mode_http_private_label)
-        BaristaDialogInteractions.clickDialogPositiveButton()
+        clickDialogPositiveButton()
         clickOnAndWait(R.string.preferencesHost)
-        BaristaEditTextInteractions.writeTo(R.id.url, "http://localhost:${httpPort}/")
-        BaristaDialogInteractions.clickDialogPositiveButton()
+        writeTo(R.id.url, "http://localhost:${httpPort}/")
+        clickDialogPositiveButton()
         clickBack()
 
         openDrawer()
         clickOnAndWait(R.string.title_activity_map)
 
         val locationIdlingResource = baristaRule.activityTestRule.activity.locationIdlingResource
-        IdlingPolicies.setIdlingResourceTimeout(30, TimeUnit.SECONDS)
         IdlingRegistry.getInstance().register(locationIdlingResource)
         clickOnAndWait(R.id.menu_report)
 
