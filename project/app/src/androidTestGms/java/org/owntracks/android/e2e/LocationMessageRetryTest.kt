@@ -101,7 +101,7 @@ class LocationMessageRetryTest {
         clickOnAndWait(R.string.title_activity_map)
 
         val locationIdlingResource = baristaRule.activityTestRule.activity.locationIdlingResource
-        IdlingPolicies.setIdlingResourceTimeout(2, TimeUnit.MINUTES)
+        IdlingPolicies.setIdlingResourceTimeout(30, TimeUnit.SECONDS)
         IdlingRegistry.getInstance().register(locationIdlingResource)
         clickOnAndWait(R.id.menu_report)
 

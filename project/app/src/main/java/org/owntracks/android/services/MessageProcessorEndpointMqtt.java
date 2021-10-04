@@ -1,5 +1,6 @@
 package org.owntracks.android.services;
 
+import static org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CLIENT_DISCONNECT_PROHIBITED;
 import static org.owntracks.android.support.RunThingsOnOtherThreads.NETWORK_HANDLER_THREAD_NAME;
 
 import android.content.Context;
@@ -14,11 +15,9 @@ import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
-import org.eclipse.paho.client.mqttv3.MqttClientPersistence;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.eclipse.paho.client.mqttv3.MqttPersistable;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.greenrobot.eventbus.EventBus;
 import org.jetbrains.annotations.NotNull;
@@ -53,8 +52,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.Semaphore;
@@ -261,8 +258,16 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
         try {
             if (this.mqttClient != null) {
-                Timber.d("Closing mqtt Client");
-                this.mqttClient.close();
+                Timber.d("Disconnecting mqtt Client");
+                try {
+                    this.mqttClient.disconnect().waitForCompletion();
+                } catch (MqttException e) {
+                    Timber.d(e, "Error disconnecting from mqtt client.");
+                    if (e.getReasonCode() == REASON_CODE_CLIENT_DISCONNECT_PROHIBITED) {
+                        Timber.w("Disconnect existing mqtt client would deadlock, not continuing connect");
+                        throw e;
+                    }
+                }
             }
             this.mqttClient = buildMqttClient();
         } catch (URISyntaxException | MqttException e) {
@@ -475,10 +480,8 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
             if (mqttClient != null) {
                 if (mqttClient.isConnected()) {
                     Timber.d("Disconnecting");
-                    this.mqttClient.disconnect(0);
+                    this.mqttClient.disconnect().waitForCompletion();
                 }
-                Timber.d("Closing mqtt Client");
-                this.mqttClient.close();
             }
         } catch (MqttException | IllegalArgumentException e) {
             Timber.e(e, "Error disconnecting from broker");

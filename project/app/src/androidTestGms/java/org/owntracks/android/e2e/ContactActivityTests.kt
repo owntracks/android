@@ -111,9 +111,9 @@ class ContactActivityTests {
 
         clickOnAndWait(R.id.menu_report)
 
-        val networkIdlingResource =
+        val outgoingQueueIdlingResource =
             baristaRule.activityTestRule.activity.outgoingQueueIdlingResource
-        IdlingRegistry.getInstance().register(networkIdlingResource)
+        IdlingRegistry.getInstance().register(outgoingQueueIdlingResource)
 
         openDrawer()
         clickOnAndWait(R.string.title_activity_contacts)
