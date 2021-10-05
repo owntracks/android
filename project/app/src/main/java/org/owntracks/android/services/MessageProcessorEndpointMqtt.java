@@ -163,7 +163,6 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
             changeState(EndpointState.DISCONNECTED.withError(cause));
             Timber.d("Releasing connectinglock");
             connectingLock.release();
-            scheduler.scheduleMqttReconnect();
         }
 
         @Override
