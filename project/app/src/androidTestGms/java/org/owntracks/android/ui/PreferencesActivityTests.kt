@@ -144,8 +144,9 @@ class PreferencesActivityTests {
         assertContains(R.id.effectiveConfiguration, "\"locatorInterval\" : 123")
         assertContains(R.id.effectiveConfiguration, "\"moveModeLocatorInterval\" : 5")
         assertContains(R.id.effectiveConfiguration, "\"autostartOnBoot\" : false")
-//        assertContains(R.id.effectiveConfiguration, "\"reverseGeocodeProvider\" : \"OpenCage\"`")
-//        assertContains(R.id.effectiveConfiguration, "\"opencageApiKey\" : \"geocodeAPIKey\"")
+        assertContains(R.id.effectiveConfiguration, "\"reverseGeocodeProvider\" : \"OpenCage\"")
+        assertContains(R.id.effectiveConfiguration, "\"opencageApiKey\" : \"geocodeAPIKey\"")
+        assertContains(R.id.effectiveConfiguration, "\"connectionTimeoutSeconds\" : 30")
 
         // Make sure that the MQTT-specific settings aren't present
         assertNotContains(R.id.effectiveConfiguration, "\"host\"")

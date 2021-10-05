@@ -17,6 +17,7 @@
     <integer name="valMqttProtocolLevel">4</integer>
     <integer name="valPing">30</integer>
     <integer name="valLocatorPriority">2</integer>
+    <integer name="defaultConnectionTimeoutSeconds">30</integer>
 
     <bool name="valCleanSession">false</bool>
     <bool name="valPubExtendedData">true</bool>

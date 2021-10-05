@@ -300,6 +300,22 @@ class Preferences @Inject constructor(
         }
 
     @get:Export(
+        keyResId = R.string.preferenceKeyConnectionTimeoutSeconds,
+        exportModeMqtt = true,
+        exportModeHttp = true
+    )
+    @set:Import(keyResId = R.string.preferenceKeyConnectionTimeoutSeconds)
+    var connectionTimeoutSeconds: Int
+        get() = getIntOrDefault(
+            R.string.preferenceKeyConnectionTimeoutSeconds,
+            R.integer.defaultConnectionTimeoutSeconds
+        )
+        set(newValue) {
+            setInt(R.string.preferenceKeyConnectionTimeoutSeconds, newValue.coerceAtLeast(1))
+        }
+
+
+    @get:Export(
         keyResId = R.string.preferenceKeyPublishExtendedData,
         exportModeMqtt = true,
         exportModeHttp = true
@@ -701,9 +717,14 @@ class Preferences @Inject constructor(
     @get:Export(keyResId = R.string.preferenceKeyPubQos, exportModeMqtt = true)
     @set:Import(keyResId = R.string.preferenceKeyPubQos)
     var pubQos: Int
-        get() = getIntOrDefault(R.string.preferenceKeyPubQos, R.integer.valPubQos).coerceAtMost(MQTT_MAX_QOS).coerceAtLeast(MQTT_MIN_QOS)
+        get() = getIntOrDefault(R.string.preferenceKeyPubQos, R.integer.valPubQos).coerceAtMost(
+            MQTT_MAX_QOS
+        ).coerceAtLeast(MQTT_MIN_QOS)
         set(anInt) {
-            setInt(R.string.preferenceKeyPubQos, anInt.coerceAtMost(MQTT_MAX_QOS).coerceAtLeast(MQTT_MIN_QOS))
+            setInt(
+                R.string.preferenceKeyPubQos,
+                anInt.coerceAtMost(MQTT_MAX_QOS).coerceAtLeast(MQTT_MIN_QOS)
+            )
         }
 
 
@@ -719,9 +740,14 @@ class Preferences @Inject constructor(
     @get:Export(keyResId = R.string.preferenceKeySubQos, exportModeMqtt = true)
     @set:Import(keyResId = R.string.preferenceKeySubQos)
     var subQos: Int
-        get() = getIntOrDefault(R.string.preferenceKeySubQos, R.integer.valSubQos).coerceAtMost(MQTT_MAX_QOS).coerceAtLeast(MQTT_MIN_QOS)
+        get() = getIntOrDefault(R.string.preferenceKeySubQos, R.integer.valSubQos).coerceAtMost(
+            MQTT_MAX_QOS
+        ).coerceAtLeast(MQTT_MIN_QOS)
         set(anInt) {
-            setInt(R.string.preferenceKeySubQos, anInt.coerceAtMost(MQTT_MAX_QOS).coerceAtLeast(MQTT_MIN_QOS))
+            setInt(
+                R.string.preferenceKeySubQos,
+                anInt.coerceAtMost(MQTT_MAX_QOS).coerceAtLeast(MQTT_MIN_QOS)
+            )
         }
 
     @get:Export(

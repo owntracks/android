@@ -379,7 +379,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
         connectOptions.setAutomaticReconnect(true);
         connectOptions.setKeepAliveInterval(preferences.getKeepalive());
-        connectOptions.setConnectionTimeout(5);
+        connectOptions.setConnectionTimeout(preferences.getConnectionTimeoutSeconds());
 
         connectOptions.setCleanSession(preferences.getCleanSession());
         return connectOptions;

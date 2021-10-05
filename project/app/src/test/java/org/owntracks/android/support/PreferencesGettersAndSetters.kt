@@ -75,6 +75,8 @@ class PreferencesGettersAndSetters(
                     arrayOf("AutostartOnBoot", "autostartOnBoot", true, true, Boolean::class, false),
                     arrayOf("CleanSession", "cleanSession", true, true, Boolean::class, false),
                     arrayOf("ClientId", "clientId", "testClientId", "testClientId", String::class, false),
+                    arrayOf("ConnectionTimeoutSeconds", "connectionTimeoutSeconds", 20, 20, Int::class, false),
+                    arrayOf("ConnectionTimeoutSeconds", "connectionTimeoutSeconds", -5, 1, Int::class, false),
                     arrayOf("DebugLog", "debugLog", true, true, Boolean::class, false),
                     arrayOf("DeviceId", "deviceId", "deviceId", "deviceId", String::class, false),
                     arrayOf("DontReuseHttpClient", "dontReuseHttpClient", true, true, Boolean::class, true),
@@ -143,6 +145,7 @@ class PreferencesGettersAndSetters(
                 on { getString(eq(R.string.preferenceKeyAutostartOnBoot)) } doReturn "autostartOnBoot"
                 on { getString(eq(R.string.preferenceKeyCleanSession)) } doReturn "cleanSession"
                 on { getString(eq(R.string.preferenceKeyClientId)) } doReturn "clientId"
+                on { getString(eq(R.string.preferenceKeyConnectionTimeoutSeconds)) } doReturn "connectionTimeoutSeconds"
                 on { getString(eq(R.string.preferenceKeyDebugLog)) } doReturn "debugLog"
                 on { getString(eq(R.string.preferenceKeyDeviceId)) } doReturn "deviceId"
                 on { getString(eq(R.string.preferenceKeyDontReuseHttpClient)) } doReturn "dontReuseHttpClient"

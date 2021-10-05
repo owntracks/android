@@ -140,7 +140,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .followRedirects(true)
                 .followSslRedirects(true)
-                .connectTimeout(15, TimeUnit.SECONDS)
+                .connectTimeout(preferences.getConnectionTimeoutSeconds(), TimeUnit.SECONDS)
                 .connectionPool(new ConnectionPool(1, 1, TimeUnit.MICROSECONDS))
                 .retryOnConnectionFailure(false)
                 .protocols(Collections.singletonList(Protocol.HTTP_1_1))

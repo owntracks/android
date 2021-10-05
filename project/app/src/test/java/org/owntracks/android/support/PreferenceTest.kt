@@ -68,6 +68,7 @@ class PreferenceTest {
 
     private val preferenceKeys = listOf(
         "autostartOnBoot",
+        "connectionTimeoutSeconds",
         "debugLog",
         "deviceId",
         "fusedRegionDetection",
