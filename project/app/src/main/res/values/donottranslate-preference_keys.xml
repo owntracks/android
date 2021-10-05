@@ -4,6 +4,7 @@
     <string name="preferenceKeyAutostartOnBoot">autostartOnBoot</string>
     <string name="preferenceKeyCleanSession">cleanSession</string>
     <string name="preferenceKeyClientId">clientId</string>
+    <string name="preferenceKeyConnectionTimeoutSeconds">connectionTimeoutSeconds</string>
     <string name="preferenceKeyDebugLog">debugLog</string>
     <string name="preferenceKeyDeviceId">deviceId</string>
     <string name="preferenceKeyDontReuseHttpClient">dontReuseHttpClient</string>

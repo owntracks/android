@@ -68,7 +68,6 @@ class PreferenceTest {
 
     private val preferenceKeys = listOf(
         "autostartOnBoot",
-        "cleanSession",
         "debugLog",
         "deviceId",
         "fusedRegionDetection",
@@ -96,6 +95,7 @@ class PreferenceTest {
     )
     private val httpOnlyPreferenceKeys = listOf("dontReuseHttpClient", "url")
     private val mqttOnlyPreferenceKeys = listOf(
+        "cleanSession",
         "clientId",
         "host",
         "info",

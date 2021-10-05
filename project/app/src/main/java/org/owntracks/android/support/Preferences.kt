@@ -290,7 +290,7 @@ class Preferences @Inject constructor(
     @get:Export(
         keyResId = R.string.preferenceKeyCleanSession,
         exportModeMqtt = true,
-        exportModeHttp = true
+        exportModeHttp = false
     )
     @set:Import(keyResId = R.string.preferenceKeyCleanSession)
     var cleanSession: Boolean
