@@ -1,5 +1,16 @@
 # Changelog
 
+## Version 2.4.3
+
+### New features
+
+* Connection timeout is now configurable
+
+### Bug fixes
+
+* Fix crash in the MQTT library related to how the connection was closed (#1093).
+* Cleansession preference shouldn't be exported in HTTP mode
+
 ## Version 2.4.2
 
 ### New features
