@@ -9,10 +9,10 @@ import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.*
-import com.schibsted.spain.barista.interaction.BaristaClickInteractions.clickOn
-import com.schibsted.spain.barista.interaction.BaristaSleepInteractions.sleepThread
-import com.schibsted.spain.barista.interaction.PermissionGranter
-import com.schibsted.spain.barista.internal.util.resourceMatcher
+import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
+import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleepThread
+import com.adevinta.android.barista.interaction.PermissionGranter
+import com.adevinta.android.barista.internal.util.resourceMatcher
 import org.owntracks.android.App
 import org.owntracks.android.R
 import org.owntracks.android.ui.clickOnAndWait

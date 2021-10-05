@@ -5,10 +5,10 @@ import androidx.preference.PreferenceManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
-import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
-import com.schibsted.spain.barista.interaction.PermissionGranter
-import com.schibsted.spain.barista.rule.BaristaRule
-import com.schibsted.spain.barista.rule.flaky.AllowFlaky
+import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
+import com.adevinta.android.barista.interaction.PermissionGranter
+import com.adevinta.android.barista.rule.BaristaRule
+import com.adevinta.android.barista.rule.flaky.AllowFlaky
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain

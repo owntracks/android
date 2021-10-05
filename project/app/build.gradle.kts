@@ -179,8 +179,8 @@ tasks.withType<Test> {
 val okHttpVersion = "4.9.1"
 val jacksonVersion = "2.12.2"
 val materialDialogsVersion = "0.9.6.0"
-val espressoVersion = "3.3.0"
-val androidxTestVersion = "1.3.0"
+val espressoVersion = "3.4.0"
+val androidxTestVersion = "1.4.0"
 val kotlinCoroutinesVersion = "1.4.1"
 val jaxbVersion = "3.0.1"
 
@@ -250,13 +250,10 @@ dependencies {
     testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
     testImplementation("android.arch.core:core-testing:1.1.1")
 
-    androidTestImplementation("androidx.test.espresso:espresso-core:${espressoVersion}")
-    androidTestImplementation("androidx.test.espresso:espresso-contrib:${espressoVersion}")
-    androidTestImplementation("androidx.test.espresso:espresso-intents:${espressoVersion}")
 
-    androidTestImplementation("androidx.test.ext:junit:1.1.2")
+    androidTestImplementation("androidx.test.ext:junit:1.1.3")
     androidTestImplementation("androidx.test:core-ktx:${androidxTestVersion}")
-    androidTestImplementation("com.schibsted.spain:barista:3.9.0") {
+    androidTestImplementation("com.adevinta.android:barista:4.2.0") {
         exclude("org.jetbrains.kotlin")
     }
     androidTestImplementation("com.squareup.okhttp3:mockwebserver:${okHttpVersion}")

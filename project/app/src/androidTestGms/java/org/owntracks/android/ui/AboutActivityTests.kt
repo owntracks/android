@@ -7,10 +7,10 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import com.schibsted.spain.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
-import com.schibsted.spain.barista.interaction.BaristaClickInteractions.clickOn
-import com.schibsted.spain.barista.rule.BaristaRule
-import com.schibsted.spain.barista.rule.flaky.AllowFlaky
+import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
+import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
+import com.adevinta.android.barista.rule.BaristaRule
+import com.adevinta.android.barista.rule.flaky.AllowFlaky
 import org.hamcrest.CoreMatchers.allOf
 import org.junit.After
 import org.junit.Before

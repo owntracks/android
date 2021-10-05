@@ -1,8 +1,8 @@
 package org.owntracks.android.ui
 
-import com.schibsted.spain.barista.interaction.BaristaClickInteractions.clickBack
-import com.schibsted.spain.barista.interaction.BaristaClickInteractions.clickOn
-import com.schibsted.spain.barista.interaction.BaristaSleepInteractions.sleep
+import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickBack
+import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
+import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 
 private const val sleepMillis = 1000L
 fun clickOnAndWait(int: Int) {
