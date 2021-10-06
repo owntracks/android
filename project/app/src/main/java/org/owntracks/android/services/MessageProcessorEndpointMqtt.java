@@ -163,6 +163,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
             changeState(EndpointState.DISCONNECTED.withError(cause));
             Timber.d("Releasing connectinglock");
             connectingLock.release();
+            scheduler.scheduleMqttReconnect();
         }
 
         @Override
@@ -376,7 +377,9 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
         setWill(connectOptions);
 
-        connectOptions.setAutomaticReconnect(true);
+        // Autoconnect in paho is *hilariously* buggy. Expect much sadness and many race conditions
+        // if you think enabling this is a good idea
+        connectOptions.setAutomaticReconnect(false);
         connectOptions.setKeepAliveInterval(preferences.getKeepalive());
         connectOptions.setConnectionTimeout(preferences.getConnectionTimeoutSeconds());
 
