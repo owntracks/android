@@ -10,6 +10,7 @@
 
 * Fix crash in the MQTT library related to how the connection was closed (#1093).
 * Cleansession preference shouldn't be exported in HTTP mode
+* OSS build now requests GPS updates in significant changes mode (#1096)
 
 ## Version 2.4.2
 

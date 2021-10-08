@@ -24,19 +24,22 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient 
             withContext(Dispatchers.Main) {
                 gpsMyLocationProvider.stopLocationProvider()
                 val listener = IMyLocationConsumer { location, _ -> clientCallBack.onLocationResult(LocationResult(location)) }
+                gpsMyLocationProvider.clearLocationSources()
                 when (locationRequest.priority) {
+
                     PRIORITY_HIGH_ACCURACY -> {
                         gpsMyLocationProvider.addLocationSource("gps")
                         gpsMyLocationProvider.addLocationSource("network")
                         gpsMyLocationProvider.addLocationSource("passive")
                     }
                     PRIORITY_BALANCED_POWER_ACCURACY -> {
-                        gpsMyLocationProvider.clearLocationSources()
+                        gpsMyLocationProvider.addLocationSource("gps")
                         gpsMyLocationProvider.addLocationSource("network")
                         gpsMyLocationProvider.addLocationSource("passive")
                     }
                     else -> {
                         gpsMyLocationProvider.addLocationSource("network")
+                        gpsMyLocationProvider.addLocationSource("passive")
                     }
                 }
                 gpsMyLocationProvider.locationUpdateMinTime = locationRequest.interval ?: 30_000
