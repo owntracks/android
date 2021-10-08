@@ -33,7 +33,54 @@ class TestWithMQTTBrokerImpl : TestWithAnMQTTBroker {
     override val deviceId = "aa"
     private val mqttTestPassword = "testPassword"
     override val mqttPacketsReceived: MutableList<MQTTPacket> = mutableListOf()
-    override val broker =
+    override lateinit var broker: Broker
+
+
+    override fun <E : MessageBase> Collection<E>.sendFromBroker(broker: Broker) {
+        map(Parser(null)::toJsonBytes)
+            .forEach {
+                broker.publish(
+                    false,
+                    "owntracks/someuser/somedevice",
+                    Qos.AT_LEAST_ONCE,
+                    MQTT5Properties(),
+                    it.toUByteArray()
+                )
+            }
+    }
+
+    private lateinit var brokerThread: Thread
+    private var shouldBeRunning = false
+
+    @DelicateCoroutinesApi
+    override fun startBroker() {
+        mqttPacketsReceived.clear()
+        Timber.i("Starting MQTT Broker")
+        broker = createNewBroker()
+        shouldBeRunning = true
+        brokerThread = thread {
+            while (shouldBeRunning) {
+                Timber.i("Calling MQTT Broker listen")
+                broker.listen()
+                Timber.i("MQTT Broker no longer listening")
+            }
+            Timber.i("MQTT Broker Thread ending")
+        }
+        var listening = false
+        while (!listening) {
+            try {
+                val socket = Socket().apply { connect(InetSocketAddress("localhost", mqttPort)) }
+                listening = true
+                socket.close()
+            } catch (e: ConnectException) {
+                Timber.i(e, "broker not listening on $mqttPort yet")
+                Thread.sleep(100)
+            }
+        }
+        Timber.i("Test MQTT Broker listening")
+    }
+
+    private fun createNewBroker(): Broker =
         Broker(host = "127.0.0.1",
             port = mqttPort,
             authentication = object : Authentication {
@@ -59,47 +106,14 @@ class TestWithMQTTBrokerImpl : TestWithAnMQTTBroker {
                 }
             })
 
-    override fun <E : MessageBase> Collection<E>.sendFromBroker(broker: Broker) {
-        map(Parser(null)::toJsonBytes)
-            .forEach {
-                broker.publish(
-                    false,
-                    "owntracks/someuser/somedevice",
-                    Qos.AT_LEAST_ONCE,
-                    MQTT5Properties(),
-                    it.toUByteArray()
-                )
-            }
-    }
-
-    private lateinit var brokerThread: Thread
-
-    @DelicateCoroutinesApi
-    override fun startBroker() {
-        mqttPacketsReceived.clear()
-        brokerThread = thread {
-            broker.listen()
-        }
-        var listening = false
-        while (!listening) {
-            try {
-                val socket = Socket().apply { connect(InetSocketAddress("localhost", mqttPort)) }
-                listening = true
-                socket.close()
-            } catch (e: ConnectException) {
-                Timber.i("$broker not listening yet")
-                sleep(100)
-            }
-        }
-        Timber.i("Test MQTT Broker listening $broker")
-    }
 
     override fun stopBroker() {
-        Timber.i("Test MQTT Broker stopping")
+        shouldBeRunning = false
+        Timber.i("Requesting MQTT Broker stop")
         broker.stop()
-        Timber.i("Test MQTT Broker thread joining")
+        Timber.i("Waiting to join thread")
         brokerThread.join()
-        Timber.i("Test MQTT Broker stopped")
+        Timber.i("MQTT Broker stopped")
     }
 
     override fun configureMQTTConnectionToLocal(password: String) {
