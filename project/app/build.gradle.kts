@@ -392,11 +392,18 @@ val codesTask = tasks.register<GetLatestVersionCodeMinusOne>("getLatestVersionCo
 
 androidComponents {
     onVariants { variant ->
-        val minusOne = System.getenv("MAKE_APK_SAME_VERSION_CODE_AS_GOOGLE_PLAY")
-        if (!minusOne.isNullOrEmpty()) {
+        val overrideVerCode = System.getenv("VERSION_CODE_OVERRIDE")
+        overrideVerCode?.toIntOrNull()?.apply {
             for (output in variant.outputs) {
-                output.versionCode.set(codesTask.flatMap { it.outCode }
-                    .map { it.asFile.readText().toInt() })
+                output.versionCode.set(this)
+            }
+        } ?:run {
+            val minusOne = System.getenv("MAKE_APK_SAME_VERSION_CODE_AS_GOOGLE_PLAY")
+            if (!minusOne.isNullOrEmpty()) {
+                for (output in variant.outputs) {
+                    output.versionCode.set(codesTask.flatMap { it.outCode }
+                        .map { it.asFile.readText().toInt() })
+                }
             }
         }
     }
