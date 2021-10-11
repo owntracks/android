@@ -3,7 +3,7 @@ package org.owntracks.android.data.repos
 import io.objectbox.android.ObjectBoxLiveData
 import io.objectbox.query.Query
 import org.owntracks.android.data.WaypointModel
-import org.owntracks.android.support.MessageWaypointCollection
+import org.owntracks.android.model.messages.MessageWaypoint
 
 abstract class WaypointsRepo protected constructor() {
     abstract operator fun get(tst: Long): WaypointModel?
@@ -24,18 +24,15 @@ abstract class WaypointsRepo protected constructor() {
         deleteImpl(waypoint)
     }
 
-    fun importFromMessage(waypoints: MessageWaypointCollection?) {
-        if (waypoints == null) return
-        waypoints.forEach {
+    fun importFromMessage(waypoints: List<MessageWaypoint>?) {
+        waypoints?.forEach {
             // Delete existing waypoint if one with the same tst already exists
             get(it.timestamp)?.run(this::delete)
             insert(it.toWaypoint())
         }
     }
 
-    fun exportToMessage(): MessageWaypointCollection = MessageWaypointCollection().apply {
-        all.forEach { this.add(it.toMessageWaypoint()) }
-    }
+    fun exportToMessage(): List<MessageWaypoint> = all.map { it.toMessageWaypoint() }
 
     protected abstract fun insertImpl(waypoint: WaypointModel)
     protected abstract fun updateImpl(waypoint: WaypointModel)

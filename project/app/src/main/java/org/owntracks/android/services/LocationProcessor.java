@@ -14,9 +14,9 @@ import org.owntracks.android.model.messages.MessageTransition;
 import org.owntracks.android.model.messages.MessageWaypoint;
 import org.owntracks.android.model.messages.MessageWaypoints;
 import org.owntracks.android.support.DeviceMetricsProvider;
-import org.owntracks.android.support.MessageWaypointCollection;
 import org.owntracks.android.support.Preferences;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -179,7 +179,7 @@ public class LocationProcessor {
 
     public void publishWaypointsMessage() {
         MessageWaypoints message = new MessageWaypoints();
-        MessageWaypointCollection collection = new MessageWaypointCollection();
+        List<MessageWaypoint> collection = new ArrayList<>();
         for (WaypointModel w : waypointsRepo.getAllWithGeofences()) {
             MessageWaypoint m = new MessageWaypoint();
             m.setDescription(w.getDescription());

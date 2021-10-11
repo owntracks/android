@@ -154,7 +154,7 @@ jobs:
       - persist_to_workspace:
           root: project/app/build/
           paths:
-          - reports/coverage/oss/debug/report.xml
+          - reports/coverage/androidTest/oss/debug/report.xml
       - store_artifacts:
           path: project/app/build/reports/androidTests
           destination: espresso-report-oss
@@ -205,7 +205,7 @@ jobs:
       - persist_to_workspace:
           root: project/app/build/
           paths:
-            - reports/coverage/gms/debug/report.xml
+            - reports/coverage/androidTest/gms/debug/report.xml
       - store_artifacts:
           path: project/app/build/reports/androidTests
           destination: espresso-report-gms
@@ -297,6 +297,7 @@ workflows:
           requires:
             - unit-test
       - gms-ui-tests:
+          context: Espresso Google Maps Key
           requires:
             - unit-test
       - publish-coverage:

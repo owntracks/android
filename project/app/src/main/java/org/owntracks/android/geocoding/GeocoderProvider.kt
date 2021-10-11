@@ -41,7 +41,7 @@ class GeocoderProvider @Inject constructor(
         Timber.i("Setting geocoding provider to ${preferences.reverseGeocodeProvider}")
         job = GlobalScope.launch {
             withContext(ioDispatcher) {
-                perfLog {
+                perfLog() {
                     geocoder = when (preferences.reverseGeocodeProvider) {
                         Preferences.REVERSE_GEOCODE_PROVIDER_OPENCAGE -> OpenCageGeocoder(
                                 preferences.openCageGeocoderApiKey

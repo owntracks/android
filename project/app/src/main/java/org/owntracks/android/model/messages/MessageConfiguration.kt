@@ -1,7 +1,6 @@
 package org.owntracks.android.model.messages
 
 import com.fasterxml.jackson.annotation.*
-import org.owntracks.android.support.MessageWaypointCollection
 import java.util.*
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
@@ -9,7 +8,7 @@ class MessageConfiguration : MessageBase() {
     private val map: MutableMap<String, Any?> = TreeMap()
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    var waypoints: MessageWaypointCollection = MessageWaypointCollection()
+    var waypoints: List<MessageWaypoint> = listOf()
 
     @JsonAnyGetter
     @JsonPropertyOrder(alphabetic = true)

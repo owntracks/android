@@ -109,10 +109,7 @@ class MapViewModel @Inject constructor(
         override fun onLocationResult(locationResult: LocationResult) {
             mutableCurrentLocation.value = locationResult.lastLocation
             if (locationResult.lastLocation.accuracy < preferences.ignoreInaccurateLocations) {
-                if (!locationIdlingResource.isIdleNow) {
-                    Timber.d("Idling location")
-                    locationIdlingResource.setIdleState(true)
-                }
+                locationIdlingResource.setIdleState(true)
             }
             if (viewMode is ViewMode.Device && mutableMapCenter.value != locationResult.lastLocation.toLatLng()) {
                 mutableMapCenter.postValue(locationResult.lastLocation.toLatLng())
@@ -125,7 +122,7 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    fun refreshGeocodeForActiveContact() {
+    internal fun refreshGeocodeForActiveContact() {
         mutableCurrentContact.value?.also {
             viewModelScope.launch {
                 it.messageLocation?.run { geocoderProvider.resolve(this) }
@@ -149,6 +146,7 @@ class MapViewModel @Inject constructor(
     }
 
     private fun setViewModeContact(contact: FusedContact, center: Boolean) {
+        Timber.d("setting view mode: VIEW_CONTACT")
         viewMode = ViewMode.Contact(center)
         mutableCurrentContact.value = contact
         mutableBottomSheetHidden.value = false

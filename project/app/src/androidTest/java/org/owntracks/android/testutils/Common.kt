@@ -1,12 +1,14 @@
 package org.owntracks.android.testutils
 
+import android.app.Activity
+import android.app.ActivityManager
+import android.content.Context
 import android.view.View
 import androidx.annotation.IdRes
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.IdlingPolicies
-import androidx.test.espresso.IdlingRegistry
+import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.UiController
 import androidx.test.espresso.ViewAction
 import androidx.test.espresso.action.ViewActions
@@ -18,10 +20,9 @@ import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDr
 import org.hamcrest.CoreMatchers
 import org.hamcrest.Matcher
 import org.owntracks.android.R
-import org.owntracks.android.support.SimpleIdlingResource
 import org.owntracks.android.ui.clickOnAndWait
+import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
 
 internal fun clickOnRegardlessOfVisibility(@IdRes id: Int) {
     onView(withId(id)).check(
@@ -48,15 +49,14 @@ internal fun clickOnRegardlessOfVisibility(@IdRes id: Int) {
     )
 }
 
-fun reportLocationFromMap(locationIdlingResource: SimpleIdlingResource?) {
+fun reportLocationFromMap(locationIdlingResource: IdlingResource?) {
     openDrawer()
     clickOnAndWait(R.string.title_activity_map)
-    IdlingPolicies.setIdlingResourceTimeout(15, TimeUnit.SECONDS)
     Timber.d("Waiting for location")
-    locationIdlingResource?.run {
-        IdlingRegistry.getInstance().register(locationIdlingResource)
+    locationIdlingResource.with {
+        waitUntilActivityVisible<MapActivity>()
+        clickOnAndWait(R.id.menu_mylocation)
     }
-    clickOnAndWait(R.id.menu_mylocation)
     Timber.d("location now available")
     clickOnAndWait(R.id.menu_report)
 }
@@ -79,4 +79,27 @@ fun setNotFirstStartPreferences() {
         .putBoolean(context.getString(R.string.preferenceKeySetupNotCompleted), false)
         .apply()
 
+}
+
+inline fun <reified T : Activity> isVisible(): Boolean {
+    val am =
+        InstrumentationRegistry.getInstrumentation().targetContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+    val visibleActivityName = am.appTasks[0].taskInfo.baseActivity?.className
+    Timber.d("Visible activity is $visibleActivityName. Looking for ${T::class.java.name}")
+    return visibleActivityName == T::class.java.name
+}
+
+const val TIMEOUT = 5000L
+const val CONDITION_CHECK_INTERVAL = 100L
+
+inline fun <reified T : Activity> waitUntilActivityVisible() {
+    val startTime = System.currentTimeMillis()
+    Timber.d("Waiting for ${T::class.java.simpleName} to be visible")
+    while (!isVisible<T>()) {
+        Thread.sleep(CONDITION_CHECK_INTERVAL)
+        if (System.currentTimeMillis() - startTime >= TIMEOUT) {
+            throw AssertionError("Activity ${T::class.java.simpleName} not visible after $TIMEOUT milliseconds")
+        }
+    }
+    Timber.d("${T::class.java.simpleName} is now visible visible")
 }

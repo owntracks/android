@@ -5,9 +5,15 @@ import androidx.test.core.graphics.writeToTestStorage
 import androidx.test.runner.screenshot.Screenshot
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
+import timber.log.Timber
 import java.util.*
 
 class ScreenshotTakingOnTestEndRule : TestWatcher() {
+    override fun starting(description: Description?) {
+        Timber.i("Starting test: $description")
+        super.starting(description)
+    }
+
     override fun finished(description: Description?) {
         description?.run {
             takeScreenshot(screenShotName = "${description.className}/${description.methodName}")

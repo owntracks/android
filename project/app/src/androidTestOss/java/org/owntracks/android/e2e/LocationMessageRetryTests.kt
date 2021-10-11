@@ -2,7 +2,6 @@ package org.owntracks.android.e2e
 
 import android.Manifest
 import androidx.test.espresso.IdlingPolicies
-import androidx.test.espresso.IdlingRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
@@ -16,10 +15,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
-import org.owntracks.android.testutils.TestWithAnActivity
-import org.owntracks.android.testutils.TestWithAnHTTPServer
-import org.owntracks.android.testutils.TestWithAnHTTPServerImpl
-import org.owntracks.android.testutils.setNotFirstStartPreferences
+import org.owntracks.android.testutils.*
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.map.MapActivity
 import java.util.concurrent.TimeUnit
@@ -49,21 +45,6 @@ class LocationMessageRetryTests : TestWithAnActivity<MapActivity>(MapActivity::c
         stopServer()
     }
 
-    @After
-    fun unregisterIdlingResource() {
-        try {
-            IdlingRegistry.getInstance()
-                .unregister(baristaRule.activityTestRule.activity.locationIdlingResource)
-        } catch (_: NullPointerException) {
-            // Happens when the vm is already gone from the MapActivity
-        }
-        try {
-            IdlingRegistry.getInstance()
-                .unregister(baristaRule.activityTestRule.activity.outgoingQueueIdlingResource)
-        } catch (_: NullPointerException) {
-        }
-    }
-
     @Test
     fun testReportingLocationSucceedsAfterSomeFailures() {
         setNotFirstStartPreferences()
@@ -73,20 +54,12 @@ class LocationMessageRetryTests : TestWithAnActivity<MapActivity>(MapActivity::c
 
         configureHTTPConnectionToLocal()
 
-        openDrawer()
-        clickOnAndWait(R.string.title_activity_map)
+        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource)
 
-        val locationIdlingResource = baristaRule.activityTestRule.activity.locationIdlingResource
-        IdlingPolicies.setIdlingResourceTimeout(30, TimeUnit.SECONDS)
-        IdlingRegistry.getInstance().register(locationIdlingResource)
-        clickOnAndWait(R.id.menu_report)
-
-        val outgoingQueueIdlingResource =
-            baristaRule.activityTestRule.activity.outgoingQueueIdlingResource
-        IdlingRegistry.getInstance().register(outgoingQueueIdlingResource)
-
-        openDrawer()
-        clickOnAndWait(R.string.title_activity_status)
+        baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.with {
+            openDrawer()
+            clickOnAndWait(R.string.title_activity_status)
+        }
 
         assertContains(R.id.connectedStatusMessage, "Response 200")
     }

@@ -915,7 +915,7 @@ class Preferences @Inject constructor(
     private val deviceIdDefault: String
         get() = // Use device name (Mako, Surnia, etc. and strip all non alpha digits)
             Build.DEVICE?.replace(" ", "-")?.replace("[^a-zA-Z0-9]+".toRegex(), "")
-                    ?.toLowerCase(Locale.getDefault())
+                    ?.lowercase(Locale.getDefault())
                     ?: "unknown"
 
 

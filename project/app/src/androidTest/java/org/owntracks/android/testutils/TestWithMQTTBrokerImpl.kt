@@ -68,13 +68,15 @@ class TestWithMQTTBrokerImpl : TestWithAnMQTTBroker {
         }
         var listening = false
         while (!listening) {
-            try {
-                val socket = Socket().apply { connect(InetSocketAddress("localhost", mqttPort)) }
-                listening = true
-                socket.close()
-            } catch (e: ConnectException) {
-                Timber.i(e, "broker not listening on $mqttPort yet")
-                Thread.sleep(100)
+            Socket().use {
+                try {
+                    it.apply { connect(InetSocketAddress("localhost", mqttPort)) }
+                    listening = true
+
+                } catch (e: ConnectException) {
+                    Timber.i(e, "broker not listening on $mqttPort yet")
+                    Thread.sleep(100)
+                }
             }
         }
         Timber.i("Test MQTT Broker listening")

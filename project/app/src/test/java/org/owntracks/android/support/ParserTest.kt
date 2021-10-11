@@ -372,7 +372,7 @@ class ParserTest {
             radius = 45
             timestamp = 123456789
         }
-        message.waypoints.add(waypoint)
+        message.waypoints = listOf(waypoint)
         val serialized = message.toJson(parser)
         val expected =
             "{\"_type\":\"configuration\",\"waypoints\":[{\"_type\":\"waypoint\",\"desc\":\"Test waypoint\",\"lat\":51.0,\"lon\":-20.0,\"rad\":45,\"tst\":123456789}],\"TestBoolKey\":true,\"TestFloatKey\":13487.0,\"TestIntKey\":13487,\"TestStringKey\":\"testString\"}"

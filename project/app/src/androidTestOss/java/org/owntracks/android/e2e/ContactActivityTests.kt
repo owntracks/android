@@ -4,7 +4,6 @@ import android.Manifest
 import android.view.View
 import android.view.animation.Animation
 import androidx.test.espresso.IdlingPolicies
-import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.IdlingResource
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -47,21 +46,6 @@ class ContactActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.
     }
 
     @After
-    fun unregisterIdlingResource() {
-        try {
-            IdlingRegistry.getInstance()
-                .unregister(baristaRule.activityTestRule.activity.locationIdlingResource)
-        } catch (_: NullPointerException) {
-            // Happens when the vm is already gone from the MapActivity
-        }
-        try {
-            IdlingRegistry.getInstance()
-                .unregister(baristaRule.activityTestRule.activity.outgoingQueueIdlingResource)
-        } catch (_: NullPointerException) {
-        }
-    }
-
-    @After
     fun uninitMockLocation() {
         unInitializeMockLocationProvider()
     }
@@ -82,22 +66,16 @@ class ContactActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.
         openDrawer()
         clickOnAndWait(R.string.title_activity_map)
 
-        val locationIdlingResource = baristaRule.activityTestRule.activity.locationIdlingResource
-        IdlingPolicies.setIdlingResourceTimeout(15, TimeUnit.SECONDS)
-        IdlingRegistry.getInstance().register(locationIdlingResource)
-        setMockLocation(51.0, 0.0)
-        clickOnAndWait(R.id.menu_report)
+        baristaRule.activityTestRule.activity.locationIdlingResource.with {
+            waitUntilActivityVisible<MapActivity>()
+            setMockLocation(51.0, 0.0)
+            clickOnAndWait(R.id.menu_mylocation)
+        }
 
-        val outgoingQueueIdlingResource =
-            baristaRule.activityTestRule.activity.outgoingQueueIdlingResource
-        IdlingRegistry.getInstance().register(outgoingQueueIdlingResource)
-
-        openDrawer()
-        clickOnAndWait(R.string.title_activity_contacts)
-        assertRecyclerViewItemCount(R.id.contactsRecyclerView, 1)
-
-        baristaRule.activityTestRule.activity.locationIdlingResource?.run {
-            IdlingRegistry.getInstance().unregister(this)
+        baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.with {
+            openDrawer()
+            clickOnAndWait(R.string.title_activity_contacts)
+            assertRecyclerViewItemCount(R.id.contactsRecyclerView, 1)
         }
 
         clickOnAndWait("aa")

@@ -4,8 +4,6 @@ import android.Manifest
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
-import androidx.test.espresso.IdlingPolicies
-import androidx.test.espresso.IdlingRegistry
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
@@ -68,21 +66,6 @@ class MQTTTransitionEventTests : TestWithAnActivity<MapActivity>(MapActivity::cl
         unInitializeMockLocationProvider()
     }
 
-    @After
-    fun unregisterIdlingResource() {
-        try {
-            IdlingRegistry.getInstance()
-                .unregister(baristaRule.activityTestRule.activity.locationIdlingResource)
-        } catch (_: NullPointerException) {
-            // Happens when the vm is already gone from the MapActivity
-        }
-        try {
-            IdlingRegistry.getInstance()
-                .unregister(baristaRule.activityTestRule.activity.outgoingQueueIdlingResource)
-        } catch (_: NullPointerException) {
-        }
-    }
-
     @Test
     fun given_an_MQTT_configured_client_when_the_broker_sends_a_transition_message_then_something_happens() {
         setNotFirstStartPreferences()
@@ -92,7 +75,7 @@ class MQTTTransitionEventTests : TestWithAnActivity<MapActivity>(MapActivity::cl
         clearNotifications()
         configureMQTTConnectionToLocal()
 
-        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource as SimpleIdlingResource?)
+        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource)
 
         listOf(
             MessageLocation().apply {
@@ -149,12 +132,13 @@ class MQTTTransitionEventTests : TestWithAnActivity<MapActivity>(MapActivity::cl
 
         openDrawer()
         clickOnAndWait(R.string.title_activity_map)
-        setMockLocation(51.0, 0.0)
-        IdlingPolicies.setIdlingResourceTimeout(1, TimeUnit.MINUTES)
-        (baristaRule.activityTestRule.activity.locationIdlingResource as SimpleIdlingResource?).run {
-            IdlingRegistry.getInstance().register(this)
+
+        baristaRule.activityTestRule.activity.locationIdlingResource.with {
+            waitUntilActivityVisible<MapActivity>()
+            setMockLocation(51.0, 0.0)
+            clickOnAndWait(R.id.menu_mylocation)
         }
-        clickOnAndWait(R.id.menu_mylocation)
+
         clickOnAndWait(R.id.menu_report)
 
         openDrawer()
@@ -169,11 +153,13 @@ class MQTTTransitionEventTests : TestWithAnActivity<MapActivity>(MapActivity::cl
         clickOnAndWait(R.id.save)
 
         openDrawer()
-        setMockLocation(51.0, 0.0)
         clickOnAndWait(R.string.title_activity_map)
+        baristaRule.activityTestRule.activity.locationIdlingResource.with {
+            waitUntilActivityVisible<MapActivity>()
+            setMockLocation(regionLatitude, regionLongitude)
+            clickOnAndWait(R.id.menu_mylocation)
+        }
 
-        setMockLocation(regionLatitude, regionLongitude)
-        clickOnAndWait(R.id.menu_mylocation)
         clickOnAndWait(R.id.menu_report)
 
         uiDevice.openNotification()

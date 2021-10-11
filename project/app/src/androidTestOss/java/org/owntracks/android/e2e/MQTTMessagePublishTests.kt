@@ -1,8 +1,6 @@
 package org.owntracks.android.e2e
 
 import androidx.test.espresso.Espresso.onData
-import androidx.test.espresso.IdlingPolicies
-import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -28,13 +26,11 @@ import org.owntracks.android.model.BatteryStatus
 import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.support.Parser
-import org.owntracks.android.support.SimpleIdlingResource
 import org.owntracks.android.testutils.*
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber
 import java.time.Instant
-import java.util.concurrent.TimeUnit
 
 @ExperimentalUnsignedTypes
 @LargeTest
@@ -59,21 +55,6 @@ class MQTTMessagePublishTests : TestWithAnActivity<MapActivity>(MapActivity::cla
         unInitializeMockLocationProvider()
     }
 
-    @After
-    fun unregisterIdlingResource() {
-        try {
-            IdlingRegistry.getInstance()
-                .unregister(baristaRule.activityTestRule.activity.locationIdlingResource)
-        } catch (_: NullPointerException) {
-            // Happens when the vm is already gone from the MapActivity
-        }
-        try {
-            IdlingRegistry.getInstance()
-                .unregister(baristaRule.activityTestRule.activity.outgoingQueueIdlingResource)
-        } catch (_: NullPointerException) {
-        }
-    }
-
     @Test
     fun given_an_MQTT_configured_client_when_the_report_button_is_pressed_then_the_broker_receives_a_packet_with_the_correct_location_message_in() {
         setNotFirstStartPreferences()
@@ -88,15 +69,12 @@ class MQTTMessagePublishTests : TestWithAnActivity<MapActivity>(MapActivity::cla
 
         openDrawer()
         clickOnAndWait(R.string.title_activity_map)
-        setMockLocation(mockLatitude, mockLongitude)
-        IdlingPolicies.setIdlingResourceTimeout(15, TimeUnit.SECONDS)
-        Timber.d("Waiting for location")
-        (baristaRule.activityTestRule.activity.locationIdlingResource as SimpleIdlingResource?).run {
-            IdlingRegistry.getInstance().register(this)
+        baristaRule.activityTestRule.activity.locationIdlingResource.with {
+            waitUntilActivityVisible<MapActivity>()
+            setMockLocation(mockLatitude, mockLongitude)
+            clickOnAndWait(R.id.menu_mylocation)
         }
 
-        setMockLocation(mockLatitude, mockLongitude)
-        clickOnAndWait(R.id.menu_mylocation)
         Timber.d("location now available")
         clickOnAndWait(R.id.menu_report)
 
@@ -117,7 +95,7 @@ class MQTTMessagePublishTests : TestWithAnActivity<MapActivity>(MapActivity::cla
         baristaRule.launchActivity()
         configureMQTTConnectionToLocal()
 
-        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource as SimpleIdlingResource?)
+        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource)
 
         openDrawer()
         clickOnAndWait(R.string.title_activity_contacts)
@@ -147,7 +125,7 @@ class MQTTMessagePublishTests : TestWithAnActivity<MapActivity>(MapActivity::cla
         baristaRule.launchActivity()
         configureMQTTConnectionToLocal()
 
-        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource as SimpleIdlingResource?)
+        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource)
 
         openDrawer()
         clickOnAndWait(R.string.title_activity_contacts)
@@ -198,7 +176,7 @@ class MQTTMessagePublishTests : TestWithAnActivity<MapActivity>(MapActivity::cla
         baristaRule.launchActivity()
         configureMQTTConnectionToLocal()
 
-        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource as SimpleIdlingResource?)
+        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource)
 
         openDrawer()
         clickOnAndWait(R.string.title_activity_contacts)

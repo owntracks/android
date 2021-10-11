@@ -18,6 +18,7 @@ package org.owntracks.android.support
 import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.IdlingResource.ResourceCallback
 import org.jetbrains.annotations.NotNull
+import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -27,7 +28,8 @@ import java.util.concurrent.atomic.AtomicBoolean
  * Consider using CountingIdlingResource from espresso-contrib package if you use this class from
  * multiple threads or need to keep a count of pending operations.
  */
-class SimpleIdlingResource(private val resourceName: @NotNull String, initialIdlingState: Boolean) : IdlingResource {
+class SimpleIdlingResource(private val resourceName: @NotNull String, initialIdlingState: Boolean) :
+        IdlingResource {
     @Volatile
     private var mCallback: ResourceCallback? = null
 
@@ -38,6 +40,7 @@ class SimpleIdlingResource(private val resourceName: @NotNull String, initialIdl
     }
 
     override fun isIdleNow(): Boolean {
+        Timber.d("Being asked if $this isidle ")
         return mIsIdleNow.get()
     }
 
@@ -46,13 +49,19 @@ class SimpleIdlingResource(private val resourceName: @NotNull String, initialIdl
     }
 
     /**
-     * Sets the new idle state, if isIdleNow is true, it pings the [ResourceCallback].
+     * Sets the new idle state, if isIdleNow transitions to true, it pings the [ResourceCallback].
      * @param isIdleNow false if there are pending operations, true if idle.
      */
     fun setIdleState(isIdleNow: Boolean) {
+        Timber.d("Setting idling resource $this to idle=$isIdleNow")
         mIsIdleNow.set(isIdleNow)
-        if (isIdleNow && mCallback != null) {
-            mCallback!!.onTransitionToIdle()
+        if (isIdleNow) {
+            Timber.d("Calling onTransitionToIdleCallback for $this")
+            mCallback?.onTransitionToIdle()
         }
+    }
+
+    override fun toString(): String {
+        return "$resourceName-${hashCode()}"
     }
 }
