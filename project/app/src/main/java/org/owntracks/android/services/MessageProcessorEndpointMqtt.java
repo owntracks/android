@@ -455,6 +455,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         changeState(EndpointState.CONNECTED);
 
         sendMessageConnectPressure = 0; // allow new connection attempts from queueMessageForSending
+        scheduler.cancelMqttReconnect();
 
         // Check if we're connecting to the same broker that we were already connected to
         String connectionId = String.format("%s/%s", mqttClient.getServerURI(), mqttClient.getClientId());
@@ -539,6 +540,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         } finally {
             changeState(EndpointState.DISCONNECTED);
             scheduler.cancelMqttPing();
+            scheduler.cancelMqttReconnect();
         }
     }
 
