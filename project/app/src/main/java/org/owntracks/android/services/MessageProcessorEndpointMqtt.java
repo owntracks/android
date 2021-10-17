@@ -43,10 +43,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -403,7 +399,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
                 connectOptions.setSocketFactory(new SocketFactory(socketFactoryOptions));
             }
 
-        } catch (CertificateException | NoSuchAlgorithmException | UnrecoverableKeyException | KeyStoreException | KeyManagementException | IOException e) {
+        } catch (CertificateException | IOException e) {
             changeState(EndpointState.ERROR.withError(e).withMessage("TLS setup failed"));
             throw new MqttConnectionException(e);
         } finally {

@@ -17,6 +17,7 @@ import org.owntracks.android.model.messages.MessageConfiguration
 import org.owntracks.android.support.Parser
 import org.owntracks.android.support.Parser.EncryptionException
 import org.owntracks.android.support.Preferences
+import org.owntracks.android.support.SimpleIdlingResource
 import timber.log.Timber
 import java.io.BufferedReader
 import java.io.FileInputStream
@@ -35,6 +36,7 @@ class LoadViewModel @Inject constructor(
         private val waypointsRepo: WaypointsRepo,
         @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
+    internal val loadIdlingResource = SimpleIdlingResource("loadIdlingResource", true)
     private var configuration: MessageConfiguration? = null
 
     private val mutableConfig = MutableLiveData("")
@@ -66,7 +68,7 @@ class LoadViewModel @Inject constructor(
             mutableImportStatus.postValue(ImportStatus.LOADING)
             configuration?.run {
                 preferences.importFromMessage(this)
-                if (!waypoints.isEmpty()) {
+                if (waypoints.isNotEmpty()) {
                     waypointsRepo.importFromMessage(waypoints)
                 }
             }
@@ -85,6 +87,7 @@ class LoadViewModel @Inject constructor(
     }
 
     fun extractPreferences(uri: URI) {
+        loadIdlingResource.setIdleState(false)
         try {
             if (ContentResolver.SCHEME_FILE == uri.scheme) {
                 // Note: left here to avoid breaking compatibility.  May be removed

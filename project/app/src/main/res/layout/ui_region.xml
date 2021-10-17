@@ -90,7 +90,7 @@
                         android:layout_height="wrap_content"
                         android:digits="0123456789"
                         android:inputType="numberDecimal"
-                        android:text='@={org.owntracks.android.support.widgets.BindingConversions.convertToStringZeroIsEmpty(vm.waypoint.geofenceRadius)}' />
+                        android:text='@={vm.waypoint.geofenceRadiusAsStr}' />
                 </com.google.android.material.textfield.TextInputLayout>
 
 

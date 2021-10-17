@@ -53,7 +53,7 @@
             android:paddingRight="16dp"
             android:src="@drawable/ic_baseline_done_24"
             android:textSize="18sp"
-            android:visibility="@{vm.doneEnabled}"
+            android:visibility="@{vm.doneEnabled ? View.VISIBLE : View.INVISIBLE}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="@+id/btn_next" />
 

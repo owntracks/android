@@ -9,7 +9,6 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotExist
 import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickDialogNegativeButton
 import com.adevinta.android.barista.interaction.PermissionGranter
-import com.adevinta.android.barista.rule.flaky.AllowFlaky
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
@@ -34,13 +33,9 @@ class OSSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
             InstrumentationRegistry.getInstrumentation().uiAutomation
                 .executeShellCommand("settings put secure location_mode 0")
                 .close()
-            val context = InstrumentationRegistry.getInstrumentation().targetContext
-            PreferenceManager.getDefaultSharedPreferences(context)
-                .edit()
-                .putBoolean(context.getString(R.string.preferenceKeyFirstStart), false)
-                .putBoolean(context.getString(R.string.preferenceKeySetupNotCompleted), false)
-                .apply()
+            setNotFirstStartPreferences()
             baristaRule.launchActivity()
+            PermissionGranter.allowPermissionsIfNeeded(ACCESS_FINE_LOCATION)
             assertDisplayed(R.string.deviceLocationDisabledDialogTitle)
             clickDialogNegativeButton()
             assertDisplayed(R.id.osm_map_view)
@@ -63,6 +58,7 @@ class OSSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
                 .putBoolean(Preferences.preferenceKeyUserDeclinedEnableLocationServices, true)
                 .apply()
             baristaRule.launchActivity()
+            PermissionGranter.allowPermissionsIfNeeded(ACCESS_FINE_LOCATION)
             assertNotExist(R.string.deviceLocationDisabledDialogTitle)
             assertDisplayed(R.id.osm_map_view)
         } finally {

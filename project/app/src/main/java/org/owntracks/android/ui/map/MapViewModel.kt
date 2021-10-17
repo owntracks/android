@@ -78,7 +78,10 @@ class MapViewModel @Inject constructor(
 
     fun getCurrentConnectionMode(): LiveData<Int> = currentConnectionMode
 
-    val locationIdlingResource = SimpleIdlingResource("locationIdlingResource", false)
+    internal val locationIdlingResource = SimpleIdlingResource(
+        "locationIdlingResource",
+        false
+    )
 
     private var viewMode: ViewMode = ViewMode.Device
 

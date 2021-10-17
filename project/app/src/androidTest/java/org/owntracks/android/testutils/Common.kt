@@ -3,51 +3,19 @@ package org.owntracks.android.testutils
 import android.app.Activity
 import android.app.ActivityManager
 import android.content.Context
-import android.view.View
-import androidx.annotation.IdRes
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.Espresso
 import androidx.test.espresso.IdlingResource
-import androidx.test.espresso.UiController
-import androidx.test.espresso.ViewAction
 import androidx.test.espresso.action.ViewActions
-import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
-import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
-import org.hamcrest.CoreMatchers
-import org.hamcrest.Matcher
 import org.owntracks.android.R
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber
-
-internal fun clickOnRegardlessOfVisibility(@IdRes id: Int) {
-    onView(withId(id)).check(
-        matches(
-            CoreMatchers.allOf(
-                isEnabled(),
-                isClickable()
-            )
-        )
-    ).perform(
-        object : ViewAction {
-            override fun getConstraints(): Matcher<View> {
-                return isEnabled() // no constraints, they are checked above
-            }
-
-            override fun getDescription(): String {
-                return "click plus button"
-            }
-
-            override fun perform(uiController: UiController?, view: View) {
-                view.performClick()
-            }
-        }
-    )
-}
 
 fun reportLocationFromMap(locationIdlingResource: IdlingResource?) {
     openDrawer()
@@ -61,16 +29,6 @@ fun reportLocationFromMap(locationIdlingResource: IdlingResource?) {
     clickOnAndWait(R.id.menu_report)
 }
 
-fun scrollToPreferenceWithText(textResource: Int) {
-    onView(withId(androidx.preference.R.id.recycler_view))
-        .perform(
-            RecyclerViewActions.actionOnItem<RecyclerView.ViewHolder>(
-                hasDescendant(withText(textResource)),
-                ViewActions.scrollTo()
-            )
-        )
-}
-
 fun setNotFirstStartPreferences() {
     val context = InstrumentationRegistry.getInstrumentation().targetContext
     PreferenceManager.getDefaultSharedPreferences(context)
@@ -79,6 +37,16 @@ fun setNotFirstStartPreferences() {
         .putBoolean(context.getString(R.string.preferenceKeySetupNotCompleted), false)
         .apply()
 
+}
+
+fun scrollToPreferenceWithText(textResource: Int) {
+    Espresso.onView(ViewMatchers.withId(androidx.preference.R.id.recycler_view))
+        .perform(
+            RecyclerViewActions.actionOnItem<RecyclerView.ViewHolder>(
+                ViewMatchers.hasDescendant(ViewMatchers.withText(textResource)),
+                ViewActions.scrollTo()
+            )
+        )
 }
 
 inline fun <reified T : Activity> isVisible(): Boolean {

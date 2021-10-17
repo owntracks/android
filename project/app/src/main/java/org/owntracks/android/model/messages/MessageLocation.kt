@@ -20,8 +20,9 @@ import kotlin.math.roundToInt
 )
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreatedAtNow(RealClock())) :
-    MessageBase(), MessageWithCreatedAt by dep {
+data class MessageLocation(
+        override val createdAt: Long = TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
+) : MessageBase(), MessageWithCreatedAt {
     @JsonIgnore
     override val numberOfRetries: Int = 10_080 // This should last a week at 1 attempt per minute
 

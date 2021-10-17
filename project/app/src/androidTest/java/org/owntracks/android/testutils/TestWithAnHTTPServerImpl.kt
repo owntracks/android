@@ -12,6 +12,7 @@ import okhttp3.mockwebserver.RecordedRequest
 import org.eclipse.paho.client.mqttv3.internal.websocket.Base64
 import org.owntracks.android.R
 import org.owntracks.android.ui.clickOnAndWait
+import timber.log.Timber
 
 class TestWithAnHTTPServerImpl : TestWithAnHTTPServer {
     private lateinit var mockWebServer: MockWebServer
@@ -19,6 +20,7 @@ class TestWithAnHTTPServerImpl : TestWithAnHTTPServer {
     override fun startServer(dispatcher: Dispatcher) {
         mockWebServer = MockWebServer()
         mockWebServer.start()
+        Timber.i("Started HTTP server on port ${mockWebServer.port}")
         mockWebServer.dispatcher = dispatcher
     }
 
@@ -28,6 +30,7 @@ class TestWithAnHTTPServerImpl : TestWithAnHTTPServer {
 
     override fun stopServer() {
         if (this::mockWebServer.isInitialized) {
+            Timber.i("Stopping HTTP Server on port ${mockWebServer.port}")
             mockWebServer.shutdown()
         }
     }

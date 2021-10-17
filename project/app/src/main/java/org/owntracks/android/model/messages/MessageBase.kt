@@ -122,12 +122,12 @@ abstract class MessageBase : BaseObservable() {
     open fun addMqttPreferences(preferences: Preferences) {}
 
     @Throws(IOException::class)
-    open fun toJsonBytes(parser: Parser): ByteArray? {
+    open fun toJsonBytes(parser: Parser): ByteArray {
         return parser.toJsonBytes(this)
     }
 
     @Throws(IOException::class)
-    open fun toJson(parser: Parser): String? {
+    open fun toJson(parser: Parser): String {
         return parser.toJson(this)
     }
 

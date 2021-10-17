@@ -9,7 +9,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito
-import org.owntracks.android.location.geofencing.Geofence
+import org.owntracks.android.location.Geofence
 import org.owntracks.android.model.BatteryStatus
 import org.owntracks.android.model.CommandAction
 import org.owntracks.android.model.messages.*
@@ -42,7 +42,7 @@ class ParserTest {
         val regions: MutableList<String> = LinkedList()
         regions.add("Testregion1")
         regions.add("Testregion2")
-        messageLocation = MessageLocation(MessageCreatedAtNow(FakeClock())).apply {
+        messageLocation = MessageLocation(25).apply {
             accuracy = 10
             altitude = 20
             latitude = 50.1
@@ -173,6 +173,15 @@ class ParserTest {
     }
 
     @Test
+    fun `Parser can serialize a location message to a byte array`() {
+        Mockito.`when`(encryptionProvider.isPayloadEncryptionEnabled).thenReturn(false)
+        val parser = Parser(encryptionProvider)
+        val input = messageLocation
+        val serialized = input.toJsonBytes(parser)
+        assertEquals(locationWithRegionsJSON.toByteArray().toList(), serialized.toList())
+    }
+
+    @Test
     fun `Parser can serialize a location message with the topic visible`() {
         Mockito.`when`(encryptionProvider.isPayloadEncryptionEnabled).thenReturn(false)
         val parser = Parser(encryptionProvider)
@@ -185,9 +194,9 @@ class ParserTest {
 
     @Test
     fun `Parser can deserialize an encrypted location message`() {
-        Mockito.`when`(encryptionProvider.isPayloadEncryptionEnabled).thenReturn(true)
         val messageLocationJSON =
             "{\"_type\":\"location\",\"tid\":\"s5\",\"acc\":1600,\"alt\":0.0,\"batt\":99,\"bs\":1,\"conn\":\"w\",\"lat\":52.3153748,\"lon\":5.0408462,\"t\":\"p\",\"tst\":1514455575,\"vac\":0,\"vel\":2}"
+        Mockito.`when`(encryptionProvider.isPayloadEncryptionEnabled).thenReturn(true)
         Mockito.`when`(encryptionProvider.decrypt("TestCipherText")).thenReturn(messageLocationJSON)
         val parser = Parser(encryptionProvider)
         val input = "{\"_type\":\"encrypted\",\"data\":\"TestCipherText\"}"
@@ -229,8 +238,37 @@ class ParserTest {
 
     @Test
     fun `Parser can deserialize multiple location messages in same document`() {
-        val multipleMessageLocationJSON =
-            "[{\"_type\":\"location\",\"tid\":\"s5\",\"acc\":1600,\"alt\":0.0,\"batt\":99,\"conn\":\"w\",\"lat\":52.3153748,\"lon\":5.0408462,\"t\":\"p\",\"tst\":1514455575,\"vac\":0},{\"_type\":\"location\",\"tid\":\"s5\",\"acc\":95,\"alt\":0.0,\"batt\":99,\"conn\":\"w\",\"lat\":12.3153748,\"lon\":15.0408462,\"t\":\"p\",\"tst\":1514455579,\"vac\":0}]"
+        val multipleMessageLocationJSON = """
+            [
+                {
+                    "_type": "location",
+                    "tid": "s5",
+                    "acc": 1600,
+                    "alt": 0.0,
+                    "batt": 99,
+                    "conn": "w",
+                    "lat": 52.3153748,
+                    "lon": 5.0408462,
+                    "t": "p",
+                    "tst": 1514455575,
+                    "vac": 0
+                },
+                {
+                    "_type": "location",
+                    "tid": "s5",
+                    "acc": 95,
+                    "alt": 0.0,
+                    "batt": 99,
+                    "conn": "w",
+                    "lat": 12.3153748,
+                    "lon": 15.0408462,
+                    "t": "p",
+                    "tst": 1514455579,
+                    "vac": 0
+                }
+            ]
+        """.trimIndent()
+
         val parser = Parser(encryptionProvider)
         val byteArrayInputStream = ByteArrayInputStream(multipleMessageLocationJSON.toByteArray())
         val messages = parser.fromJson(byteArrayInputStream)
@@ -242,6 +280,84 @@ class ParserTest {
         assertEquals(1514455575L, firstMessageLocation.timestamp)
         val secondMessageLocation = messages[1] as MessageLocation
         assertEquals(1514455579L, secondMessageLocation.timestamp)
+    }
+
+    @Test
+    fun `Parser can deserialize single location message in same document`() {
+        val multipleMessageLocationJSON = """
+            [
+                {
+                    "_type": "location",
+                    "tid": "s5",
+                    "acc": 1600,
+                    "alt": 0.0,
+                    "batt": 99,
+                    "conn": "w",
+                    "lat": 52.3153748,
+                    "lon": 5.0408462,
+                    "t": "p",
+                    "tst": 1514455575,
+                    "vac": 0
+                }
+            ]
+        """.trimIndent()
+
+        val parser = Parser(encryptionProvider)
+        val byteArrayInputStream = ByteArrayInputStream(multipleMessageLocationJSON.toByteArray())
+        val messages = parser.fromJson(byteArrayInputStream)
+        assertEquals(1, messages.size.toLong())
+        for (messageBase in messages) {
+            assertEquals(MessageLocation::class.java, messageBase.javaClass)
+        }
+        val firstMessageLocation = messages[0] as MessageLocation
+        assertEquals(1514455575L, firstMessageLocation.timestamp)
+    }
+
+    @Test
+    fun `Parser can deserialize single encrypted message in same document`() {
+        val multipleMessageLocationJSON = """
+            [
+                {
+                    "_type": "location",
+                    "tid": "s5",
+                    "acc": 1600,
+                    "alt": 0.0,
+                    "batt": 99,
+                    "conn": "w",
+                    "lat": 52.3153748,
+                    "lon": 5.0408462,
+                    "t": "p",
+                    "tst": 1514455575,
+                    "vac": 0
+                },
+                {
+                    "_type": "location",
+                    "tid": "s5",
+                    "acc": 95,
+                    "alt": 0.0,
+                    "batt": 99,
+                    "conn": "w",
+                    "lat": 12.3153748,
+                    "lon": 15.0408462,
+                    "t": "p",
+                    "tst": 1514455579,
+                    "vac": 0
+                }
+            ]
+        """.trimIndent()
+        Mockito.`when`(encryptionProvider.isPayloadEncryptionEnabled).thenReturn(true)
+        Mockito.`when`(encryptionProvider.decrypt("TestCipherText"))
+            .thenReturn(multipleMessageLocationJSON)
+        val parser = Parser(encryptionProvider)
+        val encryptedJSON = "{\"_type\":\"encrypted\",\"data\":\"TestCipherText\"}"
+        val byteArrayInputStream = ByteArrayInputStream(encryptedJSON.toByteArray())
+        val messages = parser.fromJson(byteArrayInputStream)
+        assertEquals(2, messages.size.toLong())
+        for (messageBase in messages) {
+            assertEquals(MessageLocation::class.java, messageBase.javaClass)
+        }
+        val firstMessageLocation = messages[0] as MessageLocation
+        assertEquals(1514455575L, firstMessageLocation.timestamp)
     }
     //endregion
 
@@ -472,8 +588,4 @@ class ParserTest {
         parser.fromJson("not JSON")
     }
     //endregion
-
-    inner class FakeClock : Clock {
-        override val time: Long = 25
-    }
 }

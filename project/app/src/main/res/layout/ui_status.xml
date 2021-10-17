@@ -85,7 +85,7 @@
                     android:ellipsize="none"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:paddingRight="@dimen/activity_horizontal_margin"
-                    android:text="@{org.owntracks.android.support.widgets.BindingConversions.convertToString(vm.endpointQueueLength)}" />
+                    android:text="@{vm.endpointQueueLength.toString()}" />
 
                 <TextView
                     style="@style/ListItemSecondary"

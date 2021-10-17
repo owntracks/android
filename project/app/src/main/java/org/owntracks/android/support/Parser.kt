@@ -1,8 +1,9 @@
 package org.owntracks.android.support
 
 import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.databind.json.JsonMapper
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.model.messages.MessageEncrypted
 import java.io.IOException
@@ -12,12 +13,17 @@ import javax.inject.Singleton
 
 @Singleton
 class Parser @Inject constructor(private val encryptionProvider: EncryptionProvider?) {
-    private val defaultMapper = ObjectMapper()
+    private val defaultMapper = JsonMapper.builder()
+            .addModule(KotlinModule())
+            .configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, false)
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true)
-    private val arrayCompatMapper = ObjectMapper()
+            .build()
+    private val arrayCompatMapper = JsonMapper.builder()
+            .addModule(KotlinModule())
             .configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .build()
 
     @Throws(IOException::class)
     fun toUnencryptedJsonPretty(message: MessageBase): String {
@@ -67,41 +73,41 @@ class Parser @Inject constructor(private val encryptionProvider: EncryptionProvi
     }
 
     @Throws(IOException::class, EncryptionException::class)
-    private fun decrypt(a: Array<MessageBase>?): Array<MessageBase> {
+    private fun decrypt(arrayOfMessageBases: Array<MessageBase>): Array<MessageBase> {
         // Recorder compatibility, encrypted messages with data array
-        if (a == null) throw IOException("null array")
-        return if (a.size == 1 && a[0] is MessageEncrypted) {
+        return if (arrayOfMessageBases.size == 1 && arrayOfMessageBases[0] is MessageEncrypted) {
             if (encryptionProvider == null || !encryptionProvider.isPayloadEncryptionEnabled) throw EncryptionException(
                     "received encrypted message but payload encryption is not enabled"
             )
+            val data = encryptionProvider.decrypt((arrayOfMessageBases[0] as MessageEncrypted).data!!)
             defaultMapper.readValue(
-                    encryptionProvider.decrypt((a[0] as MessageEncrypted).data),
+                    data,
                     Array<MessageBase>::class.java
             )
         } else { // single message wrapped in array by mapper or array of messages
-            a
+            arrayOfMessageBases
         }
     }
 
     @Throws(IOException::class, EncryptionException::class)
-    private fun decrypt(m: MessageBase): MessageBase {
-        if (m is MessageEncrypted) {
+    private fun decrypt(messageBase: MessageBase): MessageBase {
+        if (messageBase is MessageEncrypted) {
             if (encryptionProvider == null || !encryptionProvider.isPayloadEncryptionEnabled) throw EncryptionException(
                     "received encrypted message but payload encryption is not enabled"
             )
             return defaultMapper.readValue(
-                    encryptionProvider.decrypt(m.data), MessageBase::class.java
+                    encryptionProvider.decrypt(messageBase.data!!), MessageBase::class.java
             )
         }
-        return m
+        return messageBase
     }
 
     @Throws(IOException::class)
     private fun encryptString(input: String): String {
         if (encryptionProvider != null && encryptionProvider.isPayloadEncryptionEnabled) {
-            val m = MessageEncrypted()
-            m.data = encryptionProvider.encrypt(input)
-            return defaultMapper.writeValueAsString(m)
+            val messageEncrypted =
+                    MessageEncrypted().apply { data = encryptionProvider.encrypt(input) }
+            return defaultMapper.writeValueAsString(messageEncrypted)
         }
         return input
     }
@@ -109,8 +115,7 @@ class Parser @Inject constructor(private val encryptionProvider: EncryptionProvi
     @Throws(IOException::class)
     private fun encryptBytes(input: ByteArray): ByteArray {
         if (encryptionProvider != null && encryptionProvider.isPayloadEncryptionEnabled) {
-            val m = MessageEncrypted()
-            m.data = encryptionProvider.encrypt(input)
+            val m = MessageEncrypted().apply { data = encryptionProvider.encrypt(input) }
             return defaultMapper.writeValueAsBytes(m)
         }
         return input

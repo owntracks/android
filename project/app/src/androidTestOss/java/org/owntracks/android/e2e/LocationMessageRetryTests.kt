@@ -49,9 +49,7 @@ class LocationMessageRetryTests : TestWithAnActivity<MapActivity>(MapActivity::c
     fun testReportingLocationSucceedsAfterSomeFailures() {
         setNotFirstStartPreferences()
         baristaRule.launchActivity()
-
         PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
-
         configureHTTPConnectionToLocal()
 
         reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource)

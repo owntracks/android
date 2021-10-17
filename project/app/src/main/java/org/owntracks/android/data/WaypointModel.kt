@@ -73,9 +73,9 @@ class WaypointModel : BaseObservable {
     @get:Bindable
     var geofenceLatitudeAsStr: String
         get() = geofenceLatitude.toString()
-        set(geofenceLatitudeAsStr) {
+        set(value) {
             try {
-                geofenceLatitude = geofenceLatitudeAsStr.toDouble()
+                geofenceLatitude = value.toDouble()
             } catch (e: NumberFormatException) {
                 // User has entered something that can't be converted to a double
                 // TODO: figure out validation feeback
@@ -87,12 +87,23 @@ class WaypointModel : BaseObservable {
     @get:Bindable
     var geofenceLongitudeAsStr: String
         get() = geofenceLongitude.toString()
-        set(geofenceLongitudeAsStr) {
+        set(value) {
             try {
-                geofenceLongitude = geofenceLongitudeAsStr.toDouble()
+                geofenceLongitude = value.toDouble()
             } catch (e: NumberFormatException) {
                 // User has entered something that can't be converted to a double
                 // TODO: figure out validation feeback
+            }
+        }
+
+    @get:Bindable
+    var geofenceRadiusAsStr: String
+        get() = geofenceRadius.toString()
+        set(value) {
+            try {
+                geofenceRadius = value.toInt()
+            } catch (e: java.lang.NumberFormatException) {
+
             }
         }
 

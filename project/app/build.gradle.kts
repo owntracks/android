@@ -137,19 +137,25 @@ android {
         unitTests {
             isIncludeAndroidResources = true
             isIncludeAndroidResources = true
+            all {
+                it.testLogging {
+                    events("passed", "skipped", "failed")
+                    setExceptionFormat("full")
+                }
+                it.reports {
+                    junitXml.required.set(true)
+                    html.required.set(false)
+                }
+
+                it.systemProperties["junit.jupiter.execution.parallel.enabled"] = true
+                it.systemProperties["junit.jupiter.execution.parallel.mode.default"] = "concurrent"
+                it.maxParallelForks =
+                    (Runtime.getRuntime().availableProcessors() / 4).takeIf { parallelism -> parallelism > 0 } ?: 1
+            }
         }
     }
     testCoverage {
         jacocoVersion = rootJacocoVersion
-    }
-
-    tasks.withType<Test> {
-        testLogging {
-            events("passed", "skipped", "failed")
-            setExceptionFormat("full")
-        }
-        reports.junitXml.required.set(true)
-        reports.html.required.set(false)
     }
 
     compileOptions {
@@ -179,12 +185,6 @@ kapt {
     arguments {
         arg("eventBusIndex", "org.owntracks.android.EventBusIndex")
     }
-}
-
-tasks.withType<Test> {
-    systemProperties["junit.jupiter.execution.parallel.enabled"] = true
-    systemProperties["junit.jupiter.execution.parallel.mode.default"] = "concurrent"
-    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
 }
 
 tasks.withType<JavaCompile>().configureEach {

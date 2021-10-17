@@ -7,19 +7,17 @@ import android.net.Uri
 import android.os.Environment
 import android.os.ParcelFileDescriptor
 import android.provider.MediaStore
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotExist
-import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import com.adevinta.android.barista.interaction.PermissionGranter.allowPermissionsIfNeeded
 import com.adevinta.android.barista.rule.flaky.AllowFlaky
-import okhttp3.mockwebserver.Dispatcher
-import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
-import okhttp3.mockwebserver.RecordedRequest
+import org.hamcrest.Matchers.allOf
 import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,6 +25,7 @@ import org.owntracks.android.R
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.TestWithAnHTTPServer
 import org.owntracks.android.testutils.TestWithAnHTTPServerImpl
+import org.owntracks.android.testutils.waitForElement
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import java.io.File
 import java.io.FileWriter
@@ -113,6 +112,7 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
                 )
             )
         )
+        waitForElement(allOf(withId(R.id.effectiveConfiguration), isDisplayed()))
         assertDisplayed(expectedConfig)
         assertDisplayed(R.id.save)
         assertDisplayed(R.id.close)
@@ -126,11 +126,11 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
                 Uri.parse("owntracks:///config?inline=e30k")
             )
         )
+        waitForElement(allOf(withId(R.id.importError), isDisplayed()))
         assertDisplayed(R.id.importError)
         assertContains(R.id.importError, "Message is not a valid configuration message")
         assertNotExist(R.id.save)
         assertDisplayed(R.id.close)
-
     }
 
     @Test
@@ -141,10 +141,12 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
                 Uri.parse("owntracks:///config?inline=aaaaaaaaaaaaaaaaaaaaaaaaa")
             )
         )
+        waitForElement(allOf(withId(R.id.importError), isDisplayed()))
         assertDisplayed(R.id.importError)
         assertContains(R.id.importError, "Unrecognized token")
         assertNotExist(R.id.save)
         assertDisplayed(R.id.close)
+
     }
 
     @Test
@@ -157,7 +159,7 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
                 Uri.parse("owntracks:///config?url=http%3A%2F%2Flocalhost%3A${webserverPort}%2Fmyconfig.otrc")
             )
         )
-        sleep(500)
+        waitForElement(allOf(withId(R.id.effectiveConfiguration), isDisplayed()))
         assertDisplayed(expectedConfig)
         assertDisplayed(R.id.save)
         assertDisplayed(R.id.close)
@@ -173,6 +175,7 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
                 Uri.parse("owntracks:///config?url=http%3A%2F%2Flocalhost%3A${webserverPort}%2Fnotfound")
             )
         )
+        waitForElement(allOf(withId(R.id.importError), isDisplayed()))
         assertDisplayed(R.id.importError)
         assertContains(R.id.importError, "Unexpected status code")
         assertNotExist(R.id.save)
@@ -192,6 +195,7 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
                     Uri.parse("file://${localConfig.absoluteFile}")
                 )
             )
+            waitForElement(allOf(withId(R.id.effectiveConfiguration), isDisplayed()))
             assertDisplayed(expectedConfig)
             assertDisplayed(R.id.save)
             assertDisplayed(R.id.close)
@@ -260,6 +264,7 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
     @Test
     fun loadActivityErrorsCorrectlyFromInvalidContentURL() {
         baristaRule.launchActivity(Intent(Intent.ACTION_VIEW, null))
+        waitForElement(allOf(withId(R.id.importError), isDisplayed()))
         assertDisplayed(R.id.importError)
         assertContains(R.id.importError, R.string.preferencesImportNoURIGiven)
         assertNotExist(R.id.save)

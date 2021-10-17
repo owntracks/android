@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-class GMSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.java) {
+class GMSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.java, false) {
     @Before
     fun setIdlingTimeout() {
         IdlingPolicies.setIdlingResourceTimeout(10, TimeUnit.SECONDS)
@@ -90,6 +90,7 @@ class GMSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
     fun welcomeActivityShouldNotRunWhenFirstStartPreferencesSet() {
         setNotFirstStartPreferences()
         baristaRule.launchActivity()
+        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
         assertDisplayed(R.id.google_map_view)
     }
 
@@ -122,10 +123,10 @@ class GMSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
         baristaRule.launchActivity()
         PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
         assertDisplayed(R.id.menu_monitoring)
+        clickOn(R.id.menu_monitoring)
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
     fun mapActivityShouldPromptForLocationServicesOnFirstTime() {
         try {
             InstrumentationRegistry.getInstrumentation().uiAutomation
@@ -133,6 +134,7 @@ class GMSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
                 .close()
             setNotFirstStartPreferences()
             baristaRule.launchActivity()
+            PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
             assertDisplayed(R.string.deviceLocationDisabledDialogTitle)
             clickDialogNegativeButton()
             assertDisplayed(R.id.google_map_view)
@@ -155,6 +157,7 @@ class GMSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
                 .putBoolean(Preferences.preferenceKeyUserDeclinedEnableLocationServices, true)
                 .apply()
             baristaRule.launchActivity()
+            PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
             assertNotExist(R.string.deviceLocationDisabledDialogTitle)
             assertDisplayed(R.id.google_map_view)
         } finally {

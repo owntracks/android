@@ -11,7 +11,6 @@ import androidx.test.uiautomator.Until
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
 import com.adevinta.android.barista.interaction.PermissionGranter
-import com.adevinta.android.barista.rule.flaky.AllowFlaky
 import kotlinx.coroutines.DelicateCoroutinesApi
 import mqtt.packets.Qos
 import mqtt.packets.mqtt.MQTTPublish
@@ -22,13 +21,11 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
-import org.owntracks.android.App
 import org.owntracks.android.R
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.model.messages.MessageTransition
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.support.Parser
-import org.owntracks.android.support.SimpleIdlingResource
 import org.owntracks.android.testutils.*
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.map.MapActivity
@@ -71,7 +68,6 @@ class MQTTTransitionEventTests : TestWithAnActivity<MapActivity>(MapActivity::cl
         setNotFirstStartPreferences()
         baristaRule.launchActivity()
         PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
-
         clearNotifications()
         configureMQTTConnectionToLocal()
 
@@ -165,10 +161,10 @@ class MQTTTransitionEventTests : TestWithAnActivity<MapActivity>(MapActivity::cl
         uiDevice.openNotification()
 
         val notification = uiDevice.findObject(By.textEndsWith(regionDescription))
-        val closeIntent = Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)
-        baristaRule.activityTestRule.activity.sendBroadcast(closeIntent)
         assertNotNull(notification)
         assertTrue(notification.text.endsWith("$deviceId enters Test Region"))
+        val closeIntent = Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)
+        baristaRule.activityTestRule.activity.sendBroadcast(closeIntent)
 
         assertTrue("Packet has been received that is a transition message with the correct details",
             mqttPacketsReceived

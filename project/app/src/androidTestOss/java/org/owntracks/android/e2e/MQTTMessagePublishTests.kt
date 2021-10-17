@@ -1,7 +1,15 @@
 package org.owntracks.android.e2e
 
+import android.Manifest
+import android.view.View
+import androidx.annotation.IdRes
 import androidx.test.espresso.Espresso.onData
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.UiController
+import androidx.test.espresso.ViewAction
 import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -11,11 +19,14 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
+import com.adevinta.android.barista.interaction.PermissionGranter
 import kotlinx.coroutines.DelicateCoroutinesApi
 import mqtt.packets.Qos
 import mqtt.packets.mqtt.MQTTPublish
 import mqtt.packets.mqttv5.MQTT5Properties
+import org.hamcrest.CoreMatchers
 import org.hamcrest.CoreMatchers.anything
+import org.hamcrest.Matcher
 import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -57,12 +68,12 @@ class MQTTMessagePublishTests : TestWithAnActivity<MapActivity>(MapActivity::cla
 
     @Test
     fun given_an_MQTT_configured_client_when_the_report_button_is_pressed_then_the_broker_receives_a_packet_with_the_correct_location_message_in() {
-        setNotFirstStartPreferences()
         val mockLatitude = 51.0
         val mockLongitude = 1.0
-
+        setNotFirstStartPreferences()
         baristaRule.launchActivity()
 
+        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
         initializeMockLocationProvider(InstrumentationRegistry.getInstrumentation().targetContext)
 
         configureMQTTConnectionToLocal()
@@ -93,6 +104,8 @@ class MQTTMessagePublishTests : TestWithAnActivity<MapActivity>(MapActivity::cla
     fun given_an_MQTT_configured_client_when_the_broker_sends_a_message_card_without_a_location_then_a_new_contact_appears() {
         setNotFirstStartPreferences()
         baristaRule.launchActivity()
+
+        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
         configureMQTTConnectionToLocal()
 
         reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource)
@@ -123,6 +136,8 @@ class MQTTMessagePublishTests : TestWithAnActivity<MapActivity>(MapActivity::cla
     fun given_an_MQTT_configured_client_when_the_broker_sends_a_message_card_with_a_location_then_a_new_contact_appears() {
         setNotFirstStartPreferences()
         baristaRule.launchActivity()
+        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+
         configureMQTTConnectionToLocal()
 
         reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource)
@@ -174,6 +189,8 @@ class MQTTMessagePublishTests : TestWithAnActivity<MapActivity>(MapActivity::cla
     fun given_an_MQTT_configured_client_when_the_broker_sends_a_location_for_a_cleared_contact_then_a_the_contact_returns_with_the_correct_details() {
         setNotFirstStartPreferences()
         baristaRule.launchActivity()
+
+        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
         configureMQTTConnectionToLocal()
 
         reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource)
@@ -237,9 +254,36 @@ class MQTTMessagePublishTests : TestWithAnActivity<MapActivity>(MapActivity::cla
     fun given_an_MQTT_configured_client_when_the_wrong_credentials_are_used_then_the_status_screen_shows_that_the_broker_is_not_connected() {
         setNotFirstStartPreferences()
         baristaRule.launchActivity()
+
+        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
         configureMQTTConnectionToLocal("not the right password")
         assertContains(R.id.connectedStatus, R.string.ERROR)
         assertContains(R.id.connectedStatusMessage, "Connection lost")
+    }
+
+    private fun clickOnRegardlessOfVisibility(@IdRes id: Int) {
+        onView(withId(id)).check(
+            matches(
+                CoreMatchers.allOf(
+                    isEnabled(),
+                    isClickable()
+                )
+            )
+        ).perform(
+            object : ViewAction {
+                override fun getConstraints(): Matcher<View> {
+                    return isEnabled() // no constraints, they are checked above
+                }
+
+                override fun getDescription(): String {
+                    return "click plus button"
+                }
+
+                override fun perform(uiController: UiController?, view: View) {
+                    view.performClick()
+                }
+            }
+        )
     }
 
     companion object {

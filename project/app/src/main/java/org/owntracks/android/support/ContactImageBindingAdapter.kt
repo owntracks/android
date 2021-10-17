@@ -22,7 +22,7 @@ class ContactImageBindingAdapter @Inject constructor(
         @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
         @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
 ) {
-    @BindingAdapter(value = ["contact"])
+    @BindingAdapter("contact")
     fun ImageView.displayFaceInViewAsync(c: FusedContact?) {
         c?.also { contact ->
             GlobalScope.launch(mainDispatcher) {
