@@ -144,6 +144,7 @@ jobs:
             - run: adb shell settings put secure location_providers_allowed +gps
             - run: adb shell settings put secure location_providers_allowed +network
             - run: adb shell settings put secure location_mode 3
+            - run: adb shell settings put global heads_up_notifications_enabled 0
           post-emulator-launch-assemble-command: ""
           run-logcat: true
           max-tries: 1
@@ -190,6 +191,7 @@ jobs:
             - run: adb shell settings put secure location_providers_allowed +gps
             - run: adb shell settings put secure location_providers_allowed +network
             - run: adb shell settings put secure location_mode 3
+            - run: adb shell settings put global heads_up_notifications_enabled 0
           post-emulator-launch-assemble-command: ""
           run-logcat: true
           max-tries: 1
