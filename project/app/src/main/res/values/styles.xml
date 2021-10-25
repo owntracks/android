@@ -19,7 +19,7 @@
         </item>
         <item name="drawerArrowStyle">@style/Theme.Owntracks.ToolbarDrawerArrowStyle</item>
         <item name="actionOverflowButtonStyle">@style/Theme.Owntracks.Overflow</item>
-        <item name="materialAlertDialogTheme">@style/Theme.Owntracks.AlertDialogTheme</item>
+        <item name="materialAlertDialogTheme">@style/Theme.Owntracks.AlertDialog</item>
     </style>
 
     <!-- Hamburger theme -->
@@ -69,15 +69,15 @@
         <item name="android:paddingTop">@dimen/listitem_vertical_margin_choice</item>
     </style>
 
-    <style name="Theme.Owntracks.AlertDialogTheme" parent="@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog">
-        <item name="android:tint">?attr/colorPrimary</item>
-    </style>
-
     <style name="DialogView">
         <item name="android:paddingStart">24dp</item>
         <item name="android:paddingEnd">24dp</item>
         <item name="android:paddingTop">8dp</item>
         <item name="android:paddingBottom">8dp</item>
+    </style>
+
+    <style name="Theme.Owntracks.AlertDialog" parent="@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="android:tint">?attr/colorPrimary</item>
     </style>
 
     <!-- https://paletton.com/#uid=53D0n0kmN-+hrHfkdDlptylsRwF -->

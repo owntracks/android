@@ -1,17 +1,24 @@
 package org.owntracks.android.gms.location
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.location.Location
+import android.location.LocationManager
 import android.os.Looper
-import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.common.api.ResolvableApiException
-import com.google.android.gms.location.*
+import android.provider.Settings
+import androidx.core.location.LocationManagerCompat
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationAvailability
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.Tasks
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import org.owntracks.android.R
 import org.owntracks.android.location.LocationCallback
 import org.owntracks.android.location.LocationProviderClient
 import org.owntracks.android.location.LocationRequest
-import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber
 
 
@@ -23,42 +30,44 @@ class GMSLocationProviderClient(private val fusedLocationProviderClient: FusedLo
         requestLocationUpdates(locationRequest, clientCallBack, null)
     }
 
-    override fun requestLocationUpdates(locationRequest: LocationRequest, clientCallBack: LocationCallback, looper: Looper?) {
+    override fun requestLocationUpdates(
+        locationRequest: LocationRequest,
+        clientCallBack: LocationCallback,
+        looper: Looper?
+    ) {
         removeLocationUpdates(clientCallBack)
-
-        val locationSettingsRequestBuilder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest.toGMSLocationRequest())
-
-        LocationServices.getSettingsClient(this.fusedLocationProviderClient.applicationContext)
-                .checkLocationSettings(locationSettingsRequestBuilder.build())
-                .addOnFailureListener {
-                    when (it) {
-                        is ApiException -> {
-                            when (it.statusCode) {
-                                LocationSettingsStatusCodes.RESOLUTION_REQUIRED -> {
-                                    if (userHasDeclinedLocationSettingsRequest) {
-                                        Timber.w("User previously declined to enable location for this context, so not asking again")
-                                    } else if (this.context is MapActivity) {
-                                        this.context.locationLifecycleObserver.resolveException(it as ResolvableApiException) { success ->
-                                            if (success) {
-                                                Timber.d("User enabled location")
-                                                actuallyRequestLocationUpdates(locationRequest, clientCallBack, looper)
-                                            } else {
-                                                Timber.w("User did not enable location, not requesting location updates")
-                                                userHasDeclinedLocationSettingsRequest = true
-                                            }
-                                        }
-                                    }
-                                }
-                                else -> Timber.e("Unhandled error from SettingsClient $it")
-                            }
+        if (context is Activity) {
+            val locationService =
+                context.getSystemService(Context.LOCATION_SERVICE) as LocationManager?
+            locationService?.run {
+                val locationEnabled = LocationManagerCompat.isLocationEnabled(this)
+                if (!locationEnabled && !userHasDeclinedLocationSettingsRequest) {
+                    MaterialAlertDialogBuilder(context)
+                        .setTitle("Device location disabled")
+                        .setMessage(
+                            "Device location is not currently enabled, so OwnTracks cannot fetch your current location." +
+                                    "\n\n" +
+                                    "Open the Location Settings page and enable location to allow OwnTracks to track your current location."
+                        )
+                        .setIcon(R.drawable.ic_baseline_location_disabled_24)
+                        .setPositiveButton(
+                            "Open Location Settings"
+                        ) { _, _ ->
+                            context.startActivity(
+                                Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                            )
                         }
-                        else -> Timber.e("Unhandled error from SettingsClient $it")
-                    }
-                }
-                .addOnSuccessListener {
-                    Timber.d("GMS Location Settings check success")
+                        .setNegativeButton("Cancel") { _, _ ->
+                            userHasDeclinedLocationSettingsRequest = true
+                        }
+                        .show()
+                } else {
                     actuallyRequestLocationUpdates(locationRequest, clientCallBack, looper)
                 }
+            }
+        } else {
+            actuallyRequestLocationUpdates(locationRequest, clientCallBack, looper)
+        }
     }
 
     @SuppressLint("MissingPermission")
