@@ -8,10 +8,6 @@ plugins {
     id("com.hiya.jacoco-android")
 }
 
-val versionMajor = 2
-val versionMinor = 4
-val versionPatch = 3
-
 val googleMapsAPIKey = extra.get("google_maps_api_key")?.toString() ?: "PLACEHOLDER_API_KEY"
 
 jacoco {
@@ -27,8 +23,8 @@ android {
         minSdkVersion(21)
         targetSdkVersion(30)
 
-        versionCode = versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100
-        versionName = "${versionMajor}.${versionMinor}.${versionPatch}"
+        versionCode = 24300
+        versionName = "2.4.3"
 
         javaCompileOptions {
             annotationProcessorOptions {
