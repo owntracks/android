@@ -19,6 +19,7 @@
         </item>
         <item name="drawerArrowStyle">@style/Theme.Owntracks.ToolbarDrawerArrowStyle</item>
         <item name="actionOverflowButtonStyle">@style/Theme.Owntracks.Overflow</item>
+        <item name="materialAlertDialogTheme">@style/Theme.Owntracks.AlertDialogTheme</item>
     </style>
 
     <!-- Hamburger theme -->
@@ -66,6 +67,10 @@
         <item name="android:paddingBottom">@dimen/listitem_vertical_margin_choice</item>
         <item name="android:paddingLeft">@dimen/listitem_control_margin</item>
         <item name="android:paddingTop">@dimen/listitem_vertical_margin_choice</item>
+    </style>
+
+    <style name="Theme.Owntracks.AlertDialogTheme" parent="@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="android:tint">?attr/colorOnPrimary</item>
     </style>
 
     <style name="DialogView">

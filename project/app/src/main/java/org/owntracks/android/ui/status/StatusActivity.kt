@@ -1,6 +1,10 @@
 package org.owntracks.android.ui.status
 
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiStatusBinding
@@ -14,5 +18,24 @@ class StatusActivity : BaseActivity<UiStatusBinding?, StatusMvvm.ViewModel<Statu
         bindAndAttachContentView(R.layout.ui_status, savedInstanceState)
         setSupportToolbar(binding!!.appbar.toolbar)
         setDrawer(binding!!.appbar.toolbar)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+            binding!!.dozeWhiteListed.setOnClickListener {
+                if (!viewModel!!.dozeWhitelisted) {
+                    MaterialAlertDialogBuilder(this)
+                        .setIcon(R.drawable.ic_baseline_battery_charging_full_24)
+                        .setTitle(getString(R.string.batteryOptimizationWhitelistDialogTitle))
+                        .setMessage(getString(R.string.batteryOptimizationWhitelistDialogMessage))
+                        .setCancelable(true)
+                        .setPositiveButton(getString(R.string.batteryOptimizationWhitelistDialogButtonLabel)) { _, _ ->
+                            startActivity(
+                                Intent(
+                                    ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS
+                                )
+                            )
+                        }.show()
+                }
+            }
+        }
     }
 }

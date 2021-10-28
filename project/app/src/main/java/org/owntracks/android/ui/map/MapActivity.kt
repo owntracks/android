@@ -214,7 +214,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
                                 }
                             )
                         }
-                        .setPositiveButton(android.R.string.ok, null)
+                        .setCancelable(true)
                         .show()
                 }
             })
