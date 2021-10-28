@@ -1,5 +1,6 @@
 package org.owntracks.android
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.app.Notification
 import android.app.NotificationChannel
@@ -9,6 +10,7 @@ import android.os.StrictMode
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NotificationManagerCompat
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.MutableLiveData
 import androidx.work.Configuration
 import androidx.work.WorkManager
 import androidx.work.WorkerFactory
@@ -50,6 +52,9 @@ class App : Application() {
     @Inject
     lateinit var bindingComponentProvider: Provider<CustomBindingComponentBuilder>
 
+    val workManagerFailedToInitialize = MutableLiveData(false)
+
+    @SuppressLint("RestrictedApi")
     override fun onCreate() {
         // Make sure we use Conscrypt for advanced TLS features on all devices.
         // X509ExtendedTrustManager not available pre-24, fall back to device. https://github.com/google/conscrypt/issues/603
@@ -74,7 +79,13 @@ class App : Application() {
 
         WorkManager.initialize(
             this,
-            Configuration.Builder().setWorkerFactory(workerFactory).build()
+            Configuration.Builder()
+                .setWorkerFactory(workerFactory)
+                .setInitializationExceptionHandler { throwable ->
+                    Timber.e(throwable, "Exception thrown when initializing WorkManager")
+                    workManagerFailedToInitialize.postValue(true)
+                }
+                .build()
         )
         scheduler.cancelAllTasks()
         Timber.plant(TimberInMemoryLogTree(BuildConfig.DEBUG))

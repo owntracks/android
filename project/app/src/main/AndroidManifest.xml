@@ -49,11 +49,11 @@
 
         <!-- Disables default initialization of WorkManager because custom initializer is used in App.onCreate()-->
         <provider
-            android:name="androidx.work.impl.WorkManagerInitializer"
-            android:authorities="${applicationId}.workmanager-init"
-            android:enabled="false"
-            android:exported="false"
-            tools:replace="android:authorities" />
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            tools:node="remove">
+        </provider>
+
 
         <!-- Maps SDK requires this as of API v28 -->
         <uses-library

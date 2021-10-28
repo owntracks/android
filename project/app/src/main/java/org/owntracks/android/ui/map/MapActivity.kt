@@ -12,6 +12,7 @@ import android.hardware.SensorManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
@@ -28,12 +29,14 @@ import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.idling.CountingIdlingResource
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
+import org.owntracks.android.App
 import org.owntracks.android.BuildConfig.FLAVOR
 import org.owntracks.android.R
 import org.owntracks.android.data.repos.LocationRepo
@@ -195,6 +198,26 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
             // We've been started in the foreground, so cancel the background restriction notification
             NotificationManagerCompat.from(this)
                 .cancel(BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG, 0)
+
+            (applicationContext as App).workManagerFailedToInitialize.observe(this, { value ->
+                if (value) {
+                    MaterialAlertDialogBuilder(this)
+                        .setIcon(R.drawable.ic_baseline_warning_24)
+                        .setTitle(getString(R.string.workmanagerInitializationErrorDialogTitle))
+                        .setMessage(getString(R.string.workmanagerInitializationErrorDialogMessage))
+                        .setNeutralButton(getString(R.string.workmanagerInitializationErrorDialogOpenSettingsLabel)) { _, _ ->
+                            startActivity(
+                                Intent(
+                                    ACTION_APPLICATION_DETAILS_SETTINGS
+                                ).apply {
+                                    data = Uri.fromParts("package", packageName, "")
+                                }
+                            )
+                        }
+                        .setPositiveButton(android.R.string.ok, null)
+                        .show()
+                }
+            })
         }
     }
 
