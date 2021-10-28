@@ -47,8 +47,15 @@ class OSMMapFragment internal constructor() : MapFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        Configuration.getInstance()
-            .load(context, PreferenceManager.getDefaultSharedPreferences(context))
+        Configuration.getInstance().apply {
+            load(context, PreferenceManager.getDefaultSharedPreferences(context))
+            osmdroidBasePath.resolve("tiles").run {
+                if (exists()) {
+                    deleteRecursively()
+                }
+            }
+            osmdroidTileCache = requireContext().cacheDir.resolve("osmdroid/tiles")
+        }
         binding = DataBindingUtil.inflate(inflater, R.layout.osm_map_fragment, container, false)
         ((requireActivity() as MapActivity).checkAndRequestLocationPermissions())
         if (requireActivity() is MapActivity) {
