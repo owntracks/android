@@ -70,7 +70,7 @@
     </style>
 
     <style name="Theme.Owntracks.AlertDialogTheme" parent="@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog">
-        <item name="android:tint">?attr/colorOnPrimary</item>
+        <item name="android:tint">?attr/colorPrimary</item>
     </style>
 
     <style name="DialogView">
