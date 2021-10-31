@@ -52,13 +52,11 @@ class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallba
 
     override fun onMapReady(googleMap: GoogleMap) {
         this.googleMap = googleMap
-        if ((requireActivity() as MapActivity).checkAndRequestLocationPermissions()) {
-            initMap()
-        }
+        initMap()
         ((requireActivity()) as MapActivity).onMapReady()
     }
 
-    fun setMapStyle() {
+    private fun setMapStyle() {
         if (resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) {
             googleMap?.setMapStyle(
                 MapStyleOptions.loadRawResourceStyle(
@@ -71,9 +69,11 @@ class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallba
 
     @SuppressLint("MissingPermission")
     private fun initMap() {
+        val myLocationEnabled = (requireActivity() as MapActivity).checkAndRequestMyLocationCapability(false)
+        Timber.d("GoogleMapFragment initMap locationEnabled=$myLocationEnabled")
         this.googleMap?.run {
             isIndoorEnabled = false
-            isMyLocationEnabled = true
+            isMyLocationEnabled = myLocationEnabled
             uiSettings.isMyLocationButtonEnabled = false
             uiSettings.setAllGesturesEnabled(true)
 
@@ -163,7 +163,7 @@ class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallba
         }
     }
 
-    override fun locationPermissionGranted() {
+    override fun myLocationEnabled() {
         initMap()
     }
 

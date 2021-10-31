@@ -57,7 +57,6 @@ class OSMMapFragment internal constructor() : MapFragment() {
             osmdroidTileCache = requireContext().cacheDir.resolve("osmdroid/tiles")
         }
         binding = DataBindingUtil.inflate(inflater, R.layout.osm_map_fragment, container, false)
-        ((requireActivity() as MapActivity).checkAndRequestLocationPermissions())
         if (requireActivity() is MapActivity) {
             if (locationRepo == null) {
                 locationRepo = (activity as MapActivity).locationRepo
@@ -66,6 +65,27 @@ class OSMMapFragment internal constructor() : MapFragment() {
                 locationSource = (activity as MapActivity).mapLocationSource
             }
         }
+        initMap()
+        ((requireActivity()) as MapActivity).onMapReady()
+        return binding!!.root
+    }
+
+    private fun setMapStyle() {
+        if (resources.configuration.uiMode.and(android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES) {
+            mapView?.run {
+                overlayManager.tilesOverlay.setColorFilter(TilesOverlay.INVERT_COLORS)
+            }
+        } else {
+            mapView?.run {
+                overlayManager.tilesOverlay.setColorFilter(null)
+            }
+        }
+    }
+
+    private fun initMap() {
+        val myLocationEnabled =
+            (requireActivity() as MapActivity).checkAndRequestMyLocationCapability(false)
+        Timber.d("OSMMapFragment initMap locationEnabled=$myLocationEnabled")
         mapView = this.binding!!.osmMapView.apply {
             setTileSource(TileSourceFactory.MAPNIK)
             zoomController.setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
@@ -95,20 +115,6 @@ class OSMMapFragment internal constructor() : MapFragment() {
             }
         }
         setMapStyle()
-        ((requireActivity()) as MapActivity).onMapReady()
-        return binding!!.root
-    }
-
-    fun setMapStyle() {
-        if (resources.configuration.uiMode.and(android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES) {
-            mapView?.run {
-                overlayManager.tilesOverlay.setColorFilter(TilesOverlay.INVERT_COLORS)
-            }
-        } else {
-            mapView?.run {
-                overlayManager.tilesOverlay.setColorFilter(null)
-            }
-        }
     }
 
     override fun clearMarkers() {
@@ -156,18 +162,20 @@ class OSMMapFragment internal constructor() : MapFragment() {
         }
     }
 
-    override fun locationPermissionGranted() {
-        Timber.i("OSM Location permission granted")
+    override fun myLocationEnabled() {
+        initMap()
     }
 
     override fun onResume() {
         super.onResume()
+        locationSource?.reactivate()
         mapView?.onResume()
         setMapStyle()
     }
 
     override fun onPause() {
         mapView?.onPause()
+        locationSource?.deactivate()
         super.onPause()
     }
 

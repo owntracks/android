@@ -96,9 +96,7 @@
     <string name="welcome_heading">"Willkommen"</string>
     <string name="welcome_description">"Die folgenden Schritte werden Dir helfen, OwnTracks einzurichten"</string>
     <string name="mode_heading">"Modus"</string>
-    <string name="permissions_heading">"Berechtigungen"</string>
-    <string name="permissions_description">"OwnTracks benötigt Zugriff auf Deinen Standort. Bitte erteile diese Berechtigung, bevor es weitergeht."</string>
-    <string name="permissions_granted">"Berechtigungen wurden erteilt"</string>
+    <string name="locationPermissionRequestDialogMessage">"OwnTracks benötigt Zugriff auf Deinen Standort. Bitte erteile diese Berechtigung, bevor es weitergeht."</string>
     <string name="icon_description_owntracks">"OwnTracks"</string>
     <string name="enjoy_description">"Viel Spaß mit OwnTracks"</string>
     <string name="done_heading">"Fertig"</string>

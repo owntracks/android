@@ -7,6 +7,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import org.owntracks.android.R
 import org.owntracks.android.services.MessageProcessorEndpointHttp
 import org.owntracks.android.services.MessageProcessorEndpointMqtt
+import org.owntracks.android.support.Preferences
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -31,10 +32,12 @@ class SharedPreferencesStore @Inject constructor(@ApplicationContext context: Co
         context.getSharedPreferences(FILENAME_HTTP, Context.MODE_PRIVATE)
 
     // Some preferences are always read from commonSharedPreferences. We list these out so that we can use the right store when these keys are requested.
-    private val commonPreferenceKeys: List<String> = listOf(
+    private val commonPreferenceKeys: Set<String> = setOf(
         context.getString(R.string.preferenceKeyFirstStart),
         context.getString(R.string.preferenceKeySetupNotCompleted),
-        context.getString(R.string.preferenceKeyObjectboxMigrated)
+        context.getString(R.string.preferenceKeyObjectboxMigrated),
+        Preferences.preferenceKeyUserDeclinedEnableLocationPermissions,
+        Preferences.preferenceKeyUserDeclinedEnableLocationServices
     )
 
     override fun putString(key: String, value: String) {

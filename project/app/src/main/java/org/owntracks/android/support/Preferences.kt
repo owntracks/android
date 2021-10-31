@@ -989,6 +989,14 @@ class Preferences @Inject constructor(
             false
         )
 
+    var userDeclinedEnableLocationPermissions: Boolean
+        get() = preferencesStore.getBoolean(preferenceKeyUserDeclinedEnableLocationPermissions, false)
+        set(value) = preferencesStore.putBoolean(preferenceKeyUserDeclinedEnableLocationPermissions, value)
+
+    var userDeclinedEnableLocationServices: Boolean
+        get() = preferencesStore.getBoolean(preferenceKeyUserDeclinedEnableLocationServices, false)
+        set(value) = preferencesStore.putBoolean(preferenceKeyUserDeclinedEnableLocationServices, value)
+
     fun setObjectBoxMigrated() {
         preferencesStore.putBoolean(getPreferenceKey(R.string.preferenceKeyObjectboxMigrated), true)
     }
@@ -1182,5 +1190,9 @@ class Preferences @Inject constructor(
 
         const val MQTT_MIN_QOS = 0
         const val MQTT_MAX_QOS = 2
+
+        // Preference Keys
+        const val preferenceKeyUserDeclinedEnableLocationPermissions = "userDeclinedEnableLocationPermissions"
+        const val preferenceKeyUserDeclinedEnableLocationServices = "userDeclinedEnableLocationServices"
     }
 }

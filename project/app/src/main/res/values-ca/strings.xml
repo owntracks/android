@@ -96,9 +96,7 @@
     <string name="welcome_heading">"Benvinguda"</string>
     <string name="welcome_description">"Els següents passos t'ajudaran a començar amb Owntracks"</string>
     <string name="mode_heading">"Mode"</string>
-    <string name="permissions_heading">"Permisos"</string>
-    <string name="permissions_description">"Owntracks necessita accedir a la ubicació. Sisplau atorga aquest permís abans de continuar."</string>
-    <string name="permissions_granted">"Permisos concedits"</string>
+    <string name="locationPermissionRequestDialogMessage">"Owntracks necessita accedir a la ubicació. Sisplau atorga aquest permís abans de continuar."</string>
     <string name="icon_description_owntracks">"Owntracks"</string>
     <string name="enjoy_description">"Escull preferències des del menú i configura Owntracks per al teu servidor abans d'utilitzar-lo"</string>
     <string name="done_heading">"Fet"</string>

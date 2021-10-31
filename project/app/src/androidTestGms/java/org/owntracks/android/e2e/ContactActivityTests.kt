@@ -1,5 +1,6 @@
 package org.owntracks.android.e2e
 
+import android.Manifest
 import android.view.View
 import android.view.animation.Animation
 import androidx.test.espresso.IdlingPolicies
@@ -16,6 +17,7 @@ import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickBa
 import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickDialogPositiveButton
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
+import com.adevinta.android.barista.interaction.PermissionGranter
 import com.adevinta.android.barista.rule.BaristaRule
 import com.adevinta.android.barista.rule.flaky.AllowFlaky
 import okhttp3.mockwebserver.Dispatcher
@@ -28,7 +30,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
-import org.owntracks.android.App
 import org.owntracks.android.R
 import org.owntracks.android.ScreenshotTakingOnTestEndRule
 import org.owntracks.android.ui.clickOnAndWait
@@ -92,12 +93,12 @@ class ContactActivityTests {
     """.trimIndent()
 
     @Test
-    @AllowFlaky
     fun testClickingOnContactLoadsContactOnMap() {
+        setNotFirstStartPreferences()
         baristaRule.launchActivity()
 
         val httpPort = mockWebServer.port
-        doWelcomeProcess(baristaRule.activityTestRule.activity.application as App)
+        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
 
         openDrawer()
         clickOnAndWait(R.string.title_activity_preferences)

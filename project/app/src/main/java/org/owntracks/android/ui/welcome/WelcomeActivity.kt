@@ -15,7 +15,6 @@ import org.owntracks.android.ui.base.navigator.Navigator
 import org.owntracks.android.ui.map.MapActivity
 import org.owntracks.android.ui.welcome.finish.FinishFragment
 import org.owntracks.android.ui.welcome.intro.IntroFragment
-import org.owntracks.android.ui.welcome.permission.PermissionFragment
 import org.owntracks.android.ui.welcome.permission.PlayFragment
 import org.owntracks.android.ui.welcome.version.VersionFragment
 import timber.log.Timber
@@ -40,9 +39,6 @@ class WelcomeActivity : BaseActivity<UiWelcomeBinding?, WelcomeViewModel?>(), We
     lateinit var playFragment: PlayFragment
 
     @Inject
-    lateinit var permissionFragment: PermissionFragment
-
-    @Inject
     lateinit var finishFragment: FinishFragment
 
     private var welcomeAdapter: WelcomeAdapter? = null
@@ -62,7 +58,6 @@ class WelcomeActivity : BaseActivity<UiWelcomeBinding?, WelcomeViewModel?>(), We
             introFragment,
             versionFragment,
             playFragment,
-            permissionFragment,
             finishFragment
         )
 

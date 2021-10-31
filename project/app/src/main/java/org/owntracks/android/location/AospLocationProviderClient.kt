@@ -14,16 +14,22 @@ import org.owntracks.android.location.LocationRequest.Companion.PRIORITY_BALANCE
 import org.owntracks.android.location.LocationRequest.Companion.PRIORITY_HIGH_ACCURACY
 import timber.log.Timber
 
-class AospLocationProviderClient(val context: Context) : LocationProviderClient {
+class AospLocationProviderClient(val context: Context) : LocationProviderClient() {
     private val callbackMap = mutableMapOf<LocationCallback, IMyLocationConsumer>()
     private val gpsMyLocationProvider = GpsMyLocationProvider(context)
 
     @SuppressLint("MissingPermission")
-    override fun requestLocationUpdates(locationRequest: LocationRequest, clientCallBack: LocationCallback) {
+    override fun actuallyRequestLocationUpdates(
+        locationRequest: LocationRequest,
+        clientCallBack: LocationCallback,
+        looper: Looper?
+    ) {
         GlobalScope.launch {
             withContext(Dispatchers.Main) {
                 gpsMyLocationProvider.stopLocationProvider()
-                val listener = IMyLocationConsumer { location, _ -> clientCallBack.onLocationResult(LocationResult(location)) }
+                val listener = IMyLocationConsumer { location, _ ->
+                    clientCallBack.onLocationResult(LocationResult(location))
+                }
                 gpsMyLocationProvider.clearLocationSources()
                 when (locationRequest.priority) {
 
@@ -43,17 +49,13 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient 
                     }
                 }
                 gpsMyLocationProvider.locationUpdateMinTime = locationRequest.interval ?: 30_000
-                gpsMyLocationProvider.locationUpdateMinDistance = locationRequest.smallestDisplacement
+                gpsMyLocationProvider.locationUpdateMinDistance =
+                    locationRequest.smallestDisplacement
                         ?: 10f
                 gpsMyLocationProvider.startLocationProvider(listener)
                 callbackMap[clientCallBack] = listener
             }
         }
-    }
-
-    @SuppressLint("MissingPermission")
-    override fun requestLocationUpdates(locationRequest: LocationRequest, clientCallBack: LocationCallback, looper: Looper?) {
-        requestLocationUpdates(locationRequest, clientCallBack)
     }
 
     override fun removeLocationUpdates(clientCallBack: LocationCallback) {

@@ -96,9 +96,7 @@
     <string name="welcome_heading">"Bienvenu"</string>
     <string name="welcome_description">"Les étapes suivantes vous aideront à démarrer avec OwnTracks"</string>
     <string name="mode_heading">"Mode"</string>
-    <string name="permissions_heading">"Autorisations"</string>
-    <string name="permissions_description">"OwnTracks nécessite l'accès à votre position. Veuillez accorder cette autorisation avant de continuer."</string>
-    <string name="permissions_granted">"Les autorisations ont été accordées"</string>
+    <string name="locationPermissionRequestDialogMessage">"OwnTracks nécessite l'accès à votre position. Veuillez accorder cette autorisation avant de continuer."</string>
     <string name="icon_description_owntracks">"OwnTracks"</string>
     <string name="enjoy_description">"Sélectionnez les préférences dans le menu et configurez OwnTracks pour votre serveur avant de l'utiliser"</string>
     <string name="done_heading">"Terminé"</string>

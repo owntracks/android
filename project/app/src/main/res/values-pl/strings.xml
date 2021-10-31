@@ -96,9 +96,7 @@
     <string name="welcome_heading">"Witaj"</string>
     <string name="welcome_description">"Poniższe kroki pomogą Ci rozpocząć pracę z Owntracks"</string>
     <string name="mode_heading">"Tryb"</string>
-    <string name="permissions_heading">"Uprawnienia"</string>
-    <string name="permissions_description">"Owntracks wymaga dostępu do Twojej lokalizacji. Zezwól na niego, zanim rozpoczniesz."</string>
-    <string name="permissions_granted">"Uprawnienia zostały udzielone"</string>
+    <string name="locationPermissionRequestDialogMessage">"Owntracks wymaga dostępu do Twojej lokalizacji. Zezwól na niego, zanim rozpoczniesz."</string>
     <string name="icon_description_owntracks">"Owntracks"</string>
     <string name="enjoy_description">"Wybierz ustawienia z menu i skonfiguruj OwnTracks dla swojego serwera przed użyciem go"</string>
     <string name="done_heading">"Gotowe"</string>

@@ -16,7 +16,6 @@
 
     <item
         android:id="@+id/menu_mylocation"
-        android:icon="@drawable/ic_baseline_my_location_24"
         android:orderInCategory="1"
         android:title="@string/menuCurrentLocation"
         app:showAsAction="ifRoom" />

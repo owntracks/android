@@ -1,25 +1,25 @@
 package org.owntracks.android.ui.map
 
-import android.Manifest
-import android.app.Activity
+import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.content.ActivityNotFoundException
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
-import android.content.pm.PackageManager
+import android.content.pm.PackageManager.PERMISSION_DENIED
+import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+import android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.app.ActivityCompat
@@ -135,7 +135,10 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
 
             locationProviderClient = LocationServices.getLocationProviderClient(this, preferences)
             mapLocationSource =
-                MapLocationSource(locationProviderClient!!, viewModel!!.mapLocationUpdateCallback)
+                MapLocationSource(
+                    locationProviderClient!!,
+                    viewModel!!.mapLocationUpdateCallback
+                )
 
             if (savedInstanceState == null || supportFragmentManager.findFragmentByTag("map") == null) {
                 mapFragment = getMapFragment()
@@ -231,43 +234,136 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
             }
         }
 
-    internal fun checkAndRequestLocationPermissions(): Boolean {
-        if (!requirementsChecker.isPermissionCheckPassed()) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
-                    val currentActivity: Activity = this
-                    AlertDialog.Builder(this)
-                        .setCancelable(true)
-                        .setMessage(R.string.permissions_description)
-                        .setPositiveButton(
-                            "OK"
-                        ) { _: DialogInterface?, _: Int ->
-                            ActivityCompat.requestPermissions(
-                                currentActivity,
-                                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                                PERMISSIONS_REQUEST_CODE
-                            )
-                        }
-                        .show()
-                } else {
-                    ActivityCompat.requestPermissions(
-                        this,
-                        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                        PERMISSIONS_REQUEST_CODE
-                    )
-                }
-            } else {
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                    PERMISSIONS_REQUEST_CODE
-                )
+    internal fun checkAndRequestMyLocationCapability(explicitUserAction: Boolean): Boolean =
+        checkAndRequestLocationPermissions(explicitUserAction) &&
+                checkAndRequestLocationServicesEnabled(explicitUserAction)
+
+    private val locationServicesLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            // We have to check permissions again here, because it may have been revoked in the
+            // period between asking for location services and returning here.
+            if (checkAndRequestLocationPermissions(false)) {
+                mapFragment.myLocationEnabled()
+            }
+        }
+
+    private fun checkAndRequestLocationServicesEnabled(explicitUserAction: Boolean): Boolean {
+        if (!requirementsChecker.isLocationServiceEnabled()) {
+            Timber.d("Location Services disabled")
+            if ((explicitUserAction || !preferences.userDeclinedEnableLocationServices)) {
+                MaterialAlertDialogBuilder(this)
+                    .setCancelable(true)
+                    .setIcon(R.drawable.ic_baseline_location_disabled_24)
+                    .setTitle(getString(R.string.deviceLocationDisabledDialogTitle))
+                    .setMessage(getString(R.string.deviceLocationDisabledDialogMessage))
+                    .setPositiveButton(getString(R.string.deviceLocationDisabledDialogPositiveButtonLabel)) { _, _ ->
+                        locationServicesLauncher.launch(Intent(ACTION_LOCATION_SOURCE_SETTINGS))
+                    }
+                    .setNegativeButton(android.R.string.cancel) { _, _ ->
+                        preferences.userDeclinedEnableLocationServices = true
+                    }
+                    .show()
             }
             return false
         } else {
             return true
         }
     }
+
+    private fun checkAndRequestLocationPermissions(explicitUserAction: Boolean): Boolean {
+        if (!requirementsChecker.isLocationPermissionCheckPassed()) {
+            Timber.d("No location permission")
+            // We don't have location permission
+            if ((explicitUserAction || !preferences.userDeclinedEnableLocationPermissions)) {
+                // We should prompt for permission
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (shouldShowRequestPermissionRationale(ACCESS_FINE_LOCATION)) {
+                        // The user may have denied us once already, so show a rationale
+                        MaterialAlertDialogBuilder(this)
+                            .setCancelable(true)
+                            .setIcon(R.drawable.ic_baseline_location_disabled_24)
+                            .setTitle(getString(R.string.locationPermissionRequestDialogTitle))
+                            .setMessage(R.string.locationPermissionRequestDialogMessage)
+                            .setPositiveButton(
+                                android.R.string.ok
+                            ) { _, _ ->
+                                ActivityCompat.requestPermissions(
+                                    this,
+                                    arrayOf(ACCESS_FINE_LOCATION),
+                                    if (explicitUserAction) PERMISSIONS_REQUEST_CODE_WITH_EXPLICIT_SERVICES_CHECK else PERMISSIONS_REQUEST_CODE
+                                )
+                            }
+                            .setNegativeButton(android.R.string.cancel) { _, _ ->
+                                preferences.userDeclinedEnableLocationPermissions = true
+                            }
+                            .show()
+                    } else {
+                        // No need to show rationale, just request
+                        ActivityCompat.requestPermissions(
+                            this,
+                            arrayOf(ACCESS_FINE_LOCATION),
+                            if (explicitUserAction) PERMISSIONS_REQUEST_CODE_WITH_EXPLICIT_SERVICES_CHECK else PERMISSIONS_REQUEST_CODE
+                        )
+                    }
+                } else {
+                    // Older android, so no rationale mech. Just request.
+                    ActivityCompat.requestPermissions(
+                        this,
+                        arrayOf(ACCESS_FINE_LOCATION),
+                        if (explicitUserAction) PERMISSIONS_REQUEST_CODE_WITH_EXPLICIT_SERVICES_CHECK else PERMISSIONS_REQUEST_CODE
+                    )
+                }
+            }
+            return false
+        } else {
+            return true
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        Timber.d(
+            "Permission result code=$requestCode. Permissions=${permissions.joinToString(",")} and grantResults=${
+                grantResults.joinToString(
+                    ","
+                )
+            }"
+        )
+        if (requestCode in setOf(
+                PERMISSIONS_REQUEST_CODE,
+                PERMISSIONS_REQUEST_CODE_WITH_EXPLICIT_SERVICES_CHECK
+            )
+            && grantResults.isNotEmpty()
+            && permissions.isNotEmpty()
+            && permissions.contains(ACCESS_FINE_LOCATION)
+        ) {
+            when (grantResults[permissions.indexOf(ACCESS_FINE_LOCATION)]) {
+                PERMISSION_GRANTED -> {
+                    if (requestCode == PERMISSIONS_REQUEST_CODE_WITH_EXPLICIT_SERVICES_CHECK) {
+                        checkAndRequestLocationServicesEnabled(true)
+                    }
+                    mapFragment.myLocationEnabled()
+                    eventBus.postSticky(PermissionGranted(ACCESS_FINE_LOCATION))
+                }
+                PERMISSION_DENIED -> {
+                    Snackbar.make(
+                        binding!!.coordinatorLayout,
+                        getString(R.string.locationPermissionNotGrantedNotification),
+                        Snackbar.LENGTH_LONG
+                    ).setAction(getString(R.string.fixProblemLabel)) {
+                        startActivity(Intent(ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                            data = Uri.parse("package:${packageName}")
+                        })
+                    }.show()
+                }
+            }
+        }
+    }
+
 
     override fun onResume() {
         if (FLAVOR == "gms") {
@@ -306,6 +402,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         super.onResume()
         handleIntentExtras(intent)
         updateMonitoringModeMenu()
+        updateMyLocationMenuIcon()
         viewModel?.refreshMarkers()
     }
 
@@ -331,7 +428,18 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         inflater.inflate(R.menu.activity_map, menu)
         this.menu = menu
         updateMonitoringModeMenu()
+        updateMyLocationMenuIcon()
         return true
+    }
+
+    private fun updateMyLocationMenuIcon() {
+        menu?.findItem(R.id.menu_mylocation)?.setIcon(
+            if (requirementsChecker.isLocationPermissionCheckPassed() && requirementsChecker.isLocationServiceEnabled()) {
+                R.drawable.ic_baseline_my_location_24
+            } else {
+                R.drawable.ic_baseline_location_disabled_24
+            }
+        )
     }
 
     override fun updateMonitoringModeMenu() {
@@ -360,24 +468,28 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
+        return when (item.itemId) {
             R.id.menu_report -> {
-                viewModel!!.sendLocation()
-                return true
+                viewModel?.sendLocation()
+                true
             }
             R.id.menu_mylocation -> {
-                viewModel!!.onMenuCenterDeviceClicked()
-                return true
+                if (checkAndRequestLocationPermissions(true)) {
+                    checkAndRequestLocationServicesEnabled(true)
+                }
+                viewModel?.onMenuCenterDeviceClicked()
+                true
             }
             android.R.id.home -> {
                 finish()
-                return true
+                true
             }
             R.id.menu_monitoring -> {
                 stepMonitoringModeMenu()
+                true
             }
+            else -> false
         }
-        return false
     }
 
     private fun stepMonitoringModeMenu() {
@@ -444,38 +556,40 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
     }
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
-        val itemId = item.itemId
-        if (itemId == R.id.menu_navigate) {
-            val c = viewModel!!.contact
-            c.value?.latLng?.run {
-                try {
-                    val l = this.toGMSLatLng()
-                    val intent = Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse("google.navigation:q=${l.latitude},${l.longitude}")
-                    )
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    startActivity(intent)
-                } catch (e: ActivityNotFoundException) {
+        return when (item.itemId) {
+            R.id.menu_clear -> {
+                viewModel?.onClearContactClicked()
+                false
+            }
+            R.id.menu_navigate -> {
+                val c = viewModel!!.contact
+                c.value?.latLng?.run {
+                    try {
+                        val l = this.toGMSLatLng()
+                        val intent = Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse("google.navigation:q=${l.latitude},${l.longitude}")
+                        )
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        startActivity(intent)
+                    } catch (e: ActivityNotFoundException) {
+                        Snackbar.make(
+                            binding!!.coordinatorLayout,
+                            getString(R.string.noNavigationApp),
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                    }
+                } ?: run {
                     Snackbar.make(
                         binding!!.coordinatorLayout,
-                        getString(R.string.noNavigationApp),
+                        getString(R.string.contactLocationUnknown),
                         Snackbar.LENGTH_SHORT
                     ).show()
                 }
-            } ?: run {
-                Snackbar.make(
-                    binding!!.coordinatorLayout,
-                    getString(R.string.contactLocationUnknown),
-                    Snackbar.LENGTH_SHORT
-                ).show()
+                true
             }
-            return true
-        } else if (itemId == R.id.menu_clear) {
-            viewModel!!.onClearContactClicked()
-            return false
+            else -> false
         }
-        return false
     }
 
     override fun onLongClick(view: View): Boolean {
@@ -517,18 +631,6 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
             popupMenu.menu.removeItem(R.id.menu_navigate)
         }
         popupMenu.show()
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == PERMISSIONS_REQUEST_CODE && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            mapFragment.locationPermissionGranted()
-            eventBus.postSticky(PermissionGranted(Manifest.permission.ACCESS_FINE_LOCATION))
-        }
     }
 
     fun onMapReady() {
@@ -573,6 +675,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         const val BUNDLE_KEY_CONTACT_ID = "BUNDLE_KEY_CONTACT_ID"
         const val STARTING_LATITUDE = 48.856826
         const val STARTING_LONGITUDE = 2.292713
-        private const val PERMISSIONS_REQUEST_CODE = 1
+        const val PERMISSIONS_REQUEST_CODE = 1
+        const val PERMISSIONS_REQUEST_CODE_WITH_EXPLICIT_SERVICES_CHECK = 2
     }
 }

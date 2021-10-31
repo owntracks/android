@@ -11,7 +11,7 @@ import javax.inject.Inject
 @ActivityScoped
 class GMSRequirementsChecker @Inject constructor(private val preferences: Preferences, override val context: Context) : OSSRequirementsChecker(preferences, context) {
     override fun areRequirementsMet(): Boolean {
-        return isPlayServicesCheckPassed() && isPermissionCheckPassed() && preferences.isSetupCompleted
+        return isPlayServicesCheckPassed() && isLocationPermissionCheckPassed() && preferences.isSetupCompleted
     }
 
     override fun isPlayServicesCheckPassed(): Boolean = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS

@@ -3,10 +3,29 @@ package org.owntracks.android.location
 import android.location.Location
 import android.os.Looper
 
-interface LocationProviderClient {
-    fun requestLocationUpdates(locationRequest: LocationRequest, clientCallBack: LocationCallback)
-    fun requestLocationUpdates(locationRequest: LocationRequest, clientCallBack: LocationCallback, looper: Looper?)
-    fun removeLocationUpdates(clientCallBack: LocationCallback)
-    fun flushLocations()
-    fun getLastLocation(): Location?
+abstract class LocationProviderClient {
+
+    fun requestLocationUpdates(locationRequest: LocationRequest, clientCallBack: LocationCallback) {
+        requestLocationUpdates(locationRequest, clientCallBack, null)
+    }
+
+    fun requestLocationUpdates(
+        locationRequest: LocationRequest,
+        clientCallBack: LocationCallback,
+        looper: Looper?
+    ) {
+        removeLocationUpdates(clientCallBack)
+        actuallyRequestLocationUpdates(locationRequest, clientCallBack, looper)
+
+    }
+
+    protected abstract fun actuallyRequestLocationUpdates(
+        locationRequest: LocationRequest,
+        clientCallBack: LocationCallback,
+        looper: Looper?
+    )
+
+    abstract fun removeLocationUpdates(clientCallBack: LocationCallback)
+    abstract fun flushLocations()
+    abstract fun getLastLocation(): Location?
 }
