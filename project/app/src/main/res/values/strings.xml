@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Owntracks</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
     <string name="preferencesServer">Connection</string>
     <string name="preferencesHost">Host</string>
     <string name="preferencesPort">Port</string>

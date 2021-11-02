@@ -19,23 +19,25 @@ class StatusActivity : BaseActivity<UiStatusBinding?, StatusMvvm.ViewModel<Statu
         setSupportToolbar(binding!!.appbar.toolbar)
         setDrawer(binding!!.appbar.toolbar)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-
             binding!!.dozeWhiteListed.setOnClickListener {
-                if (!viewModel!!.dozeWhitelisted) {
-                    MaterialAlertDialogBuilder(this)
-                        .setIcon(R.drawable.ic_baseline_battery_charging_full_24)
-                        .setTitle(getString(R.string.batteryOptimizationWhitelistDialogTitle))
-                        .setMessage(getString(R.string.batteryOptimizationWhitelistDialogMessage))
-                        .setCancelable(true)
-                        .setPositiveButton(getString(R.string.batteryOptimizationWhitelistDialogButtonLabel)) { _, _ ->
-                            startActivity(
-                                Intent(
-                                    ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS
-                                )
+                MaterialAlertDialogBuilder(this)
+                    .setIcon(R.drawable.ic_baseline_battery_charging_full_24)
+                    .setTitle(getString(R.string.batteryOptimizationWhitelistDialogTitle))
+                    .setMessage(getString(R.string.batteryOptimizationWhitelistDialogMessage))
+                    .setCancelable(true)
+                    .setPositiveButton(getString(R.string.batteryOptimizationWhitelistDialogButtonLabel)) { _, _ ->
+                        startActivity(
+                            Intent(
+                                ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS
                             )
-                        }.show()
-                }
+                        )
+                    }.show()
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel?.refreshDozeModeWhitelisted()
     }
 }

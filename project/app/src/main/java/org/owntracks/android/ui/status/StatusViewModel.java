@@ -10,6 +10,8 @@ import android.os.PowerManager;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.Bindable;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.owntracks.android.BR;
@@ -37,6 +39,7 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
     private Date serviceStarted;
     private long locationUpdated;
     private int queueLength;
+    private final MutableLiveData<Boolean> isDozeWhitelisted = new MutableLiveData<>();
 
     @Inject
     public StatusViewModel(@ApplicationContext Context context) {
@@ -72,7 +75,16 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
     }
 
     @Override
-    public boolean getDozeWhitelisted() {
+    public LiveData<Boolean> getDozeWhitelisted() {
+        return isDozeWhitelisted;
+    }
+
+    @Override
+    public void refreshDozeModeWhitelisted() {
+        isDozeWhitelisted.postValue(isIgnoringBatteryOptimizations());
+    }
+
+    private boolean isIgnoringBatteryOptimizations() {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
                 ((PowerManager) context.getApplicationContext().getSystemService(Context.POWER_SERVICE)).isIgnoringBatteryOptimizations(context.getApplicationContext().getPackageName());
     }

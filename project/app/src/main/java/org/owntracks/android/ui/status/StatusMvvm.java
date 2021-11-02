@@ -1,5 +1,7 @@
 package org.owntracks.android.ui.status;
 
+import androidx.lifecycle.LiveData;
+
 import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
@@ -18,6 +20,7 @@ public interface StatusMvvm {
 
         long getLocationUpdated();
         Date getServiceStarted();
-        boolean getDozeWhitelisted();
+        LiveData<Boolean> getDozeWhitelisted();
+        void refreshDozeModeWhitelisted();
     }
 }
