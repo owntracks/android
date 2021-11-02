@@ -95,6 +95,7 @@ jobs:
           post-emulator-launch-assemble-command: ""
           run-logcat: true
           max-tries: 1
+          no-output-timeout: 30m
       - store_test_results:
           path: project/app/build/outputs/androidTest-results/connected/flavors/oss/
       - persist_to_workspace:
@@ -129,6 +130,7 @@ jobs:
           post-emulator-launch-assemble-command: ""
           run-logcat: true
           max-tries: 1
+          no-output-timeout: 30m
       - run:
           name: Debug
           command: |
