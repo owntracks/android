@@ -4,13 +4,19 @@
 
 ### New features
 
-* Connection timeout is now configurable
+* Device location enable / disable is now detected, along with location permissions on the map view. Location permissions no longer asked for in the welcome screen, and it's now possible to use without granting location permissions (or enabling device location). (#1102)
+* Battery doze whitelisting in Status screen can now take you to the relavent settings page
+* Connection timeout is now configurable with `connectionTimeoutSeconds` preference
+* [OSS] Significant location mode now listens to GPS as well as passive / network sources (#1096)
 
 ### Bug fixes
 
 * Fix crash in the MQTT library related to how the connection was closed (#1093).
 * Cleansession preference shouldn't be exported in HTTP mode
-* OSS build now requests GPS updates in significant changes mode (#1096)
+* [OSS] OSM map now puts markers in the right place, rather than the wrong place
+* Tries to detect problems when initializing WorkManager (#1064)
+* [OSS] OSM map tiles are now cached in a location that's not included in device backups (#1108)
+* MQTT `cleanSession` preference should now not be exported in HTTP mode
 
 ## Version 2.4.2
 
