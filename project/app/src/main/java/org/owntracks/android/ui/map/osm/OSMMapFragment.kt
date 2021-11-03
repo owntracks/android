@@ -54,7 +54,7 @@ class OSMMapFragment internal constructor() : MapFragment() {
                     deleteRecursively()
                 }
             }
-            osmdroidTileCache = requireContext().cacheDir.resolve("osmdroid/tiles")
+            osmdroidTileCache = requireContext().noBackupFilesDir.resolve("osmdroid/tiles")
         }
         binding = DataBindingUtil.inflate(inflater, R.layout.osm_map_fragment, container, false)
         if (requireActivity() is MapActivity) {

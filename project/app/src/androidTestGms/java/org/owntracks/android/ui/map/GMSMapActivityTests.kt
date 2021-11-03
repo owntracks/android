@@ -146,6 +146,7 @@ class GMSMapActivityTests {
         try {
             InstrumentationRegistry.getInstrumentation().uiAutomation
                 .executeShellCommand("settings put secure location_mode 0")
+                .close()
             setNotFirstStartPreferences()
             baristaRule.launchActivity()
             assertDisplayed(R.string.deviceLocationDisabledDialogTitle)
@@ -154,6 +155,7 @@ class GMSMapActivityTests {
         } finally {
             InstrumentationRegistry.getInstrumentation().uiAutomation
                 .executeShellCommand("settings put secure location_mode 3")
+                .close()
         }
     }
 
@@ -162,6 +164,7 @@ class GMSMapActivityTests {
         try {
             InstrumentationRegistry.getInstrumentation().uiAutomation
                 .executeShellCommand("settings put secure location_mode 0")
+                .close()
             setNotFirstStartPreferences()
             PreferenceManager.getDefaultSharedPreferences(InstrumentationRegistry.getInstrumentation().targetContext)
                 .edit()
@@ -173,6 +176,7 @@ class GMSMapActivityTests {
         } finally {
             InstrumentationRegistry.getInstrumentation().uiAutomation
                 .executeShellCommand("settings put secure location_mode 3")
+                .close()
         }
     }
 }

@@ -149,7 +149,7 @@
                         android:ellipsize="none"
                         android:paddingLeft="@dimen/activity_horizontal_margin"
                         android:paddingRight="@dimen/activity_horizontal_margin"
-                        android:text="@{vm.dozeWhitelisted ? @string/yes : @string/no}" />
+                        android:text="@{vm.dozeWhitelisted ? @string/statusBatteryDozeWhiteListEnabled : @string/statusBatteryDozeWhiteListDisabled}" />
 
                     <TextView
                         style="@style/ListItemSecondary"

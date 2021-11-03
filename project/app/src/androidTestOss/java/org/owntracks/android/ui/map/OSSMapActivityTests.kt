@@ -51,6 +51,7 @@ class OSSMapActivityTests {
         try {
             InstrumentationRegistry.getInstrumentation().uiAutomation
                 .executeShellCommand("settings put secure location_mode 0")
+                .close()
             val context = InstrumentationRegistry.getInstrumentation().targetContext
             PreferenceManager.getDefaultSharedPreferences(context)
                 .edit()
@@ -64,6 +65,7 @@ class OSSMapActivityTests {
         } finally {
             InstrumentationRegistry.getInstrumentation().uiAutomation
                 .executeShellCommand("settings put secure location_mode 3")
+                .close()
         }
     }
 
@@ -72,6 +74,7 @@ class OSSMapActivityTests {
         try {
             InstrumentationRegistry.getInstrumentation().uiAutomation
                 .executeShellCommand("settings put secure location_mode 0")
+                .close()
             val context = InstrumentationRegistry.getInstrumentation().targetContext
             PreferenceManager.getDefaultSharedPreferences(context)
                 .edit()
@@ -86,6 +89,7 @@ class OSSMapActivityTests {
         } finally {
             InstrumentationRegistry.getInstrumentation().uiAutomation
                 .executeShellCommand("settings put secure location_mode 3")
+                .close()
         }
     }
 }
