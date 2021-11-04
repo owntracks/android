@@ -4,6 +4,7 @@
 
 ### New features
 
+* Added Japanese, Czech and partial Portuguese, Chinese translations. Mant thanks to all the contributors!
 * Device location enable / disable is now detected, along with location permissions on the map view. Location permissions no longer asked for in the welcome screen, and it's now possible to use without granting location permissions (or enabling device location). (#1102)
 * Battery doze whitelisting in Status screen can now take you to the relavent settings page
 * Connection timeout is now configurable with `connectionTimeoutSeconds` preference

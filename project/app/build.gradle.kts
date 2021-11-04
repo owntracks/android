@@ -31,7 +31,7 @@ android {
                 arguments(mapOf("eventBusIndex" to "org.owntracks.android.EventBusIndex"))
             }
         }
-        val locales = listOf("en", "de", "fr", "es", "ru", "ca", "pl")
+        val locales = listOf("en", "de", "fr", "es", "ru", "ca", "pl", "cs", "ja", "pt", "zh")
         buildConfigField(
             "String[]",
             "TRANSLATION_ARRAY",
