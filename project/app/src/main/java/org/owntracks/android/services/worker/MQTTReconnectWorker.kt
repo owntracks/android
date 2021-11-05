@@ -11,7 +11,7 @@ import javax.inject.Inject
 
 class MQTTReconnectWorker(context: Context, workerParams: WorkerParameters, private val messageProcessor: MessageProcessor) : Worker(context, workerParams) {
     override fun doWork(): Result {
-        Timber.i("MQTTReconnectWorker Doing work on threadID: %s", Thread.currentThread())
+        Timber.i("MQTTReconnectWorker started on threadID: %s", Thread.currentThread())
         if (!messageProcessor.isEndpointConfigurationComplete) return Result.failure()
         // We're going to try and call messagePrcessor.reconnect() here, which may reinvoke itself on
         // a different thread. One option here was to faff around with futures, but it seems easier just to

@@ -11,7 +11,7 @@ import javax.inject.Inject
 
 class SendLocationPingWorker @Inject constructor(context: Context, workerParams: WorkerParameters, private val locationProcessor: LocationProcessor) : Worker(context, workerParams) {
     override fun doWork(): Result {
-        Timber.d("SendLocationPingWorker doing work. ThreadID: %s", Thread.currentThread())
+        Timber.d("SendLocationPingWorker started. ThreadID: %s", Thread.currentThread())
         locationProcessor.publishLocationMessage(MessageLocation.REPORT_TYPE_PING)
         return Result.success()
     }

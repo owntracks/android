@@ -58,7 +58,7 @@ class GMSLocationProviderClient(
 
     override fun removeLocationUpdates(clientCallBack: LocationCallback) {
         callbackMap[clientCallBack]?.run {
-            Timber.i("Removing location updates ${clientCallBack.hashCode()}")
+            Timber.d("Removing location updates ${clientCallBack.hashCode()}")
             fusedLocationProviderClient.removeLocationUpdates(this)
             callbackMap.remove(clientCallBack)
         }

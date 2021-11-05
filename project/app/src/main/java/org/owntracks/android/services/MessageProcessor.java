@@ -372,7 +372,7 @@ public class MessageProcessor {
     }
 
     public void processIncomingMessage(MessageBase message) {
-        Timber.d("Received incoming message: %s on %s", message.getClass().getSimpleName(), message.getContactKey());
+        Timber.i("Received incoming message: %s on %s", message.getClass().getSimpleName(), message.getContactKey());
         if (message instanceof MessageClear) {
             processIncomingMessage((MessageClear) message);
         } else if (message instanceof MessageLocation) {
@@ -389,16 +389,13 @@ public class MessageProcessor {
     }
 
     private void processIncomingMessage(MessageUnknown message) {
-        Timber.i("Unknown message received on %s", message.getContactKey());
     }
 
     private void processIncomingMessage(MessageClear message) {
-        Timber.d("processing clear message %s. ThreadID: %s", message.getContactKey(), Thread.currentThread());
         contactsRepo.remove(message.getContactKey());
     }
 
     private void processIncomingMessage(MessageLocation message) {
-        Timber.d("processing location message %s. ThreadID: %s", message.getContactKey(), Thread.currentThread());
         // do not use TimeUnit.DAYS.toMillis to avoid long/double conversion issues...
         if ((preferences.getIgnoreStaleLocations() > 0) && (System.currentTimeMillis() - ((message).getTimestamp() * 1000)) > (preferences.getIgnoreStaleLocations() * 24 * 60 * 60 * 1000)) {
             Timber.e("discarding stale location");

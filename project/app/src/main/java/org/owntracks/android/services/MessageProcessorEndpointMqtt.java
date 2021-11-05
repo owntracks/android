@@ -130,7 +130,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
             pubToken.waitForCompletion(TimeUnit.SECONDS.toMillis(30));
             long endTime = System.nanoTime();
             long duration = (endTime - startTime);
-            Timber.i("Message id=%s sent in %dms", messageId, TimeUnit.NANOSECONDS.toMillis(duration));
+            Timber.i("%s id=%s sent in %dms", m.getClass().getSimpleName(), messageId, TimeUnit.NANOSECONDS.toMillis(duration));
             messageProcessor.onMessageDelivered(m);
         } catch (MqttException e) {
             Timber.e(e, "MQTT Exception delivering message");
