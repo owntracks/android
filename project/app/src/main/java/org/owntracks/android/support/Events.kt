@@ -12,7 +12,6 @@ class Events {
     class ModeChanged(val newModeId: Int) : E()
     class MonitoringChanged : E()
     class EndpointChanged : E()
-    class PermissionGranted(val permission: String) : E()
     class ServiceStarted : E()
     class QueueChanged : E() {
         var newLength = 0

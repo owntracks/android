@@ -94,7 +94,7 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
     private static final String INTENT_ACTION_CLEAR_NOTIFICATIONS = "org.owntracks.android.CLEAR_NOTIFICATIONS";
     private static final String INTENT_ACTION_SEND_LOCATION_USER = "org.owntracks.android.SEND_LOCATION_USER";
     private static final String INTENT_ACTION_SEND_EVENT_CIRCULAR = "org.owntracks.android.SEND_EVENT_CIRCULAR";
-    private static final String INTENT_ACTION_REREQUEST_LOCATION_UPDATES = "org.owntracks.android.REREQUEST_LOCATION_UPDATES";
+    public static final String INTENT_ACTION_REREQUEST_LOCATION_UPDATES = "org.owntracks.android.REREQUEST_LOCATION_UPDATES";
     private static final String INTENT_ACTION_CHANGE_MONITORING = "org.owntracks.android.CHANGE_MONITORING";
     private static final String INTENT_ACTION_EXIT = "org.owntracks.android.EXIT";
 
@@ -172,7 +172,7 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
 
             @Override
             public void onLocationResult(@NotNull LocationResult locationResult) {
-                Timber.d("BackgroundService Location result received: %s", locationResult);
+                Timber.d("BackgroundService location result received: %s", locationResult);
                 onLocationChanged(locationResult.getLastLocation(), MessageLocation.REPORT_TYPE_DEFAULT);
             }
         };
@@ -185,7 +185,7 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
 
             @Override
             public void onLocationResult(@NotNull LocationResult locationResult) {
-                Timber.d("BackgroundService Ondemand Locationresult received: %s", locationResult);
+                Timber.d("BackgroundService On-demand location result received: %s", locationResult);
                 onLocationChanged(locationResult.getLastLocation(), MessageLocation.REPORT_TYPE_RESPONSE);
             }
         };
@@ -520,15 +520,16 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
     }
 
     @SuppressWarnings("MissingPermission")
-    private void setupLocationRequest() {
+    private boolean setupLocationRequest() {
+        Timber.d("Setting up location request");
         if (missingLocationPermission()) {
             Timber.e("missing location permission");
-            return;
+            return false;
         }
 
         if (locationProviderClient == null) {
             Timber.e("FusedLocationClient not available");
-            return;
+            return false;
         }
         int monitoring = preferences.getMonitoring();
 
@@ -554,6 +555,7 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
         Timber.d("Location update request params: %s", request);
         locationProviderClient.flushLocations();
         locationProviderClient.requestLocationUpdates(request, locationCallback, runThingsOnOtherThreads.getBackgroundLooper());
+        return true;
     }
 
     private int getLocationRequestPriority() {
@@ -697,18 +699,6 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
         updateOngoingNotification();
     }
 
-    @Subscribe(sticky = true, threadMode = ThreadMode.BACKGROUND)
-    public void onEvent(Events.PermissionGranted event) {
-        Timber.d("location permission granted");
-        removeGeofences();
-        setupGeofences();
-        Timber.d("Getting last location");
-        Location lastLocation = locationProviderClient.getLastLocation();
-        if (lastLocation != null) {
-            onLocationChanged(lastLocation, MessageLocation.REPORT_TYPE_DEFAULT);
-        }
-    }
-
     @Subscribe
     public void onEvent(Events.RestartApp e) {
         Timber.i("Triggering restart");
@@ -743,11 +733,8 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             eventsNotificationCompatBuilder.setColor(getColor(R.color.primary));
         }
-
         return eventsNotificationCompatBuilder;
     }
-
-    private final IBinder mBinder = new LocalBinder();
 
     @Override
     public void onAttachAfterModeChanged() {
@@ -766,6 +753,23 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
         }
     }
 
+    public void reInitializeLocationRequests() {
+        runThingsOnOtherThreads.postOnServiceHandlerDelayed((Runnable) () -> {
+            if (setupLocationRequest()) {
+                removeGeofences();
+                setupGeofences();
+                Timber.d("Getting last location");
+                Location lastLocation = locationProviderClient.getLastLocation();
+                if (lastLocation != null) {
+                    onLocationChanged(lastLocation, MessageLocation.REPORT_TYPE_DEFAULT);
+                }
+            }
+        },0);
+
+    }
+
+    private final IBinder localServiceBinder = new LocalBinder();
+
     public class LocalBinder extends Binder {
         public BackgroundService getService() {
             return BackgroundService.this;
@@ -774,12 +778,7 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
 
     @Override
     public IBinder onBind(Intent intent) {
-        Timber.v("in onBind()");
-        return mBinder;
-    }
-
-    @Override
-    public void onRebind(Intent intent) {
-        Timber.v("Last client unbound from service");
+        Timber.d("Background service bound");
+        return localServiceBinder;
     }
 }

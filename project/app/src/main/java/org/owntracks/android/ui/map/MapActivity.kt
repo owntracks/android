@@ -1,9 +1,7 @@
 package org.owntracks.android.ui.map
 
 import android.Manifest.permission.ACCESS_FINE_LOCATION
-import android.content.ActivityNotFoundException
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.content.pm.PackageManager.PERMISSION_DENIED
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.hardware.Sensor
@@ -11,6 +9,7 @@ import android.hardware.SensorManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS
 import android.view.Gravity
@@ -54,7 +53,6 @@ import org.owntracks.android.services.BackgroundService.BACKGROUND_LOCATION_REST
 import org.owntracks.android.services.LocationProcessor
 import org.owntracks.android.services.MessageProcessorEndpointHttp
 import org.owntracks.android.support.ContactImageBindingAdapter
-import org.owntracks.android.support.Events.PermissionGranted
 import org.owntracks.android.support.Preferences.Companion.EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION
 import org.owntracks.android.support.Preferences.Companion.EXPERIMENTAL_FEATURE_USE_OSM_MAP
 import org.owntracks.android.support.RequirementsChecker
@@ -69,6 +67,8 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>?>(), MapMvvm.View,
     View.OnClickListener, View.OnLongClickListener, PopupMenu.OnMenuItemClickListener {
+    private var previouslyHadLocationPermissions: Boolean = false
+    private var service: BackgroundService? = null
     lateinit var locationLifecycleObserver: LocationLifecycleObserver
     private var bottomSheetBehavior: BottomSheetBehavior<LinearLayoutCompat>? = null
     private var menu: Menu? = null
@@ -102,6 +102,18 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
 
     @Inject
     lateinit var requirementsChecker: RequirementsChecker
+
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            Timber.d("Service connected to MapActivity")
+            this@MapActivity.service = (service as BackgroundService.LocalBinder).service
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            Timber.d("Service disconnected from MapActivity")
+            service = null
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         perfLog {
@@ -347,7 +359,8 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
                         checkAndRequestLocationServicesEnabled(true)
                     }
                     mapFragment.myLocationEnabled()
-                    eventBus.postSticky(PermissionGranted(ACCESS_FINE_LOCATION))
+                    service?.reInitializeLocationRequests()
+                    previouslyHadLocationPermissions = true
                 }
                 PERMISSION_DENIED -> {
                     Snackbar.make(
@@ -403,6 +416,11 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         handleIntentExtras(intent)
         updateMonitoringModeMenu()
         updateMyLocationMenuIcon()
+        if (!previouslyHadLocationPermissions && requirementsChecker.isLocationPermissionCheckPassed()) {
+            previouslyHadLocationPermissions = true
+            mapFragment.myLocationEnabled()
+            service?.reInitializeLocationRequests()
+        }
         viewModel?.refreshMarkers()
     }
 
@@ -663,6 +681,20 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        bindService(
+            Intent(this, BackgroundService::class.java),
+            serviceConnection,
+            Context.BIND_AUTO_CREATE
+        )
+    }
+
+    override fun onStop() {
+        super.onStop()
+        unbindService(serviceConnection)
+    }
+
     @get:VisibleForTesting
     val locationIdlingResource: IdlingResource?
         get() = binding?.vm?.locationIdlingResource
@@ -673,8 +705,11 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
 
     companion object {
         const val BUNDLE_KEY_CONTACT_ID = "BUNDLE_KEY_CONTACT_ID"
+
+        // Paris
         const val STARTING_LATITUDE = 48.856826
         const val STARTING_LONGITUDE = 2.292713
+
         const val PERMISSIONS_REQUEST_CODE = 1
         const val PERMISSIONS_REQUEST_CODE_WITH_EXPLICIT_SERVICES_CHECK = 2
     }

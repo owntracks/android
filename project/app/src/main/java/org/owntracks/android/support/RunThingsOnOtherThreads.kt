@@ -30,12 +30,16 @@ class RunThingsOnOtherThreads @Inject constructor(@ApplicationContext appContext
         return backgroundHandler.looper
     }
 
-    fun postOnMainHandlerDelayed(r: Runnable, delayMilliseconds: Long) {
+    fun postOnMainHandlerDelayed(r: Runnable, delayMilliseconds: Long = 0) {
         mainHandler.postDelayed(r, delayMilliseconds)
     }
 
-    fun postOnNetworkHandlerDelayed(r: Runnable, delayMilliseconds: Long) {
+    fun postOnNetworkHandlerDelayed(r: Runnable, delayMilliseconds: Long = 0) {
         networkHandler.postDelayed(r, delayMilliseconds)
+    }
+
+    fun postOnServiceHandlerDelayed(r: Runnable, delayMilliseconds: Long = 0) {
+        backgroundHandler.postDelayed(r, delayMilliseconds)
     }
 
     companion object {
