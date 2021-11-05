@@ -16,7 +16,8 @@ import timber.log.Timber
 
 
 class GMSLocationProviderClient(
-    private val fusedLocationProviderClient: FusedLocationProviderClient
+    private val fusedLocationProviderClient: FusedLocationProviderClient,
+    private val contextClass: Class<Context>
 ) : LocationProviderClient() {
 
     private val callbackMap =
@@ -27,8 +28,9 @@ class GMSLocationProviderClient(
         locationRequest: LocationRequest,
         clientCallBack: LocationCallback,
         looper: Looper?
-    ){
-        Timber.i("Requesting location updates $locationRequest ${clientCallBack.hashCode()}")
+    ) {
+        Timber.i("Requesting location updates $locationRequest ${clientCallBack.hashCode()} $contextClass")
+
         val gmsCallBack = object : com.google.android.gms.location.LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
                 clientCallBack.onLocationResult(
@@ -74,12 +76,13 @@ class GMSLocationProviderClient(
     companion object {
         fun create(context: Context): GMSLocationProviderClient {
             return GMSLocationProviderClient(
-                LocationServices.getFusedLocationProviderClient(context)
+                LocationServices.getFusedLocationProviderClient(context),
+                context.javaClass
             )
         }
     }
 
     init {
-        Timber.i("Using Google Play Services as a location provider")
+        Timber.i("Using Google Play Services as a location provider called from $contextClass")
     }
 }

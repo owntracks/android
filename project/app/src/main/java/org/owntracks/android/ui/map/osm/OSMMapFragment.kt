@@ -167,14 +167,12 @@ class OSMMapFragment internal constructor() : MapFragment() {
 
     override fun onResume() {
         super.onResume()
-        locationSource?.reactivate()
         mapView?.onResume()
         setMapStyle()
     }
 
     override fun onPause() {
         mapView?.onPause()
-        locationSource?.deactivate()
         super.onPause()
     }
 

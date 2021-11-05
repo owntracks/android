@@ -27,12 +27,12 @@ import java.util.*
 @AndroidEntryPoint
 class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallback {
     constructor(locationSource: LocationSource, locationRepo: LocationRepo?) : this() {
-        this.locationSource = locationSource
+        this.locationSource = locationSource.toGMSLocationSource()
         this.locationRepo = locationRepo
     }
 
     private var locationRepo: LocationRepo? = null
-    private var locationSource: LocationSource? = null
+    private var locationSource: com.google.android.gms.maps.LocationSource? = null
     private var googleMap: GoogleMap? = null
     private var binding: GoogleMapFragmentBinding? = null
     private val markers: MutableMap<String, Marker?> = HashMap()
@@ -47,6 +47,16 @@ class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallba
         val mapView = this.binding!!.googleMapView
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
+
+        if (activity is MapActivity) {
+            if (locationRepo == null) {
+                locationRepo = (activity as MapActivity).locationRepo
+            }
+            if (locationSource == null) {
+                locationSource = (activity as MapActivity).mapLocationSource.toGMSLocationSource()
+            }
+        }
+
         return binding!!.root
     }
 
@@ -69,7 +79,8 @@ class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallba
 
     @SuppressLint("MissingPermission")
     private fun initMap() {
-        val myLocationEnabled = (requireActivity() as MapActivity).checkAndRequestMyLocationCapability(false)
+        val myLocationEnabled =
+            (requireActivity() as MapActivity).checkAndRequestMyLocationCapability(false)
         Timber.d("GoogleMapFragment initMap locationEnabled=$myLocationEnabled")
         this.googleMap?.run {
             isIndoorEnabled = false
@@ -77,20 +88,7 @@ class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallba
             uiSettings.isMyLocationButtonEnabled = false
             uiSettings.setAllGesturesEnabled(true)
 
-            if (activity is MapActivity) {
-                if (locationRepo == null) {
-                    locationRepo = (activity as MapActivity).locationRepo
-                }
-                if (locationSource == null) {
-                    locationSource = (activity as MapActivity).mapLocationSource
-                }
-            }
-
-            if (locationSource == null) {
-                Timber.e("No location source set")
-            } else {
-                setLocationSource(locationSource!!.toGMSLocationSource())
-            }
+            setLocationSource(locationSource)
 
             setMapStyle()
 
@@ -173,7 +171,7 @@ class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallba
 
     override fun onResume() {
         super.onResume()
-        locationSource?.reactivate()
+        googleMap?.setLocationSource(locationSource)
         binding?.googleMapView?.onResume()
         setMapStyle()
     }
