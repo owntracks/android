@@ -279,6 +279,7 @@ val reportsDirectoryPath = "$buildDir/reports/androidTests/connected/flavors/%s"
 val screenshotsDeviceFolder = "/sdcard/Download/testscreenshots"
 
 android.productFlavors.all { productFlavor ->
+//    tasks.register<GreetingTask>("Hi")
     tasks.register<Exec>("create${productFlavor.name.capitalize()}ScreenshotDirectory") {
         group = "reporting"
         description =
@@ -356,26 +357,6 @@ tasks.whenTaskAdded {
     }
     if (name == "connectedOssDebugAndroidTest") {
         finalizedBy("embedOssScreenshots")
-    }
-}
-
-
-// From  https://github.com/Triple-T/gradle-play-publisher/issues/974
-// We need a way to get the *current* release code on GP, so that we can make an APK with the same
-// code for the GH release. GPP has a way of getting the *next* release, so we can get that and
-// subtract one
-
-abstract class GetLatestVersionCodeMinusOne : DefaultTask() {
-    @get:InputFile
-    abstract val codes: RegularFileProperty
-
-    @get:OutputFile
-    abstract val outCode: RegularFileProperty
-
-    @TaskAction
-    fun read() {
-        val code = codes.get().asFile.readLines().first().toInt() - 1
-        outCode.get().asFile.writeText(code.toString())
     }
 }
 
