@@ -7,6 +7,7 @@ plugins {
     id("io.objectbox")
     id("com.hiya.jacoco-android")
 }
+apply<EspressoScreenshotsPlugin>()
 
 val googleMapsAPIKey = extra.get("google_maps_api_key")?.toString() ?: "PLACEHOLDER_API_KEY"
 
@@ -272,92 +273,6 @@ play {
     track.set("internal")
 
     resolutionStrategy.set(com.github.triplet.gradle.androidpublisher.ResolutionStrategy.AUTO)
-}
-
-// Espresso test screenshot gathering
-val reportsDirectoryPath = "$buildDir/reports/androidTests/connected/flavors/%s"
-val screenshotsDeviceFolder = "/sdcard/Download/testscreenshots"
-
-android.productFlavors.all { productFlavor ->
-//    tasks.register<GreetingTask>("Hi")
-    tasks.register<Exec>("create${productFlavor.name.capitalize()}ScreenshotDirectory") {
-        group = "reporting"
-        description =
-            "Creates ${productFlavor.name.capitalize()} screenshot directory on connected device"
-        executable = "${android.adbExecutable}"
-        args(mutableListOf("shell", "mkdir", "-p", screenshotsDeviceFolder))
-    }
-    tasks.register<Exec>("clear${productFlavor.name.capitalize()}Screenshots") {
-        group = "reporting"
-        description = "Removes ${productFlavor.name.capitalize()} screenshots from connected device"
-        executable = "${android.adbExecutable}"
-        args("shell", "rm", "-rf", screenshotsDeviceFolder)
-    }
-    tasks.register<Exec>("fetch${productFlavor.name.capitalize()}Screenshots") {
-        group = "reporting"
-        description =
-            "Fetches ${productFlavor.name.capitalize()} espresso screenshots from the device"
-        executable = "${android.adbExecutable}"
-        args("pull", screenshotsDeviceFolder, reportsDirectoryPath.format(productFlavor.name))
-        dependsOn("create${productFlavor.name.capitalize()}ScreenshotDirectory")
-        doFirst {
-            File(reportsDirectoryPath.format(productFlavor.name)).mkdirs()
-        }
-    }
-    tasks.register("embed${productFlavor.name.capitalize()}Screenshots") {
-        group = "reporting"
-        description = "Embeds the ${productFlavor.name.capitalize()} screenshots in the test report"
-        dependsOn("fetch${productFlavor.name.capitalize()}Screenshots")
-        finalizedBy("clear${productFlavor.name.capitalize()}Screenshots")
-        doFirst {
-            val reportsPath = reportsDirectoryPath.format(productFlavor.name)
-            val screenshotsDirectory = File(reportsPath, "testscreenshots/")
-            if (!screenshotsDirectory.exists()) {
-                println("Could not find screenshots. Skipping...")
-                return@doFirst
-            }
-            screenshotsDirectory
-                .listFiles()!!
-                .forEach { testClassDirectory ->
-                    val testClassName = testClassDirectory.name
-                    testClassDirectory.listFiles()?.forEach failedFile@{
-                        val testName = it.name
-                        val testNameWithoutExtension = it.nameWithoutExtension
-                        val testClassJunitReportFile = File(reportsPath, "${testClassName}.html")
-                        if (!testClassJunitReportFile.exists()) {
-                            println("Could not find JUnit report file for test class '${testClassJunitReportFile}'")
-                            return@failedFile
-                        }
-                        val testJunitReportContent = testClassJunitReportFile.readText()
-
-                        val failedHeaderPatternToFind =
-                            "<h3 class=\"failures\">${testNameWithoutExtension}</h3>"
-
-                        val failedPatternToReplace =
-                            "$failedHeaderPatternToFind <img src=\"testscreenshots/${testClassName}/${testName}\" width =\"360\" />"
-                        val successRecordPatternToFind = "<td>${testNameWithoutExtension}</td>"
-                        val successPatternToReplace =
-                            "<td>${testNameWithoutExtension} <a href=\"testscreenshots/${testClassName}/${testName}\">(screenshot)</a></td>"
-
-                        testClassJunitReportFile.writeText(
-                            testJunitReportContent
-                                .replace(failedHeaderPatternToFind, failedPatternToReplace)
-                                .replace(successRecordPatternToFind, successPatternToReplace)
-                        )
-                    }
-                }
-        }
-    }
-    true
-}
-
-tasks.whenTaskAdded {
-    if (name == "connectedGmsDebugAndroidTest") {
-        finalizedBy("embedGmsScreenshots")
-    }
-    if (name == "connectedOssDebugAndroidTest") {
-        finalizedBy("embedOssScreenshots")
-    }
 }
 
 val codesTask = tasks.register<GetLatestVersionCodeMinusOne>("getLatestVersionCodeMinusOne") {
