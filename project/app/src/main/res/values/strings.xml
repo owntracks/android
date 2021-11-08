@@ -59,12 +59,12 @@
     <string name="contactDetailsDistance">Distance</string>
     <string name="contactDetailsBattery">Battery</string>
     <string name="contactDetailsSpeed">Speed</string>
-    <string name="contactDetailsAccuracyValue" translatable="false">%d m</string>
-    <string name="contactDetailsDistanceValue" translatable="false">%,.2f %s</string>
-    <string name="contactDetailsBearingValue" translatable="false">%,.0f°</string>
-    <string name="contactDetailsAltitudeValue" translatable="false">%,d m</string>
-    <string name="contactDetailsBatteryValue" translatable="false">%d %%</string>
-    <string name="contactDetailsSpeedValue" translatable="false">%d kph</string>
+    <string name="contactDetailsAccuracyValue">%d m</string>
+    <string name="contactDetailsDistanceValue">%,.2f %s</string>
+    <string name="contactDetailsBearingValue">%,.0f°</string>
+    <string name="contactDetailsAltitudeValue">%,d m</string>
+    <string name="contactDetailsBatteryValue">%d %%</string>
+    <string name="contactDetailsSpeedValue">%d kph</string>
     <string name="contactDetailsTopic">Identifier</string>
     <string name="waypointListPlaceholder">No regions defined yet</string>
     <string name="importConfig">Import</string>
@@ -95,7 +95,7 @@
     <string name="preferencesCategoryAdvancedLocator">Locator</string>
     <string name="preferencesCategoryAdvancedEncryption">Encryption</string>
     <string name="preferencesCategoryAdvancedMisc">Misc</string>
-    <string name="contactDetailsTrackerId" translatable="false">Tracker ID</string>
+    <string name="contactDetailsTrackerId">Tracker ID</string>
     <string name="exportWaypointsToEndpoint">Publish Waypoints</string>
     <string name="preferencesExportFailed">Preferences export failed</string>
     <string name="preferencesExportSuccess">Export successful</string>

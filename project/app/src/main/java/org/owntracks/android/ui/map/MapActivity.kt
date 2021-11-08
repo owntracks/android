@@ -223,7 +223,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
                         .setIcon(R.drawable.ic_baseline_warning_24)
                         .setTitle(getString(R.string.workmanagerInitializationErrorDialogTitle))
                         .setMessage(getString(R.string.workmanagerInitializationErrorDialogMessage))
-                        .setNeutralButton(getString(R.string.workmanagerInitializationErrorDialogOpenSettingsLabel)) { _, _ ->
+                        .setPositiveButton(getString(R.string.workmanagerInitializationErrorDialogOpenSettingsLabel)) { _, _ ->
                             startActivity(
                                 Intent(
                                     ACTION_APPLICATION_DETAILS_SETTINGS
