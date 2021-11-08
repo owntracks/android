@@ -79,10 +79,10 @@ class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallba
 
     @SuppressLint("MissingPermission")
     private fun initMap() {
-        val myLocationEnabled =
-            (requireActivity() as MapActivity).checkAndRequestMyLocationCapability(false)
-        Timber.d("GoogleMapFragment initMap locationEnabled=$myLocationEnabled")
         this.googleMap?.run {
+            val myLocationEnabled =
+                (requireActivity() as MapActivity).checkAndRequestMyLocationCapability(false)
+            Timber.d("GoogleMapFragment initMap locationEnabled=$myLocationEnabled")
             isIndoorEnabled = false
             isMyLocationEnabled = myLocationEnabled
             uiSettings.isMyLocationButtonEnabled = false

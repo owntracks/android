@@ -29,7 +29,6 @@ import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 import org.owntracks.android.R
 import org.owntracks.android.ScreenshotTakingOnTestEndRule
-import org.owntracks.android.e2e.doWelcomeProcess
 import org.owntracks.android.e2e.setNotFirstStartPreferences
 import org.owntracks.android.support.Preferences
 import org.owntracks.android.ui.clickOnAndWait
@@ -58,8 +57,9 @@ class GMSMapActivityTests {
     @Test
     @AllowFlaky
     fun statusActivityCanBeLaunchedFromMapActivityDrawer() {
+        setNotFirstStartPreferences()
         baristaRule.launchActivity()
-        doWelcomeProcess()
+        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
         assertDrawerIsClosed()
         openDrawer()
 
@@ -79,8 +79,9 @@ class GMSMapActivityTests {
     @Test
     @AllowFlaky
     fun preferencesActivityCanBeLaunchedFromMapActivityDrawer() {
+        setNotFirstStartPreferences()
         baristaRule.launchActivity()
-        doWelcomeProcess()
+        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
         assertDrawerIsClosed()
 
         openDrawer()
@@ -136,12 +137,14 @@ class GMSMapActivityTests {
     @Test
     @AllowFlaky
     fun modeButtonOnMapActivityCyclesThroughModes() {
+        setNotFirstStartPreferences()
         baristaRule.launchActivity()
-        doWelcomeProcess()
+        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
         assertDisplayed(R.id.menu_monitoring)
     }
 
     @Test
+    @AllowFlaky(attempts = 1)
     fun mapActivityShouldPromptForLocationServicesOnFirstTime() {
         try {
             InstrumentationRegistry.getInstrumentation().uiAutomation

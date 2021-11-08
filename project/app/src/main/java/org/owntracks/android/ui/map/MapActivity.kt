@@ -10,8 +10,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import android.provider.Settings
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-import android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
@@ -19,6 +19,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.app.ActivityCompat
@@ -78,6 +79,8 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
     private var orientationSensor: Sensor? = null
 
     internal lateinit var mapLocationSource: LocationSource
+    private lateinit var locationServicesAlertDialog: AlertDialog
+    private lateinit var locationPermissionsRationaleAlertDialog: AlertDialog
 
     @Inject
     lateinit var locationRepo: LocationRepo
@@ -259,26 +262,31 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
             }
         }
 
+
     private fun checkAndRequestLocationServicesEnabled(explicitUserAction: Boolean): Boolean {
-        if (!requirementsChecker.isLocationServiceEnabled()) {
-            Timber.d("Location Services disabled")
+        return if (!requirementsChecker.isLocationServiceEnabled()) {
+            Timber.d(Exception(), "Location Services disabled")
             if ((explicitUserAction || !preferences.userDeclinedEnableLocationServices)) {
-                MaterialAlertDialogBuilder(this)
-                    .setCancelable(true)
-                    .setIcon(R.drawable.ic_baseline_location_disabled_24)
-                    .setTitle(getString(R.string.deviceLocationDisabledDialogTitle))
-                    .setMessage(getString(R.string.deviceLocationDisabledDialogMessage))
-                    .setPositiveButton(getString(R.string.deviceLocationDisabledDialogPositiveButtonLabel)) { _, _ ->
-                        locationServicesLauncher.launch(Intent(ACTION_LOCATION_SOURCE_SETTINGS))
-                    }
-                    .setNegativeButton(android.R.string.cancel) { _, _ ->
-                        preferences.userDeclinedEnableLocationServices = true
-                    }
-                    .show()
+                if (!this::locationServicesAlertDialog.isInitialized) {
+                    locationServicesAlertDialog = MaterialAlertDialogBuilder(this)
+                        .setCancelable(true)
+                        .setIcon(R.drawable.ic_baseline_location_disabled_24)
+                        .setTitle(getString(R.string.deviceLocationDisabledDialogTitle))
+                        .setMessage(getString(R.string.deviceLocationDisabledDialogMessage))
+                        .setPositiveButton(getString(R.string.deviceLocationDisabledDialogPositiveButtonLabel)) { _, _ ->
+                            locationServicesLauncher.launch(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                        }
+                        .setNegativeButton(android.R.string.cancel) { _, _ ->
+                            preferences.userDeclinedEnableLocationServices = true
+                        }.create()
+                }
+                if (!locationServicesAlertDialog.isShowing) {
+                    locationServicesAlertDialog.show()
+                }
             }
-            return false
+            false
         } else {
-            return true
+            true
         }
     }
 
@@ -291,24 +299,31 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     if (shouldShowRequestPermissionRationale(ACCESS_FINE_LOCATION)) {
                         // The user may have denied us once already, so show a rationale
-                        MaterialAlertDialogBuilder(this)
-                            .setCancelable(true)
-                            .setIcon(R.drawable.ic_baseline_location_disabled_24)
-                            .setTitle(getString(R.string.locationPermissionRequestDialogTitle))
-                            .setMessage(R.string.locationPermissionRequestDialogMessage)
-                            .setPositiveButton(
-                                android.R.string.ok
-                            ) { _, _ ->
-                                ActivityCompat.requestPermissions(
-                                    this,
-                                    arrayOf(ACCESS_FINE_LOCATION),
-                                    if (explicitUserAction) PERMISSIONS_REQUEST_CODE_WITH_EXPLICIT_SERVICES_CHECK else PERMISSIONS_REQUEST_CODE
-                                )
-                            }
-                            .setNegativeButton(android.R.string.cancel) { _, _ ->
-                                preferences.userDeclinedEnableLocationPermissions = true
-                            }
-                            .show()
+                        if (!this::locationPermissionsRationaleAlertDialog.isInitialized) {
+                            locationPermissionsRationaleAlertDialog =
+
+                                MaterialAlertDialogBuilder(this)
+                                    .setCancelable(true)
+                                    .setIcon(R.drawable.ic_baseline_location_disabled_24)
+                                    .setTitle(getString(R.string.locationPermissionRequestDialogTitle))
+                                    .setMessage(R.string.locationPermissionRequestDialogMessage)
+                                    .setPositiveButton(
+                                        android.R.string.ok
+                                    ) { _, _ ->
+                                        ActivityCompat.requestPermissions(
+                                            this,
+                                            arrayOf(ACCESS_FINE_LOCATION),
+                                            if (explicitUserAction) PERMISSIONS_REQUEST_CODE_WITH_EXPLICIT_SERVICES_CHECK else PERMISSIONS_REQUEST_CODE
+                                        )
+                                    }
+                                    .setNegativeButton(android.R.string.cancel) { _, _ ->
+                                        preferences.userDeclinedEnableLocationPermissions = true
+                                    }
+                                    .create()
+                        }
+                        if (!locationPermissionsRationaleAlertDialog.isShowing) {
+                            locationPermissionsRationaleAlertDialog.show()
+                        }
                     } else {
                         // No need to show rationale, just request
                         ActivityCompat.requestPermissions(
