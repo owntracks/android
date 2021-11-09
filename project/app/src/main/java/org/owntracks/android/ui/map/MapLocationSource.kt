@@ -10,11 +10,11 @@ class MapLocationSource internal constructor(
     private val locationProviderClient: LocationProviderClient,
     private val locationUpdateCallback: LocationCallback
 ) : LocationSource {
-    private lateinit var cachedOnLocationChangedListener: LocationSource.OnLocationChangedListener
-    private lateinit var callbackWrapper: LocationCallback
+    private var cachedOnLocationChangedListener: LocationSource.OnLocationChangedListener? = null
+    private var callbackWrapper: LocationCallback? = null
     private var lastKnownLocation: Location? = null
     override fun activate(onLocationChangedListener: LocationSource.OnLocationChangedListener) {
-        Timber.d("Activating mapLocationSource with client=${locationProviderClient}")
+        Timber.d("Activating mapLocationSource with locationChangedListener=${onLocationChangedListener.hashCode()}")
         cachedOnLocationChangedListener = onLocationChangedListener
         callbackWrapper = object : LocationCallback {
             override fun onLocationResult(locationResult: LocationResult) {
@@ -29,29 +29,27 @@ class MapLocationSource internal constructor(
                 locationUpdateCallback.onLocationAvailability(locationAvailability)
             }
         }
-        locationProviderClient.requestLocationUpdates(
-            LocationRequest(
-                smallestDisplacement = 1f,
-                priority = LocationRequest.PRIORITY_HIGH_ACCURACY,
-                interval = TimeUnit.SECONDS.toMillis(2)
-            ),
-            callbackWrapper,
-            Looper.getMainLooper()
-        )
+        callbackWrapper?.run {
+            locationProviderClient.requestLocationUpdates(
+                LocationRequest(
+                    smallestDisplacement = 1f,
+                    priority = LocationRequest.PRIORITY_HIGH_ACCURACY,
+                    interval = TimeUnit.SECONDS.toMillis(2)
+                ),
+                this,
+                Looper.getMainLooper()
+            )
+        }
     }
 
     override fun reactivate() {
-        if (this::cachedOnLocationChangedListener.isInitialized) {
-            Timber.d("Reactivating MapLocationSource with cached locationChangedListener=${cachedOnLocationChangedListener.hashCode()}")
-            activate(this.cachedOnLocationChangedListener)
-        }
+        Timber.d("Reactivating MapLocationSource with locationChangedListener=${cachedOnLocationChangedListener?.hashCode() ?: "none"}")
+        cachedOnLocationChangedListener?.run(this::activate)
     }
 
     override fun deactivate() {
-        Timber.d("Deactivating mapLocationSource with client=$locationProviderClient")
-        if (this::callbackWrapper.isInitialized) {
-            locationProviderClient.removeLocationUpdates(callbackWrapper)
-        }
+        Timber.d("Deactivating mapLocationSource with locationChangedListener=${cachedOnLocationChangedListener?.hashCode() ?: "none"}")
+        callbackWrapper?.run(locationProviderClient::removeLocationUpdates)
     }
 
     override fun getLastKnownLocation(): Location? = lastKnownLocation

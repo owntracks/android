@@ -38,13 +38,15 @@ import java.util.*
 
 @AndroidEntryPoint
 class LogViewerActivity : BaseActivity<UiPreferencesLogsBinding, NoOpViewModel>(), MvvmView {
-    private val shareIntentActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        revokeExportUriPermissions()
-    }
+    private val shareIntentActivityLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            revokeExportUriPermissions()
+        }
     private lateinit var logAdapter: LogEntryAdapter
     private var logExportUri: Uri? = null
 
-    private val timberInMemoryLogTree = Timber.forest().filterIsInstance(TimberInMemoryLogTree::class.java).first()
+    private val timberInMemoryLogTree =
+        Timber.forest().filterIsInstance(TimberInMemoryLogTree::class.java).first()
     private var recyclerView: RecyclerView? = null
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
     private var clearButton: MenuItem? = null
@@ -57,13 +59,13 @@ class LogViewerActivity : BaseActivity<UiPreferencesLogsBinding, NoOpViewModel>(
         setHasEventBus(false)
         @Suppress("DEPRECATION")
         logAdapter = LogEntryAdapter(
-                LogPalette(
-                        resources.getColor(R.color.primary),
-                        resources.getColor(R.color.log_debug_tag_color),
-                        resources.getColor(R.color.log_info_tag_color),
-                        resources.getColor(R.color.log_warning_tag_color),
-                        resources.getColor(R.color.log_error_tag_color)
-                )
+            LogPalette(
+                resources.getColor(R.color.primary),
+                resources.getColor(R.color.log_debug_tag_color),
+                resources.getColor(R.color.log_info_tag_color),
+                resources.getColor(R.color.log_warning_tag_color),
+                resources.getColor(R.color.log_error_tag_color)
+            )
         )
 
         binding.recyclerView.apply {
@@ -78,15 +80,20 @@ class LogViewerActivity : BaseActivity<UiPreferencesLogsBinding, NoOpViewModel>(
             val key = "${getRandomHexString()}/debug=${preferences.debugLog}/owntracks-debug.txt"
             logExportUri = Uri.parse("content://${BuildConfig.APPLICATION_ID}.log/$key")
             val shareIntent = ShareCompat.IntentBuilder.from(this)
-                    .setType("text/plain")
-                    .setSubject("Owntracks Log File")
-                    .setChooserTitle(R.string.exportLogFilePrompt)
-                    .setStream(logExportUri)
-                    .createChooserIntent()
-                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                .setType("text/plain")
+                .setSubject("OwnTracks Log File")
+                .setChooserTitle(R.string.exportLogFilePrompt)
+                .setStream(logExportUri)
+                .createChooserIntent()
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             grantUriPermission("android", logExportUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
             shareIntentActivityLauncher.launch(shareIntent)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        this.recyclerView?.scrollToPosition(logAdapter.itemCount-1)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
