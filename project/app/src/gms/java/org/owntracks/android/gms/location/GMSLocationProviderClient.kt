@@ -14,7 +14,13 @@ import org.owntracks.android.location.LocationProviderClient
 import org.owntracks.android.location.LocationRequest
 import timber.log.Timber
 
-
+/**
+ * An implementation of [LocationProviderClient] that uses a [FusedLocationProviderClient] to request
+ * loctaion updates
+ *
+ * @property fusedLocationProviderClient instance of Google location client to use to request updates
+ * @property contextClass class of the requester, used just for logging
+ */
 class GMSLocationProviderClient(
     private val fusedLocationProviderClient: FusedLocationProviderClient,
     private val contextClass: Class<Context>
@@ -23,13 +29,22 @@ class GMSLocationProviderClient(
     private val callbackMap =
         mutableMapOf<LocationCallback, com.google.android.gms.location.LocationCallback>()
 
+    /**
+     * Converts the generic callback into a GMS-specific callback before invoking the location client
+     * to make location requests. Called by the superclass after removing location updates for this
+     * specific callback to prevent duplicate location requests being active for the same callback
+     *
+     * @param locationRequest a [LocationRequest] describing how often locations should be produced
+     * @param clientCallBack a [LocationCallback] instance that's invoked on new locations / location availability
+     * @param looper a handler on which to run the location requester loop
+     */
     @SuppressLint("MissingPermission")
     override fun actuallyRequestLocationUpdates(
         locationRequest: LocationRequest,
         clientCallBack: LocationCallback,
         looper: Looper?
     ) {
-        Timber.i("Requesting location updates $locationRequest ${clientCallBack.hashCode()} $contextClass")
+        Timber.i("Requesting location updates priority=${locationRequest.priority}, interval=${locationRequest.interval} clientCallback=${clientCallBack.hashCode()}, requester=$contextClass")
 
         val gmsCallBack = object : com.google.android.gms.location.LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {

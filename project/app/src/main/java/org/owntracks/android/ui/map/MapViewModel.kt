@@ -7,7 +7,6 @@ import android.location.Location
 import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.google.android.gms.maps.LocationSource.OnLocationChangedListener
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -39,8 +38,6 @@ class MapViewModel @Inject constructor(
     private val geocoderProvider: GeocoderProvider,
     private val preferences: Preferences
 ) : BaseViewModel<MapMvvm.View>(), MapMvvm.ViewModel<MapMvvm.View> {
-    private var onLocationChangedListener: OnLocationChangedListener? = null
-
     private val mutableLiveContact = MutableLiveData<FusedContact?>()
     private val liveBottomSheetHidden = MutableLiveData<Boolean>()
     private val liveCamera = MutableLiveData<LatLng>()
@@ -102,9 +99,6 @@ class MapViewModel @Inject constructor(
             locationIdlingResource.setIdleState(true)
             if (mode == VIEW_DEVICE && liveCamera.value != locationResult.lastLocation.toLatLng()) {
                 liveCamera.postValue(locationResult.lastLocation.toLatLng())
-            }
-            if (onLocationChangedListener != null) {
-                onLocationChangedListener!!.onLocationChanged(locationResult.lastLocation)
             }
         }
 

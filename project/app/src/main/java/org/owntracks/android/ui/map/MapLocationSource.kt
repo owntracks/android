@@ -6,6 +6,16 @@ import org.owntracks.android.location.*
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
+/**
+ * A LocationSource for a map that activates a high accuracy location request and provides an API
+ * similar to that of the [com.google.android.gms.maps.LocationSource] (activate / deactivate etc.)
+ *
+ * This sets up a callback for a location update request that both calls the location changed listener
+ * that's been provided by a client, but can also call another supplied [LocationCallback]
+ *
+ * @property locationProviderClient the client used to request high accuracy location updates
+ * @property locationUpdateCallback an additional [LocationCallback] to be called on location update
+ */
 class MapLocationSource internal constructor(
     private val locationProviderClient: LocationProviderClient,
     private val locationUpdateCallback: LocationCallback

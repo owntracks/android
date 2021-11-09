@@ -9,6 +9,10 @@ import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.support.Preferences
 import org.owntracks.android.support.Preferences.Companion.EXPERIMENTAL_FEATURE_USE_AOSP_LOCATION_PROVIDER
 
+/**
+ * A helper object that can provide appropriate instances of [GeofencingClient] and [LocationProviderClient]
+ * depending on preferences and the current build flavor
+ */
 object LocationServices {
     fun getGeofencingClient(backgroundService: BackgroundService): GeofencingClient {
         return when (FLAVOR) {
