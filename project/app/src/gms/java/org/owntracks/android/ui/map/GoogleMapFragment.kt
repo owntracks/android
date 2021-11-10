@@ -82,7 +82,7 @@ class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallba
         this.googleMap?.run {
             val myLocationEnabled =
                 (requireActivity() as MapActivity).checkAndRequestMyLocationCapability(false)
-            Timber.d("GoogleMapFragment initMap locationEnabled=$myLocationEnabled")
+            Timber.d("GoogleMapFragment initMap hasLocationCapability=$myLocationEnabled")
             isIndoorEnabled = false
             isMyLocationEnabled = myLocationEnabled
             uiSettings.isMyLocationButtonEnabled = false

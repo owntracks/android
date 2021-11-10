@@ -17,6 +17,7 @@ import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.TilesOverlay
+import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import org.owntracks.android.R
 import org.owntracks.android.data.repos.LocationRepo
@@ -34,12 +35,12 @@ import timber.log.Timber
 @AndroidEntryPoint
 class OSMMapFragment internal constructor() : MapFragment() {
     constructor(locationSource: LocationSource, locationRepo: LocationRepo?) : this() {
-        this.locationSource = locationSource
+        this.locationSource = locationSource.toOSMLocationSource()
         this.locationRepo = locationRepo
     }
 
     private var locationRepo: LocationRepo? = null
-    private var locationSource: LocationSource? = null
+    private var locationSource: IMyLocationProvider? = null
     private var mapView: MapView? = null
     private var binding: OsmMapFragmentBinding? = null
     override fun onCreateView(
@@ -62,7 +63,7 @@ class OSMMapFragment internal constructor() : MapFragment() {
                 locationRepo = (activity as MapActivity).locationRepo
             }
             if (locationSource == null) {
-                locationSource = (activity as MapActivity).mapLocationSource
+                locationSource = (activity as MapActivity).mapLocationSource.toOSMLocationSource()
             }
         }
         initMap()
@@ -104,10 +105,7 @@ class OSMMapFragment internal constructor() : MapFragment() {
 
             locationSource?.also {
                 overlays.add(
-                    MyLocationNewOverlay(
-                        it.toOSMLocationSource(),
-                        this
-                    )
+                    MyLocationNewOverlay(it, this)
                 )
             }
 
