@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">"Owntracks"</string>
-    <string name="preferencesServer">"Подключение"</string>
+
+    <!-- So, OwnTracks or Owntracks? -->
+    <string name="app_name">"OwnTracks"</string>
+    <string name="preferencesServer">"Подключение к серверу"</string>
     <string name="preferencesHost">"Адрес"</string>
     <string name="preferencesPort">"Порт"</string>
     <string name="preferencesWebsocket">"Использовать WebSockets"</string>
@@ -12,7 +14,7 @@
     <string name="preferencesClientCrtPath">"Сертификат пользователя"</string>
     <string name="preferencesClientCrtPassword">"Пароль"</string>
     <string name="preferencesLicenses">"Библиотеки"</string>
-    <string name="preferencesLicensesSummary">"Благодарим авторов используемых библиотек"</string>
+    <string name="preferencesLicensesSummary">"Благодарим авторов использованных библиотек"</string>
     <string name="preferencesNotification">"Уведомления"</string>
     <string name="preferencesNotificationEvents">"События"</string>
     <string name="preferencesNotificationEventsSummary">"Уведомлять о событиях"</string>
@@ -22,7 +24,9 @@
     <string name="preferencesChangelog">"Список изменений"</string>
     <string name="version">"Версия"</string>
     <string name="preferencesReporting">"Отчеты"</string>
-    <string name="preferencesTrackerId">"ID трекера"</string>
+
+    <!-- but contactDetailsTrackerId is untranslated? -->
+    <string name="preferencesTrackerId">"Метка на карте"</string>
     <string name="preferencesRepository">"Исходный код"</string>
     <string name="preferencesDocumentation">"Документация"</string>
     <string name="preferencesEncryptionKeySummary">"Ключ симметрического шифрования данных"</string>
@@ -35,10 +39,10 @@
     <string name="publish">"Сообщить местоположение"</string>
     <string name="preferencesPubExtendedDataSummary">"Отправлять расширенные сведения"</string>
     <string name="preferencesPubExtendedData">"Расширенные сведения"</string>
-    <string name="preferencesAutostartSummary">"Автозапуск при включении устройства"</string>
+    <string name="preferencesAutostartSummary">"Автоматический запуск приложения при включении устройства"</string>
     <string name="preferencesAutostart">"Автозапуск"</string>
     <string name="preferencesRemoteCommand">"Внешние команды"</string>
-    <string name="preferencesRemoteCommandSummary">"Разрешить внешние команды"</string>
+    <string name="preferencesRemoteCommandSummary">"Разрешить получение команд от сервера"</string>
     <string name="preferencesReverseGeocodeProvider">"Геокодирование"</string>
     <string name="description">"Описание"</string>
     <string name="longitude">"Долгота"</string>
@@ -51,7 +55,7 @@
     <string name="menuCurrentLocation">"Текущее местоположение"</string>
     <string name="contactDetailsAccuracy">"Точность"</string>
     <string name="contactDetailsTopic">"Идентификатор"</string>
-    <string name="waypointListPlaceholder">"Места еще не определены"</string>
+    <string name="waypointListPlaceholder">"Места еще не обозначены"</string>
     <string name="importConfig">"Импорт"</string>
     <string name="preferencesSecurity">"Безопасность"</string>
     <string name="accept">"Сохранить"</string>
@@ -79,6 +83,9 @@
     <string name="preferencesCategoryAdvancedLocator">"Локатор"</string>
     <string name="preferencesCategoryAdvancedEncryption">"Шифрование"</string>
     <string name="preferencesCategoryAdvancedMisc">"Прочее"</string>
+
+    <!-- Non-translatable? Why? -->
+    <string name="contactDetailsTrackerId">"Метка на карте"</string>
     <string name="exportWaypointsToEndpoint">"Опубликовать места"</string>
     <string name="preferencesExportFailed">"Не удалось экспортировать настройки"</string>
     <string name="preferencesExportSuccess">"Настройки экспортированы"</string>
@@ -91,17 +98,19 @@
     <string name="transitionLeaving">"покинул(а)"</string>
     <string name="errorPreferencesImportFailed">"Не удалось импортировать настройки"</string>
     <string name="welcome_play_heading">"Сервисы Google Play"</string>
-    <string name="welcome_play_description">"Owntracks необходимы сервисы Google Play"</string>
+    <string name="welcome_play_description">"Для работы OwnTracks необходимы сервисы Google Play"</string>
     <string name="icon_description_warning">"Предупреждение"</string>
     <string name="welcome_heading">"Добро пожаловать!"</string>
-    <string name="welcome_description">"Следующие шаги помогут вам начать работу с Owntracks"</string>
+    <string name="welcome_description">"Следующие шаги помогут вам начать работу с OwnTracks"</string>
     <string name="mode_heading">"Режим"</string>
-    <string name="locationPermissionRequestDialogMessage">"Owntracks необходимо разрешение на определение вашего местоположения. Пожалуйста, предоставьте это разрешение, прежде чем продолжить."</string>
-    <string name="icon_description_owntracks">"Owntracks"</string>
+    <string name="permissions_heading">"Разрешения"</string>
+    <string name="permissions_description">"OwnTracks необходимо разрешение на определение вашего местоположения. Пожалуйста, предоставьте это разрешение для продолжения."</string>
+    <string name="permissions_granted">"Разрешения предоставлены"</string>
+    <string name="icon_description_owntracks">"OwnTracks"</string>
     <string name="enjoy_description">"Воспользуйтесь меню настроек и настройте OwnTracks для работы с вашим сервером"</string>
     <string name="done_heading">"Готово"</string>
     <string name="icon_description_done">"Готово"</string>
-    <string name="title_activity_load">"Испорт"</string>
+    <string name="title_activity_load">"Импорт"</string>
     <string name="preferencesIgnoreInaccurateLocations">"Неточные местоположения"</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">"Игнорировать неточные местоположения"</string>
     <string name="preferencesIgnoreInaccurateLocationsDialog">"Игнорировать местоположение, если неточность его определения превышает указанное количество метров"</string>
@@ -111,7 +120,7 @@
     <string name="preferencesMoveModeLocatorInterval">"Интервал определения местоположения (Режим отслеживания перемещения)"</string>
     <string name="preferencesMoveModeLocatorIntervalSummary">"Интервал между обновлениями местоположения в режиме отслеживания перемещения"</string>
     <string name="preferencesMoveModeLocatorIntervalDialog">"Как часто должно запрашиваться текущее местоположение у устройства в режиме отслеживания перемещения (в секундах)"</string>
-    <string name="noNavigationApp">"подходящее приложение не установлено"</string>
+    <string name="noNavigationApp">"Подходящее приложение не установлено"</string>
     <string name="menuClear">"Очистить"</string>
     <string name="configurationManagement">"Управление конфигурацией"</string>
     <string name="preferencesEditor">"Редактор"</string>
@@ -129,7 +138,7 @@
         <item quantity="other">"%1$d новых событий"</item>
     </plurals>
     <string name="ui_fragment_welcome_version_title">"Ограничения"</string>
-    <string name="ui_fragment_welcome_version_description">"Из-за ограничений ОС некоторые функции могут работать ограниченно.
+    <string name="ui_fragment_welcome_version_description">"Из-за ограничений Android некоторые функции могут работать не в полной мере.
 
 Постоянное уведомление будет отображаться в шторке для того, чтобы дать возможность приложению работать в фоне. Его можно отключить в системных настройках уведомлений."</string>
     <string name="ui_fragment_welcome_version_learn_more">"Узнайте больше"</string>
@@ -142,7 +151,7 @@
     <string name="DISCONNECTED_USERDISCONNECT">"Отключен"</string>
     <string name="ERROR">"Ошибка"</string>
     <string name="ERROR_DATADISABLED">"Подключение для передачи данных недоступно"</string>
-    <string name="ERROR_CONFIGURATION">"Конфигурация не завершена"</string>
+    <string name="ERROR_CONFIGURATION">"Не настроено"</string>
     <string name="notificationChannelOngoing">"Постоянное"</string>
     <string name="notificationChannelOngoingDescription">"Необходимо для обновления текущего местоположения в фоновом режиме"</string>
     <string name="notificationChannelEventsDescription">"Передача места"</string>
@@ -152,16 +161,17 @@
     <string name="region_unknown">"Статус неизвестен"</string>
     <string name="region_inside">"Сейчас в этом месте"</string>
     <string name="region_outside">"Сейчас вне этого места"</string>
-    <string name="monitoring_quiet">"Режим тихого отслеживания"</string>
-    <string name="monitoring_manual">"Режим ручного отслеживания"</string>
-    <string name="monitoring_significant">"Режим отслеживания существенных перемещений"</string>
-    <string name="monitoring_move">"Режим отслеживания перемещения"</string>
+    <string name="monitoring_quiet">"Тихое отслеживание"</string>
+    <string name="monitoring_manual">"Ручное отслеживание"</string>
+    <string name="monitoring_significant">"Отслеживание существенного перемещения"</string>
+    <string name="monitoring_move">"Отслеживание перемещения"</string>
     <string name="notificationChangeMonitoring">"Изменить режим"</string>
     <string name="preferencesDebugLog">"Журнал отладки"</string>
     <string name="monitoring_mode">"Режим отслеживания"</string>
+    <string name="distance_label">"Расстояние"</string>
     <string name="preferencesClientId">"ID клиента"</string>
-    <string name="status_endpoint_state_hint">"Состояние конечной точки"</string>
-    <string name="status_endpoint_state_message_hint">"Сообщение о состоянии конечной точки"</string>
+    <string name="status_endpoint_state_hint">"Состояние подключения к серверу"</string>
+    <string name="status_endpoint_state_message_hint">"Сообщение о состоянии подключения к серверу"</string>
     <string name="status_endpoint_queue_hint">"Очередь конечной точки"</string>
     <string name="status_last_background_update_hint">"Последнее фоновое обновление местоположения"</string>
     <string name="status_background_service_started_hint">"Дата и время запуска фонового процесса"</string>
@@ -188,23 +198,51 @@
     <string name="geocoderProblemNotificationTitle">"Проблема геокодирования"</string>
     <string name="geocoderIPAddressRejected">"IP-адрес клиента отклонен"</string>
     <string name="backgroundLocationRestrictionNotificationTitle">"Отслеживание местоположения приостановлено"</string>
-    <string name="backgroundLocationRestrictionNotificationText">"Ваша версия Android ограничивает возможность определения местоположения при фоновом запуске приложения до его открытия. Нажмите на это уведомление, чтобы открыть OwnTracks и начать отслеживание местоположения."</string>
+    <string name="backgroundLocationRestrictionNotificationText">"Ваша версия Android ограничивает возможность определения местоположения при автоматическом запуске приложения до его открытия. Нажмите на это уведомление, чтобы открыть OwnTracks и начать отслеживание местоположения."</string>
     <string name="preferencesExperimental">"Экспериментальные"</string>
     <string name="refresh_log">"Обновить"</string>
     <string name="preferencesTheme">"Тема"</string>
-    <string name="contactDetailsAltitude"></string>
-    <string name="contactDetailsBearing"></string>
-    <string name="contactDetailsDistance"></string>
-    <string name="contactDetailsBattery"></string>
-    <string name="contactDetailsSpeed"></string>
-    <string-array name="geocoders">
-        <item>Не используется</item>
-        <item>Стандартное (Google)</item>
-        <item>OpenCage</item>
-    </string-array>
-    <string-array name="themeLabels">
-        <item>Светлая</item>
-        <item>Темная</item>
-        <item>Системная</item>
-    </string-array>
+
+    <!-- meters in Russian is "метров", i.e. "%dм" instead if "%d m" -->
+    <string name="contactDetailsAccuracyValue">"%dм"</string>
+    <string name="contactDetailsDistanceValue">"%,.2f %s"</string>
+    <string name="contactDetailsAltitude">"Высота"</string>
+    <string name="contactDetailsBearing">"Азимут"</string>
+    <string name="contactDetailsDistance">"Расстояние"</string>
+    <string name="contactDetailsBattery">"Батарея"</string>
+    <string name="contactDetailsSpeed">"Скорость"</string>
+    <string name="contactDetailsBearingValue">"%,.0f°"</string>
+
+    <!-- meters in Russian is "метров", i.e. "%dм" instead if "%d m" -->
+    <string name="contactDetailsAltitudeValue">"%,dм"</string>
+    <string name="contactDetailsBatteryValue">"%d %%"</string>
+
+    <!-- kph in Russian is "км/ч", i.e. "%d км/ч" instead of "%d kph" -->
+    <string name="contactDetailsSpeedValue">"%d км/ч"</string>
+    <string name="preferencesCategoryNotificationErrors">"Ошибки и проблемы"</string>
+    <string name="preferenceKeyNotificationGeocoderErrors">"Ошибки геокодирования"</string>
+    <string name="preferencesNotificationGeocoderErrors">"Ошибки геокодирования"</string>
+    <string name="preferencesNotificationGeocoderErrorsSummary">"Показывать ошибки геокодирования, превышения лимитов частоты и количества запросов к геокодеру"</string>
+    <string name="preferencesAdvancedAutostartWarning">"Ваша версия Android ограничивает возможность определения местоположения при автоматическом запуске приложения до его открытия."</string>
+    <string name="workmanagerInitializationErrorDialogTitle">"Ошибка инициализации"</string>
+
+    <!-- Where is it? -->
+    <string name="workmanagerInitializationErrorDialogOpenSettingsLabel">"Перейти к настройкам"</string>
+    <string name="workmanagerInitializationErrorDialogMessage">"Некоторые компоненты не были корректно инициализированы, поэтому OwnTracks может работать не в полной мере. Может потребоваться переустановка приложения или очистка данных приложения.
+
+Пожалуйста, проверьте журнал для получения более подробной информации."</string>
+    <string name="batteryOptimizationWhitelistDialogTitle">"Оптимизация энергопотребления"</string>
+    <string name="batteryOptimizationWhitelistDialogMessage">"Добавление OwnTracks в исключения сервиса оптимизации энергопотребления может помочь надежно отслеживать ваши местоположения и обеспечит бесперебойную связь с сервером."</string>
+    <string name="batteryOptimizationWhitelistDialogButtonLabel">"Настройки оптимизации энергопотребления"</string>
+    <string name="statusBatteryDozeWhiteListEnabled">"Да"</string>
+    <string name="statusBatteryDozeWhiteListDisabled">"Нет"</string>
+    <string name="locationPermissionRequestDialogMessage">"Для отслеживания вашего текущего местоположения, пожалуйста, предоставьте OwnTracks соответствующие разрешения."</string>
+    <string name="fixProblemLabel">"Исправить"</string>
+    <string name="locationPermissionNotGrantedNotification">"Нет доступа к местоположению"</string>
+    <string name="locationPermissionRequestDialogTitle">"Запрос доступа к местоположению"</string>
+    <string name="deviceLocationDisabledDialogTitle">"Определение местоположения на устройстве отключено"</string>
+    <string name="deviceLocationDisabledDialogPositiveButtonLabel">"Настройки"</string>
+    <string name="deviceLocationDisabledDialogMessage">"Службы определения местоположения на этом устройстве отключены, поэтому OwnTracks не может отслеживать ваше текущее местоположение.
+
+Пожалуйста, включите \"Местоположение\" в настройках устройства."</string>
 </resources>

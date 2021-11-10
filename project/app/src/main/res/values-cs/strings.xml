@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">"Owntracks"</string>
+    <string name="app_name">"OwnTracks"</string>
     <string name="preferencesServer">"Připojení"</string>
     <string name="preferencesHost">"Server"</string>
     <string name="preferencesPort">"Port"</string>
@@ -79,6 +79,7 @@
     <string name="preferencesCategoryAdvancedLocator">"Lokátor"</string>
     <string name="preferencesCategoryAdvancedEncryption">"Šifrování"</string>
     <string name="preferencesCategoryAdvancedMisc">"Různé"</string>
+    <string name="contactDetailsTrackerId">"Tracker ID"</string>
     <string name="exportWaypointsToEndpoint">"Zveřejnit body na trase"</string>
     <string name="preferencesExportFailed">"Export nastavení selhal"</string>
     <string name="preferencesExportSuccess">"Export byl úspěšný"</string>
@@ -196,11 +197,17 @@ Aby aplikace mohla běžet na pozadí, bude zobrazeno trvalé oznámení. Lze to
     <string name="preferencesExperimental">"Experimentální"</string>
     <string name="refresh_log">"Obnovit"</string>
     <string name="preferencesTheme">"Téma"</string>
+    <string name="contactDetailsAccuracyValue">"%d m"</string>
+    <string name="contactDetailsDistanceValue">"%,.2f %s"</string>
     <string name="contactDetailsAltitude">"Výška"</string>
     <string name="contactDetailsBearing">"Směr"</string>
     <string name="contactDetailsDistance">"Vzdálenost"</string>
     <string name="contactDetailsBattery">"Baterie"</string>
     <string name="contactDetailsSpeed">"Rychlost"</string>
+    <string name="contactDetailsBearingValue">"%,.0f°"</string>
+    <string name="contactDetailsAltitudeValue">"%,d m"</string>
+    <string name="contactDetailsBatteryValue">"%d %%"</string>
+    <string name="contactDetailsSpeedValue">"%d kph"</string>
     <string name="preferencesCategoryNotificationErrors">"Chyby a prohlémy"</string>
     <string name="preferenceKeyNotificationGeocoderErrors">"Oznámení chyb geokóderu"</string>
     <string name="preferencesNotificationGeocoderErrors">"Chyby geokóderu"</string>

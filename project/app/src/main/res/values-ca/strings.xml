@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">"Owntracks"</string>
+    <string name="app_name">"OwnTracks"</string>
     <string name="preferencesServer">"Connexió"</string>
     <string name="preferencesHost">"Amfitrió"</string>
     <string name="preferencesPort">"Port"</string>
@@ -79,6 +79,7 @@
     <string name="preferencesCategoryAdvancedLocator">"Localitzador"</string>
     <string name="preferencesCategoryAdvancedEncryption">"Encriptació"</string>
     <string name="preferencesCategoryAdvancedMisc">"Misc"</string>
+    <string name="contactDetailsTrackerId">"Tracker ID"</string>
     <string name="exportWaypointsToEndpoint">"Publicar punts de pas"</string>
     <string name="preferencesExportFailed">"Error en exportar preferències"</string>
     <string name="preferencesExportSuccess">"Exportació reeixida"</string>
@@ -96,7 +97,11 @@
     <string name="welcome_heading">"Benvinguda"</string>
     <string name="welcome_description">"Els següents passos t'ajudaran a començar amb Owntracks"</string>
     <string name="mode_heading">"Mode"</string>
-    <string name="locationPermissionRequestDialogMessage">"Owntracks necessita accedir a la ubicació. Sisplau atorga aquest permís abans de continuar."</string>
+    <string name="permissions_heading">"Permisos"</string>
+    <string name="permissions_description">"Owntracks necessita accedir a la ubicació. Sisplau atorga aquest permís abans de continuar."</string>
+    <string name="permissions_granted">"Permisos concedits"</string>
+
+    <!-- Fuzzy -->
     <string name="icon_description_owntracks">"Owntracks"</string>
     <string name="enjoy_description">"Escull preferències des del menú i configura Owntracks per al teu servidor abans d'utilitzar-lo"</string>
     <string name="done_heading">"Fet"</string>
@@ -159,7 +164,7 @@ Es mostrarà una notificació permanent per continuar executant-se en segon pla.
     <string name="notificationChangeMonitoring">"Canvia el mode control"</string>
     <string name="preferencesDebugLog">"Registre de depuració"</string>
     <string name="monitoring_mode">"Seguiment"</string>
-    <string name="contactDetailsDistance">"Distància"</string>
+    <string name="distance_label">"Distància"</string>
     <string name="preferencesClientId">"ID Client"</string>
     <string name="status_endpoint_state_hint">"Estat del punt final"</string>
     <string name="status_endpoint_state_message_hint">"Missatge de l'estat del punt final"</string>
@@ -180,12 +185,52 @@ Es mostrarà una notificació permanent per continuar executant-se en segon pla.
     <string name="preferencesRemoteConfiguration">"Configuració remota"</string>
     <string name="preferencesRemoteConfigurationSummary">"Activa la configuració per actualitzar-se remotament (requereix comandes remotes) "</string>
     <string name="aboutLicense">"LLicència"</string>
-    <string name="aboutTranslationsSummary">"Actualment disponible en %d idiomes!"</string>
+    <string name="aboutTranslationsSummary">"Actualment disponible en 5 idiomes!"</string>
     <string name="aboutTranslations">"Ajudeu a traduir aquesta aplicació"</string>
-    <string name="geocoderDisabled"></string>
-    <string name="geocoderRateLimited">%s</string>
-    <string name="geocoderError">%s</string>
-    <string name="notificationChannelErrors"></string>
-    <string name="geocoderProblemNotificationTitle"></string>
-    <string name="geocoderIPAddressRejected"></string>
+    <string name="geocoderDisabled">"El servei de geocodificació està desactivat"</string>
+    <string name="geocoderRateLimited">"El servei de geocodificació té un límit. No es tornarà a provar fins %s"</string>
+    <string name="geocoderError">"Error rebut del servei de geocodificació: %s"</string>
+    <string name="notificationChannelErrors">"Errors"</string>
+    <string name="geocoderProblemNotificationTitle">"Problema de geocodificador"</string>
+    <string name="geocoderIPAddressRejected">"L'adreça IP del client s'ha rebutjat"</string>
+    <string name="backgroundLocationRestrictionNotificationTitle">"Seguiment d'ubicació en pausa"</string>
+    <string name="backgroundLocationRestrictionNotificationText">"Aquesta versió d'Android impedeix a OwnTracks rebre ubicacions quan s'inicia en segon pla fins que s'obre l'aplicació. Feu clic a aquesta notificació per obrir l'aplicació i començar a fer el seguiment de la ubicació."</string>
+    <string name="preferencesExperimental">"Experimental"</string>
+    <string name="refresh_log">"Actualitzar"</string>
+    <string name="preferencesTheme">"Tema"</string>
+    <string name="contactDetailsAccuracyValue">"%d m"</string>
+    <string name="contactDetailsDistanceValue">"%,.2f %s"</string>
+    <string name="contactDetailsAltitude">"Alçada"</string>
+    <string name="contactDetailsBearing">"Orientació"</string>
+    <string name="contactDetailsDistance">"Distància"</string>
+    <string name="contactDetailsBattery">"Bateria"</string>
+    <string name="contactDetailsSpeed">"Velocitat"</string>
+    <string name="contactDetailsBearingValue">"%,.0f°"</string>
+    <string name="contactDetailsAltitudeValue">"%,d m"</string>
+    <string name="contactDetailsBatteryValue">"%d %%"</string>
+    <string name="contactDetailsSpeedValue">"%d kph"</string>
+    <string name="preferencesCategoryNotificationErrors">"Errors i Problemes"</string>
+    <string name="preferenceKeyNotificationGeocoderErrors">"notificationGeocoderErrors"</string>
+    <string name="preferencesNotificationGeocoderErrors">"Errors geocodificació"</string>
+    <string name="preferencesNotificationGeocoderErrorsSummary">"Mostra els errors de geocodificació, els límits de consum i els excessos de quota"</string>
+    <string name="preferencesAdvancedAutostartWarning">"Aquesta versió d'Android impedeix a OwnTracks rebre ubicacions quan s'inicia automàticament a l'arrencada del dispositiu fins que s'obre l'aplicació."</string>
+    <string name="workmanagerInitializationErrorDialogTitle">"Error d'inicialització"</string>
+    <string name="workmanagerInitializationErrorDialogOpenSettingsLabel">"Obriu la configuració de l'aplicació"</string>
+    <string name="workmanagerInitializationErrorDialogMessage">"Alguns components no s'han pogut inicialitzar correctament, de manera que és possible que OwnTracks no funcioni bé. Pot ser que calgui tornar a instal·lar l'aplicació o esborrar les dades de l'usuari.
+
+Consulteu el registre per tenir més detalls."</string>
+    <string name="batteryOptimizationWhitelistDialogTitle">"Optimització de la bateria"</string>
+    <string name="batteryOptimizationWhitelistDialogMessage">"Posar OwnTracks a la llista de l'optimització de la bateria pot ajudar-lo a fer un seguiment més fiable de les ubicacions i del contacte principal amb el servidor."</string>
+    <string name="batteryOptimizationWhitelistDialogButtonLabel">"Configuració d'optimització de la bateria"</string>
+    <string name="statusBatteryDozeWhiteListEnabled">"Si"</string>
+    <string name="statusBatteryDozeWhiteListDisabled">"No"</string>
+    <string name="locationPermissionRequestDialogMessage">"Per fer el seguiment de la teva ubicació actual concediu permisos d'ubicació a OwnTracks."</string>
+    <string name="fixProblemLabel">"Fix"</string>
+    <string name="locationPermissionNotGrantedNotification">"No s'ha concedit el permís d'ubicació"</string>
+    <string name="locationPermissionRequestDialogTitle">"Sol·licitud de permís d'ubicació"</string>
+    <string name="deviceLocationDisabledDialogTitle">"La ubicació del dispositiu està desactivada"</string>
+    <string name="deviceLocationDisabledDialogPositiveButtonLabel">"Configuració d'ubicació"</string>
+    <string name="deviceLocationDisabledDialogMessage">"Actualment els serveis d'ubicació d'aquest dispositiu estan desactivats, de manera que OwnTracks no pot fer un seguiment de la vostra ubicació actual.
+
+Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</string>
 </resources>

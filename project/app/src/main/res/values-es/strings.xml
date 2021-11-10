@@ -79,6 +79,7 @@
     <string name="preferencesCategoryAdvancedLocator">"Locator"</string>
     <string name="preferencesCategoryAdvancedEncryption">"Encriptación"</string>
     <string name="preferencesCategoryAdvancedMisc">"Miscelánea"</string>
+    <string name="contactDetailsTrackerId">"Tracker ID"</string>
     <string name="exportWaypointsToEndpoint">"Publicar Waypoints"</string>
     <string name="preferencesExportFailed">"Fallo al exportar las preferencias"</string>
     <string name="preferencesExportSuccess">"Preferencias exportadas"</string>
@@ -96,7 +97,11 @@
     <string name="welcome_heading">"Bienvenido"</string>
     <string name="welcome_description">"Los siguientes pasos te ayudarán a comenzar con OwnTracks"</string>
     <string name="mode_heading">"Modo"</string>
-    <string name="locationPermissionRequestDialogMessage">"OwnTracks necesita acceso a la ubicación. Por favor, concede el permiso antes de continuar."</string>
+    <string name="permissions_heading">"Permisos"</string>
+    <string name="permissions_description">"OwnTracks necesita acceso a la ubicación. Por favor, concede el permiso antes de continuar."</string>
+    <string name="permissions_granted">"Permisos concedidos"</string>
+
+    <!-- Fuzzy -->
     <string name="icon_description_owntracks">"OwnTracks"</string>
     <string name="enjoy_description">"Selecciona las preferencias del menú y configura tu OwnTracks antes de empezar a usarlo"</string>
     <string name="done_heading">"Hecho"</string>
@@ -157,7 +162,7 @@ Una notificación permanente se mostrará para mantener la aplicación funcionan
     <string name="notificationChangeMonitoring">"Cambio modo"</string>
     <string name="preferencesDebugLog">"Registro de depuración"</string>
     <string name="monitoring_mode">"Monitorización"</string>
-    <string name="contactDetailsDistance">"Distancia"</string>
+    <string name="distance_label">"Distancia"</string>
     <string name="preferencesClientId">"ID de cliente"</string>
     <string name="status_endpoint_state_hint">"Estado del punto de conexión"</string>
     <string name="status_endpoint_state_message_hint">"Mensaje de estado del punto de conexión"</string>
@@ -178,12 +183,50 @@ Una notificación permanente se mostrará para mantener la aplicación funcionan
     <string name="preferencesRemoteConfiguration">"Configuración remota"</string>
     <string name="preferencesRemoteConfigurationSummary">"Permitir que la configuración se actualice de forma remota (requiere comandos remotos)"</string>
     <string name="aboutLicense">"Licencia"</string>
-    <string name="aboutTranslationsSummary">"¡Actualmente disponible en %d idiomas!"</string>
+    <string name="aboutTranslationsSummary">"¡Actualmente disponible en 6 idiomas!"</string>
     <string name="aboutTranslations">"Ayude a traducir esta aplicación"</string>
     <string name="geocoderDisabled">"El servicio de geocodificador está deshabilitado"</string>
     <string name="geocoderRateLimited">"El servicio de geocodificador tiene tasa limitada. No lo intente hasta %s"</string>
     <string name="geocoderError">"Se recibió un error del servicio de geocodificador: %s"</string>
     <string name="notificationChannelErrors">"Errores"</string>
+
+    <!-- Fuzzy -->
     <string name="geocoderProblemNotificationTitle">"Problema del geocodificador"</string>
     <string name="geocoderIPAddressRejected">"La IP del cliente fue rechazada"</string>
+    <string name="backgroundLocationRestrictionNotificationTitle"></string>
+    <string name="backgroundLocationRestrictionNotificationText"></string>
+    <string name="preferencesExperimental"></string>
+    <string name="refresh_log"></string>
+    <string name="preferencesTheme"></string>
+    <string name="contactDetailsAccuracyValue">"%d m"</string>
+    <string name="contactDetailsDistanceValue">"%,.2f %s"</string>
+    <string name="contactDetailsAltitude"></string>
+    <string name="contactDetailsBearing"></string>
+    <string name="contactDetailsDistance"></string>
+    <string name="contactDetailsBattery"></string>
+    <string name="contactDetailsSpeed"></string>
+    <string name="contactDetailsBearingValue">"%,.0f°"</string>
+    <string name="contactDetailsAltitudeValue">"%,d m"</string>
+    <string name="contactDetailsBatteryValue">"%d %%"</string>
+    <string name="contactDetailsSpeedValue">"%d kph"</string>
+    <string name="preferencesCategoryNotificationErrors"></string>
+    <string name="preferenceKeyNotificationGeocoderErrors"></string>
+    <string name="preferencesNotificationGeocoderErrors"></string>
+    <string name="preferencesNotificationGeocoderErrorsSummary"></string>
+    <string name="preferencesAdvancedAutostartWarning"></string>
+    <string name="workmanagerInitializationErrorDialogTitle"></string>
+    <string name="workmanagerInitializationErrorDialogOpenSettingsLabel"></string>
+    <string name="workmanagerInitializationErrorDialogMessage"></string>
+    <string name="batteryOptimizationWhitelistDialogTitle"></string>
+    <string name="batteryOptimizationWhitelistDialogMessage"></string>
+    <string name="batteryOptimizationWhitelistDialogButtonLabel"></string>
+    <string name="statusBatteryDozeWhiteListEnabled"></string>
+    <string name="statusBatteryDozeWhiteListDisabled"></string>
+    <string name="locationPermissionRequestDialogMessage"></string>
+    <string name="fixProblemLabel"></string>
+    <string name="locationPermissionNotGrantedNotification"></string>
+    <string name="locationPermissionRequestDialogTitle"></string>
+    <string name="deviceLocationDisabledDialogTitle"></string>
+    <string name="deviceLocationDisabledDialogPositiveButtonLabel"></string>
+    <string name="deviceLocationDisabledDialogMessage"></string>
 </resources>

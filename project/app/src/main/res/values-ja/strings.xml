@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">"Owntracks"</string>
+    <string name="app_name">"OwnTracks"</string>
     <string name="preferencesServer">"接続"</string>
     <string name="preferencesHost">"ホスト"</string>
     <string name="preferencesPort">"ポート"</string>
@@ -79,6 +79,7 @@
     <string name="preferencesCategoryAdvancedLocator">"位置情報取得"</string>
     <string name="preferencesCategoryAdvancedEncryption">"暗号化"</string>
     <string name="preferencesCategoryAdvancedMisc">"その他"</string>
+    <string name="contactDetailsTrackerId">"Tracker ID"</string>
     <string name="exportWaypointsToEndpoint">"ウェイポイントを公開"</string>
     <string name="preferencesExportFailed">"環境設定のエクスポートに失敗しました"</string>
     <string name="preferencesExportSuccess">"エクスポートに成功しました"</string>
@@ -194,11 +195,17 @@
     <string name="preferencesExperimental">"試験段階"</string>
     <string name="refresh_log">"更新"</string>
     <string name="preferencesTheme">"テーマ"</string>
+    <string name="contactDetailsAccuracyValue">"%d m"</string>
+    <string name="contactDetailsDistanceValue">"%,.2f %s"</string>
     <string name="contactDetailsAltitude">"高度"</string>
     <string name="contactDetailsBearing">"角度"</string>
     <string name="contactDetailsDistance">"距離"</string>
     <string name="contactDetailsBattery">"バッテリー"</string>
     <string name="contactDetailsSpeed">"速度"</string>
+    <string name="contactDetailsBearingValue">"%,.0f°"</string>
+    <string name="contactDetailsAltitudeValue">"%,d m"</string>
+    <string name="contactDetailsBatteryValue">"%d %%"</string>
+    <string name="contactDetailsSpeedValue">"%d kph"</string>
     <string name="preferencesCategoryNotificationErrors">"エラー・問題"</string>
     <string name="preferenceKeyNotificationGeocoderErrors">"ジオコーダーエラーの通知"</string>
     <string name="preferencesNotificationGeocoderErrors">"ジオコーダーエラー"</string>
