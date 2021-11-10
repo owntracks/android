@@ -90,7 +90,17 @@ class OSMMapFragment internal constructor() : MapFragment() {
             setTileSource(TileSourceFactory.MAPNIK)
             zoomController.setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
             controller.setZoom(ZOOM_STREET_LEVEL)
-            controller.setCenter(GeoPoint(STARTING_LATITUDE, STARTING_LONGITUDE))
+            if (locationRepo?.currentLocation != null) {
+                controller.setCenter(
+                    GeoPoint(
+                        locationRepo!!.currentLocation!!.latitude,
+                        locationRepo!!.currentLocation!!.longitude
+                    )
+                )
+            } else {
+                controller.setCenter(GeoPoint(STARTING_LATITUDE, STARTING_LONGITUDE))
+            }
+
 
             locationSource?.also {
                 overlays.add(
@@ -100,7 +110,7 @@ class OSMMapFragment internal constructor() : MapFragment() {
                     )
                 )
             }
-            
+
             setMultiTouchControls(true)
             setOnClickListener {
                 (activity as MapActivity).onMapClick()
