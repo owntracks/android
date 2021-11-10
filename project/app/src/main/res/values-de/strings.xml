@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">"OwnTracks"</string>
     <string name="preferencesServer">"Verbindung"</string>
-    <string name="preferencesHost">"Hostnamen"</string>
+    <string name="preferencesHost">"Hostname"</string>
     <string name="preferencesPort">"Port"</string>
     <string name="preferencesWebsocket">"WebSockets nutzen"</string>
     <string name="preferencesUserUsername">"Benutzername"</string>
@@ -11,8 +11,8 @@
     <string name="preferencesCaCrtPath">"CA-Zertifikat"</string>
     <string name="preferencesClientCrtPath">"Client-Zertifikat"</string>
     <string name="preferencesClientCrtPassword">"Passwort für Client-Zertifikat"</string>
-    <string name="preferencesLicenses">"Danke"</string>
-    <string name="preferencesLicensesSummary">"Danke an die Autoren"</string>
+    <string name="preferencesLicenses">"Danksagungen"</string>
+    <string name="preferencesLicensesSummary">"Danke an die Autoren dieser Bibliotheken"</string>
     <string name="preferencesNotification">"Benachrichtigungen"</string>
     <string name="preferencesNotificationEvents">"Ereignisse"</string>
     <string name="preferencesNotificationEventsSummary">"Über empfangene Ereignisse benachrichtigen"</string>
@@ -22,7 +22,7 @@
     <string name="preferencesChangelog">"Änderungshistorie"</string>
     <string name="version">"Version"</string>
     <string name="preferencesReporting">"Berichte"</string>
-    <string name="preferencesTrackerId">"Tracker ID"</string>
+    <string name="preferencesTrackerId">"Tracker-ID"</string>
     <string name="preferencesRepository">"Quelltext"</string>
     <string name="preferencesDocumentation">"Handbuch"</string>
     <string name="preferencesEncryptionKeySummary">"Symmetrischer Schlüssel für Inhalts-Verschlüsselung"</string>
@@ -35,7 +35,7 @@
     <string name="publish">"Bericht"</string>
     <string name="preferencesPubExtendedDataSummary">"Erweiterte Daten in Standort-Berichten einschließen"</string>
     <string name="preferencesPubExtendedData">"Erweiterte Daten"</string>
-    <string name="preferencesAutostartSummary">"Automatisch beim Geräte-Boot starten"</string>
+    <string name="preferencesAutostartSummary">"Automatisch mit Gerät starten"</string>
     <string name="preferencesAutostart">"Autostart"</string>
     <string name="preferencesRemoteCommand">"Fernkommandos"</string>
     <string name="preferencesRemoteCommandSummary">"Fernkommandos aktivieren"</string>
@@ -48,7 +48,7 @@
     <string name="exportConfiguration">"Exportieren"</string>
     <string name="contactLocationUnknown">"Kein Standort verfügbar"</string>
     <string name="menuContactNavigate">"Navigieren"</string>
-    <string name="menuCurrentLocation">"Aktuelle position"</string>
+    <string name="menuCurrentLocation">"Aktuelle Position"</string>
     <string name="contactDetailsAccuracy">"Genauigkeit"</string>
     <string name="contactDetailsTopic">"Kennung"</string>
     <string name="waypointListPlaceholder">"Keine Orte angelegt"</string>
@@ -79,6 +79,7 @@
     <string name="preferencesCategoryAdvancedLocator">"Ortung"</string>
     <string name="preferencesCategoryAdvancedEncryption">"Verschlüsselung"</string>
     <string name="preferencesCategoryAdvancedMisc">"Weiteres"</string>
+    <string name="contactDetailsTrackerId">"Tracker ID"</string>
     <string name="exportWaypointsToEndpoint">"Orte veröffentlichen"</string>
     <string name="preferencesExportFailed">"Einstellungs-Export fehlgeschlagen"</string>
     <string name="preferencesExportSuccess">"Export erfolgreich"</string>
@@ -96,7 +97,11 @@
     <string name="welcome_heading">"Willkommen"</string>
     <string name="welcome_description">"Die folgenden Schritte werden Dir helfen, OwnTracks einzurichten"</string>
     <string name="mode_heading">"Modus"</string>
-    <string name="locationPermissionRequestDialogMessage">"OwnTracks benötigt Zugriff auf Deinen Standort. Bitte erteile diese Berechtigung, bevor es weitergeht."</string>
+    <string name="permissions_heading">"Berechtigungen"</string>
+    <string name="permissions_description">"OwnTracks benötigt Zugriff auf Deinen Standort. Bitte erteile diese Berechtigung, bevor es weitergeht."</string>
+    <string name="permissions_granted">"Berechtigungen wurden erteilt"</string>
+
+    <!-- Fuzzy -->
     <string name="icon_description_owntracks">"OwnTracks"</string>
     <string name="enjoy_description">"Viel Spaß mit OwnTracks"</string>
     <string name="done_heading">"Fertig"</string>
@@ -155,12 +160,12 @@
     <string name="notificationChangeMonitoring">"Bewegungs Modus"</string>
     <string name="preferencesDebugLog">"Debug Log"</string>
     <string name="monitoring_mode">"Monitoring"</string>
-    <string name="contactDetailsDistance">"Abstand"</string>
+    <string name="distance_label">"Abstand"</string>
     <string name="preferencesClientId">"Client ID"</string>
     <string name="status_endpoint_state_hint">"Endpunktstatus"</string>
     <string name="status_endpoint_state_message_hint">"Endpunkt Statusnachricht"</string>
     <string name="status_endpoint_queue_hint">"Endpunktschlange"</string>
-    <string name="status_last_background_update_hint">"Letzer Update vom Standortservice"</string>
+    <string name="status_last_background_update_hint">"Letzes Update vom Standortservice"</string>
     <string name="status_background_service_started_hint">"Standortservice gestartet"</string>
     <string name="status_battery_optimization_whitelisted_hint">"Batterieoptimierung ermöglicht"</string>
     <string name="clear_log">"Löschen"</string>
@@ -174,14 +179,56 @@
     <string name="select">"Auswählen"</string>
     <string name="contact_image">"Bild"</string>
     <string name="preferencesRemoteConfiguration">"Fernkonfiguration"</string>
-    <string name="preferencesRemoteConfigurationSummary">"Fernkonfiguration ermöglichen (benötigt remote Kommandos)"</string>
+    <string name="preferencesRemoteConfigurationSummary">"Fernkonfiguration ermöglichen (benötigt Fernkommandos)"</string>
     <string name="aboutLicense">"Lizenz"</string>
-    <string name="aboutTranslationsSummary">"Jetzt in %d Sprachen verfügbar!"</string>
+    <string name="aboutTranslationsSummary">"Jetzt in sechs Sprachen verfügbar!"</string>
     <string name="aboutTranslations">"Übersetzungshilfe"</string>
     <string name="geocoderDisabled">"Der Geocoding Dienst ist ausgeschaltet"</string>
     <string name="geocoderRateLimited">"Geocoding Duchstatz ist limitiert worden. Nächster Versuch wenn %s"</string>
     <string name="geocoderError">"Der Fehler %s ist vom Geocoding Dienst geliefert worden"</string>
     <string name="notificationChannelErrors">"Fehler"</string>
+
+    <!-- Fuzzy -->
     <string name="geocoderProblemNotificationTitle">"Geocoding Problem"</string>
     <string name="geocoderIPAddressRejected">"Die Client IP-Adresse ist zurueckgewiesen worden"</string>
+    <string name="backgroundLocationRestrictionNotificationTitle">"Standortverfolgung pausiert"</string>
+    <string name="backgroundLocationRestrictionNotificationText">"Diese Version von Android limitiert OwnTracks Standortzugriff im Hintergrund, bis die App geöffnet wird. Antippen dieser Benachrichtigung öffnet die App und fängt an den Standort aufzuzeichnen."</string>
+    <string name="preferencesExperimental">"Experimentell"</string>
+    <string name="refresh_log">"Neu laden"</string>
+    <string name="preferencesTheme">"Aussehen"</string>
+    <string name="contactDetailsAccuracyValue">"%d m"</string>
+    <string name="contactDetailsDistanceValue">"%,.2f %s"</string>
+    <string name="contactDetailsAltitude">"Höhe"</string>
+    <string name="contactDetailsBearing">"Richtung"</string>
+    <string name="contactDetailsDistance">"Distanz"</string>
+    <string name="contactDetailsBattery">"Batterie"</string>
+    <string name="contactDetailsSpeed">"Geschwindigkeit"</string>
+    <string name="contactDetailsBearingValue">"%,.0f°"</string>
+    <string name="contactDetailsAltitudeValue">"%,d m"</string>
+    <string name="contactDetailsBatteryValue">"%d %%"</string>
+    <string name="contactDetailsSpeedValue">"%d kph"</string>
+    <string name="preferencesCategoryNotificationErrors">"Fehler &amp; Probleme"</string>
+    <string name="preferenceKeyNotificationGeocoderErrors">"notificationGeocoderErrors"</string>
+    <string name="preferencesNotificationGeocoderErrors">"Geocoder-Fehler"</string>
+    <string name="preferencesNotificationGeocoderErrorsSummary">"Geocoder-Fehler, Nutzungslimits &amp; Quotenevents anzeigen"</string>
+    <string name="preferencesAdvancedAutostartWarning">"Diese Version von Android beschränkt OwnTracks bebis im Empfang von Positionsdaten wenn es automatisch beim Start aktiviert wird bis die App geöffnet wird."</string>
+    <string name="workmanagerInitializationErrorDialogTitle">"Initialisationsfehler"</string>
+    <string name="workmanagerInitializationErrorDialogOpenSettingsLabel">"App Einstellungen öffnen"</string>
+    <string name="workmanagerInitializationErrorDialogMessage">"Einige Komponenten konnten nicht initialisiert werden; OwnTracks könnte fehlerhaft arbeiten. Es kann notwendig sein die App neu zu installieren oder die Daten zu löschen.
+
+Bitte überprüfen Sie die Logs für mehr Details."</string>
+    <string name="batteryOptimizationWhitelistDialogTitle">"Batterieoptimierung"</string>
+    <string name="batteryOptimizationWhitelistDialogMessage">"Es kann von Vorteil sein OwnTracks von der Akkuoptimierung zu entfernen damit es Kontakt mit dem Server beibehalten kann."</string>
+    <string name="batteryOptimizationWhitelistDialogButtonLabel">"Akkuoptimierungseinstellungen"</string>
+    <string name="statusBatteryDozeWhiteListEnabled">"Ja"</string>
+    <string name="statusBatteryDozeWhiteListDisabled">"Nein"</string>
+    <string name="locationPermissionRequestDialogMessage">"Bitte erlauben Sie OwnTracks die Position zu ermitteln."</string>
+    <string name="fixProblemLabel">"Fix"</string>
+    <string name="locationPermissionNotGrantedNotification">"Standortberechtigung nicht erteilt"</string>
+    <string name="locationPermissionRequestDialogTitle">"Erlaubnis für Positionsermittlung"</string>
+    <string name="deviceLocationDisabledDialogTitle">"Positionsmeldungen nicht aktiviert"</string>
+    <string name="deviceLocationDisabledDialogPositiveButtonLabel">"Standorteinstellungen"</string>
+    <string name="deviceLocationDisabledDialogMessage">"Die Ortungsdienste auf diesem Gerät sind derzeit deaktiviert, sodass OwnTracks Ihren aktuellen Standort nicht verfolgen kann.
+
+Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstellungen."</string>
 </resources>

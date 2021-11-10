@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">"Owntracks"</string>
+    <string name="app_name">"OwnTracks"</string>
     <string name="preferencesServer">"Połączenie"</string>
     <string name="preferencesHost">"Host"</string>
     <string name="preferencesPort">"Port"</string>
@@ -79,6 +79,7 @@
     <string name="preferencesCategoryAdvancedLocator">"Lokalizator"</string>
     <string name="preferencesCategoryAdvancedEncryption">"Szyfrowanie"</string>
     <string name="preferencesCategoryAdvancedMisc">"Różne"</string>
+    <string name="contactDetailsTrackerId">"Tracker ID"</string>
     <string name="exportWaypointsToEndpoint">"Publikuj Punkty"</string>
     <string name="preferencesExportFailed">"Nieudany eksport ustawień"</string>
     <string name="preferencesExportSuccess">"Eksport udany"</string>
@@ -96,7 +97,11 @@
     <string name="welcome_heading">"Witaj"</string>
     <string name="welcome_description">"Poniższe kroki pomogą Ci rozpocząć pracę z Owntracks"</string>
     <string name="mode_heading">"Tryb"</string>
-    <string name="locationPermissionRequestDialogMessage">"Owntracks wymaga dostępu do Twojej lokalizacji. Zezwól na niego, zanim rozpoczniesz."</string>
+    <string name="permissions_heading">"Uprawnienia"</string>
+    <string name="permissions_description">"Owntracks wymaga dostępu do Twojej lokalizacji. Zezwól na niego, zanim rozpoczniesz."</string>
+    <string name="permissions_granted">"Uprawnienia zostały udzielone"</string>
+
+    <!-- Fuzzy -->
     <string name="icon_description_owntracks">"Owntracks"</string>
     <string name="enjoy_description">"Wybierz ustawienia z menu i skonfiguruj OwnTracks dla swojego serwera przed użyciem go"</string>
     <string name="done_heading">"Gotowe"</string>
@@ -126,7 +131,7 @@
         <item quantity="one">"%1$d nowe zdarzenie"</item>
         <item quantity="few">"%1$d nowe zdarzenia"</item>
         <item quantity="many">"%1$d nowych zdarzeń"</item>
-        <item quantity="other">"%1$d nowe zdarzenie"</item>
+        <item quantity="other">"%1$d nowych zdarzeń"</item>
     </plurals>
     <string name="ui_fragment_welcome_version_title">"Ograniczenia"</string>
     <string name="ui_fragment_welcome_version_description">"Przez ograniczenia systemu, niektóre funkcje mogą zostać zredukowane.
@@ -159,7 +164,7 @@ Aby utrzymać działanie aplikacji w tle, będzie wyświetlana permanentna notyf
     <string name="notificationChangeMonitoring">"Zmień monitorowanie"</string>
     <string name="preferencesDebugLog">"Informacje debugowania"</string>
     <string name="monitoring_mode">"Monitorowanie"</string>
-    <string name="contactDetailsDistance">"Odległość"</string>
+    <string name="distance_label">"Odległość"</string>
     <string name="preferencesClientId">"ID Klienta"</string>
     <string name="status_endpoint_state_hint">"Stan endpointa"</string>
     <string name="status_endpoint_state_message_hint">"Komunikat stanu endpointa"</string>
@@ -186,6 +191,44 @@ Aby utrzymać działanie aplikacji w tle, będzie wyświetlana permanentna notyf
     <string name="geocoderRateLimited">"Usługa geokodowania została ograniczona. Wstrzymane do %s"</string>
     <string name="geocoderError">"Błąd usługi geokodowania: %s"</string>
     <string name="notificationChannelErrors">"Błędy"</string>
+
+    <!-- Fuzzy -->
     <string name="geocoderProblemNotificationTitle">"Problem geokodowania"</string>
     <string name="geocoderIPAddressRejected">"Adres IP klienta został odrzucony"</string>
+    <string name="backgroundLocationRestrictionNotificationTitle">"Śledzenie pozycji wstrzymane"</string>
+    <string name="backgroundLocationRestrictionNotificationText">"Ta wersja Androida ogranicza OwnTracks możliwość odbierania lokalizacji po uruchomieniu w tle, dopóki aplikacja nie zostanie otwarta. Kliknij to powiadomienie, aby otworzyć aplikację i rozpocząć śledzenie lokalizacji."</string>
+    <string name="preferencesExperimental">"Eksperymentalne"</string>
+    <string name="refresh_log">"Odśwież"</string>
+    <string name="preferencesTheme">"Motyw"</string>
+    <string name="contactDetailsAccuracyValue">"%d m"</string>
+    <string name="contactDetailsDistanceValue">"%,.2f %s"</string>
+    <string name="contactDetailsAltitude">"Wysokość"</string>
+    <string name="contactDetailsBearing">"Kierunek"</string>
+    <string name="contactDetailsDistance">"Odległość"</string>
+    <string name="contactDetailsBattery">"Bateria"</string>
+    <string name="contactDetailsSpeed">"Prędkość"</string>
+    <string name="contactDetailsBearingValue">"%,.0f°"</string>
+    <string name="contactDetailsAltitudeValue">"%,d m"</string>
+    <string name="contactDetailsBatteryValue">"%d %%"</string>
+    <string name="contactDetailsSpeedValue">"%d kph"</string>
+    <string name="preferencesCategoryNotificationErrors">"Błędy i problemy"</string>
+    <string name="preferenceKeyNotificationGeocoderErrors"></string>
+    <string name="preferencesNotificationGeocoderErrors">"Błędy geokodera"</string>
+    <string name="preferencesNotificationGeocoderErrorsSummary">"Wyświetl błędy geokodera, limity szybkości i zdarzenia przekroczenia limitu"</string>
+    <string name="preferencesAdvancedAutostartWarning"></string>
+    <string name="workmanagerInitializationErrorDialogTitle"></string>
+    <string name="workmanagerInitializationErrorDialogOpenSettingsLabel"></string>
+    <string name="workmanagerInitializationErrorDialogMessage"></string>
+    <string name="batteryOptimizationWhitelistDialogTitle"></string>
+    <string name="batteryOptimizationWhitelistDialogMessage"></string>
+    <string name="batteryOptimizationWhitelistDialogButtonLabel"></string>
+    <string name="statusBatteryDozeWhiteListEnabled"></string>
+    <string name="statusBatteryDozeWhiteListDisabled"></string>
+    <string name="locationPermissionRequestDialogMessage"></string>
+    <string name="fixProblemLabel"></string>
+    <string name="locationPermissionNotGrantedNotification"></string>
+    <string name="locationPermissionRequestDialogTitle"></string>
+    <string name="deviceLocationDisabledDialogTitle"></string>
+    <string name="deviceLocationDisabledDialogPositiveButtonLabel"></string>
+    <string name="deviceLocationDisabledDialogMessage"></string>
 </resources>

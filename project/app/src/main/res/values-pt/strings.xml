@@ -79,6 +79,7 @@
     <string name="preferencesCategoryAdvancedLocator">"Localizador"</string>
     <string name="preferencesCategoryAdvancedEncryption">"Encriptação"</string>
     <string name="preferencesCategoryAdvancedMisc">"Diversos"</string>
+    <string name="contactDetailsTrackerId">"Tracker ID"</string>
     <string name="exportWaypointsToEndpoint">"Publicar caminhos"</string>
     <string name="preferencesExportFailed">"Falha ao exportar preferências"</string>
     <string name="preferencesExportSuccess">"Exportação bem sucedida"</string>
@@ -193,11 +194,17 @@
     <string name="preferencesExperimental"></string>
     <string name="refresh_log"></string>
     <string name="preferencesTheme"></string>
+    <string name="contactDetailsAccuracyValue">"%d m"</string>
+    <string name="contactDetailsDistanceValue">"%,.2f %s"</string>
     <string name="contactDetailsAltitude"></string>
     <string name="contactDetailsBearing"></string>
     <string name="contactDetailsDistance"></string>
     <string name="contactDetailsBattery"></string>
     <string name="contactDetailsSpeed"></string>
+    <string name="contactDetailsBearingValue">"%,.0f°"</string>
+    <string name="contactDetailsAltitudeValue">"%,d m"</string>
+    <string name="contactDetailsBatteryValue">"%d %%"</string>
+    <string name="contactDetailsSpeedValue">"%d kph"</string>
     <string name="preferencesCategoryNotificationErrors"></string>
     <string name="preferenceKeyNotificationGeocoderErrors"></string>
     <string name="preferencesNotificationGeocoderErrors"></string>
