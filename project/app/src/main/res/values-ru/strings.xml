@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <!-- So, OwnTracks or Owntracks? -->
     <string name="app_name">"OwnTracks"</string>
     <string name="preferencesServer">"Подключение к серверу"</string>
     <string name="preferencesHost">"Адрес"</string>
@@ -24,8 +22,6 @@
     <string name="preferencesChangelog">"Список изменений"</string>
     <string name="version">"Версия"</string>
     <string name="preferencesReporting">"Отчеты"</string>
-
-    <!-- but contactDetailsTrackerId is untranslated? -->
     <string name="preferencesTrackerId">"Метка на карте"</string>
     <string name="preferencesRepository">"Исходный код"</string>
     <string name="preferencesDocumentation">"Документация"</string>
@@ -83,8 +79,6 @@
     <string name="preferencesCategoryAdvancedLocator">"Локатор"</string>
     <string name="preferencesCategoryAdvancedEncryption">"Шифрование"</string>
     <string name="preferencesCategoryAdvancedMisc">"Прочее"</string>
-
-    <!-- Non-translatable? Why? -->
     <string name="contactDetailsTrackerId">"Метка на карте"</string>
     <string name="exportWaypointsToEndpoint">"Опубликовать места"</string>
     <string name="preferencesExportFailed">"Не удалось экспортировать настройки"</string>
@@ -202,8 +196,6 @@
     <string name="preferencesExperimental">"Экспериментальные"</string>
     <string name="refresh_log">"Обновить"</string>
     <string name="preferencesTheme">"Тема"</string>
-
-    <!-- meters in Russian is "метров", i.e. "%dм" instead if "%d m" -->
     <string name="contactDetailsAccuracyValue">"%dм"</string>
     <string name="contactDetailsDistanceValue">"%,.2f %s"</string>
     <string name="contactDetailsAltitude">"Высота"</string>
@@ -212,12 +204,8 @@
     <string name="contactDetailsBattery">"Батарея"</string>
     <string name="contactDetailsSpeed">"Скорость"</string>
     <string name="contactDetailsBearingValue">"%,.0f°"</string>
-
-    <!-- meters in Russian is "метров", i.e. "%dм" instead if "%d m" -->
     <string name="contactDetailsAltitudeValue">"%,dм"</string>
     <string name="contactDetailsBatteryValue">"%d %%"</string>
-
-    <!-- kph in Russian is "км/ч", i.e. "%d км/ч" instead of "%d kph" -->
     <string name="contactDetailsSpeedValue">"%d км/ч"</string>
     <string name="preferencesCategoryNotificationErrors">"Ошибки и проблемы"</string>
     <string name="preferenceKeyNotificationGeocoderErrors">"Ошибки геокодирования"</string>
@@ -225,8 +213,6 @@
     <string name="preferencesNotificationGeocoderErrorsSummary">"Показывать ошибки геокодирования, превышения лимитов частоты и количества запросов к геокодеру"</string>
     <string name="preferencesAdvancedAutostartWarning">"Ваша версия Android ограничивает возможность определения местоположения при автоматическом запуске приложения до его открытия."</string>
     <string name="workmanagerInitializationErrorDialogTitle">"Ошибка инициализации"</string>
-
-    <!-- Where is it? -->
     <string name="workmanagerInitializationErrorDialogOpenSettingsLabel">"Перейти к настройкам"</string>
     <string name="workmanagerInitializationErrorDialogMessage">"Некоторые компоненты не были корректно инициализированы, поэтому OwnTracks может работать не в полной мере. Может потребоваться переустановка приложения или очистка данных приложения.
 
