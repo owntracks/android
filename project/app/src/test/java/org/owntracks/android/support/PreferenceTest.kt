@@ -27,7 +27,7 @@ class PreferenceTest {
 
     @Test
     fun `given a configuration message, when importing to preferences, all the keys in the config should be added`() {
-        val preferences = Preferences(mockContext, null, preferencesStore)
+        val preferences = Preferences(mockContext, preferencesStore)
         val messageConfiguration = MessageConfiguration()
         messageConfiguration["autostartOnBoot"] = true
         messageConfiguration["host"] = "testhost"
@@ -40,7 +40,7 @@ class PreferenceTest {
 
     @Test
     fun `given a configuration message with an entry value of null, when importing to preferences, the config value should be cleared`() {
-        val preferences = Preferences(mockContext, null, preferencesStore)
+        val preferences = Preferences(mockContext, preferencesStore)
         val messageConfiguration = MessageConfiguration()
         messageConfiguration["host"] = null
         preferences.host = "testHost"
@@ -50,7 +50,7 @@ class PreferenceTest {
 
     @Test
     fun `given a configuration message with an invalid key, when importing to preferences, it should be ignored`() {
-        val preferences = Preferences(mockContext, null, preferencesStore)
+        val preferences = Preferences(mockContext, preferencesStore)
         val messageConfiguration = MessageConfiguration()
         messageConfiguration["Invalid"] = "invalid"
         preferences.importFromMessage(messageConfiguration)
@@ -59,7 +59,7 @@ class PreferenceTest {
 
     @Test
     fun `given a configuration message with a value of the wrong type, when importing to preferences, it should be ignored`() {
-        val preferences = Preferences(mockContext, null, preferencesStore)
+        val preferences = Preferences(mockContext, preferencesStore)
         val messageConfiguration = MessageConfiguration()
         messageConfiguration["host"] = 4
         preferences.importFromMessage(messageConfiguration)
@@ -117,7 +117,7 @@ class PreferenceTest {
 
     @Test
     fun `given an MQTT configuration message, when imported and then exported, the config is merged and all the preference keys are present`() {
-        val preferences = Preferences(mockContext, null, preferencesStore)
+        val preferences = Preferences(mockContext, preferencesStore)
         val messageConfiguration = MessageConfiguration()
         messageConfiguration["autostartOnBoot"] = true
         messageConfiguration["host"] = "testhost"
@@ -148,7 +148,7 @@ class PreferenceTest {
 
     @Test
     fun `given an HTTP configuration message, when imported and then exported, the config is merged and all the preference keys are present`() {
-        val preferences = Preferences(mockContext, null, preferencesStore)
+        val preferences = Preferences(mockContext, preferencesStore)
         val messageConfiguration = MessageConfiguration()
         messageConfiguration["autostartOnBoot"] = true
         messageConfiguration["host"] = "testhost"
@@ -179,7 +179,7 @@ class PreferenceTest {
 
     @Test
     fun `given a Preferences object with no username set, when asking for the topic, the correct username placeholder is populated`() {
-        val preferences = Preferences(mockContext, null, preferencesStore)
+        val preferences = Preferences(mockContext, preferencesStore)
         preferences.username = ""
         preferences.deviceId = "myDevice"
 

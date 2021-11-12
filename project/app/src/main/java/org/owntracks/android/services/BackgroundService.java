@@ -32,9 +32,6 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.lifecycle.LifecycleService;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 import org.jetbrains.annotations.NotNull;
 import org.owntracks.android.R;
 import org.owntracks.android.data.EndpointState;
@@ -65,6 +62,7 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import kotlin.Unit;
 import timber.log.Timber;
 
 @AndroidEntryPoint
@@ -108,9 +106,6 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
 
     @Inject
     Preferences preferences;
-
-    @Inject
-    EventBus eventBus;
 
     @Inject
     Scheduler scheduler;
@@ -183,9 +178,9 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
 
         scheduler.scheduleLocationPing();
 
-        eventBus.register(this);
-
         preferences.registerOnPreferenceChangedListener(this);
+
+        messageProcessor.getLastTransitionMessage().observe(this, this::sendEventNotification);
     }
 
 
@@ -464,6 +459,16 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
         } else {
             Timber.v("Not re-sending message with same timestamp as last");
         }
+        MessageLocation messageLocation = MessageLocation.fromLocation(location);
+        if (lastLocationMessage == null || lastLocationMessage.getTimestamp() < messageLocation.getTimestamp()) {
+            lastLocationMessage = messageLocation;
+            geocoderProvider.resolve(messageLocation, messageLocation1 -> {
+                if (messageLocation1 == lastLocationMessage) {
+                    updateOngoingNotification();
+                }
+                return Unit.INSTANCE;
+            });
+        }
     }
 
     public void requestOnDemandLocationUpdate() {
@@ -537,28 +542,6 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
 
     private boolean missingLocationPermission() {
         return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED;
-    }
-
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void onEvent(MessageTransition message) {
-        Timber.d("transition isIncoming:%s topic:%s", message.isIncoming(), message.getTopic());
-        if (message.isIncoming())
-            sendEventNotification(message);
-    }
-
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void onEvent(Location location) {
-        MessageLocation messageLocation = MessageLocation.fromLocation(location);
-        if (lastLocationMessage == null || lastLocationMessage.getTimestamp() < messageLocation.getTimestamp()) {
-            this.lastLocationMessage = messageLocation;
-            geocoderProvider.resolve(messageLocation, this);
-        }
-    }
-
-    public void onGeocodingProviderResult(MessageLocation m) {
-        if (m == lastLocationMessage) {
-            updateOngoingNotification();
-        }
     }
 
     private NotificationCompat.Builder getEventsNotificationBuilder() {

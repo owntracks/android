@@ -131,15 +131,15 @@ class GeocoderProvider @Inject constructor(
                 else -> null
             }
 
-    fun resolve(messageLocation: MessageLocation, backgroundService: BackgroundService) {
+    fun resolve(messageLocation: MessageLocation, callback: (MessageLocation) -> Unit) {
         if (messageLocation.hasGeocode) {
-            backgroundService.onGeocodingProviderResult(messageLocation)
+            callback(messageLocation)
             return
         }
         MainScope().launch {
             val result = geocoderResolve(messageLocation)
             messageLocation.geocode = geocodeResultToText(result)
-            backgroundService.onGeocodingProviderResult(messageLocation)
+            callback(messageLocation)
             maybeCreateErrorNotification(result)
         }
     }

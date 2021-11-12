@@ -42,7 +42,7 @@ class LoadViewModelTest {
     @Test
     fun `When invalid JSON on an inline owntracks config URL, then the error is correctly set`() {
         val parser = Parser(null)
-        val preferences = Preferences(mockContext, null, preferencesStore)
+        val preferences = Preferences(mockContext, preferencesStore)
         val vm = LoadViewModel(
             preferences, parser, InMemoryWaypointsRepo(),
             TestCoroutineDispatcher()

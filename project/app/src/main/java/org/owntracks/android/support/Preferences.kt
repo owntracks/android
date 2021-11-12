@@ -13,7 +13,6 @@ import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
 import androidx.preference.PreferenceManagerFix
 import dagger.hilt.android.qualifiers.ApplicationContext
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions
-import org.greenrobot.eventbus.EventBus
 import org.owntracks.android.BuildConfig
 import org.owntracks.android.R
 import org.owntracks.android.model.messages.MessageConfiguration
@@ -21,7 +20,6 @@ import org.owntracks.android.services.LocationProcessor
 import org.owntracks.android.services.MessageProcessorEndpointHttp
 import org.owntracks.android.services.MessageProcessorEndpointMqtt
 import org.owntracks.android.services.worker.Scheduler
-import org.owntracks.android.support.Events.ModeChanged
 import org.owntracks.android.support.preferences.PreferenceDataStoreShim
 import timber.log.Timber
 import java.lang.reflect.InvocationTargetException
@@ -36,7 +34,6 @@ import javax.inject.Singleton
 @Singleton
 class Preferences @Inject constructor(
         @ApplicationContext applicationContext: Context,
-        private val eventBus: EventBus?,
         private val preferencesStore: PreferenceDataStoreShim
 ) {
 
@@ -209,10 +206,6 @@ class Preferences @Inject constructor(
         }
         Timber.v("setting mode to: $requestedMode")
         preferencesStore.putInt(getPreferenceKey(R.string.preferenceKeyModeId), requestedMode)
-        if (!init && eventBus != null) {
-            Timber.v("broadcasting mode change event")
-            eventBus.post(ModeChanged(requestedMode))
-        }
     }
 
     fun setMonitoringNext() {

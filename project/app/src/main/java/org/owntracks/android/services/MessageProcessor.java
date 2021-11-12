@@ -4,9 +4,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.test.espresso.idling.CountingIdlingResource;
 
-import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.R;
 import org.owntracks.android.data.EndpointState;
 import org.owntracks.android.data.repos.ContactsRepo;
@@ -19,7 +20,6 @@ import org.owntracks.android.model.messages.MessageCmd;
 import org.owntracks.android.model.messages.MessageLocation;
 import org.owntracks.android.model.messages.MessageTransition;
 import org.owntracks.android.services.worker.Scheduler;
-
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.RunThingsOnOtherThreads;
@@ -36,7 +36,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -49,7 +48,6 @@ import timber.log.Timber;
 
 @Singleton
 public class MessageProcessor implements SharedPreferences.OnSharedPreferenceChangeListener {
-    private final EventBus eventBus;
     private final ContactsRepo contactsRepo;
     private final WaypointsRepo waypointsRepo;
     private final Context applicationContext;
@@ -74,10 +72,11 @@ public class MessageProcessor implements SharedPreferences.OnSharedPreferenceCha
     private ScheduledFuture<?> waitFuture = null;
     private long retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT;
 
+    private final MutableLiveData<MessageTransition> lastTransitionMessage = new MutableLiveData<>();
+
     @Inject
     public MessageProcessor(
             @ApplicationContext Context applicationContext,
-            EventBus eventBus,
             ContactsRepo contactsRepo,
             Preferences preferences,
             WaypointsRepo waypointsRepo,
@@ -91,7 +90,6 @@ public class MessageProcessor implements SharedPreferences.OnSharedPreferenceCha
     ) {
         this.applicationContext = applicationContext;
         this.preferences = preferences;
-        this.eventBus = eventBus;
         this.contactsRepo = contactsRepo;
         this.waypointsRepo = waypointsRepo;
         this.parser = parser;
@@ -339,7 +337,6 @@ public class MessageProcessor implements SharedPreferences.OnSharedPreferenceCha
     void onMessageDelivered(MessageBase messageBase) {
         Timber.d("onMessageDelivered in MessageProcessor Noop. ThreadID: %s", Thread.currentThread());
         endpointStateRepo.setQueueLength(outgoingQueue.size());
-        eventBus.post(messageBase);
     }
 
     void onMessageDeliveryFailedFinal(String messageId) {
@@ -369,6 +366,12 @@ public class MessageProcessor implements SharedPreferences.OnSharedPreferenceCha
             processIncomingMessage((MessageCmd) message);
         } else if (message instanceof MessageTransition) {
             processIncomingMessage((MessageTransition) message);
+        }
+    }
+
+    private void processIncomingMessage(MessageTransition message) {
+        if (message.isIncoming()) {
+            lastTransitionMessage.postValue(message);
         }
     }
 
@@ -452,10 +455,6 @@ public class MessageProcessor implements SharedPreferences.OnSharedPreferenceCha
         }
     }
 
-    private void processIncomingMessage(MessageTransition message) {
-        eventBus.post(message);
-    }
-
     public void stopSendingMessages() {
         Timber.d("Interrupting background sending thread");
         backgroundDequeueThread.interrupt();
@@ -466,5 +465,9 @@ public class MessageProcessor implements SharedPreferences.OnSharedPreferenceCha
         if (Objects.equals(key, applicationContext.getString(R.string.preferenceKeyModeId))) {
             loadOutgoingMessageProcessor(preferences.getMode());
         }
+    }
+
+    public LiveData<MessageTransition> getLastTransitionMessage() {
+        return lastTransitionMessage;
     }
 }

@@ -41,7 +41,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
-import org.greenrobot.eventbus.EventBus
 import org.owntracks.android.App
 import org.owntracks.android.R
 import org.owntracks.android.data.repos.LocationRepo
@@ -95,9 +94,6 @@ class MapActivity : AppCompatActivity(), View.OnClickListener, View.OnLongClickL
 
     @Inject
     lateinit var preferences: Preferences
-
-    @Inject
-    lateinit var eventBus: EventBus
 
     @Inject
     lateinit var geocoderProvider: GeocoderProvider

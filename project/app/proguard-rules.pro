@@ -32,24 +32,6 @@
 -keep class org.eclipse.paho.client.mqttv3.* { *; }
 -keep class org.eclipse.paho.client.mqttv3.*$* { *; }
 
-# GREENDAO
--keep class **$Properties
--dontwarn org.greenrobot.greendao.database.**
--dontwarn rx.**
-
-
-# EVENTBUS
--keepattributes *Annotation*
--keepclassmembers,includedescriptorclasses class ** {
-    @org.greenrobot.eventbus.Subscribe <methods>;
-}
--keep enum org.greenrobot.eventbus.ThreadMode { *; }
-
-# Only required if you use AsyncExecutor
--keepclassmembers class * extends org.greenrobot.eventbus.util.ThrowableFailureEvent {
-    <init>(java.lang.Throwable);
-}
-
 # JACKSON
 -keepattributes *Annotation*,EnclosingMethod,Signature
 -keepnames class com.fasterxml.jackson.** { *; }

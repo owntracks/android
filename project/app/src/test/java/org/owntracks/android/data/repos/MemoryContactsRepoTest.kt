@@ -7,7 +7,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
-import org.greenrobot.eventbus.EventBus
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
@@ -26,7 +25,6 @@ class MemoryContactsRepoTest {
     private lateinit var mockResources: Resources
     private lateinit var mockContext: Context
     private lateinit var messageLocation: MessageLocation
-    private lateinit var eventBus: EventBus
     private lateinit var contactBitmapAndNameMemoryCache: ContactBitmapAndNameMemoryCache
     private var contactsRepo: ContactsRepo? = null
 

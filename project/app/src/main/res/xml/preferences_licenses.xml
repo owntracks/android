@@ -20,24 +20,7 @@
             android:action="android.intent.action.VIEW"
             android:data="https://github.com/eclipse/paho.mqtt.java" />
     </Preference>
-    <Preference
-        android:key="greenrobot-eventbus"
-        android:summary="Greenrobot"
-        android:title="EventBus"
-        app:iconSpaceReserved="false">
-        <intent
-            android:action="android.intent.action.VIEW"
-            android:data="https://github.com/greenrobot/EventBus" />
-    </Preference>
-    <Preference
-        android:key="greenrobot-greendao"
-        android:summary="Greenrobot"
-        android:title="GreenDao"
-        app:iconSpaceReserved="false">
-        <intent
-            android:action="android.intent.action.VIEW"
-            android:data="https://github.com/greenrobot/greenDAO" />
-    </Preference>
+
     <Preference
         android:key="jackson"
         android:summary="Fasterxml"

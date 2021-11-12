@@ -150,7 +150,8 @@ android {
                 it.systemProperties["junit.jupiter.execution.parallel.enabled"] = true
                 it.systemProperties["junit.jupiter.execution.parallel.mode.default"] = "concurrent"
                 it.maxParallelForks =
-                    (Runtime.getRuntime().availableProcessors() / 4).takeIf { parallelism -> parallelism > 0 } ?: 1
+                    (Runtime.getRuntime()
+                        .availableProcessors() / 4).takeIf { parallelism -> parallelism > 0 } ?: 1
             }
         }
     }
@@ -182,9 +183,6 @@ android {
 
 kapt {
     correctErrorTypes = true
-    arguments {
-        arg("eventBusIndex", "org.owntracks.android.EventBusIndex")
-    }
 }
 
 tasks.withType<JavaCompile>().configureEach {
@@ -221,8 +219,6 @@ dependencies {
     implementation("com.google.dagger:hilt-android:${rootProject.extra["dagger-version"]}")
     implementation("androidx.hilt:hilt-work:1.0.0")
 
-    implementation("org.greenrobot:eventbus:3.2.0")
-
     // Connectivity
     implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
     implementation("com.squareup.okhttp3:okhttp:${okHttpVersion}")
@@ -258,8 +254,7 @@ dependencies {
     kapt("com.sun.xml.bind:jaxb-impl:$jaxbVersion")
 
     // Preprocessors
-    kapt("org.greenrobot:eventbus-annotation-processor:3.2.0")
-    kapt("com.google.dagger:hilt-android-compiler:${rootProject.extra["dagger-version"]}")
+    kapt("com.google.dagger:hilt-compiler:${rootProject.extra["dagger-version"]}")
 
     kaptTest("com.google.dagger:hilt-android-compiler:${rootProject.extra["dagger-version"]}")
 

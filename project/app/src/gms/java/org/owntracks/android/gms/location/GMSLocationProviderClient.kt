@@ -49,7 +49,7 @@ class GMSLocationProviderClient(
 
         val gmsCallBack = object : com.google.android.gms.location.LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
-                Timber.e("GMS location received. Is mock? ${locationResult.lastLocation.isFromMockProvider} ${locationResult.lastLocation}")
+                Timber.d("GMS location received. Is mock? ${locationResult.lastLocation.isFromMockProvider} ${locationResult.lastLocation}")
                 clientCallBack.onLocationResult(
                     org.owntracks.android.location.LocationResult(
                         locationResult.lastLocation

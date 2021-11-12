@@ -46,7 +46,7 @@ class PreferencesGettersAndSetters(
 
     @Test
     fun `when setting a preference ensure that the preference is set correctly on export`() {
-        val preferences = Preferences(mockContext, null, preferencesStore)
+        val preferences = Preferences(mockContext, preferencesStore)
         val setter =
             Preferences::class.java.getMethod("set$preferenceMethodName", preferenceType.java)
         if (httpOnlyMode) {
@@ -59,7 +59,7 @@ class PreferencesGettersAndSetters(
 
     @Test
     fun `when importing a configuration ensure that the supplied preference is set to the given value`() {
-        val preferences = Preferences(mockContext, null, preferencesStore)
+        val preferences = Preferences(mockContext, preferencesStore)
         val messageConfiguration = MessageConfiguration()
         messageConfiguration[preferenceName] = preferenceValue
         preferences.importFromMessage(messageConfiguration)
