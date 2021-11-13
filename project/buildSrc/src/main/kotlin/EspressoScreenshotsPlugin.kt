@@ -1,5 +1,4 @@
 import com.android.build.gradle.AppExtension
-import org.apache.tools.ant.taskdefs.ExecTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Exec
@@ -7,126 +6,57 @@ import org.gradle.kotlin.dsl.register
 import java.io.File
 
 class EspressoScreenshotsPlugin : Plugin<Project> {
-    private val screenshotsDeviceFolder = "/sdcard/Download/testscreenshots"
+    // This is where the androidx test files service puts saved bitmaps
+    @Suppress("SdCardPath")
+    private val screenshotsDeviceFolder = "/sdcard/googletest/test_outputfiles"
 
     override fun apply(project: Project) {
+        // This is where AGP writes out connected test reports
         val reportsDirectoryPath = "${project.buildDir}/reports/androidTests/connected/flavors/%s"
-
         val android: AppExtension? = project.extensions.findByType(AppExtension::class.java)
-
         android?.run {
             productFlavors.all {
-                val flavorName = this.name.capitalize()
+                val flavorName = this.name
+                val flavorTestReportPath = reportsDirectoryPath.format(flavorName)
                 project.run {
-                    tasks.register<Exec>("create${flavorName}ScreenshotDirectory") {
+                    val adbExecutable = android.adbExecutable.absolutePath
+                    tasks.register<Exec>("clear${flavorName.capitalize()}Screenshots") {
                         group = "reporting"
                         description =
-                            "Creates $flavorName screenshot directory on connected device"
-                        executable = "${android.adbExecutable}"
-                        args(mutableListOf("shell", "mkdir", "-p", screenshotsDeviceFolder))
-                    }
-                    tasks.register<Exec>("clear${flavorName}Screenshots") {
-                        group = "reporting"
-                        description =
-                            "Removes ${flavorName} screenshots from connected device"
-                        executable = "${android.adbExecutable}"
-                        args("shell", "rm", "-rf", screenshotsDeviceFolder)
-                    }
-
-                    tasks.register<Exec>("fetch${flavorName}Screenshots") {
-                        group = "reporting"
-                        description =
-                            "Fetches ${flavorName} espresso screenshots from the device"
-                        executable = "${android.adbExecutable}"
+                            "Removes $flavorName screenshots from connected device"
+                        executable = adbExecutable
                         args(
-                            "pull",
-                            screenshotsDeviceFolder,
-                            reportsDirectoryPath.format(flavorName)
+                            "shell", "rm", "-rf", screenshotsDeviceFolder
                         )
-                        dependsOn("create${flavorName}ScreenshotDirectory")
+                    }
+
+                    tasks.register<Exec>("fetch${flavorName.capitalize()}Screenshots") {
+                        group = "reporting"
+                        description = "Fetches $flavorName espresso screenshots from the device"
+                        executable = adbExecutable
+                        args(
+                            "pull", screenshotsDeviceFolder, reportsDirectoryPath.format(flavorName)
+                        )
                         doFirst {
-                            File(reportsDirectoryPath.format(flavorName)).mkdirs()
+                            File(flavorTestReportPath).mkdirs()
                         }
                     }
 
-                    tasks.register("embed${flavorName}Screenshots") {
+                    tasks.register<EmbedScreenshotsInTestReport>("embed${flavorName.capitalize()}Screenshots") {
                         group = "reporting"
-                        description =
-                            "Embeds the ${flavorName} screenshots in the test report"
-                        dependsOn("fetch${flavorName}Screenshots")
-                        finalizedBy("clear${flavorName}Screenshots")
-                        doFirst {
-                            val reportsPath = reportsDirectoryPath.format(flavorName)
-                            val screenshotsDirectory = File(reportsPath, "testscreenshots/")
-                            if (!screenshotsDirectory.exists()) {
-                                println("Could not find screenshots. Skipping...")
-                                return@doFirst
-                            }
-                            screenshotsDirectory
-                                .listFiles()!!
-                                .forEach { testClassDirectory ->
-                                    val testClassName = testClassDirectory.name
-                                    testClassDirectory.listFiles()?.forEach failedFile@{
-                                        val testName = it.name
-                                        val testNameWithoutExtension = it.nameWithoutExtension
-                                        val testClassJunitReportFile =
-                                            File(reportsPath, "${testClassName}.html")
-                                        if (!testClassJunitReportFile.exists()) {
-                                            println("Could not find JUnit report file for test class '${testClassJunitReportFile}'")
-                                            return@failedFile
-                                        }
-                                        val testJunitReportContent =
-                                            testClassJunitReportFile.readText()
-
-                                        val failedHeaderPatternToFind =
-                                            "<h3 class=\"failures\">${testNameWithoutExtension}</h3>"
-
-                                        val failedPatternToReplace =
-                                            "$failedHeaderPatternToFind <img src=\"testscreenshots/${testClassName}/${testName}\" width =\"360\" />"
-                                        val successRecordPatternToFind =
-                                            "<td>${testNameWithoutExtension}</td>"
-                                        val successPatternToReplace =
-                                            "<td>${testNameWithoutExtension} <a href=\"testscreenshots/${testClassName}/${testName}\">(screenshot)</a></td>"
-
-                                        testClassJunitReportFile.writeText(
-                                            testJunitReportContent
-                                                .replace(
-                                                    failedHeaderPatternToFind,
-                                                    failedPatternToReplace
-                                                )
-                                                .replace(
-                                                    successRecordPatternToFind,
-                                                    successPatternToReplace
-                                                )
-                                        )
-                                    }
-                                }
-                        }
+                        description = "Embeds the $flavorName screenshots in the test report"
+                        dependsOn("fetch${flavorName.capitalize()}Screenshots")
+                        finalizedBy("clear${flavorName.capitalize()}Screenshots")
+                        reportsPath = flavorTestReportPath
                     }
                 }
             }
             project.tasks.whenTaskAdded {
-                when(name) {
+                when (name) {
                     "connectedGmsDebugAndroidTest" -> finalizedBy("embedGmsScreenshots")
                     "connectedOssDebugAndroidTest" -> finalizedBy("embedOssScreenshots")
                 }
             }
-
         }
     }
 }
-
-abstract class CreateScreenshotDirectory : ExecTask() {
-
-}
-
-abstract class ClearScreenshots : ExecTask() {
-    override fun init() {
-        super.init()
-
-    }
-}
-
-abstract class FetchScreenshots : ExecTask() {}
-
-abstract class EmbedScreenshots : ExecTask() {}

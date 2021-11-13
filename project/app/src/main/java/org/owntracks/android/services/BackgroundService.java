@@ -327,7 +327,7 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
                 .setOngoing(true);
 
         if (android.os.Build.VERSION.SDK_INT >= 23) {
-            activeNotificationCompatBuilder.setColor(getColor(R.color.primary))
+            activeNotificationCompatBuilder.setColor(getColor(com.mikepenz.materialize.R.color.primary))
                     .setCategory(NotificationCompat.CATEGORY_SERVICE)
                     .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
         }
@@ -444,7 +444,7 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
                 .setContentText(summary)
                 .setGroup(NOTIFICATION_GROUP_EVENTS) // same as group of single notifications
                 .setGroupSummary(true)
-                .setColor(getColor(R.color.primary))
+                .setColor(getColor(com.mikepenz.materialize.R.color.primary))
                 .setAutoCancel(true)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setSmallIcon(R.drawable.ic_owntracks_80)
@@ -731,7 +731,7 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            eventsNotificationCompatBuilder.setColor(getColor(R.color.primary));
+            eventsNotificationCompatBuilder.setColor(getColor(com.mikepenz.materialize.R.color.primary));
         }
         return eventsNotificationCompatBuilder;
     }
