@@ -177,7 +177,7 @@ val okHttpVersion = "4.9.1"
 val jacksonVersion = "2.12.2"
 val materialDialogsVersion = "0.9.6.0"
 val espressoVersion = "3.4.0"
-val androidxTestVersion = "1.4.0"
+val androidxTestVersion = "1.4.1-alpha03"
 val kotlinCoroutinesVersion = "1.4.1"
 val jaxbVersion = "3.0.1"
 
@@ -247,7 +247,6 @@ dependencies {
     testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
     testImplementation("android.arch.core:core-testing:1.1.1")
 
-
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
     androidTestImplementation("androidx.test:core-ktx:${androidxTestVersion}")
     androidTestImplementation("com.adevinta.android:barista:4.2.0") {
@@ -257,6 +256,8 @@ dependencies {
 
     androidTestImplementation("androidx.test:rules:${androidxTestVersion}")
     androidTestImplementation("androidx.test:runner:${androidxTestVersion}")
+
+    androidTestUtil("androidx.test.services:test-services:${androidxTestVersion}")
 }
 
 
