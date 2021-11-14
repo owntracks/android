@@ -190,7 +190,7 @@ dependencies {
     implementation("androidx.fragment:fragment-ktx:1.3.5")
     implementation("androidx.core:core-ktx:1.5.0")
     implementation("androidx.test.espresso:espresso-idling-resource:${espressoVersion}")
-    implementation("androidx.lifecycle:lifecycle-common-java8:2.3.1")
+    implementation("androidx.lifecycle:lifecycle-common-java8:2.4.0")
 
     // Explicit dependency on conscrypt to give up-to-date TLS support on all devices
     implementation("org.conscrypt:conscrypt-android:2.5.2")
