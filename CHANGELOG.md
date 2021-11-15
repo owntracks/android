@@ -4,9 +4,9 @@
 
 ### New features
 
-* Added Japanese, Czech and partial Portuguese, Chinese translations. Mant thanks to all the contributors!
+* Added Japanese, Czech and partial Portuguese, Chinese translations. Many thanks to all the contributors!
 * Device location enable / disable is now detected, along with location permissions on the map view. Location permissions no longer asked for in the welcome screen, and it's now possible to use without granting location permissions (or enabling device location). (#1102)
-* Battery doze whitelisting in Status screen can now take you to the relavent settings page
+* Battery doze whitelisting in Status screen can now take you to the relevant settings page
 * Connection timeout is now configurable with `connectionTimeoutSeconds` preference
 * [OSS] Significant location mode now listens to GPS as well as passive / network sources (#1096)
 
@@ -151,16 +151,16 @@
 * Fixed a bug preventing users from putting the mode into low power mode
 * Stale incoming locations are only discarded if the preference is set
 * All messages have the current time populated into the `tst` field, as opposed to the time of the last location fix
-* Better reliability in reading from mis-typed preferences.
+* Better reliability in reading from mistyped preferences.
 * Few general lint / stability fixes
 
 ## Version 2.1.3
 
 ### New features
 
-* `dontReuseHttpClient` config key to create a new HTTP client on every request. Can fix stuck queue on certain devives (see #656)
+* `dontReuseHttpClient` config key to create a new HTTP client on every request. Can fix stuck queue on certain devices (see #656)
 * Removed locator interval and displacement UI settings because they were misunderstood causing too much confusion for many users
-* made locator accuracy configurable in signifficant mode with locatorPriority configuration key
+* made locator accuracy configurable in significant mode with locatorPriority configuration key
 * Improve display of error conditions
 * Remote reportLocation command triggers new location fix (thanks to @grheard)
 * Added debug log toggle in preferences
