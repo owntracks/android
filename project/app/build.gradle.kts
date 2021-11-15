@@ -245,7 +245,7 @@ dependencies {
 
     testImplementation("androidx.test:core:${androidxTestVersion}")
     testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
-    testImplementation("android.arch.core:core-testing:1.1.1")
+    testImplementation("androidx.arch.core:core-testing:2.1.0")
 
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
     androidTestImplementation("androidx.test:core-ktx:${androidxTestVersion}")

@@ -26,10 +26,7 @@
 
     <!-- To locate the device -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
-    <!-- To access Google Play Services -->
-    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
-
+    
     <!-- API v28 requires this for foreground services -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
@@ -53,16 +50,6 @@
             android:authorities="${applicationId}.androidx-startup"
             tools:node="remove">
         </provider>
-
-
-        <!-- Maps SDK requires this as of API v28 -->
-        <uses-library
-            android:name="org.apache.http.legacy"
-            android:required="false" />
-
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/GOOGLE_MAPS_API_KEY" />
 
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"
