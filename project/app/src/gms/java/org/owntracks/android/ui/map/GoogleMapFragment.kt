@@ -16,22 +16,14 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.*
 import dagger.hilt.android.AndroidEntryPoint
 import org.owntracks.android.R
-import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.databinding.GoogleMapFragmentBinding
 import org.owntracks.android.gms.location.toGMSLatLng
 import org.owntracks.android.gms.location.toGMSLocationSource
-import org.owntracks.android.location.LocationSource
 import timber.log.Timber
 import java.util.*
 
 @AndroidEntryPoint
 class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallback {
-    constructor(locationSource: LocationSource, locationRepo: LocationRepo?) : this() {
-        this.locationSource = locationSource.toGMSLocationSource()
-        this.locationRepo = locationRepo
-    }
-
-    private var locationRepo: LocationRepo? = null
     private var locationSource: com.google.android.gms.maps.LocationSource? = null
     private var googleMap: GoogleMap? = null
     private var binding: GoogleMapFragmentBinding? = null
@@ -49,9 +41,6 @@ class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallba
         mapView.getMapAsync(this)
 
         if (activity is MapActivity) {
-            if (locationRepo == null) {
-                locationRepo = (activity as MapActivity).locationRepo
-            }
             if (locationSource == null) {
                 locationSource = (activity as MapActivity).mapLocationSource.toGMSLocationSource()
             }
@@ -92,12 +81,12 @@ class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallba
 
             setMapStyle()
 
-            if (locationRepo?.currentLocation != null) {
+            if (locationRepo.currentLocation != null) {
                 moveCamera(
                     CameraUpdateFactory.newLatLngZoom(
                         LatLng(
-                            locationRepo!!.currentLocation!!.latitude,
-                            locationRepo!!.currentLocation!!.longitude
+                            locationRepo.currentLocation!!.latitude,
+                            locationRepo.currentLocation!!.longitude
                         ), ZOOM_LEVEL_STREET
                     )
                 )
@@ -163,6 +152,10 @@ class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallba
 
     override fun myLocationEnabled() {
         initMap()
+    }
+
+    override fun setMapLocationSource(mapLocationSource: MapLocationSource) {
+        this.locationSource = mapLocationSource.toGMSLocationSource()
     }
 
     override fun removeMarker(id: String) {

@@ -51,7 +51,6 @@ import org.owntracks.android.location.LocationCallback;
 import org.owntracks.android.location.LocationProviderClient;
 import org.owntracks.android.location.LocationRequest;
 import org.owntracks.android.location.LocationResult;
-import org.owntracks.android.location.LocationServices;
 import org.owntracks.android.location.geofencing.Geofence;
 import org.owntracks.android.location.geofencing.GeofencingClient;
 import org.owntracks.android.location.geofencing.GeofencingEvent;
@@ -100,9 +99,6 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
 
     private static final String INTENT_ACTION_BOOT_COMPLETED = "android.intent.action.BOOT_COMPLETED";
     private static final String INTENT_ACTION_PACKAGE_REPLACED = "android.intent.action.MY_PACKAGE_REPLACED";
-
-    private LocationProviderClient locationProviderClient;
-    private GeofencingClient geofencingClient;
 
     private LocationCallback locationCallback;
     private LocationCallback locationCallbackOnDemand;
@@ -154,13 +150,18 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
     @Inject
     MessageProcessor messageProcessor;
 
+    @Inject
+    GeofencingClient geofencingClient;
+
+    @Inject
+    LocationProviderClient locationProviderClient;
+
     @Override
     public void onCreate() {
         super.onCreate();
         Timber.v("Background service onCreate. ThreadID: %s", Thread.currentThread());
         serviceBridge.bind(this);
-        locationProviderClient = LocationServices.INSTANCE.getLocationProviderClient(this, preferences);
-        geofencingClient = LocationServices.INSTANCE.getGeofencingClient(this);
+
         notificationManagerCompat = NotificationManagerCompat.from(this);
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -515,8 +516,8 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
         request.setExpirationDuration(TimeUnit.MINUTES.toMillis(1));
 
         Timber.d("On demand location request");
-        LocationProviderClient client = LocationServices.INSTANCE.getLocationProviderClient(this, preferences);
-        client.requestLocationUpdates(request, locationCallbackOnDemand, runThingsOnOtherThreads.getBackgroundLooper());
+
+        locationProviderClient.requestLocationUpdates(request, locationCallbackOnDemand, runThingsOnOtherThreads.getBackgroundLooper());
     }
 
     @SuppressWarnings("MissingPermission")

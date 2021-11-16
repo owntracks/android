@@ -8,10 +8,6 @@ import dagger.hilt.android.components.ActivityComponent
 @InstallIn(ActivityComponent::class)
 @Module
 abstract class LoadActivityModule {
-//    @Binds
-//    @ActivityScoped
-//    abstract fun bindActivity(a: LoadActivity?): AppCompatActivity?
-
     @Binds
     abstract fun bindViewModel(viewModel: LoadViewModel): LoadMvvm.ViewModel<LoadMvvm.View>?
 }

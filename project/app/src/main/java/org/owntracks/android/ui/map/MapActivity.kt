@@ -37,16 +37,12 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.owntracks.android.App
-import org.owntracks.android.BuildConfig.FLAVOR
 import org.owntracks.android.R
 import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.databinding.UiMapBinding
 import org.owntracks.android.geocoding.GeocoderProvider
-import org.owntracks.android.gms.location.toGMSLatLng
 import org.owntracks.android.location.LatLng
 import org.owntracks.android.location.LocationProviderClient
-import org.owntracks.android.location.LocationServices
-import org.owntracks.android.location.LocationSource
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.perfLog
 import org.owntracks.android.services.BackgroundService
@@ -55,12 +51,10 @@ import org.owntracks.android.services.LocationProcessor
 import org.owntracks.android.services.MessageProcessorEndpointHttp
 import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.support.Preferences.Companion.EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION
-import org.owntracks.android.support.Preferences.Companion.EXPERIMENTAL_FEATURE_USE_OSM_MAP
 import org.owntracks.android.support.RequirementsChecker
 import org.owntracks.android.support.RunThingsOnOtherThreads
 import org.owntracks.android.ui.base.BaseActivity
 import org.owntracks.android.ui.base.navigator.Navigator
-import org.owntracks.android.ui.map.osm.OSMMapFragment
 import org.owntracks.android.ui.welcome.WelcomeActivity
 import timber.log.Timber
 import javax.inject.Inject
@@ -73,12 +67,11 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
     lateinit var locationLifecycleObserver: LocationLifecycleObserver
     private var bottomSheetBehavior: BottomSheetBehavior<LinearLayoutCompat>? = null
     private var menu: Menu? = null
-    private var locationProviderClient: LocationProviderClient? = null
     private lateinit var mapFragment: MapFragment
     private var sensorManager: SensorManager? = null
     private var orientationSensor: Sensor? = null
 
-    internal lateinit var mapLocationSource: LocationSource
+    internal lateinit var mapLocationSource: MapLocationSource
     private lateinit var locationServicesAlertDialog: AlertDialog
     private lateinit var locationPermissionsRationaleAlertDialog: AlertDialog
 
@@ -105,6 +98,12 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
 
     @Inject
     lateinit var requirementsChecker: RequirementsChecker
+
+    @Inject
+    lateinit var locationProviderClient: LocationProviderClient
+
+    @Inject
+    lateinit var mapFragmentFactory: IMapFragmentFactory
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -148,15 +147,14 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
             locationLifecycleObserver = LocationLifecycleObserver(activityResultRegistry)
             lifecycle.addObserver(locationLifecycleObserver)
 
-            locationProviderClient = LocationServices.getLocationProviderClient(this, preferences)
             mapLocationSource =
                 MapLocationSource(
-                    locationProviderClient!!,
+                    locationProviderClient,
                     viewModel!!.mapLocationUpdateCallback
                 )
 
             if (savedInstanceState == null || supportFragmentManager.findFragmentByTag("map") == null) {
-                mapFragment = getMapFragment()
+                mapFragment = mapFragmentFactory.getMapFragment(null, mapLocationSource)
                 supportFragmentManager.commit {
                     setReorderingAllowed(true)
                     replace(R.id.mapFragment, mapFragment, "map")
@@ -238,16 +236,6 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
             })
         }
     }
-
-    private fun getMapFragment() =
-        if (preferences.isExperimentalFeatureEnabled(EXPERIMENTAL_FEATURE_USE_OSM_MAP)) {
-            OSMMapFragment()
-        } else {
-            when (FLAVOR) {
-                "gms" -> GoogleMapFragment(mapLocationSource, locationRepo)
-                else -> OSMMapFragment(mapLocationSource, locationRepo)
-            }
-        }
 
     internal fun checkAndRequestMyLocationCapability(explicitUserAction: Boolean): Boolean =
         checkAndRequestLocationPermissions(explicitUserAction) &&
@@ -394,25 +382,11 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
 
 
     override fun onResume() {
-        if (FLAVOR == "gms") {
-            if (mapFragment is GoogleMapFragment && preferences.isExperimentalFeatureEnabled(
-                    EXPERIMENTAL_FEATURE_USE_OSM_MAP
-                )
-            ) {
-                mapFragment = OSMMapFragment(mapLocationSource, locationRepo)
-                supportFragmentManager.commit(true) {
-                    this.replace(R.id.mapFragment, mapFragment)
-                }
-            } else if (mapFragment is OSMMapFragment && !preferences.isExperimentalFeatureEnabled(
-                    EXPERIMENTAL_FEATURE_USE_OSM_MAP
-                )
-            ) {
-                mapFragment = GoogleMapFragment(mapLocationSource, locationRepo)
-                supportFragmentManager.commit(true) {
-                    this.replace(R.id.mapFragment, mapFragment)
-                }
-            }
+        mapFragment = mapFragmentFactory.getMapFragment(mapFragment, mapLocationSource)
+        supportFragmentManager.commit(true) {
+            this.replace(R.id.mapFragment, mapFragment)
         }
+
         if (preferences.isExperimentalFeatureEnabled(
                 EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION
             )
@@ -598,10 +572,9 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
                 val c = viewModel!!.contact
                 c.value?.latLng?.run {
                     try {
-                        val l = this.toGMSLatLng()
                         val intent = Intent(
                             Intent.ACTION_VIEW,
-                            Uri.parse("google.navigation:q=${l.latitude},${l.longitude}")
+                            Uri.parse("google.navigation:q=${latitude},${longitude}")
                         )
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         startActivity(intent)

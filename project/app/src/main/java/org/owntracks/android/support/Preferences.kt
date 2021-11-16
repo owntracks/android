@@ -913,12 +913,12 @@ class Preferences @Inject constructor(
     private val deviceIdDefault: String
         get() = // Use device name (Mako, Surnia, etc. and strip all non alpha digits)
             Build.DEVICE?.replace(" ", "-")?.replace("[^a-zA-Z0-9]+".toRegex(), "")
-                ?.toLowerCase(Locale.getDefault())
+                ?.lowercase(Locale.getDefault())
                 ?: "unknown"
 
 
     private val clientIdDefault: String
-        get() = (username + deviceId).replace("\\W".toRegex(), "").toLowerCase(Locale.getDefault())
+        get() = (username + deviceId).replace("\\W".toRegex(), "").lowercase(Locale.getDefault())
 
     val pubTopicLocations: String
         get() = pubTopicBase

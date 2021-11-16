@@ -1,0 +1,37 @@
+package org.owntracks.android.ui.welcome
+
+import android.os.Build
+import androidx.fragment.app.Fragment
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import dagger.hilt.android.scopes.ActivityScoped
+import org.owntracks.android.support.RequirementsChecker
+import java.util.*
+
+@ActivityScoped
+class WelcomeAdapter constructor(
+    welcomeActivity: BaseWelcomeActivity,
+    private val requirementsChecker: RequirementsChecker
+) : FragmentStateAdapter(welcomeActivity) {
+    private val fragments = ArrayList<Fragment>()
+    fun setupFragments(
+        introFragment: Fragment,
+        versionFragment: Fragment,
+        playFragment: Fragment,
+        finishFragment: Fragment
+    ) {
+        fragments.add(introFragment)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) fragments.add(versionFragment)
+        if (!requirementsChecker.isPlayServicesCheckPassed()) {
+            fragments.add(playFragment)
+        }
+        fragments.add(finishFragment)
+    }
+
+    override fun getItemCount(): Int {
+        return fragments.size
+    }
+
+    override fun createFragment(position: Int): Fragment {
+        return fragments[position]
+    }
+}

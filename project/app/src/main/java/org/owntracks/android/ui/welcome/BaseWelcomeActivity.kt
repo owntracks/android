@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.viewpager2.widget.ViewPager2
-import dagger.hilt.android.AndroidEntryPoint
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiWelcomeBinding
 import org.owntracks.android.support.RequirementsChecker
@@ -15,13 +14,12 @@ import org.owntracks.android.ui.base.navigator.Navigator
 import org.owntracks.android.ui.map.MapActivity
 import org.owntracks.android.ui.welcome.finish.FinishFragment
 import org.owntracks.android.ui.welcome.intro.IntroFragment
-import org.owntracks.android.ui.welcome.permission.PlayFragment
 import org.owntracks.android.ui.welcome.version.VersionFragment
 import timber.log.Timber
 import javax.inject.Inject
 
-@AndroidEntryPoint
-class WelcomeActivity : BaseActivity<UiWelcomeBinding?, WelcomeViewModel?>(), WelcomeMvvm.View {
+abstract class BaseWelcomeActivity : BaseActivity<UiWelcomeBinding?, WelcomeViewModel?>(),
+    WelcomeMvvm.View {
 
     @Inject
     lateinit var navigator: Navigator
@@ -36,16 +34,12 @@ class WelcomeActivity : BaseActivity<UiWelcomeBinding?, WelcomeViewModel?>(), We
     lateinit var versionFragment: VersionFragment
 
     @Inject
-    lateinit var playFragment: PlayFragment
-
-    @Inject
     lateinit var finishFragment: FinishFragment
 
     private var welcomeAdapter: WelcomeAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        welcomeAdapter = WelcomeAdapter(this, requirementsChecker)
         if (requirementsChecker.areRequirementsMet()) {
             navigator.startActivity(MapActivity::class.java, null, Intent.FLAG_ACTIVITY_NEW_TASK)
             finish()
@@ -54,12 +48,7 @@ class WelcomeActivity : BaseActivity<UiWelcomeBinding?, WelcomeViewModel?>(), We
         bindAndAttachContentView(R.layout.ui_welcome, savedInstanceState)
         setHasEventBus(false)
 
-        welcomeAdapter!!.setupFragments(
-            introFragment,
-            versionFragment,
-            playFragment,
-            finishFragment
-        )
+        welcomeAdapter = WelcomeAdapter(this, requirementsChecker).apply { addFragmentsToAdapter(this) }
 
         binding!!.viewPager.adapter = welcomeAdapter
         binding!!.viewPager.registerOnPageChangeCallback(object :
@@ -78,6 +67,8 @@ class WelcomeActivity : BaseActivity<UiWelcomeBinding?, WelcomeViewModel?>(), We
         Timber.v("pager setup with %s fragments", welcomeAdapter!!.itemCount)
         buildPagerIndicator()
     }
+
+    abstract fun addFragmentsToAdapter(welcomeAdapter: WelcomeAdapter)
 
     override fun setPagerIndicator(position: Int) {
         if (position < welcomeAdapter!!.itemCount) {
@@ -120,13 +111,6 @@ class WelcomeActivity : BaseActivity<UiWelcomeBinding?, WelcomeViewModel?>(), We
             finish()
         } else {
             binding!!.vm!!.moveBack()
-        }
-    }
-
-    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == PlayFragment.PLAY_SERVICES_RESOLUTION_REQUEST) {
-            playFragment.onPlayServicesResolutionResult()
         }
     }
 

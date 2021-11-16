@@ -147,12 +147,7 @@ android {
     productFlavors {
         create("gms") {
             dimension = "locationProvider"
-            sourceSets {
-                getByName("main").java.srcDirs("src/gms/java")
-                getByName("main").res.srcDirs("src/gms/res")
-            }
             dependencies {
-                // Play Services libraries
                 implementation("com.google.android.gms:play-services-maps:17.0.1")
                 implementation("com.google.android.gms:play-services-location:18.0.0")
             }
@@ -290,7 +285,7 @@ androidComponents {
             for (output in variant.outputs) {
                 output.versionCode.set(this)
             }
-        } ?:run {
+        } ?: run {
             val minusOne = System.getenv("MAKE_APK_SAME_VERSION_CODE_AS_GOOGLE_PLAY")
             if (!minusOne.isNullOrEmpty()) {
                 for (output in variant.outputs) {

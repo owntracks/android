@@ -16,14 +16,14 @@ import java.util.concurrent.TimeUnit
  * @property locationProviderClient the client used to request high accuracy location updates
  * @property locationUpdateCallback an additional [LocationCallback] to be called on location update
  */
-class MapLocationSource internal constructor(
+open class MapLocationSource internal constructor(
     private val locationProviderClient: LocationProviderClient,
     private val locationUpdateCallback: LocationCallback
-) : LocationSource {
-    private var cachedOnLocationChangedListener: LocationSource.OnLocationChangedListener? = null
+) {
+    private var cachedOnLocationChangedListener: OnLocationChangedListener? = null
     private var callbackWrapper: LocationCallback? = null
     private var lastKnownLocation: Location? = null
-    override fun activate(onLocationChangedListener: LocationSource.OnLocationChangedListener) {
+    open fun activate(onLocationChangedListener: OnLocationChangedListener) {
         Timber.d("Activating mapLocationSource with locationChangedListener=${onLocationChangedListener.hashCode()}")
         cachedOnLocationChangedListener = onLocationChangedListener
         callbackWrapper = object : LocationCallback {
@@ -52,15 +52,15 @@ class MapLocationSource internal constructor(
         }
     }
 
-    override fun reactivate() {
+    open fun reactivate() {
         Timber.d("Reactivating MapLocationSource with locationChangedListener=${cachedOnLocationChangedListener?.hashCode() ?: "none"}")
         cachedOnLocationChangedListener?.run(this::activate)
     }
 
-    override fun deactivate() {
+    open fun deactivate() {
         Timber.d("Deactivating mapLocationSource with locationChangedListener=${cachedOnLocationChangedListener?.hashCode() ?: "none"}")
         callbackWrapper?.run(locationProviderClient::removeLocationUpdates)
     }
 
-    override fun getLastKnownLocation(): Location? = lastKnownLocation
+    open fun getLastKnownLocation(): Location? = lastKnownLocation
 }

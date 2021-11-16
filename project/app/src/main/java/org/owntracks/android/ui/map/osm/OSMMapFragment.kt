@@ -20,26 +20,19 @@ import org.osmdroid.views.overlay.TilesOverlay
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import org.owntracks.android.R
-import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.databinding.OsmMapFragmentBinding
 import org.owntracks.android.location.LatLng
-import org.owntracks.android.location.LocationSource
 import org.owntracks.android.location.toGeoPoint
 import org.owntracks.android.location.toOSMLocationSource
 import org.owntracks.android.ui.map.MapActivity
 import org.owntracks.android.ui.map.MapActivity.Companion.STARTING_LATITUDE
 import org.owntracks.android.ui.map.MapActivity.Companion.STARTING_LONGITUDE
 import org.owntracks.android.ui.map.MapFragment
+import org.owntracks.android.ui.map.MapLocationSource
 import timber.log.Timber
 
 @AndroidEntryPoint
 class OSMMapFragment internal constructor() : MapFragment() {
-    constructor(locationSource: LocationSource, locationRepo: LocationRepo?) : this() {
-        this.locationSource = locationSource.toOSMLocationSource()
-        this.locationRepo = locationRepo
-    }
-
-    private var locationRepo: LocationRepo? = null
     private var locationSource: IMyLocationProvider? = null
     private var mapView: MapView? = null
     private var binding: OsmMapFragmentBinding? = null
@@ -59,9 +52,6 @@ class OSMMapFragment internal constructor() : MapFragment() {
         }
         binding = DataBindingUtil.inflate(inflater, R.layout.osm_map_fragment, container, false)
         if (requireActivity() is MapActivity) {
-            if (locationRepo == null) {
-                locationRepo = (activity as MapActivity).locationRepo
-            }
             if (locationSource == null) {
                 locationSource = (activity as MapActivity).mapLocationSource.toOSMLocationSource()
             }
@@ -91,11 +81,11 @@ class OSMMapFragment internal constructor() : MapFragment() {
             setTileSource(TileSourceFactory.MAPNIK)
             zoomController.setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
             controller.setZoom(ZOOM_STREET_LEVEL)
-            if (locationRepo?.currentLocation != null) {
+            if (locationRepo.currentLocation != null) {
                 controller.setCenter(
                     GeoPoint(
-                        locationRepo!!.currentLocation!!.latitude,
-                        locationRepo!!.currentLocation!!.longitude
+                        locationRepo.currentLocation!!.latitude,
+                        locationRepo.currentLocation!!.longitude
                     )
                 )
             } else {
@@ -171,6 +161,10 @@ class OSMMapFragment internal constructor() : MapFragment() {
 
     override fun myLocationEnabled() {
         initMap()
+    }
+
+    override fun setMapLocationSource(mapLocationSource: MapLocationSource) {
+        this.locationSource = mapLocationSource.toOSMLocationSource()
     }
 
     override fun onResume() {

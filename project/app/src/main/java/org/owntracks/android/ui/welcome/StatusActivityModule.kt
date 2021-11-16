@@ -10,10 +10,6 @@ import org.owntracks.android.ui.status.StatusViewModel
 @InstallIn(ActivityComponent::class)
 @Module
 abstract class StatusActivityModule {
-//    @Binds
-//    @ActivityScoped
-//    abstract fun bindActivity(a: StatusActivity?): AppCompatActivity?
-
     @Binds
     abstract fun bindViewModel(viewModel: StatusViewModel): StatusMvvm.ViewModel<StatusMvvm.View>
 }

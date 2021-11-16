@@ -8,10 +8,6 @@ import dagger.hilt.android.components.ActivityComponent
 @InstallIn(ActivityComponent::class)
 @Module
 abstract class ConnectionActivityModule {
-//    @Binds
-//    @ActivityScoped
-//    abstract fun bindActivity(a: ConnectionActivity?): AppCompatActivity?
-
     @Binds
     abstract fun bindViewModel(viewModel: ConnectionViewModel): ConnectionMvvm.ViewModel<ConnectionMvvm.View>
 }
