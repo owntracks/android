@@ -197,7 +197,7 @@
     <string name="refresh_log">"Обновить"</string>
     <string name="preferencesTheme">"Тема"</string>
     <string name="contactDetailsAccuracyValue">"%dм"</string>
-    <string name="contactDetailsDistanceValue">"%,.2f %s"</string>
+    <string name="contactDetailsDistanceValue">%1$,.2f %2$s</string>
     <string name="contactDetailsAltitude">"Высота"</string>
     <string name="contactDetailsBearing">"Азимут"</string>
     <string name="contactDetailsDistance">"Расстояние"</string>

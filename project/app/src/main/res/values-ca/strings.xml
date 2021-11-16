@@ -199,7 +199,7 @@ Es mostrarà una notificació permanent per continuar executant-se en segon pla.
     <string name="refresh_log">"Actualitzar"</string>
     <string name="preferencesTheme">"Tema"</string>
     <string name="contactDetailsAccuracyValue">"%d m"</string>
-    <string name="contactDetailsDistanceValue">"%,.2f %s"</string>
+    <string name="contactDetailsDistanceValue">%1$,.2f %2$s</string>
     <string name="contactDetailsAltitude">"Alçada"</string>
     <string name="contactDetailsBearing">"Orientació"</string>
     <string name="contactDetailsDistance">"Distància"</string>

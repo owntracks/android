@@ -199,7 +199,7 @@ Una notificación permanente se mostrará para mantener la aplicación funcionan
     <string name="refresh_log"></string>
     <string name="preferencesTheme"></string>
     <string name="contactDetailsAccuracyValue">"%d m"</string>
-    <string name="contactDetailsDistanceValue">"%,.2f %s"</string>
+    <string name="contactDetailsDistanceValue">%1$,.2f %2$s</string>
     <string name="contactDetailsAltitude"></string>
     <string name="contactDetailsBearing"></string>
     <string name="contactDetailsDistance"></string>

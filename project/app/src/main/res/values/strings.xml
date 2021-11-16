@@ -60,7 +60,7 @@
     <string name="contactDetailsBattery">Battery</string>
     <string name="contactDetailsSpeed">Speed</string>
     <string name="contactDetailsAccuracyValue">%d m</string>
-    <string name="contactDetailsDistanceValue">%,.2f %s</string>
+    <string name="contactDetailsDistanceValue">%1$,.2f %2$s</string>
     <string name="contactDetailsBearingValue">%,.0f°</string>
     <string name="contactDetailsAltitudeValue">%,d m</string>
     <string name="contactDetailsBatteryValue">%d %%</string>

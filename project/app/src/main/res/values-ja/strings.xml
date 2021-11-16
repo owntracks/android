@@ -196,7 +196,7 @@
     <string name="refresh_log">"更新"</string>
     <string name="preferencesTheme">"テーマ"</string>
     <string name="contactDetailsAccuracyValue">"%d m"</string>
-    <string name="contactDetailsDistanceValue">"%,.2f %s"</string>
+    <string name="contactDetailsDistanceValue">%1$,.2f %2$s</string>
     <string name="contactDetailsAltitude">"高度"</string>
     <string name="contactDetailsBearing">"角度"</string>
     <string name="contactDetailsDistance">"距離"</string>
