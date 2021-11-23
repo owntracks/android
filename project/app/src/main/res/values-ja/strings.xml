@@ -182,7 +182,9 @@
     <string name="preferencesRemoteConfiguration">"リモート構成管理"</string>
     <string name="preferencesRemoteConfigurationSummary">"リモートで構成設定を更新できるようにします(リモートコマンドが必要です)"</string>
     <string name="aboutLicense">"ライセンス"</string>
-    <string name="aboutTranslationsSummary">"現在 %d 個の言語が利用可能です!"</string>
+    <plurals name="aboutTranslationsSummary">
+        <item quantity="other">"現在 %1$d 個の言語が利用可能です!"</item>
+    </plurals>
     <string name="aboutTranslations">"このアプリの翻訳を助ける"</string>
     <string name="geocoderDisabled">"ジオコーダーサービスが利用できません"</string>
     <string name="geocoderRateLimited">"ジオコーダーサービスのレート制限に到達しました。 %s までは再試行しません"</string>
@@ -230,4 +232,8 @@
     <string name="deviceLocationDisabledDialogMessage">"デバイスの位置情報サービスが無効になっているため、Owntracksは現在地をトラッキングできません。
 
 デバイスの設定から、位置情報を有効にしてください。"</string>
+    <string name="aboutIssuesTitle">Report an issue</string>
+    <string name="aboutIssuesSummary">File on GitHub</string>
+    <string name="aboutSourceCodeSummary">on GitHub</string>
+    <string name="aboutFeedbackCategoryTitle">Feedback</string>
 </resources>

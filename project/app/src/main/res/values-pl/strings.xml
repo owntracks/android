@@ -185,7 +185,9 @@ Aby utrzymać działanie aplikacji w tle, będzie wyświetlana permanentna notyf
     <string name="preferencesRemoteConfiguration">"Zdalna konfiguracja"</string>
     <string name="preferencesRemoteConfigurationSummary">"Pozwól na zdalną aktualizację konfiguracji (wymaga zdalnych poleceń)"</string>
     <string name="aboutLicense">"Licencja"</string>
-    <string name="aboutTranslationsSummary">"Aktualnie dostępny w 6 językach!"</string>
+    <plurals name="aboutTranslationsSummary">
+        <item quantity="other">"Aktualnie dostępny w %1$d językach!"</item>
+    </plurals>
     <string name="aboutTranslations">"Pomóż w tłumaczeniu tej aplikacji"</string>
     <string name="geocoderDisabled">"Usługa geokodowania jest wyłączona"</string>
     <string name="geocoderRateLimited">"Usługa geokodowania została ograniczona. Wstrzymane do %s"</string>
@@ -231,4 +233,8 @@ Aby utrzymać działanie aplikacji w tle, będzie wyświetlana permanentna notyf
     <string name="deviceLocationDisabledDialogTitle"></string>
     <string name="deviceLocationDisabledDialogPositiveButtonLabel"></string>
     <string name="deviceLocationDisabledDialogMessage"></string>
+    <string name="aboutIssuesTitle">Report an issue</string>
+    <string name="aboutIssuesSummary">File on GitHub</string>
+    <string name="aboutSourceCodeSummary">on GitHub</string>
+    <string name="aboutFeedbackCategoryTitle">Feedback</string>
 </resources>

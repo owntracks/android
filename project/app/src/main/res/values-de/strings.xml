@@ -181,7 +181,9 @@
     <string name="preferencesRemoteConfiguration">"Fernkonfiguration"</string>
     <string name="preferencesRemoteConfigurationSummary">"Fernkonfiguration ermöglichen (benötigt Fernkommandos)"</string>
     <string name="aboutLicense">"Lizenz"</string>
-    <string name="aboutTranslationsSummary">"Jetzt in sechs Sprachen verfügbar!"</string>
+    <plurals name="aboutTranslationsSummary">
+        <item quantity="other">"Jetzt in %1$d Sprachen verfügbar!"</item>
+    </plurals>
     <string name="aboutTranslations">"Übersetzungshilfe"</string>
     <string name="geocoderDisabled">"Der Geocoding Dienst ist ausgeschaltet"</string>
     <string name="geocoderRateLimited">"Geocoding Duchstatz ist limitiert worden. Nächster Versuch wenn %s"</string>
@@ -231,4 +233,8 @@ Bitte überprüfen Sie die Logs für mehr Details."</string>
     <string name="deviceLocationDisabledDialogMessage">"Die Ortungsdienste auf diesem Gerät sind derzeit deaktiviert, sodass OwnTracks Ihren aktuellen Standort nicht verfolgen kann.
 
 Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstellungen."</string>
+    <string name="aboutIssuesTitle">Report an issue</string>
+    <string name="aboutIssuesSummary">File on GitHub</string>
+    <string name="aboutSourceCodeSummary">on GitHub</string>
+    <string name="aboutFeedbackCategoryTitle">Feedback</string>
 </resources>

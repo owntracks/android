@@ -32,7 +32,7 @@
     <Preference
         android:icon="@drawable/ic_baseline_code_24"
         android:key="repo"
-        android:summary="on GitHub"
+        android:summary="@string/aboutSourceCodeSummary"
         android:title="@string/preferencesRepository">
         <intent
             android:action="android.intent.action.VIEW"
@@ -55,11 +55,11 @@
             android:data="@string/translationContributionUrl" />
     </Preference>
 
-    <PreferenceCategory app:title="Feedback">
+    <PreferenceCategory app:title="@string/aboutFeedbackCategoryTitle">
         <Preference
             android:key="issue"
-            android:summary="File on GitHub"
-            android:title="Report an issue"
+            android:summary="@string/aboutIssuesSummary"
+            android:title="@string/aboutIssuesTitle"
             app:icon="@drawable/ic_baseline_bug_report_24"
             app:iconSpaceReserved="true">
             <intent

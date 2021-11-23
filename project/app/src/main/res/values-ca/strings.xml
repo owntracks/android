@@ -185,7 +185,9 @@ Es mostrarà una notificació permanent per continuar executant-se en segon pla.
     <string name="preferencesRemoteConfiguration">"Configuració remota"</string>
     <string name="preferencesRemoteConfigurationSummary">"Activa la configuració per actualitzar-se remotament (requereix comandes remotes) "</string>
     <string name="aboutLicense">"LLicència"</string>
-    <string name="aboutTranslationsSummary">"Actualment disponible en 5 idiomes!"</string>
+    <plurals name="aboutTranslationsSummary">
+        <item quantity="other">"Actualment disponible en %1$d idiomes!"</item>
+    </plurals>
     <string name="aboutTranslations">"Ajudeu a traduir aquesta aplicació"</string>
     <string name="geocoderDisabled">"El servei de geocodificació està desactivat"</string>
     <string name="geocoderRateLimited">"El servei de geocodificació té un límit. No es tornarà a provar fins %s"</string>
@@ -233,4 +235,8 @@ Consulteu el registre per tenir més detalls."</string>
     <string name="deviceLocationDisabledDialogMessage">"Actualment els serveis d'ubicació d'aquest dispositiu estan desactivats, de manera que OwnTracks no pot fer un seguiment de la vostra ubicació actual.
 
 Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</string>
+    <string name="aboutIssuesTitle">Report an issue</string>
+    <string name="aboutIssuesSummary">File on GitHub</string>
+    <string name="aboutSourceCodeSummary">on GitHub</string>
+    <string name="aboutFeedbackCategoryTitle">Feedback</string>
 </resources>

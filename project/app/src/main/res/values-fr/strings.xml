@@ -182,7 +182,9 @@ Importer"</string>
     <string name="preferencesRemoteConfiguration">"Configuration à distance"</string>
     <string name="preferencesRemoteConfigurationSummary">"Activer la mise à jour de la configuration à distance (nécessite les commandes à distance)"</string>
     <string name="aboutLicense">"Licence"</string>
-    <string name="aboutTranslationsSummary">"Actuellement disponible en 6 langues!"</string>
+    <plurals name="aboutTranslationsSummary">
+        <item quantity="other">"Actuellement disponible en %1$d langues!"</item>
+    </plurals>
     <string name="aboutTranslations">"Aidez à traduire cette application"</string>
     <string name="geocoderDisabled">"Le service de géocodage est désactivé"</string>
     <string name="geocoderRateLimited">"Le service de géocodage a été limité. Ne pas réessayer avant %s"</string>
@@ -228,4 +230,8 @@ Importer"</string>
     <string name="deviceLocationDisabledDialogTitle"></string>
     <string name="deviceLocationDisabledDialogPositiveButtonLabel"></string>
     <string name="deviceLocationDisabledDialogMessage"></string>
+    <string name="aboutIssuesTitle">Report an issue</string>
+    <string name="aboutIssuesSummary">File on GitHub</string>
+    <string name="aboutSourceCodeSummary">on GitHub</string>
+    <string name="aboutFeedbackCategoryTitle">Feedback</string>
 </resources>

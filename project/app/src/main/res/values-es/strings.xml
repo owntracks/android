@@ -183,7 +183,9 @@ Una notificación permanente se mostrará para mantener la aplicación funcionan
     <string name="preferencesRemoteConfiguration">"Configuración remota"</string>
     <string name="preferencesRemoteConfigurationSummary">"Permitir que la configuración se actualice de forma remota (requiere comandos remotos)"</string>
     <string name="aboutLicense">"Licencia"</string>
-    <string name="aboutTranslationsSummary">"¡Actualmente disponible en 6 idiomas!"</string>
+    <plurals name="aboutTranslationsSummary">
+        <item quantity="other">"¡Actualmente disponible en %1$d idiomas!"</item>
+    </plurals>
     <string name="aboutTranslations">"Ayude a traducir esta aplicación"</string>
     <string name="geocoderDisabled">"El servicio de geocodificador está deshabilitado"</string>
     <string name="geocoderRateLimited">"El servicio de geocodificador tiene tasa limitada. No lo intente hasta %s"</string>
@@ -229,4 +231,8 @@ Una notificación permanente se mostrará para mantener la aplicación funcionan
     <string name="deviceLocationDisabledDialogTitle"></string>
     <string name="deviceLocationDisabledDialogPositiveButtonLabel"></string>
     <string name="deviceLocationDisabledDialogMessage"></string>
+    <string name="aboutIssuesTitle">Report an issue</string>
+    <string name="aboutIssuesSummary">File on GitHub</string>
+    <string name="aboutSourceCodeSummary">on GitHub</string>
+    <string name="aboutFeedbackCategoryTitle">Feedback</string>
 </resources>

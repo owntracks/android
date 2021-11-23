@@ -194,7 +194,10 @@
     <string name="preferencesRemoteConfiguration">Remote configuration</string>
     <string name="preferencesRemoteConfigurationSummary">Enable configuration to be updated remotely (requires remote commands)</string>
     <string name="aboutLicense">License</string>
-    <string name="aboutTranslationsSummary">Currently available in %d languages!</string>
+    <plurals name="aboutTranslationsSummary">
+        <item quantity="one">Currently available in %1$d language!</item>
+        <item quantity="other">Currently available in %1$d languages!</item>
+    </plurals>
     <string name="aboutTranslations">Help translate this app</string>
     <string name="geocoderDisabled">Geocoder service is disabled</string>
     <string name="geocoderRateLimited">Geocoder service has been rate limited. Not retrying until %s</string>
@@ -223,6 +226,10 @@
     <string name="deviceLocationDisabledDialogTitle">Device location disabled</string>
     <string name="deviceLocationDisabledDialogPositiveButtonLabel">Location Settings</string>
     <string name="deviceLocationDisabledDialogMessage">Location services on this device are currently disabled, so OwnTracks is unable to track your current location.\n\nTo allow this, please enable Location in the device settings.</string>
+    <string name="aboutIssuesTitle">Report an issue</string>
+    <string name="aboutIssuesSummary">File on GitHub</string>
+    <string name="aboutSourceCodeSummary">on GitHub</string>
+    <string name="aboutFeedbackCategoryTitle">Feedback</string>
     <string-array name="geocoders">
         <item>None</item>
         <item>Device (Google)</item>

@@ -183,7 +183,9 @@
     <string name="preferencesRemoteConfiguration">"Удаленное изменение параметров"</string>
     <string name="preferencesRemoteConfigurationSummary">"Разрешить удаленное изменение параметров конфигурации"</string>
     <string name="aboutLicense">"Лицензия"</string>
-    <string name="aboutTranslationsSummary">"Уже доступен на 6 языках!"</string>
+    <plurals name="aboutTranslationsSummary">
+        <item quantity="other">"Уже доступен на %1$d языках!"</item>
+    </plurals>
     <string name="aboutTranslations">"Помощь с переводом приложения"</string>
     <string name="geocoderDisabled">"Сервис геокодирования отключен"</string>
     <string name="geocoderRateLimited">"Сервис геокодирования ограничивает запросы до %s"</string>
@@ -231,6 +233,10 @@
     <string name="deviceLocationDisabledDialogMessage">"Службы определения местоположения на этом устройстве отключены, поэтому OwnTracks не может отслеживать ваше текущее местоположение.
 
 Пожалуйста, включите \"Местоположение\" в настройках устройства."</string>
+    <string name="aboutIssuesTitle">Report an issue</string>
+    <string name="aboutIssuesSummary">File on GitHub</string>
+    <string name="aboutSourceCodeSummary">on GitHub</string>
+    <string name="aboutFeedbackCategoryTitle">Feedback</string>
     <string-array name="geocoders">
         <item>Не используется</item>
         <item>Стандартное (Google)</item>

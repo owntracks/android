@@ -179,7 +179,9 @@
     <string name="preferencesRemoteConfiguration"></string>
     <string name="preferencesRemoteConfigurationSummary"></string>
     <string name="aboutLicense"></string>
-    <string name="aboutTranslationsSummary"></string>
+    <plurals name="aboutTranslationsSummary">
+        <item quantity="other"></item>
+    </plurals>
     <string name="aboutTranslations"></string>
     <string name="geocoderDisabled"></string>
     <string name="geocoderRateLimited"></string>
@@ -223,4 +225,8 @@
     <string name="deviceLocationDisabledDialogTitle"></string>
     <string name="deviceLocationDisabledDialogPositiveButtonLabel"></string>
     <string name="deviceLocationDisabledDialogMessage"></string>
+    <string name="aboutIssuesTitle">Report an issue</string>
+    <string name="aboutIssuesSummary">File on GitHub</string>
+    <string name="aboutSourceCodeSummary">on GitHub</string>
+    <string name="aboutFeedbackCategoryTitle">Feedback</string>
 </resources>

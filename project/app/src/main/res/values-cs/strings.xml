@@ -184,7 +184,9 @@ Aby aplikace mohla běžet na pozadí, bude zobrazeno trvalé oznámení. Lze to
     <string name="preferencesRemoteConfiguration">"Vzdálená konfigurace"</string>
     <string name="preferencesRemoteConfigurationSummary">"Zapnout vzdálenou aktualizaci konfigurace (Vyžaduje vzdálené příkazy)"</string>
     <string name="aboutLicense">"Licence"</string>
-    <string name="aboutTranslationsSummary">"Nyní dostupné v %d jazycích!"</string>
+    <plurals name="aboutTranslationsSummary">
+        <item quantity="other">"Nyní dostupné v %1$d jazycích!"</item>
+    </plurals>
     <string name="aboutTranslations">"Pomozte přeložit tuto aplikaci"</string>
     <string name="geocoderDisabled">"Služba geokóderu je vypnuta."</string>
     <string name="geocoderRateLimited">"Služba geokodéru byla omezena rychlostí. Zkuste to znovu až %s"</string>
@@ -232,4 +234,8 @@ Další podrobnosti naleznete v protokolech."</string>
     <string name="deviceLocationDisabledDialogMessage">"Služby určování polohy na tomto zařízení jsou momentálně vypnuté, takže OwnTracks nemůže sledovat vaši aktuální polohu.
 
 Chcete-li to povolit, zapněte polohu v nastavení zařízení."</string>
+    <string name="aboutIssuesTitle">Report an issue</string>
+    <string name="aboutIssuesSummary">File on GitHub</string>
+    <string name="aboutSourceCodeSummary">on GitHub</string>
+    <string name="aboutFeedbackCategoryTitle">Feedback</string>
 </resources>

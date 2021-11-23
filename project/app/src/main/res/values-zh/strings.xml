@@ -182,7 +182,9 @@
     <string name="preferencesRemoteConfiguration">"远程配置"</string>
     <string name="preferencesRemoteConfigurationSummary">"允许配置文件被远程更新（需要开启远程命令）"</string>
     <string name="aboutLicense">"许可协议"</string>
-    <string name="aboutTranslationsSummary">"目前支持 6 种语言！"</string>
+    <plurals name="aboutTranslationsSummary">
+        <item quantity="other">"目前支持 %1$d 种语言！"</item>
+    </plurals>
     <string name="aboutTranslations">"帮助翻译"</string>
     <string name="geocoderDisabled">"未开启地理编码服务"</string>
     <string name="geocoderRateLimited">"地理编码服务频率受限。%s 前不会重试"</string>
@@ -228,4 +230,8 @@
     <string name="deviceLocationDisabledDialogTitle"></string>
     <string name="deviceLocationDisabledDialogPositiveButtonLabel"></string>
     <string name="deviceLocationDisabledDialogMessage"></string>
+    <string name="aboutIssuesTitle">Report an issue</string>
+    <string name="aboutIssuesSummary">File on GitHub</string>
+    <string name="aboutSourceCodeSummary">on GitHub</string>
+    <string name="aboutFeedbackCategoryTitle">Feedback</string>
 </resources>
