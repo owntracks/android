@@ -11,7 +11,7 @@
             type="String" />
 
         <variable
-            name="value"
+            name="textValue"
             type="String" />
 
         <variable
@@ -21,6 +21,7 @@
         <variable
             name="iconRotation"
             type="Float" />
+
     </data>
 
     <androidx.appcompat.widget.LinearLayoutCompat
@@ -30,22 +31,21 @@
 
         <ImageView
             android:id="@+id/image"
-            android:layout_width="0dp"
+            android:layout_width="24dp"
             android:layout_height="match_parent"
             android:layout_gravity="start"
-            android:layout_marginEnd="8dp"
-            android:layout_weight="1"
+
             android:contentDescription="@{label}"
             android:rotation="@{iconRotation}"
             android:src="@{icon}"
-            android:visibility="@{icon !=null ? View.VISIBLE : View.GONE}"
+            android:visibility="@{icon !=null ? View.VISIBLE : View.INVISIBLE}"
             app:tint="@color/primary" />
 
         <androidx.appcompat.widget.LinearLayoutCompat
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="start"
-            android:layout_weight="3"
+            android:paddingStart="8dp"
             android:orientation="vertical">
 
             <TextView
@@ -58,7 +58,7 @@
                 android:paddingTop="@dimen/activity_horizontal_margin"
                 android:paddingEnd="0dp"
                 android:singleLine="true"
-                android:text="@{value}"
+                android:text="@{textValue}"
                 android:textIsSelectable="true"
                 android:textSize="16sp"
                 app:autoSizeMaxTextSize="16sp"
