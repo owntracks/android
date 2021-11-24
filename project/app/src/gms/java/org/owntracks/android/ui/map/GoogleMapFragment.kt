@@ -16,11 +16,13 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.*
 import dagger.hilt.android.AndroidEntryPoint
 import org.owntracks.android.R
+import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.databinding.GoogleMapFragmentBinding
 import org.owntracks.android.gms.location.toGMSLatLng
 import org.owntracks.android.gms.location.toGMSLocationSource
 import timber.log.Timber
 import java.util.*
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallback {
@@ -28,6 +30,9 @@ class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallba
     private var googleMap: GoogleMap? = null
     private var binding: GoogleMapFragmentBinding? = null
     private val markers: MutableMap<String, Marker?> = HashMap()
+
+    @Inject
+    lateinit var locationRepo: LocationRepo
 
     override fun onCreateView(
         inflater: LayoutInflater,

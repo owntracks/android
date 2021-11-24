@@ -20,6 +20,7 @@ import org.osmdroid.views.overlay.TilesOverlay
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import org.owntracks.android.R
+import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.databinding.OsmMapFragmentBinding
 import org.owntracks.android.location.LatLng
 import org.owntracks.android.location.toGeoPoint
@@ -30,12 +31,17 @@ import org.owntracks.android.ui.map.MapActivity.Companion.STARTING_LONGITUDE
 import org.owntracks.android.ui.map.MapFragment
 import org.owntracks.android.ui.map.MapLocationSource
 import timber.log.Timber
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class OSMMapFragment internal constructor() : MapFragment() {
     private var locationSource: IMyLocationProvider? = null
     private var mapView: MapView? = null
     private var binding: OsmMapFragmentBinding? = null
+
+    @Inject
+    lateinit var locationRepo: LocationRepo
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
