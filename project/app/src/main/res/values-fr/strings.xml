@@ -211,7 +211,6 @@ Importer"</string>
     <string name="contactDetailsBatteryValue">"%d %%"</string>
     <string name="contactDetailsSpeedValue">"%d kph"</string>
     <string name="preferencesCategoryNotificationErrors">"Erreurs &amp; Problèmes"</string>
-    <string name="preferenceKeyNotificationGeocoderErrors"></string>
     <string name="preferencesNotificationGeocoderErrors">"Erreurs de géocodage"</string>
     <string name="preferencesNotificationGeocoderErrorsSummary"></string>
     <string name="preferencesAdvancedAutostartWarning"></string>

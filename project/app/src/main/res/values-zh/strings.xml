@@ -211,7 +211,6 @@
     <string name="contactDetailsBatteryValue">"%d %%"</string>
     <string name="contactDetailsSpeedValue">"%d kph"</string>
     <string name="preferencesCategoryNotificationErrors"></string>
-    <string name="preferenceKeyNotificationGeocoderErrors"></string>
     <string name="preferencesNotificationGeocoderErrors"></string>
     <string name="preferencesNotificationGeocoderErrorsSummary"></string>
     <string name="preferencesAdvancedAutostartWarning"></string>

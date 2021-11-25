@@ -210,7 +210,6 @@
     <string name="contactDetailsBatteryValue">"%d %%"</string>
     <string name="contactDetailsSpeedValue">"%d км/ч"</string>
     <string name="preferencesCategoryNotificationErrors">"Ошибки и проблемы"</string>
-    <string name="preferenceKeyNotificationGeocoderErrors">"Ошибки геокодирования"</string>
     <string name="preferencesNotificationGeocoderErrors">"Ошибки геокодирования"</string>
     <string name="preferencesNotificationGeocoderErrorsSummary">"Показывать ошибки геокодирования, превышения лимитов частоты и количества запросов к геокодеру"</string>
     <string name="preferencesAdvancedAutostartWarning">"Ваша версия Android ограничивает возможность определения местоположения при автоматическом запуске приложения до его открытия."</string>

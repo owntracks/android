@@ -30,6 +30,7 @@
     <string name="preferenceKeyNotificationEvents">notificationEvents</string>
     <string name="preferenceKeyNotificationHigherPriority">notificationHigherPriority</string>
     <string name="preferenceKeyNotificationLocation">notificationLocation</string>
+    <string name="preferenceKeyNotificationGeocoderErrors">notificationGeocoderErrors</string>
     <string name="preferenceKeyObjectboxMigrated">_objectboxMigrated</string>
     <string name="preferenceKeyOpencageGeocoderApiKey">opencageApiKey</string>
     <string name="preferenceKeyPassword">password</string>

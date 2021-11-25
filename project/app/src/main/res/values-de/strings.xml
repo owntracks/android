@@ -210,7 +210,6 @@
     <string name="contactDetailsBatteryValue">"%d %%"</string>
     <string name="contactDetailsSpeedValue">"%d kph"</string>
     <string name="preferencesCategoryNotificationErrors">"Fehler &amp; Probleme"</string>
-    <string name="preferenceKeyNotificationGeocoderErrors">"notificationGeocoderErrors"</string>
     <string name="preferencesNotificationGeocoderErrors">"Geocoder-Fehler"</string>
     <string name="preferencesNotificationGeocoderErrorsSummary">"Geocoder-Fehler, Nutzungslimits &amp; Quotenevents anzeigen"</string>
     <string name="preferencesAdvancedAutostartWarning">"Diese Version von Android beschränkt OwnTracks bebis im Empfang von Positionsdaten wenn es automatisch beim Start aktiviert wird bis die App geöffnet wird."</string>

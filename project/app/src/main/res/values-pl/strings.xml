@@ -214,7 +214,6 @@ Aby utrzymać działanie aplikacji w tle, będzie wyświetlana permanentna notyf
     <string name="contactDetailsBatteryValue">"%d %%"</string>
     <string name="contactDetailsSpeedValue">"%d kph"</string>
     <string name="preferencesCategoryNotificationErrors">"Błędy i problemy"</string>
-    <string name="preferenceKeyNotificationGeocoderErrors"></string>
     <string name="preferencesNotificationGeocoderErrors">"Błędy geokodera"</string>
     <string name="preferencesNotificationGeocoderErrorsSummary">"Wyświetl błędy geokodera, limity szybkości i zdarzenia przekroczenia limitu"</string>
     <string name="preferencesAdvancedAutostartWarning"></string>

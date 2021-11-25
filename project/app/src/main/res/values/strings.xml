@@ -210,7 +210,6 @@
     <string name="preferencesExperimental">Experimental</string>
     <string name="refresh_log">Refresh</string>
     <string name="preferencesCategoryNotificationErrors">Errors &amp; Issues</string>
-    <string name="preferenceKeyNotificationGeocoderErrors">notificationGeocoderErrors</string>
     <string name="preferencesNotificationGeocoderErrors">Geocoder errors</string>
     <string name="preferencesNotificationGeocoderErrorsSummary">Display geocoder errors, rate limits &amp; quota exceeded events </string>
     <string name="preferencesAdvancedAutostartWarning">This version of Android restricts OwnTracks from receiving locations when automatically started on device boot until the app is opened.</string>

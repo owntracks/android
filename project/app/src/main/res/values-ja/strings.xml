@@ -209,7 +209,6 @@
     <string name="contactDetailsBatteryValue">"%d %%"</string>
     <string name="contactDetailsSpeedValue">"%d kph"</string>
     <string name="preferencesCategoryNotificationErrors">"エラー・問題"</string>
-    <string name="preferenceKeyNotificationGeocoderErrors">"ジオコーダーエラーの通知"</string>
     <string name="preferencesNotificationGeocoderErrors">"ジオコーダーエラー"</string>
     <string name="preferencesNotificationGeocoderErrorsSummary">"ジオコーダーのエラー、レート制限、クォータ超過に関する情報を表示する"</string>
     <string name="preferencesAdvancedAutostartWarning">"このバージョンのAndroidは、デバイス起動時にOwntracksが開始されたときに、アプリが開かれるまで位置情報の取得が制限されます。"</string>

@@ -212,7 +212,6 @@ Es mostrarà una notificació permanent per continuar executant-se en segon pla.
     <string name="contactDetailsBatteryValue">"%d %%"</string>
     <string name="contactDetailsSpeedValue">"%d kph"</string>
     <string name="preferencesCategoryNotificationErrors">"Errors i Problemes"</string>
-    <string name="preferenceKeyNotificationGeocoderErrors">"notificationGeocoderErrors"</string>
     <string name="preferencesNotificationGeocoderErrors">"Errors geocodificació"</string>
     <string name="preferencesNotificationGeocoderErrorsSummary">"Mostra els errors de geocodificació, els límits de consum i els excessos de quota"</string>
     <string name="preferencesAdvancedAutostartWarning">"Aquesta versió d'Android impedeix a OwnTracks rebre ubicacions quan s'inicia automàticament a l'arrencada del dispositiu fins que s'obre l'aplicació."</string>
