@@ -11,5 +11,4 @@ abstract class MapFragment : Fragment() {
     abstract fun removeMarker(id: String)
     abstract fun setMarkerImage(id: String, bitmap: Bitmap)
     abstract fun myLocationEnabled()
-    abstract fun setMapLocationSource(mapLocationSource: MapLocationSource)
 }

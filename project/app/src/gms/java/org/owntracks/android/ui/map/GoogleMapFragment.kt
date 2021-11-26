@@ -24,15 +24,15 @@ import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
-@AndroidEntryPoint
-class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallback {
-    private var locationSource: com.google.android.gms.maps.LocationSource? = null
+class GoogleMapFragment internal constructor(
+    private val locationRepo: LocationRepo,
+    mapLocationSource: MapLocationSource
+) : MapFragment(), OnMapReadyCallback {
+    private val locationSource: com.google.android.gms.maps.LocationSource =
+        mapLocationSource.toGMSLocationSource()
     private var googleMap: GoogleMap? = null
     private var binding: GoogleMapFragmentBinding? = null
     private val markers: MutableMap<String, Marker?> = HashMap()
-
-    @Inject
-    lateinit var locationRepo: LocationRepo
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -44,12 +44,6 @@ class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallba
         val mapView = this.binding!!.googleMapView
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
-
-        if (activity is MapActivity) {
-            if (locationSource == null) {
-                locationSource = (activity as MapActivity).mapLocationSource.toGMSLocationSource()
-            }
-        }
 
         return binding!!.root
     }
@@ -159,10 +153,6 @@ class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallba
         initMap()
     }
 
-    override fun setMapLocationSource(mapLocationSource: MapLocationSource) {
-        this.locationSource = mapLocationSource.toGMSLocationSource()
-    }
-
     override fun removeMarker(id: String) {
         markers[id]?.remove()
     }
@@ -181,7 +171,7 @@ class GoogleMapFragment internal constructor() : MapFragment(), OnMapReadyCallba
 
     override fun onPause() {
         binding?.googleMapView?.onPause()
-        locationSource?.deactivate()
+        locationSource.deactivate()
         super.onPause()
     }
 

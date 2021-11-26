@@ -33,14 +33,13 @@ import org.owntracks.android.ui.map.MapLocationSource
 import timber.log.Timber
 import javax.inject.Inject
 
-@AndroidEntryPoint
-class OSMMapFragment internal constructor() : MapFragment() {
-    private var locationSource: IMyLocationProvider? = null
+class OSMMapFragment internal constructor(
+    private val locationRepo: LocationRepo,
+    mapLocationSource: MapLocationSource
+) : MapFragment() {
+    private var locationSource: IMyLocationProvider = mapLocationSource.toOSMLocationSource()
     private var mapView: MapView? = null
     private var binding: OsmMapFragmentBinding? = null
-
-    @Inject
-    lateinit var locationRepo: LocationRepo
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -57,11 +56,7 @@ class OSMMapFragment internal constructor() : MapFragment() {
             osmdroidTileCache = requireContext().noBackupFilesDir.resolve("osmdroid/tiles")
         }
         binding = DataBindingUtil.inflate(inflater, R.layout.osm_map_fragment, container, false)
-        if (requireActivity() is MapActivity) {
-            if (locationSource == null) {
-                locationSource = (activity as MapActivity).mapLocationSource.toOSMLocationSource()
-            }
-        }
+
         initMap()
         ((requireActivity()) as MapActivity).onMapReady()
         return binding!!.root
@@ -98,12 +93,7 @@ class OSMMapFragment internal constructor() : MapFragment() {
                 controller.setCenter(GeoPoint(STARTING_LATITUDE, STARTING_LONGITUDE))
             }
 
-
-            locationSource?.also {
-                overlays.add(
-                    MyLocationNewOverlay(it, this)
-                )
-            }
+            overlays.add(MyLocationNewOverlay(locationSource, this))
 
             setMultiTouchControls(true)
             setOnClickListener {
@@ -167,10 +157,6 @@ class OSMMapFragment internal constructor() : MapFragment() {
 
     override fun myLocationEnabled() {
         initMap()
-    }
-
-    override fun setMapLocationSource(mapLocationSource: MapLocationSource) {
-        this.locationSource = mapLocationSource.toOSMLocationSource()
     }
 
     override fun onResume() {

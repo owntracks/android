@@ -25,6 +25,7 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.commit
+import androidx.fragment.app.replace
 import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.idling.CountingIdlingResource
 import com.google.android.material.appbar.AppBarLayout
@@ -32,6 +33,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -102,9 +104,6 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
     @Inject
     lateinit var locationProviderClient: LocationProviderClient
 
-    @Inject
-    lateinit var mapFragmentFactory: IMapFragmentFactory
-
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             Timber.d("Service connected to MapActivity")
@@ -119,6 +118,10 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         perfLog {
+            supportFragmentManager.fragmentFactory = EntryPointAccessors.fromActivity(
+                this,
+                MapActivityEntryPoint::class.java
+            ).fragmentFactory
             super.onCreate(savedInstanceState)
             if (!preferences.isSetupCompleted) {
                 navigator.startActivity(WelcomeActivity::class.java)
@@ -152,16 +155,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
                     locationProviderClient,
                     viewModel!!.mapLocationUpdateCallback
                 )
-
-            if (savedInstanceState == null || supportFragmentManager.findFragmentByTag("map") == null) {
-                mapFragment = mapFragmentFactory.getMapFragment(null, mapLocationSource)
-                supportFragmentManager.commit {
-                    setReorderingAllowed(true)
-                    replace(R.id.mapFragment, mapFragment, "map")
-                }
-            } else {
-                mapFragment = supportFragmentManager.findFragmentByTag("map") as MapFragment
-            }
+            (supportFragmentManager.fragmentFactory as MapFragmentFactory).apply {mapLocationSource = this@MapActivity.mapLocationSource}
 
             // Watch various things that the viewModel owns
             viewModel?.also { vm ->
@@ -382,10 +376,11 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
 
 
     override fun onResume() {
-        mapFragment = mapFragmentFactory.getMapFragment(mapFragment, mapLocationSource)
         supportFragmentManager.commit(true) {
-            this.replace(R.id.mapFragment, mapFragment)
+            replace<MapFragment>(R.id.mapFragment, "map")
         }
+        supportFragmentManager.executePendingTransactions()
+        mapFragment = supportFragmentManager.findFragmentByTag("map") as MapFragment
 
         if (preferences.isExperimentalFeatureEnabled(
                 EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION
