@@ -755,7 +755,7 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
     }
 
     public void reInitializeLocationRequests() {
-        runThingsOnOtherThreads.postOnServiceHandlerDelayed((Runnable) () -> {
+        runThingsOnOtherThreads.postOnServiceHandlerDelayed(() -> {
             if (setupLocationRequest()) {
                 removeGeofences();
                 setupGeofences();

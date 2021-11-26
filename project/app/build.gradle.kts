@@ -16,6 +16,9 @@ jacoco {
     toolVersion = "0.8.7"
 }
 
+
+val gmsImplementation by configurations.creating
+
 android {
     compileSdkVersion(30)
 
@@ -148,8 +151,8 @@ android {
         create("gms") {
             dimension = "locationProvider"
             dependencies {
-                implementation("com.google.android.gms:play-services-maps:17.0.1")
-                implementation("com.google.android.gms:play-services-location:18.0.0")
+                gmsImplementation("com.google.android.gms:play-services-maps:17.0.1")
+                gmsImplementation("com.google.android.gms:play-services-location:18.0.0")
             }
         }
         create("oss") {

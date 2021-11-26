@@ -129,7 +129,7 @@ public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadM
                 }
                 if (configQueryParam.size() == 1) {
 
-                    byte[] config = new Base64().decodeBase64(configQueryParam.get(0).getBytes());
+                    byte[] config = Base64.decodeBase64(configQueryParam.get(0).getBytes());
                     setConfiguration(new String(config, StandardCharsets.UTF_8));
                 } else if (urlQueryParam.size() == 1) {
                     URL remoteConfigUrl = new URL(urlQueryParam.get(0));
