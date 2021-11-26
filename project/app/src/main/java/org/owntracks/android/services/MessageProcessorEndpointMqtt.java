@@ -278,9 +278,8 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
             throw new MqttConnectionException(e);
         }
 
-        MqttConnectOptions mqttConnectOptions = getMqttConnectOptions();
-
         try {
+            MqttConnectOptions mqttConnectOptions = getMqttConnectOptions();
             Timber.v("MQTT connecting synchronously");
             IMqttToken token = this.mqttClient.connect(mqttConnectOptions);
             token.waitForCompletion();
