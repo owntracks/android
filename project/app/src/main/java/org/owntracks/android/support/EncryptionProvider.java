@@ -68,9 +68,12 @@ public class EncryptionProvider {
         initializeSecretBox();
     }
 
-    String decrypt(String cyphertextb64) {
+    String decrypt(String cyphertextb64) throws Parser.EncryptionException {
         byte[] onTheWire = Base64.decode(cyphertextb64.getBytes(), Base64.DEFAULT);
         byte[] nonce = new byte[crypto_secretbox_NONCEBYTES];
+        if (onTheWire.length<=crypto_secretbox_NONCEBYTES) {
+            throw new Parser.EncryptionException("Message length shorter than nonce");
+        }
         byte[] cyphertext = new byte[onTheWire.length - crypto_secretbox_NONCEBYTES];
 
         System.arraycopy(onTheWire, 0, nonce, 0, crypto_secretbox_NONCEBYTES);

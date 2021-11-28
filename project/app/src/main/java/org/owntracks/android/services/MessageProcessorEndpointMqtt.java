@@ -179,7 +179,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
                 m.setQos(message.getQos());
                 onMessageReceived(m);
             } catch (Parser.EncryptionException e) {
-                Timber.e(e, "Decryption failure payload:%s ", new String(message.getPayload()));
+                Timber.e(e, "Decryption failure message: %s ", message);
             } catch (IOException e) {
                 if (message.getPayload().length == 0) {
                     Timber.d("clear message received: %s", topic);
@@ -187,7 +187,13 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
                     m.setTopic(topic.replace(MessageCard.BASETOPIC_SUFFIX, ""));
                     onMessageReceived(m);
                 } else {
-                    Timber.e(e, "payload: %s ", new String(message.getPayload()));
+                    Timber.e(e, "message: %s", message);
+                }
+            } catch (RuntimeException e) {
+                if (e.getMessage() != null && e.getMessage().equals("Decryption failed. Ciphertext failed verification")) {
+                    Timber.e(e);
+                } else {
+                    throw e;
                 }
             }
         }
