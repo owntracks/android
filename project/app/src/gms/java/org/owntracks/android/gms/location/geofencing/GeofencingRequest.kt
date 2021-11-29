@@ -14,7 +14,17 @@ fun GeofencingRequest.toGMSGeofencingRequest(): com.google.android.gms.location.
 fun Geofence.toGMSGeofence(): com.google.android.gms.location.Geofence {
     val builder = com.google.android.gms.location.Geofence.Builder()
     this.requestId?.run { builder.setRequestId(this) }
-    this.circularLatitude?.also { this.circularLongitude?.also { this.circularRadius?.also { builder.setCircularRegion(this.circularLatitude, this.circularLongitude, this.circularRadius) } } }
+    this.circularLatitude?.also {
+        this.circularLongitude?.also {
+            this.circularRadius?.also {
+                builder.setCircularRegion(
+                    this.circularLatitude,
+                    this.circularLongitude,
+                    this.circularRadius
+                )
+            }
+        }
+    }
     this.expirationDuration?.run { builder.setExpirationDuration(this) }
     this.transitionTypes?.run { builder.setTransitionTypes(this) }
     this.notificationResponsiveness?.run { builder.setNotificationResponsiveness(this) }

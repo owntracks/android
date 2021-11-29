@@ -14,7 +14,6 @@ import com.google.android.gms.maps.GoogleMap.OnCameraMoveStartedListener.REASON_
 import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.*
-import dagger.hilt.android.AndroidEntryPoint
 import org.owntracks.android.R
 import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.databinding.GoogleMapFragmentBinding
@@ -22,7 +21,6 @@ import org.owntracks.android.gms.location.toGMSLatLng
 import org.owntracks.android.gms.location.toGMSLocationSource
 import timber.log.Timber
 import java.util.*
-import javax.inject.Inject
 
 class GoogleMapFragment internal constructor(
     private val locationRepo: LocationRepo,

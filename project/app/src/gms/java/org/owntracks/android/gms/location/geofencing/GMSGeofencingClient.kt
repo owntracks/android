@@ -6,7 +6,8 @@ import android.content.Context
 import org.owntracks.android.location.geofencing.GeofencingClient
 import org.owntracks.android.location.geofencing.GeofencingRequest
 
-class GMSGeofencingClient(private val geofencingClient: com.google.android.gms.location.GeofencingClient) : GeofencingClient {
+class GMSGeofencingClient(private val geofencingClient: com.google.android.gms.location.GeofencingClient) :
+    GeofencingClient {
     override fun removeGeofences(GeofencePendingIntent: PendingIntent) {
         this.geofencingClient.removeGeofences(GeofencePendingIntent)
     }
