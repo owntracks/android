@@ -207,7 +207,7 @@
     <string name="contactDetailsSpeed">"Скорость"</string>
     <string name="contactDetailsBearingValue">"%,.0f°"</string>
     <string name="contactDetailsAltitudeValue">"%,dм"</string>
-    <string name="contactDetailsBatteryValue">"%d %%"</string>
+    <string name="contactDetailsBatteryValue">"%d%%"</string>
     <string name="contactDetailsSpeedValue">"%d км/ч"</string>
     <string name="preferencesCategoryNotificationErrors">"Ошибки и проблемы"</string>
     <string name="preferencesNotificationGeocoderErrors">"Ошибки геокодирования"</string>
