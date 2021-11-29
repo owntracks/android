@@ -28,7 +28,6 @@ import org.owntracks.android.ui.base.viewmodel.BaseViewModel
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.math.asin
-import kotlin.math.roundToInt
 
 @ActivityScoped
 class MapViewModel @Inject constructor(
@@ -45,7 +44,6 @@ class MapViewModel @Inject constructor(
     private val mainScope = MainScope()
 
     private val mutableContactDistance = MutableLiveData(0f)
-    private val mutableContactDistanceUnit = MutableLiveData("m")
     private val mutableContactBearing = MutableLiveData(0f)
     private val mutableRelativeContactBearing = MutableLiveData(0f)
 
@@ -59,8 +57,6 @@ class MapViewModel @Inject constructor(
         get() = liveLocation
     val contactDistance: LiveData<Float>
         get() = mutableContactDistance
-    val contactDistanceUnit: LiveData<String>
-        get() = mutableContactDistanceUnit
     val contactBearing: LiveData<Float>
         get() = mutableContactBearing
     val relativeContactBearing: LiveData<Float>
@@ -238,10 +234,7 @@ class MapViewModel @Inject constructor(
                 longitude,
                 distanceBetween
             )
-            mutableContactDistance.postValue(
-                if (distanceBetween[0].roundToInt() > 1000) (distanceBetween[0] / 1000) else distanceBetween[0]
-            )
-            mutableContactDistanceUnit.postValue(if (distanceBetween[0] > 1000) "km" else "m")
+            mutableContactDistance.postValue(distanceBetween[0])
             mutableContactBearing.postValue(distanceBetween[1])
             mutableRelativeContactBearing.postValue(distanceBetween[1])
         }
