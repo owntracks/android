@@ -1,5 +1,18 @@
 # Changelog
 
+## Verison 2.4.4
+
+### New features
+
+* Updated Russian translations (thanks @Allineer - #1123)
+
+### Bug fixes
+
+* Fix a crash when running into an issue deserializing a persistent-storage-queue message (#1129)
+* The OSS build now should be GMS / non-OSS dependency free. Hopefully.
+* When receiving an encrypted message over MQTT that can't be decrypted, don't treat as an MQTT error and disconnect, but log more gracefully.
+* Fix issue when MQTT fails to reconnect if it encounters a client-cert TLS issue.
+
 ## Version 2.4.3
 
 ### New features
