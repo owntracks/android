@@ -9,10 +9,14 @@ import org.owntracks.android.support.Preferences
 import javax.inject.Inject
 
 @ActivityScoped
-class GMSRequirementsChecker @Inject constructor(private val preferences: Preferences, override val context: Context) : OSSRequirementsChecker(preferences, context) {
+class GMSRequirementsChecker @Inject constructor(
+    private val preferences: Preferences,
+    override val context: Context
+) : OSSRequirementsChecker(preferences, context) {
     override fun areRequirementsMet(): Boolean {
         return isPlayServicesCheckPassed() && isLocationPermissionCheckPassed() && preferences.isSetupCompleted
     }
 
-    override fun isPlayServicesCheckPassed(): Boolean = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS
+    override fun isPlayServicesCheckPassed(): Boolean = GoogleApiAvailability.getInstance()
+        .isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS
 }

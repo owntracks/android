@@ -114,7 +114,7 @@
                         layout="@layout/ui_contactsheet_parameter"
                         app:icon="@{@drawable/ic_baseline_architecture_24}"
                         app:label="@{@string/contactDetailsDistance}"
-                        app:textValue="@{String.format(@string/contactDetailsDistanceValue, vm.contactDistance, vm.contactDistanceUnit)}" />
+                        app:textValue="@{String.format(@string/contactDetailsDistanceValue, vm.contactDistance > 1000f ? (vm.contactDistance / 1000) : vm.contactDistance, vm.contactDistance > 1000f ? @string/contactDetailsDistanceUnitKilometres : @string/contactDetailsDistanceUnitMeters)}" />
 
                     <include
                         layout="@layout/ui_contactsheet_parameter"

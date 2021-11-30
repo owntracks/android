@@ -4,12 +4,12 @@
     android:key="root"
     app:title="@string/title_activity_preferences">
     <IntListPreference
+        app:defaultValue="@integer/defaultTheme"
         app:entries="@array/themeLabels"
         app:entryValues="@array/themeValues"
         app:iconSpaceReserved="false"
         app:key="@string/preferenceKeyTheme"
         app:title="@string/preferencesTheme"
-        app:defaultValue="@integer/defaultTheme"
         app:useSimpleSummaryProvider="true" />
     <Preference
         android:key="connectionScreen"

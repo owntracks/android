@@ -1,3 +1,5 @@
 <paths>
-    <cache-path name="config_cache" path="/"/>
+    <cache-path
+        name="config_cache"
+        path="/" />
 </paths>
