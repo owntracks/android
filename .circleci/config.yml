@@ -26,6 +26,23 @@ jobs:
 
       - android/save-gradle-cache
       - android/save-build-cache
+      - persist_to_workspace:
+          root: project/app/build/outputs/apk/oss/debug/
+          paths:
+            - app-oss-debug.apk
+  fdroid-scanner:
+    executor:
+      name: android/android
+      sdk-version: '30'
+    resource_class: small
+    steps:
+      - checkout
+      - attach_workspace:
+          at: project/app/build/outputs/apk/oss/debug/
+      - run:
+          name: Fdroid Scanner
+          command: |
+            python3 ./.circleci/fdroid-scanner-stub.py
 
   unit-test:
     executor:
@@ -212,6 +229,9 @@ workflows:
   build-and-test:
     jobs:
       - build
+      - fdroid-scanner:
+          requires:
+            - build
       - unit-test:
           requires:
             - build
