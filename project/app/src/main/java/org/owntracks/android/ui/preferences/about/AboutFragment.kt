@@ -33,7 +33,7 @@ class AboutFragment : PreferenceFragmentCompat() {
 
         findPreference<Preference>(UI_PREFERENCE_TRANSLATION)?.setSummaryProvider {
             val langCount = TRANSLATION_ARRAY.size
-            resources.getQuantityString(R.plurals.aboutTranslationsSummary, langCount)
+            resources.getQuantityString(R.plurals.aboutTranslationsSummary, langCount, langCount)
         }
 
     }
