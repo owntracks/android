@@ -74,7 +74,12 @@ public class LocationProcessor {
         // Check if publish would trigger a region if fusedRegionDetection is enabled
         if (loadedWaypoints.size() > 0 && preferences.getFusedRegionDetection() && !MessageLocation.REPORT_TYPE_CIRCULAR.equals(trigger)) {
             for (WaypointModel waypoint : loadedWaypoints) {
-                onWaypointTransition(waypoint, currentLocation, currentLocation.distanceTo(waypoint.getLocation()) <= waypoint.getGeofenceRadius() ? Geofence.GEOFENCE_TRANSITION_ENTER : Geofence.GEOFENCE_TRANSITION_EXIT, MessageTransition.TRIGGER_LOCATION);
+                onWaypointTransition(
+                        waypoint,
+                        currentLocation,
+                        currentLocation.distanceTo(waypoint.getLocation()) <= (waypoint.getGeofenceRadius() + currentLocation.getAccuracy()) ? Geofence.GEOFENCE_TRANSITION_ENTER : Geofence.GEOFENCE_TRANSITION_EXIT,
+                        MessageTransition.TRIGGER_LOCATION
+                );
             }
         }
 
