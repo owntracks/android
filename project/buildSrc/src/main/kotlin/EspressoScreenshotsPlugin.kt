@@ -51,10 +51,12 @@ class EspressoScreenshotsPlugin : Plugin<Project> {
                     }
                 }
             }
-            project.tasks.whenTaskAdded {
-                when (name) {
-                    "connectedGmsDebugAndroidTest" -> finalizedBy("embedGmsScreenshots")
-                    "connectedOssDebugAndroidTest" -> finalizedBy("embedOssScreenshots")
+            if (!org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.getCurrentOperatingSystem().isWindows) {
+                project.tasks.whenTaskAdded {
+                    when (name) {
+                        "connectedGmsDebugAndroidTest" -> finalizedBy("embedGmsScreenshots")
+                        "connectedOssDebugAndroidTest" -> finalizedBy("embedOssScreenshots")
+                    }
                 }
             }
         }
