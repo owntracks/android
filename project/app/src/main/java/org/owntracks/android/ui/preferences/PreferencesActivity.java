@@ -29,7 +29,7 @@ public class PreferencesActivity extends BaseActivity<UiPreferencesBinding, NoOp
         setContentView(R.layout.ui_preferences);
         bindAndAttachContentView(R.layout.ui_preferences, savedInstanceState);
         setHasEventBus(false);
-        setSupportToolbar(this.binding.appbar.toolbar, true, true);
+        setSupportToolbar(this.binding.appbar.toolbar, true);
         setDrawer(binding.appbar.toolbar);
         getSupportFragmentManager().addOnBackStackChangedListener(() -> {
                     if (getSupportFragmentManager().getFragments().isEmpty()) {

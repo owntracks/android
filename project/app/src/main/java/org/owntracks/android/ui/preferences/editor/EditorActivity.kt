@@ -43,7 +43,7 @@ class EditorActivity :
         disablesAnimation()
         bindAndAttachContentView(R.layout.ui_preferences_editor, savedInstanceState)
         setHasEventBus(false)
-        setSupportToolbar(binding!!.appbar.toolbar, true, true)
+        setSupportToolbar(binding!!.appbar.toolbar, true)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

@@ -51,7 +51,7 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
         super.onCreate(savedInstanceState);
         disablesAnimation();
         bindAndAttachContentView(R.layout.ui_preferences_connection, savedInstanceState);
-        setSupportToolbar(binding.appbar.toolbar, true, true);
+        setSupportToolbar(binding.appbar.toolbar, true);
         setHasEventBus(true);
     }
 

@@ -1,4 +1,1596 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="5" by="lint 4.1.3">
+<issues format="5" by="lint Arctic Fox | 2020.3.1 Patch 3">
+
+    <issue
+        id="JcenterRepositoryObsolete"
+        message="JCenter Maven repository is no longer receiving updates: newer library versions may be available elsewhere">
+        <location
+            file="build.gradle.kts"
+            line="26"/>
+    </issue>
+
+    <issue
+        id="OldTargetApi"
+        message="Not targeting the latest versions of Android; compatibility modes apply. Consider testing and updating this version. Consult the android.os.Build.VERSION_CODES javadoc for details.">
+        <location
+            file="build.gradle.kts"
+            line="28"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="223"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="227"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="236"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="240"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="255"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="259"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="267"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="271"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="279"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="283"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="291"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="295"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="303"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="307"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="319"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="323"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="334"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="338"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="346"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="350"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="362"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="363"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="373"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="377"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="385"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="389"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="402"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="406"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="417"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="421"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="432"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="433"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="444"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="445"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="458"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="459"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="466"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="467"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="476"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="480"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="515"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="516"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="530"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="531"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="549"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="550"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="590"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="594"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="605"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="609"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="620"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="624"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="635"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="636"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="643"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="644"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="652"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="656"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="663"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="664"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="671"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="672"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="679"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="680"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="688"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="692"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="703"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="707"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="717"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="718"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="731"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="732"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="740"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="741"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="754"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="758"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="768"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="769"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="776"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="777"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="784"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="785"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="793"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="797"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="805"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="809"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="817"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="821"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="828"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="835"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="839"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="850"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="854"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="882"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="886"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="893"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final by default in Android Gradle Plugin version 8.0, avoid using them as annotation attributes">
+        <location
+            file="src\main\java\org\owntracks\android\support\Preferences.kt"
+            line="894"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_add_24.xml"
+            line="4"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_adjust_24.xml"
+            line="6"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_adjust_24.xml"
+            line="8"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_airplanemode_active_24.xml"
+            line="4"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_android_48.xml"
+            line="8"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_architecture_24.xml"
+            line="4"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_architecture_24.xml"
+            line="5"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_architecture_24.xml"
+            line="6"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_arrow_upward_24.xml"
+            line="4"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_assignment_late_48.xml"
+            line="8"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_autorenew_24.xml"
+            line="4"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_battery_charging_full_24.xml"
+            line="4"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_battery_std_24.xml"
+            line="4"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_battery_unknown_24.xml"
+            line="4"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_beenhere_24.xml"
+            line="4"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_bug_report_24.xml"
+            line="4"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_close_24.xml"
+            line="4"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_code_24.xml"
+            line="8"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_domain_verification_24.xml"
+            line="8"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_domain_verification_24.xml"
+            line="11"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_done_24.xml"
+            line="4"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_done_all_24.xml"
+            line="4"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_fiber_manual_record_24.xml"
+            line="4"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_info_24.xml"
+            line="4"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_info_24.xml"
+            line="8"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_insert_drive_file_24.xml"
+            line="1"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_insert_drive_file_24.xml"
+            line="4"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_keyboard_arrow_right_24.xml"
+            line="4"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_layers_24.xml"
+            line="6"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_layers_24.xml"
+            line="8"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_library_books_24.xml"
+            line="4"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_library_books_24.xml"
+            line="9"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_location_disabled_24.xml"
+            line="8"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_more_horiz_24.xml"
+            line="6"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_more_horiz_24.xml"
+            line="8"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_my_location_24.xml"
+            line="4"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_pause_36.xml"
+            line="4"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_perm_identity_24.xml"
+            line="4"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_play_arrow_36.xml"
+            line="4"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_power_settings_new_24.xml"
+            line="6"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_power_settings_new_24.xml"
+            line="8"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_publish_24.xml"
+            line="4"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_refresh_24.xml"
+            line="8"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_settings_24.xml"
+            line="4"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_settings_24.xml"
+            line="8"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_share_24.xml"
+            line="4"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_speed_24.xml"
+            line="4"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_stop_36.xml"
+            line="4"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_supervisor_account_24.xml"
+            line="6"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_supervisor_account_24.xml"
+            line="8"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_translate_24.xml"
+            line="8"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_baseline_warning_24.xml"
+            line="8"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_launcher_foreground.xml"
+            line="12"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_launcher_foreground.xml"
+            line="15"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_launcher_foreground.xml"
+            line="18"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_outline_info_24.xml"
+            line="8"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_outline_label_24.xml"
+            line="1"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_outline_label_24.xml"
+            line="4"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_owntracks_80.xml"
+            line="8"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_owntracks_80.xml"
+            line="11"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_owntracks_80.xml"
+            line="14"/>
+    </issue>
+
+    <issue
+        id="VectorRaster"
+        message="">
+        <location
+            file="src\main\res\drawable\ic_step_forward_2.xml"
+            line="8"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of com.google.android.gms:play-services-maps than 17.0.1 is available: 18.0.0">
+        <location
+            file="build.gradle.kts"
+            line="154"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of com.google.android.material:material than 1.3.0 is available: 1.4.0">
+        <location
+            file="build.gradle.kts"
+            line="185"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.work:work-runtime than 2.6.0 is available: 2.7.1">
+        <location
+            file="build.gradle.kts"
+            line="187"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.fragment:fragment-ktx than 1.3.5 is available: 1.4.0">
+        <location
+            file="build.gradle.kts"
+            line="188"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of androidx.core:core-ktx than 1.5.0 is available: 1.7.0">
+        <location
+            file="build.gradle.kts"
+            line="189"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        message="A newer version of org.osmdroid:osmdroid-android than 6.1.10 is available: 6.1.11">
+        <location
+            file="build.gradle.kts"
+            line="197"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;el&quot; (Greek) the following quantities should also be defined: `one`">
+        <location
+            file="src\main\res\values-el\strings.xml"
+            line="178"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;lb&quot; (Luxembourgish) the following quantities should also be defined: `one`">
+        <location
+            file="src\main\res\values-lb\strings.xml"
+            line="178"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;de&quot; (German) the following quantities should also be defined: `one`">
+        <location
+            file="src\main\res\values-de\strings.xml"
+            line="180"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;pt&quot; (Portuguese) the following quantities should also be defined: `one`">
+        <location
+            file="src\main\res\values-pt\strings.xml"
+            line="180"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;fr&quot; (French) the following quantities should also be defined: `one`">
+        <location
+            file="src\main\res\values-fr\strings.xml"
+            line="181"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;ru&quot; (Russian) the following quantities should also be defined: `few`, `many`">
+        <location
+            file="src\main\res\values-ru\strings.xml"
+            line="181"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;es&quot; (Spanish) the following quantities should also be defined: `one`">
+        <location
+            file="src\main\res\values-es\strings.xml"
+            line="182"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;cs&quot; (Czech) the following quantities should also be defined: `few`, `one`">
+        <location
+            file="src\main\res\values-cs\strings.xml"
+            line="183"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;ca&quot; (Catalan) the following quantities should also be defined: `one`">
+        <location
+            file="src\main\res\values-ca\strings.xml"
+            line="184"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;pl&quot; (Polish) the following quantities should also be defined: `few`, `many`, `one`">
+        <location
+            file="src\main\res\values-pl\strings.xml"
+            line="184"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;contactDetailsDistanceUnitKilometres&quot; is not translated in &quot;cs&quot; (Czech), &quot;de&quot; (German), &quot;pt&quot; (Portuguese), &quot;ja&quot; (Japanese), &quot;fr&quot; (French), &quot;pl&quot; (Polish), &quot;ca&quot; (Catalan), &quot;es&quot; (Spanish), &quot;zh&quot; (Chinese)">
+        <location
+            file="src\main\res\values\strings.xml"
+            line="64"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;contactDetailsDistanceUnitMeters&quot; is not translated in &quot;cs&quot; (Czech), &quot;de&quot; (German), &quot;pt&quot; (Portuguese), &quot;ja&quot; (Japanese), &quot;fr&quot; (French), &quot;pl&quot; (Polish), &quot;ca&quot; (Catalan), &quot;es&quot; (Spanish), &quot;zh&quot; (Chinese)">
+        <location
+            file="src\main\res\values\strings.xml"
+            line="65"/>
+    </issue>
+
+    <issue
+        id="ImpliedQuantity"
+        message="The quantity `&apos;one&apos;` matches more than one specific number in this locale (0, 1), but the message did not include a formatting argument (such as `%d`). This is usually an internationalization error. See full issue explanation for more.">
+        <location
+            file="src\main\res\values-pt\strings.xml"
+            line="128"/>
+    </issue>
+
+    <issue
+        id="IntentFilterExportedReceiver"
+        message="As of Android 12, `android:exported` must be set; use `true` to make the activity \&#xA;available to other apps, and `false` otherwise.">
+        <location
+            file="src\main\AndroidManifest.xml"
+            line="102"/>
+    </issue>
+
+    <issue
+        id="IntentFilterExportedReceiver"
+        message="As of Android 12, `android:exported` must be set; use `true` to make the activity \&#xA;available to other apps, and `false` otherwise.">
+        <location
+            file="src\main\AndroidManifest.xml"
+            line="102"/>
+    </issue>
+
+    <issue
+        id="IntentFilterExportedReceiver"
+        message="As of Android 12, `android:exported` must be set; use `true` to make the activity \&#xA;available to other apps, and `false` otherwise. For launcher activities, this should be set to `true`.">
+        <location
+            file="src\main\AndroidManifest.xml"
+            line="217"/>
+    </issue>
+
+    <issue
+        id="IntentFilterExportedReceiver"
+        message="As of Android 12, `android:exported` must be set; use `true` to make the activity \&#xA;available to other apps, and `false` otherwise. For launcher activities, this should be set to `true`.">
+        <location
+            file="src\main\AndroidManifest.xml"
+            line="217"/>
+    </issue>
+
+    <issue
+        id="NotifyDataSetChanged"
+        message="It will always be more efficient to use more specific change events if you can. Rely on `notifyDataSetChanged` as a last resort.">
+        <location
+            file="src\main\java\org\owntracks\android\ui\base\BaseAdapter.java"
+            line="62"/>
+    </issue>
+
+    <issue
+        id="NotifyDataSetChanged"
+        message="It will always be more efficient to use more specific change events if you can. Rely on `notifyDataSetChanged` as a last resort.">
+        <location
+            file="src\main\java\org\owntracks\android\ui\base\BaseAdapter.java"
+            line="230"/>
+    </issue>
+
+    <issue
+        id="NotifyDataSetChanged"
+        message="It will always be more efficient to use more specific change events if you can. Rely on `notifyDataSetChanged` as a last resort.">
+        <location
+            file="src\main\java\org\owntracks\android\ui\contacts\ContactsAdapter.kt"
+            line="37"/>
+    </issue>
+
+    <issue
+        id="NotifyDataSetChanged"
+        message="It will always be more efficient to use more specific change events if you can. Rely on `notifyDataSetChanged` as a last resort.">
+        <location
+            file="src\main\java\org\owntracks\android\ui\status\logs\LogEntryAdapter.kt"
+            line="32"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        message="This `AsyncTask` class should be static or leaks might occur (org.owntracks.android.ui.preferences.connection.dialog.ConnectionSecurityViewModel.CopyTask)">
+        <location
+            file="src\main\java\org\owntracks\android\ui\preferences\connection\dialog\ConnectionSecurityViewModel.java"
+            line="169"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        message="This `AsyncTask` class should be static or leaks might occur (org.owntracks.android.ui.preferences.connection.dialog.ConnectionSecurityViewModel.CaCrtCopyTask)">
+        <location
+            file="src\main\java\org\owntracks\android\ui\preferences\connection\dialog\ConnectionSecurityViewModel.java"
+            line="206"/>
+    </issue>
+
+    <issue
+        id="StaticFieldLeak"
+        message="This `AsyncTask` class should be static or leaks might occur (org.owntracks.android.ui.preferences.connection.dialog.ConnectionSecurityViewModel.ClientCrtCopyTask)">
+        <location
+            file="src\main\java\org\owntracks\android\ui\preferences\connection\dialog\ConnectionSecurityViewModel.java"
+            line="225"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (904 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector.">
+        <location
+            file="src\main\res\drawable\ic_baseline_settings_24.xml"
+            line="9"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.cursor_white` appears to be unused">
+        <location
+            file="src\main\res\drawable\cursor_white.xml"
+            line="2"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.ic_baseline_battery_unknown_24` appears to be unused">
+        <location
+            file="src\main\res\drawable\ic_baseline_battery_unknown_24.xml"
+            line="1"/>
+    </issue>
+
+    <issue
+        id="RelativeOverlap"
+        message="`TextView-1` can overlap `@id/ws` if @string/preferencesWebsocket grows due to localized text expansion">
+        <location
+            file="src\main\res\layout\ui_preferences_connection_host_mqtt.xml"
+            line="66"/>
+    </issue>
+
+    <issue
+        id="RelativeOverlap"
+        message="`TextView-1` can overlap `@id/cleanSession` if @string/preferencesCleanSessionEnabled grows due to localized text expansion">
+        <location
+            file="src\main\res\layout\ui_preferences_connection_parameters.xml"
+            line="26"/>
+    </issue>
+
+    <issue
+        id="RelativeOverlap"
+        message="`TextView-1` can overlap `@id/tls` if @string/tls grows due to localized text expansion">
+        <location
+            file="src\main\res\layout\ui_preferences_connection_security.xml"
+            line="25"/>
+    </issue>
+
+    <issue
+        id="RtlSymmetry"
+        message="When you define `paddingStart` you should probably also define `paddingEnd` for right-to-left symmetry">
+        <location
+            file="src\main\res\layout\ui_contactsheet_parameter.xml"
+            line="47"/>
+    </issue>
+
+    <issue
+        id="RtlSymmetry"
+        message="When you define `paddingStart` you should probably also define `paddingEnd` for right-to-left symmetry">
+        <location
+            file="src\main\res\layout\ui_contactsheet_parameter.xml"
+            line="47"/>
+    </issue>
 
 </issues>

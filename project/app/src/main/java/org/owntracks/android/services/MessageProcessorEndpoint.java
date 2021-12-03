@@ -7,7 +7,7 @@ import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 import java.io.IOException;
 
 public abstract class MessageProcessorEndpoint implements OutgoingMessageProcessor {
-    MessageProcessor messageProcessor;
+    final MessageProcessor messageProcessor;
 
     MessageProcessorEndpoint(MessageProcessor messageProcessor) {
         this.messageProcessor = messageProcessor;
@@ -23,7 +23,7 @@ public abstract class MessageProcessorEndpoint implements OutgoingMessageProcess
 
     abstract int getModeId();
 
-    abstract void sendMessage(MessageBase m) throws ConfigurationIncompleteException, OutgoingMessageSendingException, IOException, AlreadyConnectingToBrokerException;
+    abstract void sendMessage(MessageBase m) throws ConfigurationIncompleteException, OutgoingMessageSendingException, IOException;
 }
 
 class OutgoingMessageSendingException extends Exception {

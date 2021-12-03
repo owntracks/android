@@ -97,9 +97,6 @@
     <string name="welcome_heading">"ようこそ"</string>
     <string name="welcome_description">"いくつかのステップを実施し、Owntracksを利用開始できるようにします"</string>
     <string name="mode_heading">"モード"</string>
-    <string name="permissions_heading">"権限"</string>
-    <string name="permissions_description">"Owntracksを利用するには位置情報へのアクセスが必要です。続ける前に、権限を付与してください。"</string>
-    <string name="permissions_granted">"権限が付与されました"</string>
 
     <!-- Fuzzy -->
     <string name="icon_description_owntracks">"Owntracks"</string>
@@ -161,7 +158,6 @@
     <string name="notificationChangeMonitoring">"モニタリングモード変更"</string>
     <string name="preferencesDebugLog">"デバッグログ"</string>
     <string name="monitoring_mode">"モニタリング"</string>
-    <string name="distance_label">"距離"</string>
     <string name="preferencesClientId">"クライアントID"</string>
     <string name="status_endpoint_state_hint">"エンドポイントの状態"</string>
     <string name="status_endpoint_state_message_hint">"エンドポイントからのメッセージ"</string>

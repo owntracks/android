@@ -117,6 +117,8 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
 
     private boolean hasBeenStartedExplicitly = false;
 
+    private static final int updateCurrentIntentFlags = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT : PendingIntent.FLAG_UPDATE_CURRENT;
+
     @Inject
     Preferences preferences;
 
@@ -291,9 +293,9 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
                 .setAutoCancel(true)
                 .setSmallIcon(R.drawable.ic_owntracks_80)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(notificationText))
-                .setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, activityLaunchIntent, PendingIntent.FLAG_UPDATE_CURRENT))
+                .setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, activityLaunchIntent, updateCurrentIntentFlags))
                 .setPriority(PRIORITY_LOW)
-                .setNotificationSilent()
+                .setSilent(true)
                 .build();
 
         notificationManager.notify(BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG, 0, notification);
@@ -308,13 +310,13 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
         resultIntent.setAction("android.intent.action.MAIN");
         resultIntent.addCategory("android.intent.category.LAUNCHER");
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent, updateCurrentIntentFlags);
         Intent publishIntent = new Intent();
         publishIntent.setAction(INTENT_ACTION_SEND_LOCATION_USER);
-        PendingIntent publishPendingIntent = PendingIntent.getService(this, 0, publishIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent publishPendingIntent = PendingIntent.getService(this, 0, publishIntent, updateCurrentIntentFlags);
 
         publishIntent.setAction(INTENT_ACTION_CHANGE_MONITORING);
-        PendingIntent changeMonitoringPendingIntent = PendingIntent.getService(this, 0, publishIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent changeMonitoringPendingIntent = PendingIntent.getService(this, 0, publishIntent, updateCurrentIntentFlags);
 
 
         activeNotificationCompatBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ONGOING)
@@ -453,8 +455,8 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setNumber(activeNotifications.size())
                 .setStyle(inbox)
-                .setContentIntent(PendingIntent.getActivity(this, (int) System.currentTimeMillis() / 1000, new Intent(this, MapActivity.class), PendingIntent.FLAG_ONE_SHOT))
-                .setDeleteIntent(PendingIntent.getService(this, INTENT_REQUEST_CODE_CLEAR_EVENTS, (new Intent(this, BackgroundService.class)).setAction(INTENT_ACTION_CLEAR_NOTIFICATIONS), PendingIntent.FLAG_ONE_SHOT));
+                .setContentIntent(PendingIntent.getActivity(this, (int) System.currentTimeMillis() / 1000, new Intent(this, MapActivity.class), updateCurrentIntentFlags))
+                .setDeleteIntent(PendingIntent.getService(this, INTENT_REQUEST_CODE_CLEAR_EVENTS, (new Intent(this, BackgroundService.class)).setAction(INTENT_ACTION_CLEAR_NOTIFICATIONS), updateCurrentIntentFlags));
 
         Notification stackNotification = builder.build();
         notificationManagerCompat.notify(NOTIFICATION_GROUP_EVENTS, NOTIFICATION_ID_EVENT_GROUP, stackNotification);
@@ -576,7 +578,7 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
     private PendingIntent getGeofencePendingIntent() {
         Intent geofenceIntent = new Intent(this, BackgroundService.class);
         geofenceIntent.setAction(INTENT_ACTION_SEND_EVENT_CIRCULAR);
-        return PendingIntent.getBroadcast(this, INTENT_REQUEST_CODE_GEOFENCE, geofenceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        return PendingIntent.getBroadcast(this, INTENT_REQUEST_CODE_GEOFENCE, geofenceIntent, updateCurrentIntentFlags);
     }
 
     @SuppressWarnings("MissingPermission")
@@ -722,7 +724,7 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
         openIntent.setAction("android.intent.action.MAIN");
         openIntent.addCategory("android.intent.category.LAUNCHER");
         openIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent openPendingIntent = PendingIntent.getActivity(this, 0, openIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent openPendingIntent = PendingIntent.getActivity(this, 0, openIntent, updateCurrentIntentFlags);
         eventsNotificationCompatBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_EVENTS)
                 .setContentIntent(openPendingIntent)
                 .setSmallIcon(R.drawable.ic_baseline_add_24)

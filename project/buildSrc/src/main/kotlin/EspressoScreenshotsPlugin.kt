@@ -4,6 +4,7 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.Exec
 import org.gradle.kotlin.dsl.register
 import java.io.File
+import java.util.*
 
 class EspressoScreenshotsPlugin : Plugin<Project> {
     // This is where the androidx test files service puts saved bitmaps
@@ -20,7 +21,7 @@ class EspressoScreenshotsPlugin : Plugin<Project> {
                 val flavorTestReportPath = reportsDirectoryPath.format(flavorName)
                 project.run {
                     val adbExecutable = android.adbExecutable.absolutePath
-                    tasks.register<Exec>("clear${flavorName.capitalize()}Screenshots") {
+                    tasks.register<Exec>("clear${flavorName.capitalize(Locale.ROOT)}Screenshots") {
                         group = "reporting"
                         description =
                             "Removes $flavorName screenshots from connected device"
@@ -30,7 +31,7 @@ class EspressoScreenshotsPlugin : Plugin<Project> {
                         )
                     }
 
-                    tasks.register<Exec>("fetch${flavorName.capitalize()}Screenshots") {
+                    tasks.register<Exec>("fetch${flavorName.capitalize(Locale.ROOT)}Screenshots") {
                         group = "reporting"
                         description = "Fetches $flavorName espresso screenshots from the device"
                         executable = adbExecutable
@@ -42,11 +43,17 @@ class EspressoScreenshotsPlugin : Plugin<Project> {
                         }
                     }
 
-                    tasks.register<EmbedScreenshotsInTestReport>("embed${flavorName.capitalize()}Screenshots") {
+                    tasks.register<EmbedScreenshotsInTestReport>(
+                        "embed${
+                            flavorName.capitalize(
+                                Locale.ROOT
+                            )
+                        }Screenshots"
+                    ) {
                         group = "reporting"
                         description = "Embeds the $flavorName screenshots in the test report"
-                        dependsOn("fetch${flavorName.capitalize()}Screenshots")
-                        finalizedBy("clear${flavorName.capitalize()}Screenshots")
+                        dependsOn("fetch${flavorName.capitalize(Locale.ROOT)}Screenshots")
+                        finalizedBy("clear${flavorName.capitalize(Locale.ROOT)}Screenshots")
                         reportsPath = flavorTestReportPath
                     }
                 }

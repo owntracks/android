@@ -97,9 +97,6 @@
     <string name="welcome_heading">"Bem vindo"</string>
     <string name="welcome_description"></string>
     <string name="mode_heading">"Modo"</string>
-    <string name="permissions_heading">"Permissões"</string>
-    <string name="permissions_description"></string>
-    <string name="permissions_granted">"Permissões adicionadas"</string>
 
     <!-- Fuzzy -->
     <string name="icon_description_owntracks">"Owntracks"</string>
@@ -160,7 +157,6 @@
     <string name="notificationChangeMonitoring"></string>
     <string name="preferencesDebugLog"></string>
     <string name="monitoring_mode"></string>
-    <string name="distance_label"></string>
     <string name="preferencesClientId"></string>
     <string name="status_endpoint_state_hint"></string>
     <string name="status_endpoint_state_message_hint"></string>

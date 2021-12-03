@@ -17,7 +17,6 @@ import org.owntracks.android.model.messages.MessageClear;
 import org.owntracks.android.model.messages.MessageCmd;
 import org.owntracks.android.model.messages.MessageLocation;
 import org.owntracks.android.model.messages.MessageTransition;
-import org.owntracks.android.model.messages.MessageUnknown;
 import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Parser;
@@ -51,7 +50,7 @@ public class MessageProcessor {
     private final EventBus eventBus;
     private final ContactsRepo contactsRepo;
     private final WaypointsRepo waypointsRepo;
-    private Context applicationContext;
+    private final Context applicationContext;
     private final Preferences preferences;
     private final Parser parser;
     private final Scheduler scheduler;
@@ -383,12 +382,7 @@ public class MessageProcessor {
             processIncomingMessage((MessageCmd) message);
         } else if (message instanceof MessageTransition) {
             processIncomingMessage((MessageTransition) message);
-        } else if (message instanceof MessageUnknown) {
-            processIncomingMessage((MessageUnknown) message);
         }
-    }
-
-    private void processIncomingMessage(MessageUnknown message) {
     }
 
     private void processIncomingMessage(MessageClear message) {
@@ -509,7 +503,7 @@ public class MessageProcessor {
                     }
                     return error.getMessage();
                 }
-                return null;
+                return "";
             } else if (error != null) {
                 return String.format(Locale.ROOT, "%s: %s", message, error.getMessage());
             }

@@ -28,7 +28,7 @@ import timber.log.Timber;
 @Singleton
 public class ObjectboxWaypointsRepo extends WaypointsRepo {
     private final Preferences preferences;
-    private Box<org.owntracks.android.data.WaypointModel> box;
+    private final Box<org.owntracks.android.data.WaypointModel> box;
 
     @Inject
     public ObjectboxWaypointsRepo(@ApplicationContext Context context, EventBus eventBus, Preferences preferences) {

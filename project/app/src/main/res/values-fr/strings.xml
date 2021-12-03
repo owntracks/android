@@ -97,9 +97,6 @@
     <string name="welcome_heading">"Bienvenu"</string>
     <string name="welcome_description">"Les étapes suivantes vous aideront à démarrer avec OwnTracks"</string>
     <string name="mode_heading">"Mode"</string>
-    <string name="permissions_heading">"Autorisations"</string>
-    <string name="permissions_description">"OwnTracks nécessite l'accès au service de localisation. Veuillez accorder cette autorisation avant de continuer."</string>
-    <string name="permissions_granted">"Les autorisations ont été accordées"</string>
 
     <!-- Fuzzy -->
     <string name="icon_description_owntracks">"OwnTracks"</string>
@@ -161,7 +158,6 @@ Importer"</string>
     <string name="notificationChangeMonitoring">"Changer le mode de surveillance"</string>
     <string name="preferencesDebugLog">"Débogage du journal"</string>
     <string name="monitoring_mode">"Mode de surveillance passif"</string>
-    <string name="distance_label">"Distance"</string>
     <string name="preferencesClientId">"ID Client"</string>
     <string name="status_endpoint_state_hint">"Etat du Endpoint"</string>
     <string name="status_endpoint_state_message_hint">"Message d'état du Endpoint"</string>

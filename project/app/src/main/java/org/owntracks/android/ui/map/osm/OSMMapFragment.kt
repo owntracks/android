@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.preference.PreferenceManager
-import dagger.hilt.android.AndroidEntryPoint
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -31,7 +30,6 @@ import org.owntracks.android.ui.map.MapActivity.Companion.STARTING_LONGITUDE
 import org.owntracks.android.ui.map.MapFragment
 import org.owntracks.android.ui.map.MapLocationSource
 import timber.log.Timber
-import javax.inject.Inject
 
 class OSMMapFragment internal constructor(
     private val locationRepo: LocationRepo,

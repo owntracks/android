@@ -15,7 +15,7 @@ import io.objectbox.android.ObjectBoxLiveData;
 import io.objectbox.query.Query;
 
 public abstract class WaypointsRepo {
-    private EventBus eventBus;
+    private final EventBus eventBus;
     protected WaypointsRepo(EventBus eventBus) {
         this.eventBus = eventBus;
     }

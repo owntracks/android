@@ -97,9 +97,6 @@
     <string name="welcome_heading">"Добро пожаловать!"</string>
     <string name="welcome_description">"Следующие шаги помогут вам начать работу с OwnTracks"</string>
     <string name="mode_heading">"Режим"</string>
-    <string name="permissions_heading">"Разрешения"</string>
-    <string name="permissions_description">"OwnTracks необходимо разрешение на определение вашего местоположения. Пожалуйста, предоставьте это разрешение для продолжения."</string>
-    <string name="permissions_granted">"Разрешения предоставлены"</string>
     <string name="icon_description_owntracks">"OwnTracks"</string>
     <string name="enjoy_description">"Воспользуйтесь меню настроек и настройте OwnTracks для работы с вашим сервером"</string>
     <string name="done_heading">"Готово"</string>
@@ -161,7 +158,6 @@
     <string name="notificationChangeMonitoring">"Изменить режим"</string>
     <string name="preferencesDebugLog">"Журнал отладки"</string>
     <string name="monitoring_mode">"Режим отслеживания"</string>
-    <string name="distance_label">"Расстояние"</string>
     <string name="preferencesClientId">"ID клиента"</string>
     <string name="status_endpoint_state_hint">"Состояние подключения к серверу"</string>
     <string name="status_endpoint_state_message_hint">"Сообщение о состоянии подключения к серверу"</string>

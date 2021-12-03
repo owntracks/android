@@ -97,9 +97,6 @@
     <string name="welcome_heading">"欢迎"</string>
     <string name="welcome_description">"以下步骤将帮助您开始使用 Owntracks"</string>
     <string name="mode_heading">"模式"</string>
-    <string name="permissions_heading">"权限"</string>
-    <string name="permissions_description">"Owntracks 需要获取您的位置。请授权 Owntracks 访问您的位置信息。"</string>
-    <string name="permissions_granted">"已获得权限"</string>
 
     <!-- Fuzzy -->
     <string name="icon_description_owntracks">"Owntracks"</string>
@@ -161,7 +158,6 @@
     <string name="notificationChangeMonitoring"></string>
     <string name="preferencesDebugLog"></string>
     <string name="monitoring_mode"></string>
-    <string name="distance_label">"距离"</string>
     <string name="preferencesClientId"></string>
     <string name="status_endpoint_state_hint"></string>
     <string name="status_endpoint_state_message_hint"></string>

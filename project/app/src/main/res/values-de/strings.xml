@@ -97,9 +97,6 @@
     <string name="welcome_heading">"Willkommen"</string>
     <string name="welcome_description">"Die folgenden Schritte werden Dir helfen, OwnTracks einzurichten"</string>
     <string name="mode_heading">"Modus"</string>
-    <string name="permissions_heading">"Berechtigungen"</string>
-    <string name="permissions_description">"OwnTracks benötigt Zugriff auf Deinen Standort. Bitte erteile diese Berechtigung, bevor es weitergeht."</string>
-    <string name="permissions_granted">"Berechtigungen wurden erteilt"</string>
 
     <!-- Fuzzy -->
     <string name="icon_description_owntracks">"OwnTracks"</string>
@@ -160,7 +157,6 @@
     <string name="notificationChangeMonitoring">"Bewegungs Modus"</string>
     <string name="preferencesDebugLog">"Debug Log"</string>
     <string name="monitoring_mode">"Monitoring"</string>
-    <string name="distance_label">"Abstand"</string>
     <string name="preferencesClientId">"Client ID"</string>
     <string name="status_endpoint_state_hint">"Endpunktstatus"</string>
     <string name="status_endpoint_state_message_hint">"Endpunkt Statusnachricht"</string>

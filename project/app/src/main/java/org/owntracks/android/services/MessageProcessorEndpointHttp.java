@@ -59,10 +59,10 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
     public static final String USERAGENT = "Owntracks-Android/"+ BuildConfig.VERSION_CODE;
     private static final String HTTPTOPIC = "owntracks/http/";
 
-    private Preferences preferences;
-    private Parser parser;
-    private Scheduler scheduler;
-    private Context applicationContext;
+    private final Preferences preferences;
+    private final Parser parser;
+    private final Scheduler scheduler;
+    private final Context applicationContext;
     private HttpUrl httpEndpoint;
 
     public MessageProcessorEndpointHttp(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, Context applicationContext) {

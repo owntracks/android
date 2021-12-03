@@ -6,7 +6,7 @@ import org.owntracks.android.location.OnLocationChangedListener
 import org.owntracks.android.ui.map.MapLocationSource
 
 /**
- * Converts a generic [org.owntracks.android.location.LocationSource] to a GMS-specific [LocationSource]
+ * Converts a generic [MapLocationSource] to a GMS-specific [LocationSource]
  * that can then be passed to specific GMS components that need it.
  */
 fun MapLocationSource.toGMSLocationSource(): LocationSource {

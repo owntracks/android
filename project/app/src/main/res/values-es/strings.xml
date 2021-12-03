@@ -97,9 +97,6 @@
     <string name="welcome_heading">"Bienvenido"</string>
     <string name="welcome_description">"Los siguientes pasos te ayudarán a comenzar con OwnTracks"</string>
     <string name="mode_heading">"Modo"</string>
-    <string name="permissions_heading">"Permisos"</string>
-    <string name="permissions_description">"OwnTracks necesita acceso a la ubicación. Por favor, concede el permiso antes de continuar."</string>
-    <string name="permissions_granted">"Permisos concedidos"</string>
 
     <!-- Fuzzy -->
     <string name="icon_description_owntracks">"OwnTracks"</string>
@@ -162,7 +159,6 @@ Una notificación permanente se mostrará para mantener la aplicación funcionan
     <string name="notificationChangeMonitoring">"Cambio modo"</string>
     <string name="preferencesDebugLog">"Registro de depuración"</string>
     <string name="monitoring_mode">"Monitorización"</string>
-    <string name="distance_label">"Distancia"</string>
     <string name="preferencesClientId">"ID de cliente"</string>
     <string name="status_endpoint_state_hint">"Estado del punto de conexión"</string>
     <string name="status_endpoint_state_message_hint">"Mensaje de estado del punto de conexión"</string>

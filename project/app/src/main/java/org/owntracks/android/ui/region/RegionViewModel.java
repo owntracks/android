@@ -18,7 +18,7 @@ import dagger.hilt.android.scopes.ActivityScoped;
 @ActivityScoped
 public class RegionViewModel extends BaseViewModel<RegionMvvm.View> implements RegionMvvm.ViewModel<RegionMvvm.View> {
     private final LocationRepo locationRepo;
-    private WaypointsRepo waypointsRepo;
+    private final WaypointsRepo waypointsRepo;
 
     private WaypointModel waypoint;
 

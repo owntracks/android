@@ -2,23 +2,23 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:title="@string/preferencesAdvanced">
-    <PreferenceCategory
+    <androidx.preference.PreferenceCategory
         app:iconSpaceReserved="false"
         app:title="@string/preferencesCategoryAdvancedServices">
-        <SwitchPreferenceCompat
+        <androidx.preference.SwitchPreferenceCompat
             app:defaultValue="@bool/valRemoteCommand"
             app:iconSpaceReserved="false"
             app:key="@string/preferenceKeyRemoteCommand"
             app:summary="@string/preferencesRemoteCommandSummary"
             app:title="@string/preferencesRemoteCommand" />
-        <SwitchPreferenceCompat
+        <androidx.preference.SwitchPreferenceCompat
             app:defaultValue="@bool/valRemoteConfiguration"
             app:iconSpaceReserved="false"
             app:key="@string/preferenceKeyRemoteConfiguration"
             app:summary="@string/preferencesRemoteConfigurationSummary"
             app:title="@string/preferencesRemoteConfiguration" />
-    </PreferenceCategory>
-    <PreferenceCategory
+    </androidx.preference.PreferenceCategory>
+    <androidx.preference.PreferenceCategory
         app:iconSpaceReserved="false"
         app:title="@string/preferencesCategoryAdvancedLocator">
         <org.owntracks.android.support.widgets.EditIntegerPreference
@@ -48,22 +48,22 @@
             app:key="@string/preferenceKeyMoveModeLocatorInterval"
             app:summary="@string/preferencesMoveModeLocatorIntervalSummary"
             app:title="@string/preferencesMoveModeLocatorInterval" />
-    </PreferenceCategory>
-    <PreferenceCategory
+    </androidx.preference.PreferenceCategory>
+    <androidx.preference.PreferenceCategory
         app:iconSpaceReserved="false"
         app:title="@string/preferencesCategoryAdvancedEncryption">
-        <EditTextPreference
+        <androidx.preference.EditTextPreference
             app:dialogMessage="@string/preferencesEncryptionKeyDialogMessage"
             app:iconSpaceReserved="false"
             app:key="@string/preferenceKeyEncryptionKey"
             app:summary="@string/preferencesEncryptionKeySummary"
             app:title="@string/preferencesEncryptionKey" />
-    </PreferenceCategory>
-    <PreferenceCategory
+    </androidx.preference.PreferenceCategory>
+    <androidx.preference.PreferenceCategory
         app:iconSpaceReserved="false"
         app:title="@string/preferencesCategoryAdvancedMisc">
 
-        <SwitchPreferenceCompat
+        <androidx.preference.SwitchPreferenceCompat
             app:defaultValue="@bool/valAutostartOnBoot"
             app:iconSpaceReserved="false"
             app:key="@string/preferenceKeyAutostartOnBoot"
@@ -82,13 +82,13 @@
             app:key="@string/preferenceKeyReverseGeocodeProvider"
             app:title="@string/preferencesReverseGeocodeProvider"
             app:useSimpleSummaryProvider="true" />
-        <EditTextPreference
+        <androidx.preference.EditTextPreference
             app:dialogMessage="@string/preferencesOpencageGeocoderApiKeyDialog"
             app:iconSpaceReserved="false"
             app:isPreferenceVisible="false"
             app:key="@string/preferenceKeyOpencageGeocoderApiKey"
             app:summary="@string/preferencesOpencageGeocoderApiKeySummary"
             app:title="@string/preferencesOpencageGeocoderApiKey" />
-    </PreferenceCategory>
+    </androidx.preference.PreferenceCategory>
 
 </PreferenceScreen>

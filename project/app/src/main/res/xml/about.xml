@@ -55,7 +55,7 @@
             android:data="@string/translationContributionUrl" />
     </Preference>
 
-    <PreferenceCategory app:title="@string/aboutFeedbackCategoryTitle">
+    <androidx.preference.PreferenceCategory app:title="@string/aboutFeedbackCategoryTitle">
         <Preference
             android:key="issue"
             android:summary="@string/aboutIssuesSummary"
@@ -75,5 +75,5 @@
                 android:action="android.intent.action.VIEW"
                 android:data="@string/twitterUrl" />
         </Preference>
-    </PreferenceCategory>
+    </androidx.preference.PreferenceCategory>
 </PreferenceScreen>

@@ -44,7 +44,7 @@
                     android:ellipsize="none"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:paddingRight="@dimen/activity_horizontal_margin"
-                    android:text="@{vm.endpointState, default=Connected}" />
+                    android:text="@{vm.endpointState.getLabel(context), default=Connected}" />
 
                 <TextView
                     style="@style/ListItemSecondary"

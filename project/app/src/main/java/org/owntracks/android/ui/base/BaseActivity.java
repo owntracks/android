@@ -47,10 +47,6 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
     /* Use this method to set the content view on your Activity. This method also handles
      * creating the binding, setting the view model on the binding and attaching the view. */
     protected final void bindAndAttachContentView(@LayoutRes int layoutResId, @Nullable Bundle savedInstanceState) {
-        bindAndAttachContentView(layoutResId, savedInstanceState, null);
-    }
-
-    protected final void bindAndAttachContentView(@LayoutRes int layoutResId, @Nullable Bundle savedInstanceState, @Nullable androidx.databinding.DataBindingComponent dataBindingComponent) {
         if (viewModel == null) {
             throw new IllegalStateException("viewModel must not be null and should be injected via activityComponent().inject(this)");
         }
@@ -86,33 +82,24 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
     };
 
     protected void setSupportToolbar(@NonNull Toolbar toolbar) {
-        setSupportToolbar(toolbar, true, true);
+        setSupportToolbar(toolbar, true);
     }
 
-    protected void setSupportToolbar(@NonNull Toolbar toolbar, boolean showTitle, boolean showHome) {
+    protected void setSupportToolbar(@NonNull Toolbar toolbar, boolean showHome) {
         setSupportActionBar(toolbar);
 
         if (getSupportActionBar() != null) {
-            if (showTitle)
-                getSupportActionBar().setTitle(getTitle());
-
-            getSupportActionBar().setDisplayShowTitleEnabled(showTitle);
+            getSupportActionBar().setTitle(getTitle());
+            getSupportActionBar().setDisplayShowTitleEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(showHome);
             getSupportActionBar().setDisplayHomeAsUpEnabled(showHome);
         }
 
     }
 
-    protected void setSupportToolbarWithDrawer(@NonNull Toolbar toolbar) {
-        setSupportToolbar(toolbar, true, true);
-        setDrawer(toolbar);
-    }
-
-
     protected void setDrawer(@NonNull Toolbar toolbar) {
         drawerProvider.attach(toolbar);
     }
-
 
     @Override
     protected void onCreate(Bundle b) {
@@ -129,7 +116,6 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
             viewModel.saveInstanceState(outState);
         }
     }
-
 
     @Override
     public void onStart() {

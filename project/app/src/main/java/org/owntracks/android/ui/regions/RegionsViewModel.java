@@ -14,7 +14,7 @@ import timber.log.Timber;
 @ActivityScoped
 public class RegionsViewModel extends BaseViewModel<RegionsMvvm.View> implements RegionsMvvm.ViewModel<RegionsMvvm.View> {
     private final LocationProcessor locationProcessor;
-    private WaypointsRepo waypointsRepo;
+    private final WaypointsRepo waypointsRepo;
 
     @Inject
     public RegionsViewModel(WaypointsRepo waypointsRepo, LocationProcessor locationProcessor) {

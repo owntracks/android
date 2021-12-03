@@ -27,7 +27,7 @@ fun IMyLocationConsumer.toOnLocationChangedListener(): OnLocationChangedListener
 }
 
 /**
- * Converts a generic [LocationSource] into an [IMyLocationProvider] for use with an OSMDroid map
+ * Converts a generic [MapLocationSource] into an [IMyLocationProvider] for use with an OSMDroid map
  *
  * @return
  */

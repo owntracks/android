@@ -2,34 +2,34 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:title="@string/preferencesNotification">
-    <PreferenceCategory
+    <androidx.preference.PreferenceCategory
         app:iconSpaceReserved="false"
         app:title="@string/preferencesCategoryNotificationOngoing">
-        <SwitchPreferenceCompat
+        <androidx.preference.SwitchPreferenceCompat
             android:defaultValue="@bool/valNotificationLocation"
             app:iconSpaceReserved="false"
             app:key="@string/preferenceKeyNotificationLocation"
             app:summary="@string/preferencesNotificationLocationSummary"
             app:title="@string/preferencesNotificationLocation" />
-    </PreferenceCategory>
-    <PreferenceCategory
+    </androidx.preference.PreferenceCategory>
+    <androidx.preference.PreferenceCategory
         app:iconSpaceReserved="false"
         app:title="@string/preferencesCategoryNotificationBackground">
-        <SwitchPreferenceCompat
+        <androidx.preference.SwitchPreferenceCompat
             android:defaultValue="@bool/valNotificationEvents"
             app:iconSpaceReserved="false"
             app:key="@string/preferenceKeyNotificationEvents"
             app:summary="@string/preferencesNotificationEventsSummary"
             app:title="@string/preferencesNotificationEvents" />
-    </PreferenceCategory>
-    <PreferenceCategory
+    </androidx.preference.PreferenceCategory>
+    <androidx.preference.PreferenceCategory
         app:iconSpaceReserved="false"
         app:title="@string/preferencesCategoryNotificationErrors">
-        <SwitchPreferenceCompat
+        <androidx.preference.SwitchPreferenceCompat
             android:defaultValue="@bool/valNotificationGeocoderErrors"
             app:iconSpaceReserved="false"
             app:key="@string/preferenceKeyNotificationGeocoderErrors"
             app:summary="@string/preferencesNotificationGeocoderErrorsSummary"
             app:title="@string/preferencesNotificationGeocoderErrors" />
-    </PreferenceCategory>
+    </androidx.preference.PreferenceCategory>
 </PreferenceScreen>

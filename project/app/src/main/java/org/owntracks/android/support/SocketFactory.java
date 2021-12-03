@@ -22,8 +22,8 @@ import javax.net.ssl.TrustManagerFactory;
 import timber.log.Timber;
 
 public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
-    private javax.net.ssl.SSLSocketFactory factory;
-    private String[] protocols=new String[] {"TLSv1", "TLSv1.1", "TLSv1.2", "TLSv1.3"};
+    private final javax.net.ssl.SSLSocketFactory factory;
+    private final String[] protocols=new String[] {"TLSv1", "TLSv1.1", "TLSv1.2", "TLSv1.3"};
 
     public static class SocketFactoryOptions {
 

@@ -97,9 +97,6 @@
     <string name="welcome_heading">"Witaj"</string>
     <string name="welcome_description">"Poniższe kroki pomogą Ci rozpocząć pracę z Owntracks"</string>
     <string name="mode_heading">"Tryb"</string>
-    <string name="permissions_heading">"Uprawnienia"</string>
-    <string name="permissions_description">"Owntracks wymaga dostępu do Twojej lokalizacji. Zezwól na niego, zanim rozpoczniesz."</string>
-    <string name="permissions_granted">"Uprawnienia zostały udzielone"</string>
 
     <!-- Fuzzy -->
     <string name="icon_description_owntracks">"Owntracks"</string>
@@ -164,7 +161,6 @@ Aby utrzymać działanie aplikacji w tle, będzie wyświetlana permanentna notyf
     <string name="notificationChangeMonitoring">"Zmień monitorowanie"</string>
     <string name="preferencesDebugLog">"Informacje debugowania"</string>
     <string name="monitoring_mode">"Monitorowanie"</string>
-    <string name="distance_label">"Odległość"</string>
     <string name="preferencesClientId">"ID Klienta"</string>
     <string name="status_endpoint_state_hint">"Stan endpointa"</string>
     <string name="status_endpoint_state_message_hint">"Komunikat stanu endpointa"</string>
