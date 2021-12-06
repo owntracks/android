@@ -1,5 +1,11 @@
 # Changelog
 
+## Verison 2.4.5
+
+### Bug fixes
+
+* Fix crash resuming the MapActivity caused by FragmentFactory handling fragment creation correctly onResume
+
 ## Verison 2.4.4
 
 ### New features

@@ -27,8 +27,8 @@ android {
         minSdkVersion(21)
         targetSdkVersion(30)
 
-        versionCode = 24400
-        versionName = "2.4.4"
+        versionCode = 24500
+        versionName = "2.4.5"
 
         javaCompileOptions {
             annotationProcessorOptions {
