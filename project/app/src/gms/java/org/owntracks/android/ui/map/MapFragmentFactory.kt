@@ -5,6 +5,7 @@ import androidx.fragment.app.FragmentFactory
 import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.support.Preferences
 import org.owntracks.android.ui.map.osm.OSMMapFragment
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -22,15 +23,15 @@ class MapFragmentFactory @Inject constructor(
 ) : FragmentFactory() {
     var mapLocationSource: MapLocationSource? = null
     override fun instantiate(classLoader: ClassLoader, className: String): Fragment {
-        return when (classLoader.loadClass(className)) {
-            MapFragment::class.java -> {
-                return if (preferences.experimentalFeatures.contains(Preferences.EXPERIMENTAL_FEATURE_USE_OSM_MAP)) {
-                    OSMMapFragment(locationRepo, mapLocationSource!!)
-                } else {
-                    GoogleMapFragment(locationRepo, mapLocationSource!!)
-                }
+        Timber.d("Instantiating Fragment for $className")
+        return if (MapFragment::class.java.isAssignableFrom(classLoader.loadClass(className))) {
+            if (preferences.experimentalFeatures.contains(Preferences.EXPERIMENTAL_FEATURE_USE_OSM_MAP)) {
+                OSMMapFragment(locationRepo, mapLocationSource!!)
+            } else {
+                GoogleMapFragment(locationRepo, mapLocationSource!!)
             }
-            else -> super.instantiate(classLoader, className)
+        } else {
+            super.instantiate(classLoader, className)
         }
     }
 }

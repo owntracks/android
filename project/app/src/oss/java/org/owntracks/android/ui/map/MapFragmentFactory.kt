@@ -21,9 +21,10 @@ class MapFragmentFactory @Inject constructor(
 ) : FragmentFactory() {
     var mapLocationSource: MapLocationSource? = null
     override fun instantiate(classLoader: ClassLoader, className: String): Fragment {
-        return when (classLoader.loadClass(className)) {
-            MapFragment::class.java -> OSMMapFragment(locationRepo, mapLocationSource!!)
-            else -> super.instantiate(classLoader, className)
+        return if (MapFragment::class.java.isAssignableFrom(classLoader.loadClass(className))) {
+            OSMMapFragment(locationRepo, mapLocationSource!!)
+        } else {
+            super.instantiate(classLoader, className)
         }
     }
 }
