@@ -13,6 +13,7 @@ import org.owntracks.android.location.LocationCallback
 import org.owntracks.android.location.LocationProviderClient
 import org.owntracks.android.location.LocationRequest
 import timber.log.Timber
+import java.util.concurrent.ExecutionException
 
 /**
  * An implementation of [LocationProviderClient] that uses a [FusedLocationProviderClient] to request
@@ -85,7 +86,15 @@ class GMSLocationProviderClient(
 
     @SuppressLint("MissingPermission")
     override fun getLastLocation(): Location? {
-        return Tasks.await(fusedLocationProviderClient.lastLocation)
+        try {
+            return Tasks.await(fusedLocationProviderClient.lastLocation)
+        } catch (e: ExecutionException) {
+            Timber.e(e, "Error fetching last location from GMS client")
+            return null
+        } catch (e: InterruptedException) {
+            Timber.e(e, "Error fetching last location from GMS client")
+            return null
+        }
     }
 
     companion object {
