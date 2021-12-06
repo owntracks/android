@@ -184,7 +184,9 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
                     }
                 })
                 vm.mapCenter.observe(this, { o: LatLng ->
-                    mapFragment.updateCamera(o)
+                    if (::mapFragment.isInitialized) {
+                        mapFragment.updateCamera(o)
+                    }
                 })
                 vm.currentLocation.observe(this, { location ->
                     if (location == null) {
@@ -376,11 +378,11 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
 
 
     override fun onResume() {
+        mapFragment =
+            supportFragmentManager.fragmentFactory.instantiate(this.classLoader, MapFragment::class.java.name) as MapFragment
         supportFragmentManager.commit(true) {
-            replace<MapFragment>(R.id.mapFragment, "map")
+            replace(R.id.mapFragment, mapFragment, "map")
         }
-        supportFragmentManager.executePendingTransactions()
-        mapFragment = supportFragmentManager.findFragmentByTag("map") as MapFragment
 
         if (preferences.isExperimentalFeatureEnabled(
                 EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION
