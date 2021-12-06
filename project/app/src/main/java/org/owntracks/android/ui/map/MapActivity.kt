@@ -130,7 +130,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
             bindAndAttachContentView(R.layout.ui_map, savedInstanceState)
 
             binding?.also {
-                setSupportToolbar(it.appbar.toolbar, true)
+                setSupportToolbar(it.appbar.toolbar, false, true)
                 setDrawer(it.appbar.toolbar)
                 bottomSheetBehavior = BottomSheetBehavior.from(it.bottomSheetLayout)
                 it.contactPeek.contactRow.setOnClickListener(this)
