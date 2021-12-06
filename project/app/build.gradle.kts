@@ -57,6 +57,10 @@ android {
             keyPassword = System.getenv("KEYSTORE_PASSPHRASE")
             storeFile = file("../owntracks.release.keystore.jks")
             storePassword = System.getenv("KEYSTORE_PASSPHRASE")
+            enableV1Signing = true
+            enableV2Signing = true
+            enableV3Signing = true
+            enableV4Signing = true
         }
     }
 
