@@ -5,6 +5,7 @@
 ### Bug fixes
 
 * Fix crash resuming the MapActivity caused by FragmentFactory handling fragment creation correctly onResume
+* Auto-sizing of text on the bottomsheet contact details pull-up should work properly now (#1123)
 
 ## Verison 2.4.4
 

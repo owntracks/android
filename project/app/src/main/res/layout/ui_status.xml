@@ -65,7 +65,7 @@
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:paddingRight="@dimen/activity_horizontal_margin"
                     android:text="@{vm.endpointMessage ?? @string/na, default=@string/na}"
-                    android:visibility="@{vm.endpointMessage!=null}" />
+                    android:visibility="@{vm.endpointMessage.isEmpty() ? View.GONE : View.VISIBLE}" />
 
                 <TextView
                     style="@style/ListItemSecondary"
@@ -76,7 +76,7 @@
                     android:paddingRight="@dimen/activity_horizontal_margin"
                     android:paddingBottom="@dimen/activity_horizontal_margin"
                     android:text="@string/status_endpoint_state_message_hint"
-                    android:visibility="@{vm.endpointMessage!=null}" />
+                    android:visibility="@{vm.endpointMessage.isEmpty() ? View.GONE : View.VISIBLE}" />
 
                 <TextView
                     style="@style/ListItemPrimary"
