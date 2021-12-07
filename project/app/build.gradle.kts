@@ -204,7 +204,7 @@ dependencies {
     implementation("com.google.dagger:hilt-compiler:${rootProject.extra["dagger-version"]}")
     implementation("com.google.dagger:hilt-android:${rootProject.extra["dagger-version"]}")
 
-    implementation("org.greenrobot:eventbus:3.2.0")
+    implementation("org.greenrobot:eventbus:3.3.0")
     implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
 
     implementation("com.squareup.okhttp3:okhttp:${okHttpVersion}")
