@@ -92,14 +92,15 @@
     <string name="transitionLeaving">"surt"</string>
     <string name="errorPreferencesImportFailed">"Error importació"</string>
     <string name="welcome_play_heading">"Serveis Google Play"</string>
-    <string name="welcome_play_description">"Owntracks necessita Serveis Google Play"</string>
+    <string name="welcome_play_description">"OwnTracks necessita Serveis Google Play"</string>
     <string name="icon_description_warning">"Avís"</string>
     <string name="welcome_heading">"Benvinguda"</string>
     <string name="welcome_description">"Els següents passos t'ajudaran a començar amb Owntracks"</string>
     <string name="mode_heading">"Mode"</string>
-
-    <!-- Fuzzy -->
-    <string name="icon_description_owntracks">"Owntracks"</string>
+    <string name="permissions_heading">"Permisos"</string>
+    <string name="permissions_description">"Owntracks necessita accedir a la ubicació. Sisplau atorga aquest permís abans de continuar."</string>
+    <string name="permissions_granted">"Permisos concedits"</string>
+    <string name="icon_description_owntracks">"OwnTracks"</string>
     <string name="enjoy_description">"Escull preferències des del menú i configura Owntracks per al teu servidor abans d'utilitzar-lo"</string>
     <string name="done_heading">"Fet"</string>
     <string name="icon_description_done">"Fet"</string>
@@ -161,6 +162,7 @@ Es mostrarà una notificació permanent per continuar executant-se en segon pla.
     <string name="notificationChangeMonitoring">"Canvia el mode control"</string>
     <string name="preferencesDebugLog">"Registre de depuració"</string>
     <string name="monitoring_mode">"Seguiment"</string>
+    <string name="distance_label">"Distància"</string>
     <string name="preferencesClientId">"ID Client"</string>
     <string name="status_endpoint_state_hint">"Estat del punt final"</string>
     <string name="status_endpoint_state_message_hint">"Missatge de l'estat del punt final"</string>
@@ -182,6 +184,7 @@ Es mostrarà una notificació permanent per continuar executant-se en segon pla.
     <string name="preferencesRemoteConfigurationSummary">"Activa la configuració per actualitzar-se remotament (requereix comandes remotes) "</string>
     <string name="aboutLicense">"LLicència"</string>
     <plurals name="aboutTranslationsSummary">
+        <item quantity="one">"Actualment disponible en 5 idiomes!"</item>
         <item quantity="other">"Actualment disponible en %1$d idiomes!"</item>
     </plurals>
     <string name="aboutTranslations">"Ajudeu a traduir aquesta aplicació"</string>
@@ -197,7 +200,7 @@ Es mostrarà una notificació permanent per continuar executant-se en segon pla.
     <string name="refresh_log">"Actualitzar"</string>
     <string name="preferencesTheme">"Tema"</string>
     <string name="contactDetailsAccuracyValue">"%d m"</string>
-    <string name="contactDetailsDistanceValue">%1$,.2f %2$s</string>
+    <string name="contactDetailsDistanceValue">"%1$,.2f %2$s"</string>
     <string name="contactDetailsAltitude">"Alçada"</string>
     <string name="contactDetailsBearing">"Orientació"</string>
     <string name="contactDetailsDistance">"Distància"</string>
@@ -230,8 +233,11 @@ Consulteu el registre per tenir més detalls."</string>
     <string name="deviceLocationDisabledDialogMessage">"Actualment els serveis d'ubicació d'aquest dispositiu estan desactivats, de manera que OwnTracks no pot fer un seguiment de la vostra ubicació actual.
 
 Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</string>
-    <string name="aboutIssuesTitle">Report an issue</string>
-    <string name="aboutIssuesSummary">File on GitHub</string>
-    <string name="aboutSourceCodeSummary">on GitHub</string>
-    <string name="aboutFeedbackCategoryTitle">Feedback</string>
+    <string name="aboutIssuesTitle">"Report an issue"</string>
+    <string name="aboutIssuesSummary">"File on GitHub"</string>
+    <string name="aboutSourceCodeSummary">"on GitHub"</string>
+    <string name="aboutFeedbackCategoryTitle">"Feedback"</string>
+    <string name="contactDetailsDistanceUnitKilometres"></string>
+    <string name="contactDetailsDistanceUnitMeters"></string>
+    <string name="exportConfigurationSubject"></string>
 </resources>

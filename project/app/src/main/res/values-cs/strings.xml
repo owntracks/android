@@ -92,14 +92,15 @@
     <string name="transitionLeaving">"opouští"</string>
     <string name="errorPreferencesImportFailed">"Import selhal"</string>
     <string name="welcome_play_heading">"Google Play Services"</string>
-    <string name="welcome_play_description">"Owntracks vyžaduje Google Play Services"</string>
+    <string name="welcome_play_description">"OwnTracks vyžaduje Google Play Services"</string>
     <string name="icon_description_warning">"Varování"</string>
     <string name="welcome_heading">"Vítejte"</string>
-    <string name="welcome_description">"Následující kroky Vám pomohou začít s Owntracks"</string>
+    <string name="welcome_description">"Následující kroky Vám pomohou začít s OwnTracks"</string>
     <string name="mode_heading">"Mód"</string>
-
-    <!-- Fuzzy -->
-    <string name="icon_description_owntracks">"Owntracks"</string>
+    <string name="permissions_heading">"Oprávnění"</string>
+    <string name="permissions_description">"Owntrack vyžaduje přístup k poloze zařízení. Udělte oprávnění a potom pokračujte."</string>
+    <string name="permissions_granted">"Oprávnění byla uděleno"</string>
+    <string name="icon_description_owntracks">"OwnTracks"</string>
     <string name="enjoy_description">"Zvolte nabídku Nastavení a nakonfigurujte Owntracks před tím, než jej začnete používat"</string>
     <string name="done_heading">"Hotovo"</string>
     <string name="icon_description_done">"Hotovo"</string>
@@ -155,11 +156,12 @@ Aby aplikace mohla běžet na pozadí, bude zobrazeno trvalé oznámení. Lze to
     <string name="region_outside">"Nyní venku"</string>
     <string name="monitoring_quiet">"Tichý mód"</string>
     <string name="monitoring_manual">"Ruční mód"</string>
-    <string name="monitoring_significant">"Mód rychlého pohybu"</string>
+    <string name="monitoring_significant">"Mód velkých změn"</string>
     <string name="monitoring_move">"Mód pohybu"</string>
-    <string name="notificationChangeMonitoring">"Sledování změn"</string>
+    <string name="notificationChangeMonitoring">"Změna módu"</string>
     <string name="preferencesDebugLog">"Protokol ladění"</string>
     <string name="monitoring_mode">"Sledování"</string>
+    <string name="distance_label">"Vzdálenost"</string>
     <string name="preferencesClientId">"Client ID"</string>
     <string name="status_endpoint_state_hint">"Stav spojení"</string>
     <string name="status_endpoint_state_message_hint">"Zpráva o stavu spojení"</string>
@@ -181,7 +183,9 @@ Aby aplikace mohla běžet na pozadí, bude zobrazeno trvalé oznámení. Lze to
     <string name="preferencesRemoteConfigurationSummary">"Zapnout vzdálenou aktualizaci konfigurace (Vyžaduje vzdálené příkazy)"</string>
     <string name="aboutLicense">"Licence"</string>
     <plurals name="aboutTranslationsSummary">
-        <item quantity="other">"Nyní dostupné v %1$d jazycích!"</item>
+        <item quantity="one">"Nyní dostupná v %d jazycích!"</item>
+        <item quantity="few">"Nyní dostupná v %d jazycích!"</item>
+        <item quantity="other">"Nyní dostupná v %d jazycích!"</item>
     </plurals>
     <string name="aboutTranslations">"Pomozte přeložit tuto aplikaci"</string>
     <string name="geocoderDisabled">"Služba geokóderu je vypnuta."</string>
@@ -196,7 +200,7 @@ Aby aplikace mohla běžet na pozadí, bude zobrazeno trvalé oznámení. Lze to
     <string name="refresh_log">"Obnovit"</string>
     <string name="preferencesTheme">"Téma"</string>
     <string name="contactDetailsAccuracyValue">"%d m"</string>
-    <string name="contactDetailsDistanceValue">%1$,.2f %2$s</string>
+    <string name="contactDetailsDistanceValue">"%,.2f %s"</string>
     <string name="contactDetailsAltitude">"Výška"</string>
     <string name="contactDetailsBearing">"Směr"</string>
     <string name="contactDetailsDistance">"Vzdálenost"</string>
@@ -229,8 +233,11 @@ Další podrobnosti naleznete v protokolech."</string>
     <string name="deviceLocationDisabledDialogMessage">"Služby určování polohy na tomto zařízení jsou momentálně vypnuté, takže OwnTracks nemůže sledovat vaši aktuální polohu.
 
 Chcete-li to povolit, zapněte polohu v nastavení zařízení."</string>
-    <string name="aboutIssuesTitle">Report an issue</string>
-    <string name="aboutIssuesSummary">File on GitHub</string>
-    <string name="aboutSourceCodeSummary">on GitHub</string>
-    <string name="aboutFeedbackCategoryTitle">Feedback</string>
+    <string name="aboutIssuesTitle">"Report an issue"</string>
+    <string name="aboutIssuesSummary">"File on GitHub"</string>
+    <string name="aboutSourceCodeSummary">"on GitHub"</string>
+    <string name="aboutFeedbackCategoryTitle">"Feedback"</string>
+    <string name="contactDetailsDistanceUnitKilometres"></string>
+    <string name="contactDetailsDistanceUnitMeters"></string>
+    <string name="exportConfigurationSubject"></string>
 </resources>

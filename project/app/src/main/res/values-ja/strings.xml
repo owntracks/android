@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!-- Fuzzy -->
     <string name="app_name">"OwnTracks"</string>
     <string name="preferencesServer">"接続"</string>
     <string name="preferencesHost">"ホスト"</string>
@@ -92,11 +94,18 @@
     <string name="transitionLeaving"></string>
     <string name="errorPreferencesImportFailed">"インポートに失敗しました"</string>
     <string name="welcome_play_heading">"Google Play開発者サービス"</string>
+
+    <!-- Fuzzy -->
     <string name="welcome_play_description">"Owntrack"</string>
     <string name="icon_description_warning">"警告"</string>
     <string name="welcome_heading">"ようこそ"</string>
+
+    <!-- Fuzzy -->
     <string name="welcome_description">"いくつかのステップを実施し、Owntracksを利用開始できるようにします"</string>
     <string name="mode_heading">"モード"</string>
+    <string name="permissions_heading">"権限"</string>
+    <string name="permissions_description">"Owntracksを利用するには位置情報へのアクセスが必要です。続ける前に、権限を付与してください。"</string>
+    <string name="permissions_granted">"権限が付与されました"</string>
 
     <!-- Fuzzy -->
     <string name="icon_description_owntracks">"Owntracks"</string>
@@ -158,6 +167,7 @@
     <string name="notificationChangeMonitoring">"モニタリングモード変更"</string>
     <string name="preferencesDebugLog">"デバッグログ"</string>
     <string name="monitoring_mode">"モニタリング"</string>
+    <string name="distance_label">"距離"</string>
     <string name="preferencesClientId">"クライアントID"</string>
     <string name="status_endpoint_state_hint">"エンドポイントの状態"</string>
     <string name="status_endpoint_state_message_hint">"エンドポイントからのメッセージ"</string>
@@ -179,7 +189,7 @@
     <string name="preferencesRemoteConfigurationSummary">"リモートで構成設定を更新できるようにします(リモートコマンドが必要です)"</string>
     <string name="aboutLicense">"ライセンス"</string>
     <plurals name="aboutTranslationsSummary">
-        <item quantity="other">"現在 %1$d 個の言語が利用可能です!"</item>
+        <item quantity="other">"現在 %d 個の言語が利用可能です!"</item>
     </plurals>
     <string name="aboutTranslations">"このアプリの翻訳を助ける"</string>
     <string name="geocoderDisabled">"ジオコーダーサービスが利用できません"</string>
@@ -194,7 +204,7 @@
     <string name="refresh_log">"更新"</string>
     <string name="preferencesTheme">"テーマ"</string>
     <string name="contactDetailsAccuracyValue">"%d m"</string>
-    <string name="contactDetailsDistanceValue">%1$,.2f %2$s</string>
+    <string name="contactDetailsDistanceValue">"%,.2f %s"</string>
     <string name="contactDetailsAltitude">"高度"</string>
     <string name="contactDetailsBearing">"角度"</string>
     <string name="contactDetailsDistance">"距離"</string>
@@ -227,8 +237,11 @@
     <string name="deviceLocationDisabledDialogMessage">"デバイスの位置情報サービスが無効になっているため、Owntracksは現在地をトラッキングできません。
 
 デバイスの設定から、位置情報を有効にしてください。"</string>
-    <string name="aboutIssuesTitle">Report an issue</string>
-    <string name="aboutIssuesSummary">File on GitHub</string>
-    <string name="aboutSourceCodeSummary">on GitHub</string>
-    <string name="aboutFeedbackCategoryTitle">Feedback</string>
+    <string name="aboutIssuesTitle">"Report an issue"</string>
+    <string name="aboutIssuesSummary">"File on GitHub"</string>
+    <string name="aboutSourceCodeSummary">"on GitHub"</string>
+    <string name="aboutFeedbackCategoryTitle">"Feedback"</string>
+    <string name="contactDetailsDistanceUnitKilometres"></string>
+    <string name="contactDetailsDistanceUnitMeters"></string>
+    <string name="exportConfigurationSubject"></string>
 </resources>
