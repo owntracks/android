@@ -196,7 +196,7 @@
     <string name="refresh_log">"Neu laden"</string>
     <string name="preferencesTheme">"Aussehen"</string>
     <string name="contactDetailsAccuracyValue">"%d m"</string>
-    <string name="contactDetailsDistanceValue">"%,.2f %s"</string>
+    <string name="contactDetailsDistanceValue">"%,.21$f %2$s"</string>
     <string name="contactDetailsAltitude">"Höhe"</string>
     <string name="contactDetailsBearing">"Richtung"</string>
     <string name="contactDetailsDistance">"Distanz"</string>

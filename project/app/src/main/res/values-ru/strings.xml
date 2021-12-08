@@ -210,7 +210,7 @@
 
     <!-- meters in Russian is "метров", i.e. "%dм" instead if "%d m" -->
     <string name="contactDetailsAccuracyValue">"%dм"</string>
-    <string name="contactDetailsDistanceValue">"%,.2f %s"</string>
+    <string name="contactDetailsDistanceValue">"%1$,.2f %2$s"</string>
     <string name="contactDetailsAltitude">"Высота"</string>
     <string name="contactDetailsBearing">"Азимут"</string>
     <string name="contactDetailsDistance">"Расстояние"</string>

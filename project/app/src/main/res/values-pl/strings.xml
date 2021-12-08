@@ -202,7 +202,7 @@ Aby utrzymać działanie aplikacji w tle, będzie wyświetlana permanentna notyf
     <string name="refresh_log">"Odśwież"</string>
     <string name="preferencesTheme">"Motyw"</string>
     <string name="contactDetailsAccuracyValue">"%d m"</string>
-    <string name="contactDetailsDistanceValue">"%,.2f %s"</string>
+    <string name="contactDetailsDistanceValue">"%1$,.2f %2$s"</string>
     <string name="contactDetailsAltitude">"Wysokość"</string>
     <string name="contactDetailsBearing">"Kierunek"</string>
     <string name="contactDetailsDistance">"Odległość"</string>
