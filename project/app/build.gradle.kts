@@ -240,7 +240,7 @@ dependencies {
     kapt("com.sun.xml.bind:jaxb-impl:$jaxbVersion")
 
     // Preprocessors
-    kapt("org.greenrobot:eventbus-annotation-processor:3.2.0")
+    kapt("org.greenrobot:eventbus-annotation-processor:3.3.1")
     kapt("com.google.dagger:hilt-compiler:${rootProject.extra["dagger-version"]}")
 
     kaptTest("com.google.dagger:hilt-compiler:${rootProject.extra["dagger-version"]}")
