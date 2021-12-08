@@ -232,6 +232,7 @@
     <string name="aboutSourceCodeSummary">on GitHub</string>
     <string name="aboutFeedbackCategoryTitle">Feedback</string>
     <string name="exportConfigurationSubject">OwnTracks Configuration File</string>
+    <string name="exportLogFileSubject">OwnTracks Log File</string>
     <string-array name="geocoders">
         <item>None</item>
         <item>Device (Google)</item>

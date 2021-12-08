@@ -79,9 +79,9 @@ class LogViewerActivity : BaseActivity<UiPreferencesLogsBinding, NoOpViewModel>(
             revokeExportUriPermissions()
             val key = "${getRandomHexString()}/debug=${preferences.debugLog}/owntracks-debug.txt"
             logExportUri = Uri.parse("content://${BuildConfig.APPLICATION_ID}.log/$key")
-            val shareIntent = ShareCompat.IntentBuilder.from(this)
+            val shareIntent = ShareCompat.IntentBuilder(this)
                 .setType("text/plain")
-                .setSubject("OwnTracks Log File")
+                .setSubject(getString(R.string.exportLogFileSubject))
                 .setChooserTitle(R.string.exportLogFilePrompt)
                 .setStream(logExportUri)
                 .createChooserIntent()
