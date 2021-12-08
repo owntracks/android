@@ -97,8 +97,9 @@
     <string name="welcome_heading">"Willkommen"</string>
     <string name="welcome_description">"Die folgenden Schritte werden Dir helfen, OwnTracks einzurichten"</string>
     <string name="mode_heading">"Modus"</string>
-
-    <!-- Fuzzy -->
+    <string name="permissions_heading">"Berechtigungen"</string>
+    <string name="permissions_description">"OwnTracks benötigt Zugriff auf Deinen Standort. Bitte erteile diese Berechtigung, bevor es weitergeht."</string>
+    <string name="permissions_granted">"Berechtigungen wurden erteilt"</string>
     <string name="icon_description_owntracks">"OwnTracks"</string>
     <string name="enjoy_description">"Viel Spaß mit OwnTracks"</string>
     <string name="done_heading">"Fertig"</string>
@@ -157,6 +158,7 @@
     <string name="notificationChangeMonitoring">"Bewegungs Modus"</string>
     <string name="preferencesDebugLog">"Debug Log"</string>
     <string name="monitoring_mode">"Monitoring"</string>
+    <string name="distance_label">"Abstand"</string>
     <string name="preferencesClientId">"Client ID"</string>
     <string name="status_endpoint_state_hint">"Endpunktstatus"</string>
     <string name="status_endpoint_state_message_hint">"Endpunkt Statusnachricht"</string>
@@ -178,15 +180,14 @@
     <string name="preferencesRemoteConfigurationSummary">"Fernkonfiguration ermöglichen (benötigt Fernkommandos)"</string>
     <string name="aboutLicense">"Lizenz"</string>
     <plurals name="aboutTranslationsSummary">
-        <item quantity="other">"Jetzt in %1$d Sprachen verfügbar!"</item>
+        <item quantity="one">"Jetzt in sechs Sprachen verfügbar!"</item>
+        <item quantity="other">"Jetzt in sechs Sprachen verfügbar!"</item>
     </plurals>
     <string name="aboutTranslations">"Übersetzungshilfe"</string>
     <string name="geocoderDisabled">"Der Geocoding Dienst ist ausgeschaltet"</string>
     <string name="geocoderRateLimited">"Geocoding Duchstatz ist limitiert worden. Nächster Versuch wenn %s"</string>
     <string name="geocoderError">"Der Fehler %s ist vom Geocoding Dienst geliefert worden"</string>
     <string name="notificationChannelErrors">"Fehler"</string>
-
-    <!-- Fuzzy -->
     <string name="geocoderProblemNotificationTitle">"Geocoding Problem"</string>
     <string name="geocoderIPAddressRejected">"Die Client IP-Adresse ist zurueckgewiesen worden"</string>
     <string name="backgroundLocationRestrictionNotificationTitle">"Standortverfolgung pausiert"</string>
@@ -195,7 +196,7 @@
     <string name="refresh_log">"Neu laden"</string>
     <string name="preferencesTheme">"Aussehen"</string>
     <string name="contactDetailsAccuracyValue">"%d m"</string>
-    <string name="contactDetailsDistanceValue">%1$,.2f %2$s</string>
+    <string name="contactDetailsDistanceValue">"%,.2f %s"</string>
     <string name="contactDetailsAltitude">"Höhe"</string>
     <string name="contactDetailsBearing">"Richtung"</string>
     <string name="contactDetailsDistance">"Distanz"</string>
@@ -228,8 +229,11 @@ Bitte überprüfen Sie die Logs für mehr Details."</string>
     <string name="deviceLocationDisabledDialogMessage">"Die Ortungsdienste auf diesem Gerät sind derzeit deaktiviert, sodass OwnTracks Ihren aktuellen Standort nicht verfolgen kann.
 
 Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstellungen."</string>
-    <string name="aboutIssuesTitle">Report an issue</string>
-    <string name="aboutIssuesSummary">File on GitHub</string>
-    <string name="aboutSourceCodeSummary">on GitHub</string>
-    <string name="aboutFeedbackCategoryTitle">Feedback</string>
+    <string name="aboutIssuesTitle">"Report an issue"</string>
+    <string name="aboutIssuesSummary">"File on GitHub"</string>
+    <string name="aboutSourceCodeSummary">"on GitHub"</string>
+    <string name="aboutFeedbackCategoryTitle">"Feedback"</string>
+    <string name="contactDetailsDistanceUnitKilometres"></string>
+    <string name="contactDetailsDistanceUnitMeters"></string>
+    <string name="exportConfigurationSubject"></string>
 </resources>

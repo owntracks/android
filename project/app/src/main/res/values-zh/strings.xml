@@ -92,11 +92,18 @@
     <string name="transitionLeaving">"离开"</string>
     <string name="errorPreferencesImportFailed">"导入失败"</string>
     <string name="welcome_play_heading">"Google Play 服务"</string>
+
+    <!-- Fuzzy -->
     <string name="welcome_play_description">"Owntracks 依赖 Google Play 服务"</string>
     <string name="icon_description_warning">"警告"</string>
     <string name="welcome_heading">"欢迎"</string>
+
+    <!-- Fuzzy -->
     <string name="welcome_description">"以下步骤将帮助您开始使用 Owntracks"</string>
     <string name="mode_heading">"模式"</string>
+    <string name="permissions_heading">"权限"</string>
+    <string name="permissions_description">"Owntracks 需要获取您的位置。请授权 Owntracks 访问您的位置信息。"</string>
+    <string name="permissions_granted">"已获得权限"</string>
 
     <!-- Fuzzy -->
     <string name="icon_description_owntracks">"Owntracks"</string>
@@ -158,6 +165,7 @@
     <string name="notificationChangeMonitoring"></string>
     <string name="preferencesDebugLog"></string>
     <string name="monitoring_mode"></string>
+    <string name="distance_label">"距离"</string>
     <string name="preferencesClientId"></string>
     <string name="status_endpoint_state_hint"></string>
     <string name="status_endpoint_state_message_hint"></string>
@@ -179,7 +187,7 @@
     <string name="preferencesRemoteConfigurationSummary">"允许配置文件被远程更新（需要开启远程命令）"</string>
     <string name="aboutLicense">"许可协议"</string>
     <plurals name="aboutTranslationsSummary">
-        <item quantity="other">"目前支持 %1$d 种语言！"</item>
+        <item quantity="other">"目前支持 6 种语言！"</item>
     </plurals>
     <string name="aboutTranslations">"帮助翻译"</string>
     <string name="geocoderDisabled">"未开启地理编码服务"</string>
@@ -196,7 +204,7 @@
     <string name="refresh_log"></string>
     <string name="preferencesTheme"></string>
     <string name="contactDetailsAccuracyValue">"%d m"</string>
-    <string name="contactDetailsDistanceValue">%1$,.2f %2$s</string>
+    <string name="contactDetailsDistanceValue">"%,.2f %s"</string>
     <string name="contactDetailsAltitude"></string>
     <string name="contactDetailsBearing"></string>
     <string name="contactDetailsDistance"></string>
@@ -225,8 +233,11 @@
     <string name="deviceLocationDisabledDialogTitle"></string>
     <string name="deviceLocationDisabledDialogPositiveButtonLabel"></string>
     <string name="deviceLocationDisabledDialogMessage"></string>
-    <string name="aboutIssuesTitle">Report an issue</string>
-    <string name="aboutIssuesSummary">File on GitHub</string>
-    <string name="aboutSourceCodeSummary">on GitHub</string>
-    <string name="aboutFeedbackCategoryTitle">Feedback</string>
+    <string name="aboutIssuesTitle">"Report an issue"</string>
+    <string name="aboutIssuesSummary">"File on GitHub"</string>
+    <string name="aboutSourceCodeSummary">"on GitHub"</string>
+    <string name="aboutFeedbackCategoryTitle">"Feedback"</string>
+    <string name="contactDetailsDistanceUnitKilometres"></string>
+    <string name="contactDetailsDistanceUnitMeters"></string>
+    <string name="exportConfigurationSubject"></string>
 </resources>
