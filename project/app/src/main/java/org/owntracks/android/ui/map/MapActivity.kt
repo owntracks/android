@@ -399,7 +399,6 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
             orientationSensor = null
         }
         super.onResume()
-        handleIntentExtras(intent)
         updateMonitoringModeMenu()
         updateMyLocationMenuIcon()
         if (!previouslyHadLocationPermissions && requirementsChecker.isLocationPermissionCheckPassed()) {
@@ -417,7 +416,7 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
             Timber.v("intent has extras from drawerProvider")
             val contactId = b.getString(BUNDLE_KEY_CONTACT_ID)
             if (contactId != null) {
-                viewModel!!.restore(contactId)
+                viewModel!!.setLiveContact(contactId)
             }
         }
     }

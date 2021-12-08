@@ -31,7 +31,7 @@ interface MapMvvm {
         fun onClearContactClicked()
         fun onMapClick()
         fun onMarkerClick(id: String)
-        fun restore(contactId: String?)
+        fun setLiveContact(contactId: String?)
         fun onMapReady()
         fun refreshMarkers()
         val contact: LiveData<FusedContact?>

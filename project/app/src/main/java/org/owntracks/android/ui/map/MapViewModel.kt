@@ -5,6 +5,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.location.Location
 import android.os.Bundle
+import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.scopes.ActivityScoped
@@ -70,7 +71,7 @@ class MapViewModel @Inject constructor(
 
     override fun onMapReady() {
         refreshMarkers()
-        when (mode) {
+        when (viewMode) {
             VIEW_CONTACT -> {
                 mutableLiveContact.value?.run { setViewModeContact(this, true) }
             }
@@ -93,7 +94,7 @@ class MapViewModel @Inject constructor(
         override fun onLocationResult(locationResult: LocationResult) {
             liveLocation.value = locationResult.lastLocation
             locationIdlingResource.setIdleState(true)
-            if (mode == VIEW_DEVICE && liveCamera.value != locationResult.lastLocation.toLatLng()) {
+            if (viewMode == VIEW_DEVICE && liveCamera.value != locationResult.lastLocation.toLatLng()) {
                 liveCamera.postValue(locationResult.lastLocation.toLatLng())
             }
         }
@@ -126,7 +127,7 @@ class MapViewModel @Inject constructor(
     }
 
     private fun setViewModeContact(c: FusedContact, center: Boolean) {
-        mode = VIEW_CONTACT
+        viewMode = VIEW_CONTACT
         mutableLiveContact.postValue(c)
         refreshGeocodeForActiveContact()
         updateActiveContactDistanceAndBearing(c)
@@ -136,13 +137,13 @@ class MapViewModel @Inject constructor(
 
     private fun setViewModeFree() {
         Timber.v("setting view mode: VIEW_FREE")
-        mode = VIEW_FREE
+        viewMode = VIEW_FREE
         clearActiveContact()
     }
 
     private fun setViewModeDevice() {
         Timber.v("setting view mode: VIEW_DEVICE")
-        mode = VIEW_DEVICE
+        viewMode = VIEW_DEVICE
         clearActiveContact()
         if (liveLocation.value != null) {
             liveCamera.postValue(liveLocation.value!!.toLatLng())
@@ -151,10 +152,11 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    override fun restore(contactId: String?) {
+    @MainThread
+    override fun setLiveContact(contactId: String?) {
         contactId?.let {
-            Timber.v("restoring contact id:%s", it)
-            setViewModeContact(it, true)
+            viewMode = VIEW_CONTACT
+            contactsRepo.getById(it)?.run(mutableLiveContact::setValue)
         }
     }
 
@@ -224,7 +226,10 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    private fun updateActiveContactDistanceAndBearing(currentLocation: Location, contact: FusedContact) {
+    private fun updateActiveContactDistanceAndBearing(
+        currentLocation: Location,
+        contact: FusedContact
+    ) {
         contact.messageLocation?.run {
             val distanceBetween = FloatArray(2)
             Location.distanceBetween(
@@ -298,7 +303,7 @@ class MapViewModel @Inject constructor(
         private const val VIEW_FREE = 0
         private const val VIEW_CONTACT = 1
         private const val VIEW_DEVICE = 2
-        private var mode = VIEW_DEVICE
+        private var viewMode = VIEW_DEVICE
     }
 }
 

@@ -23,7 +23,7 @@ class DeviceGeocoder internal constructor(context: Context?) : CachingGeocoder()
 
     override fun doLookup(latitude: BigDecimal, longitude: BigDecimal): GeocodeResult {
         if (tripResetTimestamp > Instant.now()) {
-            Timber.w("Rate-limited, not querying")
+            Timber.w("Rate-limited, not querying until $tripResetTimestamp")
             return GeocodeResult.RateLimited(tripResetTimestamp)
         }
         val addresses: List<Address>?
