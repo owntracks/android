@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">Owntracks</string>
+    <string name="app_name">OwnTracks</string>
     <string name="statusBatteryDozeWhiteListEnabled">Yes</string>
     <string name="statusBatteryDozeWhiteListDisabled">No</string>
     <string name="preferencesServer">Connection</string>
@@ -111,10 +111,10 @@
     <string name="transitionLeaving">leaves</string>
     <string name="errorPreferencesImportFailed">Import failed</string>
     <string name="welcome_play_heading">Google Play Services</string>
-    <string name="welcome_play_description">Owntracks requires Google Play Services</string>
+    <string name="welcome_play_description">OwnTracks requires Google Play Services</string>
     <string name="icon_description_warning">Warning</string>
     <string name="welcome_heading">Welcome</string>
-    <string name="welcome_description">The following steps will help you to get started with Owntracks</string>
+    <string name="welcome_description">The following steps will help you to get started with OwnTracks</string>
     <string name="mode_heading">Mode</string>
     <string name="locationPermissionRequestDialogMessage">To track your current location, please grant OwnTracks location permissions.</string>
     <string name="icon_description_owntracks">OwnTracks</string>
@@ -231,6 +231,7 @@
     <string name="aboutIssuesSummary">File on GitHub</string>
     <string name="aboutSourceCodeSummary">on GitHub</string>
     <string name="aboutFeedbackCategoryTitle">Feedback</string>
+    <string name="exportConfigurationSubject">OwnTracks Configuration File</string>
     <string-array name="geocoders">
         <item>None</item>
         <item>Device (Google)</item>
