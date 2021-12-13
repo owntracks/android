@@ -97,9 +97,6 @@
     <string name="welcome_heading">"Witaj"</string>
     <string name="welcome_description">"Poniższe kroki pomogą Ci rozpocząć pracę z OwnTracks"</string>
     <string name="mode_heading">"Tryb"</string>
-    <string name="permissions_heading">"Uprawnienia"</string>
-    <string name="permissions_description">"Owntracks wymaga dostępu do Twojej lokalizacji. Zezwól na niego, zanim rozpoczniesz."</string>
-    <string name="permissions_granted">"Uprawnienia zostały udzielone"</string>
     <string name="icon_description_owntracks">"OwnTracks"</string>
     <string name="enjoy_description">"Wybierz ustawienia z menu i skonfiguruj OwnTracks dla swojego serwera przed użyciem go"</string>
     <string name="done_heading">"Gotowe"</string>
@@ -162,7 +159,6 @@ Aby utrzymać działanie aplikacji w tle, będzie wyświetlana permanentna notyf
     <string name="notificationChangeMonitoring">"Zmień monitorowanie"</string>
     <string name="preferencesDebugLog">"Informacje debugowania"</string>
     <string name="monitoring_mode">"Monitorowanie"</string>
-    <string name="distance_label">"Odległość"</string>
     <string name="preferencesClientId">"ID Klienta"</string>
     <string name="status_endpoint_state_hint">"Stan endpointa"</string>
     <string name="status_endpoint_state_message_hint">"Komunikat stanu endpointa"</string>
@@ -241,5 +237,4 @@ Aby to umożliwić, włącz lokalizację w ustawieniach urządzenia."</string>
     <string name="aboutFeedbackCategoryTitle">"Feedback"</string>
     <string name="contactDetailsDistanceUnitKilometres">"km"</string>
     <string name="contactDetailsDistanceUnitMeters">"m"</string>
-    <string name="exportConfigurationSubject"></string>
 </resources>

@@ -97,9 +97,6 @@
     <string name="welcome_heading">"Benvinguda"</string>
     <string name="welcome_description">"Els següents passos t'ajudaran a començar amb Owntracks"</string>
     <string name="mode_heading">"Mode"</string>
-    <string name="permissions_heading">"Permisos"</string>
-    <string name="permissions_description">"Owntracks necessita accedir a la ubicació. Sisplau atorga aquest permís abans de continuar."</string>
-    <string name="permissions_granted">"Permisos concedits"</string>
     <string name="icon_description_owntracks">"OwnTracks"</string>
     <string name="enjoy_description">"Escull preferències des del menú i configura Owntracks per al teu servidor abans d'utilitzar-lo"</string>
     <string name="done_heading">"Fet"</string>
@@ -132,7 +129,7 @@
     <string name="ui_fragment_welcome_version_title">"Restriccions"</string>
     <string name="ui_fragment_welcome_version_description">"A causa de les limitacions del sistema operatiu, algunes característiques poden funcionar de manera restringida.
 
-Es mostrarà una notificació permanent per continuar executant-se en segon pla. Es pot desactivar a les preferències de notificació del sistema. "</string>
+Es mostrarà una notificació permanent per continuar executant-se en segon pla. Es pot desactivar a les preferències de notificació del sistema."</string>
     <string name="ui_fragment_welcome_version_learn_more">"Saber-ne més"</string>
     <string name="INITIAL">"Inicialitzant"</string>
     <string name="IDLE">"Inactiu"</string>
@@ -147,10 +144,8 @@ Es mostrarà una notificació permanent per continuar executant-se en segon pla.
     <string name="notificationChannelOngoing">"En marxa"</string>
     <string name="notificationChannelOngoingDescription">"Obligatori per rebre actualitzacions d’ubicació en segon pla"</string>
     <string name="notificationChannelEventsDescription">"Transmissions regionals "</string>
-    <string name="preferencesOpencageGeocoderApiKey">"OpenCage API Key
-"</string>
-    <string name="preferencesOpencageGeocoderApiKeySummary">"API key per OpenCage Reverse Geocoder
-"</string>
+    <string name="preferencesOpencageGeocoderApiKey">"OpenCage API Key"</string>
+    <string name="preferencesOpencageGeocoderApiKeySummary">"API key per OpenCage Reverse Geocoder"</string>
     <string name="preferencesOpencageGeocoderApiKeyDialog">"Si es defineix, s'utilitza OpenCage per resoldre les adreces d'ubicació en lloc de Google. Requereix reiniciar."</string>
     <string name="region_unknown">"Estat desconegut"</string>
     <string name="region_inside">"Actualment dins"</string>
@@ -162,7 +157,6 @@ Es mostrarà una notificació permanent per continuar executant-se en segon pla.
     <string name="notificationChangeMonitoring">"Canvia el mode control"</string>
     <string name="preferencesDebugLog">"Registre de depuració"</string>
     <string name="monitoring_mode">"Seguiment"</string>
-    <string name="distance_label">"Distància"</string>
     <string name="preferencesClientId">"ID Client"</string>
     <string name="status_endpoint_state_hint">"Estat del punt final"</string>
     <string name="status_endpoint_state_message_hint">"Missatge de l'estat del punt final"</string>
@@ -237,7 +231,4 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="aboutIssuesSummary">"File on GitHub"</string>
     <string name="aboutSourceCodeSummary">"on GitHub"</string>
     <string name="aboutFeedbackCategoryTitle">"Feedback"</string>
-    <string name="contactDetailsDistanceUnitKilometres"></string>
-    <string name="contactDetailsDistanceUnitMeters"></string>
-    <string name="exportConfigurationSubject"></string>
 </resources>

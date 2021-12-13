@@ -90,8 +90,6 @@
     <string name="play_services_not_available">"Google Play開発者サービスを利用できません"</string>
     <string name="play_services_update_required">"Google Play開発者サービスの更新が必要です"</string>
     <string name="mode_http_private_label">"HTTP"</string>
-    <string name="transitionEntering"></string>
-    <string name="transitionLeaving"></string>
     <string name="errorPreferencesImportFailed">"インポートに失敗しました"</string>
     <string name="welcome_play_heading">"Google Play開発者サービス"</string>
 
@@ -103,9 +101,6 @@
     <!-- Fuzzy -->
     <string name="welcome_description">"いくつかのステップを実施し、Owntracksを利用開始できるようにします"</string>
     <string name="mode_heading">"モード"</string>
-    <string name="permissions_heading">"権限"</string>
-    <string name="permissions_description">"Owntracksを利用するには位置情報へのアクセスが必要です。続ける前に、権限を付与してください。"</string>
-    <string name="permissions_granted">"権限が付与されました"</string>
 
     <!-- Fuzzy -->
     <string name="icon_description_owntracks">"Owntracks"</string>
@@ -153,7 +148,6 @@
     <string name="ERROR_CONFIGURATION">"構成設定が完全ではありません"</string>
     <string name="notificationChannelOngoing">"起動中"</string>
     <string name="notificationChannelOngoingDescription">"バックグラウンドで位置情報を更新するために必要"</string>
-    <string name="notificationChannelEventsDescription"></string>
     <string name="preferencesOpencageGeocoderApiKey">"OpenCageのAPIキー"</string>
     <string name="preferencesOpencageGeocoderApiKeySummary">"OpenCage逆ジオコーディングに必要なAPIキー"</string>
     <string name="preferencesOpencageGeocoderApiKeyDialog">"キーが設定されている場合、Googleの代わりにOpenCageを使用して住所を判定します。アプリの再起動が必要です。"</string>
@@ -167,7 +161,6 @@
     <string name="notificationChangeMonitoring">"モニタリングモード変更"</string>
     <string name="preferencesDebugLog">"デバッグログ"</string>
     <string name="monitoring_mode">"モニタリング"</string>
-    <string name="distance_label">"距離"</string>
     <string name="preferencesClientId">"クライアントID"</string>
     <string name="status_endpoint_state_hint">"エンドポイントの状態"</string>
     <string name="status_endpoint_state_message_hint">"エンドポイントからのメッセージ"</string>
@@ -180,7 +173,6 @@
     <string name="logViewerActivityTitle">"ログ"</string>
     <string name="exportLogFilePrompt">"ログファイルをエクスポート"</string>
     <string name="show_options">"オプションを見る"</string>
-    <string name="divider"></string>
     <string name="next">"次"</string>
     <string name="reconnect">"再接続"</string>
     <string name="select">"選択"</string>
@@ -241,7 +233,4 @@
     <string name="aboutIssuesSummary">"File on GitHub"</string>
     <string name="aboutSourceCodeSummary">"on GitHub"</string>
     <string name="aboutFeedbackCategoryTitle">"Feedback"</string>
-    <string name="contactDetailsDistanceUnitKilometres"></string>
-    <string name="contactDetailsDistanceUnitMeters"></string>
-    <string name="exportConfigurationSubject"></string>
 </resources>

@@ -97,9 +97,6 @@
     <string name="welcome_heading">"Vítejte"</string>
     <string name="welcome_description">"Následující kroky Vám pomohou začít s OwnTracks"</string>
     <string name="mode_heading">"Mód"</string>
-    <string name="permissions_heading">"Oprávnění"</string>
-    <string name="permissions_description">"Owntrack vyžaduje přístup k poloze zařízení. Udělte oprávnění a potom pokračujte."</string>
-    <string name="permissions_granted">"Oprávnění byla uděleno"</string>
     <string name="icon_description_owntracks">"OwnTracks"</string>
     <string name="enjoy_description">"Zvolte nabídku Nastavení a nakonfigurujte Owntracks před tím, než jej začnete používat"</string>
     <string name="done_heading">"Hotovo"</string>
@@ -161,7 +158,6 @@ Aby aplikace mohla běžet na pozadí, bude zobrazeno trvalé oznámení. Lze to
     <string name="notificationChangeMonitoring">"Změna módu"</string>
     <string name="preferencesDebugLog">"Protokol ladění"</string>
     <string name="monitoring_mode">"Sledování"</string>
-    <string name="distance_label">"Vzdálenost"</string>
     <string name="preferencesClientId">"Client ID"</string>
     <string name="status_endpoint_state_hint">"Stav spojení"</string>
     <string name="status_endpoint_state_message_hint">"Zpráva o stavu spojení"</string>
@@ -237,7 +233,4 @@ Chcete-li to povolit, zapněte polohu v nastavení zařízení."</string>
     <string name="aboutIssuesSummary">"File on GitHub"</string>
     <string name="aboutSourceCodeSummary">"on GitHub"</string>
     <string name="aboutFeedbackCategoryTitle">"Feedback"</string>
-    <string name="contactDetailsDistanceUnitKilometres"></string>
-    <string name="contactDetailsDistanceUnitMeters"></string>
-    <string name="exportConfigurationSubject"></string>
 </resources>
