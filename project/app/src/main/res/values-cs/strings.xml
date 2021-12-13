@@ -58,7 +58,7 @@
     <string name="preferencesIdentification">"Identifikace"</string>
     <string name="preferencesParameters">"Parametry"</string>
     <string name="preferencesKeepalive">"Keepalive"</string>
-    <string name="preferencesKeepaliveValidationError">"Keepalive by měla být minimálně %d"</string>
+    <string name="preferencesKeepaliveValidationError">"Keepalive by mělo být minimálně %d"</string>
     <string name="seconds">"Vteřin"</string>
     <string name="preferencesProfileId">"Mód"</string>
     <string name="mode_mqtt_private_label">"MQTT"</string>
@@ -102,9 +102,9 @@
     <string name="done_heading">"Hotovo"</string>
     <string name="icon_description_done">"Hotovo"</string>
     <string name="title_activity_load">"Import"</string>
-    <string name="preferencesIgnoreInaccurateLocations">"Nepřesná poloha"</string>
+    <string name="preferencesIgnoreInaccurateLocations">"Nepřesné polohy"</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">"Ignorovat nepřesné polohy"</string>
-    <string name="preferencesIgnoreInaccurateLocationsDialog">"Ignorovat polohu, pokud je přesnost větší než zadaný počet metrů"</string>
+    <string name="preferencesIgnoreInaccurateLocationsDialog">"Ignorovat polohu, pokud je přesnost horší než zadaný počet metrů"</string>
     <string name="preferencesLocatorInterval">"Interval polohy"</string>
     <string name="preferencesLocatorIntervalSummary">"Interval aktualizace polohy"</string>
     <string name="preferencesLocatorIntervalDialog">"Jak často se dotazovat zařízení na jeho polohu (ve vteřinách)"</string>
@@ -179,7 +179,7 @@ Aby aplikace mohla běžet na pozadí, bude zobrazeno trvalé oznámení. Lze to
     <string name="preferencesRemoteConfigurationSummary">"Zapnout vzdálenou aktualizaci konfigurace (Vyžaduje vzdálené příkazy)"</string>
     <string name="aboutLicense">"Licence"</string>
     <plurals name="aboutTranslationsSummary">
-        <item quantity="one">"Nyní dostupná v %d jazycích!"</item>
+        <item quantity="one">"Nyní dostupná v %d jazyce!"</item>
         <item quantity="few">"Nyní dostupná v %d jazycích!"</item>
         <item quantity="other">"Nyní dostupná v %d jazycích!"</item>
     </plurals>
@@ -196,7 +196,7 @@ Aby aplikace mohla běžet na pozadí, bude zobrazeno trvalé oznámení. Lze to
     <string name="refresh_log">"Obnovit"</string>
     <string name="preferencesTheme">"Téma"</string>
     <string name="contactDetailsAccuracyValue">"%d m"</string>
-    <string name="contactDetailsDistanceValue">"%1$,.2f %2$s"</string>
+    <string name="contactDetailsDistanceValue">"%,.2f %s"</string>
     <string name="contactDetailsAltitude">"Výška"</string>
     <string name="contactDetailsBearing">"Směr"</string>
     <string name="contactDetailsDistance">"Vzdálenost"</string>
@@ -205,7 +205,7 @@ Aby aplikace mohla běžet na pozadí, bude zobrazeno trvalé oznámení. Lze to
     <string name="contactDetailsBearingValue">"%,.0f°"</string>
     <string name="contactDetailsAltitudeValue">"%,d m"</string>
     <string name="contactDetailsBatteryValue">"%d %%"</string>
-    <string name="contactDetailsSpeedValue">"%d kph"</string>
+    <string name="contactDetailsSpeedValue">"%d km/h"</string>
     <string name="preferencesCategoryNotificationErrors">"Chyby a prohlémy"</string>
     <string name="preferencesNotificationGeocoderErrors">"Chyby geokóderu"</string>
     <string name="preferencesNotificationGeocoderErrorsSummary">"Zobrazit chyby geokodéru, limity četností a překročení kvóty"</string>
@@ -229,8 +229,11 @@ Další podrobnosti naleznete v protokolech."</string>
     <string name="deviceLocationDisabledDialogMessage">"Služby určování polohy na tomto zařízení jsou momentálně vypnuté, takže OwnTracks nemůže sledovat vaši aktuální polohu.
 
 Chcete-li to povolit, zapněte polohu v nastavení zařízení."</string>
-    <string name="aboutIssuesTitle">"Report an issue"</string>
-    <string name="aboutIssuesSummary">"File on GitHub"</string>
-    <string name="aboutSourceCodeSummary">"on GitHub"</string>
-    <string name="aboutFeedbackCategoryTitle">"Feedback"</string>
+    <string name="aboutIssuesTitle">"Nahlásit problém"</string>
+    <string name="aboutIssuesSummary">"Na GitHub-u"</string>
+    <string name="aboutSourceCodeSummary">"GitHub"</string>
+    <string name="aboutFeedbackCategoryTitle">"Zpětná vazba"</string>
+    <string name="contactDetailsDistanceUnitKilometres">"km"</string>
+    <string name="contactDetailsDistanceUnitMeters">"m"</string>
+    <string name="exportConfigurationSubject">"Konfigurační soubor OwnTracks"</string>
 </resources>

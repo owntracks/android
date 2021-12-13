@@ -1,17 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">"OwnTracks"</string>
     <string name="preferencesServer">"连接"</string>
+    <string name="preferencesHost">"主机"</string>
     <string name="preferencesPort">"端口"</string>
     <string name="preferencesWebsocket">"使用 WebSockets"</string>
     <string name="preferencesUserUsername">"用户名"</string>
     <string name="preferencesDeviceName">"设备 ID"</string>
     <string name="preferencesBrokerPassword">"密码"</string>
+    <string name="preferencesCaCrtPath">"CA证书"</string>
+    <string name="preferencesClientCrtPath">"客户端证书"</string>
+    <string name="preferencesClientCrtPassword">"客户端证书密码"</string>
     <string name="preferencesNotification">"通知"</string>
     <string name="preferencesNotificationEvents">"事件"</string>
     <string name="preferencesNotificationEventsSummary">"通知收到的事件"</string>
     <string name="preferencesNotificationLocationSummary">"显示最后上报时间地点"</string>
     <string name="preferencesNotificationLocation">"最后上报地点"</string>
     <string name="preferencesAdvanced">"高级"</string>
+    <string name="preferencesChangelog">"更新日志"</string>
     <string name="version">"版本"</string>
     <string name="preferencesReporting">"上报"</string>
     <string name="preferencesRepository">"源代码"</string>
@@ -25,6 +31,8 @@
     <string name="preferencesPubExtendedData">"附加数据"</string>
     <string name="preferencesAutostartSummary">"自动随设备启动"</string>
     <string name="preferencesAutostart">"自动启动"</string>
+    <string name="preferencesRemoteCommand">"远程命令"</string>
+    <string name="preferencesRemoteCommandSummary">"启用远程命令"</string>
     <string name="preferencesReverseGeocodeProvider">"逆地理编码服务提供商"</string>
     <string name="description">"描述"</string>
     <string name="longitude">"经度"</string>
@@ -34,12 +42,14 @@
     <string name="menuContactNavigate">"导航"</string>
     <string name="menuCurrentLocation">"当前位置"</string>
     <string name="contactDetailsAccuracy">"精度"</string>
+    <string name="waypointListPlaceholder">"还未定义区域"</string>
     <string name="importConfig">"导入"</string>
     <string name="preferencesSecurity">"安全性"</string>
     <string name="accept">"接受"</string>
     <string name="preferencesParameters">"参数"</string>
     <string name="seconds">"秒"</string>
     <string name="preferencesProfileId">"模式"</string>
+    <string name="mode_mqtt_private_label">"MQTT"</string>
     <string name="events">"事件"</string>
     <string name="title_activity_regions">"区域"</string>
     <string name="title_activity_region">"区域"</string>
@@ -90,6 +100,7 @@
     <string name="preferencesMoveModeLocatorIntervalSummary">"移动模式下更新位置的时间间隔"</string>
     <string name="preferencesMoveModeLocatorIntervalDialog">"移动模式下从设备获取位置信息更新的间隔（单位为秒）"</string>
     <string name="menuClear">"清除"</string>
+    <string name="configurationManagement">"配置管理"</string>
     <plurals name="notificationEventsTitle">
         <item quantity="other">"%1$d 条新事件"</item>
     </plurals>
@@ -107,6 +118,7 @@
     <string name="DISCONNECTED_USERDISCONNECT">"已断开"</string>
     <string name="ERROR">"错误"</string>
     <string name="ERROR_DATADISABLED">"没有可用的数据连接"</string>
+    <string name="ERROR_CONFIGURATION">"配置未完成"</string>
     <string name="region_unknown">"未知状态"</string>
     <string name="region_inside">"目前位于"</string>
     <string name="region_outside">"目前不在"</string>
@@ -117,11 +129,12 @@
     <string name="viewLogs">"查看日志"</string>
     <string name="logViewerActivityTitle">"日志"</string>
     <string name="exportLogFilePrompt">"导出日志文件"</string>
+    <string name="reconnect">"重新连接"</string>
     <string name="preferencesRemoteConfiguration">"远程配置"</string>
     <string name="preferencesRemoteConfigurationSummary">"允许配置文件被远程更新（需要开启远程命令）"</string>
     <string name="aboutLicense">"许可协议"</string>
     <plurals name="aboutTranslationsSummary">
-        <item quantity="other">"目前支持 6 种语言！"</item>
+        <item quantity="other">"目前支持 %1$d 种语言！"</item>
     </plurals>
     <string name="aboutTranslations">"帮助翻译"</string>
     <string name="geocoderDisabled">"未开启地理编码服务"</string>
@@ -131,8 +144,12 @@
     <!-- Fuzzy -->
     <string name="geocoderProblemNotificationTitle">"地理编码服务出现问题"</string>
     <string name="geocoderIPAddressRejected">"您的客户端 IP 地址已被拒绝"</string>
+    <string name="preferencesTheme">"主题"</string>
     <string name="contactDetailsAccuracyValue">"%d m"</string>
-    <string name="contactDetailsDistanceValue">"%1$,.2f %2$s"</string>
+    <string name="contactDetailsDistanceValue">"%,.2f %s"</string>
+    <string name="contactDetailsDistance">"距离"</string>
+    <string name="contactDetailsBattery">"电池"</string>
+    <string name="contactDetailsSpeed">"速度"</string>
     <string name="contactDetailsBearingValue">"%,.0f°"</string>
     <string name="contactDetailsAltitudeValue">"%,d m"</string>
     <string name="contactDetailsBatteryValue">"%d %%"</string>
@@ -141,4 +158,7 @@
     <string name="aboutIssuesSummary">"File on GitHub"</string>
     <string name="aboutSourceCodeSummary">"on GitHub"</string>
     <string name="aboutFeedbackCategoryTitle">"Feedback"</string>
+    <string name="contactDetailsDistanceUnitKilometres">"千米"</string>
+    <string name="contactDetailsDistanceUnitMeters">"米"</string>
+    <string name="exportConfigurationSubject">"OwnTracks配置文件"</string>
 </resources>

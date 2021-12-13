@@ -97,10 +97,6 @@
     <string name="preferencesEditorKey">"Chave"</string>
     <string name="preferencesEditorValue">"Valor"</string>
     <string name="restart">"Reiniciar"</string>
-    <plurals name="notificationEventsTitle">
-        <item quantity="one"></item>
-        <item quantity="other"></item>
-    </plurals>
     <string name="ui_fragment_welcome_version_title">"Restrições"</string>
     <string name="ui_fragment_welcome_version_learn_more">"Saber mais"</string>
     <string name="INITIAL">"Inicializando"</string>
@@ -110,10 +106,6 @@
     <string name="DISCONNECTED">"Desconectado"</string>
     <string name="DISCONNECTED_USERDISCONNECT">"Desconectado"</string>
     <string name="ERROR">"Erro"</string>
-    <plurals name="aboutTranslationsSummary">
-        <item quantity="one"></item>
-        <item quantity="other"></item>
-    </plurals>
     <string name="contactDetailsAccuracyValue">"%d m"</string>
     <string name="contactDetailsDistanceValue">"%1$,.2f %2$s"</string>
     <string name="contactDetailsBearingValue">"%,.0f°"</string>
