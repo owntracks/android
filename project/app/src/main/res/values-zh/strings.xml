@@ -83,6 +83,9 @@
     <!-- Fuzzy -->
     <string name="welcome_description">"以下步骤将帮助您开始使用 Owntracks"</string>
     <string name="mode_heading">"模式"</string>
+    <string name="permissions_heading">"权限"</string>
+    <string name="permissions_description">"Owntracks 需要获取您的位置。请授权 Owntracks 访问您的位置信息。"</string>
+    <string name="permissions_granted">"已获得权限"</string>
 
     <!-- Fuzzy -->
     <string name="icon_description_owntracks">"Owntracks"</string>
@@ -122,6 +125,7 @@
     <string name="region_unknown">"未知状态"</string>
     <string name="region_inside">"目前位于"</string>
     <string name="region_outside">"目前不在"</string>
+    <string name="distance_label">"距离"</string>
     <string name="status_last_background_update_hint">"后台服务最后一次定位时间"</string>
     <string name="status_background_service_started_hint">"后台服务启动时间"</string>
     <string name="status_battery_optimization_whitelisted_hint">"未优化电池使用量"</string>
