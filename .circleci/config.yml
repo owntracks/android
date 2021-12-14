@@ -100,7 +100,7 @@ jobs:
       - android/start-emulator-and-run-tests:
           additional-avd-args: "-d pixel_3a -c 1G"
           additional-emulator-args: "-memory 4096"
-          test-command: ./gradlew createOssDebugCoverageReport --scan
+          test-command: ./gradlew createOssDebugCoverageReport --scan -P"android.testInstrumentationRunnerArguments.numShards=$CIRCLE_NODE_TOTAL" -P"android.testInstrumentationRunnerArguments.shardIndex=$CIRCLE_NODE_INDEX"
           system-image: system-images;android-29;default;x86_64
           restore-gradle-cache-post-emulator-launch: true
           restore-gradle-cache-find-args: ". -name 'build.gradle.kts'"
@@ -127,7 +127,7 @@ jobs:
     executor:
       name: android/android-machine
       resource-class: large
-
+    parallelism: 2
     steps:
       - checkout
       - android/accept-licenses
@@ -135,7 +135,7 @@ jobs:
       - android/start-emulator-and-run-tests:
           additional-avd-args: "-d pixel_3a -c 1G"
           additional-emulator-args: "-memory 4096"
-          test-command: ./gradlew createGmsDebugCoverageReport --scan
+          test-command: ./gradlew createGmsDebugCoverageReport --scan -P"android.testInstrumentationRunnerArguments.numShards=$CIRCLE_NODE_TOTAL" -P"android.testInstrumentationRunnerArguments.shardIndex=$CIRCLE_NODE_INDEX"
           system-image: system-images;android-29;google_apis;x86_64
           restore-gradle-cache-post-emulator-launch: true
           restore-gradle-cache-find-args: ". -name 'build.gradle.kts'"

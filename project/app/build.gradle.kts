@@ -175,6 +175,10 @@ tasks.withType<Test> {
     maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
 }
 
+tasks.withType<JavaCompile>().configureEach {
+    options.isFork = true
+}
+
 val okHttpVersion = "4.9.3"
 val jacksonVersion = "2.12.2"
 val materialDialogsVersion = "0.9.6.0"
