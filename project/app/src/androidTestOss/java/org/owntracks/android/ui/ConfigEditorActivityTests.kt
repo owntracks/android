@@ -12,7 +12,6 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickDialogPositiveButton
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
-import com.adevinta.android.barista.rule.flaky.AllowFlaky
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.allOf
 import org.junit.Test
@@ -25,7 +24,6 @@ import org.owntracks.android.ui.preferences.editor.EditorActivity
 @RunWith(AndroidJUnit4::class)
 class ConfigEditorActivityTests : TestWithAnActivity<EditorActivity>(EditorActivity::class.java) {
     @Test
-    @AllowFlaky
     fun configurationManagementCanEditASetType() {
         openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
         clickOn(R.string.preferencesEditor)
@@ -42,7 +40,6 @@ class ConfigEditorActivityTests : TestWithAnActivity<EditorActivity>(EditorActiv
     }
 
     @Test
-    @AllowFlaky
     fun configurationManagementCanEditAStringType() {
         openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
         clickOn(R.string.preferencesEditor)
@@ -69,7 +66,6 @@ class ConfigEditorActivityTests : TestWithAnActivity<EditorActivity>(EditorActiv
     }
 
     @Test
-    @AllowFlaky
     fun configurationManagementCanEditABooleanType() {
         openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
         clickOn(R.string.preferencesEditor)
@@ -83,7 +79,6 @@ class ConfigEditorActivityTests : TestWithAnActivity<EditorActivity>(EditorActiv
     }
 
     @Test
-    @AllowFlaky
     fun editorActivityShowsDefaultConfig() {
         assertContains(
             R.id.effectiveConfiguration,
@@ -92,7 +87,6 @@ class ConfigEditorActivityTests : TestWithAnActivity<EditorActivity>(EditorActiv
     }
 
     @Test
-    @AllowFlaky
     fun editorCanExportConfig() {
         val chooserIntentMatcher = allOf(
             hasAction(Intent.ACTION_CHOOSER),

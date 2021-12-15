@@ -41,7 +41,6 @@ class GMSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
     }
 
     @Test
-    @AllowFlaky
     fun statusActivityCanBeLaunchedFromMapActivityDrawer() {
         setNotFirstStartPreferences()
         baristaRule.launchActivity()
@@ -63,7 +62,6 @@ class GMSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
     }
 
     @Test
-    @AllowFlaky
     fun preferencesActivityCanBeLaunchedFromMapActivityDrawer() {
         setNotFirstStartPreferences()
         baristaRule.launchActivity()
@@ -89,7 +87,6 @@ class GMSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
     }
 
     @Test
-    @AllowFlaky
     fun welcomeActivityShouldNotRunWhenFirstStartPreferencesSet() {
         setNotFirstStartPreferences()
         baristaRule.launchActivity()
@@ -97,7 +94,6 @@ class GMSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
     }
 
     @Test
-    @AllowFlaky
     fun enablingOSMMapSwitchesFromGMSMapToOSMMap() {
         setNotFirstStartPreferences()
         baristaRule.launchActivity()
@@ -121,7 +117,6 @@ class GMSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
     }
 
     @Test
-    @AllowFlaky
     fun modeButtonOnMapActivityCyclesThroughModes() {
         setNotFirstStartPreferences()
         baristaRule.launchActivity()

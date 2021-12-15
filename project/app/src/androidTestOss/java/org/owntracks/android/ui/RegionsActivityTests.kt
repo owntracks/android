@@ -7,7 +7,6 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.longClickOn
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
-import com.adevinta.android.barista.rule.flaky.AllowFlaky
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
@@ -18,14 +17,12 @@ import org.owntracks.android.ui.regions.RegionsActivity
 @RunWith(AndroidJUnit4::class)
 class RegionsActivityTests : TestWithAnActivity<RegionsActivity>(RegionsActivity::class.java) {
     @Test
-    @AllowFlaky(attempts = 1)
     fun initialRegionsActivityIsEmpty() {
         assertDisplayed(R.string.waypointListPlaceholder)
         assertDisplayed(R.id.add)
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
     fun whenAddingARegionThenTheRegionIsShown() {
         val regionName = "test region"
         val latitude = 51.123
@@ -50,7 +47,6 @@ class RegionsActivityTests : TestWithAnActivity<RegionsActivity>(RegionsActivity
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
     fun whenAddingARegionAndThenDeletingItThenTheRegionIsNotShown() {
         val regionName = "test region to be deleted"
         val latitude = 51.123

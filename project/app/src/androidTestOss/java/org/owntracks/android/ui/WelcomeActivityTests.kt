@@ -6,7 +6,6 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import com.adevinta.android.barista.interaction.BaristaViewPagerInteractions.swipeViewPagerBack
 import com.adevinta.android.barista.interaction.BaristaViewPagerInteractions.swipeViewPagerForward
-import com.adevinta.android.barista.rule.flaky.AllowFlaky
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
@@ -18,7 +17,6 @@ import org.owntracks.android.ui.welcome.WelcomeActivity
 @RunWith(AndroidJUnit4::class)
 class WelcomeActivityTests : TestWithAnActivity<WelcomeActivity>(WelcomeActivity::class.java) {
     @Test
-    @AllowFlaky(attempts = 1)
     fun welcomeActivityCanBeSwipedThroughToTheEnd() {
         swipeViewPagerForward()
         swipeViewPagerForward()
@@ -28,7 +26,6 @@ class WelcomeActivityTests : TestWithAnActivity<WelcomeActivity>(WelcomeActivity
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
     fun welcomeActivityCanBeSwipedBackToStart() {
         swipeViewPagerForward()
         swipeViewPagerBack()

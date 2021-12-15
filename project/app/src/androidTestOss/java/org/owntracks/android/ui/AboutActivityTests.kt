@@ -8,7 +8,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
-import com.adevinta.android.barista.rule.flaky.AllowFlaky
 import org.hamcrest.CoreMatchers.allOf
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -22,7 +21,6 @@ import org.owntracks.android.ui.preferences.about.AboutActivity
 @RunWith(AndroidJUnit4::class)
 class AboutActivityTests : TestWithAnActivity<AboutActivity>(AboutActivity::class.java) {
     @Test
-    @AllowFlaky
     fun documentationLinkOpensSite() {
         scrollToPreferenceWithText(R.string.preferencesDocumentation)
         clickOn(R.string.preferencesDocumentation)
@@ -35,7 +33,6 @@ class AboutActivityTests : TestWithAnActivity<AboutActivity>(AboutActivity::clas
     }
 
     @Test
-    @AllowFlaky
     fun twitterLinkOpensSite() {
         scrollToPreferenceWithText(R.string.preferencesTwitter)
         clickOn(R.string.preferencesTwitter)
@@ -48,7 +45,6 @@ class AboutActivityTests : TestWithAnActivity<AboutActivity>(AboutActivity::clas
     }
 
     @Test
-    @AllowFlaky
     fun sourceLinkOpensSite() {
         scrollToPreferenceWithText(R.string.preferencesRepository)
         clickOn(R.string.preferencesRepository)
@@ -61,7 +57,6 @@ class AboutActivityTests : TestWithAnActivity<AboutActivity>(AboutActivity::clas
     }
 
     @Test
-    @AllowFlaky
     fun translationLinkOpensSite() {
         scrollToPreferenceWithText(R.string.aboutTranslations)
         clickOn(R.string.aboutTranslations)
@@ -74,7 +69,6 @@ class AboutActivityTests : TestWithAnActivity<AboutActivity>(AboutActivity::clas
     }
 
     @Test
-    @AllowFlaky
     fun librariesLinkListsLibraries() {
         scrollToPreferenceWithText(R.string.preferencesLicenses)
         clickOn(R.string.preferencesLicenses)

@@ -17,13 +17,11 @@ import org.owntracks.android.ui.status.StatusActivity
 @RunWith(AndroidJUnit4::class)
 class StatusActivityTests : TestWithAnActivity<StatusActivity>(StatusActivity::class.java) {
     @Test
-    @AllowFlaky
     fun statusActivityShowsEndpointState() {
         assertDisplayed(R.string.status_endpoint_state_hint)
     }
 
     @Test
-    @AllowFlaky
     fun statusActivityShowsLogsLauncher() {
         assertDisplayed(R.string.viewLogs)
     }

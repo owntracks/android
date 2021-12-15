@@ -7,7 +7,6 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotContains
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotExist
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions
-import com.adevinta.android.barista.rule.flaky.AllowFlaky
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
@@ -19,7 +18,6 @@ import org.owntracks.android.ui.preferences.PreferencesActivity
 class PreferencesActivityTests :
     TestWithAnActivity<PreferencesActivity>(PreferencesActivity::class.java) {
     @Test
-    @AllowFlaky(attempts = 1)
     fun initialViewShowsTopLevelMenu() {
         assertDisplayed(R.string.preferencesServer)
         assertDisplayed(R.string.preferencesReporting)
@@ -29,7 +27,6 @@ class PreferencesActivityTests :
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
     fun httpURLBlankIsInvalidURL() {
         clickOnAndWait(R.string.preferencesServer)
         clickOnAndWait(R.string.mode_heading)
@@ -42,7 +39,6 @@ class PreferencesActivityTests :
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
     fun httpURLSimpleStringIsInvalidURL() {
         clickOnAndWait(R.string.preferencesServer)
         clickOnAndWait(R.string.mode_heading)
@@ -55,7 +51,6 @@ class PreferencesActivityTests :
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
     fun mqttKeepaliveBelowMinimumIsInvalid() {
         clickOnAndWait(R.string.preferencesServer)
         clickOnAndWait(R.string.mode_heading)
@@ -65,7 +60,6 @@ class PreferencesActivityTests :
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
     fun mqttKeepaliveAtMinimumIsValid() {
         clickOnAndWait(R.string.preferencesServer)
         clickOnAndWait(R.string.mode_heading)
@@ -75,7 +69,6 @@ class PreferencesActivityTests :
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
     fun settingSimpleMQTTConfigSettingsCanBeShownInEditor() {
         clickOnAndWait(R.string.preferencesServer)
         clickOnAndWait(R.string.mode_heading)
@@ -129,7 +122,6 @@ class PreferencesActivityTests :
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
     fun settingSimpleHTTPConfigSettingsCanBeShownInEditor() {
         clickOnAndWait(R.string.preferencesServer)
         clickOnAndWait(R.string.mode_heading)
@@ -206,7 +198,6 @@ class PreferencesActivityTests :
     }
 
     @Test
-    @AllowFlaky
     fun defaultGeocoderIsSelected() {
         clickOnAndWait(R.string.preferencesAdvanced)
         scrollToText(R.string.preferencesReverseGeocodeProvider)

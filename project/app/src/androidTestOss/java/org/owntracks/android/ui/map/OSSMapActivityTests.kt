@@ -21,7 +21,6 @@ import org.owntracks.android.testutils.setNotFirstStartPreferences
 @RunWith(AndroidJUnit4::class)
 class OSSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.java) {
     @Test
-    @AllowFlaky
     fun welcomeActivityShouldNotRunWhenFirstStartPreferencesSet() {
         setNotFirstStartPreferences()
         baristaRule.launchActivity()

@@ -8,7 +8,6 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
-import com.adevinta.android.barista.rule.flaky.AllowFlaky
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
@@ -21,7 +20,6 @@ class PreferencesActivityTests :
     TestWithAnActivity<PreferencesActivity>(PreferencesActivity::class.java) {
 
     @Test
-    @AllowFlaky(attempts = 1)
     fun defaultGeocoderIsSelected() {
         clickOnAndWait(R.string.preferencesAdvanced)
         scrollToText(R.string.preferencesReverseGeocodeProvider)

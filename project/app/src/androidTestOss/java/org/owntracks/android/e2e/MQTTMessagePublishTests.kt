@@ -13,7 +13,6 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
-import com.adevinta.android.barista.rule.flaky.AllowFlaky
 import kotlinx.coroutines.DelicateCoroutinesApi
 import mqtt.packets.Qos
 import mqtt.packets.mqtt.MQTTPublish
@@ -76,7 +75,6 @@ class MQTTMessagePublishTests : TestWithAnActivity<MapActivity>(MapActivity::cla
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
     fun given_an_MQTT_configured_client_when_the_report_button_is_pressed_then_the_broker_receives_a_packet_with_the_correct_location_message_in() {
         setNotFirstStartPreferences()
         val mockLatitude = 51.0
@@ -114,7 +112,6 @@ class MQTTMessagePublishTests : TestWithAnActivity<MapActivity>(MapActivity::cla
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
     fun given_an_MQTT_configured_client_when_the_broker_sends_a_message_card_without_a_location_then_a_new_contact_appears() {
         setNotFirstStartPreferences()
         baristaRule.launchActivity()
@@ -145,7 +142,6 @@ class MQTTMessagePublishTests : TestWithAnActivity<MapActivity>(MapActivity::cla
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
     fun given_an_MQTT_configured_client_when_the_broker_sends_a_message_card_with_a_location_then_a_new_contact_appears() {
         setNotFirstStartPreferences()
         baristaRule.launchActivity()
@@ -197,7 +193,6 @@ class MQTTMessagePublishTests : TestWithAnActivity<MapActivity>(MapActivity::cla
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
     fun given_an_MQTT_configured_client_when_the_broker_sends_a_location_for_a_cleared_contact_then_a_the_contact_returns_with_the_correct_details() {
         setNotFirstStartPreferences()
         baristaRule.launchActivity()
@@ -261,7 +256,6 @@ class MQTTMessagePublishTests : TestWithAnActivity<MapActivity>(MapActivity::cla
 
 
     @Test
-    @AllowFlaky(attempts = 1)
     fun given_an_MQTT_configured_client_when_the_wrong_credentials_are_used_then_the_status_screen_shows_that_the_broker_is_not_connected() {
         setNotFirstStartPreferences()
         baristaRule.launchActivity()

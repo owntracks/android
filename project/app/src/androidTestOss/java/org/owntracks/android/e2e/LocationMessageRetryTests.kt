@@ -8,7 +8,6 @@ import androidx.test.filters.LargeTest
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.PermissionGranter
-import com.adevinta.android.barista.rule.flaky.AllowFlaky
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
@@ -66,7 +65,6 @@ class LocationMessageRetryTests : TestWithAnActivity<MapActivity>(MapActivity::c
     }
 
     @Test
-    @AllowFlaky
     fun testReportingLocationSucceedsAfterSomeFailures() {
         setNotFirstStartPreferences()
         baristaRule.launchActivity()
