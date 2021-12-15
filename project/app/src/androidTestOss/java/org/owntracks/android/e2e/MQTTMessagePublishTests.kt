@@ -62,11 +62,16 @@ class MQTTMessagePublishTests : TestWithAnActivity<MapActivity>(MapActivity::cla
 
     @After
     fun unregisterIdlingResource() {
-        baristaRule.activityTestRule.activity.locationIdlingResource?.run {
-            IdlingRegistry.getInstance().unregister(this)
+        try {
+            IdlingRegistry.getInstance()
+                .unregister(baristaRule.activityTestRule.activity.locationIdlingResource)
+        } catch (_: NullPointerException) {
+            // Happens when the vm is already gone from the MapActivity
         }
-        baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.run {
-            IdlingRegistry.getInstance().unregister(this)
+        try {
+            IdlingRegistry.getInstance()
+                .unregister(baristaRule.activityTestRule.activity.outgoingQueueIdlingResource)
+        } catch (_: NullPointerException) {
         }
     }
 
@@ -86,11 +91,13 @@ class MQTTMessagePublishTests : TestWithAnActivity<MapActivity>(MapActivity::cla
         openDrawer()
         clickOnAndWait(R.string.title_activity_map)
         setMockLocation(mockLatitude, mockLongitude)
-        IdlingPolicies.setIdlingResourceTimeout(1, TimeUnit.MINUTES)
+        IdlingPolicies.setIdlingResourceTimeout(15, TimeUnit.SECONDS)
         Timber.d("Waiting for location")
         (baristaRule.activityTestRule.activity.locationIdlingResource as SimpleIdlingResource?).run {
             IdlingRegistry.getInstance().register(this)
         }
+
+        setMockLocation(mockLatitude, mockLongitude)
         clickOnAndWait(R.id.menu_mylocation)
         Timber.d("location now available")
         clickOnAndWait(R.id.menu_report)
@@ -120,7 +127,7 @@ class MQTTMessagePublishTests : TestWithAnActivity<MapActivity>(MapActivity::cla
 
         val messageCard = MessageCard().apply {
             name = "TestName"
-            face = Companion.owntracksIconBase64
+            face = owntracksIconBase64
         }
         val bytes = Parser(null).toJsonBytes(messageCard)
 
@@ -156,7 +163,7 @@ class MQTTMessagePublishTests : TestWithAnActivity<MapActivity>(MapActivity::cla
             },
             MessageCard().apply {
                 name = "TestName"
-                face = Companion.owntracksIconBase64
+                face = owntracksIconBase64
             }
         )
             .map {
@@ -212,7 +219,7 @@ class MQTTMessagePublishTests : TestWithAnActivity<MapActivity>(MapActivity::cla
                 timestamp = Instant.parse("2006-01-02T15:04:05Z").epochSecond
             }, MessageCard().apply {
                 name = "TestName"
-                face = Companion.owntracksIconBase64
+                face = owntracksIconBase64
             }
         ).sendFromBroker(broker)
 

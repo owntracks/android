@@ -6,13 +6,11 @@ import androidx.test.espresso.IdlingRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
-import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickBack
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.PermissionGranter
 import com.adevinta.android.barista.rule.flaky.AllowFlaky
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.junit.After
 import org.junit.Before
@@ -20,17 +18,21 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.testutils.TestWithAnActivity
+import org.owntracks.android.testutils.TestWithAnHTTPServer
+import org.owntracks.android.testutils.TestWithAnHTTPServerImpl
 import org.owntracks.android.testutils.setNotFirstStartPreferences
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.map.MapActivity
-import org.owntracks.android.ui.writeToEditTextDialog
 import java.util.concurrent.TimeUnit
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class LocationMessageRetryTests : TestWithAnActivity<MapActivity>(MapActivity::class.java, false) {
+class LocationMessageRetryTests : TestWithAnActivity<MapActivity>(MapActivity::class.java, false),
+    TestWithAnHTTPServer by TestWithAnHTTPServerImpl() {
 
-    private val mockWebServer = MockWebServer()
+    private val locationResponse = """
+        {"_type":"location","acc":20,"al":0,"batt":100,"bs":0,"conn":"w","created_at":1610748273,"lat":51.2,"lon":-4,"tid":"aa","tst":1610799026,"vac":40,"vel":7}
+    """.trimIndent()
 
     @Before
     fun setIdlingTimeout() {
@@ -40,17 +42,12 @@ class LocationMessageRetryTests : TestWithAnActivity<MapActivity>(MapActivity::c
 
     @Before
     fun startMockWebserver() {
-        try {
-            mockWebServer.start()
-        } catch (e: IllegalArgumentException) {
-            // Already started
-        }
-        mockWebServer.dispatcher = MockWebserverLocationDispatcher(locationResponse)
+        startServer(MockWebserverLocationDispatcher(locationResponse))
     }
 
     @After
     fun stopMockWebserver() {
-        mockWebServer.shutdown()
+        stopServer()
     }
 
     @After
@@ -68,30 +65,21 @@ class LocationMessageRetryTests : TestWithAnActivity<MapActivity>(MapActivity::c
         }
     }
 
-    private val locationResponse = """
-        {"_type":"location","acc":20,"al":0,"batt":100,"bs":0,"conn":"w","created_at":1610748273,"lat":51.2,"lon":-4,"tid":"aa","tst":1610799026,"vac":40,"vel":7}
-    """.trimIndent()
-
     @Test
     @AllowFlaky
     fun testReportingLocationSucceedsAfterSomeFailures() {
         setNotFirstStartPreferences()
         baristaRule.launchActivity()
-        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
-        val httpPort = mockWebServer.port
 
-        openDrawer()
-        clickOnAndWait(R.string.title_activity_preferences)
-        clickOnAndWait(R.string.preferencesServer)
-        clickOnAndWait(R.string.mode_heading)
-        clickOnAndWait(R.string.mode_http_private_label)
-        writeToEditTextDialog(R.string.preferencesUrl, "http://localhost:${httpPort}/")
-        clickBack()
+        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+
+        configureHTTPConnectionToLocal()
 
         openDrawer()
         clickOnAndWait(R.string.title_activity_map)
 
         val locationIdlingResource = baristaRule.activityTestRule.activity.locationIdlingResource
+        IdlingPolicies.setIdlingResourceTimeout(30, TimeUnit.SECONDS)
         IdlingRegistry.getInstance().register(locationIdlingResource)
         clickOnAndWait(R.id.menu_report)
 

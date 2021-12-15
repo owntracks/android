@@ -22,7 +22,6 @@ import org.owntracks.android.services.MessageProcessorEndpointHttp
 import org.owntracks.android.services.MessageProcessorEndpointMqtt
 import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.Events.ModeChanged
-import org.owntracks.android.support.Events.MonitoringChanged
 import org.owntracks.android.support.preferences.PreferenceDataStoreShim
 import timber.log.Timber
 import java.lang.reflect.InvocationTargetException
@@ -165,16 +164,11 @@ class Preferences @Inject constructor(
 
     @SuppressLint("CommitPrefEdits", "ApplySharedPref")
     fun importFromMessage(messageConfiguration: MessageConfiguration) {
-        Timber.v("importing %s keys ", messageConfiguration.keys.size)
-
-        if (messageConfiguration.containsKey(getPreferenceKey(R.string.preferenceKeyModeId))) {
-            Timber.v(
-                    "setting mode to %s",
-                    messageConfiguration[getPreferenceKey(R.string.preferenceKeyModeId)]
-            )
-            mode = messageConfiguration[getPreferenceKey(R.string.preferenceKeyModeId)] as Int
-            messageConfiguration.removeKey(getPreferenceKey(R.string.preferenceKeyModeId))
+        when (val modeId = messageConfiguration[getPreferenceKey(R.string.preferenceKeyModeId)]) {
+            is Int -> mode = modeId
+            is String -> modeId.toIntOrNull()?.run { mode = this }
         }
+        messageConfiguration.removeKey(getPreferenceKey(R.string.preferenceKeyModeId))
 
         // Don't show setup if a config has been imported
         setSetupCompleted()
@@ -260,7 +254,6 @@ class Preferences @Inject constructor(
             }
             if (newMode != this.monitoring) {
                 setInt(R.string.preferenceKeyMonitoring, newMode)
-                eventBus?.post(MonitoringChanged())
             }
         }
 
@@ -303,7 +296,7 @@ class Preferences @Inject constructor(
     @get:Export(
             keyResId = R.string.preferenceKeyCleanSession,
             exportModeMqtt = true,
-            exportModeHttp = false
+            exportModeHttp = true
     )
     @set:Import(keyResId = R.string.preferenceKeyCleanSession)
     var cleanSession: Boolean
@@ -724,9 +717,9 @@ class Preferences @Inject constructor(
     @get:Export(keyResId = R.string.preferenceKeyPubQos, exportModeMqtt = true)
     @set:Import(keyResId = R.string.preferenceKeyPubQos)
     var pubQos: Int
-        get() = getIntOrDefault(R.string.preferenceKeyPubQos, R.integer.valPubQos)
-                .coerceAtMost(MQTT_MAX_QOS)
-                .coerceAtLeast(MQTT_MIN_QOS)
+        get() = getIntOrDefault(R.string.preferenceKeyPubQos, R.integer.valPubQos).coerceAtMost(
+                MQTT_MAX_QOS
+        ).coerceAtLeast(MQTT_MIN_QOS)
         set(anInt) {
             setInt(
                     R.string.preferenceKeyPubQos,
@@ -747,9 +740,9 @@ class Preferences @Inject constructor(
     @get:Export(keyResId = R.string.preferenceKeySubQos, exportModeMqtt = true)
     @set:Import(keyResId = R.string.preferenceKeySubQos)
     var subQos: Int
-        get() = getIntOrDefault(R.string.preferenceKeySubQos, R.integer.valSubQos)
-                .coerceAtMost(MQTT_MAX_QOS)
-                .coerceAtLeast(MQTT_MIN_QOS)
+        get() = getIntOrDefault(R.string.preferenceKeySubQos, R.integer.valSubQos).coerceAtMost(
+                MQTT_MAX_QOS
+        ).coerceAtLeast(MQTT_MIN_QOS)
         set(anInt) {
             setInt(
                     R.string.preferenceKeySubQos,
@@ -922,7 +915,7 @@ class Preferences @Inject constructor(
     private val deviceIdDefault: String
         get() = // Use device name (Mako, Surnia, etc. and strip all non alpha digits)
             Build.DEVICE?.replace(" ", "-")?.replace("[^a-zA-Z0-9]+".toRegex(), "")
-                    ?.lowercase(Locale.getDefault())
+                    ?.toLowerCase(Locale.getDefault())
                     ?: "unknown"
 
 

@@ -1,28 +1,27 @@
 package org.owntracks.android.data.repos
 
+import android.content.SharedPreferences
 import androidx.annotation.MainThread
 import androidx.lifecycle.MutableLiveData
-import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.support.ContactBitmapAndName
 import org.owntracks.android.support.ContactBitmapAndNameMemoryCache
-import org.owntracks.android.support.Events.*
+import org.owntracks.android.support.Preferences
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class MemoryContactsRepo @Inject constructor(
-        private val eventBus: EventBus,
+        preferences: Preferences,
         private val contactsBitmapAndNameMemoryCache: ContactBitmapAndNameMemoryCache
-) : ContactsRepo {
+) : ContactsRepo, SharedPreferences.OnSharedPreferenceChangeListener {
 
     private val contacts = mutableMapOf<String, FusedContact>()
     override val all = MutableLiveData(contacts)
+    override val lastUpdated = MutableLiveData<ContactUpdatedEvent?>(null)
 
     override fun getById(id: String): FusedContact? {
         return contacts[id]
@@ -33,6 +32,7 @@ class MemoryContactsRepo @Inject constructor(
         Timber.v("new contact allocated id:%s, tid:%s", id, contact.trackerId)
         contacts[id] = contact
         all.postValue(contacts)
+        lastUpdated.postValue(ContactUpdatedEvent(contact, false))
     }
 
     @MainThread
@@ -41,34 +41,35 @@ class MemoryContactsRepo @Inject constructor(
         contacts.clear()
         contactsBitmapAndNameMemoryCache.evictAll()
         all.postValue(contacts)
+        lastUpdated.postValue(null)
     }
 
     @Synchronized
     override fun remove(id: String) {
         Timber.v("removing contact: %s", id)
-        contacts.remove(id)?.run { eventBus.post(FusedContactRemoved(this)) }
+        contacts.remove(id)?.apply { lastUpdated.postValue(ContactUpdatedEvent(this, true)) }
         all.postValue(contacts)
+
     }
 
     @Synchronized
     override fun update(id: String, messageCard: MessageCard) {
-        var c = getById(id)
-        if (c != null) {
-            c.messageCard = messageCard
+        var contact = getById(id)
+        if (contact != null) {
+            contact.messageCard = messageCard
             contactsBitmapAndNameMemoryCache.put(
-                    c.id,
+                    contact.id,
                     ContactBitmapAndName.CardBitmap(messageCard.name, null)
             )
-            eventBus.post(c)
+            lastUpdated.postValue(ContactUpdatedEvent(contact, false))
         } else {
-            c = FusedContact(id)
-            c.messageCard = messageCard
+            contact = FusedContact(id)
+            contact.messageCard = messageCard
             contactsBitmapAndNameMemoryCache.put(
-                    c.id,
+                    contact.id,
                     ContactBitmapAndName.CardBitmap(messageCard.name, null)
             )
-            put(id, c)
-            eventBus.post(FusedContactAdded(c))
+            put(id, contact)
         }
     }
 
@@ -81,8 +82,8 @@ class MemoryContactsRepo @Inject constructor(
             // If timestamp of last location message is <= the new location message, skip update. We either received an old or already known message.
             if (fusedContact.setMessageLocation(messageLocation)) {
                 Timber.d("Location is new for contact $id. Updating")
+                lastUpdated.postValue(ContactUpdatedEvent(fusedContact, false))
                 all.postValue(contacts)
-                eventBus.post(fusedContact)
             }
         } else {
             Timber.d("Contact $id is new")
@@ -97,17 +98,18 @@ class MemoryContactsRepo @Inject constructor(
                 }
             }
             put(id, fusedContact)
-            eventBus.post(FusedContactAdded(fusedContact))
         }
     }
 
-
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    fun onEventMainThread(@Suppress("UNUSED_PARAMETER") e: ModeChanged?) {
-        clearAll()
+    init {
+        preferences.registerOnPreferenceChangedListener(this)
     }
 
-    init {
-        eventBus.register(this)
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        when (key) {
+            "mode" -> {
+                clearAll()
+            }
+        }
     }
 }

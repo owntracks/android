@@ -54,10 +54,8 @@ abstract class MapFragment<V : ViewDataBinding> internal constructor(
         viewModel.allContacts.observe(viewLifecycleOwner, { contacts ->
             contacts.values.forEach {
                 updateMarkerForContact(it)
-                if (it == viewModel.currentContact.value) {
-                    viewModel.refreshGeocodeForContact(it)
-                }
             }
+            viewModel.refreshGeocodeForActiveContact()
         })
         viewModel.myLocationEnabled.observe(viewLifecycleOwner, {
             initMap()

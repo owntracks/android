@@ -73,5 +73,4 @@ class RegionsActivityTests : TestWithAnActivity<RegionsActivity>(RegionsActivity
         assertNotDisplayed(regionName)
         assertDisplayed(R.string.waypointListPlaceholder)
     }
-
 }

@@ -6,36 +6,30 @@ import android.view.animation.Animation
 import androidx.test.espresso.IdlingPolicies
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.IdlingResource
-import androidx.test.espresso.IdlingResource.ResourceCallback
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.assertion.BaristaRecyclerViewAssertions.assertRecyclerViewItemCount
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
-import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickBack
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.PermissionGranter
-import okhttp3.mockwebserver.Dispatcher
-import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
-import okhttp3.mockwebserver.RecordedRequest
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
-import org.owntracks.android.testutils.TestWithAnActivity
-import org.owntracks.android.testutils.setNotFirstStartPreferences
+import org.owntracks.android.testutils.*
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.map.MapActivity
-import org.owntracks.android.ui.writeToEditTextDialog
 import java.util.concurrent.TimeUnit
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class ContactActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.java) {
-    private val mockWebServer = MockWebServer()
+class ContactActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.java, false),
+    MockDeviceLocation by GPSMockDeviceLocation(),
+    TestWithAnHTTPServer by TestWithAnHTTPServerImpl() {
 
     @Before
     fun setIdlingTimeout() {
@@ -44,17 +38,12 @@ class ContactActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.
 
     @Before
     fun startMockWebserver() {
-        try {
-            mockWebServer.start()
-        } catch (e: IllegalArgumentException) {
-            // Already started
-        }
-        mockWebServer.dispatcher = MockWebserverLocationDispatcher(locationResponse)
+        startServer(mapOf("/" to locationResponse))
     }
 
     @After
     fun stopMockWebserver() {
-        mockWebServer.shutdown()
+        stopServer()
     }
 
     @After
@@ -72,6 +61,11 @@ class ContactActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.
         }
     }
 
+    @After
+    fun uninitMockLocation() {
+        unInitializeMockLocationProvider()
+    }
+
     private val locationResponse = """
         {"_type":"location","acc":20,"al":0,"batt":100,"bs":0,"conn":"w","created_at":1610748273,"lat":51.2,"lon":-4,"tid":"aa","tst":1610799026,"vac":40,"vel":7}
     """.trimIndent()
@@ -80,24 +74,18 @@ class ContactActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.
     fun testClickingOnContactLoadsContactOnMap() {
         setNotFirstStartPreferences()
         baristaRule.launchActivity()
-
-        val httpPort = mockWebServer.port
         PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+        initializeMockLocationProvider(InstrumentationRegistry.getInstrumentation().targetContext)
 
-        openDrawer()
-        clickOnAndWait(R.string.title_activity_preferences)
-        clickOnAndWait(R.string.preferencesServer)
-        clickOnAndWait(R.string.mode_heading)
-        clickOnAndWait(R.string.mode_http_private_label)
-        writeToEditTextDialog(R.string.preferencesUrl, "http://localhost:${httpPort}/")
-        clickBack()
+        configureHTTPConnectionToLocal()
 
         openDrawer()
         clickOnAndWait(R.string.title_activity_map)
 
         val locationIdlingResource = baristaRule.activityTestRule.activity.locationIdlingResource
+        IdlingPolicies.setIdlingResourceTimeout(15, TimeUnit.SECONDS)
         IdlingRegistry.getInstance().register(locationIdlingResource)
-
+        setMockLocation(51.0, 0.0)
         clickOnAndWait(R.id.menu_report)
 
         val outgoingQueueIdlingResource =
@@ -108,7 +96,12 @@ class ContactActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.
         clickOnAndWait(R.string.title_activity_contacts)
         assertRecyclerViewItemCount(R.id.contactsRecyclerView, 1)
 
+        baristaRule.activityTestRule.activity.locationIdlingResource?.run {
+            IdlingRegistry.getInstance().unregister(this)
+        }
+
         clickOnAndWait("aa")
+
         assertDisplayed(R.id.bottomSheetLayout)
         assertDisplayed(R.id.contactPeek)
         assertContains(R.id.name, "aa")
@@ -119,20 +112,8 @@ class ContactActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.
         assertNotDisplayed(R.id.contactPeek)
     }
 
-    class MockWebserverLocationDispatcher(private val config: String) : Dispatcher() {
-        override fun dispatch(request: RecordedRequest): MockResponse {
-            val errorResponse = MockResponse().setResponseCode(404)
-            return if (request.path == "/") {
-                MockResponse().setResponseCode(200).setHeader("Content-type", "application/json")
-                    .setBody(config)
-            } else {
-                errorResponse
-            }
-        }
-    }
-
     class AnimationIdlingResource(view: View) : IdlingResource {
-        private var callback: ResourceCallback? = null
+        private var callback: IdlingResource.ResourceCallback? = null
         override fun getName(): String {
             return AnimationIdlingResource::class.java.name
         }
@@ -141,7 +122,7 @@ class ContactActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.
             return true
         }
 
-        override fun registerIdleTransitionCallback(callback: ResourceCallback) {
+        override fun registerIdleTransitionCallback(callback: IdlingResource.ResourceCallback) {
             this.callback = callback
         }
 

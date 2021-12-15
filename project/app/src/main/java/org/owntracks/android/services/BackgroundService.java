@@ -41,7 +41,6 @@ import org.owntracks.android.data.EndpointState;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.data.repos.EndpointStateRepo;
 import org.owntracks.android.data.repos.LocationRepo;
-import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.geocoding.GeocoderProvider;
 import org.owntracks.android.location.Geofence;
 import org.owntracks.android.location.LocationAvailability;
@@ -131,9 +130,6 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
 
     @Inject
     RunThingsOnOtherThreads runThingsOnOtherThreads;
-
-    @Inject
-    WaypointsRepo waypointsRepo;
 
     @Inject
     ServiceBridge serviceBridge;
@@ -545,18 +541,6 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
     }
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void onEvent(Events.ModeChanged e) {
-        setupLocationRequest();
-        updateOngoingNotification();
-    }
-
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void onEvent(Events.MonitoringChanged e) {
-        setupLocationRequest();
-        updateOngoingNotification();
-    }
-
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(MessageTransition message) {
         Timber.d("transition isIncoming:%s topic:%s", message.isIncoming(), message.getTopic());
         if (message.isIncoming())
@@ -616,6 +600,11 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
         ) {
             Timber.d("locator preferences changed. Resetting location request.");
             setupLocationRequest();
+        } else if (
+                preferences.getPreferenceKey(R.string.preferenceKeyMonitoring).equals(key) ||
+                        preferences.getPreferenceKey(R.string.preferenceKeyModeId).equals(key)) {
+            setupLocationRequest();
+            updateOngoingNotification();
         }
     }
 

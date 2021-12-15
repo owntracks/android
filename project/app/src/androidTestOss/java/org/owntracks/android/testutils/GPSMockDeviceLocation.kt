@@ -5,7 +5,6 @@ import android.location.Criteria
 import android.location.Location
 import android.location.LocationManager
 import android.os.SystemClock
-import org.owntracks.android.testutils.MockDeviceLocation
 import java.util.concurrent.TimeUnit
 
 open class GPSMockDeviceLocation : MockDeviceLocation {

@@ -10,8 +10,6 @@ import androidx.test.filters.LargeTest
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
-import com.adevinta.android.barista.rule.BaristaRule
-import com.adevinta.android.barista.rule.flaky.AllowFlaky
 import org.hamcrest.Matchers.`is`
 import org.hamcrest.Matchers.allOf
 import org.junit.Test
@@ -26,7 +24,6 @@ import java.util.concurrent.TimeUnit
 class LogViewerActivityTests :
     TestWithAnActivity<LogViewerActivity>(LogViewerActivity::class.java) {
     @Test
-    @AllowFlaky
     fun logViewerActivityShowsTitle() {
         // Wait for the logviewer coroutine to start
         sleep(5, TimeUnit.SECONDS)
@@ -34,7 +31,6 @@ class LogViewerActivityTests :
     }
 
     @Test
-    @AllowFlaky
     fun logViewerActivityExportFiresIntent() {
         sleep(1, TimeUnit.SECONDS)
         clickOn(R.id.share_fab)

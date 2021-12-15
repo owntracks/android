@@ -1,5 +1,6 @@
 package org.owntracks.android.e2e
 
+import android.Manifest
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
@@ -11,6 +12,7 @@ import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
+import com.adevinta.android.barista.interaction.PermissionGranter
 import com.adevinta.android.barista.rule.flaky.AllowFlaky
 import kotlinx.coroutines.DelicateCoroutinesApi
 import mqtt.packets.Qos
@@ -20,7 +22,9 @@ import org.junit.After
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
+import org.owntracks.android.App
 import org.owntracks.android.R
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.model.messages.MessageTransition
@@ -30,6 +34,7 @@ import org.owntracks.android.support.SimpleIdlingResource
 import org.owntracks.android.testutils.*
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.map.MapActivity
+import timber.log.Timber
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 
@@ -65,11 +70,16 @@ class MQTTTransitionEventTests : TestWithAnActivity<MapActivity>(MapActivity::cl
 
     @After
     fun unregisterIdlingResource() {
-        baristaRule.activityTestRule.activity?.locationIdlingResource?.run {
-            IdlingRegistry.getInstance().unregister(this)
+        try {
+            IdlingRegistry.getInstance()
+                .unregister(baristaRule.activityTestRule.activity.locationIdlingResource)
+        } catch (_: NullPointerException) {
+            // Happens when the vm is already gone from the MapActivity
         }
-        baristaRule.activityTestRule.activity?.outgoingQueueIdlingResource.run {
-            IdlingRegistry.getInstance().unregister(this)
+        try {
+            IdlingRegistry.getInstance()
+                .unregister(baristaRule.activityTestRule.activity.outgoingQueueIdlingResource)
+        } catch (_: NullPointerException) {
         }
     }
 
@@ -78,6 +88,7 @@ class MQTTTransitionEventTests : TestWithAnActivity<MapActivity>(MapActivity::cl
     fun given_an_MQTT_configured_client_when_the_broker_sends_a_transition_message_then_something_happens() {
         setNotFirstStartPreferences()
         baristaRule.launchActivity()
+        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
 
         clearNotifications()
         configureMQTTConnectionToLocal()
@@ -124,6 +135,7 @@ class MQTTTransitionEventTests : TestWithAnActivity<MapActivity>(MapActivity::cl
     fun given_an_MQTT_configured_client_when_the_location_enters_a_geofence_a_transition_message_is_sent_and_notification_raised() {
         setNotFirstStartPreferences()
         baristaRule.launchActivity()
+        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
 
         initializeMockLocationProvider(
             InstrumentationRegistry

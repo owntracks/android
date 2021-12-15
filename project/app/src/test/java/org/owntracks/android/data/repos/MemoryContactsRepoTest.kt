@@ -8,7 +8,8 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import org.greenrobot.eventbus.EventBus
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -16,7 +17,6 @@ import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.support.ContactBitmapAndName
 import org.owntracks.android.support.ContactBitmapAndNameMemoryCache
-import org.owntracks.android.support.Events.ModeChanged
 
 class MemoryContactsRepoTest {
 
@@ -32,7 +32,6 @@ class MemoryContactsRepoTest {
 
     @Before
     fun setup() {
-        eventBus = mock {}
         val mockDisplayMetrics = DisplayMetrics()
         mockDisplayMetrics.densityDpi = 160
         mockResources = mock {
@@ -55,7 +54,7 @@ class MemoryContactsRepoTest {
 
         contactBitmapAndNameMemoryCache = ContactBitmapAndNameMemoryCache()
 
-        contactsRepo = MemoryContactsRepo(eventBus, contactBitmapAndNameMemoryCache)
+        contactsRepo = MemoryContactsRepo(mock{}, contactBitmapAndNameMemoryCache)
     }
 
     @Test
@@ -105,13 +104,6 @@ class MemoryContactsRepoTest {
         contactsRepo!!.update(CONTACT_ID, messageLocation)
         contactsRepo!!.remove(CONTACT_ID)
         assertNull(contactsRepo!!.getById(CONTACT_ID))
-    }
-
-    @Test
-    fun `given a non-empty repo, when the mode change event is called, the repo is emptied`() {
-        contactsRepo!!.update(CONTACT_ID, messageLocation)
-        (contactsRepo as MemoryContactsRepo?)!!.onEventMainThread(ModeChanged(1))
-        assertTrue(contactsRepo!!.all.value!!.isEmpty())
     }
 
     companion object {

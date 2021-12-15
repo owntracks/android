@@ -5,8 +5,11 @@ import org.owntracks.android.model.FusedContact
 import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageLocation
 
+data class ContactUpdatedEvent(val contact: FusedContact, val removed: Boolean)
+
 interface ContactsRepo {
     val all: LiveData<MutableMap<String, FusedContact>>
+    val lastUpdated: LiveData<ContactUpdatedEvent?>
     fun getById(id: String): FusedContact?
     fun clearAll()
     fun remove(id: String)

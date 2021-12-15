@@ -1,5 +1,6 @@
 package org.owntracks.android.ui.map
 
+import android.content.SharedPreferences
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -35,7 +36,7 @@ class MapViewModel @Inject constructor(
     private val messageProcessor: MessageProcessor,
     private val geocoderProvider: GeocoderProvider,
     private val preferences: Preferences
-) : ViewModel() {
+) : ViewModel(), SharedPreferences.OnSharedPreferenceChangeListener {
     private val mutableCurrentContact = MutableLiveData<FusedContact?>()
     private val mutableBottomSheetHidden = MutableLiveData<Boolean>()
     private val mutableMapCenter = MutableLiveData<LatLng>()
@@ -45,6 +46,8 @@ class MapViewModel @Inject constructor(
     private val mutableRelativeContactBearing = MutableLiveData(0f)
     private val mutableMyLocationEnabled = MutableLiveData(false)
 
+    val allContacts = contactsRepo.all
+    
     val currentContact: LiveData<FusedContact?>
         get() = mutableCurrentContact
     val bottomSheetHidden: LiveData<Boolean>
@@ -62,10 +65,31 @@ class MapViewModel @Inject constructor(
     val myLocationEnabled: LiveData<Boolean>
         get() = mutableMyLocationEnabled
 
-    val allContacts = contactsRepo.all
+
+    private val currentMonitoringMode: MutableLiveData<Int> by lazy {
+        MutableLiveData(preferences.monitoring)
+    }
+
+    fun getCurrentMonitoringMode(): LiveData<Int> = currentMonitoringMode
+
+    private val currentConnectionMode: MutableLiveData<Int> by lazy {
+        MutableLiveData(preferences.mode)
+    }
+
+    fun getCurrentConnectionMode(): LiveData<Int> = currentConnectionMode
+
     val locationIdlingResource = SimpleIdlingResource("locationIdlingResource", false)
 
     private var viewMode: ViewMode = ViewMode.Device
+
+    init {
+        preferences.registerOnPreferenceChangedListener(this)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        preferences.unregisterOnPreferenceChangedListener(this)
+    }
 
     fun onMapReady() {
         when (viewMode) {
@@ -101,9 +125,11 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    fun refreshGeocodeForContact(contact: FusedContact) {
-        viewModelScope.launch {
-            contact.messageLocation?.run { geocoderProvider.resolve(this) }
+    fun refreshGeocodeForActiveContact() {
+        mutableCurrentContact.value?.also {
+            viewModelScope.launch {
+                it.messageLocation?.run { geocoderProvider.resolve(this) }
+            }
         }
     }
 
@@ -114,9 +140,9 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    private fun setViewModeContact(contactId: String, center: Boolean) {
+    private fun setViewModeContact(contactId: String, centerMapOnContact: Boolean) {
         val c = contactsRepo.getById(contactId)
-        if (c != null) setViewModeContact(c, center) else Timber.e(
+        if (c != null) setViewModeContact(c, centerMapOnContact) else Timber.e(
             "contact not found %s, ",
             contactId
         )
@@ -126,7 +152,7 @@ class MapViewModel @Inject constructor(
         viewMode = ViewMode.Contact(center)
         mutableCurrentContact.value = contact
         mutableBottomSheetHidden.value = false
-        refreshGeocodeForContact(contact)
+        refreshGeocodeForActiveContact()
         updateActiveContactDistanceAndBearing(contact)
         if (center && contact.latLng != null) mutableMapCenter.postValue(contact.latLng)
     }
@@ -223,7 +249,6 @@ class MapViewModel @Inject constructor(
         mutableCurrentContact.value?.run {
             setViewModeContact(id, true)
         }
-
     }
 
     fun myLocationIsNowEnabled() {
@@ -260,5 +285,15 @@ class MapViewModel @Inject constructor(
         object Free : ViewMode()
         object Device : ViewMode()
         data class Contact(val follow: Boolean) : ViewMode()
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        when (key) {
+            "monitoring" -> currentMonitoringMode.postValue(preferences.monitoring)
+            "mode" -> {
+                currentConnectionMode.postValue(preferences.mode)
+                clearActiveContact()
+            }
+        }
     }
 }

@@ -21,11 +21,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.appcompat.widget.PopupMenu
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.setPadding
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
 import androidx.test.espresso.IdlingResource
@@ -40,7 +43,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.owntracks.android.App
-import org.owntracks.android.BR
 import org.owntracks.android.R
 import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.databinding.UiMapBinding
@@ -54,28 +56,27 @@ import org.owntracks.android.services.BackgroundService.BACKGROUND_LOCATION_REST
 import org.owntracks.android.services.BackgroundService.INTENT_ACTION_CLEAR_NOTIFICATIONS
 import org.owntracks.android.services.LocationProcessor
 import org.owntracks.android.services.MessageProcessorEndpointHttp
-import org.owntracks.android.support.ContactImageBindingAdapter
+import org.owntracks.android.support.*
 import org.owntracks.android.support.Preferences.Companion.EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION
-import org.owntracks.android.support.RequirementsChecker
-import org.owntracks.android.support.RunThingsOnOtherThreads
-import org.owntracks.android.ui.base.BaseActivity
 import org.owntracks.android.ui.base.navigator.Navigator
-import org.owntracks.android.ui.base.viewmodel.NoOpViewModel
+import org.owntracks.android.ui.map.*
 import org.owntracks.android.ui.welcome.WelcomeActivity
 import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
-    View.OnClickListener, View.OnLongClickListener, PopupMenu.OnMenuItemClickListener {
-    private val mapViewModel: MapViewModel by viewModels()
+class MapActivity : AppCompatActivity(), View.OnClickListener, View.OnLongClickListener,
+    PopupMenu.OnMenuItemClickListener {
     private var previouslyHadLocationPermissions: Boolean = false
     private var service: BackgroundService? = null
-    lateinit var locationLifecycleObserver: LocationLifecycleObserver
+    private lateinit var locationLifecycleObserver: LocationLifecycleObserver
     private var bottomSheetBehavior: BottomSheetBehavior<LinearLayoutCompat>? = null
+    private var binding: UiMapBinding? = null
+    private var coordinatorLayout: CoordinatorLayout? = null
     private var menu: Menu? = null
     private var sensorManager: SensorManager? = null
     private var orientationSensor: Sensor? = null
+    private val viewModel: MapViewModel by viewModels()
 
     private lateinit var locationServicesAlertDialog: AlertDialog
     private lateinit var locationPermissionsRationaleAlertDialog: AlertDialog
@@ -88,6 +89,12 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
 
     @Inject
     lateinit var contactImageBindingAdapter: ContactImageBindingAdapter
+
+    @Inject
+    lateinit var drawerProvider: DrawerProvider
+
+    @Inject
+    lateinit var preferences: Preferences
 
     @Inject
     lateinit var eventBus: EventBus
@@ -130,40 +137,42 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
             }
 
             super.onCreate(savedInstanceState)
-
             preferences.setDefaultPreferencesFromResources()
 
             if (!preferences.isSetupCompleted) {
                 navigator.startActivity(WelcomeActivity::class.java)
                 finish()
             }
-            bindAndAttachContentView(R.layout.ui_map, savedInstanceState)
+            binding = DataBindingUtil.setContentView(this, R.layout.ui_map)
+            binding?.vm = viewModel
+            binding?.lifecycleOwner = this
 
-            binding?.also {
-                setSupportToolbar(it.appbar.toolbar, false, true)
-                setDrawer(it.appbar.toolbar)
-                bottomSheetBehavior = BottomSheetBehavior.from(it.bottomSheetLayout)
-                it.setVariable(BR.vm, mapViewModel)
-                it.contactPeek.contactRow.setOnClickListener(this)
-                it.contactPeek.contactRow.setOnLongClickListener(this)
-                it.moreButton.setOnClickListener { v: View -> showPopupMenu(v) }
-                setBottomSheetHidden()
+            setSupportActionBar(binding?.appbar?.toolbar)
+            supportActionBar?.setDisplayShowTitleEnabled(false)
+            drawerProvider.attach(binding?.appbar?.toolbar!!)
 
-                // Need to set the appbar layout behaviour to be non-drag, so that we can drag the map
-                val behavior = AppBarLayout.Behavior()
-                behavior.setDragCallback(object : AppBarLayout.Behavior.DragCallback() {
-                    override fun canDrag(appBarLayout: AppBarLayout): Boolean {
-                        return false
-                    }
-                })
-            }
+            bottomSheetBehavior = BottomSheetBehavior.from(binding?.bottomSheetLayout!!)
+            coordinatorLayout = binding?.coordinatorLayout
+            binding?.contactPeek?.contactRow?.setOnClickListener(this)
+            binding?.contactPeek?.contactRow?.setOnLongClickListener(this)
+            binding?.moreButton?.setOnClickListener { v: View -> showPopupMenu(v) }
+            setBottomSheetHidden()
+
+            // Need to set the appbar layout behaviour to be non-drag, so that we can drag the map
+            val behavior = AppBarLayout.Behavior()
+            behavior.setDragCallback(object : AppBarLayout.Behavior.DragCallback() {
+                override fun canDrag(appBarLayout: AppBarLayout): Boolean {
+                    return false
+                }
+            })
+
 
             locationLifecycleObserver = LocationLifecycleObserver(activityResultRegistry)
             lifecycle.addObserver(locationLifecycleObserver)
 
             // Watch various things that the mapViewModel owns
 
-            mapViewModel.currentContact.observe(this, { contact: FusedContact? ->
+            viewModel.currentContact.observe(this, { contact: FusedContact? ->
                 contact?.let {
                     binding?.contactPeek?.run {
                         image.setImageResource(0) // Remove old image before async loading the new one
@@ -177,7 +186,7 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
                     }
                 }
             })
-            mapViewModel.bottomSheetHidden.observe(this, { o: Boolean? ->
+            viewModel.bottomSheetHidden.observe(this, { o: Boolean? ->
                 if (o == null || o) {
                     setBottomSheetHidden()
                 } else {
@@ -185,7 +194,7 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
                 }
             })
 
-            mapViewModel.currentLocation.observe(this, { location ->
+            viewModel.currentLocation.observe(this, { location ->
                 if (location == null) {
                     disableLocationMenus()
                 } else {
@@ -235,10 +244,9 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
             // We have to check permissions again here, because it may have been revoked in the
             // period between asking for location services and returning here.
             if (checkAndRequestLocationPermissions(false)) {
-                mapViewModel.myLocationIsNowEnabled()
+                viewModel.myLocationIsNowEnabled()
             }
         }
-
 
     private fun checkAndRequestLocationServicesEnabled(explicitUserAction: Boolean): Boolean {
         return if (!requirementsChecker.isLocationServiceEnabled()) {
@@ -350,20 +358,22 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
                     if (requestCode == PERMISSIONS_REQUEST_CODE_WITH_EXPLICIT_SERVICES_CHECK) {
                         checkAndRequestLocationServicesEnabled(true)
                     }
-                    mapViewModel.myLocationIsNowEnabled()
+                    viewModel.myLocationIsNowEnabled()
                     service?.reInitializeLocationRequests()
                     previouslyHadLocationPermissions = true
                 }
                 PERMISSION_DENIED -> {
-                    Snackbar.make(
-                        binding!!.coordinatorLayout,
-                        getString(R.string.locationPermissionNotGrantedNotification),
-                        Snackbar.LENGTH_LONG
-                    ).setAction(getString(R.string.fixProblemLabel)) {
-                        startActivity(Intent(ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                            data = Uri.parse("package:${packageName}")
-                        })
-                    }.show()
+                    coordinatorLayout?.run {
+                        Snackbar.make(
+                            this,
+                            getString(R.string.locationPermissionNotGrantedNotification),
+                            Snackbar.LENGTH_LONG
+                        ).setAction(getString(R.string.fixProblemLabel)) {
+                            startActivity(Intent(ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                data = Uri.parse("package:${packageName}")
+                            })
+                        }.show()
+                    }
                 }
             }
         }
@@ -375,6 +385,8 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
                 this.classLoader,
                 MapFragment::class.java.name
             )
+        Timber.d("Unidling location")
+        viewModel.locationIdlingResource.setIdleState(false)
         supportFragmentManager.commit(true) {
             replace(R.id.mapFragment, mapFragment, "map")
         }
@@ -389,7 +401,7 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
                 orientationSensor?.run { Timber.d("Got a rotation vector sensor") }
             }
         } else {
-            sensorManager?.unregisterListener(mapViewModel.orientationSensorEventListener)
+            sensorManager?.unregisterListener(viewModel.orientationSensorEventListener)
             sensorManager = null
             orientationSensor = null
         }
@@ -398,7 +410,7 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
         updateMyLocationMenuIcon()
         if (!previouslyHadLocationPermissions && requirementsChecker.isLocationPermissionCheckPassed()) {
             previouslyHadLocationPermissions = true
-            mapViewModel.myLocationIsNowEnabled()
+            viewModel.myLocationIsNowEnabled()
             service?.reInitializeLocationRequests()
         }
     }
@@ -416,7 +428,7 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
             Timber.v("intent has extras from drawerProvider")
             val contactId = b.getString(BUNDLE_KEY_CONTACT_ID)
             if (contactId != null) {
-                mapViewModel.setLiveContact(contactId)
+                viewModel.setLiveContact(contactId)
             }
         }
     }
@@ -429,7 +441,7 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
         }
     }
 
-    public override fun onNewIntent(intent: Intent) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         handleIntentExtras(intent)
     }
@@ -481,14 +493,14 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_report -> {
-                mapViewModel.sendLocation()
+                viewModel.sendLocation()
                 true
             }
             R.id.menu_mylocation -> {
                 if (checkAndRequestLocationPermissions(true)) {
                     checkAndRequestLocationServicesEnabled(true)
                 }
-                mapViewModel.onMenuCenterDeviceClicked()
+                viewModel.onMenuCenterDeviceClicked()
                 true
             }
             android.R.id.home -> {
@@ -539,11 +551,11 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
     override fun onMenuItemClick(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_clear -> {
-                mapViewModel.onClearContactClicked()
+                viewModel.onClearContactClicked()
                 false
             }
             R.id.menu_navigate -> {
-                val c = mapViewModel.currentContact
+                val c = viewModel.currentContact
                 c.value?.latLng?.run {
                     try {
                         val intent = Intent(
@@ -553,18 +565,22 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         startActivity(intent)
                     } catch (e: ActivityNotFoundException) {
+                        coordinatorLayout?.run {
+                            Snackbar.make(
+                                this,
+                                getString(R.string.noNavigationApp),
+                                Snackbar.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                } ?: run {
+                    coordinatorLayout?.run {
                         Snackbar.make(
-                            binding!!.coordinatorLayout,
-                            getString(R.string.noNavigationApp),
+                            this,
+                            getString(R.string.contactLocationUnknown),
                             Snackbar.LENGTH_SHORT
                         ).show()
                     }
-                } ?: run {
-                    Snackbar.make(
-                        binding!!.coordinatorLayout,
-                        getString(R.string.contactLocationUnknown),
-                        Snackbar.LENGTH_SHORT
-                    ).show()
                 }
                 true
             }
@@ -573,16 +589,16 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
     }
 
     override fun onLongClick(view: View): Boolean {
-        mapViewModel.onBottomSheetLongClick()
+        viewModel.onBottomSheetLongClick()
         return true
     }
 
     private fun setBottomSheetExpanded() {
         bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_EXPANDED
-        binding!!.mapFragment.setPaddingRelative(0, 0, 0, binding!!.bottomSheetLayout.height)
+        binding?.mapFragment?.setPaddingRelative(0, 0, 0, binding!!.bottomSheetLayout.height)
         orientationSensor?.let {
             sensorManager?.registerListener(
-                mapViewModel.orientationSensorEventListener,
+                viewModel.orientationSensorEventListener,
                 it,
                 500_000
             )
@@ -596,15 +612,15 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
 
     private fun setBottomSheetCollapsed() {
         bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_COLLAPSED
-        binding!!.mapFragment.setPadding(0)
-        sensorManager?.unregisterListener(mapViewModel.orientationSensorEventListener)
+        binding?.mapFragment?.setPadding(0)
+        sensorManager?.unregisterListener(viewModel.orientationSensorEventListener)
     }
 
     private fun setBottomSheetHidden() {
-        bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_HIDDEN
-        binding!!.mapFragment.setPadding(0)
+        bottomSheetBehavior?.state = BottomSheetBehavior.STATE_HIDDEN
+        binding?.mapFragment?.setPadding(0)
         menu?.run { close() }
-        sensorManager?.unregisterListener(mapViewModel.orientationSensorEventListener)
+        sensorManager?.unregisterListener(viewModel.orientationSensorEventListener)
     }
 
     private fun showPopupMenu(v: View) {
@@ -614,7 +630,7 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
         if (preferences.mode == MessageProcessorEndpointHttp.MODE_ID) {
             popupMenu.menu.removeItem(R.id.menu_clear)
         }
-        if (!mapViewModel.contactHasLocation()) {
+        if (!viewModel.contactHasLocation()) {
             popupMenu.menu.removeItem(R.id.menu_navigate)
         }
         popupMenu.show()
@@ -662,7 +678,7 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
 
     @get:VisibleForTesting
     val locationIdlingResource: IdlingResource?
-        get() = mapViewModel.locationIdlingResource
+        get() = viewModel.locationIdlingResource
 
     @get:VisibleForTesting
     val outgoingQueueIdlingResource: IdlingResource

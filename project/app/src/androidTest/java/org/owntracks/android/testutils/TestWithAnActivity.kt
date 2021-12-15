@@ -10,11 +10,10 @@ import org.junit.rules.RuleChain
 import org.owntracks.android.testutils.rules.ScreenshotTakingOnTestEndRule
 import org.owntracks.android.testutils.rules.WaypointsObjectBoxClearRule
 
-
 abstract class TestWithAnActivity<T : Activity>(
     activity: Class<T>,
     private val startActivity: Boolean = true
-) {
+) : TestWithCoverageEnabled() {
     @get:Rule
     var baristaRule = BaristaRule.create(activity)
 

@@ -51,7 +51,10 @@ class SharedPreferencesStore @Inject constructor(@ApplicationContext private val
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     oldSharedPreferenceNames.forEach {
-                        context.deleteSharedPreferences(it)
+                        val deleted = context.deleteSharedPreferences(it)
+                        if (!deleted) {
+                            Timber.w("Failed to delete shared preference $it")
+                        }
                     }
                 }
             }

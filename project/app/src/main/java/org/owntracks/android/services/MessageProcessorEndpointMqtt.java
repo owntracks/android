@@ -20,9 +20,6 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
-import org.eclipse.paho.client.mqttv3.MqttPersistable;
-import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-import org.greenrobot.eventbus.EventBus;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -54,7 +51,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
-import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.BlockingQueue;
@@ -154,7 +150,6 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
     synchronized void sendMessage(MessageBase m) throws ConfigurationIncompleteException, OutgoingMessageSendingException, IOException {
         Timber.d("Sending message %s. Thread: %s", m, Thread.currentThread());
-        m.addMqttPreferences(preferences);
         String messageId = m.getMessageId();
         try {
             connectToBroker();
@@ -169,7 +164,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         }
 
         try {
-            Timber.d("Publishing %s message to MQTT on %s", m.getClass(), m.getTopic());
+            m.addMqttPreferences(preferences);
             IMqttDeliveryToken pubToken = this.mqttClient.publish(m.getTopic(), m.toJsonBytes(parser), m.getQos(), m.getRetained());
             long startTime = System.nanoTime();
             pubToken.waitForCompletion(TimeUnit.SECONDS.toMillis(30));
@@ -263,7 +258,6 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         String connectString = new URI(scheme, null, preferences.getHost(), preferences.getPort(), null, null, null).toString();
         Timber.d("client id: %s, connect string: %s", cid, connectString);
         try {
-
             IMqttAsyncClient mqttClient = new MqttAsyncClient(connectString, cid, new MqttDefaultFilePersistence(applicationContext.getFilesDir().toString()));
             mqttClient.setCallback(iCallbackClient);
             return mqttClient;
@@ -276,6 +270,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
     @WorkerThread
     private synchronized void connectToBroker() throws MqttConnectionException, ConfigurationIncompleteException, AlreadyConnectingToBrokerException {
+        Timber.d("Connecting to broker. ThreadId: %s", Thread.currentThread());
         boolean isUiThread = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? Looper.getMainLooper().isCurrentThread()
                 : Thread.currentThread() == Looper.getMainLooper().getThread();
 
@@ -524,7 +519,6 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         return qos;
     }
 
-
     private void disconnect() {
         Timber.d("disconnect. ThreadID: %s", Thread.currentThread());
         if (isConnecting()) {
@@ -633,6 +627,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     public void onCreateFromProcessor() {
         try {
             checkConfigurationComplete();
+            reconnect();
         } catch (ConfigurationIncompleteException e) {
             changeState(EndpointState.ERROR_CONFIGURATION.withError(e));
         }

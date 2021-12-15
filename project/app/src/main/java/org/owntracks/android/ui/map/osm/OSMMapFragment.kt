@@ -112,7 +112,7 @@ class OSMMapFragment internal constructor(
     }
 
     override fun clearMarkers() {
-        mapView?.overlays?.clear()
+        mapView?.overlays?.removeAll { it is Marker }
     }
 
     override fun updateCamera(latLng: LatLng) {
