@@ -47,7 +47,7 @@ class MapViewModel @Inject constructor(
     private val mutableMyLocationEnabled = MutableLiveData(false)
 
     val allContacts = contactsRepo.all
-    
+
     val currentContact: LiveData<FusedContact?>
         get() = mutableCurrentContact
     val bottomSheetHidden: LiveData<Boolean>

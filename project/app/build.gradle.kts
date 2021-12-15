@@ -1,7 +1,7 @@
 plugins {
     id("com.android.application")
     id("dagger.hilt.android.plugin")
-    id("com.github.triplet.play") version "3.5.0"
+    id("com.github.triplet.play") version "3.6.0"
     kotlin("android")
     kotlin("kapt")
     id("io.objectbox")
@@ -32,23 +32,20 @@ android {
         versionCode = 24600
         versionName = "2.4.6"
 
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments(mapOf("eventBusIndex" to "org.owntracks.android.EventBusIndex"))
-            }
-        }
         val locales = listOf("en", "de", "fr", "es", "ru", "ca", "pl", "cs", "ja", "pt", "zh")
         buildConfigField(
             "String[]",
             "TRANSLATION_ARRAY",
             "new String[]{\"" + locales.joinToString("\",\"") + "\"}"
         )
-        resConfigs(locales)
-        testInstrumentationRunner("androidx.test.runner.AndroidJUnitRunner")
+        resourceConfigurations.addAll(locales)
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments.putAll(
             mapOf(
-                "clearPackageData" to "false",
-                "coverageFilePath" to "/storage/emulated/0/coverage"
+                "clearPackageData" to "true",
+                "coverage" to "true",
+                "coverageFilePath" to "/sdcard/coverage/",
+                "disableAnalytics" to "true"
             )
         )
     }
@@ -71,9 +68,11 @@ android {
         named("release") {
             isMinifyEnabled = true
             isShrinkResources = true
-            proguardFiles = mutableListOf(
-                getDefaultProguardFile("proguard-android.txt"),
-                file("proguard-rules.pro")
+            proguardFiles.addAll(
+                listOf(
+                    getDefaultProguardFile("proguard-android.txt"),
+                    file("proguard-rules.pro")
+                )
             )
             resValue("string", "GOOGLE_MAPS_API_KEY", googleMapsAPIKey)
             signingConfig = signingConfigs.findByName("release")
@@ -82,9 +81,11 @@ android {
         named("debug") {
             isMinifyEnabled = false
             isShrinkResources = false
-            proguardFiles = mutableListOf(
-                getDefaultProguardFile("proguard-android.txt"),
-                file("proguard-rules.pro")
+            proguardFiles.addAll(
+                listOf(
+                    getDefaultProguardFile("proguard-android.txt"),
+                    file("proguard-rules.pro")
+                )
             )
             resValue("string", "GOOGLE_MAPS_API_KEY", googleMapsAPIKey)
             applicationIdSuffix = ".debug"
@@ -97,28 +98,29 @@ android {
         viewBinding = true
     }
 
-    packagingOptions.excludes.addAll(
-        listOf(
-            "META-INF/DEPENDENCIES.txt",
-            "META-INF/LICENSE.txt",
-            "META-INF/NOTICE.txt",
-            "META-INF/NOTICE",
-            "META-INF/LICENSE",
-            "META-INF/DEPENDENCIES",
-            "META-INF/notice.txt",
-            "META-INF/license.txt",
-            "META-INF/dependencies.txt",
-            "META-INF/LGPL2.1",
-            "META-INF/proguard/androidx-annotations.pro",
-            "META-INF/metadata.kotlin_module",
-            "META-INF/metadata.jvm.kotlin_module",
-            "META-INF/gradle/incremental.annotation.processors"
+    packagingOptions {
+        resources.excludes.addAll(
+            listOf(
+                "META-INF/DEPENDENCIES.txt",
+                "META-INF/LICENSE.txt",
+                "META-INF/NOTICE.txt",
+                "META-INF/NOTICE",
+                "META-INF/LICENSE",
+                "META-INF/DEPENDENCIES",
+                "META-INF/notice.txt",
+                "META-INF/license.txt",
+                "META-INF/dependencies.txt",
+                "META-INF/LGPL2.1",
+                "META-INF/proguard/androidx-annotations.pro",
+                "META-INF/metadata.kotlin_module",
+                "META-INF/metadata.jvm.kotlin_module",
+                "META-INF/gradle/incremental.annotation.processors"
+            )
         )
-    )
-    packagingOptions.jniLibs.useLegacyPackaging = false
+        jniLibs.useLegacyPackaging = false
+    }
 
-
-    lintOptions {
+    lint {
         baselineFile = file("../../lint/lint-baseline.xml")
         isCheckAllWarnings = true
         isWarningsAsErrors = false
@@ -137,6 +139,9 @@ android {
             isIncludeAndroidResources = true
         }
     }
+    testCoverage {
+        jacocoVersion = rootJacocoVersion
+    }
 
     tasks.withType<Test> {
         testLogging {
@@ -154,7 +159,7 @@ android {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
-    flavorDimensions("locationProvider")
+    flavorDimensions.add("locationProvider")
     productFlavors {
         create("gms") {
             dimension = "locationProvider"
@@ -171,6 +176,9 @@ android {
 
 kapt {
     correctErrorTypes = true
+    arguments {
+        arg("eventBusIndex", "org.owntracks.android.EventBusIndex")
+    }
 }
 
 tasks.withType<Test> {
@@ -276,12 +284,12 @@ dependencies {
 
 
 // Publishing
-val serviceAccountCreds = file("owntracks-android-gcloud-creds.json")
+val serviceAccountCredentials = file("owntracks-android-gcloud-creds.json")
 
 play {
-    if (serviceAccountCreds.exists()) {
+    if (this@Build_gradle.serviceAccountCredentials.exists()) {
         enabled.set(true)
-        serviceAccountCredentials.set(serviceAccountCreds)
+        serviceAccountCredentials.set(this@Build_gradle.serviceAccountCredentials)
     } else {
         enabled.set(false)
     }
