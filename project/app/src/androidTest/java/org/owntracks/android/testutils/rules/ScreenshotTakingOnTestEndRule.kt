@@ -1,4 +1,4 @@
-package org.owntracks.android
+package org.owntracks.android.testutils.rules
 
 import android.util.Log
 import androidx.test.core.graphics.writeToTestStorage

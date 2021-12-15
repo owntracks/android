@@ -28,7 +28,7 @@ import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 import org.owntracks.android.R
-import org.owntracks.android.ScreenshotTakingOnTestEndRule
+import org.owntracks.android.testutils.rules.ScreenshotTakingOnTestEndRule
 import org.owntracks.android.e2e.setNotFirstStartPreferences
 import org.owntracks.android.support.Preferences
 import org.owntracks.android.ui.clickOnAndWait
