@@ -6,7 +6,7 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotContains
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotExist
-import com.adevinta.android.barista.interaction.BaristaSleepInteractions
+import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
@@ -92,7 +92,7 @@ class PreferencesActivityTests :
         clickBackAndWait()
         clickOnAndWait(R.string.configurationManagement)
 
-        BaristaSleepInteractions.sleep(1000)
+        sleep(1000)
 
         assertContains(R.id.effectiveConfiguration, "\"_type\" : \"configuration\"")
         assertContains(R.id.effectiveConfiguration, " \"waypoints\" : [ ]")

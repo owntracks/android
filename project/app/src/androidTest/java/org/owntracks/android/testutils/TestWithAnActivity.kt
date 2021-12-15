@@ -44,4 +44,3 @@ abstract class TestWithAnActivity<T : Activity>(
         }
     }
 }
-

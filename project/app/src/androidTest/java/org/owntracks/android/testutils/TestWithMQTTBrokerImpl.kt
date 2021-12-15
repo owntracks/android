@@ -3,8 +3,8 @@ package org.owntracks.android.testutils
 import android.content.Intent
 import android.net.Uri
 import androidx.test.platform.app.InstrumentationRegistry
-import com.adevinta.android.barista.interaction.BaristaDrawerInteractions
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
+import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import kotlinx.coroutines.DelicateCoroutinesApi
 import mqtt.broker.Broker
@@ -124,7 +124,7 @@ class TestWithMQTTBrokerImpl : TestWithAnMQTTBroker {
         })
         sleep(500)
         clickOnAndWait(R.id.save)
-        BaristaDrawerInteractions.openDrawer()
+        openDrawer()
         clickOnAndWait(R.string.title_activity_status)
     }
 

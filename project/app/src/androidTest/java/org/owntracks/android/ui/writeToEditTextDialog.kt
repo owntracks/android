@@ -7,14 +7,14 @@ import androidx.test.espresso.Espresso
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers
-import com.adevinta.android.barista.interaction.BaristaDialogInteractions
-import com.adevinta.android.barista.interaction.BaristaEditTextInteractions
+import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickDialogPositiveButton
+import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
 
 fun writeToEditTextDialog(@StringRes name: Int, value: String) {
     scrollToText(name)
     clickOnAndWait(name)
-    BaristaEditTextInteractions.writeTo(R.id.edit, value)
-    BaristaDialogInteractions.clickDialogPositiveButton()
+    writeTo(R.id.edit, value)
+    clickDialogPositiveButton()
 }
 
 fun scrollToText(textResource: Int) {

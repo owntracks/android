@@ -2,7 +2,7 @@ package org.owntracks.android.testutils
 
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
-import com.adevinta.android.barista.interaction.BaristaSleepInteractions
+import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 
 interface MockDeviceLocation {
     fun initializeMockLocationProvider(context: Context)
@@ -14,7 +14,7 @@ interface MockDeviceLocation {
             .uiAutomation
             .executeShellCommand("appops set ${context.packageName} android:mock_location allow")
             .close()
-        BaristaSleepInteractions.sleep(100)
+        sleep(100)
     }
 }
 
