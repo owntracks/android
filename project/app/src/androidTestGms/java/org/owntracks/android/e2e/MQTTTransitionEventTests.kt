@@ -77,10 +77,10 @@ class MQTTTransitionEventTests : TestWithAnActivity<MapActivity>(MapActivity::cl
     @Test
     @AllowFlaky(attempts = 1)
     fun given_an_MQTT_configured_client_when_the_broker_sends_a_transition_message_then_something_happens() {
+        setNotFirstStartPreferences()
         baristaRule.launchActivity()
 
         clearNotifications()
-        doWelcomeProcess()
         configureMQTTConnectionToLocal(
             1000L * baristaRule.activityTestRule.activity.resources.getInteger(
                 R.integer.defaultConnectionTimeoutSeconds
@@ -127,6 +127,7 @@ class MQTTTransitionEventTests : TestWithAnActivity<MapActivity>(MapActivity::cl
     @Test
     @AllowFlaky(attempts = 1)
     fun given_an_MQTT_configured_client_when_the_location_enters_a_geofence_a_transition_message_is_sent_and_notification_raised() {
+        setNotFirstStartPreferences()
         baristaRule.launchActivity()
 
         initializeMockLocationProvider(
@@ -139,7 +140,7 @@ class MQTTTransitionEventTests : TestWithAnActivity<MapActivity>(MapActivity::cl
         val regionDescription = "Test Region"
 
         clearNotifications()
-        doWelcomeProcess()
+
         configureMQTTConnectionToLocal(
             1000L * baristaRule.activityTestRule.activity.resources.getInteger(
                 R.integer.defaultConnectionTimeoutSeconds

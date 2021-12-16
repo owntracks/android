@@ -84,8 +84,11 @@ class MapViewModel @Inject constructor(
     val mapLocationUpdateCallback: LocationCallback = object : LocationCallback {
         override fun onLocationResult(locationResult: LocationResult) {
             mutableCurrentLocation.value = locationResult.lastLocation
-            if (locationResult.lastLocation.provider == "gps") {
-                locationIdlingResource.setIdleState(true)
+            if (locationResult.lastLocation.accuracy < preferences.ignoreInaccurateLocations) {
+                if (!locationIdlingResource.isIdleNow) {
+                    Timber.d("Idling location")
+                    locationIdlingResource.setIdleState(true)
+                }
             }
             if (viewMode is ViewMode.Device && mutableMapCenter.value != locationResult.lastLocation.toLatLng()) {
                 mutableMapCenter.postValue(locationResult.lastLocation.toLatLng())
