@@ -6,6 +6,7 @@
 
 * Fix crash resuming the MapActivity caused by FragmentFactory handling fragment creation correctly onResume
 * Auto-sizing of text on the bottomsheet contact details pull-up should work properly now (#1123)
+* Locales with incomplete translations should fall back to the default locale rather than show a blank (#1145)
 
 ## Verison 2.4.4
 
