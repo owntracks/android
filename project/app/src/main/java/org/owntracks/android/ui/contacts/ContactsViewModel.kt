@@ -1,6 +1,5 @@
 package org.owntracks.android.ui.contacts
 
-import android.os.Bundle
 import androidx.lifecycle.LiveData
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.MainScope
@@ -14,22 +13,19 @@ import javax.inject.Inject
 
 @ActivityScoped
 class ContactsViewModel @Inject constructor(
-    private val contactsRepo: ContactsRepo, private val geocoderProvider: GeocoderProvider
+        private val contactsRepo: ContactsRepo,
+        private val geocoderProvider: GeocoderProvider
 ) :
-    BaseViewModel<ContactsMvvm.View?>(), ContactsMvvm.ViewModel<ContactsMvvm.View?> {
+        BaseViewModel<ContactsMvvm.View>(), ContactsMvvm.ViewModel<ContactsMvvm.View> {
     private val mainScope = MainScope()
-    override fun attachView(savedInstanceState: Bundle?, view: ContactsMvvm.View?) {
-        super.attachView(savedInstanceState, view!!)
-    }
-
     fun refreshGeocodes() {
         Timber.i("Refreshing contacts geocodes")
         mainScope.launch {
             contactsRepo.all.value?.run {
                 map { it.value.messageLocation }
-                    .filterNotNull()
-                    .iterator()
-                    .forEach { geocoderProvider.resolve(it) }
+                        .filterNotNull()
+                        .iterator()
+                        .forEach { geocoderProvider.resolve(it) }
             }
         }
     }

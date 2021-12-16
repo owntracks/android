@@ -10,12 +10,17 @@ import org.greenrobot.eventbus.ThreadMode
 import org.owntracks.android.BR
 import org.owntracks.android.support.Events
 import org.owntracks.android.support.Preferences
+import org.owntracks.android.ui.base.navigator.Navigator
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel
 import org.owntracks.android.ui.map.MapActivity
 import javax.inject.Inject
 
 @ActivityScoped
-class WelcomeViewModel @Inject constructor(private val preferences: Preferences, private val eventBus: EventBus) : BaseViewModel<WelcomeMvvm.View?>() {
+class WelcomeViewModel @Inject constructor(
+        private val preferences: Preferences,
+        private val eventBus: EventBus,
+        private val navigator: Navigator
+) : BaseViewModel<WelcomeMvvm.View>() {
     var currentFragmentPosition: MutableLiveData<Int> = MutableLiveData(0)
 
     @get:Bindable
@@ -46,8 +51,11 @@ class WelcomeViewModel @Inject constructor(private val preferences: Preferences,
 
     fun onDoneClicked() {
         preferences.setSetupCompleted()
-        navigator.startActivity(MapActivity::class.java, null, Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
-
+        navigator.startActivity(
+                MapActivity::class.java,
+                null,
+                Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+        )
     }
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)

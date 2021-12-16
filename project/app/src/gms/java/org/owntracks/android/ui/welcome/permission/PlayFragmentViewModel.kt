@@ -7,7 +7,7 @@ import org.owntracks.android.ui.base.viewmodel.BaseViewModel
 import javax.inject.Inject
 
 @ActivityScoped
-class PlayFragmentViewModel @Inject constructor() : BaseViewModel<PlayFragmentMvvm.View?>() {
+class PlayFragmentViewModel @Inject constructor() : BaseViewModel<PlayFragmentMvvm.View>() {
     @get:Bindable
     var fixAvailable = false
         set(value) {
@@ -23,6 +23,6 @@ class PlayFragmentViewModel @Inject constructor() : BaseViewModel<PlayFragmentMv
         }
 
     fun onFixClicked() {
-        view!!.requestFix()
+        view?.requestFix()
     }
 }

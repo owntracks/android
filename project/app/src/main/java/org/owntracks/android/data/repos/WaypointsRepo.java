@@ -16,6 +16,7 @@ import io.objectbox.query.Query;
 
 public abstract class WaypointsRepo {
     private final EventBus eventBus;
+
     protected WaypointsRepo(EventBus eventBus) {
         this.eventBus = eventBus;
     }
