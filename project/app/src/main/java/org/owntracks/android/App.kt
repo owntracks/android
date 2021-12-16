@@ -7,6 +7,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
 import android.os.StrictMode
+import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NotificationManagerCompat
 import androidx.databinding.DataBindingUtil
@@ -16,6 +17,7 @@ import androidx.work.WorkerFactory
 import dagger.hilt.EntryPoints
 import dagger.hilt.android.HiltAndroidApp
 import org.conscrypt.Conscrypt
+import org.owntracks.android.data.repos.WaypointsRepo
 import org.owntracks.android.di.CustomBindingComponentBuilder
 import org.owntracks.android.di.CustomBindingEntryPoint
 import org.owntracks.android.geocoding.GeocoderProvider
@@ -46,6 +48,9 @@ class App : Application(), Configuration.Provider {
 
     @Inject
     lateinit var bindingComponentProvider: Provider<CustomBindingComponentBuilder>
+
+    @Inject
+    lateinit var waypointsRepo: WaypointsRepo
 
     val workManagerFailedToInitialize = MutableLiveData(false)
 
@@ -173,6 +178,11 @@ class App : Application(), Configuration.Provider {
                         workManagerFailedToInitialize.postValue(true)
                     }
                     .build()
+
+    @VisibleForTesting
+    fun resetWaypointsRepo() {
+        waypointsRepo.reset()
+    }
 }
 
 inline fun perfLog(description: String, block: () -> Unit) {

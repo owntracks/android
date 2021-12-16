@@ -92,4 +92,5 @@ public abstract class WaypointsRepo {
 
     protected abstract void delete_impl(WaypointModel w);
 
+    public abstract void reset();
 }

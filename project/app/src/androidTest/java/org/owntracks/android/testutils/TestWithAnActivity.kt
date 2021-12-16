@@ -8,6 +8,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.RuleChain
 import org.owntracks.android.testutils.rules.ScreenshotTakingOnTestEndRule
+import org.owntracks.android.testutils.rules.WaypointsObjectBoxClearRule
 
 
 abstract class TestWithAnActivity<T : Activity>(
@@ -19,10 +20,13 @@ abstract class TestWithAnActivity<T : Activity>(
 
     private val screenshotRule = ScreenshotTakingOnTestEndRule()
 
+    private val objectStoreClearRule = WaypointsObjectBoxClearRule()
+
     @get:Rule
     val ruleChain: RuleChain = RuleChain
         .outerRule(baristaRule.activityTestRule)
-        .around(screenshotRule)
+        .around(screenshotRule).around(objectStoreClearRule)
+
 
     @Before
     fun initIntents() {
@@ -41,3 +45,4 @@ abstract class TestWithAnActivity<T : Activity>(
         }
     }
 }
+

@@ -135,5 +135,8 @@ public class ObjectboxWaypointsRepo extends WaypointsRepo {
         box.remove(w);
     }
 
-
+    @Override
+    public void reset() {
+        box.removeAll();
+    }
 }
