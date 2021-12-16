@@ -462,7 +462,7 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setNumber(activeNotifications.size())
                 .setStyle(inbox)
-                .setContentIntent(PendingIntent.getActivity(this, (int) System.currentTimeMillis() / 1000, new Intent(this, MapActivity.class), updateCurrentIntentFlags))
+                .setContentIntent(PendingIntent.getActivity(this, (int) System.currentTimeMillis() / 1000, new Intent(this, MapActivity.class).putExtra(INTENT_ACTION_CLEAR_NOTIFICATIONS, true), updateCurrentIntentFlags))
                 .setDeleteIntent(PendingIntent.getService(this, INTENT_REQUEST_CODE_CLEAR_EVENTS, (new Intent(this, BackgroundService.class)).setAction(INTENT_ACTION_CLEAR_NOTIFICATIONS), updateCurrentIntentFlags));
 
         Notification stackNotification = builder.build();

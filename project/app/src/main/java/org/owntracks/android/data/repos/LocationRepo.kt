@@ -2,13 +2,12 @@ package org.owntracks.android.data.repos
 
 import android.location.Location
 import androidx.lifecycle.MutableLiveData
-import org.greenrobot.eventbus.EventBus
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class LocationRepo @Inject constructor(private val eventBus: EventBus) {
+class LocationRepo @Inject constructor() {
     var currentPublishedLocation: MutableLiveData<Location> = MutableLiveData()
 
     val currentLocationTime: Long
@@ -17,11 +16,11 @@ class LocationRepo @Inject constructor(private val eventBus: EventBus) {
     fun setCurrentPublishedLocation(l: Location) {
         Timber.d("Setting current location to $l on ${Thread.currentThread()}")
         try {
+            // If we're on the right thread, let's just update this value synchronously
             currentPublishedLocation.value = l
         } catch (e: IllegalStateException) {
             currentPublishedLocation.postValue(l)
         }
-        eventBus.postSticky(l)
     }
 
     var currentMapLocation: Location? = null

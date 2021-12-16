@@ -49,6 +49,7 @@ class GMSLocationProviderClient(
 
         val gmsCallBack = object : com.google.android.gms.location.LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
+                Timber.e("GMS location received. Is mock? ${locationResult.lastLocation.isFromMockProvider} ${locationResult.lastLocation}")
                 clientCallBack.onLocationResult(
                     org.owntracks.android.location.LocationResult(
                         locationResult.lastLocation
@@ -65,8 +66,10 @@ class GMSLocationProviderClient(
             }
         }
         callbackMap[clientCallBack] = gmsCallBack
+        val gmsLocationRequest = locationRequest.toGMSLocationRequest()
+        Timber.d("GMS location request is $gmsLocationRequest for callback $clientCallBack")
         fusedLocationProviderClient.requestLocationUpdates(
-            locationRequest.toGMSLocationRequest(),
+            gmsLocationRequest,
             gmsCallBack,
             looper!!
         )

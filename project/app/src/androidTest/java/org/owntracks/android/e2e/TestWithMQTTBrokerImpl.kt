@@ -11,7 +11,6 @@ import mqtt.broker.interfaces.PacketInterceptor
 import mqtt.packets.MQTTPacket
 import mqtt.packets.Qos
 import mqtt.packets.mqttv5.MQTT5Properties
-import org.junit.After
 import org.owntracks.android.R
 import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.support.Parser
@@ -70,11 +69,14 @@ class TestWithMQTTBrokerImpl : TestWithAnMQTTBroker {
     @DelicateCoroutinesApi
     override fun startBroker() {
         mqttPacketsReceived.clear()
-        GlobalScope.launch { broker.listen() }
+        GlobalScope.launch {
+            broker.listen()
+            Timber.i("Test MQTT Broker listening $broker")
+        }
     }
 
-    @After
     override fun stopBroker() {
+        Timber.i("Test MQTT Broker stopping")
         broker.stop()
     }
 
@@ -86,11 +88,12 @@ class TestWithMQTTBrokerImpl : TestWithAnMQTTBroker {
         clickOnAndWait(R.string.mode_mqtt_private_label)
         writeToEditTextDialog(R.string.preferencesHost, "127.0.0.1")
         writeToEditTextDialog(R.string.preferencesPort, "18883")
-        writeToEditTextDialog(R.string.preferencesClientId, "testClientId")
+        writeToEditTextDialog(R.string.preferencesClientId, mqttClientId)
         writeToEditTextDialog(R.string.preferencesUserUsername, mqttUsername)
         writeToEditTextDialog(R.string.preferencesBrokerPassword, password)
         scrollToText(R.string.tls)
         clickOnAndWait(R.string.tls)
+        writeToEditTextDialog(R.string.preferencesDeviceName, deviceId)
         BaristaDrawerInteractions.openDrawer()
         clickOnAndWait(R.string.title_activity_status)
         BaristaSleepInteractions.sleep(timeoutMs)

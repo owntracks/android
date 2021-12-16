@@ -12,7 +12,7 @@ interface TestWithAnMQTTBroker {
     val broker: Broker
     val mqttUsername: String
     val mqttClientId: String
-    val deviceId: String
+    val deviceId:String
     fun <E : MessageBase> Collection<E>.sendFromBroker(broker: Broker)
     @DelicateCoroutinesApi
     fun startBroker()
