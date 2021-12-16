@@ -16,10 +16,10 @@ class SingletonModule {
     @Singleton
     fun provideEventbus(): EventBus {
         return EventBus.builder()
-            .addIndex(EventBusIndex())
-            .sendNoSubscriberEvent(false)
-            .logNoSubscriberMessages(true)
-            .build()
+                .addIndex(EventBusIndex())
+                .sendNoSubscriberEvent(false)
+                .logNoSubscriberMessages(true)
+                .build()
     }
 
     @Provides

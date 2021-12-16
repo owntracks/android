@@ -45,6 +45,6 @@ fun LatLng.toGeoPoint(): GeoPoint {
 }
 
 
-fun Double.equalsDelta(other: Double) = abs(this/other - 1) < 0.00000001
+fun Double.equalsDelta(other: Double) = abs(this / other - 1) < 0.00000001
 
-fun Location.toLatLng() = LatLng(latitude,longitude)
+fun Location.toLatLng() = LatLng(latitude, longitude)

@@ -33,16 +33,16 @@ public class ConnectionIdentificationViewModel extends BaseDialogViewModel {
 
     @Override
     public void save() {
-        if(usernameDirty)
+        if (usernameDirty)
             preferences.setUsername(username);
 
-        if(passwordDirty)
+        if (passwordDirty)
             preferences.setPassword(password);
 
-        if(deviceIdDirty)
+        if (deviceIdDirty)
             preferences.setDeviceId(deviceId);
 
-        if(trackerIdDirty)
+        if (trackerIdDirty)
             preferences.setTrackerId(trackerId);
     }
 

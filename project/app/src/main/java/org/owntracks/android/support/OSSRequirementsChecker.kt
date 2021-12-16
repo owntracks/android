@@ -11,22 +11,22 @@ import javax.inject.Inject
 
 @ActivityScoped
 open class OSSRequirementsChecker @Inject constructor(
-    private val preferences: Preferences,
-    open val context: Context
+        private val preferences: Preferences,
+        open val context: Context
 ) : RequirementsChecker {
     override fun areRequirementsMet(): Boolean {
         return isLocationPermissionCheckPassed() && preferences.isSetupCompleted
     }
 
     override fun isLocationPermissionCheckPassed(): Boolean = ContextCompat.checkSelfPermission(
-        context,
-        Manifest.permission.ACCESS_FINE_LOCATION
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
     ) == PackageManager.PERMISSION_GRANTED
 
     override fun isLocationServiceEnabled(): Boolean =
-        (context.getSystemService(Context.LOCATION_SERVICE) as LocationManager?)?.run {
-            LocationManagerCompat.isLocationEnabled(this)
-        } ?: false
+            (context.getSystemService(Context.LOCATION_SERVICE) as LocationManager?)?.run {
+                LocationManagerCompat.isLocationEnabled(this)
+            } ?: false
 
 
     override fun isPlayServicesCheckPassed(): Boolean = true

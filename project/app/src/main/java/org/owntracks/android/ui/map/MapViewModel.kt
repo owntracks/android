@@ -12,6 +12,8 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import org.owntracks.android.data.repos.ContactsRepo
+import org.owntracks.android.data.repos.LocationRepo
+import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.location.*
 import org.owntracks.android.model.FusedContact
@@ -29,6 +31,7 @@ import kotlin.math.asin
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val contactsRepo: ContactsRepo,
+    private val locationRepo: LocationRepo,
     private val locationProcessor: LocationProcessor,
     private val messageProcessor: MessageProcessor,
     private val geocoderProvider: GeocoderProvider,
@@ -86,6 +89,7 @@ class MapViewModel @Inject constructor(
             if (viewMode is ViewMode.Device && mutableMapCenter.value != locationResult.lastLocation.toLatLng()) {
                 mutableMapCenter.postValue(locationResult.lastLocation.toLatLng())
             }
+            locationRepo.setMapLocation(locationResult.lastLocation)
         }
 
         override fun onLocationAvailability(locationAvailability: LocationAvailability) {
@@ -253,4 +257,3 @@ class MapViewModel @Inject constructor(
         data class Contact(val follow: Boolean) : ViewMode()
     }
 }
-

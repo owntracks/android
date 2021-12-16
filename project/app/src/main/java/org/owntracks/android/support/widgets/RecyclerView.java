@@ -13,13 +13,12 @@ public class RecyclerView extends androidx.recyclerview.widget.RecyclerView {
 
         @Override
         public void onChanged() {
-            Adapter<?> adapter =  getAdapter();
-            if(adapter != null && emptyView != null) {
-                if(adapter.getItemCount() == 0) {
+            Adapter<?> adapter = getAdapter();
+            if (adapter != null && emptyView != null) {
+                if (adapter.getItemCount() == 0) {
                     emptyView.setVisibility(View.VISIBLE);
                     RecyclerView.this.setVisibility(View.GONE);
-                }
-                else {
+                } else {
                     emptyView.setVisibility(View.GONE);
                     RecyclerView.this.setVisibility(View.VISIBLE);
                 }
@@ -44,12 +43,13 @@ public class RecyclerView extends androidx.recyclerview.widget.RecyclerView {
     public void setAdapter(Adapter adapter) {
         super.setAdapter(adapter);
 
-        if(adapter != null) {
+        if (adapter != null) {
             adapter.registerAdapterDataObserver(emptyObserver);
         }
 
         emptyObserver.onChanged();
     }
+
     public void setEmptyView(View emptyView) {
         this.emptyView = emptyView;
     }

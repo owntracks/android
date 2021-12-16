@@ -16,20 +16,20 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class IntroFragment @Inject constructor() :
-    BaseSupportFragment<UiWelcomeIntroBinding?, NoOpViewModel?>(),
-    WelcomeFragmentMvvm.View {
+        BaseSupportFragment<UiWelcomeIntroBinding?, NoOpViewModel?>(),
+        WelcomeFragmentMvvm.View {
     @Inject
     lateinit var eventBus: EventBus
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         return setAndBindContentView(
-            inflater,
-            container,
-            R.layout.ui_welcome_intro,
-            savedInstanceState
+                inflater,
+                container,
+                R.layout.ui_welcome_intro,
+                savedInstanceState
         )
     }
 

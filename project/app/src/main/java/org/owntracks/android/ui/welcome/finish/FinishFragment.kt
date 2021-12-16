@@ -16,29 +16,29 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class FinishFragment @Inject constructor() : BaseSupportFragment<UiWelcomeFinishBinding?, NoOpViewModel?>(),
-    WelcomeFragmentMvvm.View {
+        WelcomeFragmentMvvm.View {
     @Inject
     lateinit var eventBus: EventBus
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         return setAndBindContentView(
-            inflater,
-            container,
-            R.layout.ui_welcome_finish,
-            savedInstanceState
+                inflater,
+                container,
+                R.layout.ui_welcome_finish,
+                savedInstanceState
         )
     }
 
     override fun onResume() {
         super.onResume()
         eventBus.post(
-            Events.WelcomeNextDoneButtonsEnableToggle(
-                nextEnabled = false,
-                doneEnabled = true
-            )
+                Events.WelcomeNextDoneButtonsEnableToggle(
+                        nextEnabled = false,
+                        doneEnabled = true
+                )
         )
     }
 }

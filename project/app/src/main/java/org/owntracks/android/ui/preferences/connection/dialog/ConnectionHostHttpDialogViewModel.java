@@ -8,6 +8,7 @@ import timber.log.Timber;
 
 public class ConnectionHostHttpDialogViewModel extends BaseDialogViewModel {
     private String url;
+
     public ConnectionHostHttpDialogViewModel(Preferences preferences) {
         super(preferences);
     }

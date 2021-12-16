@@ -198,6 +198,7 @@ dependencies {
     implementation("androidx.core:core-ktx:1.7.0")
     implementation("androidx.test.espresso:espresso-idling-resource:${espressoVersion}")
     implementation("androidx.lifecycle:lifecycle-common-java8:2.4.0")
+    implementation("androidx.lifecycle:lifecycle-service:2.4.0")
 
     implementation("com.google.android.material:material:1.4.0")
 

@@ -33,9 +33,9 @@ import javax.inject.Singleton
 
 @Singleton
 class Preferences @Inject constructor(
-    @ApplicationContext applicationContext: Context,
-    private val eventBus: EventBus?,
-    private val preferencesStore: PreferencesStore
+        @ApplicationContext applicationContext: Context,
+        private val eventBus: EventBus?,
+        private val preferencesStore: PreferencesStore
 ) {
     private val context: Context = applicationContext
     private var isFirstStart = false
@@ -48,17 +48,17 @@ class Preferences @Inject constructor(
     // iterate though the list of methods declared in the class represented by klass variable, and insert those annotated with the specified annotation
     private val exportMethods: Map<String, Method>
         get() = Preferences::class.java
-            .parentClasses()
-            .flatMap { it.declaredMethods.asSequence() }
-            .filter { it.isAnnotationPresent(Export::class.java) }
-            .filter {
-                val annotation = it.getAnnotation(Export::class.java)
-                annotation != null &&
-                        (currentMode == MessageProcessorEndpointMqtt.MODE_ID && annotation.exportModeMqtt ||
-                                currentMode == MessageProcessorEndpointHttp.MODE_ID && annotation.exportModeHttp)
-            }
-            .map { Pair(getPreferenceKey(it.getAnnotation(Export::class.java)!!.keyResId), it) }
-            .toMap()
+                .parentClasses()
+                .flatMap { it.declaredMethods.asSequence() }
+                .filter { it.isAnnotationPresent(Export::class.java) }
+                .filter {
+                    val annotation = it.getAnnotation(Export::class.java)
+                    annotation != null &&
+                            (currentMode == MessageProcessorEndpointMqtt.MODE_ID && annotation.exportModeMqtt ||
+                                    currentMode == MessageProcessorEndpointHttp.MODE_ID && annotation.exportModeHttp)
+                }
+                .map { Pair(getPreferenceKey(it.getAnnotation(Export::class.java)!!.keyResId), it) }
+                .toMap()
 
     val importKeys: List<String>
         get() = ArrayList(importMethods.keys)
@@ -68,11 +68,11 @@ class Preferences @Inject constructor(
     // iterate though the list of methods declared in the class represented by klass variable, and insert those annotated with the specified annotation
     private val importMethods: Map<String, Method>
         get() = Preferences::class.java
-            .parentClasses()
-            .flatMap { it.declaredMethods.asSequence() }
-            .filter { it.isAnnotationPresent(Import::class.java) }
-            .map { Pair(getPreferenceKey(it.getAnnotation(Import::class.java)!!.keyResId), it) }
-            .toMap()
+                .parentClasses()
+                .flatMap { it.declaredMethods.asSequence() }
+                .filter { it.isAnnotationPresent(Import::class.java) }
+                .map { Pair(getPreferenceKey(it.getAnnotation(Import::class.java)!!.keyResId), it) }
+                .toMap()
 
     private fun Class<*>.parentClasses(): Sequence<Class<*>> {
         var k = this
@@ -99,8 +99,8 @@ class Preferences @Inject constructor(
             isFirstStart = true
             preferencesStore.putBoolean(getPreferenceKey(R.string.preferenceKeyFirstStart), false)
             preferencesStore.putBoolean(
-                getPreferenceKey(R.string.preferenceKeySetupNotCompleted),
-                true
+                    getPreferenceKey(R.string.preferenceKeySetupNotCompleted),
+                    true
             )
         }
     }
@@ -154,8 +154,8 @@ class Preferences @Inject constructor(
 
         if (messageConfiguration.containsKey(getPreferenceKey(R.string.preferenceKeyModeId))) {
             Timber.v(
-                "setting mode to %s",
-                messageConfiguration[getPreferenceKey(R.string.preferenceKeyModeId)]
+                    "setting mode to %s",
+                    messageConfiguration[getPreferenceKey(R.string.preferenceKeyModeId)]
             )
             mode = messageConfiguration[getPreferenceKey(R.string.preferenceKeyModeId)] as Int
             messageConfiguration.removeKey(getPreferenceKey(R.string.preferenceKeyModeId))
@@ -165,28 +165,28 @@ class Preferences @Inject constructor(
         setSetupCompleted()
 
         messageConfiguration.keys
-            .filter { messageConfiguration[it] == null }
-            .forEach {
-                Timber.d("clearing value for key %s", it)
-                clearKey(it)
-            }
+                .filter { messageConfiguration[it] == null }
+                .forEach {
+                    Timber.d("clearing value for key %s", it)
+                    clearKey(it)
+                }
         val methods = importMethods
         messageConfiguration.keys
-            .filter { messageConfiguration[it] != null }
-            .filter { methods.containsKey(it) }
-            .forEach {
-                Timber.d("Loading key %s from method: %s", it, methods.getValue(it).name)
-                try {
-                    methods.getValue(it).invoke(this, messageConfiguration[it])
-                } catch (e: IllegalArgumentException) {
-                    Timber.e(
-                        "Tried to import %s but value is wrong type. Expected: %s, given %s",
-                        it,
-                        methods.getValue(it).parameterTypes.first().canonicalName,
-                        messageConfiguration[it]?.javaClass?.canonicalName
-                    )
+                .filter { messageConfiguration[it] != null }
+                .filter { methods.containsKey(it) }
+                .forEach {
+                    Timber.d("Loading key %s from method: %s", it, methods.getValue(it).name)
+                    try {
+                        methods.getValue(it).invoke(this, messageConfiguration[it])
+                    } catch (e: IllegalArgumentException) {
+                        Timber.e(
+                                "Tried to import %s but value is wrong type. Expected: %s, given %s",
+                                it,
+                                methods.getValue(it).parameterTypes.first().canonicalName,
+                                messageConfiguration[it]?.javaClass?.canonicalName
+                        )
+                    }
                 }
-            }
     }
 
     private fun setMode(requestedMode: Int, init: Boolean) {
@@ -220,9 +220,9 @@ class Preferences @Inject constructor(
     }
 
     @get:Export(
-        keyResId = R.string.preferenceKeyModeId,
-        exportModeMqtt = true,
-        exportModeHttp = true
+            keyResId = R.string.preferenceKeyModeId,
+            exportModeMqtt = true,
+            exportModeHttp = true
     )
     @set:Import(keyResId = R.string.preferenceKeyModeId)
     var mode: Int
@@ -233,9 +233,9 @@ class Preferences @Inject constructor(
 
 
     @get:Export(
-        keyResId = R.string.preferenceKeyMonitoring,
-        exportModeMqtt = true,
-        exportModeHttp = true
+            keyResId = R.string.preferenceKeyMonitoring,
+            exportModeMqtt = true,
+            exportModeHttp = true
     )
     @set:Import(keyResId = R.string.preferenceKeyMonitoring)
     var monitoring: Int
@@ -252,9 +252,9 @@ class Preferences @Inject constructor(
         }
 
     @get:Export(
-        keyResId = R.string.preferenceKeyDontReuseHttpClient,
-        exportModeMqtt = false,
-        exportModeHttp = true
+            keyResId = R.string.preferenceKeyDontReuseHttpClient,
+            exportModeMqtt = false,
+            exportModeHttp = true
     )
     @set:Import(keyResId = R.string.preferenceKeyDontReuseHttpClient)
     var dontReuseHttpClient: Boolean
@@ -264,9 +264,9 @@ class Preferences @Inject constructor(
         }
 
     @get:Export(
-        keyResId = R.string.preferenceKeyOpencageGeocoderApiKey,
-        exportModeMqtt = true,
-        exportModeHttp = true
+            keyResId = R.string.preferenceKeyOpencageGeocoderApiKey,
+            exportModeMqtt = true,
+            exportModeHttp = true
     )
     @set:Import(keyResId = R.string.preferenceKeyOpencageGeocoderApiKey)
     var openCageGeocoderApiKey: String
@@ -276,9 +276,9 @@ class Preferences @Inject constructor(
         }
 
     @get:Export(
-        keyResId = R.string.preferenceKeyRemoteCommand,
-        exportModeMqtt = true,
-        exportModeHttp = true
+            keyResId = R.string.preferenceKeyRemoteCommand,
+            exportModeMqtt = true,
+            exportModeHttp = true
     )
     @set:Import(keyResId = R.string.preferenceKeyRemoteCommand)
     var remoteCommand: Boolean
@@ -288,9 +288,9 @@ class Preferences @Inject constructor(
         }
 
     @get:Export(
-        keyResId = R.string.preferenceKeyCleanSession,
-        exportModeMqtt = true,
-        exportModeHttp = false
+            keyResId = R.string.preferenceKeyCleanSession,
+            exportModeMqtt = true,
+            exportModeHttp = false
     )
     @set:Import(keyResId = R.string.preferenceKeyCleanSession)
     var cleanSession: Boolean
@@ -300,15 +300,15 @@ class Preferences @Inject constructor(
         }
 
     @get:Export(
-        keyResId = R.string.preferenceKeyConnectionTimeoutSeconds,
-        exportModeMqtt = true,
-        exportModeHttp = true
+            keyResId = R.string.preferenceKeyConnectionTimeoutSeconds,
+            exportModeMqtt = true,
+            exportModeHttp = true
     )
     @set:Import(keyResId = R.string.preferenceKeyConnectionTimeoutSeconds)
     var connectionTimeoutSeconds: Int
         get() = getIntOrDefault(
-            R.string.preferenceKeyConnectionTimeoutSeconds,
-            R.integer.defaultConnectionTimeoutSeconds
+                R.string.preferenceKeyConnectionTimeoutSeconds,
+                R.integer.defaultConnectionTimeoutSeconds
         )
         set(newValue) {
             setInt(R.string.preferenceKeyConnectionTimeoutSeconds, newValue.coerceAtLeast(1))
@@ -316,24 +316,24 @@ class Preferences @Inject constructor(
 
 
     @get:Export(
-        keyResId = R.string.preferenceKeyPublishExtendedData,
-        exportModeMqtt = true,
-        exportModeHttp = true
+            keyResId = R.string.preferenceKeyPublishExtendedData,
+            exportModeMqtt = true,
+            exportModeHttp = true
     )
     @set:Import(keyResId = R.string.preferenceKeyPublishExtendedData)
     var pubLocationExtendedData: Boolean
         get() = getBooleanOrDefault(
-            R.string.preferenceKeyPublishExtendedData,
-            R.bool.valPubExtendedData
+                R.string.preferenceKeyPublishExtendedData,
+                R.bool.valPubExtendedData
         )
         set(newValue) {
             setBoolean(R.string.preferenceKeyPublishExtendedData, newValue)
         }
 
     @get:Export(
-        keyResId = R.string.preferenceKeyLocatorInterval,
-        exportModeMqtt = true,
-        exportModeHttp = true
+            keyResId = R.string.preferenceKeyLocatorInterval,
+            exportModeMqtt = true,
+            exportModeHttp = true
     )
     @set:Import(keyResId = R.string.preferenceKeyLocatorInterval)
     var locatorInterval: Int
@@ -343,15 +343,15 @@ class Preferences @Inject constructor(
         }
 
     @get:Export(
-        keyResId = R.string.preferenceKeyMoveModeLocatorInterval,
-        exportModeMqtt = true,
-        exportModeHttp = true
+            keyResId = R.string.preferenceKeyMoveModeLocatorInterval,
+            exportModeMqtt = true,
+            exportModeHttp = true
     )
     @set:Import(keyResId = R.string.preferenceKeyMoveModeLocatorInterval)
     var moveModeLocatorInterval: Int
         get() = getIntOrDefault(
-            R.string.preferenceKeyMoveModeLocatorInterval,
-            R.integer.valMoveModeLocatorInterval
+                R.string.preferenceKeyMoveModeLocatorInterval,
+                R.integer.valMoveModeLocatorInterval
         )
         set(moveModeLocatorInterval) {
             setInt(R.string.preferenceKeyMoveModeLocatorInterval, moveModeLocatorInterval)
@@ -363,16 +363,16 @@ class Preferences @Inject constructor(
     @set:Import(keyResId = R.string.preferenceKeyPing)
     var ping: Int
         get() = getIntOrDefault(R.string.preferenceKeyPing, R.integer.valPing).coerceAtLeast(
-            TimeUnit.MILLISECONDS.toMinutes(Scheduler.MIN_PERIODIC_INTERVAL_MILLIS).toInt()
+                TimeUnit.MILLISECONDS.toMinutes(Scheduler.MIN_PERIODIC_INTERVAL_MILLIS).toInt()
         )
         set(anInt) {
             setInt(R.string.preferenceKeyPing, anInt)
         }
 
     @get:Export(
-        keyResId = R.string.preferenceKeyUsername,
-        exportModeMqtt = true,
-        exportModeHttp = true
+            keyResId = R.string.preferenceKeyUsername,
+            exportModeMqtt = true,
+            exportModeHttp = true
     )
     @set:Import(keyResId = R.string.preferenceKeyUsername)
     var username: String
@@ -382,9 +382,9 @@ class Preferences @Inject constructor(
         }
 
     @get:Export(
-        keyResId = R.string.preferenceKeyDeviceId,
-        exportModeMqtt = true,
-        exportModeHttp = true
+            keyResId = R.string.preferenceKeyDeviceId,
+            exportModeMqtt = true,
+            exportModeHttp = true
     )
     @set:Import(keyResId = R.string.preferenceKeyDeviceId)
     var deviceId: String
@@ -399,30 +399,30 @@ class Preferences @Inject constructor(
     }
 
     @get:Export(
-        keyResId = R.string.preferenceKeyIgnoreStaleLocations,
-        exportModeMqtt = true,
-        exportModeHttp = true
+            keyResId = R.string.preferenceKeyIgnoreStaleLocations,
+            exportModeMqtt = true,
+            exportModeHttp = true
     )
     @set:Import(keyResId = R.string.preferenceKeyIgnoreStaleLocations)
     var ignoreStaleLocations: Double
         get() = getStringOrDefault(
-            R.string.preferenceKeyIgnoreStaleLocations,
-            R.string.valIgnoreStaleLocations
+                R.string.preferenceKeyIgnoreStaleLocations,
+                R.string.valIgnoreStaleLocations
         ).toDouble()
         set(days) {
             setString(R.string.preferenceKeyIgnoreStaleLocations, days.toString())
         }
 
     @get:Export(
-        keyResId = R.string.preferenceKeyIgnoreInaccurateLocations,
-        exportModeMqtt = true,
-        exportModeHttp = true
+            keyResId = R.string.preferenceKeyIgnoreInaccurateLocations,
+            exportModeMqtt = true,
+            exportModeHttp = true
     )
     @set:Import(keyResId = R.string.preferenceKeyIgnoreInaccurateLocations)
     var ignoreInaccurateLocations: Int
         get() = getIntOrDefault(
-            R.string.preferenceKeyIgnoreInaccurateLocations,
-            R.integer.valIgnoreInaccurateLocations
+                R.string.preferenceKeyIgnoreInaccurateLocations,
+                R.integer.valIgnoreInaccurateLocations
         )
         set(meters) {
             setInt(R.string.preferenceKeyIgnoreInaccurateLocations, meters)
@@ -451,8 +451,8 @@ class Preferences @Inject constructor(
 
     val pubTopicBase: String
         get() = pubTopicBaseFormatString.replace(
-            "%u",
-            if (username.isNotBlank()) username else "user"
+                "%u",
+                if (username.isNotBlank()) username else "user"
         ).replace("%d", deviceId)
 
     @get:Export(keyResId = R.string.preferenceKeySubTopic, exportModeMqtt = true)
@@ -473,9 +473,9 @@ class Preferences @Inject constructor(
 
     // value validation - must be max 2 characters, only letters and digits
     @get:Export(
-        keyResId = R.string.preferenceKeyTrackerId,
-        exportModeMqtt = true,
-        exportModeHttp = true
+            keyResId = R.string.preferenceKeyTrackerId,
+            exportModeMqtt = true,
+            exportModeHttp = true
     )
     @set:Import(keyResId = R.string.preferenceKeyTrackerId)
     var trackerId: String
@@ -486,13 +486,13 @@ class Preferences @Inject constructor(
             if (len >= 2) {
                 val shortTrackerId = trackerId.substring(0, 2)
                 if (Character.isLetterOrDigit(shortTrackerId[0]) && Character.isLetterOrDigit(
-                        shortTrackerId[1]
-                    )
+                                shortTrackerId[1]
+                        )
                 ) setString(R.string.preferenceKeyTrackerId, shortTrackerId)
             } else {
                 if (len > 0 && Character.isLetterOrDigit(trackerId[0])) setString(
-                    R.string.preferenceKeyTrackerId,
-                    trackerId
+                        R.string.preferenceKeyTrackerId,
+                        trackerId
                 ) else setString(R.string.preferenceKeyTrackerId, "")
             }
         }
@@ -531,16 +531,16 @@ class Preferences @Inject constructor(
     @set:Import(keyResId = R.string.preferenceKeyMqttProtocolLevel)
     var mqttProtocolLevel: Int
         get() = getIntOrDefault(
-            R.string.preferenceKeyMqttProtocolLevel,
-            R.integer.valMqttProtocolLevel
+                R.string.preferenceKeyMqttProtocolLevel,
+                R.integer.valMqttProtocolLevel
         )
         set(mqttProtocolLevel) {
             setInt(
-                R.string.preferenceKeyMqttProtocolLevel, if (
+                    R.string.preferenceKeyMqttProtocolLevel, if (
                     mqttProtocolLevel == MqttConnectOptions.MQTT_VERSION_DEFAULT ||
                     mqttProtocolLevel == MqttConnectOptions.MQTT_VERSION_3_1 ||
                     mqttProtocolLevel == MqttConnectOptions.MQTT_VERSION_3_1_1
-                ) mqttProtocolLevel else MqttConnectOptions.MQTT_VERSION_DEFAULT
+            ) mqttProtocolLevel else MqttConnectOptions.MQTT_VERSION_DEFAULT
             )
         }
 
@@ -552,15 +552,15 @@ class Preferences @Inject constructor(
         get() {
             if (isExperimentalFeatureEnabled(EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE)) {
                 return getIntOrDefault(
-                    R.string.preferenceKeyKeepalive,
-                    R.integer.valKeepalive
+                        R.string.preferenceKeyKeepalive,
+                        R.integer.valKeepalive
                 ).coerceAtLeast(1)
             }
             return getIntOrDefault(
-                R.string.preferenceKeyKeepalive,
-                R.integer.valKeepalive
+                    R.string.preferenceKeyKeepalive,
+                    R.integer.valKeepalive
             ).coerceAtLeast(
-                TimeUnit.MILLISECONDS.toSeconds(Scheduler.MIN_PERIODIC_INTERVAL_MILLIS).toInt()
+                    TimeUnit.MILLISECONDS.toSeconds(Scheduler.MIN_PERIODIC_INTERVAL_MILLIS).toInt()
             )
         }
         set(value) {
@@ -574,7 +574,7 @@ class Preferences @Inject constructor(
         }
 
     fun keepAliveInRange(i: Int): Boolean =
-        i >= TimeUnit.MILLISECONDS.toSeconds(Scheduler.MIN_PERIODIC_INTERVAL_MILLIS)
+            i >= TimeUnit.MILLISECONDS.toSeconds(Scheduler.MIN_PERIODIC_INTERVAL_MILLIS)
 
     val minimumKeepalive = TimeUnit.MILLISECONDS.toSeconds(Scheduler.MIN_PERIODIC_INTERVAL_MILLIS)
 
@@ -587,39 +587,39 @@ class Preferences @Inject constructor(
     }
 
     @get:Export(
-        keyResId = R.string.preferenceKeyNotificationEvents,
-        exportModeMqtt = true,
-        exportModeHttp = true
+            keyResId = R.string.preferenceKeyNotificationEvents,
+            exportModeMqtt = true,
+            exportModeHttp = true
     )
     @set:Import(keyResId = R.string.preferenceKeyNotificationEvents)
     var notificationEvents: Boolean
         get() = getBooleanOrDefault(
-            R.string.preferenceKeyNotificationEvents,
-            R.bool.valNotificationEvents
+                R.string.preferenceKeyNotificationEvents,
+                R.bool.valNotificationEvents
         )
         set(notificationEvents) {
             setBoolean(R.string.preferenceKeyNotificationEvents, notificationEvents)
         }
 
     @get:Export(
-        keyResId = R.string.preferenceKeyLocatorDisplacement,
-        exportModeMqtt = true,
-        exportModeHttp = true
+            keyResId = R.string.preferenceKeyLocatorDisplacement,
+            exportModeMqtt = true,
+            exportModeHttp = true
     )
     @set:Import(keyResId = R.string.preferenceKeyLocatorDisplacement)
     var locatorDisplacement: Int
         get() = getIntOrDefault(
-            R.string.preferenceKeyLocatorDisplacement,
-            R.integer.valLocatorDisplacement
+                R.string.preferenceKeyLocatorDisplacement,
+                R.integer.valLocatorDisplacement
         )
         set(anInt) {
             setInt(R.string.preferenceKeyLocatorDisplacement, anInt)
         }
 
     @get:Export(
-        keyResId = R.string.preferenceKeyLocatorPriority,
-        exportModeMqtt = true,
-        exportModeHttp = true
+            keyResId = R.string.preferenceKeyLocatorPriority,
+            exportModeMqtt = true,
+            exportModeHttp = true
     )
     @set:Import(keyResId = R.string.preferenceKeyLocatorPriority)
     var locatorPriority: Int
@@ -649,9 +649,9 @@ class Preferences @Inject constructor(
         }
 
     @get:Export(
-        keyResId = R.string.preferenceKeyPassword,
-        exportModeMqtt = true,
-        exportModeHttp = true
+            keyResId = R.string.preferenceKeyPassword,
+            exportModeMqtt = true,
+            exportModeHttp = true
     )
     @set:Import(keyResId = R.string.preferenceKeyPassword)
     var password: String
@@ -685,30 +685,30 @@ class Preferences @Inject constructor(
         }
 
     @get:Export(
-        keyResId = R.string.preferenceKeyNotificationHigherPriority,
-        exportModeMqtt = true,
-        exportModeHttp = true
+            keyResId = R.string.preferenceKeyNotificationHigherPriority,
+            exportModeMqtt = true,
+            exportModeHttp = true
     )
     @set:Import(keyResId = R.string.preferenceKeyNotificationHigherPriority)
     var notificationHigherPriority: Boolean
         get() = getBooleanOrDefault(
-            R.string.preferenceKeyNotificationHigherPriority,
-            R.bool.valNotificationHigherPriority
+                R.string.preferenceKeyNotificationHigherPriority,
+                R.bool.valNotificationHigherPriority
         )
         set(newValue) {
             setBoolean(R.string.preferenceKeyNotificationHigherPriority, newValue)
         }
 
     @get:Export(
-        keyResId = R.string.preferenceKeyNotificationLocation,
-        exportModeMqtt = true,
-        exportModeHttp = true
+            keyResId = R.string.preferenceKeyNotificationLocation,
+            exportModeMqtt = true,
+            exportModeHttp = true
     )
     @set:Import(keyResId = R.string.preferenceKeyNotificationLocation)
     var notificationLocation: Boolean
         get() = getBooleanOrDefault(
-            R.string.preferenceKeyNotificationLocation,
-            R.bool.valNotificationLocation
+                R.string.preferenceKeyNotificationLocation,
+                R.bool.valNotificationLocation
         )
         set(newValue) {
             setBoolean(R.string.preferenceKeyNotificationLocation, newValue)
@@ -718,12 +718,12 @@ class Preferences @Inject constructor(
     @set:Import(keyResId = R.string.preferenceKeyPubQos)
     var pubQos: Int
         get() = getIntOrDefault(R.string.preferenceKeyPubQos, R.integer.valPubQos).coerceAtMost(
-            MQTT_MAX_QOS
+                MQTT_MAX_QOS
         ).coerceAtLeast(MQTT_MIN_QOS)
         set(anInt) {
             setInt(
-                R.string.preferenceKeyPubQos,
-                anInt.coerceAtMost(MQTT_MAX_QOS).coerceAtLeast(MQTT_MIN_QOS)
+                    R.string.preferenceKeyPubQos,
+                    anInt.coerceAtMost(MQTT_MAX_QOS).coerceAtLeast(MQTT_MIN_QOS)
             )
         }
 
@@ -741,25 +741,25 @@ class Preferences @Inject constructor(
     @set:Import(keyResId = R.string.preferenceKeySubQos)
     var subQos: Int
         get() = getIntOrDefault(R.string.preferenceKeySubQos, R.integer.valSubQos).coerceAtMost(
-            MQTT_MAX_QOS
+                MQTT_MAX_QOS
         ).coerceAtLeast(MQTT_MIN_QOS)
         set(anInt) {
             setInt(
-                R.string.preferenceKeySubQos,
-                anInt.coerceAtMost(MQTT_MAX_QOS).coerceAtLeast(MQTT_MIN_QOS)
+                    R.string.preferenceKeySubQos,
+                    anInt.coerceAtMost(MQTT_MAX_QOS).coerceAtLeast(MQTT_MIN_QOS)
             )
         }
 
     @get:Export(
-        keyResId = R.string.preferenceKeyAutostartOnBoot,
-        exportModeMqtt = true,
-        exportModeHttp = true
+            keyResId = R.string.preferenceKeyAutostartOnBoot,
+            exportModeMqtt = true,
+            exportModeHttp = true
     )
     @set:Import(keyResId = R.string.preferenceKeyAutostartOnBoot)
     var autostartOnBoot: Boolean
         get() = getBooleanOrDefault(
-            R.string.preferenceKeyAutostartOnBoot,
-            R.bool.valAutostartOnBoot
+                R.string.preferenceKeyAutostartOnBoot,
+                R.bool.valAutostartOnBoot
         )
         set(newValue) {
             setBoolean(R.string.preferenceKeyAutostartOnBoot, newValue)
@@ -790,9 +790,9 @@ class Preferences @Inject constructor(
         }
 
     @get:Export(
-        keyResId = R.string.preferenceKeyFusedRegionDetection,
-        exportModeMqtt = true,
-        exportModeHttp = true
+            keyResId = R.string.preferenceKeyFusedRegionDetection,
+            exportModeMqtt = true,
+            exportModeHttp = true
     )
     @set:Import(keyResId = R.string.preferenceKeyFusedRegionDetection)
     var fusedRegionDetection: Boolean
@@ -802,9 +802,9 @@ class Preferences @Inject constructor(
         }
 
     @get:Export(
-        keyResId = R.string.preferenceKeyDebugLog,
-        exportModeMqtt = true,
-        exportModeHttp = true
+            keyResId = R.string.preferenceKeyDebugLog,
+            exportModeMqtt = true,
+            exportModeHttp = true
     )
     @set:Import(keyResId = R.string.preferenceKeyDebugLog)
     var debugLog: Boolean
@@ -814,9 +814,9 @@ class Preferences @Inject constructor(
         }
 
     @get:Export(
-        keyResId = R.string.preferenceKeyRemoteConfiguration,
-        exportModeMqtt = true,
-        exportModeHttp = true
+            keyResId = R.string.preferenceKeyRemoteConfiguration,
+            exportModeMqtt = true,
+            exportModeHttp = true
     )
     @set:Import(keyResId = R.string.preferenceKeyRemoteConfiguration)
     var remoteConfiguration: Boolean
@@ -828,35 +828,35 @@ class Preferences @Inject constructor(
     @Import(keyResId = R.string.preferenceKeyGeocodeEnabled)
     fun setGeocodeEnabled(newValue: Boolean) {
         reverseGeocodeProvider =
-            if (newValue) REVERSE_GEOCODE_PROVIDER_DEVICE else REVERSE_GEOCODE_PROVIDER_NONE
+                if (newValue) REVERSE_GEOCODE_PROVIDER_DEVICE else REVERSE_GEOCODE_PROVIDER_NONE
     }
 
     @get:Export(
-        keyResId = R.string.preferenceKeyNotificationGeocoderErrors,
-        exportModeMqtt = true,
-        exportModeHttp = true
+            keyResId = R.string.preferenceKeyNotificationGeocoderErrors,
+            exportModeMqtt = true,
+            exportModeHttp = true
     )
     @set:Import(keyResId = R.string.preferenceKeyNotificationGeocoderErrors)
     var notificationGeocoderErrors: Boolean
         get() = getBooleanOrDefault(
-            R.string.preferenceKeyNotificationGeocoderErrors,
-            R.bool.valNotificationGeocoderErrors
+                R.string.preferenceKeyNotificationGeocoderErrors,
+                R.bool.valNotificationGeocoderErrors
         )
         set(newValue) {
             setBoolean(R.string.preferenceKeyNotificationGeocoderErrors, newValue)
         }
 
     @get:Export(
-        keyResId = R.string.preferenceKeyReverseGeocodeProvider,
-        exportModeMqtt = true,
-        exportModeHttp = true
+            keyResId = R.string.preferenceKeyReverseGeocodeProvider,
+            exportModeMqtt = true,
+            exportModeHttp = true
     )
     @set:Import(keyResId = R.string.preferenceKeyReverseGeocodeProvider)
     var reverseGeocodeProvider: String
         get() {
             val currentValue = getStringOrDefault(
-                R.string.preferenceKeyReverseGeocodeProvider,
-                R.string.valDefaultGeocoder
+                    R.string.preferenceKeyReverseGeocodeProvider,
+                    R.string.valDefaultGeocoder
             )
             return if (!REVERSE_GEOCODE_PROVIDERS.contains(currentValue)) {
                 val default = getStringResource(R.string.valDefaultGeocoder)
@@ -871,17 +871,17 @@ class Preferences @Inject constructor(
                 setString(R.string.preferenceKeyReverseGeocodeProvider, newValue)
             } else {
                 setString(
-                    R.string.preferenceKeyReverseGeocodeProvider,
-                    getStringResource(R.string.valDefaultGeocoder)
+                        R.string.preferenceKeyReverseGeocodeProvider,
+                        getStringResource(R.string.valDefaultGeocoder)
                 )
             }
         }
 
 
     @get:Export(
-        keyResId = R.string.preferenceKeyExperimentalFeatures,
-        exportModeMqtt = true,
-        exportModeHttp = true
+            keyResId = R.string.preferenceKeyExperimentalFeatures,
+            exportModeMqtt = true,
+            exportModeHttp = true
     )
     @set:Import(keyResId = R.string.preferenceKeyExperimentalFeatures)
     var experimentalFeatures: Collection<String>
@@ -913,8 +913,8 @@ class Preferences @Inject constructor(
     private val deviceIdDefault: String
         get() = // Use device name (Mako, Surnia, etc. and strip all non alpha digits)
             Build.DEVICE?.replace(" ", "-")?.replace("[^a-zA-Z0-9]+".toRegex(), "")
-                ?.lowercase(Locale.getDefault())
-                ?: "unknown"
+                    ?.lowercase(Locale.getDefault())
+                    ?: "unknown"
 
 
     private val clientIdDefault: String
@@ -971,22 +971,22 @@ class Preferences @Inject constructor(
     val isSetupCompleted: Boolean
         get() =// sharedPreferences because the value is independent from the selected mode
             !preferencesStore.getBoolean(
-                getPreferenceKey(R.string.preferenceKeySetupNotCompleted),
-                true
+                    getPreferenceKey(R.string.preferenceKeySetupNotCompleted),
+                    true
             )
 
     fun setSetupCompleted() {
         preferencesStore.putBoolean(
-            getPreferenceKey(R.string.preferenceKeySetupNotCompleted),
-            false
+                getPreferenceKey(R.string.preferenceKeySetupNotCompleted),
+                false
         )
         isFirstStart = false
     }
 
     val isObjectboxMigrated: Boolean
         get() = isFirstStart || preferencesStore.getBoolean(
-            getPreferenceKey(R.string.preferenceKeyObjectboxMigrated),
-            false
+                getPreferenceKey(R.string.preferenceKeyObjectboxMigrated),
+                false
         )
 
     var userDeclinedEnableLocationPermissions: Boolean
@@ -1015,8 +1015,8 @@ class Preferences @Inject constructor(
             preferencesStore.getInt(getPreferenceKey(resKeyId), getIntResource(defId))
         } catch (e: ClassCastException) {
             Timber.e(
-                "Error retrieving string preference %s, returning default",
-                getPreferenceKey(resKeyId)
+                    "Error retrieving string preference %s, returning default",
+                    getPreferenceKey(resKeyId)
             )
             val default = getIntResource(defId)
             preferencesStore.putInt(getPreferenceKey(resKeyId), default)
@@ -1088,21 +1088,21 @@ class Preferences @Inject constructor(
 
     @Retention(AnnotationRetention.RUNTIME)
     @Target(
-        AnnotationTarget.FUNCTION,
-        AnnotationTarget.PROPERTY_GETTER,
-        AnnotationTarget.PROPERTY_SETTER
+            AnnotationTarget.FUNCTION,
+            AnnotationTarget.PROPERTY_GETTER,
+            AnnotationTarget.PROPERTY_SETTER
     )
     annotation class Export(
-        val keyResId: Int = 0,
-        val exportModeMqtt: Boolean = false,
-        val exportModeHttp: Boolean = false
+            val keyResId: Int = 0,
+            val exportModeMqtt: Boolean = false,
+            val exportModeHttp: Boolean = false
     )
 
     @Retention(AnnotationRetention.RUNTIME)
     @Target(
-        AnnotationTarget.FUNCTION,
-        AnnotationTarget.PROPERTY_GETTER,
-        AnnotationTarget.PROPERTY_SETTER
+            AnnotationTarget.FUNCTION,
+            AnnotationTarget.PROPERTY_GETTER,
+            AnnotationTarget.PROPERTY_SETTER
     )
     annotation class Import(val keyResId: Int = 0)
 
@@ -1113,21 +1113,21 @@ class Preferences @Inject constructor(
     init {
         val modePreferenceKey = getPreferenceKey(R.string.preferenceKeyModeId)
         val initMode = preferencesStore.getInitMode(
-            modePreferenceKey,
-            getIntResource(R.integer.valModeId)
+                modePreferenceKey,
+                getIntResource(R.integer.valModeId)
         )
         setMode(initMode, true)
 
         // Migrations
         if (preferencesStore.hasKey(getPreferenceKey(R.string.preferenceKeyGeocodeEnabled))) {
             val oldEnabledValue = preferencesStore.getBoolean(
-                getPreferenceKey(R.string.preferenceKeyGeocodeEnabled),
-                false
+                    getPreferenceKey(R.string.preferenceKeyGeocodeEnabled),
+                    false
             )
 
             val opencageApiKey = preferencesStore.getString(
-                getPreferenceKey(R.string.preferenceKeyOpencageGeocoderApiKey),
-                ""
+                    getPreferenceKey(R.string.preferenceKeyOpencageGeocoderApiKey),
+                    ""
             )
 
             reverseGeocodeProvider = if (oldEnabledValue && opencageApiKey.isNullOrBlank()) {
@@ -1141,50 +1141,50 @@ class Preferences @Inject constructor(
         }
         // Migrate old "google" reverse geocoder value to "device"
         if (preferencesStore.hasKey(getPreferenceKey(R.string.preferencesReverseGeocodeProvider)) && preferencesStore.getString(
-                getPreferenceKey(R.string.preferencesReverseGeocodeProvider),
-                ""
-            ) == "Google"
+                        getPreferenceKey(R.string.preferencesReverseGeocodeProvider),
+                        ""
+                ) == "Google"
         ) {
             preferencesStore.putString(
-                getPreferenceKey(R.string.preferencesReverseGeocodeProvider),
-                REVERSE_GEOCODE_PROVIDER_DEVICE
+                    getPreferenceKey(R.string.preferencesReverseGeocodeProvider),
+                    REVERSE_GEOCODE_PROVIDER_DEVICE
             )
         }
     }
 
     companion object {
         const val EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI =
-            "showExperimentalPreferenceUI"
+                "showExperimentalPreferenceUI"
         const val EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE = "allowSmallKeepalive"
         const val EXPERIMENTAL_FEATURE_USE_AOSP_LOCATION_PROVIDER = "useAospLocationProvider"
         const val EXPERIMENTAL_FEATURE_USE_OSM_MAP = "useOSMMap"
         const val EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION =
-            "bearingArrowFollowsDeviceOrientation"
+                "bearingArrowFollowsDeviceOrientation"
 
         internal val EXPERIMENTAL_FEATURES = setOf(
-            EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI,
-            EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE,
-            EXPERIMENTAL_FEATURE_USE_OSM_MAP,
-            EXPERIMENTAL_FEATURE_USE_AOSP_LOCATION_PROVIDER,
-            EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION
+                EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI,
+                EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE,
+                EXPERIMENTAL_FEATURE_USE_OSM_MAP,
+                EXPERIMENTAL_FEATURE_USE_AOSP_LOCATION_PROVIDER,
+                EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION
 
         )
         const val REVERSE_GEOCODE_PROVIDER_NONE = "None"
         const val REVERSE_GEOCODE_PROVIDER_DEVICE = "Device"
         const val REVERSE_GEOCODE_PROVIDER_OPENCAGE = "OpenCage"
         val REVERSE_GEOCODE_PROVIDERS = setOf(
-            REVERSE_GEOCODE_PROVIDER_NONE,
-            REVERSE_GEOCODE_PROVIDER_DEVICE,
-            REVERSE_GEOCODE_PROVIDER_OPENCAGE
+                REVERSE_GEOCODE_PROVIDER_NONE,
+                REVERSE_GEOCODE_PROVIDER_DEVICE,
+                REVERSE_GEOCODE_PROVIDER_OPENCAGE
         )
 
         const val NIGHT_MODE_DISABLE = 0
         const val NIGHT_MODE_ENABLE = 1
         const val NIGHT_MODE_AUTO = 2
         val NIGHT_MODES = setOf(
-            NIGHT_MODE_AUTO,
-            NIGHT_MODE_DISABLE,
-            NIGHT_MODE_ENABLE
+                NIGHT_MODE_AUTO,
+                NIGHT_MODE_DISABLE,
+                NIGHT_MODE_ENABLE
         )
         val SYSTEM_NIGHT_AUTO_MODE by lazy { if (SDK_INT > Build.VERSION_CODES.Q) MODE_NIGHT_FOLLOW_SYSTEM else MODE_NIGHT_AUTO_BATTERY }
 

@@ -17,27 +17,27 @@ import javax.inject.Singleton
  */
 @Singleton
 class SharedPreferencesStore @Inject constructor(@ApplicationContext context: Context) :
-    PreferencesStore {
+        PreferencesStore {
     private lateinit var sharedPreferencesName: String
     private val activeSharedPreferencesChangeListener =
-        LinkedList<OnModeChangedPreferenceChangedListener>()
+            LinkedList<OnModeChangedPreferenceChangedListener>()
 
     private lateinit var activeSharedPreferences: SharedPreferences
     private val commonSharedPreferences: SharedPreferences =
-        PreferenceManager.getDefaultSharedPreferences(context)
+            PreferenceManager.getDefaultSharedPreferences(context)
 
     private val privateSharedPreferences: SharedPreferences =
-        context.getSharedPreferences(FILENAME_PRIVATE, Context.MODE_PRIVATE)
+            context.getSharedPreferences(FILENAME_PRIVATE, Context.MODE_PRIVATE)
     private val httpSharedPreferences: SharedPreferences =
-        context.getSharedPreferences(FILENAME_HTTP, Context.MODE_PRIVATE)
+            context.getSharedPreferences(FILENAME_HTTP, Context.MODE_PRIVATE)
 
     // Some preferences are always read from commonSharedPreferences. We list these out so that we can use the right store when these keys are requested.
     private val commonPreferenceKeys: Set<String> = setOf(
-        context.getString(R.string.preferenceKeyFirstStart),
-        context.getString(R.string.preferenceKeySetupNotCompleted),
-        context.getString(R.string.preferenceKeyObjectboxMigrated),
-        Preferences.preferenceKeyUserDeclinedEnableLocationPermissions,
-        Preferences.preferenceKeyUserDeclinedEnableLocationServices
+            context.getString(R.string.preferenceKeyFirstStart),
+            context.getString(R.string.preferenceKeySetupNotCompleted),
+            context.getString(R.string.preferenceKeyObjectboxMigrated),
+            Preferences.preferenceKeyUserDeclinedEnableLocationPermissions,
+            Preferences.preferenceKeyUserDeclinedEnableLocationServices
     )
 
     override fun putString(key: String, value: String) {
@@ -45,27 +45,27 @@ class SharedPreferencesStore @Inject constructor(@ApplicationContext context: Co
     }
 
     override fun getString(key: String, default: String): String? =
-        activeSharedPreferences.getString(key, default)
+            activeSharedPreferences.getString(key, default)
 
     override fun remove(key: String) {
         activeSharedPreferences.edit().remove(key).apply()
     }
 
     override fun getBoolean(key: String, default: Boolean): Boolean =
-        if (commonPreferenceKeys.contains(key)) commonSharedPreferences.getBoolean(
-            key,
-            default
-        ) else activeSharedPreferences.getBoolean(key, default)
+            if (commonPreferenceKeys.contains(key)) commonSharedPreferences.getBoolean(
+                    key,
+                    default
+            ) else activeSharedPreferences.getBoolean(key, default)
 
 
     override fun putBoolean(key: String, value: Boolean) {
         if (commonPreferenceKeys.contains(key)) commonSharedPreferences.edit()
-            .putBoolean(key, value).apply() else activeSharedPreferences.edit()
-            .putBoolean(key, value).apply()
+                .putBoolean(key, value).apply() else activeSharedPreferences.edit()
+                .putBoolean(key, value).apply()
     }
 
     override fun getInt(key: String, default: Int): Int =
-        activeSharedPreferences.getInt(key, default)
+            activeSharedPreferences.getInt(key, default)
 
 
     override fun putInt(key: String, value: Int) {
@@ -89,9 +89,9 @@ class SharedPreferencesStore @Inject constructor(@ApplicationContext context: Co
     override fun getInitMode(key: String, default: Int): Int {
         val initMode = commonSharedPreferences.getInt(key, default)
         return if (initMode in listOf(
-                MessageProcessorEndpointMqtt.MODE_ID,
-                MessageProcessorEndpointHttp.MODE_ID
-            )
+                        MessageProcessorEndpointMqtt.MODE_ID,
+                        MessageProcessorEndpointHttp.MODE_ID
+                )
         ) {
             initMode
         } else {
@@ -136,7 +136,7 @@ class SharedPreferencesStore @Inject constructor(@ApplicationContext context: Co
     private fun detachAllActivePreferenceChangeListeners() {
         activeSharedPreferencesChangeListener.forEach {
             activeSharedPreferences.unregisterOnSharedPreferenceChangeListener(
-                it
+                    it
             )
         }
     }

@@ -12,14 +12,6 @@ class Events {
     class ModeChanged(val newModeId: Int) : E()
     class MonitoringChanged : E()
     class EndpointChanged : E()
-    class ServiceStarted : E()
-    class QueueChanged : E() {
-        var newLength = 0
-        fun withNewLength(length: Int): QueueChanged {
-            newLength = length
-            return this
-        }
-    }
 
     open class WaypointEvent internal constructor(val waypointModel: WaypointModel) : E()
     class WaypointAdded(m: WaypointModel) : WaypointEvent(m)

@@ -9,7 +9,9 @@ import androidx.annotation.NonNull;
 import org.libsodium.jni.crypto.Random;
 import org.libsodium.jni.crypto.SecretBox;
 import org.owntracks.android.R;
+
 import javax.inject.Singleton;
+
 import org.owntracks.android.support.preferences.OnModeChangedPreferenceChangedListener;
 
 import javax.inject.Inject;
@@ -45,13 +47,13 @@ public class EncryptionProvider {
         byte[] encryptionKeyBytes = encryptionKey != null ? encryptionKey.getBytes() : new byte[0];
         byte[] encryptionKeyBytesPadded = new byte[crypto_secretbox_KEYBYTES];
 
-        if (encryptionKeyBytes.length == 0 ) {
+        if (encryptionKeyBytes.length == 0) {
             Timber.e("encryption key is too short or too long. Has %s bytes", encryptionKeyBytes.length);
             enabled = false;
             return;
         }
         int copyBytes = encryptionKeyBytes.length;
-        if( copyBytes > crypto_secretbox_KEYBYTES) {
+        if (copyBytes > crypto_secretbox_KEYBYTES) {
             copyBytes = crypto_secretbox_KEYBYTES;
         }
 
@@ -71,7 +73,7 @@ public class EncryptionProvider {
     String decrypt(String cyphertextb64) throws Parser.EncryptionException {
         byte[] onTheWire = Base64.decode(cyphertextb64.getBytes(), Base64.DEFAULT);
         byte[] nonce = new byte[crypto_secretbox_NONCEBYTES];
-        if (onTheWire.length<=crypto_secretbox_NONCEBYTES) {
+        if (onTheWire.length <= crypto_secretbox_NONCEBYTES) {
             throw new Parser.EncryptionException("Message length shorter than nonce");
         }
         byte[] cyphertext = new byte[onTheWire.length - crypto_secretbox_NONCEBYTES];

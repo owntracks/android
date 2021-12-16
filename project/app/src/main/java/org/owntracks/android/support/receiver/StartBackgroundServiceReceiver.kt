@@ -18,8 +18,8 @@ class StartBackgroundServiceReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         if (("android.intent.action.MY_PACKAGE_REPLACED" == intent.action ||
-                    "android.intent.action.BOOT_COMPLETED" == intent.action)
-            && preferences.autostartOnBoot
+                        "android.intent.action.BOOT_COMPLETED" == intent.action)
+                && preferences.autostartOnBoot
         ) {
             Timber.v("android.intent.action.BOOT_COMPLETED received")
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

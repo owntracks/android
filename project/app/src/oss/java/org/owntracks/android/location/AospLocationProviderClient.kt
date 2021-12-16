@@ -20,9 +20,9 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient(
 
     @SuppressLint("MissingPermission")
     override fun actuallyRequestLocationUpdates(
-        locationRequest: LocationRequest,
-        clientCallBack: LocationCallback,
-        looper: Looper?
+            locationRequest: LocationRequest,
+            clientCallBack: LocationCallback,
+            looper: Looper?
     ) {
         GlobalScope.launch {
             withContext(Dispatchers.Main) {
@@ -50,8 +50,8 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient(
                 }
                 gpsMyLocationProvider.locationUpdateMinTime = locationRequest.interval ?: 30_000
                 gpsMyLocationProvider.locationUpdateMinDistance =
-                    locationRequest.smallestDisplacement
-                        ?: 10f
+                        locationRequest.smallestDisplacement
+                                ?: 10f
                 gpsMyLocationProvider.startLocationProvider(listener)
                 callbackMap[clientCallBack] = listener
             }

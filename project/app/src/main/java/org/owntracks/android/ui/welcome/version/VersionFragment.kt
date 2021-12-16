@@ -20,19 +20,19 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class VersionFragment @Inject constructor() : BaseSupportFragment<UiWelcomeVersionBinding?, NoOpViewModel?>(),
-    WelcomeFragmentMvvm.View, View.OnClickListener {
+        WelcomeFragmentMvvm.View, View.OnClickListener {
     @Inject
     lateinit var eventBus: EventBus
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         val v = setAndBindContentView(
-            inflater,
-            container,
-            R.layout.ui_welcome_version,
-            savedInstanceState
+                inflater,
+                container,
+                R.layout.ui_welcome_version,
+                savedInstanceState
         )
         binding!!.uiFragmentWelcomeVersionButtonLearnMore.setOnClickListener(this)
         return v
@@ -41,7 +41,7 @@ class VersionFragment @Inject constructor() : BaseSupportFragment<UiWelcomeVersi
     override fun onClick(view: View) {
         try {
             val i =
-                Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.documentationUrlAndroid)))
+                    Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.documentationUrlAndroid)))
             startActivity(i)
         } catch (e: ActivityNotFoundException) {
             Toast.makeText(context, "No suitable browser installed", Toast.LENGTH_SHORT).show()

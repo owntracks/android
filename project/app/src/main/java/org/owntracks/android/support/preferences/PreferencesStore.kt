@@ -21,7 +21,7 @@ interface PreferencesStore {
     fun putStringSet(key: String, values: Set<String>)
     fun getStringSet(key: String): Set<String>
 
-    fun hasKey(key:String):Boolean
+    fun hasKey(key: String): Boolean
 
     fun remove(key: String)
 

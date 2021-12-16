@@ -17,11 +17,11 @@ import javax.inject.Singleton
 
 @Singleton
 class MemoryContactsRepo @Inject constructor(
-    private val eventBus: EventBus,
-    private val contactsBitmapAndNameMemoryCache: ContactBitmapAndNameMemoryCache
+        private val eventBus: EventBus,
+        private val contactsBitmapAndNameMemoryCache: ContactBitmapAndNameMemoryCache
 ) : ContactsRepo {
 
-    private val contacts = mutableMapOf<String,FusedContact>()
+    private val contacts = mutableMapOf<String, FusedContact>()
     override val all = MutableLiveData(contacts)
 
     override fun getById(id: String): FusedContact? {
@@ -56,16 +56,16 @@ class MemoryContactsRepo @Inject constructor(
         if (c != null) {
             c.messageCard = messageCard
             contactsBitmapAndNameMemoryCache.put(
-                c.id,
-                ContactBitmapAndName.CardBitmap(messageCard.name, null)
+                    c.id,
+                    ContactBitmapAndName.CardBitmap(messageCard.name, null)
             )
             eventBus.post(c)
         } else {
             c = FusedContact(id)
             c.messageCard = messageCard
             contactsBitmapAndNameMemoryCache.put(
-                c.id,
-                ContactBitmapAndName.CardBitmap(messageCard.name, null)
+                    c.id,
+                    ContactBitmapAndName.CardBitmap(messageCard.name, null)
             )
             put(id, c)
             eventBus.post(FusedContactAdded(c))

@@ -21,7 +21,6 @@ import org.owntracks.android.R
 import org.owntracks.android.testutils.rules.ScreenshotTakingOnTestEndRule
 import org.owntracks.android.ui.preferences.PreferencesActivity
 
-
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class PreferencesActivityTests {
@@ -32,8 +31,8 @@ class PreferencesActivityTests {
 
     @get:Rule
     val ruleChain: RuleChain = RuleChain
-            .outerRule(baristaRule.activityTestRule)
-            .around(screenshotRule)
+        .outerRule(baristaRule.activityTestRule)
+        .around(screenshotRule)
 
     @Before
     fun setUp() {
@@ -60,7 +59,10 @@ class PreferencesActivityTests {
 
     private fun scrollToText(textResource: Int) {
         onView(withId(androidx.preference.R.id.recycler_view))
-                .perform(actionOnItem<RecyclerView.ViewHolder>(
-                        hasDescendant(withText(textResource)), scrollTo()))
+            .perform(
+                actionOnItem<RecyclerView.ViewHolder>(
+                    hasDescendant(withText(textResource)), scrollTo()
+                )
+            )
     }
 }

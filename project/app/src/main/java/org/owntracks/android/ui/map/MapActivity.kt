@@ -38,8 +38,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
 import org.owntracks.android.App
 import org.owntracks.android.BR
 import org.owntracks.android.R
@@ -54,7 +52,6 @@ import org.owntracks.android.services.BackgroundService.BACKGROUND_LOCATION_REST
 import org.owntracks.android.services.LocationProcessor
 import org.owntracks.android.services.MessageProcessorEndpointHttp
 import org.owntracks.android.support.ContactImageBindingAdapter
-import org.owntracks.android.support.Events
 import org.owntracks.android.support.Preferences.Companion.EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION
 import org.owntracks.android.support.RequirementsChecker
 import org.owntracks.android.support.RunThingsOnOtherThreads
@@ -637,13 +634,11 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
             serviceConnection,
             Context.BIND_AUTO_CREATE
         )
-        eventBus.register(this)
     }
 
     override fun onStop() {
         super.onStop()
         unbindService(serviceConnection)
-        eventBus.unregister(this)
     }
 
     @get:VisibleForTesting
@@ -654,11 +649,6 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
     val outgoingQueueIdlingResource: IdlingResource
         get() = countingIdlingResource
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    @Suppress("UNUSED_PARAMETER")
-    fun onEvent(e: Events.MonitoringChanged?) {
-        updateMonitoringModeMenu()
-    }
 
     companion object {
         const val BUNDLE_KEY_CONTACT_ID = "BUNDLE_KEY_CONTACT_ID"

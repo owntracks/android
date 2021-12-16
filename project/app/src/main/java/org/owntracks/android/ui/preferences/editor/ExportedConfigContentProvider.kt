@@ -34,16 +34,16 @@ class ExportedConfigContentProvider : ContentProvider() {
     override fun onCreate(): Boolean = true
 
     override fun query(
-        uri: Uri,
-        projection: Array<out String>?,
-        selection: String?,
-        selectionArgs: Array<out String>?,
-        sortOrder: String?
+            uri: Uri,
+            projection: Array<out String>?,
+            selection: String?,
+            selectionArgs: Array<out String>?,
+            sortOrder: String?
     ): Cursor {
         val appContext = context?.applicationContext ?: throw IllegalStateException()
         val hiltEntryPoint = EntryPointAccessors.fromApplication(
-            appContext,
-            ExportedConfigContentProviderEntryPoint::class.java
+                appContext,
+                ExportedConfigContentProviderEntryPoint::class.java
         )
         val preferences = hiltEntryPoint.preferences()
         val waypointsRepo = hiltEntryPoint.waypointsRepo()
@@ -53,7 +53,7 @@ class ExportedConfigContentProvider : ContentProvider() {
         configurationMessage.waypoints = waypointsRepo.exportToMessage()
         exportedConfigJson = parser.toUnencryptedJsonPretty(configurationMessage)
         val matrixCursor =
-            MatrixCursor(arrayOf(OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE), 1)
+                MatrixCursor(arrayOf(OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE), 1)
         matrixCursor.addRow(arrayOf("config.otrc", exportedConfigJson.length.toLong()))
         return matrixCursor
     }
@@ -66,10 +66,10 @@ class ExportedConfigContentProvider : ContentProvider() {
         }
 
         return openPipeHelper(
-            uri,
-            "text/plain",
-            null,
-            exportedConfigJson.toByteArray()
+                uri,
+                "text/plain",
+                null,
+                exportedConfigJson.toByteArray()
         ) { output, _, _, _, l ->
             try {
                 FileOutputStream(output.fileDescriptor).write(l)
@@ -87,9 +87,9 @@ class ExportedConfigContentProvider : ContentProvider() {
     override fun delete(uri: Uri, selection: String?, selectionArgs: Array<out String>?): Int = 0
 
     override fun update(
-        uri: Uri,
-        values: ContentValues?,
-        selection: String?,
-        selectionArgs: Array<out String>?
+            uri: Uri,
+            values: ContentValues?,
+            selection: String?,
+            selectionArgs: Array<out String>?
     ): Int = 0
 }

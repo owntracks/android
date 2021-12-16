@@ -43,7 +43,7 @@ fun MapLocationSource.toOSMLocationSource(): IMyLocationProvider {
         }
 
         override fun getLastKnownLocation(): Location? =
-            this@toOSMLocationSource.getLastKnownLocation()
+                this@toOSMLocationSource.getLastKnownLocation()
 
         override fun destroy() {
             this@toOSMLocationSource.deactivate()

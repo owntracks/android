@@ -13,9 +13,9 @@ import java.io.OutputStream
 import java.util.concurrent.LinkedBlockingDeque
 
 class BlockingDequeThatAlsoSometimesPersistsThingsToDiskMaybe(
-    capacity: Int,
-    path: File,
-    parser: Parser
+        capacity: Int,
+        path: File,
+        parser: Parser
 ) : LinkedBlockingDeque<MessageBase>(capacity) {
     private val parallelDiskQueueHead: ObjectQueue<MessageBase>
     private val parallelDiskQueue: ObjectQueue<MessageBase>
@@ -42,19 +42,19 @@ class BlockingDequeThatAlsoSometimesPersistsThingsToDiskMaybe(
         }
 
         parallelDiskQueue = queueFile?.run { ObjectQueue.create(this, messageBaseConverter) }
-            ?: ObjectQueue.createInMemory()
-
-        parallelDiskQueueHead =
-            headQueueFile?.run { ObjectQueue.create(this, messageBaseConverter) }
                 ?: ObjectQueue.createInMemory()
 
+        parallelDiskQueueHead =
+                headQueueFile?.run { ObjectQueue.create(this, messageBaseConverter) }
+                        ?: ObjectQueue.createInMemory()
+
         (parallelDiskQueueHead.asList() + parallelDiskQueue.asList())
-            .filter { it !is MessageEncrypted }
-            .forEach {
-                if (!offerLast(it)) {
-                    Timber.w("On-disk queue contains message that won't fit into queue. Dropping: $it")
+                .filter { it !is MessageEncrypted }
+                .forEach {
+                    if (!offerLast(it)) {
+                        Timber.w("On-disk queue contains message that won't fit into queue. Dropping: $it")
+                    }
                 }
-            }
         resyncQueueToDisk()
     }
 

@@ -7,6 +7,8 @@ import android.view.LayoutInflater
 import android.view.MotionEvent.ACTION_BUTTON_RELEASE
 import android.view.View
 import android.view.ViewGroup
+import androidx.preference.PreferenceManager
+import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
@@ -45,6 +47,15 @@ class OSMMapFragment internal constructor(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        Configuration.getInstance().apply {
+            load(context, PreferenceManager.getDefaultSharedPreferences(context))
+            osmdroidBasePath.resolve("tiles").run {
+                if (exists()) {
+                    deleteRecursively()
+                }
+            }
+            osmdroidTileCache = requireContext().noBackupFilesDir.resolve("osmdroid/tiles")
+        }
         locationSource = MapLocationSource(
             locationProviderClient,
             viewModel.mapLocationUpdateCallback
@@ -72,16 +83,11 @@ class OSMMapFragment internal constructor(
             setTileSource(TileSourceFactory.MAPNIK)
             zoomController.setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
             controller.setZoom(ZOOM_STREET_LEVEL)
-            if (locationRepo.currentLocation != null) {
-                controller.setCenter(
-                    GeoPoint(
-                        locationRepo.currentLocation!!.latitude,
-                        locationRepo.currentLocation!!.longitude
-                    )
-                )
-            } else {
-                controller.setCenter(GeoPoint(STARTING_LATITUDE, STARTING_LONGITUDE))
-            }
+            val zoomLocation =
+                locationRepo.currentPublishedLocation.value?.run { GeoPoint(latitude, longitude) }
+                    ?: GeoPoint(STARTING_LATITUDE, STARTING_LONGITUDE)
+            controller.setCenter(zoomLocation)
+
             // Make sure we don't add to the overlays
             if (!overlays.any { it is MyLocationNewOverlay && it.mMyLocationProvider == locationSource }) {
                 overlays.add(

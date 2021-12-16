@@ -11,7 +11,6 @@ import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -33,6 +32,7 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.lifecycle.LifecycleService;
 
 import com.jakewharton.processphoenix.ProcessPhoenix;
 
@@ -41,8 +41,10 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.jetbrains.annotations.NotNull;
 import org.owntracks.android.R;
+import org.owntracks.android.data.EndpointState;
 import org.owntracks.android.data.WaypointModel;
 import org.owntracks.android.data.repos.ContactsRepo;
+import org.owntracks.android.data.repos.EndpointStateRepo;
 import org.owntracks.android.data.repos.LocationRepo;
 import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.geocoding.GeocoderProvider;
@@ -77,7 +79,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 import timber.log.Timber;
 
 @AndroidEntryPoint
-public class BackgroundService extends Service implements OnModeChangedPreferenceChangedListener, ServiceBridge.ServiceBridgeInterface {
+public class BackgroundService extends LifecycleService implements OnModeChangedPreferenceChangedListener, ServiceBridge.ServiceBridgeInterface {
     private static final int INTENT_REQUEST_CODE_GEOFENCE = 1264;
     private static final int INTENT_REQUEST_CODE_CLEAR_EVENTS = 1263;
 
@@ -103,8 +105,6 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
     private LocationCallback locationCallback;
     private LocationCallback locationCallbackOnDemand;
     private MessageLocation lastLocationMessage;
-    private MessageProcessor.EndpointState lastEndpointState = MessageProcessor.EndpointState.INITIAL;
-
 
     private NotificationCompat.Builder activeNotificationCompatBuilder;
     private NotificationCompat.Builder eventsNotificationCompatBuilder;
@@ -151,6 +151,9 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
 
     @Inject
     MessageProcessor messageProcessor;
+
+    @Inject
+    EndpointStateRepo endpointStateRepo;
 
     @Inject
     GeofencingClient geofencingClient;
@@ -202,7 +205,6 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
         setupGeofences();
 
         eventBus.register(this);
-        eventBus.postSticky(new Events.ServiceStarted());
 
         messageProcessor.initialize();
 
@@ -225,6 +227,14 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
         if (intent != null) {
             handleIntent(intent);
         }
+
+        endpointStateRepo.getEndpointQueueLength().observe(this, queueLength -> {
+            lastQueueLength = queueLength;
+            updateOngoingNotification();
+        });
+        endpointStateRepo.getEndpointState().observe(this, state -> updateOngoingNotification());
+
+        endpointStateRepo.setServiceStartedNow();
 
         return START_STICKY;
     }
@@ -357,9 +367,10 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
         }
 
         // Show monitoring mode if endpoint state is not interesting
-        if (lastEndpointState == MessageProcessor.EndpointState.CONNECTED || lastEndpointState == MessageProcessor.EndpointState.IDLE) {
+        EndpointState lastEndpointState = endpointStateRepo.getEndpointState().getValue();
+        if (lastEndpointState == EndpointState.CONNECTED || lastEndpointState == EndpointState.IDLE || lastEndpointState == null) {
             builder.setContentText(getMonitoringLabel(preferences.getMonitoring()));
-        } else if (lastEndpointState == MessageProcessor.EndpointState.ERROR && lastEndpointState.getMessage() != null) {
+        } else if (lastEndpointState == EndpointState.ERROR && lastEndpointState.getMessage() != null) {
             builder.setContentText(lastEndpointState.getLabel(this) + ": " + lastEndpointState.getMessage());
         } else {
             builder.setContentText(lastEndpointState.getLabel(this));
@@ -689,19 +700,6 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
         }
     }
 
-    @Subscribe(sticky = true)
-    public void onEvent(MessageProcessor.EndpointState state) {
-        Timber.d(state.getError(), "endpoint state changed %s. Message: %s", state.getLabel(this), state.getMessage());
-        this.lastEndpointState = state;
-        updateOngoingNotification();
-    }
-
-    @Subscribe(sticky = true)
-    public void onEvent(Events.QueueChanged e) {
-        this.lastQueueLength = e.getNewLength();
-        updateOngoingNotification();
-    }
-
     @Subscribe
     public void onEvent(Events.RestartApp e) {
         Timber.i("Triggering restart");
@@ -767,7 +765,7 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
                     onLocationChanged(lastLocation, MessageLocation.REPORT_TYPE_DEFAULT);
                 }
             }
-        },0);
+        }, 0);
 
     }
 

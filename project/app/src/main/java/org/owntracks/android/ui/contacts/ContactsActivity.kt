@@ -14,7 +14,7 @@ import org.owntracks.android.ui.map.MapActivity
 
 @AndroidEntryPoint
 class ContactsActivity : BaseActivity<UiContactsBinding?, ContactsMvvm.ViewModel<*>?>(),
-    ContactsMvvm.View, BaseAdapter.ClickListener<FusedContact?> {
+        ContactsMvvm.View, BaseAdapter.ClickListener<FusedContact?> {
 
     private lateinit var contactsAdapter: ContactsAdapter
 

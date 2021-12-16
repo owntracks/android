@@ -20,10 +20,15 @@ public abstract class WaypointsRepo {
     protected WaypointsRepo(EventBus eventBus) {
         this.eventBus = eventBus;
     }
+
     public abstract WaypointModel get(long tst);
+
     protected abstract List<WaypointModel> getAll();
+
     public abstract List<WaypointModel> getAllWithGeofences();
+
     public abstract ObjectBoxLiveData<WaypointModel> getAllLive();
+
     public abstract Query<WaypointModel> getAllQuery();
 
     public void insert(WaypointModel w) {
@@ -34,7 +39,7 @@ public abstract class WaypointsRepo {
 
     public void update(WaypointModel w, boolean notify) {
         update_impl(w);
-        if(notify) {
+        if (notify) {
             eventBus.post(new Events.WaypointUpdated(w));
         }
     }
@@ -45,13 +50,13 @@ public abstract class WaypointsRepo {
     }
 
     public void importFromMessage(@Nullable MessageWaypointCollection waypoints) {
-        if(waypoints == null)
+        if (waypoints == null)
             return;
 
-        for (MessageWaypoint m: waypoints) {
+        for (MessageWaypoint m : waypoints) {
             // Delete existing waypoint if one with the same tst already exists
             WaypointModel exisiting = get(m.getTimestamp());
-            if(exisiting != null) {
+            if (exisiting != null) {
                 delete(exisiting);
             }
             insert(toDaoObject(m));
@@ -61,14 +66,14 @@ public abstract class WaypointsRepo {
     @NonNull
     public MessageWaypointCollection exportToMessage() {
         MessageWaypointCollection messages = new MessageWaypointCollection();
-        for(WaypointModel waypoint : getAll()) {
+        for (WaypointModel waypoint : getAll()) {
             messages.add(fromDaoObject(waypoint));
         }
         return messages;
     }
 
     private WaypointModel toDaoObject(@NonNull MessageWaypoint messageWaypoint) {
-        return new WaypointModel(0, messageWaypoint.getTimestamp(),messageWaypoint.getDescription(), messageWaypoint.getLatitude(), messageWaypoint.getLongitude(), messageWaypoint.getRadius() != null ? messageWaypoint.getRadius() : 0, 0, 0);
+        return new WaypointModel(0, messageWaypoint.getTimestamp(), messageWaypoint.getDescription(), messageWaypoint.getLatitude(), messageWaypoint.getLongitude(), messageWaypoint.getRadius() != null ? messageWaypoint.getRadius() : 0, 0, 0);
     }
 
     public MessageWaypoint fromDaoObject(@NonNull WaypointModel w) {
@@ -82,7 +87,9 @@ public abstract class WaypointsRepo {
     }
 
     protected abstract void insert_impl(WaypointModel w);
+
     protected abstract void update_impl(WaypointModel w);
+
     protected abstract void delete_impl(WaypointModel w);
 
 }

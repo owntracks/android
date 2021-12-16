@@ -60,11 +60,11 @@ class App : Application() {
         // X509ExtendedTrustManager not available pre-24, fall back to device. https://github.com/google/conscrypt/issues/603
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             Security.insertProviderAt(
-                Conscrypt.newProviderBuilder().provideTrustManager(true).build(), 1
+                    Conscrypt.newProviderBuilder().provideTrustManager(true).build(), 1
             )
         } else {
             Security.insertProviderAt(
-                Conscrypt.newProviderBuilder().provideTrustManager(false).build(), 1
+                    Conscrypt.newProviderBuilder().provideTrustManager(false).build(), 1
             )
         }
 
@@ -72,39 +72,39 @@ class App : Application() {
 
         val dataBindingComponent = bindingComponentProvider.get().build()
         val dataBindingEntryPoint = EntryPoints.get(
-            dataBindingComponent, CustomBindingEntryPoint::class.java
+                dataBindingComponent, CustomBindingEntryPoint::class.java
         )
 
         DataBindingUtil.setDefaultComponent(dataBindingEntryPoint)
 
         WorkManager.initialize(
-            this,
-            Configuration.Builder()
-                .setWorkerFactory(workerFactory)
-                .setInitializationExceptionHandler { throwable ->
-                    Timber.e(throwable, "Exception thrown when initializing WorkManager")
-                    workManagerFailedToInitialize.postValue(true)
-                }
-                .build()
+                this,
+                Configuration.Builder()
+                        .setWorkerFactory(workerFactory)
+                        .setInitializationExceptionHandler { throwable ->
+                            Timber.e(throwable, "Exception thrown when initializing WorkManager")
+                            workManagerFailedToInitialize.postValue(true)
+                        }
+                        .build()
         )
         scheduler.cancelAllTasks()
         Timber.plant(TimberInMemoryLogTree(BuildConfig.DEBUG))
         if (BuildConfig.DEBUG) {
             Timber.e("StrictMode enabled in DEBUG build")
             StrictMode.setThreadPolicy(
-                StrictMode.ThreadPolicy.Builder()
-                    .detectNetwork()
-                    .penaltyFlashScreen()
-                    .penaltyDialog()
-                    .build()
+                    StrictMode.ThreadPolicy.Builder()
+                            .detectNetwork()
+                            .penaltyFlashScreen()
+                            .penaltyDialog()
+                            .build()
             )
             StrictMode.setVmPolicy(
-                StrictMode.VmPolicy.Builder()
-                    .detectLeakedSqlLiteObjects()
-                    .detectLeakedClosableObjects()
-                    .detectFileUriExposure()
-                    .penaltyLog()
-                    .build()
+                    StrictMode.VmPolicy.Builder()
+                            .detectLeakedSqlLiteObjects()
+                            .detectLeakedClosableObjects()
+                            .detectFileUriExposure()
+                            .penaltyLog()
+                            .build()
             )
         }
         preferences.checkFirstStart()
@@ -118,7 +118,7 @@ class App : Application() {
             Preferences.NIGHT_MODE_AUTO -> AppCompatDelegate.setDefaultNightMode(Preferences.SYSTEM_NIGHT_AUTO_MODE)
             Preferences.NIGHT_MODE_ENABLE -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
             Preferences.NIGHT_MODE_DISABLE -> AppCompatDelegate.setDefaultNightMode(
-                AppCompatDelegate.MODE_NIGHT_NO
+                    AppCompatDelegate.MODE_NIGHT_NO
             )
         }
 
@@ -134,13 +134,13 @@ class App : Application() {
             // Importance min will show normal priority notification for foreground service. See https://developer.android.com/reference/android/app/NotificationManager#IMPORTANCE_MIN
             // User has to actively configure this in the notification channel settings.
             val ongoingNotificationChannelName =
-                if (getString(R.string.notificationChannelOngoing).trim()
-                        .isNotEmpty()
-                ) getString(R.string.notificationChannelOngoing) else "Ongoing"
+                    if (getString(R.string.notificationChannelOngoing).trim()
+                                    .isNotEmpty()
+                    ) getString(R.string.notificationChannelOngoing) else "Ongoing"
             NotificationChannel(
-                NOTIFICATION_CHANNEL_ONGOING,
-                ongoingNotificationChannelName,
-                NotificationManager.IMPORTANCE_LOW
+                    NOTIFICATION_CHANNEL_ONGOING,
+                    ongoingNotificationChannelName,
+                    NotificationManager.IMPORTANCE_LOW
             ).apply {
                 lockscreenVisibility = Notification.VISIBILITY_PUBLIC
                 description = getString(R.string.notificationChannelOngoingDescription)
@@ -152,12 +152,12 @@ class App : Application() {
 
 
             val eventsNotificationChannelName = if (getString(R.string.events).trim()
-                    .isNotEmpty()
+                            .isNotEmpty()
             ) getString(R.string.events) else "Events"
             NotificationChannel(
-                NOTIFICATION_CHANNEL_EVENTS,
-                eventsNotificationChannelName,
-                NotificationManager.IMPORTANCE_HIGH
+                    NOTIFICATION_CHANNEL_EVENTS,
+                    eventsNotificationChannelName,
+                    NotificationManager.IMPORTANCE_HIGH
             ).apply {
                 lockscreenVisibility = Notification.VISIBILITY_PUBLIC
                 description = getString(R.string.notificationChannelEventsDescription)
@@ -168,13 +168,13 @@ class App : Application() {
             }.run { notificationManager.createNotificationChannel(this) }
 
             val errorNotificationChannelName =
-                if (getString(R.string.notificationChannelErrors).trim()
-                        .isNotEmpty()
-                ) getString(R.string.notificationChannelErrors) else "Errors"
+                    if (getString(R.string.notificationChannelErrors).trim()
+                                    .isNotEmpty()
+                    ) getString(R.string.notificationChannelErrors) else "Errors"
             NotificationChannel(
-                GeocoderProvider.ERROR_NOTIFICATION_CHANNEL_ID,
-                errorNotificationChannelName,
-                NotificationManager.IMPORTANCE_LOW
+                    GeocoderProvider.ERROR_NOTIFICATION_CHANNEL_ID,
+                    errorNotificationChannelName,
+                    NotificationManager.IMPORTANCE_LOW
             ).apply {
                 lockscreenVisibility = Notification.VISIBILITY_PRIVATE
             }.run { notificationManager.createNotificationChannel(this) }
@@ -202,7 +202,7 @@ inline fun perfLog(description: String, block: () -> Unit) {
 inline fun perfLog(block: () -> Unit) {
     if (BuildConfig.DEBUG) {
         val caller =
-            Thread.currentThread().stackTrace[2].let { "${it.className}/ ${it.methodName}" }
+                Thread.currentThread().stackTrace[2].let { "${it.className}/ ${it.methodName}" }
         perfLog(caller, block)
     } else {
         block()

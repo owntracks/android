@@ -29,7 +29,7 @@ public class ConnectionParametersViewModel extends BaseDialogViewModel {
     public void save() {
         preferences.setCleanSession(cleanSession);
 
-        if(keepaliveTextDirty) {
+        if (keepaliveTextDirty) {
             try {
                 preferences.setKeepalive(Integer.parseInt(keepaliveText));
             } catch (NumberFormatException e) {

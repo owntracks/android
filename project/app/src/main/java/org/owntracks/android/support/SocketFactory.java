@@ -21,9 +21,9 @@ import javax.net.ssl.TrustManagerFactory;
 
 import timber.log.Timber;
 
-public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
+public class SocketFactory extends javax.net.ssl.SSLSocketFactory {
     private final javax.net.ssl.SSLSocketFactory factory;
-    private final String[] protocols=new String[] {"TLSv1", "TLSv1.1", "TLSv1.2", "TLSv1.3"};
+    private final String[] protocols = new String[]{"TLSv1", "TLSv1.1", "TLSv1.2", "TLSv1.3"};
 
     public static class SocketFactoryOptions {
 
@@ -35,10 +35,12 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
             this.caCrtInputStream = stream;
             return this;
         }
+
         public SocketFactoryOptions withClientP12InputStream(InputStream stream) {
             this.caClientP12InputStream = stream;
             return this;
         }
+
         public SocketFactoryOptions withClientP12Password(String password) {
             this.caClientP12Password = password;
             return this;
@@ -79,7 +81,7 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
 
         KeyManagerFactory kmf = KeyManagerFactory.getInstance("X509");
 
-        if(options.hasCaCrt()) {
+        if (options.hasCaCrt()) {
             Timber.v("options.hasCaCrt(): true");
 
             KeyStore caKeyStore = KeyStore.getInstance(KeyStore.getDefaultType());
@@ -126,13 +128,13 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
             }
         } else {
             Timber.v("Client .p12 sideload: false, using null client cert");
-            kmf.init(null,null);
+            kmf.init(null, null);
         }
 
         // Create an SSLContext that uses our TrustManager
         SSLContext context = SSLContext.getInstance("TLS");
         context.init(kmf.getKeyManagers(), getTrustManagers(), null);
-        this.factory= context.getSocketFactory();
+        this.factory = context.getSocketFactory();
     }
 
     public TrustManager[] getTrustManagers() {
@@ -150,15 +152,15 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
     }
 
     @Override
-    public Socket createSocket() throws IOException{
-        SSLSocket r = (SSLSocket)this.factory.createSocket();
+    public Socket createSocket() throws IOException {
+        SSLSocket r = (SSLSocket) this.factory.createSocket();
         r.setEnabledProtocols(protocols);
         return r;
     }
 
     @Override
     public Socket createSocket(Socket s, String host, int port, boolean autoClose) throws IOException {
-        SSLSocket r = (SSLSocket)this.factory.createSocket(s, host, port, autoClose);
+        SSLSocket r = (SSLSocket) this.factory.createSocket(s, host, port, autoClose);
         r.setEnabledProtocols(protocols);
         return r;
     }
@@ -166,28 +168,28 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
     @Override
     public Socket createSocket(String host, int port) throws IOException {
 
-        SSLSocket r = (SSLSocket)this.factory.createSocket(host, port);
+        SSLSocket r = (SSLSocket) this.factory.createSocket(host, port);
         r.setEnabledProtocols(protocols);
         return r;
     }
 
     @Override
     public Socket createSocket(String host, int port, InetAddress localHost, int localPort) throws IOException {
-        SSLSocket r = (SSLSocket)this.factory.createSocket(host, port, localHost, localPort);
+        SSLSocket r = (SSLSocket) this.factory.createSocket(host, port, localHost, localPort);
         r.setEnabledProtocols(protocols);
         return r;
     }
 
     @Override
     public Socket createSocket(InetAddress host, int port) throws IOException {
-        SSLSocket r = (SSLSocket)this.factory.createSocket(host, port);
+        SSLSocket r = (SSLSocket) this.factory.createSocket(host, port);
         r.setEnabledProtocols(protocols);
         return r;
     }
 
     @Override
     public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort) throws IOException {
-        SSLSocket r = (SSLSocket)this.factory.createSocket(address, port, localAddress,localPort);
+        SSLSocket r = (SSLSocket) this.factory.createSocket(address, port, localAddress, localPort);
         r.setEnabledProtocols(protocols);
         return r;
     }

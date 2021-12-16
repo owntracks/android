@@ -5,10 +5,10 @@ import android.location.Location
 import timber.log.Timber
 
 data class GeofencingEvent(
-    val errorCode: Int?,
-    val geofenceTransition: Int?,
-    val triggeringGeofences: List<Geofence>?,
-    val triggeringLocation: Location?
+        val errorCode: Int?,
+        val geofenceTransition: Int?,
+        val triggeringGeofences: List<Geofence>?,
+        val triggeringLocation: Location?
 ) {
     fun hasError(): Boolean = errorCode != null && errorCode >= 0
 

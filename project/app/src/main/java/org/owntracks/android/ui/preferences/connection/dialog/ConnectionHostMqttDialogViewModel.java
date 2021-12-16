@@ -1,7 +1,9 @@
 package org.owntracks.android.ui.preferences.connection.dialog;
+
 import android.content.Intent;
 
 import org.owntracks.android.support.Preferences;
+
 import timber.log.Timber;
 
 public class ConnectionHostMqttDialogViewModel extends BaseDialogViewModel {
@@ -34,11 +36,11 @@ public class ConnectionHostMqttDialogViewModel extends BaseDialogViewModel {
     @Override
     public void save() {
         Timber.v("saving host:%s, port:%s, ws:%s, clientId:%s", host, port, ws, clientId);
-        if(hostDirty) {
+        if (hostDirty) {
             preferences.setHost(host);
         }
 
-        if(portDirty) {
+        if (portDirty) {
             try {
                 preferences.setPort(Integer.parseInt(port));
             } catch (NumberFormatException e) {
@@ -46,7 +48,7 @@ public class ConnectionHostMqttDialogViewModel extends BaseDialogViewModel {
             }
         }
 
-        if(wsDirty) {
+        if (wsDirty) {
             preferences.setWs(ws);
         }
         if (clientIdDirty) {
@@ -84,9 +86,10 @@ public class ConnectionHostMqttDialogViewModel extends BaseDialogViewModel {
     public String getClientId() {
         return clientId;
     }
+
     public void setClientId(String clientId) {
         this.clientId = clientId;
-        this.clientIdDirty=true;
+        this.clientIdDirty = true;
     }
 }
 

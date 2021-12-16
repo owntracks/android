@@ -19,6 +19,7 @@ class AboutFragment : PreferenceFragmentCompat() {
         versionPreference?.setSummaryProvider { _ ->
             try {
                 val pm = requireActivity().packageManager
+
                 @Suppress("DEPRECATION")
                 val versionCode =
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)

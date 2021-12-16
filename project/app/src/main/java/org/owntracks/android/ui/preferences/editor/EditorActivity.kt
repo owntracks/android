@@ -28,8 +28,8 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class EditorActivity :
-    BaseActivity<UiPreferencesEditorBinding?, EditorMvvm.ViewModel<EditorMvvm.View?>?>(),
-    EditorMvvm.View {
+        BaseActivity<UiPreferencesEditorBinding?, EditorMvvm.ViewModel<EditorMvvm.View?>?>(),
+        EditorMvvm.View {
     private var configExportUri: Uri? = null
 
     @Inject
@@ -93,43 +93,43 @@ class EditorActivity :
         // Set autocomplete items
         val inputKeyView: MaterialAutoCompleteTextView = layout.findViewById(R.id.inputKey)
         inputKeyView.setAdapter(
-            ArrayAdapter(
-                this,
-                android.R.layout.simple_dropdown_item_1line,
-                preferences.importKeys
-            )
+                ArrayAdapter(
+                        this,
+                        android.R.layout.simple_dropdown_item_1line,
+                        preferences.importKeys
+                )
         )
         builder.setTitle(R.string.preferencesEditor)
-            .setPositiveButton(R.string.accept) { dialog: DialogInterface, _: Int ->
-                val inputValue: MaterialEditText = layout.findViewById(R.id.inputValue)
-                val key = inputKeyView.text.toString()
-                val value = inputValue.text.toString()
-                try {
-                    preferences.importKeyValue(key, value)
-                    viewModel!!.onPreferencesValueForKeySetSuccessful()
-                    dialog.dismiss()
-                } catch (e: IllegalAccessException) {
-                    Timber.w(e)
-                    displayPreferencesValueForKeySetFailedKey()
-                } catch (e: IllegalArgumentException) {
-                    Timber.w(e)
-                    displayPreferencesValueForKeySetFailedValue()
+                .setPositiveButton(R.string.accept) { dialog: DialogInterface, _: Int ->
+                    val inputValue: MaterialEditText = layout.findViewById(R.id.inputValue)
+                    val key = inputKeyView.text.toString()
+                    val value = inputValue.text.toString()
+                    try {
+                        preferences.importKeyValue(key, value)
+                        viewModel!!.onPreferencesValueForKeySetSuccessful()
+                        dialog.dismiss()
+                    } catch (e: IllegalAccessException) {
+                        Timber.w(e)
+                        displayPreferencesValueForKeySetFailedKey()
+                    } catch (e: IllegalArgumentException) {
+                        Timber.w(e)
+                        displayPreferencesValueForKeySetFailedValue()
+                    }
                 }
-            }
-            .setNegativeButton(R.string.cancel) { dialog: DialogInterface, _: Int -> dialog.dismiss() }
-            .setView(layout)
+                .setNegativeButton(R.string.cancel) { dialog: DialogInterface, _: Int -> dialog.dismiss() }
+                .setView(layout)
         builder.show()
     }
 
     private val shareIntentActivityLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            Snackbar.make(
-                findViewById(R.id.effectiveConfiguration),
-                R.string.preferencesExportSuccess,
-                Snackbar.LENGTH_SHORT
-            ).show()
-            revokeExportUriPermissions()
-        }
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                Snackbar.make(
+                        findViewById(R.id.effectiveConfiguration),
+                        R.string.preferencesExportSuccess,
+                        Snackbar.LENGTH_SHORT
+                ).show()
+                revokeExportUriPermissions()
+            }
 
     private fun revokeExportUriPermissions() {
         configExportUri?.let {
@@ -147,12 +147,12 @@ class EditorActivity :
         val key = getRandomHexString()
         configExportUri = Uri.parse("content://${BuildConfig.APPLICATION_ID}.config/$key")
         val shareIntent = ShareCompat.IntentBuilder(this)
-            .setType("text/plain")
-            .setSubject(getString(R.string.exportConfigurationSubject))
-            .setChooserTitle(R.string.exportConfiguration)
-            .setStream(configExportUri)
-            .createChooserIntent()
-            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                .setType("text/plain")
+                .setSubject(getString(R.string.exportConfigurationSubject))
+                .setChooserTitle(R.string.exportConfiguration)
+                .setStream(configExportUri)
+                .createChooserIntent()
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         grantUriPermission("android", configExportUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
         shareIntentActivityLauncher.launch(shareIntent)
         return true
@@ -160,25 +160,25 @@ class EditorActivity :
 
     override fun displayLoadFailed() {
         Snackbar.make(
-            findViewById(R.id.effectiveConfiguration),
-            R.string.preferencesLoadFailed,
-            Snackbar.LENGTH_SHORT
+                findViewById(R.id.effectiveConfiguration),
+                R.string.preferencesLoadFailed,
+                Snackbar.LENGTH_SHORT
         ).show()
     }
 
     private fun displayPreferencesValueForKeySetFailedKey() {
         Snackbar.make(
-            findViewById(R.id.effectiveConfiguration),
-            R.string.preferencesEditorKeyError,
-            Snackbar.LENGTH_SHORT
+                findViewById(R.id.effectiveConfiguration),
+                R.string.preferencesEditorKeyError,
+                Snackbar.LENGTH_SHORT
         ).show()
     }
 
     private fun displayPreferencesValueForKeySetFailedValue() {
         Snackbar.make(
-            findViewById(R.id.effectiveConfiguration),
-            R.string.preferencesEditorValueError,
-            Snackbar.LENGTH_SHORT
+                findViewById(R.id.effectiveConfiguration),
+                R.string.preferencesEditorValueError,
+                Snackbar.LENGTH_SHORT
         ).show()
     }
 }

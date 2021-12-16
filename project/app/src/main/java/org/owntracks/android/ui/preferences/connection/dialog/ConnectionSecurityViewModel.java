@@ -55,13 +55,13 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
     public void save() {
         preferences.setTls(tls);
 
-        if(tlsCaCrtNameDirty)
+        if (tlsCaCrtNameDirty)
             preferences.setTlsCaCrt(tlsCaCrtName == null ? "" : tlsCaCrtName);
 
-        if(tlsClientCrtNameDirty)
+        if (tlsClientCrtNameDirty)
             preferences.setTlsClientCrt(tlsClientCrtName == null ? "" : tlsClientCrtName);
 
-        if(tlsClientCrtPasswortDirty)
+        if (tlsClientCrtPasswortDirty)
             preferences.setTlsClientCrtPassword(tlsClientCrtPassword == null ? "" : tlsClientCrtPassword);
     }
 
@@ -154,7 +154,7 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if(resultCode == RESULT_OK && (requestCode == ConnectionSecurityViewModel.REQUEST_CODE_FILE_CA_CRT || requestCode == ConnectionSecurityViewModel.REQUEST_CODE_FILE_CLIENT_CRT )) {
+        if (resultCode == RESULT_OK && (requestCode == ConnectionSecurityViewModel.REQUEST_CODE_FILE_CA_CRT || requestCode == ConnectionSecurityViewModel.REQUEST_CODE_FILE_CLIENT_CRT)) {
             Uri uri = data.getData();
             Timber.v("uri:  %s,", uri.toString());
             if (requestCode == ConnectionSecurityViewModel.REQUEST_CODE_FILE_CA_CRT)
@@ -163,7 +163,6 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
                 new ClientCrtCopyTask(context).execute(uri);
         }
     }
-
 
 
     private abstract class CopyTask extends AsyncTask<Uri, String, String> {
@@ -211,7 +210,7 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
 
         @Override
         protected void onPostExecute(String s) {
-            Timber.v("crt copied %s",s);
+            Timber.v("crt copied %s", s);
             setTlsCaCrtName(s);
         }
 
@@ -246,7 +245,7 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
             try (Cursor cursor = context.getApplicationContext().getContentResolver().query(uri, null, null, null, null)) {
                 if (cursor != null && cursor.moveToFirst()) {
                     int index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-                    if (index<0) {
+                    if (index < 0) {
                         throw new IndexOutOfBoundsException("DISPLAY_NAME column not present in data store");
                     }
                     result = cursor.getString(index);

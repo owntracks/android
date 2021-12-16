@@ -2,12 +2,14 @@ package org.owntracks.android.ui.preferences.connection.dialog;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+
 import androidx.databinding.BaseObservable;
 
 import org.owntracks.android.support.Preferences;
 
 public abstract class BaseDialogViewModel extends BaseObservable implements DialogInterface.OnClickListener {
     final Preferences preferences;
+
     BaseDialogViewModel(Preferences preferences) {
         this.preferences = preferences;
         load();
@@ -15,9 +17,9 @@ public abstract class BaseDialogViewModel extends BaseObservable implements Dial
 
     @Override
     public void onClick(DialogInterface dialog, int which) {
-        if(which == DialogInterface.BUTTON_POSITIVE) {
+        if (which == DialogInterface.BUTTON_POSITIVE) {
             save();
-        } else if(which == DialogInterface.BUTTON_NEGATIVE) {
+        } else if (which == DialogInterface.BUTTON_NEGATIVE) {
             dialog.cancel();
         }
 
@@ -25,6 +27,8 @@ public abstract class BaseDialogViewModel extends BaseObservable implements Dial
     }
 
     public abstract void onActivityResult(int requestCode, int resultCode, Intent data);
+
     abstract void load();
+
     abstract void save();
 }

@@ -17,25 +17,25 @@ class AdvancedFragment @Inject constructor() : AbstractPreferenceFragment() {
         super.onCreatePreferencesFix(savedInstanceState, rootKey)
         setPreferencesFromResource(R.xml.preferences_advanced, rootKey)
         val remoteConfigurationPreference =
-            findPreference<SwitchPreferenceCompat>(getString(R.string.preferenceKeyRemoteConfiguration))
+                findPreference<SwitchPreferenceCompat>(getString(R.string.preferenceKeyRemoteConfiguration))
         val remoteCommandPreference =
-            findPreference<SwitchPreferenceCompat>(getString(R.string.preferenceKeyRemoteCommand))
+                findPreference<SwitchPreferenceCompat>(getString(R.string.preferenceKeyRemoteCommand))
         val remoteCommandAndConfigurationChangeListener =
-            Preference.OnPreferenceChangeListener { preference, newValue ->
-                if (newValue is Boolean) {
-                    when (preference.key) {
-                        getString(R.string.preferenceKeyRemoteCommand) -> if (!newValue) remoteConfigurationPreference?.isChecked =
-                            false
-                        getString(R.string.preferenceKeyRemoteConfiguration) -> if (newValue) remoteCommandPreference?.isChecked =
-                            true
+                Preference.OnPreferenceChangeListener { preference, newValue ->
+                    if (newValue is Boolean) {
+                        when (preference.key) {
+                            getString(R.string.preferenceKeyRemoteCommand) -> if (!newValue) remoteConfigurationPreference?.isChecked =
+                                    false
+                            getString(R.string.preferenceKeyRemoteConfiguration) -> if (newValue) remoteCommandPreference?.isChecked =
+                                    true
+                        }
                     }
+                    true
                 }
-                true
-            }
         remoteConfigurationPreference?.onPreferenceChangeListener =
-            remoteCommandAndConfigurationChangeListener
+                remoteCommandAndConfigurationChangeListener
         remoteCommandPreference?.onPreferenceChangeListener =
-            remoteCommandAndConfigurationChangeListener
+                remoteCommandAndConfigurationChangeListener
 
         findPreference<ListPreference>(getString(R.string.preferenceKeyReverseGeocodeProvider))?.setOnPreferenceChangeListener { _, newValue ->
             preferences.reverseGeocodeProvider = newValue.toString()
@@ -52,11 +52,11 @@ class AdvancedFragment @Inject constructor() : AbstractPreferenceFragment() {
         }
 
         findPreference<Preference>("autostartWarning")?.isVisible =
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
     }
 
     private fun setOpenCageAPIKeyPreferenceVisibility() {
         findPreference<EditTextPreference>(getString(R.string.preferenceKeyOpencageGeocoderApiKey))?.isVisible =
-            preferences.reverseGeocodeProvider == Preferences.REVERSE_GEOCODE_PROVIDER_OPENCAGE
+                preferences.reverseGeocodeProvider == Preferences.REVERSE_GEOCODE_PROVIDER_OPENCAGE
     }
 }

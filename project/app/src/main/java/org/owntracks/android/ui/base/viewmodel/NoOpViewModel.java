@@ -20,5 +20,6 @@ import javax.inject.Inject;
 public final class NoOpViewModel extends BaseViewModel<MvvmView> {
 
     @Inject
-    public NoOpViewModel() { }
+    public NoOpViewModel() {
+    }
 }

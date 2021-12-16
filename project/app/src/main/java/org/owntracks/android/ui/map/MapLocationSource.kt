@@ -18,8 +18,8 @@ import java.util.concurrent.TimeUnit
  * @property locationUpdateCallback an additional [LocationCallback] to be called on location update
  */
 open class MapLocationSource internal constructor(
-    private val locationProviderClient: LocationProviderClient,
-    private val locationUpdateCallback: LocationCallback
+        private val locationProviderClient: LocationProviderClient,
+        private val locationUpdateCallback: LocationCallback
 ) {
     private var cachedOnLocationChangedListener: OnLocationChangedListener? = null
     private var callbackWrapper: LocationCallback? = null
@@ -42,13 +42,13 @@ open class MapLocationSource internal constructor(
         }
         callbackWrapper?.run {
             locationProviderClient.requestLocationUpdates(
-                LocationRequest(
-                    smallestDisplacement = 1f,
-                    priority = LocationRequest.PRIORITY_HIGH_ACCURACY,
-                    interval = TimeUnit.SECONDS.toMillis(2)
-                ),
-                this,
-                Looper.getMainLooper()
+                    LocationRequest(
+                            smallestDisplacement = 1f,
+                            priority = LocationRequest.PRIORITY_HIGH_ACCURACY,
+                            interval = TimeUnit.SECONDS.toMillis(2)
+                    ),
+                    this,
+                    Looper.getMainLooper()
             )
         }
     }

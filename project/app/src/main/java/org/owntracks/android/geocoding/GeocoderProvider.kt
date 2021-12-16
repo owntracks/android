@@ -27,8 +27,8 @@ import javax.inject.Singleton
 
 @Singleton
 class GeocoderProvider @Inject constructor(
-    @ApplicationContext private val context: Context,
-    private val preferences: Preferences
+        @ApplicationContext private val context: Context,
+        private val preferences: Preferences
 ) {
 
     private val ioDispatcher = Dispatchers.IO
@@ -45,7 +45,7 @@ class GeocoderProvider @Inject constructor(
                 perfLog {
                     geocoder = when (preferences.reverseGeocodeProvider) {
                         Preferences.REVERSE_GEOCODE_PROVIDER_OPENCAGE -> OpenCageGeocoder(
-                            preferences.openCageGeocoderApiKey
+                                preferences.openCageGeocoderApiKey
                         )
                         Preferences.REVERSE_GEOCODE_PROVIDER_DEVICE -> DeviceGeocoder(context)
                         else -> GeocoderNone()
@@ -82,8 +82,8 @@ class GeocoderProvider @Inject constructor(
             is GeocodeResult.Disabled -> context.getString(R.string.geocoderDisabled)
             is GeocodeResult.IPAddressRejected -> context.getString(R.string.geocoderIPAddressRejected)
             is GeocodeResult.RateLimited -> context.getString(
-                R.string.geocoderRateLimited,
-                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(UTC).format(result.until)
+                    R.string.geocoderRateLimited,
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(UTC).format(result.until)
             )
             else -> ""
         }
@@ -106,31 +106,31 @@ class GeocoderProvider @Inject constructor(
         activityLaunchIntent.addCategory("android.intent.category.LAUNCHER")
         activityLaunchIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
         val notification = NotificationCompat.Builder(context, ERROR_NOTIFICATION_CHANNEL_ID)
-            .setContentTitle(context.getString(R.string.geocoderProblemNotificationTitle))
-            .setContentText(errorNotificationText)
-            .setAutoCancel(true)
-            .setSmallIcon(R.drawable.ic_owntracks_80)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(errorNotificationText))
-            .setContentIntent(
-                PendingIntent.getActivity(
-                    context,
-                    0,
-                    activityLaunchIntent,
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT else PendingIntent.FLAG_UPDATE_CURRENT
+                .setContentTitle(context.getString(R.string.geocoderProblemNotificationTitle))
+                .setContentText(errorNotificationText)
+                .setAutoCancel(true)
+                .setSmallIcon(R.drawable.ic_owntracks_80)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(errorNotificationText))
+                .setContentIntent(
+                        PendingIntent.getActivity(
+                                context,
+                                0,
+                                activityLaunchIntent,
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT else PendingIntent.FLAG_UPDATE_CURRENT
+                        )
                 )
-            )
-            .setPriority(PRIORITY_LOW)
-            .setSilent(true)
-            .build()
+                .setPriority(PRIORITY_LOW)
+                .setSilent(true)
+                .build()
 
         notificationManager.notify(GEOCODE_ERROR_NOTIFICATION_TAG, 0, notification)
     }
 
     private fun geocodeResultToText(result: GeocodeResult) =
-        when (result) {
-            is GeocodeResult.Formatted -> result.text
-            else -> null
-        }
+            when (result) {
+                is GeocodeResult.Formatted -> result.text
+                else -> null
+            }
 
     fun resolve(messageLocation: MessageLocation, backgroundService: BackgroundService) {
         if (messageLocation.hasGeocode) {
@@ -148,18 +148,18 @@ class GeocoderProvider @Inject constructor(
     init {
         setGeocoderProvider(context, preferences)
         preferences.registerOnPreferenceChangedListener(object :
-            OnModeChangedPreferenceChangedListener {
+                OnModeChangedPreferenceChangedListener {
             override fun onAttachAfterModeChanged() {
 
             }
 
             override fun onSharedPreferenceChanged(
-                sharedPreferences: SharedPreferences?,
-                key: String?
+                    sharedPreferences: SharedPreferences?,
+                    key: String?
             ) {
                 if (key == preferences.getPreferenceKey(R.string.preferenceKeyReverseGeocodeProvider) || key == preferences.getPreferenceKey(
-                        R.string.preferenceKeyOpencageGeocoderApiKey
-                    )
+                                R.string.preferenceKeyOpencageGeocoderApiKey
+                        )
                 ) {
                     setGeocoderProvider(context, preferences)
                 }

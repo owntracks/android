@@ -2,7 +2,9 @@ package org.owntracks.android.data;
 
 import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
+
 import android.location.Location;
+
 import androidx.annotation.NonNull;
 
 import java.util.concurrent.TimeUnit;
@@ -11,6 +13,7 @@ import io.objectbox.annotation.Entity;
 import io.objectbox.annotation.Id;
 import io.objectbox.annotation.Index;
 import io.objectbox.annotation.Unique;
+
 import org.owntracks.android.BR;
 
 @Entity
@@ -56,6 +59,7 @@ public class WaypointModel extends BaseObservable {
     public long getTst() {
         return tst; // unit is seconds
     }
+
     private void setTst(long tst) {
         this.tst = tst;
     }
@@ -90,9 +94,9 @@ public class WaypointModel extends BaseObservable {
     }
 
     public void setGeofenceLatitude(double geofenceLatitude) {
-        if(geofenceLatitude > 90)
+        if (geofenceLatitude > 90)
             this.geofenceLatitude = 90;
-        else if(geofenceLatitude < -90)
+        else if (geofenceLatitude < -90)
             this.geofenceLatitude = -90;
         else
             this.geofenceLatitude = geofenceLatitude;
@@ -120,10 +124,10 @@ public class WaypointModel extends BaseObservable {
     }
 
     public void setGeofenceLongitude(double geofenceLongitude) {
-        if(geofenceLongitude > 180 )
-            this.geofenceLongitude = 180 ;
-        else if(geofenceLongitude < -180 )
-            this.geofenceLongitude = -180 ;
+        if (geofenceLongitude > 180)
+            this.geofenceLongitude = 180;
+        else if (geofenceLongitude < -180)
+            this.geofenceLongitude = -180;
         else
             this.geofenceLongitude = geofenceLongitude;
         notifyPropertyChanged(BR.geofenceLongitude);
@@ -139,7 +143,7 @@ public class WaypointModel extends BaseObservable {
 
     @NonNull
     public Location getLocation() {
-        Location l= new Location("waypoint");
+        Location l = new Location("waypoint");
         l.setLatitude(getGeofenceLatitude());
         l.setLongitude(getGeofenceLongitude());
         l.setAccuracy(getGeofenceRadius());
@@ -176,6 +180,6 @@ public class WaypointModel extends BaseObservable {
 
     @NonNull
     public String toString() {
-        return "WaypointModel("+getId()+","+getTst()+","+getDescription()+")";
+        return "WaypointModel(" + getId() + "," + getTst() + "," + getDescription() + ")";
     }
 }

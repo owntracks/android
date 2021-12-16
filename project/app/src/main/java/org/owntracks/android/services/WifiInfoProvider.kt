@@ -16,7 +16,7 @@ import javax.inject.Singleton
 class WifiInfoProvider @Inject constructor(@ApplicationContext context: Context) {
     @SuppressLint("WifiManagerPotentialLeak")
     private val wifiManager: WifiManager =
-        context.getSystemService(Context.WIFI_SERVICE) as WifiManager
+            context.getSystemService(Context.WIFI_SERVICE) as WifiManager
 
     private var ssid: String? = null
     private var bssid: String? = null

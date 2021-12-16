@@ -19,7 +19,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 abstract class BaseWelcomeActivity : BaseActivity<UiWelcomeBinding?, WelcomeViewModel?>(),
-    WelcomeMvvm.View {
+        WelcomeMvvm.View {
 
     @Inject
     lateinit var navigator: Navigator
@@ -52,7 +52,7 @@ abstract class BaseWelcomeActivity : BaseActivity<UiWelcomeBinding?, WelcomeView
 
         binding!!.viewPager.adapter = welcomeAdapter
         binding!!.viewPager.registerOnPageChangeCallback(object :
-            ViewPager2.OnPageChangeCallback() {
+                ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 binding!!.vm!!.currentFragmentPosition.value = position
@@ -90,14 +90,14 @@ abstract class BaseWelcomeActivity : BaseActivity<UiWelcomeBinding?, WelcomeView
         for (i in 0 until welcomeAdapter!!.itemCount) {
             val circle = ImageView(this)
             circle.setImageDrawable(
-                ContextCompat.getDrawable(
-                    this,
-                    R.drawable.ic_baseline_fiber_manual_record_24
-                )
+                    ContextCompat.getDrawable(
+                            this,
+                            R.drawable.ic_baseline_fiber_manual_record_24
+                    )
             )
             circle.layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
             )
             circle.adjustViewBounds = true
             circle.setPadding(padding, 0, padding, 0)

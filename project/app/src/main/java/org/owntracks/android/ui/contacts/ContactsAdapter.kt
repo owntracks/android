@@ -12,14 +12,14 @@ import org.owntracks.android.ui.base.BaseAdapter
 import java.util.*
 
 internal class ContactsAdapter(private val clickListener: BaseAdapter.ClickListener<FusedContact?>) :
-    RecyclerView.Adapter<FusedContactViewHolder>() {
+        RecyclerView.Adapter<FusedContactViewHolder>() {
     private lateinit var contactList: List<FusedContact>
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FusedContactViewHolder {
         val binding = DataBindingUtil.inflate<ViewDataBinding>(
-            LayoutInflater.from(parent.context),
-            R.layout.ui_row_contact,
-            parent,
-            false
+                LayoutInflater.from(parent.context),
+                R.layout.ui_row_contact,
+                parent,
+                false
         )
         return FusedContactViewHolder(binding)
     }
@@ -39,15 +39,15 @@ internal class ContactsAdapter(private val clickListener: BaseAdapter.ClickListe
 }
 
 internal class FusedContactViewHolder(private val binding: ViewDataBinding) :
-    RecyclerView.ViewHolder(binding.root) {
+        RecyclerView.ViewHolder(binding.root) {
     fun bind(fusedContact: FusedContact?, clickListener: BaseAdapter.ClickListener<FusedContact?>) {
         fusedContact?.run {
             binding.setVariable(BR.contact, this)
             binding.root.setOnClickListener {
                 clickListener.onClick(
-                    this,
-                    binding.root,
-                    false
+                        this,
+                        binding.root,
+                        false
                 )
             }
 

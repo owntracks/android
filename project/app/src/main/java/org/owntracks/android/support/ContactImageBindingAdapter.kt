@@ -15,8 +15,8 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class ContactImageBindingAdapter @Inject constructor(
-    @ApplicationContext context: Context,
-    private val memoryCache: ContactBitmapAndNameMemoryCache
+        @ApplicationContext context: Context,
+        private val memoryCache: ContactBitmapAndNameMemoryCache
 ) {
     @BindingAdapter(value = ["contact"])
     fun ImageView.displayFaceInViewAsync(c: FusedContact?) {
@@ -39,39 +39,39 @@ class ContactImageBindingAdapter @Inject constructor(
             contact.messageCard?.run {
                 face?.also { face ->
                     val imageAsBytes =
-                        Base64.decode(face.toByteArray(), Base64.DEFAULT)
+                            Base64.decode(face.toByteArray(), Base64.DEFAULT)
                     val b = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.size)
                     val bitmap: Bitmap
                     if (b == null) {
                         Timber.e("Decoding card bitmap failed")
                         val fallbackBitmap = Bitmap.createBitmap(
-                            faceDimensions,
-                            faceDimensions,
-                            Bitmap.Config.ARGB_8888
+                                faceDimensions,
+                                faceDimensions,
+                                Bitmap.Config.ARGB_8888
                         )
                         val canvas = Canvas(fallbackBitmap)
                         val paint = Paint()
                         paint.color = -0x1
                         canvas.drawRect(
-                            0f,
-                            0f,
-                            faceDimensions.toFloat(),
-                            faceDimensions.toFloat(),
-                            paint
+                                0f,
+                                0f,
+                                faceDimensions.toFloat(),
+                                faceDimensions.toFloat(),
+                                paint
                         )
                         bitmap = getRoundedShape(fallbackBitmap)
                     } else {
                         bitmap = getRoundedShape(
-                            Bitmap.createScaledBitmap(
-                                b,
-                                faceDimensions,
-                                faceDimensions,
-                                true
-                            )
+                                Bitmap.createScaledBitmap(
+                                        b,
+                                        faceDimensions,
+                                        faceDimensions,
+                                        true
+                                )
                         )
                         memoryCache.put(
-                            contact.id,
-                            ContactBitmapAndName.CardBitmap(name, bitmap)
+                                contact.id,
+                                ContactBitmapAndName.CardBitmap(name, bitmap)
                         )
                     }
                     return@withContext bitmap
@@ -79,17 +79,17 @@ class ContactImageBindingAdapter @Inject constructor(
             }
             if (contactBitMapAndName !is ContactBitmapAndName.TrackerIdBitmap || contactBitMapAndName.trackerId != contact.trackerId) {
                 val bitmap = drawableToBitmap(
-                    TextDrawable
-                        .Builder()
-                        .buildRoundRect(
-                            contact.trackerId,
-                            TextDrawable.ColorGenerator.MATERIAL.getColor(contact.id),
-                            faceDimensions
-                        )
+                        TextDrawable
+                                .Builder()
+                                .buildRoundRect(
+                                        contact.trackerId,
+                                        TextDrawable.ColorGenerator.MATERIAL.getColor(contact.id),
+                                        faceDimensions
+                                )
                 )
                 memoryCache.put(
-                    contact.id,
-                    ContactBitmapAndName.TrackerIdBitmap(contact.trackerId, bitmap)
+                        contact.id,
+                        ContactBitmapAndName.TrackerIdBitmap(contact.trackerId, bitmap)
                 )
 
                 return@withContext bitmap

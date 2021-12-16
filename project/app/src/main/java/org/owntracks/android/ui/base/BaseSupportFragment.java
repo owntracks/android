@@ -23,12 +23,16 @@ import javax.inject.Inject;
 public abstract class BaseSupportFragment<B extends ViewDataBinding, V extends MvvmViewModel> extends Fragment {
 
     protected B binding;
-    @Inject protected V viewModel;
-    @Inject protected Navigator navigator;
+    @Inject
+    protected V viewModel;
+    @Inject
+    protected Navigator navigator;
 
     /* Use this method to inflate the content view for your Fragment.  */
     protected final View setAndBindContentView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @LayoutRes int layoutResId, Bundle savedInstanceState) {
-        if(viewModel == null) { throw new IllegalStateException("viewModel must not be null and should be injected"); }
+        if (viewModel == null) {
+            throw new IllegalStateException("viewModel must not be null and should be injected");
+        }
         binding = DataBindingUtil.inflate(inflater, layoutResId, container, false);
         binding.setVariable(BR.vm, viewModel);
         //noinspection unchecked
@@ -40,14 +44,18 @@ public abstract class BaseSupportFragment<B extends ViewDataBinding, V extends M
     @CallSuper
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        if(viewModel != null) { viewModel.saveInstanceState(outState); }
+        if (viewModel != null) {
+            viewModel.saveInstanceState(outState);
+        }
     }
 
     @Override
     @CallSuper
     public void onDestroyView() {
         super.onDestroyView();
-        if(viewModel != null) { viewModel.detachView(); }
+        if (viewModel != null) {
+            viewModel.detachView();
+        }
         binding = null;
         viewModel = null;
     }

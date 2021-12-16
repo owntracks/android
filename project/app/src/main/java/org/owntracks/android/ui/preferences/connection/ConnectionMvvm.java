@@ -14,29 +14,44 @@ public interface ConnectionMvvm {
 
     interface View extends MvvmView {
         void showModeDialog();
+
         void showHostDialog();
+
         void showIdentificationDialog();
+
         void showSecurityDialog();
+
         void showParametersDialog();
+
         void recreateOptionsMenu();
 
-        }
+    }
 
     interface ViewModel<V extends MvvmView> extends MvvmViewModel<V> {
         void onModeClick();
+
         void onHostClick();
+
         void onIdentificationClick();
+
         void onSecurityClick();
+
         void onParametersClick();
 
         int getModeId();
+
         void setModeId(int newModeId);
 
         ConnectionHostMqttDialogViewModel getHostDialogViewModelMqtt();
+
         ConnectionHostHttpDialogViewModel getHostDialogViewModelHttp();
+
         ConnectionModeDialogViewModel getModeDialogViewModel();
+
         ConnectionIdentificationViewModel getIdentificationDialogViewModel();
+
         ConnectionSecurityViewModel getConnectionSecurityViewModel();
+
         ConnectionParametersViewModel getConnectionParametersViewModel();
     }
 }

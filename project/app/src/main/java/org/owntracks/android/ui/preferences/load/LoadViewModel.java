@@ -187,7 +187,7 @@ public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadM
 
     private void configurationImportFailed(Throwable e) {
         Timber.e(e);
-        displayedConfiguration = String.format("Import failed: %s",e.getMessage());
+        displayedConfiguration = String.format("Import failed: %s", e.getMessage());
         importStatus = ImportStatus.FAILED;
         notifyChange();
     }
