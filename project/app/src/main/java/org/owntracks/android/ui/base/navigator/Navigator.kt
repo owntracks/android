@@ -47,14 +47,6 @@ class Navigator @Inject constructor(@ActivityContext private val activity: Conte
         activity.startActivity(intent)
     }
 
-    fun getExtrasBundle(intent: Intent): Bundle? {
-        return if (intent.hasExtra(EXTRA_ARGS)) intent.getBundleExtra(EXTRA_ARGS) else Bundle()
-    }
-
-    fun startActivityForResult(intent: Intent?, requestCode: Int) {
-        (activity as Activity).startActivityForResult(intent, requestCode)
-    }
-
     companion object {
         private const val EXTRA_ARGS = "_args"
     }

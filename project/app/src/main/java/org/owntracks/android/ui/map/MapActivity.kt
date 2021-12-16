@@ -51,6 +51,7 @@ import org.owntracks.android.model.FusedContact
 import org.owntracks.android.perfLog
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.services.BackgroundService.BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG
+import org.owntracks.android.services.BackgroundService.INTENT_ACTION_CLEAR_NOTIFICATIONS
 import org.owntracks.android.services.LocationProcessor
 import org.owntracks.android.services.MessageProcessorEndpointHttp
 import org.owntracks.android.support.ContactImageBindingAdapter
@@ -197,11 +198,7 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
 
 
             Timber.d("starting BackgroundService")
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(Intent(this, BackgroundService::class.java))
-            } else {
-                startService(Intent(this, BackgroundService::class.java))
-            }
+            startServiceOrForegroundService(Intent(this, BackgroundService::class.java))
 
             // We've been started in the foreground, so cancel the background restriction notification
             NotificationManagerCompat.from(this)
@@ -407,14 +404,28 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
     }
 
     private fun handleIntentExtras(intent: Intent) {
-        Timber.v("handleIntentExtras")
-        val b = navigator.getExtrasBundle(intent)
+        if (intent.getBooleanExtra(INTENT_ACTION_CLEAR_NOTIFICATIONS, false)) {
+            startServiceOrForegroundService(
+                Intent(this, BackgroundService::class.java).setAction(
+                    INTENT_ACTION_CLEAR_NOTIFICATIONS
+                )
+            )
+        }
+        val b = if (intent.hasExtra("_args")) intent.getBundleExtra("_args") else Bundle()
         if (b != null) {
             Timber.v("intent has extras from drawerProvider")
             val contactId = b.getString(BUNDLE_KEY_CONTACT_ID)
             if (contactId != null) {
                 mapViewModel.setLiveContact(contactId)
             }
+        }
+    }
+
+    private fun startServiceOrForegroundService(intent: Intent) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent)
+        } else {
+            startService(intent)
         }
     }
 
