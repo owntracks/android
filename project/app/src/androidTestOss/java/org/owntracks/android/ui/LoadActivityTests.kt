@@ -25,19 +25,20 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.testutils.TestWithAnActivity
+import org.owntracks.android.testutils.TestWithAnHTTPServer
+import org.owntracks.android.testutils.TestWithAnHTTPServerImpl
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import java.io.File
 import java.io.FileWriter
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.java, false) {
-
-    private var mockWebServer = MockWebServer()
+class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.java, false),
+    TestWithAnHTTPServer by TestWithAnHTTPServerImpl() {
 
     @After
     fun teardown() {
-        mockWebServer.shutdown()
+        stopServer()
     }
 
 
@@ -113,7 +114,7 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
                 )
             )
         )
-        assertContains(R.id.effectiveConfiguration, expectedConfig)
+        assertDisplayed(expectedConfig)
         assertDisplayed(R.id.save)
         assertDisplayed(R.id.close)
     }
@@ -127,7 +128,8 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
                 Uri.parse("owntracks:///config?inline=e30k")
             )
         )
-        assertContains(R.id.effectiveConfiguration, R.string.errorPreferencesImportFailed)
+        assertDisplayed(R.id.importError)
+        assertContains(R.id.importError, "Message is not a valid configuration message")
         assertNotExist(R.id.save)
         assertDisplayed(R.id.close)
 
@@ -142,7 +144,8 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
                 Uri.parse("owntracks:///config?inline=aaaaaaaaaaaaaaaaaaaaaaaaa")
             )
         )
-        assertContains(R.id.effectiveConfiguration, R.string.errorPreferencesImportFailed)
+        assertDisplayed(R.id.importError)
+        assertContains(R.id.importError, "Unrecognized token")
         assertNotExist(R.id.save)
         assertDisplayed(R.id.close)
     }
@@ -150,13 +153,12 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
     @Test
     @AllowFlaky
     fun loadActivityCanLoadConfigFromOwntracksRemoteURL() {
-        mockWebServer.start(8080)
-        mockWebServer.dispatcher = MockWebserverConfigDispatcher(servedConfig)
+        startServer(mapOf("/myconfig.otrc" to servedConfig))
 
         baristaRule.launchActivity(
             Intent(
                 Intent.ACTION_VIEW,
-                Uri.parse("owntracks:///config?url=http%3A%2F%2Flocalhost%3A8080%2Fmyconfig.otrc")
+                Uri.parse("owntracks:///config?url=http%3A%2F%2Flocalhost%3A${webserverPort}%2Fmyconfig.otrc")
             )
         )
         sleep(500)
@@ -168,13 +170,12 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
     @Test
     @AllowFlaky
     fun loadActivityShowsErrorTryingToLoadNotFoundRemoteUrl() {
-        mockWebServer.start(8080)
-        mockWebServer.dispatcher = MockWebserverConfigDispatcher(servedConfig)
+        startServer(mapOf("/" to servedConfig))
 
         baristaRule.launchActivity(
             Intent(
                 Intent.ACTION_VIEW,
-                Uri.parse("owntracks:///config?url=http%3A%2F%2Flocalhost%3A8080%2Fnotfound")
+                Uri.parse("owntracks:///config?url=http%3A%2F%2Flocalhost%3A${webserverPort}%2Fnotfound")
             )
         )
         assertDisplayed(R.id.importError)
@@ -270,17 +271,5 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
         assertContains(R.id.importError, R.string.preferencesImportNoURIGiven)
         assertNotExist(R.id.save)
         assertDisplayed(R.id.close)
-    }
-
-    class MockWebserverConfigDispatcher(private val config: String) : Dispatcher() {
-        override fun dispatch(request: RecordedRequest): MockResponse {
-            val errorResponse = MockResponse().setResponseCode(404)
-            return if (request.path == "/myconfig.otrc") {
-                MockResponse().setResponseCode(200).setHeader("Content-type", "application/json")
-                    .setBody(config)
-            } else {
-                errorResponse
-            }
-        }
     }
 }

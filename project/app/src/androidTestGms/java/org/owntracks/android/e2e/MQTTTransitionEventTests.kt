@@ -27,9 +27,7 @@ import org.owntracks.android.model.messages.MessageTransition
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.support.Parser
 import org.owntracks.android.support.SimpleIdlingResource
-import org.owntracks.android.testutils.FusedGMSockDeviceLocation
-import org.owntracks.android.testutils.MockDeviceLocation
-import org.owntracks.android.testutils.TestWithAnActivity
+import org.owntracks.android.testutils.*
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.map.MapActivity
 import java.time.Instant

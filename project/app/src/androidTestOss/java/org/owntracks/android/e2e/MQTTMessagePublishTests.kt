@@ -30,9 +30,7 @@ import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.support.Parser
 import org.owntracks.android.support.SimpleIdlingResource
-import org.owntracks.android.testutils.GPSMockDeviceLocation
-import org.owntracks.android.testutils.MockDeviceLocation
-import org.owntracks.android.testutils.TestWithAnActivity
+import org.owntracks.android.testutils.*
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber

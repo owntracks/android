@@ -6,6 +6,7 @@ import android.location.LocationManager
 import android.os.SystemClock
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.tasks.Tasks
+import org.owntracks.android.testutils.MockDeviceLocation
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 

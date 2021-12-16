@@ -5,6 +5,7 @@ import android.location.Criteria
 import android.location.Location
 import android.location.LocationManager
 import android.os.SystemClock
+import org.owntracks.android.testutils.MockDeviceLocation
 import java.util.concurrent.TimeUnit
 
 open class GPSMockDeviceLocation : MockDeviceLocation {
@@ -19,6 +20,10 @@ open class GPSMockDeviceLocation : MockDeviceLocation {
 
         locationManager?.run {
             locationProvidersToMock.forEach { provider ->
+                try {
+                    removeTestProvider(provider)
+                } catch (e: IllegalArgumentException) {
+                }
                 addTestProvider(
                     provider,
                     false,

@@ -1,4 +1,4 @@
-package org.owntracks.android.e2e
+package org.owntracks.android.testutils
 
 import android.view.View
 import androidx.annotation.IdRes
@@ -51,7 +51,7 @@ internal fun clickOnRegardlessOfVisibility(@IdRes id: Int) {
 fun reportLocationFromMap(locationIdlingResource: SimpleIdlingResource?) {
     openDrawer()
     clickOnAndWait(R.string.title_activity_map)
-    IdlingPolicies.setIdlingResourceTimeout(2, TimeUnit.MINUTES)
+    IdlingPolicies.setIdlingResourceTimeout(15, TimeUnit.SECONDS)
     Timber.d("Waiting for location")
     locationIdlingResource?.run {
         IdlingRegistry.getInstance().register(locationIdlingResource)

@@ -1,4 +1,4 @@
-package org.owntracks.android.e2e
+package org.owntracks.android.testutils
 
 import android.content.Intent
 import android.net.Uri
@@ -34,42 +34,42 @@ class TestWithMQTTBrokerImpl : TestWithAnMQTTBroker {
     private val mqttTestPassword = "testPassword"
     override val mqttPacketsReceived: MutableList<MQTTPacket> = mutableListOf()
     override val broker =
-            Broker(host = "127.0.0.1",
-                    port = mqttPort,
-                    authentication = object : Authentication {
-                        override fun authenticate(
-                                clientId: String,
-                                username: String?,
-                                password: UByteArray?
-                        ): Boolean {
-                            return username == mqttUsername && password.contentEquals(
-                                    mqttTestPassword.toByteArray().toUByteArray()
-                            )
-                        }
-                    },
-                    packetInterceptor = object : PacketInterceptor {
-                        override fun packetReceived(
-                                clientId: String,
-                                username: String?,
-                                password: UByteArray?,
-                                packet: MQTTPacket
-                        ) {
-                            Timber.d("MQTT Packet received $packet")
-                            mqttPacketsReceived.add(packet)
-                        }
-                    })
+        Broker(host = "127.0.0.1",
+            port = mqttPort,
+            authentication = object : Authentication {
+                override fun authenticate(
+                    clientId: String,
+                    username: String?,
+                    password: UByteArray?
+                ): Boolean {
+                    return username == mqttUsername && password.contentEquals(
+                        mqttTestPassword.toByteArray().toUByteArray()
+                    )
+                }
+            },
+            packetInterceptor = object : PacketInterceptor {
+                override fun packetReceived(
+                    clientId: String,
+                    username: String?,
+                    password: UByteArray?,
+                    packet: MQTTPacket
+                ) {
+                    Timber.d("MQTT Packet received $packet")
+                    mqttPacketsReceived.add(packet)
+                }
+            })
 
     override fun <E : MessageBase> Collection<E>.sendFromBroker(broker: Broker) {
         map(Parser(null)::toJsonBytes)
-                .forEach {
-                    broker.publish(
-                            false,
-                            "owntracks/someuser/somedevice",
-                            Qos.AT_LEAST_ONCE,
-                            MQTT5Properties(),
-                            it.toUByteArray()
-                    )
-                }
+            .forEach {
+                broker.publish(
+                    false,
+                    "owntracks/someuser/somedevice",
+                    Qos.AT_LEAST_ONCE,
+                    MQTT5Properties(),
+                    it.toUByteArray()
+                )
+            }
     }
 
     private lateinit var brokerThread: Thread
@@ -103,7 +103,8 @@ class TestWithMQTTBrokerImpl : TestWithAnMQTTBroker {
     }
 
     override fun configureMQTTConnectionToLocal(password: String) {
-        val config = Base64.encode("""
+        val config = Base64.encode(
+            """
             {
                 "_type": "configuration",
                 "clientId": "$mqttClientId",
@@ -115,7 +116,8 @@ class TestWithMQTTBrokerImpl : TestWithAnMQTTBroker {
                 "tls": false,
                 "mqttConnectionTimeout": 1
             }
-        """.trimIndent())
+        """.trimIndent()
+        )
         InstrumentationRegistry.getInstrumentation().targetContext.startActivity(Intent(Intent.ACTION_VIEW).apply {
             data = Uri.parse("owntracks:///config?inline=$config")
             flags = Intent.FLAG_ACTIVITY_NEW_TASK

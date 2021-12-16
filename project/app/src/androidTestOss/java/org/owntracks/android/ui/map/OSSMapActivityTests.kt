@@ -13,9 +13,9 @@ import com.adevinta.android.barista.rule.flaky.AllowFlaky
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
-import org.owntracks.android.testutils.TestWithAnActivity
-import org.owntracks.android.e2e.setNotFirstStartPreferences
 import org.owntracks.android.support.Preferences
+import org.owntracks.android.testutils.TestWithAnActivity
+import org.owntracks.android.testutils.setNotFirstStartPreferences
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)

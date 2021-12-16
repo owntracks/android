@@ -1,4 +1,4 @@
-package org.owntracks.android.e2e
+package org.owntracks.android.testutils
 
 import kotlinx.coroutines.DelicateCoroutinesApi
 import mqtt.broker.Broker
@@ -15,6 +15,7 @@ interface TestWithAnMQTTBroker {
     val mqttClientId: String
     val deviceId: String
     fun <E : MessageBase> Collection<E>.sendFromBroker(broker: Broker)
+
     @DelicateCoroutinesApi
     fun startBroker()
     fun stopBroker()
