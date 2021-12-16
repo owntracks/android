@@ -118,7 +118,7 @@ jobs:
       name: android/android-machine
       tag: 2021.10.1
       resource-class: large
-
+    parallelism: 2
     steps:
       - checkout
       - android/accept-licenses
