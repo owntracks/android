@@ -14,7 +14,7 @@ buildscript {
         classpath("com.hiya:jacoco-android:0.2")
         classpath("io.objectbox:objectbox-gradle-plugin:3.0.1")
         //noinspection DifferentKotlinGradleVersion
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.0")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10")
         classpath("com.google.dagger:hilt-android-gradle-plugin:${rootProject.extra["dagger-version"]}")
     }
 }
