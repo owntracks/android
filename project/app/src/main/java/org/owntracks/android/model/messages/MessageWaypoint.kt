@@ -4,9 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import org.owntracks.android.data.WaypointModel
 import org.owntracks.android.support.Preferences
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.EXTERNAL_PROPERTY,
+        property = "_type"
+)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 class MessageWaypoint : MessageBase() {
@@ -35,6 +40,18 @@ class MessageWaypoint : MessageBase() {
         qos = preferences.pubQosWaypoints
         retained = preferences.pubRetainWaypoints
     }
+
+    fun toWaypoint(): WaypointModel =
+            WaypointModel(
+                    0,
+                    timestamp,
+                    description!!,
+                    latitude,
+                    longitude,
+                    ((if (radius != null) radius else 0)!!),
+                    0,
+                    0
+            )
 
     override val baseTopicSuffix: String
         get() = BASETOPIC_SUFFIX

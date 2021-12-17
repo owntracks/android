@@ -9,10 +9,10 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
-import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
 import com.adevinta.android.barista.rule.flaky.AllowFlaky
+import kotlinx.coroutines.DelicateCoroutinesApi
 import mqtt.packets.Qos
 import mqtt.packets.mqtt.MQTTPublish
 import mqtt.packets.mqttv5.MQTT5Properties
@@ -49,6 +49,7 @@ class MQTTTransitionEventTests : TestWithAnActivity<MapActivity>(MapActivity::cl
             .targetContext.applicationContext.sendBroadcast(Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS))
     }
 
+    @DelicateCoroutinesApi
     @Before
     fun mqttBefore() {
         startBroker()
@@ -81,12 +82,8 @@ class MQTTTransitionEventTests : TestWithAnActivity<MapActivity>(MapActivity::cl
         baristaRule.launchActivity()
 
         clearNotifications()
-        configureMQTTConnectionToLocal(
-            1000L * baristaRule.activityTestRule.activity.resources.getInteger(
-                R.integer.defaultConnectionTimeoutSeconds
-            )
-        )
-        assertContains(R.id.connectedStatus, R.string.CONNECTED)
+        configureMQTTConnectionToLocal()
+
         reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource as SimpleIdlingResource?)
 
         listOf(
@@ -140,13 +137,8 @@ class MQTTTransitionEventTests : TestWithAnActivity<MapActivity>(MapActivity::cl
         val regionDescription = "Test Region"
 
         clearNotifications()
+        configureMQTTConnectionToLocal()
 
-        configureMQTTConnectionToLocal(
-            1000L * baristaRule.activityTestRule.activity.resources.getInteger(
-                R.integer.defaultConnectionTimeoutSeconds
-            )
-        )
-        assertContains(R.id.connectedStatus, R.string.CONNECTED)
         openDrawer()
         clickOnAndWait(R.string.title_activity_map)
         setMockLocation(51.0, 0.0)

@@ -7,7 +7,6 @@ import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineDispatcher
-import org.greenrobot.eventbus.EventBus
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -23,7 +22,6 @@ class LoadViewModelTest {
     private lateinit var mockResources: Resources
     private lateinit var mockContext: Context
     private lateinit var preferencesStore: PreferenceDataStoreShim
-    private val eventBus: EventBus = mock {}
 
 
     @get:Rule
@@ -46,7 +44,7 @@ class LoadViewModelTest {
         val parser = Parser(null)
         val preferences = Preferences(mockContext, null, preferencesStore)
         val vm = LoadViewModel(
-            preferences, parser, InMemoryWaypointsRepo(eventBus),
+            preferences, parser, InMemoryWaypointsRepo(),
             TestCoroutineDispatcher()
         )
 

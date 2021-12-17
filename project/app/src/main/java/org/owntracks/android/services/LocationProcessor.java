@@ -8,7 +8,7 @@ import androidx.annotation.Nullable;
 import org.owntracks.android.data.WaypointModel;
 import org.owntracks.android.data.repos.LocationRepo;
 import org.owntracks.android.data.repos.WaypointsRepo;
-import org.owntracks.android.location.geofencing.Geofence;
+import org.owntracks.android.location.Geofence;
 import org.owntracks.android.model.messages.MessageLocation;
 import org.owntracks.android.model.messages.MessageTransition;
 import org.owntracks.android.model.messages.MessageWaypoint;
@@ -57,22 +57,28 @@ public class LocationProcessor {
     }
 
     public void publishLocationMessage(@Nullable String trigger) {
+        Location currentLocation = locationRepo.getCurrentPublishedLocation().getValue();
+        if (currentLocation != null) {
+            publishLocationMessage(trigger, currentLocation);
+        }
+    }
+
+    public void publishLocationMessage(@Nullable String trigger, @NonNull Location currentLocation) {
         if (locationRepo.getCurrentPublishedLocation().getValue() == null) {
             Timber.e("no location available");
             return;
         }
 
-        Location currentLocation = locationRepo.getCurrentPublishedLocation().getValue();
+
         List<WaypointModel> loadedWaypoints = waypointsRepo.getAllWithGeofences();
 
-        assert currentLocation != null;
         if (ignoreLowAccuracy(currentLocation)) {
             Timber.d("Ignoring location %s,%s as below accuracy threshold: %s", currentLocation.getLatitude(), currentLocation.getLongitude(), currentLocation.getAccuracy());
             return;
         }
 
         // Check if publish would trigger a region if fusedRegionDetection is enabled
-        if (loadedWaypoints.size() > 0 && preferences.getFusedRegionDetection() && !MessageLocation.REPORT_TYPE_CIRCULAR.equals(trigger)) {
+        if (loadedWaypoints.size() > 0 && preferences.getFusedRegionDetection()) {
             for (WaypointModel waypoint : loadedWaypoints) {
                 onWaypointTransition(
                         waypoint,
@@ -84,12 +90,12 @@ public class LocationProcessor {
         }
 
         if (preferences.getMonitoring() == MONITORING_QUIET && !MessageLocation.REPORT_TYPE_USER.equals(trigger)) {
-            Timber.v("message suppressed by monitoring settings: quiet");
+            Timber.d("location message suppressed by monitoring settings: quiet");
             return;
         }
 
-        if (preferences.getMonitoring() == MONITORING_MANUAL && (!MessageLocation.REPORT_TYPE_USER.equals(trigger) && !MessageLocation.REPORT_TYPE_CIRCULAR.equals(trigger))) {
-            Timber.v("message suppressed by monitoring settings: manual");
+        if (preferences.getMonitoring() == MONITORING_MANUAL && (!MessageLocation.REPORT_TYPE_USER.equals(trigger))) {
+            Timber.d("location message suppressed by monitoring settings: manual");
             return;
         }
 
@@ -122,14 +128,14 @@ public class LocationProcessor {
         return l;
     }
 
-    public void onLocationChanged(@NonNull Location l, @Nullable String reportType) {
-        locationRepo.setCurrentPublishedLocation(l);
-        publishLocationMessage(reportType);
+    public void onLocationChanged(@NonNull Location location, @Nullable String reportType) {
+        locationRepo.setCurrentPublishedLocation(location);
+        publishLocationMessage(reportType, location);
     }
 
 
     void onWaypointTransition(@NonNull WaypointModel waypointModel, @NonNull final Location location, final int transition, @NonNull final String trigger) {
-        Timber.v("geofence %s/%s transition:%s, trigger:%s", waypointModel.getTst(), waypointModel.getDescription(), transition == Geofence.GEOFENCE_TRANSITION_ENTER ? "enter" : "exit", trigger);
+        Timber.d("geofence %s/%s transition:%s, trigger:%s", waypointModel.getTst(), waypointModel.getDescription(), transition == Geofence.GEOFENCE_TRANSITION_ENTER ? "enter" : "exit", trigger);
 
         if (ignoreLowAccuracy(location)) {
             Timber.d("ignoring transition: low accuracy ");
@@ -141,13 +147,13 @@ public class LocationProcessor {
         if (((transition == waypointModel.getLastTransition()) || (waypointModel.isUnknown() && transition == Geofence.GEOFENCE_TRANSITION_EXIT))) {
             Timber.d("ignoring initial or duplicate transition: %s", waypointModel.getDescription());
             waypointModel.setLastTransition(transition);
-            waypointsRepo.update(waypointModel, false);
+            waypointsRepo.update(waypointModel);
             return;
         }
 
         waypointModel.setLastTransition(transition);
         waypointModel.setLastTriggeredNow();
-        waypointsRepo.update(waypointModel, false);
+        waypointsRepo.update(waypointModel);
 
         if (preferences.getMonitoring() == MONITORING_QUIET) {
             Timber.v("message suppressed by monitoring settings: %s", preferences.getMonitoring());
@@ -155,13 +161,6 @@ public class LocationProcessor {
         }
 
         publishTransitionMessage(waypointModel, location, transition, trigger);
-        if (trigger.equals(MessageTransition.TRIGGER_CIRCULAR)) {
-            publishLocationMessage(MessageLocation.REPORT_TYPE_CIRCULAR);
-        }
-    }
-
-    void publishWaypointMessage(@NonNull WaypointModel e) {
-        messageProcessor.queueMessageForSending(waypointsRepo.fromDaoObject(e));
     }
 
     private void publishTransitionMessage(@NonNull WaypointModel w, @NonNull Location triggeringLocation, int transition, String trigger) {

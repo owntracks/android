@@ -159,7 +159,6 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
         const val TYPE = "location"
         const val REPORT_TYPE_USER = "u"
         const val REPORT_TYPE_RESPONSE = "r"
-        const val REPORT_TYPE_CIRCULAR = "c"
         const val REPORT_TYPE_PING = "p"
 
         @JvmField

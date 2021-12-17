@@ -1,7 +1,7 @@
 package org.owntracks.android.model.messages
 
 import com.fasterxml.jackson.annotation.*
-import org.owntracks.android.location.geofencing.Geofence
+import org.owntracks.android.location.Geofence
 import org.owntracks.android.support.Preferences
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
@@ -63,7 +63,6 @@ class MessageTransition : MessageBase() {
 
     companion object {
         const val TYPE = "transition"
-        const val TRIGGER_CIRCULAR = "c"
         const val TRIGGER_LOCATION = "l"
         private const val BASETOPIC_SUFFIX = "/event"
         private const val EVENT_ENTER = "enter"

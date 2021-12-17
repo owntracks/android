@@ -44,7 +44,7 @@ class RegionViewModel @Inject constructor(
 
     fun saveWaypoint() {
         if (canSaveWaypoint()) {
-            waypointsRepo.insert(waypoint.value)
+            waypoint.value?.run(waypointsRepo::insert)
         }
     }
 }

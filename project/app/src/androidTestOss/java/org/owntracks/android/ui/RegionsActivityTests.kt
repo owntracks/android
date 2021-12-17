@@ -4,7 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
-import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotExist
+import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.longClickOn
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
 import com.adevinta.android.barista.rule.flaky.AllowFlaky
@@ -70,7 +70,8 @@ class RegionsActivityTests : TestWithAnActivity<RegionsActivity>(RegionsActivity
 
         clickOnAndWait("Delete")
 
-        assertNotExist(regionName)
+        assertNotDisplayed(regionName)
+        assertDisplayed(R.string.waypointListPlaceholder)
     }
 
 }

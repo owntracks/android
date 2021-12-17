@@ -5,7 +5,6 @@ import static android.os.Process.myPid;
 import static androidx.core.app.NotificationCompat.PRIORITY_LOW;
 import static org.owntracks.android.App.NOTIFICATION_CHANNEL_EVENTS;
 import static org.owntracks.android.App.NOTIFICATION_CHANNEL_ONGOING;
-import static org.owntracks.android.geocoding.GeocoderProvider.ERROR_NOTIFICATION_CHANNEL_ID;
 
 import android.Manifest;
 import android.app.Notification;
@@ -21,7 +20,6 @@ import android.media.AudioManager;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
-import android.os.Looper;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
@@ -40,21 +38,17 @@ import org.greenrobot.eventbus.ThreadMode;
 import org.jetbrains.annotations.NotNull;
 import org.owntracks.android.R;
 import org.owntracks.android.data.EndpointState;
-import org.owntracks.android.data.WaypointModel;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.data.repos.EndpointStateRepo;
 import org.owntracks.android.data.repos.LocationRepo;
 import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.geocoding.GeocoderProvider;
+import org.owntracks.android.location.Geofence;
 import org.owntracks.android.location.LocationAvailability;
 import org.owntracks.android.location.LocationCallback;
 import org.owntracks.android.location.LocationProviderClient;
 import org.owntracks.android.location.LocationRequest;
 import org.owntracks.android.location.LocationResult;
-import org.owntracks.android.location.geofencing.Geofence;
-import org.owntracks.android.location.geofencing.GeofencingClient;
-import org.owntracks.android.location.geofencing.GeofencingEvent;
-import org.owntracks.android.location.geofencing.GeofencingRequest;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.model.messages.MessageLocation;
 import org.owntracks.android.model.messages.MessageTransition;
@@ -68,7 +62,6 @@ import org.owntracks.android.ui.map.MapActivity;
 
 import java.util.Date;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -78,7 +71,6 @@ import timber.log.Timber;
 
 @AndroidEntryPoint
 public class BackgroundService extends LifecycleService implements SharedPreferences.OnSharedPreferenceChangeListener, ServiceBridge.ServiceBridgeInterface {
-    private static final int INTENT_REQUEST_CODE_GEOFENCE = 1264;
     private static final int INTENT_REQUEST_CODE_CLEAR_EVENTS = 1263;
 
     private static final int NOTIFICATION_ID_ONGOING = 1;
@@ -92,7 +84,6 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
     // NEW ACTIONS ALSO HAVE TO BE ADDED TO THE SERVICE INTENT FILTER
     public static final String INTENT_ACTION_CLEAR_NOTIFICATIONS = "org.owntracks.android.CLEAR_NOTIFICATIONS";
     private static final String INTENT_ACTION_SEND_LOCATION_USER = "org.owntracks.android.SEND_LOCATION_USER";
-    private static final String INTENT_ACTION_SEND_EVENT_CIRCULAR = "org.owntracks.android.SEND_EVENT_CIRCULAR";
     public static final String INTENT_ACTION_REREQUEST_LOCATION_UPDATES = "org.owntracks.android.REREQUEST_LOCATION_UPDATES";
     private static final String INTENT_ACTION_CHANGE_MONITORING = "org.owntracks.android.CHANGE_MONITORING";
     private static final String INTENT_ACTION_EXIT = "org.owntracks.android.EXIT";
@@ -154,9 +145,6 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
     EndpointStateRepo endpointStateRepo;
 
     @Inject
-    GeofencingClient geofencingClient;
-
-    @Inject
     LocationProviderClient locationProviderClient;
 
     @Override
@@ -200,8 +188,6 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
 
         scheduler.scheduleLocationPing();
 
-        setupGeofences();
-
         eventBus.register(this);
 
         preferences.registerOnPreferenceChangedListener(this);
@@ -219,7 +205,6 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-
         if (intent != null) {
             handleIntent(intent);
         }
@@ -242,9 +227,6 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
             switch (intent.getAction()) {
                 case INTENT_ACTION_SEND_LOCATION_USER:
                     locationProcessor.publishLocationMessage(MessageLocation.REPORT_TYPE_USER);
-                    return;
-                case INTENT_ACTION_SEND_EVENT_CIRCULAR:
-                    onGeofencingEvent(GeofencingEvent.fromIntent(intent));
                     return;
                 case INTENT_ACTION_CLEAR_NOTIFICATIONS:
                     clearEventStackNotification();
@@ -293,7 +275,7 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
         String notificationText = getString(R.string.backgroundLocationRestrictionNotificationText);
         String notificationTitle = getString(R.string.backgroundLocationRestrictionNotificationTitle);
 
-        Notification notification = new NotificationCompat.Builder(getApplicationContext(), ERROR_NOTIFICATION_CHANNEL_ID)
+        Notification notification = new NotificationCompat.Builder(getApplicationContext(), GeocoderProvider.ERROR_NOTIFICATION_CHANNEL_ID)
                 .setContentTitle(notificationTitle)
                 .setContentText(notificationText)
                 .setAutoCancel(true)
@@ -475,28 +457,6 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
         activeNotifications.clear();
     }
 
-    private void onGeofencingEvent(@Nullable final GeofencingEvent event) {
-        if (event == null) {
-            Timber.e("geofencingEvent null");
-            return;
-        }
-
-        if (event.hasError()) {
-            Timber.e("geofencingEvent hasError: %s", event.getErrorCode());
-            return;
-        }
-
-        final int transition = event.getGeofenceTransition();
-        for (int index = 0; index < event.getTriggeringGeofences().size(); index++) {
-            WaypointModel w = waypointsRepo.get(Long.parseLong(event.getTriggeringGeofences().get(index).getRequestId()));
-            if (w == null) {
-                Timber.e("waypoint id %s not found for geofence event", event.getTriggeringGeofences().get(index).getRequestId());
-                continue;
-            }
-            locationProcessor.onWaypointTransition(w, event.getTriggeringLocation(), transition, MessageTransition.TRIGGER_CIRCULAR);
-        }
-    }
-
     void onLocationChanged(@Nullable Location location, @Nullable String reportType) {
         if (location == null) {
             Timber.e("no location provided");
@@ -511,7 +471,6 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
         }
     }
 
-    @SuppressWarnings("MissingPermission")
     public void requestOnDemandLocationUpdate() {
         if (missingLocationPermission()) {
             Timber.e("missing location permission");
@@ -529,7 +488,6 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
         locationProviderClient.requestLocationUpdates(request, locationCallbackOnDemand, runThingsOnOtherThreads.getBackgroundLooper());
     }
 
-    @SuppressWarnings("MissingPermission")
     private boolean setupLocationRequest() {
         Timber.d("Setting up location request");
         if (missingLocationPermission()) {
@@ -582,88 +540,12 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
         }
     }
 
-    private PendingIntent getGeofencePendingIntent() {
-        Intent geofenceIntent = new Intent(this, BackgroundService.class);
-        geofenceIntent.setAction(INTENT_ACTION_SEND_EVENT_CIRCULAR);
-        return PendingIntent.getBroadcast(this, INTENT_REQUEST_CODE_GEOFENCE, geofenceIntent, updateCurrentIntentFlags);
-    }
-
-    @SuppressWarnings("MissingPermission")
-    private void setupGeofences() {
-        if (missingLocationPermission()) {
-            Timber.e("missing location permission");
-            return;
-        }
-
-        Timber.d("loader thread:%s, isMain:%s", Looper.myLooper(), Looper.myLooper() == Looper.getMainLooper());
-
-        LinkedList<Geofence> geofences = new LinkedList<>();
-        List<WaypointModel> loadedWaypoints = waypointsRepo.getAllWithGeofences();
-
-
-        for (WaypointModel w : loadedWaypoints) {
-            Timber.d("id:%s, desc:%s, lat:%s, lon:%s, rad:%s", w.getId(), w.getDescription(), w.getGeofenceLatitude(), w.getGeofenceLongitude(), w.getGeofenceRadius());
-
-            try {
-                geofences.add(
-                        new Geofence(
-                                Long.toString(w.getId()),
-                                Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT,
-                                (int) TimeUnit.MINUTES.toMillis(2),
-                                w.getGeofenceLatitude(),
-                                w.getGeofenceLongitude(),
-                                (float) w.getGeofenceRadius(),
-                                Geofence.NEVER_EXPIRE,
-                                null
-                        )
-                );
-            } catch (IllegalArgumentException e) {
-                Timber.e(e, "Invalid geofence parameter");
-            }
-        }
-
-        if (geofences.size() > 0) {
-            GeofencingRequest request = new GeofencingRequest(Geofence.GEOFENCE_TRANSITION_ENTER, geofences);
-            geofencingClient.addGeofences(request, getGeofencePendingIntent());
-        }
-    }
-
     private boolean missingLocationPermission() {
         return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED;
     }
 
-    private void removeGeofences() {
-        geofencingClient.removeGeofences(getGeofencePendingIntent());
-    }
-
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void onEvent(Events.WaypointAdded e) {
-        locationProcessor.publishWaypointMessage(e.getWaypointModel()); // TODO: move to waypointsRepo
-        if (e.getWaypointModel().hasGeofence()) {
-            removeGeofences();
-            setupGeofences();
-        }
-    }
-
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void onEvent(Events.WaypointUpdated e) {
-        locationProcessor.publishWaypointMessage(e.getWaypointModel()); // TODO: move to waypointsRepo
-        removeGeofences();
-        setupGeofences();
-    }
-
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void onEvent(Events.WaypointRemoved e) {
-        if (e.getWaypointModel().hasGeofence()) {
-            removeGeofences();
-            setupGeofences();
-        }
-    }
-
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(Events.ModeChanged e) {
-        removeGeofences();
-        setupGeofences();
         setupLocationRequest();
         updateOngoingNotification();
     }
@@ -740,8 +622,6 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
     public void reInitializeLocationRequests() {
         runThingsOnOtherThreads.postOnServiceHandlerDelayed(() -> {
             if (setupLocationRequest()) {
-                removeGeofences();
-                setupGeofences();
                 Timber.d("Getting last location");
                 Location lastLocation = locationProviderClient.getLastLocation();
                 if (lastLocation != null) {

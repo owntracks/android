@@ -1,6 +1,5 @@
 package org.owntracks.android.support
 
-import org.owntracks.android.data.WaypointModel
 import org.owntracks.android.model.FusedContact
 import java.util.*
 
@@ -11,11 +10,6 @@ class Events {
 
     class ModeChanged(val newModeId: Int) : E()
     class MonitoringChanged : E()
-
-    open class WaypointEvent internal constructor(val waypointModel: WaypointModel) : E()
-    class WaypointAdded(m: WaypointModel) : WaypointEvent(m)
-    class WaypointUpdated(m: WaypointModel) : WaypointEvent(m)
-    class WaypointRemoved(m: WaypointModel) : WaypointEvent(m)
     class FusedContactAdded(val contact: FusedContact) : E()
     class FusedContactRemoved(val contact: FusedContact) : E()
 }

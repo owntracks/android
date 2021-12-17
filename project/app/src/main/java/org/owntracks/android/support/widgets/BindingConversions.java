@@ -14,7 +14,7 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 
 import org.owntracks.android.R;
 import org.owntracks.android.data.EndpointState;
-import org.owntracks.android.location.geofencing.Geofence;
+import org.owntracks.android.location.Geofence;
 import org.owntracks.android.services.MessageProcessorEndpointHttp;
 import org.owntracks.android.services.MessageProcessorEndpointMqtt;
 

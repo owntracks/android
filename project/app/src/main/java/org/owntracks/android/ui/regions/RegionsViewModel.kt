@@ -15,7 +15,7 @@ class RegionsViewModel @Inject constructor(
 ) : ViewModel() {
     val waypointsList: ObjectBoxLiveData<WaypointModel> = waypointsRepo.allLive
 
-    fun delete(model: WaypointModel?) {
+    fun delete(model: WaypointModel) {
         waypointsRepo.delete(model)
     }
 
