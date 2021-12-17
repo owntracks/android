@@ -42,8 +42,7 @@ import org.owntracks.android.R
 import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.databinding.UiMapBinding
 import org.owntracks.android.geocoding.GeocoderProvider
-import org.owntracks.android.location.LatLng
-import org.owntracks.android.location.LocationProviderClient
+import org.owntracks.android.location.*
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.perfLog
 import org.owntracks.android.services.BackgroundService
@@ -72,7 +71,6 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
     private var sensorManager: SensorManager? = null
     private var orientationSensor: Sensor? = null
 
-    internal lateinit var mapLocationSource: MapLocationSource
     private lateinit var locationServicesAlertDialog: AlertDialog
     private lateinit var locationPermissionsRationaleAlertDialog: AlertDialog
 
@@ -100,9 +98,6 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
     @Inject
     lateinit var requirementsChecker: RequirementsChecker
 
-    @Inject
-    lateinit var locationProviderClient: LocationProviderClient
-
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             Timber.d("Service connected to MapActivity")
@@ -115,13 +110,29 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
         }
     }
 
+    // We need a pass-through to the viewmodel, because the MapLocationSource needs a callback
+    // and the viewmodel might not exist at the point that it needs it.
+    val mapLocationSourceCallback: LocationCallback = object : LocationCallback{
+        override fun onLocationResult(locationResult: LocationResult) {
+            viewModel?.mapLocationUpdateCallback?.onLocationResult(locationResult)
+        }
+
+        override fun onLocationAvailability(locationAvailability: LocationAvailability) {
+            viewModel?.mapLocationUpdateCallback?.onLocationAvailability(locationAvailability)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         perfLog {
-            supportFragmentManager.fragmentFactory = EntryPointAccessors.fromActivity(
+            EntryPointAccessors.fromActivity(
                 this,
                 MapActivityEntryPoint::class.java
-            ).fragmentFactory
+            ).let {
+                supportFragmentManager.fragmentFactory = it.fragmentFactory
+            }
+
             super.onCreate(savedInstanceState)
+
             if (!preferences.isSetupCompleted) {
                 navigator.startActivity(WelcomeActivity::class.java)
                 finish()
@@ -148,13 +159,6 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
 
             locationLifecycleObserver = LocationLifecycleObserver(activityResultRegistry)
             lifecycle.addObserver(locationLifecycleObserver)
-
-            mapLocationSource =
-                MapLocationSource(
-                    locationProviderClient,
-                    viewModel!!.mapLocationUpdateCallback
-                )
-            (supportFragmentManager.fragmentFactory as MapFragmentFactory).apply {mapLocationSource = this@MapActivity.mapLocationSource}
 
             // Watch various things that the viewModel owns
             viewModel?.also { vm ->
@@ -378,7 +382,10 @@ class MapActivity : BaseActivity<UiMapBinding?, MapMvvm.ViewModel<MapMvvm.View?>
 
     override fun onResume() {
         mapFragment =
-            supportFragmentManager.fragmentFactory.instantiate(this.classLoader, MapFragment::class.java.name) as MapFragment
+            supportFragmentManager.fragmentFactory.instantiate(
+                this.classLoader,
+                MapFragment::class.java.name
+            ) as MapFragment
         supportFragmentManager.commit(true) {
             replace(R.id.mapFragment, mapFragment, "map")
         }

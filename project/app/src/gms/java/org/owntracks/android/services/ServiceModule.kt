@@ -1,4 +1,4 @@
-package org.owntracks.android.di
+package org.owntracks.android.services
 
 import android.app.Service
 import dagger.Module
