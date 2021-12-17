@@ -130,6 +130,7 @@ android {
         )
     }
     testOptions {
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
         animationsDisabled = true
         unitTests {
             isIncludeAndroidResources = true
@@ -270,6 +271,7 @@ dependencies {
     androidTestImplementation("androidx.test:runner:${androidxTestVersion}")
 
     androidTestUtil("androidx.test.services:test-services:1.4.1")
+    androidTestUtil("androidx.test:orchestrator:1.4.1")
 }
 
 
