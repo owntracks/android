@@ -7,7 +7,6 @@ import org.owntracks.android.location.LocationProviderClient
 import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.support.Preferences
 import org.owntracks.android.ui.map.osm.OSMMapFragment
-import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -25,7 +24,6 @@ class MapFragmentFactory @Inject constructor(
     private val contactImageBindingAdapter: ContactImageBindingAdapter
 ) : FragmentFactory() {
     override fun instantiate(classLoader: ClassLoader, className: String): Fragment {
-        Timber.d("Instantiating Fragment for $className")
         return if (MapFragment::class.java.isAssignableFrom(classLoader.loadClass(className))) {
             if (preferences.experimentalFeatures.contains(Preferences.EXPERIMENTAL_FEATURE_USE_OSM_MAP)) {
                 OSMMapFragment(locationRepo, locationProviderClient, contactImageBindingAdapter)
