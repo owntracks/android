@@ -133,14 +133,11 @@ class App : Application() {
 
             // Importance min will show normal priority notification for foreground service. See https://developer.android.com/reference/android/app/NotificationManager#IMPORTANCE_MIN
             // User has to actively configure this in the notification channel settings.
-            val ongoingNotificationChannelName =
-                    if (getString(R.string.notificationChannelOngoing).trim()
-                                    .isNotEmpty()
-                    ) getString(R.string.notificationChannelOngoing) else "Ongoing"
+            val ongoingNotificationChannelName = if (getString(R.string.notificationChannelOngoing).trim().isNotEmpty()) getString(R.string.notificationChannelOngoing) else "Ongoing"
             NotificationChannel(
                     NOTIFICATION_CHANNEL_ONGOING,
                     ongoingNotificationChannelName,
-                    NotificationManager.IMPORTANCE_LOW
+                    NotificationManager.IMPORTANCE_DEFAULT
             ).apply {
                 lockscreenVisibility = Notification.VISIBILITY_PUBLIC
                 description = getString(R.string.notificationChannelOngoingDescription)
@@ -151,9 +148,7 @@ class App : Application() {
             }.run { notificationManager.createNotificationChannel(this) }
 
 
-            val eventsNotificationChannelName = if (getString(R.string.events).trim()
-                            .isNotEmpty()
-            ) getString(R.string.events) else "Events"
+            val eventsNotificationChannelName = if (getString(R.string.events).trim().isNotEmpty()) getString(R.string.events) else "Events"
             NotificationChannel(
                     NOTIFICATION_CHANNEL_EVENTS,
                     eventsNotificationChannelName,
@@ -167,10 +162,7 @@ class App : Application() {
                 setSound(null, null)
             }.run { notificationManager.createNotificationChannel(this) }
 
-            val errorNotificationChannelName =
-                    if (getString(R.string.notificationChannelErrors).trim()
-                                    .isNotEmpty()
-                    ) getString(R.string.notificationChannelErrors) else "Errors"
+            val errorNotificationChannelName = if (getString(R.string.notificationChannelErrors).trim().isNotEmpty()) getString(R.string.notificationChannelErrors) else "Errors"
             NotificationChannel(
                     GeocoderProvider.ERROR_NOTIFICATION_CHANNEL_ID,
                     errorNotificationChannelName,
