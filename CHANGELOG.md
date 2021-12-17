@@ -5,6 +5,7 @@
 ### Bug fixes
 
 * Fix format string bug in some locale resource files that caused a hard crash on startup in those locales. Oops. Sorry everyone.
+* MapFragmentFactory was throwing a NPE under certain circumstances. Workaround until we get MapFragmentViewModel in 2.5.0
 
 ## Verison 2.4.5
 

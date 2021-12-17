@@ -86,14 +86,14 @@ class GMSLocationProviderClient(
 
     @SuppressLint("MissingPermission")
     override fun getLastLocation(): Location? {
-        try {
-            return Tasks.await(fusedLocationProviderClient.lastLocation)
+        return try {
+            Tasks.await(fusedLocationProviderClient.lastLocation)
         } catch (e: ExecutionException) {
             Timber.e(e, "Error fetching last location from GMS client")
-            return null
+            null
         } catch (e: InterruptedException) {
             Timber.e(e, "Error fetching last location from GMS client")
-            return null
+            null
         }
     }
 
