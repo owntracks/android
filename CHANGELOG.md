@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 2.4.6
+
+### Bug fixes
+
+* Fix format string bug in some locale resource files that caused a hard crash on startup in those locales. Oops. Sorry everyone.
+
 ## Verison 2.4.5
 
 ### Bug fixes

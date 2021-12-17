@@ -146,7 +146,7 @@
     <string name="geocoderIPAddressRejected">"您的客户端 IP 地址已被拒绝"</string>
     <string name="preferencesTheme">"主题"</string>
     <string name="contactDetailsAccuracyValue">"%d m"</string>
-    <string name="contactDetailsDistanceValue">"%,.2f %s"</string>
+    <string name="contactDetailsDistanceValue">"%1$,.2f %2$s"</string>
     <string name="contactDetailsDistance">"距离"</string>
     <string name="contactDetailsBattery">"电池"</string>
     <string name="contactDetailsSpeed">"速度"</string>

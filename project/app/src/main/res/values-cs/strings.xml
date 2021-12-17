@@ -196,7 +196,7 @@ Aby aplikace mohla běžet na pozadí, bude zobrazeno trvalé oznámení. Lze to
     <string name="refresh_log">"Obnovit"</string>
     <string name="preferencesTheme">"Téma"</string>
     <string name="contactDetailsAccuracyValue">"%d m"</string>
-    <string name="contactDetailsDistanceValue">"%,.2f %s"</string>
+    <string name="contactDetailsDistanceValue">"%1$,.2f %2$s"</string>
     <string name="contactDetailsAltitude">"Výška"</string>
     <string name="contactDetailsBearing">"Směr"</string>
     <string name="contactDetailsDistance">"Vzdálenost"</string>
