@@ -61,7 +61,7 @@
                 android:text="@{textValue}"
                 android:textIsSelectable="true"
                 android:textSize="16sp"
-                app:autoSizeMaxTextSize="24sp"
+                app:autoSizeMaxTextSize="16sp"
                 app:autoSizeMinTextSize="1sp"
                 app:autoSizeStepGranularity="1sp"
                 app:autoSizeTextType="uniform" />
@@ -78,7 +78,7 @@
                 android:paddingBottom="@dimen/activity_horizontal_margin"
                 android:text="@{label}"
                 android:textIsSelectable="true"
-                app:autoSizeMaxTextSize="24sp"
+                app:autoSizeMaxTextSize="16sp"
                 app:autoSizeMinTextSize="1sp"
                 app:autoSizeStepGranularity="1sp"
                 app:autoSizeTextType="uniform" />
