@@ -10,7 +10,6 @@ import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickBa
 import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickDialogPositiveButton
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
-import com.adevinta.android.barista.interaction.BaristaSleepInteractions
 import com.adevinta.android.barista.interaction.PermissionGranter
 import com.adevinta.android.barista.rule.BaristaRule
 import com.adevinta.android.barista.rule.flaky.AllowFlaky
@@ -89,12 +88,10 @@ class LocationMessageRetryTest {
     @Test
     @AllowFlaky
     fun testReportingLocationSucceedsAfterSomeFailures() {
+        setNotFirstStartPreferences()
         baristaRule.launchActivity()
-
-        val httpPort = mockWebServer.port
-        doWelcomeProcess()
-        BaristaSleepInteractions.sleep(3000)
         PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+        val httpPort = mockWebServer.port
 
         openDrawer()
         clickOnAndWait(R.string.title_activity_preferences)

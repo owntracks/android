@@ -7,9 +7,6 @@ import android.view.LayoutInflater
 import android.view.MotionEvent.ACTION_BUTTON_RELEASE
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
-import androidx.preference.PreferenceManager
-import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
@@ -22,8 +19,10 @@ import org.owntracks.android.R
 import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.databinding.OsmMapFragmentBinding
 import org.owntracks.android.location.LatLng
+import org.owntracks.android.location.LocationProviderClient
 import org.owntracks.android.location.toGeoPoint
 import org.owntracks.android.location.toOSMLocationSource
+import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.ui.map.MapActivity
 import org.owntracks.android.ui.map.MapActivity.Companion.STARTING_LATITUDE
 import org.owntracks.android.ui.map.MapActivity.Companion.STARTING_LONGITUDE
@@ -33,31 +32,24 @@ import timber.log.Timber
 
 class OSMMapFragment internal constructor(
     private val locationRepo: LocationRepo,
-    mapLocationSource: MapLocationSource
-) : MapFragment() {
-    private var locationSource: IMyLocationProvider = mapLocationSource.toOSMLocationSource()
+    private val locationProviderClient: LocationProviderClient,
+    contactImageBindingAdapter: ContactImageBindingAdapter
+) : MapFragment<OsmMapFragmentBinding>(contactImageBindingAdapter) {
+    private var locationSource: IMyLocationProvider? = null
     private var mapView: MapView? = null
-    private var binding: OsmMapFragmentBinding? = null
+    override val layout: Int
+        get() = R.layout.osm_map_fragment
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        Configuration.getInstance().apply {
-            load(context, PreferenceManager.getDefaultSharedPreferences(context))
-            osmdroidBasePath.resolve("tiles").run {
-                if (exists()) {
-                    deleteRecursively()
-                }
-            }
-            osmdroidTileCache = requireContext().noBackupFilesDir.resolve("osmdroid/tiles")
-        }
-        binding = DataBindingUtil.inflate(inflater, R.layout.osm_map_fragment, container, false)
-
-        initMap()
-        ((requireActivity()) as MapActivity).onMapReady()
-        return binding!!.root
+        locationSource = MapLocationSource(
+            locationProviderClient,
+            viewModel.mapLocationUpdateCallback
+        ).toOSMLocationSource()
+        return super.onCreateView(inflater, container, savedInstanceState)
     }
 
     private fun setMapStyle() {
@@ -72,11 +64,11 @@ class OSMMapFragment internal constructor(
         }
     }
 
-    private fun initMap() {
+    override fun initMap() {
         val myLocationEnabled =
             (requireActivity() as MapActivity).checkAndRequestMyLocationCapability(false)
         Timber.d("OSMMapFragment initMap locationEnabled=$myLocationEnabled")
-        mapView = this.binding!!.osmMapView.apply {
+        mapView = this.binding.osmMapView.apply {
             setTileSource(TileSourceFactory.MAPNIK)
             zoomController.setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
             controller.setZoom(ZOOM_STREET_LEVEL)
@@ -91,19 +83,22 @@ class OSMMapFragment internal constructor(
                 controller.setCenter(GeoPoint(STARTING_LATITUDE, STARTING_LONGITUDE))
             }
 
-            overlays.add(MyLocationNewOverlay(locationSource, this))
+            overlays.add(
+                MyLocationNewOverlay(
+                    locationSource,
+                    this
+                ).apply {
+                    setOnClickListener { onMapClick() }
+                    setOnTouchListener { v, event ->
+                        if (event.action == ACTION_BUTTON_RELEASE) {
+                            v.performClick()
+                        }
+                        onMapClick()
+                        false
+                    }
+                })
 
             setMultiTouchControls(true)
-            setOnClickListener {
-                (activity as MapActivity).onMapClick()
-            }
-            setOnTouchListener { v, motionEvent ->
-                if (motionEvent.action == ACTION_BUTTON_RELEASE) {
-                    v.performClick()
-                }
-                (activity as MapActivity).onMapClick()
-                false
-            }
         }
         setMapStyle()
     }
@@ -118,7 +113,7 @@ class OSMMapFragment internal constructor(
         }
     }
 
-    override fun updateMarker(id: String, latLng: LatLng) {
+    override fun updateMarkerOnMap(id: String, latLng: LatLng, image: Bitmap) {
         mapView?.run {
             val existingMarker: Marker? =
                 overlays.firstOrNull { it is Marker && it.id == id } as Marker?
@@ -130,31 +125,22 @@ class OSMMapFragment internal constructor(
                     position = latLng.toGeoPoint()
                     infoWindow = null
                     setOnMarkerClickListener { marker, _ ->
-                        (activity as MapActivity).onMarkerClicked(marker.id)
+                        onMarkerClicked(marker.id)
                         true
                     }
                     setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
                 })
             }
-        }
-    }
-
-    override fun removeMarker(id: String) {
-        mapView?.run {
-            overlays.removeAll { it is Marker && it.id == id }
-        }
-    }
-
-    override fun setMarkerImage(id: String, bitmap: Bitmap) {
-        mapView?.run {
             overlays.firstOrNull { it is Marker && it.id == id }?.run {
-                (this as Marker).icon = BitmapDrawable(resources, bitmap)
+                (this as Marker).icon = BitmapDrawable(resources, image)
             }
         }
     }
 
-    override fun myLocationEnabled() {
-        initMap()
+    override fun removeMarkerFromMap(id: String) {
+        mapView?.run {
+            overlays.removeAll { it is Marker && it.id == id }
+        }
     }
 
     override fun onResume() {

@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE
@@ -19,37 +18,43 @@ import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.databinding.GoogleMapFragmentBinding
 import org.owntracks.android.gms.location.toGMSLatLng
 import org.owntracks.android.gms.location.toGMSLocationSource
+import org.owntracks.android.location.LocationProviderClient
+import org.owntracks.android.support.ContactImageBindingAdapter
 import timber.log.Timber
 import java.util.*
 
 class GoogleMapFragment internal constructor(
     private val locationRepo: LocationRepo,
-    mapLocationSource: MapLocationSource
-) : MapFragment(), OnMapReadyCallback {
-    private val locationSource: com.google.android.gms.maps.LocationSource =
-        mapLocationSource.toGMSLocationSource()
+    private val locationProviderClient: LocationProviderClient,
+    contactImageBindingAdapter: ContactImageBindingAdapter
+) : MapFragment<GoogleMapFragmentBinding>(contactImageBindingAdapter), OnMapReadyCallback {
+    private var locationSource: com.google.android.gms.maps.LocationSource? = null
     private var googleMap: GoogleMap? = null
-    private var binding: GoogleMapFragmentBinding? = null
-    private val markers: MutableMap<String, Marker?> = HashMap()
+    override val layout: Int
+        get() = R.layout.google_map_fragment
+    private val markers: MutableMap<String, Marker> = HashMap()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = DataBindingUtil.inflate(inflater, R.layout.google_map_fragment, container, false)
-        MapsInitializer.initialize(requireContext())
-        val mapView = this.binding!!.googleMapView
-        mapView.onCreate(savedInstanceState)
-        mapView.getMapAsync(this)
 
-        return binding!!.root
+        val root = super.onCreateView(inflater, container, savedInstanceState)
+        locationSource = MapLocationSource(
+            locationProviderClient,
+            viewModel.mapLocationUpdateCallback
+        ).toGMSLocationSource()
+        binding.googleMapView.onCreate(savedInstanceState)
+        binding.googleMapView.getMapAsync(this)
+
+        return root
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         this.googleMap = googleMap
         initMap()
-        ((requireActivity()) as MapActivity).onMapReady()
+        viewModel.onMapReady()
     }
 
     private fun setMapStyle() {
@@ -64,7 +69,8 @@ class GoogleMapFragment internal constructor(
     }
 
     @SuppressLint("MissingPermission")
-    private fun initMap() {
+    override fun initMap() {
+        MapsInitializer.initialize(requireContext())
         this.googleMap?.run {
             val myLocationEnabled =
                 (requireActivity() as MapActivity).checkAndRequestMyLocationCapability(false)
@@ -99,14 +105,14 @@ class GoogleMapFragment internal constructor(
             }
 
             setOnMarkerClickListener {
-                it.tag?.run { (activity as MapActivity).onMarkerClicked(this as String) }
+                it.tag?.run { onMarkerClicked(this as String) }
                 true
             }
 
-            setOnMapClickListener { (activity as MapActivity).onMapClick() }
+            setOnMapClickListener { onMapClick() }
             setOnCameraMoveStartedListener { reason ->
                 if (reason == REASON_GESTURE) {
-                    (activity as MapActivity).onMapClick()
+                    onMapClick()
                 }
             }
 
@@ -122,74 +128,67 @@ class GoogleMapFragment internal constructor(
         markers.clear()
     }
 
-    override fun updateMarker(id: String, latLng: org.owntracks.android.location.LatLng) {
-        val marker = markers[id]
-        if (marker?.tag != null) {
-            marker.position = latLng.toGMSLatLng()
-        } else {
-            // If a marker has been removed, its tag will be null. Doing anything with it will make it explode
-            if (marker != null) {
-                markers.remove(id)
-                marker.remove()
-            }
-            markers[id] = googleMap?.run {
+    override fun updateMarkerOnMap(
+        id: String,
+        latLng: org.owntracks.android.location.LatLng,
+        image: Bitmap
+    ) {
+        googleMap?.run { // If we don't have a google Map, we can't add markers to it
+            // Remove null markers from the collection
+            markers.values.removeIf { it.tag == null }
+            markers.getOrPut(id) {
                 addMarker(
-                    MarkerOptions().position(latLng.toGMSLatLng()).anchor(0.5f, 0.5f).visible(false)
-                ).also { it?.tag = id }
+                    MarkerOptions()
+                        .position(latLng.toGMSLatLng())
+                        .anchor(0.5f, 0.5f).visible(false)
+                )!!.also { it.tag = id }
+            }.run {
+                position = latLng.toGMSLatLng()
+                setIcon(BitmapDescriptorFactory.fromBitmap(image))
+                isVisible = true
             }
         }
     }
 
-    override fun setMarkerImage(id: String, bitmap: Bitmap) {
-        markers[id]?.run {
-            setIcon(BitmapDescriptorFactory.fromBitmap(bitmap))
-            isVisible = true
-        }
-    }
-
-    override fun myLocationEnabled() {
-        initMap()
-    }
-
-    override fun removeMarker(id: String) {
+    override fun removeMarkerFromMap(id: String) {
         markers[id]?.remove()
     }
 
     override fun onResume() {
         super.onResume()
         googleMap?.setLocationSource(locationSource)
-        binding?.googleMapView?.onResume()
+        binding.googleMapView.onResume()
         setMapStyle()
     }
 
     override fun onLowMemory() {
-        binding?.googleMapView?.onLowMemory()
+        binding.googleMapView.onLowMemory()
         super.onLowMemory()
     }
 
     override fun onPause() {
-        binding?.googleMapView?.onPause()
-        locationSource.deactivate()
+        binding.googleMapView.onPause()
+        locationSource?.deactivate()
         super.onPause()
     }
 
     override fun onDestroy() {
-        binding?.googleMapView?.onDestroy()
+        binding.googleMapView.onDestroy()
         super.onDestroy()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        binding?.googleMapView?.onSaveInstanceState(outState)
+        binding.googleMapView.onSaveInstanceState(outState)
         super.onSaveInstanceState(outState)
     }
 
     override fun onStart() {
         super.onStart()
-        binding?.googleMapView?.onStart()
+        binding.googleMapView.onStart()
     }
 
     override fun onStop() {
-        binding?.googleMapView?.onStop()
+        binding.googleMapView.onStop()
         super.onStop()
     }
 
