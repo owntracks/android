@@ -22,6 +22,7 @@ import org.owntracks.android.support.DrawerProvider;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
+import org.owntracks.android.ui.base.viewmodel.NoOpViewModel;
 
 import javax.inject.Inject;
 
@@ -51,7 +52,9 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
             throw new IllegalStateException("viewModel must not be null and should be injected via activityComponent().inject(this)");
         }
         binding = DataBindingUtil.setContentView(this, layoutResId);
-        binding.setVariable(BR.vm, viewModel);
+        if (!(viewModel instanceof NoOpViewModel)) {
+            binding.setVariable(BR.vm, viewModel);
+        }
         binding.setLifecycleOwner(this);
 
         //noinspection unchecked
@@ -157,7 +160,7 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
     public void onResume() {
         super.onResume();
 
-        if (hasEventBus && !eventBus.isRegistered(viewModel))
+        if (hasEventBus && !eventBus.isRegistered(viewModel) && !(viewModel instanceof NoOpViewModel))
             eventBus.register(viewModel);
     }
 

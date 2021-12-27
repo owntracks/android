@@ -1,11 +1,10 @@
 package org.owntracks.android.ui.map
 
-import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
-import dagger.hilt.android.qualifiers.ActivityContext
 import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.location.LocationProviderClient
+import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.support.Preferences
 import org.owntracks.android.ui.map.osm.OSMMapFragment
 import timber.log.Timber
@@ -22,21 +21,16 @@ import javax.inject.Inject
 class MapFragmentFactory @Inject constructor(
     private val locationRepo: LocationRepo,
     private val preferences: Preferences,
-    @ActivityContext private val activityContext: Context,
-    locationProviderClient: LocationProviderClient
+    private val locationProviderClient: LocationProviderClient,
+    private val contactImageBindingAdapter: ContactImageBindingAdapter
 ) : FragmentFactory() {
-    private val mapLocationSource = MapLocationSource(
-        locationProviderClient,
-        (activityContext as MapActivity).mapLocationSourceCallback
-    )
-
     override fun instantiate(classLoader: ClassLoader, className: String): Fragment {
         Timber.d("Instantiating Fragment for $className")
         return if (MapFragment::class.java.isAssignableFrom(classLoader.loadClass(className))) {
             if (preferences.experimentalFeatures.contains(Preferences.EXPERIMENTAL_FEATURE_USE_OSM_MAP)) {
-                OSMMapFragment(locationRepo, mapLocationSource)
+                OSMMapFragment(locationRepo, locationProviderClient, contactImageBindingAdapter)
             } else {
-                GoogleMapFragment(locationRepo, mapLocationSource)
+                GoogleMapFragment(locationRepo, locationProviderClient, contactImageBindingAdapter)
             }
         } else {
             super.instantiate(classLoader, className)

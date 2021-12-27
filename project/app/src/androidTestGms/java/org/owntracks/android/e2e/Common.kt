@@ -8,13 +8,6 @@ import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.platform.app.InstrumentationRegistry
 import org.owntracks.android.R
-import org.owntracks.android.ui.clickOnAndWait
-
-internal fun doWelcomeProcess() {
-    clickOnAndWait(R.id.btn_next)
-    clickOnAndWait(R.id.btn_next)
-    clickOnAndWait(R.id.done)
-}
 
 fun scrollToPreferenceWithText(textResource: Int) {
     onView(withId(androidx.preference.R.id.recycler_view))
