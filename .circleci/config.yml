@@ -1,30 +1,38 @@
 version: 2.1
 
 orbs:
-  android: circleci/android@1.0.3
+  android: circleci/android@2.0.0
 
 jobs:
   build:
     # These next lines define the Android machine image executor: https://circleci.com/docs/2.0/executor-types/
     executor:
-      name: android/android
-      sdk-version: '30'
-    resource_class: large
+      name: android/android-docker
+      tag: 2021.10.2
+      resource-class: large
 
     steps:
       # Checkout the code as the first step.
       - checkout
       - android/accept-licenses
       - android/restore-build-cache
-      - android/restore-gradle-cache:
-          find-args: ". -name 'build.gradle.kts'"
-
+      - run:
+          name: Generate cache checksum
+          command: |
+            find . -name 'build.gradle.kts' | sort | xargs cat | shasum | awk '{print $1}' > /tmp/gradle_cache_seed
+      - restore_cache:
+          name: Restore gradle cache
+          keys:
+            - gradle-v3-{{ arch }}-{{ checksum "/tmp/gradle_cache_seed" }}
+            - gradle-v3-{{ arch }}-
+            - gradle-v3-
       - run:
           name: Build
           command: |
-            ./project/gradlew -p ./project assembleDebug assembleAndroidTest :app:compileOssReleaseSources :app:compileGmsReleaseSources app:bundleGmsReleaseClasses --scan
+            ./project/gradlew -p ./project assembleDebug assembleAndroidTest assembleGmsReleaseUnitTest :app:compileOssReleaseSources :app:packageGmsReleaseBundle --scan
 
-      - android/save-gradle-cache
+      - android/save-gradle-cache:
+          cache-prefix: v3
       - android/save-build-cache
       - persist_to_workspace:
           root: project/app/build/outputs/apk/oss/debug/
@@ -32,9 +40,9 @@ jobs:
             - app-oss-debug.apk
   fdroid-scanner:
     executor:
-      name: android/android
-      sdk-version: '30'
-    resource_class: small
+      name: android/android-docker
+      tag: 2021.10.2
+      resource-class: small
     steps:
       - checkout
       - attach_workspace:
@@ -46,16 +54,25 @@ jobs:
 
   unit-test:
     executor:
-      name: android/android
-      sdk-version: '30'
-    resource_class: large
+      name: android/android-docker
+      tag: 2021.10.2
+      resource-class: large
 
     steps:
       - checkout
       - android/accept-licenses
       - android/restore-build-cache
-      - android/restore-gradle-cache:
-          find-args: ". -name 'build.gradle.kts'"
+      - run:
+          name: Generate cache checksum
+          command: |
+            find . -name 'build.gradle.kts' | sort | xargs cat |
+            shasum | awk '{print $1}' > /tmp/gradle_cache_seed
+      - restore_cache:
+          name: Restore gradle cache
+          keys:
+            - gradle-v3-{{ arch }}-{{ checksum "/tmp/gradle_cache_seed" }}
+            - gradle-v3-{{ arch }}-
+            - gradle-v3-
       - run:
           name: Unit Test
           command: |
@@ -69,16 +86,24 @@ jobs:
 
   lint:
     executor:
-      name: android/android
-      sdk-version: '30'
-    resource_class: large
+      name: android/android-docker
+      tag: 2021.10.2
+      resource-class: medium+
 
     steps:
       - checkout
       - android/accept-licenses
       - android/restore-build-cache
-      - android/restore-gradle-cache:
-          find-args: ". -name 'build.gradle.kts'"
+      - run:
+          name: Generate cache checksum
+          command: |
+            find . -name 'build.gradle.kts' | sort | xargs cat | shasum | awk '{print $1}' > /tmp/gradle_cache_seed
+      - restore_cache:
+          name: Restore gradle cache
+          keys:
+            - gradle-v3-{{ arch }}-{{ checksum "/tmp/gradle_cache_seed" }}
+            - gradle-v3-{{ arch }}-
+            - gradle-v3-
       - run:
           name: Lint
           command: |
@@ -91,19 +116,29 @@ jobs:
   oss-ui-tests:
     executor:
       name: android/android-machine
+      tag: 2021.10.1
       resource-class: large
 
     steps:
       - checkout
       - android/accept-licenses
       - android/restore-build-cache
+      - run:
+          name: Generate cache checksum
+          command: |
+            find . -name 'build.gradle.kts' | sort | xargs cat | shasum | awk '{print $1}' > /tmp/gradle_cache_seed
+      - restore_cache:
+          name: Restore gradle cache
+          keys:
+            - gradle-v3-{{ arch }}-{{ checksum "/tmp/gradle_cache_seed" }}
+            - gradle-v3-{{ arch }}-
+            - gradle-v3-
       - android/start-emulator-and-run-tests:
           additional-avd-args: "-d pixel_3a -c 1G"
           additional-emulator-args: "-memory 4096"
           test-command: ./gradlew createOssDebugCoverageReport --scan -P"android.testInstrumentationRunnerArguments.numShards=$CIRCLE_NODE_TOTAL" -P"android.testInstrumentationRunnerArguments.shardIndex=$CIRCLE_NODE_INDEX"
           system-image: system-images;android-29;default;x86_64
-          restore-gradle-cache-post-emulator-launch: true
-          restore-gradle-cache-find-args: ". -name 'build.gradle.kts'"
+          restore-gradle-cache-post-emulator-launch: false
           run-tests-working-directory: ./project
           post-emulator-wait-steps:
             - run: adb shell settings put secure location_providers_allowed +gps
@@ -113,6 +148,7 @@ jobs:
           run-logcat: true
           max-tries: 1
           no-output-timeout: 30m
+          save-gradle-cache: false
       - store_test_results:
           path: project/app/build/outputs/androidTest-results/connected/flavors/oss/
       - persist_to_workspace:
@@ -126,19 +162,29 @@ jobs:
   gms-ui-tests:
     executor:
       name: android/android-machine
+      tag: 2021.10.1
       resource-class: large
     parallelism: 2
     steps:
       - checkout
       - android/accept-licenses
       - android/restore-build-cache
+      - run:
+          name: Generate cache checksum
+          command: |
+            find . -name 'build.gradle.kts' | sort | xargs cat | shasum | awk '{print $1}' > /tmp/gradle_cache_seed
+      - restore_cache:
+          name: Restore gradle cache
+          keys:
+            - gradle-v3-{{ arch }}-{{ checksum "/tmp/gradle_cache_seed" }}
+            - gradle-v3-{{ arch }}-
+            - gradle-v3-
       - android/start-emulator-and-run-tests:
           additional-avd-args: "-d pixel_3a -c 1G"
           additional-emulator-args: "-memory 4096"
           test-command: ./gradlew createGmsDebugCoverageReport --scan -P"android.testInstrumentationRunnerArguments.numShards=$CIRCLE_NODE_TOTAL" -P"android.testInstrumentationRunnerArguments.shardIndex=$CIRCLE_NODE_INDEX"
           system-image: system-images;android-29;google_apis;x86_64
-          restore-gradle-cache-post-emulator-launch: true
-          restore-gradle-cache-find-args: ". -name 'build.gradle.kts'"
+          restore-gradle-cache-post-emulator-launch: false
           run-tests-working-directory: ./project
           post-emulator-wait-steps:
             - run: adb shell settings put secure location_providers_allowed +gps
@@ -148,6 +194,7 @@ jobs:
           run-logcat: true
           max-tries: 1
           no-output-timeout: 30m
+          save-gradle-cache: false
       - run:
           name: Debug
           command: |
@@ -204,17 +251,25 @@ jobs:
               -f project/app/build/jacoco/jacoco.xml
   publish-to-play-store:
     executor:
-      name: android/android
-      sdk-version: '30'
-    resource_class: large
+      name: android/android-docker
+      tag: 2021.10.2
+      resource-class: medium
 
     steps:
       # Checkout the code as the first step.
       - checkout
       - android/accept-licenses
       - android/restore-build-cache
-      - android/restore-gradle-cache:
-          find-args: ". -name 'build.gradle.kts'"
+      - run:
+          name: Generate cache checksum
+          command: |
+            find . -name 'build.gradle.kts' | sort | xargs cat | shasum | awk '{print $1}' > /tmp/gradle_cache_seed
+      - restore_cache:
+          name: Restore gradle cache
+          keys:
+            - gradle-v3-{{ arch }}-{{ checksum "/tmp/gradle_cache_seed" }}
+            - gradle-v3-{{ arch }}-
+            - gradle-v3-
       - run:
           name: Set credentials
           command: |
