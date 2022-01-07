@@ -263,7 +263,7 @@ dependencies {
     androidTestImplementation("androidx.test:rules:${androidxTestVersion}")
     androidTestImplementation("androidx.test:runner:${androidxTestVersion}")
 
-    androidTestUtil("androidx.test.services:test-services:${androidxTestVersion}")
+    androidTestUtil("androidx.test.services:test-services:1.4.1")
 }
 
 
