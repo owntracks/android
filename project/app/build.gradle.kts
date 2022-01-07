@@ -196,7 +196,7 @@ dependencies {
     implementation("androidx.test.espresso:espresso-idling-resource:${espressoVersion}")
     implementation("androidx.lifecycle:lifecycle-common-java8:2.4.0")
 
-    implementation("com.google.android.material:material:1.3.0")
+    implementation("com.google.android.material:material:1.5.0")
 
     // Explicit dependency on conscrypt to give up-to-date TLS support on all devices
     implementation("org.conscrypt:conscrypt-android:2.5.2")
