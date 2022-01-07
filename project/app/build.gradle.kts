@@ -17,15 +17,15 @@ jacoco {
 }
 
 
-val gmsImplementation by configurations.creating
+val gmsImplementation: Configuration by configurations.creating
 
 android {
-    compileSdkVersion(30)
+    compileSdkVersion(31)
 
     defaultConfig {
         applicationId = "org.owntracks.android"
         minSdkVersion(21)
-        targetSdkVersion(30)
+        targetSdkVersion(31)
 
         versionCode = 24600
         versionName = "2.4.6"
@@ -188,15 +188,15 @@ val kotlinCoroutinesVersion = "1.4.1"
 val jaxbVersion = "3.0.1"
 
 dependencies {
+    // AndroidX
     implementation("androidx.preference:preference:1.1.1")
-    implementation("com.takisoft.preferencex:preferencex:1.1.0")
-    implementation("com.google.android.material:material:1.3.0")
-
-    implementation("androidx.work:work-runtime:2.6.0")
+    implementation("androidx.work:work-runtime:2.7.1")
     implementation("androidx.fragment:fragment-ktx:1.3.5")
     implementation("androidx.core:core-ktx:1.5.0")
     implementation("androidx.test.espresso:espresso-idling-resource:${espressoVersion}")
     implementation("androidx.lifecycle:lifecycle-common-java8:2.4.0")
+
+    implementation("com.google.android.material:material:1.3.0")
 
     // Explicit dependency on conscrypt to give up-to-date TLS support on all devices
     implementation("org.conscrypt:conscrypt-android:2.5.2")
@@ -207,26 +207,29 @@ dependencies {
     // Utility libraries
     implementation("com.google.dagger:hilt-compiler:${rootProject.extra["dagger-version"]}")
     implementation("com.google.dagger:hilt-android:${rootProject.extra["dagger-version"]}")
-
     implementation("org.greenrobot:eventbus:3.2.0")
-    implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
 
+    // Connectivity
+    implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
     implementation("com.squareup.okhttp3:okhttp:${okHttpVersion}")
     implementation("com.squareup.okhttp3:logging-interceptor:${okHttpVersion}")
 
+    // Jackson
     implementation("com.fasterxml.jackson.core:jackson-core:${jacksonVersion}")
     implementation("com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:${jacksonVersion}")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}")
 
+    // Kotlin
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${kotlinCoroutinesVersion}")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:${kotlinCoroutinesVersion}")
-
+    
+    implementation("com.squareup.tape2:tape:2.0.0-beta1")
+    implementation("com.jakewharton:process-phoenix:2.1.1")
     implementation("com.jakewharton.timber:timber:4.7.1")
     implementation("com.github.joshjdevl.libsodiumjni:libsodium-jni-aar:2.0.2")
     implementation("org.apache.httpcomponents.core5:httpcore5:5.1.2")
     implementation("commons-codec:commons-codec:1.15")
-
     implementation("org.threeten:threetenbp:1.5.2")
     implementation("com.github.joschi.jackson:jackson-datatype-threetenbp:$jacksonVersion")
 
@@ -234,9 +237,7 @@ dependencies {
     implementation("com.rengwuxian.materialedittext:library:2.1.4")
     implementation("com.mikepenz:materialdrawer:6.1.2@aar") { isTransitive = true }
     implementation("com.mikepenz:materialize:1.2.1@aar")
-
-    implementation("com.jakewharton:process-phoenix:2.1.1")
-    implementation("com.squareup.tape2:tape:2.0.0-beta1")
+    implementation("com.takisoft.preferencex:preferencex:1.1.0")
 
     // These Java EE libs are no longer included in JDKs, so we include explicitly
     kapt("javax.xml.bind:jaxb-api:2.3.1")
