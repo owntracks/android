@@ -202,7 +202,7 @@ dependencies {
     implementation("org.conscrypt:conscrypt-android:2.5.2")
 
     // Mapping
-    implementation("org.osmdroid:osmdroid-android:6.1.10")
+    implementation("org.osmdroid:osmdroid-android:6.1.11")
 
     // Utility libraries
     implementation("com.google.dagger:hilt-compiler:${rootProject.extra["dagger-version"]}")
