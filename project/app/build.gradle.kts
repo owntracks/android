@@ -192,7 +192,7 @@ dependencies {
     implementation("androidx.preference:preference:1.1.1")
     implementation("androidx.work:work-runtime:2.7.1")
     implementation("androidx.fragment:fragment-ktx:1.3.5")
-    implementation("androidx.core:core-ktx:1.5.0")
+    implementation("androidx.core:core-ktx:1.7.0")
     implementation("androidx.test.espresso:espresso-idling-resource:${espressoVersion}")
     implementation("androidx.lifecycle:lifecycle-common-java8:2.4.0")
 
