@@ -180,7 +180,7 @@ tasks.withType<JavaCompile>().configureEach {
 }
 
 val okHttpVersion = "4.9.3"
-val jacksonVersion = "2.12.2"
+val jacksonVersion = "2.13.1"
 val materialDialogsVersion = "0.9.6.0"
 val espressoVersion = "3.4.0"
 val androidxTestVersion = "1.4.1-alpha03"
@@ -231,7 +231,7 @@ dependencies {
     implementation("org.apache.httpcomponents.core5:httpcore5:5.1.2")
     implementation("commons-codec:commons-codec:1.15")
     implementation("org.threeten:threetenbp:1.5.2")
-    implementation("com.github.joschi.jackson:jackson-datatype-threetenbp:$jacksonVersion")
+    implementation("com.github.joschi.jackson:jackson-datatype-threetenbp:2.12.5")
 
     // Widget libraries
     implementation("com.rengwuxian.materialedittext:library:2.1.4")
