@@ -1,12 +1,12 @@
 package org.owntracks.android.services
 
-import com.google.common.io.Files
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.support.Parser
 import java.io.File
+import java.nio.file.Files
 import kotlin.random.Random
 
 class BlockingDequeueThatAlsoSometimesPersistsThingsToDiskMaybeTest {
@@ -24,7 +24,7 @@ class BlockingDequeueThatAlsoSometimesPersistsThingsToDiskMaybeTest {
     fun `given an empty queue when polling then null is returned`() {
         val queue = BlockingDequeThatAlsoSometimesPersistsThingsToDiskMaybe(
             10,
-            Files.createTempDir(),
+            Files.createTempDirectory("").toFile(),
             parser
         )
         assertNull(queue.poll())
@@ -34,7 +34,7 @@ class BlockingDequeueThatAlsoSometimesPersistsThingsToDiskMaybeTest {
     fun `given an empty queue when adding an item the queue size is 1`() {
         val queue = BlockingDequeThatAlsoSometimesPersistsThingsToDiskMaybe(
             10,
-            Files.createTempDir(),
+            Files.createTempDirectory("").toFile(),
             parser
         )
         queue.offer(generateRandomMessageLocation())
@@ -45,7 +45,7 @@ class BlockingDequeueThatAlsoSometimesPersistsThingsToDiskMaybeTest {
     fun `given a non-empty queue, when pushing an item to the head then that same item is returned on poll`() {
         val queue = BlockingDequeThatAlsoSometimesPersistsThingsToDiskMaybe(
             10,
-            Files.createTempDir(),
+            Files.createTempDirectory("").toFile(),
             parser
         )
         repeat(5) { queue.offer(generateRandomMessageLocation()) }
@@ -61,7 +61,7 @@ class BlockingDequeueThatAlsoSometimesPersistsThingsToDiskMaybeTest {
 
     @Test
     fun `given a file path, when initializing the queue the size is correct`() {
-        val dir = Files.createTempDir()
+        val dir = Files.createTempDirectory("").toFile()
         val queue = BlockingDequeThatAlsoSometimesPersistsThingsToDiskMaybe(
             10,
             dir,
@@ -80,7 +80,7 @@ class BlockingDequeueThatAlsoSometimesPersistsThingsToDiskMaybeTest {
 
     @Test
     fun `given a file path where the head slot is occupied, when initializing the queue the size is correct`() {
-        val dir = Files.createTempDir()
+        val dir = Files.createTempDirectory("").toFile()
         val queue = BlockingDequeThatAlsoSometimesPersistsThingsToDiskMaybe(
             10,
             dir,
@@ -107,7 +107,7 @@ class BlockingDequeueThatAlsoSometimesPersistsThingsToDiskMaybeTest {
     fun `given a non-empty queue, when taking an item to the head then the item is returned`() {
         val queue = BlockingDequeThatAlsoSometimesPersistsThingsToDiskMaybe(
             10,
-            Files.createTempDir(),
+            Files.createTempDirectory("").toFile(),
             parser
         )
         repeat(5) { queue.offer(generateRandomMessageLocation()) }
@@ -123,7 +123,7 @@ class BlockingDequeueThatAlsoSometimesPersistsThingsToDiskMaybeTest {
 
     @Test
     fun `given a corrupt file, when initializing the queue then an empty queue is created`() {
-        val dir = Files.createTempDir()
+        val dir = Files.createTempDirectory("").toFile()
         dir.resolve("messageQueue.dat").writeBytes(random.nextBytes(100))
         val queue = BlockingDequeThatAlsoSometimesPersistsThingsToDiskMaybe(
             10,
