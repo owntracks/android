@@ -226,7 +226,7 @@ dependencies {
     implementation("com.jakewharton:process-phoenix:2.1.1")
     implementation("com.jakewharton.timber:timber:5.0.1")
     implementation("com.github.joshjdevl.libsodiumjni:libsodium-jni-aar:2.0.2")
-    implementation("org.apache.httpcomponents.core5:httpcore5:5.1.2")
+    implementation("org.apache.httpcomponents.core5:httpcore5:5.1.3")
     implementation("commons-codec:commons-codec:1.15")
     implementation("org.threeten:threetenbp:1.5.2")
     implementation("com.github.joschi.jackson:jackson-datatype-threetenbp:2.12.5")
