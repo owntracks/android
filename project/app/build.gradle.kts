@@ -11,21 +11,23 @@ apply<EspressoScreenshotsPlugin>()
 
 val googleMapsAPIKey = extra.get("google_maps_api_key")?.toString() ?: "PLACEHOLDER_API_KEY"
 
+val rootJacocoVersion = "0.8.7"
+
 jacoco {
-    version = "0.8.7"
-    toolVersion = "0.8.7"
+    version = rootJacocoVersion
+    toolVersion = rootJacocoVersion
 }
 
 
 val gmsImplementation: Configuration by configurations.creating
 
 android {
-    compileSdkVersion(31)
+    compileSdk = 31
 
     defaultConfig {
         applicationId = "org.owntracks.android"
-        minSdkVersion(21)
-        targetSdkVersion(31)
+        minSdk = 21
+        targetSdk = 31
 
         versionCode = 24600
         versionName = "2.4.6"
@@ -95,23 +97,26 @@ android {
         viewBinding = true
     }
 
-    packagingOptions {
-        exclude("META-INF/DEPENDENCIES.txt")
-        exclude("META-INF/LICENSE.txt")
-        exclude("META-INF/NOTICE.txt")
-        exclude("META-INF/NOTICE")
-        exclude("META-INF/LICENSE")
-        exclude("META-INF/DEPENDENCIES")
-        exclude("META-INF/notice.txt")
-        exclude("META-INF/license.txt")
-        exclude("META-INF/dependencies.txt")
-        exclude("META-INF/LGPL2.1")
-        exclude("META-INF/proguard/androidx-annotations.pro")
-        exclude("META-INF/metadata.kotlin_module")
-        exclude("META-INF/metadata.jvm.kotlin_module")
-        exclude("META-INF/gradle/incremental.annotation.processors")
-        jniLibs.useLegacyPackaging = false
-    }
+    packagingOptions.excludes.addAll(
+        listOf(
+            "META-INF/DEPENDENCIES.txt",
+            "META-INF/LICENSE.txt",
+            "META-INF/NOTICE.txt",
+            "META-INF/NOTICE",
+            "META-INF/LICENSE",
+            "META-INF/DEPENDENCIES",
+            "META-INF/notice.txt",
+            "META-INF/license.txt",
+            "META-INF/dependencies.txt",
+            "META-INF/LGPL2.1",
+            "META-INF/proguard/androidx-annotations.pro",
+            "META-INF/metadata.kotlin_module",
+            "META-INF/metadata.jvm.kotlin_module",
+            "META-INF/gradle/incremental.annotation.processors"
+        )
+    )
+    packagingOptions.jniLibs.useLegacyPackaging = false
+
 
     lintOptions {
         baselineFile = file("../../lint/lint-baseline.xml")
@@ -122,8 +127,6 @@ android {
             "TypographyFractions",
             "TypographyQuotes",
             "Typos",
-            "UnsafeExperimentalUsageError",
-            "UnsafeExperimentalUsageWarning"
         )
     }
     testOptions {
@@ -139,8 +142,8 @@ android {
             events("passed", "skipped", "failed")
             setExceptionFormat("full")
         }
-        reports.junitXml.isEnabled = true
-        reports.html.isEnabled = false
+        reports.junitXml.required.set(true)
+        reports.html.required.set(false)
     }
 
     compileOptions {
@@ -221,7 +224,7 @@ dependencies {
     // Kotlin
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${kotlinCoroutinesVersion}")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:${kotlinCoroutinesVersion}")
-    
+
     implementation("com.squareup.tape2:tape:2.0.0-beta1")
     implementation("com.jakewharton:process-phoenix:2.1.1")
     implementation("com.jakewharton.timber:timber:5.0.1")
@@ -289,18 +292,11 @@ val codesTask = tasks.register<GetLatestVersionCodeMinusOne>("getLatestVersionCo
 
 androidComponents {
     onVariants { variant ->
-        val overrideVerCode = System.getenv("VERSION_CODE_OVERRIDE")
-        overrideVerCode?.toIntOrNull()?.apply {
+        val minusOne = System.getenv("MAKE_APK_SAME_VERSION_CODE_AS_GOOGLE_PLAY")
+        if (!minusOne.isNullOrEmpty()) {
             for (output in variant.outputs) {
-                output.versionCode.set(this)
-            }
-        } ?: run {
-            val minusOne = System.getenv("MAKE_APK_SAME_VERSION_CODE_AS_GOOGLE_PLAY")
-            if (!minusOne.isNullOrEmpty()) {
-                for (output in variant.outputs) {
-                    output.versionCode.set(codesTask.flatMap { it.outCode }
-                        .map { it.asFile.readText().toInt() })
-                }
+                output.versionCode.set(codesTask.flatMap { it.outCode }
+                    .map { it.asFile.readText().toInt() })
             }
         }
     }
