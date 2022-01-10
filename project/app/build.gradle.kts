@@ -224,7 +224,7 @@ dependencies {
     
     implementation("com.squareup.tape2:tape:2.0.0-beta1")
     implementation("com.jakewharton:process-phoenix:2.1.1")
-    implementation("com.jakewharton.timber:timber:4.7.1")
+    implementation("com.jakewharton.timber:timber:5.0.1")
     implementation("com.github.joshjdevl.libsodiumjni:libsodium-jni-aar:2.0.2")
     implementation("org.apache.httpcomponents.core5:httpcore5:5.1.2")
     implementation("commons-codec:commons-codec:1.15")
