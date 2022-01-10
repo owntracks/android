@@ -11,11 +11,11 @@ import org.owntracks.android.ui.map.MapLocationSource
  */
 fun MapLocationSource.toGMSLocationSource(): LocationSource {
     return object : LocationSource {
-        override fun activate(gmsLocationChangedListener: LocationSource.OnLocationChangedListener?) {
+        override fun activate(gmsLocationChangedListener: LocationSource.OnLocationChangedListener) {
             this@toGMSLocationSource.activate(object :
                 OnLocationChangedListener {
                 override fun onLocationChanged(location: Location) {
-                    gmsLocationChangedListener?.onLocationChanged(location)
+                    gmsLocationChangedListener.onLocationChanged(location)
                 }
             })
         }
