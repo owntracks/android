@@ -155,7 +155,7 @@ android {
         create("gms") {
             dimension = "locationProvider"
             dependencies {
-                gmsImplementation("com.google.android.gms:play-services-maps:17.0.1")
+                gmsImplementation("com.google.android.gms:play-services-maps:18.0.1")
                 gmsImplementation("com.google.android.gms:play-services-location:19.0.1")
             }
         }
