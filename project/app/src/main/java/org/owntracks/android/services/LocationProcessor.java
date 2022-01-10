@@ -100,6 +100,7 @@ public class LocationProcessor {
             message.setBattery(deviceMetricsProvider.getBatteryLevel());
             message.setBatteryStatus(deviceMetricsProvider.getBatteryStatus());
             message.setConn(deviceMetricsProvider.getConnectionType());
+            message.setMonitoringMode(preferences.getMonitoring());
         } else {
             message = MessageLocation.fromLocation(currentLocation);
         }

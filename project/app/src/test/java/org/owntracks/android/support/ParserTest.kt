@@ -13,6 +13,7 @@ import org.owntracks.android.location.geofencing.Geofence
 import org.owntracks.android.model.BatteryStatus
 import org.owntracks.android.model.CommandAction
 import org.owntracks.android.model.messages.*
+import org.owntracks.android.services.LocationProcessor.MONITORING_SIGNIFICANT
 import org.owntracks.android.support.Parser.EncryptionException
 import java.io.ByteArrayInputStream
 import java.io.IOException
@@ -20,6 +21,7 @@ import java.util.*
 
 
 class ParserTest {
+    private lateinit var extendedMessageLocation: MessageLocation
     private lateinit var messageLocation: MessageLocation
 
     @Mock
@@ -31,9 +33,9 @@ class ParserTest {
 
     //region Location Messages
     private val locationWithRegionsJSON =
-        "{\"_type\":\"location\",\"acc\":10,\"alt\":20,\"batt\":30,\"bs\":2,\"conn\":\"TestConn\",\"created_at\":25,\"inregions\":[\"Testregion1\",\"Testregion2\"],\"lat\":50.1,\"lon\":60.2,\"tst\":123456789,\"vac\":1,\"vel\":5}"
+        "{\"_type\":\"location\",\"BSSID\":\"12:34:56:78\",\"SSID\":\"Wifi SSID\",\"acc\":10,\"alt\":20,\"batt\":30,\"bs\":2,\"conn\":\"TestConn\",\"created_at\":25,\"inregions\":[\"Testregion1\",\"Testregion2\"],\"lat\":50.1,\"lon\":60.2,\"m\":1,\"tst\":123456789,\"vac\":1,\"vel\":5}"
     private val locationWithRegionsJSONWithTopic =
-        "{\"_type\":\"location\",\"acc\":10,\"alt\":20,\"batt\":30,\"bs\":2,\"conn\":\"TestConn\",\"created_at\":25,\"inregions\":[\"Testregion1\",\"Testregion2\"],\"lat\":50.1,\"lon\":60.2,\"topic\":\"owntracks/testUsername/testDevice\",\"tst\":123456789,\"vac\":1,\"vel\":5}"
+        "{\"_type\":\"location\",\"BSSID\":\"12:34:56:78\",\"SSID\":\"Wifi SSID\",\"acc\":10,\"alt\":20,\"batt\":30,\"bs\":2,\"conn\":\"TestConn\",\"created_at\":25,\"inregions\":[\"Testregion1\",\"Testregion2\"],\"lat\":50.1,\"lon\":60.2,\"m\":1,\"topic\":\"owntracks/testUsername/testDevice\",\"tst\":123456789,\"vac\":1,\"vel\":5}"
 
     @Before
     fun setupMessageLocation() {
@@ -43,15 +45,21 @@ class ParserTest {
         messageLocation = MessageLocation(MessageCreatedAtNow(FakeClock())).apply {
             accuracy = 10
             altitude = 20
-            battery = 30
-            batteryStatus = BatteryStatus.CHARGING
-            conn = "TestConn"
             latitude = 50.1
             longitude = 60.2
             timestamp = 123456789
             velocity = 5.6.toInt()
             verticalAccuracy = 1.7.toInt()
             inregions = regions
+        }
+
+        extendedMessageLocation = messageLocation.apply {
+            battery = 30
+            batteryStatus = BatteryStatus.CHARGING
+            bssid = "12:34:56:78"
+            conn = "TestConn"
+            monitoringMode = MONITORING_SIGNIFICANT
+            ssid = "Wifi SSID"
         }
     }
 
@@ -65,11 +73,13 @@ class ParserTest {
     }
 
     @Test
-    fun `Parser can serialize location message to a pretty JSON message`() {
+    fun `Parser can serialize extended location message to a pretty JSON message`() {
         val parser = Parser(null)
         val expected = """
             {
               "_type" : "location",
+              "BSSID" : "12:34:56:78",
+              "SSID" : "Wifi SSID",
               "acc" : 10,
               "alt" : 20,
               "batt" : 30,
@@ -79,6 +89,29 @@ class ParserTest {
               "inregions" : [ "Testregion1", "Testregion2" ],
               "lat" : 50.1,
               "lon" : 60.2,
+              "m" : 1,
+              "tst" : 123456789,
+              "vac" : 1,
+              "vel" : 5
+            }
+        """.trimIndent()
+        assertEquals(expected, parser.toUnencryptedJsonPretty(extendedMessageLocation))
+    }
+
+
+    fun `Parser can serialize non-extended location message to a pretty JSON message`() {
+        val parser = Parser(null)
+        val expected = """
+            {
+              "_type" : "location",              
+              "acc" : 10,
+              "alt" : 20,
+              "batt" : 30,
+              "bs" : 2,              
+              "created_at" : 25,
+              "inregions" : [ "Testregion1", "Testregion2" ],
+              "lat" : 50.1,
+              "lon" : 60.2,              
               "tst" : 123456789,
               "vac" : 1,
               "vel" : 5
@@ -92,7 +125,27 @@ class ParserTest {
         Mockito.`when`(encryptionProvider.isPayloadEncryptionEnabled).thenReturn(false)
         val parser = Parser(encryptionProvider)
         val input =
-            "{\"_type\":\"location\",\"tid\":\"s5\",\"acc\":1600,\"alt\":0.0,\"batt\":99,\"bs\":3,\"conn\":\"w\",\"lat\":52.3153748,\"lon\":5.0408462,\"t\":\"p\",\"tst\":1514455575,\"vac\":0,\"inregions\":[\"Testregion1\",\"Testregion2\"]}"
+            """
+                {
+                    "_type": "location",
+                    "tid": "s5",
+                    "acc": 1600,
+                    "alt": 0.0,
+                    "batt": 99,
+                    "bs": 3,
+                    "conn": "w",
+                    "lat": 52.3153748,
+                    "lon": 5.0408462,
+                    "t": "p",
+                    "tst": 1514455575,
+                    "vac": 0,
+                    "inregions":
+                    [
+                        "Testregion1",
+                        "Testregion2"
+                    ]
+                }
+                """.trimIndent()
         val messageBase = parser.fromJson(input)
         assertEquals(MessageLocation::class.java, messageBase.javaClass)
         val message = messageBase as MessageLocation
@@ -114,7 +167,7 @@ class ParserTest {
     fun `Parser can serialize a location message`() {
         Mockito.`when`(encryptionProvider.isPayloadEncryptionEnabled).thenReturn(false)
         val parser = Parser(encryptionProvider)
-        val input = messageLocation
+        val input = extendedMessageLocation
         val serialized = input.toJson(parser)
         assertEquals(locationWithRegionsJSON, serialized)
     }
@@ -123,7 +176,7 @@ class ParserTest {
     fun `Parser can serialize a location message with the topic visible`() {
         Mockito.`when`(encryptionProvider.isPayloadEncryptionEnabled).thenReturn(false)
         val parser = Parser(encryptionProvider)
-        val input = messageLocation
+        val input = extendedMessageLocation
         input.addMqttPreferences(testPreferences)
         input.setTopicVisible()
         val serialized = input.toJson(parser)
@@ -160,7 +213,7 @@ class ParserTest {
         Mockito.`when`(encryptionProvider.encrypt(locationWithRegionsJSON))
             .thenReturn("TestCipherText")
         val parser = Parser(encryptionProvider)
-        val input = messageLocation
+        val input = extendedMessageLocation
         val serialized = input.toJson(parser)
         val expected = """{"_type":"encrypted","data":"TestCipherText"}"""
         assertEquals(expected, serialized)

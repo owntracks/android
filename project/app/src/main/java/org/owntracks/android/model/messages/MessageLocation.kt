@@ -22,6 +22,7 @@ import kotlin.math.roundToInt
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreatedAtNow(RealClock())) :
     MessageBase(), MessageWithCreatedAt by dep {
+
     @JsonIgnore
     override val numberOfRetries: Int = 10_080 // This should last a week at 1 attempt per minute
 
@@ -54,6 +55,9 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
 
     @JsonProperty("tst")
     var timestamp: Long = 0
+
+    @JsonProperty("m")
+    var monitoringMode: Int? = null
 
     private var _contact: WeakReference<FusedContact?>? = null
     var conn: String? = null
