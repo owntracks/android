@@ -211,7 +211,6 @@ dependencies {
     // Connectivity
     implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
     implementation("com.squareup.okhttp3:okhttp:${okHttpVersion}")
-    implementation("com.squareup.okhttp3:logging-interceptor:${okHttpVersion}")
 
     // Jackson
     implementation("com.fasterxml.jackson.core:jackson-core:${jacksonVersion}")
@@ -249,7 +248,6 @@ dependencies {
 
     kaptTest("com.google.dagger:hilt-android-compiler:${rootProject.extra["dagger-version"]}")
 
-    testImplementation("androidx.test:core:${androidxTestVersion}")
     testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
     testImplementation("androidx.arch.core:core-testing:2.1.0")
 
