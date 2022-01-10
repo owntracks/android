@@ -185,7 +185,7 @@ val materialDialogsVersion = "0.9.6.0"
 val espressoVersion = "3.4.0"
 val androidxTestVersion = "1.4.1-alpha03"
 val kotlinCoroutinesVersion = "1.6.0"
-val jaxbVersion = "3.0.1"
+val jaxbVersion = "3.0.2"
 
 dependencies {
     // AndroidX
