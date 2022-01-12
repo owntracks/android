@@ -8,11 +8,9 @@ import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
 import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.location.*
@@ -22,8 +20,6 @@ import org.owntracks.android.model.messages.MessageLocation.Companion.REPORT_TYP
 import org.owntracks.android.services.LocationProcessor
 import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.services.MessageProcessorEndpointHttp
-import org.owntracks.android.support.Events.FusedContactAdded
-import org.owntracks.android.support.Events.FusedContactRemoved
 import org.owntracks.android.support.Preferences
 import org.owntracks.android.support.SimpleIdlingResource
 import timber.log.Timber
@@ -47,8 +43,6 @@ class MapViewModel @Inject constructor(
     private val mutableRelativeContactBearing = MutableLiveData(0f)
     private val mutableMyLocationEnabled = MutableLiveData(false)
 
-    private val mainScope = MainScope()
-
     val currentContact: LiveData<FusedContact?>
         get() = mutableCurrentContact
     val bottomSheetHidden: LiveData<Boolean>
@@ -67,19 +61,19 @@ class MapViewModel @Inject constructor(
         get() = mutableMyLocationEnabled
 
     val allContacts = contactsRepo.all
-
-
     val locationIdlingResource = SimpleIdlingResource("locationIdlingResource", false)
+
+    private var viewMode: ViewMode = ViewMode.Device
 
     fun onMapReady() {
         when (viewMode) {
-            VIEW_CONTACT -> {
+            is ViewMode.Contact -> {
                 mutableCurrentContact.value?.run { setViewModeContact(this, true) }
             }
-            VIEW_FREE -> {
+            is ViewMode.Free -> {
                 setViewModeFree()
             }
-            else -> {
+            is ViewMode.Device -> {
                 setViewModeDevice()
             }
         }
@@ -89,7 +83,7 @@ class MapViewModel @Inject constructor(
         override fun onLocationResult(locationResult: LocationResult) {
             mutableCurrentLocation.value = locationResult.lastLocation
             locationIdlingResource.setIdleState(true)
-            if (viewMode == VIEW_DEVICE && mutableMapCenter.value != locationResult.lastLocation.toLatLng()) {
+            if (viewMode is ViewMode.Device && mutableMapCenter.value != locationResult.lastLocation.toLatLng()) {
                 mutableMapCenter.postValue(locationResult.lastLocation.toLatLng())
             }
         }
@@ -100,7 +94,7 @@ class MapViewModel @Inject constructor(
     }
 
     fun refreshGeocodeForContact(contact: FusedContact) {
-        mainScope.launch {
+        viewModelScope.launch {
             contact.messageLocation?.run { geocoderProvider.resolve(this) }
         }
     }
@@ -120,7 +114,7 @@ class MapViewModel @Inject constructor(
     }
 
     private fun setViewModeContact(contact: FusedContact, center: Boolean) {
-        viewMode = VIEW_CONTACT
+        viewMode = ViewMode.Contact(center)
         mutableCurrentContact.value = contact
         mutableBottomSheetHidden.value = false
         refreshGeocodeForContact(contact)
@@ -130,13 +124,13 @@ class MapViewModel @Inject constructor(
 
     private fun setViewModeFree() {
         Timber.v("setting view mode: VIEW_FREE")
-        viewMode = VIEW_FREE
+        viewMode = ViewMode.Free
         clearActiveContact()
     }
 
     private fun setViewModeDevice() {
         Timber.v("setting view mode: VIEW_DEVICE")
-        viewMode = VIEW_DEVICE
+        viewMode = ViewMode.Device
         clearActiveContact()
         if (mutableCurrentLocation.value != null) {
             mutableMapCenter.postValue(mutableCurrentLocation.value!!.toLatLng())
@@ -148,7 +142,7 @@ class MapViewModel @Inject constructor(
     @MainThread
     fun setLiveContact(contactId: String?) {
         contactId?.let {
-            viewMode = VIEW_CONTACT
+            viewMode = ViewMode.Contact(true)
             contactsRepo.getById(it)?.run(mutableCurrentContact::setValue)
         }
     }
@@ -168,31 +162,6 @@ class MapViewModel @Inject constructor(
             contactsRepo.remove(it.id)
         }
         clearActiveContact()
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onEvent(e: FusedContactAdded) {
-        onEvent(e.contact)
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onEvent(c: FusedContactRemoved) {
-        if (c.contact == mutableCurrentContact.value) {
-            clearActiveContact()
-            setViewModeFree()
-        }
-//        view!!.removeMarker(c.contact)
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onEvent(c: FusedContact) {
-//        view!!.updateMarker(c)
-        if (c == mutableCurrentContact.value) {
-            mutableCurrentContact.postValue(c)
-            if (c.latLng != null) {
-                mutableMapCenter.postValue(c.latLng)
-            }
-        }
     }
 
     fun contactPeekPopupmenuVisibility(): Boolean =
@@ -278,11 +247,10 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    companion object {
-        private const val VIEW_FREE = 0
-        private const val VIEW_CONTACT = 1
-        private const val VIEW_DEVICE = 2
-        private var viewMode = VIEW_DEVICE
+    sealed class ViewMode {
+        object Free : ViewMode()
+        object Device : ViewMode()
+        data class Contact(val follow: Boolean) : ViewMode()
     }
 }
 

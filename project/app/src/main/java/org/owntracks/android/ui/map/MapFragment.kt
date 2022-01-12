@@ -11,8 +11,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
 import org.owntracks.android.location.LatLng
@@ -54,7 +52,12 @@ abstract class MapFragment<V : ViewDataBinding> internal constructor(
             updateCamera(latLng)
         })
         viewModel.allContacts.observe(viewLifecycleOwner, { contacts ->
-            contacts.values.forEach { updateMarkerForContact(it) }
+            contacts.values.forEach {
+                updateMarkerForContact(it)
+                if (it == viewModel.currentContact.value) {
+                    viewModel.refreshGeocodeForContact(it)
+                }
+            }
         })
         viewModel.myLocationEnabled.observe(viewLifecycleOwner, {
             initMap()
