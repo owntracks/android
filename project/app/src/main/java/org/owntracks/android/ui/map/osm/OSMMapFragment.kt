@@ -82,21 +82,23 @@ class OSMMapFragment internal constructor(
             } else {
                 controller.setCenter(GeoPoint(STARTING_LATITUDE, STARTING_LONGITUDE))
             }
-
-            overlays.add(
-                MyLocationNewOverlay(
-                    locationSource,
-                    this
-                ).apply {
-                    setOnClickListener { onMapClick() }
-                    setOnTouchListener { v, event ->
-                        if (event.action == ACTION_BUTTON_RELEASE) {
-                            v.performClick()
+            // Make sure we don't add to the overlays
+            if (!overlays.any { it is MyLocationNewOverlay && it.mMyLocationProvider == locationSource }) {
+                overlays.add(
+                    MyLocationNewOverlay(
+                        locationSource,
+                        this
+                    ).apply {
+                        setOnClickListener { onMapClick() }
+                        setOnTouchListener { v, event ->
+                            if (event.action == ACTION_BUTTON_RELEASE) {
+                                v.performClick()
+                            }
+                            onMapClick()
+                            false
                         }
-                        onMapClick()
-                        false
-                    }
-                })
+                    })
+            }
 
             setMultiTouchControls(true)
         }

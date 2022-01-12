@@ -4,6 +4,7 @@ import android.location.Location
 import android.os.Looper
 import org.owntracks.android.location.*
 import timber.log.Timber
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**
