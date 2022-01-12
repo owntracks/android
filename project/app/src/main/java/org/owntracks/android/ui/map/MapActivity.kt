@@ -27,6 +27,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.setPadding
 import androidx.fragment.app.commit
+import androidx.lifecycle.lifecycleScope
 import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.idling.CountingIdlingResource
 import com.google.android.material.appbar.AppBarLayout
@@ -162,7 +163,7 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
                 contact?.let {
                     binding?.contactPeek?.run {
                         image.setImageResource(0) // Remove old image before async loading the new one
-                        GlobalScope.launch(Dispatchers.Main) {
+                        lifecycleScope.launch {
                             contactImageBindingAdapter.run {
                                 image.setImageBitmap(
                                     getBitmapFromCache(it)
