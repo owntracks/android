@@ -39,7 +39,6 @@ class GoogleMapFragment internal constructor(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         val root = super.onCreateView(inflater, container, savedInstanceState)
         locationSource = MapLocationSource(
             locationProviderClient,
