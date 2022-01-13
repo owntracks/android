@@ -1,5 +1,6 @@
 package org.owntracks.android.ui.map
 
+import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -10,10 +11,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.geocoding.GeocoderProvider
-import org.owntracks.android.location.*
+import org.owntracks.android.location.LatLng
+import org.owntracks.android.location.toLatLng
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.model.messages.MessageClear
 import org.owntracks.android.model.messages.MessageLocation.Companion.REPORT_TYPE_USER
@@ -32,12 +35,12 @@ class MapViewModel @Inject constructor(
     private val locationProcessor: LocationProcessor,
     private val messageProcessor: MessageProcessor,
     private val geocoderProvider: GeocoderProvider,
-    private val preferences: Preferences
+    private val preferences: Preferences,
+    @ApplicationContext private val applicationContext: Context
 ) : ViewModel() {
     private val mutableCurrentContact = MutableLiveData<FusedContact?>()
     private val mutableBottomSheetHidden = MutableLiveData<Boolean>()
     private val mutableMapCenter = MutableLiveData<LatLng>()
-    private val mutableCurrentLocation = MutableLiveData<Location?>()
     private val mutableContactDistance = MutableLiveData(0f)
     private val mutableContactBearing = MutableLiveData(0f)
     private val mutableRelativeContactBearing = MutableLiveData(0f)
@@ -49,8 +52,8 @@ class MapViewModel @Inject constructor(
         get() = mutableBottomSheetHidden
     val mapCenter: LiveData<LatLng>
         get() = mutableMapCenter
-    val currentLocation: LiveData<Location?>
-        get() = mutableCurrentLocation
+    val currentLocation = LocationLiveData(applicationContext, viewModelScope)
+
     val contactDistance: LiveData<Float>
         get() = mutableContactDistance
     val contactBearing: LiveData<Float>
@@ -63,7 +66,7 @@ class MapViewModel @Inject constructor(
     val allContacts = contactsRepo.all
     val locationIdlingResource = SimpleIdlingResource("locationIdlingResource", false)
 
-    private var viewMode: ViewMode = ViewMode.Device
+    var viewMode: ViewMode = ViewMode.Device
 
     fun onMapReady() {
         when (viewMode) {
@@ -76,20 +79,6 @@ class MapViewModel @Inject constructor(
             is ViewMode.Device -> {
                 setViewModeDevice()
             }
-        }
-    }
-
-    val mapLocationUpdateCallback: LocationCallback = object : LocationCallback {
-        override fun onLocationResult(locationResult: LocationResult) {
-            mutableCurrentLocation.value = locationResult.lastLocation
-            locationIdlingResource.setIdleState(true)
-            if (viewMode is ViewMode.Device && mutableMapCenter.value != locationResult.lastLocation.toLatLng()) {
-                mutableMapCenter.postValue(locationResult.lastLocation.toLatLng())
-            }
-        }
-
-        override fun onLocationAvailability(locationAvailability: LocationAvailability) {
-            // NOOP
         }
     }
 
@@ -132,8 +121,8 @@ class MapViewModel @Inject constructor(
         Timber.v("setting view mode: VIEW_DEVICE")
         viewMode = ViewMode.Device
         clearActiveContact()
-        if (mutableCurrentLocation.value != null) {
-            mutableMapCenter.postValue(mutableCurrentLocation.value!!.toLatLng())
+        if (currentLocation.value != null) {
+            mutableMapCenter.postValue(currentLocation.value!!.toLatLng())
         } else {
             Timber.e("no location available")
         }
@@ -172,7 +161,7 @@ class MapViewModel @Inject constructor(
     }
 
     private fun updateActiveContactDistanceAndBearing(contact: FusedContact) {
-        mutableCurrentLocation.value?.run {
+        currentLocation.value?.run {
             updateActiveContactDistanceAndBearing(this, contact)
         }
     }
@@ -214,11 +203,11 @@ class MapViewModel @Inject constructor(
         mutableCurrentContact.value?.run {
             setViewModeContact(id, true)
         }
-
     }
 
     fun myLocationIsNowEnabled() {
         mutableMyLocationEnabled.postValue(true)
+        viewModelScope.launch { currentLocation.requestLocationUpdates() }
     }
 
     val orientationSensorEventListener = object : SensorEventListener {
@@ -253,4 +242,3 @@ class MapViewModel @Inject constructor(
         data class Contact(val follow: Boolean) : ViewMode()
     }
 }
-

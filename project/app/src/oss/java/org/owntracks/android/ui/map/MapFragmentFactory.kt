@@ -3,7 +3,6 @@ package org.owntracks.android.ui.map
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
 import org.owntracks.android.data.repos.LocationRepo
-import org.owntracks.android.location.LocationProviderClient
 import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.support.Preferences
 import org.owntracks.android.ui.map.osm.OSMMapFragment
@@ -19,12 +18,11 @@ import javax.inject.Inject
 class MapFragmentFactory @Inject constructor(
     private val locationRepo: LocationRepo,
     private val preferences: Preferences,
-    private val locationProviderClient: LocationProviderClient,
     private val contactImageBindingAdapter: ContactImageBindingAdapter
 ) : FragmentFactory() {
     override fun instantiate(classLoader: ClassLoader, className: String): Fragment {
         return if (MapFragment::class.java.isAssignableFrom(classLoader.loadClass(className))) {
-            OSMMapFragment(locationRepo, locationProviderClient, contactImageBindingAdapter)
+            OSMMapFragment(locationRepo, contactImageBindingAdapter)
         } else {
             super.instantiate(classLoader, className)
         }

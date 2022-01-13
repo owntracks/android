@@ -36,8 +36,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -139,7 +137,7 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
                 setSupportToolbar(it.appbar.toolbar, false, true)
                 setDrawer(it.appbar.toolbar)
                 bottomSheetBehavior = BottomSheetBehavior.from(it.bottomSheetLayout)
-                it.setVariable(BR.vm,mapViewModel)
+                it.setVariable(BR.vm, mapViewModel)
                 it.contactPeek.contactRow.setOnClickListener(this)
                 it.contactPeek.contactRow.setOnLongClickListener(this)
                 it.moreButton.setOnClickListener { v: View -> showPopupMenu(v) }
@@ -565,7 +563,7 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
 
     private fun setBottomSheetExpanded() {
         bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_EXPANDED
-        binding!!.mapFragment.setPaddingRelative(0,0,0,binding!!.bottomSheetLayout.height)
+        binding!!.mapFragment.setPaddingRelative(0, 0, 0, binding!!.bottomSheetLayout.height)
         orientationSensor?.let {
             sensorManager?.registerListener(
                 mapViewModel.orientationSensorEventListener,

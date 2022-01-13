@@ -3,35 +3,58 @@ package org.owntracks.android.ui.map
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.graphics.Bitmap
+import android.location.Location
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
+import androidx.lifecycle.Observer
+import com.google.android.gms.maps.*
 import com.google.android.gms.maps.GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE
-import com.google.android.gms.maps.MapsInitializer
-import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.*
 import org.owntracks.android.R
 import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.databinding.GoogleMapFragmentBinding
 import org.owntracks.android.gms.location.toGMSLatLng
-import org.owntracks.android.gms.location.toGMSLocationSource
-import org.owntracks.android.location.LocationProviderClient
+import org.owntracks.android.location.toLatLng
 import org.owntracks.android.support.ContactImageBindingAdapter
 import timber.log.Timber
 import java.util.*
 
 class GoogleMapFragment internal constructor(
     private val locationRepo: LocationRepo,
-    private val locationProviderClient: LocationProviderClient,
     contactImageBindingAdapter: ContactImageBindingAdapter
 ) : MapFragment<GoogleMapFragmentBinding>(contactImageBindingAdapter), OnMapReadyCallback {
-    private var locationSource: com.google.android.gms.maps.LocationSource? = null
-    private var googleMap: GoogleMap? = null
     override val layout: Int
         get() = R.layout.google_map_fragment
+
+    private var locationObserver: Observer<Location>? = null
+    private val googleMapLocationSource: com.google.android.gms.maps.LocationSource by lazy {
+        object : com.google.android.gms.maps.LocationSource {
+            override fun activate(onLocationChangedListener: LocationSource.OnLocationChangedListener) {
+                locationObserver = object : Observer<Location> {
+                    override fun onChanged(location: Location) {
+                        onLocationChangedListener.onLocationChanged(location)
+                        viewModel.locationIdlingResource.setIdleState(true)
+                        if (viewModel.viewMode == MapViewModel.ViewMode.Device) {
+                            updateCamera(location.toLatLng())
+                        }
+                    }
+
+                }
+                locationObserver?.run {
+                    viewModel.currentLocation.observe(viewLifecycleOwner, this)
+                }
+
+            }
+
+            override fun deactivate() {
+                locationObserver?.run(viewModel.currentLocation::removeObserver)
+            }
+        }
+    }
+
+    private var googleMap: GoogleMap? = null
     private val markers: MutableMap<String, Marker> = HashMap()
 
     override fun onCreateView(
@@ -40,13 +63,8 @@ class GoogleMapFragment internal constructor(
         savedInstanceState: Bundle?
     ): View {
         val root = super.onCreateView(inflater, container, savedInstanceState)
-        locationSource = MapLocationSource(
-            locationProviderClient,
-            viewModel.mapLocationUpdateCallback
-        ).toGMSLocationSource()
         binding.googleMapView.onCreate(savedInstanceState)
         binding.googleMapView.getMapAsync(this)
-
         return root
     }
 
@@ -79,17 +97,12 @@ class GoogleMapFragment internal constructor(
             uiSettings.isMyLocationButtonEnabled = false
             uiSettings.setAllGesturesEnabled(true)
 
-            setLocationSource(locationSource)
+            setLocationSource(googleMapLocationSource)
 
             setMapStyle()
 
-            val zoomLocation =
-                locationRepo.currentPublishedLocation.value?.run { LatLng(latitude, longitude) }
-                    ?: LatLng(
-                        MapActivity.STARTING_LATITUDE,
-                        MapActivity.STARTING_LONGITUDE
-                    )
-
+            val zoomLocation = viewModel.mapCenter.value?.run { LatLng(latitude, longitude) }
+                ?: LatLng(MapActivity.STARTING_LATITUDE, MapActivity.STARTING_LONGITUDE)
             moveCamera(
                 CameraUpdateFactory.newLatLngZoom(zoomLocation, ZOOM_LEVEL_STREET)
             )
@@ -105,7 +118,6 @@ class GoogleMapFragment internal constructor(
                     onMapClick()
                 }
             }
-
         }
     }
 
@@ -146,7 +158,6 @@ class GoogleMapFragment internal constructor(
 
     override fun onResume() {
         super.onResume()
-        googleMap?.setLocationSource(locationSource)
         binding.googleMapView.onResume()
         setMapStyle()
     }
@@ -158,7 +169,6 @@ class GoogleMapFragment internal constructor(
 
     override fun onPause() {
         binding.googleMapView.onPause()
-        locationSource?.deactivate()
         super.onPause()
     }
 
@@ -186,4 +196,3 @@ class GoogleMapFragment internal constructor(
         private const val ZOOM_LEVEL_STREET: Float = 15f
     }
 }
-

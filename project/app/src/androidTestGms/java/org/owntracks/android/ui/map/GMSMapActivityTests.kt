@@ -3,7 +3,6 @@ package org.owntracks.android.ui.map
 import android.Manifest
 import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso
-import androidx.test.espresso.IdlingPolicies
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -18,47 +17,25 @@ import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickD
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
 import com.adevinta.android.barista.interaction.PermissionGranter
-import com.adevinta.android.barista.rule.BaristaRule
-import com.adevinta.android.barista.rule.flaky.AllowFlaky
-import org.junit.Before
 import org.junit.FixMethodOrder
-import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 import org.owntracks.android.R
-import org.owntracks.android.testutils.rules.ScreenshotTakingOnTestEndRule
-import org.owntracks.android.e2e.setNotFirstStartPreferences
 import org.owntracks.android.support.Preferences
+import org.owntracks.android.testutils.TestWithAnActivity
+import org.owntracks.android.testutils.setNotFirstStartPreferences
 import org.owntracks.android.ui.clickOnAndWait
-import java.util.concurrent.TimeUnit
 
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-class GMSMapActivityTests {
-    @get:Rule
-    var baristaRule = BaristaRule.create(MapActivity::class.java)
-
-    private val screenshotRule = ScreenshotTakingOnTestEndRule()
-
-    @get:Rule
-    val ruleChain: RuleChain = RuleChain
-        .outerRule(baristaRule.activityTestRule)
-        .around(screenshotRule)
-
-    @Before
-    fun setIdlingTimeout() {
-        IdlingPolicies.setIdlingResourceTimeout(10, TimeUnit.SECONDS)
-    }
-
+class GMSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.java, false) {
     @Test
-    @AllowFlaky
     fun statusActivityCanBeLaunchedFromMapActivityDrawer() {
         setNotFirstStartPreferences()
-        baristaRule.launchActivity()
+        launchActivity()
         PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
         assertDrawerIsClosed()
         openDrawer()
@@ -77,10 +54,9 @@ class GMSMapActivityTests {
     }
 
     @Test
-    @AllowFlaky
     fun preferencesActivityCanBeLaunchedFromMapActivityDrawer() {
         setNotFirstStartPreferences()
-        baristaRule.launchActivity()
+        launchActivity()
         PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
         assertDrawerIsClosed()
 
@@ -103,18 +79,17 @@ class GMSMapActivityTests {
     }
 
     @Test
-    @AllowFlaky
     fun welcomeActivityShouldNotRunWhenFirstStartPreferencesSet() {
         setNotFirstStartPreferences()
-        baristaRule.launchActivity()
+        launchActivity()
+        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
         assertDisplayed(R.id.google_map_view)
     }
 
     @Test
-    @AllowFlaky
     fun enablingOSMMapSwitchesFromGMSMapToOSMMap() {
         setNotFirstStartPreferences()
-        baristaRule.launchActivity()
+        launchActivity()
         PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
         assertDisplayed(R.id.google_map_view)
 
@@ -135,23 +110,22 @@ class GMSMapActivityTests {
     }
 
     @Test
-    @AllowFlaky
     fun modeButtonOnMapActivityCyclesThroughModes() {
         setNotFirstStartPreferences()
-        baristaRule.launchActivity()
+        launchActivity()
         PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
         assertDisplayed(R.id.menu_monitoring)
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
     fun mapActivityShouldPromptForLocationServicesOnFirstTime() {
         try {
             InstrumentationRegistry.getInstrumentation().uiAutomation
                 .executeShellCommand("settings put secure location_mode 0")
                 .close()
             setNotFirstStartPreferences()
-            baristaRule.launchActivity()
+            launchActivity()
+            PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
             assertDisplayed(R.string.deviceLocationDisabledDialogTitle)
             clickDialogNegativeButton()
             assertDisplayed(R.id.google_map_view)
@@ -173,7 +147,8 @@ class GMSMapActivityTests {
                 .edit()
                 .putBoolean(Preferences.preferenceKeyUserDeclinedEnableLocationServices, true)
                 .apply()
-            baristaRule.launchActivity()
+            launchActivity()
+            PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
             assertNotExist(R.string.deviceLocationDisabledDialogTitle)
             assertDisplayed(R.id.google_map_view)
         } finally {

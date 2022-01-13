@@ -1,3 +1,4 @@
+---
 version: 2.1
 
 orbs:
@@ -8,7 +9,7 @@ jobs:
     # These next lines define the Android machine image executor: https://circleci.com/docs/2.0/executor-types/
     executor:
       name: android/android-docker
-      tag: 2021.10.2
+      tag: 2021.12.2
       resource-class: large
 
     steps:
@@ -29,7 +30,7 @@ jobs:
       - run:
           name: Build
           command: |
-            ./project/gradlew -p ./project assembleDebug assembleAndroidTest assembleGmsReleaseUnitTest :app:compileOssReleaseSources :app:packageGmsReleaseBundle --scan
+            ./project/gradlew -p ./project assembleDebug assembleAndroidTest assembleGmsReleaseUnitTest :app:compileOssReleaseSources :app:packageGmsReleaseBundle app:assembleGmsDebugAndroidTest app:assembleOssDebugAndroidTest --scan
 
       - android/save-gradle-cache:
           cache-prefix: v3
@@ -41,7 +42,7 @@ jobs:
   fdroid-scanner:
     executor:
       name: android/android-docker
-      tag: 2021.10.2
+      tag: 2021.12.2
       resource-class: small
     steps:
       - checkout
@@ -55,7 +56,7 @@ jobs:
   unit-test:
     executor:
       name: android/android-docker
-      tag: 2021.10.2
+      tag: 2021.12.2
       resource-class: large
 
     steps:
@@ -82,12 +83,12 @@ jobs:
       - persist_to_workspace:
           root: project/app/build/
           paths:
-          - jacoco/jacoco.xml
+            - jacoco/jacoco.xml
 
   lint:
     executor:
       name: android/android-docker
-      tag: 2021.10.2
+      tag: 2021.12.2
       resource-class: medium+
 
     steps:
@@ -116,9 +117,11 @@ jobs:
   oss-ui-tests:
     executor:
       name: android/android-machine
-      tag: 2021.10.1
+      tag: 2021.12.1
       resource-class: large
-
+    parallelism: 4
+    environment:
+      GRADLE_OPTS: "-Dkotlin.compiler.execution.strategy=in-process"
     steps:
       - checkout
       - android/accept-licenses
@@ -135,18 +138,21 @@ jobs:
             - gradle-v3-
       - android/start-emulator-and-run-tests:
           additional-avd-args: "-d pixel_3a -c 1G"
-          additional-emulator-args: "-memory 4096"
-          test-command: ./gradlew createOssDebugCoverageReport --scan -P"android.testInstrumentationRunnerArguments.numShards=$CIRCLE_NODE_TOTAL" -P"android.testInstrumentationRunnerArguments.shardIndex=$CIRCLE_NODE_INDEX"
+          additional-emulator-args: "-memory 4096 -cores 3"
+          test-command: ./gradlew createOssDebugCoverageReport --scan --no-daemon --max-workers 2
           system-image: system-images;android-29;default;x86_64
           restore-gradle-cache-post-emulator-launch: false
           run-tests-working-directory: ./project
           post-emulator-wait-steps:
-            - run: adb shell settings put secure location_providers_allowed +gps
-            - run: adb shell settings put secure location_providers_allowed +network
-            - run: adb shell settings put secure location_mode 3
+            - run: adb shell settings put secure location_providers_allowed +gps && adb shell settings put secure location_providers_allowed +network && adb shell settings put secure location_mode 3 && adb shell settings put global heads_up_notifications_enabled 0 && adb root && sleep 5 && adb shell setprop ctl.restart zygote
+            - run:
+                background: true
+                command: |
+                  adb logcat
+                name: Logcat
           post-emulator-launch-assemble-command: ""
-          run-logcat: true
-          max-tries: 1
+          run-logcat: false
+          max-tries: 2
           no-output-timeout: 30m
           save-gradle-cache: false
       - store_test_results:
@@ -154,7 +160,7 @@ jobs:
       - persist_to_workspace:
           root: project/app/build/
           paths:
-          - reports/coverage/oss/debug/report.xml
+            - reports/coverage/androidTest/oss/debug/report.xml
       - store_artifacts:
           path: project/app/build/reports/androidTests
           destination: espresso-report-oss
@@ -162,9 +168,11 @@ jobs:
   gms-ui-tests:
     executor:
       name: android/android-machine
-      tag: 2021.10.1
+      tag: 2021.12.1
       resource-class: large
-    parallelism: 2
+    parallelism: 4
+    environment:
+      GRADLE_OPTS: "-Dkotlin.compiler.execution.strategy=in-process"    
     steps:
       - checkout
       - android/accept-licenses
@@ -181,18 +189,21 @@ jobs:
             - gradle-v3-
       - android/start-emulator-and-run-tests:
           additional-avd-args: "-d pixel_3a -c 1G"
-          additional-emulator-args: "-memory 4096"
-          test-command: ./gradlew createGmsDebugCoverageReport --scan -P"android.testInstrumentationRunnerArguments.numShards=$CIRCLE_NODE_TOTAL" -P"android.testInstrumentationRunnerArguments.shardIndex=$CIRCLE_NODE_INDEX"
+          additional-emulator-args: "-memory 4096 -cores 3"
+          test-command: ./gradlew createGmsDebugCoverageReport --scan --no-daemon --max-workers 2
           system-image: system-images;android-29;google_apis;x86_64
           restore-gradle-cache-post-emulator-launch: false
           run-tests-working-directory: ./project
           post-emulator-wait-steps:
-            - run: adb shell settings put secure location_providers_allowed +gps
-            - run: adb shell settings put secure location_providers_allowed +network
-            - run: adb shell settings put secure location_mode 3
+            - run: adb shell settings put secure location_providers_allowed +gps && adb shell settings put secure location_providers_allowed +network && adb shell settings put secure location_mode 3 && adb shell settings put global heads_up_notifications_enabled 0 && adb root && sleep 5 && adb shell setprop ctl.restart zygote
+            - run:
+                background: true
+                command: |
+                  adb logcat
+                name: Logcat
           post-emulator-launch-assemble-command: ""
-          run-logcat: true
-          max-tries: 1
+          run-logcat: false
+          max-tries: 2
           no-output-timeout: 30m
           save-gradle-cache: false
       - run:
@@ -205,7 +216,7 @@ jobs:
       - persist_to_workspace:
           root: project/app/build/
           paths:
-            - reports/coverage/gms/debug/report.xml
+            - reports/coverage/androidTest/gms/debug/report.xml
       - store_artifacts:
           path: project/app/build/reports/androidTests
           destination: espresso-report-gms
@@ -252,7 +263,7 @@ jobs:
   publish-to-play-store:
     executor:
       name: android/android-docker
-      tag: 2021.10.2
+      tag: 2021.12.2
       resource-class: medium
 
     steps:
@@ -314,3 +325,4 @@ workflows:
           filters:
             branches:
               only: master
+

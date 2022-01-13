@@ -14,6 +14,9 @@ import androidx.preference.PreferenceManager
 import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
 import org.owntracks.android.location.LatLng
+import org.owntracks.android.location.LocationAvailability
+import org.owntracks.android.location.LocationCallback
+import org.owntracks.android.location.LocationResult
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.support.ContactImageBindingAdapter
 import timber.log.Timber
@@ -35,24 +38,16 @@ abstract class MapFragment<V : ViewDataBinding> internal constructor(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        Configuration.getInstance().apply {
-            load(context, PreferenceManager.getDefaultSharedPreferences(context))
-            osmdroidBasePath.resolve("tiles").run {
-                if (exists()) {
-                    deleteRecursively()
-                }
-            }
-            osmdroidTileCache = requireContext().noBackupFilesDir.resolve("osmdroid/tiles")
-        }
+
         binding = DataBindingUtil.inflate(inflater, layout, container, false)
-        binding.lifecycleOwner = this
+        binding.lifecycleOwner = this.viewLifecycleOwner
 
         initMap()
         viewModel.mapCenter.observe(viewLifecycleOwner, { latLng: LatLng ->
             updateCamera(latLng)
         })
         viewModel.allContacts.observe(viewLifecycleOwner, { contacts ->
-            contacts.values.forEach {
+            contacts.values.toSet().forEach {
                 updateMarkerForContact(it)
                 if (it == viewModel.currentContact.value) {
                     viewModel.refreshGeocodeForContact(it)

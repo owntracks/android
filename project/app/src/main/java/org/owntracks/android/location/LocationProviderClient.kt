@@ -4,11 +4,6 @@ import android.location.Location
 import android.os.Looper
 
 abstract class LocationProviderClient {
-
-    fun requestLocationUpdates(locationRequest: LocationRequest, clientCallBack: LocationCallback) {
-        requestLocationUpdates(locationRequest, clientCallBack, null)
-    }
-
     fun requestLocationUpdates(
         locationRequest: LocationRequest,
         clientCallBack: LocationCallback,
@@ -16,7 +11,6 @@ abstract class LocationProviderClient {
     ) {
         removeLocationUpdates(clientCallBack)
         actuallyRequestLocationUpdates(locationRequest, clientCallBack, looper)
-
     }
 
     protected abstract fun actuallyRequestLocationUpdates(

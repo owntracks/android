@@ -1,7 +1,7 @@
 plugins {
     id("com.android.application")
     id("dagger.hilt.android.plugin")
-    id("com.github.triplet.play") version "3.5.0"
+    id("com.github.triplet.play") version "3.6.0"
     kotlin("android")
     kotlin("kapt")
     id("io.objectbox")
@@ -20,6 +20,8 @@ jacoco {
 
 
 val gmsImplementation: Configuration by configurations.creating
+val numShards = System.getenv("CIRCLE_NODE_TOTAL") ?: "0"
+val shardIndex = System.getenv("CIRCLE_NODE_INDEX") ?: "0"
 
 android {
     compileSdk = 31
@@ -32,23 +34,23 @@ android {
         versionCode = 24600
         versionName = "2.4.6"
 
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments(mapOf("eventBusIndex" to "org.owntracks.android.EventBusIndex"))
-            }
-        }
         val locales = listOf("en", "de", "fr", "es", "ru", "ca", "pl", "cs", "ja", "pt", "zh")
         buildConfigField(
             "String[]",
             "TRANSLATION_ARRAY",
             "new String[]{\"" + locales.joinToString("\",\"") + "\"}"
         )
-        resConfigs(locales)
-        testInstrumentationRunner("androidx.test.runner.AndroidJUnitRunner")
+        resourceConfigurations.addAll(locales)
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments.putAll(
             mapOf(
-                "clearPackageData" to "false",
-                "coverageFilePath" to "/storage/emulated/0/coverage"
+                "clearPackageData" to "true",
+                "coverage" to "true",
+                "coverageFilePath" to "/sdcard/coverage/",
+                "disableAnalytics" to "true",
+                "useTestStorageService" to "false", // TODO: use this when we get to AGP 7.1
+                "numShards" to numShards,
+                "shardIndex" to shardIndex
             )
         )
     }
@@ -71,9 +73,11 @@ android {
         named("release") {
             isMinifyEnabled = true
             isShrinkResources = true
-            proguardFiles = mutableListOf(
-                getDefaultProguardFile("proguard-android.txt"),
-                file("proguard-rules.pro")
+            proguardFiles.addAll(
+                listOf(
+                    getDefaultProguardFile("proguard-android.txt"),
+                    file("proguard-rules.pro")
+                )
             )
             resValue("string", "GOOGLE_MAPS_API_KEY", googleMapsAPIKey)
             signingConfig = signingConfigs.findByName("release")
@@ -82,9 +86,11 @@ android {
         named("debug") {
             isMinifyEnabled = false
             isShrinkResources = false
-            proguardFiles = mutableListOf(
-                getDefaultProguardFile("proguard-android.txt"),
-                file("proguard-rules.pro")
+            proguardFiles.addAll(
+                listOf(
+                    getDefaultProguardFile("proguard-android.txt"),
+                    file("proguard-rules.pro")
+                )
             )
             resValue("string", "GOOGLE_MAPS_API_KEY", googleMapsAPIKey)
             applicationIdSuffix = ".debug"
@@ -97,28 +103,29 @@ android {
         viewBinding = true
     }
 
-    packagingOptions.excludes.addAll(
-        listOf(
-            "META-INF/DEPENDENCIES.txt",
-            "META-INF/LICENSE.txt",
-            "META-INF/NOTICE.txt",
-            "META-INF/NOTICE",
-            "META-INF/LICENSE",
-            "META-INF/DEPENDENCIES",
-            "META-INF/notice.txt",
-            "META-INF/license.txt",
-            "META-INF/dependencies.txt",
-            "META-INF/LGPL2.1",
-            "META-INF/proguard/androidx-annotations.pro",
-            "META-INF/metadata.kotlin_module",
-            "META-INF/metadata.jvm.kotlin_module",
-            "META-INF/gradle/incremental.annotation.processors"
+    packagingOptions {
+        resources.excludes.addAll(
+            listOf(
+                "META-INF/DEPENDENCIES.txt",
+                "META-INF/LICENSE.txt",
+                "META-INF/NOTICE.txt",
+                "META-INF/NOTICE",
+                "META-INF/LICENSE",
+                "META-INF/DEPENDENCIES",
+                "META-INF/notice.txt",
+                "META-INF/license.txt",
+                "META-INF/dependencies.txt",
+                "META-INF/LGPL2.1",
+                "META-INF/proguard/androidx-annotations.pro",
+                "META-INF/metadata.kotlin_module",
+                "META-INF/metadata.jvm.kotlin_module",
+                "META-INF/gradle/incremental.annotation.processors"
+            )
         )
-    )
-    packagingOptions.jniLibs.useLegacyPackaging = false
+        jniLibs.useLegacyPackaging = false
+    }
 
-
-    lintOptions {
+    lint {
         baselineFile = file("../../lint/lint-baseline.xml")
         isCheckAllWarnings = true
         isWarningsAsErrors = false
@@ -130,11 +137,15 @@ android {
         )
     }
     testOptions {
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
         animationsDisabled = true
         unitTests {
             isIncludeAndroidResources = true
             isIncludeAndroidResources = true
         }
+    }
+    testCoverage {
+        jacocoVersion = rootJacocoVersion
     }
 
     tasks.withType<Test> {
@@ -153,7 +164,7 @@ android {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
-    flavorDimensions("locationProvider")
+    flavorDimensions.add("locationProvider")
     productFlavors {
         create("gms") {
             dimension = "locationProvider"
@@ -170,6 +181,9 @@ android {
 
 kapt {
     correctErrorTypes = true
+    arguments {
+        arg("eventBusIndex", "org.owntracks.android.EventBusIndex")
+    }
 }
 
 tasks.withType<Test> {
@@ -240,6 +254,8 @@ dependencies {
     implementation("com.mikepenz:materialize:1.2.1@aar")
     implementation("com.takisoft.preferencex:preferencex:1.1.0")
 
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.8.1")
+
     // These Java EE libs are no longer included in JDKs, so we include explicitly
     kapt("javax.xml.bind:jaxb-api:2.3.1")
     kapt("com.sun.xml.bind:jaxb-core:$jaxbVersion")
@@ -260,21 +276,24 @@ dependencies {
         exclude("org.jetbrains.kotlin")
     }
     androidTestImplementation("com.squareup.okhttp3:mockwebserver:${okHttpVersion}")
+    androidTestImplementation("com.github.davidepianca98.KMQTT:kmqtt:0.2.9")
 
     androidTestImplementation("androidx.test:rules:${androidxTestVersion}")
     androidTestImplementation("androidx.test:runner:${androidxTestVersion}")
+    androidTestImplementation("com.squareup.leakcanary:leakcanary-android-instrumentation:2.8.1")
 
     androidTestUtil("androidx.test.services:test-services:1.4.1")
+    androidTestUtil("androidx.test:orchestrator:1.4.1")
 }
 
 
 // Publishing
-val serviceAccountCreds = file("owntracks-android-gcloud-creds.json")
+val serviceAccountCredentials = file("owntracks-android-gcloud-creds.json")
 
 play {
-    if (serviceAccountCreds.exists()) {
+    if (this@Build_gradle.serviceAccountCredentials.exists()) {
         enabled.set(true)
-        serviceAccountCredentials.set(serviceAccountCreds)
+        serviceAccountCredentials.set(this@Build_gradle.serviceAccountCredentials)
     } else {
         enabled.set(false)
     }

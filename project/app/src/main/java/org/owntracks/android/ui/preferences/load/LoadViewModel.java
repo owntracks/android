@@ -105,14 +105,15 @@ public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadM
                 // Note: left here to avoid breaking compatibility.  May be removed
                 // with sufficient testing. Will not work on Android >5 without granting READ_EXTERNAL_STORAGE permission
                 Timber.v("using file:// uri");
-                BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(uri.getPath())));
-                StringBuilder total = new StringBuilder();
+                try (BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(uri.getPath())))) {
+                    StringBuilder total = new StringBuilder();
 
-                String content;
-                while ((content = r.readLine()) != null) {
-                    total.append(content);
+                    String content;
+                    while ((content = r.readLine()) != null) {
+                        total.append(content);
+                    }
+                    setConfiguration(total.toString());
                 }
-                setConfiguration(total.toString());
             } else if ("owntracks".equals(uri.getScheme()) && "/config".equals(uri.getPath())) {
                 Timber.v("Importing config using owntracks: scheme");
 

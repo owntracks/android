@@ -176,11 +176,12 @@ public class LoadActivity extends BaseActivity<UiPreferencesLoadBinding, LoadMvv
     }
 
     private byte[] getContentFromURI(Uri uri) throws IOException {
-        InputStream stream = getContentResolver().openInputStream(uri);
-        byte[] output = new byte[stream.available()];
-        int bytesRead = stream.read(output);
-        Timber.d("Read %d bytes from content URI", bytesRead);
-        return output;
+        try (InputStream stream = getContentResolver().openInputStream(uri)) {
+            byte[] output = new byte[stream.available()];
+            int bytesRead = stream.read(output);
+            Timber.d("Read %d bytes from content URI", bytesRead);
+            return output;
+        }
     }
 
     @Override

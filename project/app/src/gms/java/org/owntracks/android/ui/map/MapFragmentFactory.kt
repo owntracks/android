@@ -21,16 +21,16 @@ import javax.inject.Inject
 class MapFragmentFactory @Inject constructor(
     private val locationRepo: LocationRepo,
     private val preferences: Preferences,
-    private val locationProviderClient: LocationProviderClient,
     private val contactImageBindingAdapter: ContactImageBindingAdapter
 ) : FragmentFactory() {
     override fun instantiate(classLoader: ClassLoader, className: String): Fragment {
         Timber.d("Instantiating Fragment for $className")
+
         return if (MapFragment::class.java.isAssignableFrom(classLoader.loadClass(className))) {
             if (preferences.experimentalFeatures.contains(Preferences.EXPERIMENTAL_FEATURE_USE_OSM_MAP)) {
-                OSMMapFragment(locationRepo, locationProviderClient, contactImageBindingAdapter)
+                OSMMapFragment(locationRepo,  contactImageBindingAdapter)
             } else {
-                GoogleMapFragment(locationRepo, locationProviderClient, contactImageBindingAdapter)
+                GoogleMapFragment(locationRepo,  contactImageBindingAdapter)
             }
         } else {
             super.instantiate(classLoader, className)

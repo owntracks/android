@@ -21,6 +21,6 @@ import org.owntracks.android.ui.base.viewmodel.MvvmViewModel
 interface ContactsMvvm {
     interface View : MvvmView
     interface ViewModel<V : MvvmView?> : MvvmViewModel<V> {
-        val contacts: LiveData<MutableMap<String, FusedContact>>
+        val contacts: LiveData<out Map<String, FusedContact>>
     }
 }

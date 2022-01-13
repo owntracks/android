@@ -28,7 +28,7 @@ class GMSLocationProviderClient(
 ) : LocationProviderClient() {
 
     private val callbackMap =
-        mutableMapOf<LocationCallback, com.google.android.gms.location.LocationCallback>()
+        mutableMapOf<Int, com.google.android.gms.location.LocationCallback>()
 
     /**
      * Converts the generic callback into a GMS-specific callback before invoking the location client
@@ -46,37 +46,24 @@ class GMSLocationProviderClient(
         looper: Looper?
     ) {
         Timber.i("Requesting location updates priority=${locationRequest.priority}, interval=${locationRequest.interval} clientCallback=${clientCallBack.hashCode()}, requester=$contextClass")
-
-        val gmsCallBack = object : com.google.android.gms.location.LocationCallback() {
-            override fun onLocationResult(locationResult: LocationResult) {
-                clientCallBack.onLocationResult(
-                    org.owntracks.android.location.LocationResult(
-                        locationResult.lastLocation
-                    )
-                )
-            }
-
-            override fun onLocationAvailability(locationAvailability: LocationAvailability) {
-                clientCallBack.onLocationAvailability(
-                    org.owntracks.android.location.LocationAvailability(
-                        locationAvailability.isLocationAvailable
-                    )
-                )
-            }
+        if (looper == null) {
+            Timber.e("No looper provided, can't request GMS location updates")
+            return
         }
-        callbackMap[clientCallBack] = gmsCallBack
+        val gmsCallBack = GMSLocationCallback(clientCallBack)
+        callbackMap[clientCallBack.hashCode()] = gmsCallBack
         fusedLocationProviderClient.requestLocationUpdates(
             locationRequest.toGMSLocationRequest(),
             gmsCallBack,
-            looper!!
+            looper
         )
     }
 
     override fun removeLocationUpdates(clientCallBack: LocationCallback) {
-        callbackMap[clientCallBack]?.run {
+        callbackMap[clientCallBack.hashCode()]?.run {
             Timber.d("Removing location updates clientcallback=${clientCallBack.hashCode()}")
             fusedLocationProviderClient.removeLocationUpdates(this)
-            callbackMap.remove(clientCallBack)
+            callbackMap.remove(clientCallBack.hashCode())
         }
     }
 
@@ -108,5 +95,32 @@ class GMSLocationProviderClient(
 
     init {
         Timber.i("Using Google Play Services as a location provider called from $contextClass")
+    }
+
+}
+
+/**
+ * This is a wrapper around a [LocationCallback] instance that can be given to something that needs
+ * a [com.google.android.gms.location.LocationCallback]. Once the thing that owns the [com.google.android.gms.location.LocationCallback]
+ * has any of its methods triggered, it then passes that on to the methods of the [LocationCallback]
+ *
+ * @property clientCallBack the [LocationCallback] to wrap
+ */
+class GMSLocationCallback(private val clientCallBack: LocationCallback) :
+    com.google.android.gms.location.LocationCallback() {
+    override fun onLocationResult(locationResult: LocationResult) {
+        clientCallBack.onLocationResult(
+            org.owntracks.android.location.LocationResult(
+                locationResult.lastLocation
+            )
+        )
+    }
+
+    override fun onLocationAvailability(locationAvailability: LocationAvailability) {
+        clientCallBack.onLocationAvailability(
+            org.owntracks.android.location.LocationAvailability(
+                locationAvailability.isLocationAvailable
+            )
+        )
     }
 }

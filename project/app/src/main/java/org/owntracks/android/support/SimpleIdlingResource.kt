@@ -27,7 +27,8 @@ import java.util.concurrent.atomic.AtomicBoolean
  * Consider using CountingIdlingResource from espresso-contrib package if you use this class from
  * multiple threads or need to keep a count of pending operations.
  */
-class SimpleIdlingResource(private val resourceName: @NotNull String, initialIdlingState: Boolean) : IdlingResource {
+class SimpleIdlingResource(private val resourceName: @NotNull String, initialIdlingState: Boolean) :
+    IdlingResource {
     @Volatile
     private var mCallback: ResourceCallback? = null
 

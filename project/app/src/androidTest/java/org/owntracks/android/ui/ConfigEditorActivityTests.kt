@@ -3,7 +3,6 @@ package org.owntracks.android.ui
 import android.app.Instrumentation
 import android.content.Intent
 import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
-import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.*
@@ -13,50 +12,18 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickDialogPositiveButton
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
-import com.adevinta.android.barista.rule.BaristaRule
-import com.adevinta.android.barista.rule.flaky.AllowFlaky
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.allOf
-import org.junit.After
-import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.owntracks.android.R
-import org.owntracks.android.testutils.rules.ScreenshotTakingOnTestEndRule
+import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.ui.preferences.editor.EditorActivity
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class ConfigEditorActivityTests {
-    @get:Rule
-    var baristaRule = BaristaRule.create(EditorActivity::class.java)
-
-    private val screenshotRule = ScreenshotTakingOnTestEndRule()
-
-    @get:Rule
-    val ruleChain: RuleChain = RuleChain
-        .outerRule(baristaRule.activityTestRule)
-        .around(screenshotRule)
-
-    @Before
-    fun initIntents() {
-        Intents.init()
-    }
-
-    @After
-    fun releaseIntents() {
-        Intents.release()
-    }
-
-    @Before
-    fun setUp() {
-        baristaRule.launchActivity()
-    }
-
+class ConfigEditorActivityTests : TestWithAnActivity<EditorActivity>(EditorActivity::class.java) {
     @Test
-    @AllowFlaky
     fun configurationManagementCanEditASetType() {
         openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
         clickOn(R.string.preferencesEditor)
@@ -73,7 +40,6 @@ class ConfigEditorActivityTests {
     }
 
     @Test
-    @AllowFlaky
     fun configurationManagementCanEditAStringType() {
         openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
         clickOn(R.string.preferencesEditor)
@@ -100,7 +66,6 @@ class ConfigEditorActivityTests {
     }
 
     @Test
-    @AllowFlaky
     fun configurationManagementCanEditABooleanType() {
         openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
         clickOn(R.string.preferencesEditor)
@@ -114,7 +79,6 @@ class ConfigEditorActivityTests {
     }
 
     @Test
-    @AllowFlaky
     fun editorActivityShowsDefaultConfig() {
         assertContains(
             R.id.effectiveConfiguration,
@@ -123,7 +87,6 @@ class ConfigEditorActivityTests {
     }
 
     @Test
-    @AllowFlaky
     fun editorCanExportConfig() {
         val chooserIntentMatcher = allOf(
             hasAction(Intent.ACTION_CHOOSER),

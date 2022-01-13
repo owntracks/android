@@ -2,7 +2,7 @@
 
 buildscript {
     extra.apply {
-        set("dagger-version","2.40.1")
+        set("dagger-version", "2.40.1")
     }
     repositories {
         google()
@@ -10,10 +10,9 @@ buildscript {
         maven("https://plugins.gradle.org/m2/")
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:4.2.2")
+        classpath("com.android.tools.build:gradle:7.0.4")
         classpath("com.hiya:jacoco-android:0.2")
         classpath("io.objectbox:objectbox-gradle-plugin:3.0.1")
-        //noinspection DifferentKotlinGradleVersion
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10")
         classpath("com.google.dagger:hilt-android-gradle-plugin:${rootProject.extra["dagger-version"]}")
     }
@@ -23,6 +22,7 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        maven("https://jitpack.io")
         jcenter()
     }
 }

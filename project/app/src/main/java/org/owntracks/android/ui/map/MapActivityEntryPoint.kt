@@ -9,5 +9,4 @@ import org.owntracks.android.location.LocationProviderClient
 @InstallIn(ActivityComponent::class)
 interface MapActivityEntryPoint {
     val fragmentFactory: MapFragmentFactory
-    val locationProviderClient: LocationProviderClient
 }

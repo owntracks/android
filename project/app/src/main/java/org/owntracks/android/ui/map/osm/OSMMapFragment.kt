@@ -2,53 +2,92 @@ package org.owntracks.android.ui.map.osm
 
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
+import android.location.Location
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MotionEvent.ACTION_BUTTON_RELEASE
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Observer
+import androidx.preference.PreferenceManager
+import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.TilesOverlay
+import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import org.owntracks.android.R
 import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.databinding.OsmMapFragmentBinding
 import org.owntracks.android.location.LatLng
-import org.owntracks.android.location.LocationProviderClient
 import org.owntracks.android.location.toGeoPoint
-import org.owntracks.android.location.toOSMLocationSource
+import org.owntracks.android.location.toLatLng
 import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.ui.map.MapActivity
 import org.owntracks.android.ui.map.MapActivity.Companion.STARTING_LATITUDE
 import org.owntracks.android.ui.map.MapActivity.Companion.STARTING_LONGITUDE
 import org.owntracks.android.ui.map.MapFragment
-import org.owntracks.android.ui.map.MapLocationSource
+import org.owntracks.android.ui.map.MapViewModel
 import timber.log.Timber
 
 class OSMMapFragment internal constructor(
     private val locationRepo: LocationRepo,
-    private val locationProviderClient: LocationProviderClient,
     contactImageBindingAdapter: ContactImageBindingAdapter
 ) : MapFragment<OsmMapFragmentBinding>(contactImageBindingAdapter) {
-    private var locationSource: IMyLocationProvider? = null
-    private var mapView: MapView? = null
     override val layout: Int
         get() = R.layout.osm_map_fragment
+
+    private var locationObserver: Observer<Location>? = null
+    private val osmMapLocationSource: IMyLocationProvider = object : IMyLocationProvider {
+        override fun startLocationProvider(myLocationConsumer: IMyLocationConsumer?): Boolean {
+            val locationProvider: IMyLocationProvider = this
+            locationObserver = Observer<Location> { location ->
+                myLocationConsumer?.onLocationChanged(location, locationProvider)
+                viewModel.locationIdlingResource.setIdleState(true)
+                if (viewModel.viewMode == MapViewModel.ViewMode.Device) {
+                    updateCamera(location.toLatLng())
+                }
+            }
+            locationObserver?.run {
+                viewModel.currentLocation.observe(viewLifecycleOwner, this)
+            }
+            return true
+        }
+
+        override fun stopLocationProvider() {
+            locationObserver?.run(viewModel.currentLocation::removeObserver)
+        }
+
+        override fun getLastKnownLocation(): Location? {
+            return viewModel.currentLocation.value
+        }
+
+        override fun destroy() {
+            stopLocationProvider()
+        }
+    }
+
+    private var mapView: MapView? = null
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        locationSource = MapLocationSource(
-            locationProviderClient,
-            viewModel.mapLocationUpdateCallback
-        ).toOSMLocationSource()
+        Configuration.getInstance().apply {
+            load(context, PreferenceManager.getDefaultSharedPreferences(context))
+            osmdroidBasePath.resolve("tiles").run {
+                if (exists()) {
+                    deleteRecursively()
+                }
+            }
+            osmdroidTileCache = requireContext().noBackupFilesDir.resolve("osmdroid/tiles")
+        }
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
@@ -77,10 +116,10 @@ class OSMMapFragment internal constructor(
                     ?: GeoPoint(STARTING_LATITUDE, STARTING_LONGITUDE)
             controller.setCenter(zoomLocation)
             // Make sure we don't add to the overlays
-            if (!overlays.any { it is MyLocationNewOverlay && it.mMyLocationProvider == locationSource }) {
+            if (!overlays.any { it is MyLocationNewOverlay && it.mMyLocationProvider == osmMapLocationSource }) {
                 overlays.add(
                     MyLocationNewOverlay(
-                        locationSource,
+                        osmMapLocationSource,
                         this
                     ).apply {
                         setOnClickListener { onMapClick() }
@@ -153,6 +192,11 @@ class OSMMapFragment internal constructor(
     override fun onDetach() {
         mapView?.onDetach()
         super.onDetach()
+    }
+
+    override fun onStop() {
+        mapView?.onDetach()
+        super.onStop()
     }
 
     companion object {

@@ -1,5 +1,6 @@
 package org.owntracks.android.ui.map
 
+import android.Manifest
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import androidx.preference.PreferenceManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -9,39 +10,20 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotExist
 import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickDialogNegativeButton
 import com.adevinta.android.barista.interaction.PermissionGranter
-import com.adevinta.android.barista.rule.BaristaRule
-import com.adevinta.android.barista.rule.flaky.AllowFlaky
-import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.support.Preferences
-import org.owntracks.android.testutils.rules.ScreenshotTakingOnTestEndRule
+import org.owntracks.android.testutils.TestWithAnActivity
+import org.owntracks.android.testutils.setNotFirstStartPreferences
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class OSSMapActivityTests {
-    @get:Rule
-    var baristaRule = BaristaRule.create(MapActivity::class.java)
-
-    private val screenshotRule = ScreenshotTakingOnTestEndRule()
-
-    @get:Rule
-    val ruleChain: RuleChain = RuleChain
-        .outerRule(baristaRule.activityTestRule)
-        .around(screenshotRule)
-
+class OSSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.java, false) {
     @Test
-    @AllowFlaky
     fun welcomeActivityShouldNotRunWhenFirstStartPreferencesSet() {
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
-        PreferenceManager.getDefaultSharedPreferences(context)
-            .edit()
-            .putBoolean(context.getString(R.string.preferenceKeyFirstStart), false)
-            .putBoolean(context.getString(R.string.preferenceKeySetupNotCompleted), false)
-            .apply()
-        baristaRule.launchActivity()
+        setNotFirstStartPreferences()
+        launchActivity()
         PermissionGranter.allowPermissionsIfNeeded(ACCESS_FINE_LOCATION)
         assertDisplayed(R.id.osm_map_view)
     }
@@ -52,13 +34,9 @@ class OSSMapActivityTests {
             InstrumentationRegistry.getInstrumentation().uiAutomation
                 .executeShellCommand("settings put secure location_mode 0")
                 .close()
-            val context = InstrumentationRegistry.getInstrumentation().targetContext
-            PreferenceManager.getDefaultSharedPreferences(context)
-                .edit()
-                .putBoolean(context.getString(R.string.preferenceKeyFirstStart), false)
-                .putBoolean(context.getString(R.string.preferenceKeySetupNotCompleted), false)
-                .apply()
-            baristaRule.launchActivity()
+            setNotFirstStartPreferences()
+            launchActivity()
+            PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
             assertDisplayed(R.string.deviceLocationDisabledDialogTitle)
             clickDialogNegativeButton()
             assertDisplayed(R.id.osm_map_view)
@@ -75,15 +53,13 @@ class OSSMapActivityTests {
             InstrumentationRegistry.getInstrumentation().uiAutomation
                 .executeShellCommand("settings put secure location_mode 0")
                 .close()
-            val context = InstrumentationRegistry.getInstrumentation().targetContext
-            PreferenceManager.getDefaultSharedPreferences(context)
+            setNotFirstStartPreferences()
+            PreferenceManager.getDefaultSharedPreferences(InstrumentationRegistry.getInstrumentation().targetContext)
                 .edit()
-                .putBoolean(context.getString(R.string.preferenceKeyFirstStart), false)
-                .putBoolean(context.getString(R.string.preferenceKeySetupNotCompleted), false)
-                .putBoolean(context.getString(R.string.preferenceKeySetupNotCompleted), false)
                 .putBoolean(Preferences.preferenceKeyUserDeclinedEnableLocationServices, true)
                 .apply()
-            baristaRule.launchActivity()
+            launchActivity()
+            PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
             assertNotExist(R.string.deviceLocationDisabledDialogTitle)
             assertDisplayed(R.id.osm_map_view)
         } finally {
