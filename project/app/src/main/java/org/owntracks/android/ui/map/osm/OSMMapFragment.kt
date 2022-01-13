@@ -72,16 +72,10 @@ class OSMMapFragment internal constructor(
             setTileSource(TileSourceFactory.MAPNIK)
             zoomController.setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
             controller.setZoom(ZOOM_STREET_LEVEL)
-            if (locationRepo.currentLocation != null) {
-                controller.setCenter(
-                    GeoPoint(
-                        locationRepo.currentLocation!!.latitude,
-                        locationRepo.currentLocation!!.longitude
-                    )
-                )
-            } else {
-                controller.setCenter(GeoPoint(STARTING_LATITUDE, STARTING_LONGITUDE))
-            }
+            val zoomLocation =
+                locationRepo.currentPublishedLocation.value?.run { GeoPoint(latitude, longitude) }
+                    ?: GeoPoint(STARTING_LATITUDE, STARTING_LONGITUDE)
+            controller.setCenter(zoomLocation)
             // Make sure we don't add to the overlays
             if (!overlays.any { it is MyLocationNewOverlay && it.mMyLocationProvider == locationSource }) {
                 overlays.add(

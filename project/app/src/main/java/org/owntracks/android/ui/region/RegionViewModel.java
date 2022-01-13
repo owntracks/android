@@ -37,9 +37,9 @@ public class RegionViewModel extends BaseViewModel<RegionMvvm.View> implements R
         WaypointModel w = waypointsRepo.get(id);
         if(w == null) {
             w = new WaypointModel();
-            if (locationRepo.hasLocation()) {
-                w.setGeofenceLatitude(locationRepo.getCurrentLocation().getLatitude());
-                w.setGeofenceLongitude(locationRepo.getCurrentLocation().getLongitude());
+            if (locationRepo.getCurrentMapLocation() != null) {
+                w.setGeofenceLatitude(locationRepo.getCurrentMapLocation().getLatitude());
+                w.setGeofenceLongitude(locationRepo.getCurrentMapLocation().getLongitude());
             } else {
                 w.setGeofenceLatitude(0);
                 w.setGeofenceLongitude(0);
