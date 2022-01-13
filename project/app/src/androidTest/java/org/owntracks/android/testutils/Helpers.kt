@@ -1,4 +1,4 @@
-package org.owntracks.android.e2e
+package org.owntracks.android.testutils
 
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
@@ -26,5 +26,4 @@ fun setNotFirstStartPreferences() {
         .putBoolean(context.getString(R.string.preferenceKeyFirstStart), false)
         .putBoolean(context.getString(R.string.preferenceKeySetupNotCompleted), false)
         .apply()
-
 }

@@ -3,7 +3,6 @@ package org.owntracks.android.ui
 import android.app.Instrumentation
 import android.content.Intent
 import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
-import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.*
@@ -13,56 +12,26 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickDialogPositiveButton
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
-import com.adevinta.android.barista.rule.BaristaRule
 import com.adevinta.android.barista.rule.flaky.AllowFlaky
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.allOf
-import org.junit.After
-import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.owntracks.android.R
-import org.owntracks.android.testutils.rules.ScreenshotTakingOnTestEndRule
+import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.ui.preferences.editor.EditorActivity
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class ConfigEditorActivityTests {
-    @get:Rule
-    var baristaRule = BaristaRule.create(EditorActivity::class.java)
-
-    private val screenshotRule = ScreenshotTakingOnTestEndRule()
-
-    @get:Rule
-    val ruleChain: RuleChain = RuleChain
-        .outerRule(baristaRule.activityTestRule)
-        .around(screenshotRule)
-
-    @Before
-    fun initIntents() {
-        Intents.init()
-    }
-
-    @After
-    fun releaseIntents() {
-        Intents.release()
-    }
-
-    @Before
-    fun setUp() {
-        baristaRule.launchActivity()
-    }
-
+class ConfigEditorActivityTests : TestWithAnActivity<EditorActivity>(EditorActivity::class.java) {
     @Test
     @AllowFlaky
     fun configurationManagementCanEditASetType() {
-        openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
+        openActionBarOverflowOrOptionsMenu(activity)
         clickOn(R.string.preferencesEditor)
         writeTo(
             R.id.inputKey,
-            baristaRule.activityTestRule.activity.getString(R.string.preferenceKeyExperimentalFeatures)
+            activity.getString(R.string.preferenceKeyExperimentalFeatures)
         )
         writeTo(R.id.inputValue, "this, that,    other")
         clickDialogPositiveButton()
@@ -75,20 +44,20 @@ class ConfigEditorActivityTests {
     @Test
     @AllowFlaky
     fun configurationManagementCanEditAStringType() {
-        openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
+        openActionBarOverflowOrOptionsMenu(activity)
         clickOn(R.string.preferencesEditor)
         writeTo(
             R.id.inputKey,
-            baristaRule.activityTestRule.activity.getString(R.string.preferenceKeyModeId)
+            activity.getString(R.string.preferenceKeyModeId)
         )
         writeTo(R.id.inputValue, "0")
         clickDialogPositiveButton()
 
-        openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
+        openActionBarOverflowOrOptionsMenu(activity)
         clickOn(R.string.preferencesEditor)
         writeTo(
             R.id.inputKey,
-            baristaRule.activityTestRule.activity.getString(R.string.preferenceKeyHost)
+            activity.getString(R.string.preferenceKeyHost)
         )
         writeTo(R.id.inputValue, "example.com")
         clickDialogPositiveButton()
@@ -102,11 +71,11 @@ class ConfigEditorActivityTests {
     @Test
     @AllowFlaky
     fun configurationManagementCanEditABooleanType() {
-        openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
+        openActionBarOverflowOrOptionsMenu(activity)
         clickOn(R.string.preferencesEditor)
         writeTo(
             R.id.inputKey,
-            baristaRule.activityTestRule.activity.getString(R.string.preferenceKeyRemoteCommand)
+            activity.getString(R.string.preferenceKeyRemoteCommand)
         )
         writeTo(R.id.inputValue, "false")
         clickDialogPositiveButton()
@@ -138,7 +107,7 @@ class ConfigEditorActivityTests {
         )
         intending(anyIntent()).respondWithFunction { Instrumentation.ActivityResult(0, null) }
 
-        openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
+        openActionBarOverflowOrOptionsMenu(activity)
         clickOn(R.string.exportConfiguration)
 
         intended(chooserIntentMatcher)

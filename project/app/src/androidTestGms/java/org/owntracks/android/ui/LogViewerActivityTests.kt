@@ -11,38 +11,20 @@ import androidx.test.filters.LargeTest
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
-import com.adevinta.android.barista.rule.BaristaRule
 import com.adevinta.android.barista.rule.flaky.AllowFlaky
 import org.hamcrest.Matchers.`is`
 import org.hamcrest.Matchers.allOf
-import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.owntracks.android.R
-import org.owntracks.android.testutils.rules.ScreenshotTakingOnTestEndRule
+import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.ui.status.logs.LogViewerActivity
 import java.util.concurrent.TimeUnit
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class LogViewerActivityTests {
-    @get:Rule
-    var baristaRule = BaristaRule.create(LogViewerActivity::class.java)
-
-    private val screenshotRule = ScreenshotTakingOnTestEndRule()
-
-    @get:Rule
-    val ruleChain: RuleChain = RuleChain
-        .outerRule(baristaRule.activityTestRule)
-        .around(screenshotRule)
-
-    @Before
-    fun setUp() {
-        baristaRule.launchActivity()
-    }
-
+class LogViewerActivityTests :
+    TestWithAnActivity<LogViewerActivity>(LogViewerActivity::class.java) {
     @Test
     @AllowFlaky
     fun logViewerActivityShowsTitle() {
@@ -54,33 +36,27 @@ class LogViewerActivityTests {
     @Test
     @AllowFlaky
     fun logViewerActivityExportFiresIntent() {
-        try {
-            Intents.init()
-            sleep(1, TimeUnit.SECONDS)
-            clickOn(R.id.share_fab)
-            intended(
-                allOf(
-                    hasAction(ACTION_CHOOSER),
-                    hasExtras(
-                        allOf(
-                            hasEntry(
-                                EXTRA_TITLE,
-                                baristaRule.activityTestRule.activity.getString(R.string.exportLogFilePrompt)
-                            ),
-                            hasEntry(
-                                `is`(EXTRA_INTENT),
-                                allOf(
-                                    hasAction(ACTION_SEND),
-                                    hasFlag(FLAG_GRANT_READ_URI_PERMISSION),
-                                    hasType("text/plain")
-                                )
+        clickOn(R.id.share_fab)
+        intended(
+            allOf(
+                hasAction(ACTION_CHOOSER),
+                hasExtras(
+                    allOf(
+                        hasEntry(
+                            EXTRA_TITLE,
+                            activity.getString(R.string.exportLogFilePrompt)
+                        ),
+                        hasEntry(
+                            `is`(EXTRA_INTENT),
+                            allOf(
+                                hasAction(ACTION_SEND),
+                                hasFlag(FLAG_GRANT_READ_URI_PERMISSION),
+                                hasType("text/plain")
                             )
                         )
                     )
                 )
             )
-        } finally {
-            Intents.release()
-        }
+        )
     }
 }
