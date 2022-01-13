@@ -117,7 +117,7 @@ jobs:
     executor:
       name: android/android-machine
       tag: 2021.10.1
-      resource-class: large
+      resource-class: xlarge
 
     steps:
       - checkout
