@@ -19,14 +19,20 @@ class OpenCageGeocoder @JvmOverloads internal constructor(
     private val httpClient: OkHttpClient = OkHttpClient()
 ) : CachingGeocoder() {
     private val jsonMapper: ObjectMapper =
-        ObjectMapper().registerKotlinModule().registerModule(ThreeTenModule())
+        ObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .registerKotlinModule().registerModule(ThreeTenModule())
     private var tripResetTimestamp: Instant = Instant.now()
     private var something = true
+
+    internal fun deserializeOpenCageResponse(json: String): OpenCageResponse =
+        jsonMapper.readValue(json, OpenCageResponse::class.java)
+
     override fun doLookup(latitude: BigDecimal, longitude: BigDecimal): GeocodeResult {
         if (tripResetTimestamp > Instant.now()) {
             Timber.w("Rate-limited, not querying")
             something = false
-            return GeocodeResult.RateLimited(tripResetTimestamp)
+            return GeocodeResult.Fault.RateLimited(tripResetTimestamp)
         }
         val url = HttpUrl.Builder()
             .scheme("http")
@@ -50,69 +56,71 @@ class OpenCageGeocoder @JvmOverloads internal constructor(
         return try {
             httpClient.newCall(request).execute().use { response ->
                 val responseBody = response.body?.string()
-                when (response.code) {
-                    200 -> {
-                        val deserializedOpenCageResponse =
-                            jsonMapper.readValue(responseBody, OpenCageResponse::class.java)
-                        Timber.d("Opencage HTTP response: %s", responseBody)
-                        return deserializedOpenCageResponse.formatted?.let {
-                            GeocodeResult.Formatted(
-                                it
+                try {
+                    when (response.code) {
+                        200 -> {
+                            responseBody?.let {
+                                val deserializedOpenCageResponse = deserializeOpenCageResponse(it)
+                                Timber.d("Opencage HTTP response: $it")
+                                deserializedOpenCageResponse.formatted?.let {
+                                    GeocodeResult.Formatted(it)
+                                } ?: GeocodeResult.Empty
+                            } ?: GeocodeResult.Empty
+                        }
+                        401 -> {
+                            val deserializedOpenCageResponse =
+                                jsonMapper.readValue(responseBody, OpenCageResponse::class.java)
+                            tripResetTimestamp = Instant.now().plus(1, ChronoUnit.MINUTES)
+                            GeocodeResult.Fault.Error(
+                                deserializedOpenCageResponse.status?.message
+                                    ?: "No error message provided", tripResetTimestamp
                             )
                         }
-                            ?: GeocodeResult.Empty
-                    }
-                    401 -> {
-                        val deserializedOpenCageResponse =
-                            jsonMapper.readValue(responseBody, OpenCageResponse::class.java)
-                        tripResetTimestamp = Instant.now().plus(1, ChronoUnit.MINUTES)
-                        GeocodeResult.Error(
-                            deserializedOpenCageResponse.status?.message
-                                ?: "No error message provided", tripResetTimestamp
-                        )
-                    }
-                    402 -> {
-                        val deserializedOpenCageResponse =
-                            jsonMapper.readValue(responseBody, OpenCageResponse::class.java)
-                        Timber.d("Opencage HTTP response: %s", responseBody)
-                        Timber.w("Opencage quota exceeded")
-                        deserializedOpenCageResponse.rate?.let { rate ->
-                            Timber.w("Not retrying Opencage requests until ${rate.reset}")
-                            tripResetTimestamp = rate.reset
+                        402 -> {
+                            val deserializedOpenCageResponse =
+                                jsonMapper.readValue(responseBody, OpenCageResponse::class.java)
+                            Timber.d("Opencage HTTP response: %s", responseBody)
+                            Timber.w("Opencage quota exceeded")
+                            deserializedOpenCageResponse.rate?.let { rate ->
+                                Timber.w("Not retrying Opencage requests until ${rate.reset}")
+                                tripResetTimestamp = rate.reset
+                            }
+                            GeocodeResult.Fault.RateLimited(tripResetTimestamp)
                         }
-                        GeocodeResult.RateLimited(tripResetTimestamp)
-                    }
-                    403 -> {
-                        val deserializedOpenCageResponse =
-                            jsonMapper.readValue(responseBody, OpenCageResponse::class.java)
-                        Timber.e(responseBody)
-                        tripResetTimestamp = Instant.now().plus(1, ChronoUnit.MINUTES)
-                        if (deserializedOpenCageResponse.status?.message == "IP address rejected") {
-                            GeocodeResult.IPAddressRejected(tripResetTimestamp)
-                        } else {
-                            GeocodeResult.Disabled(tripResetTimestamp)
-                        }
+                        403 -> {
+                            val deserializedOpenCageResponse =
+                                jsonMapper.readValue(responseBody, OpenCageResponse::class.java)
+                            Timber.e(responseBody)
+                            tripResetTimestamp = Instant.now().plus(1, ChronoUnit.MINUTES)
+                            if (deserializedOpenCageResponse.status?.message == "IP address rejected") {
+                                GeocodeResult.Fault.IPAddressRejected(tripResetTimestamp)
+                            } else {
+                                GeocodeResult.Fault.Disabled(tripResetTimestamp)
+                            }
 
+                        }
+                        429 -> {
+                            tripResetTimestamp = Instant.now().plus(1, ChronoUnit.MINUTES)
+                            GeocodeResult.Fault.RateLimited(tripResetTimestamp)
+                        }
+                        else -> {
+                            tripResetTimestamp = Instant.now().plus(1, ChronoUnit.MINUTES)
+                            Timber.e("Unexpected response from Opencage: %s", response)
+                            GeocodeResult.Fault.Error(
+                                "status: ${response.code} $responseBody",
+                                tripResetTimestamp
+                            )
+                        }
                     }
-                    429 -> {
-                        tripResetTimestamp = Instant.now().plus(1, ChronoUnit.MINUTES)
-                        GeocodeResult.RateLimited(tripResetTimestamp)
-                    }
-                    else -> {
-                        tripResetTimestamp = Instant.now().plus(1, ChronoUnit.MINUTES)
-                        Timber.e("Unexpected response from Opencage: %s", response)
-                        GeocodeResult.Error(
-                            "status: ${response.code} $responseBody",
-                            tripResetTimestamp
-                        )
-                    }
+                } catch (e: Exception) {
+                    Timber.d("Json response: $responseBody")
+                    throw e
                 }
             }
-
         } catch (e: Exception) {
             tripResetTimestamp = Instant.now().plus(1, ChronoUnit.MINUTES)
             Timber.e(e, "Error reverse geocoding from opencage")
-            GeocodeResult.Error(e.message ?: "No error provided", tripResetTimestamp)
+            GeocodeResult.Fault.ExceptionError(e, tripResetTimestamp)
         }
     }
 

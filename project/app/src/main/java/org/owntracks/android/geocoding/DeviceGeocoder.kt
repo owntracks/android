@@ -17,14 +17,14 @@ class DeviceGeocoder internal constructor(context: Context?) : CachingGeocoder()
             super.reverse(latitude, longitude)
         } else {
             tripResetTimestamp = Instant.now().plus(1, ChronoUnit.MINUTES)
-            GeocodeResult.Unavailable(tripResetTimestamp)
+            GeocodeResult.Fault.Unavailable(tripResetTimestamp)
         }
     }
 
     override fun doLookup(latitude: BigDecimal, longitude: BigDecimal): GeocodeResult {
         if (tripResetTimestamp > Instant.now()) {
             Timber.w("Rate-limited, not querying until $tripResetTimestamp")
-            return GeocodeResult.RateLimited(tripResetTimestamp)
+            return GeocodeResult.Fault.RateLimited(tripResetTimestamp)
         }
         val addresses: List<Address>?
         return try {
@@ -40,7 +40,7 @@ class DeviceGeocoder internal constructor(context: Context?) : CachingGeocoder()
             }
         } catch (e: Exception) {
             tripResetTimestamp = Instant.now().plus(1, ChronoUnit.MINUTES)
-            GeocodeResult.Error(e.toString(), tripResetTimestamp)
+            GeocodeResult.Fault.Error(e.toString(), tripResetTimestamp)
         }
     }
 

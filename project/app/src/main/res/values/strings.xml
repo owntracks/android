@@ -204,6 +204,8 @@
     <string name="geocoderDisabled">Geocoder service is disabled</string>
     <string name="geocoderRateLimited">Geocoder service has been rate limited. Not retrying until %s</string>
     <string name="geocoderError">An error was received from the geocoder service: %s</string>
+    <string name="geocoderExceptionError">An error was received from the geocoder service. Check the logs for more details</string>
+    <string name="geocoderUnavailable">Geocoder service is temporarily unavailable</string>
     <string name="notificationChannelErrors">Errors</string>
     <string name="geocoderProblemNotificationTitle">Geocoder Problem</string>
     <string name="geocoderIPAddressRejected">The client IP address was rejected</string>

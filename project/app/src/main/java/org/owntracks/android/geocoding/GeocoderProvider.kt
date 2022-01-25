@@ -78,20 +78,22 @@ class GeocoderProvider @Inject constructor(
             return
         }
         val errorNotificationText = when (result) {
-            is GeocodeResult.Error -> context.getString(R.string.geocoderError, result.message)
-            is GeocodeResult.Disabled -> context.getString(R.string.geocoderDisabled)
-            is GeocodeResult.IPAddressRejected -> context.getString(R.string.geocoderIPAddressRejected)
-            is GeocodeResult.RateLimited -> context.getString(
+            is GeocodeResult.Fault.Error -> context.getString(
+                R.string.geocoderError,
+                result.message
+            )
+            is GeocodeResult.Fault.ExceptionError -> context.getString(R.string.geocoderExceptionError)
+            is GeocodeResult.Fault.Disabled -> context.getString(R.string.geocoderDisabled)
+            is GeocodeResult.Fault.IPAddressRejected -> context.getString(R.string.geocoderIPAddressRejected)
+            is GeocodeResult.Fault.RateLimited -> context.getString(
                 R.string.geocoderRateLimited,
                 DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(UTC).format(result.until)
             )
+            is GeocodeResult.Fault.Unavailable -> context.getString(R.string.geocoderUnavailable)
             else -> ""
         }
         val until = when (result) {
-            is GeocodeResult.Error -> result.until
-            is GeocodeResult.Disabled -> result.until
-            is GeocodeResult.IPAddressRejected -> result.until
-            is GeocodeResult.RateLimited -> result.until
+            is GeocodeResult.Fault -> result.until
             else -> Instant.MIN
         }
 
