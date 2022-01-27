@@ -10,7 +10,7 @@ buildscript {
         maven("https://plugins.gradle.org/m2/")
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:7.0.4")
+        classpath("com.android.tools.build:gradle:7.1.0")
         classpath("com.hiya:jacoco-android:0.2")
         classpath("io.objectbox:objectbox-gradle-plugin:3.1.1")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10")
