@@ -80,7 +80,7 @@ class OSMMapFragment internal constructor(
         savedInstanceState: Bundle?
     ): View {
         Configuration.getInstance().apply {
-            load(context, PreferenceManager.getDefaultSharedPreferences(context))
+            load(requireContext(), PreferenceManager.getDefaultSharedPreferences(requireContext()))
             osmdroidBasePath.resolve("tiles").run {
                 if (exists()) {
                     deleteRecursively()
