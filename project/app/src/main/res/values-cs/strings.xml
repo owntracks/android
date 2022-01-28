@@ -153,7 +153,7 @@ Aby aplikace mohla běžet na pozadí, bude zobrazeno trvalé oznámení. Lze to
     <string name="region_outside">"Nyní venku"</string>
     <string name="monitoring_quiet">"Tichý mód"</string>
     <string name="monitoring_manual">"Ruční mód"</string>
-    <string name="monitoring_significant">"Mód velkých změn"</string>
+    <string name="monitoring_significant">"Mód změn"</string>
     <string name="monitoring_move">"Mód pohybu"</string>
     <string name="notificationChangeMonitoring">"Změna módu"</string>
     <string name="preferencesDebugLog">"Protokol ladění"</string>
@@ -236,7 +236,7 @@ Chcete-li to povolit, zapněte polohu v nastavení zařízení."</string>
     <string name="contactDetailsDistanceUnitKilometres">"km"</string>
     <string name="contactDetailsDistanceUnitMeters">"m"</string>
     <string name="exportConfigurationSubject">"Konfigurační soubor OwnTracks"</string>
-    <string name="exportLogFileSubject">OwnTracks Log File</string>
+    <string name="exportLogFileSubject">"OwnTracks log soubor"</string>
     <string-array name="geocoders">
         <item>Žádný</item>
         <item>Výchozí (Google)</item>

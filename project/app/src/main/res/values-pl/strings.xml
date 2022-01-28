@@ -237,4 +237,6 @@ Aby to umożliwić, włącz lokalizację w ustawieniach urządzenia."</string>
     <string name="aboutFeedbackCategoryTitle">"Feedback"</string>
     <string name="contactDetailsDistanceUnitKilometres">"km"</string>
     <string name="contactDetailsDistanceUnitMeters">"m"</string>
+    <string name="exportConfigurationSubject">"Plik konfiguracyjny OwnTracks"</string>
+    <string name="exportLogFileSubject">"Log OwnTracks"</string>
 </resources>

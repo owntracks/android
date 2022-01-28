@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!-- So, OwnTracks or Owntracks? -->
     <string name="app_name">"OwnTracks"</string>
     <string name="preferencesServer">"Подключение к серверу"</string>
     <string name="preferencesHost">"Адрес"</string>
@@ -22,6 +24,8 @@
     <string name="preferencesChangelog">"Список изменений"</string>
     <string name="version">"Версия"</string>
     <string name="preferencesReporting">"Отчеты"</string>
+
+    <!-- but contactDetailsTrackerId is untranslated? -->
     <string name="preferencesTrackerId">"Метка на карте"</string>
     <string name="preferencesRepository">"Исходный код"</string>
     <string name="preferencesDocumentation">"Документация"</string>
@@ -79,6 +83,8 @@
     <string name="preferencesCategoryAdvancedLocator">"Локатор"</string>
     <string name="preferencesCategoryAdvancedEncryption">"Шифрование"</string>
     <string name="preferencesCategoryAdvancedMisc">"Прочее"</string>
+
+    <!-- Non-translatable? Why? -->
     <string name="contactDetailsTrackerId">"Метка на карте"</string>
     <string name="exportWaypointsToEndpoint">"Опубликовать места"</string>
     <string name="preferencesExportFailed">"Не удалось экспортировать настройки"</string>
@@ -126,6 +132,7 @@
         <item quantity="one">"%1$d новое событие"</item>
         <item quantity="few">"%1$d новых события"</item>
         <item quantity="many">"%1$d новых событий"</item>
+        <item quantity="other">"%1$d новых событий"</item>
     </plurals>
     <string name="ui_fragment_welcome_version_title">"Ограничения"</string>
     <string name="ui_fragment_welcome_version_description">"Из-за ограничений Android некоторые функции могут работать не в полной мере.
@@ -178,10 +185,6 @@
     <string name="preferencesRemoteConfiguration">"Удаленное изменение параметров"</string>
     <string name="preferencesRemoteConfigurationSummary">"Разрешить удаленное изменение параметров конфигурации"</string>
     <string name="aboutLicense">"Лицензия"</string>
-    <plurals name="aboutTranslationsSummary">
-        <item quantity="one">"Уже доступен на %1$d языке!"</item>
-        <item quantity="other">"Уже доступен на %1$d языках!"</item>
-    </plurals>
     <string name="aboutTranslations">"Помочь с переводом приложения"</string>
     <string name="geocoderDisabled">"Сервис геокодирования отключен"</string>
     <string name="geocoderRateLimited">"Сервис геокодирования ограничивает запросы до %s"</string>
@@ -194,24 +197,30 @@
     <string name="preferencesExperimental">"Экспериментальные"</string>
     <string name="refresh_log">"Обновить"</string>
     <string name="preferencesTheme">"Тема"</string>
+
+    <!-- meters in Russian is "метров", i.e. "%dм" instead if "%d m" -->
     <string name="contactDetailsAccuracyValue">"%dм"</string>
     <string name="contactDetailsDistanceValue">"%1$,.2f%2$s"</string>
-    <string name="contactDetailsDistanceUnitKilometres">км</string>
-    <string name="contactDetailsDistanceUnitMeters">м</string>
     <string name="contactDetailsAltitude">"Высота"</string>
     <string name="contactDetailsBearing">"Азимут"</string>
     <string name="contactDetailsDistance">"Расстояние"</string>
     <string name="contactDetailsBattery">"Батарея"</string>
     <string name="contactDetailsSpeed">"Скорость"</string>
     <string name="contactDetailsBearingValue">"%,.0f°"</string>
+
+    <!-- meters in Russian is "метров", i.e. "%dм" instead if "%d m" -->
     <string name="contactDetailsAltitudeValue">"%,dм"</string>
     <string name="contactDetailsBatteryValue">"%d%%"</string>
+
+    <!-- kph in Russian is "км/ч", i.e. "%d км/ч" instead of "%d kph" -->
     <string name="contactDetailsSpeedValue">"%d км/ч"</string>
     <string name="preferencesCategoryNotificationErrors">"Ошибки и проблемы"</string>
     <string name="preferencesNotificationGeocoderErrors">"Ошибки геокодирования"</string>
     <string name="preferencesNotificationGeocoderErrorsSummary">"Показывать ошибки геокодирования, превышения лимитов частоты и количества запросов к геокодеру"</string>
     <string name="preferencesAdvancedAutostartWarning">"Ваша версия Android ограничивает возможность определения местоположения при автоматическом запуске приложения до его открытия."</string>
     <string name="workmanagerInitializationErrorDialogTitle">"Ошибка инициализации"</string>
+
+    <!-- Where is it? -->
     <string name="workmanagerInitializationErrorDialogOpenSettingsLabel">"Перейти к настройкам"</string>
     <string name="workmanagerInitializationErrorDialogMessage">"Некоторые компоненты не были корректно инициализированы, поэтому OwnTracks может работать не в полной мере. Может потребоваться переустановка приложения или очистка данных приложения.
 
@@ -230,10 +239,12 @@
     <string name="deviceLocationDisabledDialogMessage">"Службы определения местоположения на этом устройстве отключены, поэтому OwnTracks не может отслеживать ваше текущее местоположение.
 
 Пожалуйста, включите \"Местоположение\" в настройках устройства."</string>
-    <string name="aboutIssuesTitle">Сообщить о проблеме</string>
-    <string name="aboutIssuesSummary">На GitHub</string>
-    <string name="aboutSourceCodeSummary">На GitHub</string>
-    <string name="aboutFeedbackCategoryTitle">Обратная связь</string>
+    <string name="aboutIssuesTitle">"Сообщить о проблеме"</string>
+    <string name="aboutIssuesSummary">"На GitHub"</string>
+    <string name="aboutSourceCodeSummary">"На GitHub"</string>
+    <string name="aboutFeedbackCategoryTitle">"Обратная связь"</string>
+    <string name="contactDetailsDistanceUnitKilometres">"км"</string>
+    <string name="contactDetailsDistanceUnitMeters">"м"</string>
     <string-array name="geocoders">
         <item>Не используется</item>
         <item>Стандартное (Google)</item>
