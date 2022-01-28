@@ -194,7 +194,7 @@ Aby aplikace mohla běžet na pozadí, bude zobrazeno trvalé oznámení. Lze to
     <string name="backgroundLocationRestrictionNotificationText">"Tato verze Androidu omezuje OwnTracks zjišťovat polohu při spuštění na pozadí, dokud není aplikace otevřena. Kliknutím na toto oznámení otevřete aplikaci a zahájíte sledování polohy."</string>
     <string name="preferencesExperimental">"Experimentální"</string>
     <string name="refresh_log">"Obnovit"</string>
-    <string name="preferencesTheme">"Téma"</string>
+    <string name="preferencesTheme">"Vzhled aplikace"</string>
     <string name="contactDetailsAccuracyValue">"%d m"</string>
     <string name="contactDetailsDistanceValue">"%1$,.2f %2$s"</string>
     <string name="contactDetailsAltitude">"Výška"</string>
@@ -236,4 +236,15 @@ Chcete-li to povolit, zapněte polohu v nastavení zařízení."</string>
     <string name="contactDetailsDistanceUnitKilometres">"km"</string>
     <string name="contactDetailsDistanceUnitMeters">"m"</string>
     <string name="exportConfigurationSubject">"Konfigurační soubor OwnTracks"</string>
+    <string name="exportLogFileSubject">OwnTracks Log File</string>
+    <string-array name="geocoders">
+        <item>Žádný</item>
+        <item>Výchozí (Google)</item>
+        <item>OpenCage</item>
+    </string-array>
+    <string-array name="themeLabels">
+        <item>Vždy světlý</item>
+        <item>Vždy tmavý</item>
+        <item>Výchozí</item>
+    </string-array>
 </resources>
