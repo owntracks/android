@@ -176,8 +176,8 @@
     <string name="preferencesRemoteConfigurationSummary">"Fernkonfiguration ermöglichen (benötigt Fernkommandos)"</string>
     <string name="aboutLicense">"Lizenz"</string>
     <plurals name="aboutTranslationsSummary">
-        <item quantity="one">"Jetzt in sechs Sprachen verfügbar!"</item>
-        <item quantity="other">"Jetzt in sechs Sprachen verfügbar!"</item>
+        <item quantity="one">"In einer Sprache verfügbar!"</item>
+        <item quantity="other">"In %1$d Sprachen verfügbar!"</item>
     </plurals>
     <string name="aboutTranslations">"Übersetzungshilfe"</string>
     <string name="geocoderDisabled">"Der Geocoding Dienst ist ausgeschaltet"</string>
@@ -229,4 +229,8 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="aboutIssuesSummary">"File on GitHub"</string>
     <string name="aboutSourceCodeSummary">"on GitHub"</string>
     <string name="aboutFeedbackCategoryTitle">"Feedback"</string>
+    <string name="contactDetailsDistanceUnitKilometres">"km"</string>
+    <string name="contactDetailsDistanceUnitMeters">"m"</string>
+    <string name="exportConfigurationSubject">"OwnTracks Configuration Files"</string>
+    <string name="exportLogFileSubject">"OwnTracks Log File"</string>
 </resources>
