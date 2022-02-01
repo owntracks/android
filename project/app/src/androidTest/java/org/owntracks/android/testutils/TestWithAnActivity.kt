@@ -9,11 +9,13 @@ import com.adevinta.android.barista.rule.cleardata.ClearFilesRule
 import com.adevinta.android.barista.rule.cleardata.ClearPreferencesRule
 import com.adevinta.android.barista.rule.flaky.FlakyTestRule
 import leakcanary.DetectLeaksAfterTestSuccess
+import leakcanary.LeakCanary
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.RuleChain
 import org.owntracks.android.testutils.rules.ScreenshotTakingOnTestEndRule
+import shark.AndroidReferenceMatchers
 
 
 abstract class TestWithAnActivity<T : Activity>(
@@ -30,6 +32,42 @@ abstract class TestWithAnActivity<T : Activity>(
 
     @get:Rule
     val leakRule = DetectLeaksAfterTestSuccess()
+
+    init {
+        LeakCanary.config = LeakCanary.config.copy(
+            referenceMatchers = AndroidReferenceMatchers.appDefaults +
+                    AndroidReferenceMatchers.instanceFieldLeak(
+                        className = "android.permission.PermissionUsageHelper",
+                        fieldName = "mContext",
+                        description = "Android API31 leaks contexts"
+                    ) +
+                    AndroidReferenceMatchers.instanceFieldLeak(
+                        className = "android.permission.PermissionUsageHelper",
+                        fieldName = "mPackageManager",
+                        description = "Android API31 leaks contexts"
+                    ) +
+                    AndroidReferenceMatchers.instanceFieldLeak(
+                        className = "android.permission.PermissionUsageHelper",
+                        fieldName = "mUserContexts",
+                        description = "Android API31 leaks contexts"
+                    ) +
+                    AndroidReferenceMatchers.instanceFieldLeak(
+                        className = "android.app.AppOpsManager",
+                        fieldName = "mContext",
+                        description = "Android API31 leaks contexts"
+                    ) +
+                    AndroidReferenceMatchers.instanceFieldLeak(
+                        className = "android.app.ApplicationPackageManager",
+                        fieldName = "mContext",
+                        description = "Android API31 leaks contexts"
+                    ) +
+                    AndroidReferenceMatchers.instanceFieldLeak(
+                        className = "android.app.ApplicationPackageManager",
+                        fieldName = "mPermissionManager",
+                        description = "Android API31 leaks contexts"
+                    )
+        )
+    }
 
     @get:Rule
     val ruleChain: RuleChain = RuleChain

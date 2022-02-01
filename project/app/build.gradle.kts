@@ -1,16 +1,16 @@
 plugins {
     id("com.android.application")
     id("dagger.hilt.android.plugin")
-    id("com.github.triplet.play") version "3.6.0"
+    id("com.github.triplet.play")
     kotlin("android")
     kotlin("kapt")
     id("io.objectbox")
     id("com.hiya.jacoco-android")
 }
+
 apply<EspressoScreenshotsPlugin>()
 
 val googleMapsAPIKey = extra.get("google_maps_api_key")?.toString() ?: "PLACEHOLDER_API_KEY"
-
 val rootJacocoVersion = "0.8.7"
 
 jacoco {
@@ -69,16 +69,10 @@ android {
     }
 
     buildTypes {
-
         named("release") {
             isMinifyEnabled = true
             isShrinkResources = true
-            proguardFiles.addAll(
-                listOf(
-                    getDefaultProguardFile("proguard-android.txt"),
-                    file("proguard-rules.pro")
-                )
-            )
+            proguardFiles.add(getDefaultProguardFile("proguard-android-optimize.txt"))
             resValue("string", "GOOGLE_MAPS_API_KEY", googleMapsAPIKey)
             signingConfig = signingConfigs.findByName("release")
         }
@@ -86,12 +80,7 @@ android {
         named("debug") {
             isMinifyEnabled = false
             isShrinkResources = false
-            proguardFiles.addAll(
-                listOf(
-                    getDefaultProguardFile("proguard-android.txt"),
-                    file("proguard-rules.pro")
-                )
-            )
+            proguardFiles.add(getDefaultProguardFile("proguard-android-optimize.txt"))
             resValue("string", "GOOGLE_MAPS_API_KEY", googleMapsAPIKey)
             applicationIdSuffix = ".debug"
             isTestCoverageEnabled = true
@@ -104,24 +93,7 @@ android {
     }
 
     packagingOptions {
-        resources.excludes.addAll(
-            listOf(
-                "META-INF/DEPENDENCIES.txt",
-                "META-INF/LICENSE.txt",
-                "META-INF/NOTICE.txt",
-                "META-INF/NOTICE",
-                "META-INF/LICENSE",
-                "META-INF/DEPENDENCIES",
-                "META-INF/notice.txt",
-                "META-INF/license.txt",
-                "META-INF/dependencies.txt",
-                "META-INF/LGPL2.1",
-                "META-INF/proguard/androidx-annotations.pro",
-                "META-INF/metadata.kotlin_module",
-                "META-INF/metadata.jvm.kotlin_module",
-                "META-INF/gradle/incremental.annotation.processors"
-            )
-        )
+        resources.excludes.add("META-INF/*")
         jniLibs.useLegacyPackaging = false
     }
 
@@ -130,10 +102,12 @@ android {
         isCheckAllWarnings = true
         isWarningsAsErrors = false
         isAbortOnError = false
-        disable(
-            "TypographyFractions",
-            "TypographyQuotes",
-            "Typos",
+        disable.addAll(
+            setOf(
+                "TypographyFractions",
+                "TypographyQuotes",
+                "Typos"
+            )
         )
     }
     testOptions {
@@ -200,9 +174,9 @@ val okHttpVersion = "4.9.3"
 val jacksonVersion = "2.13.1"
 val materialDialogsVersion = "0.9.6.0"
 val espressoVersion = "3.4.0"
-val androidxTestVersion = "1.4.1-alpha03"
 val kotlinCoroutinesVersion = "1.6.0"
 val jaxbVersion = "3.0.2"
+val hiltVersion = rootProject.ext["hiltVersion"]
 
 dependencies {
     // AndroidX
@@ -222,7 +196,7 @@ dependencies {
     implementation("org.osmdroid:osmdroid-android:6.1.11")
 
     // Utility libraries
-    implementation("com.google.dagger:hilt-android:${rootProject.extra["dagger-version"]}")
+    implementation("com.google.dagger:hilt-android:${hiltVersion}")
     implementation("org.greenrobot:eventbus:3.2.0")
 
     // Connectivity
@@ -254,8 +228,6 @@ dependencies {
     implementation("com.mikepenz:materialize:1.2.1@aar")
     implementation("com.takisoft.preferencex:preferencex:1.1.0")
 
-    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.8.1")
-
     // These Java EE libs are no longer included in JDKs, so we include explicitly
     kapt("javax.xml.bind:jaxb-api:2.3.1")
     kapt("com.sun.xml.bind:jaxb-core:$jaxbVersion")
@@ -263,23 +235,23 @@ dependencies {
 
     // Preprocessors
     kapt("org.greenrobot:eventbus-annotation-processor:3.2.0")
-    kapt("com.google.dagger:hilt-android-compiler:${rootProject.extra["dagger-version"]}")
+    kapt("com.google.dagger:hilt-android-compiler:${hiltVersion}")
 
-    kaptTest("com.google.dagger:hilt-android-compiler:${rootProject.extra["dagger-version"]}")
+    kaptTest("com.google.dagger:hilt-android-compiler:${hiltVersion}")
 
     testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
     testImplementation("androidx.arch.core:core-testing:2.1.0")
 
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
-    androidTestImplementation("androidx.test:core-ktx:${androidxTestVersion}")
+    androidTestImplementation("androidx.test:core-ktx:1.4.0")
     androidTestImplementation("com.adevinta.android:barista:4.2.0") {
         exclude("org.jetbrains.kotlin")
     }
     androidTestImplementation("com.squareup.okhttp3:mockwebserver:${okHttpVersion}")
     androidTestImplementation("com.github.davidepianca98.KMQTT:kmqtt:0.2.9")
 
-    androidTestImplementation("androidx.test:rules:${androidxTestVersion}")
-    androidTestImplementation("androidx.test:runner:${androidxTestVersion}")
+    androidTestImplementation("androidx.test:rules:1.4.0")
+    androidTestImplementation("androidx.test:runner:1.4.0")
     androidTestImplementation("com.squareup.leakcanary:leakcanary-android-instrumentation:2.8.1")
 
     androidTestUtil("androidx.test.services:test-services:1.4.1")
