@@ -30,7 +30,7 @@ class OpenCageGeocoder @JvmOverloads internal constructor(
 
     override fun doLookup(latitude: BigDecimal, longitude: BigDecimal): GeocodeResult {
         if (tripResetTimestamp > Instant.now()) {
-            Timber.w("Rate-limited, not querying")
+            Timber.w("Rate-limited, not querying until $tripResetTimestamp")
             something = false
             return GeocodeResult.Fault.RateLimited(tripResetTimestamp)
         }
@@ -126,10 +126,6 @@ class OpenCageGeocoder @JvmOverloads internal constructor(
 
     companion object {
         private const val OPENCAGE_HOST = "api.opencagedata.com"
-    }
-
-    init {
-        jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
     }
 
     internal class OpenCageResult {

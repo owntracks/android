@@ -2,12 +2,12 @@ package org.owntracks.android.ui.preferences.load;
 
 import android.content.Context
 import android.content.res.Resources
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
 import org.greenrobot.eventbus.EventBus
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
 import org.owntracks.android.support.InMemoryPreferencesStore
 import org.owntracks.android.support.Parser
 import org.owntracks.android.support.Preferences
@@ -39,7 +39,10 @@ class LoadViewModelTest {
         val vm = LoadViewModel(preferences, parser, InMemoryWaypointsRepo(eventBus))
 
         vm.extractPreferences(URI("owntracks:///config?inline=e30k"))
-        assertEquals("""Import failed: Message is not a valid configuration message""", vm.displayedConfiguration)
+        assertEquals(
+            """Import failed: Message is not a valid configuration message""",
+            vm.displayedConfiguration
+        )
     }
 }
 

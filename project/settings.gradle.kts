@@ -12,6 +12,18 @@ pluginManagement {
             }
         }
     }
+    buildscript {
+        repositories {
+            mavenCentral()
+            maven {
+                url = uri("https://storage.googleapis.com/r8-releases/raw")
+            }
+        }
+        dependencies {
+            classpath("com.android.tools:r8:3.1.34")
+            classpath("com.google.guava:guava:30.1.1-jre")
+        }
+    }
 }
 
 dependencyResolutionManagement {

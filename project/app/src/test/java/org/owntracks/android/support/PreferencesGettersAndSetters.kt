@@ -2,10 +2,6 @@ package org.owntracks.android.support
 
 import android.content.Context
 import android.content.res.Resources
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.mock
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions.MQTT_VERSION_3_1_1
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions.MQTT_VERSION_DEFAULT
 import org.junit.Assert.assertEquals
@@ -13,6 +9,10 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
 import org.owntracks.android.R
 import org.owntracks.android.model.messages.MessageConfiguration
 import org.owntracks.android.services.MessageProcessorEndpointHttp
@@ -72,68 +72,292 @@ class PreferencesGettersAndSetters(
         @Parameterized.Parameters(name = "{index}: {0} (sets={2}, expected={3})")
         fun data(): Iterable<Array<Any>> {
             return arrayListOf(
-                    arrayOf("AutostartOnBoot", "autostartOnBoot", true, true, Boolean::class, false),
-                    arrayOf("CleanSession", "cleanSession", true, true, Boolean::class, false),
-                    arrayOf("ClientId", "clientId", "testClientId", "testClientId", String::class, false),
-                    arrayOf("ConnectionTimeoutSeconds", "connectionTimeoutSeconds", 20, 20, Int::class, false),
-                    arrayOf("ConnectionTimeoutSeconds", "connectionTimeoutSeconds", -5, 1, Int::class, false),
-                    arrayOf("DebugLog", "debugLog", true, true, Boolean::class, false),
-                    arrayOf("DeviceId", "deviceId", "deviceId", "deviceId", String::class, false),
-                    arrayOf("DontReuseHttpClient", "dontReuseHttpClient", true, true, Boolean::class, true),
-                    arrayOf("ExperimentalFeatures", "experimentalFeatures", setOf("this", "that", "other"), setOf("this", "that", "other"), Collection::class, false),
-                    arrayOf("FusedRegionDetection", "fusedRegionDetection", true, true, Boolean::class, false),
-                    arrayOf("ReverseGeocodeProvider", "reverseGeocodeProvider", "Device", "Device", String::class, false),
-                    arrayOf("ReverseGeocodeProvider", "reverseGeocodeProvider", "OpenCage", "OpenCage", String::class, false),
-                    arrayOf("ReverseGeocodeProvider", "reverseGeocodeProvider", "None", "None", String::class, false),
-                    arrayOf("ReverseGeocodeProvider", "reverseGeocodeProvider", "Nonsense", "None", String::class, false),
-                    arrayOf("Host", "host", "testHost", "testHost", String::class, false),
-                    arrayOf("IgnoreInaccurateLocations", "ignoreInaccurateLocations", 123, 123, Int::class, false),
-                    arrayOf("IgnoreStaleLocations", "ignoreStaleLocations", 456.0, 456.0, Double::class, false),
-                    arrayOf("Info", "info", true, true, Boolean::class, false),
-                    arrayOf("Keepalive", "keepalive", 1500, 1500, Int::class, false),
-                    arrayOf("Keepalive", "keepalive", 900, 900, Int::class, false),
-                    arrayOf("Keepalive", "keepalive", 899, 900, Int::class, false),
-                    arrayOf("Keepalive", "keepalive", 0, 900, Int::class, false),
-                    arrayOf("Keepalive", "keepalive", -1, 900, Int::class, false),
-                    arrayOf("LocatorDisplacement", "locatorDisplacement", 1690, 1690, Int::class, false),
-                    arrayOf("LocatorInterval", "locatorInterval", 1000, 1000, Int::class, false),
-                    arrayOf("LocatorPriority", "locatorPriority", 2, 2, Int::class, false),
-                    arrayOf("Mode", "mode", MessageProcessorEndpointHttp.MODE_ID, MessageProcessorEndpointHttp.MODE_ID, Int::class, false),
-                    arrayOf("Mode", "mode", MessageProcessorEndpointMqtt.MODE_ID, MessageProcessorEndpointMqtt.MODE_ID, Int::class, false),
-                    arrayOf("Mode", "mode", -1, MessageProcessorEndpointMqtt.MODE_ID, Int::class, false),
-                    arrayOf("Monitoring", "monitoring", 2, 2, Int::class, false),
-                    arrayOf("MoveModeLocatorInterval", "moveModeLocatorInterval", 1500, 1500, Int::class, false),
-                    arrayOf("MqttProtocolLevel", "mqttProtocolLevel", MQTT_VERSION_3_1_1, MQTT_VERSION_3_1_1, Int::class, false),
-                    arrayOf("MqttProtocolLevel", "mqttProtocolLevel", -1, MQTT_VERSION_DEFAULT, Int::class, false),
-                    arrayOf("NotificationEvents", "notificationEvents", true, true, Boolean::class, false),
-                    arrayOf("NotificationHigherPriority", "notificationHigherPriority", true, true, Boolean::class, false),
-                    arrayOf("NotificationLocation", "notificationLocation", true, true, Boolean::class, false),
-                    arrayOf("NotificationGeocoderErrors", "notificationGeocoderErrors", false, false, Boolean::class, false),
-                    arrayOf("OpenCageGeocoderApiKey", "opencageApiKey", "testOpencageAPIKey", "testOpencageAPIKey", String::class, false),
-                    arrayOf("Password", "password", "testPassword!\"£", "testPassword!\"£", String::class, false),
-                    arrayOf("Ping", "ping", 400, 400, Int::class, false),
-                    arrayOf("Port", "port", 9999, 9999, Int::class, false),
-                    arrayOf("Port", "port", -50, 0, Int::class, false),
-                    arrayOf("Port", "port", 65536, 0, Int::class, false),
-                    arrayOf("Port", "port", 65535, 65535, Int::class, false),
-                    arrayOf("PubLocationExtendedData", "pubExtendedData", true, true, Boolean::class, false),
-                    arrayOf("PubQos", "pubQos", 1, 1, Int::class, false),
-                    arrayOf("PubRetain", "pubRetain", true, true, Boolean::class, false),
-                    arrayOf("PubTopicBaseFormatString", "pubTopicBase", "testDeviceTopic", "testDeviceTopic", String::class, false),
-                    arrayOf("RemoteCommand", "cmd", true, true, Boolean::class, false),
-                    arrayOf("RemoteConfiguration", "remoteConfiguration", true, true, Boolean::class, false),
-                    arrayOf("Sub", "sub", true, true, Boolean::class, false),
-                    arrayOf("SubQos", "subQos", 1, 1, Int::class, false),
-                    arrayOf("SubTopic", "subTopic", "testSubTopic", "testSubTopic", String::class, false),
-                    arrayOf("Tls", "tls", true, true, Boolean::class, false),
-                    arrayOf("TlsCaCrt", "tlsCaCrt", "caCertName", "caCertName", String::class, false),
-                    arrayOf("TlsClientCrt", "tlsClientCrt", "clientCertName", "clientCertName", String::class, false),
-                    arrayOf("TlsClientCrtPassword", "tlsClientCrtPassword", "clientCrtPassword", "clientCrtPassword", String::class, false),
-                    arrayOf("TrackerId", "tid", "t1", "t1", String::class, false),
-                    arrayOf("TrackerId", "tid", "trackerId", "tr", String::class, false),
-                    arrayOf("Url", "url", "https://www.example.com", "https://www.example.com", String::class, true),
-                    arrayOf("Username", "username", "testUser", "testUser", String::class, false),
-                    arrayOf("Ws", "ws", true, true, Boolean::class, false)
+                arrayOf("AutostartOnBoot", "autostartOnBoot", true, true, Boolean::class, false),
+                arrayOf("CleanSession", "cleanSession", true, true, Boolean::class, false),
+                arrayOf(
+                    "ClientId",
+                    "clientId",
+                    "testClientId",
+                    "testClientId",
+                    String::class,
+                    false
+                ),
+                arrayOf(
+                    "ConnectionTimeoutSeconds",
+                    "connectionTimeoutSeconds",
+                    20,
+                    20,
+                    Int::class,
+                    false
+                ),
+                arrayOf(
+                    "ConnectionTimeoutSeconds",
+                    "connectionTimeoutSeconds",
+                    -5,
+                    1,
+                    Int::class,
+                    false
+                ),
+                arrayOf("DebugLog", "debugLog", true, true, Boolean::class, false),
+                arrayOf("DeviceId", "deviceId", "deviceId", "deviceId", String::class, false),
+                arrayOf(
+                    "DontReuseHttpClient",
+                    "dontReuseHttpClient",
+                    true,
+                    true,
+                    Boolean::class,
+                    true
+                ),
+                arrayOf(
+                    "ExperimentalFeatures",
+                    "experimentalFeatures",
+                    setOf("this", "that", "other"),
+                    setOf("this", "that", "other"),
+                    Collection::class,
+                    false
+                ),
+                arrayOf(
+                    "FusedRegionDetection",
+                    "fusedRegionDetection",
+                    true,
+                    true,
+                    Boolean::class,
+                    false
+                ),
+                arrayOf(
+                    "ReverseGeocodeProvider",
+                    "reverseGeocodeProvider",
+                    "Device",
+                    "Device",
+                    String::class,
+                    false
+                ),
+                arrayOf(
+                    "ReverseGeocodeProvider",
+                    "reverseGeocodeProvider",
+                    "OpenCage",
+                    "OpenCage",
+                    String::class,
+                    false
+                ),
+                arrayOf(
+                    "ReverseGeocodeProvider",
+                    "reverseGeocodeProvider",
+                    "None",
+                    "None",
+                    String::class,
+                    false
+                ),
+                arrayOf(
+                    "ReverseGeocodeProvider",
+                    "reverseGeocodeProvider",
+                    "Nonsense",
+                    "None",
+                    String::class,
+                    false
+                ),
+                arrayOf("Host", "host", "testHost", "testHost", String::class, false),
+                arrayOf(
+                    "IgnoreInaccurateLocations",
+                    "ignoreInaccurateLocations",
+                    123,
+                    123,
+                    Int::class,
+                    false
+                ),
+                arrayOf(
+                    "IgnoreStaleLocations",
+                    "ignoreStaleLocations",
+                    456.0,
+                    456.0,
+                    Double::class,
+                    false
+                ),
+                arrayOf("Info", "info", true, true, Boolean::class, false),
+                arrayOf("Keepalive", "keepalive", 1500, 1500, Int::class, false),
+                arrayOf("Keepalive", "keepalive", 900, 900, Int::class, false),
+                arrayOf("Keepalive", "keepalive", 899, 900, Int::class, false),
+                arrayOf("Keepalive", "keepalive", 0, 900, Int::class, false),
+                arrayOf("Keepalive", "keepalive", -1, 900, Int::class, false),
+                arrayOf(
+                    "LocatorDisplacement",
+                    "locatorDisplacement",
+                    1690,
+                    1690,
+                    Int::class,
+                    false
+                ),
+                arrayOf("LocatorInterval", "locatorInterval", 1000, 1000, Int::class, false),
+                arrayOf("LocatorPriority", "locatorPriority", 2, 2, Int::class, false),
+                arrayOf(
+                    "Mode",
+                    "mode",
+                    MessageProcessorEndpointHttp.MODE_ID,
+                    MessageProcessorEndpointHttp.MODE_ID,
+                    Int::class,
+                    false
+                ),
+                arrayOf(
+                    "Mode",
+                    "mode",
+                    MessageProcessorEndpointMqtt.MODE_ID,
+                    MessageProcessorEndpointMqtt.MODE_ID,
+                    Int::class,
+                    false
+                ),
+                arrayOf(
+                    "Mode",
+                    "mode",
+                    -1,
+                    MessageProcessorEndpointMqtt.MODE_ID,
+                    Int::class,
+                    false
+                ),
+                arrayOf("Monitoring", "monitoring", 2, 2, Int::class, false),
+                arrayOf(
+                    "MoveModeLocatorInterval",
+                    "moveModeLocatorInterval",
+                    1500,
+                    1500,
+                    Int::class,
+                    false
+                ),
+                arrayOf(
+                    "MqttProtocolLevel",
+                    "mqttProtocolLevel",
+                    MQTT_VERSION_3_1_1,
+                    MQTT_VERSION_3_1_1,
+                    Int::class,
+                    false
+                ),
+                arrayOf(
+                    "MqttProtocolLevel",
+                    "mqttProtocolLevel",
+                    -1,
+                    MQTT_VERSION_DEFAULT,
+                    Int::class,
+                    false
+                ),
+                arrayOf(
+                    "NotificationEvents",
+                    "notificationEvents",
+                    true,
+                    true,
+                    Boolean::class,
+                    false
+                ),
+                arrayOf(
+                    "NotificationHigherPriority",
+                    "notificationHigherPriority",
+                    true,
+                    true,
+                    Boolean::class,
+                    false
+                ),
+                arrayOf(
+                    "NotificationLocation",
+                    "notificationLocation",
+                    true,
+                    true,
+                    Boolean::class,
+                    false
+                ),
+                arrayOf(
+                    "NotificationGeocoderErrors",
+                    "notificationGeocoderErrors",
+                    false,
+                    false,
+                    Boolean::class,
+                    false
+                ),
+                arrayOf(
+                    "OpenCageGeocoderApiKey",
+                    "opencageApiKey",
+                    "testOpencageAPIKey",
+                    "testOpencageAPIKey",
+                    String::class,
+                    false
+                ),
+                arrayOf(
+                    "Password",
+                    "password",
+                    "testPassword!\"£",
+                    "testPassword!\"£",
+                    String::class,
+                    false
+                ),
+                arrayOf("Ping", "ping", 400, 400, Int::class, false),
+                arrayOf("Port", "port", 9999, 9999, Int::class, false),
+                arrayOf("Port", "port", -50, 0, Int::class, false),
+                arrayOf("Port", "port", 65536, 0, Int::class, false),
+                arrayOf("Port", "port", 65535, 65535, Int::class, false),
+                arrayOf(
+                    "PubLocationExtendedData",
+                    "pubExtendedData",
+                    true,
+                    true,
+                    Boolean::class,
+                    false
+                ),
+                arrayOf("PubQos", "pubQos", 1, 1, Int::class, false),
+                arrayOf("PubRetain", "pubRetain", true, true, Boolean::class, false),
+                arrayOf(
+                    "PubTopicBaseFormatString",
+                    "pubTopicBase",
+                    "testDeviceTopic",
+                    "testDeviceTopic",
+                    String::class,
+                    false
+                ),
+                arrayOf("RemoteCommand", "cmd", true, true, Boolean::class, false),
+                arrayOf(
+                    "RemoteConfiguration",
+                    "remoteConfiguration",
+                    true,
+                    true,
+                    Boolean::class,
+                    false
+                ),
+                arrayOf("Sub", "sub", true, true, Boolean::class, false),
+                arrayOf("SubQos", "subQos", 1, 1, Int::class, false),
+                arrayOf(
+                    "SubTopic",
+                    "subTopic",
+                    "testSubTopic",
+                    "testSubTopic",
+                    String::class,
+                    false
+                ),
+                arrayOf("Tls", "tls", true, true, Boolean::class, false),
+                arrayOf("TlsCaCrt", "tlsCaCrt", "caCertName", "caCertName", String::class, false),
+                arrayOf(
+                    "TlsClientCrt",
+                    "tlsClientCrt",
+                    "clientCertName",
+                    "clientCertName",
+                    String::class,
+                    false
+                ),
+                arrayOf(
+                    "TlsClientCrtPassword",
+                    "tlsClientCrtPassword",
+                    "clientCrtPassword",
+                    "clientCrtPassword",
+                    String::class,
+                    false
+                ),
+                arrayOf("TrackerId", "tid", "t1", "t1", String::class, false),
+                arrayOf("TrackerId", "tid", "trackerId", "tr", String::class, false),
+                arrayOf(
+                    "Url",
+                    "url",
+                    "https://www.example.com",
+                    "https://www.example.com",
+                    String::class,
+                    true
+                ),
+                arrayOf("Username", "username", "testUser", "testUser", String::class, false),
+                arrayOf("Ws", "ws", true, true, Boolean::class, false)
             ).toList()
         }
 

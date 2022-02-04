@@ -2,11 +2,11 @@ package org.owntracks.android.support
 
 import android.content.Context
 import android.content.res.Resources
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
 import org.owntracks.android.model.messages.MessageConfiguration
 import org.owntracks.android.support.preferences.PreferencesStore
 

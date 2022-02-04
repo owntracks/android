@@ -1,64 +1,31 @@
-# Add project specific ProGuard rules here.
-# By default, the flags in this file are appended to flags specified
-# in C:\Users\alexander\AppData\Local\Android\Sdk/tools/proguard/proguard-android.txt
-# You can edit the include path and order by changing the proguardFiles
-# directive in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
-
-# Add any project specific keep options here:
-
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
-
 # Skip obfuscation
 -dontobfuscate
 -optimizations !field/removal/writeonly,!field/marking/private,!class/merging/*,!code/allocation/variable
 
+# Keep our package
 -keep public class org.owntracks.android.** {
   public protected private *;
 }
 
+# Keep kotlin.Metadata annotations to maintain metadata on kept items.
+-keepattributes RuntimeVisibleAnnotations
+-keep class kotlin.Metadata { *; }
 
-# PAHO (https://github.com/eclipse/paho.mqtt.android/issues/79)
--keepattributes InnerClasses
--keepattributes EnclosingMethod
--keepattributes EnclosingMethod
--keep class org.eclipse.paho.client.mqttv3.* { *; }
--keep class org.eclipse.paho.client.mqttv3.*$* { *; }
-
-# GREENDAO
--keep class **$Properties
--dontwarn org.greenrobot.greendao.database.**
--dontwarn rx.**
-
-
-# EVENTBUS
+## EventBus
 -keepattributes *Annotation*
--keepclassmembers,includedescriptorclasses class ** {
+-keepclassmembers class * {
     @org.greenrobot.eventbus.Subscribe <methods>;
 }
 -keep enum org.greenrobot.eventbus.ThreadMode { *; }
 
-# Only required if you use AsyncExecutor
--keepclassmembers class * extends org.greenrobot.eventbus.util.ThrowableFailureEvent {
-    <init>(java.lang.Throwable);
-}
+# Accessed via reflection, avoid renaming or removal
+-keep class org.greenrobot.eventbus.android.AndroidComponentsImpl
 
-# JACKSON
+## Jackson
 -keepattributes *Annotation*,EnclosingMethod,Signature
 -keepnames class com.fasterxml.jackson.** { *; }
  -dontwarn com.fasterxml.jackson.databind.**
  -keep class org.codehaus.** { *; }
-
--keep public class org.owntracks.android.model.messages.** {
- *;
- }
 
 -keep class com.fasterxml.jackson.databind.ObjectWriter {
     public ** writeValueAsString(**);
@@ -69,12 +36,35 @@
     protected <methods>;
 }
 
-# OKHTTP
--dontwarn okhttp3.**
--dontwarn okio.**
+## Paho
+-keep class org.eclipse.paho.clent.mqttv3.** { *; }
+-keep class org.eclipse.paho.client.mqttv3.logging.JSR47Logger { *; }
 
--keep class com.google.android.gms.** { *; }
--dontwarn com.google.android.gms.**
+## Conscrypt
+-keep class org.conscrypt.** { *; }
 
--printseeds obfuscation/seeds.txt
--printmapping obfuscation/mapping.txt
+# Backward compatibility code.
+-dontnote libcore.io.Libcore
+-dontnote org.apache.harmony.xnet.provider.jsse.OpenSSLRSAPrivateKey
+-dontnote org.apache.harmony.security.utils.AlgNameMapper
+-dontnote sun.security.x509.AlgorithmId
+
+-dontwarn android.util.StatsEvent
+-dontwarn dalvik.system.BlockGuard
+-dontwarn dalvik.system.BlockGuard$Policy
+-dontwarn dalvik.system.CloseGuard
+-dontwarn com.android.org.conscrypt.AbstractConscryptSocket
+-dontwarn com.android.org.conscrypt.ConscryptFileDescriptorSocket
+-dontwarn com.android.org.conscrypt.OpenSSLSocketImpl
+-dontwarn org.apache.harmony.xnet.provider.jsse.OpenSSLSocketImpl
+
+# Please add these rules to your existing keep rules in order to suppress warnings.
+# This is generated automatically by the Android Gradle plugin.-dontwarn com.android.org.conscrypt.SSLParametersImpl
+-dontwarn com.android.org.conscrypt.SSLParametersImpl
+-dontwarn org.apache.harmony.xnet.provider.jsse.SSLParametersImpl
+-dontwarn org.bouncycastle.jsse.BCSSLParameters
+-dontwarn org.bouncycastle.jsse.BCSSLSocket
+-dontwarn org.bouncycastle.jsse.provider.BouncyCastleJsseProvider
+-dontwarn org.openjsse.javax.net.ssl.SSLParameters
+-dontwarn org.openjsse.javax.net.ssl.SSLSocket
+-dontwarn org.openjsse.net.ssl.OpenJSSE

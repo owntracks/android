@@ -3,10 +3,10 @@ package org.owntracks.android.services
 import android.content.Context
 import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
 
 class WifiInfoProviderTest {
 

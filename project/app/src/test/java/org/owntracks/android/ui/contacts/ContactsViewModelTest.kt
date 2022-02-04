@@ -1,10 +1,10 @@
 package org.owntracks.android.ui.contacts
 
 import androidx.lifecycle.MutableLiveData
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
 import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.model.FusedContact

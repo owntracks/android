@@ -7,11 +7,11 @@ import android.net.wifi.WifiManager
 import android.net.wifi.WifiManager.UNKNOWN_SSID
 import android.os.Build
 import android.os.Build.VERSION
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
 import org.owntracks.android.services.WifiInfoProvider
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier

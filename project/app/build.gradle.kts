@@ -72,7 +72,12 @@ android {
         named("release") {
             isMinifyEnabled = true
             isShrinkResources = true
-            proguardFiles.add(getDefaultProguardFile("proguard-android-optimize.txt"))
+            proguardFiles.addAll(
+                listOf(
+                    getDefaultProguardFile("proguard-android-optimize.txt"),
+                    file("proguard-rules.pro")
+                )
+            )
             resValue("string", "GOOGLE_MAPS_API_KEY", googleMapsAPIKey)
             signingConfig = signingConfigs.findByName("release")
         }
@@ -80,7 +85,12 @@ android {
         named("debug") {
             isMinifyEnabled = false
             isShrinkResources = false
-            proguardFiles.add(getDefaultProguardFile("proguard-android-optimize.txt"))
+            proguardFiles.addAll(
+                listOf(
+                    getDefaultProguardFile("proguard-android-optimize.txt"),
+                    file("proguard-rules.pro")
+                )
+            )
             resValue("string", "GOOGLE_MAPS_API_KEY", googleMapsAPIKey)
             applicationIdSuffix = ".debug"
             isTestCoverageEnabled = true
@@ -132,11 +142,11 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
+        jvmTarget = JavaVersion.VERSION_11.toString()
     }
     flavorDimensions.add("locationProvider")
     productFlavors {
@@ -212,6 +222,7 @@ dependencies {
     // Kotlin
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${kotlinCoroutinesVersion}")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:${kotlinCoroutinesVersion}")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.10")
 
     implementation("com.squareup.tape2:tape:2.0.0-beta1")
     implementation("com.jakewharton:process-phoenix:2.1.1")
@@ -239,7 +250,7 @@ dependencies {
 
     kaptTest("com.google.dagger:hilt-android-compiler:${hiltVersion}")
 
-    testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
     testImplementation("androidx.arch.core:core-testing:2.1.0")
 
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
