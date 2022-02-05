@@ -12,7 +12,6 @@ import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
-import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
@@ -21,23 +20,18 @@ import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import org.owntracks.android.R
-import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.databinding.OsmMapFragmentBinding
 import org.owntracks.android.location.LatLng
 import org.owntracks.android.location.toGeoPoint
 import org.owntracks.android.location.toLatLng
 import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.ui.map.MapActivity
-import org.owntracks.android.ui.map.MapActivity.Companion.STARTING_LATITUDE
-import org.owntracks.android.ui.map.MapActivity.Companion.STARTING_LONGITUDE
 import org.owntracks.android.ui.map.MapFragment
 import org.owntracks.android.ui.map.MapViewModel
 import timber.log.Timber
 
-class OSMMapFragment internal constructor(
-    private val locationRepo: LocationRepo,
-    contactImageBindingAdapter: ContactImageBindingAdapter
-) : MapFragment<OsmMapFragmentBinding>(contactImageBindingAdapter) {
+class OSMMapFragment internal constructor(contactImageBindingAdapter: ContactImageBindingAdapter) :
+    MapFragment<OsmMapFragmentBinding>(contactImageBindingAdapter) {
     override val layout: Int
         get() = R.layout.osm_map_fragment
 
@@ -47,7 +41,7 @@ class OSMMapFragment internal constructor(
             val locationProvider: IMyLocationProvider = this
             locationObserver = Observer<Location> { location ->
                 myLocationConsumer?.onLocationChanged(location, locationProvider)
-                viewModel.locationIdlingResource.setIdleState(true)
+                viewModel.setMapLocation(location.toLatLng())
                 if (viewModel.viewMode == MapViewModel.ViewMode.Device) {
                     updateCamera(location.toLatLng())
                 }
@@ -111,10 +105,7 @@ class OSMMapFragment internal constructor(
             setTileSource(TileSourceFactory.MAPNIK)
             zoomController.setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
             controller.setZoom(ZOOM_STREET_LEVEL)
-            val zoomLocation =
-                locationRepo.currentPublishedLocation.value?.run { GeoPoint(latitude, longitude) }
-                    ?: GeoPoint(STARTING_LATITUDE, STARTING_LONGITUDE)
-            controller.setCenter(zoomLocation)
+            controller.setCenter(viewModel.getMapLocation().toGeoPoint())
             // Make sure we don't add to the overlays
             if (!overlays.any { it is MyLocationNewOverlay && it.mMyLocationProvider == osmMapLocationSource }) {
                 overlays.add(

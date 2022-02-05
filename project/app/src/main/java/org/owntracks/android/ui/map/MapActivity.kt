@@ -663,10 +663,6 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
     companion object {
         const val BUNDLE_KEY_CONTACT_ID = "BUNDLE_KEY_CONTACT_ID"
 
-        // Paris
-        const val STARTING_LATITUDE = 48.856826
-        const val STARTING_LONGITUDE = 2.292713
-
         const val PERMISSIONS_REQUEST_CODE = 1
         const val PERMISSIONS_REQUEST_CODE_WITH_EXPLICIT_SERVICES_CHECK = 2
     }

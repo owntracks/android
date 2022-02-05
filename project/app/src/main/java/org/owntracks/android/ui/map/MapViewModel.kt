@@ -14,6 +14,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import org.owntracks.android.data.repos.ContactsRepo
+import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.location.LatLng
 import org.owntracks.android.location.toLatLng
@@ -29,6 +30,10 @@ import timber.log.Timber
 import javax.inject.Inject
 import kotlin.math.asin
 
+// Paris
+private const val STARTING_LATITUDE = 48.856826
+private const val STARTING_LONGITUDE = 2.292713
+
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val contactsRepo: ContactsRepo,
@@ -36,6 +41,7 @@ class MapViewModel @Inject constructor(
     private val messageProcessor: MessageProcessor,
     private val geocoderProvider: GeocoderProvider,
     private val preferences: Preferences,
+    private val locationRepo: LocationRepo,
     @ApplicationContext private val applicationContext: Context
 ) : ViewModel() {
     private val mutableCurrentContact = MutableLiveData<FusedContact?>()
@@ -209,6 +215,16 @@ class MapViewModel @Inject constructor(
         mutableMyLocationEnabled.postValue(true)
         viewModelScope.launch { currentLocation.requestLocationUpdates() }
     }
+
+    fun setMapLocation(latLng: LatLng) {
+        locationIdlingResource.setIdleState(true)
+        locationRepo.setMapLocation(latLng)
+    }
+
+    fun getMapLocation(): LatLng =
+        mapCenter.value
+            ?: locationRepo.currentMapLocation
+            ?: LatLng(STARTING_LATITUDE, STARTING_LONGITUDE)
 
     val orientationSensorEventListener = object : SensorEventListener {
         override fun onSensorChanged(maybeEvent: SensorEvent?) {
