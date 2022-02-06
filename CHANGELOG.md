@@ -1,5 +1,20 @@
 # Changelog
 
+## Version 2.4.7
+
+Target Android SDK is now 31.
+
+### New features
+
+* Location updates will now contain the app's mode as a field if extended data reporting is enabled (#1160). Documentation change at https://github.com/owntracks/booklet/commit/d4876781f801a8b006587e26ca3fba27328596b0
+
+### Bug fixes
+
+* Fixed issue where the app would crash when resuming due to a bug in how the MapFragment was created
+* Fixed a boat-load of memory leaks (thanks to [LeakCanary](https://square.github.io/leakcanary/))
+* Tweaked the font sizing in the contacts sheet to be a little more coherent (#1153)
+* Translation updates (thanks to all who contributed) (#1167)
+
 ## Version 2.4.6
 
 ### Bug fixes
