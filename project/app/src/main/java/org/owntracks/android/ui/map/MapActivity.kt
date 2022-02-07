@@ -46,7 +46,6 @@ import org.owntracks.android.R
 import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.databinding.UiMapBinding
 import org.owntracks.android.geocoding.GeocoderProvider
-import org.owntracks.android.location.*
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.perfLog
 import org.owntracks.android.services.BackgroundService
@@ -353,6 +352,7 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
                     previouslyHadLocationPermissions = true
                 }
                 PERMISSION_DENIED -> {
+                    preferences.userDeclinedEnableLocationPermissions = true
                     Snackbar.make(
                         binding!!.coordinatorLayout,
                         getString(R.string.locationPermissionNotGrantedNotification),
