@@ -18,6 +18,7 @@ import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.TimerPingSender;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.greenrobot.eventbus.EventBus;
 import org.jetbrains.annotations.NotNull;
@@ -218,8 +219,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         String connectString = new URI(scheme, null, preferences.getHost(), preferences.getPort(), null, null, null).toString();
         Timber.d("client id :%s, connect string: %s", cid, connectString);
         try {
-
-            IMqttAsyncClient mqttClient = new MqttAsyncClient(connectString, cid, new MemoryPersistence());
+            IMqttAsyncClient mqttClient = new MqttAsyncClient(connectString, cid, new MemoryPersistence(), new TimerPingSender(), null, new AndroidHighResolutionTimer());
             mqttClient.setCallback(iCallbackClient);
             return mqttClient;
         } catch (IllegalArgumentException e) {
