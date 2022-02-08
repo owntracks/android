@@ -20,11 +20,9 @@ import java.util.concurrent.ExecutionException
  * loctaion updates
  *
  * @property fusedLocationProviderClient instance of Google location client to use to request updates
- * @property contextClass class of the requester, used just for logging
  */
 class GMSLocationProviderClient(
-    private val fusedLocationProviderClient: FusedLocationProviderClient,
-    private val contextClass: Class<Context>
+    private val fusedLocationProviderClient: FusedLocationProviderClient
 ) : LocationProviderClient() {
 
     private val callbackMap =
@@ -45,18 +43,22 @@ class GMSLocationProviderClient(
         clientCallBack: LocationCallback,
         looper: Looper?
     ) {
-        Timber.i("Requesting location updates priority=${locationRequest.priority}, interval=${locationRequest.interval} clientCallback=${clientCallBack.hashCode()}, requester=$contextClass")
+        Timber.d("Requesting location updates priority=${locationRequest.priority}, interval=${locationRequest.interval} clientCallback=${clientCallBack.hashCode()}")
         if (looper == null) {
             Timber.e("No looper provided, can't request GMS location updates")
             return
         }
         val gmsCallBack = GMSLocationCallback(clientCallBack)
         callbackMap[clientCallBack.hashCode()] = gmsCallBack
+        val gmsLocationRequest = locationRequest.toGMSLocationRequest()
+        Timber.d("transformed location request is $gmsLocationRequest")
         fusedLocationProviderClient.requestLocationUpdates(
-            locationRequest.toGMSLocationRequest(),
+            gmsLocationRequest,
             gmsCallBack,
             looper
-        )
+        ).addOnCompleteListener {
+            Timber.d("GMS Background location update request completed: Success=${it.isSuccessful} Cancelled=${it.isCanceled}")
+        }
     }
 
     override fun removeLocationUpdates(clientCallBack: LocationCallback) {
@@ -86,17 +88,9 @@ class GMSLocationProviderClient(
 
     companion object {
         fun create(context: Context): GMSLocationProviderClient {
-            return GMSLocationProviderClient(
-                LocationServices.getFusedLocationProviderClient(context),
-                context.javaClass
-            )
+            return GMSLocationProviderClient(LocationServices.getFusedLocationProviderClient(context))
         }
     }
-
-    init {
-        Timber.i("Using Google Play Services as a location provider called from $contextClass")
-    }
-
 }
 
 /**
@@ -109,6 +103,7 @@ class GMSLocationProviderClient(
 class GMSLocationCallback(private val clientCallBack: LocationCallback) :
     com.google.android.gms.location.LocationCallback() {
     override fun onLocationResult(locationResult: LocationResult) {
+        super.onLocationResult(locationResult)
         clientCallBack.onLocationResult(
             org.owntracks.android.location.LocationResult(
                 locationResult.lastLocation
@@ -117,6 +112,7 @@ class GMSLocationCallback(private val clientCallBack: LocationCallback) :
     }
 
     override fun onLocationAvailability(locationAvailability: LocationAvailability) {
+        super.onLocationAvailability(locationAvailability)
         clientCallBack.onLocationAvailability(
             org.owntracks.android.location.LocationAvailability(
                 locationAvailability.isLocationAvailable

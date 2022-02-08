@@ -170,12 +170,12 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
         locationCallback = new LocationCallback() {
             @Override
             public void onLocationAvailability(@NotNull LocationAvailability locationAvailability) {
-                Timber.d("BackgroundService location availability %s", locationAvailability);
+                Timber.d("location availability %s", locationAvailability);
             }
 
             @Override
             public void onLocationResult(@NotNull LocationResult locationResult) {
-                Timber.d("BackgroundService location result received: %s", locationResult);
+                Timber.d("location result received: %s", locationResult);
                 onLocationChanged(locationResult.getLastLocation(), MessageLocation.REPORT_TYPE_DEFAULT);
             }
         };
@@ -522,9 +522,7 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
         locationProviderClient.requestLocationUpdates(request, locationCallbackOnDemand, runThingsOnOtherThreads.getBackgroundLooper());
     }
 
-    @SuppressWarnings("MissingPermission")
     private boolean setupLocationRequest() {
-        Timber.d("Setting up location request");
         if (missingLocationPermission()) {
             Timber.e("missing location permission");
             return false;
@@ -555,7 +553,7 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
                 request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
                 break;
         }
-        Timber.d("Location update request params: %s", request);
+        Timber.d("location update request params: %s", request);
         locationProviderClient.flushLocations();
         locationProviderClient.requestLocationUpdates(request, locationCallback, runThingsOnOtherThreads.getBackgroundLooper());
         return true;
