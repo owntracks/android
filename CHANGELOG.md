@@ -7,6 +7,7 @@ Target Android SDK is now 31.
 ### New features
 
 * Location updates will now contain the app's mode as a field if extended data reporting is enabled (#1160). Documentation change at https://github.com/owntracks/booklet/commit/d4876781f801a8b006587e26ca3fba27328596b0
+* The minimum locator displacement configuration value is now exposed in the preferences (*#1177)
 
 ### Bug fixes
 

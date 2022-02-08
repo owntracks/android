@@ -33,6 +33,15 @@
         <org.owntracks.android.support.widgets.EditIntegerPreference
             android:digits="0123456789"
             android:inputType="number"
+            app:defaultValue="@integer/valLocatorDisplacement"
+            app:dialogMessage="@string/preferencesLocatorDisplacementDialog"
+            app:iconSpaceReserved="false"
+            app:key="@string/preferenceKeyLocatorDisplacement"
+            app:summary="@string/preferencesLocatorDisplacementSummary"
+            app:title="@string/preferencesLocatorDisplacement" />
+        <org.owntracks.android.support.widgets.EditIntegerPreference
+            android:digits="0123456789"
+            android:inputType="number"
             app:defaultValue="@integer/valLocatorInterval"
             app:dialogMessage="@string/preferencesLocatorIntervalDialog"
             app:iconSpaceReserved="false"

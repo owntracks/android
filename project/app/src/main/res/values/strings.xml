@@ -128,6 +128,9 @@
     <string name="preferencesLocatorInterval">Location interval</string>
     <string name="preferencesLocatorIntervalSummary">Interval between location updates</string>
     <string name="preferencesLocatorIntervalDialog">How often should locations be requested from the device (seconds)</string>
+    <string name="preferencesLocatorDisplacement">Minimal location displacement</string>
+    <string name="preferencesLocatorDisplacementSummary">Minimum distance between location updates</string>
+    <string name="preferencesLocatorDisplacementDialog">How far should the device travel (in metres) before receiving another location</string>
     <string name="preferencesMoveModeLocatorInterval">Location interval (Move mode)</string>
     <string name="preferencesMoveModeLocatorIntervalSummary">Interval between location updates in Move mode</string>
     <string name="preferencesMoveModeLocatorIntervalDialog">How often should locations be requested from the device whilst in Move mode (seconds)</string>
