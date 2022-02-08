@@ -26,6 +26,7 @@ import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.Preferences
 import org.owntracks.android.support.RunThingsOnOtherThreads
 import org.owntracks.android.support.SimpleIdlingResource
+import org.owntracks.android.ui.AppShortcuts
 import timber.log.Timber
 import java.security.Security
 import javax.inject.Inject
@@ -51,6 +52,9 @@ class App : Application() {
 
     @Inject
     lateinit var bindingComponentProvider: Provider<CustomBindingComponentBuilder>
+
+    @Inject
+    lateinit var appShortcuts: AppShortcuts
 
     val workManagerFailedToInitialize = MutableLiveData(false)
 
@@ -120,6 +124,12 @@ class App : Application() {
             Preferences.NIGHT_MODE_DISABLE -> AppCompatDelegate.setDefaultNightMode(
                 AppCompatDelegate.MODE_NIGHT_NO
             )
+        }
+
+        if (preferences.experimentalFeatures.contains(Preferences.EXPERIMENTAL_FEATURE_ENABLE_LOG_VIEWER_APP_SHORTCUT)) {
+            appShortcuts.enableLogViewerShortcut(this)
+        } else {
+            appShortcuts.disableLogViewerShortcut(this)
         }
 
         // Notifications can be sent from multiple places, so let's make sure we've got the channels in place

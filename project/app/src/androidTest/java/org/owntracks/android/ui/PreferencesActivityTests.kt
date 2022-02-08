@@ -64,20 +64,21 @@ class PreferencesActivityTests :
         clickOnAndWait(R.string.preferencesIgnoreInaccurateLocations)
 
         writeTo(android.R.id.edit, "950")
-
         clickDialogPositiveButton()
 
         clickOnAndWait(R.string.preferencesLocatorInterval)
 
         writeTo(android.R.id.edit, "123")
+        clickDialogPositiveButton()
 
+        clickOnAndWait(R.string.preferencesLocatorDisplacement)
+        writeTo(android.R.id.edit,"567")
         clickDialogPositiveButton()
 
         scrollToPreferenceWithText(R.string.preferencesMoveModeLocatorInterval)
         clickOnAndWait(R.string.preferencesMoveModeLocatorInterval)
 
         writeTo(android.R.id.edit, "5")
-
         clickDialogPositiveButton()
 
         scrollToPreferenceWithText(R.string.preferencesAutostart)
@@ -109,6 +110,7 @@ class PreferencesActivityTests :
         assertContains(R.id.effectiveConfiguration, "\"pubExtendedData\" : false")
         assertContains(R.id.effectiveConfiguration, "\"ignoreInaccurateLocations\" : 950")
         assertContains(R.id.effectiveConfiguration, "\"locatorInterval\" : 123")
+        assertContains(R.id.effectiveConfiguration, "\"locatorDisplacement\" : 567")
         assertContains(R.id.effectiveConfiguration, "\"moveModeLocatorInterval\" : 5")
         assertContains(R.id.effectiveConfiguration, "\"autostartOnBoot\" : false")
         assertContains(R.id.effectiveConfiguration, "\"reverseGeocodeProvider\" : \"OpenCage\"")

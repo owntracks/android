@@ -1,6 +1,7 @@
 package org.owntracks.android.support
 
 import android.content.Context
+import android.content.pm.ShortcutManager
 import android.content.res.Resources
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions.MQTT_VERSION_3_1_1
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions.MQTT_VERSION_DEFAULT
@@ -18,6 +19,7 @@ import org.owntracks.android.model.messages.MessageConfiguration
 import org.owntracks.android.services.MessageProcessorEndpointHttp
 import org.owntracks.android.services.MessageProcessorEndpointMqtt
 import org.owntracks.android.support.preferences.PreferencesStore
+import org.owntracks.android.ui.NoopAppShortcuts
 import kotlin.reflect.KClass
 
 @RunWith(Parameterized::class)
@@ -32,13 +34,16 @@ class PreferencesGettersAndSetters(
     private lateinit var mockResources: Resources
     private lateinit var mockContext: Context
     private lateinit var preferencesStore: PreferencesStore
+    private lateinit var shortcutService: ShortcutManager
 
     @Before
     fun createMocks() {
+        shortcutService = mock<ShortcutManager> {}
         mockResources = getMockResources()
         mockContext = mock {
             on { resources } doReturn mockResources
             on { packageName } doReturn javaClass.canonicalName
+            on { getSystemService(Context.SHORTCUT_SERVICE) } doReturn shortcutService
         }
         preferencesStore = InMemoryPreferencesStore()
 
@@ -46,7 +51,7 @@ class PreferencesGettersAndSetters(
 
     @Test
     fun `when setting a preference ensure that the preference is set correctly on export`() {
-        val preferences = Preferences(mockContext, null, preferencesStore)
+        val preferences = Preferences(mockContext, null, preferencesStore, NoopAppShortcuts())
         val setter =
             Preferences::class.java.getMethod("set$preferenceMethodName", preferenceType.java)
         if (httpOnlyMode) {
@@ -59,7 +64,7 @@ class PreferencesGettersAndSetters(
 
     @Test
     fun `when importing a configuration ensure that the supplied preference is set to the given value`() {
-        val preferences = Preferences(mockContext, null, preferencesStore)
+        val preferences = Preferences(mockContext, null, preferencesStore, NoopAppShortcuts())
         val messageConfiguration = MessageConfiguration()
         messageConfiguration[preferenceName] = preferenceValue
         preferences.importFromMessage(messageConfiguration)

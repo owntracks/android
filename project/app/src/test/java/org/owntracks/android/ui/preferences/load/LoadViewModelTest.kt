@@ -13,6 +13,8 @@ import org.owntracks.android.support.Parser
 import org.owntracks.android.support.Preferences
 import org.owntracks.android.support.PreferencesGettersAndSetters
 import org.owntracks.android.support.preferences.PreferencesStore
+import org.owntracks.android.ui.AppShortcuts
+import org.owntracks.android.ui.NoopAppShortcuts
 import java.net.URI
 
 class LoadViewModelTest {
@@ -35,7 +37,7 @@ class LoadViewModelTest {
     @Test
     fun `When invalid JSON on an inline owntracks config URL, then the error is correctly set`() {
         val parser = Parser(null)
-        val preferences = Preferences(mockContext, null, preferencesStore)
+        val preferences = Preferences(mockContext, null, preferencesStore, NoopAppShortcuts())
         val vm = LoadViewModel(preferences, parser, InMemoryWaypointsRepo(eventBus))
 
         vm.extractPreferences(URI("owntracks:///config?inline=e30k"))

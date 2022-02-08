@@ -7,6 +7,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import org.greenrobot.eventbus.EventBus
 import org.owntracks.android.EventBusIndex
+import org.owntracks.android.ui.AppShortcuts
+import org.owntracks.android.ui.AppShortcutsImpl
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -26,6 +28,11 @@ class SingletonModule {
     @Singleton
     fun provideOutgoingQueueIdlingResource(): CountingIdlingResource {
         return CountingIdlingResource("outgoingQueueIdlingResource", false)
+    }
+
+    @Provides
+    fun provideAppShortcuts(): AppShortcuts {
+        return AppShortcutsImpl()
     }
 }
 

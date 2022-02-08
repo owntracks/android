@@ -21,6 +21,7 @@ import org.owntracks.android.support.Events.ModeChanged
 import org.owntracks.android.support.Events.MonitoringChanged
 import org.owntracks.android.support.preferences.OnModeChangedPreferenceChangedListener
 import org.owntracks.android.support.preferences.PreferencesStore
+import org.owntracks.android.ui.AppShortcuts
 import timber.log.Timber
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
@@ -33,11 +34,11 @@ import javax.inject.Singleton
 
 @Singleton
 class Preferences @Inject constructor(
-    @ApplicationContext applicationContext: Context,
+    @ApplicationContext private val applicationContext: Context,
     private val eventBus: EventBus?,
-    private val preferencesStore: PreferencesStore
+    private val preferencesStore: PreferencesStore,
+    private val appShortcuts: AppShortcuts
 ) {
-    private val context: Context = applicationContext
     private var isFirstStart = false
     private var currentMode = MessageProcessorEndpointMqtt.MODE_ID
 
@@ -888,6 +889,11 @@ class Preferences @Inject constructor(
         get() = getStringSet(R.string.preferenceKeyExperimentalFeatures).toSortedSet()
         set(value) {
             setStringSet(R.string.preferenceKeyExperimentalFeatures, value.toSet())
+            if (value.contains(EXPERIMENTAL_FEATURE_ENABLE_LOG_VIEWER_APP_SHORTCUT)) {
+                appShortcuts.enableLogViewerShortcut(applicationContext)
+            } else {
+                appShortcuts.disableLogViewerShortcut(applicationContext)
+            }
         }
 
     @get:Export(keyResId = R.string.preferenceKeyTheme, exportModeMqtt = true)
@@ -990,12 +996,21 @@ class Preferences @Inject constructor(
         )
 
     var userDeclinedEnableLocationPermissions: Boolean
-        get() = preferencesStore.getBoolean(preferenceKeyUserDeclinedEnableLocationPermissions, false)
-        set(value) = preferencesStore.putBoolean(preferenceKeyUserDeclinedEnableLocationPermissions, value)
+        get() = preferencesStore.getBoolean(
+            preferenceKeyUserDeclinedEnableLocationPermissions,
+            false
+        )
+        set(value) = preferencesStore.putBoolean(
+            preferenceKeyUserDeclinedEnableLocationPermissions,
+            value
+        )
 
     var userDeclinedEnableLocationServices: Boolean
         get() = preferencesStore.getBoolean(preferenceKeyUserDeclinedEnableLocationServices, false)
-        set(value) = preferencesStore.putBoolean(preferenceKeyUserDeclinedEnableLocationServices, value)
+        set(value) = preferencesStore.putBoolean(
+            preferenceKeyUserDeclinedEnableLocationServices,
+            value
+        )
 
     fun setObjectBoxMigrated() {
         preferencesStore.putBoolean(getPreferenceKey(R.string.preferenceKeyObjectboxMigrated), true)
@@ -1007,7 +1022,7 @@ class Preferences @Inject constructor(
     }
 
     private fun getBooleanResource(resId: Int): Boolean {
-        return context.resources.getBoolean(resId)
+        return applicationContext.resources.getBoolean(resId)
     }
 
     private fun getIntOrDefault(resKeyId: Int, defId: Int): Int {
@@ -1025,7 +1040,7 @@ class Preferences @Inject constructor(
     }
 
     private fun getIntResource(resId: Int): Int {
-        return context.resources.getInteger(resId)
+        return applicationContext.resources.getInteger(resId)
     }
 
     private fun getIntWithHintSupport(resKeyId: Int): String {
@@ -1049,7 +1064,7 @@ class Preferences @Inject constructor(
     }
 
     private fun getStringResource(resId: Int): String {
-        return context.resources.getString(resId)
+        return applicationContext.resources.getString(resId)
     }
 
     private fun setString(resKeyId: Int, value: String) {
@@ -1160,14 +1175,16 @@ class Preferences @Inject constructor(
         const val EXPERIMENTAL_FEATURE_USE_OSM_MAP = "useOSMMap"
         const val EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION =
             "bearingArrowFollowsDeviceOrientation"
+        const val EXPERIMENTAL_FEATURE_ENABLE_LOG_VIEWER_APP_SHORTCUT =
+            "enableLogViewerAppShortcut"
 
         internal val EXPERIMENTAL_FEATURES = setOf(
             EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI,
             EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE,
             EXPERIMENTAL_FEATURE_USE_OSM_MAP,
             EXPERIMENTAL_FEATURE_USE_AOSP_LOCATION_PROVIDER,
-            EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION
-
+            EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION,
+            EXPERIMENTAL_FEATURE_ENABLE_LOG_VIEWER_APP_SHORTCUT
         )
         const val REVERSE_GEOCODE_PROVIDER_NONE = "None"
         const val REVERSE_GEOCODE_PROVIDER_DEVICE = "Device"
@@ -1192,7 +1209,9 @@ class Preferences @Inject constructor(
         const val MQTT_MAX_QOS = 2
 
         // Preference Keys
-        const val preferenceKeyUserDeclinedEnableLocationPermissions = "userDeclinedEnableLocationPermissions"
-        const val preferenceKeyUserDeclinedEnableLocationServices = "userDeclinedEnableLocationServices"
+        const val preferenceKeyUserDeclinedEnableLocationPermissions =
+            "userDeclinedEnableLocationPermissions"
+        const val preferenceKeyUserDeclinedEnableLocationServices =
+            "userDeclinedEnableLocationServices"
     }
 }

@@ -31,8 +31,5 @@ class ExperimentalFragment @Inject constructor() : AbstractPreferenceFragment() 
                 preferenceScreen.addPreference(this)
             }
         }
-
-
     }
-
 }
