@@ -8,7 +8,10 @@ import android.util.Base64
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.support.widgets.TextDrawable
 import timber.log.Timber
@@ -18,11 +21,11 @@ class ContactImageBindingAdapter @Inject constructor(
     @ApplicationContext context: Context,
     private val memoryCache: ContactBitmapAndNameMemoryCache
 ) {
-    @BindingAdapter(value = ["contact"])
-    fun ImageView.displayFaceInViewAsync(c: FusedContact?) {
-        c?.also { contact ->
-            GlobalScope.launch(Dispatchers.Main) {
-                setImageBitmap(getBitmapFromCache(contact))
+    @BindingAdapter(value = ["contact", "coroutineScope"])
+    fun ImageView.displayFaceInViewAsync(contact: FusedContact?, scope: CoroutineScope) {
+        contact?.also {
+            scope.launch(Dispatchers.Main) {
+                setImageBitmap(getBitmapFromCache(it))
             }
         }
     }

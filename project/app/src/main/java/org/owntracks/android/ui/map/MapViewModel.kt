@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.data.repos.LocationRepo
@@ -68,6 +69,9 @@ class MapViewModel @Inject constructor(
         get() = mutableRelativeContactBearing
     val myLocationEnabled: LiveData<Boolean>
         get() = mutableMyLocationEnabled
+
+    val scope: CoroutineScope
+        get() = viewModelScope
 
     val allContacts = contactsRepo.all
     val locationIdlingResource = SimpleIdlingResource("locationIdlingResource", false)

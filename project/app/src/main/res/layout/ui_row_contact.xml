@@ -10,6 +10,9 @@
             name="contact"
             type="org.owntracks.android.model.FusedContact" />
 
+        <variable
+            name="coroutineScope"
+            type="kotlinx.coroutines.CoroutineScope" />
     </data>
 
 
@@ -30,6 +33,7 @@
             android:layout_marginTop="16dp"
             android:contentDescription="@string/contact_image"
             app:contact="@{contact}"
+            app:coroutineScope="@{coroutineScope}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

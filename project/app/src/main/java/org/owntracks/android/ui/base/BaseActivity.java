@@ -58,7 +58,9 @@ public abstract class BaseActivity<B extends ViewDataBinding, V extends MvvmView
         binding.setLifecycleOwner(this);
 
         //noinspection unchecked
-        viewModel.attachView(savedInstanceState, (MvvmView) this);
+        if (MvvmView.class.isAssignableFrom(this.getClass())) {
+            viewModel.attachView(savedInstanceState, (MvvmView) this);
+        }
     }
 
 

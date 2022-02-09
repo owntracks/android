@@ -47,7 +47,8 @@
             <include
                 android:id="@+id/contactPeek"
                 layout="@layout/ui_row_contact"
-                app:contact="@{vm.currentContact}" />
+                app:contact="@{vm.currentContact}"
+                app:coroutineScope="@{vm.scope}" />
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
