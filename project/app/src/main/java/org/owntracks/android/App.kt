@@ -126,7 +126,7 @@ class App : Application() {
             )
         }
 
-        if (preferences.experimentalFeatures.contains(Preferences.EXPERIMENTAL_FEATURE_ENABLE_LOG_VIEWER_APP_SHORTCUT)) {
+        if (preferences.experimentalFeatures.contains(Preferences.EXPERIMENTAL_FEATURE_ENABLE_APP_SHORTCUTS)) {
             appShortcuts.enableLogViewerShortcut(this)
         } else {
             appShortcuts.disableLogViewerShortcut(this)

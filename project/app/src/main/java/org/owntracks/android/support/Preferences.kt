@@ -889,7 +889,7 @@ class Preferences @Inject constructor(
         get() = getStringSet(R.string.preferenceKeyExperimentalFeatures).toSortedSet()
         set(value) {
             setStringSet(R.string.preferenceKeyExperimentalFeatures, value.toSet())
-            if (value.contains(EXPERIMENTAL_FEATURE_ENABLE_LOG_VIEWER_APP_SHORTCUT)) {
+            if (value.contains(EXPERIMENTAL_FEATURE_ENABLE_APP_SHORTCUTS)) {
                 appShortcuts.enableLogViewerShortcut(applicationContext)
             } else {
                 appShortcuts.disableLogViewerShortcut(applicationContext)
@@ -1175,8 +1175,8 @@ class Preferences @Inject constructor(
         const val EXPERIMENTAL_FEATURE_USE_OSM_MAP = "useOSMMap"
         const val EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION =
             "bearingArrowFollowsDeviceOrientation"
-        const val EXPERIMENTAL_FEATURE_ENABLE_LOG_VIEWER_APP_SHORTCUT =
-            "enableLogViewerAppShortcut"
+        const val EXPERIMENTAL_FEATURE_ENABLE_APP_SHORTCUTS =
+            "enableAppShortcuts"
 
         internal val EXPERIMENTAL_FEATURES = setOf(
             EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI,
@@ -1184,7 +1184,7 @@ class Preferences @Inject constructor(
             EXPERIMENTAL_FEATURE_USE_OSM_MAP,
             EXPERIMENTAL_FEATURE_USE_AOSP_LOCATION_PROVIDER,
             EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION,
-            EXPERIMENTAL_FEATURE_ENABLE_LOG_VIEWER_APP_SHORTCUT
+            EXPERIMENTAL_FEATURE_ENABLE_APP_SHORTCUTS
         )
         const val REVERSE_GEOCODE_PROVIDER_NONE = "None"
         const val REVERSE_GEOCODE_PROVIDER_DEVICE = "Device"

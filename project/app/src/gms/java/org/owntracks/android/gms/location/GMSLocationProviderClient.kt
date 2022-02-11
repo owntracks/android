@@ -5,8 +5,6 @@ import android.content.Context
 import android.location.Location
 import android.os.Looper
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationAvailability
-import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.Tasks
 import org.owntracks.android.location.LocationCallback
@@ -90,33 +88,5 @@ class GMSLocationProviderClient(
         fun create(context: Context): GMSLocationProviderClient {
             return GMSLocationProviderClient(LocationServices.getFusedLocationProviderClient(context))
         }
-    }
-}
-
-/**
- * This is a wrapper around a [LocationCallback] instance that can be given to something that needs
- * a [com.google.android.gms.location.LocationCallback]. Once the thing that owns the [com.google.android.gms.location.LocationCallback]
- * has any of its methods triggered, it then passes that on to the methods of the [LocationCallback]
- *
- * @property clientCallBack the [LocationCallback] to wrap
- */
-class GMSLocationCallback(private val clientCallBack: LocationCallback) :
-    com.google.android.gms.location.LocationCallback() {
-    override fun onLocationResult(locationResult: LocationResult) {
-        super.onLocationResult(locationResult)
-        clientCallBack.onLocationResult(
-            org.owntracks.android.location.LocationResult(
-                locationResult.lastLocation
-            )
-        )
-    }
-
-    override fun onLocationAvailability(locationAvailability: LocationAvailability) {
-        super.onLocationAvailability(locationAvailability)
-        clientCallBack.onLocationAvailability(
-            org.owntracks.android.location.LocationAvailability(
-                locationAvailability.isLocationAvailable
-            )
-        )
     }
 }
