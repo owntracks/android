@@ -7,12 +7,10 @@ import android.database.MatrixCursor
 import android.net.Uri
 import android.os.ParcelFileDescriptor
 import android.provider.OpenableColumns
-import android.widget.Toast
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
-import org.owntracks.android.R
 import org.owntracks.android.data.repos.WaypointsRepo
 import org.owntracks.android.support.Parser
 import org.owntracks.android.support.Preferences
@@ -60,8 +58,8 @@ class ExportedConfigContentProvider : ContentProvider() {
 
     override fun openFile(uri: Uri, mode: String): ParcelFileDescriptor? {
         if (mode != "r") {
-            // We have no view to attach snackbars to, so have to use a toast here
-            Toast.makeText(context, R.string.preferencesExportFailed, Toast.LENGTH_SHORT).show()
+            Timber.e("Can't export, mode set to $mode, expecting 'r'")
+            // Cancel
             return null
         }
 
@@ -70,12 +68,11 @@ class ExportedConfigContentProvider : ContentProvider() {
             "text/plain",
             null,
             exportedConfigJson.toByteArray()
-        ) { output, _, _, _, l ->
+        ) { parcelFileDescriptor, _, _, _, bytes ->
             try {
-                FileOutputStream(output.fileDescriptor).write(l)
+                FileOutputStream(parcelFileDescriptor.fileDescriptor).write(bytes)
             } catch (e: Exception) {
                 Timber.e(e, "Can't write config to output")
-                Toast.makeText(context, R.string.preferencesExportFailed, Toast.LENGTH_SHORT).show()
             }
         }
     }

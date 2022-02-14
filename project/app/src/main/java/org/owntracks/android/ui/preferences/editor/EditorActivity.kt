@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ArrayAdapter
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ShareCompat
@@ -123,11 +124,22 @@ class EditorActivity :
 
     private val shareIntentActivityLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            Snackbar.make(
-                findViewById(R.id.effectiveConfiguration),
-                R.string.preferencesExportSuccess,
-                Snackbar.LENGTH_SHORT
-            ).show()
+            when (it.resultCode) {
+                RESULT_OK -> {
+                    Snackbar.make(
+                        findViewById(R.id.effectiveConfiguration),
+                        R.string.preferencesExportSuccess,
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                }
+                RESULT_CANCELED -> {
+                    Snackbar.make(
+                        findViewById(R.id.effectiveConfiguration),
+                        R.string.preferencesExportFailed,
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                }
+            }
             revokeExportUriPermissions()
         }
 
