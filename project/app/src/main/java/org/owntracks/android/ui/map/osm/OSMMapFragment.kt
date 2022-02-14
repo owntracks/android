@@ -145,7 +145,12 @@ class OSMMapFragment internal constructor(contactImageBindingAdapter: ContactIma
                 overlays.firstOrNull { it is Marker && it.id == id } as Marker?
             if (existingMarker != null) {
                 existingMarker.position = latLng.toGeoPoint()
-            } else {
+            } else if (activity?.isDestroyed == false) {
+                /*
+                There's a race condition where in the time it takes to create all the markers, the
+                activity has been destroyed. Creating a Marker requires (for some reason) the `mapView`
+                to be attached to a non-destroyed activity somehow, so we check before creating the marker
+                 */
                 overlays.add(0, Marker(this).apply {
                     this.id = id
                     position = latLng.toGeoPoint()
