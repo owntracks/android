@@ -245,14 +245,4 @@
     <string name="aboutFeedbackCategoryTitle">"Обратная связь"</string>
     <string name="contactDetailsDistanceUnitKilometres">"км"</string>
     <string name="contactDetailsDistanceUnitMeters">"м"</string>
-    <string-array name="geocoders">
-        <item>Не используется</item>
-        <item>Стандартное (Google)</item>
-        <item>OpenCage</item>
-    </string-array>
-    <string-array name="themeLabels">
-        <item>Светлая</item>
-        <item>Темная</item>
-        <item>Системная</item>
-    </string-array>
 </resources>

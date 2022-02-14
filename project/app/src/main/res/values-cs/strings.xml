@@ -237,14 +237,4 @@ Chcete-li to povolit, zapněte polohu v nastavení zařízení."</string>
     <string name="contactDetailsDistanceUnitMeters">"m"</string>
     <string name="exportConfigurationSubject">"Konfigurační soubor OwnTracks"</string>
     <string name="exportLogFileSubject">"OwnTracks log soubor"</string>
-    <string-array name="geocoders">
-        <item>Žádný</item>
-        <item>Výchozí (Google)</item>
-        <item>OpenCage</item>
-    </string-array>
-    <string-array name="themeLabels">
-        <item>Vždy světlý</item>
-        <item>Vždy tmavý</item>
-        <item>Výchozí</item>
-    </string-array>
 </resources>

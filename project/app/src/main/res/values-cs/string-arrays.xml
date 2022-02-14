@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="geocoders">
+        <item>Žádný</item>
+        <item>Výchozí (Google)</item>
+        <item>OpenCage</item>
+    </string-array>
+    <string-array name="themeLabels">
+        <item>Vždy světlý</item>
+        <item>Vždy tmavý</item>
+        <item>Výchozí</item>
+    </string-array>
+</resources>

@@ -238,14 +238,4 @@
     <string name="aboutFeedbackCategoryTitle">Feedback</string>
     <string name="exportConfigurationSubject">OwnTracks Configuration File</string>
     <string name="exportLogFileSubject">OwnTracks Log File</string>
-    <string-array name="geocoders">
-        <item>None</item>
-        <item>Device (Google)</item>
-        <item>OpenCage</item>
-    </string-array>
-    <string-array name="themeLabels">
-        <item>Always in light theme</item>
-        <item>Always in dark theme</item>
-        <item>Same as device</item>
-    </string-array>
 </resources>
