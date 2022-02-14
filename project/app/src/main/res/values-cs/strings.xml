@@ -118,7 +118,7 @@
     <string name="preferencesEditorKeyError">"Zadán neplatný klíč"</string>
     <string name="preferencesEditorValueError">"Zadána neplatná hodnota"</string>
     <string name="preferencesEditorDescription">"Nastavte jednu hodnotu pro zadaný klíč. Některé změny mohou vyžadovat restart aplikace."</string>
-    <string name="preferencesLoadFailed">"Nelze načíst efektivní konfiguraci"</string>
+    <string name="preferencesLoadFailed">"Nelze načíst použitelnou konfiguraci"</string>
     <string name="preferencesEditorKey">"Klíč"</string>
     <string name="preferencesEditorValue">"Hodnota"</string>
     <string name="restart">"Restart"</string>
@@ -146,8 +146,8 @@ Aby aplikace mohla běžet na pozadí, bude zobrazeno trvalé oznámení. Lze to
     <string name="notificationChannelOngoingDescription">"Vyžadováno pro přijem aktualizací polohy na pozadí"</string>
     <string name="notificationChannelEventsDescription">"Přenosy oblastí"</string>
     <string name="preferencesOpencageGeocoderApiKey">"Klíč OpenCage API"</string>
-    <string name="preferencesOpencageGeocoderApiKeySummary">"API klíč pro OpenCage Reverse Geocoder"</string>
-    <string name="preferencesOpencageGeocoderApiKeyDialog">"Pokud je nastaveno, použije se OpenCage k zjištění adres umístění místo Google. Vyžaduje restart."</string>
+    <string name="preferencesOpencageGeocoderApiKeySummary">"API klíč pro zpětný geokodér OpenCage"</string>
+    <string name="preferencesOpencageGeocoderApiKeyDialog">"Pokud je nastaveno, použije se ke zjištění adres polohy OpenCage místo Google. Vyžaduje restart."</string>
     <string name="region_unknown">"Stav neznámý"</string>
     <string name="region_inside">"Nyní vevnitř"</string>
     <string name="region_outside">"Nyní venku"</string>
@@ -184,7 +184,7 @@ Aby aplikace mohla běžet na pozadí, bude zobrazeno trvalé oznámení. Lze to
         <item quantity="other">"Nyní dostupná v %d jazycích!"</item>
     </plurals>
     <string name="aboutTranslations">"Pomozte přeložit tuto aplikaci"</string>
-    <string name="geocoderDisabled">"Služba geokóderu je vypnuta."</string>
+    <string name="geocoderDisabled">"Služba geokodéru je vypnuta."</string>
     <string name="geocoderRateLimited">"Služba geokodéru byla omezena rychlostí. Zkuste to znovu až %s"</string>
     <string name="geocoderError">"Ze služby geokodéru byla přijata chyba: %s"</string>
     <string name="notificationChannelErrors">"Chyby"</string>
@@ -199,7 +199,7 @@ Aby aplikace mohla běžet na pozadí, bude zobrazeno trvalé oznámení. Lze to
     <string name="contactDetailsDistanceValue">"%1$,.2f %2$s"</string>
     <string name="contactDetailsAltitude">"Výška"</string>
     <string name="contactDetailsBearing">"Směr"</string>
-    <string name="contactDetailsDistance">"Vzdálenost"</string>
+    <string name="contactDetailsDistance">"Daleko"</string>
     <string name="contactDetailsBattery">"Baterie"</string>
     <string name="contactDetailsSpeed">"Rychlost"</string>
     <string name="contactDetailsBearingValue">"%,.0f°"</string>
@@ -207,7 +207,7 @@ Aby aplikace mohla běžet na pozadí, bude zobrazeno trvalé oznámení. Lze to
     <string name="contactDetailsBatteryValue">"%d %%"</string>
     <string name="contactDetailsSpeedValue">"%d km/h"</string>
     <string name="preferencesCategoryNotificationErrors">"Chyby a prohlémy"</string>
-    <string name="preferencesNotificationGeocoderErrors">"Chyby geokóderu"</string>
+    <string name="preferencesNotificationGeocoderErrors">"Chyby geokodéru"</string>
     <string name="preferencesNotificationGeocoderErrorsSummary">"Zobrazit chyby geokodéru, limity četností a překročení kvóty"</string>
     <string name="preferencesAdvancedAutostartWarning">"Tato verze Androidu omezuje Owntracks zjištovat polohu při automatickém spuštění při spouštění zařízení, dokud není aplikace otevřena."</string>
     <string name="workmanagerInitializationErrorDialogTitle">"Chyba inicializace"</string>
@@ -230,11 +230,16 @@ Další podrobnosti naleznete v protokolech."</string>
 
 Chcete-li to povolit, zapněte polohu v nastavení zařízení."</string>
     <string name="aboutIssuesTitle">"Nahlásit problém"</string>
-    <string name="aboutIssuesSummary">"Na GitHub-u"</string>
+    <string name="aboutIssuesSummary">"GitHub"</string>
     <string name="aboutSourceCodeSummary">"GitHub"</string>
     <string name="aboutFeedbackCategoryTitle">"Zpětná vazba"</string>
     <string name="contactDetailsDistanceUnitKilometres">"km"</string>
     <string name="contactDetailsDistanceUnitMeters">"m"</string>
     <string name="exportConfigurationSubject">"Konfigurační soubor OwnTracks"</string>
-    <string name="exportLogFileSubject">"OwnTracks log soubor"</string>
+    <string name="exportLogFileSubject">"Soubor protokolu OwnTracks"</string>
+    <string name="preferencesLocatorDisplacement">"Minimální posun polohy"</string>
+    <string name="preferencesLocatorDisplacementSummary">"Minimální vzdálenost mezi aktualizacemi polohy"</string>
+    <string name="preferencesLocatorDisplacementDialog">"Jak daleko se musí zařízení posunout (v metrech), než odešle další polohu"</string>
+    <string name="geocoderExceptionError">"Ze služby geokodéru byla přijata chyba. Zkontrolujte protokoly a zjistěte další podrobnosti"</string>
+    <string name="geocoderUnavailable">"Služba geokodéru je dočasně nedostupná"</string>
 </resources>
