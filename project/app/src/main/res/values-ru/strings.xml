@@ -245,4 +245,11 @@
     <string name="aboutFeedbackCategoryTitle">"Обратная связь"</string>
     <string name="contactDetailsDistanceUnitKilometres">"км"</string>
     <string name="contactDetailsDistanceUnitMeters">"м"</string>
+    <string name="exportConfigurationSubject">"Файл конфигурации OwnTracks"</string>
+    <string name="exportLogFileSubject">"Файл журнала OwnTracks"</string>
+    <string name="preferencesLocatorDisplacement">"Минимальное перемещение"</string>
+    <string name="preferencesLocatorDisplacementSummary">"Минимальное расстояние между обновлениями местоположения"</string>
+    <string name="preferencesLocatorDisplacementDialog">"На какое расстояние должно переместиться устройство для обновления местоположения"</string>
+    <string name="geocoderExceptionError">"Ошибка геокодирования. Подробная информация в журнале работы"</string>
+    <string name="geocoderUnavailable">"Сервис геокодирования временно недоступен"</string>
 </resources>
