@@ -712,12 +712,9 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
         if (!preferences.getNotificationEvents())
             return null;
 
-        Timber.d("building notification builder");
-
         if (eventsNotificationCompatBuilder != null)
             return eventsNotificationCompatBuilder;
 
-        Timber.d("builder not present, lazy building");
         Intent openIntent = new Intent(this, MapActivity.class);
         openIntent.setAction("android.intent.action.MAIN");
         openIntent.addCategory("android.intent.category.LAUNCHER");

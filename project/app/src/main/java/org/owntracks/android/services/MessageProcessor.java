@@ -352,7 +352,6 @@ public class MessageProcessor {
     void onMessageDelivered(MessageBase messageBase) {
         Timber.d("onMessageDelivered in MessageProcessor Noop. ThreadID: %s", Thread.currentThread());
         eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
-        eventBus.post(messageBase);
     }
 
     void onMessageDeliveryFailedFinal(String messageId) {

@@ -46,29 +46,28 @@ class MemoryContactsRepo @Inject constructor(
     @Synchronized
     override fun remove(id: String) {
         Timber.v("removing contact: %s", id)
-        contacts.remove(id)?.run { eventBus.post(FusedContactRemoved(this)) }
+        contacts.remove(id)
         all.postValue(contacts)
     }
 
     @Synchronized
     override fun update(id: String, messageCard: MessageCard) {
-        var c = getById(id)
-        if (c != null) {
-            c.messageCard = messageCard
+        var contact = getById(id)
+        if (contact != null) {
+            contact.messageCard = messageCard
             contactsBitmapAndNameMemoryCache.put(
-                c.id,
+                contact.id,
                 ContactBitmapAndName.CardBitmap(messageCard.name, null)
             )
-            eventBus.post(c)
+            eventBus.post(contact)
         } else {
-            c = FusedContact(id)
-            c.messageCard = messageCard
+            contact = FusedContact(id)
+            contact.messageCard = messageCard
             contactsBitmapAndNameMemoryCache.put(
-                c.id,
+                contact.id,
                 ContactBitmapAndName.CardBitmap(messageCard.name, null)
             )
-            put(id, c)
-            eventBus.post(FusedContactAdded(c))
+            put(id, contact)
         }
     }
 
@@ -93,7 +92,6 @@ class MemoryContactsRepo @Inject constructor(
                 }
             }
             put(id, fusedContact)
-            eventBus.post(FusedContactAdded(fusedContact))
         }
     }
 
