@@ -1,4 +1,5 @@
-import com.android.build.gradle.AppExtension
+import com.android.build.api.dsl.ApplicationExtension
+import com.android.build.api.variant.AndroidComponentsExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Exec
@@ -12,15 +13,21 @@ class EspressoScreenshotsPlugin : Plugin<Project> {
     private val screenshotsDeviceFolder = "/sdcard/googletest/test_outputfiles"
 
     override fun apply(project: Project) {
+        val android: ApplicationExtension =
+            project.extensions.getByType(ApplicationExtension::class.java)
+        val androidComponents = project.extensions.getByType(AndroidComponentsExtension::class.java)
+
         // This is where AGP writes out connected test reports
         val reportsDirectoryPath = "${project.buildDir}/reports/androidTests/connected/flavors/%s"
-        val android: AppExtension? = project.extensions.findByType(AppExtension::class.java)
-        android?.run {
+        android.run {
             productFlavors.all {
                 val flavorName = this.name
                 val flavorTestReportPath = reportsDirectoryPath.format(flavorName)
                 project.run {
-                    val adbExecutable = android.adbExecutable.absolutePath
+
+                    val adbExecutable =
+                        androidComponents.sdkComponents.adb.get().asFile.invariantSeparatorsPath
+
                     tasks.register<Exec>("clear${flavorName.capitalize(Locale.ROOT)}Screenshots") {
                         group = "reporting"
                         description =

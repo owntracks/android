@@ -2,6 +2,7 @@
 
 ext["hiltVersion"] = "2.40.1"
 plugins {
+    id("com.android.application").version("7.0.4").apply(false)
     id("org.jetbrains.kotlin.android").version("1.6.10").apply(false)
     id("dagger.hilt.android.plugin").version("2.40.1").apply(false)
     id("io.objectbox").version("3.1.1").apply(false)
@@ -12,4 +13,10 @@ plugins {
 extensions.findByName("buildScan")?.withGroovyBuilder {
     setProperty("termsOfServiceUrl", "https://gradle.com/terms-of-service")
     setProperty("termsOfServiceAgree", "yes")
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_11.toString()
+    }
 }

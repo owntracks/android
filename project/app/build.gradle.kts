@@ -102,6 +102,10 @@ android {
         viewBinding = true
     }
 
+    dataBinding {
+        addKtx = true
+    }
+
     packagingOptions {
         resources.excludes.add("META-INF/*")
         jniLibs.useLegacyPackaging = false
@@ -145,9 +149,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_11.toString()
     }
+
     flavorDimensions.add("locationProvider")
     productFlavors {
         create("gms") {
