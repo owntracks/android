@@ -11,7 +11,10 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE
-import com.google.android.gms.maps.model.*
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
 import org.owntracks.android.R
 import org.owntracks.android.databinding.GoogleMapFragmentBinding
 import org.owntracks.android.gms.location.toGMSLatLng
@@ -20,7 +23,8 @@ import org.owntracks.android.support.ContactImageBindingAdapter
 import timber.log.Timber
 
 class GoogleMapFragment internal constructor(contactImageBindingAdapter: ContactImageBindingAdapter) :
-    MapFragment<GoogleMapFragmentBinding>(contactImageBindingAdapter), OnMapReadyCallback {
+    MapFragment<GoogleMapFragmentBinding>(contactImageBindingAdapter), OnMapReadyCallback,
+    OnMapsSdkInitializedCallback {
     override val layout: Int
         get() = R.layout.google_map_fragment
 
@@ -81,7 +85,7 @@ class GoogleMapFragment internal constructor(contactImageBindingAdapter: Contact
 
     @SuppressLint("MissingPermission")
     override fun initMap() {
-        MapsInitializer.initialize(requireContext())
+        MapsInitializer.initialize(requireContext(), MapsInitializer.Renderer.LATEST, this)
         this.googleMap?.run {
             val myLocationEnabled =
                 (requireActivity() as MapActivity).checkAndRequestMyLocationCapability(false)
@@ -96,7 +100,10 @@ class GoogleMapFragment internal constructor(contactImageBindingAdapter: Contact
             setMapStyle()
 
             moveCamera(
-                CameraUpdateFactory.newLatLngZoom(viewModel.getMapLocation().toGMSLatLng(), ZOOM_LEVEL_STREET)
+                CameraUpdateFactory.newLatLngZoom(
+                    viewModel.getMapLocation().toGMSLatLng(),
+                    ZOOM_LEVEL_STREET
+                )
             )
 
             setOnMarkerClickListener {
@@ -186,5 +193,9 @@ class GoogleMapFragment internal constructor(contactImageBindingAdapter: Contact
 
     companion object {
         private const val ZOOM_LEVEL_STREET: Float = 15f
+    }
+
+    override fun onMapsSdkInitialized(renderer: MapsInitializer.Renderer) {
+        Timber.d("Maps SDK initialized with renderer: ${renderer.name}")
     }
 }
