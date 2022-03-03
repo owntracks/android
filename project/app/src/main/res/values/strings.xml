@@ -238,4 +238,5 @@
     <string name="aboutFeedbackCategoryTitle">Feedback</string>
     <string name="exportConfigurationSubject">OwnTracks Configuration File</string>
     <string name="exportLogFileSubject">OwnTracks Log File</string>
+    <string name="noBrowserInstalled">No suitable browser installed</string>
 </resources>

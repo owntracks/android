@@ -16,7 +16,6 @@ import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.VisibleForTesting
@@ -491,17 +490,23 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
         preferences.setMonitoringNext()
         when (preferences.monitoring) {
             LocationProcessor.MONITORING_QUIET -> {
-                Toast.makeText(this, R.string.monitoring_quiet, Toast.LENGTH_SHORT).show()
-            }
-            LocationProcessor.MONITORING_MANUAL -> {
-                Toast.makeText(this, R.string.monitoring_manual, Toast.LENGTH_SHORT).show()
-            }
-            LocationProcessor.MONITORING_SIGNIFICANT -> {
-                Toast.makeText(this, R.string.monitoring_significant, Toast.LENGTH_SHORT)
+                Snackbar.make(binding!!.root, R.string.monitoring_quiet, Snackbar.LENGTH_SHORT)
                     .show()
             }
+            LocationProcessor.MONITORING_MANUAL -> {
+                Snackbar.make(binding!!.root, R.string.monitoring_manual, Snackbar.LENGTH_SHORT)
+                    .show()
+            }
+            LocationProcessor.MONITORING_SIGNIFICANT -> {
+                Snackbar.make(
+                    binding!!.root,
+                    R.string.monitoring_significant,
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            }
             else -> {
-                Toast.makeText(this, R.string.monitoring_move, Toast.LENGTH_SHORT).show()
+                Snackbar.make(binding!!.root, R.string.monitoring_move, Snackbar.LENGTH_SHORT)
+                    .show()
             }
         }
     }

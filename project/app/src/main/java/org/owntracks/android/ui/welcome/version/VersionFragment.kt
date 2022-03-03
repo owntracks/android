@@ -7,7 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import org.greenrobot.eventbus.EventBus
 import org.owntracks.android.R
@@ -19,7 +19,8 @@ import org.owntracks.android.ui.welcome.WelcomeFragmentMvvm
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class VersionFragment @Inject constructor() : BaseSupportFragment<UiWelcomeVersionBinding?, NoOpViewModel?>(),
+class VersionFragment @Inject constructor() :
+    BaseSupportFragment<UiWelcomeVersionBinding?, NoOpViewModel?>(),
     WelcomeFragmentMvvm.View, View.OnClickListener {
     @Inject
     lateinit var eventBus: EventBus
@@ -44,7 +45,12 @@ class VersionFragment @Inject constructor() : BaseSupportFragment<UiWelcomeVersi
                 Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.documentationUrlAndroid)))
             startActivity(i)
         } catch (e: ActivityNotFoundException) {
-            Toast.makeText(context, "No suitable browser installed", Toast.LENGTH_SHORT).show()
+            Snackbar.make(
+                binding!!.root,
+                getString(R.string.noBrowserInstalled),
+                Snackbar.LENGTH_SHORT
+            )
+                .show()
         }
     }
 
