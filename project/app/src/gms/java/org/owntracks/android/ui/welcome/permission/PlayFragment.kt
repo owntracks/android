@@ -4,9 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import org.greenrobot.eventbus.EventBus
 import org.owntracks.android.R
@@ -47,10 +47,10 @@ class PlayFragment @Inject constructor() :
                 PLAY_SERVICES_RESOLUTION_REQUEST
             )
         ) {
-            Toast.makeText(
-                this.context,
-                "Unable to update Google Play Services",
-                Toast.LENGTH_SHORT
+            Snackbar.make(
+                binding!!.root,
+                getString(R.string.play_services_not_available),
+                Snackbar.LENGTH_SHORT
             ).show()
         }
         checkAvailability()
