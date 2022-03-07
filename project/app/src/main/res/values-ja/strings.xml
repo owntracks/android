@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <!-- Fuzzy -->
     <string name="app_name">"OwnTracks"</string>
     <string name="preferencesServer">"接続"</string>
     <string name="preferencesHost">"ホスト"</string>
@@ -156,7 +154,7 @@
     <string name="region_outside">"範囲外にいます"</string>
     <string name="monitoring_quiet">"静寂モニタリングモード"</string>
     <string name="monitoring_manual">"手動モニタリングモード"</string>
-    <string name="monitoring_significant">"Sgnificant-Changeモニタリングモード"</string>
+    <string name="monitoring_significant">"大雑把な移動モニタリングモード"</string>
     <string name="monitoring_move">"移動モニタリングモード"</string>
     <string name="notificationChangeMonitoring">"モニタリングモード変更"</string>
     <string name="preferencesDebugLog">"デバッグログ"</string>
@@ -229,8 +227,14 @@
     <string name="deviceLocationDisabledDialogMessage">"デバイスの位置情報サービスが無効になっているため、Owntracksは現在地をトラッキングできません。
 
 デバイスの設定から、位置情報を有効にしてください。"</string>
-    <string name="aboutIssuesTitle">"Report an issue"</string>
-    <string name="aboutIssuesSummary">"File on GitHub"</string>
-    <string name="aboutSourceCodeSummary">"on GitHub"</string>
-    <string name="aboutFeedbackCategoryTitle">"Feedback"</string>
+    <string name="aboutIssuesTitle">"問題を報告する"</string>
+    <string name="aboutIssuesSummary">"GitHubで管理しています"</string>
+    <string name="aboutSourceCodeSummary">"GitHubで公開しています"</string>
+    <string name="aboutFeedbackCategoryTitle">"フィードバック"</string>
+    <string name="contactDetailsDistanceUnitKilometres">"km"</string>
+    <string name="contactDetailsDistanceUnitMeters">"m"</string>
+    <string name="exportConfigurationSubject">"OwnTracks構成ファイル"</string>
+    <string name="exportLogFileSubject">"OwnTracksログファイル"</string>
+    <string name="geocoderExceptionError">"ジオコーダーサービスでエラーが発生しました。詳細はログを確認してください。"</string>
+    <string name="geocoderUnavailable">"ジオコーダーサービスは一時的に利用できません"</string>
 </resources>
