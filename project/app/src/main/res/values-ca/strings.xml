@@ -231,4 +231,13 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="aboutIssuesSummary">"File on GitHub"</string>
     <string name="aboutSourceCodeSummary">"on GitHub"</string>
     <string name="aboutFeedbackCategoryTitle">"Feedback"</string>
+    <string name="contactDetailsDistanceUnitKilometres">"km"</string>
+    <string name="contactDetailsDistanceUnitMeters">"m"</string>
+    <string name="exportConfigurationSubject">"Arxiu de configuració OwnTracks"</string>
+    <string name="exportLogFileSubject">"Arxiu de registre OwnTracks"</string>
+    <string name="preferencesLocatorDisplacement">"Desplaçament d'ubicació mínim"</string>
+    <string name="preferencesLocatorDisplacementSummary">"Distància mínima entre actualitzacions d'ubicació"</string>
+    <string name="preferencesLocatorDisplacementDialog">"Distància que hauria de recórrer el dispositiu (en metres) abans de rebre una altra ubicació"</string>
+    <string name="geocoderExceptionError">"S'ha rebut un error del servei de geocodificador. Consulteu els registres per obtenir més detalls"</string>
+    <string name="geocoderUnavailable">"El servei de geocodificador no està disponible temporalment"</string>
 </resources>
