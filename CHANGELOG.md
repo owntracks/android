@@ -1,5 +1,16 @@
 # Changelog
 
+## Version 2.4.8
+
+### New features
+
+* Use new Google Maps renderer on gms flavour: https://developers.google.com/maps/documentation/android-sdk/renderer
+* Update to Catalan, Japanese and Polish translations (thanks all!)
+
+### Bug fixes
+
+* Fix crash when the ForegroundService is requested to start after reboot or upgrade on Android 12. In theory, this crash should never happen, as these intents are specifically exempted from restrictions in starting foreground services. However, sometimes an exception causing a crash was seen on certain devices, so this tries to handle that a bit more gracefully.
+
 ## Version 2.4.7
 
 Target Android SDK is now 31.
