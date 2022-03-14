@@ -113,6 +113,7 @@ android {
 
     lint {
         baselineFile = file("../../lint/lint-baseline.xml")
+        lintConfig = file("../../lint/lint.xml")
         isCheckAllWarnings = true
         isWarningsAsErrors = false
         isAbortOnError = false
