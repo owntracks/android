@@ -136,7 +136,7 @@ class GoogleMapFragment internal constructor(contactImageBindingAdapter: Contact
     ) {
         googleMap?.run { // If we don't have a google Map, we can't add markers to it
             // Remove null markers from the collection
-            markers.values.removeIf { it.tag == null }
+            markers.values.removeAll { it.tag == null }
             markers.getOrPut(id) {
                 addMarker(
                     MarkerOptions()
