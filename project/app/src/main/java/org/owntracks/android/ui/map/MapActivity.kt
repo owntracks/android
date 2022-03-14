@@ -1,9 +1,8 @@
 package org.owntracks.android.ui.map
 
+import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.content.*
-import android.content.pm.PackageManager.PERMISSION_DENIED
-import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.net.Uri
@@ -22,7 +21,6 @@ import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.appcompat.widget.PopupMenu
-import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.setPadding
 import androidx.fragment.app.commit
@@ -269,12 +267,14 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
             // We don't have location permission
             if ((explicitUserAction || !preferences.userDeclinedEnableLocationPermissions)) {
                 // We should prompt for permission
+                val permissionRequester =
+                    if (explicitUserAction) explicitLocationPermissionRequest else locationPermissionRequest
+                val permissions = arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     if (shouldShowRequestPermissionRationale(ACCESS_FINE_LOCATION)) {
                         // The user may have denied us once already, so show a rationale
                         if (!this::locationPermissionsRationaleAlertDialog.isInitialized) {
                             locationPermissionsRationaleAlertDialog =
-
                                 MaterialAlertDialogBuilder(this)
                                     .setCancelable(true)
                                     .setIcon(R.drawable.ic_baseline_location_disabled_24)
@@ -283,11 +283,7 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
                                     .setPositiveButton(
                                         android.R.string.ok
                                     ) { _, _ ->
-                                        ActivityCompat.requestPermissions(
-                                            this,
-                                            arrayOf(ACCESS_FINE_LOCATION),
-                                            if (explicitUserAction) PERMISSIONS_REQUEST_CODE_WITH_EXPLICIT_SERVICES_CHECK else PERMISSIONS_REQUEST_CODE
-                                        )
+                                        permissionRequester.launch(permissions)
                                     }
                                     .setNegativeButton(android.R.string.cancel) { _, _ ->
                                         preferences.userDeclinedEnableLocationPermissions = true
@@ -299,19 +295,11 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
                         }
                     } else {
                         // No need to show rationale, just request
-                        ActivityCompat.requestPermissions(
-                            this,
-                            arrayOf(ACCESS_FINE_LOCATION),
-                            if (explicitUserAction) PERMISSIONS_REQUEST_CODE_WITH_EXPLICIT_SERVICES_CHECK else PERMISSIONS_REQUEST_CODE
-                        )
+                        permissionRequester.launch(permissions)
                     }
                 } else {
                     // Older android, so no rationale mech. Just request.
-                    ActivityCompat.requestPermissions(
-                        this,
-                        arrayOf(ACCESS_FINE_LOCATION),
-                        if (explicitUserAction) PERMISSIONS_REQUEST_CODE_WITH_EXPLICIT_SERVICES_CHECK else PERMISSIONS_REQUEST_CODE
-                    )
+                    permissionRequester.launch(permissions)
                 }
             }
             return false
@@ -320,51 +308,48 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
         }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        Timber.d(
-            "Permission result code=$requestCode. Permissions=${permissions.joinToString(",")} and grantResults=${
-                grantResults.joinToString(
-                    ","
-                )
-            }"
-        )
-        if (requestCode in setOf(
-                PERMISSIONS_REQUEST_CODE,
-                PERMISSIONS_REQUEST_CODE_WITH_EXPLICIT_SERVICES_CHECK
-            )
-            && grantResults.isNotEmpty()
-            && permissions.isNotEmpty()
-            && permissions.contains(ACCESS_FINE_LOCATION)
-        ) {
-            when (grantResults[permissions.indexOf(ACCESS_FINE_LOCATION)]) {
-                PERMISSION_GRANTED -> {
-                    if (requestCode == PERMISSIONS_REQUEST_CODE_WITH_EXPLICIT_SERVICES_CHECK) {
-                        checkAndRequestLocationServicesEnabled(true)
-                    }
-                    mapViewModel.myLocationIsNowEnabled()
-                    service?.reInitializeLocationRequests()
-                    previouslyHadLocationPermissions = true
+    private fun userGrantedPermissions() {
+        mapViewModel.myLocationIsNowEnabled()
+        service?.reInitializeLocationRequests()
+        previouslyHadLocationPermissions = true
+    }
+
+    private fun userDeclinedPermissions() {
+        preferences.userDeclinedEnableLocationPermissions = true
+        Snackbar.make(
+            binding!!.coordinatorLayout,
+            getString(R.string.locationPermissionNotGrantedNotification),
+            Snackbar.LENGTH_LONG
+        ).setAction(getString(R.string.fixProblemLabel)) {
+            startActivity(Intent(ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                data = Uri.parse("package:${packageName}")
+            })
+        }.show()
+    }
+
+    val explicitLocationPermissionRequest =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            when {
+                permissions[ACCESS_COARSE_LOCATION] ?: false || permissions[ACCESS_FINE_LOCATION] ?: false -> {
+                    checkAndRequestLocationServicesEnabled(true)
+                    userGrantedPermissions()
                 }
-                PERMISSION_DENIED -> {
-                    preferences.userDeclinedEnableLocationPermissions = true
-                    Snackbar.make(
-                        binding!!.coordinatorLayout,
-                        getString(R.string.locationPermissionNotGrantedNotification),
-                        Snackbar.LENGTH_LONG
-                    ).setAction(getString(R.string.fixProblemLabel)) {
-                        startActivity(Intent(ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                            data = Uri.parse("package:${packageName}")
-                        })
-                    }.show()
+                else -> {
+                    userDeclinedPermissions()
                 }
             }
         }
-    }
+    val locationPermissionRequest =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            when {
+                permissions[ACCESS_COARSE_LOCATION] ?: false || permissions[ACCESS_FINE_LOCATION] ?: false -> {
+                    userGrantedPermissions()
+                }
+                else -> {
+                    userDeclinedPermissions()
+                }
+            }
+        }
 
     override fun onResume() {
         val mapFragment =

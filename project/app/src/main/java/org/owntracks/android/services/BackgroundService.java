@@ -620,7 +620,8 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
     }
 
     private boolean missingLocationPermission() {
-        return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED;
+        return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED;
     }
 
     private void removeGeofences() {
@@ -762,7 +763,7 @@ public class BackgroundService extends Service implements OnModeChangedPreferenc
                     onLocationChanged(lastLocation, MessageLocation.REPORT_TYPE_DEFAULT);
                 }
             }
-        },0);
+        }, 0);
 
     }
 
