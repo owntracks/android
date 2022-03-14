@@ -2,4 +2,7 @@
     <issue id="InvalidPackage">
         <ignore path="**/org.jacoco.agent-0.*.jar"/>
     </issue>
+    <issue id="ObsoleteLintCustomCheck">
+    <ignore />
+    </issue>
 </lint>

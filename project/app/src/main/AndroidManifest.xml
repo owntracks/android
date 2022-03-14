@@ -33,6 +33,7 @@
     <!-- Not actively requested. Has to be enabled manually. Access to broker certificates in private storage on older APIs or on devices not providing files through content:// URIs -->
 
     <!-- To locate the device -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <!-- API v28 requires this for foreground services -->
@@ -101,8 +102,8 @@
         <activity
             android:name=".ui.preferences.load.LoadActivity"
             android:configChanges="orientation"
-            android:label="@string/app_name"
             android:exported="true"
+            android:label="@string/app_name"
             android:launchMode="singleTask">
 
             <!-- Support two dots in file name: -->
@@ -218,8 +219,8 @@
             android:name=".ui.map.MapActivity"
             android:clearTaskOnLaunch="true"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/app_name"
             android:exported="true"
+            android:label="@string/app_name"
             android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
