@@ -27,10 +27,14 @@ class StartBackgroundServiceReceiver : BroadcastReceiver() {
                 Timber.v("running startForegroundService")
                 val startIntent = Intent(context, BackgroundService::class.java)
                 startIntent.action = intent.action
-                try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    try {
+                        context.startForegroundService(startIntent)
+                    } catch (e: ForegroundServiceStartNotAllowedException) {
+                        Timber.e("Unable to start foreground service, because Android has prevented it. This should not happen if intent action is ${Intent.ACTION_MY_PACKAGE_REPLACED} or ${Intent.ACTION_BOOT_COMPLETED}. intent action was ${intent.action}")
+                    }
+                } else {
                     context.startForegroundService(startIntent)
-                } catch (e: ForegroundServiceStartNotAllowedException) {
-                    Timber.e("Unable to start foreground service, because Android has prevented it. This should not happen if intent action is ${Intent.ACTION_MY_PACKAGE_REPLACED} or ${Intent.ACTION_BOOT_COMPLETED}. intent action was ${intent.action}")
                 }
             } else {
                 Timber.v("running legacy startService")
