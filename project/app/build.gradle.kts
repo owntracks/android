@@ -188,7 +188,7 @@ tasks.withType<JavaCompile>().configureEach {
 }
 
 val okHttpVersion = "4.9.3"
-val jacksonVersion = "2.13.1"
+val jacksonVersion = "2.13.2"
 val materialDialogsVersion = "0.9.6.0"
 val espressoVersion = "3.4.0"
 val kotlinCoroutinesVersion = "1.6.0"
