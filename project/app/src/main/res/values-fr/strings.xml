@@ -191,8 +191,8 @@ Importer"</string>
 
     <!-- Fuzzy -->
     <plurals name="aboutTranslationsSummary">
-        <item quantity="one">"Actuellement disponible en 6 langues!"</item>
-        <item quantity="other">"Actuellement disponible en 6 langues!"</item>
+        <item quantity="one">"Actuellement disponible en %1$d langue!"</item>
+        <item quantity="other">"Actuellement disponible en %1$d langues!"</item>
     </plurals>
     <string name="aboutTranslations">"Aidez à traduire cette application"</string>
     <string name="geocoderDisabled">"Le service de géocodage est désactivé"</string>
