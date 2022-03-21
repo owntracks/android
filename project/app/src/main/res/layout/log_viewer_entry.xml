@@ -12,6 +12,7 @@
         android:fontFamily="monospace"
         android:scrollbars="none"
         android:textColor="?android:attr/textColorPrimary"
+        android:textIsSelectable="true"
         android:textSize="12sp" />
 
 </org.owntracks.android.ui.status.logs.HorizontalScrollViewWithOnScrollHandler>
