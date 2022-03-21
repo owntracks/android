@@ -238,7 +238,7 @@ dependencies {
     implementation("org.apache.httpcomponents.core5:httpcore5:5.1.3")
     implementation("commons-codec:commons-codec:1.15")
     implementation("com.github.joschi.jackson:jackson-datatype-threetenbp:2.12.5")
-    implementation("org.threeten:threetenbp:1.5.2") // Jackson-datatype brings in an earlier vesion, so pin the later
+    implementation("org.threeten:threetenbp:1.6.0") // Jackson-datatype brings in an earlier vesion, so pin the later
 
     // Widget libraries
     implementation("com.rengwuxian.materialedittext:library:2.1.4")
