@@ -25,6 +25,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.format.DateUtils;
 import android.text.style.StyleSpan;
 
 import androidx.annotation.NonNull;
@@ -59,13 +60,14 @@ import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.model.messages.MessageLocation;
 import org.owntracks.android.model.messages.MessageTransition;
 import org.owntracks.android.services.worker.Scheduler;
-import org.owntracks.android.support.DateFormatter;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.ServiceBridge;
 import org.owntracks.android.ui.map.MapActivity;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -426,7 +428,13 @@ public class BackgroundService extends Service implements SharedPreferences.OnSh
     private void sendEventStackNotification(String title, String text, long when) {
         Timber.v("SDK_INT >= 23, building stack notification");
 
-        String whenStr = DateFormatter.formatDate(TimeUnit.MILLISECONDS.toSeconds((when)));
+        String whenStr;
+        Date whenDate = new Date();
+        if (DateUtils.isToday(TimeUnit.MILLISECONDS.toSeconds((when)))) {
+            whenStr = new SimpleDateFormat("HH:mm").format(new Date(TimeUnit.MILLISECONDS.toSeconds((when))));
+        } else {
+            whenStr = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date(TimeUnit.MILLISECONDS.toSeconds((when))));
+        }
 
         Spannable newLine = new SpannableString(String.format("%s %s %s", whenStr, title, text));
         newLine.setSpan(new StyleSpan(Typeface.BOLD), 0, whenStr.length() + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
