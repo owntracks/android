@@ -4,10 +4,7 @@ import android.content.Context
 import android.location.Location
 import android.os.Looper
 import androidx.lifecycle.LiveData
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationAvailability
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
@@ -24,7 +21,7 @@ class LocationLiveData(
     constructor(
         context: Context,
         coroutineScope: CoroutineScope
-    ) : this(FusedLocationProviderClient(context), coroutineScope)
+    ) : this(LocationServices.getFusedLocationProviderClient(context), coroutineScope)
 
     private val locationCallback = Callback()
 
@@ -32,8 +29,8 @@ class LocationLiveData(
     suspend fun requestLocationUpdates() {
         // We don't want to kick off another request while we're doing this one
         lock.acquire()
-        locationProviderClient.removeLocationUpdates(locationCallback).continueWith {
-            Timber.d("Removing previous locationupdate task complete.  Success=${it.isSuccessful} Cancelled=${it.isCanceled}")
+        locationProviderClient.removeLocationUpdates(locationCallback).continueWith { task ->
+            Timber.d("Removing previous locationupdate task complete.  Success=${task.isSuccessful} Cancelled=${task.isCanceled}")
             locationProviderClient.requestLocationUpdates(
                 LocationRequest(
                     smallestDisplacement = 1f,
@@ -72,7 +69,7 @@ class LocationLiveData(
         }
 
         override fun onLocationAvailability(locationAvailability: LocationAvailability) {
-            Timber.d("LocationLiveData location availability: ${locationAvailability}")
+            Timber.d("LocationLiveData location availability: $locationAvailability")
             super.onLocationAvailability(locationAvailability)
         }
     }
