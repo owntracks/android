@@ -15,7 +15,6 @@ import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.perfLog
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.support.Preferences
-import org.owntracks.android.support.preferences.OnModeChangedPreferenceChangedListener
 import org.owntracks.android.ui.map.MapActivity
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneOffset.UTC
@@ -148,11 +147,7 @@ class GeocoderProvider @Inject constructor(
     init {
         setGeocoderProvider(context, preferences)
         preferences.registerOnPreferenceChangedListener(object :
-            OnModeChangedPreferenceChangedListener {
-            override fun onAttachAfterModeChanged() {
-
-            }
-
+            SharedPreferences.OnSharedPreferenceChangeListener {
             override fun onSharedPreferenceChanged(
                 sharedPreferences: SharedPreferences?,
                 key: String?

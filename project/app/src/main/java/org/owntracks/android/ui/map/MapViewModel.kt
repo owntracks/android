@@ -1,6 +1,7 @@
 package org.owntracks.android.ui.map
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -44,7 +45,7 @@ class MapViewModel @Inject constructor(
     private val preferences: Preferences,
     private val locationRepo: LocationRepo,
     @ApplicationContext private val applicationContext: Context
-) : ViewModel() {
+) : ViewModel(), SharedPreferences.OnSharedPreferenceChangeListener {
     private val mutableCurrentContact = MutableLiveData<FusedContact?>()
     private val mutableBottomSheetHidden = MutableLiveData<Boolean>()
     private val mutableMapCenter = MutableLiveData<LatLng>()
@@ -74,9 +75,32 @@ class MapViewModel @Inject constructor(
         get() = viewModelScope
 
     val allContacts = contactsRepo.all
+
+    private val mutableCurrentMonitoringMode: MutableLiveData<Int> by lazy {
+        MutableLiveData(preferences.monitoring)
+    }
+
+    val currentMonitoringMode: LiveData<Int>
+        get() = mutableCurrentMonitoringMode
+
+    private val currentConnectionMode: MutableLiveData<Int> by lazy {
+        MutableLiveData(preferences.mode)
+    }
+
+    fun getCurrentConnectionMode(): LiveData<Int> = currentConnectionMode
+
     val locationIdlingResource = SimpleIdlingResource("locationIdlingResource", false)
 
     var viewMode: ViewMode = ViewMode.Device
+
+    init {
+        preferences.registerOnPreferenceChangedListener(this)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        preferences.unregisterOnPreferenceChangedListener(this)
+    }
 
     fun onMapReady() {
         when (viewMode) {
@@ -260,5 +284,15 @@ class MapViewModel @Inject constructor(
         object Free : ViewMode()
         object Device : ViewMode()
         data class Contact(val follow: Boolean) : ViewMode()
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        when (key) {
+            "monitoring" -> mutableCurrentMonitoringMode.postValue(preferences.monitoring)
+            "mode" -> {
+                currentConnectionMode.postValue(preferences.mode)
+                clearActiveContact()
+            }
+        }
     }
 }

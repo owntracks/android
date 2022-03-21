@@ -1,6 +1,6 @@
 package org.owntracks.android.support
 
-import org.owntracks.android.support.preferences.OnModeChangedPreferenceChangedListener
+import android.content.SharedPreferences
 import org.owntracks.android.support.preferences.PreferencesStore
 
 class InMemoryPreferencesStore : PreferencesStore {
@@ -58,11 +58,11 @@ class InMemoryPreferencesStore : PreferencesStore {
         valueMap.remove(key)
     }
 
-    override fun registerOnSharedPreferenceChangeListener(listenerModeChanged: OnModeChangedPreferenceChangedListener) {
+    override fun registerOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
 
     }
 
-    override fun unregisterOnSharedPreferenceChangeListener(listenerModeChanged: OnModeChangedPreferenceChangedListener) {
-        TODO("Not yet implemented")
+    override fun unregisterOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
+        
     }
 }

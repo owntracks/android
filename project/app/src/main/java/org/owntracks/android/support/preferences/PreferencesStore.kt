@@ -1,5 +1,7 @@
 package org.owntracks.android.support.preferences
 
+import android.content.SharedPreferences
+
 /***
  * Allows a preferences class to read and write values from some sort of store
  */
@@ -21,11 +23,10 @@ interface PreferencesStore {
     fun putStringSet(key: String, values: Set<String>)
     fun getStringSet(key: String): Set<String>
 
-    fun hasKey(key:String):Boolean
+    fun hasKey(key: String): Boolean
 
     fun remove(key: String)
 
-    fun registerOnSharedPreferenceChangeListener(listenerModeChanged: OnModeChangedPreferenceChangedListener)
-    fun unregisterOnSharedPreferenceChangeListener(listenerModeChanged: OnModeChangedPreferenceChangedListener)
-
+    fun registerOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener)
+    fun unregisterOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener)
 }

@@ -20,7 +20,7 @@ class SharedPreferencesStore @Inject constructor(@ApplicationContext context: Co
     PreferencesStore {
     private lateinit var sharedPreferencesName: String
     private val activeSharedPreferencesChangeListener =
-        LinkedList<OnModeChangedPreferenceChangedListener>()
+        LinkedList<SharedPreferences.OnSharedPreferenceChangeListener>()
 
     private lateinit var activeSharedPreferences: SharedPreferences
     private val commonSharedPreferences: SharedPreferences =
@@ -119,32 +119,29 @@ class SharedPreferencesStore @Inject constructor(@ApplicationContext context: Co
         attachAllActivePreferenceChangeListeners()
     }
 
-    override fun registerOnSharedPreferenceChangeListener(listenerModeChanged: OnModeChangedPreferenceChangedListener) {
+    override fun registerOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
         if (this::activeSharedPreferences.isInitialized) {
-            activeSharedPreferences.registerOnSharedPreferenceChangeListener(listenerModeChanged)
+            activeSharedPreferences.registerOnSharedPreferenceChangeListener(listener)
         }
-        activeSharedPreferencesChangeListener.push(listenerModeChanged)
+        activeSharedPreferencesChangeListener.push(listener)
     }
 
-    override fun unregisterOnSharedPreferenceChangeListener(listenerModeChanged: OnModeChangedPreferenceChangedListener) {
+    override fun unregisterOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
         if (this::activeSharedPreferences.isInitialized) {
-            activeSharedPreferences.unregisterOnSharedPreferenceChangeListener(listenerModeChanged)
+            activeSharedPreferences.unregisterOnSharedPreferenceChangeListener(listener)
         }
-        activeSharedPreferencesChangeListener.remove(listenerModeChanged)
+        activeSharedPreferencesChangeListener.remove(listener)
     }
 
     private fun detachAllActivePreferenceChangeListeners() {
         activeSharedPreferencesChangeListener.forEach {
-            activeSharedPreferences.unregisterOnSharedPreferenceChangeListener(
-                it
-            )
+            activeSharedPreferences.unregisterOnSharedPreferenceChangeListener(it)
         }
     }
 
     private fun attachAllActivePreferenceChangeListeners() {
         activeSharedPreferencesChangeListener.forEach {
             activeSharedPreferences.registerOnSharedPreferenceChangeListener(it)
-            it.onAttachAfterModeChanged()
         }
     }
 

@@ -34,9 +34,6 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.launch
-import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
 import org.owntracks.android.App
 import org.owntracks.android.BR
 import org.owntracks.android.R
@@ -50,7 +47,6 @@ import org.owntracks.android.services.BackgroundService.BACKGROUND_LOCATION_REST
 import org.owntracks.android.services.LocationProcessor
 import org.owntracks.android.services.MessageProcessorEndpointHttp
 import org.owntracks.android.support.ContactImageBindingAdapter
-import org.owntracks.android.support.Events
 import org.owntracks.android.support.Preferences.Companion.EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION
 import org.owntracks.android.support.RequirementsChecker
 import org.owntracks.android.support.RunThingsOnOtherThreads
@@ -84,9 +80,6 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
 
     @Inject
     lateinit var contactImageBindingAdapter: ContactImageBindingAdapter
-
-    @Inject
-    lateinit var eventBus: EventBus
 
     @Inject
     lateinit var geocoderProvider: GeocoderProvider
@@ -153,7 +146,7 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
 
             // Watch various things that the mapViewModel owns
 
-            mapViewModel.currentContact.observe(this, { contact: FusedContact? ->
+            mapViewModel.currentContact.observe(this) { contact: FusedContact? ->
                 contact?.let {
                     binding?.contactPeek?.run {
                         image.setImageResource(0) // Remove old image before async loading the new one
@@ -166,16 +159,15 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
                         }
                     }
                 }
-            })
-            mapViewModel.bottomSheetHidden.observe(this, { o: Boolean? ->
+            }
+            mapViewModel.bottomSheetHidden.observe(this) { o: Boolean? ->
                 if (o == null || o) {
                     setBottomSheetHidden()
                 } else {
                     setBottomSheetCollapsed()
                 }
-            })
-
-            mapViewModel.currentLocation.observe(this, { location ->
+            }
+            mapViewModel.currentLocation.observe(this) { location ->
                 if (location == null) {
                     disableLocationMenus()
                 } else {
@@ -184,8 +176,10 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
                         updateActiveContactDistanceAndBearing(location)
                     }
                 }
-            })
-
+            }
+            mapViewModel.currentMonitoringMode.observe(this) {
+                updateMonitoringModeMenu()
+            }
 
             Timber.d("starting BackgroundService")
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -422,28 +416,28 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
     }
 
     fun updateMonitoringModeMenu() {
-        if (menu == null) {
-            return
+        menu?.findItem(R.id.menu_monitoring)?.run {
+            when (preferences.monitoring) {
+                LocationProcessor.MONITORING_QUIET -> {
+                    setIcon(R.drawable.ic_baseline_stop_36)
+                    setTitle(R.string.monitoring_quiet)
+                }
+                LocationProcessor.MONITORING_MANUAL -> {
+                    setIcon(R.drawable.ic_baseline_pause_36)
+                    setTitle(R.string.monitoring_manual)
+                }
+                LocationProcessor.MONITORING_SIGNIFICANT -> {
+                    setIcon(R.drawable.ic_baseline_play_arrow_36)
+                    setTitle(R.string.monitoring_significant)
+                }
+                LocationProcessor.MONITORING_MOVE -> {
+                    setIcon(R.drawable.ic_step_forward_2)
+                    setTitle(R.string.monitoring_move)
+                }
+                else -> {}
+            }
         }
-        val item = menu!!.findItem(R.id.menu_monitoring)
-        when (preferences.monitoring) {
-            LocationProcessor.MONITORING_QUIET -> {
-                item.setIcon(R.drawable.ic_baseline_stop_36)
-                item.setTitle(R.string.monitoring_quiet)
-            }
-            LocationProcessor.MONITORING_MANUAL -> {
-                item.setIcon(R.drawable.ic_baseline_pause_36)
-                item.setTitle(R.string.monitoring_manual)
-            }
-            LocationProcessor.MONITORING_SIGNIFICANT -> {
-                item.setIcon(R.drawable.ic_baseline_play_arrow_36)
-                item.setTitle(R.string.monitoring_significant)
-            }
-            LocationProcessor.MONITORING_MOVE -> {
-                item.setIcon(R.drawable.ic_step_forward_2)
-                item.setTitle(R.string.monitoring_move)
-            }
-        }
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -627,13 +621,11 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
             serviceConnection,
             Context.BIND_AUTO_CREATE
         )
-        eventBus.register(this)
     }
 
     override fun onStop() {
         super.onStop()
         unbindService(serviceConnection)
-        eventBus.unregister(this)
     }
 
     @get:VisibleForTesting
@@ -644,16 +636,8 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
     val outgoingQueueIdlingResource: IdlingResource
         get() = countingIdlingResource
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    @Suppress("UNUSED_PARAMETER")
-    fun onEvent(e: Events.MonitoringChanged?) {
-        updateMonitoringModeMenu()
-    }
 
     companion object {
         const val BUNDLE_KEY_CONTACT_ID = "BUNDLE_KEY_CONTACT_ID"
-
-        const val PERMISSIONS_REQUEST_CODE = 1
-        const val PERMISSIONS_REQUEST_CODE_WITH_EXPLICIT_SERVICES_CHECK = 2
     }
 }
