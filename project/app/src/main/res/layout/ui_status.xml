@@ -4,8 +4,6 @@
 
     <data>
 
-        <import type="org.owntracks.android.support.DateFormatter" />
-
         <import type="android.view.View" />
 
         <variable
@@ -104,7 +102,7 @@
                     android:ellipsize="none"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:paddingRight="@dimen/activity_horizontal_margin"
-                    android:text="@{vm.locationUpdated != 0 ? DateFormatter.formatDate(vm.locationUpdated) : @string/na}" />
+                    android:text="@{vm.locationUpdated}" />
 
                 <TextView
                     style="@style/ListItemSecondary"
@@ -123,7 +121,7 @@
                     android:ellipsize="none"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:paddingRight="@dimen/activity_horizontal_margin"
-                    android:text="@{vm.serviceStarted != null ? DateFormatter.formatDate(vm.serviceStarted) : @string/na}" />
+                    android:text="@{vm.serviceStarted}" />
 
                 <TextView
                     style="@style/ListItemSecondary"

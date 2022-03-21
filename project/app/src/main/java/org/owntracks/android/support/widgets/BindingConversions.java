@@ -17,6 +17,8 @@ import org.owntracks.android.services.MessageProcessorEndpointHttp;
 import org.owntracks.android.services.MessageProcessorEndpointMqtt;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 public class BindingConversions {
@@ -104,6 +106,24 @@ public class BindingConversions {
                 break;
 
         }
+    }
+
+    @BindingAdapter("android:text")
+    public static void setDate(TextView view, Date date) {
+        if (date == null) {
+            view.setText(R.string.na);
+        } else {
+            if (DateUtils.isToday(date.getTime())) {
+                view.setText(new SimpleDateFormat("HH:mm").format(date));
+            } else {
+                view.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(date));
+            }
+        }
+    }
+
+    @BindingAdapter("android:text")
+    public static void setDate(TextView view, long date) {
+        setDate(view, new Date(TimeUnit.SECONDS.toMillis(date)));
     }
 
 

@@ -8,8 +8,6 @@
             name="vm"
             type="org.owntracks.android.ui.map.MapViewModel" />
 
-        <import type="org.owntracks.android.support.DateFormatter" />
-
         <import type="android.view.View" />
     </data>
 
