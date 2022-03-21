@@ -2,6 +2,7 @@ package org.owntracks.android.support
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import androidx.appcompat.app.AppCompatDelegate
@@ -19,7 +20,6 @@ import org.owntracks.android.services.MessageProcessorEndpointMqtt
 import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.Events.ModeChanged
 import org.owntracks.android.support.Events.MonitoringChanged
-import org.owntracks.android.support.preferences.OnModeChangedPreferenceChangedListener
 import org.owntracks.android.support.preferences.PreferencesStore
 import org.owntracks.android.ui.AppShortcuts
 import timber.log.Timber
@@ -86,12 +86,15 @@ class Preferences @Inject constructor(
         }
     }
 
-    fun registerOnPreferenceChangedListener(listener: OnModeChangedPreferenceChangedListener?) {
-        preferencesStore.registerOnSharedPreferenceChangeListener(listener!!)
+    // SharedPreferencesImpl stores its listeners as a list of WeakReferences. So we shouldn't use a
+    // lambda as a listener, as that'll just get GC'd and then mysteriously disappear
+    // https://stackoverflow.com/a/3104265/352740
+    fun registerOnPreferenceChangedListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
+        preferencesStore.registerOnSharedPreferenceChangeListener(listener)
     }
 
-    fun unregisterOnPreferenceChangedListener(listener: OnModeChangedPreferenceChangedListener?) {
-        preferencesStore.unregisterOnSharedPreferenceChangeListener(listener!!)
+    fun unregisterOnPreferenceChangedListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
+        preferencesStore.unregisterOnSharedPreferenceChangeListener(listener)
     }
 
     fun checkFirstStart() {

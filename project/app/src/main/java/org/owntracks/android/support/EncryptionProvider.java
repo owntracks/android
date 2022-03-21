@@ -10,7 +10,6 @@ import org.libsodium.jni.crypto.Random;
 import org.libsodium.jni.crypto.SecretBox;
 import org.owntracks.android.R;
 import javax.inject.Singleton;
-import org.owntracks.android.support.preferences.OnModeChangedPreferenceChangedListener;
 
 import javax.inject.Inject;
 
@@ -96,14 +95,9 @@ public class EncryptionProvider {
         return Base64.encodeToString(out, Base64.NO_WRAP);
     }
 
-    private class SecretBoxManager implements OnModeChangedPreferenceChangedListener {
+    private class SecretBoxManager implements SharedPreferences.OnSharedPreferenceChangeListener {
         SecretBoxManager() {
             preferences.registerOnPreferenceChangedListener(this);
-        }
-
-        @Override
-        public void onAttachAfterModeChanged() {
-            initializeSecretBox();
         }
 
         @Override

@@ -37,7 +37,6 @@ import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.SocketFactory;
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException;
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
-import org.owntracks.android.support.preferences.OnModeChangedPreferenceChangedListener;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -60,7 +59,7 @@ import java.util.concurrent.TimeUnit;
 
 import timber.log.Timber;
 
-public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint implements StatefulServiceMessageProcessor, OnModeChangedPreferenceChangedListener {
+public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint implements StatefulServiceMessageProcessor, SharedPreferences.OnSharedPreferenceChangeListener {
     public static final int MODE_ID = 0;
 
     private IMqttAsyncClient mqttClient;
@@ -584,11 +583,6 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         } catch (ConfigurationIncompleteException e) {
             changeState(EndpointState.ERROR_CONFIGURATION.withError(e));
         }
-    }
-
-    @Override
-    public void onAttachAfterModeChanged() {
-        //NOOP
     }
 
     @Override
