@@ -431,9 +431,9 @@ public class BackgroundService extends Service implements SharedPreferences.OnSh
         String whenStr;
         Date whenDate = new Date();
         if (DateUtils.isToday(TimeUnit.MILLISECONDS.toSeconds((when)))) {
-            whenStr = new SimpleDateFormat("HH:mm").format(new Date(TimeUnit.MILLISECONDS.toSeconds((when))));
+            whenStr = new SimpleDateFormat("HH:mm", this.getResources().getConfiguration().locale).format(new Date(TimeUnit.MILLISECONDS.toSeconds((when))));
         } else {
-            whenStr = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(new Date(TimeUnit.MILLISECONDS.toSeconds((when))));
+            whenStr = new SimpleDateFormat("yyyy-MM-dd HH:mm", this.getResources().getConfiguration().locale).format(new Date(TimeUnit.MILLISECONDS.toSeconds((when))));
         }
 
         Spannable newLine = new SpannableString(String.format("%s %s %s", whenStr, title, text));
