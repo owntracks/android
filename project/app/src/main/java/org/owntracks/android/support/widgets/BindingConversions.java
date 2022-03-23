@@ -114,9 +114,9 @@ public class BindingConversions {
             view.setText(R.string.na);
         } else {
             if (DateUtils.isToday(date.getTime())) {
-                view.setText(new SimpleDateFormat("HH:mm").format(date));
+                view.setText(new SimpleDateFormat("HH:mm", view.getTextLocale()).format(date));
             } else {
-                view.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(date));
+                view.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm", view.getTextLocale()).format(date));
             }
         }
     }
