@@ -187,93 +187,62 @@ tasks.withType<JavaCompile>().configureEach {
     options.isFork = true
 }
 
-val okHttpVersion = "4.9.3"
-val jacksonVersion = "2.13.1"
-val materialDialogsVersion = "0.9.6.0"
-val espressoVersion = "3.4.0"
-val kotlinCoroutinesVersion = "1.6.0"
-val jaxbVersion = "3.0.2"
-val hiltVersion = rootProject.ext["hiltVersion"]
-
 dependencies {
-    // AndroidX
-    implementation("androidx.preference:preference:1.2.0")
-    implementation("androidx.work:work-runtime:2.7.1")
-    implementation("androidx.fragment:fragment-ktx:1.4.1")
-    implementation("androidx.core:core-ktx:1.7.0")
-    implementation("androidx.test.espresso:espresso-idling-resource:${espressoVersion}")
-    implementation("androidx.lifecycle:lifecycle-common-java8:2.4.1")
+    implementation(libs.bundles.kotlin)
+    implementation(libs.bundles.androidx)
+    implementation(libs.androidx.test.espresso.idling)
 
-    implementation("com.google.android.material:material:1.5.0")
+    implementation(libs.google.material)
 
     // Explicit dependency on conscrypt to give up-to-date TLS support on all devices
-    implementation("org.conscrypt:conscrypt-android:2.5.2")
+    implementation(libs.conscrypt)
 
     // Mapping
-    implementation("org.osmdroid:osmdroid-android:6.1.11")
+    implementation(libs.osmdroid)
 
     // Utility libraries
-    implementation("com.google.dagger:hilt-android:${hiltVersion}")
-    implementation("org.greenrobot:eventbus:3.2.0")
+    implementation(libs.hilt.android)
+    implementation(libs.eventbus)
 
     // Connectivity
-    implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
-    implementation("com.squareup.okhttp3:okhttp:${okHttpVersion}")
+    implementation(libs.paho.mqttclient)
+    implementation(libs.okhttp)
 
-    // Jackson
-    implementation("com.fasterxml.jackson.core:jackson-core:${jacksonVersion}")
-    implementation("com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:${jacksonVersion}")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}")
-
-    // Kotlin
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${kotlinCoroutinesVersion}")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:${kotlinCoroutinesVersion}")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.10")
-
-    implementation("com.squareup.tape2:tape:2.0.0-beta1")
-    implementation("com.jakewharton:process-phoenix:2.1.1")
-    implementation("com.jakewharton.timber:timber:5.0.1")
-    implementation("com.github.joshjdevl.libsodiumjni:libsodium-jni-aar:2.0.2")
-    implementation("org.apache.httpcomponents.core5:httpcore5:5.1.3")
-    implementation("commons-codec:commons-codec:1.15")
-    implementation("com.github.joschi.jackson:jackson-datatype-threetenbp:2.12.5")
-    implementation("org.threeten:threetenbp:1.5.2") // Jackson-datatype brings in an earlier vesion, so pin the later
+    implementation(libs.bundles.jackson)
+    implementation(libs.square.tape2)
+    implementation(libs.processphoenix)
+    implementation(libs.timber)
+    implementation(libs.libsodium)
+    implementation(libs.apache.httpcore)
+    implementation(libs.commons.codec)
 
     // Widget libraries
-    implementation("com.rengwuxian.materialedittext:library:2.1.4")
-    implementation("com.mikepenz:materialdrawer:6.1.2@aar") { isTransitive = true }
-    implementation("com.mikepenz:materialize:1.2.1@aar")
-    implementation("com.takisoft.preferencex:preferencex:1.1.0")
+    implementation(libs.widgets.materialedittext)
+    implementation(libs.widgets.materialdrawer) { artifact { type = "aar" } }
+    implementation(libs.widgets.materialize) { artifact { type = "aar" } }
+    implementation(libs.widgets.preferencex)
 
     // These Java EE libs are no longer included in JDKs, so we include explicitly
-    kapt("javax.xml.bind:jaxb-api:2.3.1")
-    kapt("com.sun.xml.bind:jaxb-core:$jaxbVersion")
-    kapt("com.sun.xml.bind:jaxb-impl:$jaxbVersion")
+    kapt(libs.bundles.jaxb.annotation.processors)
 
     // Preprocessors
-    kapt("org.greenrobot:eventbus-annotation-processor:3.2.0")
-    kapt("com.google.dagger:hilt-android-compiler:${hiltVersion}")
+    kapt(libs.eventbus.annotationprocessor)
+    kapt(libs.hilt.compiler)
 
-    kaptTest("com.google.dagger:hilt-android-compiler:${hiltVersion}")
+    kaptTest(libs.hilt.compiler)
 
-    testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
-    testImplementation("androidx.arch.core:core-testing:2.1.0")
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.androidx.core.testing)
 
-    androidTestImplementation("androidx.test.ext:junit:1.1.3")
-    androidTestImplementation("androidx.test:core-ktx:1.4.0")
-    androidTestImplementation("com.adevinta.android:barista:4.2.0") {
+    androidTestImplementation(libs.bundles.androidx.test)
+    androidTestImplementation(libs.barista) {
         exclude("org.jetbrains.kotlin")
     }
-    androidTestImplementation("com.squareup.okhttp3:mockwebserver:${okHttpVersion}")
-    androidTestImplementation("com.github.davidepianca98.KMQTT:kmqtt:0.2.9")
+    androidTestImplementation(libs.okhttp.mockwebserver)
+    androidTestImplementation(libs.kmqtt)
+    androidTestImplementation(libs.square.leakcanary)
 
-    androidTestImplementation("androidx.test:rules:1.4.0")
-    androidTestImplementation("androidx.test:runner:1.4.0")
-    androidTestImplementation("com.squareup.leakcanary:leakcanary-android-instrumentation:2.8.1")
-
-    androidTestUtil("androidx.test.services:test-services:1.4.1")
-    androidTestUtil("androidx.test:orchestrator:1.4.1")
+    androidTestUtil(libs.bundles.androidx.test.util)
 }
 
 
