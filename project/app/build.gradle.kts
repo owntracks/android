@@ -229,7 +229,7 @@ dependencies {
     // Kotlin
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${kotlinCoroutinesVersion}")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:${kotlinCoroutinesVersion}")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.10")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.20")
 
     implementation("com.squareup.tape2:tape:2.0.0-beta1")
     implementation("com.jakewharton:process-phoenix:2.1.1")
