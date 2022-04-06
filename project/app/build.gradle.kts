@@ -48,7 +48,7 @@ android {
                 "coverage" to "true",
                 "coverageFilePath" to "/sdcard/coverage/",
                 "disableAnalytics" to "true",
-                "useTestStorageService" to "false", // TODO: use this when we get to AGP 7.1
+                "useTestStorageService" to "true",
                 "numShards" to numShards,
                 "shardIndex" to shardIndex
             )
@@ -112,11 +112,11 @@ android {
     }
 
     lint {
-        baselineFile = file("../../lint/lint-baseline.xml")
+        baseline = file("../../lint/lint-baseline.xml")
         lintConfig = file("../../lint/lint.xml")
-        isCheckAllWarnings = true
-        isWarningsAsErrors = false
-        isAbortOnError = false
+        checkAllWarnings = true
+        warningsAsErrors = false
+        abortOnError = false
         disable.addAll(
             setOf(
                 "TypographyFractions",
