@@ -1,5 +1,5 @@
 [versions]
-agp = "7.0.4"
+agp = "7.1.2"
 hilt = "2.40.1"
 kotlin = "1.6.10"
 kotlin-coroutines = "1.6.0"

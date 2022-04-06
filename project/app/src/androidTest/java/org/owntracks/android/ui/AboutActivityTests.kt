@@ -16,7 +16,6 @@ import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.scrollToPreferenceWithText
 import org.owntracks.android.ui.preferences.about.AboutActivity
 
-
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class AboutActivityTests : TestWithAnActivity<AboutActivity>(AboutActivity::class.java) {
