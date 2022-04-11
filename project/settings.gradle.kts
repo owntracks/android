@@ -20,7 +20,7 @@ pluginManagement {
             }
         }
         dependencies {
-            classpath("com.android.tools:r8:3.1.51")
+            classpath("com.android.tools:r8:3.3.28")
             classpath("com.google.guava:guava:31.1-jre")
         }
     }
