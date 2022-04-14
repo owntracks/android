@@ -8,6 +8,8 @@ import android.view.LayoutInflater
 import android.view.MotionEvent.ACTION_BUTTON_RELEASE
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import org.osmdroid.config.Configuration
@@ -29,6 +31,7 @@ import org.owntracks.android.ui.map.MapActivity
 import org.owntracks.android.ui.map.MapFragment
 import org.owntracks.android.ui.map.MapViewModel
 import timber.log.Timber
+import kotlin.math.roundToInt
 
 class OSMMapFragment internal constructor(contactImageBindingAdapter: ContactImageBindingAdapter) :
     MapFragment<OsmMapFragmentBinding>(contactImageBindingAdapter) {
@@ -121,6 +124,21 @@ class OSMMapFragment internal constructor(contactImageBindingAdapter: ContactIma
                             onMapClick()
                             false
                         }
+                        val bitmapDimension = resources.displayMetrics.density * 24
+                        val dot = ResourcesCompat.getDrawable(
+                            resources,
+                            R.drawable.location_dot,
+                            null
+                        )?.toBitmap(bitmapDimension.roundToInt(), bitmapDimension.roundToInt())
+                        val arrow = ResourcesCompat.getDrawable(
+                            resources,
+                            R.drawable.location_dot_arrow,
+                            null
+                        )?.toBitmap(bitmapDimension.roundToInt(), bitmapDimension.roundToInt())
+                        setDirectionArrow(
+                            dot,
+                            arrow
+                        )
                     })
             }
 
