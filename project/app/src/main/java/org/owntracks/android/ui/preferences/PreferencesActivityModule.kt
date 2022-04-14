@@ -28,5 +28,9 @@ abstract class PreferencesActivityModule {
 
     @Binds
     @FragmentScoped
-    abstract fun bindAdvancedExperimentalFragment(experimentalFragment: ExperimentalFragment): Fragment
+    abstract fun bindExperimentalFragment(experimentalFragment: ExperimentalFragment): Fragment
+
+    @Binds
+    @FragmentScoped
+    abstract fun bindMapFragment(mapFragment: MapFragment): Fragment
 }

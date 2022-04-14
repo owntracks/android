@@ -16,6 +16,11 @@
         android:title="@string/preferencesServer"
         app:iconSpaceReserved="false" />
     <Preference
+        android:key="mapScreen"
+        android:title="@string/preferencesMap"
+        app:fragment="org.owntracks.android.ui.preferences.MapFragment"
+        app:iconSpaceReserved="false" />
+    <Preference
         android:key="reportingScreen"
         android:title="@string/preferencesReporting"
         app:fragment="org.owntracks.android.ui.preferences.ReportingFragment"

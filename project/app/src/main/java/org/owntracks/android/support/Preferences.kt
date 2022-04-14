@@ -917,6 +917,20 @@ class Preferences @Inject constructor(
             }
         }
 
+    @get:Export(
+        keyResId = R.string.preferenceKeyShowRegionsOnMap,
+        exportModeMqtt = true,
+        exportModeHttp = true
+    )
+    @set:Import(keyResId = R.string.preferenceKeyShowRegionsOnMap)
+    var showRegionsOnMap: Boolean
+        get() = getBooleanOrDefault(
+            R.string.preferenceKeyShowRegionsOnMap,
+            R.bool.valShowRegionsOnMap
+        )
+        set(newValue) {
+            setBoolean(R.string.preferenceKeyShowRegionsOnMap, newValue)
+        }
 
     // Not used on public, as many people might use the same device type
     private val deviceIdDefault: String

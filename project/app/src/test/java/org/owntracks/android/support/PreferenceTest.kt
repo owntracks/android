@@ -9,7 +9,6 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.owntracks.android.model.messages.MessageConfiguration
 import org.owntracks.android.support.preferences.PreferencesStore
-import org.owntracks.android.ui.AppShortcuts
 import org.owntracks.android.ui.NoopAppShortcuts
 
 class PreferenceTest {
@@ -94,6 +93,7 @@ class PreferenceTest {
         "remoteConfiguration",
         "tid",
         "username",
+        "showRegionsOnMap",
         "_build"
     )
     private val httpOnlyPreferenceKeys = listOf("dontReuseHttpClient", "url")

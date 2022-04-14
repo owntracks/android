@@ -19,6 +19,7 @@ import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.testutils.*
 import org.owntracks.android.ui.clickOnAndWait
+import org.owntracks.android.ui.clickOnDrawerAndWait
 import org.owntracks.android.ui.map.MapActivity
 import java.util.concurrent.TimeUnit
 
@@ -63,7 +64,7 @@ class LocationMessageRetryTest : TestWithAnActivity<MapActivity>(MapActivity::cl
         clickBack()
 
         openDrawer()
-        clickOnAndWait(R.string.title_activity_map)
+        clickOnDrawerAndWait(R.string.title_activity_map)
 
         baristaRule.activityTestRule.activity.locationIdlingResource.with {
             setMockLocation(51.0, 0.0)

@@ -11,20 +11,26 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import org.owntracks.android.R
+import org.owntracks.android.data.WaypointModel
 import org.owntracks.android.databinding.GoogleMapFragmentBinding
 import org.owntracks.android.gms.location.toGMSLatLng
 import org.owntracks.android.location.toLatLng
 import org.owntracks.android.support.ContactImageBindingAdapter
+import org.owntracks.android.support.Preferences
 import timber.log.Timber
 
-class GoogleMapFragment internal constructor(contactImageBindingAdapter: ContactImageBindingAdapter) :
-    MapFragment<GoogleMapFragmentBinding>(contactImageBindingAdapter), OnMapReadyCallback,
+class GoogleMapFragment internal constructor(
+    private val preferences: Preferences,
+    contactImageBindingAdapter: ContactImageBindingAdapter
+) :
+    MapFragment<GoogleMapFragmentBinding>(contactImageBindingAdapter),
+    OnMapReadyCallback,
     OnMapsSdkInitializedCallback {
+
+    data class RegionOnMap(val marker: Marker, val circle: Circle)
+
     override val layout: Int
         get() = R.layout.google_map_fragment
 
@@ -53,7 +59,8 @@ class GoogleMapFragment internal constructor(contactImageBindingAdapter: Contact
     }
 
     private var googleMap: GoogleMap? = null
-    private val markers: MutableMap<String, Marker> = HashMap()
+    private val markersOnMap: MutableMap<String, Marker> = HashMap()
+    private val regionsOnMap: MutableList<RegionOnMap> = mutableListOf()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -107,8 +114,10 @@ class GoogleMapFragment internal constructor(contactImageBindingAdapter: Contact
             )
 
             setOnMarkerClickListener {
-                it.tag?.run { onMarkerClicked(this as String) }
-                true
+                it.tag?.run {
+                    onMarkerClicked(this as String)
+                    true
+                } ?: false
             }
 
             setOnMapClickListener { onMapClick() }
@@ -117,6 +126,9 @@ class GoogleMapFragment internal constructor(contactImageBindingAdapter: Contact
                     onMapClick()
                 }
             }
+            // We need to specifically re-draw any contact markers and regions now that we've re-init the map
+            viewModel.allContacts.value?.values?.toSet()?.run(::updateAllMarkers)
+            viewModel.regions.value?.toSet()?.run(::drawRegions)
         }
     }
 
@@ -126,7 +138,7 @@ class GoogleMapFragment internal constructor(contactImageBindingAdapter: Contact
 
     override fun clearMarkers() {
         this.googleMap?.clear()
-        markers.clear()
+        markersOnMap.clear()
     }
 
     override fun updateMarkerOnMap(
@@ -136,8 +148,8 @@ class GoogleMapFragment internal constructor(contactImageBindingAdapter: Contact
     ) {
         googleMap?.run { // If we don't have a google Map, we can't add markers to it
             // Remove null markers from the collection
-            markers.values.removeAll { it.tag == null }
-            markers.getOrPut(id) {
+            markersOnMap.values.removeAll { it.tag == null }
+            markersOnMap.getOrPut(id) {
                 addMarker(
                     MarkerOptions()
                         .position(latLng.toGMSLatLng())
@@ -152,7 +164,7 @@ class GoogleMapFragment internal constructor(contactImageBindingAdapter: Contact
     }
 
     override fun removeMarkerFromMap(id: String) {
-        markers[id]?.remove()
+        markersOnMap[id]?.remove()
     }
 
     override fun onResume() {
@@ -191,11 +203,39 @@ class GoogleMapFragment internal constructor(contactImageBindingAdapter: Contact
         super.onStop()
     }
 
-    companion object {
-        private const val ZOOM_LEVEL_STREET: Float = 15f
-    }
 
     override fun onMapsSdkInitialized(renderer: MapsInitializer.Renderer) {
         Timber.d("Maps SDK initialized with renderer: ${renderer.name}")
+    }
+
+    override fun drawRegions(regions: Set<WaypointModel>) {
+        if (preferences.showRegionsOnMap) {
+            googleMap?.run {
+                Timber.d("Drawing regions on map")
+                regionsOnMap.forEach {
+                    it.circle.remove()
+                    it.marker.remove()
+                }
+                regions.forEach { region ->
+                    RegionOnMap(
+                        MarkerOptions().apply {
+                            position(region.location.toLatLng().toGMSLatLng())
+                            anchor(0.5f, 1.0f)
+                            title(region.description)
+                        }.let { addMarker(it)!! },
+                        CircleOptions().apply {
+                            center(region.location.toLatLng().toGMSLatLng())
+                            radius(region.geofenceRadius.toDouble())
+                            fillColor(getRegionColor())
+                            strokeWidth(0.0f)
+                        }.let { addCircle(it) }
+                    ).run(regionsOnMap::add)
+                }
+            }
+        }
+    }
+
+    companion object {
+        private const val ZOOM_LEVEL_STREET: Float = 15f
     }
 }

@@ -46,7 +46,7 @@ android {
             mapOf(
                 "clearPackageData" to "true",
                 "coverage" to "true",
-                "coverageFilePath" to "/sdcard/coverage/",
+//                "coverageFilePath" to "/sdcard/coverage/",
                 "disableAnalytics" to "true",
                 "useTestStorageService" to "true",
                 "numShards" to numShards,

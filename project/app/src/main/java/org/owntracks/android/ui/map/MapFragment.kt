@@ -2,6 +2,7 @@ package org.owntracks.android.ui.map
 
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,13 +11,10 @@ import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.preference.PreferenceManager
 import kotlinx.coroutines.launch
-import org.osmdroid.config.Configuration
+import org.owntracks.android.R
+import org.owntracks.android.data.WaypointModel
 import org.owntracks.android.location.LatLng
-import org.owntracks.android.location.LocationAvailability
-import org.owntracks.android.location.LocationCallback
-import org.owntracks.android.location.LocationResult
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.support.ContactImageBindingAdapter
 import timber.log.Timber
@@ -31,7 +29,14 @@ abstract class MapFragment<V : ViewDataBinding> internal constructor(
     abstract fun updateMarkerOnMap(id: String, latLng: LatLng, image: Bitmap)
     abstract fun removeMarkerFromMap(id: String)
     abstract fun initMap()
+    abstract fun drawRegions(regions: Set<WaypointModel>)
     protected val viewModel: MapViewModel by activityViewModels()
+
+    protected fun getRegionColor(): Int {
+        val typedValue = TypedValue()
+        requireContext().theme.resolveAttribute(R.attr.colorRegion, typedValue, true)
+        return typedValue.data
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,23 +47,30 @@ abstract class MapFragment<V : ViewDataBinding> internal constructor(
         binding = DataBindingUtil.inflate(inflater, layout, container, false)
         binding.lifecycleOwner = this.viewLifecycleOwner
 
-        initMap()
+        viewModel.myLocationEnabled.observe(viewLifecycleOwner, {
+            initMap()
+        })
         viewModel.mapCenter.observe(viewLifecycleOwner, { latLng: LatLng ->
             updateCamera(latLng)
         })
         viewModel.allContacts.observe(viewLifecycleOwner, { contacts ->
-            contacts.values.toSet().forEach {
-                updateMarkerForContact(it)
-                if (it == viewModel.currentContact.value) {
-                    viewModel.refreshGeocodeForContact(it)
-                }
-            }
+            updateAllMarkers(contacts.values.toSet())
         })
-        viewModel.myLocationEnabled.observe(viewLifecycleOwner, {
-            initMap()
+
+        viewModel.regions.observe(viewLifecycleOwner, { regions ->
+            drawRegions(regions.toSet())
         })
         viewModel.onMapReady()
         return binding.root
+    }
+
+    protected fun updateAllMarkers(contacts: Set<FusedContact>) {
+        contacts.forEach {
+            updateMarkerForContact(it)
+            if (it == viewModel.currentContact.value) {
+                viewModel.refreshGeocodeForContact(it)
+            }
+        }
     }
 
     private fun updateMarkerForContact(contact: FusedContact) {
