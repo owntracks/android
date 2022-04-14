@@ -5,6 +5,7 @@
 ### New features
 
 * Use new Google Maps renderer on gms flavour: https://developers.google.com/maps/documentation/android-sdk/renderer
+* OSM map now uses a blue dot and arrow for current location (#1078)
 * Update to Catalan, Japanese and Polish translations (thanks all!)
 
 ### Bug fixes
