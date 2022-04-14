@@ -43,6 +43,8 @@ materialedittext = "2.1.4"
 materialize = "1.2.1"
 materialdrawer = "6.1.2"
 preferencex = "1.1.0"
+r8 = "3.3.28"
+guava = "31.1-jre"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -113,6 +115,9 @@ kmqtt = { module = "com.github.davidepianca98.KMQTT:kmqtt", version.ref = "kmqtt
 barista = { module = "com.adevinta.android:barista", version.ref = "barista" }
 square-leakcanary = { module = "com.squareup.leakcanary:leakcanary-android-instrumentation", version.ref = "square-leakcanary" }
 
+r8 = { module = "com.android.tools:r8", version.ref = "r8" }
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
+
 [bundles]
 jackson = ["jackson-core", "jackson-databind", "jackson-module-kotlin", "jackson-datatype-jsr310", "jackson-threetenbp", "threetenbp"]
 kotlin = ["kotlin-coroutines-core", "kotlin-coroutines-android", "kotlin-reflect"]
@@ -120,3 +125,4 @@ jaxb-annotation-processors = ["jaxb-api", "jaxb-core", "jaxb-impl"]
 androidx = ["androidx-core-ktx", "androidx-preference", "androidx-work-runtime", "androidx-fragment-ktx", "androidx-lifecycle"]
 androidx-test = ["androidx-test-junit", "androidx-test-core-ktx", "androidx-test-rules", "androidx-test-runner"]
 androidx-test-util = ["androidx-test-services", "androidx-test-orchestrator"]
+buildscript = ["r8", "guava"]
