@@ -20,6 +20,7 @@
         <item name="drawerArrowStyle">@style/Theme.Owntracks.ToolbarDrawerArrowStyle</item>
         <item name="actionOverflowButtonStyle">@style/Theme.Owntracks.Overflow</item>
         <item name="materialAlertDialogTheme">@style/Theme.Owntracks.AlertDialog</item>
+        <item name="colorRegion">@color/MapRegion</item>
     </style>
 
     <!-- Hamburger theme -->
@@ -79,11 +80,4 @@
     <style name="Theme.Owntracks.AlertDialog" parent="@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog">
         <item name="android:tint">?attr/colorPrimary</item>
     </style>
-
-    <!-- https://paletton.com/#uid=53D0n0kmN-+hrHfkdDlptylsRwF -->
-    <color name="textPrimary">#de000000</color>
-
-    <color name="OTPrimaryBlue">#3f72b5</color>
-    <color name="OTDarkerBlue">#305e9f</color>
-    <color name="OTAccent">#31aba6</color>
 </resources>

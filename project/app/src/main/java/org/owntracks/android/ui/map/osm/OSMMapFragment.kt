@@ -17,23 +17,30 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.Polygon
 import org.osmdroid.views.overlay.TilesOverlay
+import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow
 import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import org.owntracks.android.R
+import org.owntracks.android.data.WaypointModel
 import org.owntracks.android.databinding.OsmMapFragmentBinding
 import org.owntracks.android.location.LatLng
 import org.owntracks.android.location.toGeoPoint
 import org.owntracks.android.location.toLatLng
 import org.owntracks.android.support.ContactImageBindingAdapter
+import org.owntracks.android.support.Preferences
 import org.owntracks.android.ui.map.MapActivity
 import org.owntracks.android.ui.map.MapFragment
 import org.owntracks.android.ui.map.MapViewModel
 import timber.log.Timber
 import kotlin.math.roundToInt
 
-class OSMMapFragment internal constructor(contactImageBindingAdapter: ContactImageBindingAdapter) :
+class OSMMapFragment internal constructor(
+    private val preferences: Preferences,
+    contactImageBindingAdapter: ContactImageBindingAdapter
+) :
     MapFragment<OsmMapFragmentBinding>(contactImageBindingAdapter) {
     override val layout: Int
         get() = R.layout.osm_map_fragment
@@ -208,12 +215,44 @@ class OSMMapFragment internal constructor(contactImageBindingAdapter: ContactIma
         super.onDetach()
     }
 
-    override fun onStop() {
-        mapView?.onDetach()
-        super.onStop()
+    override fun drawRegions(regions: Set<WaypointModel>) {
+        if (preferences.showRegionsOnMap) {
+            mapView?.run {
+                Timber.d("Drawing regions on map")
+                overlays
+                    .filterIsInstance<Marker>()
+                    .filter { it.id.startsWith("regionmarker-") }
+                    .forEach(overlays::remove)
+                overlays
+                    .filterIsInstance<Polygon>()
+                    .filter { it.id.startsWith("regionpolygon-") }
+                    .forEach(overlays::remove)
+
+                regions.forEach { region ->
+                    Marker(this).apply {
+                        id = "regionmarker-${region.id}"
+                        position = region.location.toLatLng().toGeoPoint()
+                        title = region.description
+                        setInfoWindow(MarkerInfoWindow(R.layout.osm_region_bubble, this@run))
+                    }.let { overlays.add(0, it) }
+                    Polygon(this).apply {
+                        id = "regionpolygon-${region.id}"
+                        points = Polygon.pointsAsCircle(
+                            region.location.toLatLng().toGeoPoint(),
+                            region.geofenceRadius.toDouble()
+                        )
+                        fillPaint.setColor(getRegionColor())
+                        outlinePaint.strokeWidth = 0f
+                        setOnClickListener { _, _, _ -> true }
+                    }.let { overlays.add(0, it) }
+
+                }
+            }
+        }
     }
 
     companion object {
         private const val ZOOM_STREET_LEVEL: Double = 16.0
     }
+
 }

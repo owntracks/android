@@ -239,4 +239,7 @@
     <string name="exportConfigurationSubject">OwnTracks Configuration File</string>
     <string name="exportLogFileSubject">OwnTracks Log File</string>
     <string name="noBrowserInstalled">No suitable browser installed</string>
+    <string name="preferencesMap">Map</string>
+    <string name="preferencesShowRegionsOnMapSummary"></string>
+    <string name="preferencesShowRegionsOnMap">Show Regions</string>
 </resources>

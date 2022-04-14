@@ -17,6 +17,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.data.repos.LocationRepo
+import org.owntracks.android.data.repos.WaypointsRepo
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.location.LatLng
 import org.owntracks.android.location.toLatLng
@@ -44,6 +45,7 @@ class MapViewModel @Inject constructor(
     private val geocoderProvider: GeocoderProvider,
     private val preferences: Preferences,
     private val locationRepo: LocationRepo,
+    private val waypointsRepo: WaypointsRepo,
     @ApplicationContext private val applicationContext: Context
 ) : ViewModel(), SharedPreferences.OnSharedPreferenceChangeListener {
     private val mutableCurrentContact = MutableLiveData<FusedContact?>()
@@ -70,6 +72,8 @@ class MapViewModel @Inject constructor(
         get() = mutableRelativeContactBearing
     val myLocationEnabled: LiveData<Boolean>
         get() = mutableMyLocationEnabled
+
+    val regions = waypointsRepo.allLive
 
     val scope: CoroutineScope
         get() = viewModelScope

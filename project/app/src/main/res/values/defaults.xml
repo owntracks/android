@@ -32,6 +32,7 @@
     <bool name="valWs">false</bool>
     <bool name="valInfo">true</bool>
     <bool name="valRemoteConfiguration">false</bool>
+    <bool name="valShowRegionsOnMap">false</bool>
 
     <string name="valEmpty" translatable="false" />
 </resources>

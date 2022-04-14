@@ -3,4 +3,7 @@
 <declare-styleable name="RelativeLayout">
     <attr name="onLongClick" format="string"/>
 </declare-styleable>
+    <declare-styleable name="Theme">
+        <attr name="colorRegion" format="color"/>
+    </declare-styleable>
 </resources>

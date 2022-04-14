@@ -25,9 +25,9 @@ class MapFragmentFactory @Inject constructor(
 
         return if (MapFragment::class.java.isAssignableFrom(classLoader.loadClass(className))) {
             if (preferences.experimentalFeatures.contains(Preferences.EXPERIMENTAL_FEATURE_USE_OSM_MAP)) {
-                OSMMapFragment(contactImageBindingAdapter)
+                OSMMapFragment(preferences, contactImageBindingAdapter)
             } else {
-                GoogleMapFragment(contactImageBindingAdapter)
+                GoogleMapFragment(preferences, contactImageBindingAdapter)
             }
         } else {
             super.instantiate(classLoader, className)
