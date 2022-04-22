@@ -57,6 +57,12 @@
             app:key="@string/preferenceKeyMoveModeLocatorInterval"
             app:summary="@string/preferencesMoveModeLocatorIntervalSummary"
             app:title="@string/preferencesMoveModeLocatorInterval" />
+        <androidx.preference.SwitchPreferenceCompat
+            app:defaultValue="@bool/valPegLocatorFastestIntervalToInterval"
+            app:iconSpaceReserved="false"
+            app:key="@string/preferenceKeyPegLocatorFastestIntervalToInterval"
+            app:summary="@string/preferencesPegLocatorFastestIntervalToIntervalSummary"
+            app:title="@string/preferencesPegLocatorFastestIntervalToInterval" />
     </androidx.preference.PreferenceCategory>
     <androidx.preference.PreferenceCategory
         app:iconSpaceReserved="false"

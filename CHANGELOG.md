@@ -7,6 +7,7 @@
 * Use new Google Maps renderer on gms flavour: https://developers.google.com/maps/documentation/android-sdk/renderer
 * OSM map now uses a blue dot and arrow for current location (#1078)
 * Add preference to draw regions on the map (#1068)
+* Add a preference to prevent location updates any faster than the requested interval (#1168)
 * Update to Catalan, Japanese and Polish translations (thanks all!)
 
 ### Bug fixes

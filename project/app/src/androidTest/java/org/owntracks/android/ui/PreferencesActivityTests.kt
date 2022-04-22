@@ -77,9 +77,11 @@ class PreferencesActivityTests :
 
         scrollToPreferenceWithText(R.string.preferencesMoveModeLocatorInterval)
         clickOnAndWait(R.string.preferencesMoveModeLocatorInterval)
-
         writeTo(android.R.id.edit, "5")
         clickDialogPositiveButton()
+
+        scrollToPreferenceWithText(R.string.preferencesPegLocatorFastestIntervalToInterval)
+        clickOnAndWait(R.string.preferencesPegLocatorFastestIntervalToInterval)
 
         scrollToPreferenceWithText(R.string.preferencesAutostart)
         clickOnAndWait(R.string.preferencesAutostart)
@@ -116,6 +118,8 @@ class PreferencesActivityTests :
         assertContains(R.id.effectiveConfiguration, "\"reverseGeocodeProvider\" : \"OpenCage\"")
         assertContains(R.id.effectiveConfiguration, "\"opencageApiKey\" : \"geocodeAPIKey\"")
         assertContains(R.id.effectiveConfiguration, "\"connectionTimeoutSeconds\" : 30")
+        assertContains(R.id.effectiveConfiguration, "\"pegLocatorFastestIntervalToInterval\" : true")
+
 
         // Make sure that the MQTT-specific settings aren't present
         assertNotContains(R.id.effectiveConfiguration, "\"host\"")

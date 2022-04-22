@@ -242,4 +242,6 @@
     <string name="preferencesMap">Map</string>
     <string name="preferencesShowRegionsOnMapSummary"></string>
     <string name="preferencesShowRegionsOnMap">Show Regions</string>
+    <string name="preferencesPegLocatorFastestIntervalToInterval">Limit max locator frequency</string>
+    <string name="preferencesPegLocatorFastestIntervalToIntervalSummary">Request that the location provider deliver updates no faster than the requested locator interval</string>
 </resources>
