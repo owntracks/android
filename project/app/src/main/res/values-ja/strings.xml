@@ -235,6 +235,8 @@
     <string name="contactDetailsDistanceUnitMeters">"m"</string>
     <string name="exportConfigurationSubject">"OwnTracks構成ファイル"</string>
     <string name="exportLogFileSubject">"OwnTracksログファイル"</string>
+    <string name="preferencesLocatorDisplacement">"移動距離の下限値"</string>
+    <string name="preferencesLocatorDisplacementSummary">"位置更新と判定する最小移動距離"</string>
     <string name="geocoderExceptionError">"ジオコーダーサービスでエラーが発生しました。詳細はログを確認してください。"</string>
     <string name="geocoderUnavailable">"ジオコーダーサービスは一時的に利用できません"</string>
 </resources>
