@@ -1,4 +1,5 @@
 ---
+# Machine image tags listed at https://circleci.com/developer/machine/image/android
 version: 2.1
 
 aliases:
@@ -14,17 +15,17 @@ aliases:
         - gradle-v3-{{ arch }}-{{ checksum "/tmp/gradle_cache_seed" }}
         - gradle-v3-{{ arch }}-
         - gradle-v3-
+  - &android-docker-image
+    image: cimg/android:2022.04
 
 orbs:
-  android: circleci/android@2.0.0
+  android: circleci/android@2.0.3
 
 jobs:
   build:
-    # These next lines define the Android machine image executor: https://circleci.com/docs/2.0/executor-types/
-    executor:
-      name: android/android-docker
-      tag: 2021.12.2
-      resource-class: large
+    docker:
+      - *android-docker-image
+    resource_class: large
 
     steps:
       # Checkout the code as the first step.
@@ -46,10 +47,9 @@ jobs:
           paths:
             - app-oss-debug.apk
   fdroid-scanner:
-    executor:
-      name: android/android-docker
-      tag: 2021.12.2
-      resource-class: small
+    docker:
+      - *android-docker-image
+    resource_class: small
     steps:
       - checkout
       - attach_workspace:
@@ -60,10 +60,9 @@ jobs:
             python3 ./.circleci/fdroid-scanner-stub.py
 
   unit-test:
-    executor:
-      name: android/android-docker
-      tag: 2021.12.2
-      resource-class: large
+    docker:
+      - *android-docker-image
+    resource_class: large
 
     steps:
       - checkout
@@ -83,10 +82,9 @@ jobs:
             - jacoco/jacoco.xml
 
   lint:
-    executor:
-      name: android/android-docker
-      tag: 2021.12.2
-      resource-class: medium+
+    docker:
+      - *android-docker-image
+    resource_class: medium+
 
     steps:
       - checkout
@@ -103,10 +101,9 @@ jobs:
           destination: lint-report
 
   oss-ui-tests:
-    executor:
-      name: android/android-machine
-      tag: 2021.12.1
-      resource-class: large
+    machine:
+      image: android:2022.04.1
+    resource_class: large
     parallelism: 4
     environment:
       GRADLE_OPTS: "-Dkotlin.compiler.execution.strategy=in-process"
@@ -146,10 +143,9 @@ jobs:
           destination: espresso-report-oss
 
   gms-ui-tests:
-    executor:
-      name: android/android-machine
-      tag: 2021.12.1
-      resource-class: large
+    machine:
+      image: android:2022.04.1
+    resource_class: large
     parallelism: 4
     environment:
       GRADLE_OPTS: "-Dkotlin.compiler.execution.strategy=in-process"
@@ -233,10 +229,9 @@ jobs:
               -F unittests \
               -f project/app/build/jacoco/jacoco.xml
   publish-to-play-store:
-    executor:
-      name: android/android-docker
-      tag: 2021.12.2
-      resource-class: medium
+    docker:
+      - *android-docker-image
+    resource_class: medium
 
     steps:
       # Checkout the code as the first step.
