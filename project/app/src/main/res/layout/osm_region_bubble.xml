@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?><!--suppress UnusedIds - IDs are needed for OSMdroid to find this layout -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -9,6 +9,7 @@
         android:id="@+id/bubble_image"
         android:layout_width="65dp"
         android:layout_height="65dp"
+        android:contentDescription="@string/aLocation"
         android:visibility="gone" />
 
     <LinearLayout
@@ -25,14 +26,15 @@
 
             <TextView
                 android:id="@+id/bubble_title"
-                android:layout_width="90dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:textAlignment="center"
-                android:textColor="#000000" />
+                android:textColor="#000000"
+                android:textIsSelectable="true" />
 
         </LinearLayout>
 
@@ -41,9 +43,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxEms="17"
-            android:text="Description"
             android:textColor="#000000"
-            android:textSize="12dp"
+            android:textSize="12sp"
             android:visibility="gone" />
 
         <TextView
@@ -51,9 +52,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxEms="17"
-            android:text="Address"
             android:textColor="#000000"
-            android:textSize="10dp"
+            android:textSize="10sp"
             android:visibility="gone" />
     </LinearLayout>
 </LinearLayout>

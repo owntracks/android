@@ -33,6 +33,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
+@SuppressLint("NonConstantResourceId")
 class Preferences @Inject constructor(
     @ApplicationContext private val applicationContext: Context,
     private val eventBus: EventBus?,
@@ -456,7 +457,7 @@ class Preferences @Inject constructor(
     val pubTopicBase: String
         get() = pubTopicBaseFormatString.replace(
             "%u",
-            if (username.isNotBlank()) username else "user"
+            username.ifBlank { "user" }
         ).replace("%d", deviceId)
 
     @get:Export(keyResId = R.string.preferenceKeySubTopic, exportModeMqtt = true)
@@ -503,7 +504,7 @@ class Preferences @Inject constructor(
 
     fun getTrackerId(fallback: Boolean): String {
         val tid = getStringOrDefault(R.string.preferenceKeyTrackerId, R.string.valEmpty)
-        return if (tid.isEmpty()) if (fallback) trackerIdDefault else "" else tid
+        return tid.ifEmpty { if (fallback) trackerIdDefault else "" }
     }
 
     // defaults to the last two characters of configured deviceId.
@@ -828,12 +829,6 @@ class Preferences @Inject constructor(
         set(newValue) {
             setBoolean(R.string.preferenceKeyRemoteConfiguration, newValue)
         }
-
-    @Import(keyResId = R.string.preferenceKeyGeocodeEnabled)
-    fun setGeocodeEnabled(newValue: Boolean) {
-        reverseGeocodeProvider =
-            if (newValue) REVERSE_GEOCODE_PROVIDER_DEVICE else REVERSE_GEOCODE_PROVIDER_NONE
-    }
 
     @get:Export(
         keyResId = R.string.preferenceKeyNotificationGeocoderErrors,
@@ -1204,7 +1199,6 @@ class Preferences @Inject constructor(
         const val EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI =
             "showExperimentalPreferenceUI"
         const val EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE = "allowSmallKeepalive"
-        const val EXPERIMENTAL_FEATURE_USE_AOSP_LOCATION_PROVIDER = "useAospLocationProvider"
         const val EXPERIMENTAL_FEATURE_USE_OSM_MAP = "useOSMMap"
         const val EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION =
             "bearingArrowFollowsDeviceOrientation"
@@ -1215,7 +1209,6 @@ class Preferences @Inject constructor(
             EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI,
             EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE,
             EXPERIMENTAL_FEATURE_USE_OSM_MAP,
-            EXPERIMENTAL_FEATURE_USE_AOSP_LOCATION_PROVIDER,
             EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION,
             EXPERIMENTAL_FEATURE_ENABLE_APP_SHORTCUTS
         )

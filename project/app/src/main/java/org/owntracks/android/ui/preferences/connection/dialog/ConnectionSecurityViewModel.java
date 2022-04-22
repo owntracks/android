@@ -35,7 +35,7 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
     private String tlsClientCrtPassword;
     private boolean tlsClientCrtNameDirty;
     private boolean tlsCaCrtNameDirty;
-    private boolean tlsClientCrtPasswortDirty;
+    private boolean tlsClientCrtPasswordDirty;
 
     public ConnectionSecurityViewModel(Preferences preferences, Navigator navigator, Context context) {
         super(preferences);
@@ -61,7 +61,7 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
         if(tlsClientCrtNameDirty)
             preferences.setTlsClientCrt(tlsClientCrtName == null ? "" : tlsClientCrtName);
 
-        if(tlsClientCrtPasswortDirty)
+        if(tlsClientCrtPasswordDirty)
             preferences.setTlsClientCrtPassword(tlsClientCrtPassword == null ? "" : tlsClientCrtPassword);
     }
 
@@ -100,7 +100,7 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
 
     public void setTlsClientCrtPassword(String tlsClientCrtPassword) {
         this.tlsClientCrtPassword = tlsClientCrtPassword;
-        this.tlsClientCrtPasswortDirty = true;
+        this.tlsClientCrtPasswordDirty = true;
     }
 
     public void onTlsCheckedChanged(final CompoundButton ignored, boolean isChecked) {
