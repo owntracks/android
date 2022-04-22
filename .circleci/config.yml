@@ -1,6 +1,20 @@
 ---
 version: 2.1
 
+aliases:
+  - &generate_gradle_cache_checksum
+    run:
+      name: Generate cache checksum
+      command: |
+        find . -name 'build.gradle.kts' -o -name "libs.versions.toml" -o -name "gradle-wrapper.properties" | sort | xargs cat | shasum | awk '{print $1}' > /tmp/gradle_cache_seed
+  - &restore_gradle_cache
+    restore_cache:
+      name: Restore gradle cache
+      keys:
+        - gradle-v3-{{ arch }}-{{ checksum "/tmp/gradle_cache_seed" }}
+        - gradle-v3-{{ arch }}-
+        - gradle-v3-
+
 orbs:
   android: circleci/android@2.0.0
 
@@ -17,16 +31,8 @@ jobs:
       - checkout
       - android/accept-licenses
       - android/restore-build-cache
-      - run:
-          name: Generate cache checksum
-          command: |
-            find . -name 'build.gradle.kts' | sort | xargs cat | shasum | awk '{print $1}' > /tmp/gradle_cache_seed
-      - restore_cache:
-          name: Restore gradle cache
-          keys:
-            - gradle-v3-{{ arch }}-{{ checksum "/tmp/gradle_cache_seed" }}
-            - gradle-v3-{{ arch }}-
-            - gradle-v3-
+      - *generate_gradle_cache_checksum
+      - *restore_gradle_cache
       - run:
           name: Build
           command: |
@@ -63,17 +69,8 @@ jobs:
       - checkout
       - android/accept-licenses
       - android/restore-build-cache
-      - run:
-          name: Generate cache checksum
-          command: |
-            find . -name 'build.gradle.kts' | sort | xargs cat |
-            shasum | awk '{print $1}' > /tmp/gradle_cache_seed
-      - restore_cache:
-          name: Restore gradle cache
-          keys:
-            - gradle-v3-{{ arch }}-{{ checksum "/tmp/gradle_cache_seed" }}
-            - gradle-v3-{{ arch }}-
-            - gradle-v3-
+      - *generate_gradle_cache_checksum
+      - *restore_gradle_cache
       - run:
           name: Unit Test
           command: |
@@ -95,16 +92,8 @@ jobs:
       - checkout
       - android/accept-licenses
       - android/restore-build-cache
-      - run:
-          name: Generate cache checksum
-          command: |
-            find . -name 'build.gradle.kts' | sort | xargs cat | shasum | awk '{print $1}' > /tmp/gradle_cache_seed
-      - restore_cache:
-          name: Restore gradle cache
-          keys:
-            - gradle-v3-{{ arch }}-{{ checksum "/tmp/gradle_cache_seed" }}
-            - gradle-v3-{{ arch }}-
-            - gradle-v3-
+      - *generate_gradle_cache_checksum
+      - *restore_gradle_cache
       - run:
           name: Lint
           command: |
@@ -112,7 +101,6 @@ jobs:
       - store_artifacts:
           path: project/app/build/reports/lint-results.html
           destination: lint-report
-
 
   oss-ui-tests:
     executor:
@@ -126,16 +114,8 @@ jobs:
       - checkout
       - android/accept-licenses
       - android/restore-build-cache
-      - run:
-          name: Generate cache checksum
-          command: |
-            find . -name 'build.gradle.kts' | sort | xargs cat | shasum | awk '{print $1}' > /tmp/gradle_cache_seed
-      - restore_cache:
-          name: Restore gradle cache
-          keys:
-            - gradle-v3-{{ arch }}-{{ checksum "/tmp/gradle_cache_seed" }}
-            - gradle-v3-{{ arch }}-
-            - gradle-v3-
+      - *generate_gradle_cache_checksum
+      - *restore_gradle_cache
       - android/start-emulator-and-run-tests:
           additional-avd-args: "-d pixel_3a -c 1G"
           additional-emulator-args: "-memory 4096 -cores 3"
@@ -172,21 +152,13 @@ jobs:
       resource-class: large
     parallelism: 4
     environment:
-      GRADLE_OPTS: "-Dkotlin.compiler.execution.strategy=in-process"    
+      GRADLE_OPTS: "-Dkotlin.compiler.execution.strategy=in-process"
     steps:
       - checkout
       - android/accept-licenses
       - android/restore-build-cache
-      - run:
-          name: Generate cache checksum
-          command: |
-            find . -name 'build.gradle.kts' | sort | xargs cat | shasum | awk '{print $1}' > /tmp/gradle_cache_seed
-      - restore_cache:
-          name: Restore gradle cache
-          keys:
-            - gradle-v3-{{ arch }}-{{ checksum "/tmp/gradle_cache_seed" }}
-            - gradle-v3-{{ arch }}-
-            - gradle-v3-
+      - *generate_gradle_cache_checksum
+      - *restore_gradle_cache
       - android/start-emulator-and-run-tests:
           additional-avd-args: "-d pixel_3a -c 1G"
           additional-emulator-args: "-memory 4096 -cores 3"
@@ -271,16 +243,8 @@ jobs:
       - checkout
       - android/accept-licenses
       - android/restore-build-cache
-      - run:
-          name: Generate cache checksum
-          command: |
-            find . -name 'build.gradle.kts' | sort | xargs cat | shasum | awk '{print $1}' > /tmp/gradle_cache_seed
-      - restore_cache:
-          name: Restore gradle cache
-          keys:
-            - gradle-v3-{{ arch }}-{{ checksum "/tmp/gradle_cache_seed" }}
-            - gradle-v3-{{ arch }}-
-            - gradle-v3-
+      - *generate_gradle_cache_checksum
+      - *restore_gradle_cache
       - run:
           name: Set credentials
           command: |
@@ -325,4 +289,3 @@ workflows:
           filters:
             branches:
               only: master
-
