@@ -80,12 +80,12 @@ class PreferencesGettersAndSetters(
                 arrayOf("AutostartOnBoot", "autostartOnBoot", true, true, Boolean::class, false),
                 arrayOf("CleanSession", "cleanSession", true, true, Boolean::class, false),
                 arrayOf(
-                    "ClientId",
-                    "clientId",
-                    "testClientId",
-                    "testClientId",
-                    String::class,
-                    false
+                    "ClientId", // Method name
+                    "clientId", // Preference name
+                    "testClientId", // Given preference value
+                    "testClientId", // Expected preference value
+                    String::class, // Preference type
+                    false // HTTP only
                 ),
                 arrayOf(
                     "ConnectionTimeoutSeconds",
@@ -291,6 +291,14 @@ class PreferencesGettersAndSetters(
                     String::class,
                     false
                 ),
+                arrayOf(
+                    "PegLocatorFastestIntervalToInterval",
+                    "pegLocatorFastestIntervalToInterval",
+                    false,
+                    false,
+                    Boolean::class,
+                    false
+                ),
                 arrayOf("Ping", "ping", 400, 400, Int::class, false),
                 arrayOf("Port", "port", 9999, 9999, Int::class, false),
                 arrayOf("Port", "port", -50, 0, Int::class, false),
@@ -429,6 +437,7 @@ class PreferencesGettersAndSetters(
                 on { getString(eq(R.string.defaultSubTopic)) } doReturn "owntracks/+/+"
                 on { getString(eq(R.string.valPubTopic)) } doReturn "owntracks/%u/%d"
                 on { getString(eq(R.string.preferenceKeyShowRegionsOnMap)) } doReturn "showRegionsOnMap"
+                on { getString(eq(R.string.preferenceKeyPegLocatorFastestIntervalToInterval)) } doReturn "pegLocatorFastestIntervalToInterval"
                 on { getString(eq(R.string.valDefaultGeocoder)) } doReturn "None"
                 on { getInteger(any()) } doReturn 0
                 on { getBoolean(any()) } doReturn false

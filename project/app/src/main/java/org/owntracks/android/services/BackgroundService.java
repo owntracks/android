@@ -560,6 +560,9 @@ public class BackgroundService extends Service implements SharedPreferences.OnSh
                 request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
                 break;
         }
+        if (preferences.getPegLocatorFastestIntervalToInterval()) {
+            request.setFastestInterval(request.getInterval());
+        }
         Timber.d("location update request params: %s", request);
         locationProviderClient.flushLocations();
         locationProviderClient.requestLocationUpdates(request, locationCallback, runThingsOnOtherThreads.getBackgroundLooper());
@@ -747,7 +750,8 @@ public class BackgroundService extends Service implements SharedPreferences.OnSh
         if (preferences.getPreferenceKey(R.string.preferenceKeyLocatorInterval).equals(key) ||
                 preferences.getPreferenceKey(R.string.preferenceKeyLocatorDisplacement).equals(key) ||
                 preferences.getPreferenceKey(R.string.preferenceKeyLocatorPriority).equals(key) ||
-                preferences.getPreferenceKey(R.string.preferenceKeyMoveModeLocatorInterval).equals(key)
+                preferences.getPreferenceKey(R.string.preferenceKeyMoveModeLocatorInterval).equals(key) ||
+                preferences.getPreferenceKey(R.string.preferenceKeyPegLocatorFastestIntervalToInterval).equals(key)
         ) {
             Timber.d("locator preferences changed. Resetting location request.");
             setupLocationRequest();

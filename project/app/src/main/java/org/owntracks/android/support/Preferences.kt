@@ -932,6 +932,22 @@ class Preferences @Inject constructor(
             setBoolean(R.string.preferenceKeyShowRegionsOnMap, newValue)
         }
 
+    @get:Export(
+        keyResId = R.string.preferenceKeyPegLocatorFastestIntervalToInterval,
+        exportModeMqtt = true,
+        exportModeHttp = true
+    )
+    @set:Import(keyResId = R.string.preferenceKeyPegLocatorFastestIntervalToInterval)
+    var pegLocatorFastestIntervalToInterval: Boolean
+        get() = getBooleanOrDefault(
+            R.string.preferenceKeyPegLocatorFastestIntervalToInterval,
+            R.bool.valPegLocatorFastestIntervalToInterval
+        )
+        set(newValue) {
+            setBoolean(R.string.preferenceKeyPegLocatorFastestIntervalToInterval, newValue)
+        }
+
+
     // Not used on public, as many people might use the same device type
     private val deviceIdDefault: String
         get() = // Use device name (Mako, Surnia, etc. and strip all non alpha digits)
