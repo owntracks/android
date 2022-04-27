@@ -4,6 +4,7 @@
 
 ### New features
 
+* OpenStreetMap now available as a map layer (!). Layer style toggle switch between the different Google Maps layer styles (Default, Hybrid, Satellite, Terrain), OpenStreetMap and Wikimedia.
 * Use new Google Maps renderer on gms flavour: https://developers.google.com/maps/documentation/android-sdk/renderer
 * Update to Catalan, Japanese and Polish translations (thanks all!)
 

@@ -30,6 +30,7 @@ abstract class MapFragment<V : ViewDataBinding> internal constructor(
     abstract fun removeMarkerFromMap(id: String)
     abstract fun initMap()
     abstract fun drawRegions(regions: Set<WaypointModel>)
+    abstract fun setMapLayerType(mapLayerStyle: MapLayerStyle)
     protected val viewModel: MapViewModel by activityViewModels()
 
     protected fun getRegionColor(): Int {
@@ -50,9 +51,7 @@ abstract class MapFragment<V : ViewDataBinding> internal constructor(
         viewModel.myLocationEnabled.observe(viewLifecycleOwner, {
             initMap()
         })
-        viewModel.mapCenter.observe(viewLifecycleOwner, { latLng: LatLng ->
-            updateCamera(latLng)
-        })
+        viewModel.mapCenter.observe(viewLifecycleOwner, this::updateCamera)
         viewModel.allContacts.observe(viewLifecycleOwner, { contacts ->
             updateAllMarkers(contacts.values.toSet())
         })
@@ -60,6 +59,7 @@ abstract class MapFragment<V : ViewDataBinding> internal constructor(
         viewModel.regions.observe(viewLifecycleOwner, { regions ->
             drawRegions(regions.toSet())
         })
+        viewModel.mapLayerStyle.observe(viewLifecycleOwner, this::setMapLayerType)
         viewModel.onMapReady()
         return binding.root
     }

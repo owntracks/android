@@ -20,6 +20,7 @@ import org.owntracks.android.services.MessageProcessorEndpointHttp
 import org.owntracks.android.services.MessageProcessorEndpointMqtt
 import org.owntracks.android.support.preferences.PreferencesStore
 import org.owntracks.android.ui.NoopAppShortcuts
+import org.owntracks.android.ui.map.MapLayerStyle
 import kotlin.reflect.KClass
 
 @RunWith(Parameterized::class)
@@ -194,6 +195,14 @@ class PreferencesGettersAndSetters(
                 ),
                 arrayOf("LocatorInterval", "locatorInterval", 1000, 1000, Int::class, false),
                 arrayOf("LocatorPriority", "locatorPriority", 2, 2, Int::class, false),
+                arrayOf(
+                    "MapLayerStyle",
+                    "mapLayerStyle",
+                    MapLayerStyle.GoogleMapHybrid,
+                    MapLayerStyle.GoogleMapHybrid,
+                    MapLayerStyle::class,
+                    false
+                ),
                 arrayOf(
                     "Mode",
                     "mode",
@@ -438,6 +447,7 @@ class PreferencesGettersAndSetters(
                 on { getString(eq(R.string.valPubTopic)) } doReturn "owntracks/%u/%d"
                 on { getString(eq(R.string.preferenceKeyShowRegionsOnMap)) } doReturn "showRegionsOnMap"
                 on { getString(eq(R.string.preferenceKeyPegLocatorFastestIntervalToInterval)) } doReturn "pegLocatorFastestIntervalToInterval"
+                on { getString(eq(R.string.preferenceKeyMapLayerStyle)) } doReturn "mapLayerStyle"
                 on { getString(eq(R.string.valDefaultGeocoder)) } doReturn "None"
                 on { getInteger(any()) } doReturn 0
                 on { getBoolean(any()) } doReturn false

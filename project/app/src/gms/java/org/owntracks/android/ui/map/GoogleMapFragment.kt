@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import com.google.android.gms.maps.*
+import com.google.android.gms.maps.GoogleMap.*
 import com.google.android.gms.maps.GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE
 import com.google.android.gms.maps.model.*
 import org.owntracks.android.R
@@ -126,6 +127,11 @@ class GoogleMapFragment internal constructor(
                     onMapClick()
                 }
             }
+
+            viewModel.mapLayerStyle.value?.run {
+                setMapLayerType(this)
+            }
+
             // We need to specifically re-draw any contact markers and regions now that we've re-init the map
             viewModel.allContacts.value?.values?.toSet()?.run(::updateAllMarkers)
             viewModel.regions.value?.toSet()?.run(::drawRegions)
@@ -237,5 +243,25 @@ class GoogleMapFragment internal constructor(
 
     companion object {
         private const val ZOOM_LEVEL_STREET: Float = 15f
+    }
+
+    override fun setMapLayerType(mapLayerStyle: MapLayerStyle) {
+        when (mapLayerStyle) {
+            MapLayerStyle.GoogleMapDefault -> {
+                googleMap?.mapType = MAP_TYPE_NORMAL
+            }
+            MapLayerStyle.GoogleMapHybrid -> {
+                googleMap?.mapType = MAP_TYPE_HYBRID
+            }
+            MapLayerStyle.GoogleMapSatellite -> {
+                googleMap?.mapType = MAP_TYPE_SATELLITE
+            }
+            MapLayerStyle.GoogleMapTerrain -> {
+                googleMap?.mapType = MAP_TYPE_TERRAIN
+            }
+            else -> {
+                Timber.w("Unsupported map layer type $mapLayerStyle")
+            }
+        }
     }
 }

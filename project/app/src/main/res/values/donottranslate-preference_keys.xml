@@ -58,6 +58,7 @@
     <string name="preferenceKeyWS">ws</string>
     <string name="preferenceKeyShowRegionsOnMap">showRegionsOnMap</string>
     <string name="preferenceKeyPegLocatorFastestIntervalToInterval">pegLocatorFastestIntervalToInterval</string>
+    <string name="preferenceKeyMapLayerStyle">mapLayerStyle</string>
     <string-array name="geocoderValues" translatable="false">
         <item>None</item>
         <item>Device</item>

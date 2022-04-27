@@ -33,6 +33,7 @@ import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.support.Preferences
 import org.owntracks.android.ui.map.MapActivity
 import org.owntracks.android.ui.map.MapFragment
+import org.owntracks.android.ui.map.MapLayerStyle
 import org.owntracks.android.ui.map.MapViewModel
 import timber.log.Timber
 import kotlin.math.roundToInt
@@ -112,7 +113,9 @@ class OSMMapFragment internal constructor(
             (requireActivity() as MapActivity).checkAndRequestMyLocationCapability(false)
         Timber.d("OSMMapFragment initMap locationEnabled=$myLocationEnabled")
         mapView = this.binding.osmMapView.apply {
-            setTileSource(TileSourceFactory.MAPNIK)
+            viewModel.mapLayerStyle.value?.run {
+                setMapLayerType(this)
+            }
             zoomController.setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
             controller.setZoom(ZOOM_STREET_LEVEL)
             controller.setCenter(viewModel.getMapLocation().toGeoPoint())
@@ -255,4 +258,17 @@ class OSMMapFragment internal constructor(
         private const val ZOOM_STREET_LEVEL: Double = 16.0
     }
 
+    override fun setMapLayerType(mapLayerStyle: MapLayerStyle) {
+        when (mapLayerStyle) {
+            MapLayerStyle.OpenStreetMapNormal -> {
+                binding.osmMapView.setTileSource(TileSourceFactory.MAPNIK)
+            }
+            MapLayerStyle.OpenStreetMapWikimedia -> {
+                binding.osmMapView.setTileSource(TileSourceFactory.WIKIMEDIA)
+            }
+            else -> {
+                Timber.w("Unsupported map layer type $mapLayerStyle")
+            }
+        }
+    }
 }
