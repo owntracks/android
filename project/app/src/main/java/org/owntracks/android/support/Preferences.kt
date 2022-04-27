@@ -22,6 +22,8 @@ import org.owntracks.android.support.Events.ModeChanged
 import org.owntracks.android.support.Events.MonitoringChanged
 import org.owntracks.android.support.preferences.PreferencesStore
 import org.owntracks.android.ui.AppShortcuts
+import org.owntracks.android.ui.map.MapLayerStyle
+import org.owntracks.android.ui.map.MapViewModel
 import timber.log.Timber
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
@@ -942,6 +944,23 @@ class Preferences @Inject constructor(
             setBoolean(R.string.preferenceKeyPegLocatorFastestIntervalToInterval, newValue)
         }
 
+    @get:Export(
+        keyResId = R.string.preferenceKeyMapLayerStyle,
+        exportModeMqtt = true,
+        exportModeHttp = true
+    )
+    @set:Import(keyResId = R.string.preferenceKeyMapLayerStyle)
+    var mapLayerStyle: MapLayerStyle
+        get() = MapLayerStyle.values().firstOrNull {
+            it.name == getStringOrDefault(
+                R.string.preferenceKeyMapLayerStyle,
+                R.string.valDefaultMapLayerStyle
+            )
+        } ?: MapLayerStyle.OpenStreetMapNormal
+        set(newValue) {
+            setString(R.string.preferenceKeyMapLayerStyle, newValue.name)
+        }
+
 
     // Not used on public, as many people might use the same device type
     private val deviceIdDefault: String
@@ -979,7 +998,7 @@ class Preferences @Inject constructor(
         get() = "/cmd"
 
     // Maybe make this configurable
-    // For now it makes things easier to change
+// For now it makes things easier to change
     val pubQosEvents: Int
         get() = pubQos
 
@@ -1199,7 +1218,6 @@ class Preferences @Inject constructor(
         const val EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI =
             "showExperimentalPreferenceUI"
         const val EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE = "allowSmallKeepalive"
-        const val EXPERIMENTAL_FEATURE_USE_OSM_MAP = "useOSMMap"
         const val EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION =
             "bearingArrowFollowsDeviceOrientation"
         const val EXPERIMENTAL_FEATURE_ENABLE_APP_SHORTCUTS =
@@ -1208,7 +1226,6 @@ class Preferences @Inject constructor(
         internal val EXPERIMENTAL_FEATURES = setOf(
             EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI,
             EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE,
-            EXPERIMENTAL_FEATURE_USE_OSM_MAP,
             EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION,
             EXPERIMENTAL_FEATURE_ENABLE_APP_SHORTCUTS
         )

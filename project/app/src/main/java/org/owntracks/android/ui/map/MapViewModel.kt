@@ -33,10 +33,6 @@ import timber.log.Timber
 import javax.inject.Inject
 import kotlin.math.asin
 
-// Paris
-private const val STARTING_LATITUDE = 48.856826
-private const val STARTING_LONGITUDE = 2.292713
-
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val contactsRepo: ContactsRepo,
@@ -55,6 +51,7 @@ class MapViewModel @Inject constructor(
     private val mutableContactBearing = MutableLiveData(0f)
     private val mutableRelativeContactBearing = MutableLiveData(0f)
     private val mutableMyLocationEnabled = MutableLiveData(false)
+    private val mutableMapLayerStyle = MutableLiveData<MapLayerStyle>(preferences.mapLayerStyle)
 
     val currentContact: LiveData<FusedContact?>
         get() = mutableCurrentContact
@@ -74,6 +71,9 @@ class MapViewModel @Inject constructor(
         get() = mutableMyLocationEnabled
 
     val regions = waypointsRepo.allLive
+
+    val mapLayerStyle: LiveData<MapLayerStyle>
+        get() = mutableMapLayerStyle
 
     val scope: CoroutineScope
         get() = viewModelScope
@@ -284,12 +284,6 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    sealed class ViewMode {
-        object Free : ViewMode()
-        object Device : ViewMode()
-        data class Contact(val follow: Boolean) : ViewMode()
-    }
-
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         when (key) {
             "monitoring" -> mutableCurrentMonitoringMode.postValue(preferences.monitoring)
@@ -299,4 +293,22 @@ class MapViewModel @Inject constructor(
             }
         }
     }
+
+    fun setMapLayerStyle(mapLayerStyle: MapLayerStyle) {
+        preferences.mapLayerStyle = mapLayerStyle
+        mutableMapLayerStyle.postValue(mapLayerStyle)
+    }
+
+    companion object {
+        // Paris
+        private const val STARTING_LATITUDE = 48.856826
+        private const val STARTING_LONGITUDE = 2.292713
+    }
+
+    sealed class ViewMode {
+        object Free : ViewMode()
+        object Device : ViewMode()
+        data class Contact(val follow: Boolean) : ViewMode()
+    }
 }
+

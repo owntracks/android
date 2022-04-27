@@ -345,7 +345,7 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
             }
         }
 
-    override fun onResume() {
+    private fun replaceMapFragment() {
         val mapFragment =
             supportFragmentManager.fragmentFactory.instantiate(
                 this.classLoader,
@@ -354,7 +354,10 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
         supportFragmentManager.commit(true) {
             replace(R.id.mapFragment, mapFragment, "map")
         }
+    }
 
+    override fun onResume() {
+        replaceMapFragment()
         if (preferences.isExperimentalFeatureEnabled(
                 EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION
             )
@@ -372,6 +375,7 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
         super.onResume()
         updateMonitoringModeMenu()
         updateMyLocationMenuIcon()
+        mapViewModel.mapLayerStyle.value?.run(this::updateLayerMenuChecked)
         if (!previouslyHadLocationPermissions && requirementsChecker.isLocationPermissionCheckPassed()) {
             previouslyHadLocationPermissions = true
             mapViewModel.myLocationIsNowEnabled()
@@ -402,9 +406,29 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
         this.menu = menu
         updateMonitoringModeMenu()
         updateMyLocationMenuIcon()
+        mapViewModel.mapLayerStyle.value?.run(this::updateLayerMenuChecked)
         return true
     }
 
+
+
+    /**
+     * Updates the map layer style menu check box states
+     *
+     * @param mapLayerStyle The currently selected map layer style
+     */
+    private fun updateLayerMenuChecked(mapLayerStyle: MapLayerStyle) {
+        mapLayerStyleMenuItemsToStyles.forEach {
+            menu?.findItem(it.key)?.also { menuItem ->
+                menuItem.isChecked = it.value == mapLayerStyle
+            }
+        }
+    }
+
+    /**
+     * sets the my location menu item icon based on whether location permissions have been granted
+     * and the location service is enabled
+     */
     private fun updateMyLocationMenuIcon() {
         menu?.findItem(R.id.menu_mylocation)?.setIcon(
             if (requirementsChecker.isLocationPermissionCheckPassed() && requirementsChecker.isLocationServiceEnabled()) {
@@ -441,6 +465,19 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        fun setLayerStyle(
+            currentMapLayerStyle: MapLayerStyle?,
+            newMapLayerStyle: MapLayerStyle
+        ) {
+            newMapLayerStyle.run {
+                mapViewModel.setMapLayerStyle(this)
+                updateLayerMenuChecked(this)
+            }
+            if (!(currentMapLayerStyle?.isSameProviderAs(newMapLayerStyle) ?: false)
+            ) {
+                replaceMapFragment()
+            }
+        }
         return when (item.itemId) {
             R.id.menu_report -> {
                 mapViewModel.sendLocation()
@@ -461,8 +498,15 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
                 stepMonitoringModeMenu()
                 true
             }
-            else -> false
+            else -> {
+                mapLayerStyleMenuItemsToStyles.get(item.itemId)?.also {
+                    setLayerStyle(mapViewModel.mapLayerStyle.value, it)
+                    return true
+                }
+                return false
+            }
         }
+
     }
 
     private fun stepMonitoringModeMenu() {

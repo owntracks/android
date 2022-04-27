@@ -146,7 +146,7 @@ class SharedPreferencesStore @Inject constructor(@ApplicationContext context: Co
     }
 
     companion object {
-        private const val FILENAME_PRIVATE = "org.owntracks.android.preferences.private"
+        const val FILENAME_PRIVATE = "org.owntracks.android.preferences.private"
         private const val FILENAME_HTTP = "org.owntracks.android.preferences.http"
     }
 }

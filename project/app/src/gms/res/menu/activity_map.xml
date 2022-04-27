@@ -1,0 +1,55 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menuMapLayer"
+        android:icon="@drawable/ic_baseline_layers_24"
+        android:title="@string/menuMapLayer"
+        app:showAsAction="always">
+        <menu>
+            <item
+                android:id="@+id/menuMapLayerGoogleMapDefault"
+                android:checkable="true"
+                android:title="@string/menuMapLayerGoogleMapDefault" />
+            <item
+                android:id="@+id/menuMapLayerGoogleMapHybrid"
+                android:checkable="true"
+                android:title="@string/menuMapLayerGoogleMapHybrid" />
+            <item
+                android:id="@+id/menuMapLayerGoogleMapSatellite"
+                android:checkable="true"
+                android:title="@string/menuMapLayerGoogleMapSatellite" />
+            <item
+                android:id="@+id/menuMapLayerGoogleMapTerrain"
+                android:checkable="true"
+                android:title="@string/menuMapLayerGoogleMapTerrain" />
+            <item
+                android:id="@+id/menuMapLayerOpenStreetMap"
+                android:checkable="true"
+                android:title="@string/menuMapLayerOpenStreetMap" />
+            <item
+                android:id="@+id/menuMapLayerOpenStreetMapWikimedia"
+                android:checkable="true"
+                android:title="@string/menuMapLayerOpenStreetMapWikimedia" />
+        </menu>
+    </item>
+    <item
+        android:id="@+id/menu_monitoring"
+        android:orderInCategory="1"
+        android:title="@string/monitoring_mode"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/menu_report"
+        android:icon="@drawable/ic_baseline_publish_24"
+        android:orderInCategory="1"
+        android:title="@string/publish"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/menu_mylocation"
+        android:orderInCategory="1"
+        android:title="@string/menuCurrentLocation"
+        app:showAsAction="always" />
+
+</menu>
