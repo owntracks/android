@@ -192,6 +192,7 @@ jobs:
   publish-coverage:
     docker:
       - image: cimg/base:stable
+    resource_class: small
     steps:
       - checkout
       - attach_workspace:
