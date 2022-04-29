@@ -430,12 +430,11 @@ public class BackgroundService extends Service implements SharedPreferences.OnSh
 
         String whenStr;
         Date whenDate = new Date();
-        if (DateUtils.isToday(TimeUnit.MILLISECONDS.toSeconds((when)))) {
-            whenStr = new SimpleDateFormat("HH:mm", this.getResources().getConfiguration().locale).format(new Date(TimeUnit.MILLISECONDS.toSeconds((when))));
+        if (DateUtils.isToday(when)) {
+            whenStr = new SimpleDateFormat("HH:mm", this.getResources().getConfiguration().locale).format(new Date(when));
         } else {
-            whenStr = new SimpleDateFormat("yyyy-MM-dd HH:mm", this.getResources().getConfiguration().locale).format(new Date(TimeUnit.MILLISECONDS.toSeconds((when))));
+            whenStr = new SimpleDateFormat("yyyy-MM-dd HH:mm", this.getResources().getConfiguration().locale).format(new Date(when));
         }
-
         Spannable newLine = new SpannableString(String.format("%s %s %s", whenStr, title, text));
         newLine.setSpan(new StyleSpan(Typeface.BOLD), 0, whenStr.length() + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         activeNotifications.push(newLine);
