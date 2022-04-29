@@ -16,7 +16,9 @@ import timber.log.Timber
 
 class TestWithAnHTTPServerImpl : TestWithAnHTTPServer {
     private lateinit var mockWebServer: MockWebServer
-    override val webserverPort: Int by lazy { mockWebServer.port }
+    override val webserverPort
+        get() = mockWebServer.port
+
     override fun startServer(dispatcher: Dispatcher) {
         mockWebServer = MockWebServer()
         mockWebServer.start()

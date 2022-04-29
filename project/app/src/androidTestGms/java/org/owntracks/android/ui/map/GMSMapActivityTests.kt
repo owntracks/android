@@ -138,11 +138,11 @@ class GMSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
         launchActivity()
         PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
         assertDisplayed(R.id.google_map_view)
-        clickOn(R.id.menuMapLayer)
-        clickOn(R.string.menuMapLayerOpenStreetMap)
+        clickOn(R.id.fabMapLayers)
+        clickOn(R.id.fabMapLayerOpenStreetMap)
         assertDisplayed(R.id.osm_map_view)
-        clickOn(R.id.menuMapLayer)
-        clickOn(R.string.menuMapLayerGoogleMapSatellite)
+        clickOn(R.id.fabMapLayers)
+        clickOn(R.id.fabMapLayerGoogleHybrid)
         assertDisplayed(R.id.google_map_view)
     }
 

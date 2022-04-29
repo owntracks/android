@@ -11,10 +11,7 @@ import android.os.Bundle
 import android.os.IBinder
 import android.provider.Settings
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-import android.view.Gravity
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.VisibleForTesting
@@ -122,14 +119,14 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
             }
             bindAndAttachContentView(R.layout.ui_map, savedInstanceState)
 
-            binding?.also {
-                setSupportToolbar(it.appbar.toolbar, false, true)
-                setDrawer(it.appbar.toolbar)
-                bottomSheetBehavior = BottomSheetBehavior.from(it.bottomSheetLayout)
-                it.setVariable(BR.vm, mapViewModel)
-                it.contactPeek.contactRow.setOnClickListener(this)
-                it.contactPeek.contactRow.setOnLongClickListener(this)
-                it.moreButton.setOnClickListener { v: View -> showPopupMenu(v) }
+            binding?.also { binding ->
+                setSupportToolbar(binding.appbar.toolbar, false, true)
+                setDrawer(binding.appbar.toolbar)
+                bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetLayout)
+                binding.setVariable(BR.vm, mapViewModel)
+                binding.contactPeek.contactRow.setOnClickListener(this)
+                binding.contactPeek.contactRow.setOnLongClickListener(this)
+                binding.moreButton.setOnClickListener { v: View -> showPopupMenu(v) }
                 setBottomSheetHidden()
 
                 // Need to set the appbar layout behaviour to be non-drag, so that we can drag the map
@@ -139,6 +136,17 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
                         return false
                     }
                 })
+
+                binding.fabMyLocation.setOnClickListener {
+                    if (checkAndRequestLocationPermissions(true)) {
+                        checkAndRequestLocationServicesEnabled(true)
+                    }
+                    mapViewModel.onMenuCenterDeviceClicked()
+                }
+
+                binding.fabMapLayers.setOnClickListener {
+                    LayerBottomSheetDialog().show(supportFragmentManager, "layerBottomSheetDialog")
+                }
             }
 
             locationLifecycleObserver = LocationLifecycleObserver(activityResultRegistry)
@@ -345,7 +353,8 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
             }
         }
 
-    private fun replaceMapFragment() {
+
+    override fun onResume() {
         val mapFragment =
             supportFragmentManager.fragmentFactory.instantiate(
                 this.classLoader,
@@ -354,10 +363,6 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
         supportFragmentManager.commit(true) {
             replace(R.id.mapFragment, mapFragment, "map")
         }
-    }
-
-    override fun onResume() {
-        replaceMapFragment()
         if (preferences.isExperimentalFeatureEnabled(
                 EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION
             )
@@ -374,8 +379,7 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
         }
         super.onResume()
         updateMonitoringModeMenu()
-        updateMyLocationMenuIcon()
-        mapViewModel.mapLayerStyle.value?.run(this::updateLayerMenuChecked)
+        updateMyLocationButton()
         if (!previouslyHadLocationPermissions && requirementsChecker.isLocationPermissionCheckPassed()) {
             previouslyHadLocationPermissions = true
             mapViewModel.myLocationIsNowEnabled()
@@ -405,32 +409,17 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
         inflater.inflate(R.menu.activity_map, menu)
         this.menu = menu
         updateMonitoringModeMenu()
-        updateMyLocationMenuIcon()
-        mapViewModel.mapLayerStyle.value?.run(this::updateLayerMenuChecked)
+        updateMyLocationButton()
         return true
-    }
-
-
-
-    /**
-     * Updates the map layer style menu check box states
-     *
-     * @param mapLayerStyle The currently selected map layer style
-     */
-    private fun updateLayerMenuChecked(mapLayerStyle: MapLayerStyle) {
-        mapLayerStyleMenuItemsToStyles.forEach {
-            menu?.findItem(it.key)?.also { menuItem ->
-                menuItem.isChecked = it.value == mapLayerStyle
-            }
-        }
     }
 
     /**
      * sets the my location menu item icon based on whether location permissions have been granted
      * and the location service is enabled
      */
-    private fun updateMyLocationMenuIcon() {
-        menu?.findItem(R.id.menu_mylocation)?.setIcon(
+    private fun updateMyLocationButton() {
+        binding?.fabMyLocation?.setImageResource(
+
             if (requirementsChecker.isLocationPermissionCheckPassed() && requirementsChecker.isLocationServiceEnabled()) {
                 R.drawable.ic_baseline_my_location_24
             } else {
@@ -461,33 +450,12 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
                 else -> {}
             }
         }
-
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        fun setLayerStyle(
-            currentMapLayerStyle: MapLayerStyle?,
-            newMapLayerStyle: MapLayerStyle
-        ) {
-            newMapLayerStyle.run {
-                mapViewModel.setMapLayerStyle(this)
-                updateLayerMenuChecked(this)
-            }
-            if (!(currentMapLayerStyle?.isSameProviderAs(newMapLayerStyle) ?: false)
-            ) {
-                replaceMapFragment()
-            }
-        }
         return when (item.itemId) {
             R.id.menu_report -> {
                 mapViewModel.sendLocation()
-                true
-            }
-            R.id.menu_mylocation -> {
-                if (checkAndRequestLocationPermissions(true)) {
-                    checkAndRequestLocationServicesEnabled(true)
-                }
-                mapViewModel.onMenuCenterDeviceClicked()
                 true
             }
             android.R.id.home -> {
@@ -498,15 +466,8 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
                 stepMonitoringModeMenu()
                 true
             }
-            else -> {
-                mapLayerStyleMenuItemsToStyles.get(item.itemId)?.also {
-                    setLayerStyle(mapViewModel.mapLayerStyle.value, it)
-                    return true
-                }
-                return false
-            }
+            else -> false
         }
-
     }
 
     private fun stepMonitoringModeMenu() {
@@ -535,15 +496,15 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
     }
 
     private fun disableLocationMenus() {
+        binding?.fabMyLocation?.isEnabled = false
         menu?.run {
-            findItem(R.id.menu_mylocation).setEnabled(false).icon.alpha = 128
             findItem(R.id.menu_report).setEnabled(false).icon.alpha = 128
         }
     }
 
     private fun enableLocationMenus() {
+        binding?.fabMyLocation?.isEnabled = true
         menu?.run {
-            findItem(R.id.menu_mylocation).setEnabled(true).icon.alpha = 255
             findItem(R.id.menu_report).setEnabled(true).icon.alpha = 255
         }
     }

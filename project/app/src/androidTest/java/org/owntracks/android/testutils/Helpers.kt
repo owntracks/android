@@ -45,7 +45,7 @@ fun reportLocationFromMap(locationIdlingResource: IdlingResource?) {
     Timber.d("Waiting for location")
     locationIdlingResource.with {
         waitUntilActivityVisible<MapActivity>()
-        clickOnAndWait(R.id.menu_mylocation)
+        clickOnAndWait(R.id.fabMyLocation)
     }
     Timber.d("location now available")
     clickOnAndWait(R.id.menu_report)

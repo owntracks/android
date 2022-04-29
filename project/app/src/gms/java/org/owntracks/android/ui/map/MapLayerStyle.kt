@@ -27,12 +27,10 @@ enum class MapLayerStyle {
     }
 }
 
-
-val mapLayerStyleMenuItemsToStyles = mapOf(
-    R.id.menuMapLayerGoogleMapDefault to MapLayerStyle.GoogleMapDefault,
-    R.id.menuMapLayerGoogleMapHybrid to MapLayerStyle.GoogleMapHybrid,
-    R.id.menuMapLayerGoogleMapSatellite to MapLayerStyle.GoogleMapSatellite,
-    R.id.menuMapLayerGoogleMapTerrain to MapLayerStyle.GoogleMapTerrain,
-    R.id.menuMapLayerOpenStreetMap to MapLayerStyle.OpenStreetMapNormal,
-    R.id.menuMapLayerOpenStreetMapWikimedia to MapLayerStyle.OpenStreetMapWikimedia,
+val mapLayerSelectorButtonsToStyles = mapOf(
+    R.id.fabMapLayerGoogleNormal to MapLayerStyle.GoogleMapDefault,
+    R.id.fabMapLayerGoogleHybrid to MapLayerStyle.GoogleMapHybrid,
+    R.id.fabMapLayerGoogleTerrain to MapLayerStyle.GoogleMapTerrain,
+    R.id.fabMapLayerOpenStreetMap to MapLayerStyle.OpenStreetMapNormal,
+    R.id.fabMapLayerOpenStreetMapWikimedia to MapLayerStyle.OpenStreetMapWikimedia
 )

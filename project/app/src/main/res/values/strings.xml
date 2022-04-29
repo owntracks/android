@@ -244,11 +244,10 @@
     <string name="preferencesShowRegionsOnMap">Show Regions</string>
     <string name="preferencesPegLocatorFastestIntervalToInterval">Limit max locator frequency</string>
     <string name="preferencesPegLocatorFastestIntervalToIntervalSummary">Request that the location provider deliver updates no faster than the requested locator interval</string>
-    <string name="menuMapLayer">Choose map layer</string>
-    <string name="menuMapLayerGoogleMapDefault">Google Default</string>
-    <string name="menuMapLayerGoogleMapHybrid">Google Hybrid</string>
-    <string name="menuMapLayerGoogleMapSatellite">Google Satellite</string>
-    <string name="menuMapLayerGoogleMapTerrain">Google Terrain</string>
-    <string name="menuMapLayerOpenStreetMap">OpenStreetMap</string>
-    <string name="menuMapLayerOpenStreetMapWikimedia">Wikimedia</string>
+    <string name="mapLayerDialogTitle">Map Layers</string>
+    <string name="mapLayerGoogleMapDefaultLabel">Google Default</string>
+    <string name="mapLayerGoogleMapHybridLabel">Google Hybrid</string>
+    <string name="mapLayerGoogleMapTerrainLabel">Google Terrain</string>
+    <string name="mapLayerOpenStreetMapLabel">OpenStreetMap</string>
+    <string name="mapLayerOpenStreetMapWikimediaLabel">Wikimedia</string>
 </resources>
