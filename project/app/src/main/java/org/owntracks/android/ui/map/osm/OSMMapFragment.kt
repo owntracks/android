@@ -13,6 +13,7 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import org.osmdroid.config.Configuration
+import org.osmdroid.events.DelayedMapListener
 import org.osmdroid.events.MapListener
 import org.osmdroid.events.ScrollEvent
 import org.osmdroid.events.ZoomEvent
@@ -111,7 +112,7 @@ class OSMMapFragment internal constructor(
         }
     }
 
-    val mapListener = object : MapListener {
+    val mapListener = DelayedMapListener(object : MapListener {
         override fun onScroll(event: ScrollEvent?): Boolean {
             mapView?.mapCenter?.run {
                 this.run { viewModel.setMapLocation(LatLng(latitude, longitude)) }
@@ -122,7 +123,7 @@ class OSMMapFragment internal constructor(
         override fun onZoom(event: ZoomEvent?): Boolean {
             return true
         }
-    }
+    })
 
     override fun initMap() {
         val myLocationEnabled =
