@@ -21,6 +21,34 @@
             layout="@layout/appbar" />
 
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabMapLayers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|end"
+            android:src="@drawable/ic_baseline_layers_24"
+            android:tooltipText="@string/menuCurrentLocation"
+            app:fabSize="normal"
+            app:layout_anchor="@+id/fabMyLocation"
+            app:layout_anchorGravity="top|end"
+            app:useCompatPadding="true" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabMyLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:contentDescription="@string/menuCurrentLocation"
+            android:src="@drawable/ic_baseline_my_location_24"
+            android:tint="@color/primary"
+            android:tooltipText="@string/menuCurrentLocation"
+            app:backgroundTint="@android:color/white"
+            app:layout_anchor="@+id/bottomSheetLayout"
+            app:layout_anchorGravity="end|bottom"
+            app:tint="@color/primary"
+            app:useCompatPadding="true" />
+
+
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/mapFragment"
             android:layout_width="match_parent"

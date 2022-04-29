@@ -248,9 +248,13 @@ class MapViewModel @Inject constructor(
         viewModelScope.launch { currentLocation.requestLocationUpdates() }
     }
 
-    fun setMapLocation(latLng: LatLng) {
+    fun setCurrentLocation(latLng: LatLng) {
         locationIdlingResource.setIdleState(true)
         locationRepo.setMapLocation(latLng)
+    }
+
+    fun setMapLocation(latLng: LatLng) {
+        mutableMapCenter.postValue(latLng)
     }
 
     fun getMapLocation(): LatLng =

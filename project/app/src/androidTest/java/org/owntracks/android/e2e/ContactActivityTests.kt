@@ -18,6 +18,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.testutils.*
+import org.owntracks.android.ui.clickBackAndWait
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.clickOnDrawerAndWait
 import org.owntracks.android.ui.map.MapActivity
@@ -82,7 +83,7 @@ class ContactActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.
         assertDisplayed(R.id.contactPeek)
         assertContains(R.id.name, "aa")
 
-        clickOnAndWait(R.id.menu_mylocation)
+        clickBackAndWait()
 
         assertNotDisplayed(R.id.bottomSheetLayout)
         assertNotDisplayed(R.id.contactPeek)

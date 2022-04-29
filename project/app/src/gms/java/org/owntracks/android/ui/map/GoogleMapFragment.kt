@@ -17,6 +17,7 @@ import org.owntracks.android.R
 import org.owntracks.android.data.WaypointModel
 import org.owntracks.android.databinding.GoogleMapFragmentBinding
 import org.owntracks.android.gms.location.toGMSLatLng
+import org.owntracks.android.location.LatLng
 import org.owntracks.android.location.toLatLng
 import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.support.Preferences
@@ -42,7 +43,7 @@ class GoogleMapFragment internal constructor(
                 locationObserver = object : Observer<Location> {
                     override fun onChanged(location: Location) {
                         onLocationChangedListener.onLocationChanged(location)
-                        viewModel.setMapLocation(location.toLatLng())
+                        viewModel.setCurrentLocation(location.toLatLng())
                         if (viewModel.viewMode == MapViewModel.ViewMode.Device) {
                             updateCamera(location.toLatLng())
                         }
@@ -126,6 +127,15 @@ class GoogleMapFragment internal constructor(
                 if (reason == REASON_GESTURE) {
                     onMapClick()
                 }
+            }
+
+            setOnCameraIdleListener {
+                viewModel.setMapLocation(this.cameraPosition.target.run {
+                    LatLng(
+                        latitude,
+                        longitude
+                    )
+                })
             }
 
             viewModel.mapLayerStyle.value?.run {

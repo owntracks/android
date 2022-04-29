@@ -13,6 +13,9 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import org.osmdroid.config.Configuration
+import org.osmdroid.events.MapListener
+import org.osmdroid.events.ScrollEvent
+import org.osmdroid.events.ZoomEvent
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
@@ -52,7 +55,7 @@ class OSMMapFragment internal constructor(
             val locationProvider: IMyLocationProvider = this
             locationObserver = Observer<Location> { location ->
                 myLocationConsumer?.onLocationChanged(location, locationProvider)
-                viewModel.setMapLocation(location.toLatLng())
+                viewModel.setCurrentLocation(location.toLatLng())
                 if (viewModel.viewMode == MapViewModel.ViewMode.Device) {
                     updateCamera(location.toLatLng())
                 }
@@ -108,6 +111,19 @@ class OSMMapFragment internal constructor(
         }
     }
 
+    val mapListener = object : MapListener {
+        override fun onScroll(event: ScrollEvent?): Boolean {
+            mapView?.mapCenter?.run {
+                this.run { viewModel.setMapLocation(LatLng(latitude, longitude)) }
+            }
+            return true
+        }
+
+        override fun onZoom(event: ZoomEvent?): Boolean {
+            return true
+        }
+    }
+
     override fun initMap() {
         val myLocationEnabled =
             (requireActivity() as MapActivity).checkAndRequestMyLocationCapability(false)
@@ -119,6 +135,7 @@ class OSMMapFragment internal constructor(
             zoomController.setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
             controller.setZoom(ZOOM_STREET_LEVEL)
             controller.setCenter(viewModel.getMapLocation().toGeoPoint())
+            addMapListener(mapListener)
             // Make sure we don't add to the overlays
             if (!overlays.any { it is MyLocationNewOverlay && it.mMyLocationProvider == osmMapLocationSource }) {
                 overlays.add(
@@ -248,7 +265,6 @@ class OSMMapFragment internal constructor(
                         outlinePaint.strokeWidth = 0f
                         setOnClickListener { _, _, _ -> true }
                     }.let { overlays.add(0, it) }
-
                 }
             }
         }
