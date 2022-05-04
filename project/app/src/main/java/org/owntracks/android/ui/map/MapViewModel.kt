@@ -46,7 +46,14 @@ class MapViewModel @Inject constructor(
 ) : ViewModel(), SharedPreferences.OnSharedPreferenceChangeListener {
     private val mutableCurrentContact = MutableLiveData<FusedContact?>()
     private val mutableBottomSheetHidden = MutableLiveData<Boolean>()
+
+    // mutableMapCenter is going to control where the view should set the camera to
     private val mutableMapCenter = MutableLiveData<LatLng>()
+
+    // lastScroppedMapCenter is where the map was last moved to. This might have been from an explicit
+    // user action, or from the observation of mutableMapCenter changing
+    private var lastScrolledMapCenter: MapLocationAndZoomLevel? = null
+
     private val mutableContactDistance = MutableLiveData(0f)
     private val mutableContactBearing = MutableLiveData(0f)
     private val mutableRelativeContactBearing = MutableLiveData(0f)
@@ -159,9 +166,9 @@ class MapViewModel @Inject constructor(
         Timber.v("setting view mode: VIEW_DEVICE")
         viewMode = ViewMode.Device
         clearActiveContact()
-        if (currentLocation.value != null) {
-            mutableMapCenter.postValue(currentLocation.value!!.toLatLng())
-        } else {
+        currentLocation.value?.apply {
+            mutableMapCenter.postValue(this.toLatLng())
+        } ?: run {
             Timber.e("no location available")
         }
     }
@@ -253,14 +260,17 @@ class MapViewModel @Inject constructor(
         locationRepo.setMapLocation(latLng)
     }
 
-    fun setMapLocation(latLng: LatLng) {
-        mutableMapCenter.postValue(latLng)
+    fun setMapLocation(mapLocationAndZoomLevel: MapLocationAndZoomLevel) {
+        lastScrolledMapCenter = mapLocationAndZoomLevel
     }
 
-    fun getMapLocation(): LatLng =
-        mapCenter.value
-            ?: locationRepo.currentMapLocation
-            ?: LatLng(STARTING_LATITUDE, STARTING_LONGITUDE)
+    fun getMapLocation(): MapLocationAndZoomLevel =
+        lastScrolledMapCenter ?: MapLocationAndZoomLevel(
+            LatLng(
+                STARTING_LATITUDE,
+                STARTING_LONGITUDE
+            ), STARTING_ZOOM
+        )
 
     val orientationSensorEventListener = object : SensorEventListener {
         override fun onSensorChanged(maybeEvent: SensorEvent?) {
@@ -307,6 +317,7 @@ class MapViewModel @Inject constructor(
         // Paris
         private const val STARTING_LATITUDE = 48.856826
         private const val STARTING_LONGITUDE = 2.292713
+        private const val STARTING_ZOOM = 15.0
     }
 
     sealed class ViewMode {

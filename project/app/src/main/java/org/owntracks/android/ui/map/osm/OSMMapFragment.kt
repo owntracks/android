@@ -35,10 +35,7 @@ import org.owntracks.android.location.toGeoPoint
 import org.owntracks.android.location.toLatLng
 import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.support.Preferences
-import org.owntracks.android.ui.map.MapActivity
-import org.owntracks.android.ui.map.MapFragment
-import org.owntracks.android.ui.map.MapLayerStyle
-import org.owntracks.android.ui.map.MapViewModel
+import org.owntracks.android.ui.map.*
 import timber.log.Timber
 import kotlin.math.roundToInt
 
@@ -114,8 +111,15 @@ class OSMMapFragment internal constructor(
 
     val mapListener = DelayedMapListener(object : MapListener {
         override fun onScroll(event: ScrollEvent?): Boolean {
-            mapView?.mapCenter?.run {
-                this.run { viewModel.setMapLocation(LatLng(latitude, longitude)) }
+            mapView?.run {
+                viewModel.setMapLocation(
+                    MapLocationAndZoomLevel(
+                        LatLng(
+                            mapCenter.latitude,
+                            mapCenter.longitude
+                        ), zoomLevelDouble
+                    )
+                )
             }
             return true
         }
@@ -130,12 +134,16 @@ class OSMMapFragment internal constructor(
             (requireActivity() as MapActivity).checkAndRequestMyLocationCapability(false)
         Timber.d("OSMMapFragment initMap locationEnabled=$myLocationEnabled")
         mapView = this.binding.osmMapView.apply {
+            minZoomLevel = MIN_ZOOM_LEVEL.toDouble()
+            maxZoomLevel = MAX_ZOOM_LEVEL.toDouble()
             viewModel.mapLayerStyle.value?.run {
                 setMapLayerType(this)
             }
             zoomController.setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
-            controller.setZoom(ZOOM_STREET_LEVEL)
-            controller.setCenter(viewModel.getMapLocation().toGeoPoint())
+            viewModel.getMapLocation().run {
+                controller.setZoom(zoom.toDouble())
+                controller.setCenter(latLng.toGeoPoint())
+            }
             addMapListener(mapListener)
             // Make sure we don't add to the overlays
             if (!overlays.any { it is MyLocationNewOverlay && it.mMyLocationProvider == osmMapLocationSource }) {
@@ -272,7 +280,8 @@ class OSMMapFragment internal constructor(
     }
 
     companion object {
-        private const val ZOOM_STREET_LEVEL: Double = 16.0
+        const val MIN_ZOOM_LEVEL = 5
+        const val MAX_ZOOM_LEVEL = 21
     }
 
     override fun setMapLayerType(mapLayerStyle: MapLayerStyle) {

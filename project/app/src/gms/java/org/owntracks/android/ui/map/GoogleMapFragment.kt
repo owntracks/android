@@ -21,6 +21,7 @@ import org.owntracks.android.location.LatLng
 import org.owntracks.android.location.toLatLng
 import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.support.Preferences
+import org.owntracks.android.ui.map.osm.OSMMapFragment
 import timber.log.Timber
 
 class GoogleMapFragment internal constructor(
@@ -92,6 +93,12 @@ class GoogleMapFragment internal constructor(
         }
     }
 
+    private fun MapLocationAndZoomLevel.toLatLngZoom(): CameraUpdate =
+        CameraUpdateFactory.newLatLngZoom(
+            this.latLng.toGMSLatLng(),
+            convertStandardZoomToGoogleZoom(this.zoom).toFloat()
+        )
+
     @SuppressLint("MissingPermission")
     override fun initMap() {
         MapsInitializer.initialize(requireContext(), MapsInitializer.Renderer.LATEST, this)
@@ -99,6 +106,8 @@ class GoogleMapFragment internal constructor(
             val myLocationEnabled =
                 (requireActivity() as MapActivity).checkAndRequestMyLocationCapability(false)
             Timber.d("GoogleMapFragment initMap hasLocationCapability=$myLocationEnabled")
+            setMaxZoomPreference(MAX_ZOOM_LEVEL.toFloat())
+            setMinZoomPreference(MIN_ZOOM_LEVEL.toFloat())
             isIndoorEnabled = false
             isMyLocationEnabled = myLocationEnabled
             uiSettings.isMyLocationButtonEnabled = false
@@ -108,12 +117,7 @@ class GoogleMapFragment internal constructor(
 
             setMapStyle()
 
-            moveCamera(
-                CameraUpdateFactory.newLatLngZoom(
-                    viewModel.getMapLocation().toGMSLatLng(),
-                    ZOOM_LEVEL_STREET
-                )
-            )
+            moveCamera(viewModel.getMapLocation().toLatLngZoom())
 
             setOnMarkerClickListener {
                 it.tag?.run {
@@ -130,10 +134,12 @@ class GoogleMapFragment internal constructor(
             }
 
             setOnCameraIdleListener {
-                viewModel.setMapLocation(this.cameraPosition.target.run {
-                    LatLng(
-                        latitude,
-                        longitude
+                viewModel.setMapLocation(this.cameraPosition.run {
+                    MapLocationAndZoomLevel(
+                        LatLng(
+                            target.latitude,
+                            target.longitude
+                        ), convertGoogleZoomToStandardZoom(zoom.toDouble())
                     )
                 })
             }
@@ -252,8 +258,46 @@ class GoogleMapFragment internal constructor(
     }
 
     companion object {
-        private const val ZOOM_LEVEL_STREET: Float = 15f
+        private const val MIN_ZOOM_LEVEL = 4
+        private const val MAX_ZOOM_LEVEL = 20
     }
+
+    /**
+     * Converts standard (OSM) zoom to Google Maps zoom level. Simple linear conversion
+     *
+     * @param inputZoom Zoom level from standard (OSM)
+     * @return Equivalent zoom level on Google Maps
+     */
+    private fun convertStandardZoomToGoogleZoom(inputZoom: Double): Double = linearConversion(
+        OSMMapFragment.MIN_ZOOM_LEVEL..OSMMapFragment.MAX_ZOOM_LEVEL,
+        MIN_ZOOM_LEVEL..MAX_ZOOM_LEVEL,
+        inputZoom
+    )
+
+
+    /**
+     * Converts Google Maps zoom to Standard (OSM) zoom level. Simple linear conversion
+     *
+     * @param inputZoom Zoom level from Google Maps
+     * @return Equivalent zoom level on Standard (OSM)
+     */
+    private fun convertGoogleZoomToStandardZoom(inputZoom: Double): Double = linearConversion(
+        MIN_ZOOM_LEVEL..MAX_ZOOM_LEVEL,
+        OSMMapFragment.MIN_ZOOM_LEVEL..OSMMapFragment.MAX_ZOOM_LEVEL,
+        inputZoom
+    )
+
+    /**
+     * Linear conversion of a point in a range to the equivalent point in another range
+     *
+     * @param fromRange Starting range the given point is in
+     * @param toRange Range to translate the point to
+     * @param point point in the starting range
+     * @return a value that's at the same location in [toRange] as [point] is in [fromRange]
+     */
+    private fun linearConversion(fromRange: IntRange, toRange: IntRange, point: Double): Double =
+        ((point - fromRange.first) / (fromRange.last - fromRange.first)) * (toRange.last - toRange.first) + toRange.first
+
 
     override fun setMapLayerType(mapLayerStyle: MapLayerStyle) {
         when (mapLayerStyle) {
