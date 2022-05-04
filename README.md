@@ -10,7 +10,9 @@ There are two build flavours for OwnTracks:
 * `gms`: This is the build published to the Google Play Store. It links to and requires the Google Play Services libraries for location (using the Google location APIs), as well as the Google Maps SDK for drawing the main map.
 * `oss`: This is an "un-Googled" build, which does not require or depend on Google Play Services. It uses the built-in android location capabilities and [OpenStreetMap](https://www.openstreetmap.org/) for the main map.
 
-Both flavours are published as an APK to Github releases, the `gms` flavour is also distributed via the [Google Play Store](https://play.google.com/store/apps/details?id=org.owntracks.android). Hopefully, the `oss` will soon be distributed on [F-Droid](https://www.f-droid.org/).
+Both flavours are published as an APK to Github releases.
+The `gms` flavour is distributed via the [Google Play Store](https://play.google.com/store/apps/details?id=org.owntracks.android).
+The `oss` flavour is distributed via [F-Droid](https://f-droid.org/packages/org.owntracks.android/).
 
 ## Contributing
 
