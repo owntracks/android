@@ -11,7 +11,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.owntracks.android.R
 import org.owntracks.android.databinding.MapLayerBottomSheetDialogBinding
 
-class LayerBottomSheetDialog() : BottomSheetDialogFragment() {
+class MapLayerBottomSheetDialog() : BottomSheetDialogFragment() {
     protected val viewModel: MapViewModel by activityViewModels()
     private lateinit var binding: MapLayerBottomSheetDialogBinding
     override fun onCreateView(

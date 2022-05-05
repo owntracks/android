@@ -21,6 +21,8 @@
         <item name="actionOverflowButtonStyle">@style/Theme.Owntracks.Overflow</item>
         <item name="materialAlertDialogTheme">@style/Theme.Owntracks.AlertDialog</item>
         <item name="colorRegion">@color/MapRegion</item>
+        <item name="actionMenuTextColor">?attr/colorOnPrimary</item>
+        <item name="android:actionMenuTextColor">?attr/colorOnPrimary</item>
     </style>
 
     <!-- Hamburger theme -->

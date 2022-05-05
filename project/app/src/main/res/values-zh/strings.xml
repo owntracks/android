@@ -40,7 +40,7 @@
     <string name="radius">"半径"</string>
     <string name="exportConfiguration">"导出"</string>
     <string name="menuContactNavigate">"导航"</string>
-    <string name="menuCurrentLocation">"当前位置"</string>
+    <string name="currentLocationButtonLabel">"当前位置"</string>
     <string name="contactDetailsAccuracy">"精度"</string>
     <string name="waypointListPlaceholder">"还未定义区域"</string>
     <string name="importConfig">"导入"</string>

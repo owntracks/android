@@ -52,7 +52,7 @@
     <string name="exportConfiguration">"Exporter"</string>
     <string name="contactLocationUnknown">"Aucune localisation disponible"</string>
     <string name="menuContactNavigate">"Naviguer"</string>
-    <string name="menuCurrentLocation">"Localisation actuelle"</string>
+    <string name="currentLocationButtonLabel">"Localisation actuelle"</string>
     <string name="contactDetailsAccuracy">"Précision"</string>
     <string name="contactDetailsTopic">"Identifiant"</string>
     <string name="waypointListPlaceholder">"Aucune région définie"</string>
@@ -165,7 +165,6 @@ Importer"</string>
     <string name="monitoring_move">"Mode de surveillance déplacement"</string>
     <string name="notificationChangeMonitoring">"Changer le mode de surveillance"</string>
     <string name="preferencesDebugLog">"Débogage du journal"</string>
-    <string name="monitoring_mode">"Mode de surveillance passif"</string>
     <string name="preferencesClientId">"ID Client"</string>
     <string name="status_endpoint_state_hint">"Etat du Endpoint"</string>
     <string name="status_endpoint_state_message_hint">"Message d'état du Endpoint"</string>

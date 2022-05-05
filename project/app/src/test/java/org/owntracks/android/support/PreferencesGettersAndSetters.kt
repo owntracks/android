@@ -227,7 +227,13 @@ class PreferencesGettersAndSetters(
                     Int::class,
                     false
                 ),
-                arrayOf("Monitoring", "monitoring", 2, 2, Int::class, false),
+                arrayOf(
+                    "Monitoring", "monitoring",
+                    MonitoringMode.SIGNIFICANT,
+                    MonitoringMode.SIGNIFICANT,
+                    MonitoringMode::class,
+                    false
+                ),
                 arrayOf(
                     "MoveModeLocatorInterval",
                     "moveModeLocatorInterval",

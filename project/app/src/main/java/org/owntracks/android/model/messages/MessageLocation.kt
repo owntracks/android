@@ -8,6 +8,7 @@ import org.owntracks.android.location.LatLng
 import org.owntracks.android.model.BatteryStatus
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.services.WifiInfoProvider
+import org.owntracks.android.support.MonitoringMode
 import org.owntracks.android.support.Preferences
 import java.lang.ref.WeakReference
 import java.util.concurrent.TimeUnit
@@ -57,7 +58,7 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
     var timestamp: Long = 0
 
     @JsonProperty("m")
-    var monitoringMode: Int? = null
+    var monitoringMode: MonitoringMode? = null
 
     private var _contact: WeakReference<FusedContact?>? = null
     var conn: String? = null

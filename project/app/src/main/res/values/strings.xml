@@ -52,7 +52,7 @@
     <string name="exportConfiguration">Export</string>
     <string name="contactLocationUnknown">No location is available</string>
     <string name="menuContactNavigate">Navigate</string>
-    <string name="menuCurrentLocation">Current location</string>
+    <string name="currentLocationButtonLabel">Current location</string>
     <string name="contactDetailsAccuracy">Accuracy</string>
     <string name="contactDetailsAltitude">Altitude</string>
     <string name="contactDetailsBearing">Bearing</string>
@@ -178,7 +178,6 @@
     <string name="monitoring_move">Move monitoring mode</string>
     <string name="notificationChangeMonitoring">Change Monitoring</string>
     <string name="preferencesDebugLog">Debug log</string>
-    <string name="monitoring_mode">Monitoring</string>
     <string name="preferencesClientId">Client ID</string>
     <string name="status_endpoint_state_hint">Endpoint state</string>
     <string name="status_endpoint_state_message_hint">Endpoint state message</string>
@@ -250,4 +249,13 @@
     <string name="mapLayerGoogleMapTerrainLabel">Google Terrain</string>
     <string name="mapLayerOpenStreetMapLabel">OpenStreetMap</string>
     <string name="mapLayerOpenStreetMapWikimediaLabel">Wikimedia</string>
+    <string name="monitoringModeDialogTitle">Monitoring Mode</string>
+    <string name="monitoringModeDialogSignificantTitle">Significant Changes</string>
+    <string name="monitoringModeDialogSignificantDescription">Balanced power usage and accuracy / frequency</string>
+    <string name="monitoringModeDialogMoveTitle">Move</string>
+    <string name="monitoringModeDialogMoveDescription">High frequency and accuracy, but high power usage</string>
+    <string name="monitoringModeDialogManualTitle">Manual</string>
+    <string name="monitoringModeDialogManualDescription">Only region transitions published automatically, not locations</string>
+    <string name="monitoringModeDialogQuietTitle">Quiet</string>
+    <string name="monitoringModeDialogQuietDescription">No events automatically published</string>
 </resources>

@@ -24,9 +24,8 @@ import java.net.InetSocketAddress
 import java.net.Socket
 import kotlin.concurrent.thread
 
-
 @ExperimentalUnsignedTypes
-class TestWithMQTTBrokerImpl : TestWithAnMQTTBroker {
+class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
     private val mqttPort: Int = 18883
     override val mqttUsername = "testUser"
     override val mqttClientId = "testClientId"

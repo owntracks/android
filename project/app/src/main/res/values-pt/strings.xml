@@ -44,7 +44,7 @@
     <string name="exportConfiguration">"Exportar"</string>
     <string name="contactLocationUnknown">"Localização não disponível"</string>
     <string name="menuContactNavigate">"Navegar"</string>
-    <string name="menuCurrentLocation">"Localização atual"</string>
+    <string name="currentLocationButtonLabel">"Localização atual"</string>
     <string name="contactDetailsTopic">"Identificador"</string>
     <string name="waypointListPlaceholder">"Nenhuma região definida"</string>
     <string name="importConfig">"Importar"</string>

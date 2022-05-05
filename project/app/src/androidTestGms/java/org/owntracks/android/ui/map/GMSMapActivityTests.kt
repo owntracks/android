@@ -83,13 +83,7 @@ class GMSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
         assertDisplayed(R.id.google_map_view)
     }
 
-    @Test
-    fun modeButtonOnMapActivityCyclesThroughModes() {
-        setNotFirstStartPreferences()
-        launchActivity()
-        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
-        assertDisplayed(R.id.menu_monitoring)
-    }
+
 
     @Test
     fun mapActivityShouldPromptForLocationServicesOnFirstTime() {

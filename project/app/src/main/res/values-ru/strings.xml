@@ -52,7 +52,7 @@
     <string name="exportConfiguration">"Экспорт"</string>
     <string name="contactLocationUnknown">"Местоположение недоступно"</string>
     <string name="menuContactNavigate">"Показать на карте"</string>
-    <string name="menuCurrentLocation">"Текущее местоположение"</string>
+    <string name="currentLocationButtonLabel">"Текущее местоположение"</string>
     <string name="contactDetailsAccuracy">"Точность"</string>
     <string name="contactDetailsTopic">"Идентификатор"</string>
     <string name="waypointListPlaceholder">"Места еще не обозначены"</string>
@@ -164,7 +164,6 @@
     <string name="monitoring_move">"Отслеживание перемещений"</string>
     <string name="notificationChangeMonitoring">"Изменить режим"</string>
     <string name="preferencesDebugLog">"Журнал отладки"</string>
-    <string name="monitoring_mode">"Режим отслеживания"</string>
     <string name="preferencesClientId">"ID клиента"</string>
     <string name="status_endpoint_state_hint">"Состояние подключения к серверу"</string>
     <string name="status_endpoint_state_message_hint">"Сообщение о состоянии подключения к серверу"</string>

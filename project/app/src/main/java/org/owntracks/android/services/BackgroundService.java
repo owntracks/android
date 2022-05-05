@@ -61,6 +61,7 @@ import org.owntracks.android.model.messages.MessageLocation;
 import org.owntracks.android.model.messages.MessageTransition;
 import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.Events;
+import org.owntracks.android.support.MonitoringMode;
 import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.ServiceBridge;
@@ -249,7 +250,13 @@ public class BackgroundService extends Service implements SharedPreferences.OnSh
                     return;
                 case INTENT_ACTION_CHANGE_MONITORING:
                     if (intent.hasExtra(preferences.getPreferenceKey(R.string.preferenceKeyMonitoring))) {
-                        preferences.setMonitoring(intent.getIntExtra(preferences.getPreferenceKey(R.string.preferenceKeyMonitoring), preferences.getMonitoring()));
+                        MonitoringMode newMode = MonitoringMode.getByValue(
+                                intent.getIntExtra(
+                                        preferences.getPreferenceKey(R.string.preferenceKeyMonitoring),
+                                        preferences.getMonitoring().getMode()
+                                )
+                        );
+                        preferences.setMonitoring(newMode);
                     } else {
                         // Step monitoring mode if no mode is specified
                         preferences.setMonitoringNext();
@@ -369,15 +376,15 @@ public class BackgroundService extends Service implements SharedPreferences.OnSh
     }
 
 
-    private String getMonitoringLabel(int mode) {
+    private String getMonitoringLabel(MonitoringMode mode) {
         switch (mode) {
-            case LocationProcessor.MONITORING_QUIET:
+            case QUIET:
                 return getString(R.string.monitoring_quiet);
-            case LocationProcessor.MONITORING_MANUAL:
+            case MANUAL:
                 return getString(R.string.monitoring_manual);
-            case LocationProcessor.MONITORING_SIGNIFICANT:
+            case SIGNIFICANT:
                 return getString(R.string.monitoring_significant);
-            case LocationProcessor.MONITORING_MOVE:
+            case MOVE:
                 return getString(R.string.monitoring_move);
         }
         return getString(R.string.na);
@@ -538,23 +545,23 @@ public class BackgroundService extends Service implements SharedPreferences.OnSh
             Timber.e("FusedLocationClient not available");
             return false;
         }
-        int monitoring = preferences.getMonitoring();
+        MonitoringMode monitoring = preferences.getMonitoring();
 
         LocationRequest request = new LocationRequest();
 
         switch (monitoring) {
-            case LocationProcessor.MONITORING_QUIET:
-            case LocationProcessor.MONITORING_MANUAL:
+            case QUIET:
+            case MANUAL:
                 request.setInterval(TimeUnit.SECONDS.toMillis(preferences.getLocatorInterval()));
                 request.setSmallestDisplacement((float) preferences.getLocatorDisplacement());
                 request.setPriority(LocationRequest.PRIORITY_LOW_POWER);
                 break;
-            case LocationProcessor.MONITORING_SIGNIFICANT:
+            case SIGNIFICANT:
                 request.setInterval(TimeUnit.SECONDS.toMillis(preferences.getLocatorInterval()));
                 request.setSmallestDisplacement((float) preferences.getLocatorDisplacement());
                 request.setPriority(getLocationRequestPriority());
                 break;
-            case LocationProcessor.MONITORING_MOVE:
+            case MOVE:
                 request.setInterval(TimeUnit.SECONDS.toMillis(preferences.getMoveModeLocatorInterval()));
                 request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
                 break;

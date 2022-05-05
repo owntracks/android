@@ -48,7 +48,7 @@
     <string name="exportConfiguration">"Eksport"</string>
     <string name="contactLocationUnknown">"Lokalizacja niedostępna"</string>
     <string name="menuContactNavigate">"Nawiguj"</string>
-    <string name="menuCurrentLocation">"Aktualna lokalizacja"</string>
+    <string name="currentLocationButtonLabel">"Aktualna lokalizacja"</string>
     <string name="contactDetailsAccuracy">"Precyzja"</string>
     <string name="contactDetailsTopic">"Identyfikator"</string>
     <string name="waypointListPlaceholder">"Nie zdefiniowano regionów"</string>
@@ -158,7 +158,6 @@ Aby utrzymać działanie aplikacji w tle, będzie wyświetlana permanentna notyf
     <string name="monitoring_move">"Tryb monitorowania ruchu"</string>
     <string name="notificationChangeMonitoring">"Zmień monitorowanie"</string>
     <string name="preferencesDebugLog">"Informacje debugowania"</string>
-    <string name="monitoring_mode">"Monitorowanie"</string>
     <string name="preferencesClientId">"ID Klienta"</string>
     <string name="status_endpoint_state_hint">"Stan endpointa"</string>
     <string name="status_endpoint_state_message_hint">"Komunikat stanu endpointa"</string>

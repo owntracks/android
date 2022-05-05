@@ -48,7 +48,7 @@
     <string name="exportConfiguration">"Exportar"</string>
     <string name="contactLocationUnknown">"Ubicació no disponible"</string>
     <string name="menuContactNavigate">"Navegar"</string>
-    <string name="menuCurrentLocation">"Posició actual"</string>
+    <string name="currentLocationButtonLabel">"Posició actual"</string>
     <string name="contactDetailsAccuracy">"Precisió"</string>
     <string name="contactDetailsTopic">"Identificador"</string>
     <string name="waypointListPlaceholder">"Cap regió definida"</string>
@@ -156,7 +156,6 @@ Es mostrarà una notificació permanent per continuar executant-se en segon pla.
     <string name="monitoring_move">"Mode de control de moviment"</string>
     <string name="notificationChangeMonitoring">"Canvia el mode control"</string>
     <string name="preferencesDebugLog">"Registre de depuració"</string>
-    <string name="monitoring_mode">"Seguiment"</string>
     <string name="preferencesClientId">"ID Client"</string>
     <string name="status_endpoint_state_hint">"Estat del punt final"</string>
     <string name="status_endpoint_state_message_hint">"Missatge de l'estat del punt final"</string>

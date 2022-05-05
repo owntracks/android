@@ -25,31 +25,31 @@ class ScreenshotTakingOnTestEndRule : TestWatcher() {
         Log.d("Screenshots", "Saving screenshot to '$screenShotName'")
         Screenshot.capture().bitmap.writeToTestStorage(screenShotName)
     }
-}
 
-@Throws(IOException::class)
-fun Bitmap.writeToTestStorage(name: String) {
-    writeToTestStorage(TestStorage(), name)
-}
+    @Throws(IOException::class)
+    fun Bitmap.writeToTestStorage(name: String) {
+        writeToTestStorage(TestStorage(), name)
+    }
 
-/**
- * Writes the contents of the [Bitmap] to a compressed png file to the given [PlatformTestStorage]
- *
- * @param testStorage the [PlatformTestStorage] to use
- * @param name a descriptive base name for the resulting file
- * @throws IOException if bitmap could not be compressed or written to storage
- */
-@Throws(IOException::class)
-fun Bitmap.writeToTestStorage(testStorage: TestStorage, name: String) {
-    testStorage.openOutputFile("$name.png").use {
-        if (!this.compress(
-                Bitmap.CompressFormat.PNG,
-                /** PNG is lossless, so quality is ignored. */
-                0,
-                it
-            )
-        ) {
-            throw IOException("Failed to compress bitmap")
+    /**
+     * Writes the contents of the [Bitmap] to a compressed png file to the given [PlatformTestStorage]
+     *
+     * @param testStorage the [PlatformTestStorage] to use
+     * @param name a descriptive base name for the resulting file
+     * @throws IOException if bitmap could not be compressed or written to storage
+     */
+    @Throws(IOException::class)
+    fun Bitmap.writeToTestStorage(testStorage: TestStorage, name: String) {
+        testStorage.openOutputFile("$name.png").use {
+            if (!this.compress(
+                    Bitmap.CompressFormat.PNG,
+                    /** PNG is lossless, so quality is ignored. */
+                    0,
+                    it
+                )
+            ) {
+                throw IOException("Failed to compress bitmap")
+            }
         }
     }
 }

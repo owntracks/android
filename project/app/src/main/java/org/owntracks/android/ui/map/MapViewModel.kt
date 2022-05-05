@@ -27,6 +27,7 @@ import org.owntracks.android.model.messages.MessageLocation.Companion.REPORT_TYP
 import org.owntracks.android.services.LocationProcessor
 import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.services.MessageProcessorEndpointHttp
+import org.owntracks.android.support.MonitoringMode
 import org.owntracks.android.support.Preferences
 import org.owntracks.android.support.SimpleIdlingResource
 import timber.log.Timber
@@ -87,11 +88,11 @@ class MapViewModel @Inject constructor(
 
     val allContacts = contactsRepo.all
 
-    private val mutableCurrentMonitoringMode: MutableLiveData<Int> by lazy {
+    private val mutableCurrentMonitoringMode: MutableLiveData<MonitoringMode> by lazy {
         MutableLiveData(preferences.monitoring)
     }
 
-    val currentMonitoringMode: LiveData<Int>
+    val currentMonitoringMode: LiveData<MonitoringMode>
         get() = mutableCurrentMonitoringMode
 
     private val currentConnectionMode: MutableLiveData<Int> by lazy {
@@ -308,6 +309,11 @@ class MapViewModel @Inject constructor(
         }
     }
 
+    fun setMonitoringMode(mode: MonitoringMode) {
+        preferences.monitoring = mode
+    }
+
+
     fun setMapLayerStyle(mapLayerStyle: MapLayerStyle) {
         preferences.mapLayerStyle = mapLayerStyle
         mutableMapLayerStyle.postValue(mapLayerStyle)
@@ -326,4 +332,3 @@ class MapViewModel @Inject constructor(
         data class Contact(val follow: Boolean) : ViewMode()
     }
 }
-

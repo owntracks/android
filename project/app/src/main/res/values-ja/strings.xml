@@ -48,7 +48,7 @@
     <string name="exportConfiguration">"エクスポート"</string>
     <string name="contactLocationUnknown">"位置情報が存在しません"</string>
     <string name="menuContactNavigate">"ナビゲーション"</string>
-    <string name="menuCurrentLocation">"現在位置"</string>
+    <string name="currentLocationButtonLabel">"現在位置"</string>
     <string name="contactDetailsAccuracy">"精度"</string>
     <string name="contactDetailsTopic">"識別子"</string>
     <string name="waypointListPlaceholder">"リージョンが1つもありません"</string>
@@ -158,7 +158,6 @@
     <string name="monitoring_move">"移動モニタリングモード"</string>
     <string name="notificationChangeMonitoring">"モニタリングモード変更"</string>
     <string name="preferencesDebugLog">"デバッグログ"</string>
-    <string name="monitoring_mode">"モニタリング"</string>
     <string name="preferencesClientId">"クライアントID"</string>
     <string name="status_endpoint_state_hint">"エンドポイントの状態"</string>
     <string name="status_endpoint_state_message_hint">"エンドポイントからのメッセージ"</string>

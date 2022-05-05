@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="12dp"
-            android:text="@string/mapLayerDialogTitle"
+            android:text="@string/monitoringModeDialogTitle"
             android:textStyle="bold" />
 
         <androidx.appcompat.widget.LinearLayoutCompat
@@ -25,6 +25,7 @@
             android:layout_marginBottom="24dp"
             android:orientation="horizontal">
 
+
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -32,19 +33,26 @@
                 android:orientation="vertical">
 
                 <androidx.appcompat.widget.AppCompatImageButton
-                    android:id="@+id/fabMapLayerGoogleNormal"
+                    android:id="@+id/fabMonitoringModeSignificantChanges"
                     android:layout_width="64dp"
                     android:layout_height="64dp"
                     android:layout_gravity="center"
                     android:layout_margin="12dp"
                     android:background="@drawable/round_button"
                     android:backgroundTint="@color/primary_dark"
-                    android:src="@drawable/ic_baseline_map_24" />
+                    android:src="@drawable/ic_baseline_play_arrow_36" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="@string/mapLayerGoogleMapDefaultLabel"
+                    android:text="@string/monitoringModeDialogSignificantTitle"
+                    android:textAlignment="center"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/monitoringModeDialogSignificantDescription"
                     android:textAlignment="center" />
             </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -55,42 +63,26 @@
                 android:orientation="vertical">
 
                 <androidx.appcompat.widget.AppCompatImageButton
-                    android:id="@+id/fabMapLayerGoogleHybrid"
+                    android:id="@+id/fabMonitoringModeMove"
                     android:layout_width="64dp"
                     android:layout_height="64dp"
                     android:layout_gravity="center"
                     android:layout_margin="12dp"
                     android:background="@drawable/round_button"
                     android:backgroundTint="@color/primary_dark"
-                    android:src="@drawable/ic_baseline_satellite_alt_24" />
+                    android:src="@drawable/ic_step_forward_2" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="@string/mapLayerGoogleMapHybridLabel"
-                    android:textAlignment="center" />
-            </androidx.appcompat.widget.LinearLayoutCompat>
-
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <androidx.appcompat.widget.AppCompatImageButton
-                    android:id="@+id/fabMapLayerGoogleTerrain"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
-                    android:layout_gravity="center"
-                    android:layout_margin="12dp"
-                    android:background="@drawable/round_button"
-                    android:backgroundTint="@color/primary_dark"
-                    android:src="@drawable/ic_baseline_terrain_24" />
+                    android:text="@string/monitoringModeDialogMoveTitle"
+                    android:textAlignment="center"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="@string/mapLayerGoogleMapTerrainLabel"
+                    android:text="@string/monitoringModeDialogMoveDescription"
                     android:textAlignment="center" />
             </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -109,19 +101,26 @@
                 android:orientation="vertical">
 
                 <androidx.appcompat.widget.AppCompatImageButton
-                    android:id="@+id/fabMapLayerOpenStreetMap"
+                    android:id="@+id/fabMonitoringModeManual"
                     android:layout_width="64dp"
                     android:layout_height="64dp"
                     android:layout_gravity="center"
                     android:layout_margin="12dp"
                     android:background="@drawable/round_button"
                     android:backgroundTint="@color/primary_dark"
-                    android:src="@drawable/ic_osm_logo_simple" />
+                    android:src="@drawable/ic_baseline_pause_36" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="@string/mapLayerOpenStreetMapLabel"
+                    android:text="@string/monitoringModeDialogManualTitle"
+                    android:textAlignment="center"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/monitoringModeDialogManualDescription"
                     android:textAlignment="center" />
             </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -132,19 +131,26 @@
                 android:orientation="vertical">
 
                 <androidx.appcompat.widget.AppCompatImageButton
-                    android:id="@+id/fabMapLayerOpenStreetMapWikimedia"
+                    android:id="@+id/fabMonitoringModeQuiet"
                     android:layout_width="64dp"
                     android:layout_height="64dp"
                     android:layout_gravity="center"
                     android:layout_margin="12dp"
                     android:background="@drawable/round_button"
                     android:backgroundTint="@color/primary_dark"
-                    android:src="@drawable/ic_wikimedia_logo" />
+                    android:src="@drawable/ic_baseline_stop_36" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="@string/mapLayerOpenStreetMapWikimediaLabel"
+                    android:text="@string/monitoringModeDialogQuietTitle"
+                    android:textAlignment="center"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/monitoringModeDialogQuietDescription"
                     android:textAlignment="center" />
             </androidx.appcompat.widget.LinearLayoutCompat>
 

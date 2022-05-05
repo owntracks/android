@@ -23,7 +23,6 @@ import org.owntracks.android.support.Events.MonitoringChanged
 import org.owntracks.android.support.preferences.PreferencesStore
 import org.owntracks.android.ui.AppShortcuts
 import org.owntracks.android.ui.map.MapLayerStyle
-import org.owntracks.android.ui.map.MapViewModel
 import timber.log.Timber
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
@@ -216,14 +215,7 @@ class Preferences @Inject constructor(
     }
 
     fun setMonitoringNext() {
-        var mode = monitoring
-        if (mode < LocationProcessor.MONITORING_MOVE) {
-            mode++
-        } else {
-            mode = LocationProcessor.MONITORING_QUIET
-        }
-        Timber.v("setting monitoring mode %s", mode)
-        monitoring = mode
+        monitoring = monitoring.next()
     }
 
     @get:Export(
@@ -245,15 +237,16 @@ class Preferences @Inject constructor(
         exportModeHttp = true
     )
     @set:Import(keyResId = R.string.preferenceKeyMonitoring)
-    var monitoring: Int
-        get() = getIntOrDefault(R.string.preferenceKeyMonitoring, R.integer.valMonitoring)
+    var monitoring: MonitoringMode
+        get() = MonitoringMode.getByValue(
+            getIntOrDefault(
+                R.string.preferenceKeyMonitoring,
+                R.integer.valMonitoring
+            )
+        )
         set(newMode) {
-            if (newMode < LocationProcessor.MONITORING_QUIET || newMode > LocationProcessor.MONITORING_MOVE) {
-                Timber.e("invalid monitoring mode specified %s", newMode)
-                return
-            }
             if (newMode != this.monitoring) {
-                setInt(R.string.preferenceKeyMonitoring, newMode)
+                setInt(R.string.preferenceKeyMonitoring, newMode.mode)
                 eventBus?.post(MonitoringChanged())
             }
         }

@@ -1,16 +1,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!--suppress MenuTitle - IDs are needed for OSMdroid to find this layout -->
     <item
         android:id="@+id/menu_monitoring"
-        android:title="@string/monitoring_mode"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/menu_report"
         android:icon="@drawable/ic_baseline_publish_24"
         android:title="@string/publish"
-        app:showAsAction="always" />
-
+        app:showAsAction="ifRoom" />
 
 </menu>

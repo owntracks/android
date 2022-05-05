@@ -11,7 +11,10 @@ import android.os.Bundle
 import android.os.IBinder
 import android.provider.Settings
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-import android.view.*
+import android.view.Gravity
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.VisibleForTesting
@@ -41,9 +44,9 @@ import org.owntracks.android.model.FusedContact
 import org.owntracks.android.perfLog
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.services.BackgroundService.BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG
-import org.owntracks.android.services.LocationProcessor
 import org.owntracks.android.services.MessageProcessorEndpointHttp
 import org.owntracks.android.support.ContactImageBindingAdapter
+import org.owntracks.android.support.MonitoringMode
 import org.owntracks.android.support.Preferences.Companion.EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION
 import org.owntracks.android.support.RequirementsChecker
 import org.owntracks.android.support.RunThingsOnOtherThreads
@@ -145,7 +148,10 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
                 }
 
                 binding.fabMapLayers.setOnClickListener {
-                    LayerBottomSheetDialog().show(supportFragmentManager, "layerBottomSheetDialog")
+                    MapLayerBottomSheetDialog().show(
+                        supportFragmentManager,
+                        "layerBottomSheetDialog"
+                    )
                 }
             }
 
@@ -431,23 +437,22 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
     fun updateMonitoringModeMenu() {
         menu?.findItem(R.id.menu_monitoring)?.run {
             when (preferences.monitoring) {
-                LocationProcessor.MONITORING_QUIET -> {
+                MonitoringMode.QUIET -> {
                     setIcon(R.drawable.ic_baseline_stop_36)
                     setTitle(R.string.monitoring_quiet)
                 }
-                LocationProcessor.MONITORING_MANUAL -> {
+                MonitoringMode.MANUAL -> {
                     setIcon(R.drawable.ic_baseline_pause_36)
                     setTitle(R.string.monitoring_manual)
                 }
-                LocationProcessor.MONITORING_SIGNIFICANT -> {
+                MonitoringMode.SIGNIFICANT -> {
                     setIcon(R.drawable.ic_baseline_play_arrow_36)
                     setTitle(R.string.monitoring_significant)
                 }
-                LocationProcessor.MONITORING_MOVE -> {
+                MonitoringMode.MOVE -> {
                     setIcon(R.drawable.ic_step_forward_2)
                     setTitle(R.string.monitoring_move)
                 }
-                else -> {}
             }
         }
     }
@@ -463,35 +468,13 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
                 true
             }
             R.id.menu_monitoring -> {
-                stepMonitoringModeMenu()
+                MonitoringModeBottomSheetDialog().show(
+                    supportFragmentManager,
+                    "modeBottomSheetDialog"
+                )
                 true
             }
             else -> false
-        }
-    }
-
-    private fun stepMonitoringModeMenu() {
-        preferences.setMonitoringNext()
-        when (preferences.monitoring) {
-            LocationProcessor.MONITORING_QUIET -> {
-                Snackbar.make(binding!!.root, R.string.monitoring_quiet, Snackbar.LENGTH_SHORT)
-                    .show()
-            }
-            LocationProcessor.MONITORING_MANUAL -> {
-                Snackbar.make(binding!!.root, R.string.monitoring_manual, Snackbar.LENGTH_SHORT)
-                    .show()
-            }
-            LocationProcessor.MONITORING_SIGNIFICANT -> {
-                Snackbar.make(
-                    binding!!.root,
-                    R.string.monitoring_significant,
-                    Snackbar.LENGTH_SHORT
-                ).show()
-            }
-            else -> {
-                Snackbar.make(binding!!.root, R.string.monitoring_move, Snackbar.LENGTH_SHORT)
-                    .show()
-            }
         }
     }
 

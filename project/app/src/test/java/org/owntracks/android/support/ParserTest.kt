@@ -13,7 +13,6 @@ import org.owntracks.android.location.geofencing.Geofence
 import org.owntracks.android.model.BatteryStatus
 import org.owntracks.android.model.CommandAction
 import org.owntracks.android.model.messages.*
-import org.owntracks.android.services.LocationProcessor.MONITORING_SIGNIFICANT
 import org.owntracks.android.support.Parser.EncryptionException
 import java.io.ByteArrayInputStream
 import java.io.IOException
@@ -58,7 +57,7 @@ class ParserTest {
             batteryStatus = BatteryStatus.CHARGING
             bssid = "12:34:56:78"
             conn = "TestConn"
-            monitoringMode = MONITORING_SIGNIFICANT
+            monitoringMode = MonitoringMode.SIGNIFICANT
             ssid = "Wifi SSID"
         }
     }

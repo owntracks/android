@@ -48,7 +48,7 @@
     <string name="exportConfiguration">"Exportieren"</string>
     <string name="contactLocationUnknown">"Kein Standort verfügbar"</string>
     <string name="menuContactNavigate">"Navigieren"</string>
-    <string name="menuCurrentLocation">"Aktuelle Position"</string>
+    <string name="currentLocationButtonLabel">"Aktuelle Position"</string>
     <string name="contactDetailsAccuracy">"Genauigkeit"</string>
     <string name="contactDetailsTopic">"Kennung"</string>
     <string name="waypointListPlaceholder">"Keine Orte angelegt"</string>
@@ -154,7 +154,6 @@
     <string name="monitoring_move">"Bewegungs Modus"</string>
     <string name="notificationChangeMonitoring">"Bewegungs Modus"</string>
     <string name="preferencesDebugLog">"Debug Log"</string>
-    <string name="monitoring_mode">"Monitoring"</string>
     <string name="preferencesClientId">"Client ID"</string>
     <string name="status_endpoint_state_hint">"Endpunktstatus"</string>
     <string name="status_endpoint_state_message_hint">"Endpunkt Statusnachricht"</string>

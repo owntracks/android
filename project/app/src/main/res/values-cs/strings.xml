@@ -48,7 +48,7 @@
     <string name="exportConfiguration">"Export"</string>
     <string name="contactLocationUnknown">"Poloha není dostupná"</string>
     <string name="menuContactNavigate">"Navigovat"</string>
-    <string name="menuCurrentLocation">"Aktuální poloha"</string>
+    <string name="currentLocationButtonLabel">"Aktuální poloha"</string>
     <string name="contactDetailsAccuracy">"Přesnost"</string>
     <string name="contactDetailsTopic">"Identifikátor"</string>
     <string name="waypointListPlaceholder">"Oblasti nejsou definovány"</string>
@@ -157,7 +157,6 @@ Aby aplikace mohla běžet na pozadí, bude zobrazeno trvalé oznámení. Lze to
     <string name="monitoring_move">"Mód pohybu"</string>
     <string name="notificationChangeMonitoring">"Změna módu"</string>
     <string name="preferencesDebugLog">"Protokol ladění"</string>
-    <string name="monitoring_mode">"Sledování"</string>
     <string name="preferencesClientId">"Client ID"</string>
     <string name="status_endpoint_state_hint">"Stav spojení"</string>
     <string name="status_endpoint_state_message_hint">"Zpráva o stavu spojení"</string>

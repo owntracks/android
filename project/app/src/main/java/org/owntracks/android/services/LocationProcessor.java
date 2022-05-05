@@ -15,6 +15,7 @@ import org.owntracks.android.model.messages.MessageWaypoint;
 import org.owntracks.android.model.messages.MessageWaypoints;
 import org.owntracks.android.support.DeviceMetricsProvider;
 import org.owntracks.android.support.MessageWaypointCollection;
+import org.owntracks.android.support.MonitoringMode;
 import org.owntracks.android.support.Preferences;
 
 import java.util.LinkedList;
@@ -34,12 +35,6 @@ public class LocationProcessor {
     private final WaypointsRepo waypointsRepo;
     private final DeviceMetricsProvider deviceMetricsProvider;
     private final WifiInfoProvider wifiInfoProvider;
-
-    public static final int MONITORING_QUIET = -1;
-    public static final int MONITORING_MANUAL = 0;
-    public static final int MONITORING_SIGNIFICANT = 1;
-    public static final int MONITORING_MOVE = 2;
-
 
     @Inject
     public LocationProcessor(MessageProcessor messageProcessor, Preferences preferences, LocationRepo locationRepo, WaypointsRepo waypointsRepo, DeviceMetricsProvider deviceMetricsProvider, WifiInfoProvider wifiInfoProvider) {
@@ -83,12 +78,12 @@ public class LocationProcessor {
             }
         }
 
-        if (preferences.getMonitoring() == MONITORING_QUIET && !MessageLocation.REPORT_TYPE_USER.equals(trigger)) {
+        if (preferences.getMonitoring() == MonitoringMode.QUIET && !MessageLocation.REPORT_TYPE_USER.equals(trigger)) {
             Timber.v("message suppressed by monitoring settings: quiet");
             return;
         }
 
-        if (preferences.getMonitoring() == MONITORING_MANUAL && (!MessageLocation.REPORT_TYPE_USER.equals(trigger) && !MessageLocation.REPORT_TYPE_CIRCULAR.equals(trigger))) {
+        if (preferences.getMonitoring() == MonitoringMode.MANUAL && (!MessageLocation.REPORT_TYPE_USER.equals(trigger) && !MessageLocation.REPORT_TYPE_CIRCULAR.equals(trigger))) {
             Timber.v("message suppressed by monitoring settings: manual");
             return;
         }
@@ -149,7 +144,7 @@ public class LocationProcessor {
         waypointModel.setLastTriggeredNow();
         waypointsRepo.update(waypointModel, false);
 
-        if (preferences.getMonitoring() == MONITORING_QUIET) {
+        if (preferences.getMonitoring() == MonitoringMode.QUIET) {
             Timber.v("message suppressed by monitoring settings: %s", preferences.getMonitoring());
             return;
         }
