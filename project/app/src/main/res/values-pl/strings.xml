@@ -239,7 +239,9 @@ Aby to umożliwić, włącz lokalizację w ustawieniach urządzenia."</string>
     <string name="contactDetailsDistanceUnitMeters">"m"</string>
     <string name="exportConfigurationSubject">"Plik konfiguracyjny OwnTracks"</string>
     <string name="exportLogFileSubject">"Log OwnTracks"</string>
+    <string name="preferencesLocatorDisplacement">"Minimalne przesunięcie lokalizacji"</string>
     <string name="preferencesLocatorDisplacementSummary">"Minimalna odległość pomiędzy aktualizacjami pozycji"</string>
+    <string name="preferencesLocatorDisplacementDialog">"Jak daleko urządzenie powinno się oddalić (w metrach) przed odebraniem kolejnej lokalizacji"</string>
     <string name="geocoderExceptionError">"Usługa geokodera zwróciła błąd. Szczegóły w logach"</string>
     <string name="geocoderUnavailable">"Usługa geokodera jest tymczasowo niedostępna"</string>
 </resources>
