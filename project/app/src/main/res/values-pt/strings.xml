@@ -97,8 +97,8 @@
     <string name="preferencesEditorKey">"Chave"</string>
     <string name="preferencesEditorValue">"Valor"</string>
     <string name="restart">"Reiniciar"</string>
-    <string name="ui_fragment_welcome_version_title">"Restrições"</string>
-    <string name="ui_fragment_welcome_version_learn_more">"Saber mais"</string>
+    <string name="welcome_version_title">"Restrições"</string>
+    <string name="welcome_version_learn_more">"Saber mais"</string>
     <string name="INITIAL">"Inicializando"</string>
     <string name="CONNECTING">"Conectando"</string>
     <string name="CONNECTED">"Conectado"</string>

@@ -6,7 +6,7 @@
 
         <variable
             name="vm"
-            type="org.owntracks.android.ui.welcome.permission.PlayFragmentViewModel" />
+            type="org.owntracks.android.ui.welcome.PlayFragmentViewModel" />
 
         <import type="android.view.View" />
     </data>
@@ -37,7 +37,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/img"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="24dp"
             android:gravity="center_horizontal"
             android:paddingLeft="24dp"
             android:paddingRight="24dp"
@@ -53,6 +53,7 @@
             android:layout_alignStart="@+id/screen_heading"
             android:layout_centerHorizontal="true"
             android:gravity="center_horizontal"
+            android:lineSpacingMultiplier="1.2"
             android:minHeight="@dimen/welcome_content_min_height"
             android:paddingLeft="24dp"
             android:paddingRight="24dp"
@@ -67,12 +68,13 @@
             android:layout_below="@+id/screen_desc"
             android:layout_alignStart="@+id/screen_desc"
             android:gravity="center_horizontal"
+            android:lineSpacingMultiplier="1.2"
             android:paddingLeft="24dp"
             android:paddingRight="24dp"
-            android:text="@{vm.getMessage}"
+            android:text="@{vm.message}"
             android:textSize="16sp"
             android:visibility="visible"
-            tools:text="@{vm.getMessage}" />
+            tools:text="@{vm.message}" />
 
         <Button
             android:id="@+id/recover"
@@ -80,9 +82,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:onClick="@{() -> vm.onFixClicked()}"
             android:text="@string/welcomeFixIssue"
-            android:visibility="@{vm.fixAvailable }" />
+            android:visibility="@{vm.playServicesFixAvailable }" />
 
     </RelativeLayout>
 </layout>

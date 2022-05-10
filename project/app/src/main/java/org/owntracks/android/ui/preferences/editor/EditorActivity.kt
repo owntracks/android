@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ArrayAdapter
-import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ShareCompat
@@ -21,7 +20,6 @@ import org.owntracks.android.R
 import org.owntracks.android.databinding.UiPreferencesEditorBinding
 import org.owntracks.android.support.Events.RestartApp
 import org.owntracks.android.ui.base.BaseActivity
-import org.owntracks.android.ui.base.navigator.Navigator
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import timber.log.Timber
 import java.util.*
@@ -35,9 +33,6 @@ class EditorActivity :
 
     @Inject
     lateinit var eventBus: EventBus
-
-    @Inject
-    lateinit var navigator: Navigator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,7 +78,7 @@ class EditorActivity :
     private fun showImportConfigurationFilePickerView() {
         val b = Bundle()
         b.putBoolean(LoadActivity.FLAG_IN_APP, true)
-        navigator.startActivity(LoadActivity::class.java, b)
+        startActivity(Intent(this, LoadActivity::class.java), b)
     }
 
     private fun showEditorView() {

@@ -5,10 +5,11 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class WelcomeActivity : BaseWelcomeActivity() {
     override fun addFragmentsToAdapter(welcomeAdapter: WelcomeAdapter) {
-        welcomeAdapter.setupFragments(
+        welcomeAdapter.setupFragments(listOf(
             introFragment,
+            connectionSetupFragment,
             versionFragment,
             finishFragment
-        )
+        ))
     }
 }

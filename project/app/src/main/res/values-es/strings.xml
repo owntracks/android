@@ -126,11 +126,11 @@
         <item quantity="one">"%1$d eventos nuevo"</item>
         <item quantity="other">"%1$d eventos nuevos"</item>
     </plurals>
-    <string name="ui_fragment_welcome_version_title">"Restricciones"</string>
-    <string name="ui_fragment_welcome_version_description">"Debido a limitaciones del sistema algunas características pueden no funcionar.
+    <string name="welcome_version_title">"Restricciones"</string>
+    <string name="welcome_version_description">"Debido a limitaciones del sistema algunas características pueden no funcionar.
 
 Una notificación permanente se mostrará para mantener la aplicación funcionando en segundo plano. Se puede deshabilitar en ajustes del sistema."</string>
-    <string name="ui_fragment_welcome_version_learn_more">"Aprender más"</string>
+    <string name="welcome_version_learn_more">"Aprender más"</string>
     <string name="INITIAL">"Inicializando"</string>
     <string name="IDLE">"Idle"</string>
     <string name="CONNECTING">"Conectando"</string>

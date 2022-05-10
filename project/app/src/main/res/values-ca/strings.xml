@@ -126,11 +126,11 @@
         <item quantity="one">"%1$d nou esdeveniment"</item>
         <item quantity="other">"%1$d nous esdeveniments"</item>
     </plurals>
-    <string name="ui_fragment_welcome_version_title">"Restriccions"</string>
-    <string name="ui_fragment_welcome_version_description">"A causa de les limitacions del sistema operatiu, algunes característiques poden funcionar de manera restringida.
+    <string name="welcome_version_title">"Restriccions"</string>
+    <string name="welcome_version_description">"A causa de les limitacions del sistema operatiu, algunes característiques poden funcionar de manera restringida.
 
 Es mostrarà una notificació permanent per continuar executant-se en segon pla. Es pot desactivar a les preferències de notificació del sistema."</string>
-    <string name="ui_fragment_welcome_version_learn_more">"Saber-ne més"</string>
+    <string name="welcome_version_learn_more">"Saber-ne més"</string>
     <string name="INITIAL">"Inicialitzant"</string>
     <string name="IDLE">"Inactiu"</string>
     <string name="CONNECTING">"Connectant"</string>

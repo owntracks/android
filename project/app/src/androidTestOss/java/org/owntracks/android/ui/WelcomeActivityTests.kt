@@ -12,7 +12,6 @@ import org.owntracks.android.R
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.ui.welcome.WelcomeActivity
 
-
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class WelcomeActivityTests : TestWithAnActivity<WelcomeActivity>(WelcomeActivity::class.java) {
@@ -20,9 +19,10 @@ class WelcomeActivityTests : TestWithAnActivity<WelcomeActivity>(WelcomeActivity
     fun welcomeActivityCanBeSwipedThroughToTheEnd() {
         swipeViewPagerForward()
         swipeViewPagerForward()
+        swipeViewPagerForward()
 
         sleep(500)
-        assertDisplayed(R.id.done)
+        assertDisplayed(R.id.btn_done)
     }
 
     @Test

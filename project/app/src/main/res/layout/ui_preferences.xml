@@ -2,18 +2,13 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <data>
-
-        <variable
-            name="vm"
-            type="org.owntracks.android.ui.base.viewmodel.NoOpViewModel" />
-    </data>
-
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <include layout="@layout/appbar" android:id="@+id/appbar"/>
+        <include
+            android:id="@+id/appbar"
+            layout="@layout/appbar" />
 
         <FrameLayout
             android:id="@+id/content_frame"

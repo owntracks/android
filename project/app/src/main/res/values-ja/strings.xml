@@ -129,11 +129,11 @@
     <plurals name="notificationEventsTitle">
         <item quantity="other">"%1$d 件の新しいイベント"</item>
     </plurals>
-    <string name="ui_fragment_welcome_version_title">"制限"</string>
-    <string name="ui_fragment_welcome_version_description">"OSの制限により、一部の機能の動作が制限される場合があります。
+    <string name="welcome_version_title">"制限"</string>
+    <string name="welcome_version_description">"OSの制限により、一部の機能の動作が制限される場合があります。
 
 アプリをバックグラウンドで常に起動させるために、常時、通知が表示されます。この通知は、システムの通知設定で無効化することができます。"</string>
-    <string name="ui_fragment_welcome_version_learn_more">"詳しく"</string>
+    <string name="welcome_version_learn_more">"詳しく"</string>
     <string name="INITIAL">"初期化中"</string>
     <string name="IDLE">"アイドル"</string>
     <string name="CONNECTING">"接続中"</string>

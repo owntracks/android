@@ -5,8 +5,11 @@ import android.app.Application
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.StrictMode
+import android.provider.Settings
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NotificationManagerCompat
 import androidx.databinding.DataBindingUtil
@@ -14,6 +17,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.work.Configuration
 import androidx.work.WorkManager
 import androidx.work.WorkerFactory
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.EntryPoints
 import dagger.hilt.android.HiltAndroidApp
 import org.conscrypt.Conscrypt
@@ -200,7 +204,7 @@ class App : Application() {
     }
 }
 
-inline fun perfLog(description: String, block: () -> Unit) {
+inline fun perfLog(description: String, block: () -> Unit) { // TODO Remove these
     if (BuildConfig.DEBUG) {
         val elapsed = measureNanoTime { block() }
         Timber.tag("PERF").d("$description: ${elapsed / 1_000_000}ms")

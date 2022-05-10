@@ -128,11 +128,11 @@
         <item quantity="many">"%1$d nowych zdarzeń"</item>
         <item quantity="other">"%1$d nowych zdarzeń"</item>
     </plurals>
-    <string name="ui_fragment_welcome_version_title">"Ograniczenia"</string>
-    <string name="ui_fragment_welcome_version_description">"Przez ograniczenia systemu, niektóre funkcje mogą zostać zredukowane.
+    <string name="welcome_version_title">"Ograniczenia"</string>
+    <string name="welcome_version_description">"Przez ograniczenia systemu, niektóre funkcje mogą zostać zredukowane.
 
 Aby utrzymać działanie aplikacji w tle, będzie wyświetlana permanentna notyfikacja. Można ją wyłączyć w systemowych ustawieniach powiadomień."</string>
-    <string name="ui_fragment_welcome_version_learn_more">"Dowiedz się więcej"</string>
+    <string name="welcome_version_learn_more">"Dowiedz się więcej"</string>
     <string name="INITIAL">"Inicjalizacja"</string>
     <string name="IDLE">"bezczynny"</string>
     <string name="CONNECTING">"Łączenie"</string>

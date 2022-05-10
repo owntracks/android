@@ -127,11 +127,11 @@
         <item quantity="few">"%1$d nových událost"</item>
         <item quantity="other">"%1$d nových událost"</item>
     </plurals>
-    <string name="ui_fragment_welcome_version_title">"Omezení"</string>
-    <string name="ui_fragment_welcome_version_description">"Kvůli omezením OS mohou některé funkce fungovat omezeně.
+    <string name="welcome_version_title">"Omezení"</string>
+    <string name="welcome_version_description">"Kvůli omezením OS mohou některé funkce fungovat omezeně.
 
 Aby aplikace mohla běžet na pozadí, bude zobrazeno trvalé oznámení. Lze to deaktivovat v předvolbách Oznámení v systému."</string>
-    <string name="ui_fragment_welcome_version_learn_more">"Zjistit víc"</string>
+    <string name="welcome_version_learn_more">"Zjistit víc"</string>
     <string name="INITIAL">"Inicializace"</string>
     <string name="IDLE">"Čekám"</string>
     <string name="CONNECTING">"Připojování"</string>

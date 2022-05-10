@@ -126,9 +126,9 @@
         <item quantity="one">"%1$d neue Ereignis"</item>
         <item quantity="other">"%1$d neue Ereignisse"</item>
     </plurals>
-    <string name="ui_fragment_welcome_version_title">"Einschränkungen"</string>
-    <string name="ui_fragment_welcome_version_description">"Einige Funktionen sind aufgrund der Android version nur eingeschränkt verfügbar"</string>
-    <string name="ui_fragment_welcome_version_learn_more">"Mehr erfahren"</string>
+    <string name="welcome_version_title">"Einschränkungen"</string>
+    <string name="welcome_version_description">"Einige Funktionen sind aufgrund der Android version nur eingeschränkt verfügbar"</string>
+    <string name="welcome_version_learn_more">"Mehr erfahren"</string>
     <string name="INITIAL">"Initialisieren"</string>
     <string name="IDLE">"Aktiv"</string>
     <string name="CONNECTING">"Verbinden"</string>

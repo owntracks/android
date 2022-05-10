@@ -110,15 +110,11 @@
     <string name="transitionEntering">enters</string>
     <string name="transitionLeaving">leaves</string>
     <string name="errorPreferencesImportFailed">Import failed</string>
-    <string name="welcome_play_heading">Google Play Services</string>
-    <string name="welcome_play_description">OwnTracks requires Google Play Services</string>
     <string name="icon_description_warning">Warning</string>
-    <string name="welcome_heading">Welcome</string>
-    <string name="welcome_description">The following steps will help you to get started with OwnTracks</string>
     <string name="mode_heading">Mode</string>
     <string name="locationPermissionRequestDialogMessage">To track your current location, please grant OwnTracks location permissions.</string>
     <string name="icon_description_owntracks">OwnTracks</string>
-    <string name="enjoy_description">Select preferences from the menu and configure OwnTracks for your server before using it</string>
+    <string name="enjoy_description">Select preferences from the menu (or use the link below) and configure OwnTracks for your server before using it</string>
     <string name="done_heading">Done</string>
     <string name="icon_description_done">Done</string>
     <string name="title_activity_load">Import</string>
@@ -150,9 +146,17 @@
         <item quantity="one">%1$d new event</item>
         <item quantity="other">%1$d new events</item>
     </plurals>
-    <string name="ui_fragment_welcome_version_title">Restrictions</string>
-    <string name="ui_fragment_welcome_version_description">Due to OS limitations, some features might work in a restricted manner. \n\n A permanent notification will be shown to keep running in the background. It can be disabled in the systems notification preferences. </string>
-    <string name="ui_fragment_welcome_version_learn_more">Learn more</string>
+    <string name="welcome_play_heading">Google Play Services</string>
+    <string name="welcome_play_description">OwnTracks requires Google Play Services</string>
+    <string name="welcome_heading">Welcome</string>
+    <string name="welcome_description">The following steps will help you to get started with OwnTracks</string>
+    <string name="welcome_version_title">Restrictions</string>
+    <string name="welcome_version_description">Due to OS limitations, some features might work in a restricted manner.\n\nA permanent notification will be shown to keep running in the background. It can be disabled in the systems notification preferences. </string>
+    <string name="welcome_version_learn_more">Learn more</string>
+    <string name="welcome_connection_setup_title">Setup a connection</string>
+    <string name="welcome_connection_setup_description">OwnTracks works by sending your location data to a server that you (or someone your trust) owns, making sure you remain in control of your data.\n\nMake sure you know the connection details of your server, whether it\'s accessible over HTTPS or MQTT and any login credentials.\n\nOnce you\'ve completed this welcome section, you\'ll need to configure the application with details of the server, available in Preferences→Connection.\n\nFor more details, take a look at the OwnTracks Booklet.</string>
+    <string name="welcome_connection_setup_learn_more_button_label">Open Booklet</string>
+    <string name="welcome_finish_open_preferences_button_label">Open Preferences</string>
     <string name="INITIAL" tools:ignore="UnusedResources">Initializing</string>
     <string name="IDLE" tools:ignore="UnusedResources">Idle</string>
     <string name="CONNECTING" tools:ignore="UnusedResources">Connecting</string>

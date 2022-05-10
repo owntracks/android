@@ -8,6 +8,7 @@ enum class MapLayerStyle {
     OpenStreetMapNormal,
     OpenStreetMapWikimedia;
 
+    @Suppress("UNUSED_PARAMETER")
     fun isSameProviderAs(_mapLayerStyle: MapLayerStyle): Boolean = true
 
     fun getFragmentClass(): Class<out MapFragment<out ViewDataBinding>> = OSMMapFragment::class.java

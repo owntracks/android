@@ -34,7 +34,6 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.launch
-import org.owntracks.android.App
 import org.owntracks.android.BR
 import org.owntracks.android.R
 import org.owntracks.android.data.repos.LocationRepo
@@ -51,15 +50,18 @@ import org.owntracks.android.support.Preferences.Companion.EXPERIMENTAL_FEATURE_
 import org.owntracks.android.support.RequirementsChecker
 import org.owntracks.android.support.RunThingsOnOtherThreads
 import org.owntracks.android.ui.base.BaseActivity
-import org.owntracks.android.ui.base.navigator.Navigator
 import org.owntracks.android.ui.base.viewmodel.NoOpViewModel
+import org.owntracks.android.ui.mixins.ServiceStarter
+import org.owntracks.android.ui.mixins.WorkManagerInitExceptionNotifier
 import org.owntracks.android.ui.welcome.WelcomeActivity
 import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
-    View.OnClickListener, View.OnLongClickListener, PopupMenu.OnMenuItemClickListener {
+    View.OnClickListener, View.OnLongClickListener, PopupMenu.OnMenuItemClickListener,
+    WorkManagerInitExceptionNotifier by WorkManagerInitExceptionNotifier.Impl(),
+    ServiceStarter by ServiceStarter.Impl() {
     private val mapViewModel: MapViewModel by viewModels()
     private var previouslyHadLocationPermissions: Boolean = false
     private var service: BackgroundService? = null
@@ -88,9 +90,6 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
     lateinit var countingIdlingResource: CountingIdlingResource
 
     @Inject
-    lateinit var navigator: Navigator
-
-    @Inject
     lateinit var requirementsChecker: RequirementsChecker
 
     private val serviceConnection = object : ServiceConnection {
@@ -117,8 +116,9 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
             super.onCreate(savedInstanceState)
 
             if (!preferences.isSetupCompleted) {
-                navigator.startActivity(WelcomeActivity::class.java)
+                startActivity(Intent(this, WelcomeActivity::class.java))
                 finish()
+                return
             }
             bindAndAttachContentView(R.layout.ui_map, savedInstanceState)
 
@@ -195,36 +195,13 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
                 updateMonitoringModeMenu()
             }
 
-            Timber.d("starting BackgroundService")
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(Intent(this, BackgroundService::class.java))
-            } else {
-                startService(Intent(this, BackgroundService::class.java))
-            }
+            startService(this)
 
             // We've been started in the foreground, so cancel the background restriction notification
             NotificationManagerCompat.from(this)
                 .cancel(BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG, 0)
 
-            (applicationContext as App).workManagerFailedToInitialize.observe(this, { value ->
-                if (value) {
-                    MaterialAlertDialogBuilder(this)
-                        .setIcon(R.drawable.ic_baseline_warning_24)
-                        .setTitle(getString(R.string.workmanagerInitializationErrorDialogTitle))
-                        .setMessage(getString(R.string.workmanagerInitializationErrorDialogMessage))
-                        .setPositiveButton(getString(R.string.workmanagerInitializationErrorDialogOpenSettingsLabel)) { _, _ ->
-                            startActivity(
-                                Intent(
-                                    ACTION_APPLICATION_DETAILS_SETTINGS
-                                ).apply {
-                                    data = Uri.fromParts("package", packageName, "")
-                                }
-                            )
-                        }
-                        .setCancelable(true)
-                        .show()
-                }
-            })
+            notifyOnWorkManagerInitFailure(this)
         }
     }
 
@@ -395,7 +372,7 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
 
     private fun handleIntentExtras(intent: Intent) {
         Timber.v("handleIntentExtras")
-        val b = navigator.getExtrasBundle(intent)
+        val b = if (intent.hasExtra("_args")) intent.getBundleExtra("_args") else Bundle()
         if (b != null) {
             Timber.v("intent has extras from drawerProvider")
             val contactId = b.getString(BUNDLE_KEY_CONTACT_ID)

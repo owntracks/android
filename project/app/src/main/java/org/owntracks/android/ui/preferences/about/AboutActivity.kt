@@ -6,7 +6,6 @@ import org.owntracks.android.ui.preferences.PreferencesActivity
 
 @AndroidEntryPoint
 class AboutActivity : PreferencesActivity() {
-    override fun getStartFragment(): Fragment {
-        return AboutFragment()
-    }
+    override val startFragment: Fragment?
+        get() = AboutFragment()
 }

@@ -4,25 +4,20 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.databinding.DataBindingUtil
 import androidx.viewpager2.widget.ViewPager2
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiWelcomeBinding
 import org.owntracks.android.support.RequirementsChecker
-import org.owntracks.android.ui.base.BaseActivity
-import org.owntracks.android.ui.base.navigator.Navigator
 import org.owntracks.android.ui.map.MapActivity
-import org.owntracks.android.ui.welcome.finish.FinishFragment
-import org.owntracks.android.ui.welcome.intro.IntroFragment
-import org.owntracks.android.ui.welcome.version.VersionFragment
-import timber.log.Timber
 import javax.inject.Inject
 
-abstract class BaseWelcomeActivity : BaseActivity<UiWelcomeBinding?, WelcomeViewModel?>(),
-    WelcomeMvvm.View {
-
-    @Inject
-    lateinit var navigator: Navigator
+abstract class BaseWelcomeActivity : AppCompatActivity() {
+    private val viewModel: WelcomeViewModel by viewModels()
+    private lateinit var binding: UiWelcomeBinding
 
     @Inject
     lateinit var requirementsChecker: RequirementsChecker
@@ -31,49 +26,63 @@ abstract class BaseWelcomeActivity : BaseActivity<UiWelcomeBinding?, WelcomeView
     lateinit var introFragment: IntroFragment
 
     @Inject
+    lateinit var connectionSetupFragment: ConnectionSetupFragment
+
+    @Inject
     lateinit var versionFragment: VersionFragment
 
     @Inject
     lateinit var finishFragment: FinishFragment
 
-    private var welcomeAdapter: WelcomeAdapter? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (requirementsChecker.areRequirementsMet()) {
-            navigator.startActivity(MapActivity::class.java, null, Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(Intent(this, MapActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            })
             finish()
             return
         }
-        bindAndAttachContentView(R.layout.ui_welcome, savedInstanceState)
-        setHasEventBus(false)
 
-        welcomeAdapter = WelcomeAdapter(this, requirementsChecker).apply { addFragmentsToAdapter(this) }
-
-        binding!!.viewPager.adapter = welcomeAdapter
-        binding!!.viewPager.registerOnPageChangeCallback(object :
-            ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                binding!!.vm!!.currentFragmentPosition.value = position
+        binding =
+            DataBindingUtil.setContentView<UiWelcomeBinding>(this, R.layout.ui_welcome).apply {
+                vm = viewModel
+                lifecycleOwner = this@BaseWelcomeActivity
+                viewPager.adapter = WelcomeAdapter(this@BaseWelcomeActivity).apply {
+                    addFragmentsToAdapter(this)
+                }
+                viewPager.registerOnPageChangeCallback(object :
+                    ViewPager2.OnPageChangeCallback() {
+                    override fun onPageSelected(position: Int) {
+                        viewModel.moveToPage(position)
+                        super.onPageSelected(position)
+                    }
+                })
+                btnNext.setOnClickListener { viewModel.nextPage() }
+                btnDone.setOnClickListener {
+                    startActivity(
+                        Intent(this@BaseWelcomeActivity, MapActivity::class.java).apply {
+                            flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                        }
+                    )
+                }
             }
-        })
 
-        binding!!.vm!!.currentFragmentPosition.observe({ this.lifecycle }, { position: Int ->
-            binding!!.viewPager.currentItem = position
+        viewModel.currentFragmentPosition.observe(this) { position: Int ->
+            binding.viewPager.currentItem = position
             setPagerIndicator(position)
-        })
+        }
 
-        Timber.v("pager setup with %s fragments", welcomeAdapter!!.itemCount)
         buildPagerIndicator()
     }
 
     abstract fun addFragmentsToAdapter(welcomeAdapter: WelcomeAdapter)
 
-    override fun setPagerIndicator(position: Int) {
-        if (position < welcomeAdapter!!.itemCount) {
-            for (i in 0 until welcomeAdapter!!.itemCount) {
-                val circle = binding!!.circles.getChildAt(i) as ImageView
+    private fun setPagerIndicator(position: Int) {
+        val itemCount = (binding.viewPager.adapter?.itemCount ?: 0) //TODO Can we globalize
+        if (position < itemCount) {
+            for (i in 0 until itemCount) {
+                val circle = binding.circles.getChildAt(i) as ImageView
                 if (i == position) {
                     circle.alpha = 1f
                 } else {
@@ -85,9 +94,10 @@ abstract class BaseWelcomeActivity : BaseActivity<UiWelcomeBinding?, WelcomeView
 
 
     private fun buildPagerIndicator() {
+        val itemCount = (binding.viewPager.adapter?.itemCount ?: 0)
         val scale = resources.displayMetrics.density
         val padding = (5 * scale + 0.5f).toInt()
-        for (i in 0 until welcomeAdapter!!.itemCount) {
+        for (i in 0 until itemCount) {
             val circle = ImageView(this)
             circle.setImageDrawable(
                 ContextCompat.getDrawable(
@@ -101,21 +111,16 @@ abstract class BaseWelcomeActivity : BaseActivity<UiWelcomeBinding?, WelcomeView
             )
             circle.adjustViewBounds = true
             circle.setPadding(padding, 0, padding, 0)
-            binding!!.circles.addView(circle)
+            binding.circles.addView(circle)
         }
         setPagerIndicator(0)
     }
 
     override fun onBackPressed() {
-        if (binding!!.viewPager.currentItem == 0) {
+        if (binding.viewPager.currentItem == 0) {
             finish()
         } else {
-            binding!!.vm!!.moveBack()
+            viewModel.previousPage()
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        viewModel?.onResume()
     }
 }

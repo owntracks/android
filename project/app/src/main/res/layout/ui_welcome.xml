@@ -29,17 +29,16 @@
             android:background="?selectableItemBackgroundBorderless"
             android:contentDescription="@string/next"
             android:gravity="center"
-            android:onClick="@{() -> vm.moveNext()}"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_baseline_keyboard_arrow_right_24"
-            android:visibility="@{vm.nextEnabled}"
+            android:visibility="@{vm.nextEnabled ? View.VISIBLE : View.INVISIBLE}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent" />
 
         <ImageButton
-            android:id="@+id/done"
+            android:id="@+id/btn_done"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
             android:layout_margin="0dp"
@@ -48,12 +47,11 @@
             android:background="?selectableItemBackgroundBorderless"
             android:contentDescription="@string/done_heading"
             android:gravity="center"
-            android:onClick="@{() -> vm.onDoneClicked()}"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:src="@drawable/ic_baseline_done_24"
             android:textSize="18sp"
-            android:visibility="@{vm.doneEnabled}"
+            android:visibility="@{vm.doneEnabled ? View.VISIBLE : View.INVISIBLE}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="@+id/btn_next" />
 

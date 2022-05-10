@@ -104,11 +104,11 @@
     <plurals name="notificationEventsTitle">
         <item quantity="other">"%1$d 条新事件"</item>
     </plurals>
-    <string name="ui_fragment_welcome_version_title">"限制"</string>
-    <string name="ui_fragment_welcome_version_description">"由于操作系统限制，某些功能可能会运作在受限的行为模式下。
+    <string name="welcome_version_title">"限制"</string>
+    <string name="welcome_version_description">"由于操作系统限制，某些功能可能会运作在受限的行为模式下。
 
 为使本程序能够在后台正常运行，通知栏中会一直显示一个通知。您可以在系统设置的通知相关设置中屏蔽掉这条通知。"</string>
-    <string name="ui_fragment_welcome_version_learn_more">"了解更多信息"</string>
+    <string name="welcome_version_learn_more">"了解更多信息"</string>
     <string name="INITIAL">"正在初始化"</string>
     <string name="IDLE">"空闲"</string>
     <string name="CONNECTING">"正在连接"</string>

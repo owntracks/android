@@ -133,9 +133,9 @@ Importer"</string>
         <item quantity="one">"%1$d nouvel événement"</item>
         <item quantity="other">"%1$d nouveaux événements"</item>
     </plurals>
-    <string name="ui_fragment_welcome_version_title">"Restrictions"</string>
-    <string name="ui_fragment_welcome_version_description">"En raison des limitations du système d'exploitation, certaines fonctionnalités peuvent fonctionner de manière restreinte. \ n \ n Une notification permanente sera affichée pour continuer à fonctionner en arrière-plan. Il peut être désactivé dans les préférences de notification des systèmes."</string>
-    <string name="ui_fragment_welcome_version_learn_more">"Apprendre encore plus"</string>
+    <string name="welcome_version_title">"Restrictions"</string>
+    <string name="welcome_version_description">"En raison des limitations du système d'exploitation, certaines fonctionnalités peuvent fonctionner de manière restreinte. \ n \ n Une notification permanente sera affichée pour continuer à fonctionner en arrière-plan. Il peut être désactivé dans les préférences de notification des systèmes."</string>
+    <string name="welcome_version_learn_more">"Apprendre encore plus"</string>
     <string name="INITIAL">"Initialisation"</string>
     <string name="IDLE">"Ralenti"</string>
     <string name="CONNECTING">"Connexion"</string>
