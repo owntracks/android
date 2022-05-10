@@ -240,4 +240,10 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="preferencesLocatorDisplacementDialog">"Distància que hauria de recórrer el dispositiu (en metres) abans de rebre una altra ubicació"</string>
     <string name="geocoderExceptionError">"S'ha rebut un error del servei de geocodificador. Consulteu els registres per obtenir més detalls"</string>
     <string name="geocoderUnavailable">"El servei de geocodificador no està disponible temporalment"</string>
+    <string name="noBrowserInstalled">"Cap navegador adequat instal·lat"</string>
+    <string name="preferencesMap">"Mapa"</string>
+    <string name="preferencesShowRegionsOnMapSummary">" preferencesShowRegionsOnMapSummary "</string>
+    <string name="preferencesShowRegionsOnMap">"Mostra regions"</string>
+    <string name="preferencesPegLocatorFastestIntervalToInterval">"Limita la freqüència màxima del localitzador"</string>
+    <string name="preferencesPegLocatorFastestIntervalToIntervalSummary">"Sol·liciteu que el proveïdor d'ubicació proporcioni actualitzacions no més ràpidament que l'interval de localització sol·licitat"</string>
 </resources>
