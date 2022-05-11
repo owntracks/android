@@ -188,7 +188,6 @@
     <string name="backgroundLocationRestrictionNotificationTitle">"Standortverfolgung pausiert"</string>
     <string name="backgroundLocationRestrictionNotificationText">"Diese Version von Android limitiert OwnTracks Standortzugriff im Hintergrund, bis die App geöffnet wird. Antippen dieser Benachrichtigung öffnet die App und fängt an den Standort aufzuzeichnen."</string>
     <string name="preferencesExperimental">"Experimentell"</string>
-    <string name="refresh_log">"Neu laden"</string>
     <string name="preferencesTheme">"Aussehen"</string>
     <string name="contactDetailsAccuracyValue">"%d m"</string>
     <string name="contactDetailsDistanceValue">"%1$,.2f %2$s"</string>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<org.owntracks.android.ui.status.logs.HorizontalScrollViewWithOnScrollHandler xmlns:android="http://schemas.android.com/apk/res/android"
+<HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/log_item_scroll_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -15,4 +15,4 @@
         android:textIsSelectable="true"
         android:textSize="12sp" />
 
-</org.owntracks.android.ui.status.logs.HorizontalScrollViewWithOnScrollHandler>
+</HorizontalScrollView>

@@ -201,7 +201,6 @@ Importer"</string>
     <string name="geocoderProblemNotificationTitle">"Problème de géocodage"</string>
     <string name="geocoderIPAddressRejected">"L'adresse IP du client a été rejetée"</string>
     <string name="preferencesExperimental">"Expérimental"</string>
-    <string name="refresh_log">"Rafraîchir"</string>
     <string name="preferencesTheme">"Thème"</string>
     <string name="contactDetailsAccuracyValue">"%d m"</string>
     <string name="contactDetailsDistanceValue">"%1$,.2f %2$s"</string>

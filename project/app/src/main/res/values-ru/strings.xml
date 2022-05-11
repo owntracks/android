@@ -194,7 +194,6 @@
     <string name="backgroundLocationRestrictionNotificationTitle">"Отслеживание местоположения приостановлено"</string>
     <string name="backgroundLocationRestrictionNotificationText">"Ваша версия Android ограничивает возможность определения местоположения при автоматическом запуске приложения до его открытия. Нажмите на это уведомление, чтобы открыть OwnTracks и начать отслеживание местоположения."</string>
     <string name="preferencesExperimental">"Экспериментальные"</string>
-    <string name="refresh_log">"Обновить"</string>
     <string name="preferencesTheme">"Тема"</string>
 
     <!-- meters in Russian is "метров", i.e. "%dм" instead if "%d m" -->

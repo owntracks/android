@@ -12,6 +12,7 @@
 * UI for mode changing is now clearer, using a bottom sheet dialog popup with explanation notes on each mode (#1197)
 * Updated the Welcome screens to add a new section describing the server requirements
 * Update to Catalan, Japanese and Polish translations (thanks all!)
+* Log viewer should now automatically scroll, and generally be less bad
 
 ### Bug fixes
 

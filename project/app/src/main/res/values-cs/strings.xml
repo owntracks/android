@@ -192,7 +192,6 @@ Aby aplikace mohla běžet na pozadí, bude zobrazeno trvalé oznámení. Lze to
     <string name="backgroundLocationRestrictionNotificationTitle">"Sledování polohy pozastaveno"</string>
     <string name="backgroundLocationRestrictionNotificationText">"Tato verze Androidu omezuje OwnTracks zjišťovat polohu při spuštění na pozadí, dokud není aplikace otevřena. Kliknutím na toto oznámení otevřete aplikaci a zahájíte sledování polohy."</string>
     <string name="preferencesExperimental">"Experimentální"</string>
-    <string name="refresh_log">"Obnovit"</string>
     <string name="preferencesTheme">"Vzhled aplikace"</string>
     <string name="contactDetailsAccuracyValue">"%d m"</string>
     <string name="contactDetailsDistanceValue">"%1$,.2f %2$s"</string>

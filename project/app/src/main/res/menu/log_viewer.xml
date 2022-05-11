@@ -6,9 +6,6 @@
         android:checkable="true"
         android:title="@string/preferencesDebugLog" />
     <item
-        android:id="@+id/refresh_log"
-        android:title="@string/refresh_log" />
-    <item
         android:id="@+id/clear_log"
         android:title="@string/clear_log"
         app:showAsAction="never" />

@@ -4,7 +4,7 @@ import android.util.Log
 import java.text.SimpleDateFormat
 import java.util.*
 
-data class LogEntry(val priority: Int, val tag: String?, val message: String, val time: String = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.sss", Locale.ROOT).format(Date(System.currentTimeMillis()))) {
+data class LogEntry(val priority: Int, val tag: String?, val message: String, val time: String = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.ROOT).format(Date(System.currentTimeMillis()))) {
     val priorityChar = when (priority) {
         Log.ASSERT -> "A"
         Log.ERROR -> "E"

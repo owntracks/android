@@ -190,7 +190,6 @@
     <string name="backgroundLocationRestrictionNotificationTitle">"位置トラッキングが一時停止されました"</string>
     <string name="backgroundLocationRestrictionNotificationText">"このバージョンのAndroidは、バックグラウンドで起動されたときに、アプリが開かれるまで位置情報の取得が制限されます。そのため、トラッキングを開始するには、通知をタップしてアプリを開いてください。"</string>
     <string name="preferencesExperimental">"試験段階"</string>
-    <string name="refresh_log">"更新"</string>
     <string name="preferencesTheme">"テーマ"</string>
     <string name="contactDetailsAccuracyValue">"%d m"</string>
     <string name="contactDetailsDistanceValue">"%1$,.2f %2$s"</string>

@@ -15,34 +15,45 @@ import java.io.FileOutputStream
 class ExportedLogContentProvider : ContentProvider() {
 
     private fun logForUri(uri: Uri): ByteArray? = Timber.forest()
-            .filterIsInstance(TimberInMemoryLogTree::class.java)
-            .firstOrNull()
-            ?.logLines()
-            ?.filter {
-                if (uri.pathSegments.contains("debug=true")) {
-                    it.priority >= Log.DEBUG
-                } else {
-                    it.priority >= Log.INFO
-                }
+        .filterIsInstance(TimberInMemoryLogTree::class.java)
+        .firstOrNull()
+        ?.logLines()
+        ?.filter {
+            if (uri.pathSegments.contains("debug=true")) {
+                it.priority >= Log.DEBUG
+            } else {
+                it.priority >= Log.INFO
             }
-            ?.joinToString("\n") { it.toString() }
-            ?.toByteArray()
+        }
+        ?.joinToString("\n") { it.toString() }
+        ?.toByteArray()
 
     override fun insert(uri: Uri, values: ContentValues?): Uri? {
         return null
     }
 
-    override fun query(uri: Uri, projection: Array<out String>?, selection: String?, selectionArgs: Array<out String>?, sortOrder: String?): Cursor? =
-            logForUri(uri)?.let {
-                val m = MatrixCursor(arrayOf(OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE), 1)
-                m.addRow(arrayOf("owntracks-log.txt", it.size.toLong()))
-                m
-            }
+    override fun query(
+        uri: Uri,
+        projection: Array<out String>?,
+        selection: String?,
+        selectionArgs: Array<out String>?,
+        sortOrder: String?,
+    ): Cursor? =
+        logForUri(uri)?.let {
+            val m = MatrixCursor(arrayOf(OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE), 1)
+            m.addRow(arrayOf("owntracks-log.txt", it.size.toLong()))
+            m
+        }
 
 
     override fun onCreate(): Boolean = true
 
-    override fun update(uri: Uri, values: ContentValues?, selection: String?, selectionArgs: Array<out String>?): Int {
+    override fun update(
+        uri: Uri,
+        values: ContentValues?,
+        selection: String?,
+        selectionArgs: Array<out String>?,
+    ): Int {
         return 0
     }
 

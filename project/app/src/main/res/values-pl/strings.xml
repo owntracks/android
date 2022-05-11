@@ -194,7 +194,6 @@ Aby utrzymać działanie aplikacji w tle, będzie wyświetlana permanentna notyf
     <string name="backgroundLocationRestrictionNotificationTitle">"Śledzenie pozycji wstrzymane"</string>
     <string name="backgroundLocationRestrictionNotificationText">"Ta wersja Androida ogranicza OwnTracks możliwość odbierania lokalizacji po uruchomieniu w tle, dopóki aplikacja nie zostanie otwarta. Kliknij to powiadomienie, aby otworzyć aplikację i rozpocząć śledzenie lokalizacji."</string>
     <string name="preferencesExperimental">"Eksperymentalne"</string>
-    <string name="refresh_log">"Odśwież"</string>
     <string name="preferencesTheme">"Motyw"</string>
     <string name="contactDetailsAccuracyValue">"%d m"</string>
     <string name="contactDetailsDistanceValue">"%1$,.2f %2$s"</string>

@@ -218,7 +218,6 @@
     <string name="backgroundLocationRestrictionNotificationTitle">Location Tracking Paused</string>
     <string name="backgroundLocationRestrictionNotificationText">This version of Android restricts OwnTracks from receiving locations when started in the background until the app is opened. Click this notification to open the app and start tracking location.</string>
     <string name="preferencesExperimental">Experimental</string>
-    <string name="refresh_log">Refresh</string>
     <string name="preferencesCategoryNotificationErrors">Errors &amp; Issues</string>
     <string name="preferencesNotificationGeocoderErrors">Geocoder errors</string>
     <string name="preferencesNotificationGeocoderErrorsSummary">Display geocoder errors, rate limits &amp; quota exceeded events </string>
