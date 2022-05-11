@@ -1,15 +1,23 @@
 package org.owntracks.android.services.worker
 
 import android.content.Context
+import androidx.hilt.work.HiltWorker
 import androidx.work.ListenableWorker
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import org.owntracks.android.services.MessageProcessor
 import timber.log.Timber
 import java.util.concurrent.Semaphore
 import javax.inject.Inject
 
-class MQTTReconnectWorker(context: Context, workerParams: WorkerParameters, private val messageProcessor: MessageProcessor) : Worker(context, workerParams) {
+@HiltWorker
+class MQTTReconnectWorker @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted workerParams: WorkerParameters,
+    private val messageProcessor: MessageProcessor
+) : Worker(context, workerParams) {
     override fun doWork(): Result {
         Timber.i("MQTTReconnectWorker started on threadID: %s", Thread.currentThread())
         if (!messageProcessor.isEndpointConfigurationComplete) return Result.failure()
@@ -27,7 +35,9 @@ class MQTTReconnectWorker(context: Context, workerParams: WorkerParameters, priv
         }
     }
 
-    class Factory @Inject constructor(private val messageProcessor: MessageProcessor) : ChildWorkerFactory {
-        override fun create(appContext: Context, params: WorkerParameters): ListenableWorker = MQTTReconnectWorker(appContext, params, messageProcessor)
+    class Factory @Inject constructor(private val messageProcessor: MessageProcessor) :
+        ChildWorkerFactory {
+        override fun create(appContext: Context, params: WorkerParameters): ListenableWorker =
+            MQTTReconnectWorker(appContext, params, messageProcessor)
     }
 }

@@ -12,7 +12,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
 import org.owntracks.android.R
 import org.owntracks.android.model.messages.MessageLocation
-import org.owntracks.android.perfLog
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.support.Preferences
 import org.owntracks.android.ui.map.MapActivity
@@ -39,14 +38,12 @@ class GeocoderProvider @Inject constructor(
         Timber.i("Setting geocoding provider to ${preferences.reverseGeocodeProvider}")
         job = GlobalScope.launch {
             withContext(ioDispatcher) {
-                perfLog {
-                    geocoder = when (preferences.reverseGeocodeProvider) {
-                        Preferences.REVERSE_GEOCODE_PROVIDER_OPENCAGE -> OpenCageGeocoder(
-                            preferences.openCageGeocoderApiKey
-                        )
-                        Preferences.REVERSE_GEOCODE_PROVIDER_DEVICE -> DeviceGeocoder(context)
-                        else -> GeocoderNone()
-                    }
+                geocoder = when (preferences.reverseGeocodeProvider) {
+                    Preferences.REVERSE_GEOCODE_PROVIDER_OPENCAGE -> OpenCageGeocoder(
+                        preferences.openCageGeocoderApiKey
+                    )
+                    Preferences.REVERSE_GEOCODE_PROVIDER_DEVICE -> DeviceGeocoder(context)
+                    else -> GeocoderNone()
                 }
             }
         }

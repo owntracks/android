@@ -46,7 +46,6 @@ android {
             mapOf(
                 "clearPackageData" to "true",
                 "coverage" to "true",
-//                "coverageFilePath" to "/sdcard/coverage/",
                 "disableAnalytics" to "true",
                 "useTestStorageService" to "true",
                 "numShards" to numShards,
@@ -201,7 +200,7 @@ dependencies {
     implementation(libs.osmdroid)
 
     // Utility libraries
-    implementation(libs.hilt.android)
+    implementation(libs.bundles.hilt)
     implementation(libs.eventbus)
 
     // Connectivity
@@ -227,9 +226,9 @@ dependencies {
 
     // Preprocessors
     kapt(libs.eventbus.annotationprocessor)
-    kapt(libs.hilt.compiler)
+    kapt(libs.bundles.kapt.hilt)
 
-    kaptTest(libs.hilt.compiler)
+    kaptTest(libs.bundles.kapt.hilt)
 
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.androidx.core.testing)

@@ -40,7 +40,6 @@ import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.databinding.UiMapBinding
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.model.FusedContact
-import org.owntracks.android.perfLog
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.services.BackgroundService.BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG
 import org.owntracks.android.services.MessageProcessorEndpointHttp
@@ -105,104 +104,102 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        perfLog {
-            EntryPointAccessors.fromActivity(
-                this,
-                MapActivityEntryPoint::class.java
-            ).let {
-                supportFragmentManager.fragmentFactory = it.fragmentFactory
-            }
+        EntryPointAccessors.fromActivity(
+            this,
+            MapActivityEntryPoint::class.java
+        ).let {
+            supportFragmentManager.fragmentFactory = it.fragmentFactory
+        }
 
-            super.onCreate(savedInstanceState)
+        super.onCreate(savedInstanceState)
 
-            if (!preferences.isSetupCompleted) {
-                startActivity(Intent(this, WelcomeActivity::class.java))
-                finish()
-                return
-            }
-            bindAndAttachContentView(R.layout.ui_map, savedInstanceState)
+        if (!preferences.isSetupCompleted) {
+            startActivity(Intent(this, WelcomeActivity::class.java))
+            finish()
+            return
+        }
+        bindAndAttachContentView(R.layout.ui_map, savedInstanceState)
 
-            binding?.also { binding ->
-                setSupportToolbar(binding.appbar.toolbar, false, true)
-                setDrawer(binding.appbar.toolbar)
-                bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetLayout)
-                binding.setVariable(BR.vm, mapViewModel)
-                binding.contactPeek.contactRow.setOnClickListener(this)
-                binding.contactPeek.contactRow.setOnLongClickListener(this)
-                binding.moreButton.setOnClickListener { v: View -> showPopupMenu(v) }
-                setBottomSheetHidden()
+        binding?.also { binding ->
+            setSupportToolbar(binding.appbar.toolbar, false, true)
+            setDrawer(binding.appbar.toolbar)
+            bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetLayout)
+            binding.setVariable(BR.vm, mapViewModel)
+            binding.contactPeek.contactRow.setOnClickListener(this)
+            binding.contactPeek.contactRow.setOnLongClickListener(this)
+            binding.moreButton.setOnClickListener { v: View -> showPopupMenu(v) }
+            setBottomSheetHidden()
 
-                // Need to set the appbar layout behaviour to be non-drag, so that we can drag the map
-                val behavior = AppBarLayout.Behavior()
-                behavior.setDragCallback(object : AppBarLayout.Behavior.DragCallback() {
-                    override fun canDrag(appBarLayout: AppBarLayout): Boolean {
-                        return false
-                    }
-                })
-
-                binding.fabMyLocation.setOnClickListener {
-                    if (checkAndRequestLocationPermissions(true)) {
-                        checkAndRequestLocationServicesEnabled(true)
-                    }
-                    mapViewModel.onMenuCenterDeviceClicked()
+            // Need to set the appbar layout behaviour to be non-drag, so that we can drag the map
+            val behavior = AppBarLayout.Behavior()
+            behavior.setDragCallback(object : AppBarLayout.Behavior.DragCallback() {
+                override fun canDrag(appBarLayout: AppBarLayout): Boolean {
+                    return false
                 }
+            })
 
-                binding.fabMapLayers.setOnClickListener {
-                    MapLayerBottomSheetDialog().show(
-                        supportFragmentManager,
-                        "layerBottomSheetDialog"
-                    )
+            binding.fabMyLocation.setOnClickListener {
+                if (checkAndRequestLocationPermissions(true)) {
+                    checkAndRequestLocationServicesEnabled(true)
                 }
+                mapViewModel.onMenuCenterDeviceClicked()
             }
 
-            locationLifecycleObserver = LocationLifecycleObserver(activityResultRegistry)
-            lifecycle.addObserver(locationLifecycleObserver)
+            binding.fabMapLayers.setOnClickListener {
+                MapLayerBottomSheetDialog().show(
+                    supportFragmentManager,
+                    "layerBottomSheetDialog"
+                )
+            }
+        }
 
-            // Watch various things that the mapViewModel owns
+        locationLifecycleObserver = LocationLifecycleObserver(activityResultRegistry)
+        lifecycle.addObserver(locationLifecycleObserver)
 
-            mapViewModel.currentContact.observe(this) { contact: FusedContact? ->
-                contact?.let {
-                    binding?.contactPeek?.run {
-                        image.setImageResource(0) // Remove old image before async loading the new one
-                        lifecycleScope.launch {
-                            contactImageBindingAdapter.run {
-                                image.setImageBitmap(
-                                    getBitmapFromCache(it)
-                                )
-                            }
+        // Watch various things that the mapViewModel owns
+
+        mapViewModel.currentContact.observe(this) { contact: FusedContact? ->
+            contact?.let {
+                binding?.contactPeek?.run {
+                    image.setImageResource(0) // Remove old image before async loading the new one
+                    lifecycleScope.launch {
+                        contactImageBindingAdapter.run {
+                            image.setImageBitmap(
+                                getBitmapFromCache(it)
+                            )
                         }
                     }
                 }
             }
-            mapViewModel.bottomSheetHidden.observe(this) { o: Boolean? ->
-                if (o == null || o) {
-                    setBottomSheetHidden()
-                } else {
-                    setBottomSheetCollapsed()
-                }
-            }
-            mapViewModel.currentLocation.observe(this) { location ->
-                if (location == null) {
-                    disableLocationMenus()
-                } else {
-                    enableLocationMenus()
-                    binding?.vm?.run {
-                        updateActiveContactDistanceAndBearing(location)
-                    }
-                }
-            }
-            mapViewModel.currentMonitoringMode.observe(this) {
-                updateMonitoringModeMenu()
-            }
-
-            startService(this)
-
-            // We've been started in the foreground, so cancel the background restriction notification
-            NotificationManagerCompat.from(this)
-                .cancel(BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG, 0)
-
-            notifyOnWorkManagerInitFailure(this)
         }
+        mapViewModel.bottomSheetHidden.observe(this) { o: Boolean? ->
+            if (o == null || o) {
+                setBottomSheetHidden()
+            } else {
+                setBottomSheetCollapsed()
+            }
+        }
+        mapViewModel.currentLocation.observe(this) { location ->
+            if (location == null) {
+                disableLocationMenus()
+            } else {
+                enableLocationMenus()
+                binding?.vm?.run {
+                    updateActiveContactDistanceAndBearing(location)
+                }
+            }
+        }
+        mapViewModel.currentMonitoringMode.observe(this) {
+            updateMonitoringModeMenu()
+        }
+
+        startService(this)
+
+        // We've been started in the foreground, so cancel the background restriction notification
+        NotificationManagerCompat.from(this)
+            .cancel(BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG, 0)
+
+        notifyOnWorkManagerInitFailure(this)
     }
 
     internal fun checkAndRequestMyLocationCapability(explicitUserAction: Boolean): Boolean =

@@ -41,7 +41,7 @@ import kotlin.math.roundToInt
 
 class OSMMapFragment internal constructor(
     private val preferences: Preferences,
-    contactImageBindingAdapter: ContactImageBindingAdapter
+    contactImageBindingAdapter: ContactImageBindingAdapter,
 ) :
     MapFragment<OsmMapFragmentBinding>(contactImageBindingAdapter) {
     override val layout: Int
@@ -83,7 +83,7 @@ class OSMMapFragment internal constructor(
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         Configuration.getInstance().apply {
             load(requireContext(), PreferenceManager.getDefaultSharedPreferences(requireContext()))
@@ -109,7 +109,7 @@ class OSMMapFragment internal constructor(
         }
     }
 
-    val mapListener = DelayedMapListener(object : MapListener {
+    private val mapListener = DelayedMapListener(object : MapListener {
         override fun onScroll(event: ScrollEvent?): Boolean {
             mapView?.run {
                 viewModel.setMapLocation(
@@ -141,7 +141,7 @@ class OSMMapFragment internal constructor(
             }
             zoomController.setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
             viewModel.getMapLocation().run {
-                controller.setZoom(zoom.toDouble())
+                controller.setZoom(zoom)
                 controller.setCenter(latLng.toGeoPoint())
             }
             addMapListener(mapListener)
@@ -270,7 +270,7 @@ class OSMMapFragment internal constructor(
                             region.location.toLatLng().toGeoPoint(),
                             region.geofenceRadius.toDouble()
                         )
-                        fillPaint.setColor(getRegionColor())
+                        fillPaint.color = getRegionColor()
                         outlinePaint.strokeWidth = 0f
                         setOnClickListener { _, _, _ -> true }
                     }.let { overlays.add(0, it) }
@@ -285,16 +285,12 @@ class OSMMapFragment internal constructor(
     }
 
     override fun setMapLayerType(mapLayerStyle: MapLayerStyle) {
+        @Suppress("REDUNDANT_ELSE_IN_WHEN")
         when (mapLayerStyle) {
-            MapLayerStyle.OpenStreetMapNormal -> {
-                binding.osmMapView.setTileSource(TileSourceFactory.MAPNIK)
-            }
-            MapLayerStyle.OpenStreetMapWikimedia -> {
-                binding.osmMapView.setTileSource(TileSourceFactory.WIKIMEDIA)
-            }
-            else -> {
-                Timber.w("Unsupported map layer type $mapLayerStyle")
-            }
+            MapLayerStyle.OpenStreetMapNormal -> binding.osmMapView.setTileSource(TileSourceFactory.MAPNIK)
+            MapLayerStyle.OpenStreetMapWikimedia -> binding.osmMapView.setTileSource(
+                TileSourceFactory.WIKIMEDIA)
+            else -> Timber.w("Unsupported map layer type $mapLayerStyle")
         }
     }
 }

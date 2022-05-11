@@ -5,19 +5,14 @@ import android.app.Application
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.StrictMode
-import android.provider.Settings
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NotificationManagerCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.MutableLiveData
 import androidx.work.Configuration
-import androidx.work.WorkManager
 import androidx.work.WorkerFactory
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.EntryPoints
 import dagger.hilt.android.HiltAndroidApp
 import org.conscrypt.Conscrypt
@@ -35,10 +30,9 @@ import timber.log.Timber
 import java.security.Security
 import javax.inject.Inject
 import javax.inject.Provider
-import kotlin.system.measureNanoTime
 
 @HiltAndroidApp
-class App : Application() {
+class App : Application(), Configuration.Provider {
     @Inject
     lateinit var preferences: Preferences
 
@@ -85,16 +79,6 @@ class App : Application() {
 
         DataBindingUtil.setDefaultComponent(dataBindingEntryPoint)
 
-        WorkManager.initialize(
-            this,
-            Configuration.Builder()
-                .setWorkerFactory(workerFactory)
-                .setInitializationExceptionHandler { throwable ->
-                    Timber.e(throwable, "Exception thrown when initializing WorkManager")
-                    workManagerFailedToInitialize.postValue(true)
-                }
-                .build()
-        )
         scheduler.cancelAllTasks()
         Timber.plant(TimberInMemoryLogTree(BuildConfig.DEBUG))
         if (BuildConfig.DEBUG) {
@@ -202,23 +186,14 @@ class App : Application() {
         const val NOTIFICATION_CHANNEL_ONGOING = "O"
         const val NOTIFICATION_CHANNEL_EVENTS = "E"
     }
-}
 
-inline fun perfLog(description: String, block: () -> Unit) { // TODO Remove these
-    if (BuildConfig.DEBUG) {
-        val elapsed = measureNanoTime { block() }
-        Timber.tag("PERF").d("$description: ${elapsed / 1_000_000}ms")
-    } else {
-        block()
-    }
-}
-
-inline fun perfLog(block: () -> Unit) {
-    if (BuildConfig.DEBUG) {
-        val caller =
-            Thread.currentThread().stackTrace[2].let { "${it.className}/ ${it.methodName}" }
-        perfLog(caller, block)
-    } else {
-        block()
-    }
+    @SuppressLint("RestrictedApi")
+    override fun getWorkManagerConfiguration(): Configuration =
+        Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .setInitializationExceptionHandler { throwable ->
+                Timber.e(throwable, "Exception thrown when initializing WorkManager")
+                workManagerFailedToInitialize.postValue(true)
+            }
+            .build()
 }
