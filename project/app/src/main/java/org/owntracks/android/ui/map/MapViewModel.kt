@@ -43,7 +43,7 @@ class MapViewModel @Inject constructor(
     private val preferences: Preferences,
     private val locationRepo: LocationRepo,
     private val waypointsRepo: WaypointsRepo,
-    @ApplicationContext private val applicationContext: Context
+    @ApplicationContext private val applicationContext: Context,
 ) : ViewModel(), SharedPreferences.OnSharedPreferenceChangeListener {
     // controls who the currently selected contact is
     private val mutableCurrentContact = MutableLiveData<FusedContact?>()
@@ -229,7 +229,7 @@ class MapViewModel @Inject constructor(
 
     private fun updateActiveContactDistanceAndBearing(
         currentLocation: Location,
-        contact: FusedContact
+        contact: FusedContact,
     ) {
         contact.messageLocation?.run {
             val distanceBetween = FloatArray(2)
@@ -265,7 +265,7 @@ class MapViewModel @Inject constructor(
         viewModelScope.launch { currentLocation.requestLocationUpdates() }
     }
 
-    fun setCurrentLocation(latLng: LatLng) {
+    fun setBlueDotCurrentLocation(latLng: LatLng) {
         locationIdlingResource.setIdleState(true)
         locationRepo.setMapLocation(latLng)
     }
@@ -275,7 +275,11 @@ class MapViewModel @Inject constructor(
     }
 
     fun getMapLocation(): MapLocationAndZoomLevel =
-        lastScrolledMapCenter ?: MapLocationAndZoomLevel(
+        lastScrolledMapCenter ?: locationRepo.currentMapLocation?.let {
+            MapLocationAndZoomLevel(it, STARTING_ZOOM)
+        } ?: locationRepo.currentPublishedLocation.value?.let {
+            MapLocationAndZoomLevel(it.toLatLng(), STARTING_ZOOM)
+        } ?: MapLocationAndZoomLevel(
             LatLng(
                 STARTING_LATITUDE,
                 STARTING_LONGITUDE
