@@ -15,12 +15,12 @@ import java.util.concurrent.TimeUnit
 
 class LocationLiveData(
     private val locationProviderClient: FusedLocationProviderClient,
-    private val coroutineScope: CoroutineScope
+    private val coroutineScope: CoroutineScope,
 ) :
     LiveData<Location>() {
     constructor(
         context: Context,
-        coroutineScope: CoroutineScope
+        coroutineScope: CoroutineScope,
     ) : this(LocationServices.getFusedLocationProviderClient(context), coroutineScope)
 
     private val locationCallback = Callback()
@@ -35,7 +35,8 @@ class LocationLiveData(
                 LocationRequest(
                     smallestDisplacement = 1f,
                     priority = LocationRequest.PRIORITY_HIGH_ACCURACY,
-                    interval = TimeUnit.SECONDS.toMillis(2)
+                    interval = TimeUnit.SECONDS.toMillis(2),
+                    waitForAccurateLocation = false
                 ).toGMSLocationRequest(), locationCallback, Looper.getMainLooper()
             ).addOnCompleteListener {
                 Timber.d("LocationLiveData location update request completed: Success=${it.isSuccessful} Cancelled=${it.isCanceled}")

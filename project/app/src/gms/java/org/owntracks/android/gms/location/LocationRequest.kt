@@ -18,6 +18,7 @@ fun LocationRequest.toGMSLocationRequest(): com.google.android.gms.location.Loca
     expirationDuration?.run { gmsLocationRequest.setExpirationDuration(this) }
     smallestDisplacement?.run { gmsLocationRequest.smallestDisplacement = this }
     fastestInterval?.run { gmsLocationRequest.fastestInterval = this }
+    waitForAccurateLocation?.run { gmsLocationRequest.isWaitForAccurateLocation = this }
     return gmsLocationRequest
 }
 
