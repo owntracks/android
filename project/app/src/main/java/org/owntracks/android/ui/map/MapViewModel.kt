@@ -45,48 +45,57 @@ class MapViewModel @Inject constructor(
     private val waypointsRepo: WaypointsRepo,
     @ApplicationContext private val applicationContext: Context
 ) : ViewModel(), SharedPreferences.OnSharedPreferenceChangeListener {
+    // controls who the currently selected contact is
     private val mutableCurrentContact = MutableLiveData<FusedContact?>()
+    val currentContact: LiveData<FusedContact?>
+        get() = mutableCurrentContact
+
+    // controls the state of the bottom sheet on the map
     private val mutableBottomSheetHidden = MutableLiveData<Boolean>()
+    val bottomSheetHidden: LiveData<Boolean>
+        get() = mutableBottomSheetHidden
 
-    // mutableMapCenter is going to control where the view should set the camera to
+    // Controls where the map should set the camera to
     private val mutableMapCenter = MutableLiveData<LatLng>()
+    val mapCenter: LiveData<LatLng>
+        get() = mutableMapCenter
 
-    // lastScroppedMapCenter is where the map was last moved to. This might have been from an explicit
+    // Where the map was last moved to. This might have been from an explicit
     // user action, or from the observation of mutableMapCenter changing
     private var lastScrolledMapCenter: MapLocationAndZoomLevel? = null
 
+    // Shows the current distance to the selected contact
     private val mutableContactDistance = MutableLiveData(0f)
-    private val mutableContactBearing = MutableLiveData(0f)
-    private val mutableRelativeContactBearing = MutableLiveData(0f)
-    private val mutableMyLocationEnabled = MutableLiveData(false)
-    private val mutableMapLayerStyle = MutableLiveData<MapLayerStyle>(preferences.mapLayerStyle)
-
-    val currentContact: LiveData<FusedContact?>
-        get() = mutableCurrentContact
-    val bottomSheetHidden: LiveData<Boolean>
-        get() = mutableBottomSheetHidden
-    val mapCenter: LiveData<LatLng>
-        get() = mutableMapCenter
-    val currentLocation = LocationLiveData(applicationContext, viewModelScope)
-
     val contactDistance: LiveData<Float>
         get() = mutableContactDistance
+
+    // Shows the bearing to the selected contact
+    private val mutableContactBearing = MutableLiveData(0f)
     val contactBearing: LiveData<Float>
         get() = mutableContactBearing
+
+    // Shows the relative bearing from this device orientation to the contact
+    private val mutableRelativeContactBearing = MutableLiveData(0f)
     val relativeContactBearing: LiveData<Float>
         get() = mutableRelativeContactBearing
+
+
+    // Controls whether the myLocation button on the map is enabled
+    private val mutableMyLocationEnabled = MutableLiveData(false)
     val myLocationEnabled: LiveData<Boolean>
         get() = mutableMyLocationEnabled
 
-    val regions = waypointsRepo.allLive
-
+    // Controls the current map layer style
+    private val mutableMapLayerStyle = MutableLiveData<MapLayerStyle>(preferences.mapLayerStyle)
     val mapLayerStyle: LiveData<MapLayerStyle>
         get() = mutableMapLayerStyle
 
+    val currentLocation = LocationLiveData(applicationContext, viewModelScope)
+    val regions = waypointsRepo.allLive
+    val allContacts = contactsRepo.all
+
     val scope: CoroutineScope
         get() = viewModelScope
-
-    val allContacts = contactsRepo.all
 
     private val mutableCurrentMonitoringMode: MutableLiveData<MonitoringMode> by lazy {
         MutableLiveData(preferences.monitoring)

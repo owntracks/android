@@ -57,7 +57,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
+class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(),
     View.OnClickListener, View.OnLongClickListener, PopupMenu.OnMenuItemClickListener,
     WorkManagerInitExceptionNotifier by WorkManagerInitExceptionNotifier.Impl(),
     ServiceStarter by ServiceStarter.Impl() {
@@ -299,7 +299,7 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
     private fun userDeclinedPermissions() {
         preferences.userDeclinedEnableLocationPermissions = true
         Snackbar.make(
-            binding!!.coordinatorLayout,
+            binding!!.mapCoordinatorLayout,
             getString(R.string.locationPermissionNotGrantedNotification),
             Snackbar.LENGTH_LONG
         ).setAction(getString(R.string.fixProblemLabel)) {
@@ -484,14 +484,14 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), MapMvvm.View,
                         startActivity(intent)
                     } catch (e: ActivityNotFoundException) {
                         Snackbar.make(
-                            binding!!.coordinatorLayout,
+                            binding!!.mapCoordinatorLayout,
                             getString(R.string.noNavigationApp),
                             Snackbar.LENGTH_SHORT
                         ).show()
                     }
                 } ?: run {
                     Snackbar.make(
-                        binding!!.coordinatorLayout,
+                        binding!!.mapCoordinatorLayout,
                         getString(R.string.contactLocationUnknown),
                         Snackbar.LENGTH_SHORT
                     ).show()

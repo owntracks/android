@@ -158,11 +158,6 @@ class GoogleMapFragment internal constructor(
         googleMap?.moveCamera(CameraUpdateFactory.newLatLng(latLng.toGMSLatLng()))
     }
 
-    override fun clearMarkers() {
-        this.googleMap?.clear()
-        markersOnMap.clear()
-    }
-
     override fun updateMarkerOnMap(
         id: String,
         latLng: org.owntracks.android.location.LatLng,

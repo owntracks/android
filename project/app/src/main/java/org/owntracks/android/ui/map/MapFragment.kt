@@ -24,7 +24,6 @@ abstract class MapFragment<V : ViewDataBinding> internal constructor(
 ) : Fragment() {
     protected abstract val layout: Int
     protected lateinit var binding: V
-    abstract fun clearMarkers()
     abstract fun updateCamera(latLng: LatLng)
     abstract fun updateMarkerOnMap(id: String, latLng: LatLng, image: Bitmap)
     abstract fun removeMarkerFromMap(id: String)

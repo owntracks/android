@@ -84,7 +84,6 @@ class GMSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
     }
 
 
-
     @Test
     fun mapActivityShouldPromptForLocationServicesOnFirstTime() {
         try {

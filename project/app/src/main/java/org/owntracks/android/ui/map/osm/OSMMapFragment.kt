@@ -183,10 +183,6 @@ class OSMMapFragment internal constructor(
         setMapStyle()
     }
 
-    override fun clearMarkers() {
-        mapView?.overlays?.clear()
-    }
-
     override fun updateCamera(latLng: LatLng) {
         mapView?.controller?.run {
             setCenter(latLng.toGeoPoint())
