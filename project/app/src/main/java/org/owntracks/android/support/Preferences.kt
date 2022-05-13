@@ -1171,7 +1171,16 @@ class Preferences @Inject constructor(
             modePreferenceKey,
             getIntResource(R.integer.valModeId)
         )
-        setMode(initMode, true)
+        if (initMode in listOf(
+                MessageProcessorEndpointMqtt.MODE_ID,
+                MessageProcessorEndpointHttp.MODE_ID
+            )
+        ) {
+            setMode(initMode, true)
+        } else {
+            preferencesStore.putInt(modePreferenceKey, getIntResource(R.integer.valModeId))
+            setMode(getIntResource(R.integer.valModeId), true)
+        }
 
         // Migrations
         if (preferencesStore.hasKey(getPreferenceKey(R.string.preferenceKeyGeocodeEnabled))) {
