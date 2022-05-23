@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="contactDetailsTrackerId">"Tracker ID"</string>
+    <string name="aboutFeedbackCategoryTitle">"Feedback"</string>
+    <string name="aboutIssuesSummary">"File on GitHub"</string>
+    <string name="aboutIssuesTitle">"Report an issue"</string>
+    <string name="aboutSourceCodeSummary">"on GitHub"</string>
     <string name="contactDetailsAccuracyValue">"%d m"</string>
-    <string name="contactDetailsDistanceValue">"%1$,.2f %2$s"</string>
-    <string name="contactDetailsBearingValue">"%,.0f°"</string>
     <string name="contactDetailsAltitudeValue">"%,d m"</string>
     <string name="contactDetailsBatteryValue">"%d %%"</string>
+    <string name="contactDetailsBearingValue">"%,.0f°"</string>
+    <string name="contactDetailsDistanceValue">"%1$,.2f %2$s"</string>
     <string name="contactDetailsSpeedValue">"%d kph"</string>
-    <string name="aboutIssuesTitle">"Report an issue"</string>
-    <string name="aboutIssuesSummary">"File on GitHub"</string>
-    <string name="aboutSourceCodeSummary">"on GitHub"</string>
-    <string name="aboutFeedbackCategoryTitle">"Feedback"</string>
+    <string name="contactDetailsTrackerId">"Tracker ID"</string>
 </resources>
