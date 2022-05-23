@@ -48,7 +48,6 @@
     <string name="exportConfiguration">"Exportar"</string>
     <string name="contactLocationUnknown">"Ubicació no disponible"</string>
     <string name="menuContactNavigate">"Navegar"</string>
-    <string name="currentLocationButtonLabel">"Posició actual"</string>
     <string name="contactDetailsAccuracy">"Precisió"</string>
     <string name="contactDetailsTopic">"Identificador"</string>
     <string name="waypointListPlaceholder">"Cap regió definida"</string>
@@ -98,6 +97,8 @@
     <string name="welcome_description">"Els següents passos t'ajudaran a començar amb Owntracks"</string>
     <string name="mode_heading">"Mode"</string>
     <string name="icon_description_owntracks">"OwnTracks"</string>
+
+    <!-- Fuzzy -->
     <string name="enjoy_description">"Escull preferències des del menú i configura Owntracks per al teu servidor abans d'utilitzar-lo"</string>
     <string name="done_heading">"Fet"</string>
     <string name="icon_description_done">"Fet"</string>
@@ -126,11 +127,6 @@
         <item quantity="one">"%1$d nou esdeveniment"</item>
         <item quantity="other">"%1$d nous esdeveniments"</item>
     </plurals>
-    <string name="welcome_version_title">"Restriccions"</string>
-    <string name="welcome_version_description">"A causa de les limitacions del sistema operatiu, algunes característiques poden funcionar de manera restringida.
-
-Es mostrarà una notificació permanent per continuar executant-se en segon pla. Es pot desactivar a les preferències de notificació del sistema."</string>
-    <string name="welcome_version_learn_more">"Saber-ne més"</string>
     <string name="INITIAL">"Inicialitzant"</string>
     <string name="IDLE">"Inactiu"</string>
     <string name="CONNECTING">"Connectant"</string>
@@ -244,4 +240,29 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="preferencesShowRegionsOnMap">"Mostra regions"</string>
     <string name="preferencesPegLocatorFastestIntervalToInterval">"Limita la freqüència màxima del localitzador"</string>
     <string name="preferencesPegLocatorFastestIntervalToIntervalSummary">"Sol·liciteu que el proveïdor d'ubicació proporcioni actualitzacions no més ràpidament que l'interval de localització sol·licitat"</string>
+    <string name="currentLocationButtonLabel">"Posició actual"</string>
+    <string name="mapLayerDialogTitle">"Capes del mapa"</string>
+    <string name="mapLayerGoogleMapDefaultLabel">"Estàndard Google"</string>
+    <string name="mapLayerGoogleMapHybridLabel">"Híbrida Google"</string>
+    <string name="mapLayerGoogleMapTerrainLabel">"Terreny Google"</string>
+    <string name="mapLayerOpenStreetMapLabel">"OpenStreetMap"</string>
+    <string name="mapLayerOpenStreetMapWikimediaLabel">"Wilimedia"</string>
+    <string name="monitoringModeDialogTitle">"Mode de seguiment"</string>
+    <string name="monitoringModeDialogSignificantTitle">"Canvis significatius"</string>
+    <string name="monitoringModeDialogSignificantDescription">"Ús d'energia i precisió/freqüència equilibrats"</string>
+    <string name="monitoringModeDialogMoveTitle">"Moure"</string>
+    <string name="monitoringModeDialogMoveDescription">"Alta freqüència i precisió, però ús elevat d'energia"</string>
+    <string name="monitoringModeDialogManualTitle">"Manual"</string>
+    <string name="monitoringModeDialogManualDescription">"Només les transicions de regió es publiquen automàticament, no les ubicacions"</string>
+    <string name="monitoringModeDialogQuietTitle">"Silenciòs"</string>
+    <string name="monitoringModeDialogQuietDescription">"No es publica cap esdeveniment automàticament"</string>
+    <string name="welcome_version_title">"Restriccions"</string>
+    <string name="welcome_version_description">"A causa de les limitacions del sistema operatiu, algunes característiques poden funcionar de manera restringida.
+
+Es mostrarà una notificació permanent per continuar executant-se en segon pla. Es pot desactivar a les preferències de notificació del sistema."</string>
+    <string name="welcome_version_learn_more">"Saber-ne més"</string>
+    <string name="welcome_connection_setup_title"></string>
+    <string name="welcome_connection_setup_description"></string>
+    <string name="welcome_connection_setup_learn_more_button_label"></string>
+    <string name="welcome_finish_open_preferences_button_label"></string>
 </resources>

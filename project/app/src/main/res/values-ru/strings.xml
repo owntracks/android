@@ -52,7 +52,6 @@
     <string name="exportConfiguration">"Экспорт"</string>
     <string name="contactLocationUnknown">"Местоположение недоступно"</string>
     <string name="menuContactNavigate">"Показать на карте"</string>
-    <string name="currentLocationButtonLabel">"Текущее местоположение"</string>
     <string name="contactDetailsAccuracy">"Точность"</string>
     <string name="contactDetailsTopic">"Идентификатор"</string>
     <string name="waypointListPlaceholder">"Места еще не обозначены"</string>
@@ -104,6 +103,8 @@
     <string name="welcome_description">"Следующие шаги помогут вам начать работу с OwnTracks"</string>
     <string name="mode_heading">"Режим"</string>
     <string name="icon_description_owntracks">"OwnTracks"</string>
+
+    <!-- Fuzzy -->
     <string name="enjoy_description">"Воспользуйтесь меню настроек и настройте OwnTracks для работы с вашим сервером"</string>
     <string name="done_heading">"Готово"</string>
     <string name="icon_description_done">"Готово"</string>
@@ -134,11 +135,6 @@
         <item quantity="many">"%1$d новых событий"</item>
         <item quantity="other">"%1$d новых событий"</item>
     </plurals>
-    <string name="welcome_version_title">"Ограничения"</string>
-    <string name="welcome_version_description">"Из-за ограничений Android некоторые функции могут работать не в полной мере.
-
-Постоянное уведомление будет отображаться в шторке для того, чтобы дать возможность приложению работать в фоне. Его можно отключить в системных настройках уведомлений."</string>
-    <string name="welcome_version_learn_more">"Узнайте больше"</string>
     <string name="INITIAL">"Инициализация"</string>
     <string name="IDLE">"Простой"</string>
     <string name="CONNECTING">"Подключение"</string>
@@ -250,4 +246,10 @@
     <string name="preferencesLocatorDisplacementDialog">"На какое расстояние должно переместиться устройство для обновления местоположения"</string>
     <string name="geocoderExceptionError">"Ошибка геокодирования. Подробная информация в журнале работы"</string>
     <string name="geocoderUnavailable">"Сервис геокодирования временно недоступен"</string>
+    <string name="currentLocationButtonLabel">"Текущее местоположение"</string>
+    <string name="welcome_version_title">"Ограничения"</string>
+    <string name="welcome_version_description">"Из-за ограничений Android некоторые функции могут работать не в полной мере.
+
+Постоянное уведомление будет отображаться в шторке для того, чтобы дать возможность приложению работать в фоне. Его можно отключить в системных настройках уведомлений."</string>
+    <string name="welcome_version_learn_more">"Узнайте больше"</string>
 </resources>

@@ -48,7 +48,6 @@
     <string name="exportConfiguration">"Export"</string>
     <string name="contactLocationUnknown">"Poloha není dostupná"</string>
     <string name="menuContactNavigate">"Navigovat"</string>
-    <string name="currentLocationButtonLabel">"Aktuální poloha"</string>
     <string name="contactDetailsAccuracy">"Přesnost"</string>
     <string name="contactDetailsTopic">"Identifikátor"</string>
     <string name="waypointListPlaceholder">"Oblasti nejsou definovány"</string>
@@ -84,20 +83,22 @@
     <string name="preferencesExportFailed">"Export nastavení selhal"</string>
     <string name="preferencesExportSuccess">"Export byl úspěšný"</string>
     <string name="welcomeFixIssue">"Fix"</string>
-    <string name="play_services_now_available">"Google Play Services jsou dostupné"</string>
-    <string name="play_services_not_available">"Google Play Services nejsou dostupné"</string>
-    <string name="play_services_update_required">"Google Play Services je nutné aktualizovat"</string>
+    <string name="play_services_now_available">"Služby Google Play jsou dostupné"</string>
+    <string name="play_services_not_available">"Sluřby Google Play nejsou dostupné"</string>
+    <string name="play_services_update_required">"Služby Google Play je nutné aktualizovat"</string>
     <string name="mode_http_private_label">"HTTP"</string>
     <string name="transitionEntering">"vstupuje"</string>
     <string name="transitionLeaving">"opouští"</string>
     <string name="errorPreferencesImportFailed">"Import selhal"</string>
-    <string name="welcome_play_heading">"Google Play Services"</string>
-    <string name="welcome_play_description">"OwnTracks vyžaduje Google Play Services"</string>
+    <string name="welcome_play_heading">"Služby Google Play"</string>
+    <string name="welcome_play_description">"OwnTracks vyžaduje služby Google Play"</string>
     <string name="icon_description_warning">"Varování"</string>
     <string name="welcome_heading">"Vítejte"</string>
     <string name="welcome_description">"Následující kroky Vám pomohou začít s OwnTracks"</string>
     <string name="mode_heading">"Mód"</string>
     <string name="icon_description_owntracks">"OwnTracks"</string>
+
+    <!-- Fuzzy -->
     <string name="enjoy_description">"Zvolte nabídku Nastavení a nakonfigurujte Owntracks před tím, než jej začnete používat"</string>
     <string name="done_heading">"Hotovo"</string>
     <string name="icon_description_done">"Hotovo"</string>
@@ -117,7 +118,7 @@
     <string name="preferencesEditor">"Editor"</string>
     <string name="preferencesEditorKeyError">"Zadán neplatný klíč"</string>
     <string name="preferencesEditorValueError">"Zadána neplatná hodnota"</string>
-    <string name="preferencesEditorDescription">"Nastavte jednu hodnotu pro zadaný klíč. Některé změny mohou vyžadovat restart aplikace."</string>
+    <string name="preferencesEditorDescription">"Nastavte hodnotu pro zadaný klíč. Některé změny mohou vyžadovat restart aplikace."</string>
     <string name="preferencesLoadFailed">"Nelze načíst použitelnou konfiguraci"</string>
     <string name="preferencesEditorKey">"Klíč"</string>
     <string name="preferencesEditorValue">"Hodnota"</string>
@@ -127,11 +128,6 @@
         <item quantity="few">"%1$d nových událost"</item>
         <item quantity="other">"%1$d nových událost"</item>
     </plurals>
-    <string name="welcome_version_title">"Omezení"</string>
-    <string name="welcome_version_description">"Kvůli omezením OS mohou některé funkce fungovat omezeně.
-
-Aby aplikace mohla běžet na pozadí, bude zobrazeno trvalé oznámení. Lze to deaktivovat v předvolbách Oznámení v systému."</string>
-    <string name="welcome_version_learn_more">"Zjistit víc"</string>
     <string name="INITIAL">"Inicializace"</string>
     <string name="IDLE">"Čekám"</string>
     <string name="CONNECTING">"Připojování"</string>
@@ -226,7 +222,7 @@ Další podrobnosti naleznete v protokolech."</string>
     <string name="deviceLocationDisabledDialogPositiveButtonLabel">"Nastavení polohy"</string>
     <string name="deviceLocationDisabledDialogMessage">"Služby určování polohy na tomto zařízení jsou momentálně vypnuté, takže OwnTracks nemůže sledovat vaši aktuální polohu.
 
-Chcete-li to povolit, zapněte polohu v nastavení zařízení."</string>
+Chcete-li to umožnit, zapněte polohu v nastavení zařízení."</string>
     <string name="aboutIssuesTitle">"Nahlásit problém"</string>
     <string name="aboutIssuesSummary">"GitHub"</string>
     <string name="aboutSourceCodeSummary">"GitHub"</string>
@@ -240,4 +236,31 @@ Chcete-li to povolit, zapněte polohu v nastavení zařízení."</string>
     <string name="preferencesLocatorDisplacementDialog">"Jak daleko se musí zařízení posunout (v metrech), než odešle další polohu"</string>
     <string name="geocoderExceptionError">"Ze služby geokodéru byla přijata chyba. Zkontrolujte protokoly a zjistěte další podrobnosti"</string>
     <string name="geocoderUnavailable">"Služba geokodéru je dočasně nedostupná"</string>
+    <string name="noBrowserInstalled">"Není nainstalován vhodný prohlížeč"</string>
+    <string name="preferencesMap">"Mapa"</string>
+    <string name="preferencesShowRegionsOnMapSummary">"Vykreslit kruhy oblasti na mapě"</string>
+    <string name="preferencesShowRegionsOnMap">"Ukázat oblasti"</string>
+    <string name="preferencesPegLocatorFastestIntervalToInterval">"Omezit max frekvenci lokátoru"</string>
+    <string name="preferencesPegLocatorFastestIntervalToIntervalSummary">"Požaduj, aby poskytovatel lokalizace neaktualizoval polohu rychleji, než je požadovaný interval"</string>
+    <string name="currentLocationButtonLabel">"Aktuální poloha"</string>
+    <string name="mapLayerDialogTitle">"Vrstvy mapy"</string>
+    <string name="mapLayerGoogleMapDefaultLabel">"Google výchozí"</string>
+    <string name="mapLayerGoogleMapHybridLabel">"Google hybridní"</string>
+    <string name="mapLayerGoogleMapTerrainLabel">"Google terén"</string>
+    <string name="mapLayerOpenStreetMapLabel">"OpenStreetMap"</string>
+    <string name="mapLayerOpenStreetMapWikimediaLabel">"Wikimedia"</string>
+    <string name="monitoringModeDialogTitle">"Mód sledování"</string>
+    <string name="monitoringModeDialogSignificantTitle">"Změny"</string>
+    <string name="monitoringModeDialogSignificantDescription">"Vyvážená spotřeba energie a přesnost/frekvence"</string>
+    <string name="monitoringModeDialogMoveTitle">"Pohyb"</string>
+    <string name="monitoringModeDialogMoveDescription">"Vysoká frekvence a přesnost, ale vysoká spotřeba energie"</string>
+    <string name="monitoringModeDialogManualTitle">"Ruční"</string>
+    <string name="monitoringModeDialogManualDescription">"Automaticky se zveřejňují pouze změny oblasti, nikoliv polohy"</string>
+    <string name="monitoringModeDialogQuietTitle">"Tichý"</string>
+    <string name="monitoringModeDialogQuietDescription">"Žádné události nejsou automaticky zveřejňovány"</string>
+    <string name="welcome_version_title">"Omezení"</string>
+    <string name="welcome_version_description">"Kvůli omezením OS mohou některé funkce fungovat omezeně.
+
+Aby aplikace mohla běžet na pozadí, bude zobrazeno trvalé oznámení. Lze to deaktivovat v předvolbách Oznámení v systému."</string>
+    <string name="welcome_version_learn_more">"Zjistit víc"</string>
 </resources>

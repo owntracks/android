@@ -44,7 +44,6 @@
     <string name="exportConfiguration">"Exportar"</string>
     <string name="contactLocationUnknown">"Localização não disponível"</string>
     <string name="menuContactNavigate">"Navegar"</string>
-    <string name="currentLocationButtonLabel">"Localização atual"</string>
     <string name="contactDetailsTopic">"Identificador"</string>
     <string name="waypointListPlaceholder">"Nenhuma região definida"</string>
     <string name="importConfig">"Importar"</string>
@@ -97,8 +96,6 @@
     <string name="preferencesEditorKey">"Chave"</string>
     <string name="preferencesEditorValue">"Valor"</string>
     <string name="restart">"Reiniciar"</string>
-    <string name="welcome_version_title">"Restrições"</string>
-    <string name="welcome_version_learn_more">"Saber mais"</string>
     <string name="INITIAL">"Inicializando"</string>
     <string name="CONNECTING">"Conectando"</string>
     <string name="CONNECTED">"Conectado"</string>
@@ -116,4 +113,7 @@
     <string name="aboutIssuesSummary">"File on GitHub"</string>
     <string name="aboutSourceCodeSummary">"on GitHub"</string>
     <string name="aboutFeedbackCategoryTitle">"Feedback"</string>
+    <string name="currentLocationButtonLabel">"Localização atual"</string>
+    <string name="welcome_version_title">"Restrições"</string>
+    <string name="welcome_version_learn_more">"Saber mais"</string>
 </resources>

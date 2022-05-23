@@ -48,10 +48,9 @@
     <string name="exportConfiguration">"Eksport"</string>
     <string name="contactLocationUnknown">"Lokalizacja niedostępna"</string>
     <string name="menuContactNavigate">"Nawiguj"</string>
-    <string name="currentLocationButtonLabel">"Aktualna lokalizacja"</string>
     <string name="contactDetailsAccuracy">"Precyzja"</string>
     <string name="contactDetailsTopic">"Identyfikator"</string>
-    <string name="waypointListPlaceholder">"Nie zdefiniowano regionów"</string>
+    <string name="waypointListPlaceholder">"Nie zdefiniowano obszarów"</string>
     <string name="importConfig">"Import"</string>
     <string name="preferencesSecurity">"Bezpieczeństwo"</string>
     <string name="accept">"Akceptuj"</string>
@@ -98,6 +97,8 @@
     <string name="welcome_description">"Poniższe kroki pomogą Ci rozpocząć pracę z OwnTracks"</string>
     <string name="mode_heading">"Tryb"</string>
     <string name="icon_description_owntracks">"OwnTracks"</string>
+
+    <!-- Fuzzy -->
     <string name="enjoy_description">"Wybierz ustawienia z menu i skonfiguruj OwnTracks dla swojego serwera przed użyciem go"</string>
     <string name="done_heading">"Gotowe"</string>
     <string name="icon_description_done">"Gotowe"</string>
@@ -128,11 +129,6 @@
         <item quantity="many">"%1$d nowych zdarzeń"</item>
         <item quantity="other">"%1$d nowych zdarzeń"</item>
     </plurals>
-    <string name="welcome_version_title">"Ograniczenia"</string>
-    <string name="welcome_version_description">"Przez ograniczenia systemu, niektóre funkcje mogą zostać zredukowane.
-
-Aby utrzymać działanie aplikacji w tle, będzie wyświetlana permanentna notyfikacja. Można ją wyłączyć w systemowych ustawieniach powiadomień."</string>
-    <string name="welcome_version_learn_more">"Dowiedz się więcej"</string>
     <string name="INITIAL">"Inicjalizacja"</string>
     <string name="IDLE">"bezczynny"</string>
     <string name="CONNECTING">"Łączenie"</string>
@@ -242,4 +238,27 @@ Aby to umożliwić, włącz lokalizację w ustawieniach urządzenia."</string>
     <string name="preferencesLocatorDisplacementDialog">"Jak daleko urządzenie powinno się oddalić (w metrach) przed odebraniem kolejnej lokalizacji"</string>
     <string name="geocoderExceptionError">"Usługa geokodera zwróciła błąd. Szczegóły w logach"</string>
     <string name="geocoderUnavailable">"Usługa geokodera jest tymczasowo niedostępna"</string>
+    <string name="noBrowserInstalled">"Brak zainstalowanej odpowiedniej przeglądarki"</string>
+    <string name="preferencesMap">"Mapa"</string>
+    <string name="preferencesShowRegionsOnMapSummary">"Rysuj okręgi obszarów na mapie"</string>
+    <string name="preferencesShowRegionsOnMap">"Pokaż obszary"</string>
+    <string name="currentLocationButtonLabel">"Aktualna lokalizacja"</string>
+    <string name="mapLayerDialogTitle">"Warstwy mapy"</string>
+    <string name="mapLayerGoogleMapDefaultLabel">"Google: domyślna"</string>
+    <string name="mapLayerGoogleMapHybridLabel">"Google: hybrydowa"</string>
+    <string name="mapLayerGoogleMapTerrainLabel">"Google: teren"</string>
+    <string name="mapLayerOpenStreetMapLabel">"OpenStreetMap"</string>
+    <string name="mapLayerOpenStreetMapWikimediaLabel">"Wikimedia"</string>
+    <string name="monitoringModeDialogTitle">"Tryb monitorowania"</string>
+    <string name="monitoringModeDialogSignificantTitle">"Znaczące zmiany"</string>
+    <string name="monitoringModeDialogSignificantDescription">"Zrównoważone zużycie energii oraz dokładność/częstotliwość"</string>
+    <string name="monitoringModeDialogMoveTitle">"Ruch"</string>
+    <string name="monitoringModeDialogMoveDescription">"Wysoka częstotliwość i dokładność, wysokie zużycie energii"</string>
+    <string name="monitoringModeDialogManualTitle">"Ręczny"</string>
+    <string name="monitoringModeDialogQuietTitle">"Cichy"</string>
+    <string name="welcome_version_title">"Ograniczenia"</string>
+    <string name="welcome_version_description">"Przez ograniczenia systemu, niektóre funkcje mogą zostać zredukowane.
+
+Aby utrzymać działanie aplikacji w tle, będzie wyświetlana permanentna notyfikacja. Można ją wyłączyć w systemowych ustawieniach powiadomień."</string>
+    <string name="welcome_version_learn_more">"Dowiedz się więcej"</string>
 </resources>

@@ -48,7 +48,6 @@
     <string name="exportConfiguration">"Exportar"</string>
     <string name="contactLocationUnknown">"Ubicación no disponible"</string>
     <string name="menuContactNavigate">"Navegar"</string>
-    <string name="currentLocationButtonLabel">"Ubicación actual"</string>
     <string name="contactDetailsAccuracy">"Precisión"</string>
     <string name="contactDetailsTopic">"Identificador"</string>
     <string name="waypointListPlaceholder">"No hay regiones definidas"</string>
@@ -98,6 +97,8 @@
     <string name="welcome_description">"Los siguientes pasos te ayudarán a comenzar con OwnTracks"</string>
     <string name="mode_heading">"Modo"</string>
     <string name="icon_description_owntracks">"OwnTracks"</string>
+
+    <!-- Fuzzy -->
     <string name="enjoy_description">"Selecciona las preferencias del menú y configura tu OwnTracks antes de empezar a usarlo"</string>
     <string name="done_heading">"Hecho"</string>
     <string name="icon_description_done">"Hecho"</string>
@@ -126,11 +127,6 @@
         <item quantity="one">"%1$d eventos nuevo"</item>
         <item quantity="other">"%1$d eventos nuevos"</item>
     </plurals>
-    <string name="welcome_version_title">"Restricciones"</string>
-    <string name="welcome_version_description">"Debido a limitaciones del sistema algunas características pueden no funcionar.
-
-Una notificación permanente se mostrará para mantener la aplicación funcionando en segundo plano. Se puede deshabilitar en ajustes del sistema."</string>
-    <string name="welcome_version_learn_more">"Aprender más"</string>
     <string name="INITIAL">"Inicializando"</string>
     <string name="IDLE">"Idle"</string>
     <string name="CONNECTING">"Conectando"</string>
@@ -197,4 +193,10 @@ Una notificación permanente se mostrará para mantener la aplicación funcionan
     <string name="aboutIssuesSummary">"File on GitHub"</string>
     <string name="aboutSourceCodeSummary">"on GitHub"</string>
     <string name="aboutFeedbackCategoryTitle">"Feedback"</string>
+    <string name="currentLocationButtonLabel">"Ubicación actual"</string>
+    <string name="welcome_version_title">"Restricciones"</string>
+    <string name="welcome_version_description">"Debido a limitaciones del sistema algunas características pueden no funcionar.
+
+Una notificación permanente se mostrará para mantener la aplicación funcionando en segundo plano. Se puede deshabilitar en ajustes del sistema."</string>
+    <string name="welcome_version_learn_more">"Aprender más"</string>
 </resources>

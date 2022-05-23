@@ -48,7 +48,6 @@
     <string name="exportConfiguration">"Exportieren"</string>
     <string name="contactLocationUnknown">"Kein Standort verfügbar"</string>
     <string name="menuContactNavigate">"Navigieren"</string>
-    <string name="currentLocationButtonLabel">"Aktuelle Position"</string>
     <string name="contactDetailsAccuracy">"Genauigkeit"</string>
     <string name="contactDetailsTopic">"Kennung"</string>
     <string name="waypointListPlaceholder">"Keine Orte angelegt"</string>
@@ -98,6 +97,8 @@
     <string name="welcome_description">"Die folgenden Schritte werden Dir helfen, OwnTracks einzurichten"</string>
     <string name="mode_heading">"Modus"</string>
     <string name="icon_description_owntracks">"OwnTracks"</string>
+
+    <!-- Fuzzy -->
     <string name="enjoy_description">"Viel Spaß mit OwnTracks"</string>
     <string name="done_heading">"Fertig"</string>
     <string name="icon_description_done">"Fertig"</string>
@@ -126,9 +127,6 @@
         <item quantity="one">"%1$d neue Ereignis"</item>
         <item quantity="other">"%1$d neue Ereignisse"</item>
     </plurals>
-    <string name="welcome_version_title">"Einschränkungen"</string>
-    <string name="welcome_version_description">"Einige Funktionen sind aufgrund der Android version nur eingeschränkt verfügbar"</string>
-    <string name="welcome_version_learn_more">"Mehr erfahren"</string>
     <string name="INITIAL">"Initialisieren"</string>
     <string name="IDLE">"Aktiv"</string>
     <string name="CONNECTING">"Verbinden"</string>
@@ -231,4 +229,8 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="contactDetailsDistanceUnitMeters">"m"</string>
     <string name="exportConfigurationSubject">"OwnTracks Configuration Files"</string>
     <string name="exportLogFileSubject">"OwnTracks Log File"</string>
+    <string name="currentLocationButtonLabel">"Aktuelle Position"</string>
+    <string name="welcome_version_title">"Einschränkungen"</string>
+    <string name="welcome_version_description">"Einige Funktionen sind aufgrund der Android version nur eingeschränkt verfügbar"</string>
+    <string name="welcome_version_learn_more">"Mehr erfahren"</string>
 </resources>

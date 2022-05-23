@@ -48,7 +48,6 @@
     <string name="exportConfiguration">"エクスポート"</string>
     <string name="contactLocationUnknown">"位置情報が存在しません"</string>
     <string name="menuContactNavigate">"ナビゲーション"</string>
-    <string name="currentLocationButtonLabel">"現在位置"</string>
     <string name="contactDetailsAccuracy">"精度"</string>
     <string name="contactDetailsTopic">"識別子"</string>
     <string name="waypointListPlaceholder">"リージョンが1つもありません"</string>
@@ -102,6 +101,8 @@
 
     <!-- Fuzzy -->
     <string name="icon_description_owntracks">"Owntracks"</string>
+
+    <!-- Fuzzy -->
     <string name="enjoy_description">"Owntracksの利用を開始する前に、メニューから環境設定を選択し、サーバの設定を行ってください"</string>
     <string name="done_heading">"完了"</string>
     <string name="icon_description_done">"完了"</string>
@@ -129,11 +130,6 @@
     <plurals name="notificationEventsTitle">
         <item quantity="other">"%1$d 件の新しいイベント"</item>
     </plurals>
-    <string name="welcome_version_title">"制限"</string>
-    <string name="welcome_version_description">"OSの制限により、一部の機能の動作が制限される場合があります。
-
-アプリをバックグラウンドで常に起動させるために、常時、通知が表示されます。この通知は、システムの通知設定で無効化することができます。"</string>
-    <string name="welcome_version_learn_more">"詳しく"</string>
     <string name="INITIAL">"初期化中"</string>
     <string name="IDLE">"アイドル"</string>
     <string name="CONNECTING">"接続中"</string>
@@ -237,4 +233,10 @@
     <string name="preferencesLocatorDisplacementSummary">"位置更新と判定する最小移動距離"</string>
     <string name="geocoderExceptionError">"ジオコーダーサービスでエラーが発生しました。詳細はログを確認してください。"</string>
     <string name="geocoderUnavailable">"ジオコーダーサービスは一時的に利用できません"</string>
+    <string name="currentLocationButtonLabel">"現在位置"</string>
+    <string name="welcome_version_title">"制限"</string>
+    <string name="welcome_version_description">"OSの制限により、一部の機能の動作が制限される場合があります。
+
+アプリをバックグラウンドで常に起動させるために、常時、通知が表示されます。この通知は、システムの通知設定で無効化することができます。"</string>
+    <string name="welcome_version_learn_more">"詳しく"</string>
 </resources>

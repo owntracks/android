@@ -40,7 +40,6 @@
     <string name="radius">"半径"</string>
     <string name="exportConfiguration">"导出"</string>
     <string name="menuContactNavigate">"导航"</string>
-    <string name="currentLocationButtonLabel">"当前位置"</string>
     <string name="contactDetailsAccuracy">"精度"</string>
     <string name="waypointListPlaceholder">"还未定义区域"</string>
     <string name="importConfig">"导入"</string>
@@ -86,6 +85,8 @@
 
     <!-- Fuzzy -->
     <string name="icon_description_owntracks">"Owntracks"</string>
+
+    <!-- Fuzzy -->
     <string name="enjoy_description">"在使用 OwnTracks 之前，请从菜单中选择首选项，并配置您的服务器"</string>
     <string name="done_heading">"完成"</string>
     <string name="icon_description_done">"完成"</string>
@@ -104,11 +105,6 @@
     <plurals name="notificationEventsTitle">
         <item quantity="other">"%1$d 条新事件"</item>
     </plurals>
-    <string name="welcome_version_title">"限制"</string>
-    <string name="welcome_version_description">"由于操作系统限制，某些功能可能会运作在受限的行为模式下。
-
-为使本程序能够在后台正常运行，通知栏中会一直显示一个通知。您可以在系统设置的通知相关设置中屏蔽掉这条通知。"</string>
-    <string name="welcome_version_learn_more">"了解更多信息"</string>
     <string name="INITIAL">"正在初始化"</string>
     <string name="IDLE">"空闲"</string>
     <string name="CONNECTING">"正在连接"</string>
@@ -161,4 +157,10 @@
     <string name="contactDetailsDistanceUnitKilometres">"千米"</string>
     <string name="contactDetailsDistanceUnitMeters">"米"</string>
     <string name="exportConfigurationSubject">"OwnTracks配置文件"</string>
+    <string name="currentLocationButtonLabel">"当前位置"</string>
+    <string name="welcome_version_title">"限制"</string>
+    <string name="welcome_version_description">"由于操作系统限制，某些功能可能会运作在受限的行为模式下。
+
+为使本程序能够在后台正常运行，通知栏中会一直显示一个通知。您可以在系统设置的通知相关设置中屏蔽掉这条通知。"</string>
+    <string name="welcome_version_learn_more">"了解更多信息"</string>
 </resources>

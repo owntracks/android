@@ -52,7 +52,6 @@
     <string name="exportConfiguration">"Exporter"</string>
     <string name="contactLocationUnknown">"Aucune localisation disponible"</string>
     <string name="menuContactNavigate">"Naviguer"</string>
-    <string name="currentLocationButtonLabel">"Localisation actuelle"</string>
     <string name="contactDetailsAccuracy">"Précision"</string>
     <string name="contactDetailsTopic">"Identifiant"</string>
     <string name="waypointListPlaceholder">"Aucune région définie"</string>
@@ -104,6 +103,8 @@
     <string name="welcome_description">"Les étapes suivantes vous aideront à démarrer avec OwnTracks"</string>
     <string name="mode_heading">"Mode"</string>
     <string name="icon_description_owntracks">"OwnTracks"</string>
+
+    <!-- Fuzzy -->
     <string name="enjoy_description">"Sélectionnez les préférences dans le menu et configurez OwnTracks pour votre serveur avant de l'utiliser"</string>
     <string name="done_heading">"Terminé"</string>
     <string name="icon_description_done">"Terminé"</string>
@@ -133,9 +134,6 @@ Importer"</string>
         <item quantity="one">"%1$d nouvel événement"</item>
         <item quantity="other">"%1$d nouveaux événements"</item>
     </plurals>
-    <string name="welcome_version_title">"Restrictions"</string>
-    <string name="welcome_version_description">"En raison des limitations du système d'exploitation, certaines fonctionnalités peuvent fonctionner de manière restreinte. \ n \ n Une notification permanente sera affichée pour continuer à fonctionner en arrière-plan. Il peut être désactivé dans les préférences de notification des systèmes."</string>
-    <string name="welcome_version_learn_more">"Apprendre encore plus"</string>
     <string name="INITIAL">"Initialisation"</string>
     <string name="IDLE">"Ralenti"</string>
     <string name="CONNECTING">"Connexion"</string>
@@ -224,4 +222,10 @@ Importer"</string>
     <string name="aboutIssuesSummary">"File on GitHub"</string>
     <string name="aboutSourceCodeSummary">"on GitHub"</string>
     <string name="aboutFeedbackCategoryTitle">"Feedback"</string>
+    <string name="currentLocationButtonLabel">"Localisation actuelle"</string>
+    <string name="welcome_version_title">"Restrictions"</string>
+    <string name="welcome_version_description">"En raison des limitations du système d'exploitation, certaines fonctionnalités peuvent fonctionner de manière restreinte.
+
+Une notification permanente sera affichée pour continuer à fonctionner en arrière-plan. Il peut être désactivé dans les préférences de notification des systèmes."</string>
+    <string name="welcome_version_learn_more">"Apprendre encore plus"</string>
 </resources>
