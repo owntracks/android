@@ -7,7 +7,7 @@ aliases:
     run:
       name: Generate cache checksum
       command: |
-        find . -name 'build.gradle.kts' -o -name "libs.versions.toml" -o -name "gradle-wrapper.properties" | sort | xargs cat | shasum | awk '{print $1}' > /tmp/gradle_cache_seed
+        find . -name 'build.gradle.kts' -o -name "libs.versions.toml" -o -name "gradle-wrapper.properties" -o \(  -path "./project/app/src/*" -a  \( -name "*.kt" -o -name "*.java" \) \) | sort | xargs cat | shasum | awk '{print $1}' > /tmp/gradle_cache_seed
   - &restore_gradle_cache
     restore_cache:
       name: Restore gradle cache
