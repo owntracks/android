@@ -5,6 +5,7 @@ import android.location.Criteria
 import android.location.Location
 import android.location.LocationManager
 import android.os.SystemClock
+import androidx.core.location.LocationCompat
 import java.util.concurrent.TimeUnit
 
 open class GPSMockDeviceLocation : MockDeviceLocation {
@@ -49,25 +50,19 @@ open class GPSMockDeviceLocation : MockDeviceLocation {
         }
     }
 
-    override fun setMockLocation(
-        latitude: Double,
-        longitude: Double,
-        accuracy: Float
-    ) {
+    override fun setMockLocation(latitude: Double, longitude: Double, accuracy: Float) {
         listOf(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER).forEach { provider ->
             val location = Location(provider).apply {
                 this.latitude = latitude
                 this.longitude = longitude
                 this.accuracy = accuracy
-                this.time = System.currentTimeMillis()
-                this.altitude = 50.0
-                this.bearing = 0f
-                this.speed = 0f
-                this.elapsedRealtimeNanos =
-                    TimeUnit.MILLISECONDS.toNanos(SystemClock.uptimeMillis())
-                this.bearingAccuracyDegrees = 0f
-                this.speedAccuracyMetersPerSecond = 1f
-                this.elapsedRealtimeUncertaintyNanos = 10.0
+                time = System.currentTimeMillis()
+                altitude = 50.0
+                bearing = 0f
+                speed = 0f
+                elapsedRealtimeNanos = TimeUnit.MILLISECONDS.toNanos(SystemClock.uptimeMillis())
+                LocationCompat.setBearingAccuracyDegrees(this, 0f)
+                LocationCompat.setSpeedAccuracyMetersPerSecond(this, 1f)
             }
             locationManager?.setTestProviderLocation(
                 provider,

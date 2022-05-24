@@ -15,6 +15,8 @@ import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.support.Preferences
 import org.owntracks.android.testutils.TestWithAnActivity
+import org.owntracks.android.testutils.disableDeviceLocation
+import org.owntracks.android.testutils.enableDeviceLocation
 import org.owntracks.android.testutils.setNotFirstStartPreferences
 
 @LargeTest
@@ -31,9 +33,7 @@ class OSSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
     @Test
     fun mapActivityShouldPromptForLocationServicesOnFirstTime() {
         try {
-            InstrumentationRegistry.getInstrumentation().uiAutomation
-                .executeShellCommand("settings put secure location_mode 0")
-                .close()
+            disableDeviceLocation()
             setNotFirstStartPreferences()
             launchActivity()
             PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -41,18 +41,14 @@ class OSSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
             clickDialogNegativeButton()
             assertDisplayed(R.id.osm_map_view)
         } finally {
-            InstrumentationRegistry.getInstrumentation().uiAutomation
-                .executeShellCommand("settings put secure location_mode 3")
-                .close()
+            disableDeviceLocation()
         }
     }
 
     @Test
     fun mapActivityShouldNotPromptForLocationServicesIfPreviouslyDeclined() {
         try {
-            InstrumentationRegistry.getInstrumentation().uiAutomation
-                .executeShellCommand("settings put secure location_mode 0")
-                .close()
+            disableDeviceLocation()
             setNotFirstStartPreferences()
             PreferenceManager.getDefaultSharedPreferences(InstrumentationRegistry.getInstrumentation().targetContext)
                 .edit()
@@ -63,9 +59,7 @@ class OSSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
             assertNotExist(R.string.deviceLocationDisabledDialogTitle)
             assertDisplayed(R.id.osm_map_view)
         } finally {
-            InstrumentationRegistry.getInstrumentation().uiAutomation
-                .executeShellCommand("settings put secure location_mode 3")
-                .close()
+            enableDeviceLocation()
         }
     }
 }
