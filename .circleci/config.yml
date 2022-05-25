@@ -2,286 +2,34 @@
 # Machine image tags listed at https://circleci.com/developer/machine/image/android
 version: 2.1
 
-aliases:
-  - &generate_gradle_cache_checksum
-    run:
-      name: Generate cache checksum
-      command: |
-        find . -name 'build.gradle.kts' -o -name "libs.versions.toml" -o -name "gradle-wrapper.properties" -o \(  -path "./project/app/src/*" -a  \( -name "*.kt" -o -name "*.java" \) \) | sort | xargs cat | shasum | awk '{print $1}' > /tmp/gradle_cache_seed
-  - &restore_gradle_cache
-    restore_cache:
-      name: Restore gradle cache
-      keys:
-        - gradle-v3-{{ arch }}-{{ checksum "/tmp/gradle_cache_seed" }}
-        - gradle-v3-{{ arch }}-
-        - gradle-v3-
-  - &android-docker-image
-    image: cimg/android:2022.04
+setup: true
 
 orbs:
-  android: circleci/android@2.0.3
+  continuation: circleci/continuation@0.3.0
 
 jobs:
-  build:
-    docker:
-      - *android-docker-image
-    resource_class: large
-
-    steps:
-      # Checkout the code as the first step.
-      - checkout
-      - android/accept-licenses
-      - android/restore-build-cache
-      - *generate_gradle_cache_checksum
-      - *restore_gradle_cache
-      - run:
-          name: Build
-          command: |
-            ./project/gradlew -p ./project assembleDebug assembleAndroidTest assembleGmsReleaseUnitTest :app:compileOssReleaseSources :app:packageGmsReleaseBundle app:assembleGmsDebugAndroidTest app:assembleOssDebugAndroidTest --scan
-
-      - android/save-gradle-cache:
-          cache-prefix: v3
-      - android/save-build-cache
-      - persist_to_workspace:
-          root: project/app/build/outputs/apk/oss/debug/
-          paths:
-            - app-oss-debug.apk
-  fdroid-scanner:
-    docker:
-      - *android-docker-image
-    resource_class: small
-    steps:
-      - checkout
-      - attach_workspace:
-          at: project/app/build/outputs/apk/oss/debug/
-      - run:
-          name: Fdroid Scanner
-          command: |
-            python3 ./.circleci/fdroid-scanner-stub.py
-
-  unit-test:
-    docker:
-      - *android-docker-image
-    resource_class: large
-
-    steps:
-      - checkout
-      - android/accept-licenses
-      - android/restore-build-cache
-      - *generate_gradle_cache_checksum
-      - *restore_gradle_cache
-      - run:
-          name: Unit Test
-          command: |
-            ./project/gradlew -p ./project jacocoTestGmsReleaseUnitTestReport --scan
-      - store_test_results:
-          path: project/app/build/test-results/testGmsReleaseUnitTest
-      - persist_to_workspace:
-          root: project/app/build/
-          paths:
-            - jacoco/jacoco.xml
-
-  lint:
-    docker:
-      - *android-docker-image
-    resource_class: medium+
-
-    steps:
-      - checkout
-      - android/accept-licenses
-      - android/restore-build-cache
-      - *generate_gradle_cache_checksum
-      - *restore_gradle_cache
-      - run:
-          name: Lint
-          command: |
-            ./project/gradlew -p ./project lint --scan
-      - store_artifacts:
-          path: project/app/build/reports/lint-results.html
-          destination: lint-report
-
-  oss-ui-tests:
-    machine:
-      image: android:2022.04.1
-    resource_class: large
-    parallelism: 4
-    environment:
-      GRADLE_OPTS: "-Dkotlin.compiler.execution.strategy=in-process"
-    steps:
-      - checkout
-      - android/accept-licenses
-      - android/restore-build-cache
-      - *generate_gradle_cache_checksum
-      - *restore_gradle_cache
-      - android/start-emulator-and-run-tests:
-          additional-avd-args: "-d pixel_3a -c 1G"
-          additional-emulator-args: "-memory 4096 -cores 3"
-          test-command: ./gradlew createOssDebugCoverageReport --scan --no-daemon --max-workers 2
-          system-image: system-images;android-29;default;x86_64
-          restore-gradle-cache-post-emulator-launch: false
-          run-tests-working-directory: ./project
-          post-emulator-wait-steps:
-            - run: adb shell settings put secure location_providers_allowed +gps && adb shell settings put secure location_providers_allowed +network && adb shell settings put secure location_mode 3 && adb shell settings put global heads_up_notifications_enabled 0 && adb root && sleep 5 && adb shell setprop ctl.restart zygote
-            - run:
-                background: true
-                command: |
-                  adb logcat
-                name: Logcat
-          post-emulator-launch-assemble-command: ""
-          run-logcat: false
-          max-tries: 2
-          no-output-timeout: 30m
-          save-gradle-cache: false
-      - store_test_results:
-          path: project/app/build/outputs/androidTest-results/connected/flavors/oss/
-      - persist_to_workspace:
-          root: project/app/build/
-          paths:
-            - reports/coverage/androidTest/oss/debug/report.xml
-      - store_artifacts:
-          path: project/app/build/reports/androidTests
-          destination: espresso-report-oss
-
-  gms-ui-tests:
-    machine:
-      image: android:2022.04.1
-    resource_class: large
-    parallelism: 4
-    environment:
-      GRADLE_OPTS: "-Dkotlin.compiler.execution.strategy=in-process"
-    steps:
-      - checkout
-      - android/accept-licenses
-      - android/restore-build-cache
-      - *generate_gradle_cache_checksum
-      - *restore_gradle_cache
-      - android/start-emulator-and-run-tests:
-          additional-avd-args: "-d pixel_3a -c 1G"
-          additional-emulator-args: "-memory 4096 -cores 3"
-          test-command: ./gradlew createGmsDebugCoverageReport --scan --no-daemon --max-workers 2
-          system-image: system-images;android-29;google_apis;x86_64
-          restore-gradle-cache-post-emulator-launch: false
-          run-tests-working-directory: ./project
-          post-emulator-wait-steps:
-            - run: adb shell settings put secure location_providers_allowed +gps && adb shell settings put secure location_providers_allowed +network && adb shell settings put secure location_mode 3 && adb shell settings put global heads_up_notifications_enabled 0 && adb root && sleep 5 && adb shell setprop ctl.restart zygote
-            - run:
-                background: true
-                command: |
-                  adb logcat
-                name: Logcat
-          post-emulator-launch-assemble-command: ""
-          run-logcat: false
-          max-tries: 2
-          no-output-timeout: 30m
-          save-gradle-cache: false
-      - run:
-          name: Debug
-          command: |
-            find -name report.xml
-
-      - store_test_results:
-          path: project/app/build/outputs/androidTest-results/connected/flavors/gms/
-      - persist_to_workspace:
-          root: project/app/build/
-          paths:
-            - reports/coverage/androidTest/gms/debug/report.xml
-      - store_artifacts:
-          path: project/app/build/reports/androidTests
-          destination: espresso-report-gms
-
-  publish-coverage:
-    docker:
+  check-if-forked:
+    docker: 
       - image: cimg/base:stable
     resource_class: small
     steps:
       - checkout
-      - attach_workspace:
-          at: project/app/build/
       - run:
-          command: curl -Os "https://uploader.codecov.io/latest/linux/codecov"
-          name: Download Codecov Uploader
-      - run:
+          name: Evaluate whether running within repo or as forked PR
           command: |
-            curl https://keybase.io/codecovsecurity/pgp_keys.asc | gpg --no-default-keyring --import # One-time step
-            curl -Os "https://uploader.codecov.io/latest/linux/codecov.SHA256SUM"
-            curl -Os "https://uploader.codecov.io/latest/linux/codecov.SHA256SUM.sig"
-            gpg --verify codecov.SHA256SUM.sig codecov.SHA256SUM
-            shasum -a 256 -c codecov.SHA256SUM || sha256sum -c codecov.SHA256SUM
-            chmod +x codecov
-          name: Validate Codecov Uploader
-      - run:
-          name: Upload Codecov coverage for espresso tests
-          command: |
-            ./codecov \
-              -Q CircleCI \
-              -n ${CIRCLE_BUILD_NUM} \
-              -F uitests \
-              -v \
-              -Z \
-              -f reports/coverage/**/report.xml
-      - run:
-          name: Upload Codecov coverage for unit tests
-          command: |
-            ./codecov \
-              -Q CircleCI \
-              -n ${CIRCLE_BUILD_NUM} \
-              -v \
-              -Z \
-              -F unittests \
-              -f project/app/build/jacoco/jacoco.xml
-  publish-to-play-store:
-    docker:
-      - *android-docker-image
-    resource_class: medium
-
-    steps:
-      # Checkout the code as the first step.
-      - checkout
-      - android/accept-licenses
-      - android/restore-build-cache
-      - *generate_gradle_cache_checksum
-      - *restore_gradle_cache
-      - run:
-          name: Set credentials
-          command: |
-            echo -n $GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS_BASE64 | base64 -d > project/app/owntracks-android-gcloud-creds.json
-            echo -n $KEYSTORE_BASE64 | base64 -d > project/owntracks.release.keystore.jks
-      - run:
-          name: Build
-          command: |
-            ./project/gradlew -p ./project publishGmsReleaseBundle --scan
-
+            if [ -z "$CIRCLE_PR_REPONAME" ] #If this exists then it's a forked PR
+            then
+              echo "In internal contribution flow"
+              echo '{}' | jq '.' > pipeline-params.json
+            else
+               echo "In OSS contribution flow - $CIRCLE_PR_USERNAME $CIRCLE_PR_REPONAME"
+              echo '{}' | jq '. += { "oss-contribution-flow" : true}' >  pipeline-params.json            
+            fi  
+            
+      - continuation/continue:
+          parameters: pipeline-params.json
+          configuration_path: .circleci/continue-config.yml
 workflows:
-  build-and-test:
+  always-run:
     jobs:
-      - build
-      - fdroid-scanner:
-          requires:
-            - build
-      - unit-test:
-          requires:
-            - build
-      - lint:
-          requires:
-            - build
-      - oss-ui-tests:
-          requires:
-            - unit-test
-      - gms-ui-tests:
-          requires:
-            - unit-test
-      - publish-coverage:
-          requires:
-            - unit-test
-            - oss-ui-tests
-            - gms-ui-tests
-      - publish-to-play-store:
-          context: Android Deploy Credentials
-          requires:
-            - unit-test
-            - oss-ui-tests
-            - gms-ui-tests
-            - lint
-          filters:
-            branches:
-              only: master
+      - check-if-forked
