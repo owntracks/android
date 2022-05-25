@@ -1,0 +1,300 @@
+version: 2.1
+
+parameters:
+  oss-contribution-flow:
+    type: boolean
+    default: false
+
+executors:
+  android-docker:
+    docker:
+      - image: cimg/android:2022.04
+  android-machine:
+    machine:
+      image: android:2022.04.1
+
+commands:
+  restore-gradle-cache:
+    parameters:
+      version:
+        type: string
+        default: v4
+    steps:
+      - run:
+          name: Generate Gradle buildfiles seed
+          command: |
+            find . -name 'build.gradle.kts' -o -name 'libs.versions.toml' -o -name 'gradle-wrapper.properties'  | 
+            sort      | 
+            xargs cat | 
+            shasum    | 
+            awk '{print $1}' > /tmp/gradle_buildfiles_cache_seed
+      - run:
+          name: Generate Gradle sources seed
+          command: |
+            find . -path "./project/app/src/*" -a  \( -name "*.kt" -o -name "*.java" \) | 
+            sort      | 
+            xargs cat | 
+            shasum    | 
+            awk '{print $1}' > /tmp/gradle_sources_cache_seed
+      - restore_cache:
+          keys:
+            - gradle-<< parameters.version >>-{{ arch }}-buildscript-{{ checksum "/tmp/gradle_buildfiles_cache_seed"}}-sources-{{ checksum "/tmp/gradle_sources_cache_seed"}}
+            - gradle-<< parameters.version >>-{{ arch }}-buildscript-{{ checksum "/tmp/gradle_buildfiles_cache_seed"}}-
+            - gradle-<< parameters.version >>-{{ arch }}-
+            - gradle-<< parameters.version >>-
+
+  save-gradle-cache:
+    parameters:
+      version:
+        type: string
+        default: v4
+    steps:
+      - save_cache:
+          key: >-
+            gradle-<< parameters.version >>-{{ arch }}-buildscript-{{ checksum "/tmp/gradle_buildfiles_cache_seed"}}-sources-{{ checksum "/tmp/gradle_sources_cache_seed"}}
+          paths:
+            - ~/.gradle/caches
+            - ~/.gradle/wrapper
+
+orbs:
+  android: circleci/android@2.0.3
+  codecov: codecov/codecov@3.2.2
+
+jobs:
+  build:
+    executor: android-docker
+    resource_class: large
+
+    steps:
+      # Checkout the code as the first step.
+      - checkout
+      - android/accept-licenses
+      - restore-gradle-cache
+      - run:
+          name: Build
+          command: |
+            ./project/gradlew -p ./project assembleDebug assembleAndroidTest assembleGmsReleaseUnitTest :app:compileOssReleaseSources :app:packageGmsReleaseBundle app:assembleGmsDebugAndroidTest app:assembleOssDebugAndroidTest --scan
+      - save-gradle-cache
+      - persist_to_workspace:
+          root: project/app/build/outputs/apk/oss/debug/
+          paths:
+            - app-oss-debug.apk
+  fdroid-scanner:
+    executor: android-docker
+    resource_class: small
+    steps:
+      - checkout
+      - attach_workspace:
+          at: project/app/build/outputs/apk/oss/debug/
+      - run:
+          name: Fdroid Scanner
+          command: |
+            python3 ./.circleci/fdroid-scanner-stub.py
+
+  unit-test:
+    executor: android-docker
+    resource_class: large
+    steps:
+      - checkout
+      - android/accept-licenses
+      - restore-gradle-cache
+      - run:
+          name: Unit Test
+          command: |
+            ./project/gradlew -p ./project jacocoTestGmsReleaseUnitTestReport --scan
+      - store_test_results:
+          path: project/app/build/test-results/testGmsReleaseUnitTest
+      - persist_to_workspace:
+          root: project/app/build/
+          paths:
+            - jacoco/jacoco.xml
+      - codecov/upload:
+          file: project/app/build/jacoco/jacoco.xml
+          flags: unittests
+
+  lint:
+    executor: android-docker
+    resource_class: medium+
+    steps:
+      - checkout
+      - android/accept-licenses
+      - restore-gradle-cache
+      - run:
+          name: Lint
+          command: |
+            ./project/gradlew -p ./project lint --scan
+      - store_artifacts:
+          path: project/app/build/reports/lint-results.html
+          destination: lint-report
+
+  ui-tests:
+    parameters:
+      flavor:
+        type: string
+        default: oss
+    executor: android-machine
+    resource_class: large
+    parallelism: 4
+    environment:
+      GRADLE_OPTS: "-Dkotlin.compiler.execution.strategy=in-process"
+    steps:
+      - checkout
+      - android/accept-licenses
+      - restore-gradle-cache
+      - run:
+          name: Prepare parameterised test command
+          command: |
+            echo "export FLAVOR=<< parameters.flavor >>" >> $BASH_ENV
+            source $BASH_ENV
+            echo "export GRADLE_TEST_COMMAND=\"./gradlew create${FLAVOR^}DebugCoverageReport --scan --no-daemon --max-workers 2\"" >> $BASH_ENV
+            source $BASH_ENV
+            echo "Gradle test command: $GRADLE_TEST_COMMAND"
+
+      - run:
+          name: Prepare parameterised system image
+          command: |
+            if [ << parameters.flavor >> = "gms" ]; then
+              image_type="google_apis"
+            else
+              image_type="default"
+            fi
+            echo "export SYSTEM_IMAGE=\"system-images;android-29;$image_type;x86_64\"" >> $BASH_ENV
+            # Debug only
+            source $BASH_ENV  
+            echo "Emulator system image: $SYSTEM_IMAGE"
+
+      - android/start-emulator-and-run-tests:
+          additional-avd-args: "-d pixel_3a -c 1G"
+          additional-emulator-args: "-memory 4096 -cores 3"
+          test-command: $GRADLE_TEST_COMMAND
+          system-image: $SYSTEM_IMAGE
+          restore-gradle-cache-post-emulator-launch: false
+          run-tests-working-directory: ./project
+          post-emulator-wait-steps:
+            - run: adb shell settings put secure location_providers_allowed +gps && adb shell settings put secure location_providers_allowed +network && adb shell settings put secure location_mode 3 && adb shell settings put global heads_up_notifications_enabled 0 && adb root && sleep 5 && adb shell setprop ctl.restart zygote
+            - run:
+                background: true
+                command: |
+                  adb logcat
+                name: Logcat
+          post-emulator-launch-assemble-command: ""
+          run-logcat: false
+          max-tries: 2
+          no-output-timeout: 30m
+      - run:
+          name: Debug
+          command: |
+            find -name report.xml
+      - store_test_results:
+          path: project/app/build/outputs/androidTest-results/connected/flavors/<< parameters.flavor >>/
+      - persist_to_workspace:
+          root: project/app/build/
+          paths:
+            - reports/coverage/androidTest/<< parameters.flavor >>/debug/report.xml
+      - store_artifacts:
+          path: project/app/build/reports/androidTests
+          destination: espresso-report-<< parameters.flavor >>
+      - codecov/upload:
+          file: reports/coverage/**/report.xml
+          flags: uitests
+
+  smoke-test:
+    executor: android-machine
+    resource_class: large
+    environment:
+      GRADLE_OPTS: "-Dkotlin.compiler.execution.strategy=in-process"
+    steps:
+      - checkout
+      - android/accept-licenses
+      - restore-gradle-cache
+      - android/start-emulator-and-run-tests:
+          additional-avd-args: "-d pixel_3a -c 1G"
+          additional-emulator-args: "-memory 4096 -cores 3"
+          test-command: ./gradlew connectedGmsDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.annotation=org.owntracks.android.testutils.SmokeTest
+          system-image: system-images;android-29;google_apis;x86_64
+          restore-gradle-cache-post-emulator-launch: false
+          run-tests-working-directory: ./project
+          post-emulator-wait-steps:
+            - run: adb shell settings put secure location_providers_allowed +gps && adb shell settings put secure location_providers_allowed +network && adb shell settings put secure location_mode 3 && adb shell settings put global heads_up_notifications_enabled 0 && adb root && sleep 5 && adb shell setprop ctl.restart zygote
+            - run:
+                background: true
+                command: |
+                  adb logcat
+                name: Logcat
+          post-emulator-launch-assemble-command: ""
+          run-logcat: false
+          max-tries: 2
+          no-output-timeout: 30m
+
+  publish-to-play-store:
+    executor: android-docker
+    resource_class: medium
+    steps:
+      # Checkout the code as the first step.
+      - checkout
+      - android/accept-licenses
+      - restore-gradle-cache
+      - run:
+          name: Set credentials
+          command: |
+            echo -n $GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS_BASE64 | base64 -d > project/app/owntracks-android-gcloud-creds.json
+            echo -n $KEYSTORE_BASE64 | base64 -d > project/owntracks.release.keystore.jks
+      - run:
+          name: Build
+          command: |
+            ./project/gradlew -p ./project publishGmsReleaseBundle --scan
+
+workflows:
+  evaluate-oss-contribution:
+    when: << pipeline.parameters.oss-contribution-flow >>
+    jobs:
+      - build
+      - unit-test:
+          requires:
+            - build
+      - lint:
+          requires:
+            - build
+      - fdroid-scanner:
+          requires:
+            - build
+      - smoke-test:
+          requires:
+            - build
+          
+  build-and-test:
+    when:
+      not: << pipeline.parameters.oss-contribution-flow >>
+    jobs:
+      - build
+      - fdroid-scanner:
+          requires:
+            - build
+      - unit-test:
+          requires:
+            - build
+      - lint:
+          requires:
+            - build
+      - ui-tests:
+          flavor: oss
+          name: oss-ui-tests
+          requires:
+            - lint
+            - unit-test
+            - build
+      - ui-tests:
+          flavor: gms
+          name: gms-ui-tests
+          requires:
+            - lint
+            - unit-test
+            - build
+      - publish-to-play-store:
+          context: Android Deploy Credentials
+          requires:
+            - oss-ui-tests
+            - gms-ui-tests
+          filters:
+            branches:
+              only: master
