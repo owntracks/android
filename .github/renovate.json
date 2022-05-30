@@ -1,11 +1,11 @@
 {
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:base",
     ":disableRateLimiting",
     ":rebaseStalePrs",
     ":disableDependencyDashboard"
   ],
-  "assignees": [
-    "growse"
-  ]
+  "assignees": ["growse"],
+  "ignoreDeps": ["android"]
 }
