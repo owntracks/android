@@ -180,16 +180,30 @@ class Preferences @Inject constructor(
         messageConfiguration.keys
             .filter { messageConfiguration[it] != null }
             .filter { methods.containsKey(it) }
-            .forEach {
-                Timber.d("Loading key %s from method: %s", it, methods.getValue(it).name)
+            .forEach { configurationKey ->
+                Timber.d(
+                    "Loading key $configurationKey from method: ${methods.getValue(configurationKey).name}"
+                )
                 try {
-                    methods.getValue(it).invoke(this, messageConfiguration[it])
+                    methods.getValue(configurationKey).let { importMethod ->
+                        if (messageConfiguration[configurationKey]?.javaClass?.isAssignableFrom(
+                                Integer::class.java
+                            ) ?: false
+                            && importMethod.parameterTypes.first() == MonitoringMode::class.java
+                        ) {
+                            importMethod.invoke(
+                                this,
+                                MonitoringMode.getByValue(messageConfiguration[configurationKey] as Int)
+                            )
+                        } else {
+                            importMethod.invoke(this, messageConfiguration[configurationKey])
+                        }
+                    }
                 } catch (e: IllegalArgumentException) {
                     Timber.e(
-                        "Tried to import %s but value is wrong type. Expected: %s, given %s",
-                        it,
-                        methods.getValue(it).parameterTypes.first().canonicalName,
-                        messageConfiguration[it]?.javaClass?.canonicalName
+                        "Tried to import $configurationKey but value is wrong type. Expected: ${
+                            methods.getValue(configurationKey).parameterTypes.first().canonicalName
+                        }, given ${messageConfiguration[configurationKey]?.javaClass?.canonicalName}",
                     )
                 }
             }
@@ -357,7 +371,6 @@ class Preferences @Inject constructor(
             setInt(R.string.preferenceKeyMoveModeLocatorInterval, moveModeLocatorInterval)
         }
 
-    // Unit is minutes
     // Unit is minutes
     @get:Export(keyResId = R.string.preferenceKeyPing, exportModeMqtt = true, exportModeHttp = true)
     @set:Import(keyResId = R.string.preferenceKeyPing)
