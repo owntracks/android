@@ -248,7 +248,17 @@ Chcete-li to umožnit, zapněte polohu v nastavení zařízení."</string>
     <string name="version">"Verze"</string>
     <string name="viewLogs">"Zobrazit protokoly"</string>
     <string name="waypointListPlaceholder">"Oblasti nejsou definovány"</string>
+    <string name="welcome_connection_setup_description">"Služba OwnTracks funguje tak, že odesílá data o vaší poloze na server, který vlastníte vy (nebo někdo, komu důvěřujete), takže máte svá data i nadále pod kontrolou.
+
+Ujistěte se, že znáte podrobnosti o připojení k serveru, zda je přístupný přes HTTPS nebo MQTT, a přihlašovací údaje.
+
+Po dokončení této uvítací části je třeba nakonfigurovat aplikaci s údaji o serveru, které jsou k dispozici v části Předvolby→Připojení.
+
+Další podrobnosti najdete v brožuře OwnTracks."</string>
+    <string name="welcome_connection_setup_learn_more_button_label">"Otevřít Brožuru"</string>
+    <string name="welcome_connection_setup_title">"Nastavit připojení"</string>
     <string name="welcome_description">"Následující kroky Vám pomohou začít s OwnTracks"</string>
+    <string name="welcome_finish_open_preferences_button_label">"Otevřít Předvolby"</string>
     <string name="welcome_heading">"Vítejte"</string>
     <string name="welcome_play_description">"OwnTracks vyžaduje služby Google Play"</string>
     <string name="welcome_play_heading">"Služby Google Play"</string>

@@ -246,7 +246,17 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="version">"Versió"</string>
     <string name="viewLogs">"Veure informes"</string>
     <string name="waypointListPlaceholder">"Cap regió definida"</string>
+    <string name="welcome_connection_setup_description">"OwnTracks funciona enviant les vostres dades d'ubicació a un servidor vostre (o d'algú de la vostra confiança), per estar segurs que manteniu el control de les vostres dades.
+
+Assegureu-vos de conèixer els detalls de connexió del vostre servidor, ja sigui accessible mitjançant HTTPS o MQTT i qualssevol credencials d'inici de sessió.
+
+Un cop hagueu completat aquesta secció de benvinguda, haureu de configurar l'aplicació amb els detalls del servidor, disponibles a Preferències→Connexió.
+
+Per obtenir més detalls, feu una ullada al llibret d'OwnTracks."</string>
+    <string name="welcome_connection_setup_learn_more_button_label">"Obrir llibret"</string>
+    <string name="welcome_connection_setup_title">"Configura una connexió"</string>
     <string name="welcome_description">"Els següents passos t'ajudaran a començar amb Owntracks"</string>
+    <string name="welcome_finish_open_preferences_button_label">"Obrir Preferències"</string>
     <string name="welcome_heading">"Benvinguda"</string>
     <string name="welcome_play_description">"OwnTracks necessita Serveis Google Play"</string>
     <string name="welcome_play_heading">"Serveis Google Play"</string>
