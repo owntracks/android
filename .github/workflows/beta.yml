@@ -14,7 +14,7 @@ jobs:
     name: Create GH release and promote Play store internal to Beta
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Create release
       id: create_release
       uses: actions/create-release@v1
