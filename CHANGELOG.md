@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 2.4.9
+
+### Bug fixes
+
+* Fix issue with setting monitoring via a remote command "set configuration" message (#1221)
+
 ## Version 2.4.8
 
 ### New features
