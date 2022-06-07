@@ -171,10 +171,8 @@ class OSMMapFragment internal constructor(
                             R.drawable.location_dot_arrow,
                             null
                         )?.toBitmap(bitmapDimension.roundToInt(), bitmapDimension.roundToInt())
-                        setDirectionArrow(
-                            dot,
-                            arrow
-                        )
+                        setDirectionIcon(arrow)
+                        setPersonIcon(dot)
                     })
             }
 
@@ -285,7 +283,8 @@ class OSMMapFragment internal constructor(
         when (mapLayerStyle) {
             MapLayerStyle.OpenStreetMapNormal -> binding.osmMapView.setTileSource(TileSourceFactory.MAPNIK)
             MapLayerStyle.OpenStreetMapWikimedia -> binding.osmMapView.setTileSource(
-                TileSourceFactory.WIKIMEDIA)
+                TileSourceFactory.WIKIMEDIA
+            )
             else -> Timber.w("Unsupported map layer type $mapLayerStyle")
         }
     }
