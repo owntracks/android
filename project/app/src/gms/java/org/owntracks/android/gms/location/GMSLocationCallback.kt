@@ -3,7 +3,6 @@ package org.owntracks.android.gms.location
 import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationResult
 import org.owntracks.android.location.LocationCallback
-import timber.log.Timber
 
 /**
  * This is a wrapper around a [LocationCallback] instance that can be given to something that needs
@@ -16,11 +15,13 @@ class GMSLocationCallback(private val clientCallBack: LocationCallback) :
     com.google.android.gms.location.LocationCallback() {
     override fun onLocationResult(locationResult: LocationResult) {
         super.onLocationResult(locationResult)
-        clientCallBack.onLocationResult(
-            org.owntracks.android.location.LocationResult(
-                locationResult.lastLocation
+        locationResult.lastLocation?.run {
+            clientCallBack.onLocationResult(
+                org.owntracks.android.location.LocationResult(
+                    this
+                )
             )
-        )
+        }
     }
 
     override fun onLocationAvailability(locationAvailability: LocationAvailability) {

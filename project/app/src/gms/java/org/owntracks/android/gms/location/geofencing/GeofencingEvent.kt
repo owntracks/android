@@ -11,7 +11,3 @@ fun GeofencingEvent.toOTGeofencingEvent(): org.owntracks.android.location.geofen
         this.triggeringLocation
     )
 }
-
-fun intentToGeofencingEvent(intent: Intent): org.owntracks.android.location.geofencing.GeofencingEvent {
-    return GeofencingEvent.fromIntent(intent).toOTGeofencingEvent()
-}
