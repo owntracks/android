@@ -24,6 +24,7 @@ import org.owntracks.android.ui.map.MapActivity
 import java.util.concurrent.TimeUnit
 
 @LargeTest
+@SmokeTest
 @RunWith(AndroidJUnit4::class)
 class LocationMessageRetryTest : TestWithAnActivity<MapActivity>(MapActivity::class.java, false),
     TestWithAnHTTPServer by TestWithAnHTTPServerImpl(),
