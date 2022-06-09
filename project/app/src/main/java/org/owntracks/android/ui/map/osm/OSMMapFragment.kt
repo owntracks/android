@@ -175,8 +175,8 @@ class OSMMapFragment internal constructor(
                         setPersonIcon(dot)
                     })
             }
-
             setMultiTouchControls(true)
+            isTilesScaledToDpi = true
         }
         setMapStyle()
     }
