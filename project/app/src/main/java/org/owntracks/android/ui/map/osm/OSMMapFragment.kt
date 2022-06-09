@@ -140,10 +140,6 @@ class OSMMapFragment internal constructor(
                 setMapLayerType(this)
             }
             zoomController.setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
-            viewModel.getMapLocation().run {
-                controller.setZoom(zoom)
-                controller.setCenter(latLng.toGeoPoint())
-            }
             addMapListener(mapListener)
             // Make sure we don't add to the overlays
             if (!overlays.any { it is MyLocationNewOverlay && it.mMyLocationProvider == osmMapLocationSource }) {
@@ -177,6 +173,10 @@ class OSMMapFragment internal constructor(
             }
             setMultiTouchControls(true)
             isTilesScaledToDpi = true
+            viewModel.getMapLocation().run {
+                controller.setZoom(zoom)
+                controller.setCenter(latLng.toGeoPoint())
+            }
         }
         setMapStyle()
     }
