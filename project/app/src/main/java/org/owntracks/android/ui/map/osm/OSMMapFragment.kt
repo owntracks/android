@@ -169,6 +169,8 @@ class OSMMapFragment internal constructor(
                         )?.toBitmap(bitmapDimension.roundToInt(), bitmapDimension.roundToInt())
                         setDirectionIcon(arrow)
                         setPersonIcon(dot)
+                        setPersonAnchor(0.5f,0.5f)
+                        setDirectionAnchor(0.5f,0.5f)
                     })
             }
             setMultiTouchControls(true)
