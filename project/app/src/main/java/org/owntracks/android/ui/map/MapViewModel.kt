@@ -272,6 +272,9 @@ class MapViewModel @Inject constructor(
 
     fun setMapLocation(mapLocationAndZoomLevel: MapLocationAndZoomLevel) {
         lastScrolledMapCenter = mapLocationAndZoomLevel
+        if (mapLocationAndZoomLevel.latLng != mapCenter.value) {
+            mutableMapCenter.postValue(mapLocationAndZoomLevel.latLng)
+        }
     }
 
     fun getMapLocation(): MapLocationAndZoomLevel =
