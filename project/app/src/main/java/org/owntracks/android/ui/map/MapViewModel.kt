@@ -62,7 +62,7 @@ class MapViewModel @Inject constructor(
 
     // Where the map was last moved to. This might have been from an explicit
     // user action, or from the observation of mutableMapCenter changing
-    private var lastScrolledMapCenter: MapLocationAndZoomLevel? = null
+    private var lastScrolledMapCenter: MapLocationZoomLevelAndRotation? = null
 
     // Shows the current distance to the selected contact
     private val mutableContactDistance = MutableLiveData(0f)
@@ -270,19 +270,19 @@ class MapViewModel @Inject constructor(
         locationRepo.setMapLocation(latLng)
     }
 
-    fun setMapLocation(mapLocationAndZoomLevel: MapLocationAndZoomLevel) {
-        lastScrolledMapCenter = mapLocationAndZoomLevel
-        if (mapLocationAndZoomLevel.latLng != mapCenter.value) {
-            mutableMapCenter.postValue(mapLocationAndZoomLevel.latLng)
+    fun setMapLocationFromMapMoveEvent(mapLocationZoomLevelAndRotation: MapLocationZoomLevelAndRotation) {
+        lastScrolledMapCenter = mapLocationZoomLevelAndRotation
+        if (mapLocationZoomLevelAndRotation.latLng != mapCenter.value) {
+            mutableMapCenter.postValue(mapLocationZoomLevelAndRotation.latLng)
         }
     }
 
-    fun getMapLocation(): MapLocationAndZoomLevel =
+    fun getMapLocation(): MapLocationZoomLevelAndRotation =
         lastScrolledMapCenter ?: locationRepo.currentMapLocation?.let {
-            MapLocationAndZoomLevel(it, STARTING_ZOOM)
+            MapLocationZoomLevelAndRotation(it, STARTING_ZOOM)
         } ?: locationRepo.currentPublishedLocation.value?.let {
-            MapLocationAndZoomLevel(it.toLatLng(), STARTING_ZOOM)
-        } ?: MapLocationAndZoomLevel(
+            MapLocationZoomLevelAndRotation(it.toLatLng(), STARTING_ZOOM)
+        } ?: MapLocationZoomLevelAndRotation(
             LatLng(
                 STARTING_LATITUDE,
                 STARTING_LONGITUDE
