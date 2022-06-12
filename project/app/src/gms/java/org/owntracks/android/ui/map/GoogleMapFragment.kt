@@ -93,11 +93,15 @@ class GoogleMapFragment internal constructor(
         }
     }
 
-    private fun MapLocationAndZoomLevel.toLatLngZoom(): CameraUpdate =
-        CameraUpdateFactory.newLatLngZoom(
-            this.latLng.toGMSLatLng(),
-            convertStandardZoomToGoogleZoom(this.zoom).toFloat()
+    private fun MapLocationZoomLevelAndRotation.toCameraUpdate(): CameraUpdate =
+        CameraUpdateFactory.newCameraPosition(
+            CameraPosition.builder()
+                .target(this.latLng.toGMSLatLng())
+                .zoom(convertGoogleZoomToStandardZoom(this.zoom).toFloat())
+                .bearing(this.rotation)
+                .build()
         )
+
 
     @SuppressLint("MissingPermission")
     override fun initMap() {
@@ -117,7 +121,7 @@ class GoogleMapFragment internal constructor(
 
             setMapStyle()
 
-            moveCamera(viewModel.getMapLocation().toLatLngZoom())
+            moveCamera(viewModel.getMapLocation().toCameraUpdate())
 
             setOnMarkerClickListener {
                 it.tag?.run {
@@ -134,12 +138,13 @@ class GoogleMapFragment internal constructor(
             }
 
             setOnCameraIdleListener {
-                viewModel.setMapLocation(this.cameraPosition.run {
-                    MapLocationAndZoomLevel(
+                viewModel.setMapLocationFromMapMoveEvent(this.cameraPosition.run {
+                    MapLocationZoomLevelAndRotation(
                         LatLng(
                             target.latitude,
                             target.longitude
-                        ), convertGoogleZoomToStandardZoom(zoom.toDouble())
+                        ), convertGoogleZoomToStandardZoom(zoom.toDouble()),
+                        bearing
                     )
                 })
             }

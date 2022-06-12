@@ -23,6 +23,7 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polygon
 import org.osmdroid.views.overlay.TilesOverlay
+import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow
 import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
@@ -112,12 +113,14 @@ class OSMMapFragment internal constructor(
     private val mapListener = DelayedMapListener(object : MapListener {
         override fun onScroll(event: ScrollEvent?): Boolean {
             mapView?.run {
-                viewModel.setMapLocation(
-                    MapLocationAndZoomLevel(
+                viewModel.setMapLocationFromMapMoveEvent(
+                    MapLocationZoomLevelAndRotation(
                         LatLng(
                             mapCenter.latitude,
                             mapCenter.longitude
-                        ), zoomLevelDouble
+                        ),
+                        zoomLevelDouble,
+                        mapOrientation
                     )
                 )
             }
@@ -141,7 +144,7 @@ class OSMMapFragment internal constructor(
             }
             zoomController.setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
             addMapListener(mapListener)
-            // Make sure we don't add to the overlays
+            // Make sure we don't add to the mylocation overlay
             if (!overlays.any { it is MyLocationNewOverlay && it.mMyLocationProvider == osmMapLocationSource }) {
                 overlays.add(
                     MyLocationNewOverlay(
@@ -169,15 +172,19 @@ class OSMMapFragment internal constructor(
                         )?.toBitmap(bitmapDimension.roundToInt(), bitmapDimension.roundToInt())
                         setDirectionIcon(arrow)
                         setPersonIcon(dot)
-                        setPersonAnchor(0.5f,0.5f)
-                        setDirectionAnchor(0.5f,0.5f)
+                        setPersonAnchor(0.5f, 0.5f)
+                        setDirectionAnchor(0.5f, 0.5f)
                     })
+            }
+            if (!overlays.any { it is RotationGestureOverlay }) {
+                overlays.add(RotationGestureOverlay(this))
             }
             setMultiTouchControls(true)
             isTilesScaledToDpi = true
-            viewModel.getMapLocation().run {
-                controller.setZoom(zoom)
-                controller.setCenter(latLng.toGeoPoint())
+            viewModel.getMapLocation(
+
+            ).run {
+                controller.animateTo(latLng.toGeoPoint(), zoom, 0, rotation)
             }
         }
         setMapStyle()
