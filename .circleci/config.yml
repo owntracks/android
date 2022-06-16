@@ -16,7 +16,7 @@ aliases:
         - gradle-v3-{{ arch }}-
         - gradle-v3-
   - &android-docker-image
-    image: cimg/android:2022.04
+    image: cimg/android:2022.06
 
 orbs:
   android: circleci/android@2.0.3
