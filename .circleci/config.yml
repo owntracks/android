@@ -5,7 +5,7 @@ version: 2.1
 setup: true
 
 orbs:
-  continuation: circleci/continuation@0.3.0
+  continuation: circleci/continuation@0.3.1
 
 jobs:
   check-if-forked:
