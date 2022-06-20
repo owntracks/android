@@ -1,9 +1,11 @@
 package org.owntracks.android.ui.status
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS
+import android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import org.owntracks.android.R
@@ -26,11 +28,20 @@ class StatusActivity : BaseActivity<UiStatusBinding?, StatusMvvm.ViewModel<Statu
                     .setMessage(getString(R.string.batteryOptimizationWhitelistDialogMessage))
                     .setCancelable(true)
                     .setPositiveButton(getString(R.string.batteryOptimizationWhitelistDialogButtonLabel)) { _, _ ->
-                        startActivity(
-                            Intent(
-                                ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS
+                        if (viewModel?.dozeWhitelisted?.value == true) {
+                            startActivity(
+                                Intent(
+                                    ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS
+                                )
                             )
-                        )
+                        } else {
+                            startActivity(
+                                Intent(
+                                    ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+                                    Uri.parse("package:${packageName}")
+                                )
+                            )
+                        }
                     }.show()
             }
         }
