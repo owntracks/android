@@ -8,6 +8,7 @@ import android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS
 import android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import org.owntracks.android.BuildConfig
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiStatusBinding
 import org.owntracks.android.ui.base.BaseActivity
@@ -28,7 +29,7 @@ class StatusActivity : BaseActivity<UiStatusBinding?, StatusMvvm.ViewModel<Statu
                     .setMessage(getString(R.string.batteryOptimizationWhitelistDialogMessage))
                     .setCancelable(true)
                     .setPositiveButton(getString(R.string.batteryOptimizationWhitelistDialogButtonLabel)) { _, _ ->
-                        if (viewModel?.dozeWhitelisted?.value == true) {
+                        if (viewModel?.dozeWhitelisted?.value == true || BuildConfig.FLAVOR == "gms") {
                             startActivity(
                                 Intent(
                                     ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS
