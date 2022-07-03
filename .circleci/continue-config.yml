@@ -181,10 +181,8 @@ jobs:
           run-logcat: false
           max-tries: 2
           no-output-timeout: 30m
-      - run:
-          name: Debug
-          command: |
-            find -name report.xml
+          save-gradle-cache: false
+      - save-gradle-cache
       - store_test_results:
           path: project/app/build/outputs/androidTest-results/connected/flavors/<< parameters.flavor >>/
       - persist_to_workspace:
@@ -225,6 +223,7 @@ jobs:
           run-logcat: false
           max-tries: 2
           no-output-timeout: 30m
+          save-gradle-cache: false
 
   publish-to-play-store:
     executor: android-docker
@@ -261,7 +260,7 @@ workflows:
       - smoke-test:
           requires:
             - build
-          
+
   build-and-test:
     when:
       not: << pipeline.parameters.oss-contribution-flow >>
