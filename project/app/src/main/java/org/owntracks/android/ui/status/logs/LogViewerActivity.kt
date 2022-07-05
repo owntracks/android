@@ -97,9 +97,9 @@ class LogViewerActivity : AppCompatActivity() {
         this.recyclerView?.scrollToPosition(logAdapter.itemCount - 1)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.log_viewer, menu)
-        clearButton = menu?.findItem(R.id.clear_log)
+        clearButton = menu.findItem(R.id.clear_log)
         return true
     }
 
