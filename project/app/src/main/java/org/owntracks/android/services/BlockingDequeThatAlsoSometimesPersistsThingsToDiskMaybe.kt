@@ -61,7 +61,7 @@ class BlockingDequeThatAlsoSometimesPersistsThingsToDiskMaybe(
     private fun diskBackedQueueOrNull(file: File) = try {
         QueueFile.Builder(file).build()
     } catch (e: IOException) {
-        Timber.e("Error initializing queue storage at ${file}. Re-initializing")
+        Timber.e("Error initializing queue storage at $file. Re-initializing")
         file.delete()
         try {
             QueueFile.Builder(file).build()

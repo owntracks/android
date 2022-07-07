@@ -23,5 +23,4 @@ class ServiceModule {
     @ServiceScoped
     fun getLocationProviderClient(service: Service): LocationProviderClient =
         GMSLocationProviderClient.create(service)
-
 }

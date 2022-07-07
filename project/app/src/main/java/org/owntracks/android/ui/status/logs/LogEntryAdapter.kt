@@ -26,7 +26,6 @@ class LogEntryAdapter(
     fun setLogLines(lines: Collection<LogEntry>) {
         logLines.clear()
         val expandedForMultiline = lines
-
             .flatMap { logEntry ->
                 logEntry.message.split("\n")
                     .map { LogEntry(logEntry.priority, logEntry.tag, it, logEntry.time) }

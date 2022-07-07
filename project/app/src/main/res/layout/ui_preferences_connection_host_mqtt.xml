@@ -17,7 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-        
+
         <com.rengwuxian.materialedittext.MaterialEditText
             android:id="@+id/host"
             android:layout_width="match_parent"

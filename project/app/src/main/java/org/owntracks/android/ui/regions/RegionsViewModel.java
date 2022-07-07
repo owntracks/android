@@ -38,4 +38,3 @@ public class RegionsViewModel extends BaseViewModel<RegionsMvvm.View> implements
         locationProcessor.publishWaypointsMessage();
     }
 }
-

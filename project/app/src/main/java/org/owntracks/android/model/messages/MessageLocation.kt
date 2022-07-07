@@ -84,19 +84,15 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
             notifyContactPropertyChanged()
         }
 
-
     @get:JsonIgnore
     internal val fallbackGeocode: String
         get() = "$latitude, $longitude"
-
 
     @get:JsonIgnore
     var hasGeocode: Boolean = false
         private set
 
-
     fun toLatLng() = LatLng(latitude, longitude)
-
 
     fun setContact(contact: FusedContact?) {
         _contact = WeakReference(contact)
@@ -113,7 +109,6 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
             field = value
             notifyContactPropertyChanged()
         }
-
 
     override fun isValidMessage(): Boolean {
         return timestamp > 0

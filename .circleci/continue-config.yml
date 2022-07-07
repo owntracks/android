@@ -23,18 +23,18 @@ commands:
       - run:
           name: Generate Gradle buildfiles seed
           command: |
-            find . -name 'build.gradle.kts' -o -name 'libs.versions.toml' -o -name 'gradle-wrapper.properties'  | 
-            sort      | 
-            xargs cat | 
-            shasum    | 
+            find . -name 'build.gradle.kts' -o -name 'libs.versions.toml' -o -name 'gradle-wrapper.properties'  |
+            sort      |
+            xargs cat |
+            shasum    |
             awk '{print $1}' > /tmp/gradle_buildfiles_cache_seed
       - run:
           name: Generate Gradle sources seed
           command: |
-            find . -path "./project/app/src/*" -a  \( -name "*.kt" -o -name "*.java" \) | 
-            sort      | 
-            xargs cat | 
-            shasum    | 
+            find . -path "./project/app/src/*" -a  \( -name "*.kt" -o -name "*.java" \) |
+            sort      |
+            xargs cat |
+            shasum    |
             awk '{print $1}' > /tmp/gradle_sources_cache_seed
       - restore_cache:
           keys:
@@ -160,7 +160,7 @@ jobs:
             fi
             echo "export SYSTEM_IMAGE=\"system-images;android-29;$image_type;x86_64\"" >> $BASH_ENV
             # Debug only
-            source $BASH_ENV  
+            source $BASH_ENV
             echo "Emulator system image: $SYSTEM_IMAGE"
 
       - android/start-emulator-and-run-tests:

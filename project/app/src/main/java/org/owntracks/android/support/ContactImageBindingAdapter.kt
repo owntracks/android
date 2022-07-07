@@ -100,7 +100,6 @@ class ContactImageBindingAdapter @Inject constructor(
                 return@withContext contactBitMapAndName.bitmap
             }
         }
-
     }
 
     private fun getRoundedShape(bitmap: Bitmap): Bitmap {

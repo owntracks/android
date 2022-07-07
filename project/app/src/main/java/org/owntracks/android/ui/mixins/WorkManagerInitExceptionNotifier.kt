@@ -43,7 +43,8 @@ interface WorkManagerInitExceptionNotifier {
                             .setCancelable(true)
                             .show()
                     }
-                })
+                }
+            )
         }
     }
 }

@@ -34,7 +34,6 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
     override val mqttPacketsReceived: MutableList<MQTTPacket> = mutableListOf()
     override lateinit var broker: Broker
 
-
     override fun <E : MessageBase> Collection<E>.sendFromBroker(broker: Broker) {
         map(Parser(null)::toJsonBytes)
             .forEach {
@@ -71,7 +70,6 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
                 try {
                     it.apply { connect(InetSocketAddress("localhost", mqttPort)) }
                     listening = true
-
                 } catch (e: ConnectException) {
                     Timber.i(e, "broker not listening on $mqttPort yet")
                     Thread.sleep(100)
@@ -82,7 +80,8 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
     }
 
     private fun createNewBroker(): Broker =
-        Broker(host = "127.0.0.1",
+        Broker(
+            host = "127.0.0.1",
             port = mqttPort,
             authentication = object : Authentication {
                 override fun authenticate(
@@ -105,8 +104,8 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
                     Timber.d("MQTT Packet received $packet")
                     mqttPacketsReceived.add(packet)
                 }
-            })
-
+            }
+        )
 
     override fun stopBroker() {
         shouldBeRunning = false
@@ -131,12 +130,14 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
                 "tls": false,
                 "mqttConnectionTimeout": 1
             }
-        """.trimIndent()
+            """.trimIndent()
         )
-        InstrumentationRegistry.getInstrumentation().targetContext.startActivity(Intent(Intent.ACTION_VIEW).apply {
-            data = Uri.parse("owntracks:///config?inline=$config")
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        })
+        InstrumentationRegistry.getInstrumentation().targetContext.startActivity(
+            Intent(Intent.ACTION_VIEW).apply {
+                data = Uri.parse("owntracks:///config?inline=$config")
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+        )
         sleep(500)
         clickOnAndWait(R.id.save)
         openDrawer()

@@ -22,5 +22,4 @@ class ServiceModule {
     @ServiceScoped
     fun getLocationProviderClient(service: Service): LocationProviderClient =
         AospLocationProviderClient(service)
-
 }

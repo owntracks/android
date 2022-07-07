@@ -31,6 +31,5 @@ open class OSSRequirementsChecker @Inject constructor(
             LocationManagerCompat.isLocationEnabled(this)
         } ?: false
 
-
     override fun isPlayServicesCheckPassed(): Boolean = true
 }

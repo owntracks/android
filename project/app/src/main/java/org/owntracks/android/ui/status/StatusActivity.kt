@@ -20,7 +20,7 @@ class StatusActivity : AppCompatActivity() {
     val batteryOptimizationIntents by lazy { BatteryOptimizingIntents(this) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val binding: UiStatusBinding = DataBindingUtil.setContentView(this, R.layout.ui_status);
+        val binding: UiStatusBinding = DataBindingUtil.setContentView(this, R.layout.ui_status)
         binding.vm = viewModel
         binding.lifecycleOwner = this
         setSupportActionBar(binding.appbar.toolbar)

@@ -1,6 +1,6 @@
 # This flow is designed to be used to update the beta track on the Play store. It does this by promoting the internal track build to beta, triggered by the creation of a beta tag.
 # Crucially, it assumes that whatever is the current internal track build is the correct candidate for sending to beta - it does *not* rebuild and publish. Therefore, if changes
-# are made and a new beta tag created at the same time, those changes will *not* be included in the build that the beta track ends up pointing at. I get around this by 
+# are made and a new beta tag created at the same time, those changes will *not* be included in the build that the beta track ends up pointing at. I get around this by
 # making sure changes are published to internal first, then creating / pushing the beta tag in order to promote. I should also fix this at some point.
 name: Android CI Beta release
 
@@ -57,7 +57,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
         asset_path: ./project/app/build/outputs/apk/gms/release/app-gms-release.apk
         asset_name: owntracks-release-gms.apk
         asset_content_type: application/vnd.android.package-archive
@@ -66,7 +66,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
         asset_path: ./project/app/build/outputs/apk/oss/release/app-oss-release.apk
         asset_name: owntracks-release-oss.apk
         asset_content_type: application/vnd.android.package-archive

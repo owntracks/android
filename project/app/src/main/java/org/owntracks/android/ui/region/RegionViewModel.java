@@ -26,7 +26,7 @@ public class RegionViewModel extends BaseViewModel<RegionMvvm.View> implements R
     public RegionViewModel(WaypointsRepo waypointsRepo, LocationRepo locationRepo) {
         super();
         this.waypointsRepo = waypointsRepo;
-        this.locationRepo = locationRepo; 
+        this.locationRepo = locationRepo;
     }
 
     public void attachView(@Nullable Bundle savedInstanceState, @NonNull RegionMvvm.View view) {
@@ -67,4 +67,3 @@ public class RegionViewModel extends BaseViewModel<RegionMvvm.View> implements R
         this.waypoint = waypoint;
     }
 }
-

@@ -7,4 +7,3 @@ public interface OutgoingMessageProcessor {
 
     void checkConfigurationComplete() throws ConfigurationIncompleteException;
 }
-

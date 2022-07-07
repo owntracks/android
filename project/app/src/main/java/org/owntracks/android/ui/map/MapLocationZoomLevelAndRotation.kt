@@ -10,4 +10,4 @@ import org.owntracks.android.location.LatLng
  * @property rotation rotation angle of the view
  * @constructor Create empty Map location and zoom level
  */
-data class MapLocationZoomLevelAndRotation(val latLng: LatLng, val zoom: Double, val rotation: Float=0f)
+data class MapLocationZoomLevelAndRotation(val latLng: LatLng, val zoom: Double, val rotation: Float = 0f)

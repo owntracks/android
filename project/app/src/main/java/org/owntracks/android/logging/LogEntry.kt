@@ -13,7 +13,6 @@ data class LogEntry(val priority: Int, val tag: String?, val message: String, va
         Log.DEBUG -> "D"
         Log.VERBOSE -> "V"
         else -> "U"
-
     }
 
     override fun toString(): String {

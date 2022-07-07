@@ -73,7 +73,8 @@ class OpenCageGeocoder @JvmOverloads internal constructor(
                             tripResetTimestamp = Instant.now().plus(1, ChronoUnit.MINUTES)
                             GeocodeResult.Fault.Error(
                                 deserializedOpenCageResponse.status?.message
-                                    ?: "No error message provided", tripResetTimestamp
+                                    ?: "No error message provided",
+                                tripResetTimestamp
                             )
                         }
                         402 -> {
@@ -97,7 +98,6 @@ class OpenCageGeocoder @JvmOverloads internal constructor(
                             } else {
                                 GeocodeResult.Fault.Disabled(tripResetTimestamp)
                             }
-
                         }
                         429 -> {
                             tripResetTimestamp = Instant.now().plus(1, ChronoUnit.MINUTES)

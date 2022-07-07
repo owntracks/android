@@ -21,7 +21,7 @@ class MemoryContactsRepo @Inject constructor(
     private val contactsBitmapAndNameMemoryCache: ContactBitmapAndNameMemoryCache
 ) : ContactsRepo {
 
-    private val contacts = mutableMapOf<String,FusedContact>()
+    private val contacts = mutableMapOf<String, FusedContact>()
     override val all = MutableLiveData(contacts)
 
     override fun getById(id: String): FusedContact? {
@@ -94,7 +94,6 @@ class MemoryContactsRepo @Inject constructor(
             put(id, fusedContact)
         }
     }
-
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     fun onEventMainThread(@Suppress("UNUSED_PARAMETER") e: ModeChanged?) {

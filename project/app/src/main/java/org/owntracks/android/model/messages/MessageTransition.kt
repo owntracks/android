@@ -36,7 +36,6 @@ class MessageTransition : MessageBase() {
     @JsonProperty("t")
     var trigger: String? = null
 
-
     @JsonProperty("tst")
     var timestamp: Long = 0
 

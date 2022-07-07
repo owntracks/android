@@ -26,7 +26,8 @@ import java.util.concurrent.TimeUnit
 @LargeTest
 @SmokeTest
 @RunWith(AndroidJUnit4::class)
-class LocationMessageRetryTest : TestWithAnActivity<MapActivity>(MapActivity::class.java, false),
+class LocationMessageRetryTest :
+    TestWithAnActivity<MapActivity>(MapActivity::class.java, false),
     TestWithAnHTTPServer by TestWithAnHTTPServerImpl(),
     MockDeviceLocation by GPSMockDeviceLocation() {
 
@@ -60,7 +61,7 @@ class LocationMessageRetryTest : TestWithAnActivity<MapActivity>(MapActivity::cl
         clickOnAndWait(R.string.mode_http_private_label)
         clickDialogPositiveButton()
         clickOnAndWait(R.string.preferencesHost)
-        writeTo(R.id.url, "http://localhost:${webserverPort}/")
+        writeTo(R.id.url, "http://localhost:$webserverPort/")
         clickDialogPositiveButton()
         clickBack()
 

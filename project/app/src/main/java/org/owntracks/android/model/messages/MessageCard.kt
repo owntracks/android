@@ -23,5 +23,4 @@ class MessageCard : MessageBase() {
         const val BASETOPIC_SUFFIX = "/info"
         const val TYPE = "card"
     }
-
 }

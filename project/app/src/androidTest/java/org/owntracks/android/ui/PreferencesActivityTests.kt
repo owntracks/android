@@ -14,7 +14,6 @@ import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.scrollToPreferenceWithText
 import org.owntracks.android.ui.preferences.PreferencesActivity
 
-
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class PreferencesActivityTests :
@@ -27,7 +26,6 @@ class PreferencesActivityTests :
         assertDisplayed(R.string.preferencesAdvanced)
         assertDisplayed(R.string.configurationManagement)
     }
-
 
     @Test
     fun settingSimpleHTTPConfigSettingsCanBeShownInEditor() {
@@ -46,7 +44,6 @@ class PreferencesActivityTests :
         writeTo(R.id.trackerId, "t1")
         clickDialogPositiveButton()
         clickBackAndWait()
-
 
         clickOnAndWait(R.string.preferencesReporting)
         clickOnAndWait(R.string.preferencesPubExtendedData)
@@ -72,7 +69,7 @@ class PreferencesActivityTests :
         clickDialogPositiveButton()
 
         clickOnAndWait(R.string.preferencesLocatorDisplacement)
-        writeTo(android.R.id.edit,"567")
+        writeTo(android.R.id.edit, "567")
         clickDialogPositiveButton()
 
         scrollToPreferenceWithText(R.string.preferencesMoveModeLocatorInterval)
@@ -119,7 +116,6 @@ class PreferencesActivityTests :
         assertContains(R.id.effectiveConfiguration, "\"opencageApiKey\" : \"geocodeAPIKey\"")
         assertContains(R.id.effectiveConfiguration, "\"connectionTimeoutSeconds\" : 30")
         assertContains(R.id.effectiveConfiguration, "\"pegLocatorFastestIntervalToInterval\" : true")
-
 
         // Make sure that the MQTT-specific settings aren't present
         assertNotContains(R.id.effectiveConfiguration, "\"host\"")

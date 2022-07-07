@@ -37,8 +37,10 @@ class LogViewerActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView<UiPreferencesLogsBinding?>(this,
-            R.layout.ui_preferences_logs).apply {
+        binding = DataBindingUtil.setContentView<UiPreferencesLogsBinding?>(
+            this,
+            R.layout.ui_preferences_logs
+        ).apply {
             lifecycleOwner = this@LogViewerActivity
             setSupportActionBar(appbar.toolbar)
         }
@@ -84,9 +86,11 @@ class LogViewerActivity : AppCompatActivity() {
 
     private fun updateAdapterWithLogLines(logEntries: List<LogEntry>) {
         val atTheBottom = !binding.logsRecyclerView.canScrollVertically(1)
-        logAdapter.setLogLines(logEntries.filter {
-            (it.priority >= Log.DEBUG && viewModel.isDebugEnabled()) || it.priority >= Log.INFO
-        })
+        logAdapter.setLogLines(
+            logEntries.filter {
+                (it.priority >= Log.DEBUG && viewModel.isDebugEnabled()) || it.priority >= Log.INFO
+            }
+        )
         if (atTheBottom) {
             binding.logsRecyclerView.scrollToPosition(logAdapter.itemCount - 1)
         }

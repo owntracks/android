@@ -102,7 +102,6 @@ class GoogleMapFragment internal constructor(
                 .build()
         )
 
-
     @SuppressLint("MissingPermission")
     override fun initMap() {
         MapsInitializer.initialize(requireContext(), MapsInitializer.Renderer.LATEST, this)
@@ -138,15 +137,18 @@ class GoogleMapFragment internal constructor(
             }
 
             setOnCameraIdleListener {
-                viewModel.setMapLocationFromMapMoveEvent(this.cameraPosition.run {
-                    MapLocationZoomLevelAndRotation(
-                        LatLng(
-                            target.latitude,
-                            target.longitude
-                        ), convertGoogleZoomToStandardZoom(zoom.toDouble()),
-                        bearing
-                    )
-                })
+                viewModel.setMapLocationFromMapMoveEvent(
+                    this.cameraPosition.run {
+                        MapLocationZoomLevelAndRotation(
+                            LatLng(
+                                target.latitude,
+                                target.longitude
+                            ),
+                            convertGoogleZoomToStandardZoom(zoom.toDouble()),
+                            bearing
+                        )
+                    }
+                )
             }
 
             viewModel.mapLayerStyle.value?.run {
@@ -225,7 +227,6 @@ class GoogleMapFragment internal constructor(
         super.onStop()
     }
 
-
     override fun onMapsSdkInitialized(renderer: MapsInitializer.Renderer) {
         Timber.d("Maps SDK initialized with renderer: ${renderer.name}")
     }
@@ -274,7 +275,6 @@ class GoogleMapFragment internal constructor(
         inputZoom
     )
 
-
     /**
      * Converts Google Maps zoom to Standard (OSM) zoom level. Simple linear conversion
      *
@@ -297,7 +297,6 @@ class GoogleMapFragment internal constructor(
      */
     private fun linearConversion(fromRange: IntRange, toRange: IntRange, point: Double): Double =
         ((point - fromRange.first) / (fromRange.last - fromRange.first)) * (toRange.last - toRange.first) + toRange.first
-
 
     override fun setMapLayerType(mapLayerStyle: MapLayerStyle) {
         when (mapLayerStyle) {

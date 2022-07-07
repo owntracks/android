@@ -45,7 +45,6 @@ class ExportedLogContentProvider : ContentProvider() {
             m
         }
 
-
     override fun onCreate(): Boolean = true
 
     override fun update(

@@ -186,6 +186,5 @@ class PreferenceTest {
         preferences.deviceId = "myDevice"
 
         assertEquals("owntracks/user/myDevice", preferences.pubTopicLocations)
-
     }
 }

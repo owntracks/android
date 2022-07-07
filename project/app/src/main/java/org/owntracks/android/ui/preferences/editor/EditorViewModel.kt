@@ -23,7 +23,6 @@ class EditorViewModel @Inject constructor(
     override var effectiveConfiguration: String? = null
         private set
 
-
     @Inject
     lateinit var waypointsRepo: WaypointsRepo
 

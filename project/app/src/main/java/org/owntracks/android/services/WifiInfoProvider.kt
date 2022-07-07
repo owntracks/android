@@ -27,24 +27,23 @@ class WifiInfoProvider @Inject constructor(@ApplicationContext context: Context)
                 context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
             connectivityManager.registerDefaultNetworkCallback(object :
-                ConnectivityManager.NetworkCallback(FLAG_INCLUDE_LOCATION_INFO) {
-                override fun onCapabilitiesChanged(
-                    network: Network,
-                    networkCapabilities: NetworkCapabilities
-                ) {
-                    if (networkCapabilities.transportInfo is WifiInfo) {
-                        ssid = (networkCapabilities.transportInfo as WifiInfo).getUnquotedSSID()
-                        bssid = (networkCapabilities.transportInfo as WifiInfo).bssid
-                    } else {
-                        ssid = null
-                        bssid = null
+                    ConnectivityManager.NetworkCallback(FLAG_INCLUDE_LOCATION_INFO) {
+                    override fun onCapabilitiesChanged(
+                        network: Network,
+                        networkCapabilities: NetworkCapabilities
+                    ) {
+                        if (networkCapabilities.transportInfo is WifiInfo) {
+                            ssid = (networkCapabilities.transportInfo as WifiInfo).getUnquotedSSID()
+                            bssid = (networkCapabilities.transportInfo as WifiInfo).bssid
+                        } else {
+                            ssid = null
+                            bssid = null
+                        }
+                        super.onCapabilitiesChanged(network, networkCapabilities)
                     }
-                    super.onCapabilitiesChanged(network, networkCapabilities)
-                }
-            })
+                })
         }
     }
-
 
     fun getBSSID(): String? = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
         @Suppress("DEPRECATION")
@@ -60,7 +59,6 @@ class WifiInfoProvider @Inject constructor(@ApplicationContext context: Context)
         } else {
             ssid
         }
-
 
     fun isConnected(): Boolean = getBSSID() != null
 }

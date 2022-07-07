@@ -37,7 +37,8 @@ class LocationLiveData(
                     priority = LocationRequest.PRIORITY_HIGH_ACCURACY,
                     interval = TimeUnit.SECONDS.toMillis(2),
                     waitForAccurateLocation = false
-                ).toGMSLocationRequest(), locationCallback, Looper.getMainLooper()
+                ).toGMSLocationRequest(),
+                locationCallback, Looper.getMainLooper()
             ).addOnCompleteListener {
                 Timber.d("LocationLiveData location update request completed: Success=${it.isSuccessful} Cancelled=${it.isCanceled}")
                 lock.release()

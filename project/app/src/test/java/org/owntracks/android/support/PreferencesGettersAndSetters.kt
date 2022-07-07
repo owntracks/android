@@ -47,7 +47,6 @@ class PreferencesGettersAndSetters(
             on { getSystemService(Context.SHORTCUT_SERVICE) } doReturn shortcutService
         }
         preferencesStore = InMemoryPreferencesStore()
-
     }
 
     @Test
@@ -461,4 +460,3 @@ class PreferencesGettersAndSetters(
         }
     }
 }
-

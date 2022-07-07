@@ -193,4 +193,3 @@ public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadM
         notifyChange();
     }
 }
-

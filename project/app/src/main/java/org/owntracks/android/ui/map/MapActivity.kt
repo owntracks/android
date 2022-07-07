@@ -57,8 +57,11 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(),
-    View.OnClickListener, View.OnLongClickListener, PopupMenu.OnMenuItemClickListener,
+class MapActivity :
+    BaseActivity<UiMapBinding?, NoOpViewModel>(),
+    View.OnClickListener,
+    View.OnLongClickListener,
+    PopupMenu.OnMenuItemClickListener,
     WorkManagerInitExceptionNotifier by WorkManagerInitExceptionNotifier.Impl(),
     ServiceStarter by ServiceStarter.Impl() {
     private val mapViewModel: MapViewModel by viewModels()
@@ -204,7 +207,7 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(),
 
     internal fun checkAndRequestMyLocationCapability(explicitUserAction: Boolean): Boolean =
         checkAndRequestLocationPermissions(explicitUserAction) &&
-                checkAndRequestLocationServicesEnabled(explicitUserAction)
+            checkAndRequestLocationServicesEnabled(explicitUserAction)
 
     private val locationServicesLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -214,7 +217,6 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(),
                 mapViewModel.myLocationIsNowEnabled()
             }
         }
-
 
     private fun checkAndRequestLocationServicesEnabled(explicitUserAction: Boolean): Boolean {
         return if (!requirementsChecker.isLocationServiceEnabled()) {
@@ -303,9 +305,11 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(),
             getString(R.string.locationPermissionNotGrantedNotification),
             Snackbar.LENGTH_LONG
         ).setAction(getString(R.string.fixProblemLabel)) {
-            startActivity(Intent(ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                data = Uri.parse("package:${packageName}")
-            })
+            startActivity(
+                Intent(ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.parse("package:$packageName")
+                }
+            )
         }.show()
     }
 
@@ -332,7 +336,6 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(),
                 }
             }
         }
-
 
     override fun onResume() {
         val mapFragment =
@@ -478,7 +481,7 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(),
                     try {
                         val intent = Intent(
                             Intent.ACTION_VIEW,
-                            Uri.parse("google.navigation:q=${latitude},${longitude}")
+                            Uri.parse("google.navigation:q=$latitude,$longitude")
                         )
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         startActivity(intent)
@@ -553,7 +556,6 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(),
     override fun onBackPressed() {
         if (bottomSheetBehavior == null) {
             super.onBackPressed()
-
         } else {
             when (bottomSheetBehavior?.state) {
                 BottomSheetBehavior.STATE_HIDDEN -> super.onBackPressed()
@@ -561,7 +563,7 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(),
                     setBottomSheetHidden()
                 }
                 BottomSheetBehavior.STATE_DRAGGING -> {
-                    //Noop
+                    // Noop
                 }
                 BottomSheetBehavior.STATE_EXPANDED -> {
                     setBottomSheetCollapsed()
@@ -570,7 +572,7 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(),
                     setBottomSheetCollapsed()
                 }
                 BottomSheetBehavior.STATE_SETTLING -> {
-                    //Noop
+                    // Noop
                 }
             }
         }
@@ -597,7 +599,6 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(),
     @get:VisibleForTesting
     val outgoingQueueIdlingResource: IdlingResource
         get() = countingIdlingResource
-
 
     companion object {
         const val BUNDLE_KEY_CONTACT_ID = "BUNDLE_KEY_CONTACT_ID"

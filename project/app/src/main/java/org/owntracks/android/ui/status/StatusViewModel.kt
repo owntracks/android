@@ -38,9 +38,9 @@ class StatusViewModel @Inject constructor(
 
     private fun isIgnoringBatteryOptimizations(): Boolean {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
-                (getApplication<Application>().applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager).isIgnoringBatteryOptimizations(
-                    getApplication<Application>().applicationContext.packageName
-                )
+            (getApplication<Application>().applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager).isIgnoringBatteryOptimizations(
+                getApplication<Application>().applicationContext.packageName
+            )
     }
 
     fun viewLogs() {

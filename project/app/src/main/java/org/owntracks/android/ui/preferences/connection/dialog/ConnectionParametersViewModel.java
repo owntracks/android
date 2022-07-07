@@ -55,4 +55,3 @@ public class ConnectionParametersViewModel extends BaseDialogViewModel {
         this.keepaliveTextDirty = true;
     }
 }
-

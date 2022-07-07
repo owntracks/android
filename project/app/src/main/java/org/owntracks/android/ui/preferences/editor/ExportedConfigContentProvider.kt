@@ -28,7 +28,6 @@ class ExportedConfigContentProvider : ContentProvider() {
         fun parser(): Parser
     }
 
-
     override fun onCreate(): Boolean = true
 
     override fun query(

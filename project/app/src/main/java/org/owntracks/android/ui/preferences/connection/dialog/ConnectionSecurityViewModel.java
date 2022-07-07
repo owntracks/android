@@ -263,4 +263,3 @@ public class ConnectionSecurityViewModel extends BaseDialogViewModel {
         return result;
     }
 }
-
