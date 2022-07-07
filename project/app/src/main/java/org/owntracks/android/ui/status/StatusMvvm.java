@@ -2,6 +2,7 @@ package org.owntracks.android.ui.status;
 
 import androidx.lifecycle.LiveData;
 
+import org.owntracks.android.data.EndpointState;
 import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
@@ -14,7 +15,7 @@ public interface StatusMvvm {
     }
 
     interface ViewModel<V extends MvvmView> extends MvvmViewModel<V> {
-        MessageProcessor.EndpointState getEndpointState();
+        EndpointState getEndpointState();
         String getEndpointMessage();
         int getEndpointQueue();
 

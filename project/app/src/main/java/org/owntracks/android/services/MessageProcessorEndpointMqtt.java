@@ -25,10 +25,10 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.owntracks.android.R;
+import org.owntracks.android.data.EndpointState;
 import org.owntracks.android.model.messages.MessageBase;
 import org.owntracks.android.model.messages.MessageCard;
 import org.owntracks.android.model.messages.MessageClear;
-import org.owntracks.android.services.MessageProcessor.EndpointState;
 import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Parser;
@@ -65,7 +65,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     private IMqttAsyncClient mqttClient;
 
     private String lastConnectionId;
-    private static MessageProcessor.EndpointState state;
+    private static EndpointState state;
 
     private final MessageProcessor messageProcessor;
     private final RunThingsOnOtherThreads runThingsOnOtherThreads;
