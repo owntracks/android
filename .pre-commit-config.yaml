@@ -1,0 +1,18 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+        exclude: project/app/objectbox-models/default.json
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+  - repo: https://github.com/dustinsand/pre-commit-jvm
+    rev: v0.5.0
+    hooks:
+      - id: ktlint
+        args: [--format]
