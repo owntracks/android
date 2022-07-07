@@ -4,6 +4,8 @@
 
     <data>
 
+        <import type="org.owntracks.android.support.DateFormatter" />
+
         <import type="android.view.View" />
 
         <variable
@@ -42,7 +44,7 @@
                     android:ellipsize="none"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:paddingRight="@dimen/activity_horizontal_margin"
-                    android:text="@{vm.endpointState.getLabel(context), default=Connected}" />
+                    android:text="@{vm.endpointState.getLabel(context)}" />
 
                 <TextView
                     style="@style/ListItemSecondary"
@@ -62,8 +64,8 @@
                     android:ellipsize="none"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:paddingRight="@dimen/activity_horizontal_margin"
-                    android:text="@{vm.endpointMessage ?? @string/na, default=@string/na}"
-                    android:visibility="@{vm.endpointMessage.isEmpty() ? View.GONE : View.VISIBLE}" />
+                    android:text="@{vm.endpointState.message, default=@string/na}"
+                    android:visibility="@{vm.endpointState.message != null ? View.VISIBLE : View.GONE}" />
 
                 <TextView
                     style="@style/ListItemSecondary"
@@ -74,7 +76,7 @@
                     android:paddingRight="@dimen/activity_horizontal_margin"
                     android:paddingBottom="@dimen/activity_horizontal_margin"
                     android:text="@string/status_endpoint_state_message_hint"
-                    android:visibility="@{vm.endpointMessage.isEmpty() ? View.GONE : View.VISIBLE}" />
+                    android:visibility="@{vm.endpointState.message != null ? View.VISIBLE : View.GONE}" />
 
                 <TextView
                     style="@style/ListItemPrimary"
@@ -83,7 +85,7 @@
                     android:ellipsize="none"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:paddingRight="@dimen/activity_horizontal_margin"
-                    android:text="@{org.owntracks.android.support.widgets.BindingConversions.convertToString(vm.endpointQueue)}" />
+                    android:text="@{vm.endpointQueueLength.toString()}" />
 
                 <TextView
                     style="@style/ListItemSecondary"
@@ -102,7 +104,7 @@
                     android:ellipsize="none"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:paddingRight="@dimen/activity_horizontal_margin"
-                    android:text="@{vm.locationUpdated}" />
+                    android:text="@{vm.currentLocation.time != 0 ? DateFormatter.formatDate(vm.currentLocation.time) : @string/na}" />
 
                 <TextView
                     style="@style/ListItemSecondary"
@@ -121,7 +123,7 @@
                     android:ellipsize="none"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:paddingRight="@dimen/activity_horizontal_margin"
-                    android:text="@{vm.serviceStarted}" />
+                    android:text="@{vm.serviceStarted != null ? DateFormatter.formatDate(vm.serviceStarted) : @string/na}" />
 
                 <TextView
                     style="@style/ListItemSecondary"

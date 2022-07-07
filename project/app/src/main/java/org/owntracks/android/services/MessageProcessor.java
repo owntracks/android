@@ -1,16 +1,15 @@
 package org.owntracks.android.services;
 
 import android.content.Context;
-import android.content.res.Resources;
 
 import androidx.test.espresso.idling.CountingIdlingResource;
 
-import org.eclipse.paho.client.mqttv3.MqttException;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.data.EndpointState;
 import org.owntracks.android.data.repos.ContactsRepo;
+import org.owntracks.android.data.repos.EndpointStateRepo;
 import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.model.messages.MessageBase;
 import org.owntracks.android.model.messages.MessageCard;
@@ -28,7 +27,6 @@ import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
 
 import java.io.IOException;
-import java.util.Locale;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -57,7 +55,7 @@ public class MessageProcessor {
     private final Scheduler scheduler;
     private final Lazy<LocationProcessor> locationProcessorLazy;
 
-    private final Events.QueueChanged queueEvent = new Events.QueueChanged();
+    private final EndpointStateRepo endpointStateRepo;
     private final ServiceBridge serviceBridge;
     private final CountingIdlingResource outgoingQueueIdlingResource;
     private final RunThingsOnOtherThreads runThingsOnOtherThreads;
@@ -85,6 +83,7 @@ public class MessageProcessor {
             WaypointsRepo waypointsRepo,
             Parser parser,
             Scheduler scheduler,
+            EndpointStateRepo endpointStateRepo,
             ServiceBridge serviceBridge,
             RunThingsOnOtherThreads runThingsOnOtherThreads,
             CountingIdlingResource outgoingQueueIdlingResource,
@@ -98,6 +97,7 @@ public class MessageProcessor {
         this.parser = parser;
         this.scheduler = scheduler;
         this.locationProcessorLazy = locationProcessorLazy;
+        this.endpointStateRepo = endpointStateRepo;
         this.serviceBridge = serviceBridge;
         this.outgoingQueueIdlingResource = outgoingQueueIdlingResource;
         this.eventBus.register(this);
@@ -108,7 +108,7 @@ public class MessageProcessor {
             for (int i = 0; i < outgoingQueue.size(); i++) {
                 outgoingQueueIdlingResource.increment();
             }
-            Timber.d("Initializing the outgoingqueueidlingresource at %s",outgoingQueue.size());
+            Timber.d("Initializing the outgoingqueueidlingresource at %s", outgoingQueue.size());
         }
     }
 
@@ -188,7 +188,7 @@ public class MessageProcessor {
             endpoint.onDestroy();
         }
 
-        eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
+        endpointStateRepo.setQueueLength(outgoingQueue.size());
 
         switch (preferences.getMode()) {
             case MessageProcessorEndpointHttp.MODE_ID:
@@ -223,7 +223,7 @@ public class MessageProcessor {
                 }
             }
         }
-        eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
+        endpointStateRepo.setQueueLength(outgoingQueue.size());
     }
 
     // Should be on the background thread here, because we block
@@ -297,7 +297,7 @@ public class MessageProcessor {
 
                 if (previousMessageFailed) {
                     Timber.i("Waiting for %s s before retrying", retryWait / 1000);
-                     waitFuture = scheduler.schedule(() -> {
+                    waitFuture = scheduler.schedule(() -> {
                         synchronized (locker) {
                             locker.notify();
                         }
@@ -327,7 +327,7 @@ public class MessageProcessor {
     }
 
     public void resetMessageSleepBlock() {
-        if (waitFuture!=null && waitFuture.cancel(false)) {
+        if (waitFuture != null && waitFuture.cancel(false)) {
             Timber.d("Resetting message send loop wait. Thread: %s", Thread.currentThread());
             retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT;
             synchronized (locker) {
@@ -352,22 +352,22 @@ public class MessageProcessor {
 
     void onMessageDelivered(MessageBase messageBase) {
         Timber.d("onMessageDelivered in MessageProcessor Noop. ThreadID: %s", Thread.currentThread());
-        eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
+        endpointStateRepo.setQueueLength(outgoingQueue.size());
     }
 
     void onMessageDeliveryFailedFinal(String messageId) {
         Timber.e("Message delivery failed, not retryable. :%s", messageId);
-        eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size()));
+        endpointStateRepo.setQueueLength(outgoingQueue.size());
     }
 
     void onMessageDeliveryFailed(String messageId) {
         Timber.e("Message delivery failed. queueLength: %s, messageId: %s", outgoingQueue.size() + 1, messageId);
-        eventBus.postSticky(queueEvent.withNewLength(outgoingQueue.size() + 1)); // Failed message hasn't been re-queued yet, so add 1
+        endpointStateRepo.setQueueLength(outgoingQueue.size());
     }
 
     void onEndpointStateChanged(EndpointState newState) {
         Timber.d("message:%s, ", newState.getMessage());
-        eventBus.postSticky(newState);
+        endpointStateRepo.setState(newState);
     }
 
     void processIncomingMessage(MessageBase message) {

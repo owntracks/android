@@ -11,7 +11,6 @@ import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -25,7 +24,6 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.text.Spannable;
 import android.text.SpannableString;
-import android.text.format.DateUtils;
 import android.text.style.StyleSpan;
 
 import androidx.annotation.NonNull;
@@ -34,6 +32,7 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.lifecycle.LifecycleService;
 
 import com.jakewharton.processphoenix.ProcessPhoenix;
 
@@ -45,6 +44,7 @@ import org.owntracks.android.R;
 import org.owntracks.android.data.EndpointState;
 import org.owntracks.android.data.WaypointModel;
 import org.owntracks.android.data.repos.ContactsRepo;
+import org.owntracks.android.data.repos.EndpointStateRepo;
 import org.owntracks.android.data.repos.LocationRepo;
 import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.geocoding.GeocoderProvider;
@@ -61,6 +61,7 @@ import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.model.messages.MessageLocation;
 import org.owntracks.android.model.messages.MessageTransition;
 import org.owntracks.android.services.worker.Scheduler;
+import org.owntracks.android.support.DateFormatter;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.MonitoringMode;
 import org.owntracks.android.support.Preferences;
@@ -68,7 +69,6 @@ import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.ServiceBridge;
 import org.owntracks.android.ui.map.MapActivity;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -80,7 +80,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 import timber.log.Timber;
 
 @AndroidEntryPoint
-public class BackgroundService extends Service implements SharedPreferences.OnSharedPreferenceChangeListener, ServiceBridge.ServiceBridgeInterface {
+public class BackgroundService extends LifecycleService implements SharedPreferences.OnSharedPreferenceChangeListener, ServiceBridge.ServiceBridgeInterface {
     private static final int INTENT_REQUEST_CODE_GEOFENCE = 1264;
     private static final int INTENT_REQUEST_CODE_CLEAR_EVENTS = 1263;
 
@@ -106,8 +106,6 @@ public class BackgroundService extends Service implements SharedPreferences.OnSh
     private LocationCallback locationCallback;
     private LocationCallback locationCallbackOnDemand;
     private MessageLocation lastLocationMessage;
-    private EndpointState lastEndpointState = EndpointState.INITIAL;
-
 
     private NotificationCompat.Builder activeNotificationCompatBuilder;
     private NotificationCompat.Builder eventsNotificationCompatBuilder;
@@ -154,6 +152,9 @@ public class BackgroundService extends Service implements SharedPreferences.OnSh
 
     @Inject
     MessageProcessor messageProcessor;
+
+    @Inject
+    EndpointStateRepo endpointStateRepo;
 
     @Inject
     GeofencingClient geofencingClient;
@@ -205,7 +206,6 @@ public class BackgroundService extends Service implements SharedPreferences.OnSh
         setupGeofences();
 
         eventBus.register(this);
-        eventBus.postSticky(new Events.ServiceStarted());
 
         messageProcessor.initialize();
 
@@ -228,6 +228,13 @@ public class BackgroundService extends Service implements SharedPreferences.OnSh
         if (intent != null) {
             handleIntent(intent);
         }
+        endpointStateRepo.getEndpointQueueLength().observe(this, queueLength -> {
+            lastQueueLength = queueLength;
+            updateOngoingNotification();
+        });
+        endpointStateRepo.getEndpointState().observe(this, state -> updateOngoingNotification());
+
+        endpointStateRepo.setServiceStartedNow();
 
         return START_STICKY;
     }
@@ -366,6 +373,7 @@ public class BackgroundService extends Service implements SharedPreferences.OnSh
         }
 
         // Show monitoring mode if endpoint state is not interesting
+        EndpointState lastEndpointState = endpointStateRepo.getEndpointState().getValue();
         if (lastEndpointState == EndpointState.CONNECTED || lastEndpointState == EndpointState.IDLE) {
             builder.setContentText(getMonitoringLabel(preferences.getMonitoring()));
         } else if (lastEndpointState == EndpointState.ERROR && lastEndpointState.getMessage() != null) {
@@ -401,7 +409,7 @@ public class BackgroundService extends Service implements SharedPreferences.OnSh
 
         FusedContact c = contactsRepo.getById(message.getContactKey());
 
-        long when = TimeUnit.SECONDS.toMillis(message.getTimestamp());
+        long timestampInMs = TimeUnit.SECONDS.toMillis(message.getTimestamp());
         String location = message.getDescription();
 
         if (location == null) {
@@ -426,23 +434,18 @@ public class BackgroundService extends Service implements SharedPreferences.OnSh
         Notification n = eventsNotificationCompatBuilder.build();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            sendEventStackNotification(title, text, when);
+            sendEventStackNotification(title, text, new Date(timestampInMs));
         } else {
             notificationManagerCompat.notify(notificationEventsID++, n);
         }
     }
 
     @RequiresApi(23)
-    private void sendEventStackNotification(String title, String text, long when) {
+    private void sendEventStackNotification(String title, String text, Date timestamp) {
         Timber.v("SDK_INT >= 23, building stack notification");
 
-        String whenStr;
-        Date whenDate = new Date();
-        if (DateUtils.isToday(when)) {
-            whenStr = new SimpleDateFormat("HH:mm", this.getResources().getConfiguration().locale).format(new Date(when));
-        } else {
-            whenStr = new SimpleDateFormat("yyyy-MM-dd HH:mm", this.getResources().getConfiguration().locale).format(new Date(when));
-        }
+        String whenStr = DateFormatter.formatDate(timestamp);
+
         Spannable newLine = new SpannableString(String.format("%s %s %s", whenStr, title, text));
         newLine.setSpan(new StyleSpan(Typeface.BOLD), 0, whenStr.length() + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         activeNotifications.push(newLine);
@@ -703,19 +706,6 @@ public class BackgroundService extends Service implements SharedPreferences.OnSh
         if (m == lastLocationMessage) {
             updateOngoingNotification();
         }
-    }
-
-    @Subscribe(sticky = true)
-    public void onEvent(EndpointState state) {
-        Timber.d(state.getError(), "endpoint state changed %s. Message: %s", state.getLabel(this), state.getMessage());
-        this.lastEndpointState = state;
-        updateOngoingNotification();
-    }
-
-    @Subscribe(sticky = true)
-    public void onEvent(Events.QueueChanged e) {
-        this.lastQueueLength = e.getNewLength();
-        updateOngoingNotification();
     }
 
     @Subscribe
