@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.provider.Settings
 
+@Suppress("UNUSED_PARAMETER")
 class BatteryOptimizingIntents(_context: Context) {
     val settingsIntent: Intent =
         Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
