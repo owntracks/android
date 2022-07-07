@@ -79,7 +79,6 @@ class MapViewModel @Inject constructor(
     val relativeContactBearing: LiveData<Float>
         get() = mutableRelativeContactBearing
 
-
     // Controls whether the myLocation button on the map is enabled
     private val mutableMyLocationEnabled = MutableLiveData(false)
     val myLocationEnabled: LiveData<Boolean>
@@ -286,7 +285,8 @@ class MapViewModel @Inject constructor(
             LatLng(
                 STARTING_LATITUDE,
                 STARTING_LONGITUDE
-            ), STARTING_ZOOM
+            ),
+            STARTING_ZOOM
         )
 
     val orientationSensorEventListener = object : SensorEventListener {
@@ -294,7 +294,7 @@ class MapViewModel @Inject constructor(
             maybeEvent?.let { event ->
                 currentContact.value?.messageLocation?.let { contactLatLng ->
                     currentLocation.value?.let { currentLocation ->
-                        //Orientation is angle around the Z axis
+                        // Orientation is angle around the Z axis
                         val azimuth = (180 / Math.PI) * 2 * asin(event.values[2])
                         val distanceBetween = FloatArray(2)
                         Location.distanceBetween(
@@ -311,7 +311,7 @@ class MapViewModel @Inject constructor(
         }
 
         override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-            //noop
+            // noop
         }
     }
 
@@ -328,7 +328,6 @@ class MapViewModel @Inject constructor(
     fun setMonitoringMode(mode: MonitoringMode) {
         preferences.monitoring = mode
     }
-
 
     fun setMapLayerStyle(mapLayerStyle: MapLayerStyle) {
         preferences.mapLayerStyle = mapLayerStyle

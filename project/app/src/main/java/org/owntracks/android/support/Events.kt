@@ -1,7 +1,6 @@
 package org.owntracks.android.support
 
 import org.owntracks.android.data.WaypointModel
-import org.owntracks.android.model.FusedContact
 import java.util.*
 
 class Events {

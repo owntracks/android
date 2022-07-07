@@ -24,7 +24,6 @@ class PlayFragment @Inject constructor() : WelcomeFragment() {
     override fun shouldBeDisplayed(context: Context): Boolean =
         googleAPI.isGooglePlayServicesAvailable(context) != ConnectionResult.SUCCESS
 
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -79,7 +78,8 @@ class PlayFragment @Inject constructor() : WelcomeFragment() {
                     playFragmentViewModel.setPlayServicesNotAvailable(
                         googleAPI.isUserResolvableError(
                             result
-                        ), getString(R.string.play_services_not_available)
+                        ),
+                        getString(R.string.play_services_not_available)
                     )
                     false
                 }

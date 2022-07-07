@@ -80,7 +80,6 @@ class OSMMapFragment internal constructor(
 
     private var mapView: MapView? = null
 
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -174,16 +173,15 @@ class OSMMapFragment internal constructor(
                         setPersonIcon(dot)
                         setPersonAnchor(0.5f, 0.5f)
                         setDirectionAnchor(0.5f, 0.5f)
-                    })
+                    }
+                )
             }
             if (!overlays.any { it is RotationGestureOverlay }) {
                 overlays.add(RotationGestureOverlay(this))
             }
             setMultiTouchControls(true)
             isTilesScaledToDpi = true
-            viewModel.getMapLocation(
-
-            ).run {
+            viewModel.getMapLocation().run {
                 controller.animateTo(latLng.toGeoPoint(), zoom, 0, rotation)
             }
         }
@@ -208,16 +206,19 @@ class OSMMapFragment internal constructor(
                 activity has been destroyed. Creating a Marker requires (for some reason) the `mapView`
                 to be attached to a non-destroyed activity somehow, so we check before creating the marker
                  */
-                overlays.add(0, Marker(this).apply {
-                    this.id = id
-                    position = latLng.toGeoPoint()
-                    infoWindow = null
-                    setOnMarkerClickListener { marker, _ ->
-                        onMarkerClicked(marker.id)
-                        true
+                overlays.add(
+                    0,
+                    Marker(this).apply {
+                        this.id = id
+                        position = latLng.toGeoPoint()
+                        infoWindow = null
+                        setOnMarkerClickListener { marker, _ ->
+                            onMarkerClicked(marker.id)
+                            true
+                        }
+                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
                     }
-                    setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-                })
+                )
             }
             overlays.firstOrNull { it is Marker && it.id == id }?.run {
                 (this as Marker).icon = BitmapDrawable(resources, image)

@@ -1,6 +1,5 @@
 package org.owntracks.android.geocoding
 
-
 import timber.log.Timber
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -23,4 +22,3 @@ abstract class CachingGeocoder : Geocoder {
 
     protected abstract fun doLookup(latitude: BigDecimal, longitude: BigDecimal): GeocodeResult
 }
-

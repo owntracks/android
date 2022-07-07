@@ -28,7 +28,6 @@ class MonitoringModeBottomSheetDialog() : BottomSheetDialogFragment() {
                 viewModel.setMonitoringMode(it.value)
                 dismiss()
             }
-
         }
         return binding.root
     }

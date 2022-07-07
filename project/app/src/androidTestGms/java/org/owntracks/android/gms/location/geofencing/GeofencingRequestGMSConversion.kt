@@ -37,7 +37,6 @@ class GeofencingRequestGMSConversion {
         assertEquals(5, gmsGeofencingRequest.initialTrigger)
         assertNotNull(gmsGeofencingRequest.geofences.find { it.requestId == "first" })
         assertNotNull(gmsGeofencingRequest.geofences.find { it.requestId == "second" })
-
     }
 
     @Test

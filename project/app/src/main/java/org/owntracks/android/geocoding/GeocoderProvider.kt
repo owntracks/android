@@ -144,19 +144,19 @@ class GeocoderProvider @Inject constructor(
     init {
         setGeocoderProvider(context, preferences)
         preferences.registerOnPreferenceChangedListener(object :
-            SharedPreferences.OnSharedPreferenceChangeListener {
-            override fun onSharedPreferenceChanged(
-                sharedPreferences: SharedPreferences?,
-                key: String?
-            ) {
-                if (key == preferences.getPreferenceKey(R.string.preferenceKeyReverseGeocodeProvider) || key == preferences.getPreferenceKey(
-                        R.string.preferenceKeyOpencageGeocoderApiKey
-                    )
+                SharedPreferences.OnSharedPreferenceChangeListener {
+                override fun onSharedPreferenceChanged(
+                    sharedPreferences: SharedPreferences?,
+                    key: String?
                 ) {
-                    setGeocoderProvider(context, preferences)
+                    if (key == preferences.getPreferenceKey(R.string.preferenceKeyReverseGeocodeProvider) || key == preferences.getPreferenceKey(
+                            R.string.preferenceKeyOpencageGeocoderApiKey
+                        )
+                    ) {
+                        setGeocoderProvider(context, preferences)
+                    }
                 }
-            }
-        })
+            })
         notificationManager = NotificationManagerCompat.from(context)
     }
 
@@ -165,4 +165,3 @@ class GeocoderProvider @Inject constructor(
         const val GEOCODE_ERROR_NOTIFICATION_TAG = "GeocoderError"
     }
 }
-

@@ -26,7 +26,6 @@ import org.owntracks.android.testutils.disableDeviceLocation
 import org.owntracks.android.testutils.enableDeviceLocation
 import org.owntracks.android.testutils.setNotFirstStartPreferences
 
-
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -84,7 +83,6 @@ class GMSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
         PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
         assertDisplayed(R.id.google_map_view)
     }
-
 
     @Test
     fun mapActivityShouldPromptForLocationServicesOnFirstTime() {

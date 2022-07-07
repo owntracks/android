@@ -1,7 +1,6 @@
 package org.owntracks.android.testutils
 
 import java.lang.annotation.Inherited
-import java.lang.annotation.RetentionPolicy
 
 @Retention(AnnotationRetention.RUNTIME)
 @Inherited

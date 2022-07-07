@@ -59,10 +59,8 @@ internal class ContactsAdapter(
                         false
                     )
                 }
-
             }
             binding.executePendingBindings()
         }
     }
 }
-

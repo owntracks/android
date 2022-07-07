@@ -52,9 +52,9 @@ class EspressoScreenshotsPlugin : Plugin<Project> {
 
                     tasks.register<EmbedScreenshotsInTestReport>(
                         "embed${
-                            flavorName.capitalize(
-                                Locale.ROOT
-                            )
+                        flavorName.capitalize(
+                            Locale.ROOT
+                        )
                         }Screenshots"
                     ) {
                         group = "reporting"

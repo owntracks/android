@@ -82,4 +82,3 @@ public class ConnectionIdentificationViewModel extends BaseDialogViewModel {
         this.trackerIdDirty = true;
     }
 }
-

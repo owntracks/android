@@ -23,23 +23,23 @@ abstract class EmbedScreenshotsInTestReport : DefaultTask() {
                     val testName = it.name
                     val testNameWithoutExtension = it.nameWithoutExtension
                     val testClassJunitReportFile =
-                        File(reportsPath, "${testClassName}.html")
+                        File(reportsPath, "$testClassName.html")
                     if (!testClassJunitReportFile.exists()) {
-                        println("Could not find JUnit report file for test class '${testClassJunitReportFile}'")
+                        println("Could not find JUnit report file for test class '$testClassJunitReportFile'")
                         return@failedFile
                     }
                     val testJunitReportContent =
                         testClassJunitReportFile.readText()
 
                     val failedHeaderPatternToFind =
-                        "<h3 class=\"failures\">${testNameWithoutExtension}</h3>"
+                        "<h3 class=\"failures\">$testNameWithoutExtension</h3>"
 
                     val failedPatternToReplace =
-                        "$failedHeaderPatternToFind <img src=\"${screenShotSrcRelativeDir}/${testClassName}/${testName}\" width =\"360\" />"
+                        "$failedHeaderPatternToFind <img src=\"$screenShotSrcRelativeDir/$testClassName/${testName}\" width =\"360\" />"
                     val successRecordPatternToFind =
-                        "<td>${testNameWithoutExtension}</td>"
+                        "<td>$testNameWithoutExtension</td>"
                     val successPatternToReplace =
-                        "<td>${testNameWithoutExtension} <a href=\"${screenShotSrcRelativeDir}/${testClassName}/${testName}\">(screenshot)</a></td>"
+                        "<td>$testNameWithoutExtension <a href=\"$screenShotSrcRelativeDir/$testClassName/${testName}\">(screenshot)</a></td>"
 
                     testClassJunitReportFile.writeText(
                         testJunitReportContent

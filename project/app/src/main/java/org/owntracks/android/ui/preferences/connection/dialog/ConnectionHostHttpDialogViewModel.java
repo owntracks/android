@@ -36,4 +36,3 @@ public class ConnectionHostHttpDialogViewModel extends BaseDialogViewModel {
         this.url = url;
     }
 }
-

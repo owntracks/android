@@ -43,14 +43,16 @@ class TestWithAnHTTPServerImpl : TestWithAnHTTPServer {
             {
                 "_type": "configuration",
                 "mode": 3,
-                "url": "http://localhost:${mockWebServer.port}" 
+                "url": "http://localhost:${mockWebServer.port}"
             }
-        """.trimIndent()
+            """.trimIndent()
         )
-        InstrumentationRegistry.getInstrumentation().targetContext.startActivity(Intent(Intent.ACTION_VIEW).apply {
-            data = Uri.parse("owntracks:///config?inline=$config")
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        })
+        InstrumentationRegistry.getInstrumentation().targetContext.startActivity(
+            Intent(Intent.ACTION_VIEW).apply {
+                data = Uri.parse("owntracks:///config?inline=$config")
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+        )
         sleep(500)
         clickOnAndWait(R.id.save)
         openDrawer()

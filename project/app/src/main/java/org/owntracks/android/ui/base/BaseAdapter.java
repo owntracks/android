@@ -292,4 +292,3 @@ public class BaseAdapter<T> extends RecyclerView.Adapter<ViewHolder> implements 
     }
 
 }
-

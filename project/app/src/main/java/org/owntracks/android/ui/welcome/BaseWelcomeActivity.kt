@@ -37,9 +37,11 @@ abstract class BaseWelcomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (requirementsChecker.areRequirementsMet()) {
-            startActivity(Intent(this, MapActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            })
+            startActivity(
+                Intent(this, MapActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                }
+            )
             finish()
             return
         }
@@ -52,12 +54,12 @@ abstract class BaseWelcomeActivity : AppCompatActivity() {
                     addFragmentsToAdapter(this)
                 }
                 viewPager.registerOnPageChangeCallback(object :
-                    ViewPager2.OnPageChangeCallback() {
-                    override fun onPageSelected(position: Int) {
-                        viewModel.moveToPage(position)
-                        super.onPageSelected(position)
-                    }
-                })
+                        ViewPager2.OnPageChangeCallback() {
+                        override fun onPageSelected(position: Int) {
+                            viewModel.moveToPage(position)
+                            super.onPageSelected(position)
+                        }
+                    })
                 btnNext.setOnClickListener { viewModel.nextPage() }
                 btnDone.setOnClickListener {
                     startActivity(
@@ -79,7 +81,7 @@ abstract class BaseWelcomeActivity : AppCompatActivity() {
     abstract fun addFragmentsToAdapter(welcomeAdapter: WelcomeAdapter)
 
     private fun setPagerIndicator(position: Int) {
-        val itemCount = (binding.viewPager.adapter?.itemCount ?: 0) //TODO Can we globalize
+        val itemCount = (binding.viewPager.adapter?.itemCount ?: 0) // TODO Can we globalize
         if (position < itemCount) {
             for (i in 0 until itemCount) {
                 val circle = binding.circles.getChildAt(i) as ImageView
@@ -91,7 +93,6 @@ abstract class BaseWelcomeActivity : AppCompatActivity() {
             }
         }
     }
-
 
     private fun buildPagerIndicator() {
         val itemCount = (binding.viewPager.adapter?.itemCount ?: 0)

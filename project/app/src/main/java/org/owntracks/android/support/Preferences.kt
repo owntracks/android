@@ -14,7 +14,6 @@ import org.greenrobot.eventbus.EventBus
 import org.owntracks.android.BuildConfig
 import org.owntracks.android.R
 import org.owntracks.android.model.messages.MessageConfiguration
-import org.owntracks.android.services.LocationProcessor
 import org.owntracks.android.services.MessageProcessorEndpointHttp
 import org.owntracks.android.services.MessageProcessorEndpointMqtt
 import org.owntracks.android.services.worker.Scheduler
@@ -57,15 +56,16 @@ class Preferences @Inject constructor(
             .filter {
                 val annotation = it.getAnnotation(Export::class.java)
                 annotation != null &&
-                        (currentMode == MessageProcessorEndpointMqtt.MODE_ID && annotation.exportModeMqtt ||
-                                currentMode == MessageProcessorEndpointHttp.MODE_ID && annotation.exportModeHttp)
+                    (
+                        currentMode == MessageProcessorEndpointMqtt.MODE_ID && annotation.exportModeMqtt ||
+                            currentMode == MessageProcessorEndpointHttp.MODE_ID && annotation.exportModeHttp
+                        )
             }
             .map { Pair(getPreferenceKey(it.getAnnotation(Export::class.java)!!.keyResId), it) }
             .toMap()
 
     val importKeys: List<String>
         get() = ArrayList(importMethods.keys)
-
 
     // need to iterated thought hierarchy in order to retrieve methods from above the current instance
     // iterate though the list of methods declared in the class represented by klass variable, and insert those annotated with the specified annotation
@@ -188,8 +188,8 @@ class Preferences @Inject constructor(
                     methods.getValue(configurationKey).let { importMethod ->
                         if (messageConfiguration[configurationKey]?.javaClass?.isAssignableFrom(
                                 Integer::class.java
-                            ) ?: false
-                            && importMethod.parameterTypes.first() == MonitoringMode::class.java
+                            ) ?: false &&
+                            importMethod.parameterTypes.first() == MonitoringMode::class.java
                         ) {
                             importMethod.invoke(
                                 this,
@@ -202,7 +202,7 @@ class Preferences @Inject constructor(
                 } catch (e: IllegalArgumentException) {
                     Timber.e(
                         "Tried to import $configurationKey but value is wrong type. Expected: ${
-                            methods.getValue(configurationKey).parameterTypes.first().canonicalName
+                        methods.getValue(configurationKey).parameterTypes.first().canonicalName
                         }, given ${messageConfiguration[configurationKey]?.javaClass?.canonicalName}",
                     )
                 }
@@ -243,7 +243,6 @@ class Preferences @Inject constructor(
         set(active) {
             setMode(active, false)
         }
-
 
     @get:Export(
         keyResId = R.string.preferenceKeyMonitoring,
@@ -327,7 +326,6 @@ class Preferences @Inject constructor(
         set(newValue) {
             setInt(R.string.preferenceKeyConnectionTimeoutSeconds, newValue.coerceAtLeast(1))
         }
-
 
     @get:Export(
         keyResId = R.string.preferenceKeyPublishExtendedData,
@@ -441,7 +439,6 @@ class Preferences @Inject constructor(
             setInt(R.string.preferenceKeyIgnoreInaccurateLocations, meters)
         }
 
-
     @get:Export(keyResId = R.string.preferenceKeyClientId, exportModeMqtt = true)
     @set:Import(keyResId = R.string.preferenceKeyClientId)
     var clientId: String
@@ -524,7 +521,6 @@ class Preferences @Inject constructor(
             else "na" // Empty trackerId won't be included in the message.
         }
 
-
     @get:Export(keyResId = R.string.preferenceKeyPort, exportModeMqtt = true)
     @set:Import(keyResId = R.string.preferenceKeyPort)
     var port: Int
@@ -549,7 +545,8 @@ class Preferences @Inject constructor(
         )
         set(mqttProtocolLevel) {
             setInt(
-                R.string.preferenceKeyMqttProtocolLevel, if (
+                R.string.preferenceKeyMqttProtocolLevel,
+                if (
                     mqttProtocolLevel == MqttConnectOptions.MQTT_VERSION_DEFAULT ||
                     mqttProtocolLevel == MqttConnectOptions.MQTT_VERSION_3_1 ||
                     mqttProtocolLevel == MqttConnectOptions.MQTT_VERSION_3_1_1
@@ -593,7 +590,6 @@ class Preferences @Inject constructor(
 
     val keepaliveWithHintSupport: String
         get() = getIntWithHintSupport(R.string.preferenceKeyKeepalive)
-
 
     fun setKeepaliveDefault() {
         clearKey(R.string.preferenceKeyKeepalive)
@@ -740,7 +736,6 @@ class Preferences @Inject constructor(
             )
         }
 
-
     @get:Export(keyResId = R.string.preferenceKeyPubRetain, exportModeMqtt = true)
     @set:Import(keyResId = R.string.preferenceKeyPubRetain)
     var pubRetain: Boolean
@@ -748,7 +743,6 @@ class Preferences @Inject constructor(
         set(newValue) {
             setBoolean(R.string.preferenceKeyPubRetain, newValue)
         }
-
 
     @get:Export(keyResId = R.string.preferenceKeySubQos, exportModeMqtt = true)
     @set:Import(keyResId = R.string.preferenceKeySubQos)
@@ -884,7 +878,6 @@ class Preferences @Inject constructor(
             }
         }
 
-
     @get:Export(
         keyResId = R.string.preferenceKeyExperimentalFeatures,
         exportModeMqtt = true,
@@ -967,14 +960,12 @@ class Preferences @Inject constructor(
             setString(R.string.preferenceKeyMapLayerStyle, newValue.name)
         }
 
-
     // Not used on public, as many people might use the same device type
     private val deviceIdDefault: String
         get() = // Use device name (Mako, Surnia, etc. and strip all non alpha digits)
             Build.DEVICE?.replace(" ", "-")?.replace("[^a-zA-Z0-9]+".toRegex(), "")
                 ?.lowercase(Locale.getDefault())
                 ?: "unknown"
-
 
     private val clientIdDefault: String
         get() = (username + deviceId).replace("\\W".toRegex(), "").lowercase(Locale.getDefault())
@@ -1028,7 +1019,7 @@ class Preferences @Inject constructor(
 
     // sharedPreferences because the value is independent from the selected mode
     val isSetupCompleted: Boolean
-        get() =// sharedPreferences because the value is independent from the selected mode
+        get() = // sharedPreferences because the value is independent from the selected mode
             !preferencesStore.getBoolean(
                 getPreferenceKey(R.string.preferenceKeySetupNotCompleted),
                 true
@@ -1068,7 +1059,6 @@ class Preferences @Inject constructor(
     fun setObjectBoxMigrated() {
         preferencesStore.putBoolean(getPreferenceKey(R.string.preferenceKeyObjectboxMigrated), true)
     }
-
 
     private fun getBooleanOrDefault(resKeyId: Int, defId: Int): Boolean {
         return preferencesStore.getBoolean(getPreferenceKey(resKeyId), getBooleanResource(defId))

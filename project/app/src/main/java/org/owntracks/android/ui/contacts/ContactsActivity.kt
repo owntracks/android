@@ -15,7 +15,8 @@ import org.owntracks.android.ui.base.viewmodel.NoOpViewModel
 import org.owntracks.android.ui.map.MapActivity
 
 @AndroidEntryPoint
-class ContactsActivity : BaseActivity<UiContactsBinding?, NoOpViewModel>(),
+class ContactsActivity :
+    BaseActivity<UiContactsBinding?, NoOpViewModel>(),
     BaseAdapter.ClickListener<FusedContact?> {
     private val vm: ContactsViewModel by viewModels()
     private lateinit var contactsAdapter: ContactsAdapter

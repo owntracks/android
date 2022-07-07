@@ -26,9 +26,11 @@ class FinishFragment @Inject constructor() : WelcomeFragment() {
         binding = UiWelcomeFinishBinding.inflate(inflater, container, false)
         binding.uiFragmentWelcomeFinishOpenPreferences.setOnClickListener {
             viewModel.setWelcomeIsAtEnd()
-            startActivity(Intent(requireContext(), PreferencesActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            })
+            startActivity(
+                Intent(requireContext(), PreferencesActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                }
+            )
         }
         return binding.root
     }

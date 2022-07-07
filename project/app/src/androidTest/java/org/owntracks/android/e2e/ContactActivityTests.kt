@@ -23,10 +23,10 @@ import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.clickOnDrawerAndWait
 import org.owntracks.android.ui.map.MapActivity
 
-
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class ContactActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.java, false),
+class ContactActivityTests :
+    TestWithAnActivity<MapActivity>(MapActivity::class.java, false),
     TestWithAnHTTPServer by TestWithAnHTTPServerImpl(),
     MockDeviceLocation by GPSMockDeviceLocation() {
     @After
@@ -59,7 +59,7 @@ class ContactActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.
         clickOnAndWait(R.string.mode_http_private_label)
         clickDialogPositiveButton()
         clickOnAndWait(R.string.preferencesHost)
-        writeTo(R.id.url, "http://localhost:${webserverPort}/")
+        writeTo(R.id.url, "http://localhost:$webserverPort/")
         clickDialogPositiveButton()
         clickBack()
 

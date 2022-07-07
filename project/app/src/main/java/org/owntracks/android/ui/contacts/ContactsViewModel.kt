@@ -14,7 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ContactsViewModel @Inject constructor(
-    private val contactsRepo: ContactsRepo, private val geocoderProvider: GeocoderProvider
+    private val contactsRepo: ContactsRepo,
+    private val geocoderProvider: GeocoderProvider
 ) : ViewModel() {
 
     fun refreshGeocodes() {

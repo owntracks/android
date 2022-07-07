@@ -54,4 +54,3 @@ public class ConnectionModeDialogViewModel extends BaseDialogViewModel {
         return MessageProcessorEndpointMqtt.MODE_ID;
     }
 }
-

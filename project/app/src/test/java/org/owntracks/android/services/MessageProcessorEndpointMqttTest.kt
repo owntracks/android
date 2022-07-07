@@ -25,7 +25,8 @@ class MessageProcessorEndpointMqttTest {
                 "owntracks/+/+/events",
                 "owntracks/+/+/info",
                 "owntracks/+/+/waypoints"
-            ), topics
+            ),
+            topics
         )
     }
 
@@ -52,7 +53,8 @@ class MessageProcessorEndpointMqttTest {
             setOf(
                 "owntracks/+/+",
                 "othertopic/+"
-            ), topics
+            ),
+            topics
         )
     }
 
@@ -67,7 +69,8 @@ class MessageProcessorEndpointMqttTest {
             setOf(
                 "owntracks/+/+",
                 "othertopic/+",
-            ), topics
+            ),
+            topics
         )
     }
 

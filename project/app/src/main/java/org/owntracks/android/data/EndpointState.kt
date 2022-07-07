@@ -25,7 +25,6 @@ enum class EndpointState {
     var error: Throwable? = null
         private set
 
-
     fun withMessage(message: String?): EndpointState {
         this.message = message
         return this

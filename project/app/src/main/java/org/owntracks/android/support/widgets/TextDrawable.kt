@@ -43,7 +43,6 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
             strokeWidth = builder.borderThickness.toFloat()
         }
 
-
         // border paint settings
         borderThickness = builder.borderThickness
         borderPaint = Paint().apply {
@@ -52,13 +51,14 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
             strokeWidth = borderThickness.toFloat()
         }
         paint.color = builder.color
-
     }
 
     private fun getDarkerShade(color: Int): Int {
-        return Color.rgb((SHADE_FACTOR * Color.red(color)).toInt(),
-                (SHADE_FACTOR * Color.green(color)).toInt(),
-                (SHADE_FACTOR * Color.blue(color)).toInt())
+        return Color.rgb(
+            (SHADE_FACTOR * Color.red(color)).toInt(),
+            (SHADE_FACTOR * Color.green(color)).toInt(),
+            (SHADE_FACTOR * Color.blue(color)).toInt()
+        )
     }
 
     override fun draw(canvas: Canvas) {
@@ -172,7 +172,8 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
 
     class ColorGenerator private constructor(private val mColors: List<Int>) {
         companion object {
-            var MATERIAL: ColorGenerator = create(listOf(
+            var MATERIAL: ColorGenerator = create(
+                listOf(
                     -0x1a8c8d,
                     -0xf9d6e,
                     -0x459738,
@@ -190,7 +191,8 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
                     -0x48b3,
                     -0x5e7781,
                     -0x6f5b52
-            ))
+                )
+            )
 
             fun create(colorList: List<Int>): ColorGenerator {
                 return ColorGenerator(colorList)
@@ -200,12 +202,10 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
         fun getColor(key: Any): Int {
             return mColors[abs(key.hashCode()) % mColors.size]
         }
-
     }
 
     companion object {
         private const val SHADE_FACTOR = 0.9f
         private val TYPEFACE = Typeface.create("sans-serif-light", Typeface.NORMAL)
-
     }
 }

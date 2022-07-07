@@ -4,7 +4,6 @@ import android.location.Location
 import org.osmdroid.util.GeoPoint
 import kotlin.math.abs
 
-
 class LatLng(latitude: Double, longitude: Double) {
     private val actualLatitude: Double = when {
         latitude % 360 <= 90 -> {
@@ -37,14 +36,12 @@ class LatLng(latitude: Double, longitude: Double) {
         result = 31 * result + longitude.hashCode()
         return result
     }
-
 }
 
 fun LatLng.toGeoPoint(): GeoPoint {
     return GeoPoint(this.latitude, this.longitude)
 }
 
+fun Double.equalsDelta(other: Double) = abs(this / other - 1) < 0.00000001
 
-fun Double.equalsDelta(other: Double) = abs(this/other - 1) < 0.00000001
-
-fun Location.toLatLng() = LatLng(latitude,longitude)
+fun Location.toLatLng() = LatLng(latitude, longitude)

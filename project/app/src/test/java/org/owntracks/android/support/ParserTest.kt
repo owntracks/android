@@ -21,7 +21,6 @@ import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.util.*
 
-
 class ParserTest {
     private lateinit var extendedMessageLocation: MessageLocation
     private lateinit var messageLocation: MessageLocation
@@ -93,24 +92,23 @@ class ParserTest {
               "vac" : 1,
               "vel" : 5
             }
-            """.trimIndent()
+        """.trimIndent()
         assertEquals(expected, parser.toUnencryptedJsonPretty(extendedMessageLocation))
     }
-
 
     fun `Parser can serialize non-extended location message to a pretty JSON message`() {
         val parser = Parser(null)
         @Language("JSON") val expected = """
             {
-              "_type" : "location",              
+              "_type" : "location",
               "acc" : 10,
               "alt" : 20,
               "batt" : 30,
-              "bs" : 2,              
+              "bs" : 2,
               "created_at" : 25,
               "inregions" : [ "Testregion1", "Testregion2" ],
               "lat" : 50.1,
-              "lon" : 60.2,              
+              "lon" : 60.2,
               "tst" : 123456789,
               "vac" : 1,
               "vel" : 5
@@ -143,7 +141,7 @@ class ParserTest {
                     "Testregion2"
                 ]
             }
-            """.trimIndent()
+        """.trimIndent()
         val messageBase = parser.fromJson(input)
         assertEquals(MessageLocation::class.java, messageBase.javaClass)
         val message = messageBase as MessageLocation
@@ -241,7 +239,7 @@ class ParserTest {
                   "vac": 0,
                   "vel": 2
                 }
-            """.trimIndent()
+        """.trimIndent()
         `when`(encryptionProvider.decrypt("TestCipherText")).thenReturn(messageLocationJSON)
         val parser = Parser(encryptionProvider)
         @Language("JSON") val input = """
@@ -289,7 +287,7 @@ class ParserTest {
               "_type": "encrypted",
               "data": "TestCipherText"
             }
-            """.trimIndent()
+        """.trimIndent()
         parser.fromJson(input)
     }
 
@@ -324,7 +322,7 @@ class ParserTest {
                 "vac": 0
               }
             ]
-            """.trimIndent()
+        """.trimIndent()
         val parser = Parser(encryptionProvider)
         val byteArrayInputStream = ByteArrayInputStream(multipleMessageLocationJSON.toByteArray())
         val messages = parser.fromJson(byteArrayInputStream)
@@ -348,7 +346,7 @@ class ParserTest {
               "_type": "cmd",
               "action": "reportLocation"
             }
-            """.trimIndent()
+        """.trimIndent()
         val messageBase = parser.fromJson(input)
         messageBase.topic = "owntracks/username/device/cmd"
         assertEquals(MessageCmd::class.java, messageBase.javaClass)
@@ -366,7 +364,7 @@ class ParserTest {
               "_type": "cmd",
               "action": "restart"
             }
-            """.trimIndent()
+        """.trimIndent()
         val messageBase = parser.fromJson(input)
         assertEquals(MessageCmd::class.java, messageBase.javaClass)
         val messageCmd = messageBase as MessageCmd
@@ -408,7 +406,7 @@ class ParserTest {
                 "host": "newHost"
               }
             }
-            """.trimIndent()
+        """.trimIndent()
         val messageBase = parser.fromJson(input)
         assertEquals(MessageCmd::class.java, messageBase.javaClass)
         val messageCmd = messageBase as MessageCmd
@@ -426,7 +424,7 @@ class ParserTest {
               "action": "nope",
               "sometgi": "parp"
             }
-            """.trimIndent()
+        """.trimIndent()
         parser.fromJson(input)
     }
 
@@ -562,7 +560,7 @@ class ParserTest {
               "username": "testusername",
               "ws": false
             }
-            """.trimIndent()
+        """.trimIndent()
         val messageBase = parser.fromJson(input)
         assertEquals(MessageConfiguration::class.java, messageBase.javaClass)
         val message = messageBase as MessageConfiguration
@@ -625,7 +623,7 @@ class ParserTest {
               "rad": 150,
               "tst": 1558351273
             }
-            """.trimIndent()
+        """.trimIndent()
         val messageBase = parser.fromJson(input)
         assertEquals(MessageWaypoint::class.java, messageBase.javaClass)
         val message = messageBase as MessageWaypoint
@@ -689,7 +687,8 @@ class ParserTest {
               "_type": "card",
               "face": "iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAABIElEQVRYhe2XsQ2DMBBFvQkrUNEihvEOTMEU9IzAAuxAwxz3UxCIIxw58n0LC/lXURI/Xs65MxhkHnO3QChFUJvnCxpjLq9FRIv9MDWLx3H0Q42hSUYLhgTcymoSTamqivKdUKIF/6nQuq6x+M91ohcWwfd1YheGmkREKJ2sarWu635+tiyLBn1GPQu2bYO1FsBeNWttPoPaDVPKDVWQNZzd0IiHXN/3LOTOpYESVA8gCYoI5nlmoC6h/uyjUZjVpJCGYWBgvKEINk0DEUHbtud70zQx0Nwt9t1dq5lqgCPiNsrtd9ReWM6DGsDXf5CV5z92XoDkbabRUmwvkOAsFhHUdc3C8gTdEZPdUZcyyQSzOup8MtkcdalTBLUpgtq8ACxgjcQLy0DfAAAAAElFTkSuQmCC",
               "name": "MyName!"
-            }""".trimIndent()
+            }
+        """.trimIndent()
         val messageBase = parser.fromJson(input)
         messageBase.topic = "owntracks/user/device/info"
         assertEquals(MessageCard::class.java, messageBase.javaClass)

@@ -20,7 +20,7 @@ class PreferencesFragment : AbstractPreferenceFragment() {
         // Have to do these manually here, as there's an android bug that prevents the activity from being found when launched from intent declared on the preferences XML.
         findPreference<Preference>(UI_SCREEN_CONFIGURATION)!!.intent = Intent(context, EditorActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
 
-        //TODO move this to a preferences fragment rather than its own activity.
+        // TODO move this to a preferences fragment rather than its own activity.
         findPreference<Preference>(UI_PREFERENCE_SCREEN_CONNECTION)!!.intent = Intent(context, ConnectionActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
 
         findPreference<Preference>(UI_PREFERENCE_SCREEN_EXPERIMENTAL)?.run {

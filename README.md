@@ -5,7 +5,7 @@ This is the OwnTracks Android app. See our [booklet](http://owntracks.org/bookle
 
 ## Build flavours
 
-There are two build flavours for OwnTracks: 
+There are two build flavours for OwnTracks:
 
 * `gms`: This is the build published to the Google Play Store. It links to and requires the Google Play Services libraries for location (using the Google location APIs), as well as the Google Maps SDK for drawing the main map.
 * `oss`: This is an "un-Googled" build, which does not require or depend on Google Play Services. It uses the built-in android location capabilities and [OpenStreetMap](https://www.openstreetmap.org/) for the main map.

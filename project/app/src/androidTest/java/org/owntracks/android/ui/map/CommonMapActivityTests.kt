@@ -22,10 +22,10 @@ import org.owntracks.android.testutils.*
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.clickOnDrawerAndWait
 
-
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class CommonMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.java, false),
+class CommonMapActivityTests :
+    TestWithAnActivity<MapActivity>(MapActivity::class.java, false),
     MockDeviceLocation by GPSMockDeviceLocation() {
     @After
     fun removeMockLocationProvider() {
@@ -118,7 +118,6 @@ class CommonMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::clas
         clickOnDrawerAndWait(R.string.title_activity_map)
         assertDisplayed(R.id.mapCoordinatorLayout)
     }
-
 
     @Test
     fun regionsCanBeDrawnOnMap() {

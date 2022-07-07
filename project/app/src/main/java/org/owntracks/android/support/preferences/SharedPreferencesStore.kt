@@ -57,7 +57,6 @@ class SharedPreferencesStore @Inject constructor(@ApplicationContext context: Co
             default
         ) else activeSharedPreferences.getBoolean(key, default)
 
-
     override fun putBoolean(key: String, value: Boolean) {
         if (commonPreferenceKeys.contains(key)) commonSharedPreferences.edit()
             .putBoolean(key, value).apply() else activeSharedPreferences.edit()
@@ -66,7 +65,6 @@ class SharedPreferencesStore @Inject constructor(@ApplicationContext context: Co
 
     override fun getInt(key: String, default: Int): Int =
         activeSharedPreferences.getInt(key, default)
-
 
     override fun putInt(key: String, value: Int) {
         activeSharedPreferences.edit().putInt(key, value).apply()
@@ -150,4 +148,3 @@ class SharedPreferencesStore @Inject constructor(@ApplicationContext context: Co
         private const val FILENAME_HTTP = "org.owntracks.android.preferences.http"
     }
 }
-

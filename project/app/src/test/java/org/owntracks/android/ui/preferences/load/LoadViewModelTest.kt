@@ -1,4 +1,4 @@
-package org.owntracks.android.ui.preferences.load;
+package org.owntracks.android.ui.preferences.load
 
 import android.content.Context
 import android.content.res.Resources
@@ -13,7 +13,6 @@ import org.owntracks.android.support.Parser
 import org.owntracks.android.support.Preferences
 import org.owntracks.android.support.PreferencesGettersAndSetters
 import org.owntracks.android.support.preferences.PreferencesStore
-import org.owntracks.android.ui.AppShortcuts
 import org.owntracks.android.ui.NoopAppShortcuts
 import java.net.URI
 
@@ -31,7 +30,6 @@ class LoadViewModelTest {
             on { packageName } doReturn javaClass.canonicalName
         }
         preferencesStore = InMemoryPreferencesStore()
-
     }
 
     @Test
@@ -47,4 +45,3 @@ class LoadViewModelTest {
         )
     }
 }
-

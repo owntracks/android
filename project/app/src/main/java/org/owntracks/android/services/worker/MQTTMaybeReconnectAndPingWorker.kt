@@ -32,4 +32,3 @@ class MQTTMaybeReconnectAndPingWorker @AssistedInject constructor(
             MQTTMaybeReconnectAndPingWorker(appContext, params, messageProcessor)
     }
 }
-

@@ -105,7 +105,6 @@ class App : Application(), Configuration.Provider {
         // Initialize will call Scheduler to connect off the main thread anyway.
         runThingsOnOtherThreads.postOnMainHandlerDelayed({ messageProcessor.initialize() }, 510)
 
-
         when (preferences.theme) {
             Preferences.NIGHT_MODE_AUTO -> AppCompatDelegate.setDefaultNightMode(Preferences.SYSTEM_NIGHT_AUTO_MODE)
             Preferences.NIGHT_MODE_ENABLE -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
@@ -122,7 +121,6 @@ class App : Application(), Configuration.Provider {
 
         // Notifications can be sent from multiple places, so let's make sure we've got the channels in place
         createNotificationChannels()
-
     }
 
     private fun createNotificationChannels() {
@@ -133,7 +131,7 @@ class App : Application(), Configuration.Provider {
             // User has to actively configure this in the notification channel settings.
             val ongoingNotificationChannelName =
                 if (getString(R.string.notificationChannelOngoing).trim()
-                        .isNotEmpty()
+                    .isNotEmpty()
                 ) getString(R.string.notificationChannelOngoing) else "Ongoing"
             NotificationChannel(
                 NOTIFICATION_CHANNEL_ONGOING,
@@ -148,9 +146,8 @@ class App : Application(), Configuration.Provider {
                 setSound(null, null)
             }.run { notificationManager.createNotificationChannel(this) }
 
-
             val eventsNotificationChannelName = if (getString(R.string.events).trim()
-                    .isNotEmpty()
+                .isNotEmpty()
             ) getString(R.string.events) else "Events"
             NotificationChannel(
                 NOTIFICATION_CHANNEL_EVENTS,
@@ -167,7 +164,7 @@ class App : Application(), Configuration.Provider {
 
             val errorNotificationChannelName =
                 if (getString(R.string.notificationChannelErrors).trim()
-                        .isNotEmpty()
+                    .isNotEmpty()
                 ) getString(R.string.notificationChannelErrors) else "Errors"
             NotificationChannel(
                 GeocoderProvider.ERROR_NOTIFICATION_CHANNEL_ID,
@@ -176,7 +173,6 @@ class App : Application(), Configuration.Provider {
             ).apply {
                 lockscreenVisibility = Notification.VISIBILITY_PRIVATE
             }.run { notificationManager.createNotificationChannel(this) }
-
         }
     }
 

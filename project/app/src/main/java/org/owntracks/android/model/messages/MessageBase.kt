@@ -93,12 +93,10 @@ abstract class MessageBase : BaseObservable() {
     protected open val baseTopicSuffix: String?
         get() = BASETOPIC_SUFFIX
 
-
     // Called after deserialization to check if all required attributes are set or not.
     // The message is discarded if false is returned.
     @JsonIgnore
     open fun isValidMessage(): Boolean = true
-
 
     @JsonIgnore
     fun hasTrackerId(): Boolean {

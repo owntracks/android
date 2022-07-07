@@ -15,7 +15,8 @@ import org.owntracks.android.ui.mixins.WorkManagerInitExceptionNotifier
 import javax.inject.Inject
 
 @AndroidEntryPoint
-open class PreferencesActivity : AppCompatActivity(),
+open class PreferencesActivity :
+    AppCompatActivity(),
     PreferenceFragmentCompat.OnPreferenceStartFragmentCallback,
     WorkManagerInitExceptionNotifier by WorkManagerInitExceptionNotifier.Impl(),
     ServiceStarter by ServiceStarter.Impl() {

@@ -3,7 +3,6 @@ package org.owntracks.android.services
 import android.os.SystemClock
 import org.eclipse.paho.client.mqttv3.internal.HighResolutionTimer
 
-
 /**
  * An android `HighResolutionTimer` implementation that includes the time spent asleep.
  */

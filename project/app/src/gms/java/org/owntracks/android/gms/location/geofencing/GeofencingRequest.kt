@@ -3,7 +3,6 @@ package org.owntracks.android.gms.location.geofencing
 import org.owntracks.android.location.geofencing.Geofence
 import org.owntracks.android.location.geofencing.GeofencingRequest
 
-
 fun GeofencingRequest.toGMSGeofencingRequest(): com.google.android.gms.location.GeofencingRequest {
     val builder = com.google.android.gms.location.GeofencingRequest.Builder()
     this.geofences?.run { builder.addGeofences(this.toMutableList().map { it.toGMSGeofence() }) }

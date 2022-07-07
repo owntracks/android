@@ -13,7 +13,7 @@ class EndpointStateRepo @Inject constructor() {
     }
 
     fun setQueueLength(queueLength: Int) {
-        endpointQueueLength.postValue(queueLength);
+        endpointQueueLength.postValue(queueLength)
     }
 
     fun setServiceStartedNow() {
@@ -21,7 +21,7 @@ class EndpointStateRepo @Inject constructor() {
     }
 
     val endpointState: MutableLiveData<EndpointState> =
-        //TODO migrate this to Kotlin flow once we get AGP 7
+        // TODO migrate this to Kotlin flow once we get AGP 7
         MutableLiveData(EndpointState.IDLE)
 
     val endpointQueueLength: MutableLiveData<Int> =

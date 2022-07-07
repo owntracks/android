@@ -88,7 +88,6 @@ inline fun IdlingResource?.with(timeoutSeconds: Long = 30, block: () -> Unit) {
     }
 }
 
-
 fun disableDeviceLocation() {
     val cmd = if (android.os.Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
         "settings put secure location_mode 0"
@@ -98,7 +97,6 @@ fun disableDeviceLocation() {
     InstrumentationRegistry.getInstrumentation().uiAutomation
         .executeShellCommand(cmd)
         .close()
-
 }
 
 fun enableDeviceLocation() {

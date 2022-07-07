@@ -17,7 +17,6 @@ import org.junit.rules.RuleChain
 import org.owntracks.android.testutils.rules.ScreenshotTakingOnTestEndRule
 import shark.AndroidReferenceMatchers
 
-
 abstract class TestWithAnActivity<T : Activity>(
     activityClass: Class<T>,
     private val startActivity: Boolean = true
@@ -36,36 +35,36 @@ abstract class TestWithAnActivity<T : Activity>(
     init {
         LeakCanary.config = LeakCanary.config.copy(
             referenceMatchers = AndroidReferenceMatchers.appDefaults +
-                    AndroidReferenceMatchers.instanceFieldLeak(
-                        className = "android.permission.PermissionUsageHelper",
-                        fieldName = "mContext",
-                        description = "Android API31 leaks contexts"
-                    ) +
-                    AndroidReferenceMatchers.instanceFieldLeak(
-                        className = "android.permission.PermissionUsageHelper",
-                        fieldName = "mPackageManager",
-                        description = "Android API31 leaks contexts"
-                    ) +
-                    AndroidReferenceMatchers.instanceFieldLeak(
-                        className = "android.permission.PermissionUsageHelper",
-                        fieldName = "mUserContexts",
-                        description = "Android API31 leaks contexts"
-                    ) +
-                    AndroidReferenceMatchers.instanceFieldLeak(
-                        className = "android.app.AppOpsManager",
-                        fieldName = "mContext",
-                        description = "Android API31 leaks contexts"
-                    ) +
-                    AndroidReferenceMatchers.instanceFieldLeak(
-                        className = "android.app.ApplicationPackageManager",
-                        fieldName = "mContext",
-                        description = "Android API31 leaks contexts"
-                    ) +
-                    AndroidReferenceMatchers.instanceFieldLeak(
-                        className = "android.app.ApplicationPackageManager",
-                        fieldName = "mPermissionManager",
-                        description = "Android API31 leaks contexts"
-                    )
+                AndroidReferenceMatchers.instanceFieldLeak(
+                    className = "android.permission.PermissionUsageHelper",
+                    fieldName = "mContext",
+                    description = "Android API31 leaks contexts"
+                ) +
+                AndroidReferenceMatchers.instanceFieldLeak(
+                    className = "android.permission.PermissionUsageHelper",
+                    fieldName = "mPackageManager",
+                    description = "Android API31 leaks contexts"
+                ) +
+                AndroidReferenceMatchers.instanceFieldLeak(
+                    className = "android.permission.PermissionUsageHelper",
+                    fieldName = "mUserContexts",
+                    description = "Android API31 leaks contexts"
+                ) +
+                AndroidReferenceMatchers.instanceFieldLeak(
+                    className = "android.app.AppOpsManager",
+                    fieldName = "mContext",
+                    description = "Android API31 leaks contexts"
+                ) +
+                AndroidReferenceMatchers.instanceFieldLeak(
+                    className = "android.app.ApplicationPackageManager",
+                    fieldName = "mContext",
+                    description = "Android API31 leaks contexts"
+                ) +
+                AndroidReferenceMatchers.instanceFieldLeak(
+                    className = "android.app.ApplicationPackageManager",
+                    fieldName = "mPermissionManager",
+                    description = "Android API31 leaks contexts"
+                )
         )
     }
 

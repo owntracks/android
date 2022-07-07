@@ -51,7 +51,6 @@ class FusedContact(id: String?) : BaseObservable() {
     val geocodedLocation: String?
         get() = messageLocation?.geocode
 
-
     @Bindable
     fun getMessageCard(): MessageCard? {
         return messageCard

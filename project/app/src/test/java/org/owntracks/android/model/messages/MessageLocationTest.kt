@@ -16,7 +16,6 @@ import org.owntracks.android.services.WifiInfoProvider
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 
-
 class MessageLocationTest {
 
     @Test
@@ -57,7 +56,6 @@ class MessageLocationTest {
         assertNull(messageLocation.bssid)
         assertNull(messageLocation.ssid)
     }
-
 
     @Test
     fun `given a location and a WifiInfo, when creating a MessageLocation, the correct SSID fields are set`() {

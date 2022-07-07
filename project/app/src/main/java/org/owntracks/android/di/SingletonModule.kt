@@ -35,4 +35,3 @@ class SingletonModule {
         return AppShortcutsImpl()
     }
 }
-

@@ -22,4 +22,3 @@ fun LocationRequest.toGMSLocationRequest(): com.google.android.gms.location.Loca
     waitForAccurateLocation?.run { gmsLocationRequest.isWaitForAccurateLocation = this }
     return gmsLocationRequest
 }
-

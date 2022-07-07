@@ -19,12 +19,14 @@ class WelcomeActivity : BaseWelcomeActivity() {
     }
 
     override fun addFragmentsToAdapter(welcomeAdapter: WelcomeAdapter) {
-        welcomeAdapter.setupFragments(listOf(
-            introFragment,
-            connectionSetupFragment,
-            versionFragment,
-            playFragment,
-            finishFragment
-        ))
+        welcomeAdapter.setupFragments(
+            listOf(
+                introFragment,
+                connectionSetupFragment,
+                versionFragment,
+                playFragment,
+                finishFragment
+            )
+        )
     }
 }

@@ -38,5 +38,4 @@ class InMemoryWaypointsRepo(eventBus: EventBus?) : WaypointsRepo(eventBus) {
     override fun delete_impl(w: WaypointModel?) {
         TODO("Not yet implemented")
     }
-
 }

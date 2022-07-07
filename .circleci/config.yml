@@ -9,7 +9,7 @@ orbs:
 
 jobs:
   check-if-forked:
-    docker: 
+    docker:
       - image: cimg/base:stable
     resource_class: small
     steps:
@@ -23,9 +23,9 @@ jobs:
               echo '{}' | jq '.' > pipeline-params.json
             else
                echo "In OSS contribution flow - $CIRCLE_PR_USERNAME $CIRCLE_PR_REPONAME"
-              echo '{}' | jq '. += { "oss-contribution-flow" : true}' >  pipeline-params.json            
-            fi  
-            
+              echo '{}' | jq '. += { "oss-contribution-flow" : true}' >  pipeline-params.json
+            fi
+
       - continuation/continue:
           parameters: pipeline-params.json
           configuration_path: .circleci/continue-config.yml

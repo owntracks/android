@@ -89,4 +89,3 @@ public class ConnectionHostMqttDialogViewModel extends BaseDialogViewModel {
         this.clientIdDirty=true;
     }
 }
-
