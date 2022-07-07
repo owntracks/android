@@ -9,6 +9,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.owntracks.android.data.EndpointState;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.model.messages.MessageBase;
@@ -369,7 +370,7 @@ public class MessageProcessor {
         eventBus.postSticky(newState);
     }
 
-    public void processIncomingMessage(MessageBase message) {
+    void processIncomingMessage(MessageBase message) {
         Timber.i("Received incoming message: %s on %s", message.getClass().getSimpleName(), message.getContactKey());
         if (message instanceof MessageClear) {
             processIncomingMessage((MessageClear) message);
@@ -471,66 +472,8 @@ public class MessageProcessor {
         eventBus.post(message);
     }
 
-    public void stopSendingMessages() {
+    void stopSendingMessages() {
         Timber.d("Interrupting background sending thread");
         backgroundDequeueThread.interrupt();
-    }
-
-    public enum EndpointState {
-        INITIAL,
-        IDLE,
-        CONNECTING,
-        CONNECTED,
-        DISCONNECTING,
-        DISCONNECTED,
-        DISCONNECTED_USERDISCONNECT,
-        ERROR,
-        ERROR_DATADISABLED,
-        ERROR_CONFIGURATION;
-
-        String message;
-        private Throwable error;
-
-        public String getMessage() {
-            if (message == null) {
-                if (error != null) {
-                    if (error instanceof MqttException && error.getCause() != null) {
-                        if (error.getMessage() != null && error.getMessage().equals("MqttException")) {
-                            return String.format("MQTT Error: %s", error.getCause().getMessage());
-                        }
-                        return String.format("MQTT Error: %s", error.getMessage());
-                    }
-                    return error.getMessage();
-                }
-                return "";
-            } else if (error != null) {
-                return String.format(Locale.ROOT, "%s: %s", message, error.getMessage());
-            }
-            return message;
-        }
-
-        public Throwable getError() {
-            return error;
-        }
-
-        public EndpointState withMessage(String message) {
-            this.message = message;
-            return this;
-        }
-
-
-        public String getLabel(Context context) {
-            Resources res = context.getResources();
-            int resId = res.getIdentifier(this.name(), "string", context.getPackageName());
-            if (0 != resId) {
-                return (res.getString(resId));
-            }
-            return (name());
-        }
-
-        public EndpointState withError(Throwable error) {
-            this.error = error;
-            return this;
-        }
     }
 }

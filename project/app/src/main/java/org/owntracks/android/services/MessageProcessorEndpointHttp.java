@@ -9,8 +9,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import org.owntracks.android.BuildConfig;
 import org.owntracks.android.R;
+import org.owntracks.android.data.EndpointState;
 import org.owntracks.android.model.messages.MessageBase;
-import org.owntracks.android.services.MessageProcessor.EndpointState;
 import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.Preferences;
@@ -53,9 +53,9 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
     private static String httpEndpointHeaderPassword = "";
 
     private static OkHttpClient mHttpClient;
-    private static final MediaType JSON  = MediaType.parse("application/json; charset=utf-8");
+    private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
-    public static final String USERAGENT = "Owntracks-Android/"+ BuildConfig.VERSION_CODE;
+    public static final String USERAGENT = "Owntracks-Android/" + BuildConfig.VERSION_CODE;
     private static final String HTTPTOPIC = "owntracks/http/";
 
     private final Preferences preferences;
@@ -89,7 +89,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
         String tlsCaCrt = preferences.getTlsCaCrt();
         String tlsClientCrt = preferences.getTlsClientCrt();
 
-        if(tlsCaCrt.length() == 0 && tlsClientCrt.length() == 0) {
+        if (tlsCaCrt.length() == 0 && tlsClientCrt.length() == 0) {
             return null;
         }
 
@@ -104,7 +104,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
             }
         }
 
-        if (tlsClientCrt.length() > 0)	{
+        if (tlsClientCrt.length() > 0) {
             try {
                 socketFactoryOptions.withClientP12InputStream(applicationContext.openFileInput(tlsClientCrt)).withClientP12Password(preferences.getTlsClientCrtPassword());
             } catch (FileNotFoundException e1) {
@@ -121,16 +121,15 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
     }
 
     private OkHttpClient getHttpClient() {
-        if(preferences.getDontReuseHttpClient()) {
+        if (preferences.getDontReuseHttpClient()) {
             return createHttpClient();
         }
 
-        if(mHttpClient == null)
+        if (mHttpClient == null)
             mHttpClient = createHttpClient();
 
         return mHttpClient;
     }
-
 
 
     private OkHttpClient createHttpClient() {
@@ -145,7 +144,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
                 .protocols(Collections.singletonList(Protocol.HTTP_1_1))
                 .cache(null);
 
-        if(f != null) {
+        if (f != null) {
             builder.sslSocketFactory(f, (X509TrustManager) f.getTrustManagers()[0]);
         }
         return builder.build();
@@ -159,10 +158,10 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
 
             httpEndpoint = HttpUrl.get(preferences.getUrl());
 
-            if(!httpEndpoint.username().isEmpty() && !httpEndpoint.password().isEmpty()) {
+            if (!httpEndpoint.username().isEmpty() && !httpEndpoint.password().isEmpty()) {
                 httpEndpointHeaderUser = httpEndpoint.username();
                 httpEndpointHeaderPassword = httpEndpoint.password();
-            } else if(!preferences.getPassword().trim().equals("")) {
+            } else if (!preferences.getPassword().trim().equals("")) {
                 httpEndpointHeaderPassword = preferences.getPassword();
             }
 
@@ -194,9 +193,9 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
         // Any exception here (invalid header value, invalid URL, etc) will persist for all future messages until configuration is fixed.
         // Setting httpEndpoint to null will make sure no message can be send until the problem is corrected.
         try {
-            Request.Builder request = new Request.Builder().url(this.httpEndpoint).header(HEADER_USERAGENT,USERAGENT).method(METHOD, RequestBody.create(JSON, body));
+            Request.Builder request = new Request.Builder().url(this.httpEndpoint).header(HEADER_USERAGENT, USERAGENT).method(METHOD, RequestBody.create(JSON, body));
 
-            if(isSet(httpEndpointHeaderUser) && isSet(httpEndpointHeaderPassword)) {
+            if (isSet(httpEndpointHeaderUser) && isSet(httpEndpointHeaderPassword)) {
                 request.header(HEADER_AUTHORIZATION, Credentials.basic(httpEndpointHeaderUser, httpEndpointHeaderPassword));
             }
 
@@ -212,7 +211,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
             request.cacheControl(CacheControl.FORCE_NETWORK);
             return request.build();
         } catch (Exception e) {
-            Timber.e(e,"invalid header specified");
+            Timber.e(e, "invalid header specified");
             messageProcessor.onEndpointStateChanged(EndpointState.ERROR_CONFIGURATION.withError(e));
             httpEndpoint = null;
             return null;
@@ -232,34 +231,34 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
         String messageId = message.getMessageId();
         long startTime = System.nanoTime();
         Request request = getRequest(message);
-        if(request == null) {
+        if (request == null) {
             messageProcessor.onMessageDeliveryFailedFinal(message.getMessageId());
             return;
         }
-        try(Response response = getHttpClient().newCall(request).execute()) {
+        try (Response response = getHttpClient().newCall(request).execute()) {
             // Message was send. Handle delivered message
-            if((response.isSuccessful())) {
+            if ((response.isSuccessful())) {
                 long endTime = System.nanoTime();
                 long duration = (endTime - startTime);
                 Timber.i("Message id=%s sent in %dms", messageId, TimeUnit.NANOSECONDS.toMillis(duration));
                 // Handle response
-                if(response.body() != null ) {
+                if (response.body() != null) {
                     try {
                         MessageBase[] result = parser.fromJson(response.body().byteStream());
                         //TODO apply i18n here
-                        messageProcessor.onEndpointStateChanged(EndpointState.IDLE.withMessage(String.format(Locale.ROOT,"Response %d, (%d msgs received)", response.code(), result.length)));
+                        messageProcessor.onEndpointStateChanged(EndpointState.IDLE.withMessage(String.format(Locale.ROOT, "Response %d, (%d msgs received)", response.code(), result.length)));
                         for (MessageBase aResult : result) {
                             onMessageReceived(aResult);
                         }
-                    } catch (JsonProcessingException e ) {
+                    } catch (JsonProcessingException e) {
                         Timber.e("JsonParseException HTTP status: %s", response.code());
-                        messageProcessor.onEndpointStateChanged(EndpointState.IDLE.withMessage(String.format(Locale.ROOT,"HTTP status %d, JsonParseException", response.code())));
+                        messageProcessor.onEndpointStateChanged(EndpointState.IDLE.withMessage(String.format(Locale.ROOT, "HTTP status %d, JsonParseException", response.code())));
                     } catch (Parser.EncryptionException e) {
                         Timber.e("JsonParseException HTTP status: %s", response.code());
-                        messageProcessor.onEndpointStateChanged(EndpointState.ERROR.withMessage(String.format(Locale.ROOT,"HTTP status: %d, EncryptionException", response.code())));
+                        messageProcessor.onEndpointStateChanged(EndpointState.ERROR.withMessage(String.format(Locale.ROOT, "HTTP status: %d, EncryptionException", response.code())));
                     }
                 }
-            // Server could be contacted but returned non success HTTP code
+                // Server could be contacted but returned non success HTTP code
             } else {
                 Exception httpException = new Exception(String.format("HTTP request failed. Status: %s", response.code()));
                 Timber.e(httpException);
@@ -267,7 +266,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
                 messageProcessor.onMessageDeliveryFailed(messageId);
                 throw new OutgoingMessageSendingException(httpException);
             }
-        // Message was not send
+            // Message was not send
         } catch (IOException e) {
             Timber.e(e, "HTTP Delivery failed ");
             messageProcessor.onEndpointStateChanged(EndpointState.ERROR.withError(e));
@@ -315,7 +314,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
     @Override
     protected MessageBase onFinalizeMessage(MessageBase message) {
         // Build pseudo topic based on tid
-        if(message.hasTrackerId()) {
+        if (message.hasTrackerId()) {
             message.setTopic(HTTPTOPIC + message.getTrackerId());
         }
         return message;

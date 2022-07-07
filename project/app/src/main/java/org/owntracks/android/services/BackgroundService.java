@@ -42,6 +42,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.jetbrains.annotations.NotNull;
 import org.owntracks.android.R;
+import org.owntracks.android.data.EndpointState;
 import org.owntracks.android.data.WaypointModel;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.data.repos.LocationRepo;
@@ -105,7 +106,7 @@ public class BackgroundService extends Service implements SharedPreferences.OnSh
     private LocationCallback locationCallback;
     private LocationCallback locationCallbackOnDemand;
     private MessageLocation lastLocationMessage;
-    private MessageProcessor.EndpointState lastEndpointState = MessageProcessor.EndpointState.INITIAL;
+    private EndpointState lastEndpointState = EndpointState.INITIAL;
 
 
     private NotificationCompat.Builder activeNotificationCompatBuilder;
@@ -365,9 +366,9 @@ public class BackgroundService extends Service implements SharedPreferences.OnSh
         }
 
         // Show monitoring mode if endpoint state is not interesting
-        if (lastEndpointState == MessageProcessor.EndpointState.CONNECTED || lastEndpointState == MessageProcessor.EndpointState.IDLE) {
+        if (lastEndpointState == EndpointState.CONNECTED || lastEndpointState == EndpointState.IDLE) {
             builder.setContentText(getMonitoringLabel(preferences.getMonitoring()));
-        } else if (lastEndpointState == MessageProcessor.EndpointState.ERROR && lastEndpointState.getMessage() != null) {
+        } else if (lastEndpointState == EndpointState.ERROR && lastEndpointState.getMessage() != null) {
             builder.setContentText(lastEndpointState.getLabel(this) + ": " + lastEndpointState.getMessage());
         } else {
             builder.setContentText(lastEndpointState.getLabel(this));
@@ -705,7 +706,7 @@ public class BackgroundService extends Service implements SharedPreferences.OnSh
     }
 
     @Subscribe(sticky = true)
-    public void onEvent(MessageProcessor.EndpointState state) {
+    public void onEvent(EndpointState state) {
         Timber.d(state.getError(), "endpoint state changed %s. Message: %s", state.getLabel(this), state.getMessage());
         this.lastEndpointState = state;
         updateOngoingNotification();

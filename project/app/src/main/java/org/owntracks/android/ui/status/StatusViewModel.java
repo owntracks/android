@@ -15,6 +15,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.owntracks.android.BR;
+import org.owntracks.android.data.EndpointState;
 import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
@@ -33,7 +34,7 @@ import timber.log.Timber;
 @ActivityScoped
 public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements StatusMvvm.ViewModel<StatusMvvm.View> {
     private final Context context;
-    private MessageProcessor.EndpointState endpointState;
+    private EndpointState endpointState;
     private String endpointMessage;
 
     private Date serviceStarted;
@@ -52,7 +53,7 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
 
     @Override
     @Bindable
-    public MessageProcessor.EndpointState getEndpointState() {
+    public EndpointState getEndpointState() {
         return endpointState;
     }
 
@@ -96,7 +97,7 @@ public class StatusViewModel extends BaseViewModel<StatusMvvm.View> implements S
     }
 
     @Subscribe(sticky = true)
-    public void onEvent(MessageProcessor.EndpointState e) {
+    public void onEvent(EndpointState e) {
         this.endpointState = e;
         this.endpointMessage = e.getMessage();
         notifyPropertyChanged(BR.endpointState);
