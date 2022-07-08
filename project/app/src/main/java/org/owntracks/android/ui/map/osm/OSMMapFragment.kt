@@ -20,6 +20,7 @@ import org.osmdroid.events.ZoomEvent
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.CopyrightOverlay
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polygon
 import org.osmdroid.views.overlay.TilesOverlay
@@ -178,6 +179,9 @@ class OSMMapFragment internal constructor(
             }
             if (!overlays.any { it is RotationGestureOverlay }) {
                 overlays.add(RotationGestureOverlay(this))
+            }
+            if (!overlays.any { it is CopyrightOverlay }) {
+                overlays.add(CopyrightOverlay(context))
             }
             setMultiTouchControls(true)
             isTilesScaledToDpi = true
