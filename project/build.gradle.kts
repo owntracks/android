@@ -31,3 +31,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         jvmTarget = JavaVersion.VERSION_11.toString()
     }
 }
+
+tasks.wrapper {
+    distributionType = Wrapper.DistributionType.ALL
+}
