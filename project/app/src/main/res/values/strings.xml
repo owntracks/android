@@ -263,7 +263,7 @@ Once you've completed this welcome section, you'll need to configure the applica
 
 For more details, take a look at the OwnTracks Booklet."</string>
     <string name="welcome_connection_setup_learn_more_button_label">"Open Booklet"</string>
-    <string name="welcome_connection_setup_title">"Setup a connection"</string>
+    <string name="welcome_connection_setup_title">"Set up a connection"</string>
     <string name="welcome_description">"The following steps will help you to get started with OwnTracks"</string>
     <string name="welcome_finish_open_preferences_button_label">"Open Preferences"</string>
     <string name="welcome_heading">"Welcome"</string>
