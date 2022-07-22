@@ -255,7 +255,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="version">"Version"</string>
     <string name="viewLogs">"View Logs"</string>
     <string name="waypointListPlaceholder">"No regions defined yet"</string>
-    <string name="welcome_connection_setup_description">"OwnTracks works by sending your location data to a server that you (or someone your trust) owns, making sure you remain in control of your data.
+    <string name="welcome_connection_setup_description">"OwnTracks works by sending your location data to a server that you (or someone you trust) owns, making sure you remain in control of your data.
 
 Make sure you know the connection details of your server, whether it's accessible over HTTPS or MQTT and any login credentials.
 
