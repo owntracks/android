@@ -1,7 +1,6 @@
 package org.owntracks.android.ui.map
 
-import android.Manifest.permission.ACCESS_COARSE_LOCATION
-import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.Manifest.permission.*
 import android.content.*
 import android.hardware.Sensor
 import android.hardware.SensorManager
