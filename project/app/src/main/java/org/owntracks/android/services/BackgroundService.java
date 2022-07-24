@@ -40,6 +40,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.jetbrains.annotations.NotNull;
+import org.owntracks.android.BuildConfig;
 import org.owntracks.android.R;
 import org.owntracks.android.data.EndpointState;
 import org.owntracks.android.data.WaypointModel;
@@ -274,7 +275,9 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
                     return;
                 case INTENT_ACTION_BOOT_COMPLETED:
                 case INTENT_ACTION_PACKAGE_REPLACED:
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !hasBeenStartedExplicitly) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+                            !hasBeenStartedExplicitly &&
+                            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_DENIED) {
                         notifyUserOfBackgroundLocationRestriction();
                     }
                     return;
