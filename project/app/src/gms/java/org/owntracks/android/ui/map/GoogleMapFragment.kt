@@ -260,8 +260,8 @@ class GoogleMapFragment internal constructor(
     }
 
     companion object {
-        private const val MIN_ZOOM_LEVEL = 4
-        private const val MAX_ZOOM_LEVEL = 20
+        private const val MIN_ZOOM_LEVEL: Double = 4.0
+        private const val MAX_ZOOM_LEVEL: Double = 20.0
     }
 
     /**
@@ -296,8 +296,16 @@ class GoogleMapFragment internal constructor(
      * @param point point in the starting range
      * @return a value that's at the same location in [toRange] as [point] is in [fromRange]
      */
-    private fun linearConversion(fromRange: IntRange, toRange: IntRange, point: Double): Double =
-        ((point - fromRange.first) / (fromRange.last - fromRange.first)) * (toRange.last - toRange.first) + toRange.first
+    fun linearConversion(
+        fromRange: ClosedRange<Double>,
+        toRange: ClosedRange<Double>,
+        point: Double,
+    ): Double {
+        if (!fromRange.contains(point)) {
+            throw Exception("Given point $point is not in fromRange $fromRange")
+        }
+        return ((point - fromRange.start) / (fromRange.endInclusive - fromRange.start)) * (toRange.endInclusive - toRange.start) + toRange.start
+    }
 
     override fun setMapLayerType(mapLayerStyle: MapLayerStyle) {
         when (mapLayerStyle) {

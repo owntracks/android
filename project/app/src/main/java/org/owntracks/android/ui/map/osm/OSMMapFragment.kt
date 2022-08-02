@@ -298,8 +298,8 @@ class OSMMapFragment internal constructor(
     }
 
     companion object {
-        const val MIN_ZOOM_LEVEL = 5
-        const val MAX_ZOOM_LEVEL = 21
+        const val MIN_ZOOM_LEVEL: Double = 5.0
+        const val MAX_ZOOM_LEVEL: Double = 21.0
     }
 
     override fun setMapLayerType(mapLayerStyle: MapLayerStyle) {
