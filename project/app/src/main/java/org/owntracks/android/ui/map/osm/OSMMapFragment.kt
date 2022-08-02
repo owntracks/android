@@ -24,6 +24,7 @@ import org.osmdroid.views.overlay.CopyrightOverlay
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polygon
 import org.osmdroid.views.overlay.TilesOverlay
+import org.osmdroid.views.overlay.compass.CompassOverlay
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow
 import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer
@@ -182,6 +183,15 @@ class OSMMapFragment internal constructor(
             }
             if (!overlays.any { it is CopyrightOverlay }) {
                 overlays.add(CopyrightOverlay(context))
+            }
+            if (!overlays.any { it is CompassOverlay }) {
+                val compassMargin = 35f
+                overlays.add(CompassOverlay(requireContext().applicationContext, this).apply {
+                    isPointerMode = false
+                    enableCompass()
+                    setCompassCenter(compassMargin,
+                        compassMargin + 56) // app bar is 56dp high I think?
+                })
             }
             setMultiTouchControls(true)
             isTilesScaledToDpi = true
