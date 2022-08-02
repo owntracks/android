@@ -115,6 +115,7 @@ class GoogleMapFragment internal constructor(
             isMyLocationEnabled = myLocationEnabled
             uiSettings.isMyLocationButtonEnabled = false
             uiSettings.setAllGesturesEnabled(true)
+            uiSettings.isCompassEnabled = true
 
             setLocationSource(googleMapLocationSource)
 
