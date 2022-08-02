@@ -26,7 +26,7 @@ import timber.log.Timber
 
 class GoogleMapFragment internal constructor(
     private val preferences: Preferences,
-    contactImageBindingAdapter: ContactImageBindingAdapter
+    contactImageBindingAdapter: ContactImageBindingAdapter,
 ) :
     MapFragment<GoogleMapFragmentBinding>(contactImageBindingAdapter),
     OnMapReadyCallback,
@@ -44,7 +44,7 @@ class GoogleMapFragment internal constructor(
                 locationObserver = object : Observer<Location> {
                     override fun onChanged(location: Location) {
                         onLocationChangedListener.onLocationChanged(location)
-                        viewModel.setBlueDotCurrentLocation(location.toLatLng())
+                        viewModel.setCurrentBlueDotLocation(location.toLatLng())
                         if (viewModel.viewMode == MapViewModel.ViewMode.Device) {
                             updateCamera(location.toLatLng())
                         }
@@ -68,7 +68,7 @@ class GoogleMapFragment internal constructor(
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         val root = super.onCreateView(inflater, container, savedInstanceState)
         binding.googleMapView.onCreate(savedInstanceState)
@@ -97,7 +97,7 @@ class GoogleMapFragment internal constructor(
         CameraUpdateFactory.newCameraPosition(
             CameraPosition.builder()
                 .target(this.latLng.toGMSLatLng())
-                .zoom(convertGoogleZoomToStandardZoom(this.zoom).toFloat())
+                .zoom(convertStandardZoomToGoogleZoom(this.zoom).toFloat())
                 .bearing(this.rotation)
                 .build()
         )
@@ -121,7 +121,9 @@ class GoogleMapFragment internal constructor(
 
             setMapStyle()
 
-            moveCamera(viewModel.getMapLocation().toCameraUpdate())
+            viewModel.initMapStartingLocation().run {
+                moveCamera(toCameraUpdate())
+            }
 
             setOnMarkerClickListener {
                 it.tag?.run {
@@ -169,7 +171,7 @@ class GoogleMapFragment internal constructor(
     override fun updateMarkerOnMap(
         id: String,
         latLng: org.owntracks.android.location.LatLng,
-        image: Bitmap
+        image: Bitmap,
     ) {
         googleMap?.run { // If we don't have a google Map, we can't add markers to it
             // Remove null markers from the collection

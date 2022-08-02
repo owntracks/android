@@ -4,11 +4,16 @@ import android.location.Location
 import androidx.lifecycle.MutableLiveData
 import org.greenrobot.eventbus.EventBus
 import org.owntracks.android.location.LatLng
+import org.owntracks.android.ui.map.MapLocationZoomLevelAndRotation
+import org.owntracks.android.ui.map.MapViewModel
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class LocationRepo @Inject constructor(private val eventBus: EventBus) {
+    /**
+     * The last location that was published to the network
+     */
     var currentPublishedLocation: MutableLiveData<Location> = MutableLiveData()
 
     val currentLocationTime: Long
@@ -19,9 +24,17 @@ class LocationRepo @Inject constructor(private val eventBus: EventBus) {
         eventBus.postSticky(l)
     }
 
-    var currentMapLocation: LatLng? = null
+    var currentBlueDotOnMapLocation: LatLng? = null
 
-    fun setMapLocation(location: LatLng) {
-        currentMapLocation = location
-    }
+    /**
+     * Where the map was last moved to. This might have been from an explicit user action, or from
+     * the map being moved due to being in DEVICE or CONTACT modes
+     */
+    var mapViewWindowLocationAndZoom: MapLocationZoomLevelAndRotation? = null
+
+
+    /**
+     * The view mode of the map
+     */
+    var viewMode: MapViewModel.ViewMode = MapViewModel.ViewMode.Device
 }

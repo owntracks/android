@@ -60,10 +60,6 @@ class MapViewModel @Inject constructor(
     val mapCenter: LiveData<LatLng>
         get() = mutableMapCenter
 
-    // Where the map was last moved to. This might have been from an explicit
-    // user action, or from the observation of mutableMapCenter changing
-    private var lastScrolledMapCenter: MapLocationZoomLevelAndRotation? = null
-
     // Shows the current distance to the selected contact
     private val mutableContactDistance = MutableLiveData(0f)
     val contactDistance: LiveData<Float>
@@ -111,7 +107,7 @@ class MapViewModel @Inject constructor(
 
     val locationIdlingResource = SimpleIdlingResource("locationIdlingResource", false)
 
-    var viewMode: ViewMode = ViewMode.Device
+    val viewMode: ViewMode by locationRepo::viewMode
 
     init {
         preferences.registerOnPreferenceChangedListener(this)
@@ -157,7 +153,8 @@ class MapViewModel @Inject constructor(
     }
 
     private fun setViewModeContact(contact: FusedContact, center: Boolean) {
-        viewMode = ViewMode.Contact(center)
+        Timber.d("setting view mode: VIEW_CONTACT for $contact, center=$center")
+        locationRepo.viewMode = ViewMode.Contact(center)
         mutableCurrentContact.value = contact
         mutableBottomSheetHidden.value = false
         refreshGeocodeForContact(contact)
@@ -166,14 +163,14 @@ class MapViewModel @Inject constructor(
     }
 
     private fun setViewModeFree() {
-        Timber.v("setting view mode: VIEW_FREE")
-        viewMode = ViewMode.Free
+        Timber.d("setting view mode: VIEW_FREE")
+        locationRepo.viewMode = ViewMode.Free
         clearActiveContact()
     }
 
     private fun setViewModeDevice() {
-        Timber.v("setting view mode: VIEW_DEVICE")
-        viewMode = ViewMode.Device
+        Timber.d("setting view mode: VIEW_DEVICE")
+        locationRepo.viewMode = ViewMode.Device
         clearActiveContact()
         currentLocation.value?.apply {
             mutableMapCenter.postValue(this.toLatLng())
@@ -185,7 +182,7 @@ class MapViewModel @Inject constructor(
     @MainThread
     fun setLiveContact(contactId: String?) {
         contactId?.let {
-            viewMode = ViewMode.Contact(true)
+            locationRepo.viewMode = ViewMode.Contact(true)
             contactsRepo.getById(it)?.run(mutableCurrentContact::setValue)
         }
     }
@@ -264,30 +261,29 @@ class MapViewModel @Inject constructor(
         viewModelScope.launch { currentLocation.requestLocationUpdates() }
     }
 
-    fun setBlueDotCurrentLocation(latLng: LatLng) {
+    fun setCurrentBlueDotLocation(latLng: LatLng) {
         locationIdlingResource.setIdleState(true)
-        locationRepo.setMapLocation(latLng)
+        locationRepo.currentBlueDotOnMapLocation = latLng
     }
 
     fun setMapLocationFromMapMoveEvent(mapLocationZoomLevelAndRotation: MapLocationZoomLevelAndRotation) {
-        lastScrolledMapCenter = mapLocationZoomLevelAndRotation
-        if (mapLocationZoomLevelAndRotation.latLng != mapCenter.value) {
-            mutableMapCenter.postValue(mapLocationZoomLevelAndRotation.latLng)
-        }
+        locationRepo.mapViewWindowLocationAndZoom = mapLocationZoomLevelAndRotation
     }
 
-    fun getMapLocation(): MapLocationZoomLevelAndRotation =
-        lastScrolledMapCenter ?: locationRepo.currentMapLocation?.let {
-            MapLocationZoomLevelAndRotation(it, STARTING_ZOOM)
-        } ?: locationRepo.currentPublishedLocation.value?.let {
-            MapLocationZoomLevelAndRotation(it.toLatLng(), STARTING_ZOOM)
-        } ?: MapLocationZoomLevelAndRotation(
-            LatLng(
-                STARTING_LATITUDE,
-                STARTING_LONGITUDE
-            ),
-            STARTING_ZOOM
-        )
+    fun initMapStartingLocation(): MapLocationZoomLevelAndRotation =
+        locationRepo.mapViewWindowLocationAndZoom
+            ?: locationRepo.currentBlueDotOnMapLocation?.let {
+                MapLocationZoomLevelAndRotation(it, STARTING_ZOOM)
+            } ?: locationRepo.currentPublishedLocation.value?.let {
+                MapLocationZoomLevelAndRotation(it.toLatLng(),
+                    STARTING_ZOOM)
+            } ?: MapLocationZoomLevelAndRotation(
+                LatLng(
+                    STARTING_LATITUDE,
+                    STARTING_LONGITUDE
+                ),
+                STARTING_ZOOM
+            )
 
     val orientationSensorEventListener = object : SensorEventListener {
         override fun onSensorChanged(maybeEvent: SensorEvent?) {

@@ -56,7 +56,7 @@ class OSMMapFragment internal constructor(
             val locationProvider: IMyLocationProvider = this
             locationObserver = Observer<Location> { location ->
                 myLocationConsumer?.onLocationChanged(location, locationProvider)
-                viewModel.setBlueDotCurrentLocation(location.toLatLng())
+                viewModel.setCurrentBlueDotLocation(location.toLatLng())
                 if (viewModel.viewMode == MapViewModel.ViewMode.Device) {
                     updateCamera(location.toLatLng())
                 }
@@ -112,7 +112,7 @@ class OSMMapFragment internal constructor(
     }
 
     private val mapListener = DelayedMapListener(object : MapListener {
-        override fun onScroll(event: ScrollEvent?): Boolean {
+        private fun updateViewModelMapLocation() {
             mapView?.run {
                 viewModel.setMapLocationFromMapMoveEvent(
                     MapLocationZoomLevelAndRotation(
@@ -125,10 +125,15 @@ class OSMMapFragment internal constructor(
                     )
                 )
             }
+        }
+
+        override fun onScroll(event: ScrollEvent?): Boolean {
+            updateViewModelMapLocation()
             return true
         }
 
         override fun onZoom(event: ZoomEvent?): Boolean {
+            updateViewModelMapLocation()
             return true
         }
     })
@@ -145,6 +150,7 @@ class OSMMapFragment internal constructor(
             }
             zoomController.setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
             addMapListener(mapListener)
+            zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
             // Make sure we don't add to the mylocation overlay
             if (!overlays.any { it is MyLocationNewOverlay && it.mMyLocationProvider == osmMapLocationSource }) {
                 overlays.add(
@@ -189,13 +195,12 @@ class OSMMapFragment internal constructor(
                 overlays.add(CompassOverlay(requireContext().applicationContext, this).apply {
                     isPointerMode = false
                     enableCompass()
-                    setCompassCenter(compassMargin,
-                        compassMargin + 56) // app bar is 56dp high I think?
+                    setCompassCenter(compassMargin, compassMargin)
                 })
             }
             setMultiTouchControls(true)
             isTilesScaledToDpi = true
-            viewModel.getMapLocation().run {
+            viewModel.initMapStartingLocation().run {
                 controller.animateTo(latLng.toGeoPoint(), zoom, 0, rotation)
             }
         }
