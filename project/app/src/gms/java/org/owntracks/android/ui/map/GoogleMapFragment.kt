@@ -9,10 +9,25 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
-import com.google.android.gms.maps.*
-import com.google.android.gms.maps.GoogleMap.*
+import com.google.android.gms.maps.CameraUpdate
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.GoogleMap.MAP_TYPE_HYBRID
+import com.google.android.gms.maps.GoogleMap.MAP_TYPE_NORMAL
+import com.google.android.gms.maps.GoogleMap.MAP_TYPE_SATELLITE
+import com.google.android.gms.maps.GoogleMap.MAP_TYPE_TERRAIN
 import com.google.android.gms.maps.GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE
-import com.google.android.gms.maps.model.*
+import com.google.android.gms.maps.LocationSource
+import com.google.android.gms.maps.MapsInitializer
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.OnMapsSdkInitializedCallback
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.Circle
+import com.google.android.gms.maps.model.CircleOptions
+import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
 import org.owntracks.android.R
 import org.owntracks.android.data.WaypointModel
 import org.owntracks.android.databinding.GoogleMapFragmentBinding
@@ -26,7 +41,7 @@ import timber.log.Timber
 
 class GoogleMapFragment internal constructor(
     private val preferences: Preferences,
-    contactImageBindingAdapter: ContactImageBindingAdapter,
+    contactImageBindingAdapter: ContactImageBindingAdapter
 ) :
     MapFragment<GoogleMapFragmentBinding>(contactImageBindingAdapter),
     OnMapReadyCallback,
@@ -40,7 +55,9 @@ class GoogleMapFragment internal constructor(
     private var locationObserver: Observer<Location>? = null
     private val googleMapLocationSource: LocationSource by lazy {
         object : LocationSource {
-            override fun activate(onLocationChangedListener: LocationSource.OnLocationChangedListener) {
+            override fun activate(
+                onLocationChangedListener: LocationSource.OnLocationChangedListener
+            ) {
                 locationObserver = object : Observer<Location> {
                     override fun onChanged(location: Location) {
                         onLocationChangedListener.onLocationChanged(location)
@@ -68,7 +85,7 @@ class GoogleMapFragment internal constructor(
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?,
+        savedInstanceState: Bundle?
     ): View {
         val root = super.onCreateView(inflater, container, savedInstanceState)
         binding.googleMapView.onCreate(savedInstanceState)
@@ -83,7 +100,11 @@ class GoogleMapFragment internal constructor(
     }
 
     private fun setMapStyle() {
-        if (resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) {
+        if (resources
+            .configuration
+            .uiMode
+            .and(Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+        ) {
             googleMap?.setMapStyle(
                 MapStyleOptions.loadRawResourceStyle(
                     requireContext(),
@@ -98,7 +119,7 @@ class GoogleMapFragment internal constructor(
             CameraPosition.builder()
                 .target(this.latLng.toGMSLatLng())
                 .zoom(convertStandardZoomToGoogleZoom(this.zoom).toFloat())
-                .bearing(this.rotation)
+                .bearing(convertBetweenStandardRotationAndBearing(this.rotation))
                 .build()
         )
 
@@ -148,7 +169,7 @@ class GoogleMapFragment internal constructor(
                                 target.longitude
                             ),
                             convertGoogleZoomToStandardZoom(zoom.toDouble()),
-                            bearing
+                            convertBetweenStandardRotationAndBearing(bearing)
                         )
                     }
                 )
@@ -171,7 +192,7 @@ class GoogleMapFragment internal constructor(
     override fun updateMarkerOnMap(
         id: String,
         latLng: org.owntracks.android.location.LatLng,
-        image: Bitmap,
+        image: Bitmap
     ) {
         googleMap?.run { // If we don't have a google Map, we can't add markers to it
             // Remove null markers from the collection
@@ -267,6 +288,17 @@ class GoogleMapFragment internal constructor(
     }
 
     /**
+     * Convert standard rotation to google bearing. OSM uses a "map rotation" concept to represent
+     * how the map is oriented, whereas google uses the "bearing". These are not the same thing, so
+     * this converts from a rotation to a bearing and back again (because it's reversable)
+     *
+     * @param input
+     * @return an equivalent bearing
+     */
+    private fun convertBetweenStandardRotationAndBearing(input: Float): Float =
+        -input % 360
+
+    /**
      * Converts standard (OSM) zoom to Google Maps zoom level. Simple linear conversion
      *
      * @param inputZoom Zoom level from standard (OSM)
@@ -301,7 +333,7 @@ class GoogleMapFragment internal constructor(
     fun linearConversion(
         fromRange: ClosedRange<Double>,
         toRange: ClosedRange<Double>,
-        point: Double,
+        point: Double
     ): Double {
         if (!fromRange.contains(point)) {
             throw Exception("Given point $point is not in fromRange $fromRange")
