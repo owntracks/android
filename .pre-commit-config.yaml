@@ -5,9 +5,20 @@ repos:
     rev: v3.2.0
     hooks:
       - id: trailing-whitespace
+        exclude: >
+          (?x)^(
+            project/app/src/main/res/values-[a-z]{2}/strings.xml
+          )$
       - id: end-of-file-fixer
-        exclude: project/app/objectbox-models/default.json
+        exclude: >
+          (?x)^(
+            project/app/objectbox-models/default.json|
+            project/app/src/main/res/values-[a-z]{2}/strings.xml
+          )$
+      - id: check-merge-conflict
       - id: check-yaml
+      - id: check-xml
+      - id: check-toml
       - id: check-added-large-files
       - id: mixed-line-ending
         args: ["--fix=lf"]

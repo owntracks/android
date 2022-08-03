@@ -45,7 +45,7 @@
     <string name="contactLocationUnknown">"위치 정보가 존재하지 않음"</string>
     <string name="currentLocationButtonLabel">"현재 위치"</string>
     <string name="description">"설명"</string>
-    <string name="deviceLocationDisabledDialogMessage">"장치의 위치 서비스가 사용 중지되어 Owntracks가 내 위치를 추적할 수 없습니다.
+    <string name="deviceLocationDisabledDialogMessage">"장치의 위치 서비스가 사용 중지되어 Owntracks가 내 위치를 추적할 수 없습니다. 
 
 기기 설정에서 위치 정보를 활성화합니다."</string>
     <string name="deviceLocationDisabledDialogPositiveButtonLabel">"위치 설정"</string>
