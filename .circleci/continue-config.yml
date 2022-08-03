@@ -205,6 +205,10 @@ jobs:
           flags: uitests
 
   smoke-test:
+    parameters:
+      android-api-version:
+        type: string
+        default: "29"
     executor: android-machine
     resource_class: large
     environment:
@@ -223,7 +227,7 @@ jobs:
       - run:
           name: Prepare parameterised system image
           command: |
-            echo "export SYSTEM_IMAGE=\"system-images;android-29;google_apis;x86_64\"" >> $BASH_ENV
+            echo "export SYSTEM_IMAGE=\"system-images;android-<< parameters.android-api-version >>;google_apis;x86_64\"" >> $BASH_ENV
             # Debug only
             source $BASH_ENV
             echo "Emulator system image: $SYSTEM_IMAGE"
@@ -280,15 +284,12 @@ workflows:
           requires:
             - build
       - ui-tests:
-          flavor: oss
-          name: oss-ui-tests
-          requires:
-            - lint
-            - unit-test
-            - build
-      - ui-tests:
-          flavor: gms
-          name: gms-ui-tests
+          matrix:
+            parameters:
+              flavor:
+                - oss
+                - gms
+          name: <<matrix.flavor>>-ui-tests
           requires:
             - lint
             - unit-test
