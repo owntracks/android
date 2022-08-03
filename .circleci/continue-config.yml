@@ -55,6 +55,32 @@ commands:
           paths:
             - ~/.gradle/caches
             - ~/.gradle/wrapper
+  run-andoid-emulator-and-tests:
+    steps:
+      - android/start-emulator-and-run-tests:
+          additional-avd-args: "-d pixel_3a -c 1G"
+          additional-emulator-args: "-memory 4096 -cores 3"
+          test-command: $GRADLE_TEST_COMMAND
+          system-image: $SYSTEM_IMAGE
+          restore-gradle-cache-post-emulator-launch: false
+          run-tests-working-directory: ./project
+          post-emulator-wait-steps:
+            # Set up the device for the right location service settings
+            - run: adb shell settings put secure location_providers_allowed +gps && adb shell settings put secure location_providers_allowed +network && adb shell settings put secure location_mode 3 && adb shell settings put global heads_up_notifications_enabled 0
+            # Restart zygote to make sure it picks up the right heap setting, otherwise mystery OOMs will happen
+            - run: adb root
+            - run: sleep 5
+            - run: adb shell setprop ctl.restart zygote
+            - run:
+                background: true
+                command: |
+                  adb logcat
+                name: Logcat
+          post-emulator-launch-assemble-command: ""
+          run-logcat: false
+          max-tries: 2
+          no-output-timeout: 30m
+          save-gradle-cache: false
 
 orbs:
   android: circleci/android@2.0.3
@@ -163,25 +189,7 @@ jobs:
             source $BASH_ENV
             echo "Emulator system image: $SYSTEM_IMAGE"
 
-      - android/start-emulator-and-run-tests:
-          additional-avd-args: "-d pixel_3a -c 1G"
-          additional-emulator-args: "-memory 4096 -cores 3"
-          test-command: $GRADLE_TEST_COMMAND
-          system-image: $SYSTEM_IMAGE
-          restore-gradle-cache-post-emulator-launch: false
-          run-tests-working-directory: ./project
-          post-emulator-wait-steps:
-            - run: adb shell settings put secure location_providers_allowed +gps && adb shell settings put secure location_providers_allowed +network && adb shell settings put secure location_mode 3 && adb shell settings put global heads_up_notifications_enabled 0 && adb root && sleep 5 && adb shell setprop ctl.restart zygote
-            - run:
-                background: true
-                command: |
-                  adb logcat
-                name: Logcat
-          post-emulator-launch-assemble-command: ""
-          run-logcat: false
-          max-tries: 2
-          no-output-timeout: 30m
-          save-gradle-cache: false
+      - run-andoid-emulator-and-tests
       - save-gradle-cache
       - store_test_results:
           path: project/app/build/outputs/androidTest-results/connected/flavors/<< parameters.flavor >>/
@@ -205,25 +213,21 @@ jobs:
       - checkout
       - android/accept-licenses
       - restore-gradle-cache
-      - android/start-emulator-and-run-tests:
-          additional-avd-args: "-d pixel_3a -c 1G"
-          additional-emulator-args: "-memory 4096 -cores 3"
-          test-command: ./gradlew connectedGmsDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.annotation=org.owntracks.android.testutils.SmokeTest
-          system-image: system-images;android-29;google_apis;x86_64
-          restore-gradle-cache-post-emulator-launch: false
-          run-tests-working-directory: ./project
-          post-emulator-wait-steps:
-            - run: adb shell settings put secure location_providers_allowed +gps && adb shell settings put secure location_providers_allowed +network && adb shell settings put secure location_mode 3 && adb shell settings put global heads_up_notifications_enabled 0 && adb root && sleep 5 && adb shell setprop ctl.restart zygote
-            - run:
-                background: true
-                command: |
-                  adb logcat
-                name: Logcat
-          post-emulator-launch-assemble-command: ""
-          run-logcat: false
-          max-tries: 2
-          no-output-timeout: 30m
-          save-gradle-cache: false
+      - run:
+          name: Prepare parameterised test command
+          command: |
+            echo "export GRADLE_TEST_COMMAND=\"./gradlew connectedGmsDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.annotation=org.owntracks.android.testutils.SmokeTest --scan --no-daemon --max-workers 2\"" >> $BASH_ENV
+            source $BASH_ENV
+            echo "Gradle test command: $GRADLE_TEST_COMMAND"
+
+      - run:
+          name: Prepare parameterised system image
+          command: |
+            echo "export SYSTEM_IMAGE=\"system-images;android-29;google_apis;x86_64\"" >> $BASH_ENV
+            # Debug only
+            source $BASH_ENV
+            echo "Emulator system image: $SYSTEM_IMAGE"
+      - run-andoid-emulator-and-tests
 
   publish-to-play-store:
     executor: android-docker
