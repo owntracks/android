@@ -7,11 +7,14 @@
 - Battery optimization status page row now links straight to the right dialog on OSS flavour (#1239, thanks @nycex)
 - Added Korean translations (#1244, thanks @whatareyoudoingfor)
 - Allow map rotation (#1236)
+- [OSS] Allow the user to request background location permission ("All the time") in the device settings (#1255)
+- [OSS] Link straight to the correct battery whitelisting dialog from the status page (#1239)
 
 ### Bug fixes
 
 - Blue dot on OSM layer should try to be in the middle of the accuracy circle (#1078)
 - The map should broadly try and stay in the same place when switching layers
+- The map should also roughly try and remember its position / orientation / zoom when switching away from the app and back again
 - OSM map layers are a little more readable with larger text sizes (#1223)
 
 ## Version 2.4.9
