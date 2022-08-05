@@ -23,6 +23,7 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.CopyrightOverlay
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polygon
+import org.osmdroid.views.overlay.ScaleBarOverlay
 import org.osmdroid.views.overlay.TilesOverlay
 import org.osmdroid.views.overlay.compass.CompassOverlay
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
@@ -197,6 +198,9 @@ class OSMMapFragment internal constructor(
                     enableCompass()
                     setCompassCenter(compassMargin, compassMargin)
                 })
+            }
+            if (!overlays.any { it is ScaleBarOverlay }) {
+                overlays.add(ScaleBarOverlay(this))
             }
             setMultiTouchControls(true)
             isTilesScaledToDpi = true
