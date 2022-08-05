@@ -7,6 +7,7 @@
 - Battery optimization status page row now links straight to the right dialog on OSS flavour (#1239, thanks @nycex)
 - Added Korean translations (#1244, thanks @whatareyoudoingfor)
 - Allow map rotation (#1236)
+- Add a scale bar to the OSM map view (#1263)
 - [OSS] Allow the user to request background location permission ("All the time") in the device settings (#1255)
 - [OSS] Link straight to the correct battery whitelisting dialog from the status page (#1239)
 
