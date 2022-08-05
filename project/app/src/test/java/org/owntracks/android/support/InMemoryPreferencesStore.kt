@@ -33,6 +33,14 @@ class InMemoryPreferencesStore : PreferencesStore {
         return valueMap[key] as Int? ?: default
     }
 
+    override fun putFloat(key: String, value: Float) {
+        valueMap[key] = value
+    }
+
+    override fun getFloat(key: String, default: Float): Float {
+        return valueMap[key] as Float? ?: default
+    }
+
     override fun putString(key: String, value: String) {
         valueMap[key] = value
     }

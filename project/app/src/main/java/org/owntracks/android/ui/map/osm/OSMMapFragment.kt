@@ -204,6 +204,7 @@ class OSMMapFragment internal constructor(
             }
             setMultiTouchControls(true)
             isTilesScaledToDpi = true
+            tilesScaleFactor = preferences.osmTileScaleFactor
             viewModel.initMapStartingLocation().run {
                 controller.animateTo(latLng.toGeoPoint(), zoom, 0, rotation)
             }

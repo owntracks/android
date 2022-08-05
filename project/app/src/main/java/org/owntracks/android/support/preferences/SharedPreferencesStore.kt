@@ -70,6 +70,13 @@ class SharedPreferencesStore @Inject constructor(@ApplicationContext context: Co
         activeSharedPreferences.edit().putInt(key, value).apply()
     }
 
+    override fun getFloat(key: String, default: Float): Float =
+        activeSharedPreferences.getFloat(key, default)
+
+    override fun putFloat(key: String, value: Float) {
+        activeSharedPreferences.edit().putFloat(key, value).apply()
+    }
+
     override fun getSharedPreferencesName(): String = sharedPreferencesName
 
     override fun putStringSet(key: String, values: Set<String>) {

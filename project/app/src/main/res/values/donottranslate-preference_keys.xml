@@ -33,6 +33,7 @@
     <string name="preferenceKeyNotificationGeocoderErrors">notificationGeocoderErrors</string>
     <string name="preferenceKeyObjectboxMigrated">_objectboxMigrated</string>
     <string name="preferenceKeyOpencageGeocoderApiKey">opencageApiKey</string>
+    <string name="preferenceKeyOsmTileScaleFactor">osmTileScaleFactor</string>
     <string name="preferenceKeyPassword">password</string>
     <string name="preferenceKeyPing">ping</string>
     <string name="preferenceKeyPort">port</string>
