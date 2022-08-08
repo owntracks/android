@@ -40,7 +40,7 @@ class ConfigEditorActivityTests : TestWithAnActivity<EditorActivity>(EditorActiv
     }
 
     @Test
-    fun configurationManagementCanEditAStringType() {
+    fun configurationManagementCanEditAnIntType() {
         openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
         clickOn(R.string.preferencesEditor)
         writeTo(
@@ -50,6 +50,14 @@ class ConfigEditorActivityTests : TestWithAnActivity<EditorActivity>(EditorActiv
         writeTo(R.id.inputValue, "0")
         clickDialogPositiveButton()
 
+        assertContains(
+            R.id.effectiveConfiguration,
+            "\"mode\" : 0"
+        )
+    }
+
+    @Test
+    fun configurationManagementCanEditAStringType() {
         openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
         clickOn(R.string.preferencesEditor)
         writeTo(
@@ -76,6 +84,35 @@ class ConfigEditorActivityTests : TestWithAnActivity<EditorActivity>(EditorActiv
         writeTo(R.id.inputValue, "false")
         clickDialogPositiveButton()
         assertContains(R.id.effectiveConfiguration, "\"cmd\" : false")
+    }
+
+    @Test
+    fun configurationManagementCanEditAFloatType() {
+        openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
+        clickOn(R.string.preferencesEditor)
+        writeTo(
+            R.id.inputKey,
+            baristaRule.activityTestRule.activity.getString(R.string.preferenceKeyOsmTileScaleFactor)
+        )
+        writeTo(R.id.inputValue, "0.5")
+        clickDialogPositiveButton()
+
+        assertContains(
+            R.id.effectiveConfiguration,
+            "\"osmTileScaleFactor\" : 0.5"
+        )
+    }
+
+    @Test
+    fun configurationManagementShowsAnErrorWhenPuttingANonFloatIntoAFloat() {
+        openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
+        clickOn(R.string.preferencesEditor)
+        writeTo(
+            R.id.inputKey,
+            baristaRule.activityTestRule.activity.getString(R.string.preferenceKeyOsmTileScaleFactor)
+        )
+        writeTo(R.id.inputValue, "not a float")
+        clickDialogPositiveButton()
     }
 
     @Test
