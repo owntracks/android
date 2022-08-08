@@ -158,9 +158,12 @@ jobs:
       flavor:
         type: string
         default: oss
+      android-api-version:
+        type: string
+        default: "31"
     executor: android-machine
     resource_class: large
-    parallelism: 4
+    parallelism: 8
     environment:
       GRADLE_OPTS: "-Dkotlin.compiler.execution.strategy=in-process"
     steps:
@@ -184,7 +187,7 @@ jobs:
             else
               image_type="default"
             fi
-            echo "export SYSTEM_IMAGE=\"system-images;android-29;$image_type;x86_64\"" >> $BASH_ENV
+            echo "export SYSTEM_IMAGE=\"system-images;android-<< parameters.android-api-version >>;$image_type;x86_64\"" >> $BASH_ENV
             # Debug only
             source $BASH_ENV
             echo "Emulator system image: $SYSTEM_IMAGE"
@@ -208,7 +211,7 @@ jobs:
     parameters:
       android-api-version:
         type: string
-        default: "29"
+        default: "31"
     executor: android-machine
     resource_class: large
     environment:
@@ -289,6 +292,8 @@ workflows:
               flavor:
                 - oss
                 - gms
+              android-api-version:
+                - "31"
           name: <<matrix.flavor>>-ui-tests
           requires:
             - lint
