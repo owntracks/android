@@ -298,6 +298,14 @@ class PreferencesGettersAndSetters(
                     false
                 ),
                 arrayOf(
+                    "OsmTileScaleFactor",
+                    "osmTileScaleFactor",
+                    1.3f,
+                    1.3f,
+                    Float::class,
+                    false
+                ),
+                arrayOf(
                     "Password",
                     "password",
                     "testPassword!\"£",
@@ -423,6 +431,7 @@ class PreferencesGettersAndSetters(
                 on { getString(eq(R.string.preferenceKeyNotificationGeocoderErrors)) } doReturn "notificationGeocoderErrors"
                 on { getString(eq(R.string.preferenceKeyObjectboxMigrated)) } doReturn "_objectboxMigrated"
                 on { getString(eq(R.string.preferenceKeyOpencageGeocoderApiKey)) } doReturn "opencageApiKey"
+                on { getString(eq(R.string.preferenceKeyOsmTileScaleFactor)) } doReturn "osmTileScaleFactor"
                 on { getString(eq(R.string.preferenceKeyPassword)) } doReturn "password"
                 on { getString(eq(R.string.preferenceKeyPing)) } doReturn "ping"
                 on { getString(eq(R.string.preferenceKeyPort)) } doReturn "port"

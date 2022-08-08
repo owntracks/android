@@ -140,8 +140,18 @@ class Preferences @Inject constructor(
         } catch (e: NumberFormatException) {
             throw IllegalArgumentException()
         }
-        if (t is ParameterizedType && Collection::class.java.isAssignableFrom(t.rawType as Class<*>))
+
+        try {
+            if (java.lang.Float.TYPE == t) return value.toFloat()
+        } catch (e: NumberFormatException) {
+            throw IllegalArgumentException()
+        }
+
+        if (t is ParameterizedType &&
+            Collection::class.java.isAssignableFrom(t.rawType as Class<*>)
+        ) {
             return value.split(",").map { it.trim() }.filter { it.isNotBlank() }.toSortedSet()
+        }
         return value
     }
 
@@ -960,6 +970,18 @@ class Preferences @Inject constructor(
             setString(R.string.preferenceKeyMapLayerStyle, newValue.name)
         }
 
+    @get:Export(
+        keyResId = R.string.preferenceKeyOsmTileScaleFactor,
+        exportModeMqtt = true,
+        exportModeHttp = true
+    )
+    @set:Import(keyResId = R.string.preferenceKeyOsmTileScaleFactor)
+    var osmTileScaleFactor: Float
+        get() = getFloatOrDefault(R.string.preferenceKeyOsmTileScaleFactor, 1.0f)
+        set(newValue) {
+            setFloat(R.string.preferenceKeyOsmTileScaleFactor, newValue)
+        }
+
     // Not used on public, as many people might use the same device type
     private val deviceIdDefault: String
         get() = // Use device name (Mako, Surnia, etc. and strip all non alpha digits)
@@ -1128,6 +1150,14 @@ class Preferences @Inject constructor(
 
     private fun getStringSet(resKeyId: Int): Set<String> {
         return preferencesStore.getStringSet(getPreferenceKey(resKeyId))
+    }
+
+    private fun setFloat(resKeyId: Int, value: Float) {
+        preferencesStore.putFloat(getPreferenceKey(resKeyId), value)
+    }
+
+    private fun getFloatOrDefault(resKeyId: Int, default: Float): Float {
+        return preferencesStore.getFloat(getPreferenceKey(resKeyId), default)
     }
 
     private fun clearKey(key: String?) {
