@@ -266,8 +266,9 @@ workflows:
           requires:
             - build
       - smoke-test:
-          parameters:
-            android-api-version: "29"
+          matrix:
+            parameters:
+              android-api-version: ["29"]
           requires:
             - build
 
