@@ -57,6 +57,8 @@ commands:
             - ~/.gradle/wrapper
   run-andoid-emulator-and-tests:
     steps:
+      - run: >
+          sed "/wait_for_sys_prop('Boot animation exited.*$/d" /usr/local/bin/circle-android > /tmp/circle-android && cat /tmp/circle-android > /usr/local/bin/circle-android
       - android/start-emulator-and-run-tests:
           additional-avd-args: "-d pixel_3a"
           test-command: $GRADLE_TEST_COMMAND
