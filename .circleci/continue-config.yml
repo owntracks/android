@@ -293,7 +293,7 @@ workflows:
                 - oss
                 - gms
               android-api-version:
-                - "29"
+                - "31"
           name: <<matrix.flavor>>-ui-tests
           requires:
             - lint
