@@ -58,8 +58,7 @@ commands:
   run-andoid-emulator-and-tests:
     steps:
       - android/start-emulator-and-run-tests:
-          additional-avd-args: "-d pixel_3a -c 1G"
-          additional-emulator-args: "-memory 4096 -cores 3"
+          additional-avd-args: "-d pixel_3a"
           test-command: $GRADLE_TEST_COMMAND
           system-image: $SYSTEM_IMAGE
           restore-gradle-cache-post-emulator-launch: false
