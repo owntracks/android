@@ -157,10 +157,8 @@ jobs:
     parameters:
       flavor:
         type: string
-        default: oss
       android-api-version:
         type: string
-        default: "31"
     executor: android-machine
     resource_class: large
     parallelism: 8
@@ -211,7 +209,6 @@ jobs:
     parameters:
       android-api-version:
         type: string
-        default: "31"
     executor: android-machine
     resource_class: large
     environment:
@@ -269,6 +266,8 @@ workflows:
           requires:
             - build
       - smoke-test:
+          parameters:
+            android-api-version: "29"
           requires:
             - build
 
@@ -293,7 +292,7 @@ workflows:
                 - oss
                 - gms
               android-api-version:
-                - "31"
+                - "29"
           name: <<matrix.flavor>>-ui-tests
           requires:
             - lint
