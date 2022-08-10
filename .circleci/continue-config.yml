@@ -57,8 +57,10 @@ commands:
             - ~/.gradle/wrapper
   run-andoid-emulator-and-tests:
     steps:
-      - run: >
-          sed "/wait_for_sys_prop('Boot animation exited.*$/d" /usr/local/bin/circle-android > /tmp/circle-android && cat /tmp/circle-android > /usr/local/bin/circle-android
+      - run:
+          name: Patch the circle-android script to not wait for boot animation exit
+          command: >
+            sed "/wait_for_sys_prop('Boot animation exited.*$/d" /usr/local/bin/circle-android > /tmp/circle-android && cat /tmp/circle-android > /usr/local/bin/circle-android
       - android/start-emulator-and-run-tests:
           additional-avd-args: "-d pixel_3a"
           additional-emulator-args: "-memory 4096 -cores 3"
@@ -66,6 +68,7 @@ commands:
           system-image: $SYSTEM_IMAGE
           restore-gradle-cache-post-emulator-launch: false
           run-tests-working-directory: ./project
+          gpu: host
           post-emulator-wait-steps:
             # Set up the device for the right location service settings
             - run: adb shell settings put secure location_providers_allowed +gps && adb shell settings put secure location_providers_allowed +network && adb shell settings put secure location_mode 3 && adb shell settings put global heads_up_notifications_enabled 0
