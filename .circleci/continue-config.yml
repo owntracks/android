@@ -162,7 +162,7 @@ jobs:
         type: string
     executor: android-machine
     resource_class: large
-    parallelism: 1
+    parallelism: 4
     environment:
       GRADLE_OPTS: "-Dkotlin.compiler.execution.strategy=in-process"
     steps:
@@ -174,7 +174,7 @@ jobs:
           command: |
             echo "export FLAVOR=<< parameters.flavor >>" >> $BASH_ENV
             source $BASH_ENV
-            echo "export GRADLE_TEST_COMMAND=\"./gradlew create${FLAVOR^}DebugCoverageReport -Pandroid.testInstrumentationRunnerArguments.annotation=org.owntracks.android.testutils.SmokeTest --scan --no-daemon --max-workers 2\"" >> $BASH_ENV
+            echo "export GRADLE_TEST_COMMAND=\"./gradlew create${FLAVOR^}DebugCoverageReport --scan --no-daemon --max-workers 2\"" >> $BASH_ENV
             source $BASH_ENV
             echo "Gradle test command: $GRADLE_TEST_COMMAND"
 
