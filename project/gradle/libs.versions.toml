@@ -44,7 +44,7 @@ materialedittext = "2.1.4"
 materialize = "1.2.1"
 materialdrawer = "6.1.2"
 preferencex = "1.1.0"
-r8 = "3.3.28"
+r8 = "3.3.75"
 guava = "31.1-jre"
 
 [plugins]
