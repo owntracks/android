@@ -44,8 +44,10 @@ class ClickableCompassOverlay(
     override fun onSingleTapConfirmed(e: MotionEvent?, mapView: MapView?): Boolean =
         letBoth(e, mapView) { motionEvent, map ->
             if (hitTest(getCompassRectangle(), map, motionEvent.rawX, motionEvent.rawY)) {
-                mapView?.setMapOrientation(0f, true)
-                mapView?.scrollX = 0
+                mapView?.run {
+                    setMapOrientation(0f,true)
+                    scrollX=0 // Trigger "onScroll" to reset the compass
+                }
                 return true
             } else {
                 return false
