@@ -12,12 +12,14 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
+import kotlin.math.roundToInt
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.DelayedMapListener
 import org.osmdroid.events.MapListener
 import org.osmdroid.events.ScrollEvent
 import org.osmdroid.events.ZoomEvent
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.CopyrightOverlay
@@ -26,6 +28,8 @@ import org.osmdroid.views.overlay.Polygon
 import org.osmdroid.views.overlay.ScaleBarOverlay
 import org.osmdroid.views.overlay.TilesOverlay
 import org.osmdroid.views.overlay.compass.CompassOverlay
+import org.osmdroid.views.overlay.compass.IOrientationConsumer
+import org.osmdroid.views.overlay.compass.IOrientationProvider
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow
 import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer
@@ -139,6 +143,46 @@ class OSMMapFragment internal constructor(
         }
     })
 
+    class MapRotationOrientationProvider : IOrientationProvider {
+        private var myOrientationConsumer: IOrientationConsumer? = null
+        private var lastOrientation = 0f
+        fun updateOrientation(orientation: Float) {
+            lastOrientation = orientation
+            myOrientationConsumer?.onOrientationChanged(orientation, this)
+        }
+
+        override fun startOrientationProvider(orientationConsumer: IOrientationConsumer?): Boolean {
+            myOrientationConsumer = orientationConsumer
+            return true
+        }
+
+        override fun stopOrientationProvider() {
+        }
+
+        override fun getLastKnownOrientation(): Float = lastOrientation
+
+        override fun destroy() {}
+    }
+
+    val orientationProvider = MapRotationOrientationProvider()
+    val compassOrientationMapListener = object : MapListener {
+        private fun updateOrientation() {
+            mapView?.mapOrientation?.run {
+                orientationProvider.updateOrientation(this)
+            }
+        }
+
+        override fun onScroll(event: ScrollEvent?): Boolean {
+            updateOrientation()
+            return true
+        }
+
+        override fun onZoom(event: ZoomEvent?): Boolean {
+            updateOrientation()
+            return true
+        }
+    }
+
     override fun initMap() {
         val myLocationEnabled =
             (requireActivity() as MapActivity).checkAndRequestMyLocationCapability(false)
@@ -185,19 +229,29 @@ class OSMMapFragment internal constructor(
                     }
                 )
             }
-            if (!overlays.any { it is RotationGestureOverlay }) {
+
+            if (!overlays.any { it is RotationGestureOverlay } && preferences.enableMapRotation) {
                 overlays.add(RotationGestureOverlay(this))
             }
             if (!overlays.any { it is CopyrightOverlay }) {
                 overlays.add(CopyrightOverlay(context))
             }
-            if (!overlays.any { it is CompassOverlay }) {
+            if (!overlays.any { it is CompassOverlay } && preferences.enableMapRotation) {
+                addMapListener(compassOrientationMapListener)
+
                 val compassMargin = 35f
-                overlays.add(CompassOverlay(requireContext().applicationContext, this).apply {
-                    isPointerMode = false
-                    enableCompass()
-                    setCompassCenter(compassMargin, compassMargin)
-                })
+
+                overlays.add(
+                    ClickableCompassOverlay(
+                        requireContext().applicationContext,
+                        orientationProvider,
+                        this
+                    ).apply {
+                        isPointerMode = false
+                        enableCompass()
+                        setCompassCenter(compassMargin, compassMargin)
+                    }
+                )
             }
             if (!overlays.any { it is ScaleBarOverlay }) {
                 overlays.add(ScaleBarOverlay(this))

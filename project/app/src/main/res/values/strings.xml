@@ -152,6 +152,8 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesEditorKeyError">"Invalid key specified"</string>
     <string name="preferencesEditorValue">"Value"</string>
     <string name="preferencesEditorValueError">"Invalid value specified"</string>
+    <string name="preferencesEnableMapRotation">"Enable Map Rotation"</string>
+    <string name="preferencesEnableMapRotationSummary">"Allow the map to be rotated"</string>
     <string name="preferencesEncryptionKey">"Encryption Key"</string>
     <string name="preferencesEncryptionKeyDialogMessage">"Encryption key is cut off after 32 characters."</string>
     <string name="preferencesEncryptionKeySummary">"Symmetric key for payload encryption"</string>

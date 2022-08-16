@@ -119,7 +119,11 @@ class GoogleMapFragment internal constructor(
             CameraPosition.builder()
                 .target(this.latLng.toGMSLatLng())
                 .zoom(convertStandardZoomToGoogleZoom(this.zoom).toFloat())
-                .bearing(convertBetweenStandardRotationAndBearing(this.rotation))
+                .bearing(
+                    if (preferences.enableMapRotation) convertBetweenStandardRotationAndBearing(
+                        this.rotation
+                    ) else 0f
+                )
                 .build()
         )
 
@@ -136,7 +140,10 @@ class GoogleMapFragment internal constructor(
             isMyLocationEnabled = myLocationEnabled
             uiSettings.isMyLocationButtonEnabled = false
             uiSettings.setAllGesturesEnabled(true)
-            uiSettings.isCompassEnabled = true
+            preferences.enableMapRotation.run {
+                uiSettings.isCompassEnabled = this
+                uiSettings.isRotateGesturesEnabled = this
+            }
 
             setLocationSource(googleMapLocationSource)
 

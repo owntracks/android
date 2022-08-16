@@ -8,6 +8,7 @@
     <string name="preferenceKeyDebugLog">debugLog</string>
     <string name="preferenceKeyDeviceId">deviceId</string>
     <string name="preferenceKeyDontReuseHttpClient">dontReuseHttpClient</string>
+    <string name="preferenceKeyEnableMapRotation">enableMapRotation</string>
     <string name="preferenceKeyEncryptionKey">encryptionKey</string>
     <string name="preferenceKeyExperimentalFeatures">experimentalFeatures</string>
     <string name="preferenceKeyTheme">theme</string>
