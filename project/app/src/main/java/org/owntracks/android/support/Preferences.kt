@@ -982,6 +982,18 @@ class Preferences @Inject constructor(
             setFloat(R.string.preferenceKeyOsmTileScaleFactor, newValue)
         }
 
+    @get:Export(
+        keyResId = R.string.preferenceKeyEnableMapRotation,
+        exportModeMqtt = true,
+        exportModeHttp = true
+    )
+    @set:Import(keyResId = R.string.preferenceKeyEnableMapRotation)
+    var enableMapRotation: Boolean
+        get() = getBooleanOrDefault(R.string.preferenceKeyEnableMapRotation, R.bool.valEnableMapRotation)
+        set(newValue) {
+            setBoolean(R.string.preferenceKeyEnableMapRotation, newValue)
+        }
+
     // Not used on public, as many people might use the same device type
     private val deviceIdDefault: String
         get() = // Use device name (Mako, Surnia, etc. and strip all non alpha digits)

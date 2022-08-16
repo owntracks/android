@@ -3,6 +3,7 @@ package org.owntracks.android.support
 import android.content.Context
 import android.content.pm.ShortcutManager
 import android.content.res.Resources
+import kotlin.reflect.KClass
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions.MQTT_VERSION_3_1_1
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions.MQTT_VERSION_DEFAULT
 import org.junit.Assert.assertEquals
@@ -21,7 +22,6 @@ import org.owntracks.android.services.MessageProcessorEndpointMqtt
 import org.owntracks.android.support.preferences.PreferencesStore
 import org.owntracks.android.ui.NoopAppShortcuts
 import org.owntracks.android.ui.map.MapLayerStyle
-import kotlin.reflect.KClass
 
 @RunWith(Parameterized::class)
 class PreferencesGettersAndSetters(
@@ -112,6 +112,14 @@ class PreferencesGettersAndSetters(
                     true,
                     Boolean::class,
                     true
+                ),
+                arrayOf(
+                    "EnableMapRotation",
+                    "enableMapRotation",
+                    true,
+                    true,
+                    Boolean::class,
+                    false
                 ),
                 arrayOf(
                     "ExperimentalFeatures",
@@ -227,7 +235,8 @@ class PreferencesGettersAndSetters(
                     false
                 ),
                 arrayOf(
-                    "Monitoring", "monitoring",
+                    "Monitoring",
+                    "monitoring",
                     MonitoringMode.SIGNIFICANT,
                     MonitoringMode.SIGNIFICANT,
                     MonitoringMode::class,
@@ -408,6 +417,7 @@ class PreferencesGettersAndSetters(
                 on { getString(eq(R.string.preferenceKeyDebugLog)) } doReturn "debugLog"
                 on { getString(eq(R.string.preferenceKeyDeviceId)) } doReturn "deviceId"
                 on { getString(eq(R.string.preferenceKeyDontReuseHttpClient)) } doReturn "dontReuseHttpClient"
+                on { getString(eq(R.string.preferenceKeyEnableMapRotation)) } doReturn "enableMapRotation"
                 on { getString(eq(R.string.preferenceKeyEncryptionKey)) } doReturn "encryptionKey"
                 on { getString(eq(R.string.preferenceKeyExperimentalFeatures)) } doReturn "experimentalFeatures"
                 on { getString(eq(R.string.preferenceKeyFirstStart)) } doReturn "firstStart"

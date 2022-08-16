@@ -10,4 +10,12 @@
             app:summary="@string/preferencesShowRegionsOnMapSummary"
             app:title="@string/preferencesShowRegionsOnMap" />
 
+        <androidx.preference.SwitchPreferenceCompat
+            android:defaultValue="@bool/valEnableMapRotation"
+            app:iconSpaceReserved="false"
+            app:key="@string/preferenceKeyEnableMapRotation"
+            app:summary="@string/preferencesEnableMapRotationSummary"
+            app:title="@string/preferencesEnableMapRotation" />
+
+
 </PreferenceScreen>
