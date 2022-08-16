@@ -8,13 +8,13 @@ import org.osmdroid.views.overlay.compass.CompassOverlay
 import org.osmdroid.views.overlay.compass.IOrientationProvider
 
 class ClickableCompassOverlay(
-    private val context: Context?,
+    context: Context?,
     orientationProvider: IOrientationProvider?,
     mapView: MapView?
 ) : CompassOverlay(context, orientationProvider, mapView) {
-    private val compassRectangle: Rect by lazy {
+    private fun getCompassRectangle(): Rect {
         val center = 35f * mScale
-        Rect(
+        return Rect(
             ((center - mCompassFrameCenterX).toInt()),
             ((center - mCompassFrameCenterY).toInt()),
             ((center + mCompassFrameCenterX).toInt()),
@@ -43,9 +43,9 @@ class ClickableCompassOverlay(
 
     override fun onSingleTapConfirmed(e: MotionEvent?, mapView: MapView?): Boolean =
         letBoth(e, mapView) { motionEvent, map ->
-
-            if (hitTest(compassRectangle, map, motionEvent.rawX, motionEvent.rawY)) {
+            if (hitTest(getCompassRectangle(), map, motionEvent.rawX, motionEvent.rawY)) {
                 mapView?.setMapOrientation(0f, true)
+                mapView?.scrollX = 0
                 return true
             } else {
                 return false
@@ -54,7 +54,11 @@ class ClickableCompassOverlay(
 }
 
 // https://stackoverflow.com/a/35522422/352740
-inline fun <T1 : Any, T2 : Any, R : Any> letBoth(p1: T1?, p2: T2?, block: (T1, T2) -> R?): R? {
+private inline fun <T1 : Any, T2 : Any, R : Any> letBoth(
+    p1: T1?,
+    p2: T2?,
+    block: (T1, T2) -> R?
+): R? {
     return if (p1 != null && p2 != null) block(p1, p2) else null
 }
 
