@@ -1,11 +1,13 @@
 package org.owntracks.android.ui.map.osm
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.location.Location
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MotionEvent.ACTION_BUTTON_RELEASE
+import android.view.Surface
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
@@ -19,7 +21,6 @@ import org.osmdroid.events.MapListener
 import org.osmdroid.events.ScrollEvent
 import org.osmdroid.events.ZoomEvent
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
-import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.CopyrightOverlay
@@ -143,13 +144,24 @@ class OSMMapFragment internal constructor(
         }
     })
 
-    class MapRotationOrientationProvider : IOrientationProvider {
+    class MapRotationOrientationProvider(private val context: Context) : IOrientationProvider {
+        val display = context.display
         private var myOrientationConsumer: IOrientationConsumer? = null
         private var lastOrientation = 0f
         fun updateOrientation(orientation: Float) {
-            lastOrientation = orientation
-            myOrientationConsumer?.onOrientationChanged(-orientation, this)
+            val correctedOrientation = orientation
+            lastOrientation = -(correctedOrientation + displayRotationToDegrees())
+            myOrientationConsumer?.onOrientationChanged(lastOrientation, this)
         }
+
+        private fun displayRotationToDegrees(): Float =
+            when (display?.rotation) {
+                Surface.ROTATION_0 -> 0f
+                Surface.ROTATION_90 -> 90f
+                Surface.ROTATION_180 -> 180f
+                Surface.ROTATION_270 -> 270f
+                else -> 0f
+            }
 
         override fun startOrientationProvider(orientationConsumer: IOrientationConsumer?): Boolean {
             myOrientationConsumer = orientationConsumer
@@ -164,7 +176,7 @@ class OSMMapFragment internal constructor(
         override fun destroy() {}
     }
 
-    val orientationProvider = MapRotationOrientationProvider()
+    val orientationProvider by lazy { MapRotationOrientationProvider(requireContext()) }
     val compassOrientationMapListener = object : MapListener {
         private fun updateOrientation() {
             mapView?.mapOrientation?.run {
@@ -324,6 +336,17 @@ class OSMMapFragment internal constructor(
     override fun onDetach() {
         mapView?.onDetach()
         super.onDetach()
+    }
+
+    /**
+     * This gets fired on rotate. We need to trigger an onScroll event to reset the orientation
+     * provider and re-draw the compass
+     *
+     * @param newConfig
+     */
+    override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
+        super.onConfigurationChanged(newConfig)
+        compassOrientationMapListener.onScroll(null)
     }
 
     override fun drawRegions(regions: Set<WaypointModel>) {
