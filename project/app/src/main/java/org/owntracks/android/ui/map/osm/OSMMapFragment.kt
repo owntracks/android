@@ -148,7 +148,7 @@ class OSMMapFragment internal constructor(
         private var lastOrientation = 0f
         fun updateOrientation(orientation: Float) {
             lastOrientation = orientation
-            myOrientationConsumer?.onOrientationChanged(orientation, this)
+            myOrientationConsumer?.onOrientationChanged(-orientation, this)
         }
 
         override fun startOrientationProvider(orientationConsumer: IOrientationConsumer?): Boolean {
