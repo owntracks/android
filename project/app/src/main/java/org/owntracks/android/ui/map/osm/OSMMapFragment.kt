@@ -296,6 +296,7 @@ class OSMMapFragment internal constructor(
     }
 
     override fun updateMarkerOnMap(id: String, latLng: LatLng, image: Bitmap) {
+        Timber.tag("PARP").i("Adding marker on map for $id at $latLng. Mapview is $mapView")
         mapView?.run {
             val existingMarker: Marker? =
                 overlays.firstOrNull { it is Marker && it.id == id } as Marker?
