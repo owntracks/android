@@ -313,6 +313,7 @@ class OSMMapFragment internal constructor(
             overlays.firstOrNull { it is Marker && it.id == id }?.run {
                 (this as Marker).icon = BitmapDrawable(resources, image)
             }
+            invalidate()
         }
     }
 
