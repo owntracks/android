@@ -112,8 +112,8 @@ class MapActivity :
         }
     }
 
-    var onBottomSheetLabelTextSizeChangedListener: AutoResizingTextViewWithListener.OnTextSizeChangedListener? =
-        null
+    private var onBottomSheetLabelTextSizeChangedListener:
+            AutoResizingTextViewWithListener.OnTextSizeChangedListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         EntryPointAccessors.fromActivity(
@@ -180,13 +180,13 @@ class MapActivity :
                     override fun onTextSizeChanged(view: View, newSize: Float) {
                         labels
                             .filter { it != view }
-                            .filter { it.textSize != newSize }
+                            .filter { it.textSize > newSize || it.configurationChangedFlag }
                             .forEach {
-                                Timber.tag("PARP").i("Setting size of $view to $newSize")
                                 it.setAutoSizeTextTypeUniformWithPresetSizes(
                                     intArrayOf(newSize.toInt()),
                                     TypedValue.COMPLEX_UNIT_PX
                                 )
+                                it.configurationChangedFlag = false
                             }
                     }
                 }.also { listener -> labels.forEach { it.withListener(listener) } }
@@ -378,35 +378,6 @@ class MapActivity :
                 }
             }
         }
-
-    private fun resizeBottomSheetLabels() {
-        val labels = listOf(
-            R.id.contactDetailsAccuracy,
-            R.id.contactDetailsAltitude,
-            R.id.contactDetailsBattery,
-            R.id.contactDetailsBearing,
-            R.id.contactDetailsSpeed,
-            R.id.contactDetailsDistance
-        )
-            .map { binding!!.bottomSheetLayout.findViewById<View>(it) }
-            .map {
-                it.findViewById<TextView>(R.id.label).also {
-                    Timber.tag("PARP").i("Textview has size ${it.textSize} ${it.textSizeUnit}")
-                }
-            }
-        val textSizeUnit = labels.first { true }.textSizeUnit
-        val smallestTextSize = 112 // labels.minOf { it.textSize }
-        Timber.tag("PARP").i("Setting all labels size to $smallestTextSize")
-        labels.forEach {
-            it.setAutoSizeTextTypeUniformWithConfiguration(
-                1,
-                smallestTextSize.toInt(),
-                1,
-                TypedValue.COMPLEX_UNIT_DIP
-            )
-//            it.textSize = smallestTextSize
-        }
-    }
 
     override fun onResume() {
         val mapFragment =

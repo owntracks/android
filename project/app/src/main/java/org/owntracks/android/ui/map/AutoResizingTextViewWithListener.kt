@@ -1,22 +1,22 @@
 package org.owntracks.android.ui.map
 
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.Canvas
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.View
 import android.widget.TextView
-import timber.log.Timber
+import androidx.appcompat.widget.AppCompatTextView
 
 /**
  * Auto resizing text view with listener.
  *
  * Derived from https://stackoverflow.com/a/52445825/352740
  *
- * @constructor
- *
- * @param context
+ * @constructor As [TextView]
  */
-class AutoResizingTextViewWithListener : TextView {
+class AutoResizingTextViewWithListener : AppCompatTextView {
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
         context,
         attrs,
@@ -28,12 +28,15 @@ class AutoResizingTextViewWithListener : TextView {
 
     private var listener: OnTextSizeChangedListener? = null
     private var previousTextSize = 0f
+    private val originalAutoSizeMinTextSize = this.autoSizeMinTextSize
+    private val originalAutoSizeMaxTextSize = this.autoSizeMaxTextSize
+
+    var configurationChangedFlag = false
+
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-        Timber.tag("PARP").i("DRAW $this $previousTextSize, ${this.textSize}")
-        if (previousTextSize != this.textSize) {
+        if (previousTextSize != this.textSize && listener != null) {
             previousTextSize = this.textSize
-            Timber.tag("PARP").i("firing listener $listener")
             listener?.onTextSizeChanged(this, previousTextSize)
         }
     }
@@ -42,7 +45,22 @@ class AutoResizingTextViewWithListener : TextView {
         this.listener = listener
     }
 
+    /**
+     * Fired when the text size of this [TextView] changes
+     */
     interface OnTextSizeChangedListener {
         fun onTextSizeChanged(view: View, newSize: Float)
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration?) {
+        super.onConfigurationChanged(newConfig)
+        setAutoSizeTextTypeUniformWithConfiguration(
+            originalAutoSizeMinTextSize,
+            originalAutoSizeMaxTextSize,
+            1,
+            TypedValue.COMPLEX_UNIT_PX
+        )
+        configurationChangedFlag = true
+        previousTextSize = 0f
     }
 }
