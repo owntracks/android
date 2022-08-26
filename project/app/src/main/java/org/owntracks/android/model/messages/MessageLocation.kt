@@ -3,7 +3,16 @@ package org.owntracks.android.model.messages
 import android.annotation.SuppressLint
 import android.location.Location
 import android.os.Build
-import com.fasterxml.jackson.annotation.*
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+import java.lang.ref.WeakReference
+import java.math.BigDecimal
+import java.math.MathContext
+import java.util.concurrent.TimeUnit
+import kotlin.math.roundToInt
 import org.jetbrains.annotations.NotNull
 import org.owntracks.android.location.LatLng
 import org.owntracks.android.model.BatteryStatus
@@ -11,9 +20,6 @@ import org.owntracks.android.model.FusedContact
 import org.owntracks.android.services.WifiInfoProvider
 import org.owntracks.android.support.MonitoringMode
 import org.owntracks.android.support.Preferences
-import java.lang.ref.WeakReference
-import java.util.concurrent.TimeUnit
-import kotlin.math.roundToInt
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
@@ -87,7 +93,7 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
 
     @get:JsonIgnore
     internal val fallbackGeocode: String
-        get() = "$latitude, $longitude"
+        get() = "${latitude.roundToSignificantDigits(6)}, ${longitude.roundToSignificantDigits(6)}"
 
     @get:JsonIgnore
     var hasGeocode: Boolean = false
@@ -167,4 +173,7 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
         const val CONN_TYPE_WIFI = "w"
         const val CONN_TYPE_MOBILE = "m"
     }
+
+    private fun Double.roundToSignificantDigits(digits: Int): String =
+        BigDecimal(this).round(MathContext(digits)).toString()
 }

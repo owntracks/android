@@ -4,6 +4,7 @@
 
 ### New features
 
+- When displayed, LanLngs now are limited to 6 significant figures, because more precision than that is a bit silly (#1278, #1279)
 - The config editor text is now selectable
 
 ### Bug fixes

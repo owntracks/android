@@ -17,7 +17,6 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
-import kotlin.math.roundToInt
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.DelayedMapListener
 import org.osmdroid.events.MapListener
@@ -386,7 +385,8 @@ class OSMMapFragment internal constructor(
                             fillPaint.color = getRegionColor()
                             outlinePaint.strokeWidth = 0f
                             setOnClickListener { _, mapView, _ ->
-                                mapView.overlays.filterIsInstance<Marker>().first { it.id== "regionmarker-${region.id}" }.showInfoWindow()
+                                mapView.overlays.filterIsInstance<Marker>()
+                                    .first { it.id == "regionmarker-${region.id}" }.showInfoWindow()
                                 true
                             }
                         },
@@ -402,11 +402,6 @@ class OSMMapFragment internal constructor(
         }
     }
 
-    companion object {
-        const val MIN_ZOOM_LEVEL: Double = 5.0
-        const val MAX_ZOOM_LEVEL: Double = 21.0
-    }
-
     override fun setMapLayerType(mapLayerStyle: MapLayerStyle) {
         @Suppress("REDUNDANT_ELSE_IN_WHEN")
         when (mapLayerStyle) {
@@ -416,6 +411,11 @@ class OSMMapFragment internal constructor(
             )
             else -> Timber.w("Unsupported map layer type $mapLayerStyle")
         }
+    }
+
+    companion object {
+        const val MIN_ZOOM_LEVEL: Double = 5.0
+        const val MAX_ZOOM_LEVEL: Double = 21.0
     }
 }
 
