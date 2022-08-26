@@ -273,7 +273,8 @@ workflows:
       - smoke-test:
           matrix:
             parameters:
-              android-api-version: ["29"]
+              android-api-version:
+                - "32"
           requires:
             - build
 
@@ -298,7 +299,7 @@ workflows:
                 - oss
                 - gms
               android-api-version:
-                - "31"
+                - "32"
           name: <<matrix.flavor>>-ui-tests
           requires:
             - lint
