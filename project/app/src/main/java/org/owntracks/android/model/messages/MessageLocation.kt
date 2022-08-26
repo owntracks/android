@@ -87,7 +87,7 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
 
     @get:JsonIgnore
     internal val fallbackGeocode: String
-        get() = "$latitude, $longitude"
+        get() = "${"%.3f".format(latitude)}, $longitude"
 
     @get:JsonIgnore
     var hasGeocode: Boolean = false

@@ -418,3 +418,11 @@ class OSMMapFragment internal constructor(
         }
     }
 }
+
+private fun Context.safeGetDisplay(): Display? {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        display
+    } else {
+        ((getSystemService(Context.DISPLAY_SERVICE)) as DisplayManager).displays.firstOrNull()
+    }
+}
