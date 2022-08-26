@@ -3,8 +3,11 @@ package org.owntracks.android.ui.map.osm
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
+import android.hardware.display.DisplayManager
 import android.location.Location
+import android.os.Build
 import android.os.Bundle
+import android.view.Display
 import android.view.LayoutInflater
 import android.view.MotionEvent.ACTION_BUTTON_RELEASE
 import android.view.Surface
@@ -145,7 +148,7 @@ class OSMMapFragment internal constructor(
     })
 
     class MapRotationOrientationProvider(private val context: Context) : IOrientationProvider {
-        val display = context.display
+        val display = context.safeGetDisplay()
         private var myOrientationConsumer: IOrientationConsumer? = null
         private var lastOrientation = 0f
         fun updateOrientation(orientation: Float) {
@@ -174,6 +177,14 @@ class OSMMapFragment internal constructor(
         override fun getLastKnownOrientation(): Float = lastOrientation
 
         override fun destroy() {}
+
+        private fun Context.safeGetDisplay(): Display? {
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                display
+            } else {
+                ((getSystemService(Context.DISPLAY_SERVICE)) as DisplayManager).displays.firstOrNull()
+            }
+        }
     }
 
     val orientationProvider by lazy { MapRotationOrientationProvider(requireContext()) }
