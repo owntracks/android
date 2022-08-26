@@ -53,6 +53,14 @@ abstract class MapFragment<V : ViewDataBinding> internal constructor(
         viewModel.mapCenter.observe(viewLifecycleOwner, this::updateCamera)
         viewModel.allContacts.observe(viewLifecycleOwner, { contacts ->
             updateAllMarkers(contacts.values.toSet())
+
+            /*
+            allContacts gets fired whenever any marker location changes, so we can update the camera
+            if we're following one.
+             */
+            if (viewModel.viewMode == MapViewModel.ViewMode.Contact(true)) {
+                viewModel.currentContact.value?.latLng?.run(this::updateCamera)
+            }
         })
 
         viewModel.regions.observe(viewLifecycleOwner, { regions ->
