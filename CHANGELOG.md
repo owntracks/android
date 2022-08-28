@@ -11,6 +11,7 @@
 - Allow scaling the OSM map tiles to help with map readability on some devices with the `osmTileScaleFactor` setting (#1223, #1262)
 - [OSS] Allow the user to request background location permission ("All the time") in the device settings (#1255)
 - [OSS] Link straight to the correct battery whitelisting dialog from the status page (#1239)
+- Themed icon on Android 13
 
 ### Bug fixes
 
