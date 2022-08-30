@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:title="@string/preferencesNotification">
+    app:title="@string/preferencesMap">
 
         <androidx.preference.SwitchPreferenceCompat
             android:defaultValue="@bool/valShowRegionsOnMap"
