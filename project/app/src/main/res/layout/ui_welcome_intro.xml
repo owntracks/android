@@ -14,13 +14,13 @@
 
         <ImageView
             android:id="@+id/img"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:layout_gravity="center"
-            android:layout_marginTop="32dp"
-            android:layout_marginBottom="32dp"
+            android:layout_marginTop="?attr/welcomeIconMargin"
+            android:layout_marginBottom="?attr/welcomeIconMargin"
             android:contentDescription="@string/icon_description_owntracks"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_owntracks_80" />
@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/img"
             android:layout_alignParentStart="true"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="?attr/welcomeHeadingMargin"
             android:gravity="bottom|center_horizontal"
             android:paddingLeft="24dp"
             android:paddingRight="24dp"

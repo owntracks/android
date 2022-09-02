@@ -20,15 +20,13 @@
         <ImageView
             android:id="@+id/img"
             android:layout_width="wrap_content"
-
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="48dp"
-            android:layout_marginBottom="48dp"
+            android:layout_marginTop="?attr/welcomeIconMargin"
+            android:layout_marginBottom="?attr/welcomeIconMargin"
             android:contentDescription="@string/icon_description_warning"
             android:gravity="center_horizontal"
-
             android:scaleType="centerInside"
             android:src="@drawable/ic_baseline_assignment_late_48" />
 
@@ -37,7 +35,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/img"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="?attr/welcomeHeadingMargin"
             android:gravity="center_horizontal"
             android:paddingLeft="24dp"
             android:paddingRight="24dp"

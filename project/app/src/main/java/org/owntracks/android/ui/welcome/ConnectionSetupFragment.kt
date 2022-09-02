@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.text.method.ScrollingMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,22 +27,24 @@ class ConnectionSetupFragment @Inject constructor() : WelcomeFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        binding = UiWelcomeConnectionSetupBinding.inflate(inflater, container, false)
-        binding.welcomeConnectionSetupLearnMoreButton.setOnClickListener {
-            try {
-                startActivity(
-                    Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse(getString(R.string.documentationUrl))
+        binding = UiWelcomeConnectionSetupBinding.inflate(inflater, container, false).apply {
+            welcomeConnectionSetupLearnMoreButton.setOnClickListener {
+                try {
+                    startActivity(
+                        Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse(getString(R.string.documentationUrl))
+                        )
                     )
-                )
-            } catch (e: ActivityNotFoundException) {
-                Snackbar.make(
-                    binding.root,
-                    getString(R.string.noBrowserInstalled),
-                    Snackbar.LENGTH_SHORT
-                ).show()
+                } catch (e: ActivityNotFoundException) {
+                    Snackbar.make(
+                        root,
+                        getString(R.string.noBrowserInstalled),
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                }
             }
+            screenDesc.movementMethod = ScrollingMovementMethod()
         }
         return binding.root
     }

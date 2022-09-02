@@ -15,13 +15,13 @@
 
         <ImageView
             android:id="@+id/img"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="48dp"
-            android:layout_marginBottom="48dp"
+            android:layout_marginTop="?attr/welcomeIconMargin"
+            android:layout_marginBottom="?attr/welcomeIconMargin"
             android:contentDescription="@string/icon_description_done"
             android:scaleType="fitXY"
             android:src="@drawable/ic_baseline_done_all_24" />
@@ -31,7 +31,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/img"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="?attr/welcomeHeadingMargin"
             android:gravity="bottom|center_horizontal"
             android:paddingLeft="24dp"
             android:paddingRight="24dp"

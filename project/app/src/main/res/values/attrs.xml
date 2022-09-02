@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<declare-styleable name="RelativeLayout">
-    <attr name="onLongClick" format="string"/>
-</declare-styleable>
     <declare-styleable name="Theme">
-        <attr name="colorRegion" format="color"/>
+        <attr name="colorRegion" format="color" />
+        <attr name="welcomeIconMargin" format="dimension" />
+        <attr name="welcomeHeadingMargin" format="dimension" />
     </declare-styleable>
 </resources>

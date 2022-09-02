@@ -51,6 +51,8 @@
         <item name="android:textColor">@color/md_white_1000</item>
         <item name="colorPrimary">@color/OTAccent</item>
         <item name="colorOnPrimary">@color/md_white_1000</item>
+        <item name="welcomeIconMargin">16dp</item>
+        <item name="welcomeHeadingMargin">12dp</item>
     </style>
 
     <style name="Theme.Owntracks.Preferences" parent="@style/PreferenceThemeOverlay">
