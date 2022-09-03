@@ -55,8 +55,6 @@ Chcete-li to umožnit, zapněte polohu v nastavení zařízení."</string>
     <string name="DISCONNECTING">"Odpojování"</string>
     <string name="divider">"Oddělovač"</string>
     <string name="done_heading">"Hotovo"</string>
-
-    <!-- Fuzzy -->
     <string name="enjoy_description">"Zvolte nabídku Nastavení a nakonfigurujte Owntracks před tím, než jej začnete používat"</string>
     <string name="ERROR">"Chyba"</string>
     <string name="ERROR_CONFIGURATION">"Neúplná konfigurace"</string>
@@ -156,6 +154,8 @@ Chcete-li to umožnit, zapněte polohu v nastavení zařízení."</string>
     <string name="preferencesEditorKeyError">"Zadán neplatný klíč"</string>
     <string name="preferencesEditorValue">"Hodnota"</string>
     <string name="preferencesEditorValueError">"Zadána neplatná hodnota"</string>
+    <string name="preferencesEnableMapRotation">"Povolit otáčení mapy"</string>
+    <string name="preferencesEnableMapRotationSummary">"Povolit mapě, aby se otáčela"</string>
     <string name="preferencesEncryptionKey">"Šifrovací klíč"</string>
     <string name="preferencesEncryptionKeyDialogMessage">"Šifrovací klíč je zkrácen na 32 znaků"</string>
     <string name="preferencesEncryptionKeySummary">"Symetrický klíč pro šifrování dat"</string>
@@ -264,7 +264,7 @@ Další podrobnosti najdete v brožuře OwnTracks."</string>
     <string name="welcome_play_heading">"Služby Google Play"</string>
     <string name="welcome_version_description">"Kvůli omezením OS mohou některé funkce fungovat omezeně.
 
-Aby aplikace mohla běžet na pozadí, bude zobrazeno trvalé oznámení. Lze to deaktivovat v předvolbách Oznámení v systému."</string>
+Aby aplikace mohla běžet na pozadí, bude zobrazeno trvalé oznámení. To lze deaktivovat v předvolbách Oznámení v systému."</string>
     <string name="welcome_version_learn_more">"Zjistit víc"</string>
     <string name="welcome_version_title">"Omezení"</string>
     <string name="welcomeFixIssue">"Fix"</string>

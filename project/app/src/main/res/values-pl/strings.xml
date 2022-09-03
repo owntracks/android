@@ -158,6 +158,8 @@ Aby to umożliwić, włącz lokalizację w ustawieniach urządzenia."</string>
     <string name="preferencesEditorKeyError">"Podany nieprawidłowy klucz"</string>
     <string name="preferencesEditorValue">"Wartość"</string>
     <string name="preferencesEditorValueError">"Podana nieprawidłowa wartość"</string>
+    <string name="preferencesEnableMapRotation">"Włącz obracanie mapy"</string>
+    <string name="preferencesEnableMapRotationSummary">"Pozwól obracać mapę"</string>
     <string name="preferencesEncryptionKey">"Klucz szyfrowania"</string>
     <string name="preferencesEncryptionKeyDialogMessage">"Klucz szyfrowania jest odcinany po 32 znakach"</string>
     <string name="preferencesEncryptionKeySummary">"Klucz symetryczny do szyfrowania danych"</string>

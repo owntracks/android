@@ -6,6 +6,12 @@
     <string name="aboutLicense">"Лицензия"</string>
     <string name="aboutSourceCodeSummary">"На GitHub"</string>
     <string name="aboutTranslations">"Помочь с переводом приложения"</string>
+    <plurals name="aboutTranslationsSummary">
+        <item quantity="one">"Уже доступен на %1$d языке!"</item>
+        <item quantity="few">"Уже доступен на %1$d языках!"</item>
+        <item quantity="many">"Уже доступен на %1$d языках!"</item>
+        <item quantity="other">"Уже доступен на %1$d языках!"</item>
+    </plurals>
     <string name="accept">"Сохранить"</string>
     <string name="addWaypoint">"Добавить место"</string>
     <string name="aLocation">"место"</string>
@@ -93,6 +99,12 @@
     <string name="locationPermissionRequestDialogTitle">"Запрос доступа к местоположению"</string>
     <string name="logViewerActivityTitle">"Журнал"</string>
     <string name="longitude">"Долгота"</string>
+    <string name="mapLayerDialogTitle">"Вид карты"</string>
+    <string name="mapLayerGoogleMapDefaultLabel">"Google"</string>
+    <string name="mapLayerGoogleMapHybridLabel">"Спутниковая от Google"</string>
+    <string name="mapLayerGoogleMapTerrainLabel">"Рельефная от Google"</string>
+    <string name="mapLayerOpenStreetMapLabel">"OpenStreetMap"</string>
+    <string name="mapLayerOpenStreetMapWikimediaLabel">"Wikimedia"</string>
     <string name="menuClear">"Очистить"</string>
     <string name="menuContactNavigate">"Показать на карте"</string>
     <string name="mode_heading">"Режим"</string>
@@ -102,8 +114,18 @@
     <string name="monitoring_move">"Отслеживание перемещений"</string>
     <string name="monitoring_quiet">"Тихое отслеживание"</string>
     <string name="monitoring_significant">"Отслеживание существенных перемещений"</string>
+    <string name="monitoringModeDialogManualDescription">"Отправляется только факт вашего прибытия/убытия из указанных ранее мест"</string>
+    <string name="monitoringModeDialogManualTitle">"Ручное"</string>
+    <string name="monitoringModeDialogMoveDescription">"Высокая частота и точность, но повышенное потребление батареи"</string>
+    <string name="monitoringModeDialogMoveTitle">"Перемещения"</string>
+    <string name="monitoringModeDialogQuietDescription">"Никакие события не отправляются"</string>
+    <string name="monitoringModeDialogQuietTitle">"Тихое"</string>
+    <string name="monitoringModeDialogSignificantDescription">"Баланс между использованием батареи и точностью/частотой"</string>
+    <string name="monitoringModeDialogSignificantTitle">"Существенные перемещения"</string>
+    <string name="monitoringModeDialogTitle">"Режим отслеживания"</string>
     <string name="na">"Недоступно"</string>
     <string name="next">"Далее"</string>
+    <string name="noBrowserInstalled">"Не установлен подходящий браузер"</string>
     <string name="noNavigationApp">"Подходящее приложение не установлено"</string>
     <string name="notificationChangeMonitoring">"Изменить режим"</string>
     <string name="notificationChannelErrors">"Ошибки"</string>
@@ -163,11 +185,12 @@
     <string name="preferencesLicensesSummary">"Благодарим авторов использованных библиотек"</string>
     <string name="preferencesLoadFailed">"Не удалось загрузить эффективную конфигурацию"</string>
     <string name="preferencesLocatorDisplacement">"Минимальное перемещение"</string>
-    <string name="preferencesLocatorDisplacementDialog">"На какое расстояние должно переместиться устройство для обновления местоположения"</string>
+    <string name="preferencesLocatorDisplacementDialog">"На какое расстояние (в метрах) должно переместиться устройство для обновления местоположения"</string>
     <string name="preferencesLocatorDisplacementSummary">"Минимальное расстояние между обновлениями местоположения"</string>
     <string name="preferencesLocatorInterval">"Интервал определения местоположения"</string>
     <string name="preferencesLocatorIntervalDialog">"Как часто должно запрашиваться текущее местоположение у устройства (в секундах)"</string>
     <string name="preferencesLocatorIntervalSummary">"Интервал между обновлениями местоположения"</string>
+    <string name="preferencesMap">"Карта"</string>
     <string name="preferencesMoveModeLocatorInterval">"Интервал определения местоположения (Режим отслеживания перемещений)"</string>
     <string name="preferencesMoveModeLocatorIntervalDialog">"Как часто должно запрашиваться текущее местоположение у устройства в режиме отслеживания перемещений (в секундах)"</string>
     <string name="preferencesMoveModeLocatorIntervalSummary">"Интервал между обновлениями местоположения в режиме отслеживания перемещений"</string>
@@ -182,8 +205,10 @@
     <string name="preferencesOpencageGeocoderApiKeyDialog">"Если установлено, OpenCage используется для разрешения адресов местоположения вместо Google. Требуется перезапуск."</string>
     <string name="preferencesOpencageGeocoderApiKeySummary">"Ключ OpenCage Geocoder API использования в качестве альтернативного геокодирования"</string>
     <string name="preferencesParameters">"Параметры"</string>
+    <string name="preferencesPegLocatorFastestIntervalToInterval">"Ограничить максимальную частоту определения местоположения"</string>
+    <string name="preferencesPegLocatorFastestIntervalToIntervalSummary">"Требовать от службы определения местоположения вашего устройства предоставлять данные не чаще, чем это требуется для выбранного режима работы приложения"</string>
     <string name="preferencesPort">"Порт"</string>
-    <string name="preferencesProfileId">"Режим"</string>
+    <string name="preferencesProfileId">"Протокол"</string>
     <string name="preferencesPubExtendedData">"Расширенные сведения"</string>
     <string name="preferencesPubExtendedDataSummary">"Отправлять расширенные сведения"</string>
     <string name="preferencesRemoteCommand">"Внешние команды"</string>
@@ -195,6 +220,8 @@
     <string name="preferencesReverseGeocodeProvider">"Геокодирование"</string>
     <string name="preferencesSecurity">"Безопасность"</string>
     <string name="preferencesServer">"Подключение к серверу"</string>
+    <string name="preferencesShowRegionsOnMap">"Показывать места"</string>
+    <string name="preferencesShowRegionsOnMapSummary">"Отображать окружность для известных мест на карте"</string>
     <string name="preferencesTheme">"Тема"</string>
 
     <!-- but contactDetailsTrackerId is untranslated? -->
@@ -235,14 +262,24 @@
     <string name="version">"Версия"</string>
     <string name="viewLogs">"Просмотр журнала"</string>
     <string name="waypointListPlaceholder">"Места еще не обозначены"</string>
+    <string name="welcome_connection_setup_description">"OwnTracks в процессе работы отправляет данные о вашем местоположении на сервер, которым владеете вы или кто-то, кому вы доверяете, тем самым гарантируя, что ваши данные контролируются только вами.
+
+Убедитесь, что вам известны данные подключения к вашему серверу - его протокол (HTTPS или MQTT), а также все необходимые учетные данные.
+
+В конце вам необходимо будет настроить приложение, указав информацию о сервере в разделе «Настройки» → «Подключение к серверу».
+
+Для получения более подробной информации ознакомьтесь с документацией к OwnTracks."</string>
+    <string name="welcome_connection_setup_learn_more_button_label">"Документация"</string>
+    <string name="welcome_connection_setup_title">"Настройте подключение"</string>
     <string name="welcome_description">"Следующие шаги помогут вам начать работу с OwnTracks"</string>
+    <string name="welcome_finish_open_preferences_button_label">"Настройки"</string>
     <string name="welcome_heading">"Добро пожаловать!"</string>
     <string name="welcome_play_description">"Для работы OwnTracks необходимы сервисы Google Play"</string>
     <string name="welcome_play_heading">"Сервисы Google Play"</string>
     <string name="welcome_version_description">"Из-за ограничений Android некоторые функции могут работать не в полной мере.
 
 Постоянное уведомление будет отображаться в шторке для того, чтобы дать возможность приложению работать в фоне. Его можно отключить в системных настройках уведомлений."</string>
-    <string name="welcome_version_learn_more">"Узнайте больше"</string>
+    <string name="welcome_version_learn_more">"Подробности"</string>
     <string name="welcome_version_title">"Ограничения"</string>
     <string name="welcomeFixIssue">"Исправить"</string>
     <string name="workmanagerInitializationErrorDialogMessage">"Некоторые компоненты не были корректно инициализированы, поэтому OwnTracks может работать не в полной мере. Может потребоваться переустановка приложения или очистка данных приложения.

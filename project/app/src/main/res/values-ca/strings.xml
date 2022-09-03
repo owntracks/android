@@ -154,6 +154,8 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="preferencesEditorKeyError">"Especificada clau no vàlida"</string>
     <string name="preferencesEditorValue">"Valor"</string>
     <string name="preferencesEditorValueError">"Valor invàlid especificat"</string>
+    <string name="preferencesEnableMapRotation">"Activa la rotació del mapa"</string>
+    <string name="preferencesEnableMapRotationSummary">"Permet girar el mapa"</string>
     <string name="preferencesEncryptionKey">"Clau d'encriptació"</string>
     <string name="preferencesEncryptionKeyDialogMessage">"La clau d'encriptació es talla als 32 caracters"</string>
     <string name="preferencesEncryptionKeySummary">"Clau simètrica d'encriptació de càrrega"</string>
