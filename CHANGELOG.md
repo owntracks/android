@@ -6,6 +6,7 @@
 
 - Battery optimization status page row now links straight to the right dialog on OSS flavour (#1239, thanks @nycex)
 - Added Korean translations (#1244, thanks @whatareyoudoingfor)
+- Added Danish tranlsations (thanks @atjn)
 - Allow map rotation (can be disabled in preferences) (#1236)
 - Add a scale bar to the OSM map view (#1263)
 - Allow scaling the OSM map tiles to help with map readability on some devices with the `osmTileScaleFactor` setting (#1223, #1262)
