@@ -17,7 +17,7 @@
     <string name="backgroundLocationRestrictionNotificationText">"This version of Android restricts OwnTracks from receiving locations when started in the background until the app is opened. Click this notification to open the app and start tracking location."</string>
     <string name="backgroundLocationRestrictionNotificationTitle">"Location Tracking Paused"</string>
     <string name="batteryOptimizationWhitelistDialogButtonLabel">"Battery optimization settings"</string>
-    <string name="batteryOptimizationWhitelistDialogMessage">"Whitelisting OwnTracks from battery optimization may help it more reliably track locations and main contact with the server."</string>
+    <string name="batteryOptimizationWhitelistDialogMessage">"Whitelisting OwnTracks from battery optimization may help it more reliably track locations and maintain contact with the server."</string>
     <string name="batteryOptimizationWhitelistDialogTitle">"Battery Optimization"</string>
     <string name="cancel">"Cancel"</string>
     <string name="clear_log">"Clear"</string>
