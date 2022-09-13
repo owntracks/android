@@ -97,21 +97,26 @@ jobs:
       - android/accept-licenses
       - restore-gradle-cache
       - run:
+          name: Set credentials
+          command: |
+            echo -n $GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS_BASE64 | base64 -d > project/app/owntracks-android-gcloud-creds.json
+            echo -n $KEYSTORE_BASE64 | base64 -d > project/owntracks.release.keystore.jks
+      - run:
           name: Build
           command: |
-            ./project/gradlew -p ./project assembleDebug assembleAndroidTest assembleGmsReleaseUnitTest :app:compileOssReleaseSources :app:packageGmsReleaseBundle app:assembleGmsDebugAndroidTest app:assembleOssDebugAndroidTest --scan
+            ./project/gradlew -p ./project assembleDebug assembleRelease assembleAndroidTest assembleGmsReleaseUnitTest :app:compileOssReleaseSources :app:packageGmsReleaseBundle app:assembleGmsDebugAndroidTest app:assembleOssDebugAndroidTest --scan
       - save-gradle-cache
       - persist_to_workspace:
-          root: project/app/build/outputs/apk/oss/debug/
+          root: project/app/build/outputs/apk/
           paths:
-            - app-oss-debug.apk
+            - "**"
   fdroid-scanner:
     executor: android-docker
     resource_class: small
     steps:
       - checkout
       - attach_workspace:
-          at: project/app/build/outputs/apk/oss/debug/
+          at: project/app/build/outputs/apk/
       - run:
           name: Fdroid Scanner
           command: |
@@ -246,13 +251,18 @@ jobs:
           command: |
             echo -n $GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS_BASE64 | base64 -d > project/app/owntracks-android-gcloud-creds.json
             echo -n $KEYSTORE_BASE64 | base64 -d > project/owntracks.release.keystore.jks
+      - attach_workspace:
+          at: project/app/build/outputs/apk/
       - run:
           name: Build
           command: |
-            ./project/gradlew -p ./project assembleRelease publishGmsReleaseBundle --scan
+            ./project/gradlew -p ./project publishGmsReleaseBundle --scan
       - store_artifacts:
-          path: project/app/build/outputs
-          destination: build-outputs
+          path: project/app/build/outputs/apk/gms/release/app-gms-release.apk
+          destination: gms-apk
+      - store_artifacts:
+          path: project/app/build/outputs/apk/oss/release/app-oss-release.apk
+          destination: oss-apk
 
 workflows:
   evaluate-oss-contribution:
@@ -276,7 +286,8 @@ workflows:
     when:
       not: << pipeline.parameters.oss-contribution-flow >>
     jobs:
-      - build
+      - build:
+          context: Android Deploy Credentials
       - fdroid-scanner:
           requires:
             - build
