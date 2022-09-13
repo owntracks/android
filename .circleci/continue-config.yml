@@ -249,7 +249,10 @@ jobs:
       - run:
           name: Build
           command: |
-            ./project/gradlew -p ./project publishGmsReleaseBundle --scan
+            ./project/gradlew -p ./project assembleRelease publishGmsReleaseBundle --scan
+      - store_artifacts:
+          path: project/app/build/outputs
+          destination: build-outputs
 
 workflows:
   evaluate-oss-contribution:
