@@ -4,6 +4,9 @@ parameters:
   oss-contribution-flow:
     type: boolean
     default: false
+  jdk-version:
+    type: integer
+    default: 17
 
 executors:
   android-docker:
@@ -83,7 +86,7 @@ commands:
           save-gradle-cache: false
 
 orbs:
-  android: circleci/android@2.0.3
+  android: circleci/android@2.1.2
   codecov: codecov/codecov@3.2.2
 
 jobs:
@@ -95,6 +98,8 @@ jobs:
       # Checkout the code as the first step.
       - checkout
       - android/accept-licenses
+      - android/change-java-version:
+          java-version: << pipeline.parameters.jdk-version >>
       - restore-gradle-cache
       - run:
           name: Set credentials
@@ -128,6 +133,8 @@ jobs:
     steps:
       - checkout
       - android/accept-licenses
+      - android/change-java-version:
+          java-version: << pipeline.parameters.jdk-version >>
       - restore-gradle-cache
       - run:
           name: Unit Test
@@ -149,6 +156,8 @@ jobs:
     steps:
       - checkout
       - android/accept-licenses
+      - android/change-java-version:
+          java-version: << pipeline.parameters.jdk-version >>
       - restore-gradle-cache
       - run:
           name: Lint
@@ -171,6 +180,8 @@ jobs:
     steps:
       - checkout
       - android/accept-licenses
+      - android/change-java-version:
+          java-version: << pipeline.parameters.jdk-version >>
       - restore-gradle-cache
       - run:
           name: Prepare parameterised test command
@@ -221,6 +232,8 @@ jobs:
     steps:
       - checkout
       - android/accept-licenses
+      - android/change-java-version:
+          java-version: << pipeline.parameters.jdk-version >>
       - restore-gradle-cache
       - run:
           name: Prepare parameterised test command
@@ -245,6 +258,8 @@ jobs:
       # Checkout the code as the first step.
       - checkout
       - android/accept-licenses
+      - android/change-java-version:
+          java-version: << pipeline.parameters.jdk-version >>
       - restore-gradle-cache
       - run:
           name: Set credentials
