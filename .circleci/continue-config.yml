@@ -61,6 +61,9 @@ commands:
   run-andoid-emulator-and-tests:
     steps:
       - run: sdkmanager --list
+      - run: echo $SYSTEM_IMAGE
+      - run: sdkmanager $SYSTEM_IMAGE
+      - run: sdkmanager --list
       - android/start-emulator-and-run-tests:
           additional-avd-args: "-d pixel_3a -c 1G"
           additional-emulator-args: "-memory 4096 -cores 3"
