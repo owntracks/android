@@ -21,7 +21,7 @@ commands:
     parameters:
       version:
         type: string
-        default: v4
+        default: v4-jvm17
     steps:
       - run:
           name: Generate Gradle buildfiles seed
@@ -50,7 +50,7 @@ commands:
     parameters:
       version:
         type: string
-        default: v4
+        default: v4-jvm17
     steps:
       - save_cache:
           key: >-
