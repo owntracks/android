@@ -12,6 +12,9 @@ executors:
   android-docker:
     docker:
       - image: cimg/android:2022.09
+  android-machine:
+    machine:
+      image: android:2022.09.1
 
 commands:
   restore-gradle-cache:
@@ -170,7 +173,7 @@ jobs:
       flavor:
         type: string
         default: oss
-    executor: android/android-machine
+    executor: android-machine
     resource_class: large
     parallelism: 4
     environment:
@@ -223,7 +226,7 @@ jobs:
       android-api-version:
         type: string
         default: "29"
-    executor: android/android-machine
+    executor: android-machine
     resource_class: large
     environment:
       GRADLE_OPTS: "-Dkotlin.compiler.execution.strategy=in-process"
