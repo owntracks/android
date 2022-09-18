@@ -11,10 +11,10 @@ parameters:
 executors:
   android-docker:
     docker:
-      - image: cimg/android:2022.04
+      - image: cimg/android:2022.09
   android-machine:
     machine:
-      image: android:2022.04.1
+      image: android:2022.09.1
 
 commands:
   restore-gradle-cache:
