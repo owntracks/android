@@ -12,9 +12,6 @@ executors:
   android-docker:
     docker:
       - image: cimg/android:2022.09
-  android-machine:
-    machine:
-      image: android:2022.09.1
 
 commands:
   restore-gradle-cache:
@@ -60,6 +57,7 @@ commands:
             - ~/.gradle/wrapper
   run-andoid-emulator-and-tests:
     steps:
+      - run: sdkmanager --list
       - android/start-emulator-and-run-tests:
           additional-avd-args: "-d pixel_3a -c 1G"
           additional-emulator-args: "-memory 4096 -cores 3"
@@ -172,7 +170,7 @@ jobs:
       flavor:
         type: string
         default: oss
-    executor: android-machine
+    executor: android/android-machine
     resource_class: large
     parallelism: 4
     environment:
@@ -225,7 +223,7 @@ jobs:
       android-api-version:
         type: string
         default: "29"
-    executor: android-machine
+    executor: android/android-machine
     resource_class: large
     environment:
       GRADLE_OPTS: "-Dkotlin.compiler.execution.strategy=in-process"
