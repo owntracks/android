@@ -64,7 +64,7 @@ commands:
           additional-avd-args: "-d pixel_3a -c 1G"
           additional-emulator-args: "-memory 4096 -cores 3"
           test-command: "${GRADLE_TEST_COMMAND}"
-          system-image: "system-images;android-29;google_apis;x86_64"
+          system-image: $SYSTEM_IMAGE
           restore-gradle-cache-post-emulator-launch: false
           run-tests-working-directory: ./project
           post-emulator-wait-steps:
@@ -88,7 +88,7 @@ commands:
           save-gradle-cache: false
 
 orbs:
-  android: circleci/android@2.1.2
+  android: circleci/android@2.1.0
   codecov: codecov/codecov@3.2.2
 
 jobs:
