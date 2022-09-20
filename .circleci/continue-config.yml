@@ -86,7 +86,7 @@ commands:
           save-gradle-cache: false
 
 orbs:
-  android: circleci/android@2.1.1
+  android: circleci/android@2.1.0
   codecov: codecov/codecov@3.2.2
 
 jobs:
@@ -301,6 +301,17 @@ workflows:
     when:
       not: << pipeline.parameters.oss-contribution-flow >>
     jobs:
+      - build:
+          context: Android Deploy Credentials
+      - fdroid-scanner:
+          requires:
+            - build
+      - unit-test:
+          requires:
+            - build
+      - lint:
+          requires:
+            - build
       - ui-tests:
           matrix:
             parameters:
@@ -308,3 +319,15 @@ workflows:
                 - oss
                 - gms
           name: <<matrix.flavor>>-ui-tests
+          requires:
+            - lint
+            - unit-test
+            - build
+      - publish-to-play-store:
+          context: Android Deploy Credentials
+          requires:
+            - oss-ui-tests
+            - gms-ui-tests
+          filters:
+            branches:
+              only: master
