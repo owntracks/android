@@ -74,6 +74,8 @@ commands:
             - run: adb root
             - run: sleep 5
             - run: adb shell setprop ctl.restart zygote
+            - run: echo $GRADLE_TEST_COMMAND
+            - run: echo $SYSTEM_IMAGE
             - run:
                 background: true
                 command: |
