@@ -63,7 +63,7 @@ commands:
       - android/start-emulator-and-run-tests:
           additional-avd-args: "-d pixel_3a -c 1G"
           additional-emulator-args: "-memory 4096 -cores 3"
-          test-command: "${GRADLE_TEST_COMMAND}"
+          test-command: $GRADLE_TEST_COMMAND
           system-image: $SYSTEM_IMAGE
           restore-gradle-cache-post-emulator-launch: false
           run-tests-working-directory: ./project
@@ -74,8 +74,6 @@ commands:
             - run: adb root
             - run: sleep 5
             - run: adb shell setprop ctl.restart zygote
-            - run: echo $GRADLE_TEST_COMMAND
-            - run: echo $SYSTEM_IMAGE
             - run:
                 background: true
                 command: |
