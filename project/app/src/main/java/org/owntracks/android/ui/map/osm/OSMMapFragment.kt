@@ -307,8 +307,9 @@ class OSMMapFragment internal constructor(
                 activity has been destroyed. Creating a Marker requires (for some reason) the `mapView`
                 to be attached to a non-destroyed activity somehow, so we check before creating the marker
                  */
+
                 overlays.add(
-                    0,
+                    overlays.filterIsInstance<MyLocationNewOverlay>().indexOfFirst { true },
                     Marker(this).apply {
                         this.id = id
                         position = latLng.toGeoPoint()
@@ -374,24 +375,29 @@ class OSMMapFragment internal constructor(
                     .filter { it.id.startsWith("regionpolygon-") }
                     .forEach(overlays::remove)
 
-                regions.forEach { region ->
-                    Marker(this).apply {
-                        id = "regionmarker-${region.id}"
-                        position = region.location.toLatLng().toGeoPoint()
-                        title = region.description
-                        setInfoWindow(MarkerInfoWindow(R.layout.osm_region_bubble, this@run))
-                    }.let { overlays.add(0, it) }
-                    Polygon(this).apply {
-                        id = "regionpolygon-${region.id}"
-                        points = Polygon.pointsAsCircle(
-                            region.location.toLatLng().toGeoPoint(),
-                            region.geofenceRadius.toDouble()
-                        )
-                        fillPaint.color = getRegionColor()
-                        outlinePaint.strokeWidth = 0f
-                        setOnClickListener { _, _, _ -> true }
-                    }.let { overlays.add(0, it) }
-                }
+                regions.flatMap { region ->
+                    listOf(
+                        Polygon(this).apply {
+                            id = "regionpolygon-${region.id}"
+                            points = Polygon.pointsAsCircle(
+                                region.location.toLatLng().toGeoPoint(),
+                                region.geofenceRadius.toDouble()
+                            )
+                            fillPaint.color = getRegionColor()
+                            outlinePaint.strokeWidth = 0f
+                            setOnClickListener { _, mapView, _ ->
+                                mapView.overlays.filterIsInstance<Marker>().first { it.id== "regionmarker-${region.id}" }.showInfoWindow()
+                                true
+                            }
+                        },
+                        Marker(this).apply {
+                            id = "regionmarker-${region.id}"
+                            position = region.location.toLatLng().toGeoPoint()
+                            title = region.description
+                            setInfoWindow(MarkerInfoWindow(R.layout.osm_region_bubble, this@run))
+                        }
+                    )
+                }.let { overlays.addAll(0, it) }
             }
         }
     }
