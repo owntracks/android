@@ -1,14 +1,29 @@
 #!/bin/bash
 echo "Commit Sha: $GITHUB_SHA"
-PIPELINE_OUTPUT=$(curl -s -u ${CIRCLE_CI_TOKEN}: https://circleci.com/api/v2/project/gh/owntracks/android/pipeline)
-echo "Found $(echo $PIPELINE_OUTPUT | jq '.items | length') pipelines"
-MATCHING_PIPELINE_ID=$(echo $PIPELINE_OUTPUT | jq -r '.items[] | select(.vcs.revision == env.GITHUB_SHA and .vcs.branch == "master") |.id')
+
+PAGE_TOKEN=""
+while [ -z "$MATCHING_PIPELINE_ID" ]; do
+if [ -z "$PAGE_TOKEN" ]; then
+    PIPELINE_OUTPUT=$(curl -s --fail-with-body -u "${CIRCLE_CI_TOKEN}": https://circleci.com/api/v2/project/gh/owntracks/android/pipeline)
+else
+    PIPELINE_OUTPUT=$(curl -s --fail-with-body -u "${CIRCLE_CI_TOKEN}": https://circleci.com/api/v2/project/gh/owntracks/android/pipeline?page-token="${PAGE_TOKEN}")
+fi
+if [ $? != 0 ]; then echo "Error fetching pipelines: $PIPELINE_OUTPUT"; exit 1; fi
+echo "Found $(echo "$PIPELINE_OUTPUT" | jq '.items | length') pipelines"
+MATCHING_PIPELINE_ID=$(echo "$PIPELINE_OUTPUT" | jq -r '.items[] | select(.vcs.revision == env.GITHUB_SHA and .vcs.branch == "master") |.id')
+PAGE_TOKEN=$(echo "$PIPELINE_OUTPUT" | jq -r '.next_page_token')
+if [ "$PAGE_TOKEN" == "null" ] && [ -z "$MATCHING_PIPELINE_ID" ]; then echo "Unable to find pipeline for commit"; exit 1; fi
+echo "Next page is $PAGE_TOKEN"
+done
+
+PAGE_TOKEN=""
+
 echo "Pipeline ID that matches git rev $GITHUB_SHA is $MATCHING_PIPELINE"
 if [ -z "$MATCHING_PIPELINE_ID" ]; then exit 1; fi
 
-WORKFLOW_OUTPUT=$(curl -s -u ${CIRCLE_CI_TOKEN}: https://circleci.com/api/v2/pipeline/$MATCHING_PIPELINE_ID/workflow)
-WORKFLOW_ID=$(echo $WORKFLOW_OUTPUT | jq -r '.items[] | select(.name=="build-and-test" and .status=="success") |.id')
-echo "This pipeline has $(echo $WORKFLOW_OUTPUT | jq '.items | length') workflows"
+WORKFLOW_OUTPUT=$(curl -s -u "${CIRCLE_CI_TOKEN}": https://circleci.com/api/v2/pipeline/"$MATCHING_PIPELINE_ID"/workflow)
+WORKFLOW_ID=$(echo "$WORKFLOW_OUTPUT" | jq -r '.items[] | select(.name=="build-and-test" and .status=="success") |.id')
+echo "This pipeline has $(echo "$WORKFLOW_OUTPUT" | jq '.items | length') workflows"
 echo "Workflow ID that matches 'build-and-test' is $WORKFLOW_ID"
 if [ -z "$WORKFLOW_ID" ]; then exit 1; fi
 
