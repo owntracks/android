@@ -1,6 +1,7 @@
 package org.owntracks.android.services;
 
 import android.location.Location;
+import android.os.Build;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -97,7 +98,7 @@ public class LocationProcessor {
             message.setConn(deviceMetricsProvider.getConnectionType());
             message.setMonitoringMode(preferences.getMonitoring());
         } else {
-            message = MessageLocation.fromLocation(currentLocation);
+            message = MessageLocation.fromLocation(currentLocation, Build.VERSION.SDK_INT);
         }
         message.setTrigger(trigger);
         message.setTrackerId(preferences.getTrackerId(true));

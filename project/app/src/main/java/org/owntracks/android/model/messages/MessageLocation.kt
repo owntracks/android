@@ -1,5 +1,6 @@
 package org.owntracks.android.model.messages
 
+import android.annotation.SuppressLint
 import android.location.Location
 import android.os.Build
 import com.fasterxml.jackson.annotation.*
@@ -126,8 +127,9 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
     }
 
     companion object {
+        @SuppressLint("NewApi")
         @JvmStatic
-        fun fromLocation(location: Location): MessageLocation = MessageLocation().apply {
+        fun fromLocation(location: Location, sdk: Int = Build.VERSION.SDK_INT): MessageLocation = MessageLocation().apply {
             latitude = location.latitude
             longitude = location.longitude
             altitude = location.altitude.roundToInt()
@@ -136,7 +138,7 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
             // Convert m/s to km/h
             velocity = if (location.hasSpeed()) ((location.speed * 3.6).toInt()) else 0
             verticalAccuracy =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && location.hasVerticalAccuracy()) location.verticalAccuracyMeters.toInt() else 0
+                if (sdk >= Build.VERSION_CODES.O && location.hasVerticalAccuracy()) location.verticalAccuracyMeters.toInt() else 0
         }
 
         @JvmStatic

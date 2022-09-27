@@ -698,7 +698,7 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(Location location) {
-        MessageLocation messageLocation = MessageLocation.fromLocation(location);
+        MessageLocation messageLocation = MessageLocation.fromLocation(location, Build.VERSION.SDK_INT);
         if (lastLocationMessage == null || lastLocationMessage.getTimestamp() < messageLocation.getTimestamp()) {
             this.lastLocationMessage = messageLocation;
             geocoderProvider.resolve(messageLocation, this);

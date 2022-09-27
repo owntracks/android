@@ -4,21 +4,24 @@ parameters:
   oss-contribution-flow:
     type: boolean
     default: false
+  jdk-version:
+    type: integer
+    default: 17
 
 executors:
   android-docker:
     docker:
-      - image: cimg/android:2022.04
+      - image: cimg/android:2022.09
   android-machine:
     machine:
-      image: android:2022.04.1
+      image: android:2022.09.1
 
 commands:
   restore-gradle-cache:
     parameters:
       version:
         type: string
-        default: v4
+        default: v4-jvm17
     steps:
       - run:
           name: Generate Gradle buildfiles seed
@@ -47,7 +50,7 @@ commands:
     parameters:
       version:
         type: string
-        default: v4
+        default: v4-jvm17
     steps:
       - save_cache:
           key: >-
@@ -83,7 +86,7 @@ commands:
           save-gradle-cache: false
 
 orbs:
-  android: circleci/android@2.0.3
+  android: circleci/android@2.1.0
   codecov: codecov/codecov@3.2.2
 
 jobs:
@@ -95,6 +98,8 @@ jobs:
       # Checkout the code as the first step.
       - checkout
       - android/accept-licenses
+      - android/change-java-version:
+          java-version: << pipeline.parameters.jdk-version >>
       - restore-gradle-cache
       - run:
           name: Set credentials
@@ -128,6 +133,8 @@ jobs:
     steps:
       - checkout
       - android/accept-licenses
+      - android/change-java-version:
+          java-version: << pipeline.parameters.jdk-version >>
       - restore-gradle-cache
       - run:
           name: Unit Test
@@ -149,6 +156,8 @@ jobs:
     steps:
       - checkout
       - android/accept-licenses
+      - android/change-java-version:
+          java-version: << pipeline.parameters.jdk-version >>
       - restore-gradle-cache
       - run:
           name: Lint
@@ -171,6 +180,8 @@ jobs:
     steps:
       - checkout
       - android/accept-licenses
+      - android/change-java-version:
+          java-version: << pipeline.parameters.jdk-version >>
       - restore-gradle-cache
       - run:
           name: Prepare parameterised test command
@@ -221,6 +232,8 @@ jobs:
     steps:
       - checkout
       - android/accept-licenses
+      - android/change-java-version:
+          java-version: << pipeline.parameters.jdk-version >>
       - restore-gradle-cache
       - run:
           name: Prepare parameterised test command
@@ -245,6 +258,8 @@ jobs:
       # Checkout the code as the first step.
       - checkout
       - android/accept-licenses
+      - android/change-java-version:
+          java-version: << pipeline.parameters.jdk-version >>
       - restore-gradle-cache
       - run:
           name: Set credentials

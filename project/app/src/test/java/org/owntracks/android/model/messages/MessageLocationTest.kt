@@ -20,7 +20,6 @@ class MessageLocationTest {
 
     @Test
     fun `given a location, when creating a MessageLocation on Android O, the correct fields are set`() {
-        setFinalStatic(VERSION::class.java.getField("SDK_INT"), Build.VERSION_CODES.O)
         val location: Location = mock {
             on { latitude } doReturn 51.0
             on { longitude } doReturn 0.3
@@ -29,7 +28,7 @@ class MessageLocationTest {
             on { hasVerticalAccuracy() } doReturn true
         }
 
-        val messageLocation = MessageLocation.fromLocation(location)
+        val messageLocation = MessageLocation.fromLocation(location, Build.VERSION_CODES.O)
         assertEquals(51.0, messageLocation.latitude, 0.0)
         assertEquals(0.3, messageLocation.longitude, 0.0)
         assertEquals(5, messageLocation.accuracy)
@@ -40,7 +39,6 @@ class MessageLocationTest {
 
     @Test
     fun `given a location, when creating a MessageLocation on Android before O, the correct fields are set`() {
-        setFinalStatic(VERSION::class.java.getField("SDK_INT"), Build.VERSION_CODES.LOLLIPOP)
         val location: Location = mock {
             on { latitude } doReturn 51.0
             on { longitude } doReturn 0.3
@@ -48,7 +46,7 @@ class MessageLocationTest {
             on { verticalAccuracyMeters } doReturn 10.0f
         }
 
-        val messageLocation = MessageLocation.fromLocation(location)
+        val messageLocation = MessageLocation.fromLocation(location, Build.VERSION_CODES.LOLLIPOP)
         assertEquals(51.0, messageLocation.latitude, 0.0)
         assertEquals(0.3, messageLocation.longitude, 0.0)
         assertEquals(5, messageLocation.accuracy)
@@ -109,14 +107,5 @@ class MessageLocationTest {
         val messageLocation = MessageLocation.fromLocationAndWifiInfo(location, wifiInfoProvider)
         assertNull(messageLocation.ssid)
         assertNull(messageLocation.bssid)
-    }
-
-    @Throws(Exception::class)
-    fun setFinalStatic(field: Field, newValue: Any?) {
-        field.isAccessible = true
-        val modifiersField: Field = Field::class.java.getDeclaredField("modifiers")
-        modifiersField.isAccessible = true
-        modifiersField.setInt(field, field.modifiers and Modifier.FINAL.inv())
-        field.set(null, newValue)
     }
 }
