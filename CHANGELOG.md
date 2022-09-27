@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 2.4.11
+
+### New features
+
+### Bug fixes
+
 ## Version 2.4.10
 
 ### New features
