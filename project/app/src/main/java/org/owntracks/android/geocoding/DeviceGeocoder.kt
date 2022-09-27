@@ -8,7 +8,7 @@ import timber.log.Timber
 import java.math.BigDecimal
 import java.util.*
 
-class DeviceGeocoder internal constructor(context: Context?) : CachingGeocoder() {
+class DeviceGeocoder internal constructor(context: Context) : CachingGeocoder() {
     private val geocoder: android.location.Geocoder =
         android.location.Geocoder(context, Locale.getDefault())
     private var tripResetTimestamp: Instant = Instant.MIN

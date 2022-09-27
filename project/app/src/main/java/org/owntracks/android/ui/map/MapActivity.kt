@@ -458,14 +458,14 @@ class MapActivity :
     private fun disableLocationMenus() {
         binding?.fabMyLocation?.isEnabled = false
         menu?.run {
-            findItem(R.id.menu_report).setEnabled(false).icon.alpha = 128
+            findItem(R.id.menu_report).setEnabled(false).icon?.alpha = 128
         }
     }
 
     private fun enableLocationMenus() {
         binding?.fabMyLocation?.isEnabled = true
         menu?.run {
-            findItem(R.id.menu_report).setEnabled(true).icon.alpha = 255
+            findItem(R.id.menu_report).setEnabled(true).icon?.alpha = 255
         }
     }
 

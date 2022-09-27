@@ -24,12 +24,12 @@ val numShards = System.getenv("CIRCLE_NODE_TOTAL") ?: "0"
 val shardIndex = System.getenv("CIRCLE_NODE_INDEX") ?: "0"
 
 android {
-    compileSdk = 31
+    compileSdk = 33
 
     defaultConfig {
         applicationId = "org.owntracks.android"
         minSdk = 21
-        targetSdk = 31
+        targetSdk = 33
 
         versionCode = 20411000
         versionName = "2.4.11"

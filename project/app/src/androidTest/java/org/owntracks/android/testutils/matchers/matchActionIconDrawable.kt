@@ -28,7 +28,7 @@ fun withActionIconDrawable(@DrawableRes resourceId: Int): Matcher<View?>? {
         override fun matchesSafely(actionMenuItemView: ActionMenuItemView): Boolean {
             return sameBitmap(
                 actionMenuItemView.context,
-                actionMenuItemView.itemData.icon,
+                actionMenuItemView.itemData.icon!!,
                 resourceId,
                 actionMenuItemView
             )
