@@ -11,7 +11,7 @@ on:
 jobs:
   release:
     name: Create GH release and promote Play store beta to release
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
 
