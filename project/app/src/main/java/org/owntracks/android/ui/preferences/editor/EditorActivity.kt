@@ -71,7 +71,7 @@ class EditorActivity :
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        onBackPressed()
+        finish()
         return true
     }
 
