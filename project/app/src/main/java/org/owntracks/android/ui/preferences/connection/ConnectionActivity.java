@@ -114,7 +114,7 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
 
     @Override
     public boolean onSupportNavigateUp() {
-        onBackPressed();
+        finish();
         return true;
     }
 
