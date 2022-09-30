@@ -157,7 +157,8 @@ commands:
             # Set up the device for the right location service settings
             - run: adb shell settings put secure location_providers_allowed +gps && adb shell settings put secure location_providers_allowed +network && adb shell settings put secure location_mode 3 && adb shell settings put global heads_up_notifications_enabled 0
             # Restart zygote to make sure it picks up the right heap setting, otherwise mystery OOMs will happen
-            - run: adb root
+            - run: |
+                for i in 1 2 3; do adb root && break || sleep 15; done
             - run: sleep 5
             - run: adb shell setprop ctl.restart zygote
             - run:
