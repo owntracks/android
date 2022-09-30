@@ -1,12 +1,98 @@
 version: 2.1
 
 parameters:
-  oss-contribution-flow:
+  source-changed:
     type: boolean
     default: false
+  smoke-test-required:
+    type: boolean
+    default: false
+  integration-test-required:
+    type: boolean
+    default: false
+  GHA_Actor:
+    type: string
+    default: ""
+  GHA_Action:
+    type: string
+    default: ""
+  GHA_Event:
+    type: string
+    default: ""
+  GHA_Meta:
+    type: string
+    default: ""
   jdk-version:
     type: integer
     default: 17
+
+workflows:
+  build-integration-test-publish:
+    when:
+      and:
+        - equal: [master, << pipeline.git.branch >>]
+        - << pipeline.parameters.source-changed >>
+    jobs:
+      - build-release:
+          context: Android Deploy Credentials
+      - fdroid-scanner:
+          requires:
+            - build-release
+      - unit-test:
+          requires:
+            - build-release
+      - lint:
+          requires:
+            - build-release
+      - ui-tests:
+          matrix:
+            parameters:
+              flavor:
+                - oss
+                - gms
+          name: <<matrix.flavor>>-ui-tests
+          requires:
+            - lint
+            - unit-test
+            - build-release
+      - publish-to-play-store:
+          context: Android Deploy Credentials
+          requires:
+            - oss-ui-tests
+            - gms-ui-tests
+
+  smoke-test:
+    when: << pipeline.parameters.smoke-test-required >>
+    jobs:
+      - unit-test
+      - ui-tests:
+          flavor: gms
+          parallelism: 1
+          only-smoke-tests: true
+          name: smoke-test
+          requires:
+            - unit-test
+      - pr-test-complete:
+          requires:
+            - smoke-test
+
+  integration-test:
+    when: << pipeline.parameters.integration-test-required >>
+    jobs:
+      - unit-test
+      - ui-tests:
+          matrix:
+            parameters:
+              flavor:
+                - oss
+                - gms
+          name: <<matrix.flavor>>-ui-tests
+          requires:
+            - unit-test
+      - pr-test-complete:
+          requires:
+            - gms-ui-tests
+            - oss-ui-tests
 
 executors:
   android-docker:
@@ -90,12 +176,10 @@ orbs:
   codecov: codecov/codecov@3.2.2
 
 jobs:
-  build:
+  build-release:
     executor: android-docker
     resource_class: large
-
     steps:
-      # Checkout the code as the first step.
       - checkout
       - android/accept-licenses
       - android/change-java-version:
@@ -115,8 +199,10 @@ jobs:
           root: project/app/build/outputs/apk/
           paths:
             - "**"
+
   fdroid-scanner:
-    executor: android-docker
+    docker:
+      - image: registry.gitlab.com/fdroid/docker-executable-fdroidserver:master
     resource_class: small
     steps:
       - checkout
@@ -125,7 +211,7 @@ jobs:
       - run:
           name: Fdroid Scanner
           command: |
-            python3 ./.circleci/fdroid-scanner-stub.py
+            fdroidserver scanner project/app/build/outputs/apk/app-oss-release.apk
 
   unit-test:
     executor: android-docker
@@ -172,9 +258,18 @@ jobs:
       flavor:
         type: string
         default: oss
+      parallelism:
+        type: integer
+        default: 4
+      android-api-version:
+        type: string
+        default: "29"
+      only-smoke-tests:
+        type: boolean
+        default: false
     executor: android-machine
     resource_class: large
-    parallelism: 4
+    parallelism: << parameters.parallelism >>
     environment:
       GRADLE_OPTS: "-Dkotlin.compiler.execution.strategy=in-process"
     steps:
@@ -186,9 +281,13 @@ jobs:
       - run:
           name: Prepare parameterised test command
           command: |
-            echo "export FLAVOR=<< parameters.flavor >>" >> $BASH_ENV
-            source $BASH_ENV
-            echo "export GRADLE_TEST_COMMAND=\"./gradlew create${FLAVOR^}DebugCoverageReport --scan --no-daemon --max-workers 2\"" >> $BASH_ENV
+            export FLAVOR="<< parameters.flavor >>"
+            if [ << parameters.only-smoke-tests >> = "true" ]; then
+              gradletask="create${FLAVOR^}DebugCoverageReport"
+            else
+              gradletask="connectedGmsDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.annotation=org.owntracks.android.testutils.SmokeTest"
+            fi
+            echo "export GRADLE_TEST_COMMAND=\"./gradlew $gradletask --scan --no-daemon --max-workers 2\"" >> $BASH_ENV
             source $BASH_ENV
             echo "Gradle test command: $GRADLE_TEST_COMMAND"
 
@@ -200,56 +299,29 @@ jobs:
             else
               image_type="default"
             fi
-            echo "export SYSTEM_IMAGE=\"system-images;android-29;$image_type;x86_64\"" >> $BASH_ENV
+            echo "export SYSTEM_IMAGE=\"system-images;android-<< parameters.android-api-version >>;$image_type;x86_64\"" >> $BASH_ENV
             # Debug only
             source $BASH_ENV
             echo "Emulator system image: $SYSTEM_IMAGE"
 
       - run-andoid-emulator-and-tests
       - save-gradle-cache
-      - store_test_results:
-          path: project/app/build/outputs/androidTest-results/connected/flavors/<< parameters.flavor >>/
-      - persist_to_workspace:
-          root: project/app/build/
-          paths:
-            - reports/coverage/androidTest/<< parameters.flavor >>/debug/report.xml
-      - store_artifacts:
-          path: project/app/build/reports/androidTests
-          destination: espresso-report-<< parameters.flavor >>
-      - codecov/upload:
-          file: reports/coverage/**/report.xml
-          flags: uitests
-
-  smoke-test:
-    parameters:
-      android-api-version:
-        type: string
-        default: "29"
-    executor: android-machine
-    resource_class: large
-    environment:
-      GRADLE_OPTS: "-Dkotlin.compiler.execution.strategy=in-process"
-    steps:
-      - checkout
-      - android/accept-licenses
-      - android/change-java-version:
-          java-version: << pipeline.parameters.jdk-version >>
-      - restore-gradle-cache
-      - run:
-          name: Prepare parameterised test command
-          command: |
-            echo "export GRADLE_TEST_COMMAND=\"./gradlew connectedGmsDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.annotation=org.owntracks.android.testutils.SmokeTest --scan --no-daemon --max-workers 2\"" >> $BASH_ENV
-            source $BASH_ENV
-            echo "Gradle test command: $GRADLE_TEST_COMMAND"
-
-      - run:
-          name: Prepare parameterised system image
-          command: |
-            echo "export SYSTEM_IMAGE=\"system-images;android-<< parameters.android-api-version >>;google_apis;x86_64\"" >> $BASH_ENV
-            # Debug only
-            source $BASH_ENV
-            echo "Emulator system image: $SYSTEM_IMAGE"
-      - run-andoid-emulator-and-tests
+      - when:
+          condition:
+            not: << parameters.only-smoke-tests >>
+          steps:
+            - store_test_results:
+                path: project/app/build/outputs/androidTest-results/connected/flavors/<< parameters.flavor >>/
+            - persist_to_workspace:
+                root: project/app/build/
+                paths:
+                  - reports/coverage/androidTest/<< parameters.flavor >>/debug/report.xml
+            - store_artifacts:
+                path: project/app/build/reports/androidTests
+                destination: espresso-report-<< parameters.flavor >>
+            - codecov/upload:
+                file: reports/coverage/**/report.xml
+                flags: uitests
 
   publish-to-play-store:
     executor: android-docker
@@ -278,56 +350,10 @@ jobs:
       - store_artifacts:
           path: project/app/build/outputs/apk/oss/release/app-oss-release.apk
           destination: oss-apk
-
-workflows:
-  evaluate-oss-contribution:
-    when: << pipeline.parameters.oss-contribution-flow >>
-    jobs:
-      - build
-      - unit-test:
-          requires:
-            - build
-      - lint:
-          requires:
-            - build
-      - fdroid-scanner:
-          requires:
-            - build
-      - smoke-test:
-          requires:
-            - build
-
-  build-and-test:
-    when:
-      not: << pipeline.parameters.oss-contribution-flow >>
-    jobs:
-      - build:
-          context: Android Deploy Credentials
-      - fdroid-scanner:
-          requires:
-            - build
-      - unit-test:
-          requires:
-            - build
-      - lint:
-          requires:
-            - build
-      - ui-tests:
-          matrix:
-            parameters:
-              flavor:
-                - oss
-                - gms
-          name: <<matrix.flavor>>-ui-tests
-          requires:
-            - lint
-            - unit-test
-            - build
-      - publish-to-play-store:
-          context: Android Deploy Credentials
-          requires:
-            - oss-ui-tests
-            - gms-ui-tests
-          filters:
-            branches:
-              only: master
+  # Stub job that allows us to gate GH PRs on either inegration or smoke test complete
+  pr-test-complete:
+    docker:
+      - image: cimg/base:stable
+    resource_class: small
+    steps:
+      - run: echo "done"
