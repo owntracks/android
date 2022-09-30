@@ -64,7 +64,8 @@ workflows:
   smoke-test:
     when: << pipeline.parameters.smoke-test-required >>
     jobs:
-      - unit-test
+      - unit-test:
+          upload-coverage: false
       - ui-tests:
           flavor: gms
           parallelism: 1
@@ -79,7 +80,8 @@ workflows:
   integration-test:
     when: << pipeline.parameters.integration-test-required >>
     jobs:
-      - unit-test
+      - unit-test:
+          upload-coverage: false
       - ui-tests:
           matrix:
             parameters:
@@ -215,6 +217,10 @@ jobs:
             fdroidserver scanner project/app/build/outputs/apk/app-oss-release.apk
 
   unit-test:
+    parameters:
+      upload-coverage:
+        type: boolean
+        default: true
     executor: android-docker
     resource_class: large
     steps:
@@ -233,9 +239,12 @@ jobs:
           root: project/app/build/
           paths:
             - jacoco/jacoco.xml
-      - codecov/upload:
-          file: project/app/build/jacoco/jacoco.xml
-          flags: unittests
+      - when:
+          condition: << parameters.upload-coverage >>
+          steps:
+            - codecov/upload:
+                file: project/app/build/jacoco/jacoco.xml
+                flags: unittests
 
   lint:
     executor: android-docker
