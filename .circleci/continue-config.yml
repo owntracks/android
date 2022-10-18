@@ -293,9 +293,9 @@ jobs:
           command: |
             export FLAVOR="<< parameters.flavor >>"
             if [ << parameters.only-smoke-tests >> = "true" ]; then
-              gradletask="create${FLAVOR^}DebugCoverageReport"
-            else
               gradletask="connectedGmsDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.annotation=org.owntracks.android.testutils.SmokeTest"
+            else
+              gradletask="create${FLAVOR^}DebugCoverageReport"
             fi
             echo "export GRADLE_TEST_COMMAND=\"./gradlew $gradletask --scan --no-daemon --max-workers 2\"" >> $BASH_ENV
             source $BASH_ENV
@@ -321,13 +321,13 @@ jobs:
             not: << parameters.only-smoke-tests >>
           steps:
             - store_test_results:
-                path: project/app/build/outputs/androidTest-results/connected/flavors/<< parameters.flavor >>/
+                path: app/build/outputs/androidTest-results/connected/flavors/<< parameters.flavor >>/
             - persist_to_workspace:
-                root: project/app/build/
+                root: app/build/
                 paths:
                   - reports/coverage/androidTest/<< parameters.flavor >>/debug/report.xml
             - store_artifacts:
-                path: project/app/build/reports/androidTests
+                path: /home/circleci/project/project/app/build/reports/androidTests
                 destination: espresso-report-<< parameters.flavor >>
             - codecov/upload:
                 file: reports/coverage/**/report.xml
