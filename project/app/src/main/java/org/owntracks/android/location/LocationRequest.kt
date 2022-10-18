@@ -6,7 +6,7 @@ data class LocationRequest(
     var numUpdates: Int? = null,
     var expirationDuration: Long? = null,
     var priority: Int = PRIORITY_BALANCED_POWER_ACCURACY,
-    var interval: Long? = null,
+    val interval: Long,
     var waitForAccurateLocation: Boolean? = null,
 ) {
     companion object {

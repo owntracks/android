@@ -40,7 +40,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.jetbrains.annotations.NotNull;
-import org.owntracks.android.BuildConfig;
 import org.owntracks.android.R;
 import org.owntracks.android.data.EndpointState;
 import org.owntracks.android.data.WaypointModel;
@@ -531,11 +530,14 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
             return;
         }
 
-        LocationRequest request = new LocationRequest();
-
-        request.setNumUpdates(1);
-        request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        request.setExpirationDuration(TimeUnit.MINUTES.toMillis(1));
+        LocationRequest request = new LocationRequest(
+                null,
+                null,
+                1,
+                TimeUnit.MINUTES.toMillis(1),
+                LocationRequest.PRIORITY_HIGH_ACCURACY,
+                1,
+                null);
 
         Timber.d("On demand location request");
 
@@ -554,28 +556,33 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
         }
         MonitoringMode monitoring = preferences.getMonitoring();
 
-        LocationRequest request = new LocationRequest();
+
+        Long interval = null;
+        Long fastestInterval = null;
+        Float smallestDisplacement = null;
+        Integer priority = null;
 
         switch (monitoring) {
             case QUIET:
             case MANUAL:
-                request.setInterval(TimeUnit.SECONDS.toMillis(preferences.getLocatorInterval()));
-                request.setSmallestDisplacement((float) preferences.getLocatorDisplacement());
-                request.setPriority(LocationRequest.PRIORITY_LOW_POWER);
+                interval = TimeUnit.SECONDS.toMillis(preferences.getLocatorInterval());
+                smallestDisplacement = (float) preferences.getLocatorDisplacement();
+                priority = LocationRequest.PRIORITY_LOW_POWER;
                 break;
             case SIGNIFICANT:
-                request.setInterval(TimeUnit.SECONDS.toMillis(preferences.getLocatorInterval()));
-                request.setSmallestDisplacement((float) preferences.getLocatorDisplacement());
-                request.setPriority(getLocationRequestPriority());
+                interval = TimeUnit.SECONDS.toMillis(preferences.getLocatorInterval());
+                smallestDisplacement = (float) preferences.getLocatorDisplacement();
+                priority = getLocationRequestPriority();
                 break;
             case MOVE:
-                request.setInterval(TimeUnit.SECONDS.toMillis(preferences.getMoveModeLocatorInterval()));
-                request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+                interval = TimeUnit.SECONDS.toMillis(preferences.getMoveModeLocatorInterval());
+                priority = LocationRequest.PRIORITY_HIGH_ACCURACY;
                 break;
         }
         if (preferences.getPegLocatorFastestIntervalToInterval()) {
-            request.setFastestInterval(request.getInterval());
+            fastestInterval = interval;
         }
+        LocationRequest request = new LocationRequest(fastestInterval, smallestDisplacement, null, null, priority, interval, null);
         Timber.d("location update request params: %s", request);
         locationProviderClient.flushLocations();
         locationProviderClient.requestLocationUpdates(request, locationCallback, runThingsOnOtherThreads.getBackgroundLooper());
