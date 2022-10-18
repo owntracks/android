@@ -3,6 +3,7 @@ package org.owntracks.android.gms.location.geofencing
 import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
+import com.google.android.gms.location.LocationServices
 import org.owntracks.android.location.geofencing.GeofencingClient
 import org.owntracks.android.location.geofencing.GeofencingRequest
 
@@ -19,7 +20,7 @@ class GMSGeofencingClient(private val geofencingClient: com.google.android.gms.l
 
     companion object {
         fun create(context: Context): GeofencingClient {
-            return GMSGeofencingClient(com.google.android.gms.location.GeofencingClient(context))
+            return GMSGeofencingClient(LocationServices.getGeofencingClient(context))
         }
     }
 }

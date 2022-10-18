@@ -11,14 +11,15 @@ fun LocationRequest.toGMSLocationRequest(): com.google.android.gms.location.Loca
         LocationRequest.PRIORITY_NO_POWER -> Priority.PRIORITY_LOW_POWER
         else -> Priority.PRIORITY_BALANCED_POWER_ACCURACY
     }
-    val gmsLocationRequest = com.google.android.gms.location.LocationRequest
-        .create()
-        .setPriority(gmsPriority)
-    interval?.run { gmsLocationRequest.interval = this }
-    numUpdates?.run { gmsLocationRequest.numUpdates = this }
-    expirationDuration?.run { gmsLocationRequest.setExpirationDuration(this) }
-    smallestDisplacement?.run { gmsLocationRequest.smallestDisplacement = this }
-    fastestInterval?.run { gmsLocationRequest.fastestInterval = this }
-    waitForAccurateLocation?.run { gmsLocationRequest.isWaitForAccurateLocation = this }
-    return gmsLocationRequest
+
+    val gmsLocationRequestBuilder =
+        com.google.android.gms.location.LocationRequest.Builder(gmsPriority, interval)
+
+    numUpdates?.run(gmsLocationRequestBuilder::setMaxUpdates)
+    expirationDuration?.run(gmsLocationRequestBuilder::setDurationMillis)
+    smallestDisplacement?.run(gmsLocationRequestBuilder::setMinUpdateDistanceMeters)
+    fastestInterval?.run(gmsLocationRequestBuilder::setMinUpdateIntervalMillis)
+    waitForAccurateLocation?.run(gmsLocationRequestBuilder::setWaitForAccurateLocation)
+
+    return gmsLocationRequestBuilder.build()
 }
