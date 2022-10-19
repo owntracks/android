@@ -214,7 +214,8 @@ jobs:
       - run:
           name: Fdroid Scanner
           command: |
-            fdroidserver scanner project/app/build/outputs/apk/app-oss-release.apk
+            find -name *.apk
+            /usr/local/bin/fdroid scanner project/app/build/outputs/apk/app-oss-release.apk
 
   unit-test:
     parameters:
