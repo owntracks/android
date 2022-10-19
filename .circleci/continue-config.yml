@@ -235,10 +235,6 @@ jobs:
             ./project/gradlew -p ./project jacocoTestGmsReleaseUnitTestReport --scan
       - store_test_results:
           path: project/app/build/test-results/testGmsReleaseUnitTest
-      - persist_to_workspace:
-          root: project/app/build/
-          paths:
-            - jacoco/jacoco.xml
       - when:
           condition: << parameters.upload-coverage >>
           steps:
@@ -321,13 +317,9 @@ jobs:
             not: << parameters.only-smoke-tests >>
           steps:
             - store_test_results:
-                path: app/build/outputs/androidTest-results/connected/flavors/<< parameters.flavor >>/
-            - persist_to_workspace:
-                root: app/build/
-                paths:
-                  - reports/coverage/androidTest/<< parameters.flavor >>/debug/report.xml
+                path: project/app/build/outputs/androidTest-results/connected/flavors/<< parameters.flavor >>/
             - store_artifacts:
-                path: /home/circleci/project/project/app/build/reports/androidTests
+                path: project/app/build/reports/androidTests
                 destination: espresso-report-<< parameters.flavor >>
             - codecov/upload:
                 file: reports/coverage/**/report.xml
