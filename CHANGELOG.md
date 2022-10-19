@@ -4,6 +4,8 @@
 
 ### New features
 
+- When displayed, LanLngs now are limited to 6 significant figures, because more precision than that is a bit silly (#1278, #1279)
+
 ### Bug fixes
 
 ## Version 2.4.10
