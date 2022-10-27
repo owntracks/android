@@ -29,6 +29,14 @@ jobs:
     resource_class: small
     steps:
       - checkout
+      - run:
+          name: Debug
+          command: |
+            echo "GHA_Actor: << pipeline.parameters.GHA_Actor >>"
+            echo "GHA_Action: << pipeline.parameters.GHA_Action >>"
+            echo "GHA_Event: << pipeline.parameters.GHA_Event >>"
+            echo "GHA_Meta: << pipeline.parameters.GHA_Meta >>"
+
       - path-filtering/set-parameters:
           base-revision: master
           output-path: /tmp/pipeline-params.json
