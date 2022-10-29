@@ -2,19 +2,20 @@ package org.owntracks.android.gms.location
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
+import com.google.android.gms.location.Priority
+import java.util.concurrent.TimeUnit
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.location.LocationRequest
-import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
 class LocationRequestGMSConversion {
 
     @Test
-    fun canConvertLocationRequestToGMS() {
-        val locationRequest = LocationRequest(
+    fun canConvertLocationRequestToGMS() =
+        LocationRequest(
             fastestInterval = 1_000,
             smallestDisplacement = 50f,
             numUpdates = 50,
@@ -22,30 +23,32 @@ class LocationRequestGMSConversion {
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY,
             interval = 30_000
         )
-
-        val gmsLocationRequest = locationRequest.toGMSLocationRequest()
-        assertEquals(1000, gmsLocationRequest.fastestInterval)
-        assertEquals(30_000, gmsLocationRequest.interval)
-        assertEquals(50, gmsLocationRequest.numUpdates)
-        assertEquals(
-            com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY,
-            gmsLocationRequest.priority
-        )
-        assertEquals(50f, gmsLocationRequest.smallestDisplacement)
-        assertTrue(gmsLocationRequest.isFastestIntervalExplicitlySet)
-    }
+            .toGMSLocationRequest()
+            .run {
+                assertEquals(1_000, minUpdateIntervalMillis)
+                assertEquals(30_000, intervalMillis)
+                assertEquals(50, maxUpdates)
+                assertEquals(TimeUnit.MINUTES.toMillis(2), durationMillis)
+                assertEquals(Priority.PRIORITY_HIGH_ACCURACY, priority)
+                assertEquals(50f, minUpdateDistanceMeters)
+            }
 
     @Test
     fun canConvertLocationRequestToGMSWithoutFastestIntervalSet() {
-        val locationRequest = LocationRequest(
+        LocationRequest(
             smallestDisplacement = 50f,
             numUpdates = 50,
             expirationDuration = TimeUnit.MINUTES.toMillis(2),
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY,
             interval = 30_000
         )
-
-        val gmsLocationRequest = locationRequest.toGMSLocationRequest()
-        assertFalse(gmsLocationRequest.isFastestIntervalExplicitlySet)
+            .toGMSLocationRequest()
+            .run {
+                assertEquals(30_000, minUpdateIntervalMillis)
+                assertEquals(50, maxUpdates)
+                assertEquals(Priority.PRIORITY_HIGH_ACCURACY, priority)
+                assertEquals(TimeUnit.MINUTES.toMillis(2), durationMillis)
+                assertEquals(50f, minUpdateDistanceMeters)
+            }
     }
 }
