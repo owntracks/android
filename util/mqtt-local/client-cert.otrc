@@ -1,0 +1,14 @@
+{
+  "_type" : "configuration",
+  "clientId" : "testemulator64x8664arm64",
+  "deviceId" : "emulator64x8664arm64",
+  "host" : "10.0.2.2",
+  "password" : "test",
+  "port" : 8883,
+  "tls" : true,
+  "tlsCaCrt" : "rootCA.pem",
+  "tlsClientCrt" : "toot-client.p12",
+  "tlsClientCrtPassword" : "changeit",
+  "username" : "test",
+  "ws" : false
+}
