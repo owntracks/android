@@ -4,6 +4,8 @@
 
 ### New features
 
+- The config editor text is now selectable
+
 ### Bug fixes
 
 ## Version 2.4.10

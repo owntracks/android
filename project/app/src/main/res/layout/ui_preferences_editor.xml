@@ -28,7 +28,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="@dimen/default_spacing"
-                android:text="@{vm.effectiveConfiguration, default=Configuration}" />
+                android:text="@{vm.effectiveConfiguration, default=Configuration}"
+                android:textIsSelectable="true" />
 
         </ScrollView>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
