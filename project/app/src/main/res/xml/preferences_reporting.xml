@@ -8,9 +8,9 @@
         app:summary="@string/preferencesPubExtendedDataSummary"
         app:title="@string/preferencesPubExtendedData" />
     <androidx.preference.SwitchPreferenceCompat
-        app:defaultValue="@bool/valRepublishOnRecconect"
+        app:defaultValue="@bool/valPublishLocationOnConnect"
         app:iconSpaceReserved="false"
-        app:key="@string/preferenceKeyRepublishOnReconnect"
+        app:key="@string/preferenceKeyPublishLocationOnConnect"
         app:summary="@string/preferencesRepublishOnRecconectSummary"
         app:title="@string/preferencesRepublishOnRecconect" />
 </PreferenceScreen>

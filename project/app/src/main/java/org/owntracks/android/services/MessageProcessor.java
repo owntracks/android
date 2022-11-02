@@ -196,7 +196,7 @@ public class MessageProcessor {
                 break;
             case MessageProcessorEndpointMqtt.MODE_ID:
             default:
-                this.endpoint = new MessageProcessorEndpointMqtt(this, this.parser, this.preferences, this.scheduler, this.eventBus, this.runThingsOnOtherThreads, this.applicationContext);
+                this.endpoint = new MessageProcessorEndpointMqtt(this, this.parser, this.preferences, this.scheduler, this.eventBus, this.runThingsOnOtherThreads, this.applicationContext, this.locationProcessorLazy.get());
 
         }
 
@@ -326,6 +326,10 @@ public class MessageProcessor {
         Timber.w("Exiting outgoingmessage loop");
     }
 
+    /**
+     * Resets the retry backoff timer back to the initial value, because we've most likely had a
+     * reconnection event.
+     */
     public void resetMessageSleepBlock() {
         if (waitFuture != null && waitFuture.cancel(false)) {
             Timber.d("Resetting message send loop wait. Thread: %s", Thread.currentThread());

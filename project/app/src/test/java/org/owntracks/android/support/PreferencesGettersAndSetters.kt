@@ -459,7 +459,7 @@ class PreferencesGettersAndSetters(
                 on { getString(eq(R.string.preferenceKeyPubTopicBase)) } doReturn "pubTopicBase"
                 on { getString(eq(R.string.preferenceKeyRemoteCommand)) } doReturn "cmd"
                 on { getString(eq(R.string.preferenceKeyRemoteConfiguration)) } doReturn "remoteConfiguration"
-                on { getString(eq(R.string.preferenceKeyRepublishOnReconnect)) } doReturn "republishOnReconnect"
+                on { getString(eq(R.string.preferenceKeyPublishLocationOnConnect)) } doReturn "republishOnReconnect"
                 on { getString(eq(R.string.preferenceKeyReverseGeocodeProvider)) } doReturn "reverseGeocodeProvider"
                 on { getString(eq(R.string.preferenceKeySetupNotCompleted)) } doReturn "setupNotCompleted"
                 on { getString(eq(R.string.preferenceKeySub)) } doReturn "sub"

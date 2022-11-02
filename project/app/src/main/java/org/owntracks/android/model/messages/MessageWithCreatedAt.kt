@@ -1,6 +1,7 @@
 package org.owntracks.android.model.messages
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import kotlin.time.Duration.Companion.milliseconds
 
 interface MessageWithCreatedAt {
     @get:JsonProperty("created_at")
@@ -16,5 +17,5 @@ interface Clock {
 }
 
 class RealClock : Clock {
-    override val time: Long = java.util.concurrent.TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis())
+    override val time: Long = System.currentTimeMillis().milliseconds.inWholeSeconds
 }
