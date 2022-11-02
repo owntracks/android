@@ -214,6 +214,8 @@ dependencies {
     implementation(libs.apache.httpcore)
     implementation(libs.commons.codec)
 
+    implementation(libs.bouncycastle)
+
     // Widget libraries
     implementation(libs.widgets.materialedittext)
     implementation(libs.widgets.materialdrawer) { artifact { type = "aar" } }

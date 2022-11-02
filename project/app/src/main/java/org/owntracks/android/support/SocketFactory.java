@@ -8,6 +8,7 @@ import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.Security;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -113,7 +114,7 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
         if (options.hasClientP12Crt()) {
             Timber.v("options.hasClientP12Crt(): true");
 
-            KeyStore clientKeyStore = KeyStore.getInstance("PKCS12");
+            KeyStore clientKeyStore = KeyStore.getInstance("PKCS12", Security.getProvider("BC"));
 
             clientKeyStore.load(options.getCaClientP12InputStream(), options.hasClientP12Password() ? options.getCaClientP12Password().toCharArray() : new char[0]);
             kmf.init(clientKeyStore, options.hasClientP12Password() ? options.getCaClientP12Password().toCharArray() : new char[0]);

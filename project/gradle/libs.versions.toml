@@ -45,6 +45,7 @@ materialdrawer = "6.1.2"
 preferencex = "1.1.0"
 r8 = "3.3.75"
 guava = "31.1-jre"
+bouncycastle = "1.72"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -95,7 +96,6 @@ androidx-test-orchestrator = { module = "androidx.test:orchestrator", version.re
 androidx-test-espresso-idling = { module = "androidx.test.espresso:espresso-idling-resource", version.ref = "androidx-test-espresso" }
 
 osmdroid = { module = "org.osmdroid:osmdroid-android", version.ref = "osmdroid" }
-conscrypt = { module = "org.conscrypt:conscrypt-android", version.ref = "conscrypt" }
 google-material = { module = "com.google.android.material:material", version.ref = "google-material" }
 eventbus = { module = "org.greenrobot:eventbus", version.ref = "eventbus" }
 eventbus-annotationprocessor = { module = "org.greenrobot:eventbus-annotation-processor", version.ref = "eventbus" }
@@ -118,6 +118,9 @@ square-leakcanary = { module = "com.squareup.leakcanary:leakcanary-android-instr
 
 r8 = { module = "com.android.tools:r8", version.ref = "r8" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
+
+conscrypt = { module = "org.conscrypt:conscrypt-android", version.ref = "conscrypt" }
+bouncycastle = { module = "org.bouncycastle:bcpkix-jdk15to18", version.ref = "bouncycastle" }
 
 [bundles]
 jackson = ["jackson-core", "jackson-databind", "jackson-module-kotlin", "jackson-datatype-jsr310", "jackson-threetenbp", "threetenbp"]
