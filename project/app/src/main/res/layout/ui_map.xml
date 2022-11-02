@@ -52,9 +52,9 @@
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/mapFragment"
-            android:layout_marginTop="?attr/actionBarSize"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:layout_marginTop="?attr/actionBarSize" />
 
 
         <androidx.appcompat.widget.LinearLayoutCompat
@@ -94,12 +94,14 @@
                     android:paddingEnd="12dp">
 
                     <include
+                        android:id="@+id/contactDetailsAccuracy"
                         layout="@layout/ui_contactsheet_parameter"
                         app:icon="@{@drawable/ic_baseline_my_location_24}"
                         app:label="@{@string/contactDetailsAccuracy}"
                         app:textValue="@{String.format(@string/contactDetailsAccuracyValue,vm.currentContact.messageLocation.accuracy)}" />
 
                     <include
+                        android:id="@+id/contactDetailsAltitude"
                         layout="@layout/ui_contactsheet_parameter"
                         app:icon="@{@drawable/ic_baseline_airplanemode_active_24}"
                         app:label="@{@string/contactDetailsAltitude}"
@@ -116,12 +118,14 @@
                     android:paddingEnd="12dp">
 
                     <include
+                        android:id="@+id/contactDetailsBattery"
                         layout="@layout/ui_contactsheet_parameter"
                         app:icon="@{@drawable/ic_baseline_battery_std_24}"
                         app:label="@{@string/contactDetailsBattery}"
                         app:textValue="@{String.format(@string/contactDetailsBatteryValue,vm.currentContact.messageLocation.battery)}" />
 
                     <include
+                        android:id="@+id/contactDetailsSpeed"
                         layout="@layout/ui_contactsheet_parameter"
                         app:icon="@{@drawable/ic_baseline_speed_24}"
                         app:label="@{@string/contactDetailsSpeed}"
@@ -140,12 +144,14 @@
                     android:visibility="@{vm.currentLocation!=null ? View.VISIBLE : View.GONE}">
 
                     <include
+                        android:id="@+id/contactDetailsDistance"
                         layout="@layout/ui_contactsheet_parameter"
                         app:icon="@{@drawable/ic_baseline_architecture_24}"
                         app:label="@{@string/contactDetailsDistance}"
                         app:textValue="@{String.format(@string/contactDetailsDistanceValue, vm.contactDistance > 1000f ? (vm.contactDistance / 1000) : vm.contactDistance, vm.contactDistance > 1000f ? @string/contactDetailsDistanceUnitKilometres : @string/contactDetailsDistanceUnitMeters)}" />
 
                     <include
+                        android:id="@+id/contactDetailsBearing"
                         layout="@layout/ui_contactsheet_parameter"
                         app:icon="@{@drawable/ic_baseline_arrow_upward_24}"
                         app:iconRotation="@{vm.relativeContactBearing}"

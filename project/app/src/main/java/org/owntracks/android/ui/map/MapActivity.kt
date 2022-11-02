@@ -1,7 +1,12 @@
 package org.owntracks.android.ui.map
 
-import android.Manifest.permission.*
-import android.content.*
+import android.Manifest.permission.ACCESS_COARSE_LOCATION
+import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.content.ActivityNotFoundException
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.net.Uri
@@ -10,11 +15,12 @@ import android.os.Bundle
 import android.os.IBinder
 import android.provider.Settings
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import androidx.activity.OnBackPressedCallback
+import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.VisibleForTesting
@@ -33,13 +39,13 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 import org.owntracks.android.BR
 import org.owntracks.android.R
 import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.databinding.UiMapBinding
 import org.owntracks.android.geocoding.GeocoderProvider
-import org.owntracks.android.location.toLatLng
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.services.BackgroundService.BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG
@@ -55,7 +61,6 @@ import org.owntracks.android.ui.mixins.ServiceStarter
 import org.owntracks.android.ui.mixins.WorkManagerInitExceptionNotifier
 import org.owntracks.android.ui.welcome.WelcomeActivity
 import timber.log.Timber
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MapActivity :
@@ -107,6 +112,9 @@ class MapActivity :
         }
     }
 
+    private var onBottomSheetLabelTextSizeChangedListener:
+            AutoResizingTextViewWithListener.OnTextSizeChangedListener? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         EntryPointAccessors.fromActivity(
             this,
@@ -155,6 +163,33 @@ class MapActivity :
                     "layerBottomSheetDialog"
                 )
             }
+
+            val labels = listOf(
+                R.id.contactDetailsAccuracy,
+                R.id.contactDetailsAltitude,
+                R.id.contactDetailsBattery,
+                R.id.contactDetailsBearing,
+                R.id.contactDetailsSpeed,
+                R.id.contactDetailsDistance
+            )
+                .map { binding.bottomSheetLayout.findViewById<View>(it) }
+                .map { it.findViewById<AutoResizingTextViewWithListener>(R.id.label) }
+
+            onBottomSheetLabelTextSizeChangedListener =
+                object : AutoResizingTextViewWithListener.OnTextSizeChangedListener {
+                    override fun onTextSizeChanged(view: View, newSize: Float) {
+                        labels
+                            .filter { it != view }
+                            .filter { it.textSize > newSize || it.configurationChangedFlag }
+                            .forEach {
+                                it.setAutoSizeTextTypeUniformWithPresetSizes(
+                                    intArrayOf(newSize.toInt()),
+                                    TypedValue.COMPLEX_UNIT_PX
+                                )
+                                it.configurationChangedFlag = false
+                            }
+                    }
+                }.also { listener -> labels.forEach { it.withListener(listener) } }
         }
 
         locationLifecycleObserver = LocationLifecycleObserver(activityResultRegistry)
@@ -204,33 +239,6 @@ class MapActivity :
             .cancel(BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG, 0)
 
         notifyOnWorkManagerInitFailure(this)
-
-        onBackPressedDispatcher.addCallback(this , object: OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                if (bottomSheetBehavior == null) {
-                    finish()
-                } else {
-                    when (bottomSheetBehavior?.state) {
-                        BottomSheetBehavior.STATE_HIDDEN -> finish()
-                        BottomSheetBehavior.STATE_COLLAPSED -> {
-                            setBottomSheetHidden()
-                        }
-                        BottomSheetBehavior.STATE_DRAGGING -> {
-                            // Noop
-                        }
-                        BottomSheetBehavior.STATE_EXPANDED -> {
-                            setBottomSheetCollapsed()
-                        }
-                        BottomSheetBehavior.STATE_HALF_EXPANDED -> {
-                            setBottomSheetCollapsed()
-                        }
-                        BottomSheetBehavior.STATE_SETTLING -> {
-                            // Noop
-                        }
-                    }
-                }
-            }
-        })
     }
 
     internal fun checkAndRequestMyLocationCapability(explicitUserAction: Boolean): Boolean =
@@ -256,8 +264,12 @@ class MapActivity :
                         .setIcon(R.drawable.ic_baseline_location_disabled_24)
                         .setTitle(getString(R.string.deviceLocationDisabledDialogTitle))
                         .setMessage(getString(R.string.deviceLocationDisabledDialogMessage))
-                        .setPositiveButton(getString(R.string.deviceLocationDisabledDialogPositiveButtonLabel)) { _, _ ->
-                            locationServicesLauncher.launch(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                        .setPositiveButton(
+                            getString(R.string.deviceLocationDisabledDialogPositiveButtonLabel)
+                        ) { _, _ ->
+                            locationServicesLauncher.launch(
+                                Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                            )
                         }
                         .setNegativeButton(android.R.string.cancel) { _, _ ->
                             preferences.userDeclinedEnableLocationServices = true
@@ -290,7 +302,9 @@ class MapActivity :
                                 MaterialAlertDialogBuilder(this)
                                     .setCancelable(true)
                                     .setIcon(R.drawable.ic_baseline_location_disabled_24)
-                                    .setTitle(getString(R.string.locationPermissionRequestDialogTitle))
+                                    .setTitle(
+                                        getString(R.string.locationPermissionRequestDialogTitle)
+                                    )
                                     .setMessage(R.string.locationPermissionRequestDialogMessage)
                                     .setPositiveButton(
                                         android.R.string.ok
@@ -579,6 +593,31 @@ class MapActivity :
             popupMenu.menu.removeItem(R.id.menu_navigate)
         }
         popupMenu.show()
+    }
+
+    override fun onBackPressed() {
+        if (bottomSheetBehavior == null) {
+            super.onBackPressed()
+        } else {
+            when (bottomSheetBehavior?.state) {
+                BottomSheetBehavior.STATE_HIDDEN -> super.onBackPressed()
+                BottomSheetBehavior.STATE_COLLAPSED -> {
+                    setBottomSheetHidden()
+                }
+                BottomSheetBehavior.STATE_DRAGGING -> {
+                    // Noop
+                }
+                BottomSheetBehavior.STATE_EXPANDED -> {
+                    setBottomSheetCollapsed()
+                }
+                BottomSheetBehavior.STATE_HALF_EXPANDED -> {
+                    setBottomSheetCollapsed()
+                }
+                BottomSheetBehavior.STATE_SETTLING -> {
+                    // Noop
+                }
+            }
+        }
     }
 
     override fun onStart() {
