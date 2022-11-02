@@ -9,6 +9,7 @@
 ### Bug fixes
 
 - Labels on the contact sheet should all be the same size as each other (#1277)
+
 ## Version 2.4.10
 
 ### New features
