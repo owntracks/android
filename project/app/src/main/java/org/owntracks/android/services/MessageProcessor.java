@@ -459,9 +459,6 @@ public class MessageProcessor {
                     }
                     reconnect();
                     break;
-                case RESTART:
-                    eventBus.post(new Events.RestartApp());
-                    break;
                 default:
                     break;
             }

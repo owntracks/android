@@ -234,7 +234,6 @@
     <string name="region_inside">"Сейчас в этом месте"</string>
     <string name="region_outside">"Сейчас вне этого места"</string>
     <string name="region_unknown">"Статус неизвестен"</string>
-    <string name="restart">"Перезапустить"</string>
     <string name="save">"Сохранить"</string>
     <string name="seconds">"Секунд"</string>
     <string name="select">"Выбрать"</string>

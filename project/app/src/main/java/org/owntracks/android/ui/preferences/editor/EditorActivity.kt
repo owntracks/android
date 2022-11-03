@@ -14,11 +14,9 @@ import com.google.android.material.snackbar.Snackbar
 import com.rengwuxian.materialedittext.MaterialAutoCompleteTextView
 import com.rengwuxian.materialedittext.MaterialEditText
 import dagger.hilt.android.AndroidEntryPoint
-import org.greenrobot.eventbus.EventBus
 import org.owntracks.android.BuildConfig
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiPreferencesEditorBinding
-import org.owntracks.android.support.Events.RestartApp
 import org.owntracks.android.ui.base.BaseActivity
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import timber.log.Timber
@@ -30,9 +28,6 @@ class EditorActivity :
     BaseActivity<UiPreferencesEditorBinding?, EditorMvvm.ViewModel<EditorMvvm.View?>?>(),
     EditorMvvm.View {
     private var configExportUri: Uri? = null
-
-    @Inject
-    lateinit var eventBus: EventBus
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,10 +56,6 @@ class EditorActivity :
             R.id.importConfigurationSingleValue -> {
                 showEditorView()
                 return true
-            }
-            R.id.restart -> {
-                eventBus.post(RestartApp())
-                return false
             }
             else -> return false
         }

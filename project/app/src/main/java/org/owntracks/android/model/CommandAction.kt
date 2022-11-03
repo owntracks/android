@@ -9,7 +9,6 @@ enum class CommandAction(val value: String) {
     REPORT_LOCATION("reportLocation"),
     SET_WAYPOINTS("setWaypoints"),
     SET_CONFIGURATION("setConfiguration"),
-    RESTART("restart"),
     RECONNECT("reconnect"),
     WAYPOINTS("waypoints");
 

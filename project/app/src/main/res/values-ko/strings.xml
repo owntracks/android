@@ -212,7 +212,6 @@
     <string name="region_inside">"범위 내에 있습니다"</string>
     <string name="region_outside">"범위를 벗어났습니다"</string>
     <string name="region_unknown">"상태 알 수 없음"</string>
-    <string name="restart">"다시 시작"</string>
     <string name="save">"저장"</string>
     <string name="seconds">"초"</string>
     <string name="select">"선택"</string>

@@ -209,7 +209,6 @@ dependencies {
 
     implementation(libs.bundles.jackson)
     implementation(libs.square.tape2)
-    implementation(libs.processphoenix)
     implementation(libs.timber)
     implementation(libs.libsodium)
     implementation(libs.apache.httpcore)

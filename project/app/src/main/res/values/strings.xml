@@ -228,7 +228,6 @@ To allow this, please enable Location in the device settings."</string>
     <string name="region_inside">"Currently inside"</string>
     <string name="region_outside">"Currently outside"</string>
     <string name="region_unknown">"Status unknown"</string>
-    <string name="restart">"Restart"</string>
     <string name="save">"Save"</string>
     <string name="seconds">"Seconds"</string>
     <string name="select">"Select"</string>

@@ -38,7 +38,6 @@ timber = "5.0.1"
 square-tape2 = "2.0.0-beta1"
 apache-httpcore = "5.1.4"
 commons-codec = "1.15"
-process-phoenix = "2.1.2"
 libsodium = "2.0.2"
 materialedittext = "2.1.4"
 materialize = "1.2.1"
@@ -103,7 +102,6 @@ eventbus-annotationprocessor = { module = "org.greenrobot:eventbus-annotation-pr
 paho-mqttclient = { module = "org.eclipse.paho:org.eclipse.paho.client.mqttv3", version.ref = "paho-mqtt" }
 apache-httpcore = { module = "org.apache.httpcomponents.core5:httpcore5", version.ref = "apache-httpcore" }
 commons-codec = { module = "commons-codec:commons-codec", version.ref = "commons-codec" }
-processphoenix = { module = "com.jakewharton:process-phoenix", version.ref = "process-phoenix" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 square-tape2 = { module = "com.squareup.tape2:tape", version.ref = "square-tape2" }
 libsodium = { module = "com.github.joshjdevl.libsodiumjni:libsodium-jni-aar", version.ref = "libsodium" }

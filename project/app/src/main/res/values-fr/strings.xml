@@ -184,7 +184,6 @@
     <!-- Fuzzy -->
     <string name="region_outside">"Actuellement à l'extérieur"</string>
     <string name="region_unknown">"Statut inconnu"</string>
-    <string name="restart">"Redémarrer"</string>
     <string name="save">"Sauvegarder"</string>
     <string name="seconds">"Secondes"</string>
     <string name="select">"Sélectionner"</string>

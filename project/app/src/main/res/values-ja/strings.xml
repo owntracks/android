@@ -194,7 +194,6 @@
     <string name="region_inside">"範囲内にいます"</string>
     <string name="region_outside">"範囲外にいます"</string>
     <string name="region_unknown">"ステータス不明"</string>
-    <string name="restart">"再起動"</string>
     <string name="save">"保存"</string>
     <string name="seconds">"秒"</string>
     <string name="select">"選択"</string>

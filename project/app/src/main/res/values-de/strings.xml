@@ -192,7 +192,6 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="region_inside">"Aktuell innerhalb"</string>
     <string name="region_outside">"Aktuell außerhalb"</string>
     <string name="region_unknown">"Status unbekannt"</string>
-    <string name="restart">"Neu starten"</string>
     <string name="save">"Speichern"</string>
     <string name="seconds">"Sekunden"</string>
     <string name="select">"Auswählen"</string>

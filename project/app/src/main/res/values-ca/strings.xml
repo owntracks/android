@@ -220,7 +220,6 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="region_inside">"Actualment dins"</string>
     <string name="region_outside">"Actualment fora"</string>
     <string name="region_unknown">"Estat desconegut"</string>
-    <string name="restart">"Reiniciar"</string>
     <string name="save">"Desa"</string>
     <string name="seconds">"Segons"</string>
     <string name="select">"Seleccionar"</string>

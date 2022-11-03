@@ -34,8 +34,6 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.lifecycle.LifecycleService;
 
-import com.jakewharton.processphoenix.ProcessPhoenix;
-
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -716,14 +714,6 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
         if (m == lastLocationMessage) {
             updateOngoingNotification();
         }
-    }
-
-    @Subscribe
-    public void onEvent(Events.RestartApp e) {
-        Timber.i("Triggering restart");
-        scheduler.cancelAllTasks();
-        messageProcessor.stopSendingMessages();
-        ProcessPhoenix.triggerRebirth(this);
     }
 
     private NotificationCompat.Builder getEventsNotificationBuilder() {

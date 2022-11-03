@@ -224,7 +224,6 @@ Aby to umożliwić, włącz lokalizację w ustawieniach urządzenia."</string>
     <string name="region_inside">"Aktualnie wewnątrz"</string>
     <string name="region_outside">"Aktualnie na zewnątrz"</string>
     <string name="region_unknown">"Status nieznany"</string>
-    <string name="restart">"Restart"</string>
     <string name="save">"Zapisz"</string>
     <string name="seconds">"Sekundy"</string>
     <string name="select">"Wybierz"</string>
