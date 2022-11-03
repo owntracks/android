@@ -7,10 +7,12 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
 import android.os.StrictMode
+import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NotificationManagerCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.MutableLiveData
+import androidx.test.espresso.IdlingResource
 import androidx.work.Configuration
 import androidx.work.WorkerFactory
 import dagger.hilt.EntryPoints
@@ -29,7 +31,6 @@ import org.owntracks.android.preferences.types.AppTheme
 import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.RunThingsOnOtherThreads
-import org.owntracks.android.support.SimpleIdlingResource
 import org.owntracks.android.ui.AppShortcuts
 import timber.log.Timber
 
@@ -52,6 +53,9 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
 
     @Inject
     lateinit var appShortcuts: AppShortcuts
+
+    @Inject
+    lateinit var messageProcessor: MessageProcessor
 
     val workManagerFailedToInitialize = MutableLiveData(false)
 
@@ -197,7 +201,10 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
         }
     }
 
-    val permissionIdlingResource: SimpleIdlingResource = SimpleIdlingResource("location", true)
+    @get:VisibleForTesting
+    val mqttConnectionIdlingResource: IdlingResource?
+        get() = messageProcessor.mqttConnectionIdlingResource
+
 
     companion object {
         const val NOTIFICATION_CHANNEL_ONGOING = "O"

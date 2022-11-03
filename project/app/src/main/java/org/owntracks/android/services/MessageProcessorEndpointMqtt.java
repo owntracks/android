@@ -11,6 +11,7 @@ import android.os.Looper;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.WorkerThread;
+import androidx.test.espresso.IdlingResource;
 
 import org.eclipse.paho.client.mqttv3.IMqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -36,6 +37,7 @@ import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.RunThingsOnOtherThreads;
+import org.owntracks.android.support.SimpleIdlingResource;
 import org.owntracks.android.support.SocketFactory;
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException;
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
@@ -82,6 +84,8 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     private final EventBus eventBus;
 
     private final Semaphore connectingLock = new Semaphore(1);
+
+    private final SimpleIdlingResource connectionIdlingResource = new SimpleIdlingResource("mqttConnection", false);
 
     MessageProcessorEndpointMqtt(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus, RunThingsOnOtherThreads runThingsOnOtherThreads, Context applicationContext) {
         super(messageProcessor);
@@ -179,6 +183,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         public void messageArrived(String topic, MqttMessage message) {
             try {
                 MessageBase m = parser.fromJson(message.getPayload());
+                Timber.tag("TOOT").w("message received: %s", m);
                 if (!m.isValidMessage()) {
                     Timber.e("message failed validation");
                     return;
@@ -239,6 +244,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
     @WorkerThread
     private synchronized void connectToBroker() throws MqttConnectionException, ConfigurationIncompleteException, AlreadyConnectingToBrokerException {
+        connectionIdlingResource.setIdleState(false);
         boolean isUiThread = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? Looper.getMainLooper().isCurrentThread()
                 : Thread.currentThread() == Looper.getMainLooper().getThread();
 
@@ -424,6 +430,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         Timber.d("Releasing connectinglock");
         connectingLock.release();
         changeState(EndpointState.CONNECTED);
+        connectionIdlingResource.setIdleState(true);
 
         sendMessageConnectPressure = 0; // allow new connection attempts from queueMessageForSending
         scheduler.cancelMqttReconnect();
@@ -458,8 +465,6 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
     @NotNull
     Set<String> getTopicsToSubscribeTo(String subTopics, Boolean subscribeToInfo, String infoTopicSuffix, String eventsTopicSuffix, String waypointsTopicSuffix) {
-
-
         // subTopics might be one topic base, or a space-separated list of topics
         if (subTopics.contains(" ")) {
             return new TreeSet<>(Arrays.asList(subTopics.split(" ")));
@@ -639,13 +644,16 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         return ConnectionMode.MQTT;
     }
 
-}
-
-class MqttConnectionException extends Exception {
-    MqttConnectionException(Exception e) {
-        super(e);
+    IdlingResource getMqttConnectionIdlingResource() {
+        return connectionIdlingResource;
     }
-}
 
-class AlreadyConnectingToBrokerException extends Exception {
+    class MqttConnectionException extends Exception {
+        MqttConnectionException(Exception e) {
+            super(e);
+        }
+    }
+
+    class AlreadyConnectingToBrokerException extends Exception {
+    }
 }

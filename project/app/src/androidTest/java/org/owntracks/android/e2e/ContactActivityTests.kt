@@ -76,7 +76,7 @@ class ContactActivityTests :
         }
         clickOnAndWait(R.string.title_activity_contacts)
         sleep(3_000)
-        assertRecyclerViewItemCount(R.id.recycler_view, 1)
+        assertRecyclerViewItemCount(R.id.contactsRecyclerView, 1)
 
         clickOnAndWait("aa")
         assertDisplayed(R.id.bottomSheetLayout)

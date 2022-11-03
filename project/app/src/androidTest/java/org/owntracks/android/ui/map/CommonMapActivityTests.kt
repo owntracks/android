@@ -77,7 +77,9 @@ class CommonMapActivityTests :
         assertDisplayed(R.id.fabMonitoringModeSignificantChanges)
         assertDisplayed(R.id.fabMonitoringModeMove)
         clickOnAndWait(R.id.fabMonitoringModeSignificantChanges)
-        onView(withId(R.id.menu_monitoring)).check(matches(withActionIconDrawable(R.drawable.ic_baseline_play_arrow_36)))
+        onView(withId(R.id.menu_monitoring)).check(
+            matches(withActionIconDrawable(R.drawable.ic_baseline_play_arrow_36))
+        )
     }
 
     @Test
@@ -103,7 +105,7 @@ class CommonMapActivityTests :
         PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
         assertDrawerIsClosed()
 
-        BaristaDrawerInteractions.openDrawer()
+        openDrawer()
 
         assertDisplayed(R.string.title_activity_preferences)
         BaristaEnabledAssertions.assertEnabled(R.string.title_activity_preferences)
@@ -130,7 +132,7 @@ class CommonMapActivityTests :
             clickOnAndWait(R.id.fabMyLocation)
         }
 
-        BaristaDrawerInteractions.openDrawer()
+        openDrawer()
 
         clickOnDrawerAndWait(R.string.title_activity_regions)
 

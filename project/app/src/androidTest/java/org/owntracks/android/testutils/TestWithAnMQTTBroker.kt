@@ -8,7 +8,7 @@ import org.owntracks.android.model.messages.MessageBase
 @ExperimentalUnsignedTypes
 interface TestWithAnMQTTBroker {
     fun configureMQTTConnectionToLocal(password: String)
-    fun configureMQTTConnectionToLocal()
+    fun configureMQTTConnectionToLocalWithGeneratedPassword()
     val mqttPacketsReceived: MutableList<MQTTPacket>
     val broker: Broker
     val mqttUsername: String

@@ -425,12 +425,12 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
 
         String text = String.format("%s %s", getString(message.getTransition() == Geofence.GEOFENCE_TRANSITION_ENTER ? R.string.transitionEntering : R.string.transitionLeaving), location);
 
-
         eventsNotificationCompatBuilder.setContentTitle(title);
         eventsNotificationCompatBuilder.setContentText(text);
         eventsNotificationCompatBuilder.setWhen(TimeUnit.SECONDS.toMillis(message.getTimestamp()));
         eventsNotificationCompatBuilder.setShowWhen(true);
         eventsNotificationCompatBuilder.setGroup(NOTIFICATION_GROUP_EVENTS);
+
         // Deliver notification
         Notification n = eventsNotificationCompatBuilder.build();
 

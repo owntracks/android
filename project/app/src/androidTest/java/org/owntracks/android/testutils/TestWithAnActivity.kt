@@ -3,6 +3,7 @@ package org.owntracks.android.testutils
 import android.app.Activity
 import android.content.Intent
 import androidx.test.espresso.intent.Intents
+import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.rule.BaristaRule
 import com.adevinta.android.barista.rule.cleardata.ClearDatabaseRule
 import com.adevinta.android.barista.rule.cleardata.ClearFilesRule
@@ -14,6 +15,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.RuleChain
+import org.owntracks.android.App
 import org.owntracks.android.testutils.rules.ScreenshotTakingOnTestEndRule
 import shark.AndroidReferenceMatchers
 
@@ -101,4 +103,10 @@ abstract class TestWithAnActivity<T : Activity>(
     fun launchActivity(intent: Intent) {
         baristaRule.launchActivity(intent)
     }
+
+    val app: App
+        get() = InstrumentationRegistry
+            .getInstrumentation()
+            .targetContext
+            .applicationContext as App
 }

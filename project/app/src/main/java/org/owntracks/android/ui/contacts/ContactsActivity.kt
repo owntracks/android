@@ -32,7 +32,7 @@ class ContactsActivity :
             contactsAdapter.setContactList(contacts.values)
             vm.refreshGeocodes()
         })
-        binding?.recyclerView?.run {
+        binding?.contactsRecyclerView?.run {
             layoutManager = LinearLayoutManager(this@ContactsActivity)
             adapter = contactsAdapter
         }

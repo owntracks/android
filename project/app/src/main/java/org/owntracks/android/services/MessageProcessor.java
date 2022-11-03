@@ -3,6 +3,7 @@ package org.owntracks.android.services;
 import android.content.Context;
 
 import androidx.annotation.NonNull;
+import androidx.test.espresso.IdlingResource;
 import androidx.test.espresso.idling.CountingIdlingResource;
 
 import org.greenrobot.eventbus.EventBus;
@@ -40,6 +41,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -482,6 +484,15 @@ public class MessageProcessor implements Preferences.OnPreferenceChangeListener 
     void stopSendingMessages() {
         Timber.d("Interrupting background sending thread");
         backgroundDequeueThread.interrupt();
+    }
+
+    @Nullable
+    public IdlingResource getMqttConnectionIdlingResource() {
+        if (this.endpoint instanceof MessageProcessorEndpointMqtt) {
+            return ((MessageProcessorEndpointMqtt) this.endpoint).getMqttConnectionIdlingResource();
+        } else {
+            return null;
+        }
     }
 
     @Override

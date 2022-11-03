@@ -3,12 +3,15 @@ package org.owntracks.android.testutils
 import android.content.Intent
 import android.net.Uri
 import androidx.test.platform.app.InstrumentationRegistry
-import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
-import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
+import java.net.ConnectException
+import java.net.InetSocketAddress
+import java.net.Socket
+import kotlin.concurrent.thread
 import kotlinx.coroutines.DelicateCoroutinesApi
 import mqtt.broker.Broker
 import mqtt.broker.interfaces.Authentication
+import mqtt.broker.interfaces.BytesMetrics
 import mqtt.broker.interfaces.PacketInterceptor
 import mqtt.packets.MQTTPacket
 import mqtt.packets.Qos
@@ -19,10 +22,6 @@ import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.support.Parser
 import org.owntracks.android.ui.clickOnAndWait
 import timber.log.Timber
-import java.net.ConnectException
-import java.net.InetSocketAddress
-import java.net.Socket
-import kotlin.concurrent.thread
 
 @ExperimentalUnsignedTypes
 class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
@@ -70,13 +69,13 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
                 try {
                     it.apply { connect(InetSocketAddress("localhost", mqttPort)) }
                     listening = true
+                    Timber.i("Test MQTT Broker listening on port $mqttPort")
                 } catch (e: ConnectException) {
                     Timber.i(e, "broker not listening on $mqttPort yet")
                     Thread.sleep(100)
                 }
             }
         }
-        Timber.i("Test MQTT Broker listening")
     }
 
     private fun createNewBroker(): Broker =
@@ -90,7 +89,8 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
                     password: UByteArray?
                 ): Boolean {
                     return username == mqttUsername && password.contentEquals(
-                        mqttTestPassword.toByteArray().toUByteArray()
+                        mqttTestPassword.toByteArray()
+                            .toUByteArray()
                     )
                 }
             },
@@ -101,7 +101,8 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
                     password: UByteArray?,
                     packet: MQTTPacket
                 ) {
-                    Timber.d("MQTT Packet received $packet")
+                    Timber
+                        .d("MQTT Packet received $packet")
                     mqttPacketsReceived.add(packet)
                 }
             }
@@ -110,10 +111,13 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
     override fun stopBroker() {
         shouldBeRunning = false
         Timber.i("Requesting MQTT Broker stop")
-        broker.stop()
+        if (this::broker.isInitialized) {
+            broker.stop()
+        }
         Timber.i("Waiting to join thread")
         brokerThread.join()
-        Timber.i("MQTT Broker stopped")
+        Timber
+            .i("MQTT Broker stopped")
     }
 
     override fun configureMQTTConnectionToLocal(password: String) {
@@ -126,9 +130,10 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
                 "host": "127.0.0.1",
                 "password": "$password",
                 "port": $mqttPort,
+                "mqttProtocolLevel": 4,
                 "username": "$mqttUsername",
                 "tls": false,
-                "mqttConnectionTimeout": 1
+                "mqttConnectionTimeout": 50
             }
             """.trimIndent()
         )
@@ -140,14 +145,11 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
         )
         sleep(500)
         clickOnAndWait(R.id.save)
-        openDrawer()
-        clickOnAndWait(R.string.title_activity_status)
+        clickOnAndWait(android.R.id.button1)
     }
 
     // This will use the right password, so we should test for success
-    override fun configureMQTTConnectionToLocal() {
+    override fun configureMQTTConnectionToLocalWithGeneratedPassword() {
         configureMQTTConnectionToLocal(mqttTestPassword)
-        sleep(2000)
-        assertContains(R.id.connectedStatus, R.string.CONNECTED)
     }
 }

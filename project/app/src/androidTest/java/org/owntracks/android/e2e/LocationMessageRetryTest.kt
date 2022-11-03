@@ -54,19 +54,7 @@ class LocationMessageRetryTest :
         PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
         initializeMockLocationProvider(baristaRule.activityTestRule.activity.applicationContext)
 
-        openDrawer()
-        clickOnAndWait(R.string.title_activity_preferences)
-        clickOnAndWait(R.string.preferencesServer)
-        clickOnAndWait(R.string.mode_heading)
-        clickOnAndWait(R.string.mode_http_private_label)
-        clickDialogPositiveButton()
-        clickOnAndWait(R.string.preferencesHost)
-        writeTo(R.id.url, "http://localhost:$webserverPort/")
-        clickDialogPositiveButton()
-        clickBack()
-
-        openDrawer()
-        clickOnDrawerAndWait(R.string.title_activity_map)
+        configureHTTPConnectionToLocal()
 
         baristaRule.activityTestRule.activity.locationIdlingResource.with {
             setMockLocation(51.0, 0.0)

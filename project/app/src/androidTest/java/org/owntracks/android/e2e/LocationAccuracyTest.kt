@@ -24,7 +24,6 @@ import org.owntracks.android.R
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.testutils.GPSMockDeviceLocation
 import org.owntracks.android.testutils.MockDeviceLocation
-import org.owntracks.android.testutils.SmokeTest
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.TestWithAnHTTPServer
 import org.owntracks.android.testutils.TestWithAnHTTPServerImpl
@@ -34,7 +33,6 @@ import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.map.MapActivity
 
 @LargeTest
-@SmokeTest
 @RunWith(AndroidJUnit4::class)
 class LocationAccuracyTest :
     TestWithAnActivity<MapActivity>(MapActivity::class.java, false),
@@ -68,7 +66,6 @@ class LocationAccuracyTest :
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
     fun testReportingLocationOutsideLocationAccuracyThreshold() {
         val dispatcher = LoggingMockJSONResponseDispatcher(mapOf("/" to "{}"))
         startServer(dispatcher)
@@ -101,7 +98,6 @@ class LocationAccuracyTest :
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
     fun testReportingLocationInsideLocationAccuracyThreshold() {
         val dispatcher = LoggingMockJSONResponseDispatcher(mapOf("/" to "{}"))
         startServer(dispatcher)
