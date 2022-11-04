@@ -16,21 +16,22 @@ import androidx.work.WorkerFactory
 import dagger.hilt.EntryPoints
 import dagger.hilt.android.HiltAndroidApp
 import org.bouncycastle.jce.provider.BouncyCastleProvider
+import java.security.Security
+import javax.inject.Inject
+import javax.inject.Provider
 import org.conscrypt.Conscrypt
 import org.owntracks.android.di.CustomBindingComponentBuilder
 import org.owntracks.android.di.CustomBindingEntryPoint
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.logging.TimberInMemoryLogTree
+import org.owntracks.android.preferences.NightMode
+import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.services.worker.Scheduler
-import org.owntracks.android.support.Preferences
 import org.owntracks.android.support.RunThingsOnOtherThreads
 import org.owntracks.android.support.SimpleIdlingResource
 import org.owntracks.android.ui.AppShortcuts
 import timber.log.Timber
-import java.security.Security
-import javax.inject.Inject
-import javax.inject.Provider
 
 @HiltAndroidApp
 class App : Application(), Configuration.Provider {
@@ -63,11 +64,13 @@ class App : Application(), Configuration.Provider {
         // X509ExtendedTrustManager not available pre-24, fall back to device. https://github.com/google/conscrypt/issues/603
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             Security.insertProviderAt(
-                Conscrypt.newProviderBuilder().provideTrustManager(true).build(), 1
+                Conscrypt.newProviderBuilder().provideTrustManager(true).build(),
+                1
             )
         } else {
             Security.insertProviderAt(
-                Conscrypt.newProviderBuilder().provideTrustManager(false).build(), 1
+                Conscrypt.newProviderBuilder().provideTrustManager(false).build(),
+                1
             )
         }
 
@@ -79,7 +82,8 @@ class App : Application(), Configuration.Provider {
 
         val dataBindingComponent = bindingComponentProvider.get().build()
         val dataBindingEntryPoint = EntryPoints.get(
-            dataBindingComponent, CustomBindingEntryPoint::class.java
+            dataBindingComponent,
+            CustomBindingEntryPoint::class.java
         )
 
         DataBindingUtil.setDefaultComponent(dataBindingEntryPoint)
@@ -104,6 +108,7 @@ class App : Application(), Configuration.Provider {
                     .build()
             )
         }
+
         preferences.checkFirstStart()
 
         // Running this on a background thread will deadlock FirebaseJobDispatcher.
@@ -111,14 +116,20 @@ class App : Application(), Configuration.Provider {
         runThingsOnOtherThreads.postOnMainHandlerDelayed({ messageProcessor.initialize() }, 510)
 
         when (preferences.theme) {
-            Preferences.NIGHT_MODE_AUTO -> AppCompatDelegate.setDefaultNightMode(Preferences.SYSTEM_NIGHT_AUTO_MODE)
-            Preferences.NIGHT_MODE_ENABLE -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            Preferences.NIGHT_MODE_DISABLE -> AppCompatDelegate.setDefaultNightMode(
+            NightMode.AUTO -> AppCompatDelegate.setDefaultNightMode(
+                Preferences.SYSTEM_NIGHT_AUTO_MODE
+            )
+            NightMode.ENABLE -> AppCompatDelegate.setDefaultNightMode(
+                AppCompatDelegate.MODE_NIGHT_YES
+            )
+            NightMode.DISABLE -> AppCompatDelegate.setDefaultNightMode(
                 AppCompatDelegate.MODE_NIGHT_NO
             )
         }
 
-        if (preferences.experimentalFeatures.contains(Preferences.EXPERIMENTAL_FEATURE_ENABLE_APP_SHORTCUTS)) {
+        if (preferences.experimentalFeatures.contains(
+                Preferences.EXPERIMENTAL_FEATURE_ENABLE_APP_SHORTCUTS
+            )) {
             appShortcuts.enableLogViewerShortcut(this)
         } else {
             appShortcuts.disableLogViewerShortcut(this)
@@ -131,7 +142,6 @@ class App : Application(), Configuration.Provider {
     private fun createNotificationChannels() {
         val notificationManager = NotificationManagerCompat.from(this)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-
             // Importance min will show normal priority notification for foreground service. See https://developer.android.com/reference/android/app/NotificationManager#IMPORTANCE_MIN
             // User has to actively configure this in the notification channel settings.
             val ongoingNotificationChannelName =

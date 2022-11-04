@@ -20,7 +20,7 @@ import org.owntracks.android.model.messages.MessageTransition;
 import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Parser;
-import org.owntracks.android.support.Preferences;
+import org.owntracks.android.preferences.Preferences;
 import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.ServiceBridge;
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException;

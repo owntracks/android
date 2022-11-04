@@ -213,6 +213,7 @@ dependencies {
     implementation(libs.libsodium)
     implementation(libs.apache.httpcore)
     implementation(libs.commons.codec)
+    implementation("androidx.datastore:datastore:1.0.0")
 
     // The BC version shipped under com.android is half-broken. Weird certificate issues etc.
     // To solve, we bring in our own version of BC

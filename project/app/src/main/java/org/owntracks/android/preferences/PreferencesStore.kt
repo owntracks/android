@@ -1,15 +1,14 @@
-package org.owntracks.android.support.preferences
+package org.owntracks.android.preferences
 
 import android.content.SharedPreferences
+import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KProperty
 
 /***
  * Allows a preferences class to read and write values from some sort of store
  */
 interface PreferencesStore {
     fun getSharedPreferencesName(): String
-
-    fun setMode(key: String, mode: Int)
-    fun getInitMode(key: String, default: Int): Int
 
     fun putBoolean(key: String, value: Boolean)
     fun getBoolean(key: String, default: Boolean): Boolean
@@ -30,6 +29,22 @@ interface PreferencesStore {
 
     fun remove(key: String)
 
-    fun registerOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener)
-    fun unregisterOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener)
+    fun registerOnSharedPreferenceChangeListener(
+        listener: SharedPreferences.OnSharedPreferenceChangeListener
+    )
+
+    fun unregisterOnSharedPreferenceChangeListener(
+        listener: SharedPreferences.OnSharedPreferenceChangeListener
+    )
+}
+
+class SomethingDelegate<in R, T> () : ReadWriteProperty<R,T> {
+    override fun getValue(thisRef: R, property: KProperty<*>): T {
+        TODO("Not yet implemented")
+    }
+
+    override fun setValue(thisRef: R, property: KProperty<*>, value: T) {
+        TODO("Not yet implemented")
+    }
+
 }

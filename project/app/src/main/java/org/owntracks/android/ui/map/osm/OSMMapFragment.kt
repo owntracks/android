@@ -45,7 +45,7 @@ import org.owntracks.android.location.LatLng
 import org.owntracks.android.location.toGeoPoint
 import org.owntracks.android.location.toLatLng
 import org.owntracks.android.support.ContactImageBindingAdapter
-import org.owntracks.android.support.Preferences
+import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.ui.map.*
 import timber.log.Timber
 import kotlin.math.roundToInt

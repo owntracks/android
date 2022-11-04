@@ -5,7 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import org.owntracks.android.support.Preferences;
+import org.owntracks.android.preferences.Preferences;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
 
 import javax.inject.Inject;

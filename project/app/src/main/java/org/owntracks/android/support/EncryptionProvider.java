@@ -9,6 +9,8 @@ import androidx.annotation.NonNull;
 import org.libsodium.jni.crypto.Random;
 import org.libsodium.jni.crypto.SecretBox;
 import org.owntracks.android.R;
+import org.owntracks.android.preferences.Preferences;
+
 import javax.inject.Singleton;
 
 import javax.inject.Inject;

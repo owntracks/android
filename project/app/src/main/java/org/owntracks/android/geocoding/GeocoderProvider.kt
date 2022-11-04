@@ -13,7 +13,8 @@ import kotlinx.coroutines.*
 import org.owntracks.android.R
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.services.BackgroundService
-import org.owntracks.android.support.Preferences
+import org.owntracks.android.preferences.Preferences
+import org.owntracks.android.preferences.ReverseGeocodeProvider
 import org.owntracks.android.ui.map.MapActivity
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneOffset.UTC
@@ -39,11 +40,11 @@ class GeocoderProvider @Inject constructor(
         job = GlobalScope.launch {
             withContext(ioDispatcher) {
                 geocoder = when (preferences.reverseGeocodeProvider) {
-                    Preferences.REVERSE_GEOCODE_PROVIDER_OPENCAGE -> OpenCageGeocoder(
+                    ReverseGeocodeProvider.OPENCAGE -> OpenCageGeocoder(
                         preferences.openCageGeocoderApiKey
                     )
-                    Preferences.REVERSE_GEOCODE_PROVIDER_DEVICE -> DeviceGeocoder(context)
-                    else -> GeocoderNone()
+                    ReverseGeocodeProvider.DEVICE -> DeviceGeocoder(context)
+                    ReverseGeocodeProvider.NONE -> GeocoderNone()
                 }
             }
         }

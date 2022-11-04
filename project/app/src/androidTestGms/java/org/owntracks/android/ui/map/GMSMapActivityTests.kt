@@ -19,8 +19,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 import org.owntracks.android.R
-import org.owntracks.android.support.Preferences
-import org.owntracks.android.support.preferences.SharedPreferencesStore
+import org.owntracks.android.preferences.Preferences
+import org.owntracks.android.preferences.SharedPreferencesStore
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.disableDeviceLocation
 import org.owntracks.android.testutils.enableDeviceLocation

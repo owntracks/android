@@ -6,9 +6,11 @@ import androidx.preference.IntListPreference
 import androidx.preference.Preference
 import dagger.hilt.android.AndroidEntryPoint
 import org.owntracks.android.R
+import org.owntracks.android.preferences.ConnectionMode
+import org.owntracks.android.preferences.NightMode
 import org.owntracks.android.services.MessageProcessorEndpointHttp
 import org.owntracks.android.services.MessageProcessorEndpointMqtt
-import org.owntracks.android.support.Preferences.Companion.EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI
+import org.owntracks.android.preferences.Preferences.Companion.EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI
 import org.owntracks.android.ui.preferences.connection.ConnectionActivity
 import org.owntracks.android.ui.preferences.editor.EditorActivity
 
@@ -24,11 +26,11 @@ class PreferencesFragment : AbstractPreferenceFragment() {
         findPreference<Preference>(UI_PREFERENCE_SCREEN_CONNECTION)!!.intent = Intent(context, ConnectionActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
 
         findPreference<Preference>(UI_PREFERENCE_SCREEN_EXPERIMENTAL)?.run {
-            this.isVisible = preferences.isExperimentalFeatureEnabled(EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI)
+            this.isVisible = preferences.experimentalFeatures.contains(EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI)
         }
 
         findPreference<IntListPreference>(getString(R.string.preferenceKeyTheme))?.setOnPreferenceChangeListener { _, newValue ->
-            preferences.theme = newValue.toString().toInt()
+            preferences.theme = NightMode.getByValue(newValue.toString().toInt())
             true
         }
     }
@@ -37,15 +39,14 @@ class PreferencesFragment : AbstractPreferenceFragment() {
         super.onResume()
         findPreference<Preference>(UI_PREFERENCE_SCREEN_CONNECTION)!!.summary = connectionMode
         findPreference<Preference>(UI_PREFERENCE_SCREEN_EXPERIMENTAL)?.run {
-            this.isVisible = preferences.isExperimentalFeatureEnabled(EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI)
+            this.isVisible = preferences.experimentalFeatures.contains(EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI)
         }
     }
 
     private val connectionMode: String
         get() = when (preferences.mode) {
-            MessageProcessorEndpointHttp.MODE_ID -> getString(R.string.mode_http_private_label)
-            MessageProcessorEndpointMqtt.MODE_ID -> getString(R.string.mode_mqtt_private_label)
-            else -> getString(R.string.mode_mqtt_private_label)
+            ConnectionMode.HTTP -> getString(R.string.mode_http_private_label)
+            ConnectionMode.MQTT -> getString(R.string.mode_mqtt_private_label)
         }
 
     companion object {

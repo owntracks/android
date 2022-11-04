@@ -1,7 +1,7 @@
 package org.owntracks.android.support
 
 import android.content.SharedPreferences
-import org.owntracks.android.support.preferences.PreferencesStore
+import org.owntracks.android.preferences.PreferencesStore
 
 class InMemoryPreferencesStore : PreferencesStore {
     private val valueMap: MutableMap<String, Any> = HashMap()

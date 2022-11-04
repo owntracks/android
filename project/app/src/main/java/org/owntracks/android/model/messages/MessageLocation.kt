@@ -18,8 +18,8 @@ import org.owntracks.android.location.LatLng
 import org.owntracks.android.model.BatteryStatus
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.services.WifiInfoProvider
-import org.owntracks.android.support.MonitoringMode
-import org.owntracks.android.support.Preferences
+import org.owntracks.android.preferences.MonitoringMode
+import org.owntracks.android.preferences.Preferences
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
@@ -128,7 +128,7 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
 
     override fun addMqttPreferences(preferences: Preferences) {
         topic = preferences.pubTopicLocations
-        qos = preferences.pubQosLocations
+        qos = preferences.pubQosLocations.value
         retained = preferences.pubRetainLocations
     }
 

@@ -5,7 +5,7 @@ import android.content.Intent;
 import org.owntracks.android.R;
 import org.owntracks.android.services.MessageProcessorEndpointHttp;
 import org.owntracks.android.services.MessageProcessorEndpointMqtt;
-import org.owntracks.android.support.Preferences;
+import org.owntracks.android.preferences.Preferences;
 
 public class ConnectionModeDialogViewModel extends BaseDialogViewModel {
     private int modeResId;

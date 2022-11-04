@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.preference.SwitchPreferenceCompat
 import dagger.hilt.android.AndroidEntryPoint
 import org.owntracks.android.R
-import org.owntracks.android.support.Preferences.Companion.EXPERIMENTAL_FEATURES
+import org.owntracks.android.preferences.Preferences.Companion.EXPERIMENTAL_FEATURES
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -16,7 +16,7 @@ class ExperimentalFragment @Inject constructor() : AbstractPreferenceFragment() 
         EXPERIMENTAL_FEATURES.forEach { feature ->
             SwitchPreferenceCompat(requireContext()).apply {
                 title = feature
-                isChecked = preferences.isExperimentalFeatureEnabled(feature)
+                isChecked = preferences.experimentalFeatures.contains(feature)
                 isIconSpaceReserved = false
                 setOnPreferenceClickListener {
                     val newFeatures = preferences.experimentalFeatures.toMutableSet()

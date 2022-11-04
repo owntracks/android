@@ -8,7 +8,7 @@ import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
 import dagger.hilt.android.AndroidEntryPoint
 import org.owntracks.android.R
-import org.owntracks.android.support.Preferences
+import org.owntracks.android.preferences.ReverseGeocodeProvider
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -38,7 +38,7 @@ class AdvancedFragment @Inject constructor() : AbstractPreferenceFragment() {
             remoteCommandAndConfigurationChangeListener
 
         findPreference<ListPreference>(getString(R.string.preferenceKeyReverseGeocodeProvider))?.setOnPreferenceChangeListener { _, newValue ->
-            preferences.reverseGeocodeProvider = newValue.toString()
+            preferences.reverseGeocodeProvider = ReverseGeocodeProvider.getByValue(newValue.toString())
             setOpenCageAPIKeyPreferenceVisibility()
             true
         }
@@ -57,6 +57,6 @@ class AdvancedFragment @Inject constructor() : AbstractPreferenceFragment() {
 
     private fun setOpenCageAPIKeyPreferenceVisibility() {
         findPreference<EditTextPreference>(getString(R.string.preferenceKeyOpencageGeocoderApiKey))?.isVisible =
-            preferences.reverseGeocodeProvider == Preferences.REVERSE_GEOCODE_PROVIDER_OPENCAGE
+            preferences.reverseGeocodeProvider == ReverseGeocodeProvider.OPENCAGE
     }
 }

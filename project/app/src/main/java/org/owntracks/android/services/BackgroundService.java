@@ -58,11 +58,11 @@ import org.owntracks.android.location.geofencing.GeofencingRequest;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.model.messages.MessageLocation;
 import org.owntracks.android.model.messages.MessageTransition;
+import org.owntracks.android.preferences.MonitoringMode;
+import org.owntracks.android.preferences.Preferences;
 import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.DateFormatter;
 import org.owntracks.android.support.Events;
-import org.owntracks.android.support.MonitoringMode;
-import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.ServiceBridge;
 import org.owntracks.android.ui.map.MapActivity;
@@ -570,7 +570,7 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
             case SIGNIFICANT:
                 interval = TimeUnit.SECONDS.toMillis(preferences.getLocatorInterval());
                 smallestDisplacement = (float) preferences.getLocatorDisplacement();
-                priority = getLocationRequestPriority();
+                priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY;;
                 break;
             case MOVE:
                 interval = TimeUnit.SECONDS.toMillis(preferences.getMoveModeLocatorInterval());
@@ -585,20 +585,6 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
         locationProviderClient.flushLocations();
         locationProviderClient.requestLocationUpdates(request, locationCallback, runThingsOnOtherThreads.getBackgroundLooper());
         return true;
-    }
-
-    private int getLocationRequestPriority() {
-        switch (preferences.getLocatorPriority()) {
-            case 0:
-                return LocationRequest.PRIORITY_NO_POWER;
-            case 1:
-                return LocationRequest.PRIORITY_LOW_POWER;
-            case 3:
-                return LocationRequest.PRIORITY_HIGH_ACCURACY;
-            case 2:
-            default:
-                return LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY;
-        }
     }
 
     private PendingIntent getGeofencePendingIntent() {
@@ -767,7 +753,6 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
                 }
             }
         }, 0);
-
     }
 
     private final IBinder localServiceBinder = new LocalBinder();

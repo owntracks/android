@@ -1,7 +1,7 @@
 package org.owntracks.android.model.messages
 
 import org.owntracks.android.support.Parser
-import org.owntracks.android.support.Preferences
+import org.owntracks.android.preferences.Preferences
 
 class MessageClear : MessageBase() {
     override fun addMqttPreferences(preferences: Preferences) {

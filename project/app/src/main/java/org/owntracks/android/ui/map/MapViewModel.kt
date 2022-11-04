@@ -24,11 +24,12 @@ import org.owntracks.android.location.toLatLng
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.model.messages.MessageClear
 import org.owntracks.android.model.messages.MessageLocation.Companion.REPORT_TYPE_USER
+import org.owntracks.android.preferences.ConnectionMode
 import org.owntracks.android.services.LocationProcessor
 import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.services.MessageProcessorEndpointHttp
-import org.owntracks.android.support.MonitoringMode
-import org.owntracks.android.support.Preferences
+import org.owntracks.android.preferences.MonitoringMode
+import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.SimpleIdlingResource
 import timber.log.Timber
 import javax.inject.Inject
@@ -99,11 +100,11 @@ class MapViewModel @Inject constructor(
     val currentMonitoringMode: LiveData<MonitoringMode>
         get() = mutableCurrentMonitoringMode
 
-    private val currentConnectionMode: MutableLiveData<Int> by lazy {
+    private val currentConnectionMode: MutableLiveData<ConnectionMode> by lazy {
         MutableLiveData(preferences.mode)
     }
 
-    fun getCurrentConnectionMode(): LiveData<Int> = currentConnectionMode
+    fun getCurrentConnectionMode(): LiveData<ConnectionMode> = currentConnectionMode
 
     val locationIdlingResource = SimpleIdlingResource("locationIdlingResource", false)
 
@@ -205,7 +206,7 @@ class MapViewModel @Inject constructor(
     }
 
     fun contactPeekPopupmenuVisibility(): Boolean =
-        mutableCurrentContact.value?.messageLocation != null || preferences.mode != MessageProcessorEndpointHttp.MODE_ID
+        mutableCurrentContact.value?.messageLocation != null || preferences.mode != ConnectionMode.HTTP
 
     fun contactHasLocation(): Boolean {
         return mutableCurrentContact.value?.messageLocation != null

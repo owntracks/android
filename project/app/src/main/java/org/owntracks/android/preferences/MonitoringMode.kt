@@ -1,4 +1,4 @@
-package org.owntracks.android.support
+package org.owntracks.android.preferences
 
 import com.fasterxml.jackson.annotation.JsonValue
 

@@ -1,6 +1,6 @@
 package org.owntracks.android.ui.preferences;
 
-import org.owntracks.android.support.Preferences;
+import org.owntracks.android.preferences.Preferences;
 import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
 

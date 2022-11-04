@@ -7,7 +7,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import org.owntracks.android.gms.GMSRequirementsChecker
-import org.owntracks.android.support.Preferences
+import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.RequirementsChecker
 
 @InstallIn(SingletonComponent::class)

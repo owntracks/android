@@ -25,7 +25,7 @@ import org.owntracks.android.databinding.UiPreferencesConnectionParametersBindin
 import org.owntracks.android.databinding.UiPreferencesConnectionSecurityBinding;
 import org.owntracks.android.services.MessageProcessor;
 import org.owntracks.android.services.MessageProcessorEndpointHttp;
-import org.owntracks.android.support.Preferences;
+import org.owntracks.android.preferences.Preferences;
 import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.preferences.connection.dialog.BaseDialogViewModel;
@@ -147,12 +147,12 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
                 .setPositiveButton(R.string.accept, dialogBinding.getVm())
                 .setNegativeButton(R.string.cancel, dialogBinding.getVm()).create();
         MaterialEditText keepAliveEditText = dialogBinding.getRoot().findViewById(R.id.keepalive);
-        keepAliveEditText.addValidator(new METValidator(getString(R.string.preferencesKeepaliveValidationError, preferences.isExperimentalFeatureEnabled(Preferences.EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE) ? 1 : preferences.getMinimumKeepalive())) {
+        keepAliveEditText.addValidator(new METValidator(getString(R.string.preferencesKeepaliveValidationError, preferences.getExperimentalFeatures().contains(Preferences.EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE) ? 1 : preferences.getMinimumKeepaliveSeconds())) {
             @Override
             public boolean isValid(@NonNull CharSequence text, boolean isEmpty) {
                 try {
                     int intValue = Integer.parseInt(text.toString());
-                    return isEmpty || preferences.keepAliveInRange(intValue) || (preferences.isExperimentalFeatureEnabled(Preferences.EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE) && intValue >= 1);
+                    return isEmpty || preferences.keepAliveInRange(intValue) || (preferences.getExperimentalFeatures().contains(Preferences.EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE) && intValue >= 1);
                 } catch (NumberFormatException e) {
                     return false;
                 }

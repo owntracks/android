@@ -16,8 +16,8 @@ import org.owntracks.android.model.messages.MessageWaypoint;
 import org.owntracks.android.model.messages.MessageWaypoints;
 import org.owntracks.android.support.DeviceMetricsProvider;
 import org.owntracks.android.support.MessageWaypointCollection;
-import org.owntracks.android.support.MonitoringMode;
-import org.owntracks.android.support.Preferences;
+import org.owntracks.android.preferences.MonitoringMode;
+import org.owntracks.android.preferences.Preferences;
 
 import java.util.LinkedList;
 import java.util.List;

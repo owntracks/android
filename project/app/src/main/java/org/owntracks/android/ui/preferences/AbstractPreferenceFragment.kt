@@ -2,7 +2,7 @@ package org.owntracks.android.ui.preferences
 
 import android.os.Bundle
 import com.takisoft.preferencex.PreferenceFragmentCompat
-import org.owntracks.android.support.Preferences
+import org.owntracks.android.preferences.Preferences
 import javax.inject.Inject
 
 abstract class AbstractPreferenceFragment : PreferenceFragmentCompat() {

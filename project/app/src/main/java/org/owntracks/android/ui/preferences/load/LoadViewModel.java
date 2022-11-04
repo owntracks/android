@@ -13,7 +13,7 @@ import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.model.messages.MessageBase;
 import org.owntracks.android.model.messages.MessageConfiguration;
 import org.owntracks.android.support.Parser;
-import org.owntracks.android.support.Preferences;
+import org.owntracks.android.preferences.Preferences;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
 
 import java.io.BufferedReader;

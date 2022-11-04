@@ -7,7 +7,7 @@ data class LocationRequest(
     var expirationDuration: Long? = null,
     var priority: Int = PRIORITY_BALANCED_POWER_ACCURACY,
     val interval: Long,
-    var waitForAccurateLocation: Boolean? = null,
+    var waitForAccurateLocation: Boolean? = null
 ) {
     companion object {
         const val PRIORITY_HIGH_ACCURACY: Int = 0

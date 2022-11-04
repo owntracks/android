@@ -9,7 +9,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.data.MyObjectBox;
 import org.owntracks.android.data.WaypointModel;
 import org.owntracks.android.data.WaypointModel_;
-import org.owntracks.android.support.Preferences;
+import org.owntracks.android.preferences.Preferences;
 
 import java.util.Arrays;
 import java.util.List;

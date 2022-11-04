@@ -4,7 +4,7 @@ import androidx.databinding.BaseObservable
 import com.fasterxml.jackson.annotation.*
 import okhttp3.internal.toHexString
 import org.owntracks.android.support.Parser
-import org.owntracks.android.support.Preferences
+import org.owntracks.android.preferences.Preferences
 import java.io.IOException
 import java.util.*
 

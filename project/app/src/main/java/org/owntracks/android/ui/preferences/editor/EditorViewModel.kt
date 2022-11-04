@@ -7,7 +7,7 @@ import org.owntracks.android.BR
 import org.owntracks.android.R
 import org.owntracks.android.data.repos.WaypointsRepo
 import org.owntracks.android.support.Parser
-import org.owntracks.android.support.Preferences
+import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel
 import timber.log.Timber
 import java.io.IOException

@@ -4,7 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import androidx.databinding.BaseObservable;
 
-import org.owntracks.android.support.Preferences;
+import org.owntracks.android.preferences.Preferences;
 
 public abstract class BaseDialogViewModel extends BaseObservable implements DialogInterface.OnClickListener {
     final Preferences preferences;

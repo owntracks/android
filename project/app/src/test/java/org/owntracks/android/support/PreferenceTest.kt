@@ -8,7 +8,8 @@ import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.owntracks.android.model.messages.MessageConfiguration
-import org.owntracks.android.support.preferences.PreferencesStore
+import org.owntracks.android.preferences.Preferences
+import org.owntracks.android.preferences.PreferencesStore
 import org.owntracks.android.ui.NoopAppShortcuts
 
 class PreferenceTest {

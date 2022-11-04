@@ -29,10 +29,11 @@ import org.owntracks.android.data.EndpointState;
 import org.owntracks.android.model.messages.MessageBase;
 import org.owntracks.android.model.messages.MessageCard;
 import org.owntracks.android.model.messages.MessageClear;
+import org.owntracks.android.preferences.ConnectionMode;
 import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Parser;
-import org.owntracks.android.support.Preferences;
+import org.owntracks.android.preferences.Preferences;
 import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.SocketFactory;
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException;
@@ -60,7 +61,6 @@ import java.util.concurrent.TimeUnit;
 import timber.log.Timber;
 
 public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint implements StatefulServiceMessageProcessor, SharedPreferences.OnSharedPreferenceChangeListener {
-    public static final int MODE_ID = 0;
     private final LocationProcessor locationProcessor;
 
     private IMqttAsyncClient mqttClient;
@@ -429,20 +429,19 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
             Timber.v("lastConnectionId changed to: %s", lastConnectionId);
         }
 
-        if (!preferences.getSub()) // Don't subscribe if base topic is invalid
-            return;
+        if (preferences.getSub()) {
+            Set<String> topics = getTopicsToSubscribeTo(
+                    preferences.getSubTopic(),
+                    preferences.getInfo(),
+                    preferences.getPubTopicInfoPart(),
+                    preferences.getPubTopicEventsPart(),
+                    preferences.getPubTopicWaypointsPart()
+            );
+            // Receive commands for us
+            topics.add(preferences.getPubTopicBase() + preferences.getPubTopicCommandsPart());
 
-        Set<String> topics = getTopicsToSubscribeTo(
-                preferences.getSubTopic(),
-                preferences.getInfo(),
-                preferences.getPubTopicInfoPart(),
-                preferences.getPubTopicEventsPart(),
-                preferences.getPubTopicWaypointsPart()
-        );
-        // Receive commands for us
-        topics.add(preferences.getPubTopicBase() + preferences.getPubTopicCommandsPart());
-
-        subscribe(topics.toArray(new String[0]));
+            subscribe(topics.toArray(new String[0]));
+        }
 
         messageProcessor.resetMessageSleepBlock();
 
@@ -597,7 +596,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (preferences.getMode() != MessageProcessorEndpointMqtt.MODE_ID) {
+        if (preferences.getMode() != ConnectionMode.MQTT) {
             return;
         }
         if (preferences.getPreferenceKey(R.string.preferenceKeyMqttProtocolLevel).equals(key) ||
@@ -615,11 +614,6 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
             Timber.d("MQTT preferences changed. Reconnecting to broker. ThreadId: %s", Thread.currentThread());
             reconnect();
         }
-    }
-
-    @Override
-    int getModeId() {
-        return MODE_ID;
     }
 
     @Override

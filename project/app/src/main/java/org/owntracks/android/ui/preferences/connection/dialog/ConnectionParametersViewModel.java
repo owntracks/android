@@ -2,7 +2,7 @@ package org.owntracks.android.ui.preferences.connection.dialog;
 
 import android.content.Intent;
 
-import org.owntracks.android.support.Preferences;
+import org.owntracks.android.preferences.Preferences;
 
 public class ConnectionParametersViewModel extends BaseDialogViewModel {
 

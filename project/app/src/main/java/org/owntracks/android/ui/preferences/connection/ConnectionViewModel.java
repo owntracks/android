@@ -9,7 +9,7 @@ import androidx.databinding.Bindable;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.owntracks.android.support.Events;
-import org.owntracks.android.support.Preferences;
+import org.owntracks.android.preferences.Preferences;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
 import org.owntracks.android.ui.preferences.connection.dialog.ConnectionHostHttpDialogViewModel;
 import org.owntracks.android.ui.preferences.connection.dialog.ConnectionHostMqttDialogViewModel;

@@ -10,8 +10,8 @@ import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.data.repos.MemoryContactsRepo
 import org.owntracks.android.data.repos.ObjectboxWaypointsRepo
 import org.owntracks.android.data.repos.WaypointsRepo
-import org.owntracks.android.support.preferences.PreferencesStore
-import org.owntracks.android.support.preferences.SharedPreferencesStore
+import org.owntracks.android.preferences.PreferencesStore
+import org.owntracks.android.preferences.SharedPreferencesStore
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
