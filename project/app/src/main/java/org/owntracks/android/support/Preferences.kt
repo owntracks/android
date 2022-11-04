@@ -9,6 +9,14 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.lang.reflect.InvocationTargetException
+import java.lang.reflect.Method
+import java.lang.reflect.ParameterizedType
+import java.lang.reflect.Type
+import java.util.*
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import javax.inject.Singleton
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions
 import org.greenrobot.eventbus.EventBus
 import org.owntracks.android.BuildConfig
@@ -23,14 +31,6 @@ import org.owntracks.android.support.preferences.PreferencesStore
 import org.owntracks.android.ui.AppShortcuts
 import org.owntracks.android.ui.map.MapLayerStyle
 import timber.log.Timber
-import java.lang.reflect.InvocationTargetException
-import java.lang.reflect.Method
-import java.lang.reflect.ParameterizedType
-import java.lang.reflect.Type
-import java.util.*
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 @SuppressLint("NonConstantResourceId")
@@ -91,11 +91,15 @@ class Preferences @Inject constructor(
     // SharedPreferencesImpl stores its listeners as a list of WeakReferences. So we shouldn't use a
     // lambda as a listener, as that'll just get GC'd and then mysteriously disappear
     // https://stackoverflow.com/a/3104265/352740
-    fun registerOnPreferenceChangedListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
+    fun registerOnPreferenceChangedListener(
+        listener: SharedPreferences.OnSharedPreferenceChangeListener
+    ) {
         preferencesStore.registerOnSharedPreferenceChangeListener(listener)
     }
 
-    fun unregisterOnPreferenceChangedListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
+    fun unregisterOnPreferenceChangedListener(
+        listener: SharedPreferences.OnSharedPreferenceChangeListener
+    ) {
         preferencesStore.unregisterOnSharedPreferenceChangeListener(listener)
     }
 
@@ -203,7 +207,9 @@ class Preferences @Inject constructor(
                         ) {
                             importMethod.invoke(
                                 this,
-                                MonitoringMode.getByValue(messageConfiguration[configurationKey] as Int)
+                                MonitoringMode.getByValue(
+                                    messageConfiguration[configurationKey] as Int
+                                )
                             )
                         } else {
                             importMethod.invoke(this, messageConfiguration[configurationKey])
@@ -213,7 +219,7 @@ class Preferences @Inject constructor(
                     Timber.e(
                         "Tried to import $configurationKey but value is wrong type. Expected: ${
                         methods.getValue(configurationKey).parameterTypes.first().canonicalName
-                        }, given ${messageConfiguration[configurationKey]?.javaClass?.canonicalName}",
+                        }, given ${messageConfiguration[configurationKey]?.javaClass?.canonicalName}"
                     )
                 }
             }
@@ -918,8 +924,12 @@ class Preferences @Inject constructor(
             setInt(R.string.preferenceKeyTheme, actualValue)
             when (actualValue) {
                 NIGHT_MODE_AUTO -> AppCompatDelegate.setDefaultNightMode(SYSTEM_NIGHT_AUTO_MODE)
-                NIGHT_MODE_ENABLE -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                NIGHT_MODE_DISABLE -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                NIGHT_MODE_ENABLE -> AppCompatDelegate.setDefaultNightMode(
+                    AppCompatDelegate.MODE_NIGHT_YES
+                )
+                NIGHT_MODE_DISABLE -> AppCompatDelegate.setDefaultNightMode(
+                    AppCompatDelegate.MODE_NIGHT_NO
+                )
             }
         }
 
@@ -989,9 +999,27 @@ class Preferences @Inject constructor(
     )
     @set:Import(keyResId = R.string.preferenceKeyEnableMapRotation)
     var enableMapRotation: Boolean
-        get() = getBooleanOrDefault(R.string.preferenceKeyEnableMapRotation, R.bool.valEnableMapRotation)
+        get() = getBooleanOrDefault(
+            R.string.preferenceKeyEnableMapRotation,
+            R.bool.valEnableMapRotation
+        )
         set(newValue) {
             setBoolean(R.string.preferenceKeyEnableMapRotation, newValue)
+        }
+
+    @get:Export(
+        keyResId = R.string.preferenceKeyPublishLocationOnConnect,
+        exportModeMqtt = true,
+        exportModeHttp = false
+    )
+    @set:Import(keyResId = R.string.preferenceKeyPublishLocationOnConnect)
+    var publishLocationOnConnect: Boolean
+        get() = getBooleanOrDefault(
+            R.string.preferenceKeyPublishLocationOnConnect,
+            R.bool.valPublishLocationOnConnect
+        )
+        set(newValue) {
+            setBoolean(R.string.preferenceKeyPublishLocationOnConnect, newValue)
         }
 
     // Not used on public, as many people might use the same device type

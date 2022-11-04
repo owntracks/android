@@ -44,6 +44,7 @@
     <string name="preferenceKeyPubTopicBase">pubTopicBase</string>
     <string name="preferenceKeyRemoteCommand">cmd</string>
     <string name="preferenceKeyRemoteConfiguration">remoteConfiguration</string>
+    <string name="preferenceKeyPublishLocationOnConnect">publishOnConnect</string>
     <string name="preferenceKeySetupNotCompleted">setupNotCompleted</string>
     <string name="preferenceKeySub">sub</string>
     <string name="preferenceKeySubQos">subQos</string>

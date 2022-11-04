@@ -4,7 +4,13 @@
     <androidx.preference.SwitchPreferenceCompat
         app:defaultValue="@bool/valPubExtendedData"
         app:iconSpaceReserved="false"
-        app:key="pubExtendedData"
+        app:key="@string/preferenceKeyPublishExtendedData"
         app:summary="@string/preferencesPubExtendedDataSummary"
         app:title="@string/preferencesPubExtendedData" />
+    <androidx.preference.SwitchPreferenceCompat
+        app:defaultValue="@bool/valPublishLocationOnConnect"
+        app:iconSpaceReserved="false"
+        app:key="@string/preferenceKeyPublishLocationOnConnect"
+        app:summary="@string/preferencesRepublishOnRecconectSummary"
+        app:title="@string/preferencesRepublishOnRecconect" />
 </PreferenceScreen>

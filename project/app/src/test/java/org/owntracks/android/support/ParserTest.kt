@@ -40,7 +40,7 @@ class ParserTest {
         val regions: MutableList<String> = LinkedList()
         regions.add("Testregion1")
         regions.add("Testregion2")
-        messageLocation = MessageLocation(MessageCreatedAtNow(FakeClock())).apply {
+        messageLocation = MessageLocation(MessageCreatedAtNow(FakeFixedClock())).apply {
             accuracy = 10
             altitude = 20
             latitude = 50.1
@@ -711,7 +711,7 @@ class ParserTest {
     }
     //endregion
 
-    inner class FakeClock : Clock {
+    inner class FakeFixedClock : Clock {
         override val time: Long = 25
     }
 }

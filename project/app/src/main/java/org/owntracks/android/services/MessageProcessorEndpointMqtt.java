@@ -61,6 +61,7 @@ import timber.log.Timber;
 
 public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint implements StatefulServiceMessageProcessor, SharedPreferences.OnSharedPreferenceChangeListener {
     public static final int MODE_ID = 0;
+    private final LocationProcessor locationProcessor;
 
     private IMqttAsyncClient mqttClient;
 
@@ -78,7 +79,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
     private final Semaphore connectingLock = new Semaphore(1);
 
-    MessageProcessorEndpointMqtt(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus, RunThingsOnOtherThreads runThingsOnOtherThreads, Context applicationContext) {
+    MessageProcessorEndpointMqtt(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus, RunThingsOnOtherThreads runThingsOnOtherThreads, Context applicationContext, LocationProcessor locationProcessor) {
         super(messageProcessor);
         this.parser = parser;
         this.preferences = preferences;
@@ -87,6 +88,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         this.messageProcessor = messageProcessor;
         this.runThingsOnOtherThreads = runThingsOnOtherThreads;
         this.applicationContext = applicationContext;
+        this.locationProcessor = locationProcessor;
         if (preferences != null) {
             preferences.registerOnPreferenceChangedListener(this);
         }
@@ -145,10 +147,13 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     }
 
     private final MqttCallbackExtended iCallbackClient = new MqttCallbackExtended() {
+        private boolean wasConnectionLost = false;
+
         @Override
         public void connectComplete(boolean reconnect, String serverURI) {
             Timber.d("Connect Complete. Reconnected: %s, serverUri:%s", reconnect, serverURI);
-            onConnect();
+            onConnect(wasConnectionLost);
+            wasConnectionLost = false;
         }
 
         @Override
@@ -163,6 +168,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
             changeState(EndpointState.DISCONNECTED.withError(cause));
             Timber.d("Releasing connectinglock");
             connectingLock.release();
+            wasConnectionLost = true;
             scheduler.scheduleMqttReconnect();
         }
 
@@ -405,7 +411,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         }
     }
 
-    private void onConnect() {
+    private void onConnect(boolean wasConnectionLost) {
         Timber.d("MQTT connected!. Running onconnect handler (threadID %s)", Thread.currentThread());
         scheduler.scheduleMqttMaybeReconnectAndPing(preferences.getKeepalive());
 
@@ -439,6 +445,10 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         subscribe(topics.toArray(new String[0]));
 
         messageProcessor.resetMessageSleepBlock();
+
+        if (preferences.getPublishLocationOnConnect()) {
+            locationProcessor.publishLocationMessage(null); // TODO fix the trigger here
+        }
     }
 
     @NotNull

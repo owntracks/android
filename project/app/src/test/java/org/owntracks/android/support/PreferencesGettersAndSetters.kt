@@ -362,6 +362,14 @@ class PreferencesGettersAndSetters(
                     Boolean::class,
                     false
                 ),
+                arrayOf(
+                    "PublishLocationOnConnect",
+                    "publishLocationOnConnect",
+                    true,
+                    true,
+                    Boolean::class,
+                    false
+                ),
                 arrayOf("Sub", "sub", true, true, Boolean::class, false),
                 arrayOf("SubQos", "subQos", 1, 1, Int::class, false),
                 arrayOf(
@@ -446,6 +454,7 @@ class PreferencesGettersAndSetters(
                 on { getString(eq(R.string.preferenceKeyPing)) } doReturn "ping"
                 on { getString(eq(R.string.preferenceKeyPort)) } doReturn "port"
                 on { getString(eq(R.string.preferenceKeyPublishExtendedData)) } doReturn "pubExtendedData"
+                on { getString(eq(R.string.preferenceKeyPublishLocationOnConnect)) } doReturn "publishLocationOnConnect"
                 on { getString(eq(R.string.preferenceKeyPubQos)) } doReturn "pubQos"
                 on { getString(eq(R.string.preferenceKeyPubRetain)) } doReturn "pubRetain"
                 on { getString(eq(R.string.preferenceKeyPubTopicBase)) } doReturn "pubTopicBase"

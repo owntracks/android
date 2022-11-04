@@ -34,6 +34,7 @@
     <bool name="valRemoteConfiguration">false</bool>
     <bool name="valShowRegionsOnMap">false</bool>
     <bool name="valEnableMapRotation">true</bool>
+    <bool name="valPublishLocationOnConnect">false</bool>
     <bool name="valPegLocatorFastestIntervalToInterval">false</bool>
 
     <string name="valEmpty" translatable="false" />
