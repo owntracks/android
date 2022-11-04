@@ -363,8 +363,8 @@ class PreferencesGettersAndSetters(
                     false
                 ),
                 arrayOf(
-                    "RepublishOnReconnect",
-                    "republishOnReconnect",
+                    "PublishLocationOnConnect",
+                    "publishLocationOnConnect",
                     true,
                     true,
                     Boolean::class,
@@ -454,12 +454,12 @@ class PreferencesGettersAndSetters(
                 on { getString(eq(R.string.preferenceKeyPing)) } doReturn "ping"
                 on { getString(eq(R.string.preferenceKeyPort)) } doReturn "port"
                 on { getString(eq(R.string.preferenceKeyPublishExtendedData)) } doReturn "pubExtendedData"
+                on { getString(eq(R.string.preferenceKeyPublishLocationOnConnect)) } doReturn "publishLocationOnConnect"
                 on { getString(eq(R.string.preferenceKeyPubQos)) } doReturn "pubQos"
                 on { getString(eq(R.string.preferenceKeyPubRetain)) } doReturn "pubRetain"
                 on { getString(eq(R.string.preferenceKeyPubTopicBase)) } doReturn "pubTopicBase"
                 on { getString(eq(R.string.preferenceKeyRemoteCommand)) } doReturn "cmd"
                 on { getString(eq(R.string.preferenceKeyRemoteConfiguration)) } doReturn "remoteConfiguration"
-                on { getString(eq(R.string.preferenceKeyPublishLocationOnConnect)) } doReturn "republishOnReconnect"
                 on { getString(eq(R.string.preferenceKeyReverseGeocodeProvider)) } doReturn "reverseGeocodeProvider"
                 on { getString(eq(R.string.preferenceKeySetupNotCompleted)) } doReturn "setupNotCompleted"
                 on { getString(eq(R.string.preferenceKeySub)) } doReturn "sub"
