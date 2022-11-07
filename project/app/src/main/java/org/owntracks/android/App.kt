@@ -70,6 +70,8 @@ class App : Application(), Configuration.Provider {
                 Conscrypt.newProviderBuilder().provideTrustManager(false).build(), 1
             )
         }
+
+        // Bring in a real version of BC and don't use the device version.
         Security.removeProvider("BC")
         Security.addProvider(BouncyCastleProvider())
 

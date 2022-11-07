@@ -214,6 +214,8 @@ dependencies {
     implementation(libs.apache.httpcore)
     implementation(libs.commons.codec)
 
+    // The BC version shipped under com.android is half-broken. Weird certificate issues etc.
+    // To solve, we bring in our own version of BC
     implementation(libs.bouncycastle)
 
     // Widget libraries
