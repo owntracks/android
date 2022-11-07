@@ -6,8 +6,6 @@ import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-import androidx.datastore.core.DataStore
-import androidx.datastore.core.Serializer
 import androidx.preference.PreferenceManagerFix
 import com.fasterxml.jackson.annotation.JsonValue
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -28,7 +26,6 @@ class Preferences @Inject constructor(
     private val preferencesStore: PreferencesStore,
     private val appShortcuts: AppShortcuts,
 ) {
-
     init {
         // Need to set the preferences to their default values
         // From https://stackoverflow.com/a/2877795/352740
@@ -40,69 +37,82 @@ class Preferences @Inject constructor(
         ).forEach {
             PreferenceManagerFix.setDefaultValues(applicationContext, it, true)
         }
-
-
     }
 
-    var autostartOnBoot: Boolean by preferencesStore
-    var cleanSession: Boolean by preferencesStore
-    var clientId: String by preferencesStore
-    var connectionTimeoutSeconds: Int by preferencesStore
-    var enableMapRotation: Boolean by preferencesStore
-    var encryptionKey: String by preferencesStore
-    var experimentalFeatures: Set<String> by preferencesStore
-    var host: String by preferencesStore
-    var info: Boolean by preferencesStore
-    var isSetupCompleted: Boolean by preferencesStore
-    var keepalive: Int by preferencesStore
-    var locatorDisplacement: Int by preferencesStore
-    var locatorInterval: Int by preferencesStore
-    var mapLayerStyle: MapLayerStyle by preferencesStore
+    val something =listOf(Boolean::class).map { it to PreferencesStore.PreferenceStoreDelegate<it>(preferencesStore) }
+
+    val parp = mapOf<Class, PreferencesStore.PreferenceStoreDelegate>(
+        Boolean to PreferencesStore.PreferenceStoreDelegate<Boolean>(preferencesStore)
+    )
+
+
+    val boolDelegate = PreferencesStore.PreferenceStoreDelegate<Boolean>(preferencesStore)
+    val stringDelegate = PreferencesStore.PreferenceStoreDelegate<String>(preferencesStore)
+    val intDelegate = PreferencesStore.PreferenceStoreDelegate<Int>(preferencesStore)
+    val floatDelegate = PreferencesStore.PreferenceStoreDelegate<Float>(preferencesStore)
+    val stringSetDelegate = PreferencesStore.PreferenceStoreDelegate<Set<String>>(preferencesStore)
+    val mapLayerStyleDelegate = PreferencesStore.PreferenceStoreDelegate<MapLayerStyle>(preferencesStore)
+    val reverseGeocodeProviderDelegate = PreferencesStore.PreferenceStoreDelegate<ReverseGeocodeProvider>(preferencesStore)
+
+    var autostartOnBoot: Boolean by boolDelegate
+    var cleanSession: Boolean by boolDelegate
+    var clientId: String by stringDelegate
+    var connectionTimeoutSeconds: Int by intDelegate
+    var enableMapRotation: Boolean by boolDelegate
+    var encryptionKey: String by stringDelegate
+    var experimentalFeatures: Set<String> by stringSetDelegate
+    var host: String by stringDelegate
+    var info: Boolean by boolDelegate
+    var isSetupCompleted: Boolean by boolDelegate
+    var keepalive: Int by intDelegate
+    var locatorDisplacement: Int by intDelegate
+    var locatorInterval: Int by intDelegate
+    var mapLayerStyle: MapLayerStyle by mapLayerStyleDelegate
     var mode: ConnectionMode by preferencesStore
     var monitoring: MonitoringMode by preferencesStore
-    var remoteConfiguration: Boolean by preferencesStore
-    var debugLog: Boolean by preferencesStore
-    var moveModeLocatorInterval: Int by preferencesStore
+    var remoteConfiguration: Boolean by boolDelegate
+    var debugLog: Boolean by boolDelegate
+    var moveModeLocatorInterval: Int by intDelegate
     var mqttProtocolLevel: MqttProtocolLevel by preferencesStore
-    var notificationGeocoderErrors: Boolean by preferencesStore
-    var notificationHigherPriority: Boolean by preferencesStore
-    var notificationLocation: Boolean by preferencesStore
-    var openCageGeocoderApiKey: String by preferencesStore
-    var password: String by preferencesStore
-    var pegLocatorFastestIntervalToInterval: Boolean by preferencesStore
-    var locatorPriority: Int by preferencesStore
-    var ping: Int by preferencesStore
-    var port: Int by preferencesStore
+    var notificationGeocoderErrors: Boolean by boolDelegate
+    var notificationHigherPriority: Boolean by boolDelegate
+    var notificationLocation: Boolean by boolDelegate
+    var openCageGeocoderApiKey: String by stringDelegate
+    var password: String by stringDelegate
+    var pegLocatorFastestIntervalToInterval: Boolean by boolDelegate
+    var locatorPriority: Int by intDelegate
+    var ping: Int by intDelegate
+    var port: Int by intDelegate
     var pubQosEvents: MqttQos by preferencesStore
     var pubQosLocations: MqttQos by preferencesStore
     var pubQosWaypoints: MqttQos by preferencesStore
-    var pubRetainEvents: Boolean by preferencesStore
-    var pubRetainLocations: Boolean by preferencesStore
-    var pubRetainWaypoints: Boolean by preferencesStore
-    var pubTopicBase: String by preferencesStore
-    var pubTopicCommands: String by preferencesStore
-    var pubTopicCommandsPart: String by preferencesStore
-    var pubTopicEvents: String by preferencesStore
-    var notificationEvents: Boolean by preferencesStore
-    var pubTopicEventsPart: String by preferencesStore
-    var userDeclinedEnableLocationPermissions: Boolean by preferencesStore
-    var pubTopicInfoPart: String by preferencesStore
-    var userDeclinedEnableLocationServices: Boolean by preferencesStore
-    var pubTopicLocations: String by preferencesStore
-    var pubTopicWaypoints: String by preferencesStore
-    var pubTopicWaypointsPart: String by preferencesStore
-    var reverseGeocodeProvider: ReverseGeocodeProvider by preferencesStore
-    var showRegionsOnMap: Boolean by preferencesStore
-    var sub: Boolean by preferencesStore
-    var subTopic: String by preferencesStore
+    var pubRetainEvents: Boolean by boolDelegate
+    var pubRetainLocations: Boolean by boolDelegate
+    var pubRetainWaypoints: Boolean by boolDelegate
+    var pubTopicBase: String by stringDelegate
+    var pubTopicCommands: String by stringDelegate
+    var pubTopicCommandsPart: String by stringDelegate
+    var pubTopicEvents: String by stringDelegate
+    var notificationEvents: Boolean by boolDelegate
+    var pubTopicEventsPart: String by stringDelegate
+    var userDeclinedEnableLocationPermissions: Boolean by boolDelegate
+    var pubTopicInfoPart: String by stringDelegate
+    var userDeclinedEnableLocationServices: Boolean by boolDelegate
+    var pubTopicLocations: String by stringDelegate
+    var pubTopicWaypoints: String by stringDelegate
+    var pubTopicWaypointsPart: String by stringDelegate
+    var reverseGeocodeProvider: ReverseGeocodeProvider by reverseGeocodeProviderDelegate
+    var showRegionsOnMap: Boolean by boolDelegate
+    var sub: Boolean by boolDelegate
+    var subTopic: String by stringDelegate
     var theme: NightMode by preferencesStore
-    var tls: Boolean by preferencesStore
-    var tlsCaCrt: String by preferencesStore
-    var osmTileScaleFactor: Float by preferencesStore
-    var tlsClientCrt: String by preferencesStore
-    var tlsClientCrtPassword: String by preferencesStore
-    var username: String by preferencesStore
-    var ws: Boolean by preferencesStore
+    var tls: Boolean by boolDelegate
+    var tlsCaCrt: String by stringDelegate
+    var osmTileScaleFactor: Float by floatDelegate
+    var tlsClientCrt: String by stringDelegate
+    var tlsClientCrtPassword: String by stringDelegate
+    var username: String by stringDelegate
+    var ws: Boolean by boolDelegate
 
     val minimumKeepaliveSeconds = MIN_PERIODIC_INTERVAL_MILLIS.milliseconds.inWholeSeconds
     fun keepAliveInRange(i: Int): Boolean = i >= minimumKeepaliveSeconds

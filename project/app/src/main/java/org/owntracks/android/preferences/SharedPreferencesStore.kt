@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.os.Build
 import androidx.preference.PreferenceManager
 import dagger.hilt.android.qualifiers.ApplicationContext
+import org.owntracks.android.preferences.PreferencesStore
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -14,7 +15,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class SharedPreferencesStore @Inject constructor(@ApplicationContext private val context: Context) :
-        PreferenceDataStoreShim() {
+PreferencesStore {
 
     private val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
