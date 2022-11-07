@@ -1,7 +1,6 @@
 package org.owntracks.android.preferences
 
 import android.content.SharedPreferences
-import org.owntracks.android.ui.map.MapLayerStyle
 import kotlin.reflect.KProperty
 import kotlin.reflect.jvm.jvmErasure
 
@@ -38,42 +37,37 @@ interface PreferencesStore {
         listener: SharedPreferences.OnSharedPreferenceChangeListener
     )
 
-    /**
-     * WTF
-     */
+    // For getting, we have to maybe assume that the type that we're passed of the property will
+    // be the same as what was previously written to the store, and then just throw caution to
+    // the wind and cast it to that thing.
     @Suppress("UNCHECKED_CAST")
-    class PreferenceStoreDelegate<T>(private val store: PreferencesStore) {
-        // For getting, we have to maybe assume that the type that we're passed of the property will
-        // be the same as what was previously written to the store, and then just throw caution to
-        // the wind and cast it to that thing.
-        operator fun <T> getValue(preferences: Preferences, property: KProperty<*>): T {
-            return when (property.returnType.jvmErasure) {
-                Boolean::class -> store.getBoolean(property.name, false) as T
-                String::class -> store.getString(property.name, "") as T
-                Int::class -> store.getInt(property.name, 0) as T
-                Float::class -> store.getFloat(property.name, 0f) as T
-                Set::class -> store.getStringSet(property.name) as T
+    operator fun <T> getValue(preferences: Preferences, property: KProperty<*>): T {
+        return when (property.returnType.jvmErasure) {
+            Boolean::class -> getBoolean(property.name, false) as T
+            String::class -> getString(property.name, "") as T
+            Int::class -> getInt(property.name, 0) as T
+            Float::class -> getFloat(property.name, 0f) as T
+            Set::class -> getStringSet(property.name) as T
 
-                ReverseGeocodeProvider::class -> ReverseGeocodeProvider.getByValue(
-                    store.getString(
-                        property.name,
-                        ""
-                    ) ?: ""
-                ) as T
-                else -> throw Exception("BAD BAD BAD BAD")
-            }
+            ReverseGeocodeProvider::class -> ReverseGeocodeProvider.getByValue(
+                getString(
+                    property.name,
+                    ""
+                ) ?: ""
+            ) as T
+            else -> throw Exception("BAD BAD BAD BAD")
         }
+    }
 
-        // For setting, we just switch on the type of the value
-        operator fun <T> setValue(preferences: Preferences, property: KProperty<*>, value: T) {
-            when (value) {
-                is Boolean -> store.putBoolean(property.name, value)
-                is String -> store.putString(property.name, value)
-                is Int -> store.putInt(property.name, value)
-                is Float -> store.putFloat(property.name, value)
-                is ReverseGeocodeProvider -> store.putString(property.name, value.value)
-                else -> throw Exception("Nopety nope.")
-            }
+    // For setting, we just switch on the type of the value
+    operator fun <T> setValue(preferences: Preferences, property: KProperty<*>, value: T) {
+        when (value) {
+            is Boolean -> putBoolean(property.name, value)
+            is String -> putString(property.name, value)
+            is Int -> putInt(property.name, value)
+            is Float -> putFloat(property.name, value)
+            is ReverseGeocodeProvider -> putString(property.name, value.value)
+            else -> throw Exception("Nopety nope.")
         }
     }
 }
