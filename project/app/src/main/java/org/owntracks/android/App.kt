@@ -15,6 +15,7 @@ import androidx.work.Configuration
 import androidx.work.WorkerFactory
 import dagger.hilt.EntryPoints
 import dagger.hilt.android.HiltAndroidApp
+import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.conscrypt.Conscrypt
 import org.owntracks.android.di.CustomBindingComponentBuilder
 import org.owntracks.android.di.CustomBindingEntryPoint
@@ -69,6 +70,10 @@ class App : Application(), Configuration.Provider {
                 Conscrypt.newProviderBuilder().provideTrustManager(false).build(), 1
             )
         }
+
+        // Bring in a real version of BC and don't use the device version.
+        Security.removeProvider("BC")
+        Security.addProvider(BouncyCastleProvider())
 
         super.onCreate()
 
