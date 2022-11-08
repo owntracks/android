@@ -120,7 +120,7 @@ r8 = { module = "com.android.tools:r8", version.ref = "r8" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 
 conscrypt = { module = "org.conscrypt:conscrypt-android", version.ref = "conscrypt" }
-bouncycastle = { module = "org.bouncycastle:bcpkix-jdk15to18", version.ref = "bouncycastle" }
+bouncycastle = { module = "org.bouncycastle:bcprov-jdk14", version.ref = "bouncycastle" }
 
 [bundles]
 jackson = ["jackson-core", "jackson-databind", "jackson-module-kotlin", "jackson-datatype-jsr310", "jackson-threetenbp", "threetenbp"]
