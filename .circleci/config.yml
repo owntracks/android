@@ -43,6 +43,7 @@ jobs:
           mapping: |
             .circleci\/.*\.yml source-changed true
             project\/app\/src\/.* source-changed true
+            project\/app\/.*\.pro source-changed true
             project\/buildSrc\/src\/.* source-changed true
             project\/.*\.gradle\.kts source-changed true
             project\/gradle\/libs.versions.toml source-changed true
