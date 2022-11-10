@@ -175,8 +175,8 @@ commands:
           save-gradle-cache: false
 
 orbs:
-  android: circleci/android@2.1.0
-  codecov: codecov/codecov@3.2.2
+  android: circleci/android@2.1.2
+  codecov: codecov/codecov@3.2.4
 
 jobs:
   build-release:
