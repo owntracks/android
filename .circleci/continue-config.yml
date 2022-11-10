@@ -105,6 +105,14 @@ executors:
       image: android:2022.09.1
 
 commands:
+  android-init:
+    steps:
+      - checkout
+      - android/accept-licenses
+      - run: |
+          sudo apt-get update
+      - android/change-java-version:
+          java-version: << pipeline.parameters.jdk-version >>
   restore-gradle-cache:
     parameters:
       version:
@@ -175,7 +183,7 @@ commands:
           save-gradle-cache: false
 
 orbs:
-  android: circleci/android@2.1.2
+  android: circleci/android@2.1.0
   codecov: codecov/codecov@3.2.4
 
 jobs:
@@ -183,10 +191,7 @@ jobs:
     executor: android-docker
     resource_class: large
     steps:
-      - checkout
-      - android/accept-licenses
-      - android/change-java-version:
-          java-version: << pipeline.parameters.jdk-version >>
+      - android-init
       - restore-gradle-cache
       - run:
           name: Set credentials
@@ -224,10 +229,7 @@ jobs:
     executor: android-docker
     resource_class: large
     steps:
-      - checkout
-      - android/accept-licenses
-      - android/change-java-version:
-          java-version: << pipeline.parameters.jdk-version >>
+      - android-init
       - restore-gradle-cache
       - run:
           name: Unit Test
@@ -246,10 +248,7 @@ jobs:
     executor: android-docker
     resource_class: medium+
     steps:
-      - checkout
-      - android/accept-licenses
-      - android/change-java-version:
-          java-version: << pipeline.parameters.jdk-version >>
+      - android-init
       - restore-gradle-cache
       - run:
           name: Lint
@@ -279,10 +278,7 @@ jobs:
     environment:
       GRADLE_OPTS: "-Dkotlin.compiler.execution.strategy=in-process"
     steps:
-      - checkout
-      - android/accept-licenses
-      - android/change-java-version:
-          java-version: << pipeline.parameters.jdk-version >>
+      - android-init
       - restore-gradle-cache
       - run:
           name: Prepare parameterised test command
@@ -329,11 +325,7 @@ jobs:
     executor: android-docker
     resource_class: medium
     steps:
-      # Checkout the code as the first step.
-      - checkout
-      - android/accept-licenses
-      - android/change-java-version:
-          java-version: << pipeline.parameters.jdk-version >>
+      - android-init
       - restore-gradle-cache
       - run:
           name: Set credentials
