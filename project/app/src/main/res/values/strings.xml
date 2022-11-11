@@ -221,6 +221,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesTheme">"Theme"</string>
     <string name="preferencesTrackerId">"Tracker ID"</string>
     <string name="preferencesTwitter" translatable="false">"Twitter"</string>
+    <string name="preferencesMastodon" translatable="false">"Mastodon"</string>
     <string name="preferencesUrl" translatable="false">"URL"</string>
     <string name="preferencesUserUsername">"Username"</string>
     <string name="preferencesWebsocket">"Use WebSockets"</string>
