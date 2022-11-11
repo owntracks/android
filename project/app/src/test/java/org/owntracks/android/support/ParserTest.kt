@@ -16,7 +16,7 @@ import org.owntracks.android.location.geofencing.Geofence
 import org.owntracks.android.model.BatteryStatus
 import org.owntracks.android.model.CommandAction
 import org.owntracks.android.model.messages.*
-import org.owntracks.android.preferences.MonitoringMode
+import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.Parser.EncryptionException
 import java.io.ByteArrayInputStream

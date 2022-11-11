@@ -16,7 +16,7 @@ import org.owntracks.android.model.messages.MessageWaypoint;
 import org.owntracks.android.model.messages.MessageWaypoints;
 import org.owntracks.android.support.DeviceMetricsProvider;
 import org.owntracks.android.support.MessageWaypointCollection;
-import org.owntracks.android.preferences.MonitoringMode;
+import org.owntracks.android.preferences.types.MonitoringMode;
 import org.owntracks.android.preferences.Preferences;
 
 import java.util.LinkedList;
@@ -101,7 +101,7 @@ public class LocationProcessor {
             message = MessageLocation.fromLocation(currentLocation, Build.VERSION.SDK_INT);
         }
         message.setTrigger(trigger);
-        message.setTrackerId(preferences.getTrackerId(true));
+        message.setTrackerId(preferences.getTrackerId().getValue());
         message.setInregions(calculateInregions(loadedWaypoints));
 
         messageProcessor.queueMessageForSending(message);
@@ -164,7 +164,7 @@ public class LocationProcessor {
         MessageTransition message = new MessageTransition();
         message.setTransition(transition);
         message.setTrigger(trigger);
-        message.setTrackerId(preferences.getTrackerId(true));
+        message.setTrackerId(preferences.getTrackerId().getValue());
         message.setLatitude(triggeringLocation.getLatitude());
         message.setLongitude(triggeringLocation.getLongitude());
         message.setAccuracy(triggeringLocation.getAccuracy());

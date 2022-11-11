@@ -1,0 +1,8 @@
+package org.owntracks.android.preferences.types
+
+import com.fasterxml.jackson.annotation.JsonValue
+
+enum class ConnectionMode(@JsonValue val value: Int) {
+    MQTT(0),
+    HTTP(3);
+}

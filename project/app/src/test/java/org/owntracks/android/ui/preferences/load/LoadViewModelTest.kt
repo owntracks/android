@@ -8,10 +8,10 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.owntracks.android.support.InMemoryPreferencesStore
+import org.owntracks.android.preferences.InMemoryPreferencesStore
 import org.owntracks.android.support.Parser
 import org.owntracks.android.preferences.Preferences
-import org.owntracks.android.support.PreferencesGettersAndSetters
+import org.owntracks.android.preferences.PreferencesGettersAndSetters
 import org.owntracks.android.preferences.PreferencesStore
 import org.owntracks.android.ui.NoopAppShortcuts
 import java.net.URI

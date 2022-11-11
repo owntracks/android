@@ -83,7 +83,7 @@ class EditorActivity :
             ArrayAdapter(
                 this,
                 android.R.layout.simple_dropdown_item_1line,
-                preferences.importKeys
+                preferences.allKeys.toList()
             )
         )
         builder.setTitle(R.string.preferencesEditor)

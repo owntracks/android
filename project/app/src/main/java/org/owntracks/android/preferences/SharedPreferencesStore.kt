@@ -1,21 +1,21 @@
-package org.owntracks.android.support.preferences
+package org.owntracks.android.preferences
 
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
 import androidx.preference.PreferenceManager
 import dagger.hilt.android.qualifiers.ApplicationContext
-import org.owntracks.android.preferences.PreferencesStore
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
+import org.owntracks.android.preferences.PreferencesStore
+import timber.log.Timber
 
 /***
  * Implements a PreferencesStore that uses a SharedPreferecnces as a backend.
  */
 @Singleton
 class SharedPreferencesStore @Inject constructor(@ApplicationContext private val context: Context) :
-PreferencesStore {
+    PreferencesStore {
 
     private val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
@@ -26,26 +26,26 @@ PreferencesStore {
     @Suppress("UNCHECKED_CAST")
     private fun migrateToSingleSharedPreferences() {
         val oldSharedPreferenceNames = listOf(
-                "org.owntracks.android.preferences.private",
-                "org.owntracks.android.preferences.http"
+            "org.owntracks.android.preferences.private",
+            "org.owntracks.android.preferences.http"
         )
 
         with(sharedPreferences.edit()) {
             oldSharedPreferenceNames
-                    .map { context.getSharedPreferences(it, Context.MODE_PRIVATE) }
-                    .forEach {
-                        it.all.forEach { (key, value) ->
-                            Timber.d("Migrating legacy preference $key from $it")
-                            when (value) {
-                                is String -> putString(key, value)
-                                is Set<*> -> putStringSet(key, value as Set<String>)
-                                is Boolean -> putBoolean(key, value)
-                                is Int -> putInt(key, value)
-                                is Long -> putLong(key, value)
-                                is Float -> putFloat(key, value)
-                            }
+                .map { context.getSharedPreferences(it, Context.MODE_PRIVATE) }
+                .forEach {
+                    it.all.forEach { (key, value) ->
+                        Timber.d("Migrating legacy preference $key from $it")
+                        when (value) {
+                            is String -> putString(key, value)
+                            is Set<*> -> putStringSet(key, value as Set<String>)
+                            is Boolean -> putBoolean(key, value)
+                            is Int -> putInt(key, value)
+                            is Long -> putLong(key, value)
+                            is Float -> putFloat(key, value)
                         }
                     }
+                }
             if (commit()) {
                 oldSharedPreferenceNames.forEach {
                     context.getSharedPreferences(it, Context.MODE_PRIVATE).edit().clear().apply()
@@ -54,7 +54,7 @@ PreferencesStore {
                     oldSharedPreferenceNames.forEach {
                         val deleted = context.deleteSharedPreferences(it)
                         if (!deleted) {
-                            Timber.w("Failed to delete shared preference $it")
+                            Timber.e("Failed to delete shared preference $it")
                         }
                     }
                 }
@@ -62,49 +62,51 @@ PreferencesStore {
         }
     }
 
+    override fun putString(key: String, value: String) =
+        sharedPreferences.edit().putString(key, value).apply()
 
-    override fun putString(key: String, value: String?) =
-            sharedPreferences.edit().putString(key, value).apply()
-
-
-    override fun getString(key: String, default: String?): String? =
-            sharedPreferences.getString(key, default)
+    override fun getString(key: String, default: String): String? =
+        sharedPreferences.getString(key, default)
 
     override fun remove(key: String) =
-            sharedPreferences.edit().remove(key).apply()
-
+        sharedPreferences.edit().remove(key).apply()
 
     override fun getBoolean(key: String, default: Boolean): Boolean =
-            sharedPreferences.getBoolean(key, default)
+        sharedPreferences.getBoolean(key, default)
 
+    override fun getSharedPreferencesName(): String = sharedPreferences.toString()
 
     override fun putBoolean(key: String, value: Boolean) =
-            sharedPreferences.edit().putBoolean(key, value).apply()
+        sharedPreferences.edit().putBoolean(key, value).apply()
 
     override fun getInt(key: String, default: Int): Int =
-            sharedPreferences.getInt(key, default)
+        sharedPreferences.getInt(key, default)
 
-    override fun putInt(key: String, value: Int) {
+    override fun putFloat(key: String, value: Float) =
+        sharedPreferences.edit().putFloat(key, value).apply()
+
+    override fun getFloat(key: String, default: Float): Float =
+        sharedPreferences.getFloat(key, default)
+
+    override fun putInt(key: String, value: Int) =
         sharedPreferences.edit().putInt(key, value).apply()
-    }
 
-    override fun putStringSet(key: String, values: Set<String>?) {
+    override fun putStringSet(key: String, values: Set<String>) {
         sharedPreferences.edit().putStringSet(key, values).apply()
     }
 
-    override fun getStringSet(key: String, defValues: Set<String>?): Set<String>? {
-        return sharedPreferences.getStringSet(key, defValues) ?: defValues
+    override fun getStringSet(key: String, defaultValues: Set<String>): Set<String> =
+        sharedPreferences.getStringSet(key, defaultValues) ?: defaultValues
+
+    override fun registerOnSharedPreferenceChangeListener(
+        listener: SharedPreferences.OnSharedPreferenceChangeListener
+    ) {
+        sharedPreferences.registerOnSharedPreferenceChangeListener(listener)
     }
 
-    override fun contains(key: String): Boolean {
-        return sharedPreferences.contains(key)
-    }
-
-    override fun registerOnSharedPreferenceChangeListener(listenerModeChanged: SharedPreferences.OnSharedPreferenceChangeListener) {
-        sharedPreferences.registerOnSharedPreferenceChangeListener(listenerModeChanged)
-    }
-
-    override fun unregisterOnSharedPreferenceChangeListener(listenerModeChanged: SharedPreferences.OnSharedPreferenceChangeListener) {
-        sharedPreferences.unregisterOnSharedPreferenceChangeListener(listenerModeChanged)
+    override fun unregisterOnSharedPreferenceChangeListener(
+        listener: SharedPreferences.OnSharedPreferenceChangeListener
+    ) {
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(listener)
     }
 }

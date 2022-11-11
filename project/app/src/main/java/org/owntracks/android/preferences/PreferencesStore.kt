@@ -1,8 +1,9 @@
 package org.owntracks.android.preferences
 
 import android.content.SharedPreferences
+import org.owntracks.android.preferences.types.ReverseGeocodeProvider
 import kotlin.reflect.KProperty
-import kotlin.reflect.jvm.jvmErasure
+import kotlin.reflect.typeOf
 
 /***
  * Allows a preferences class to read and write values from some sort of store
@@ -23,9 +24,7 @@ interface PreferencesStore {
     fun getString(key: String, default: String): String?
 
     fun putStringSet(key: String, values: Set<String>)
-    fun getStringSet(key: String): Set<String>
-
-    fun hasKey(key: String): Boolean
+    fun getStringSet(key: String, defaultValues: Set<String>): Set<String>
 
     fun remove(key: String)
 
@@ -42,14 +41,13 @@ interface PreferencesStore {
     // the wind and cast it to that thing.
     @Suppress("UNCHECKED_CAST")
     operator fun <T> getValue(preferences: Preferences, property: KProperty<*>): T {
-        return when (property.returnType.jvmErasure) {
-            Boolean::class -> getBoolean(property.name, false) as T
-            String::class -> getString(property.name, "") as T
-            Int::class -> getInt(property.name, 0) as T
-            Float::class -> getFloat(property.name, 0f) as T
-            Set::class -> getStringSet(property.name) as T
-
-            ReverseGeocodeProvider::class -> ReverseGeocodeProvider.getByValue(
+        return when (property.returnType) {
+            typeOf<Boolean>() -> getBoolean(property.name, false) as T
+            typeOf<String>() -> getString(property.name, "") as T
+            typeOf<Int>() -> getInt(property.name, 0) as T
+            typeOf<Float>() -> getFloat(property.name, 0f) as T
+            typeOf<Set<String>>() -> getStringSet(property.name, emptySet()) as T
+            typeOf<ReverseGeocodeProvider>() -> ReverseGeocodeProvider.getByValue(
                 getString(
                     property.name,
                     ""
@@ -60,12 +58,14 @@ interface PreferencesStore {
     }
 
     // For setting, we just switch on the type of the value
+    @Suppress("UNCHECKED_CAST")
     operator fun <T> setValue(preferences: Preferences, property: KProperty<*>, value: T) {
         when (value) {
             is Boolean -> putBoolean(property.name, value)
             is String -> putString(property.name, value)
             is Int -> putInt(property.name, value)
             is Float -> putFloat(property.name, value)
+            is Set<*> -> putStringSet(property.name, value as Set<String>)
             is ReverseGeocodeProvider -> putString(property.name, value.value)
             else -> throw Exception("Nopety nope.")
         }

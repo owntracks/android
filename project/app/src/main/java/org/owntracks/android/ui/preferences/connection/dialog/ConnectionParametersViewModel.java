@@ -22,7 +22,7 @@ public class ConnectionParametersViewModel extends BaseDialogViewModel {
     @Override
     public void load() {
         this.cleanSession = preferences.getCleanSession();
-        this.keepaliveText = preferences.getKeepaliveWithHintSupport();
+        this.keepaliveText = String.valueOf(preferences.getKeepalive());
     }
 
     @Override

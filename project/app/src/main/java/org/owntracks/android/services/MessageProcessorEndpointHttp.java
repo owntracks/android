@@ -11,9 +11,10 @@ import org.owntracks.android.BuildConfig;
 import org.owntracks.android.R;
 import org.owntracks.android.data.EndpointState;
 import org.owntracks.android.model.messages.MessageBase;
+import org.owntracks.android.preferences.Preferences;
+import org.owntracks.android.preferences.types.ConnectionMode;
 import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.Parser;
-import org.owntracks.android.preferences.Preferences;
 import org.owntracks.android.support.SocketFactory;
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException;
 
@@ -38,8 +39,6 @@ import okhttp3.Response;
 import timber.log.Timber;
 
 public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint implements SharedPreferences.OnSharedPreferenceChangeListener {
-    public static final int MODE_ID = 3;
-
     // Headers according to https://github.com/owntracks/recorder#http-mode
     static final String HEADER_USERNAME = "X-Limit-U";
     static final String HEADER_DEVICE = "X-Limit-D";
@@ -307,8 +306,8 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
     }
 
     @Override
-    int getModeId() {
-        return MODE_ID;
+    ConnectionMode getModeId() {
+        return ConnectionMode.HTTP;
     }
 
     @Override

@@ -46,12 +46,11 @@ import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.databinding.UiMapBinding
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.model.FusedContact
-import org.owntracks.android.preferences.ConnectionMode
+import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.services.BackgroundService.BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG
-import org.owntracks.android.services.MessageProcessorEndpointHttp
 import org.owntracks.android.support.ContactImageBindingAdapter
-import org.owntracks.android.preferences.MonitoringMode
+import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.preferences.Preferences.Companion.EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION
 import org.owntracks.android.support.RequirementsChecker
 import org.owntracks.android.support.RunThingsOnOtherThreads

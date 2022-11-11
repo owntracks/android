@@ -24,7 +24,7 @@ import org.owntracks.android.di.CustomBindingComponentBuilder
 import org.owntracks.android.di.CustomBindingEntryPoint
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.logging.TimberInMemoryLogTree
-import org.owntracks.android.preferences.NightMode
+import org.owntracks.android.preferences.types.NightMode
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.services.worker.Scheduler

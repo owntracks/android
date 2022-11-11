@@ -1,6 +1,7 @@
 package org.owntracks.android.services;
 
 import org.owntracks.android.model.messages.MessageBase;
+import org.owntracks.android.preferences.types.ConnectionMode;
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException;
 import org.owntracks.android.support.interfaces.OutgoingMessageProcessor;
 
@@ -21,7 +22,7 @@ public abstract class MessageProcessorEndpoint implements OutgoingMessageProcess
 
     protected abstract MessageBase onFinalizeMessage(MessageBase message);
 
-    abstract int getModeId();
+    abstract ConnectionMode getModeId();
 
     abstract void sendMessage(MessageBase m) throws ConfigurationIncompleteException, OutgoingMessageSendingException, IOException;
 }

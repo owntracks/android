@@ -29,7 +29,7 @@ import org.owntracks.android.data.EndpointState;
 import org.owntracks.android.model.messages.MessageBase;
 import org.owntracks.android.model.messages.MessageCard;
 import org.owntracks.android.model.messages.MessageClear;
-import org.owntracks.android.preferences.ConnectionMode;
+import org.owntracks.android.preferences.types.ConnectionMode;
 import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Parser;
@@ -321,7 +321,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
             connectOptions.setPassword(preferences.getPassword().toCharArray());
         }
 
-        connectOptions.setMqttVersion(preferences.getMqttProtocolLevel());
+        connectOptions.setMqttVersion(preferences.getMqttProtocolLevel().getVal());
         InputStream clientCaInputStream = null;
         InputStream clientCertInputStream = null;
         try {
@@ -483,7 +483,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
     private int[] getSubTopicsQos(String[] topics) {
         int[] qos = new int[topics.length];
-        Arrays.fill(qos, preferences.getSubQos());
+        Arrays.fill(qos, preferences.getSubQos().getVal());
         return qos;
     }
 
@@ -620,6 +620,11 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     protected MessageBase onFinalizeMessage(MessageBase message) {
         // Not relevant for MQTT mode
         return message;
+    }
+
+    @Override
+    ConnectionMode getModeId() {
+        return ConnectionMode.MQTT;
     }
 }
 

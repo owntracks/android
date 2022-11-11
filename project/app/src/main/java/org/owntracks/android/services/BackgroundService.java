@@ -58,7 +58,7 @@ import org.owntracks.android.location.geofencing.GeofencingRequest;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.model.messages.MessageLocation;
 import org.owntracks.android.model.messages.MessageTransition;
-import org.owntracks.android.preferences.MonitoringMode;
+import org.owntracks.android.preferences.types.MonitoringMode;
 import org.owntracks.android.preferences.Preferences;
 import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.DateFormatter;

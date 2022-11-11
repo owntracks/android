@@ -26,7 +26,7 @@ public class ConnectionHostMqttDialogViewModel extends BaseDialogViewModel {
     @Override
     public void load() {
         this.host = preferences.getHost();
-        this.port = preferences.getPortWithHintSupport();
+        this.port = String.valueOf(preferences.getPort());
         this.ws = preferences.getWs();
         this.clientId = preferences.getClientId();
     }

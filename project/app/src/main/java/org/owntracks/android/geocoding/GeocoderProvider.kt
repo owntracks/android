@@ -14,7 +14,7 @@ import org.owntracks.android.R
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.preferences.Preferences
-import org.owntracks.android.preferences.ReverseGeocodeProvider
+import org.owntracks.android.preferences.types.ReverseGeocodeProvider
 import org.owntracks.android.ui.map.MapActivity
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneOffset.UTC

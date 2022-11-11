@@ -19,7 +19,7 @@
 //import org.owntracks.android.services.worker.Scheduler
 //import org.owntracks.android.support.Events.ModeChanged
 //import org.owntracks.android.support.Events.MonitoringChanged
-//import org.owntracks.android.preferences.MonitoringMode
+//import org.owntracks.android.preferences.types.MonitoringMode
 //import org.owntracks.android.ui.AppShortcuts
 //import org.owntracks.android.ui.map.MapLayerStyle
 //import timber.log.Timber

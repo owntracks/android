@@ -80,7 +80,7 @@ public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadM
 
     @Override
     public void saveConfiguration() {
-        preferences.importFromMessage(configuration);
+        preferences.importConfiguration(configuration);
         if (!configuration.getWaypoints().isEmpty()) {
             waypointsRepo.importFromMessage(configuration.getWaypoints());
         }

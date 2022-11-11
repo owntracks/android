@@ -36,7 +36,7 @@ public class ObjectboxWaypointsRepo extends WaypointsRepo {
         BoxStore boxStore = MyObjectBox.builder().androidContext(context).build();
         this.box = boxStore.boxFor(org.owntracks.android.data.WaypointModel.class);
         this.preferences = preferences;
-        if (!preferences.isObjectboxMigrated()) {
+        if (false) { // TODO ditch this once we get rid of objectbox
             migrateLegacyData(context);
         }
     }
@@ -91,7 +91,7 @@ public class ObjectboxWaypointsRepo extends WaypointsRepo {
         } catch (Exception e) {
             Timber.e(e, "Error during migration");
         } finally {
-            preferences.setObjectBoxMigrated();
+//            preferences.setObjectBoxMigrated();
         }
     }
 

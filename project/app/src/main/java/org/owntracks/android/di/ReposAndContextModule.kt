@@ -5,6 +5,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 import org.owntracks.android.App
 import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.data.repos.MemoryContactsRepo
@@ -12,7 +13,6 @@ import org.owntracks.android.data.repos.ObjectboxWaypointsRepo
 import org.owntracks.android.data.repos.WaypointsRepo
 import org.owntracks.android.preferences.PreferencesStore
 import org.owntracks.android.preferences.SharedPreferencesStore
-import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
 @Module

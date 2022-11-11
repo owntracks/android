@@ -13,7 +13,7 @@ class MessageWaypoints : MessageBase() {
     var waypoints: MessageWaypointCollection? = null
     override fun addMqttPreferences(preferences: Preferences) {
         topic = preferences.pubTopicWaypoints
-        qos = preferences.pubQosWaypoints.value
+        qos = preferences.pubQosWaypoints.getVal()
         retained = preferences.pubRetainWaypoints
     }
 

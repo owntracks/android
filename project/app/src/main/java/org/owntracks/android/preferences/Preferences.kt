@@ -7,24 +7,28 @@ import android.os.Build.VERSION.SDK_INT
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
 import androidx.preference.PreferenceManagerFix
-import com.fasterxml.jackson.annotation.JsonValue
 import dagger.hilt.android.qualifiers.ApplicationContext
-import org.owntracks.android.R
-import org.owntracks.android.model.messages.MessageConfiguration
-import org.owntracks.android.services.worker.Scheduler.MIN_PERIODIC_INTERVAL_MILLIS
-import org.owntracks.android.ui.AppShortcuts
-import org.owntracks.android.ui.map.MapLayerStyle
-import java.io.InputStream
-import java.io.OutputStream
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.time.Duration.Companion.milliseconds
+import org.owntracks.android.R
+import org.owntracks.android.model.messages.MessageConfiguration
+import org.owntracks.android.preferences.types.ConnectionMode
+import org.owntracks.android.preferences.types.MonitoringMode
+import org.owntracks.android.preferences.types.MqttProtocolLevel
+import org.owntracks.android.preferences.types.MqttQos
+import org.owntracks.android.preferences.types.NightMode
+import org.owntracks.android.preferences.types.ReverseGeocodeProvider
+import org.owntracks.android.preferences.types.StringMaxTwoAlphaNumericChars
+import org.owntracks.android.services.worker.Scheduler.MIN_PERIODIC_INTERVAL_MILLIS
+import org.owntracks.android.ui.AppShortcuts
+import org.owntracks.android.ui.map.MapLayerStyle
 
 @Singleton
 class Preferences @Inject constructor(
     @ApplicationContext private val applicationContext: Context,
     private val preferencesStore: PreferencesStore,
-    private val appShortcuts: AppShortcuts,
+    private val appShortcuts: AppShortcuts
 ) {
     init {
         // Need to set the preferences to their default values
@@ -33,16 +37,33 @@ class Preferences @Inject constructor(
             R.xml.preferences_root,
             R.xml.preferences_advanced,
             R.xml.preferences_notification,
-            R.xml.preferences_reporting,
+            R.xml.preferences_reporting
         ).forEach {
             PreferenceManagerFix.setDefaultValues(applicationContext, it, true)
         }
+    }
+
+    val allKeys = setOf(this::autostartOnBoot)
+
+    fun importKeyValue(key: String, value: Any) {}
+
+    fun importConfiguration(configuration: MessageConfiguration) {
+        TODO("Not implemented")
+    }
+
+    fun setPortDefault() {
+        TODO("Not implemented")
+    }
+
+    fun setKeepaliveDefault() {
+        TODO("Not implemented")
     }
 
     var autostartOnBoot: Boolean by preferencesStore
     var cleanSession: Boolean by preferencesStore
     var clientId: String by preferencesStore
     var connectionTimeoutSeconds: Int by preferencesStore
+    var debugLog: Boolean by preferencesStore
     var enableMapRotation: Boolean by preferencesStore
     var encryptionKey: String by preferencesStore
     var experimentalFeatures: Set<String> by preferencesStore
@@ -52,50 +73,60 @@ class Preferences @Inject constructor(
     var keepalive: Int by preferencesStore
     var locatorDisplacement: Int by preferencesStore
     var locatorInterval: Int by preferencesStore
+    var publishLocationOnConnect: Boolean by preferencesStore
+    var ignoreStaleLocations: Float by preferencesStore
+    var locatorPriority: Int by preferencesStore
     var mapLayerStyle: MapLayerStyle by preferencesStore
     var mode: ConnectionMode by preferencesStore
     var monitoring: MonitoringMode by preferencesStore
-    var remoteConfiguration: Boolean by preferencesStore
-    var debugLog: Boolean by preferencesStore
+    var remoteCommand: Boolean by preferencesStore
     var moveModeLocatorInterval: Int by preferencesStore
     var mqttProtocolLevel: MqttProtocolLevel by preferencesStore
+    var notificationEvents: Boolean by preferencesStore
     var notificationGeocoderErrors: Boolean by preferencesStore
     var notificationHigherPriority: Boolean by preferencesStore
     var notificationLocation: Boolean by preferencesStore
     var openCageGeocoderApiKey: String by preferencesStore
+    var osmTileScaleFactor: Float by preferencesStore
     var password: String by preferencesStore
     var pegLocatorFastestIntervalToInterval: Boolean by preferencesStore
-    var locatorPriority: Int by preferencesStore
     var ping: Int by preferencesStore
+    var ignoreInaccurateLocations: Int by preferencesStore
     var port: Int by preferencesStore
     var pubQosEvents: MqttQos by preferencesStore
     var pubQosLocations: MqttQos by preferencesStore
     var pubQosWaypoints: MqttQos by preferencesStore
     var pubRetainEvents: Boolean by preferencesStore
+    var trackerId: StringMaxTwoAlphaNumericChars by preferencesStore
+    var pubLocationExtendedData: Boolean by preferencesStore
     var pubRetainLocations: Boolean by preferencesStore
     var pubRetainWaypoints: Boolean by preferencesStore
+    var fusedRegionDetection: Boolean by preferencesStore
     var pubTopicBase: String by preferencesStore
+    var url: String by preferencesStore
     var pubTopicCommands: String by preferencesStore
     var pubTopicCommandsPart: String by preferencesStore
     var pubTopicEvents: String by preferencesStore
-    var notificationEvents: Boolean by preferencesStore
     var pubTopicEventsPart: String by preferencesStore
-    var userDeclinedEnableLocationPermissions: Boolean by preferencesStore
+    var dontReuseHttpClient: Boolean by preferencesStore
     var pubTopicInfoPart: String by preferencesStore
-    var userDeclinedEnableLocationServices: Boolean by preferencesStore
+    var deviceId: String by preferencesStore
     var pubTopicLocations: String by preferencesStore
     var pubTopicWaypoints: String by preferencesStore
     var pubTopicWaypointsPart: String by preferencesStore
+    var remoteConfiguration: Boolean by preferencesStore
     var reverseGeocodeProvider: ReverseGeocodeProvider by preferencesStore
     var showRegionsOnMap: Boolean by preferencesStore
     var sub: Boolean by preferencesStore
     var subTopic: String by preferencesStore
+    var subQos: MqttQos by preferencesStore
     var theme: NightMode by preferencesStore
     var tls: Boolean by preferencesStore
     var tlsCaCrt: String by preferencesStore
-    var osmTileScaleFactor: Float by preferencesStore
     var tlsClientCrt: String by preferencesStore
     var tlsClientCrtPassword: String by preferencesStore
+    var userDeclinedEnableLocationPermissions: Boolean by preferencesStore
+    var userDeclinedEnableLocationServices: Boolean by preferencesStore
     var username: String by preferencesStore
     var ws: Boolean by preferencesStore
 
@@ -116,13 +147,13 @@ class Preferences @Inject constructor(
     // lambda as a listener, as that'll just get GC'd and then mysteriously disappear
     // https://stackoverflow.com/a/3104265/352740
     fun registerOnPreferenceChangedListener(
-        listener: SharedPreferences.OnSharedPreferenceChangeListener,
+        listener: SharedPreferences.OnSharedPreferenceChangeListener
     ) {
         preferencesStore.registerOnSharedPreferenceChangeListener(listener)
     }
 
     fun unregisterOnPreferenceChangedListener(
-        listener: SharedPreferences.OnSharedPreferenceChangeListener,
+        listener: SharedPreferences.OnSharedPreferenceChangeListener
     ) {
         preferencesStore.unregisterOnSharedPreferenceChangeListener(listener)
     }
@@ -166,26 +197,5 @@ class Preferences @Inject constructor(
             "userDeclinedEnableLocationPermissions"
         const val preferenceKeyUserDeclinedEnableLocationServices =
             "userDeclinedEnableLocationServices"
-    }
-
-    enum class MqttProtocolLevel(val value: Int) {
-        MQTT_3_1(3),
-        MQTT_3_1_1(4);
-
-        @JsonValue
-        fun getVal(): Int {
-            return value
-        }
-    }
-
-    enum class MqttQos(val value: Int) {
-        ZERO(0),
-        ONE(1),
-        TWO(2);
-
-        @JsonValue
-        fun getVal(): Int {
-            return value
-        }
     }
 }

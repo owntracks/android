@@ -1,4 +1,4 @@
-package org.owntracks.android.support
+package org.owntracks.android.preferences
 
 import android.content.Context
 import android.content.pm.ShortcutManager
@@ -17,11 +17,9 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.owntracks.android.R
 import org.owntracks.android.model.messages.MessageConfiguration
-import org.owntracks.android.preferences.MonitoringMode
-import org.owntracks.android.preferences.Preferences
+import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.services.MessageProcessorEndpointHttp
 import org.owntracks.android.services.MessageProcessorEndpointMqtt
-import org.owntracks.android.preferences.PreferencesStore
 import org.owntracks.android.ui.NoopAppShortcuts
 import org.owntracks.android.ui.map.MapLayerStyle
 

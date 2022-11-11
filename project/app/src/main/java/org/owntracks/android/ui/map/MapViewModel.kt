@@ -24,11 +24,10 @@ import org.owntracks.android.location.toLatLng
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.model.messages.MessageClear
 import org.owntracks.android.model.messages.MessageLocation.Companion.REPORT_TYPE_USER
-import org.owntracks.android.preferences.ConnectionMode
+import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.services.LocationProcessor
 import org.owntracks.android.services.MessageProcessor
-import org.owntracks.android.services.MessageProcessorEndpointHttp
-import org.owntracks.android.preferences.MonitoringMode
+import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.SimpleIdlingResource
 import timber.log.Timber

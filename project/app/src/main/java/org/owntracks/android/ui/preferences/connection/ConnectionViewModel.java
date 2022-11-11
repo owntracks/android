@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.databinding.Bindable;
 
 import org.greenrobot.eventbus.Subscribe;
+import org.owntracks.android.preferences.types.ConnectionMode;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.preferences.Preferences;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
@@ -29,7 +30,7 @@ public class ConnectionViewModel extends BaseViewModel<ConnectionMvvm.View> impl
 
     private final Preferences preferences;
     private final Context context;
-    private int modeId;
+    private ConnectionMode connectionMode;
 
 
     @Inject
@@ -40,24 +41,24 @@ public class ConnectionViewModel extends BaseViewModel<ConnectionMvvm.View> impl
 
     public void attachView(@Nullable Bundle savedInstanceState, @NonNull ConnectionMvvm.View view) {
         super.attachView(savedInstanceState, view);
-        setModeId(preferences.getMode());
+        setConnectionMode(preferences.getMode());
     }
 
     @Override
-    public void setModeId(int newModeId) {
-        this.modeId = newModeId;
+    public void setConnectionMode(ConnectionMode mode) {
+        this.connectionMode = mode;
     }
 
     @Bindable
     @Override
-    public int getModeId() {
-        return modeId;
+    public ConnectionMode getConnectionMode() {
+        return connectionMode;
     }
 
     @Subscribe
     public void onEvent(Events.ModeChanged e) {
         Timber.v("mode changed %s", e.getNewModeId());
-        setModeId(e.getNewModeId());
+        setConnectionMode(e.getNewModeId());
         getView().recreateOptionsMenu();
         notifyChange();
     }

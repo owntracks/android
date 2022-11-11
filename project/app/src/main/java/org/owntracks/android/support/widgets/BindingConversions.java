@@ -13,7 +13,7 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 
 import org.owntracks.android.R;
 import org.owntracks.android.location.geofencing.Geofence;
-import org.owntracks.android.services.MessageProcessorEndpointHttp;
+import org.owntracks.android.preferences.types.ConnectionMode;
 import org.owntracks.android.services.MessageProcessorEndpointMqtt;
 
 import java.text.DateFormat;
@@ -127,11 +127,11 @@ public class BindingConversions {
     }
 
 
-    public static int convertModeIdToLabelResId(int modeId) {
+    public static int convertModeIdToLabelResId(ConnectionMode modeId) {
         switch (modeId) {
-            case MessageProcessorEndpointHttp.MODE_ID:
+            case HTTP:
                 return R.string.mode_http_private_label;
-            case MessageProcessorEndpointMqtt.MODE_ID:
+            case MQTT:
             default:
                 return R.string.mode_mqtt_private_label;
         }

@@ -17,6 +17,7 @@ import org.owntracks.android.model.messages.MessageClear;
 import org.owntracks.android.model.messages.MessageCmd;
 import org.owntracks.android.model.messages.MessageLocation;
 import org.owntracks.android.model.messages.MessageTransition;
+import org.owntracks.android.preferences.types.ConnectionMode;
 import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Parser;
@@ -191,10 +192,10 @@ public class MessageProcessor {
         endpointStateRepo.setQueueLength(outgoingQueue.size());
 
         switch (preferences.getMode()) {
-            case MessageProcessorEndpointHttp.MODE_ID:
+            case HTTP:
                 this.endpoint = new MessageProcessorEndpointHttp(this, this.parser, this.preferences, this.scheduler, this.applicationContext);
                 break;
-            case MessageProcessorEndpointMqtt.MODE_ID:
+            case MQTT:
             default:
                 this.endpoint = new MessageProcessorEndpointMqtt(this, this.parser, this.preferences, this.scheduler, this.eventBus, this.runThingsOnOtherThreads, this.applicationContext, this.locationProcessorLazy.get());
 
@@ -412,7 +413,7 @@ public class MessageProcessor {
             return;
         }
 
-        if (message.getModeId() != MessageProcessorEndpointHttp.MODE_ID &&
+        if (message.getModeId() != ConnectionMode.HTTP &&
                 !preferences.getPubTopicCommands().equals(message.getTopic())
         ) {
             Timber.e("cmd message received on wrong topic");
@@ -426,7 +427,7 @@ public class MessageProcessor {
         if (message.getAction() != null) {
             switch (message.getAction()) {
                 case REPORT_LOCATION:
-                    if (message.getModeId() != MessageProcessorEndpointMqtt.MODE_ID) {
+                    if (message.getModeId() != ConnectionMode.MQTT) {
                         Timber.e("command not supported in HTTP mode: %s", message.getAction());
                         break;
                     }
@@ -448,7 +449,7 @@ public class MessageProcessor {
                         break;
                     }
                     if (message.getConfiguration() != null) {
-                        preferences.importFromMessage(message.getConfiguration());
+                        preferences.importConfiguration(message.getConfiguration());
                     } else {
                         Timber.w("No configuration provided");
                     }
@@ -457,7 +458,7 @@ public class MessageProcessor {
                     }
                     break;
                 case RECONNECT:
-                    if (message.getModeId() != MessageProcessorEndpointHttp.MODE_ID) {
+                    if (message.getModeId() != ConnectionMode.HTTP) {
                         Timber.e("command not supported in HTTP mode: %s", message.getAction());
                         break;
                     }

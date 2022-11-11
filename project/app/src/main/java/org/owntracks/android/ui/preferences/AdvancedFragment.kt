@@ -8,7 +8,7 @@ import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
 import dagger.hilt.android.AndroidEntryPoint
 import org.owntracks.android.R
-import org.owntracks.android.preferences.ReverseGeocodeProvider
+import org.owntracks.android.preferences.types.ReverseGeocodeProvider
 import javax.inject.Inject
 
 @AndroidEntryPoint

@@ -1,5 +1,6 @@
 package org.owntracks.android.ui.preferences.connection;
 
+import org.owntracks.android.preferences.types.ConnectionMode;
 import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
 import org.owntracks.android.ui.preferences.connection.dialog.ConnectionHostHttpDialogViewModel;
@@ -29,8 +30,8 @@ public interface ConnectionMvvm {
         void onSecurityClick();
         void onParametersClick();
 
-        int getModeId();
-        void setModeId(int newModeId);
+        ConnectionMode getConnectionMode();
+        void setConnectionMode(ConnectionMode newModeId);
 
         ConnectionHostMqttDialogViewModel getHostDialogViewModelMqtt();
         ConnectionHostHttpDialogViewModel getHostDialogViewModelHttp();
