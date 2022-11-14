@@ -6,12 +6,12 @@ import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-import androidx.preference.PreferenceManagerFix
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.reflect.full.declaredMemberProperties
 import kotlin.time.Duration.Companion.milliseconds
-import org.owntracks.android.R
 import org.owntracks.android.model.messages.MessageConfiguration
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.preferences.types.MonitoringMode
@@ -29,23 +29,27 @@ class Preferences @Inject constructor(
     @ApplicationContext private val applicationContext: Context,
     private val preferencesStore: PreferencesStore,
     private val appShortcuts: AppShortcuts
-) {
+) : DefaultsProvider by DefaultsProviderImpl() {
+    val allKeys =
+        Preferences::class.declaredMemberProperties
+            .filter { it.annotations.any { it is Preference } }
+
     init {
-        // Need to set the preferences to their default values
-        // From https://stackoverflow.com/a/2877795/352740
-        listOf(
-            R.xml.preferences_root,
-            R.xml.preferences_advanced,
-            R.xml.preferences_notification,
-            R.xml.preferences_reporting
-        ).forEach {
-            PreferenceManagerFix.setDefaultValues(applicationContext, it, true)
-        }
+        initializeDefaults()
     }
 
-    val allKeys = setOf(this::autostartOnBoot)
+    /*
+    To initialize the defaults for each property, we can simply get the property. This should set
+    the value in the underlying backing store to be the default, as only the backing store knows
+    which properties have not already been set
+     */
+    fun initializeDefaults() {
+        println(this.autostartOnBoot)
+    }
 
-    fun importKeyValue(key: String, value: Any) {}
+    fun importKeyValue(key: String, value: Any) {
+        TODO("Not implemented")
+    }
 
     fun importConfiguration(configuration: MessageConfiguration) {
         TODO("Not implemented")
@@ -59,76 +63,211 @@ class Preferences @Inject constructor(
         TODO("Not implemented")
     }
 
+    /* Persisted preferences */
+    @Preference
     var autostartOnBoot: Boolean by preferencesStore
+
+    @Preference(exportModeHttp = false)
     var cleanSession: Boolean by preferencesStore
+
+    @Preference(exportModeHttp = false)
     var clientId: String by preferencesStore
+
+    @Preference
     var connectionTimeoutSeconds: Int by preferencesStore
+
+    @Preference
     var debugLog: Boolean by preferencesStore
-    var enableMapRotation: Boolean by preferencesStore
-    var encryptionKey: String by preferencesStore
-    var experimentalFeatures: Set<String> by preferencesStore
-    var host: String by preferencesStore
-    var info: Boolean by preferencesStore
-    var isSetupCompleted: Boolean by preferencesStore
-    var keepalive: Int by preferencesStore
-    var locatorDisplacement: Int by preferencesStore
-    var locatorInterval: Int by preferencesStore
-    var publishLocationOnConnect: Boolean by preferencesStore
-    var ignoreStaleLocations: Float by preferencesStore
-    var locatorPriority: Int by preferencesStore
-    var mapLayerStyle: MapLayerStyle by preferencesStore
-    var mode: ConnectionMode by preferencesStore
-    var monitoring: MonitoringMode by preferencesStore
-    var remoteCommand: Boolean by preferencesStore
-    var moveModeLocatorInterval: Int by preferencesStore
-    var mqttProtocolLevel: MqttProtocolLevel by preferencesStore
-    var notificationEvents: Boolean by preferencesStore
-    var notificationGeocoderErrors: Boolean by preferencesStore
-    var notificationHigherPriority: Boolean by preferencesStore
-    var notificationLocation: Boolean by preferencesStore
-    var openCageGeocoderApiKey: String by preferencesStore
-    var osmTileScaleFactor: Float by preferencesStore
-    var password: String by preferencesStore
-    var pegLocatorFastestIntervalToInterval: Boolean by preferencesStore
-    var ping: Int by preferencesStore
-    var ignoreInaccurateLocations: Int by preferencesStore
-    var port: Int by preferencesStore
-    var pubQosEvents: MqttQos by preferencesStore
-    var pubQosLocations: MqttQos by preferencesStore
-    var pubQosWaypoints: MqttQos by preferencesStore
-    var pubRetainEvents: Boolean by preferencesStore
-    var trackerId: StringMaxTwoAlphaNumericChars by preferencesStore
-    var pubLocationExtendedData: Boolean by preferencesStore
-    var pubRetainLocations: Boolean by preferencesStore
-    var pubRetainWaypoints: Boolean by preferencesStore
-    var fusedRegionDetection: Boolean by preferencesStore
-    var pubTopicBase: String by preferencesStore
-    var url: String by preferencesStore
-    var pubTopicCommands: String by preferencesStore
-    var pubTopicCommandsPart: String by preferencesStore
-    var pubTopicEvents: String by preferencesStore
-    var pubTopicEventsPart: String by preferencesStore
-    var dontReuseHttpClient: Boolean by preferencesStore
-    var pubTopicInfoPart: String by preferencesStore
+
+    @Preference
     var deviceId: String by preferencesStore
-    var pubTopicLocations: String by preferencesStore
-    var pubTopicWaypoints: String by preferencesStore
-    var pubTopicWaypointsPart: String by preferencesStore
+
+    @Preference
+    var dontReuseHttpClient: Boolean by preferencesStore
+
+    @Preference
+    var enableMapRotation: Boolean by preferencesStore
+
+    @Preference
+    var encryptionKey: String by preferencesStore
+
+    @Preference
+    var experimentalFeatures: Set<String> by preferencesStore
+
+    @Preference
+    var fusedRegionDetection: Boolean by preferencesStore
+
+    @Preference
+    var host: String by preferencesStore
+
+    @Preference
+    var ignoreInaccurateLocations: Int by preferencesStore
+
+    @Preference
+    var ignoreStaleLocations: Float by preferencesStore
+
+    @Preference
+    var info: Boolean by preferencesStore
+
+    @Preference
+    var isSetupCompleted: Boolean by preferencesStore
+
+    @Preference
+    var keepalive: Int by preferencesStore
+
+    @Preference
+    var locatorDisplacement: Int by preferencesStore
+
+    @Preference
+    var locatorInterval: Int by preferencesStore
+
+    @Preference
+    var locatorPriority: Int by preferencesStore
+
+    @Preference
+    var mapLayerStyle: MapLayerStyle by preferencesStore
+
+    @Preference
+    var mode: ConnectionMode by preferencesStore
+
+    @Preference
+    var monitoring: MonitoringMode by preferencesStore
+
+    @Preference
+    var moveModeLocatorInterval: Int by preferencesStore
+
+    @Preference
+    var mqttProtocolLevel: MqttProtocolLevel by preferencesStore
+
+    @Preference
+    var notificationEvents: Boolean by preferencesStore
+
+    @Preference
+    var notificationGeocoderErrors: Boolean by preferencesStore
+
+    @Preference
+    var notificationHigherPriority: Boolean by preferencesStore
+
+    @Preference
+    var notificationLocation: Boolean by preferencesStore
+
+    @Preference
+    var openCageGeocoderApiKey: String by preferencesStore
+
+    @Preference
+    var osmTileScaleFactor: Float by preferencesStore
+
+    @Preference
+    var password: String by preferencesStore
+
+    @Preference
+    var pegLocatorFastestIntervalToInterval: Boolean by preferencesStore
+
+    @Preference
+    var ping: Int by preferencesStore
+
+    @Preference
+    var port: Int by preferencesStore
+
+    @Preference
+    var pubLocationExtendedData: Boolean by preferencesStore
+
+    @Preference
+    var pubQosEvents: MqttQos by preferencesStore
+
+    @Preference
+    var pubQosLocations: MqttQos by preferencesStore
+
+    @Preference
+    var pubQosWaypoints: MqttQos by preferencesStore
+
+    @Preference
+    var pubRetain: Boolean by preferencesStore
+
+    @Preference
+    var pubTopicBaseFormatString: String by preferencesStore
+
+    @Preference
+    var publishLocationOnConnect: Boolean by preferencesStore
+
+    @Preference
+    var remoteCommand: Boolean by preferencesStore
+
+    @Preference
     var remoteConfiguration: Boolean by preferencesStore
+
+    @Preference
     var reverseGeocodeProvider: ReverseGeocodeProvider by preferencesStore
+
+    @Preference
     var showRegionsOnMap: Boolean by preferencesStore
+
+    @Preference
     var sub: Boolean by preferencesStore
-    var subTopic: String by preferencesStore
+
+    @Preference
     var subQos: MqttQos by preferencesStore
+
+    @Preference
+    var subTopic: String by preferencesStore
+
+    @Preference
     var theme: NightMode by preferencesStore
+
+    @Preference
     var tls: Boolean by preferencesStore
+
+    @Preference
     var tlsCaCrt: String by preferencesStore
+
+    @Preference
     var tlsClientCrt: String by preferencesStore
+
+    @Preference
     var tlsClientCrtPassword: String by preferencesStore
+
+    @Preference
+    var trackerId: StringMaxTwoAlphaNumericChars by preferencesStore
+
+    @Preference
+    var url: String by preferencesStore
+
+    @Preference
     var userDeclinedEnableLocationPermissions: Boolean by preferencesStore
+
+    @Preference
     var userDeclinedEnableLocationServices: Boolean by preferencesStore
+
+    @Preference
     var username: String by preferencesStore
+
+    @Preference(exportModeHttp = false)
     var ws: Boolean by preferencesStore
+
+    /* Derived / non-stored preferences */
+    val pubRetainLocations: Boolean = pubRetain
+    val pubRetainWaypoints: Boolean = false
+    val pubRetainEvents: Boolean = false
+    val pubTopicBase: String
+        get() = pubTopicBaseFormatString.replace(
+            "%u",
+            username.ifBlank { "user" }
+        ).replace("%d", deviceId)
+
+    private val eventTopicSuffix = "/event"
+    private val commandTopicSuffix = "/cmd"
+    private val infoTopicSuffix = "/info"
+    private val waypointsTopicSuffix = "/waypoints"
+
+    val receivedCommandsTopic: String = pubTopicBase + commandTopicSuffix
+
+    val pubTopicEvents: String = pubTopicBase + eventTopicSuffix
+    val pubTopicLocations: String = pubTopicBase
+    val pubTopicWaypoints: String = pubTopicBase + waypointsTopicSuffix
+
+    val subTopicEvents: String = subTopic + eventTopicSuffix
+    val subTopicInfo: String = subTopic + infoTopicSuffix
+    val subTopicWaypoints: String = subTopic + waypointsTopicSuffix
 
     val minimumKeepaliveSeconds = MIN_PERIODIC_INTERVAL_MILLIS.milliseconds.inWholeSeconds
     fun keepAliveInRange(i: Int): Boolean = i >= minimumKeepaliveSeconds
@@ -198,4 +337,11 @@ class Preferences @Inject constructor(
         const val preferenceKeyUserDeclinedEnableLocationServices =
             "userDeclinedEnableLocationServices"
     }
+
+    @Target(AnnotationTarget.PROPERTY)
+    @Retention(AnnotationRetention.RUNTIME)
+    annotation class Preference(
+        val exportModeMqtt: Boolean = true,
+        val exportModeHttp: Boolean = true
+    )
 }

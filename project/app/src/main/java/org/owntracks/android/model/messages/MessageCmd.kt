@@ -19,7 +19,7 @@ class MessageCmd : MessageBase() {
     }
 
     override fun addMqttPreferences(preferences: Preferences) {
-        topic = preferences.pubTopicCommands
+        topic = preferences.receivedCommandsTopic
     }
 
     override val baseTopicSuffix: String

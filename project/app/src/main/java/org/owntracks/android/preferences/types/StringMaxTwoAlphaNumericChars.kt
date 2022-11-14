@@ -4,11 +4,7 @@ data class StringMaxTwoAlphaNumericChars(private val input: String) {
     val value: String
 
     init {
-        if (input.length > 2) {
-            value = "TOOT"
-        } else {
-            value = input
-        }
+        value = input.filter { Character.isLetterOrDigit(it) }.toString().substring(0, 2)
     }
 
     override fun toString(): String {

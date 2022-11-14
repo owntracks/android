@@ -1,9 +1,10 @@
 package org.owntracks.android.preferences
 
 import android.content.SharedPreferences
-import org.owntracks.android.preferences.types.ReverseGeocodeProvider
 import kotlin.reflect.KProperty
 import kotlin.reflect.typeOf
+import org.owntracks.android.preferences.types.ReverseGeocodeProvider
+import timber.log.Timber
 
 /***
  * Allows a preferences class to read and write values from some sort of store
@@ -26,6 +27,8 @@ interface PreferencesStore {
     fun putStringSet(key: String, values: Set<String>)
     fun getStringSet(key: String, defaultValues: Set<String>): Set<String>
 
+    fun hasKey(key: String): Boolean
+
     fun remove(key: String)
 
     fun registerOnSharedPreferenceChangeListener(
@@ -40,22 +43,29 @@ interface PreferencesStore {
     // be the same as what was previously written to the store, and then just throw caution to
     // the wind and cast it to that thing.
     @Suppress("UNCHECKED_CAST")
-    operator fun <T> getValue(preferences: Preferences, property: KProperty<*>): T {
-        return when (property.returnType) {
-            typeOf<Boolean>() -> getBoolean(property.name, false) as T
-            typeOf<String>() -> getString(property.name, "") as T
-            typeOf<Int>() -> getInt(property.name, 0) as T
-            typeOf<Float>() -> getFloat(property.name, 0f) as T
-            typeOf<Set<String>>() -> getStringSet(property.name, emptySet()) as T
-            typeOf<ReverseGeocodeProvider>() -> ReverseGeocodeProvider.getByValue(
-                getString(
-                    property.name,
-                    ""
-                ) ?: ""
-            ) as T
-            else -> throw Exception("BAD BAD BAD BAD")
+    operator fun <T> getValue(preferences: Preferences, property: KProperty<*>): T =
+        if (hasKey(property.name)) {
+            when (property.returnType) {
+                typeOf<Boolean>() -> getBoolean(property.name, false) as T
+                typeOf<String>() -> getString(property.name, "") as T
+                typeOf<Int>() -> getInt(property.name, 0) as T
+                typeOf<Float>() -> getFloat(property.name, 0f) as T
+                typeOf<Set<String>>() -> getStringSet(property.name, emptySet()) as T
+                typeOf<ReverseGeocodeProvider>() -> ReverseGeocodeProvider.getByValue(
+                    getString(
+                        property.name,
+                        ""
+                    ) ?: ""
+                ) as T
+                else -> throw Exception("BAD BAD BAD BAD")
+            }
+        } else {
+            preferences.getDefaultValue<T>(preferences, property)
+                .also {
+                    Timber.i("Setting default preference value for ${property.name} to $it")
+                    setValue(preferences, property, it)
+                }
         }
-    }
 
     // For setting, we just switch on the type of the value
     @Suppress("UNCHECKED_CAST")

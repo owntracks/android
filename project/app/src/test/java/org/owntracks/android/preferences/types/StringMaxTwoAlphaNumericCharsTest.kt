@@ -9,4 +9,15 @@ class StringMaxTwoAlphaNumericCharsTest {
         val s = StringMaxTwoAlphaNumericChars("ab")
         assertEquals("ab", s.toString())
     }
+
+    @Test
+    fun `Given an input that is more than two characters when retrieving the value then the truncated string is returned`() {
+        val s = StringMaxTwoAlphaNumericChars("abcde")
+        assertEquals("ab", s.toString())
+    }
+    @Test
+    fun `Given an input that contains non-alphanumeric characters when retrieving the value then the returned string has these removed`() {
+        val s = StringMaxTwoAlphaNumericChars("a b")
+        assertEquals("ab", s.toString())
+    }
 }

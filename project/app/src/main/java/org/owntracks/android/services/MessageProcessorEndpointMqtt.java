@@ -433,12 +433,12 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
             Set<String> topics = getTopicsToSubscribeTo(
                     preferences.getSubTopic(),
                     preferences.getInfo(),
-                    preferences.getPubTopicInfoPart(),
-                    preferences.getPubTopicEventsPart(),
-                    preferences.getPubTopicWaypointsPart()
+                    preferences.getSubTopicInfo(),
+                    preferences.getSubTopicEvents(),
+                    preferences.getSubTopicWaypoints()
             );
             // Receive commands for us
-            topics.add(preferences.getPubTopicBase() + preferences.getPubTopicCommandsPart());
+            topics.add(preferences.getReceivedCommandsTopic());
 
             subscribe(topics.toArray(new String[0]));
         }
@@ -451,20 +451,14 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     }
 
     @NotNull
-    Set<String> getTopicsToSubscribeTo(String subTopics, Boolean subscribeToInfo, String infoTopicSuffix, String eventsTopicSuffix, String waypointsTopicSuffix) {
+    Set<String> getTopicsToSubscribeTo(String subTopics, Boolean subscribeToInfo, String infoTopic, String eventsTopic, String waypointsTopic) {
         Set<String> topics = new TreeSet<>();
-
-        if (subTopics.equals(applicationContext.getString(R.string.defaultSubTopic))) {
-            topics.add(subTopics);
-            if (subscribeToInfo) {
-                topics.add(subTopics + infoTopicSuffix);
-            }
-            topics.add(subTopics + eventsTopicSuffix);
-            topics.add(subTopics + waypointsTopicSuffix);
-        } else {
-            topics.addAll(Arrays.asList(subTopics.split(" ")));
+        topics.add(subTopics);
+        if (subscribeToInfo) {
+            topics.add(infoTopic);
         }
-
+        topics.add(eventsTopic);
+        topics.add(waypointsTopic);
         return topics;
     }
 

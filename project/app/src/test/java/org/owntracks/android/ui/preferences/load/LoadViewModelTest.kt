@@ -35,7 +35,7 @@ class LoadViewModelTest {
     @Test
     fun `When invalid JSON on an inline owntracks config URL, then the error is correctly set`() {
         val parser = Parser(null)
-        val preferences = Preferences(mockContext, null, preferencesStore, NoopAppShortcuts())
+        val preferences = Preferences(mockContext, preferencesStore, NoopAppShortcuts())
         val vm = LoadViewModel(preferences, parser, InMemoryWaypointsRepo(eventBus))
 
         vm.extractPreferences(URI("owntracks:///config?inline=e30k"))

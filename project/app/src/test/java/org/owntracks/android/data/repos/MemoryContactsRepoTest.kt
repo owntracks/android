@@ -14,6 +14,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageLocation
+import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.support.ContactBitmapAndName
 import org.owntracks.android.support.ContactBitmapAndNameMemoryCache
 import org.owntracks.android.support.Events.EndpointChanged
@@ -113,7 +114,7 @@ class MemoryContactsRepoTest {
     @Test
     fun `given a non-empty repo, when the mode change event is called, the repo is emptied`() {
         contactsRepo!!.update(CONTACT_ID, messageLocation)
-        (contactsRepo as MemoryContactsRepo?)!!.onEventMainThread(ModeChanged(1))
+        (contactsRepo as MemoryContactsRepo?)!!.onEventMainThread(ModeChanged(ConnectionMode.MQTT))
         assertTrue(contactsRepo!!.all.value!!.isEmpty())
     }
 

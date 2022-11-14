@@ -7,7 +7,6 @@ import androidx.preference.PreferenceManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
-import org.owntracks.android.preferences.PreferencesStore
 import timber.log.Timber
 
 /***
@@ -65,6 +64,7 @@ class SharedPreferencesStore @Inject constructor(@ApplicationContext private val
     override fun putString(key: String, value: String) =
         sharedPreferences.edit().putString(key, value).apply()
 
+
     override fun getString(key: String, default: String): String? =
         sharedPreferences.getString(key, default)
 
@@ -97,6 +97,9 @@ class SharedPreferencesStore @Inject constructor(@ApplicationContext private val
 
     override fun getStringSet(key: String, defaultValues: Set<String>): Set<String> =
         sharedPreferences.getStringSet(key, defaultValues) ?: defaultValues
+
+    override fun hasKey(key: String): Boolean =
+        sharedPreferences.contains(key)
 
     override fun registerOnSharedPreferenceChangeListener(
         listener: SharedPreferences.OnSharedPreferenceChangeListener

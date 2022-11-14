@@ -414,7 +414,7 @@ public class MessageProcessor {
         }
 
         if (message.getModeId() != ConnectionMode.HTTP &&
-                !preferences.getPubTopicCommands().equals(message.getTopic())
+                !preferences.getReceivedCommandsTopic().equals(message.getTopic())
         ) {
             Timber.e("cmd message received on wrong topic");
             return;

@@ -44,6 +44,8 @@ class InMemoryPreferencesStore : PreferencesStore {
     override fun getStringSet(key: String, defaultValues: Set<String>): Set<String> =
         (valueMap[key] ?: setOf<String>()) as Set<String>
 
+    override fun hasKey(key: String): Boolean = valueMap.containsKey(key)
+
     override fun putStringSet(key: String, values: Set<String>) {
         valueMap[key] = values
     }

@@ -17,6 +17,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.owntracks.android.R
 import org.owntracks.android.model.messages.MessageConfiguration
+import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.services.MessageProcessorEndpointHttp
 import org.owntracks.android.services.MessageProcessorEndpointMqtt
@@ -51,11 +52,11 @@ class PreferencesGettersAndSetters(
 
     @Test
     fun `when setting a preference ensure that the preference is set correctly on export`() {
-        val preferences = Preferences(mockContext, null, preferencesStore, NoopAppShortcuts())
+        val preferences = Preferences(mockContext, preferencesStore, NoopAppShortcuts())
         val setter =
             Preferences::class.java.getMethod("set$preferenceMethodName", preferenceType.java)
         if (httpOnlyMode) {
-            preferences.mode = MessageProcessorEndpointHttp.MODE_ID
+            preferences.mode = ConnectionMode.HTTP
         }
         setter.invoke(preferences, preferenceValue)
         val messageConfiguration = preferences.exportToMessage()
@@ -64,10 +65,10 @@ class PreferencesGettersAndSetters(
 
     @Test
     fun `when importing a configuration ensure that the supplied preference is set to the given value`() {
-        val preferences = Preferences(mockContext, null, preferencesStore, NoopAppShortcuts())
+        val preferences = Preferences(mockContext, preferencesStore, NoopAppShortcuts())
         val messageConfiguration = MessageConfiguration()
         messageConfiguration[preferenceName] = preferenceValue
-        preferences.importFromMessage(messageConfiguration)
+        preferences.importConfiguration(messageConfiguration)
         val getter = Preferences::class.java.getMethod("get$preferenceMethodName")
         assertEquals(preferenceValueExpected, getter.invoke(preferences))
     }
@@ -213,16 +214,16 @@ class PreferencesGettersAndSetters(
                 arrayOf(
                     "Mode",
                     "mode",
-                    MessageProcessorEndpointHttp.MODE_ID,
-                    MessageProcessorEndpointHttp.MODE_ID,
+                    ConnectionMode.HTTP,
+                    ConnectionMode.HTTP,
                     Int::class,
                     false
                 ),
                 arrayOf(
                     "Mode",
                     "mode",
-                    MessageProcessorEndpointMqtt.MODE_ID,
-                    MessageProcessorEndpointMqtt.MODE_ID,
+                    ConnectionMode.MQTT,
+                    ConnectionMode.MQTT,
                     Int::class,
                     false
                 ),
@@ -230,7 +231,7 @@ class PreferencesGettersAndSetters(
                     "Mode",
                     "mode",
                     -1,
-                    MessageProcessorEndpointMqtt.MODE_ID,
+                    ConnectionMode.MQTT,
                     Int::class,
                     false
                 ),
