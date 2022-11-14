@@ -2,7 +2,9 @@ package org.owntracks.android.preferences
 
 import android.content.Context
 import android.content.res.Resources
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.doReturn
@@ -181,9 +183,16 @@ class PreferenceTest {
     @Test
     fun `given a Preferences object with no username set, when asking for the topic, the correct username placeholder is populated`() {
         val preferences = Preferences(mockContext, preferencesStore, NoopAppShortcuts())
+        preferences.autostartOnBoot = true
         preferences.username = ""
         preferences.deviceId = "myDevice"
 
         assertEquals("owntracks/user/myDevice", preferences.pubTopicLocations)
+    }
+
+    @Test
+    fun `given an empty Preferences object, when asking for a value, then the default value is returned`() {
+        val preferences = Preferences(mockContext, preferencesStore, NoopAppShortcuts())
+        assertEquals(false, preferences.debugLog)
     }
 }

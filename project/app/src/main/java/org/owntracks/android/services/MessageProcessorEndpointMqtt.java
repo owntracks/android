@@ -321,7 +321,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
             connectOptions.setPassword(preferences.getPassword().toCharArray());
         }
 
-        connectOptions.setMqttVersion(preferences.getMqttProtocolLevel().getVal());
+        connectOptions.setMqttVersion(preferences.getMqttProtocolLevel().getValue());
         InputStream clientCaInputStream = null;
         InputStream clientCertInputStream = null;
         try {
@@ -477,7 +477,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
     private int[] getSubTopicsQos(String[] topics) {
         int[] qos = new int[topics.length];
-        Arrays.fill(qos, preferences.getSubQos().getVal());
+        Arrays.fill(qos, preferences.getSubQos().getValue());
         return qos;
     }
 

@@ -8,6 +8,7 @@ import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.preferences.types.MqttProtocolLevel
 import org.owntracks.android.preferences.types.MqttQos
 import org.owntracks.android.preferences.types.NightMode
+import org.owntracks.android.preferences.types.StringMaxTwoAlphaNumericChars
 
 interface DefaultsProvider {
     @Suppress("IMPLICIT_CAST_TO_ANY", "UNCHECKED_CAST")
@@ -74,7 +75,10 @@ interface DefaultsProvider {
             Preferences::tlsCaCrt -> ""
             Preferences::tlsClientCrt -> ""
             Preferences::tlsClientCrtPassword -> ""
-            Preferences::trackerId -> preferences.deviceId.takeLast(2).ifEmpty { "na" }
+            Preferences::tid -> StringMaxTwoAlphaNumericChars(
+                preferences.deviceId.takeLast(2)
+                    .ifEmpty { "na" }
+            )
             Preferences::url -> ""
             Preferences::userDeclinedEnableLocationPermissions -> false
             Preferences::userDeclinedEnableLocationServices -> false

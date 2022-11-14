@@ -5,12 +5,12 @@ import org.owntracks.android.preferences.types.ReverseGeocodeProvider
 import org.owntracks.android.ui.map.MapLayerStyle
 
 class DefaultsProviderImpl : DefaultsProvider {
-    @Suppress("UNCHECKED_CAST")
+    @Suppress("UNCHECKED_CAST", "IMPLICIT_CAST_TO_ANY")
     override fun <T> getDefaultValue(preferences: Preferences, property: KProperty<*>): T {
         return when (property) {
             Preferences::mapLayerStyle -> MapLayerStyle.GoogleMapDefault
             Preferences::reverseGeocodeProvider -> ReverseGeocodeProvider.DEVICE
-            else -> super.getDefaultValue(preferences, property)
+            else -> super.getDefaultValue<T>(preferences, property)
         } as T
     }
 }

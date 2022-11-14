@@ -128,7 +128,7 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
 
     override fun addMqttPreferences(preferences: Preferences) {
         topic = preferences.pubTopicLocations
-        qos = preferences.pubQosLocations.getVal()
+        qos = preferences.pubQosLocations.value
         retained = preferences.pubRetainLocations
     }
 

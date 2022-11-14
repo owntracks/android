@@ -2,12 +2,14 @@ package org.owntracks.android.preferences.types
 
 import com.fasterxml.jackson.annotation.JsonValue
 
-enum class MqttProtocolLevel(private val value: Int) {
+enum class MqttProtocolLevel(@JsonValue val value: Int) {
     MQTT_3_1(3),
     MQTT_3_1_1(4);
 
-    @JsonValue
-    fun getVal(): Int {
-        return value
+    companion object {
+        @JvmStatic
+        fun getByValue(value: Int): MqttProtocolLevel =
+            MqttProtocolLevel.values()
+                .firstOrNull { it.value == value } ?: MqttProtocolLevel.MQTT_3_1
     }
 }

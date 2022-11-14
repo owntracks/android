@@ -14,7 +14,7 @@ import timber.log.Timber
  */
 @Singleton
 class SharedPreferencesStore @Inject constructor(@ApplicationContext private val context: Context) :
-    PreferencesStore {
+    PreferencesStore() {
 
     private val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 

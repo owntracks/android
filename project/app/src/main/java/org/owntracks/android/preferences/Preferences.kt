@@ -29,14 +29,10 @@ class Preferences @Inject constructor(
     @ApplicationContext private val applicationContext: Context,
     private val preferencesStore: PreferencesStore,
     private val appShortcuts: AppShortcuts
-) : DefaultsProvider by DefaultsProviderImpl() {
+) {
     val allKeys =
         Preferences::class.declaredMemberProperties
             .filter { it.annotations.any { it is Preference } }
-
-    init {
-        initializeDefaults()
-    }
 
     /*
     To initialize the defaults for each property, we can simply get the property. This should set
@@ -44,7 +40,7 @@ class Preferences @Inject constructor(
     which properties have not already been set
      */
     fun initializeDefaults() {
-        println(this.autostartOnBoot)
+        allKeys.forEach { it.get(this) }
     }
 
     fun importKeyValue(key: String, value: Any) {
@@ -227,7 +223,7 @@ class Preferences @Inject constructor(
     var tlsClientCrtPassword: String by preferencesStore
 
     @Preference
-    var trackerId: StringMaxTwoAlphaNumericChars by preferencesStore
+    var tid: StringMaxTwoAlphaNumericChars by preferencesStore
 
     @Preference
     var url: String by preferencesStore
@@ -244,30 +240,62 @@ class Preferences @Inject constructor(
     @Preference(exportModeHttp = false)
     var ws: Boolean by preferencesStore
 
+    // Needs to be after all the preferences are declared, otherwise the delegates are null.
+    init {
+        initializeDefaults()
+    }
+
     /* Derived / non-stored preferences */
-    val pubRetainLocations: Boolean = pubRetain
+    val pubRetainLocations: Boolean
+        get() {
+            return pubRetain
+        }
     val pubRetainWaypoints: Boolean = false
     val pubRetainEvents: Boolean = false
     val pubTopicBase: String
-        get() = pubTopicBaseFormatString.replace(
-            "%u",
-            username.ifBlank { "user" }
-        ).replace("%d", deviceId)
+        get() {
+            return pubTopicBaseFormatString.replace(
+                "%u",
+                username.ifBlank { "user" }
+            )
+                .replace("%d", deviceId)
+        }
 
     private val eventTopicSuffix = "/event"
     private val commandTopicSuffix = "/cmd"
     private val infoTopicSuffix = "/info"
     private val waypointsTopicSuffix = "/waypoints"
 
-    val receivedCommandsTopic: String = pubTopicBase + commandTopicSuffix
+    val receivedCommandsTopic: String
+        get() {
+            return pubTopicBase + commandTopicSuffix
+        }
 
-    val pubTopicEvents: String = pubTopicBase + eventTopicSuffix
-    val pubTopicLocations: String = pubTopicBase
-    val pubTopicWaypoints: String = pubTopicBase + waypointsTopicSuffix
+    val pubTopicEvents: String
+        get() {
+            return pubTopicBase + eventTopicSuffix
+        }
+    val pubTopicLocations: String
+        get() {
+            return pubTopicBase
+        }
+    val pubTopicWaypoints: String
+        get() {
+            return pubTopicBase + waypointsTopicSuffix
+        }
 
-    val subTopicEvents: String = subTopic + eventTopicSuffix
-    val subTopicInfo: String = subTopic + infoTopicSuffix
-    val subTopicWaypoints: String = subTopic + waypointsTopicSuffix
+    val subTopicEvents: String
+        get() {
+            return subTopic + eventTopicSuffix
+        }
+    val subTopicInfo: String
+        get() {
+            return subTopic + infoTopicSuffix
+        }
+    val subTopicWaypoints: String
+        get() {
+            return subTopic + waypointsTopicSuffix
+        }
 
     val minimumKeepaliveSeconds = MIN_PERIODIC_INTERVAL_MILLIS.milliseconds.inWholeSeconds
     fun keepAliveInRange(i: Int): Boolean = i >= minimumKeepaliveSeconds
@@ -344,4 +372,7 @@ class Preferences @Inject constructor(
         val exportModeMqtt: Boolean = true,
         val exportModeHttp: Boolean = true
     )
+}
+
+fun <T> Preferences.bind() {
 }

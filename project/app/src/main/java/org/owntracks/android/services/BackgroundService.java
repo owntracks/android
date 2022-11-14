@@ -259,7 +259,7 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
                         MonitoringMode newMode = MonitoringMode.getByValue(
                                 intent.getIntExtra(
                                         preferences.getPreferenceKey(R.string.preferenceKeyMonitoring),
-                                        preferences.getMonitoring().getMode()
+                                        preferences.getMonitoring().getValue()
                                 )
                         );
                         preferences.setMonitoring(newMode);

@@ -101,7 +101,7 @@ public class LocationProcessor {
             message = MessageLocation.fromLocation(currentLocation, Build.VERSION.SDK_INT);
         }
         message.setTrigger(trigger);
-        message.setTrackerId(preferences.getTrackerId().getValue());
+        message.setTrackerId(preferences.getTid().getValue());
         message.setInregions(calculateInregions(loadedWaypoints));
 
         messageProcessor.queueMessageForSending(message);
@@ -164,7 +164,7 @@ public class LocationProcessor {
         MessageTransition message = new MessageTransition();
         message.setTransition(transition);
         message.setTrigger(trigger);
-        message.setTrackerId(preferences.getTrackerId().getValue());
+        message.setTrackerId(preferences.getTid().getValue());
         message.setLatitude(triggeringLocation.getLatitude());
         message.setLongitude(triggeringLocation.getLongitude());
         message.setAccuracy(triggeringLocation.getAccuracy());

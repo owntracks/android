@@ -2,7 +2,7 @@ package org.owntracks.android.preferences.types
 
 import com.fasterxml.jackson.annotation.JsonValue
 
-enum class MonitoringMode(@JsonValue val mode: Int) {
+enum class MonitoringMode(@JsonValue val value: Int) {
     QUIET(-1),
     MANUAL(0),
     SIGNIFICANT(1),
@@ -18,6 +18,6 @@ enum class MonitoringMode(@JsonValue val mode: Int) {
     companion object {
         @JvmStatic
         fun getByValue(value: Int) =
-            values().firstOrNull { it.mode == value } ?: SIGNIFICANT
+            values().firstOrNull { it.value == value } ?: SIGNIFICANT
     }
 }

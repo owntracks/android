@@ -2,7 +2,7 @@ package org.owntracks.android.preferences
 
 import android.content.SharedPreferences
 
-class InMemoryPreferencesStore : PreferencesStore {
+class InMemoryPreferencesStore : PreferencesStore() {
     private val valueMap: MutableMap<String, Any> = HashMap()
     override fun getSharedPreferencesName(): String {
         return ""

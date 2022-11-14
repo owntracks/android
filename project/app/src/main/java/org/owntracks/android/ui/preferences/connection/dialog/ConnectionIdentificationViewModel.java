@@ -29,7 +29,7 @@ public class ConnectionIdentificationViewModel extends BaseDialogViewModel {
         this.username = preferences.getUsername();
         this.password = preferences.getPassword();
         this.deviceId = preferences.getDeviceId();
-        this.trackerId = preferences.getTrackerId().getValue();
+        this.trackerId = preferences.getTid().getValue();
     }
 
     @Override
@@ -44,7 +44,7 @@ public class ConnectionIdentificationViewModel extends BaseDialogViewModel {
             preferences.setDeviceId(deviceId);
 
         if(trackerIdDirty)
-            preferences.setTrackerId(new StringMaxTwoAlphaNumericChars(trackerId));
+            preferences.setTid(new StringMaxTwoAlphaNumericChars(trackerId));
     }
 
     public String getUsername() {

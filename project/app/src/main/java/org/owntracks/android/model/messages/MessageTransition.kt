@@ -53,7 +53,7 @@ class MessageTransition : MessageBase() {
 
     override fun addMqttPreferences(preferences: Preferences) {
         topic = preferences.pubTopicEvents
-        qos = preferences.pubQosEvents.getVal()
+        qos = preferences.pubQosEvents.value
         retained = preferences.pubRetainEvents
     }
 
