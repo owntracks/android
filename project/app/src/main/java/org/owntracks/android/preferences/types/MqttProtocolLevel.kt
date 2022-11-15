@@ -8,6 +8,7 @@ enum class MqttProtocolLevel(@JsonValue val value: Int) {
 
     companion object {
         @JvmStatic
+        @FromConfiguration
         fun getByValue(value: Int): MqttProtocolLevel =
             MqttProtocolLevel.values()
                 .firstOrNull { it.value == value } ?: MqttProtocolLevel.MQTT_3_1

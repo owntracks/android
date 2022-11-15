@@ -41,7 +41,7 @@ class GeocoderProvider @Inject constructor(
             withContext(ioDispatcher) {
                 geocoder = when (preferences.reverseGeocodeProvider) {
                     ReverseGeocodeProvider.OPENCAGE -> OpenCageGeocoder(
-                        preferences.openCageGeocoderApiKey
+                        preferences.opencageApiKey
                     )
                     ReverseGeocodeProvider.DEVICE -> DeviceGeocoder(context)
                     ReverseGeocodeProvider.NONE -> GeocoderNone()

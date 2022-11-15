@@ -408,7 +408,7 @@ public class MessageProcessor {
     }
 
     private void processIncomingMessage(MessageCmd message) {
-        if (!preferences.getRemoteCommand()) {
+        if (!preferences.getCmd()) {
             Timber.w("remote commands are disabled");
             return;
         }

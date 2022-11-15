@@ -51,20 +51,18 @@ interface DefaultsProvider {
             Preferences::notificationGeocoderErrors -> true
             Preferences::notificationHigherPriority -> false
             Preferences::notificationLocation -> true
-            Preferences::openCageGeocoderApiKey -> ""
+            Preferences::opencageApiKey -> ""
             Preferences::osmTileScaleFactor -> 1.0f
             Preferences::password -> ""
             Preferences::pegLocatorFastestIntervalToInterval -> false
             Preferences::ping -> 30
             Preferences::port -> 8883
-            Preferences::pubLocationExtendedData -> true
-            Preferences::pubQosEvents -> MqttQos.ONE
-            Preferences::pubQosLocations -> MqttQos.ONE
-            Preferences::pubQosWaypoints -> MqttQos.ONE
+            Preferences::pubExtendedData -> true
+            Preferences::pubQos -> MqttQos.ONE
             Preferences::pubRetain -> true
-            Preferences::pubTopicBaseFormatString -> "owntracks/%u/%d"
+            Preferences::pubTopicBase -> "owntracks/%u/%d"
             Preferences::publishLocationOnConnect -> false
-            Preferences::remoteCommand -> true
+            Preferences::cmd -> true
             Preferences::remoteConfiguration -> false
             Preferences::showRegionsOnMap -> false
             Preferences::sub -> true

@@ -403,7 +403,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
             lwt.put("_type", "lwt");
             lwt.put("tst", (int) TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
 
-            m.setWill(preferences.getPubTopicBase(), lwt.toString().getBytes(), 0, false);
+            m.setWill(preferences.getPubTopicBaseWithUserDetails(), lwt.toString().getBytes(), 0, false);
         } catch (JSONException ignored) {
         } catch (IllegalArgumentException e) {
             changeState(EndpointState.ERROR_CONFIGURATION.withError(e).withMessage("Invalid pubTopic specified"));

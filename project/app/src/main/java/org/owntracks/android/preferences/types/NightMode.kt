@@ -9,6 +9,7 @@ enum class NightMode(@JsonValue val value: Int) {
 
     companion object {
         @JvmStatic
+        @FromConfiguration
         fun getByValue(value: Int): NightMode =
             NightMode.values()
                 .firstOrNull { it.value == value } ?: DISABLE

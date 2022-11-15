@@ -91,7 +91,7 @@ public class LocationProcessor {
 
         MessageLocation message;
 
-        if (preferences.getPubLocationExtendedData()) {
+        if (preferences.getPubExtendedData()) {
             message = MessageLocation.fromLocationAndWifiInfo(currentLocation, wifiInfoProvider);
             message.setBattery(deviceMetricsProvider.getBatteryLevel());
             message.setBatteryStatus(deviceMetricsProvider.getBatteryStatus());

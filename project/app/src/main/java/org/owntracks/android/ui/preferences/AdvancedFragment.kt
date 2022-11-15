@@ -46,7 +46,7 @@ class AdvancedFragment @Inject constructor() : AbstractPreferenceFragment() {
 
         findPreference<EditTextPreference>(getString(R.string.preferenceKeyOpencageGeocoderApiKey))?.setOnPreferenceChangeListener { preference, newValue ->
             val trimmed = (newValue as String).trim()
-            preferences.openCageGeocoderApiKey = trimmed
+            preferences.opencageApiKey = trimmed
             (preference as EditTextPreference).text = trimmed
             false
         }

@@ -17,12 +17,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import org.owntracks.android.BuildConfig
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiPreferencesEditorBinding
-import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.ui.base.BaseActivity
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import timber.log.Timber
 import java.util.*
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class EditorActivity :
@@ -84,7 +82,7 @@ class EditorActivity :
             ArrayAdapter(
                 this,
                 android.R.layout.simple_dropdown_item_1line,
-                preferences.allKeys.map { it.name }.toList()
+                preferences.allConfigKeys.map { it.name }.toList()
             )
         )
         builder.setTitle(R.string.preferencesEditor)
