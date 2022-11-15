@@ -87,6 +87,10 @@ class Preferences @Inject constructor(
                             val enumValue =
                                 conversionMethod?.call(it.returnType.jvmErasure.companionObjectInstance, configValue)
                             it.setter.call(this, enumValue)
+                        } else if (
+                            it.returnType.isSubtypeOf(typeOf<StringMaxTwoAlphaNumericChars>()) && configValue is String
+                        ) {
+                            it.setter.call(this, StringMaxTwoAlphaNumericChars(configValue))
                         } else {
                             it.setter.call(this, configValue)
                         }
@@ -427,7 +431,4 @@ class Preferences @Inject constructor(
         val exportModeMqtt: Boolean = true,
         val exportModeHttp: Boolean = true
     )
-}
-
-fun <T> Preferences.bind() {
 }

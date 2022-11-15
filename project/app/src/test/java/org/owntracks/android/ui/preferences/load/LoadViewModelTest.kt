@@ -24,9 +24,9 @@ class LoadViewModelTest {
 
     @Before
     fun createMocks() {
-        mockResources = PreferencesGettersAndSetters.getMockResources()
+//        mockResources = PreferencesGettersAndSetters.getMockResources()
         mockContext = mock {
-            on { resources } doReturn mockResources
+//            on { resources } doReturn mockResources
             on { packageName } doReturn javaClass.canonicalName
         }
         preferencesStore = InMemoryPreferencesStore()

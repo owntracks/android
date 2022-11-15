@@ -16,6 +16,6 @@ enum class ReverseGeocodeProvider(val value: String) {
         @JvmStatic
         @FromConfiguration
         fun getByValue(value: String): ReverseGeocodeProvider =
-            ReverseGeocodeProvider.values().firstOrNull { it.value == value } ?: DEVICE
+            ReverseGeocodeProvider.values().firstOrNull { it.value == value } ?: NONE
     }
 }

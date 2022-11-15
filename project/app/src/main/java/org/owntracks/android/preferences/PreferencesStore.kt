@@ -16,7 +16,7 @@ import timber.log.Timber
 /**
  * Allows a preferences class to read and write values from some sort of store
  */
-abstract class PreferencesStore : DefaultsProvider by DefaultsProviderImpl() {
+abstract class PreferencesStore : DefaultsProvider by DefaultsProviderImpl(), CoercionsProvider by CoercionsProviderImpl() {
     abstract fun getSharedPreferencesName(): String
 
     abstract fun putBoolean(key: String, value: Boolean)
@@ -123,21 +123,22 @@ abstract class PreferencesStore : DefaultsProvider by DefaultsProviderImpl() {
      * @param value the value to be set
      */
     @Suppress("UNCHECKED_CAST")
-    operator fun <T> setValue(_preferences: Preferences, property: KProperty<*>, value: T) {
-        when (value) {
-            is Boolean -> putBoolean(property.name, value)
-            is String -> putString(property.name, value)
-            is Int -> putInt(property.name, value)
-            is Float -> putFloat(property.name, value)
+    operator fun <T> setValue(preferences: Preferences, property: KProperty<*>, value: T) {
+        val coercedValue = getCoercion(property, value, preferences)
+        when (coercedValue) {
+            is Boolean -> putBoolean(property.name, coercedValue)
+            is String -> putString(property.name, coercedValue)
+            is Int -> putInt(property.name, coercedValue)
+            is Float -> putFloat(property.name, coercedValue)
             is Set<*> -> putStringSet(property.name, value as Set<String>)
-            is ReverseGeocodeProvider -> putString(property.name, value.value)
-            is MapLayerStyle -> putString(property.name, value.name)
-            is ConnectionMode -> putInt(property.name, value.value)
-            is MonitoringMode -> putInt(property.name, value.value)
-            is MqttProtocolLevel -> putInt(property.name, value.value)
-            is MqttQos -> putInt(property.name, value.value)
-            is NightMode -> putInt(property.name, value.value)
-            is StringMaxTwoAlphaNumericChars -> putString(property.name, value.value)
+            is ReverseGeocodeProvider -> putString(property.name, coercedValue.value)
+            is MapLayerStyle -> putString(property.name, coercedValue.name)
+            is ConnectionMode -> putInt(property.name, coercedValue.value)
+            is MonitoringMode -> putInt(property.name, coercedValue.value)
+            is MqttProtocolLevel -> putInt(property.name, coercedValue.value)
+            is MqttQos -> putInt(property.name, coercedValue.value)
+            is NightMode -> putInt(property.name, coercedValue.value)
+            is StringMaxTwoAlphaNumericChars -> putString(property.name, coercedValue.value)
             else -> throw UnsupportedPreferenceTypeException(
                 "Trying to set property ${property.name} has type ${property.returnType}"
             )

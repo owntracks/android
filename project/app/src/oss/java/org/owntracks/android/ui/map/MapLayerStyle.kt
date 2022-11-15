@@ -12,6 +12,14 @@ enum class MapLayerStyle {
     fun isSameProviderAs(_mapLayerStyle: MapLayerStyle): Boolean = true
 
     fun getFragmentClass(): Class<out MapFragment<out ViewDataBinding>> = OSMMapFragment::class.java
+
+    companion object {
+        @JvmStatic
+        @FromConfiguration
+        fun getByValue(value: String): MapLayerStyle =
+            MapLayerStyle.values()
+                .firstOrNull { it.name == value } ?: MapLayerStyle.OpenStreetMapNormal
+    }
 }
 
 val mapLayerSelectorButtonsToStyles = mapOf(
