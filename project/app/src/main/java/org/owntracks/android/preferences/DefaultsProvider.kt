@@ -67,7 +67,7 @@ interface DefaultsProvider {
             Preferences::showRegionsOnMap -> false
             Preferences::sub -> true
             Preferences::subQos -> MqttQos.TWO
-            Preferences::subTopic -> "owntracks/+/+"
+            Preferences::subTopic -> DEFAULT_SUB_TOPIC
             Preferences::theme -> NightMode.DISABLE
             Preferences::tls -> true
             Preferences::tlsCaCrt -> ""
@@ -86,5 +86,9 @@ interface DefaultsProvider {
                 throw Exception("No default defined for ${property.name}")
             }
         } as T
+    }
+
+    companion object {
+        const val DEFAULT_SUB_TOPIC = "owntracks/+/+"
     }
 }

@@ -16,7 +16,9 @@ import timber.log.Timber
 /**
  * Allows a preferences class to read and write values from some sort of store
  */
-abstract class PreferencesStore : DefaultsProvider by DefaultsProviderImpl(), CoercionsProvider by CoercionsProviderImpl() {
+abstract class PreferencesStore :
+    DefaultsProvider by DefaultsProviderImpl(),
+    CoercionsProvider by CoercionsProviderImpl() {
     abstract fun getSharedPreferencesName(): String
 
     abstract fun putBoolean(key: String, value: Boolean)

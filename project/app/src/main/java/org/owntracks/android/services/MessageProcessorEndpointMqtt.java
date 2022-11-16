@@ -1,6 +1,7 @@
 package org.owntracks.android.services;
 
 import static org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CLIENT_DISCONNECT_PROHIBITED;
+import static org.owntracks.android.preferences.DefaultsProvider.DEFAULT_SUB_TOPIC;
 import static org.owntracks.android.support.RunThingsOnOtherThreads.NETWORK_HANDLER_THREAD_NAME;
 
 import android.content.Context;
@@ -29,11 +30,11 @@ import org.owntracks.android.data.EndpointState;
 import org.owntracks.android.model.messages.MessageBase;
 import org.owntracks.android.model.messages.MessageCard;
 import org.owntracks.android.model.messages.MessageClear;
+import org.owntracks.android.preferences.Preferences;
 import org.owntracks.android.preferences.types.ConnectionMode;
 import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Parser;
-import org.owntracks.android.preferences.Preferences;
 import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.SocketFactory;
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException;
@@ -433,9 +434,9 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
             Set<String> topics = getTopicsToSubscribeTo(
                     preferences.getSubTopic(),
                     preferences.getInfo(),
-                    preferences.getSubTopicInfo(),
-                    preferences.getSubTopicEvents(),
-                    preferences.getSubTopicWaypoints()
+                    preferences.getInfoTopicSuffix(),
+                    preferences.getEventTopicSuffix(),
+                    preferences.getWaypointsTopicSuffix()
             );
             // Receive commands for us
             topics.add(preferences.getReceivedCommandsTopic());
@@ -451,15 +452,24 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     }
 
     @NotNull
-    Set<String> getTopicsToSubscribeTo(String subTopics, Boolean subscribeToInfo, String infoTopic, String eventsTopic, String waypointsTopic) {
-        Set<String> topics = new TreeSet<>();
-        topics.add(subTopics);
-        if (subscribeToInfo) {
-            topics.add(infoTopic);
+    Set<String> getTopicsToSubscribeTo(String subTopics, Boolean subscribeToInfo, String infoTopicSuffix, String eventsTopicSuffix, String waypointsTopicSuffix) {
+
+
+        // subTopics might be one topic base, or a space-separated list of topics
+        if (subTopics.contains(" ")) {
+            return new TreeSet<>(Arrays.asList(subTopics.split(" ")));
+        } else {
+            Set<String> topics = new TreeSet<>();
+            topics.add(subTopics);
+            if (subTopics==DEFAULT_SUB_TOPIC) {
+                if (subscribeToInfo) {
+                    topics.add(subTopics + infoTopicSuffix);
+                }
+                topics.add(subTopics + eventsTopicSuffix);
+                topics.add(subTopics + waypointsTopicSuffix);
+            }
+            return topics;
         }
-        topics.add(eventsTopic);
-        topics.add(waypointsTopic);
-        return topics;
     }
 
     private void subscribe(String[] topics) {

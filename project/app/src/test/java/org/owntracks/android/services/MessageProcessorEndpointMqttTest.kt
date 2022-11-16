@@ -18,7 +18,13 @@ class MessageProcessorEndpointMqttTest {
             MessageProcessorEndpointMqtt(null, null, null, null, null, null, applicationContext, null)
         val subTopic = "owntracks/+/+"
         val topics =
-            endpoint.getTopicsToSubscribeTo(subTopic, true, "/info", "/events", "/waypoints")
+            endpoint.getTopicsToSubscribeTo(
+                subTopic,
+                true,
+                "/info",
+                "/events",
+                "/waypoints"
+            )
         Assert.assertEquals(
             setOf(
                 "owntracks/+/+",
@@ -36,9 +42,16 @@ class MessageProcessorEndpointMqttTest {
             MessageProcessorEndpointMqtt(null, null, null, null, null, null, applicationContext, null)
         val subTopic = "othertopic/+/+"
         val topics =
-            endpoint.getTopicsToSubscribeTo(subTopic, true, "/info", "/events", "/waypoints")
+            endpoint.getTopicsToSubscribeTo(
+                subTopic,
+                true,
+                "/info",
+                "/events",
+                "/waypoints"
+            )
         Assert.assertEquals(
-            setOf("othertopic/+/+"), topics
+            setOf("othertopic/+/+"),
+            topics
         )
     }
 
@@ -68,7 +81,7 @@ class MessageProcessorEndpointMqttTest {
         Assert.assertEquals(
             setOf(
                 "owntracks/+/+",
-                "othertopic/+",
+                "othertopic/+"
             ),
             topics
         )
