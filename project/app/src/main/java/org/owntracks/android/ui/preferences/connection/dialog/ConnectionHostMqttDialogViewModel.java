@@ -42,7 +42,7 @@ public class ConnectionHostMqttDialogViewModel extends BaseDialogViewModel {
             try {
                 preferences.setPort(Integer.parseInt(port));
             } catch (NumberFormatException e) {
-                preferences.setPortDefault();
+                preferences.resetPreference("port");
             }
         }
 

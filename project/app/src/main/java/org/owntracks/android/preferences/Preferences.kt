@@ -60,6 +60,13 @@ class Preferences @Inject constructor(
         TODO("Not implemented")
     }
 
+    /**
+     * We're going to loop through every existing preference, filtered by those that are actually set on the given
+     * [MessageConfiguration]. For each of those, we're going to either just set the preference, or if it's an Enum,
+     * convert from the value in the [MessageConfiguration] to the actual Enum type.
+     *
+     * @param configuration the [MessageConfiguration] to import
+     */
     fun importConfiguration(configuration: MessageConfiguration) {
         allConfigKeys.filterIsInstance<KMutableProperty<*>>()
             .filter { configuration.containsKey(it.name) }
@@ -104,12 +111,8 @@ class Preferences @Inject constructor(
             }
     }
 
-    fun setPortDefault() {
-        TODO("Not implemented")
-    }
-
-    fun setKeepaliveDefault() {
-        TODO("Not implemented")
+    fun resetPreference(name: String) {
+        preferencesStore.remove(name)
     }
 
     /* Persisted preferences */

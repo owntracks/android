@@ -33,7 +33,7 @@ public class ConnectionParametersViewModel extends BaseDialogViewModel {
             try {
                 preferences.setKeepalive(Integer.parseInt(keepaliveText));
             } catch (NumberFormatException e) {
-                preferences.setKeepaliveDefault();
+                preferences.resetPreference("keepalive");
             }
         }
     }
