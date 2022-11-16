@@ -14,7 +14,7 @@ class GMSRequirementsChecker @Inject constructor(
     override val context: Context
 ) : OSSRequirementsChecker(preferences, context) {
     override fun areRequirementsMet(): Boolean {
-        return isPlayServicesCheckPassed() && isLocationPermissionCheckPassed() && preferences.isSetupCompleted
+        return isPlayServicesCheckPassed() && isLocationPermissionCheckPassed() && preferences.setupCompleted
     }
 
     override fun isPlayServicesCheckPassed(): Boolean = GoogleApiAvailability.getInstance()

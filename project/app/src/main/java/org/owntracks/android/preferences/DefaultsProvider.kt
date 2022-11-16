@@ -34,11 +34,11 @@ interface DefaultsProvider {
             Preferences::encryptionKey -> ""
             Preferences::experimentalFeatures -> emptySet<String>()
             Preferences::fusedRegionDetection -> true
+            Preferences::firstStart -> true
             Preferences::host -> ""
             Preferences::ignoreInaccurateLocations -> 0
             Preferences::ignoreStaleLocations -> 0
             Preferences::info -> true
-            Preferences::isSetupCompleted -> false
             Preferences::keepalive -> 3600
             Preferences::locatorDisplacement -> 500
             Preferences::locatorInterval -> 900
@@ -64,6 +64,7 @@ interface DefaultsProvider {
             Preferences::publishLocationOnConnect -> false
             Preferences::cmd -> true
             Preferences::remoteConfiguration -> false
+            Preferences::setupCompleted -> true
             Preferences::showRegionsOnMap -> false
             Preferences::sub -> true
             Preferences::subQos -> MqttQos.TWO

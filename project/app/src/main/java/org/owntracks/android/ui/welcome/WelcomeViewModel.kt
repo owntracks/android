@@ -44,7 +44,7 @@ class WelcomeViewModel @Inject constructor(
     }
 
     fun setWelcomeIsAtEnd() {
-        preferences.isSetupCompleted = true
+        preferences.setupCompleted = true
         mutableNextEnabled.postValue(false)
         mutableDoneEnabled.postValue(true)
     }

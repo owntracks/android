@@ -158,9 +158,6 @@ class Preferences @Inject constructor(
     @Preference(exportModeHttp = false)
     var info: Boolean by preferencesStore
 
-    @Preference
-    var isSetupCompleted: Boolean by preferencesStore
-
     @Preference(exportModeHttp = false)
     var keepalive: Int by preferencesStore
 
@@ -287,6 +284,10 @@ class Preferences @Inject constructor(
     @Preference(exportModeHttp = false)
     var ws: Boolean by preferencesStore
 
+    // Preferences we store but don't export / imnport
+    var firstStart: Boolean by preferencesStore
+    var setupCompleted: Boolean by preferencesStore
+
     // Needs to be after all the preferences are declared, otherwise the delegates are null.
     init {
         initializeDefaults()
@@ -348,10 +349,6 @@ class Preferences @Inject constructor(
         get() = preferencesStore.getSharedPreferencesName()
 
     fun setMonitoringNext() {
-    }
-
-    fun checkFirstStart() {
-        TODO("Not implemented. Can we put this in the constructor?")
     }
 
     // SharedPreferencesImpl stores its listeners as a list of WeakReferences. So we shouldn't use a

@@ -109,8 +109,6 @@ class App : Application(), Configuration.Provider {
             )
         }
 
-        preferences.checkFirstStart()
-
         // Running this on a background thread will deadlock FirebaseJobDispatcher.
         // Initialize will call Scheduler to connect off the main thread anyway.
         runThingsOnOtherThreads.postOnMainHandlerDelayed({ messageProcessor.initialize() }, 510)

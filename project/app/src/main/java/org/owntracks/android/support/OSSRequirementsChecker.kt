@@ -16,7 +16,7 @@ open class OSSRequirementsChecker @Inject constructor(
     open val context: Context
 ) : RequirementsChecker {
     override fun areRequirementsMet(): Boolean {
-        return isLocationPermissionCheckPassed() && preferences.isSetupCompleted
+        return isLocationPermissionCheckPassed() && preferences.setupCompleted
     }
 
     override fun isLocationPermissionCheckPassed(): Boolean = ContextCompat.checkSelfPermission(
