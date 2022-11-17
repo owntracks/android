@@ -57,7 +57,15 @@ class Preferences @Inject constructor(
     }
 
     fun importKeyValue(key: String, value: Any) {
-        TODO("Not implemented")
+        try {
+            importPreference(
+                allConfigKeys.filterIsInstance<KMutableProperty<*>>()
+                    .first { it.name == key },
+                value
+            )
+        } catch (e: NoSuchElementException) {
+            Timber.e("Unable to import $key with value $value as the key is not a valid preference.")
+        }
     }
 
     /**
@@ -73,34 +81,12 @@ class Preferences @Inject constructor(
             .forEach {
                 val configValue = configuration.get(it.name)
                 if (configValue == null) {
-                    preferencesStore.remove(it.name)
+                    resetPreference(it.name)
                 } else {
                     try {
                         // We need to convert the imported config value into an enum if the type of the preference is
                         // actually an enum
-                        if (it.returnType.isSubtypeOf(typeOf<Enum<*>>())) {
-                            // Find the companion object method annotated with FromConfiguration with a single parameter
-                            // that's the same type as the configuration value
-                            val conversionMethod = it.returnType.jvmErasure
-                                .companionObject
-                                ?.members
-                                ?.first {
-                                    it.annotations.any { it is FromConfiguration } &&
-                                        it.parameters.size == 2 &&
-                                        it.parameters.any {
-                                            it.type.jvmErasure == configValue.javaClass.kotlin
-                                        }
-                                }
-                            val enumValue =
-                                conversionMethod?.call(it.returnType.jvmErasure.companionObjectInstance, configValue)
-                            it.setter.call(this, enumValue)
-                        } else if (
-                            it.returnType.isSubtypeOf(typeOf<StringMaxTwoAlphaNumericChars>()) && configValue is String
-                        ) {
-                            it.setter.call(this, StringMaxTwoAlphaNumericChars(configValue))
-                        } else {
-                            it.setter.call(this, configValue)
-                        }
+                        importPreference(it, configValue)
                     } catch (e: java.lang.IllegalArgumentException) {
                         Timber.w(
                             "Trying to import wrong type of preference for ${it.name}. " +
@@ -109,6 +95,32 @@ class Preferences @Inject constructor(
                     }
                 }
             }
+    }
+
+    private fun importPreference(it: KMutableProperty<*>, configValue: Any) {
+        if (it.returnType.isSubtypeOf(typeOf<Enum<*>>())) {
+            // Find the companion object method annotated with FromConfiguration with a single parameter
+            // that's the same type as the configuration value
+            val conversionMethod = it.returnType.jvmErasure
+                .companionObject
+                ?.members
+                ?.first {
+                    it.annotations.any { it is FromConfiguration } &&
+                        it.parameters.size == 2 &&
+                        it.parameters.any {
+                            it.type.jvmErasure == configValue.javaClass.kotlin
+                        }
+                }
+            val enumValue =
+                conversionMethod?.call(it.returnType.jvmErasure.companionObjectInstance, configValue)
+            it.setter.call(this, enumValue)
+        } else if (
+            it.returnType.isSubtypeOf(typeOf<StringMaxTwoAlphaNumericChars>()) && configValue is String
+        ) {
+            it.setter.call(this, StringMaxTwoAlphaNumericChars(configValue))
+        } else {
+            it.setter.call(this, configValue)
+        }
     }
 
     fun resetPreference(name: String) {

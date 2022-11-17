@@ -19,12 +19,17 @@ class PreferenceTest {
 
     @Before
     fun createMocks() {
-//        mockResources = PreferencesGettersAndSetters.getMockResources()
         mockContext = mock {
-//            on { resources } doReturn mockResources
             on { packageName } doReturn javaClass.canonicalName
         }
         preferencesStore = InMemoryPreferencesStore()
+    }
+
+    @Test
+    fun `given a single key value, when importing to preferences, then that value can be retrieved from the preferences`() {
+        val preferences = Preferences(mockContext, preferencesStore, NoopAppShortcuts())
+        preferences.importKeyValue("ignoreStaleLocations", 195.4f)
+        assertEquals(195.4f, preferences.ignoreStaleLocations, 0.001f)
     }
 
     @Test
