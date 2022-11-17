@@ -364,6 +364,7 @@ class Preferences @Inject constructor(
         get() = preferencesStore.getSharedPreferencesName()
 
     fun setMonitoringNext() {
+        monitoring.next()
     }
 
     // SharedPreferencesImpl stores its listeners as a list of WeakReferences. So we shouldn't use a
