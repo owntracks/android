@@ -44,7 +44,7 @@ class MapViewModel @Inject constructor(
     private val locationRepo: LocationRepo,
     private val waypointsRepo: WaypointsRepo,
     @ApplicationContext private val applicationContext: Context,
-) : ViewModel(), SharedPreferences.OnSharedPreferenceChangeListener {
+) : ViewModel(){
     // controls who the currently selected contact is
     private val mutableCurrentContact = MutableLiveData<FusedContact?>()
     val currentContact: LiveData<FusedContact?>
@@ -109,13 +109,25 @@ class MapViewModel @Inject constructor(
 
     val viewMode: ViewMode by locationRepo::viewMode
 
+
+    val preferenceChangeListener = object : Preferences.OnPreferenceChangeListener {
+        override fun onPreferenceChanged(properties: List<String>) {
+            if (properties.contains("monitoring")) {
+                mutableCurrentMonitoringMode.postValue(preferences.monitoring)
+            }
+            if (properties.contains("mode")) {
+                currentConnectionMode.postValue(preferences.mode)
+                clearActiveContact()
+            }
+        }
+    }
     init {
-        preferences.registerOnPreferenceChangedListener(this)
+        preferences.registerOnPreferenceChangedListener(preferenceChangeListener)
     }
 
     override fun onCleared() {
         super.onCleared()
-        preferences.unregisterOnPreferenceChangedListener(this)
+        preferences.unregisterOnPreferenceChangedListener(preferenceChangeListener)
     }
 
     fun onMapReady() {
@@ -308,16 +320,6 @@ class MapViewModel @Inject constructor(
 
         override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
             // noop
-        }
-    }
-
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        when (key) {
-            "monitoring" -> mutableCurrentMonitoringMode.postValue(preferences.monitoring)
-            "mode" -> {
-                currentConnectionMode.postValue(preferences.mode)
-                clearActiveContact()
-            }
         }
     }
 

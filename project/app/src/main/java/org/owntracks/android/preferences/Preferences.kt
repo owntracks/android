@@ -1,7 +1,6 @@
 package org.owntracks.android.preferences
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
@@ -11,6 +10,7 @@ import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.reflect.KMutableProperty
+import kotlin.reflect.KProperty
 import kotlin.reflect.full.companionObject
 import kotlin.reflect.full.companionObjectInstance
 import kotlin.reflect.full.declaredMemberProperties
@@ -45,6 +45,10 @@ class Preferences @Inject constructor(
 
     val mqttExportedConfigKeys = allConfigKeys.filter { it.annotations.any { it is Preference && it.exportModeMqtt } }
     val httpExportedConfigKeys = allConfigKeys.filter { it.annotations.any { it is Preference && it.exportModeHttp } }
+
+    val dummyValue = Any()
+    val listenerMapLock = Any()
+    val listeners = WeakHashMap<OnPreferenceChangeListener, Any>()
 
     /*
     To initialize the defaults for each property, we can simply get the property. This should set
@@ -360,9 +364,6 @@ class Preferences @Inject constructor(
     val minimumKeepaliveSeconds = MIN_PERIODIC_INTERVAL_MILLIS.milliseconds.inWholeSeconds
     fun keepAliveInRange(i: Int): Boolean = i >= minimumKeepaliveSeconds
 
-    val sharedPreferencesName: String
-        get() = preferencesStore.getSharedPreferencesName()
-
     fun setMonitoringNext() {
         monitoring.next()
     }
@@ -370,16 +371,16 @@ class Preferences @Inject constructor(
     // SharedPreferencesImpl stores its listeners as a list of WeakReferences. So we shouldn't use a
     // lambda as a listener, as that'll just get GC'd and then mysteriously disappear
     // https://stackoverflow.com/a/3104265/352740
-    fun registerOnPreferenceChangedListener(
-        listener: SharedPreferences.OnSharedPreferenceChangeListener
-    ) {
-        preferencesStore.registerOnSharedPreferenceChangeListener(listener)
+    fun registerOnPreferenceChangedListener(listener: OnPreferenceChangeListener) {
+        synchronized(listenerMapLock) {
+            listeners.put(listener, dummyValue)
+        }
     }
 
-    fun unregisterOnPreferenceChangedListener(
-        listener: SharedPreferences.OnSharedPreferenceChangeListener
-    ) {
-        preferencesStore.unregisterOnSharedPreferenceChangeListener(listener)
+    fun unregisterOnPreferenceChangedListener(listener: OnPreferenceChangeListener) {
+        synchronized(listenerMapLock) {
+            listeners.remove(listener)
+        }
     }
 
     fun getPreferenceKey(s: Int): String {
@@ -395,6 +396,12 @@ class Preferences @Inject constructor(
                     ConnectionMode.HTTP -> httpExportedConfigKeys
                 }.forEach { set(it.name, it.get(this@Preferences)) }
             }
+    }
+
+    fun notifyChanged(property: KProperty<*>) {
+        synchronized(listenerMapLock) {
+            listeners.forEach { it.key.onPreferenceChanged(listOf(property.name)) }
+        }
     }
 
     companion object {
@@ -431,4 +438,8 @@ class Preferences @Inject constructor(
         val exportModeMqtt: Boolean = true,
         val exportModeHttp: Boolean = true
     )
+
+    interface OnPreferenceChangeListener {
+        fun onPreferenceChanged(properties: List<String>)
+    }
 }

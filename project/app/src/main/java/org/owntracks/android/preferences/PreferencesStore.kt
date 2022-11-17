@@ -127,6 +127,7 @@ abstract class PreferencesStore :
     @Suppress("UNCHECKED_CAST")
     operator fun <T> setValue(preferences: Preferences, property: KProperty<*>, value: T) {
         val coercedValue = getCoercion(property, value, preferences)
+        preferences.notifyChanged(property)
         when (coercedValue) {
             is Boolean -> putBoolean(property.name, coercedValue)
             is String -> putString(property.name, coercedValue)

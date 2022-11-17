@@ -71,6 +71,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -78,7 +79,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 import timber.log.Timber;
 
 @AndroidEntryPoint
-public class BackgroundService extends LifecycleService implements SharedPreferences.OnSharedPreferenceChangeListener, ServiceBridge.ServiceBridgeInterface {
+public class BackgroundService extends LifecycleService implements ServiceBridge.ServiceBridgeInterface, Preferences.OnPreferenceChangeListener {
     private static final int INTENT_REQUEST_CODE_GEOFENCE = 1264;
     private static final int INTENT_REQUEST_CODE_CLEAR_EVENTS = 1263;
 
@@ -729,13 +730,15 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
     }
 
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (preferences.getPreferenceKey(R.string.preferenceKeyLocatorInterval).equals(key) ||
-                preferences.getPreferenceKey(R.string.preferenceKeyLocatorDisplacement).equals(key) ||
-                preferences.getPreferenceKey(R.string.preferenceKeyLocatorPriority).equals(key) ||
-                preferences.getPreferenceKey(R.string.preferenceKeyMoveModeLocatorInterval).equals(key) ||
-                preferences.getPreferenceKey(R.string.preferenceKeyPegLocatorFastestIntervalToInterval).equals(key)
-        ) {
+    public void onPreferenceChanged(@NonNull List<String> properties) {
+        List<String> propertiesWeCareAbout = List.of(
+                "locatorInterval",
+                "locatorDisplacement",
+                "locatorPriority",
+                "moveModeLocatorInterval",
+                "pegLocatorFastestIntervalToInterval"
+        );
+        if (!propertiesWeCareAbout.stream().filter(properties::contains).collect(Collectors.toSet()).isEmpty()) {
             Timber.d("locator preferences changed. Resetting location request.");
             setupLocationRequest();
         }

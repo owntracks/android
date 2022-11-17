@@ -20,6 +20,8 @@ import timber.log.Timber;
 import static org.libsodium.jni.SodiumConstants.XSALSA20_POLY1305_SECRETBOX_KEYBYTES;
 import static org.libsodium.jni.SodiumConstants.XSALSA20_POLY1305_SECRETBOX_NONCEBYTES;
 
+import java.util.List;
+
 @Singleton
 public class EncryptionProvider {
     private static final int crypto_secretbox_NONCEBYTES = XSALSA20_POLY1305_SECRETBOX_NONCEBYTES;
@@ -97,15 +99,16 @@ public class EncryptionProvider {
         return Base64.encodeToString(out, Base64.NO_WRAP);
     }
 
-    private class SecretBoxManager implements SharedPreferences.OnSharedPreferenceChangeListener {
+    private class SecretBoxManager implements Preferences.OnPreferenceChangeListener {
         SecretBoxManager() {
             preferences.registerOnPreferenceChangedListener(this);
         }
 
         @Override
-        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            if (preferences.getPreferenceKey(R.string.preferenceKeyEncryptionKey).equals(key))
+        public void onPreferenceChanged(@NonNull List<String> properties) {
+            if (properties.contains("encryptionKey")) {
                 initializeSecretBox();
+            }
         }
     }
 }

@@ -10,6 +10,6 @@ abstract class AbstractPreferenceFragment : PreferenceFragmentCompat() {
     lateinit var preferences: Preferences
 
     override fun onCreatePreferencesFix(savedInstanceState: Bundle?, rootKey: String?) {
-        preferenceManager.sharedPreferencesName = preferences.sharedPreferencesName
+//        preferenceManager.sharedPreferencesName = preferences.sharedPreferencesName
     }
 }

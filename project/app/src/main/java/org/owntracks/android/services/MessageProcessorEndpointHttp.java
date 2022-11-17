@@ -3,6 +3,7 @@ package org.owntracks.android.services;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -21,8 +22,10 @@ import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.net.ssl.X509TrustManager;
 
@@ -38,7 +41,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import timber.log.Timber;
 
-public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint implements Preferences.OnPreferenceChangeListener {
     // Headers according to https://github.com/owntracks/recorder#http-mode
     static final String HEADER_USERNAME = "X-Limit-U";
     static final String HEADER_DEVICE = "X-Limit-D";
@@ -282,18 +285,25 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
 
     }
 
+
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (
-                preferences.getPreferenceKey(R.string.preferenceKeyURL).equals(key)
-                        || preferences.getPreferenceKey(R.string.preferenceKeyUsername).equals(key)
-                        || preferences.getPreferenceKey(R.string.preferenceKeyPassword).equals(key)
-                        || preferences.getPreferenceKey(R.string.preferenceKeyDeviceId).equals(key)) {
+    public void onPreferenceChanged(@NonNull List<String> properties) {
+        List<String> propertiesThatTriggerAURLReload = List.of(
+                "url",
+                "username",
+                "password",
+                "deviceId"
+        );
+        List<String> propertiesThatShouldResetTheClient = List.of(
+                "tlsClientCrt",
+                "tlsClientCrtPassword",
+                "tlsCaCrt"
+        );
+
+        if (!propertiesThatTriggerAURLReload.stream().filter(properties::contains).collect(Collectors.toSet()).isEmpty()) {
             messageProcessor.resetMessageSleepBlock();
             loadEndpointUrl();
-        } else if (preferences.getPreferenceKey(R.string.preferenceKeyTLSClientCrt).equals(key)
-                || preferences.getPreferenceKey(R.string.preferenceKeyTLSClientCrtPassword).equals(key)
-                || preferences.getPreferenceKey(R.string.preferenceKeyTLSCaCrt).equals(key)) {
+        } else if (!propertiesThatShouldResetTheClient.stream().filter(properties::contains).collect(Collectors.toSet()).isEmpty()) {
             mHttpClient = null;
         }
     }
