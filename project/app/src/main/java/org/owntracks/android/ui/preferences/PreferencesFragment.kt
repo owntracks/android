@@ -14,8 +14,8 @@ import org.owntracks.android.ui.preferences.editor.EditorActivity
 
 @AndroidEntryPoint
 class PreferencesFragment : AbstractPreferenceFragment() {
-    override fun onCreatePreferencesFix(savedInstanceState: Bundle?, rootKey: String?) {
-        super.onCreatePreferencesFix(savedInstanceState, rootKey)
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        super.onCreatePreferences(savedInstanceState, rootKey)
         setPreferencesFromResource(R.xml.preferences_root, rootKey)
         // Have to do these manually here, as there's an android bug that prevents the activity from being found when launched from intent declared on the preferences XML.
         findPreference<Preference>(UI_SCREEN_CONFIGURATION)!!.intent = Intent(context, EditorActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
@@ -27,10 +27,6 @@ class PreferencesFragment : AbstractPreferenceFragment() {
             this.isVisible = preferences.experimentalFeatures.contains(EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI)
         }
 
-        findPreference<IntListPreference>(getString(R.string.preferenceKeyTheme))?.setOnPreferenceChangeListener { _, newValue ->
-            preferences.theme = NightMode.getByValue(newValue.toString().toInt())
-            true
-        }
     }
 
     override fun onResume() {

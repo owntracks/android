@@ -9,8 +9,8 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class ExperimentalFragment @Inject constructor() : AbstractPreferenceFragment() {
-    override fun onCreatePreferencesFix(savedInstanceState: Bundle?, rootKey: String?) {
-        super.onCreatePreferencesFix(savedInstanceState, rootKey)
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        super.onCreatePreferences(savedInstanceState, rootKey)
         setPreferencesFromResource(R.xml.preferences_experimental, rootKey)
 
         EXPERIMENTAL_FEATURES.forEach { feature ->

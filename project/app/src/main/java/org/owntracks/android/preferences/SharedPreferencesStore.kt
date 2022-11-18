@@ -28,10 +28,10 @@ class SharedPreferencesStore @Inject constructor(@ApplicationContext private val
             "org.owntracks.android.preferences.private",
             "org.owntracks.android.preferences.http"
         )
-
         with(sharedPreferences.edit()) {
             oldSharedPreferenceNames
                 .map { context.getSharedPreferences(it, Context.MODE_PRIVATE) }
+                .filter { it.all.isNotEmpty() }
                 .forEach {
                     it.all.forEach { (key, value) ->
                         Timber.d("Migrating legacy preference $key from $it")
@@ -47,7 +47,10 @@ class SharedPreferencesStore @Inject constructor(@ApplicationContext private val
                 }
             if (commit()) {
                 oldSharedPreferenceNames.forEach {
-                    context.getSharedPreferences(it, Context.MODE_PRIVATE).edit().clear().apply()
+                    context.getSharedPreferences(it, Context.MODE_PRIVATE)
+                        .edit()
+                        .clear()
+                        .apply()
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     oldSharedPreferenceNames.forEach {
@@ -62,14 +65,17 @@ class SharedPreferencesStore @Inject constructor(@ApplicationContext private val
     }
 
     override fun putString(key: String, value: String) =
-        sharedPreferences.edit().putString(key, value).apply()
-
+        sharedPreferences.edit()
+            .putString(key, value)
+            .apply()
 
     override fun getString(key: String, default: String): String? =
         sharedPreferences.getString(key, default)
 
     override fun remove(key: String) =
-        sharedPreferences.edit().remove(key).apply()
+        sharedPreferences.edit()
+            .remove(key)
+            .apply()
 
     override fun getBoolean(key: String, default: Boolean): Boolean =
         sharedPreferences.getBoolean(key, default)
@@ -77,22 +83,30 @@ class SharedPreferencesStore @Inject constructor(@ApplicationContext private val
     override fun getSharedPreferencesName(): String = sharedPreferences.toString()
 
     override fun putBoolean(key: String, value: Boolean) =
-        sharedPreferences.edit().putBoolean(key, value).apply()
+        sharedPreferences.edit()
+            .putBoolean(key, value)
+            .apply()
 
     override fun getInt(key: String, default: Int): Int =
         sharedPreferences.getInt(key, default)
 
     override fun putFloat(key: String, value: Float) =
-        sharedPreferences.edit().putFloat(key, value).apply()
+        sharedPreferences.edit()
+            .putFloat(key, value)
+            .apply()
 
     override fun getFloat(key: String, default: Float): Float =
         sharedPreferences.getFloat(key, default)
 
     override fun putInt(key: String, value: Int) =
-        sharedPreferences.edit().putInt(key, value).apply()
+        sharedPreferences.edit()
+            .putInt(key, value)
+            .apply()
 
     override fun putStringSet(key: String, values: Set<String>) {
-        sharedPreferences.edit().putStringSet(key, values).apply()
+        sharedPreferences.edit()
+            .putStringSet(key, values)
+            .apply()
     }
 
     override fun getStringSet(key: String, defaultValues: Set<String>): Set<String> =

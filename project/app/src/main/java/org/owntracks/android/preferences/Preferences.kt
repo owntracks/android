@@ -127,6 +127,10 @@ class Preferences @Inject constructor(
         }
     }
 
+    fun getPreferenceByName(name: String): Any? {
+        return allConfigKeys.first { it.name == name }.get(this)
+    }
+
     fun resetPreference(name: String) {
         preferencesStore.remove(name)
     }
@@ -381,10 +385,6 @@ class Preferences @Inject constructor(
         synchronized(listenerMapLock) {
             listeners.remove(listener)
         }
-    }
-
-    fun getPreferenceKey(s: Int): String {
-        TODO("Not implemented")
     }
 
     fun exportToMessage(): MessageConfiguration {

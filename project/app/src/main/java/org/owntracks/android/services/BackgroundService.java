@@ -256,10 +256,10 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
                     setupLocationRequest();
                     return;
                 case INTENT_ACTION_CHANGE_MONITORING:
-                    if (intent.hasExtra(preferences.getPreferenceKey(R.string.preferenceKeyMonitoring))) {
+                    if (intent.hasExtra("monitoring")) {
                         MonitoringMode newMode = MonitoringMode.getByValue(
                                 intent.getIntExtra(
-                                        preferences.getPreferenceKey(R.string.preferenceKeyMonitoring),
+                                        "monitoring",
                                         preferences.getMonitoring().getValue()
                                 )
                         );
