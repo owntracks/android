@@ -34,7 +34,7 @@ import org.owntracks.android.ui.AppShortcuts
 import timber.log.Timber
 
 @HiltAndroidApp
-class App : Application(), Configuration.Provider {
+class App : Application(), Configuration.Provider, Preferences.OnPreferenceChangeListener {
     @Inject
     lateinit var preferences: Preferences
 
@@ -113,17 +113,9 @@ class App : Application(), Configuration.Provider {
         // Initialize will call Scheduler to connect off the main thread anyway.
         runThingsOnOtherThreads.postOnMainHandlerDelayed({ messageProcessor.initialize() }, 510)
 
-        when (preferences.theme) {
-            NightMode.AUTO -> AppCompatDelegate.setDefaultNightMode(
-                Preferences.SYSTEM_NIGHT_AUTO_MODE
-            )
-            NightMode.ENABLE -> AppCompatDelegate.setDefaultNightMode(
-                AppCompatDelegate.MODE_NIGHT_YES
-            )
-            NightMode.DISABLE -> AppCompatDelegate.setDefaultNightMode(
-                AppCompatDelegate.MODE_NIGHT_NO
-            )
-        }
+        preferences.registerOnPreferenceChangedListener(this)
+
+        setThemeFromPreferences()
 
         if (preferences.experimentalFeatures.contains(
                 Preferences.EXPERIMENTAL_FEATURE_ENABLE_APP_SHORTCUTS
@@ -135,6 +127,20 @@ class App : Application(), Configuration.Provider {
 
         // Notifications can be sent from multiple places, so let's make sure we've got the channels in place
         createNotificationChannels()
+    }
+
+    private fun setThemeFromPreferences() {
+        when (preferences.theme) {
+            NightMode.AUTO -> AppCompatDelegate.setDefaultNightMode(
+                Preferences.SYSTEM_NIGHT_AUTO_MODE
+            )
+            NightMode.ENABLE -> AppCompatDelegate.setDefaultNightMode(
+                AppCompatDelegate.MODE_NIGHT_YES
+            )
+            NightMode.DISABLE -> AppCompatDelegate.setDefaultNightMode(
+                AppCompatDelegate.MODE_NIGHT_NO
+            )
+        }
     }
 
     private fun createNotificationChannels() {
@@ -205,4 +211,10 @@ class App : Application(), Configuration.Provider {
                 workManagerFailedToInitialize.postValue(true)
             }
             .build()
+
+    override fun onPreferenceChanged(properties: List<String>) {
+        if (properties.contains(Preferences::theme.name)) {
+            setThemeFromPreferences()
+        }
+    }
 }

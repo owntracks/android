@@ -127,7 +127,6 @@ abstract class PreferencesStore :
     @Suppress("UNCHECKED_CAST")
     operator fun <T> setValue(preferences: Preferences, property: KProperty<*>, value: T) {
         val coercedValue = getCoercion(property, value, preferences)
-        preferences.notifyChanged(property)
         when (coercedValue) {
             is Boolean -> putBoolean(property.name, coercedValue)
             is String -> putString(property.name, coercedValue)
@@ -146,6 +145,7 @@ abstract class PreferencesStore :
                 "Trying to set property ${property.name} has type ${property.returnType}"
             )
         }
+        preferences.notifyChanged(property)
     }
 
     class UnsupportedPreferenceTypeException(message: String) : Throwable(message)
