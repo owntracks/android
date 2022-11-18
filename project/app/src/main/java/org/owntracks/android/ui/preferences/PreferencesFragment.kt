@@ -2,12 +2,10 @@ package org.owntracks.android.ui.preferences
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.preference.IntListPreference
 import androidx.preference.Preference
 import dagger.hilt.android.AndroidEntryPoint
 import org.owntracks.android.R
 import org.owntracks.android.preferences.types.ConnectionMode
-import org.owntracks.android.preferences.types.NightMode
 import org.owntracks.android.preferences.Preferences.Companion.EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI
 import org.owntracks.android.ui.preferences.connection.ConnectionActivity
 import org.owntracks.android.ui.preferences.editor.EditorActivity

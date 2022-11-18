@@ -25,7 +25,7 @@ import org.owntracks.android.preferences.types.FromConfiguration
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.preferences.types.MqttProtocolLevel
 import org.owntracks.android.preferences.types.MqttQos
-import org.owntracks.android.preferences.types.NightMode
+import org.owntracks.android.preferences.types.AppTheme
 import org.owntracks.android.preferences.types.ReverseGeocodeProvider
 import org.owntracks.android.preferences.types.StringMaxTwoAlphaNumericChars
 import org.owntracks.android.services.worker.Scheduler.MIN_PERIODIC_INTERVAL_MILLIS
@@ -275,7 +275,7 @@ class Preferences @Inject constructor(
     var subTopic: String by preferencesStore
 
     @Preference
-    var theme: NightMode by preferencesStore
+    var theme: AppTheme by preferencesStore
 
     @Preference(exportModeHttp = false)
     var tls: Boolean by preferencesStore

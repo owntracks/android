@@ -3,7 +3,7 @@ package org.owntracks.android.preferences
 import androidx.preference.PreferenceDataStore
 import javax.inject.Inject
 import javax.inject.Singleton
-import org.owntracks.android.preferences.types.NightMode
+import org.owntracks.android.preferences.types.AppTheme
 
 /**
  * The whole reason this exists is to give an [androidx.preference.PreferenceFragmentCompat] a thing that it can poke
@@ -27,7 +27,7 @@ class PreferenceDataStoreShim @Inject constructor(private val preferences: Prefe
     override fun getInt(key: String?, defValue: Int): Int {
         val preferenceValue = key?.run(preferences::getPreferenceByName) ?: defValue
         val intPreferenceValue = when (preferenceValue) {
-            is NightMode -> {
+            is AppTheme -> {
                 preferenceValue.value
             }
             else -> {

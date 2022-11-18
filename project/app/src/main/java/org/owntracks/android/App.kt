@@ -15,17 +15,17 @@ import androidx.work.Configuration
 import androidx.work.WorkerFactory
 import dagger.hilt.EntryPoints
 import dagger.hilt.android.HiltAndroidApp
-import org.bouncycastle.jce.provider.BouncyCastleProvider
 import java.security.Security
 import javax.inject.Inject
 import javax.inject.Provider
+import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.conscrypt.Conscrypt
 import org.owntracks.android.di.CustomBindingComponentBuilder
 import org.owntracks.android.di.CustomBindingEntryPoint
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.logging.TimberInMemoryLogTree
-import org.owntracks.android.preferences.types.NightMode
 import org.owntracks.android.preferences.Preferences
+import org.owntracks.android.preferences.types.AppTheme
 import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.RunThingsOnOtherThreads
@@ -64,12 +64,16 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
         // X509ExtendedTrustManager not available pre-24, fall back to device. https://github.com/google/conscrypt/issues/603
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             Security.insertProviderAt(
-                Conscrypt.newProviderBuilder().provideTrustManager(true).build(),
+                Conscrypt.newProviderBuilder()
+                    .provideTrustManager(true)
+                    .build(),
                 1
             )
         } else {
             Security.insertProviderAt(
-                Conscrypt.newProviderBuilder().provideTrustManager(false).build(),
+                Conscrypt.newProviderBuilder()
+                    .provideTrustManager(false)
+                    .build(),
                 1
             )
         }
@@ -80,7 +84,8 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
 
         super.onCreate()
 
-        val dataBindingComponent = bindingComponentProvider.get().build()
+        val dataBindingComponent = bindingComponentProvider.get()
+            .build()
         val dataBindingEntryPoint = EntryPoints.get(
             dataBindingComponent,
             CustomBindingEntryPoint::class.java
@@ -119,7 +124,8 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
 
         if (preferences.experimentalFeatures.contains(
                 Preferences.EXPERIMENTAL_FEATURE_ENABLE_APP_SHORTCUTS
-            )) {
+            )
+        ) {
             appShortcuts.enableLogViewerShortcut(this)
         } else {
             appShortcuts.disableLogViewerShortcut(this)
@@ -131,13 +137,13 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
 
     private fun setThemeFromPreferences() {
         when (preferences.theme) {
-            NightMode.AUTO -> AppCompatDelegate.setDefaultNightMode(
+            AppTheme.AUTO -> AppCompatDelegate.setDefaultNightMode(
                 Preferences.SYSTEM_NIGHT_AUTO_MODE
             )
-            NightMode.ENABLE -> AppCompatDelegate.setDefaultNightMode(
+            AppTheme.DARK -> AppCompatDelegate.setDefaultNightMode(
                 AppCompatDelegate.MODE_NIGHT_YES
             )
-            NightMode.DISABLE -> AppCompatDelegate.setDefaultNightMode(
+            AppTheme.LIGHT -> AppCompatDelegate.setDefaultNightMode(
                 AppCompatDelegate.MODE_NIGHT_NO
             )
         }
@@ -163,7 +169,8 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
                 enableVibration(false)
                 setShowBadge(false)
                 setSound(null, null)
-            }.run { notificationManager.createNotificationChannel(this) }
+            }
+                .run { notificationManager.createNotificationChannel(this) }
 
             val eventsNotificationChannelName = if (getString(R.string.events).trim()
                 .isNotEmpty()
@@ -179,7 +186,8 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
                 enableVibration(false)
                 setShowBadge(true)
                 setSound(null, null)
-            }.run { notificationManager.createNotificationChannel(this) }
+            }
+                .run { notificationManager.createNotificationChannel(this) }
 
             val errorNotificationChannelName =
                 if (getString(R.string.notificationChannelErrors).trim()
@@ -191,7 +199,8 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
                 lockscreenVisibility = Notification.VISIBILITY_PRIVATE
-            }.run { notificationManager.createNotificationChannel(this) }
+            }
+                .run { notificationManager.createNotificationChannel(this) }
         }
     }
 
@@ -214,6 +223,7 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
 
     override fun onPreferenceChanged(properties: List<String>) {
         if (properties.contains(Preferences::theme.name)) {
+            Timber.d("Theme changed. Setting theme to ${preferences.theme}")
             setThemeFromPreferences()
         }
     }

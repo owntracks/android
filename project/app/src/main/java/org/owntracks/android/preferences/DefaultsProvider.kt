@@ -7,7 +7,7 @@ import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.preferences.types.MqttProtocolLevel
 import org.owntracks.android.preferences.types.MqttQos
-import org.owntracks.android.preferences.types.NightMode
+import org.owntracks.android.preferences.types.AppTheme
 import org.owntracks.android.preferences.types.StringMaxTwoAlphaNumericChars
 
 interface DefaultsProvider {
@@ -69,7 +69,7 @@ interface DefaultsProvider {
             Preferences::sub -> true
             Preferences::subQos -> MqttQos.TWO
             Preferences::subTopic -> DEFAULT_SUB_TOPIC
-            Preferences::theme -> NightMode.DISABLE
+            Preferences::theme -> AppTheme.LIGHT
             Preferences::tls -> true
             Preferences::tlsCaCrt -> ""
             Preferences::tlsClientCrt -> ""

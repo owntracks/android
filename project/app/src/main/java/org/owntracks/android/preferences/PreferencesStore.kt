@@ -7,7 +7,7 @@ import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.preferences.types.MqttProtocolLevel
 import org.owntracks.android.preferences.types.MqttQos
-import org.owntracks.android.preferences.types.NightMode
+import org.owntracks.android.preferences.types.AppTheme
 import org.owntracks.android.preferences.types.ReverseGeocodeProvider
 import org.owntracks.android.preferences.types.StringMaxTwoAlphaNumericChars
 import org.owntracks.android.ui.map.MapLayerStyle
@@ -79,7 +79,7 @@ abstract class PreferencesStore :
                     typeOf<MonitoringMode>() -> MonitoringMode.getByValue(getInt(property.name, 1))
                     typeOf<MqttProtocolLevel>() -> MqttProtocolLevel.getByValue(getInt(property.name, 3))
                     typeOf<MqttQos>() -> MqttQos.getByValue(getInt(property.name, 1))
-                    typeOf<NightMode>() -> NightMode.getByValue(getInt(property.name, 0))
+                    typeOf<AppTheme>() -> AppTheme.getByValue(getInt(property.name, 0))
                     typeOf<StringMaxTwoAlphaNumericChars>() -> StringMaxTwoAlphaNumericChars(
                         getString(
                             property.name,
@@ -127,6 +127,7 @@ abstract class PreferencesStore :
     @Suppress("UNCHECKED_CAST")
     operator fun <T> setValue(preferences: Preferences, property: KProperty<*>, value: T) {
         val coercedValue = getCoercion(property, value, preferences)
+        Timber.d("Setting preference ${property.name} to $value (coerced to $coercedValue)")
         when (coercedValue) {
             is Boolean -> putBoolean(property.name, coercedValue)
             is String -> putString(property.name, coercedValue)
@@ -139,7 +140,7 @@ abstract class PreferencesStore :
             is MonitoringMode -> putInt(property.name, coercedValue.value)
             is MqttProtocolLevel -> putInt(property.name, coercedValue.value)
             is MqttQos -> putInt(property.name, coercedValue.value)
-            is NightMode -> putInt(property.name, coercedValue.value)
+            is AppTheme -> putInt(property.name, coercedValue.value)
             is StringMaxTwoAlphaNumericChars -> putString(property.name, coercedValue.value)
             else -> throw UnsupportedPreferenceTypeException(
                 "Trying to set property ${property.name} has type ${property.returnType}"
