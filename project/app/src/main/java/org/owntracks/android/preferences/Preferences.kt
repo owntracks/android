@@ -20,12 +20,12 @@ import kotlin.reflect.typeOf
 import kotlin.time.Duration.Companion.milliseconds
 import org.owntracks.android.BuildConfig
 import org.owntracks.android.model.messages.MessageConfiguration
+import org.owntracks.android.preferences.types.AppTheme
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.preferences.types.FromConfiguration
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.preferences.types.MqttProtocolLevel
 import org.owntracks.android.preferences.types.MqttQos
-import org.owntracks.android.preferences.types.AppTheme
 import org.owntracks.android.preferences.types.ReverseGeocodeProvider
 import org.owntracks.android.preferences.types.StringMaxTwoAlphaNumericChars
 import org.owntracks.android.services.worker.Scheduler.MIN_PERIODIC_INTERVAL_MILLIS
@@ -60,6 +60,12 @@ class Preferences @Inject constructor(
         allConfigKeys.forEach { it.get(this) }
     }
 
+    /**
+     * Imports a value for a key String. Untyped, so basically accepts anything for any key string
+     *
+     * @param key key to set preference for
+     * @param value value to try and set
+     */
     fun importKeyValue(key: String, value: Any) {
         try {
             importPreference(
@@ -101,7 +107,13 @@ class Preferences @Inject constructor(
             }
     }
 
-    private fun importPreference(it: KMutableProperty<*>, configValue: Any) {
+    /**
+     * Imports an untyped value to a known preference type
+     *
+     * @param it the preference to set
+     * @param value untyped value to try and set
+     */
+    private fun importPreference(it: KMutableProperty<*>, value: Any) {
         if (it.returnType.isSubtypeOf(typeOf<Enum<*>>())) {
             // Find the companion object method annotated with FromConfiguration with a single parameter
             // that's the same type as the configuration value
@@ -112,23 +124,32 @@ class Preferences @Inject constructor(
                     it.annotations.any { it is FromConfiguration } &&
                         it.parameters.size == 2 &&
                         it.parameters.any {
-                            it.type.jvmErasure == configValue.javaClass.kotlin
+                            it.type.jvmErasure == value.javaClass.kotlin
                         }
                 }
             val enumValue =
-                conversionMethod?.call(it.returnType.jvmErasure.companionObjectInstance, configValue)
+                conversionMethod?.call(it.returnType.jvmErasure.companionObjectInstance, value)
             it.setter.call(this, enumValue)
         } else if (
-            it.returnType.isSubtypeOf(typeOf<StringMaxTwoAlphaNumericChars>()) && configValue is String
+            it.returnType.isSubtypeOf(typeOf<StringMaxTwoAlphaNumericChars>()) && value is String
         ) {
-            it.setter.call(this, StringMaxTwoAlphaNumericChars(configValue))
+            it.setter.call(this, StringMaxTwoAlphaNumericChars(value))
+        } else if (it.returnType.isSubtypeOf(typeOf<Set<*>>()) && value is String) {
+            it.setter.call(
+                this,
+                value.split(",")
+                    .map { it.trim() }
+                    .filter { it.isNotBlank() }
+                    .toSortedSet()
+            )
         } else {
-            it.setter.call(this, configValue)
+            it.setter.call(this, value)
         }
     }
 
     fun getPreferenceByName(name: String): Any? {
-        return allConfigKeys.first { it.name == name }.get(this)
+        return allConfigKeys.first { it.name == name }
+            .get(this)
     }
 
     fun resetPreference(name: String) {

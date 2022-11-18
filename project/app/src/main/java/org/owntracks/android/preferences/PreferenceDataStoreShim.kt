@@ -4,6 +4,7 @@ import androidx.preference.PreferenceDataStore
 import javax.inject.Inject
 import javax.inject.Singleton
 import org.owntracks.android.preferences.types.AppTheme
+import org.owntracks.android.preferences.types.ReverseGeocodeProvider
 
 /**
  * The whole reason this exists is to give an [androidx.preference.PreferenceFragmentCompat] a thing that it can poke
@@ -27,18 +28,19 @@ class PreferenceDataStoreShim @Inject constructor(private val preferences: Prefe
     override fun getInt(key: String?, defValue: Int): Int {
         val preferenceValue = key?.run(preferences::getPreferenceByName) ?: defValue
         val intPreferenceValue = when (preferenceValue) {
-            is AppTheme -> {
-                preferenceValue.value
-            }
-            else -> {
-                preferenceValue
-            }
+            is AppTheme -> preferenceValue.value
+            else -> preferenceValue
         }
         return intPreferenceValue as Int
     }
 
     override fun getString(key: String?, defValue: String?): String? {
-        return (key?.run(preferences::getPreferenceByName) ?: defValue) as String
+        val preferenceValue = key?.run(preferences::getPreferenceByName) ?: defValue
+        val stringPreferenceValue = when (preferenceValue) {
+            is ReverseGeocodeProvider -> preferenceValue.value
+            else -> preferenceValue
+        }
+        return stringPreferenceValue as String
     }
 
     override fun getStringSet(key: String?, defValues: MutableSet<String>?): MutableSet<String>? {

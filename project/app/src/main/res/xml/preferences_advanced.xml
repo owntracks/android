@@ -8,13 +8,13 @@
         <androidx.preference.SwitchPreferenceCompat
             app:defaultValue="@bool/valRemoteCommand"
             app:iconSpaceReserved="false"
-            app:key="@string/preferenceKeyRemoteCommand"
+            app:key="cmd"
             app:summary="@string/preferencesRemoteCommandSummary"
             app:title="@string/preferencesRemoteCommand" />
         <androidx.preference.SwitchPreferenceCompat
             app:defaultValue="@bool/valRemoteConfiguration"
             app:iconSpaceReserved="false"
-            app:key="@string/preferenceKeyRemoteConfiguration"
+            app:key="remoteConfiguration"
             app:summary="@string/preferencesRemoteConfigurationSummary"
             app:title="@string/preferencesRemoteConfiguration" />
     </androidx.preference.PreferenceCategory>
@@ -27,7 +27,7 @@
             app:defaultValue="@integer/valIgnoreInaccurateLocations"
             app:dialogMessage="@string/preferencesIgnoreInaccurateLocationsDialog"
             app:iconSpaceReserved="false"
-            app:key="@string/preferenceKeyIgnoreInaccurateLocations"
+            app:key="ignoreInaccurateLocations"
             app:summary="@string/preferencesIgnoreInaccurateLocationsSummary"
             app:title="@string/preferencesIgnoreInaccurateLocations" />
         <org.owntracks.android.support.widgets.EditIntegerPreference
@@ -36,7 +36,7 @@
             app:defaultValue="@integer/valLocatorDisplacement"
             app:dialogMessage="@string/preferencesLocatorDisplacementDialog"
             app:iconSpaceReserved="false"
-            app:key="@string/preferenceKeyLocatorDisplacement"
+            app:key="locatorDisplacement"
             app:summary="@string/preferencesLocatorDisplacementSummary"
             app:title="@string/preferencesLocatorDisplacement" />
         <org.owntracks.android.support.widgets.EditIntegerPreference
@@ -45,7 +45,7 @@
             app:defaultValue="@integer/valLocatorInterval"
             app:dialogMessage="@string/preferencesLocatorIntervalDialog"
             app:iconSpaceReserved="false"
-            app:key="@string/preferenceKeyLocatorInterval"
+            app:key="locatorInterval"
             app:summary="@string/preferencesLocatorIntervalSummary"
             app:title="@string/preferencesLocatorInterval" />
         <org.owntracks.android.support.widgets.EditIntegerPreference
@@ -54,13 +54,13 @@
             app:defaultValue="@integer/valMoveModeLocatorInterval"
             app:dialogMessage="@string/preferencesMoveModeLocatorIntervalDialog"
             app:iconSpaceReserved="false"
-            app:key="@string/preferenceKeyMoveModeLocatorInterval"
+            app:key="moveModeLocatorInterval"
             app:summary="@string/preferencesMoveModeLocatorIntervalSummary"
             app:title="@string/preferencesMoveModeLocatorInterval" />
         <androidx.preference.SwitchPreferenceCompat
             app:defaultValue="@bool/valPegLocatorFastestIntervalToInterval"
             app:iconSpaceReserved="false"
-            app:key="@string/preferenceKeyPegLocatorFastestIntervalToInterval"
+            app:key="pegLocatorFastestIntervalToInterval"
             app:summary="@string/preferencesPegLocatorFastestIntervalToIntervalSummary"
             app:title="@string/preferencesPegLocatorFastestIntervalToInterval" />
     </androidx.preference.PreferenceCategory>
@@ -70,7 +70,7 @@
         <androidx.preference.EditTextPreference
             app:dialogMessage="@string/preferencesEncryptionKeyDialogMessage"
             app:iconSpaceReserved="false"
-            app:key="@string/preferenceKeyEncryptionKey"
+            app:key="encryptionKey"
             app:summary="@string/preferencesEncryptionKeySummary"
             app:title="@string/preferencesEncryptionKey" />
     </androidx.preference.PreferenceCategory>
@@ -81,7 +81,7 @@
         <androidx.preference.SwitchPreferenceCompat
             app:defaultValue="@bool/valAutostartOnBoot"
             app:iconSpaceReserved="false"
-            app:key="@string/preferenceKeyAutostartOnBoot"
+            app:key="autostartOnBoot"
             app:summary="@string/preferencesAutostartSummary"
             app:title="@string/preferencesAutostart" />
         <Preference
@@ -94,14 +94,14 @@
             app:entries="@array/geocoders"
             app:entryValues="@array/geocoderValues"
             app:iconSpaceReserved="false"
-            app:key="@string/preferenceKeyReverseGeocodeProvider"
+            app:key="reverseGeocodeProvider"
             app:title="@string/preferencesReverseGeocodeProvider"
             app:useSimpleSummaryProvider="true" />
         <androidx.preference.EditTextPreference
             app:dialogMessage="@string/preferencesOpencageGeocoderApiKeyDialog"
             app:iconSpaceReserved="false"
             app:isPreferenceVisible="false"
-            app:key="@string/preferenceKeyOpencageGeocoderApiKey"
+            app:key="opencageApiKey"
             app:summary="@string/preferencesOpencageGeocoderApiKeySummary"
             app:title="@string/preferencesOpencageGeocoderApiKey" />
     </androidx.preference.PreferenceCategory>

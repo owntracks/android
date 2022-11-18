@@ -17,6 +17,7 @@ import org.hamcrest.CoreMatchers.`is`
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
+import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.ui.preferences.editor.EditorActivity
 
@@ -27,10 +28,7 @@ class ConfigEditorActivityTests : TestWithAnActivity<EditorActivity>(EditorActiv
     fun configurationManagementCanEditASetType() {
         openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
         clickOn(R.string.preferencesEditor)
-        writeTo(
-            R.id.inputKey,
-            baristaRule.activityTestRule.activity.getString(R.string.preferenceKeyExperimentalFeatures)
-        )
+        writeTo(R.id.inputKey, Preferences::experimentalFeatures.name)
         writeTo(R.id.inputValue, "this, that,    other")
         clickDialogPositiveButton()
         assertContains(
@@ -43,10 +41,7 @@ class ConfigEditorActivityTests : TestWithAnActivity<EditorActivity>(EditorActiv
     fun configurationManagementCanEditAnIntType() {
         openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
         clickOn(R.string.preferencesEditor)
-        writeTo(
-            R.id.inputKey,
-            baristaRule.activityTestRule.activity.getString(R.string.preferenceKeyModeId)
-        )
+        writeTo(R.id.inputKey, Preferences::mode.name)
         writeTo(R.id.inputValue, "0")
         clickDialogPositiveButton()
 
@@ -60,10 +55,7 @@ class ConfigEditorActivityTests : TestWithAnActivity<EditorActivity>(EditorActiv
     fun configurationManagementCanEditAStringType() {
         openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
         clickOn(R.string.preferencesEditor)
-        writeTo(
-            R.id.inputKey,
-            baristaRule.activityTestRule.activity.getString(R.string.preferenceKeyHost)
-        )
+        writeTo(R.id.inputKey, Preferences::host.name)
         writeTo(R.id.inputValue, "example.com")
         clickDialogPositiveButton()
 
@@ -77,10 +69,7 @@ class ConfigEditorActivityTests : TestWithAnActivity<EditorActivity>(EditorActiv
     fun configurationManagementCanEditABooleanType() {
         openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
         clickOn(R.string.preferencesEditor)
-        writeTo(
-            R.id.inputKey,
-            baristaRule.activityTestRule.activity.getString(R.string.preferenceKeyRemoteCommand)
-        )
+        writeTo(R.id.inputKey, Preferences::cmd.name)
         writeTo(R.id.inputValue, "false")
         clickDialogPositiveButton()
         assertContains(R.id.effectiveConfiguration, "\"cmd\" : false")
@@ -90,10 +79,7 @@ class ConfigEditorActivityTests : TestWithAnActivity<EditorActivity>(EditorActiv
     fun configurationManagementCanEditAFloatType() {
         openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
         clickOn(R.string.preferencesEditor)
-        writeTo(
-            R.id.inputKey,
-            baristaRule.activityTestRule.activity.getString(R.string.preferenceKeyOsmTileScaleFactor)
-        )
+        writeTo(R.id.inputKey, Preferences::osmTileScaleFactor.name)
         writeTo(R.id.inputValue, "0.5")
         clickDialogPositiveButton()
 
@@ -107,10 +93,7 @@ class ConfigEditorActivityTests : TestWithAnActivity<EditorActivity>(EditorActiv
     fun configurationManagementShowsAnErrorWhenPuttingANonFloatIntoAFloat() {
         openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
         clickOn(R.string.preferencesEditor)
-        writeTo(
-            R.id.inputKey,
-            baristaRule.activityTestRule.activity.getString(R.string.preferenceKeyOsmTileScaleFactor)
-        )
+        writeTo(R.id.inputKey, Preferences::osmTileScaleFactor.name)
         writeTo(R.id.inputValue, "not a float")
         clickDialogPositiveButton()
     }

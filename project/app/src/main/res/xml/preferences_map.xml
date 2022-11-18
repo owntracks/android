@@ -6,7 +6,7 @@
     <androidx.preference.SwitchPreferenceCompat
         android:defaultValue="@bool/valShowRegionsOnMap"
         app:iconSpaceReserved="false"
-        app:key="@string/preferenceKeyShowRegionsOnMap"
+        app:key="showRegionsOnMap"
         app:summary="@string/preferencesShowRegionsOnMapSummary"
         app:title="@string/preferencesShowRegionsOnMap" />
 
