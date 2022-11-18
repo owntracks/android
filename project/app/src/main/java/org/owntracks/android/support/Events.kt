@@ -9,7 +9,6 @@ class Events {
         val date: Date = Date()
     }
 
-    class ModeChanged(val newModeId: ConnectionMode) : E()
     class MonitoringChanged : E()
     class EndpointChanged : E()
 

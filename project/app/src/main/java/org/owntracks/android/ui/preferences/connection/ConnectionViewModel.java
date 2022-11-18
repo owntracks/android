@@ -7,7 +7,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.Bindable;
 
-import org.greenrobot.eventbus.Subscribe;
 import org.owntracks.android.preferences.types.ConnectionMode;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.preferences.Preferences;
@@ -19,6 +18,8 @@ import org.owntracks.android.ui.preferences.connection.dialog.ConnectionModeDial
 import org.owntracks.android.ui.preferences.connection.dialog.ConnectionParametersViewModel;
 import org.owntracks.android.ui.preferences.connection.dialog.ConnectionSecurityViewModel;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import dagger.hilt.android.qualifiers.ApplicationContext;
@@ -26,17 +27,17 @@ import dagger.hilt.android.scopes.ActivityScoped;
 import timber.log.Timber;
 
 @ActivityScoped
-public class ConnectionViewModel extends BaseViewModel<ConnectionMvvm.View> implements ConnectionMvvm.ViewModel<ConnectionMvvm.View> {
+public class ConnectionViewModel extends BaseViewModel<ConnectionMvvm.View> implements ConnectionMvvm.ViewModel<ConnectionMvvm.View>, Preferences.OnPreferenceChangeListener {
 
     private final Preferences preferences;
     private final Context context;
     private ConnectionMode connectionMode;
 
-
     @Inject
     ConnectionViewModel(Preferences preferences, @ApplicationContext Context context) {
         this.preferences = preferences;
         this.context = context;
+        preferences.registerOnPreferenceChangedListener(this);
     }
 
     public void attachView(@Nullable Bundle savedInstanceState, @NonNull ConnectionMvvm.View view) {
@@ -53,14 +54,6 @@ public class ConnectionViewModel extends BaseViewModel<ConnectionMvvm.View> impl
     @Override
     public ConnectionMode getConnectionMode() {
         return connectionMode;
-    }
-
-    @Subscribe
-    public void onEvent(Events.ModeChanged e) {
-        Timber.v("mode changed %s", e.getNewModeId());
-        setConnectionMode(e.getNewModeId());
-        getView().recreateOptionsMenu();
-        notifyChange();
     }
 
     @Override
@@ -118,4 +111,13 @@ public class ConnectionViewModel extends BaseViewModel<ConnectionMvvm.View> impl
         return new ConnectionParametersViewModel(preferences);
     }
 
+    @Override
+    public void onPreferenceChanged(@NonNull List<String> properties) {
+        if (properties.contains("mode")) {
+            Timber.v("mode changed %s", preferences.getMode());
+            setConnectionMode(preferences.getMode());
+            getView().recreateOptionsMenu();
+            notifyChange();
+        }
+    }
 }

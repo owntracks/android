@@ -2,6 +2,7 @@ package org.owntracks.android.services;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
 import androidx.test.espresso.idling.CountingIdlingResource;
 
 import org.greenrobot.eventbus.EventBus;
@@ -28,6 +29,7 @@ import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -46,7 +48,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext;
 import timber.log.Timber;
 
 @Singleton
-public class MessageProcessor {
+public class MessageProcessor implements Preferences.OnPreferenceChangeListener {
     private final EventBus eventBus;
     private final ContactsRepo contactsRepo;
     private final WaypointsRepo waypointsRepo;
@@ -343,13 +345,6 @@ public class MessageProcessor {
 
     @SuppressWarnings("UnusedParameters")
     @Subscribe(priority = 10, threadMode = ThreadMode.ASYNC)
-    public void onEvent(Events.ModeChanged event) {
-        acceptMessages = false;
-        loadOutgoingMessageProcessor();
-    }
-
-    @SuppressWarnings("UnusedParameters")
-    @Subscribe(priority = 10, threadMode = ThreadMode.ASYNC)
     public void onEvent(Events.EndpointChanged event) {
         acceptMessages = false;
         loadOutgoingMessageProcessor();
@@ -477,5 +472,13 @@ public class MessageProcessor {
     void stopSendingMessages() {
         Timber.d("Interrupting background sending thread");
         backgroundDequeueThread.interrupt();
+    }
+
+    @Override
+    public void onPreferenceChanged(@NonNull List<String> properties) {
+        if (properties.contains("mode")) {
+            acceptMessages = false;
+            loadOutgoingMessageProcessor();
+        }
     }
 }

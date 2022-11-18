@@ -668,14 +668,6 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
     }
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void onEvent(Events.ModeChanged e) {
-        removeGeofences();
-        setupGeofences();
-        setupLocationRequest();
-        updateOngoingNotification();
-    }
-
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(Events.MonitoringChanged e) {
         setupLocationRequest();
         updateOngoingNotification();
@@ -741,6 +733,12 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
         if (!propertiesWeCareAbout.stream().filter(properties::contains).collect(Collectors.toSet()).isEmpty()) {
             Timber.d("locator preferences changed. Resetting location request.");
             setupLocationRequest();
+        }
+        if (properties.contains("mode")) {
+            removeGeofences();
+            setupGeofences();
+            setupLocationRequest();
+            updateOngoingNotification();
         }
     }
 
