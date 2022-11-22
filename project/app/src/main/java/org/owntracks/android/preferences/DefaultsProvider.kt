@@ -3,11 +3,11 @@ package org.owntracks.android.preferences
 import android.os.Build
 import java.util.*
 import kotlin.reflect.KProperty
+import org.owntracks.android.preferences.types.AppTheme
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.preferences.types.MqttProtocolLevel
 import org.owntracks.android.preferences.types.MqttQos
-import org.owntracks.android.preferences.types.AppTheme
 import org.owntracks.android.preferences.types.StringMaxTwoAlphaNumericChars
 
 interface DefaultsProvider {
@@ -42,7 +42,6 @@ interface DefaultsProvider {
             Preferences::keepalive -> 3600
             Preferences::locatorDisplacement -> 500
             Preferences::locatorInterval -> 900
-            Preferences::locatorPriority -> 2
             Preferences::mode -> ConnectionMode.MQTT
             Preferences::monitoring -> MonitoringMode.SIGNIFICANT
             Preferences::moveModeLocatorInterval -> 10

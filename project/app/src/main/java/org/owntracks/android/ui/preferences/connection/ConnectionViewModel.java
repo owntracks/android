@@ -116,7 +116,9 @@ public class ConnectionViewModel extends BaseViewModel<ConnectionMvvm.View> impl
         if (properties.contains("mode")) {
             Timber.v("mode changed %s", preferences.getMode());
             setConnectionMode(preferences.getMode());
-            getView().recreateOptionsMenu();
+            if (getView()!=null) {
+                getView().recreateOptionsMenu();
+            }
             notifyChange();
         }
     }

@@ -15,7 +15,7 @@ class MessageProcessorEndpointMqttTest {
     @Test
     fun `MQTT Endpoint generates correct topics to subscribe to from single default subTopic`() {
         val endpoint =
-            MessageProcessorEndpointMqtt(null, null, null, null, null, null, applicationContext, null)
+            MessageProcessorEndpointMqtt(null, null, null, null, null, null, applicationContext)
         val subTopic = "owntracks/+/+"
         val topics =
             endpoint.getTopicsToSubscribeTo(
@@ -39,7 +39,7 @@ class MessageProcessorEndpointMqttTest {
     @Test
     fun `MQTT Endpoint generates correct topics to subscribe to from single custom subTopic`() {
         val endpoint =
-            MessageProcessorEndpointMqtt(null, null, null, null, null, null, applicationContext, null)
+            MessageProcessorEndpointMqtt(null, null, null, null, null, null, applicationContext)
         val subTopic = "othertopic/+/+"
         val topics =
             endpoint.getTopicsToSubscribeTo(
@@ -58,7 +58,7 @@ class MessageProcessorEndpointMqttTest {
     @Test
     fun `MQTT Endpoint generates correct topics to subscribe to from multiple subTopics`() {
         val endpoint =
-            MessageProcessorEndpointMqtt(null, null, null, null, null, null, applicationContext, null)
+            MessageProcessorEndpointMqtt(null, null, null, null, null, null, applicationContext)
         val subTopic = "owntracks/+/+ othertopic/+"
         val topics =
             endpoint.getTopicsToSubscribeTo(subTopic, true, "/info", "/events", "/waypoints")
@@ -74,7 +74,7 @@ class MessageProcessorEndpointMqttTest {
     @Test
     fun `MQTT Endpoint generates correct topics to subscribe to from multiple subTopics with info not requested`() {
         val endpoint =
-            MessageProcessorEndpointMqtt(null, null, null, null, null, null, applicationContext, null)
+            MessageProcessorEndpointMqtt(null, null, null, null, null, null, applicationContext)
         val subTopic = "owntracks/+/+ othertopic/+"
         val topics =
             endpoint.getTopicsToSubscribeTo(subTopic, false, "/info", "/events", "/waypoints")
@@ -90,7 +90,7 @@ class MessageProcessorEndpointMqttTest {
     @Test
     fun `MQTT Endpoint generates correct topics to subscribe to from wildcard topic`() {
         val endpoint =
-            MessageProcessorEndpointMqtt(null, null, null, null, null, null, applicationContext, null)
+            MessageProcessorEndpointMqtt(null, null, null, null, null, null, applicationContext)
         val subTopic = "owntracks/#"
         val topics =
             endpoint.getTopicsToSubscribeTo(subTopic, true, "/info", "/events", "/waypoints")

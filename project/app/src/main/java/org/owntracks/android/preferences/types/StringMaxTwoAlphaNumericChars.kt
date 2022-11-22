@@ -1,6 +1,8 @@
 package org.owntracks.android.preferences.types
 
-data class StringMaxTwoAlphaNumericChars(private val input: String) {
+import com.fasterxml.jackson.annotation.JsonValue
+
+data class StringMaxTwoAlphaNumericChars(@JsonValue private val input: String) {
     val value: String
 
     init {

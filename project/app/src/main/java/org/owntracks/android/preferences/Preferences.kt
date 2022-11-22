@@ -223,9 +223,6 @@ class Preferences @Inject constructor(
     var locatorInterval: Int by preferencesStore
 
     @Preference
-    var locatorPriority: Int by preferencesStore
-
-    @Preference
     var mapLayerStyle: MapLayerStyle by preferencesStore
 
     @Preference
@@ -327,10 +324,10 @@ class Preferences @Inject constructor(
     @Preference(exportModeMqtt = false)
     var url: String by preferencesStore
 
-    @Preference
+    @Preference(exportModeMqtt = false, exportModeHttp = false)
     var userDeclinedEnableLocationPermissions: Boolean by preferencesStore
 
-    @Preference
+    @Preference(exportModeMqtt = false, exportModeHttp = false)
     var userDeclinedEnableLocationServices: Boolean by preferencesStore
 
     @Preference
