@@ -8,7 +8,7 @@
         app:title="@string/preferencesPubExtendedData" />
     <androidx.preference.SwitchPreferenceCompat
         app:iconSpaceReserved="false"
-        app:key="@{org.ow}"
+        app:key="publishLocationOnConnect"
         app:summary="@string/preferencesRepublishOnRecconectSummary"
         app:title="@string/preferencesRepublishOnRecconect" />
 </PreferenceScreen>

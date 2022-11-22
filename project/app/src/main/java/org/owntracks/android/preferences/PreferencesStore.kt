@@ -112,7 +112,7 @@ abstract class PreferencesStore :
         return getDefaultValue<T>(preferences, property)
             .also {
                 Timber.i("Setting default preference value for ${property.name} to $it")
-                setValue(preferences, property, it)
+                setValueWithoutNotifying(preferences, property, it)
             }
     }
 
@@ -124,8 +124,13 @@ abstract class PreferencesStore :
      * @param property the actual field on the [Preferences] instance that's looking to set the value
      * @param value the value to be set
      */
-    @Suppress("UNCHECKED_CAST")
     operator fun <T> setValue(preferences: Preferences, property: KProperty<*>, value: T) {
+        setValueWithoutNotifying(preferences,property,value)
+        preferences.notifyChanged(property)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun <T> setValueWithoutNotifying(preferences: Preferences, property: KProperty<*>, value: T) {
         val coercedValue = getCoercion(property, value, preferences)
         Timber.d("Setting preference ${property.name} to $value (coerced to $coercedValue)")
         when (coercedValue) {
@@ -146,7 +151,6 @@ abstract class PreferencesStore :
                 "Trying to set property ${property.name} has type ${property.returnType}"
             )
         }
-        preferences.notifyChanged(property)
     }
 
     class UnsupportedPreferenceTypeException(message: String) : Throwable(message)
