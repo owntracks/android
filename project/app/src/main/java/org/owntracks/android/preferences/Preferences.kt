@@ -46,9 +46,8 @@ class Preferences @Inject constructor(
     val mqttExportedConfigKeys = allConfigKeys.filter { it.annotations.any { it is Preference && it.exportModeMqtt } }
     val httpExportedConfigKeys = allConfigKeys.filter { it.annotations.any { it is Preference && it.exportModeHttp } }
 
-    val dummyValue = Any()
-    val listenerMapLock = Any()
-    val listeners = WeakHashMap<OnPreferenceChangeListener, Any>()
+    private val CONTENT = Any()
+    private val listeners = WeakHashMap<OnPreferenceChangeListener, Any>()
 
     /*
     To initialize the defaults for each property, we can simply get the property. This should set
@@ -134,14 +133,26 @@ class Preferences @Inject constructor(
             it.returnType.isSubtypeOf(typeOf<StringMaxTwoAlphaNumericChars>()) && value is String
         ) {
             it.setter.call(this, StringMaxTwoAlphaNumericChars(value))
-        } else if (it.returnType.isSubtypeOf(typeOf<Set<*>>()) && value is String) {
-            it.setter.call(
-                this,
-                value.split(",")
-                    .map { it.trim() }
-                    .filter { it.isNotBlank() }
-                    .toSortedSet()
-            )
+        } else if (value is String) {
+            if (it.returnType.isSubtypeOf(typeOf<Set<*>>())) {
+                it.setter.call(
+                    this,
+                    value.split(",")
+                        .map { it.trim() }
+                        .filter { it.isNotBlank() }
+                        .toSortedSet()
+                )
+            } else if (it.returnType.isSubtypeOf(typeOf<Boolean>())) {
+                it.setter.call(
+                    this,
+                    value.lowercase()
+                        .toBoolean()
+                )
+            } else if (it.returnType.isSubtypeOf(typeOf<Float>())) {
+                it.setter.call(this, value.toFloat())
+            } else {
+                it.setter.call(this, value)
+            }
         } else {
             it.setter.call(this, value)
         }
@@ -397,13 +408,13 @@ class Preferences @Inject constructor(
     // lambda as a listener, as that'll just get GC'd and then mysteriously disappear
     // https://stackoverflow.com/a/3104265/352740
     fun registerOnPreferenceChangedListener(listener: OnPreferenceChangeListener) {
-        synchronized(listenerMapLock) {
-            listeners.put(listener, dummyValue)
+        synchronized(listeners) {
+            listeners.put(listener, CONTENT)
         }
     }
 
     fun unregisterOnPreferenceChangedListener(listener: OnPreferenceChangeListener) {
-        synchronized(listenerMapLock) {
+        synchronized(listeners) {
             listeners.remove(listener)
         }
     }
@@ -420,8 +431,9 @@ class Preferences @Inject constructor(
     }
 
     fun notifyChanged(property: KProperty<*>) {
-        synchronized(listenerMapLock) {
-            listeners.forEach { it.key.onPreferenceChanged(listOf(property.name)) }
+        val properties = listOf(property.name)
+        synchronized(listeners) {
+            listeners.forEach { it.key.onPreferenceChanged(properties) }
         }
     }
 

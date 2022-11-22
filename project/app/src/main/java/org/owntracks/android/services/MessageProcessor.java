@@ -18,11 +18,11 @@ import org.owntracks.android.model.messages.MessageClear;
 import org.owntracks.android.model.messages.MessageCmd;
 import org.owntracks.android.model.messages.MessageLocation;
 import org.owntracks.android.model.messages.MessageTransition;
+import org.owntracks.android.preferences.Preferences;
 import org.owntracks.android.preferences.types.ConnectionMode;
 import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Parser;
-import org.owntracks.android.preferences.Preferences;
 import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.ServiceBridge;
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException;
@@ -77,6 +77,9 @@ public class MessageProcessor implements Preferences.OnPreferenceChangeListener 
     private ScheduledFuture<?> waitFuture = null;
     private long retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT;
 
+    private MessageProcessorEndpoint httpEndpoint;
+    private MessageProcessorEndpoint mqttEndpoint;
+
     @Inject
     public MessageProcessor(
             @ApplicationContext Context applicationContext,
@@ -113,6 +116,9 @@ public class MessageProcessor implements Preferences.OnPreferenceChangeListener 
             }
             Timber.d("Initializing the outgoingqueueidlingresource at %s", outgoingQueue.size());
         }
+        preferences.registerOnPreferenceChangedListener(this);
+        httpEndpoint = new MessageProcessorEndpointHttp(this, this.parser, this.preferences, this.scheduler, this.applicationContext);
+        mqttEndpoint = new MessageProcessorEndpointMqtt(this, this.parser, this.preferences, this.scheduler, this.eventBus, this.runThingsOnOtherThreads, this.applicationContext);
     }
 
     synchronized public void initialize() {
@@ -195,11 +201,11 @@ public class MessageProcessor implements Preferences.OnPreferenceChangeListener 
 
         switch (preferences.getMode()) {
             case HTTP:
-                this.endpoint = new MessageProcessorEndpointHttp(this, this.parser, this.preferences, this.scheduler, this.applicationContext);
+                this.endpoint = httpEndpoint;
                 break;
             case MQTT:
             default:
-                this.endpoint = new MessageProcessorEndpointMqtt(this, this.parser, this.preferences, this.scheduler, this.eventBus, this.runThingsOnOtherThreads, this.applicationContext, this.locationProcessorLazy.get());
+                this.endpoint = mqttEndpoint;
 
         }
 
@@ -463,6 +469,10 @@ public class MessageProcessor implements Preferences.OnPreferenceChangeListener 
                     break;
             }
         }
+    }
+
+    void publishLocationMessage(String trigger) {
+        locationProcessorLazy.get().publishLocationMessage(trigger);
     }
 
     private void processIncomingMessage(MessageTransition message) {

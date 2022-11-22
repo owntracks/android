@@ -63,8 +63,6 @@ import java.util.stream.Collectors;
 import timber.log.Timber;
 
 public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint implements StatefulServiceMessageProcessor, Preferences.OnPreferenceChangeListener {
-    private final LocationProcessor locationProcessor;
-
     private IMqttAsyncClient mqttClient;
 
     private String lastConnectionId;
@@ -81,7 +79,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
     private final Semaphore connectingLock = new Semaphore(1);
 
-    MessageProcessorEndpointMqtt(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus, RunThingsOnOtherThreads runThingsOnOtherThreads, Context applicationContext, LocationProcessor locationProcessor) {
+    MessageProcessorEndpointMqtt(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus, RunThingsOnOtherThreads runThingsOnOtherThreads, Context applicationContext) {
         super(messageProcessor);
         this.parser = parser;
         this.preferences = preferences;
@@ -90,7 +88,6 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         this.messageProcessor = messageProcessor;
         this.runThingsOnOtherThreads = runThingsOnOtherThreads;
         this.applicationContext = applicationContext;
-        this.locationProcessor = locationProcessor;
         if (preferences != null) {
             preferences.registerOnPreferenceChangedListener(this);
         }
@@ -448,7 +445,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         messageProcessor.resetMessageSleepBlock();
 
         if (preferences.getPublishLocationOnConnect()) {
-            locationProcessor.publishLocationMessage(null); // TODO fix the trigger here
+            messageProcessor.publishLocationMessage(null); // TODO fix the trigger here
         }
     }
 

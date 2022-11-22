@@ -110,7 +110,7 @@ class SharedPreferencesStore @Inject constructor(@ApplicationContext private val
     }
 
     override fun getStringSet(key: String, defaultValues: Set<String>): Set<String> =
-        sharedPreferences.getStringSet(key, defaultValues) ?: defaultValues
+        sharedPreferences.getStringSet(key, defaultValues)?.toSortedSet() ?: defaultValues.toSortedSet()
 
     override fun hasKey(key: String): Boolean =
         sharedPreferences.contains(key)
