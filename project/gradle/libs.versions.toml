@@ -1,6 +1,6 @@
 [versions]
 agp = "7.3.1"
-hilt = "2.43.2"
+hilt = "2.44.2"
 hilt-work = "1.0.0"
 kotlin = "1.6.21"
 kotlin-coroutines = "1.6.4"
