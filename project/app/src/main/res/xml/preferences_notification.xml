@@ -6,7 +6,6 @@
         app:iconSpaceReserved="false"
         app:title="@string/preferencesCategoryNotificationOngoing">
         <androidx.preference.SwitchPreferenceCompat
-            android:defaultValue="@bool/valNotificationLocation"
             app:iconSpaceReserved="false"
             app:key="notificationLocation"
             app:summary="@string/preferencesNotificationLocationSummary"
@@ -16,7 +15,6 @@
         app:iconSpaceReserved="false"
         app:title="@string/preferencesCategoryNotificationBackground">
         <androidx.preference.SwitchPreferenceCompat
-            android:defaultValue="@bool/valNotificationEvents"
             app:iconSpaceReserved="false"
             app:key="notificationEvents"
             app:summary="@string/preferencesNotificationEventsSummary"
@@ -26,7 +24,6 @@
         app:iconSpaceReserved="false"
         app:title="@string/preferencesCategoryNotificationErrors">
         <androidx.preference.SwitchPreferenceCompat
-            android:defaultValue="@bool/valNotificationGeocoderErrors"
             app:iconSpaceReserved="false"
             app:key="notificationGeocoderErrors"
             app:summary="@string/preferencesNotificationGeocoderErrorsSummary"

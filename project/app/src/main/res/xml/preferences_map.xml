@@ -4,7 +4,6 @@
     app:title="@string/preferencesMap">
 
     <androidx.preference.SwitchPreferenceCompat
-        android:defaultValue="@bool/valShowRegionsOnMap"
         app:iconSpaceReserved="false"
         app:key="showRegionsOnMap"
         app:summary="@string/preferencesShowRegionsOnMapSummary"
@@ -15,6 +14,5 @@
         app:key="enableMapRotation"
         app:summary="@string/preferencesEnableMapRotationSummary"
         app:title="@string/preferencesEnableMapRotation" />
-
 
 </PreferenceScreen>

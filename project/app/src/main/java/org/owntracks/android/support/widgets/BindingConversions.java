@@ -84,7 +84,7 @@ public class BindingConversions {
     @BindingAdapter("relativeTimeSpanString")
     public static void setRelativeTimeSpanString(TextView view, long tstSeconds) {
         if (tstSeconds == 0) {
-            view.setText(R.string.valEmpty);
+            view.setText("");
         } else if (DateUtils.isToday(TimeUnit.SECONDS.toMillis(tstSeconds))) {
             view.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(TimeUnit.SECONDS.toMillis(tstSeconds)));
         } else {
