@@ -84,7 +84,6 @@ class PreferenceTest {
         "ignoreStaleLocations",
         "locatorDisplacement",
         "locatorInterval",
-        "locatorPriority",
         "mode",
         "monitoring",
         "moveModeLocatorInterval",

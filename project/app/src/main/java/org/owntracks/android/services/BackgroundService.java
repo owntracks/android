@@ -726,7 +726,6 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
         List<String> propertiesWeCareAbout = List.of(
                 "locatorInterval",
                 "locatorDisplacement",
-                "locatorPriority",
                 "moveModeLocatorInterval",
                 "pegLocatorFastestIntervalToInterval"
         );

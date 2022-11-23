@@ -267,13 +267,6 @@ class PreferencesGettersAndSetters(val parameter: Parameter) {
                     false
                 ),
                 Parameter(
-                    "LocatorPriority",
-                    "locatorPriority",
-                    2,
-                    Int::class,
-                    false
-                ),
-                Parameter(
                     "MapLayerStyle",
                     "mapLayerStyle",
                     MapLayerStyle.GoogleMapHybrid,

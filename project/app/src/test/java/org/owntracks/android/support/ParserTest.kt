@@ -755,7 +755,6 @@ class ParserTest {
               "keepalive": 900,
               "locatorDisplacement": 5,
               "locatorInterval": 60,
-              "locatorPriority": 2,
               "mode": 0,
               "monitoring": 1,
               "moveModeLocatorInterval": 10,
