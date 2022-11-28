@@ -2,28 +2,24 @@ package org.owntracks.android.testutils.rules
 
 import android.graphics.Bitmap
 import android.util.Log
-import androidx.test.runner.screenshot.Screenshot
+import androidx.test.core.app.takeScreenshotNoSync
 import androidx.test.services.storage.TestStorage
-import org.junit.rules.TestWatcher
-import org.junit.runner.Description
 import java.io.IOException
 import java.util.*
+import org.junit.rules.TestWatcher
+import org.junit.runner.Description
 
 class ScreenshotTakingOnTestEndRule : TestWatcher() {
-    override fun failed(throwable: Throwable, description: Description?) {
-        description?.run {
+    override fun failed(throwable: Throwable, description: Description) {
+        description.run {
             takeScreenshot(screenShotName = "${description.className}/${description.methodName}")
-        } ?: run {
-            val uuid = UUID.randomUUID()
-            println("Test finished but no description provided. Capturing under $uuid")
-            takeScreenshot(screenShotName = uuid.toString())
         }
         super.finished(description)
     }
 
     private fun takeScreenshot(screenShotName: String) {
         Log.d("Screenshots", "Saving screenshot to '$screenShotName'")
-        Screenshot.capture().bitmap.writeToTestStorage(screenShotName)
+        takeScreenshotNoSync().writeToTestStorage(screenShotName)
     }
 
     @Throws(IOException::class)
@@ -40,16 +36,17 @@ class ScreenshotTakingOnTestEndRule : TestWatcher() {
      */
     @Throws(IOException::class)
     fun Bitmap.writeToTestStorage(testStorage: TestStorage, name: String) {
-        testStorage.openOutputFile("$name.png").use {
-            if (!this.compress(
-                    Bitmap.CompressFormat.PNG,
-                    /** PNG is lossless, so quality is ignored. */
-                    0,
-                    it
-                )
-            ) {
-                throw IOException("Failed to compress bitmap")
+        testStorage.openOutputFile("$name.png")
+            .use {
+                if (!this.compress(
+                        Bitmap.CompressFormat.PNG,
+                        /** PNG is lossless, so quality is ignored. */
+                        0,
+                        it
+                    )
+                ) {
+                    throw IOException("Failed to compress bitmap")
+                }
             }
-        }
     }
 }

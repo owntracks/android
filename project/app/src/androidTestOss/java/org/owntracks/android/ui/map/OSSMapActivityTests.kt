@@ -13,7 +13,7 @@ import com.adevinta.android.barista.interaction.PermissionGranter
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
-import org.owntracks.android.support.Preferences
+import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.disableDeviceLocation
 import org.owntracks.android.testutils.enableDeviceLocation
@@ -52,7 +52,7 @@ class OSSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
             setNotFirstStartPreferences()
             PreferenceManager.getDefaultSharedPreferences(InstrumentationRegistry.getInstrumentation().targetContext)
                 .edit()
-                .putBoolean(Preferences.preferenceKeyUserDeclinedEnableLocationServices, true)
+                .putBoolean(Preferences::userDeclinedEnableLocationServices.name, true)
                 .apply()
             launchActivity()
             PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)

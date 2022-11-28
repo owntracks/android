@@ -2,8 +2,8 @@ package org.owntracks.android.ui.map
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
+import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.ContactImageBindingAdapter
-import org.owntracks.android.support.Preferences
 import org.owntracks.android.ui.map.osm.OSMMapFragment
 import javax.inject.Inject
 

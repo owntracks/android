@@ -56,7 +56,10 @@ class Preferences @Inject constructor(
      */
     fun initializeDefaults() {
         Timber.d("Initializing defaults for unset preferences")
-        allConfigKeys.forEach { it.get(this) }
+        allConfigKeys.forEach {
+            Timber.d("Initializing defaults for $it")
+            it.get(this)
+        }
     }
 
     /**
@@ -454,12 +457,6 @@ class Preferences @Inject constructor(
             if (SDK_INT > Build.VERSION_CODES.Q) MODE_NIGHT_FOLLOW_SYSTEM
             else MODE_NIGHT_AUTO_BATTERY
         }
-
-        // Preference Keys
-        const val preferenceKeyUserDeclinedEnableLocationPermissions =
-            "userDeclinedEnableLocationPermissions"
-        const val preferenceKeyUserDeclinedEnableLocationServices =
-            "userDeclinedEnableLocationServices"
     }
 
     @Target(AnnotationTarget.PROPERTY)
