@@ -104,7 +104,7 @@ class GMSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
             setNotFirstStartPreferences()
             PreferenceManager.getDefaultSharedPreferences(InstrumentationRegistry.getInstrumentation().targetContext)
                 .edit()
-                .putBoolean(Preferences.preferenceKeyUserDeclinedEnableLocationServices, true)
+                .putBoolean(Preferences::userDeclinedEnableLocationServices.name, true)
                 .apply()
             launchActivity()
             PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
