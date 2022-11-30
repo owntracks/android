@@ -1,7 +1,6 @@
 package org.owntracks.android.ui.map
 
 import android.Manifest
-import android.content.Context
 import androidx.preference.PreferenceManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -19,8 +18,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 import org.owntracks.android.R
-import org.owntracks.android.support.Preferences
-import org.owntracks.android.support.preferences.SharedPreferencesStore
+import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.disableDeviceLocation
 import org.owntracks.android.testutils.enableDeviceLocation
@@ -106,7 +104,7 @@ class GMSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
             setNotFirstStartPreferences()
             PreferenceManager.getDefaultSharedPreferences(InstrumentationRegistry.getInstrumentation().targetContext)
                 .edit()
-                .putBoolean(Preferences.preferenceKeyUserDeclinedEnableLocationServices, true)
+                .putBoolean(Preferences::userDeclinedEnableLocationServices.name, true)
                 .apply()
             launchActivity()
             PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -135,12 +133,9 @@ class GMSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
     fun mapStartsOnOSMMapIfPreferenceIsSelected() {
         setNotFirstStartPreferences()
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        context.getSharedPreferences(SharedPreferencesStore.FILENAME_PRIVATE, Context.MODE_PRIVATE)
+        PreferenceManager.getDefaultSharedPreferences(context)
             .edit()
-            .putString(
-                context.getString(R.string.preferenceKeyMapLayerStyle),
-                MapLayerStyle.OpenStreetMapNormal.name
-            )
+            .putString(Preferences::mapLayerStyle.name, MapLayerStyle.OpenStreetMapNormal.name)
             .apply()
         launchActivity()
         PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)

@@ -4,7 +4,8 @@ import androidx.databinding.BaseObservable
 import com.fasterxml.jackson.annotation.*
 import okhttp3.internal.toHexString
 import org.owntracks.android.support.Parser
-import org.owntracks.android.support.Preferences
+import org.owntracks.android.preferences.Preferences
+import org.owntracks.android.preferences.types.ConnectionMode
 import java.io.IOException
 import java.util.*
 
@@ -56,7 +57,7 @@ abstract class MessageBase : BaseObservable() {
     @get:JsonIgnore
     @set:JsonIgnore
     @JsonIgnore
-    var modeId = 0
+    var modeId = ConnectionMode.MQTT
 
     @get:JsonIgnore
     @JsonIgnore

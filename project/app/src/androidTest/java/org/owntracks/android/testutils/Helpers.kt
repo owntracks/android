@@ -16,6 +16,7 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import org.owntracks.android.R
+import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber
@@ -35,8 +36,8 @@ fun setNotFirstStartPreferences() {
     val context = InstrumentationRegistry.getInstrumentation().targetContext
     PreferenceManager.getDefaultSharedPreferences(context)
         .edit()
-        .putBoolean(context.getString(R.string.preferenceKeyFirstStart), false)
-        .putBoolean(context.getString(R.string.preferenceKeySetupNotCompleted), false)
+        .putBoolean(Preferences::firstStart.name, false)
+        .putBoolean(Preferences::setupCompleted.name, true)
         .apply()
 }
 

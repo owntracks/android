@@ -13,7 +13,7 @@ import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.model.messages.MessageBase;
 import org.owntracks.android.model.messages.MessageConfiguration;
 import org.owntracks.android.support.Parser;
-import org.owntracks.android.support.Preferences;
+import org.owntracks.android.preferences.Preferences;
 import org.owntracks.android.ui.base.viewmodel.BaseViewModel;
 
 import java.io.BufferedReader;
@@ -80,7 +80,7 @@ public class LoadViewModel extends BaseViewModel<LoadMvvm.View> implements LoadM
 
     @Override
     public void saveConfiguration() {
-        preferences.importFromMessage(configuration);
+        preferences.importConfiguration(configuration);
         if (!configuration.getWaypoints().isEmpty()) {
             waypointsRepo.importFromMessage(configuration.getWaypoints());
         }

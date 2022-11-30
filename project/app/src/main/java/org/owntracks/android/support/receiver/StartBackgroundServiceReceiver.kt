@@ -7,7 +7,7 @@ import android.content.Intent
 import android.os.Build
 import dagger.hilt.android.AndroidEntryPoint
 import org.owntracks.android.services.BackgroundService
-import org.owntracks.android.support.Preferences
+import org.owntracks.android.preferences.Preferences
 import timber.log.Timber
 import javax.inject.Inject
 

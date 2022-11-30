@@ -1,13 +1,14 @@
 package org.owntracks.android.services;
 
 import static org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CLIENT_DISCONNECT_PROHIBITED;
+import static org.owntracks.android.preferences.DefaultsProvider.DEFAULT_SUB_TOPIC;
 import static org.owntracks.android.support.RunThingsOnOtherThreads.NETWORK_HANDLER_THREAD_NAME;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Looper;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.WorkerThread;
 
 import org.eclipse.paho.client.mqttv3.IMqttAsyncClient;
@@ -24,15 +25,15 @@ import org.greenrobot.eventbus.EventBus;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.owntracks.android.R;
 import org.owntracks.android.data.EndpointState;
 import org.owntracks.android.model.messages.MessageBase;
 import org.owntracks.android.model.messages.MessageCard;
 import org.owntracks.android.model.messages.MessageClear;
+import org.owntracks.android.preferences.Preferences;
+import org.owntracks.android.preferences.types.ConnectionMode;
 import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Parser;
-import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.SocketFactory;
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException;
@@ -52,17 +53,16 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import timber.log.Timber;
 
-public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint implements StatefulServiceMessageProcessor, SharedPreferences.OnSharedPreferenceChangeListener {
-    public static final int MODE_ID = 0;
-    private final LocationProcessor locationProcessor;
-
+public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint implements StatefulServiceMessageProcessor, Preferences.OnPreferenceChangeListener {
     private IMqttAsyncClient mqttClient;
 
     private String lastConnectionId;
@@ -79,7 +79,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
     private final Semaphore connectingLock = new Semaphore(1);
 
-    MessageProcessorEndpointMqtt(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus, RunThingsOnOtherThreads runThingsOnOtherThreads, Context applicationContext, LocationProcessor locationProcessor) {
+    MessageProcessorEndpointMqtt(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, EventBus eventBus, RunThingsOnOtherThreads runThingsOnOtherThreads, Context applicationContext) {
         super(messageProcessor);
         this.parser = parser;
         this.preferences = preferences;
@@ -88,7 +88,6 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         this.messageProcessor = messageProcessor;
         this.runThingsOnOtherThreads = runThingsOnOtherThreads;
         this.applicationContext = applicationContext;
-        this.locationProcessor = locationProcessor;
         if (preferences != null) {
             preferences.registerOnPreferenceChangedListener(this);
         }
@@ -321,7 +320,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
             connectOptions.setPassword(preferences.getPassword().toCharArray());
         }
 
-        connectOptions.setMqttVersion(preferences.getMqttProtocolLevel());
+        connectOptions.setMqttVersion(preferences.getMqttProtocolLevel().getValue());
         InputStream clientCaInputStream = null;
         InputStream clientCertInputStream = null;
         try {
@@ -403,7 +402,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
             lwt.put("_type", "lwt");
             lwt.put("tst", (int) TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
 
-            m.setWill(preferences.getPubTopicBase(), lwt.toString().getBytes(), 0, false);
+            m.setWill(preferences.getPubTopicBaseWithUserDetails(), lwt.toString().getBytes(), 0, false);
         } catch (JSONException ignored) {
         } catch (IllegalArgumentException e) {
             changeState(EndpointState.ERROR_CONFIGURATION.withError(e).withMessage("Invalid pubTopic specified"));
@@ -429,44 +428,46 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
             Timber.v("lastConnectionId changed to: %s", lastConnectionId);
         }
 
-        if (!preferences.getSub()) // Don't subscribe if base topic is invalid
-            return;
+        if (preferences.getSub()) {
+            Set<String> topics = getTopicsToSubscribeTo(
+                    preferences.getSubTopic(),
+                    preferences.getInfo(),
+                    preferences.getInfoTopicSuffix(),
+                    preferences.getEventTopicSuffix(),
+                    preferences.getWaypointsTopicSuffix()
+            );
+            // Receive commands for us
+            topics.add(preferences.getReceivedCommandsTopic());
 
-        Set<String> topics = getTopicsToSubscribeTo(
-                preferences.getSubTopic(),
-                preferences.getInfo(),
-                preferences.getPubTopicInfoPart(),
-                preferences.getPubTopicEventsPart(),
-                preferences.getPubTopicWaypointsPart()
-        );
-        // Receive commands for us
-        topics.add(preferences.getPubTopicBase() + preferences.getPubTopicCommandsPart());
-
-        subscribe(topics.toArray(new String[0]));
+            subscribe(topics.toArray(new String[0]));
+        }
 
         messageProcessor.resetMessageSleepBlock();
 
         if (preferences.getPublishLocationOnConnect()) {
-            locationProcessor.publishLocationMessage(null); // TODO fix the trigger here
+            messageProcessor.publishLocationMessage(null); // TODO fix the trigger here
         }
     }
 
     @NotNull
     Set<String> getTopicsToSubscribeTo(String subTopics, Boolean subscribeToInfo, String infoTopicSuffix, String eventsTopicSuffix, String waypointsTopicSuffix) {
-        Set<String> topics = new TreeSet<>();
 
-        if (subTopics.equals(applicationContext.getString(R.string.defaultSubTopic))) {
-            topics.add(subTopics);
-            if (subscribeToInfo) {
-                topics.add(subTopics + infoTopicSuffix);
-            }
-            topics.add(subTopics + eventsTopicSuffix);
-            topics.add(subTopics + waypointsTopicSuffix);
+
+        // subTopics might be one topic base, or a space-separated list of topics
+        if (subTopics.contains(" ")) {
+            return new TreeSet<>(Arrays.asList(subTopics.split(" ")));
         } else {
-            topics.addAll(Arrays.asList(subTopics.split(" ")));
+            Set<String> topics = new TreeSet<>();
+            topics.add(subTopics);
+            if (subTopics == DEFAULT_SUB_TOPIC) {
+                if (subscribeToInfo) {
+                    topics.add(subTopics + infoTopicSuffix);
+                }
+                topics.add(subTopics + eventsTopicSuffix);
+                topics.add(subTopics + waypointsTopicSuffix);
+            }
+            return topics;
         }
-
-        return topics;
     }
 
     private void subscribe(String[] topics) {
@@ -484,7 +485,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
     private int[] getSubTopicsQos(String[] topics) {
         int[] qos = new int[topics.length];
-        Arrays.fill(qos, preferences.getSubQos());
+        Arrays.fill(qos, preferences.getSubQos().getValue());
         return qos;
     }
 
@@ -595,31 +596,29 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         }
     }
 
+
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (preferences.getMode() != MessageProcessorEndpointMqtt.MODE_ID) {
+    public void onPreferenceChanged(@NonNull List<String> properties) {
+        if (preferences.getMode() != ConnectionMode.MQTT) {
             return;
         }
-        if (preferences.getPreferenceKey(R.string.preferenceKeyMqttProtocolLevel).equals(key) ||
-                preferences.getPreferenceKey(R.string.preferenceKeyHost).equals(key) ||
-                preferences.getPreferenceKey(R.string.preferenceKeyPassword).equals(key) ||
-                preferences.getPreferenceKey(R.string.preferenceKeyPort).equals(key) ||
-                preferences.getPreferenceKey(R.string.preferenceKeyClientId).equals(key) ||
-                preferences.getPreferenceKey(R.string.preferenceKeyTLS).equals(key) ||
-                preferences.getPreferenceKey(R.string.preferenceKeyTLSCaCrt).equals(key) ||
-                preferences.getPreferenceKey(R.string.preferenceKeyTLSClientCrt).equals(key) ||
-                preferences.getPreferenceKey(R.string.preferenceKeyTLSClientCrtPassword).equals(key) ||
-                preferences.getPreferenceKey(R.string.preferenceKeyWS).equals(key) ||
-                preferences.getPreferenceKey(R.string.preferenceKeyDeviceId).equals(key)
-        ) {
+        List<String> propertiesWeWantToReconnectOn = List.of(
+                "mqttProtocolLevel",
+                "host",
+                "password",
+                "port",
+                "clientId",
+                "tls",
+                "tlsCaCrt",
+                "tlsClientCrt",
+                "tlsClientCrtPassword",
+                "ws",
+                "deviceId"
+        );
+        if (!propertiesWeWantToReconnectOn.stream().filter(properties::contains).collect(Collectors.toSet()).isEmpty()) {
             Timber.d("MQTT preferences changed. Reconnecting to broker. ThreadId: %s", Thread.currentThread());
             reconnect();
         }
-    }
-
-    @Override
-    int getModeId() {
-        return MODE_ID;
     }
 
     @Override
@@ -627,6 +626,12 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         // Not relevant for MQTT mode
         return message;
     }
+
+    @Override
+    ConnectionMode getModeId() {
+        return ConnectionMode.MQTT;
+    }
+
 }
 
 class MqttConnectionException extends Exception {

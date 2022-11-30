@@ -11,6 +11,8 @@
 
         <import type="org.owntracks.android.support.widgets.BindingConversions" />
 
+        <import type="org.owntracks.android.preferences.types.ConnectionMode" />
+
         <variable
             name="vm"
             type="org.owntracks.android.ui.preferences.connection.ConnectionMvvm.ViewModel" />
@@ -79,7 +81,7 @@
                             android:layout_height="wrap_content"
                             android:layout_below="@id/title"
                             android:maxLines="4"
-                            android:text="@{BindingConversions.convertModeIdToLabelResId(vm.modeId)}"
+                            android:text="@{BindingConversions.convertModeIdToLabelResId(vm.connectionMode)}"
                             android:textAppearance="?android:attr/textAppearanceSmall"
                             android:textColor="?android:attr/textColorSecondary" />
                     </RelativeLayout>
@@ -156,7 +158,7 @@
                     android:contentDescription="@string/divider"
                     android:scaleType="matrix"
                     android:src="@android:drawable/divider_horizontal_bright"
-                    android:visibility="@{vm.modeId != MessageProcessorEndpointHttp.MODE_ID}" />
+                    android:visibility="@{vm.connectionMode != ConnectionMode.HTTP}" />
 
                 <LinearLayout
                     android:id="@+id/security"
@@ -169,7 +171,7 @@
                     android:onClick="@{() -> vm.onSecurityClick()}"
                     android:paddingStart="15dp"
                     android:paddingEnd="?android:attr/scrollbarSize"
-                    android:visibility="@{vm.modeId != MessageProcessorEndpointHttp.MODE_ID}">
+                    android:visibility="@{vm.connectionMode != ConnectionMode.HTTP}">
 
 
                     <TextView
@@ -189,7 +191,7 @@
                     android:contentDescription="@string/divider"
                     android:scaleType="matrix"
                     android:src="@android:drawable/divider_horizontal_bright"
-                    android:visibility="@{vm.modeId != MessageProcessorEndpointHttp.MODE_ID}" />
+                    android:visibility="@{vm.connectionMode != ConnectionMode.HTTP}" />
 
                 <LinearLayout
                     android:id="@+id/parameters"
@@ -202,7 +204,7 @@
                     android:onClick="@{() -> vm.onParametersClick()}"
                     android:paddingStart="15dp"
                     android:paddingEnd="?android:attr/scrollbarSize"
-                    android:visibility="@{vm.modeId != MessageProcessorEndpointHttp.MODE_ID}">
+                    android:visibility="@{vm.connectionMode != ConnectionMode.HTTP}">
 
 
                     <TextView

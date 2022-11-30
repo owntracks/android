@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import org.owntracks.android.support.Preferences
+import org.owntracks.android.preferences.Preferences
 import javax.inject.Inject
 
 @HiltViewModel
@@ -44,7 +44,7 @@ class WelcomeViewModel @Inject constructor(
     }
 
     fun setWelcomeIsAtEnd() {
-        preferences.setSetupCompleted()
+        preferences.setupCompleted = true
         mutableNextEnabled.postValue(false)
         mutableDoneEnabled.postValue(true)
     }

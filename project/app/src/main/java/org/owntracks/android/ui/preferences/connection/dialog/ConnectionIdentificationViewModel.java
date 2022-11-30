@@ -2,7 +2,8 @@ package org.owntracks.android.ui.preferences.connection.dialog;
 
 import android.content.Intent;
 
-import org.owntracks.android.support.Preferences;
+import org.owntracks.android.preferences.Preferences;
+import org.owntracks.android.preferences.types.StringMaxTwoAlphaNumericChars;
 
 public class ConnectionIdentificationViewModel extends BaseDialogViewModel {
     private String username;
@@ -27,8 +28,8 @@ public class ConnectionIdentificationViewModel extends BaseDialogViewModel {
     public void load() {
         this.username = preferences.getUsername();
         this.password = preferences.getPassword();
-        this.deviceId = preferences.getDeviceId(false);
-        this.trackerId = preferences.getTrackerId(false);
+        this.deviceId = preferences.getDeviceId();
+        this.trackerId = preferences.getTid().getValue();
     }
 
     @Override
@@ -43,7 +44,7 @@ public class ConnectionIdentificationViewModel extends BaseDialogViewModel {
             preferences.setDeviceId(deviceId);
 
         if(trackerIdDirty)
-            preferences.setTrackerId(trackerId);
+            preferences.setTid(new StringMaxTwoAlphaNumericChars(trackerId));
     }
 
     public String getUsername() {

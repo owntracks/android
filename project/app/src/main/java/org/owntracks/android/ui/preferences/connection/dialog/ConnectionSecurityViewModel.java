@@ -13,7 +13,7 @@ import android.widget.Toast;
 import androidx.appcompat.widget.PopupMenu;
 
 import org.owntracks.android.R;
-import org.owntracks.android.support.Preferences;
+import org.owntracks.android.preferences.Preferences;
 import org.owntracks.android.ui.base.navigator.Navigator;
 
 import java.io.FileOutputStream;

@@ -8,7 +8,7 @@
         app:entries="@array/themeLabels"
         app:entryValues="@array/themeValues"
         app:iconSpaceReserved="false"
-        app:key="@string/preferenceKeyTheme"
+        app:key="theme"
         app:title="@string/preferencesTheme"
         app:useSimpleSummaryProvider="true" />
     <Preference

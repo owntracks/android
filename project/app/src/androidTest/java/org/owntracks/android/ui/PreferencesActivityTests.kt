@@ -10,6 +10,10 @@ import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writ
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
+import org.owntracks.android.preferences.DefaultsProviderImpl
+import org.owntracks.android.preferences.Preferences
+import org.owntracks.android.preferences.SharedPreferencesStore
+import org.owntracks.android.preferences.types.ReverseGeocodeProvider
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.scrollToPreferenceWithText
 import org.owntracks.android.ui.preferences.PreferencesActivity
@@ -29,7 +33,6 @@ class PreferencesActivityTests :
 
     @Test
     fun settingSimpleHTTPConfigSettingsCanBeShownInEditor() {
-
         clickOnAndWait(R.string.preferencesServer)
         clickOnAndWait(R.string.mode_heading)
         clickOnAndWait(R.string.mode_http_private_label)
@@ -135,11 +138,20 @@ class PreferencesActivityTests :
     fun defaultGeocoderIsSelected() {
         clickOnAndWait(R.string.preferencesAdvanced)
         scrollToPreferenceWithText(R.string.preferencesReverseGeocodeProvider)
-
-        val resources = baristaRule.activityTestRule.activity.resources
-        val geocoderIndex = resources.getStringArray(R.array.geocoderValues).toList()
-            .indexOf(resources.getString(R.string.valDefaultGeocoder))
-
-        assertDisplayed(resources.getStringArray(R.array.geocoders)[geocoderIndex])
+        val defaultGeocoder = baristaRule.activityTestRule.activity.applicationContext.let {
+            DefaultsProviderImpl().getDefaultValue<ReverseGeocodeProvider>(
+                Preferences(
+                    it,
+                    SharedPreferencesStore(it),
+                    AppShortcutsImpl()
+                ),
+                Preferences::reverseGeocodeProvider
+            )
+        }
+        val expected = baristaRule.activityTestRule.activity.resources.run {
+            getStringArray(R.array.geocoders)
+                .get(getStringArray(R.array.geocoderValues).indexOfFirst { it == defaultGeocoder.value })
+        }
+        assertContains(android.R.id.summary, expected)
     }
 }

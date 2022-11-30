@@ -3,19 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:title="@string/preferencesMap">
 
-        <androidx.preference.SwitchPreferenceCompat
-            android:defaultValue="@bool/valShowRegionsOnMap"
-            app:iconSpaceReserved="false"
-            app:key="@string/preferenceKeyShowRegionsOnMap"
-            app:summary="@string/preferencesShowRegionsOnMapSummary"
-            app:title="@string/preferencesShowRegionsOnMap" />
+    <androidx.preference.SwitchPreferenceCompat
+        app:iconSpaceReserved="false"
+        app:key="showRegionsOnMap"
+        app:summary="@string/preferencesShowRegionsOnMapSummary"
+        app:title="@string/preferencesShowRegionsOnMap" />
 
-        <androidx.preference.SwitchPreferenceCompat
-            android:defaultValue="@bool/valEnableMapRotation"
-            app:iconSpaceReserved="false"
-            app:key="@string/preferenceKeyEnableMapRotation"
-            app:summary="@string/preferencesEnableMapRotationSummary"
-            app:title="@string/preferencesEnableMapRotation" />
-
+    <androidx.preference.SwitchPreferenceCompat
+        app:iconSpaceReserved="false"
+        app:key="enableMapRotation"
+        app:summary="@string/preferencesEnableMapRotationSummary"
+        app:title="@string/preferencesEnableMapRotation" />
 
 </PreferenceScreen>

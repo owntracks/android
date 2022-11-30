@@ -3,7 +3,7 @@ package org.owntracks.android.ui.status.logs
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import org.owntracks.android.logging.TimberInMemoryLogTree
-import org.owntracks.android.support.Preferences
+import org.owntracks.android.preferences.Preferences
 import timber.log.Timber
 import javax.inject.Inject
 

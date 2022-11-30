@@ -2,6 +2,7 @@ package org.owntracks.android.services;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
 import androidx.test.espresso.idling.CountingIdlingResource;
 
 import org.greenrobot.eventbus.EventBus;
@@ -17,16 +18,18 @@ import org.owntracks.android.model.messages.MessageClear;
 import org.owntracks.android.model.messages.MessageCmd;
 import org.owntracks.android.model.messages.MessageLocation;
 import org.owntracks.android.model.messages.MessageTransition;
+import org.owntracks.android.preferences.Preferences;
+import org.owntracks.android.preferences.types.ConnectionMode;
 import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Parser;
-import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.ServiceBridge;
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException;
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -45,7 +48,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext;
 import timber.log.Timber;
 
 @Singleton
-public class MessageProcessor {
+public class MessageProcessor implements Preferences.OnPreferenceChangeListener {
     private final EventBus eventBus;
     private final ContactsRepo contactsRepo;
     private final WaypointsRepo waypointsRepo;
@@ -73,6 +76,9 @@ public class MessageProcessor {
     private final Object locker = new Object();
     private ScheduledFuture<?> waitFuture = null;
     private long retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT;
+
+    private MessageProcessorEndpoint httpEndpoint;
+    private MessageProcessorEndpoint mqttEndpoint;
 
     @Inject
     public MessageProcessor(
@@ -110,6 +116,9 @@ public class MessageProcessor {
             }
             Timber.d("Initializing the outgoingqueueidlingresource at %s", outgoingQueue.size());
         }
+        preferences.registerOnPreferenceChangedListener(this);
+        httpEndpoint = new MessageProcessorEndpointHttp(this, this.parser, this.preferences, this.scheduler, this.applicationContext);
+        mqttEndpoint = new MessageProcessorEndpointMqtt(this, this.parser, this.preferences, this.scheduler, this.eventBus, this.runThingsOnOtherThreads, this.applicationContext);
     }
 
     synchronized public void initialize() {
@@ -191,12 +200,12 @@ public class MessageProcessor {
         endpointStateRepo.setQueueLength(outgoingQueue.size());
 
         switch (preferences.getMode()) {
-            case MessageProcessorEndpointHttp.MODE_ID:
-                this.endpoint = new MessageProcessorEndpointHttp(this, this.parser, this.preferences, this.scheduler, this.applicationContext);
+            case HTTP:
+                this.endpoint = httpEndpoint;
                 break;
-            case MessageProcessorEndpointMqtt.MODE_ID:
+            case MQTT:
             default:
-                this.endpoint = new MessageProcessorEndpointMqtt(this, this.parser, this.preferences, this.scheduler, this.eventBus, this.runThingsOnOtherThreads, this.applicationContext, this.locationProcessorLazy.get());
+                this.endpoint = mqttEndpoint;
 
         }
 
@@ -342,13 +351,6 @@ public class MessageProcessor {
 
     @SuppressWarnings("UnusedParameters")
     @Subscribe(priority = 10, threadMode = ThreadMode.ASYNC)
-    public void onEvent(Events.ModeChanged event) {
-        acceptMessages = false;
-        loadOutgoingMessageProcessor();
-    }
-
-    @SuppressWarnings("UnusedParameters")
-    @Subscribe(priority = 10, threadMode = ThreadMode.ASYNC)
     public void onEvent(Events.EndpointChanged event) {
         acceptMessages = false;
         loadOutgoingMessageProcessor();
@@ -407,13 +409,13 @@ public class MessageProcessor {
     }
 
     private void processIncomingMessage(MessageCmd message) {
-        if (!preferences.getRemoteCommand()) {
+        if (!preferences.getCmd()) {
             Timber.w("remote commands are disabled");
             return;
         }
 
-        if (message.getModeId() != MessageProcessorEndpointHttp.MODE_ID &&
-                !preferences.getPubTopicCommands().equals(message.getTopic())
+        if (message.getModeId() != ConnectionMode.HTTP &&
+                !preferences.getReceivedCommandsTopic().equals(message.getTopic())
         ) {
             Timber.e("cmd message received on wrong topic");
             return;
@@ -426,7 +428,7 @@ public class MessageProcessor {
         if (message.getAction() != null) {
             switch (message.getAction()) {
                 case REPORT_LOCATION:
-                    if (message.getModeId() != MessageProcessorEndpointMqtt.MODE_ID) {
+                    if (message.getModeId() != ConnectionMode.MQTT) {
                         Timber.e("command not supported in HTTP mode: %s", message.getAction());
                         break;
                     }
@@ -448,7 +450,7 @@ public class MessageProcessor {
                         break;
                     }
                     if (message.getConfiguration() != null) {
-                        preferences.importFromMessage(message.getConfiguration());
+                        preferences.importConfiguration(message.getConfiguration());
                     } else {
                         Timber.w("No configuration provided");
                     }
@@ -457,7 +459,7 @@ public class MessageProcessor {
                     }
                     break;
                 case RECONNECT:
-                    if (message.getModeId() != MessageProcessorEndpointHttp.MODE_ID) {
+                    if (message.getModeId() != ConnectionMode.HTTP) {
                         Timber.e("command not supported in HTTP mode: %s", message.getAction());
                         break;
                     }
@@ -469,6 +471,10 @@ public class MessageProcessor {
         }
     }
 
+    void publishLocationMessage(String trigger) {
+        locationProcessorLazy.get().publishLocationMessage(trigger);
+    }
+
     private void processIncomingMessage(MessageTransition message) {
         eventBus.post(message);
     }
@@ -476,5 +482,13 @@ public class MessageProcessor {
     void stopSendingMessages() {
         Timber.d("Interrupting background sending thread");
         backgroundDequeueThread.interrupt();
+    }
+
+    @Override
+    public void onPreferenceChanged(@NonNull List<String> properties) {
+        if (properties.contains("mode")) {
+            acceptMessages = false;
+            loadOutgoingMessageProcessor();
+        }
     }
 }

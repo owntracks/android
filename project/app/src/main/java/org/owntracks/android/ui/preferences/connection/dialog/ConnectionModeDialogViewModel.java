@@ -3,9 +3,9 @@ package org.owntracks.android.ui.preferences.connection.dialog;
 import android.content.Intent;
 
 import org.owntracks.android.R;
+import org.owntracks.android.preferences.Preferences;
+import org.owntracks.android.preferences.types.ConnectionMode;
 import org.owntracks.android.services.MessageProcessorEndpointHttp;
-import org.owntracks.android.services.MessageProcessorEndpointMqtt;
-import org.owntracks.android.support.Preferences;
 
 public class ConnectionModeDialogViewModel extends BaseDialogViewModel {
     private int modeResId;
@@ -37,20 +37,20 @@ public class ConnectionModeDialogViewModel extends BaseDialogViewModel {
         this.modeResId = mode;
     }
 
-    private int modeToResId(int mode) {
+    private int modeToResId(ConnectionMode mode) {
         switch (mode) {
-            case MessageProcessorEndpointHttp.MODE_ID:
+            case HTTP:
                 return R.id.radioModeHttpPrivate;
-            case MessageProcessorEndpointMqtt.MODE_ID:
+            case MQTT:
             default:
                 return R.id.radioModeMqttPrivate;
         }
     }
 
-    private int resIdToMode(int resId) {
+    private ConnectionMode resIdToMode(int resId) {
         if (resId == R.id.radioModeHttpPrivate) {
-            return MessageProcessorEndpointHttp.MODE_ID;
+            return ConnectionMode.HTTP;
         }
-        return MessageProcessorEndpointMqtt.MODE_ID;
+        return ConnectionMode.MQTT;
     }
 }

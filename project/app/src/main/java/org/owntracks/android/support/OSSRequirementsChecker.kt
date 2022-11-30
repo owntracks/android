@@ -7,6 +7,7 @@ import android.location.LocationManager
 import androidx.core.content.ContextCompat
 import androidx.core.location.LocationManagerCompat
 import dagger.hilt.android.scopes.ActivityScoped
+import org.owntracks.android.preferences.Preferences
 import javax.inject.Inject
 
 @ActivityScoped
@@ -15,7 +16,7 @@ open class OSSRequirementsChecker @Inject constructor(
     open val context: Context
 ) : RequirementsChecker {
     override fun areRequirementsMet(): Boolean {
-        return isLocationPermissionCheckPassed() && preferences.isSetupCompleted
+        return isLocationPermissionCheckPassed() && preferences.setupCompleted
     }
 
     override fun isLocationPermissionCheckPassed(): Boolean = ContextCompat.checkSelfPermission(

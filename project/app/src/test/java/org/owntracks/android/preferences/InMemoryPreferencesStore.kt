@@ -1,20 +1,11 @@
-package org.owntracks.android.support
+package org.owntracks.android.preferences
 
 import android.content.SharedPreferences
-import org.owntracks.android.support.preferences.PreferencesStore
 
-class InMemoryPreferencesStore : PreferencesStore {
+class InMemoryPreferencesStore : PreferencesStore() {
     private val valueMap: MutableMap<String, Any> = HashMap()
     override fun getSharedPreferencesName(): String {
         return ""
-    }
-
-    override fun setMode(key: String, mode: Int) {
-        valueMap[key] = mode
-    }
-
-    override fun getInitMode(key: String, default: Int): Int {
-        return getInt(key, default)
     }
 
     override fun getBoolean(key: String, default: Boolean): Boolean {
@@ -49,14 +40,11 @@ class InMemoryPreferencesStore : PreferencesStore {
         return valueMap[key] as String? ?: default
     }
 
-    override fun getStringSet(key: String): Set<String> {
-        @Suppress("UNCHECKED_CAST")
-        return (valueMap[key] ?: setOf<String>()) as Set<String>
-    }
+    @Suppress("UNCHECKED_CAST")
+    override fun getStringSet(key: String, defaultValues: Set<String>): Set<String> =
+        (valueMap[key] ?: setOf<String>()) as Set<String>
 
-    override fun hasKey(key: String): Boolean {
-        return (valueMap.keys.contains(key))
-    }
+    override fun hasKey(key: String): Boolean = valueMap.containsKey(key)
 
     override fun putStringSet(key: String, values: Set<String>) {
         valueMap[key] = values
@@ -66,9 +54,13 @@ class InMemoryPreferencesStore : PreferencesStore {
         valueMap.remove(key)
     }
 
-    override fun registerOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
+    override fun registerOnSharedPreferenceChangeListener(
+        listener: SharedPreferences.OnSharedPreferenceChangeListener
+    ) {
     }
 
-    override fun unregisterOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
+    override fun unregisterOnSharedPreferenceChangeListener(
+        listener: SharedPreferences.OnSharedPreferenceChangeListener
+    ) {
     }
 }

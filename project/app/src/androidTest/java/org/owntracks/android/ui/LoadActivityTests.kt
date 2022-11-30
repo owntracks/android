@@ -15,6 +15,8 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotExist
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import com.adevinta.android.barista.interaction.PermissionGranter.allowPermissionsIfNeeded
+import java.io.File
+import java.io.FileWriter
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -25,8 +27,6 @@ import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.ui.preferences.load.LoadActivity
-import java.io.File
-import java.io.FileWriter
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -73,7 +73,6 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
   "keepalive" : 900,
   "locatorDisplacement" : 5,
   "locatorInterval" : 60,
-  "locatorPriority" : 2,
   "mode" : 0,
   "monitoring" : 1,
   "moveModeLocatorInterval" : 10,
@@ -101,7 +100,7 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
     """.trimIndent()
 
     private val servedConfig =
-        "{\"_type\":\"configuration\",\"waypoints\":[{\"_type\":\"waypoint\",\"desc\":\"work\",\"lat\":51.5,\"lon\":-0.02,\"rad\":150,\"tst\":1505910709000},{\"_type\":\"waypoint\",\"desc\":\"home\",\"lat\":53.6,\"lon\":-1.5,\"rad\":100,\"tst\":1558351273}],\"auth\":true,\"autostartOnBoot\":true,\"connectionTimeoutSeconds\":34,\"cleanSession\":false,\"clientId\":\"emulator\",\"cmd\":true,\"debugLog\":true,\"deviceId\":\"testdevice\",\"fusedRegionDetection\":true,\"geocodeEnabled\":true,\"host\":\"testhost.example.com\",\"ignoreInaccurateLocations\":150,\"ignoreStaleLocations\":0,\"keepalive\":900,\"locatorDisplacement\":5,\"locatorInterval\":60,\"locatorPriority\":2,\"mode\":0,\"monitoring\":1,\"enableMapRotation\":false,\"osmTileScaleFactor\":3.352,\"moveModeLocatorInterval\":10,\"mqttProtocolLevel\":3,\"notificationHigherPriority\":false,\"notificationLocation\":true,\"opencageApiKey\":\"\",\"password\":\"password\",\"ping\":30,\"port\":1883,\"pubExtendedData\":true,\"pubQos\":1,\"pubRetain\":true,\"pubTopicBase\":\"owntracks/%u/%d\",\"remoteConfiguration\":true,\"sub\":true,\"subQos\":2,\"subTopic\":\"owntracks/+/+\",\"tls\":false,\"usePassword\":true,\"username\":\"username\",\"ws\":false}"
+        """{"_type":"configuration","waypoints":[{"_type":"waypoint","desc":"work","lat":51.5,"lon":-0.02,"rad":150,"tst":1505910709000},{"_type":"waypoint","desc":"home","lat":53.6,"lon":-1.5,"rad":100,"tst":1558351273}],"auth":true,"autostartOnBoot":true,"connectionTimeoutSeconds":34,"cleanSession":false,"clientId":"emulator","cmd":true,"debugLog":true,"deviceId":"testdevice","fusedRegionDetection":true,"geocodeEnabled":true,"host":"testhost.example.com","ignoreInaccurateLocations":150,"ignoreStaleLocations":0,"keepalive":900,"locatorDisplacement":5,"locatorInterval":60,"mode":0,"monitoring":1,"enableMapRotation":false,"osmTileScaleFactor":3.352,"moveModeLocatorInterval":10,"mqttProtocolLevel":3,"notificationHigherPriority":false,"notificationLocation":true,"opencageApiKey":"","password":"password","ping":30,"port":1883,"pubExtendedData":true,"pubQos":1,"pubRetain":true,"pubTopicBase":"owntracks/%u/%d","remoteConfiguration":true,"sub":true,"subQos":2,"subTopic":"owntracks/+/+","tls":false,"usePassword":true,"username":"username","ws":false}""" // ktlint-disable max-line-length
 
     @Test
     fun loadActivityCanLoadConfigFromOwntracksInlineConfigURL() {
@@ -109,7 +108,7 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
             Intent(
                 Intent.ACTION_VIEW,
                 Uri.parse(
-                    "owntracks:///config?inline=eyJfdHlwZSI6ImNvbmZpZ3VyYXRpb24iLCJ3YXlwb2ludHMiOlt7Il90eXBlIjoid2F5cG9pbnQiLCJkZXNjIjoid29yayIsImxhdCI6NTEuNSwibG9uIjotMC4wMiwicmFkIjoxNTAsInRzdCI6MTUwNTkxMDcwOTAwMH0seyJfdHlwZSI6IndheXBvaW50IiwiZGVzYyI6ImhvbWUiLCJsYXQiOjUzLjYsImxvbiI6LTEuNSwicmFkIjoxMDAsInRzdCI6MTU1ODM1MTI3M31dLCJhdXRoIjp0cnVlLCJhdXRvc3RhcnRPbkJvb3QiOnRydWUsImNvbm5lY3Rpb25UaW1lb3V0U2Vjb25kcyI6MzQsImNsZWFuU2Vzc2lvbiI6ZmFsc2UsImNsaWVudElkIjoiZW11bGF0b3IiLCJjbWQiOnRydWUsImRlYnVnTG9nIjp0cnVlLCJkZXZpY2VJZCI6InRlc3RkZXZpY2UiLCJmdXNlZFJlZ2lvbkRldGVjdGlvbiI6dHJ1ZSwiZ2VvY29kZUVuYWJsZWQiOnRydWUsImhvc3QiOiJ0ZXN0aG9zdC5leGFtcGxlLmNvbSIsImlnbm9yZUluYWNjdXJhdGVMb2NhdGlvbnMiOjE1MCwiaWdub3JlU3RhbGVMb2NhdGlvbnMiOjAsImtlZXBhbGl2ZSI6OTAwLCJsb2NhdG9yRGlzcGxhY2VtZW50Ijo1LCJsb2NhdG9ySW50ZXJ2YWwiOjYwLCJsb2NhdG9yUHJpb3JpdHkiOjIsIm1vZGUiOjAsIm1vbml0b3JpbmciOjEsIm1vdmVNb2RlTG9jYXRvckludGVydmFsIjoxMCwibXF0dFByb3RvY29sTGV2ZWwiOjMsIm5vdGlmaWNhdGlvbkhpZ2hlclByaW9yaXR5IjpmYWxzZSwibm90aWZpY2F0aW9uTG9jYXRpb24iOnRydWUsIm9wZW5jYWdlQXBpS2V5IjoiIiwiZW5hYmxlTWFwUm90YXRpb24iOmZhbHNlLCJwYXNzd29yZCI6InBhc3N3b3JkIiwicGluZyI6MzAsInBvcnQiOjE4ODMsInB1YkV4dGVuZGVkRGF0YSI6dHJ1ZSwicHViUW9zIjoxLCJwdWJSZXRhaW4iOnRydWUsInB1YlRvcGljQmFzZSI6Im93bnRyYWNrcy8ldS8lZCIsInJlbW90ZUNvbmZpZ3VyYXRpb24iOnRydWUsInN1YiI6dHJ1ZSwib3NtVGlsZVNjYWxlRmFjdG9yIjozLjM1Miwic3ViUW9zIjoyLCJzdWJUb3BpYyI6Im93bnRyYWNrcy8rLysiLCJ0bHMiOmZhbHNlLCJ1c2VQYXNzd29yZCI6dHJ1ZSwidXNlcm5hbWUiOiJ1c2VybmFtZSIsIndzIjpmYWxzZX0="
+                    "owntracks:///config?inline=eyJfdHlwZSI6ImNvbmZpZ3VyYXRpb24iLCJ3YXlwb2ludHMiOlt7Il90eXBlIjoid2F5cG9pbnQiLCJkZXNjIjoid29yayIsImxhdCI6NTEuNSwibG9uIjotMC4wMiwicmFkIjoxNTAsInRzdCI6MTUwNTkxMDcwOTAwMH0seyJfdHlwZSI6IndheXBvaW50IiwiZGVzYyI6ImhvbWUiLCJsYXQiOjUzLjYsImxvbiI6LTEuNSwicmFkIjoxMDAsInRzdCI6MTU1ODM1MTI3M31dLCJhdXRoIjp0cnVlLCJhdXRvc3RhcnRPbkJvb3QiOnRydWUsImNvbm5lY3Rpb25UaW1lb3V0U2Vjb25kcyI6MzQsImNsZWFuU2Vzc2lvbiI6ZmFsc2UsImNsaWVudElkIjoiZW11bGF0b3IiLCJjbWQiOnRydWUsImRlYnVnTG9nIjp0cnVlLCJkZXZpY2VJZCI6InRlc3RkZXZpY2UiLCJmdXNlZFJlZ2lvbkRldGVjdGlvbiI6dHJ1ZSwiZ2VvY29kZUVuYWJsZWQiOnRydWUsImhvc3QiOiJ0ZXN0aG9zdC5leGFtcGxlLmNvbSIsImlnbm9yZUluYWNjdXJhdGVMb2NhdGlvbnMiOjE1MCwiaWdub3JlU3RhbGVMb2NhdGlvbnMiOjAsImtlZXBhbGl2ZSI6OTAwLCJsb2NhdG9yRGlzcGxhY2VtZW50Ijo1LCJsb2NhdG9ySW50ZXJ2YWwiOjYwLCJtb2RlIjowLCJtb25pdG9yaW5nIjoxLCJlbmFibGVNYXBSb3RhdGlvbiI6ZmFsc2UsIm9zbVRpbGVTY2FsZUZhY3RvciI6My4zNTIsIm1vdmVNb2RlTG9jYXRvckludGVydmFsIjoxMCwibXF0dFByb3RvY29sTGV2ZWwiOjMsIm5vdGlmaWNhdGlvbkhpZ2hlclByaW9yaXR5IjpmYWxzZSwibm90aWZpY2F0aW9uTG9jYXRpb24iOnRydWUsIm9wZW5jYWdlQXBpS2V5IjoiIiwicGFzc3dvcmQiOiJwYXNzd29yZCIsInBpbmciOjMwLCJwb3J0IjoxODgzLCJwdWJFeHRlbmRlZERhdGEiOnRydWUsInB1YlFvcyI6MSwicHViUmV0YWluIjp0cnVlLCJwdWJUb3BpY0Jhc2UiOiJvd250cmFja3MvJXUvJWQiLCJyZW1vdGVDb25maWd1cmF0aW9uIjp0cnVlLCJzdWIiOnRydWUsInN1YlFvcyI6Miwic3ViVG9waWMiOiJvd250cmFja3MvKy8rIiwidGxzIjpmYWxzZSwidXNlUGFzc3dvcmQiOnRydWUsInVzZXJuYW1lIjoidXNlcm5hbWUiLCJ3cyI6ZmFsc2V9" // ktlint-disable max-line-length
                 )
             )
         )
@@ -214,10 +213,11 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
                 contentValues
             )
             contentUri?.let {
-                context.contentResolver.openFileDescriptor(it, "w").use { parcelFileDescriptor ->
-                    ParcelFileDescriptor.AutoCloseOutputStream(parcelFileDescriptor)
-                        .write(servedConfig.toByteArray())
-                }
+                context.contentResolver.openFileDescriptor(it, "w")
+                    .use { parcelFileDescriptor ->
+                        ParcelFileDescriptor.AutoCloseOutputStream(parcelFileDescriptor)
+                            .write(servedConfig.toByteArray())
+                    }
                 contentValues.clear()
                 contentValues.put(MediaStore.Downloads.IS_PENDING, 0)
                 context.contentResolver.update(it, contentValues, null, null)
@@ -255,7 +255,8 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
         override fun dispatch(request: RecordedRequest): MockResponse {
             val errorResponse = MockResponse().setResponseCode(404)
             return if (request.path == "/myconfig.otrc") {
-                MockResponse().setResponseCode(200).setHeader("Content-type", "application/json")
+                MockResponse().setResponseCode(200)
+                    .setHeader("Content-type", "application/json")
                     .setBody(config)
             } else {
                 errorResponse

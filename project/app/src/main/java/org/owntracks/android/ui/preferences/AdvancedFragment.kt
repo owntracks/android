@@ -1,32 +1,43 @@
 package org.owntracks.android.ui.preferences
 
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import androidx.preference.EditTextPreference
-import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
 import dagger.hilt.android.AndroidEntryPoint
-import org.owntracks.android.R
-import org.owntracks.android.support.Preferences
 import javax.inject.Inject
+import org.owntracks.android.R
+import org.owntracks.android.preferences.Preferences
+import org.owntracks.android.preferences.types.ReverseGeocodeProvider
 
 @AndroidEntryPoint
-class AdvancedFragment @Inject constructor() : AbstractPreferenceFragment() {
-    override fun onCreatePreferencesFix(savedInstanceState: Bundle?, rootKey: String?) {
-        super.onCreatePreferencesFix(savedInstanceState, rootKey)
+class AdvancedFragment @Inject constructor() : AbstractPreferenceFragment(), Preferences.OnPreferenceChangeListener {
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        preferences.registerOnPreferenceChangedListener(this)
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        preferences.unregisterOnPreferenceChangedListener(this)
+    }
+
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        super.onCreatePreferences(savedInstanceState, rootKey)
         setPreferencesFromResource(R.xml.preferences_advanced, rootKey)
         val remoteConfigurationPreference =
-            findPreference<SwitchPreferenceCompat>(getString(R.string.preferenceKeyRemoteConfiguration))
+            findPreference<SwitchPreferenceCompat>(Preferences::remoteConfiguration.name)
         val remoteCommandPreference =
-            findPreference<SwitchPreferenceCompat>(getString(R.string.preferenceKeyRemoteCommand))
+            findPreference<SwitchPreferenceCompat>(Preferences::cmd.name)
         val remoteCommandAndConfigurationChangeListener =
             Preference.OnPreferenceChangeListener { preference, newValue ->
                 if (newValue is Boolean) {
                     when (preference.key) {
-                        getString(R.string.preferenceKeyRemoteCommand) -> if (!newValue) remoteConfigurationPreference?.isChecked =
+                        Preferences::cmd.name -> if (!newValue) remoteConfigurationPreference?.isChecked =
                             false
-                        getString(R.string.preferenceKeyRemoteConfiguration) -> if (newValue) remoteCommandPreference?.isChecked =
+                        Preferences::remoteConfiguration.name -> if (newValue) remoteCommandPreference?.isChecked =
                             true
                     }
                 }
@@ -37,26 +48,20 @@ class AdvancedFragment @Inject constructor() : AbstractPreferenceFragment() {
         remoteCommandPreference?.onPreferenceChangeListener =
             remoteCommandAndConfigurationChangeListener
 
-        findPreference<ListPreference>(getString(R.string.preferenceKeyReverseGeocodeProvider))?.setOnPreferenceChangeListener { _, newValue ->
-            preferences.reverseGeocodeProvider = newValue.toString()
-            setOpenCageAPIKeyPreferenceVisibility()
-            true
-        }
-        setOpenCageAPIKeyPreferenceVisibility()
-
-        findPreference<EditTextPreference>(getString(R.string.preferenceKeyOpencageGeocoderApiKey))?.setOnPreferenceChangeListener { preference, newValue ->
-            val trimmed = (newValue as String).trim()
-            preferences.openCageGeocoderApiKey = trimmed
-            (preference as EditTextPreference).text = trimmed
-            false
-        }
-
         findPreference<Preference>("autostartWarning")?.isVisible =
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+
+        setOpenCageAPIKeyPreferenceVisibility()
     }
 
     private fun setOpenCageAPIKeyPreferenceVisibility() {
-        findPreference<EditTextPreference>(getString(R.string.preferenceKeyOpencageGeocoderApiKey))?.isVisible =
-            preferences.reverseGeocodeProvider == Preferences.REVERSE_GEOCODE_PROVIDER_OPENCAGE
+        findPreference<EditTextPreference>(Preferences::opencageApiKey.name)?.isVisible =
+            preferences.reverseGeocodeProvider == ReverseGeocodeProvider.OPENCAGE
+    }
+
+    override fun onPreferenceChanged(properties: List<String>) {
+        if (properties.contains(Preferences::reverseGeocodeProvider.name)) {
+            setOpenCageAPIKeyPreferenceVisibility()
+        }
     }
 }

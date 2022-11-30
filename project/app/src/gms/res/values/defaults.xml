@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="valDefaultGeocoder" translatable="false">Device</string>
-    <string name="valDefaultMapLayerStyle" translatable="false">GoogleMapDefault</string>
-</resources>

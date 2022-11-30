@@ -1,7 +1,8 @@
-package org.owntracks.android.support
+package org.owntracks.android.preferences
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.owntracks.android.preferences.types.MonitoringMode
 
 class MonitoringModeTest {
 

@@ -13,7 +13,7 @@ import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import org.owntracks.android.data.repos.WaypointsRepo
 import org.owntracks.android.support.Parser
-import org.owntracks.android.support.Preferences
+import org.owntracks.android.preferences.Preferences
 import timber.log.Timber
 import java.io.FileOutputStream
 

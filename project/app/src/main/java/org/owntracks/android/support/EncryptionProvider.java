@@ -9,6 +9,8 @@ import androidx.annotation.NonNull;
 import org.libsodium.jni.crypto.Random;
 import org.libsodium.jni.crypto.SecretBox;
 import org.owntracks.android.R;
+import org.owntracks.android.preferences.Preferences;
+
 import javax.inject.Singleton;
 
 import javax.inject.Inject;
@@ -17,6 +19,8 @@ import timber.log.Timber;
 
 import static org.libsodium.jni.SodiumConstants.XSALSA20_POLY1305_SECRETBOX_KEYBYTES;
 import static org.libsodium.jni.SodiumConstants.XSALSA20_POLY1305_SECRETBOX_NONCEBYTES;
+
+import java.util.List;
 
 @Singleton
 public class EncryptionProvider {
@@ -95,15 +99,16 @@ public class EncryptionProvider {
         return Base64.encodeToString(out, Base64.NO_WRAP);
     }
 
-    private class SecretBoxManager implements SharedPreferences.OnSharedPreferenceChangeListener {
+    private class SecretBoxManager implements Preferences.OnPreferenceChangeListener {
         SecretBoxManager() {
             preferences.registerOnPreferenceChangedListener(this);
         }
 
         @Override
-        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            if (preferences.getPreferenceKey(R.string.preferenceKeyEncryptionKey).equals(key))
+        public void onPreferenceChanged(@NonNull List<String> properties) {
+            if (properties.contains("encryptionKey")) {
                 initializeSecretBox();
+            }
         }
     }
 }

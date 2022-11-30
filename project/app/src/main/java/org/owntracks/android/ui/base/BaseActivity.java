@@ -19,7 +19,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.BR;
 import org.owntracks.android.R;
 import org.owntracks.android.support.DrawerProvider;
-import org.owntracks.android.support.Preferences;
+import org.owntracks.android.preferences.Preferences;
 import org.owntracks.android.ui.base.view.MvvmView;
 import org.owntracks.android.ui.base.viewmodel.MvvmViewModel;
 import org.owntracks.android.ui.base.viewmodel.NoOpViewModel;

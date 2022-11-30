@@ -2,7 +2,7 @@ package org.owntracks.android.model.messages
 
 import com.fasterxml.jackson.annotation.*
 import org.owntracks.android.location.geofencing.Geofence
-import org.owntracks.android.support.Preferences
+import org.owntracks.android.preferences.Preferences
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -53,7 +53,7 @@ class MessageTransition : MessageBase() {
 
     override fun addMqttPreferences(preferences: Preferences) {
         topic = preferences.pubTopicEvents
-        qos = preferences.pubQosEvents
+        qos = preferences.pubQosEvents.value
         retained = preferences.pubRetainEvents
     }
 

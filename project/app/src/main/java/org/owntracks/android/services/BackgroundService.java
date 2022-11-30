@@ -58,11 +58,11 @@ import org.owntracks.android.location.geofencing.GeofencingRequest;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.model.messages.MessageLocation;
 import org.owntracks.android.model.messages.MessageTransition;
+import org.owntracks.android.preferences.types.MonitoringMode;
+import org.owntracks.android.preferences.Preferences;
 import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.DateFormatter;
 import org.owntracks.android.support.Events;
-import org.owntracks.android.support.MonitoringMode;
-import org.owntracks.android.support.Preferences;
 import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.ServiceBridge;
 import org.owntracks.android.ui.map.MapActivity;
@@ -71,6 +71,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -78,7 +79,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 import timber.log.Timber;
 
 @AndroidEntryPoint
-public class BackgroundService extends LifecycleService implements SharedPreferences.OnSharedPreferenceChangeListener, ServiceBridge.ServiceBridgeInterface {
+public class BackgroundService extends LifecycleService implements ServiceBridge.ServiceBridgeInterface, Preferences.OnPreferenceChangeListener {
     private static final int INTENT_REQUEST_CODE_GEOFENCE = 1264;
     private static final int INTENT_REQUEST_CODE_CLEAR_EVENTS = 1263;
 
@@ -255,11 +256,11 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
                     setupLocationRequest();
                     return;
                 case INTENT_ACTION_CHANGE_MONITORING:
-                    if (intent.hasExtra(preferences.getPreferenceKey(R.string.preferenceKeyMonitoring))) {
+                    if (intent.hasExtra("monitoring")) {
                         MonitoringMode newMode = MonitoringMode.getByValue(
                                 intent.getIntExtra(
-                                        preferences.getPreferenceKey(R.string.preferenceKeyMonitoring),
-                                        preferences.getMonitoring().getMode()
+                                        "monitoring",
+                                        preferences.getMonitoring().getValue()
                                 )
                         );
                         preferences.setMonitoring(newMode);
@@ -570,7 +571,7 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
             case SIGNIFICANT:
                 interval = TimeUnit.SECONDS.toMillis(preferences.getLocatorInterval());
                 smallestDisplacement = (float) preferences.getLocatorDisplacement();
-                priority = getLocationRequestPriority();
+                priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY;;
                 break;
             case MOVE:
                 interval = TimeUnit.SECONDS.toMillis(preferences.getMoveModeLocatorInterval());
@@ -585,20 +586,6 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
         locationProviderClient.flushLocations();
         locationProviderClient.requestLocationUpdates(request, locationCallback, runThingsOnOtherThreads.getBackgroundLooper());
         return true;
-    }
-
-    private int getLocationRequestPriority() {
-        switch (preferences.getLocatorPriority()) {
-            case 0:
-                return LocationRequest.PRIORITY_NO_POWER;
-            case 1:
-                return LocationRequest.PRIORITY_LOW_POWER;
-            case 3:
-                return LocationRequest.PRIORITY_HIGH_ACCURACY;
-            case 2:
-            default:
-                return LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY;
-        }
     }
 
     private PendingIntent getGeofencePendingIntent() {
@@ -681,14 +668,6 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
     }
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void onEvent(Events.ModeChanged e) {
-        removeGeofences();
-        setupGeofences();
-        setupLocationRequest();
-        updateOngoingNotification();
-    }
-
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(Events.MonitoringChanged e) {
         setupLocationRequest();
         updateOngoingNotification();
@@ -743,15 +722,22 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
     }
 
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (preferences.getPreferenceKey(R.string.preferenceKeyLocatorInterval).equals(key) ||
-                preferences.getPreferenceKey(R.string.preferenceKeyLocatorDisplacement).equals(key) ||
-                preferences.getPreferenceKey(R.string.preferenceKeyLocatorPriority).equals(key) ||
-                preferences.getPreferenceKey(R.string.preferenceKeyMoveModeLocatorInterval).equals(key) ||
-                preferences.getPreferenceKey(R.string.preferenceKeyPegLocatorFastestIntervalToInterval).equals(key)
-        ) {
+    public void onPreferenceChanged(@NonNull List<String> properties) {
+        List<String> propertiesWeCareAbout = List.of(
+                "locatorInterval",
+                "locatorDisplacement",
+                "moveModeLocatorInterval",
+                "pegLocatorFastestIntervalToInterval"
+        );
+        if (!propertiesWeCareAbout.stream().filter(properties::contains).collect(Collectors.toSet()).isEmpty()) {
             Timber.d("locator preferences changed. Resetting location request.");
             setupLocationRequest();
+        }
+        if (properties.contains("mode")) {
+            removeGeofences();
+            setupGeofences();
+            setupLocationRequest();
+            updateOngoingNotification();
         }
     }
 
@@ -767,7 +753,6 @@ public class BackgroundService extends LifecycleService implements SharedPrefere
                 }
             }
         }, 0);
-
     }
 
     private final IBinder localServiceBinder = new LocalBinder();

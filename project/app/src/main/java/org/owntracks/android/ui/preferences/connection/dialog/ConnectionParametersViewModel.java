@@ -2,7 +2,7 @@ package org.owntracks.android.ui.preferences.connection.dialog;
 
 import android.content.Intent;
 
-import org.owntracks.android.support.Preferences;
+import org.owntracks.android.preferences.Preferences;
 
 public class ConnectionParametersViewModel extends BaseDialogViewModel {
 
@@ -22,7 +22,7 @@ public class ConnectionParametersViewModel extends BaseDialogViewModel {
     @Override
     public void load() {
         this.cleanSession = preferences.getCleanSession();
-        this.keepaliveText = preferences.getKeepaliveWithHintSupport();
+        this.keepaliveText = String.valueOf(preferences.getKeepalive());
     }
 
     @Override
@@ -33,7 +33,7 @@ public class ConnectionParametersViewModel extends BaseDialogViewModel {
             try {
                 preferences.setKeepalive(Integer.parseInt(keepaliveText));
             } catch (NumberFormatException e) {
-                preferences.setKeepaliveDefault();
+                preferences.resetPreference("keepalive");
             }
         }
     }

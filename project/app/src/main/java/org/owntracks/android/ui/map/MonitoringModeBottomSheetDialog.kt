@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.owntracks.android.databinding.ModeBottomSheetDialogBinding
-import org.owntracks.android.support.MonitoringMode
+import org.owntracks.android.preferences.types.MonitoringMode
 
 class MonitoringModeBottomSheetDialog() : BottomSheetDialogFragment() {
     protected val viewModel: MapViewModel by activityViewModels()

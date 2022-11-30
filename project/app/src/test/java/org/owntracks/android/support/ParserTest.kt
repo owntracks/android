@@ -3,6 +3,9 @@ package org.owntracks.android.support
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.exc.InvalidFormatException
+import java.io.ByteArrayInputStream
+import java.io.IOException
+import java.util.*
 import org.intellij.lang.annotations.Language
 import org.junit.Assert.*
 import org.junit.Before
@@ -16,10 +19,10 @@ import org.owntracks.android.location.geofencing.Geofence
 import org.owntracks.android.model.BatteryStatus
 import org.owntracks.android.model.CommandAction
 import org.owntracks.android.model.messages.*
+import org.owntracks.android.preferences.Preferences
+import org.owntracks.android.preferences.types.MonitoringMode
+import org.owntracks.android.preferences.types.MqttQos
 import org.owntracks.android.support.Parser.EncryptionException
-import java.io.ByteArrayInputStream
-import java.io.IOException
-import java.util.*
 
 class ParserTest {
     private lateinit var extendedMessageLocation: MessageLocation
@@ -66,6 +69,7 @@ class ParserTest {
         testPreferences = mock {
             on { encryptionKey } doReturn "testEncryptionKey"
             on { pubTopicLocations } doReturn "owntracks/testUsername/testDevice"
+            on { pubQosLocations } doReturn MqttQos.ONE
         }
         encryptionProvider = mock { on { isPayloadEncryptionEnabled } doReturn false }
     }
@@ -73,7 +77,9 @@ class ParserTest {
     @Test
     fun `Parser can serialize extended location message to a pretty JSON message`() {
         val parser = Parser(null)
-        @Language("JSON") val expected = """
+
+        @Language("JSON")
+        val expected = """
             {
               "_type" : "location",
               "BSSID" : "12:34:56:78",
@@ -98,7 +104,9 @@ class ParserTest {
 
     fun `Parser can serialize non-extended location message to a pretty JSON message`() {
         val parser = Parser(null)
-        @Language("JSON") val expected = """
+
+        @Language("JSON")
+        val expected = """
             {
               "_type" : "location",
               "acc" : 10,
@@ -121,7 +129,9 @@ class ParserTest {
     fun `Parser can deserialize a location message`() {
         `when`(encryptionProvider.isPayloadEncryptionEnabled).thenReturn(false)
         val parser = Parser(encryptionProvider)
-        @Language("JSON") val input = """
+
+        @Language("JSON")
+        val input = """
             {
                 "_type": "location",
                 "tid": "s5",
@@ -167,25 +177,101 @@ class ParserTest {
         val serialized = input.toJson(parser)
         val jsonNode = objectMapper.readTree(serialized)
         assertTrue(jsonNode.isObject)
-        assertEquals("location", jsonNode.get("_type").asText())
-        assertEquals("12:34:56:78", jsonNode.get("BSSID").asText())
-        assertEquals("Wifi SSID", jsonNode.get("SSID").asText())
-        assertEquals(10, jsonNode.get("acc").asInt())
-        assertEquals(20, jsonNode.get("alt").asInt())
-        assertEquals(30, jsonNode.get("batt").asInt())
-        assertEquals(2, jsonNode.get("bs").asInt())
-        assertEquals("TestConn", jsonNode.get("conn").asText())
-        assertEquals(25, jsonNode.get("created_at").asInt())
+        assertEquals(
+            "location",
+            jsonNode.get("_type")
+                .asText()
+        )
+        assertEquals(
+            "12:34:56:78",
+            jsonNode.get("BSSID")
+                .asText()
+        )
+        assertEquals(
+            "Wifi SSID",
+            jsonNode.get("SSID")
+                .asText()
+        )
+        assertEquals(
+            10,
+            jsonNode.get("acc")
+                .asInt()
+        )
+        assertEquals(
+            20,
+            jsonNode.get("alt")
+                .asInt()
+        )
+        assertEquals(
+            30,
+            jsonNode.get("batt")
+                .asInt()
+        )
+        assertEquals(
+            2,
+            jsonNode.get("bs")
+                .asInt()
+        )
+        assertEquals(
+            "TestConn",
+            jsonNode.get("conn")
+                .asText()
+        )
+        assertEquals(
+            25,
+            jsonNode.get("created_at")
+                .asInt()
+        )
         assertTrue(jsonNode.get("inregions").isArray)
-        assertEquals(2, jsonNode.get("inregions").count())
-        assertEquals("Testregion1", jsonNode.get("inregions").get(0).asText())
-        assertEquals("Testregion2", jsonNode.get("inregions").get(1).asText())
-        assertEquals(50.1, jsonNode.get("lat").asDouble(), 0.0001)
-        assertEquals(60.2, jsonNode.get("lon").asDouble(), 0.0001)
-        assertEquals(1, jsonNode.get("m").asInt())
-        assertEquals(123456789, jsonNode.get("tst").asLong())
-        assertEquals(1, jsonNode.get("vac").asInt())
-        assertEquals(5, jsonNode.get("vel").asInt())
+        assertEquals(
+            2,
+            jsonNode.get("inregions")
+                .count()
+        )
+        assertEquals(
+            "Testregion1",
+            jsonNode.get("inregions")
+                .get(0)
+                .asText()
+        )
+        assertEquals(
+            "Testregion2",
+            jsonNode.get("inregions")
+                .get(1)
+                .asText()
+        )
+        assertEquals(
+            50.1,
+            jsonNode.get("lat")
+                .asDouble(),
+            0.0001
+        )
+        assertEquals(
+            60.2,
+            jsonNode.get("lon")
+                .asDouble(),
+            0.0001
+        )
+        assertEquals(
+            1,
+            jsonNode.get("m")
+                .asInt()
+        )
+        assertEquals(
+            123456789,
+            jsonNode.get("tst")
+                .asLong()
+        )
+        assertEquals(
+            1,
+            jsonNode.get("vac")
+                .asInt()
+        )
+        assertEquals(
+            5,
+            jsonNode.get("vel")
+                .asInt()
+        )
     }
 
     @Test
@@ -198,32 +284,113 @@ class ParserTest {
         val serialized = input.toJson(parser)
         val jsonNode = objectMapper.readTree(serialized)
         assertTrue(jsonNode.isObject)
-        assertEquals("location", jsonNode.get("_type").asText())
-        assertEquals("12:34:56:78", jsonNode.get("BSSID").asText())
-        assertEquals("Wifi SSID", jsonNode.get("SSID").asText())
-        assertEquals(10, jsonNode.get("acc").asInt())
-        assertEquals(20, jsonNode.get("alt").asInt())
-        assertEquals(30, jsonNode.get("batt").asInt())
-        assertEquals(2, jsonNode.get("bs").asInt())
-        assertEquals("TestConn", jsonNode.get("conn").asText())
-        assertEquals(25, jsonNode.get("created_at").asInt())
+        assertEquals(
+            "location",
+            jsonNode.get("_type")
+                .asText()
+        )
+        assertEquals(
+            "12:34:56:78",
+            jsonNode.get("BSSID")
+                .asText()
+        )
+        assertEquals(
+            "Wifi SSID",
+            jsonNode.get("SSID")
+                .asText()
+        )
+        assertEquals(
+            10,
+            jsonNode.get("acc")
+                .asInt()
+        )
+        assertEquals(
+            20,
+            jsonNode.get("alt")
+                .asInt()
+        )
+        assertEquals(
+            30,
+            jsonNode.get("batt")
+                .asInt()
+        )
+        assertEquals(
+            2,
+            jsonNode.get("bs")
+                .asInt()
+        )
+        assertEquals(
+            "TestConn",
+            jsonNode.get("conn")
+                .asText()
+        )
+        assertEquals(
+            25,
+            jsonNode.get("created_at")
+                .asInt()
+        )
         assertTrue(jsonNode.get("inregions").isArray)
-        assertEquals(2, jsonNode.get("inregions").count())
-        assertEquals("Testregion1", jsonNode.get("inregions").get(0).asText())
-        assertEquals("Testregion2", jsonNode.get("inregions").get(1).asText())
-        assertEquals(50.1, jsonNode.get("lat").asDouble(), 0.0001)
-        assertEquals(60.2, jsonNode.get("lon").asDouble(), 0.0001)
-        assertEquals(1, jsonNode.get("m").asInt())
-        assertEquals("owntracks/testUsername/testDevice", jsonNode.get("topic").asText())
-        assertEquals(123456789, jsonNode.get("tst").asLong())
-        assertEquals(1, jsonNode.get("vac").asInt())
-        assertEquals(5, jsonNode.get("vel").asInt())
+        assertEquals(
+            2,
+            jsonNode.get("inregions")
+                .count()
+        )
+        assertEquals(
+            "Testregion1",
+            jsonNode.get("inregions")
+                .get(0)
+                .asText()
+        )
+        assertEquals(
+            "Testregion2",
+            jsonNode.get("inregions")
+                .get(1)
+                .asText()
+        )
+        assertEquals(
+            50.1,
+            jsonNode.get("lat")
+                .asDouble(),
+            0.0001
+        )
+        assertEquals(
+            60.2,
+            jsonNode.get("lon")
+                .asDouble(),
+            0.0001
+        )
+        assertEquals(
+            1,
+            jsonNode.get("m")
+                .asInt()
+        )
+        assertEquals(
+            "owntracks/testUsername/testDevice",
+            jsonNode.get("topic")
+                .asText()
+        )
+        assertEquals(
+            123456789,
+            jsonNode.get("tst")
+                .asLong()
+        )
+        assertEquals(
+            1,
+            jsonNode.get("vac")
+                .asInt()
+        )
+        assertEquals(
+            5,
+            jsonNode.get("vel")
+                .asInt()
+        )
     }
 
     @Test
     fun `Parser can deserialize an encrypted location message`() {
         `when`(encryptionProvider.isPayloadEncryptionEnabled).thenReturn(true)
-        @Language("JSON") val messageLocationJSON = """
+        @Language("JSON")
+        val messageLocationJSON = """
                 {
                   "_type": "location",
                   "tid": "s5",
@@ -242,7 +409,9 @@ class ParserTest {
         """.trimIndent()
         `when`(encryptionProvider.decrypt("TestCipherText")).thenReturn(messageLocationJSON)
         val parser = Parser(encryptionProvider)
-        @Language("JSON") val input = """
+
+        @Language("JSON")
+        val input = """
             {
               "_type": "encrypted",
               "data": "TestCipherText"
@@ -274,15 +443,25 @@ class ParserTest {
         val serialized = input.toJson(parser)
         val jsonNode = objectMapper.readTree(serialized)
         assertTrue(jsonNode.isObject)
-        assertEquals("encrypted", jsonNode.get("_type").asText())
-        assertEquals(dummyCipherText, jsonNode.get("data").asText())
+        assertEquals(
+            "encrypted",
+            jsonNode.get("_type")
+                .asText()
+        )
+        assertEquals(
+            dummyCipherText,
+            jsonNode.get("data")
+                .asText()
+        )
     }
 
     @Test(expected = EncryptionException::class)
     fun `Parser should raise an exception when given an encrypted message with encryption disabled`() {
         `when`(encryptionProvider.isPayloadEncryptionEnabled).thenReturn(false)
         val parser = Parser(encryptionProvider)
-        @Language("JSON") val input = """
+
+        @Language("JSON")
+        val input = """
             {
               "_type": "encrypted",
               "data": "TestCipherText"
@@ -293,7 +472,8 @@ class ParserTest {
 
     @Test
     fun `Parser can deserialize multiple location messages in same document`() {
-        @Language("JSON") val multipleMessageLocationJSON = """
+        @Language("JSON")
+        val multipleMessageLocationJSON = """
             [
               {
                 "_type": "location",
@@ -341,7 +521,9 @@ class ParserTest {
     @Test
     fun `Parser can deserialize a reportLocation cmd message`() {
         val parser = Parser(encryptionProvider)
-        @Language("JSON") val input = """
+
+        @Language("JSON")
+        val input = """
             {
               "_type": "cmd",
               "action": "reportLocation"
@@ -359,7 +541,9 @@ class ParserTest {
     @Test
     fun `Parser can deserialize a setWaypoints cmd message`() {
         val parser = Parser(encryptionProvider)
-        @Language("JSON") val input =
+
+        @Language("JSON")
+        val input =
             """
             {
               "_type": "cmd",
@@ -381,7 +565,9 @@ class ParserTest {
     @Test
     fun `Parser can deserialize a setConfiguration message`() {
         val parser = Parser(encryptionProvider)
-        @Language("JSON") val input = """
+
+        @Language("JSON")
+        val input = """
             {
               "_type": "cmd",
               "action": "setConfiguration",
@@ -402,7 +588,9 @@ class ParserTest {
     @Test(expected = InvalidFormatException::class)
     fun `Parser throws exception when given cmd with invalid action`() {
         val parser = Parser(encryptionProvider)
-        @Language("JSON") val input = """
+
+        @Language("JSON")
+        val input = """
             {
               "_type": "cmd",
               "action": "nope",
@@ -418,7 +606,9 @@ class ParserTest {
     @Test
     fun `Parser can deserialize a transition message`() {
         val parser = Parser(encryptionProvider)
-        @Language("JSON") val input = """
+
+        @Language("JSON")
+        val input = """
             {
               "_type": "transition",
               "acc": 3.075,
@@ -467,16 +657,59 @@ class ParserTest {
         val serialized = message.toJson(parser)
         val jsonNode = objectMapper.readTree(serialized)
         assertTrue(jsonNode.isObject)
-        assertEquals("transition", jsonNode.get("_type").asText())
-        assertEquals(message.accuracy.toDouble(), jsonNode.get("acc").asDouble(), 0.001)
-        assertEquals(message.description, jsonNode.get("desc").asText())
-        assertEquals("leave", jsonNode.get("event").asText())
-        assertEquals(message.latitude, jsonNode.get("lat").asDouble(), 0.001)
-        assertEquals(message.longitude, jsonNode.get("lon").asDouble(), 0.001)
-        assertEquals(message.trigger, jsonNode.get("t").asText())
-        assertEquals(message.trackerId, jsonNode.get("tid").asText())
-        assertEquals(message.timestamp, jsonNode.get("tst").asLong())
-        assertEquals(message.waypointTimestamp, jsonNode.get("wtst").asLong())
+        assertEquals(
+            "transition",
+            jsonNode.get("_type")
+                .asText()
+        )
+        assertEquals(
+            message.accuracy.toDouble(),
+            jsonNode.get("acc")
+                .asDouble(),
+            0.001
+        )
+        assertEquals(
+            message.description,
+            jsonNode.get("desc")
+                .asText()
+        )
+        assertEquals(
+            "leave",
+            jsonNode.get("event")
+                .asText()
+        )
+        assertEquals(
+            message.latitude,
+            jsonNode.get("lat")
+                .asDouble(),
+            0.001
+        )
+        assertEquals(
+            message.longitude,
+            jsonNode.get("lon")
+                .asDouble(),
+            0.001
+        )
+        assertEquals(
+            message.trigger,
+            jsonNode.get("t")
+                .asText()
+        )
+        assertEquals(
+            message.trackerId,
+            jsonNode.get("tid")
+                .asText()
+        )
+        assertEquals(
+            message.timestamp,
+            jsonNode.get("tst")
+                .asLong()
+        )
+        assertEquals(
+            message.waypointTimestamp,
+            jsonNode.get("wtst")
+                .asLong()
+        )
     }
     //endregion
 
@@ -484,7 +717,9 @@ class ParserTest {
     @Test
     fun `Parser can deserialize a configuration message`() {
         val parser = Parser(encryptionProvider)
-        @Language("JSON") val input = """
+
+        @Language("JSON")
+        val input = """
             {
               "_type": "configuration",
               "waypoints": [
@@ -520,7 +755,6 @@ class ParserTest {
               "keepalive": 900,
               "locatorDisplacement": 5,
               "locatorInterval": 60,
-              "locatorPriority": 2,
               "mode": 0,
               "monitoring": 1,
               "moveModeLocatorInterval": 10,
@@ -577,20 +811,85 @@ class ParserTest {
         val jsonNode = objectMapper.readTree(serialized)
 
         assertTrue(jsonNode.isObject)
-        assertEquals("configuration", jsonNode.get("_type").asText())
+        assertEquals(
+            "configuration",
+            jsonNode.get("_type")
+                .asText()
+        )
         assertTrue(jsonNode.get("waypoints").isArray)
-        assertEquals(1, jsonNode.get("waypoints").count())
-        assertTrue(jsonNode.get("waypoints").get(0).isObject)
-        assertEquals("waypoint", jsonNode.get("waypoints").get(0).get("_type").asText())
-        assertEquals("Test waypoint", jsonNode.get("waypoints").get(0).get("desc").asText())
-        assertEquals(51.0, jsonNode.get("waypoints").get(0).get("lat").asDouble(), 0.00001)
-        assertEquals(-20.0, jsonNode.get("waypoints").get(0).get("lon").asDouble(), 0.00001)
-        assertEquals(45, jsonNode.get("waypoints").get(0).get("rad").asInt())
-        assertEquals(123456789, jsonNode.get("waypoints").get(0).get("tst").asInt())
-        assertTrue(jsonNode.get("TestBoolKey").asBoolean())
-        assertEquals(13487.0, jsonNode.get("TestFloatKey").asDouble(), 0.0001)
-        assertEquals(13487, jsonNode.get("TestIntKey").asInt())
-        assertEquals("testString", jsonNode.get("TestStringKey").asText())
+        assertEquals(
+            1,
+            jsonNode.get("waypoints")
+                .count()
+        )
+        assertTrue(
+            jsonNode.get("waypoints")
+                .get(0).isObject
+        )
+        assertEquals(
+            "waypoint",
+            jsonNode.get("waypoints")
+                .get(0)
+                .get("_type")
+                .asText()
+        )
+        assertEquals(
+            "Test waypoint",
+            jsonNode.get("waypoints")
+                .get(0)
+                .get("desc")
+                .asText()
+        )
+        assertEquals(
+            51.0,
+            jsonNode.get("waypoints")
+                .get(0)
+                .get("lat")
+                .asDouble(),
+            0.00001
+        )
+        assertEquals(
+            -20.0,
+            jsonNode.get("waypoints")
+                .get(0)
+                .get("lon")
+                .asDouble(),
+            0.00001
+        )
+        assertEquals(
+            45,
+            jsonNode.get("waypoints")
+                .get(0)
+                .get("rad")
+                .asInt()
+        )
+        assertEquals(
+            123456789,
+            jsonNode.get("waypoints")
+                .get(0)
+                .get("tst")
+                .asInt()
+        )
+        assertTrue(
+            jsonNode.get("TestBoolKey")
+                .asBoolean()
+        )
+        assertEquals(
+            13487.0,
+            jsonNode.get("TestFloatKey")
+                .asDouble(),
+            0.0001
+        )
+        assertEquals(
+            13487,
+            jsonNode.get("TestIntKey")
+                .asInt()
+        )
+        assertEquals(
+            "testString",
+            jsonNode.get("TestStringKey")
+                .asText()
+        )
     }
     //endregion
 
@@ -598,7 +897,9 @@ class ParserTest {
     @Test
     fun `Parser can deserialize a waypoint message`() {
         val parser = Parser(encryptionProvider)
-        @Language("JSON") val input = """
+
+        @Language("JSON")
+        val input = """
             {
               "_type": "waypoint",
               "desc": "mypoint",
@@ -633,12 +934,38 @@ class ParserTest {
         val serialized = message.toJson(parser)
         val jsonNode = objectMapper.readTree(serialized)
         assertTrue(jsonNode.isObject)
-        assertEquals("waypoint", jsonNode.get("_type").asText())
-        assertEquals("mypoint", jsonNode.get("desc").asText())
-        assertEquals(message.latitude.toDouble(), jsonNode.get("lat").asDouble(), 0.00001)
-        assertEquals(message.longitude.toDouble(), jsonNode.get("lon").asDouble(), 0.00001)
-        assertEquals(message.radius, jsonNode.get("rad").asInt())
-        assertEquals(message.timestamp, jsonNode.get("tst").asLong())
+        assertEquals(
+            "waypoint",
+            jsonNode.get("_type")
+                .asText()
+        )
+        assertEquals(
+            "mypoint",
+            jsonNode.get("desc")
+                .asText()
+        )
+        assertEquals(
+            message.latitude.toDouble(),
+            jsonNode.get("lat")
+                .asDouble(),
+            0.00001
+        )
+        assertEquals(
+            message.longitude.toDouble(),
+            jsonNode.get("lon")
+                .asDouble(),
+            0.00001
+        )
+        assertEquals(
+            message.radius,
+            jsonNode.get("rad")
+                .asInt()
+        )
+        assertEquals(
+            message.timestamp,
+            jsonNode.get("tst")
+                .asLong()
+        )
     }
     //endregion
 
@@ -666,7 +993,9 @@ class ParserTest {
     @Test
     fun `Parser can deserialize a MessageCard`() {
         val parser = Parser(encryptionProvider)
-        @Language("JSON") val input = """
+
+        @Language("JSON")
+        val input = """
             {
               "_type": "card",
               "face": "iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAABIElEQVRYhe2XsQ2DMBBFvQkrUNEihvEOTMEU9IzAAuxAwxz3UxCIIxw58n0LC/lXURI/Xs65MxhkHnO3QChFUJvnCxpjLq9FRIv9MDWLx3H0Q42hSUYLhgTcymoSTamqivKdUKIF/6nQuq6x+M91ohcWwfd1YheGmkREKJ2sarWu635+tiyLBn1GPQu2bYO1FsBeNWttPoPaDVPKDVWQNZzd0IiHXN/3LOTOpYESVA8gCYoI5nlmoC6h/uyjUZjVpJCGYWBgvKEINk0DEUHbtud70zQx0Nwt9t1dq5lqgCPiNsrtd9ReWM6DGsDXf5CV5z92XoDkbabRUmwvkOAsFhHUdc3C8gTdEZPdUZcyyQSzOup8MtkcdalTBLUpgtq8ACxgjcQLy0DfAAAAAElFTkSuQmCC",
@@ -694,7 +1023,9 @@ class ParserTest {
     @Test
     fun `Parser can deserialize an Unknown message`() {
         val parser = Parser(encryptionProvider)
-        @Language("JSON") val message = parser.fromJson(
+
+        @Language("JSON")
+        val message = parser.fromJson(
             """
             {
               "some": "invalid message"

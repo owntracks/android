@@ -2,15 +2,13 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
     app:title="@string/preferencesReporting">
     <androidx.preference.SwitchPreferenceCompat
-        app:defaultValue="@bool/valPubExtendedData"
         app:iconSpaceReserved="false"
-        app:key="@string/preferenceKeyPublishExtendedData"
+        app:key="pubExtendedData"
         app:summary="@string/preferencesPubExtendedDataSummary"
         app:title="@string/preferencesPubExtendedData" />
     <androidx.preference.SwitchPreferenceCompat
-        app:defaultValue="@bool/valPublishLocationOnConnect"
         app:iconSpaceReserved="false"
-        app:key="@string/preferenceKeyPublishLocationOnConnect"
+        app:key="publishLocationOnConnect"
         app:summary="@string/preferencesRepublishOnRecconectSummary"
         app:title="@string/preferencesRepublishOnRecconect" />
 </PreferenceScreen>

@@ -2,7 +2,7 @@ package org.owntracks.android.ui.preferences.connection.dialog;
 
 import android.content.Intent;
 
-import org.owntracks.android.support.Preferences;
+import org.owntracks.android.preferences.Preferences;
 
 import timber.log.Timber;
 

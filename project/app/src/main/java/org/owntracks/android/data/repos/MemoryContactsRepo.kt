@@ -8,6 +8,7 @@ import org.greenrobot.eventbus.ThreadMode
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageLocation
+import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.ContactBitmapAndName
 import org.owntracks.android.support.ContactBitmapAndNameMemoryCache
 import org.owntracks.android.support.Events.*
@@ -18,8 +19,9 @@ import javax.inject.Singleton
 @Singleton
 class MemoryContactsRepo @Inject constructor(
     private val eventBus: EventBus,
-    private val contactsBitmapAndNameMemoryCache: ContactBitmapAndNameMemoryCache
-) : ContactsRepo {
+    private val contactsBitmapAndNameMemoryCache: ContactBitmapAndNameMemoryCache,
+    private val preferences: Preferences
+) : ContactsRepo, Preferences.OnPreferenceChangeListener {
 
     private val contacts = mutableMapOf<String, FusedContact>()
     override val all = MutableLiveData(contacts)
@@ -96,16 +98,18 @@ class MemoryContactsRepo @Inject constructor(
     }
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    fun onEventMainThread(@Suppress("UNUSED_PARAMETER") e: ModeChanged?) {
-        clearAll()
-    }
-
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
     fun onEventMainThread(@Suppress("UNUSED_PARAMETER") e: EndpointChanged?) {
         clearAll()
     }
 
     init {
         eventBus.register(this)
+        preferences.registerOnPreferenceChangedListener(this)
+    }
+
+    override fun onPreferenceChanged(properties: List<String>) {
+        if (properties.contains("mode")) {
+            clearAll()
+        }
     }
 }

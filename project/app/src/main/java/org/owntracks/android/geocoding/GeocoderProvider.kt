@@ -3,7 +3,6 @@ package org.owntracks.android.geocoding
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_LOW
@@ -12,8 +11,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
 import org.owntracks.android.R
 import org.owntracks.android.model.messages.MessageLocation
+import org.owntracks.android.preferences.Preferences
+import org.owntracks.android.preferences.types.ReverseGeocodeProvider
 import org.owntracks.android.services.BackgroundService
-import org.owntracks.android.support.Preferences
 import org.owntracks.android.ui.map.MapActivity
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneOffset.UTC
@@ -25,7 +25,7 @@ import javax.inject.Singleton
 @Singleton
 class GeocoderProvider @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val preferences: Preferences
+    private val preferences: Preferences,
 ) {
     private val ioDispatcher = Dispatchers.IO
     private var lastRateLimitedNotificationTime: Instant? = null
@@ -39,11 +39,11 @@ class GeocoderProvider @Inject constructor(
         job = GlobalScope.launch {
             withContext(ioDispatcher) {
                 geocoder = when (preferences.reverseGeocodeProvider) {
-                    Preferences.REVERSE_GEOCODE_PROVIDER_OPENCAGE -> OpenCageGeocoder(
-                        preferences.openCageGeocoderApiKey
+                    ReverseGeocodeProvider.OPENCAGE -> OpenCageGeocoder(
+                        preferences.opencageApiKey
                     )
-                    Preferences.REVERSE_GEOCODE_PROVIDER_DEVICE -> DeviceGeocoder(context)
-                    else -> GeocoderNone()
+                    ReverseGeocodeProvider.DEVICE -> DeviceGeocoder(context)
+                    ReverseGeocodeProvider.NONE -> GeocoderNone()
                 }
             }
         }
@@ -81,7 +81,9 @@ class GeocoderProvider @Inject constructor(
             is GeocodeResult.Fault.IPAddressRejected -> context.getString(R.string.geocoderIPAddressRejected)
             is GeocodeResult.Fault.RateLimited -> context.getString(
                 R.string.geocoderRateLimited,
-                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(UTC).format(result.until)
+                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+                    .withZone(UTC)
+                    .format(result.until)
             )
             is GeocodeResult.Fault.Unavailable -> context.getString(R.string.geocoderUnavailable)
             else -> ""
@@ -106,7 +108,10 @@ class GeocoderProvider @Inject constructor(
             .setContentText(errorNotificationText)
             .setAutoCancel(true)
             .setSmallIcon(R.drawable.ic_owntracks_80)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(errorNotificationText))
+            .setStyle(
+                NotificationCompat.BigTextStyle()
+                    .bigText(errorNotificationText)
+            )
             .setContentIntent(
                 PendingIntent.getActivity(
                     context,
@@ -141,22 +146,17 @@ class GeocoderProvider @Inject constructor(
         }
     }
 
+    val preferenceChangeListener = object : Preferences.OnPreferenceChangeListener {
+        override fun onPreferenceChanged(properties: List<String>) {
+            if (properties.intersect(setOf("reverseGeocodeProvider","opencageApiKey")).isNotEmpty()) {
+                setGeocoderProvider(context, preferences)
+            }
+        }
+    }
+
     init {
         setGeocoderProvider(context, preferences)
-        preferences.registerOnPreferenceChangedListener(object :
-                SharedPreferences.OnSharedPreferenceChangeListener {
-                override fun onSharedPreferenceChanged(
-                    sharedPreferences: SharedPreferences?,
-                    key: String?
-                ) {
-                    if (key == preferences.getPreferenceKey(R.string.preferenceKeyReverseGeocodeProvider) || key == preferences.getPreferenceKey(
-                            R.string.preferenceKeyOpencageGeocoderApiKey
-                        )
-                    ) {
-                        setGeocoderProvider(context, preferences)
-                    }
-                }
-            })
+        preferences.registerOnPreferenceChangedListener(preferenceChangeListener)
         notificationManager = NotificationManagerCompat.from(context)
     }
 

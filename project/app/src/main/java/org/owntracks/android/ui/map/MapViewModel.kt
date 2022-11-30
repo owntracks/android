@@ -24,11 +24,11 @@ import org.owntracks.android.location.toLatLng
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.model.messages.MessageClear
 import org.owntracks.android.model.messages.MessageLocation.Companion.REPORT_TYPE_USER
+import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.services.LocationProcessor
 import org.owntracks.android.services.MessageProcessor
-import org.owntracks.android.services.MessageProcessorEndpointHttp
-import org.owntracks.android.support.MonitoringMode
-import org.owntracks.android.support.Preferences
+import org.owntracks.android.preferences.types.MonitoringMode
+import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.SimpleIdlingResource
 import timber.log.Timber
 import javax.inject.Inject
@@ -44,7 +44,7 @@ class MapViewModel @Inject constructor(
     private val locationRepo: LocationRepo,
     private val waypointsRepo: WaypointsRepo,
     @ApplicationContext private val applicationContext: Context,
-) : ViewModel(), SharedPreferences.OnSharedPreferenceChangeListener {
+) : ViewModel(){
     // controls who the currently selected contact is
     private val mutableCurrentContact = MutableLiveData<FusedContact?>()
     val currentContact: LiveData<FusedContact?>
@@ -99,23 +99,35 @@ class MapViewModel @Inject constructor(
     val currentMonitoringMode: LiveData<MonitoringMode>
         get() = mutableCurrentMonitoringMode
 
-    private val currentConnectionMode: MutableLiveData<Int> by lazy {
+    private val currentConnectionMode: MutableLiveData<ConnectionMode> by lazy {
         MutableLiveData(preferences.mode)
     }
 
-    fun getCurrentConnectionMode(): LiveData<Int> = currentConnectionMode
+    fun getCurrentConnectionMode(): LiveData<ConnectionMode> = currentConnectionMode
 
     val locationIdlingResource = SimpleIdlingResource("locationIdlingResource", false)
 
     val viewMode: ViewMode by locationRepo::viewMode
 
+
+    val preferenceChangeListener = object : Preferences.OnPreferenceChangeListener {
+        override fun onPreferenceChanged(properties: List<String>) {
+            if (properties.contains("monitoring")) {
+                mutableCurrentMonitoringMode.postValue(preferences.monitoring)
+            }
+            if (properties.contains("mode")) {
+                currentConnectionMode.postValue(preferences.mode)
+                clearActiveContact()
+            }
+        }
+    }
     init {
-        preferences.registerOnPreferenceChangedListener(this)
+        preferences.registerOnPreferenceChangedListener(preferenceChangeListener)
     }
 
     override fun onCleared() {
         super.onCleared()
-        preferences.unregisterOnPreferenceChangedListener(this)
+        preferences.unregisterOnPreferenceChangedListener(preferenceChangeListener)
     }
 
     fun onMapReady() {
@@ -205,7 +217,7 @@ class MapViewModel @Inject constructor(
     }
 
     fun contactPeekPopupmenuVisibility(): Boolean =
-        mutableCurrentContact.value?.messageLocation != null || preferences.mode != MessageProcessorEndpointHttp.MODE_ID
+        mutableCurrentContact.value?.messageLocation != null || preferences.mode != ConnectionMode.HTTP
 
     fun contactHasLocation(): Boolean {
         return mutableCurrentContact.value?.messageLocation != null
@@ -308,16 +320,6 @@ class MapViewModel @Inject constructor(
 
         override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
             // noop
-        }
-    }
-
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        when (key) {
-            "monitoring" -> mutableCurrentMonitoringMode.postValue(preferences.monitoring)
-            "mode" -> {
-                currentConnectionMode.postValue(preferences.mode)
-                clearActiveContact()
-            }
         }
     }
 

@@ -1,6 +1,7 @@
 package org.owntracks.android.support
 
 import org.owntracks.android.data.WaypointModel
+import org.owntracks.android.preferences.types.ConnectionMode
 import java.util.*
 
 class Events {
@@ -8,7 +9,6 @@ class Events {
         val date: Date = Date()
     }
 
-    class ModeChanged(val newModeId: Int) : E()
     class MonitoringChanged : E()
     class EndpointChanged : E()
 

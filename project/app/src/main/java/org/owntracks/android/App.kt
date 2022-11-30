@@ -15,25 +15,26 @@ import androidx.work.Configuration
 import androidx.work.WorkerFactory
 import dagger.hilt.EntryPoints
 import dagger.hilt.android.HiltAndroidApp
+import java.security.Security
+import javax.inject.Inject
+import javax.inject.Provider
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.conscrypt.Conscrypt
 import org.owntracks.android.di.CustomBindingComponentBuilder
 import org.owntracks.android.di.CustomBindingEntryPoint
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.logging.TimberInMemoryLogTree
+import org.owntracks.android.preferences.Preferences
+import org.owntracks.android.preferences.types.AppTheme
 import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.services.worker.Scheduler
-import org.owntracks.android.support.Preferences
 import org.owntracks.android.support.RunThingsOnOtherThreads
 import org.owntracks.android.support.SimpleIdlingResource
 import org.owntracks.android.ui.AppShortcuts
 import timber.log.Timber
-import java.security.Security
-import javax.inject.Inject
-import javax.inject.Provider
 
 @HiltAndroidApp
-class App : Application(), Configuration.Provider {
+class App : Application(), Configuration.Provider, Preferences.OnPreferenceChangeListener {
     @Inject
     lateinit var preferences: Preferences
 
@@ -63,11 +64,17 @@ class App : Application(), Configuration.Provider {
         // X509ExtendedTrustManager not available pre-24, fall back to device. https://github.com/google/conscrypt/issues/603
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             Security.insertProviderAt(
-                Conscrypt.newProviderBuilder().provideTrustManager(true).build(), 1
+                Conscrypt.newProviderBuilder()
+                    .provideTrustManager(true)
+                    .build(),
+                1
             )
         } else {
             Security.insertProviderAt(
-                Conscrypt.newProviderBuilder().provideTrustManager(false).build(), 1
+                Conscrypt.newProviderBuilder()
+                    .provideTrustManager(false)
+                    .build(),
+                1
             )
         }
 
@@ -77,9 +84,11 @@ class App : Application(), Configuration.Provider {
 
         super.onCreate()
 
-        val dataBindingComponent = bindingComponentProvider.get().build()
+        val dataBindingComponent = bindingComponentProvider.get()
+            .build()
         val dataBindingEntryPoint = EntryPoints.get(
-            dataBindingComponent, CustomBindingEntryPoint::class.java
+            dataBindingComponent,
+            CustomBindingEntryPoint::class.java
         )
 
         DataBindingUtil.setDefaultComponent(dataBindingEntryPoint)
@@ -104,21 +113,19 @@ class App : Application(), Configuration.Provider {
                     .build()
             )
         }
-        preferences.checkFirstStart()
 
         // Running this on a background thread will deadlock FirebaseJobDispatcher.
         // Initialize will call Scheduler to connect off the main thread anyway.
         runThingsOnOtherThreads.postOnMainHandlerDelayed({ messageProcessor.initialize() }, 510)
 
-        when (preferences.theme) {
-            Preferences.NIGHT_MODE_AUTO -> AppCompatDelegate.setDefaultNightMode(Preferences.SYSTEM_NIGHT_AUTO_MODE)
-            Preferences.NIGHT_MODE_ENABLE -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            Preferences.NIGHT_MODE_DISABLE -> AppCompatDelegate.setDefaultNightMode(
-                AppCompatDelegate.MODE_NIGHT_NO
-            )
-        }
+        preferences.registerOnPreferenceChangedListener(this)
 
-        if (preferences.experimentalFeatures.contains(Preferences.EXPERIMENTAL_FEATURE_ENABLE_APP_SHORTCUTS)) {
+        setThemeFromPreferences()
+
+        if (preferences.experimentalFeatures.contains(
+                Preferences.EXPERIMENTAL_FEATURE_ENABLE_APP_SHORTCUTS
+            )
+        ) {
             appShortcuts.enableLogViewerShortcut(this)
         } else {
             appShortcuts.disableLogViewerShortcut(this)
@@ -128,10 +135,23 @@ class App : Application(), Configuration.Provider {
         createNotificationChannels()
     }
 
+    private fun setThemeFromPreferences() {
+        when (preferences.theme) {
+            AppTheme.AUTO -> AppCompatDelegate.setDefaultNightMode(
+                Preferences.SYSTEM_NIGHT_AUTO_MODE
+            )
+            AppTheme.DARK -> AppCompatDelegate.setDefaultNightMode(
+                AppCompatDelegate.MODE_NIGHT_YES
+            )
+            AppTheme.LIGHT -> AppCompatDelegate.setDefaultNightMode(
+                AppCompatDelegate.MODE_NIGHT_NO
+            )
+        }
+    }
+
     private fun createNotificationChannels() {
         val notificationManager = NotificationManagerCompat.from(this)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-
             // Importance min will show normal priority notification for foreground service. See https://developer.android.com/reference/android/app/NotificationManager#IMPORTANCE_MIN
             // User has to actively configure this in the notification channel settings.
             val ongoingNotificationChannelName =
@@ -149,7 +169,8 @@ class App : Application(), Configuration.Provider {
                 enableVibration(false)
                 setShowBadge(false)
                 setSound(null, null)
-            }.run { notificationManager.createNotificationChannel(this) }
+            }
+                .run { notificationManager.createNotificationChannel(this) }
 
             val eventsNotificationChannelName = if (getString(R.string.events).trim()
                 .isNotEmpty()
@@ -165,7 +186,8 @@ class App : Application(), Configuration.Provider {
                 enableVibration(false)
                 setShowBadge(true)
                 setSound(null, null)
-            }.run { notificationManager.createNotificationChannel(this) }
+            }
+                .run { notificationManager.createNotificationChannel(this) }
 
             val errorNotificationChannelName =
                 if (getString(R.string.notificationChannelErrors).trim()
@@ -177,7 +199,8 @@ class App : Application(), Configuration.Provider {
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
                 lockscreenVisibility = Notification.VISIBILITY_PRIVATE
-            }.run { notificationManager.createNotificationChannel(this) }
+            }
+                .run { notificationManager.createNotificationChannel(this) }
         }
     }
 
@@ -197,4 +220,11 @@ class App : Application(), Configuration.Provider {
                 workManagerFailedToInitialize.postValue(true)
             }
             .build()
+
+    override fun onPreferenceChanged(properties: List<String>) {
+        if (properties.contains(Preferences::theme.name)) {
+            Timber.d("Theme changed. Setting theme to ${preferences.theme}")
+            setThemeFromPreferences()
+        }
+    }
 }

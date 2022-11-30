@@ -17,9 +17,9 @@ import org.jetbrains.annotations.NotNull
 import org.owntracks.android.location.LatLng
 import org.owntracks.android.model.BatteryStatus
 import org.owntracks.android.model.FusedContact
+import org.owntracks.android.preferences.Preferences
+import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.services.WifiInfoProvider
-import org.owntracks.android.support.MonitoringMode
-import org.owntracks.android.support.Preferences
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
@@ -106,7 +106,8 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
     }
 
     private fun notifyContactPropertyChanged() {
-        _contact?.get()?.notifyMessageLocationPropertyChanged()
+        _contact?.get()
+            ?.notifyMessageLocationPropertyChanged()
     }
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -128,24 +129,27 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
 
     override fun addMqttPreferences(preferences: Preferences) {
         topic = preferences.pubTopicLocations
-        qos = preferences.pubQosLocations
+        qos = preferences.pubQosLocations.value
         retained = preferences.pubRetainLocations
     }
 
     companion object {
         @SuppressLint("NewApi")
         @JvmStatic
-        fun fromLocation(location: Location, sdk: Int = Build.VERSION.SDK_INT): MessageLocation = MessageLocation().apply {
-            latitude = location.latitude
-            longitude = location.longitude
-            altitude = location.altitude.roundToInt()
-            accuracy = location.accuracy.roundToInt()
-            timestamp = TimeUnit.MILLISECONDS.toSeconds(location.time)
-            // Convert m/s to km/h
-            velocity = if (location.hasSpeed()) ((location.speed * 3.6).toInt()) else 0
-            verticalAccuracy =
-                if (sdk >= Build.VERSION_CODES.O && location.hasVerticalAccuracy()) location.verticalAccuracyMeters.toInt() else 0
-        }
+        fun fromLocation(location: Location, sdk: Int = Build.VERSION.SDK_INT): MessageLocation =
+            MessageLocation().apply {
+                latitude = location.latitude
+                longitude = location.longitude
+                altitude = location.altitude.roundToInt()
+                accuracy = location.accuracy.roundToInt()
+                timestamp = TimeUnit.MILLISECONDS.toSeconds(location.time)
+                // Convert m/s to km/h
+                velocity = if (location.hasSpeed()) ((location.speed * 3.6).toInt()) else 0
+                verticalAccuracy =
+                    if (sdk >= Build.VERSION_CODES.O && location.hasVerticalAccuracy()) {
+                        location.verticalAccuracyMeters.toInt()
+                    } else 0
+            }
 
         @JvmStatic
         fun fromLocationAndWifiInfo(
@@ -175,5 +179,6 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
     }
 
     private fun Double.roundToSignificantDigits(digits: Int): String =
-        BigDecimal(this).round(MathContext(digits)).toString()
+        BigDecimal(this).round(MathContext(digits))
+            .toString()
 }

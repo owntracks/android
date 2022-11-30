@@ -13,7 +13,7 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 
 import org.owntracks.android.R;
 import org.owntracks.android.location.geofencing.Geofence;
-import org.owntracks.android.services.MessageProcessorEndpointHttp;
+import org.owntracks.android.preferences.types.ConnectionMode;
 import org.owntracks.android.services.MessageProcessorEndpointMqtt;
 
 import java.text.DateFormat;
@@ -84,7 +84,7 @@ public class BindingConversions {
     @BindingAdapter("relativeTimeSpanString")
     public static void setRelativeTimeSpanString(TextView view, long tstSeconds) {
         if (tstSeconds == 0) {
-            view.setText(R.string.valEmpty);
+            view.setText("");
         } else if (DateUtils.isToday(TimeUnit.SECONDS.toMillis(tstSeconds))) {
             view.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(TimeUnit.SECONDS.toMillis(tstSeconds)));
         } else {
@@ -127,11 +127,11 @@ public class BindingConversions {
     }
 
 
-    public static int convertModeIdToLabelResId(int modeId) {
+    public static int convertModeIdToLabelResId(ConnectionMode modeId) {
         switch (modeId) {
-            case MessageProcessorEndpointHttp.MODE_ID:
+            case HTTP:
                 return R.string.mode_http_private_label;
-            case MessageProcessorEndpointMqtt.MODE_ID:
+            case MQTT:
             default:
                 return R.string.mode_mqtt_private_label;
         }

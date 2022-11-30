@@ -35,7 +35,7 @@ import org.owntracks.android.gms.location.toGMSLatLng
 import org.owntracks.android.location.LatLng
 import org.owntracks.android.location.toLatLng
 import org.owntracks.android.support.ContactImageBindingAdapter
-import org.owntracks.android.support.Preferences
+import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.ui.map.osm.OSMMapFragment
 import timber.log.Timber
 

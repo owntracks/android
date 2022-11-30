@@ -8,11 +8,11 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.owntracks.android.support.InMemoryPreferencesStore
+import org.owntracks.android.preferences.InMemoryPreferencesStore
 import org.owntracks.android.support.Parser
-import org.owntracks.android.support.Preferences
-import org.owntracks.android.support.PreferencesGettersAndSetters
-import org.owntracks.android.support.preferences.PreferencesStore
+import org.owntracks.android.preferences.Preferences
+import org.owntracks.android.preferences.PreferencesGettersAndSetters
+import org.owntracks.android.preferences.PreferencesStore
 import org.owntracks.android.ui.NoopAppShortcuts
 import java.net.URI
 
@@ -24,9 +24,7 @@ class LoadViewModelTest {
 
     @Before
     fun createMocks() {
-        mockResources = PreferencesGettersAndSetters.getMockResources()
         mockContext = mock {
-            on { resources } doReturn mockResources
             on { packageName } doReturn javaClass.canonicalName
         }
         preferencesStore = InMemoryPreferencesStore()
@@ -35,7 +33,7 @@ class LoadViewModelTest {
     @Test
     fun `When invalid JSON on an inline owntracks config URL, then the error is correctly set`() {
         val parser = Parser(null)
-        val preferences = Preferences(mockContext, null, preferencesStore, NoopAppShortcuts())
+        val preferences = Preferences(mockContext, preferencesStore, NoopAppShortcuts())
         val vm = LoadViewModel(preferences, parser, InMemoryWaypointsRepo(eventBus))
 
         vm.extractPreferences(URI("owntracks:///config?inline=e30k"))

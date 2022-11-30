@@ -1,15 +1,19 @@
 package org.owntracks.android.ui.preferences
 
 import android.os.Bundle
-import com.takisoft.preferencex.PreferenceFragmentCompat
-import org.owntracks.android.support.Preferences
+import androidx.preference.PreferenceFragmentCompat
 import javax.inject.Inject
+import org.owntracks.android.preferences.PreferenceDataStoreShim
+import org.owntracks.android.preferences.Preferences
 
 abstract class AbstractPreferenceFragment : PreferenceFragmentCompat() {
+
     @Inject
     lateinit var preferences: Preferences
+    @Inject
+    lateinit var preferenceDataStore: PreferenceDataStoreShim
 
-    override fun onCreatePreferencesFix(savedInstanceState: Bundle?, rootKey: String?) {
-        preferenceManager.sharedPreferencesName = preferences.sharedPreferencesName
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        preferenceManager.preferenceDataStore = preferenceDataStore
     }
 }

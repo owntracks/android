@@ -11,7 +11,7 @@ import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.EncryptionProvider
 import org.owntracks.android.support.Parser
-import org.owntracks.android.support.Preferences
+import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
 
 class MessageProcessorEndpointHttpTest {

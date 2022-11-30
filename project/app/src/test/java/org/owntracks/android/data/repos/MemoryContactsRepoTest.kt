@@ -5,7 +5,9 @@ import android.content.res.Resources
 import android.util.DisplayMetrics
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import org.greenrobot.eventbus.EventBus
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -14,10 +16,13 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageLocation
+import org.owntracks.android.preferences.InMemoryPreferencesStore
+import org.owntracks.android.preferences.Preferences
+import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.support.ContactBitmapAndName
 import org.owntracks.android.support.ContactBitmapAndNameMemoryCache
 import org.owntracks.android.support.Events.EndpointChanged
-import org.owntracks.android.support.Events.ModeChanged
+import org.owntracks.android.ui.NoopAppShortcuts
 
 class MemoryContactsRepoTest {
 
@@ -30,6 +35,8 @@ class MemoryContactsRepoTest {
     private lateinit var eventBus: EventBus
     private lateinit var contactBitmapAndNameMemoryCache: ContactBitmapAndNameMemoryCache
     private var contactsRepo: ContactsRepo? = null
+
+    private lateinit var preferences: Preferences
 
     @Before
     fun setup() {
@@ -44,6 +51,7 @@ class MemoryContactsRepoTest {
             on { resources } doReturn mockResources
             on { packageName } doReturn javaClass.canonicalName
         }
+        preferences = Preferences(mockContext, InMemoryPreferencesStore(), NoopAppShortcuts())
 
         messageLocation = MessageLocation()
         messageLocation.accuracy = 10
@@ -56,7 +64,7 @@ class MemoryContactsRepoTest {
 
         contactBitmapAndNameMemoryCache = ContactBitmapAndNameMemoryCache()
 
-        contactsRepo = MemoryContactsRepo(eventBus, contactBitmapAndNameMemoryCache)
+        contactsRepo = MemoryContactsRepo(eventBus, contactBitmapAndNameMemoryCache, preferences)
     }
 
     @Test
@@ -113,7 +121,7 @@ class MemoryContactsRepoTest {
     @Test
     fun `given a non-empty repo, when the mode change event is called, the repo is emptied`() {
         contactsRepo!!.update(CONTACT_ID, messageLocation)
-        (contactsRepo as MemoryContactsRepo?)!!.onEventMainThread(ModeChanged(1))
+        preferences.mode = ConnectionMode.HTTP
         assertTrue(contactsRepo!!.all.value!!.isEmpty())
     }
 

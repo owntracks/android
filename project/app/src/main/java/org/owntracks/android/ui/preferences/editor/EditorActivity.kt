@@ -21,7 +21,6 @@ import org.owntracks.android.ui.base.BaseActivity
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import timber.log.Timber
 import java.util.*
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class EditorActivity :
@@ -83,7 +82,7 @@ class EditorActivity :
             ArrayAdapter(
                 this,
                 android.R.layout.simple_dropdown_item_1line,
-                preferences.importKeys
+                preferences.allConfigKeys.map { it.name }.toList()
             )
         )
         builder.setTitle(R.string.preferencesEditor)
