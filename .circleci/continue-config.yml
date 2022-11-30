@@ -81,7 +81,7 @@ workflows:
     when: << pipeline.parameters.integration-test-required >>
     jobs:
       - unit-test:
-          upload-coverage: false
+          upload-coverage: true
       - ui-tests:
           matrix:
             parameters:
