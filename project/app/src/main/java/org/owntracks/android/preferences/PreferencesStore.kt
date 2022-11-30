@@ -3,11 +3,11 @@ package org.owntracks.android.preferences
 import android.content.SharedPreferences
 import kotlin.reflect.KProperty
 import kotlin.reflect.typeOf
+import org.owntracks.android.preferences.types.AppTheme
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.preferences.types.MqttProtocolLevel
 import org.owntracks.android.preferences.types.MqttQos
-import org.owntracks.android.preferences.types.AppTheme
 import org.owntracks.android.preferences.types.ReverseGeocodeProvider
 import org.owntracks.android.preferences.types.StringMaxTwoAlphaNumericChars
 import org.owntracks.android.ui.map.MapLayerStyle
@@ -125,7 +125,7 @@ abstract class PreferencesStore :
      * @param value the value to be set
      */
     operator fun <T> setValue(preferences: Preferences, property: KProperty<*>, value: T) {
-        setValueWithoutNotifying(preferences,property,value)
+        setValueWithoutNotifying(preferences, property, value)
         preferences.notifyChanged(property)
     }
 
