@@ -2,7 +2,6 @@ package org.owntracks.android.preferences
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.os.Build
 import androidx.preference.PreferenceManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -29,35 +28,41 @@ class SharedPreferencesStore @Inject constructor(@ApplicationContext private val
             "org.owntracks.android.preferences.http"
         )
         with(sharedPreferences.edit()) {
-            oldSharedPreferenceNames
-                .map { context.getSharedPreferences(it, Context.MODE_PRIVATE) }
-                .filter { it.all.isNotEmpty() }
-                .forEach {
-                    it.all.forEach { (key, value) ->
-                        Timber.d("Migrating legacy preference $key from $it")
-                        when (value) {
-                            is String -> putString(key, value)
-                            is Set<*> -> putStringSet(key, value as Set<String>)
-                            is Boolean -> putBoolean(key, value)
-                            is Int -> putInt(key, value)
-                            is Long -> putLong(key, value)
-                            is Float -> putFloat(key, value)
+            val nonEmptyLegacyPreferences =
+                oldSharedPreferenceNames
+                    .map { context.getSharedPreferences(it, Context.MODE_PRIVATE) }
+                    .filter { it.all.isNotEmpty() }
+                    .also {
+                        it.forEach {
+                            it.all.forEach { (key, value) ->
+                                Timber.d("Migrating legacy preference $key from $it")
+                                when (value) {
+                                    is String -> putString(key, value)
+                                    is Set<*> -> putStringSet(key, value as Set<String>)
+                                    is Boolean -> putBoolean(key, value)
+                                    is Int -> putInt(key, value)
+                                    is Long -> putLong(key, value)
+                                    is Float -> putFloat(key, value)
+                                }
+                            }
                         }
                     }
-                }
+                    .isNotEmpty()
             if (commit()) {
-                oldSharedPreferenceNames.forEach {
-                    context.getSharedPreferences(it, Context.MODE_PRIVATE)
-                        .edit()
-                        .clear()
-                        .apply()
-                }
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                if (nonEmptyLegacyPreferences) {
+                    /* Running edit / clear / apply will actually create the preference file, which we don't want to do
+                     if they didn't exist in the first place */
                     oldSharedPreferenceNames.forEach {
-                        val deleted = context.deleteSharedPreferences(it)
-                        if (!deleted) {
-                            Timber.e("Failed to delete shared preference $it")
-                        }
+                        context.getSharedPreferences(it, Context.MODE_PRIVATE)
+                            .edit()
+                            .clear()
+                            .apply()
+                    }
+                }
+                oldSharedPreferenceNames.forEach {
+                    val deleted = context.deleteSharedPreferences(it)
+                    if (!deleted) {
+                        Timber.e("Failed to delete shared preference $it")
                     }
                 }
             }
@@ -110,7 +115,8 @@ class SharedPreferencesStore @Inject constructor(@ApplicationContext private val
     }
 
     override fun getStringSet(key: String, defaultValues: Set<String>): Set<String> =
-        sharedPreferences.getStringSet(key, defaultValues)?.toSortedSet() ?: defaultValues.toSortedSet()
+        sharedPreferences.getStringSet(key, defaultValues)
+            ?.toSortedSet() ?: defaultValues.toSortedSet()
 
     override fun hasKey(key: String): Boolean =
         sharedPreferences.contains(key)
