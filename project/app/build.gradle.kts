@@ -10,14 +10,8 @@ plugins {
 
 apply<EspressoScreenshotsPlugin>()
 
-val googleMapsAPIKey = extra.get("google_maps_api_key")?.toString() ?: "PLACEHOLDER_API_KEY"
-val rootJacocoVersion = "0.8.7"
-
-jacoco {
-    version = rootJacocoVersion
-    toolVersion = rootJacocoVersion
-}
-
+val googleMapsAPIKey = extra.get("google_maps_api_key")
+    ?.toString() ?: "PLACEHOLDER_API_KEY"
 
 val gmsImplementation: Configuration by configurations.creating
 val numShards = System.getenv("CIRCLE_NODE_TOTAL") ?: "0"
@@ -132,9 +126,6 @@ android {
             isIncludeAndroidResources = true
         }
     }
-    testCoverage {
-        jacocoVersion = rootJacocoVersion
-    }
 
     tasks.withType<Test> {
         testLogging {
@@ -179,12 +170,16 @@ kapt {
 tasks.withType<Test> {
     systemProperties["junit.jupiter.execution.parallel.enabled"] = true
     systemProperties["junit.jupiter.execution.parallel.mode.default"] = "concurrent"
-    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).takeIf { it > 0 } ?: 1
+    maxParallelForks = (
+        Runtime.getRuntime()
+            .availableProcessors() / 2
+        ).takeIf { it > 0 } ?: 1
 }
 
-tasks.withType<JavaCompile>().configureEach {
-    options.isFork = true
-}
+tasks.withType<JavaCompile>()
+    .configureEach {
+        options.isFork = true
+    }
 
 dependencies {
     implementation(libs.bundles.kotlin)
@@ -248,7 +243,6 @@ dependencies {
     androidTestUtil(libs.bundles.androidx.test.util)
 }
 
-
 // Publishing
 val serviceAccountCredentials = file("owntracks-android-gcloud-creds.json")
 
@@ -276,8 +270,13 @@ androidComponents {
         val minusOne = System.getenv("MAKE_APK_SAME_VERSION_CODE_AS_GOOGLE_PLAY")
         if (!minusOne.isNullOrEmpty()) {
             for (output in variant.outputs) {
-                output.versionCode.set(codesTask.flatMap { it.outCode }
-                    .map { it.asFile.readText().toInt() })
+                output.versionCode.set(
+                    codesTask.flatMap { it.outCode }
+                        .map {
+                            it.asFile.readText()
+                                .toInt()
+                        }
+                )
             }
         }
     }
