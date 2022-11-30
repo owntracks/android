@@ -63,7 +63,7 @@ interface DefaultsProvider {
             Preferences::publishLocationOnConnect -> false
             Preferences::cmd -> true
             Preferences::remoteConfiguration -> false
-            Preferences::setupCompleted -> true
+            Preferences::setupCompleted -> false
             Preferences::showRegionsOnMap -> false
             Preferences::sub -> true
             Preferences::subQos -> MqttQos.TWO
