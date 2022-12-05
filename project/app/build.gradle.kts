@@ -28,7 +28,7 @@ android {
         versionCode = 20411000
         versionName = "2.4.11"
 
-        val locales = listOf("en", "de", "fr", "es", "ru", "ca", "pl", "cs", "ja", "pt", "zh", "da")
+        val locales = listOf("en", "de", "fr", "es", "ru", "ca", "pl", "cs", "ja", "pt", "zh", "da", "tr")
         buildConfigField(
             "String[]",
             "TRANSLATION_ARRAY",
