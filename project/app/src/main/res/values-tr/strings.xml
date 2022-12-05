@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="aboutFeedbackCategoryTitle">"Geri Bildirim"</string>
+    <string name="aboutIssuesSummary">"File on GitHub"</string>
+    <string name="aboutIssuesTitle">"Report an issue"</string>
+    <string name="aboutLicense">"Lisans"</string>
+    <string name="aboutSourceCodeSummary">"on GitHub"</string>
+    <string name="aboutTranslations">"Help translate this app"</string>
+    <plurals name="aboutTranslationsSummary">
+        <item quantity="one">"Currently available in %1$d language!"</item>
+        <item quantity="other">"Currently available in %1$d languages!"</item>
+    </plurals>
+    <string name="accept">"Kabul et"</string>
+    <string name="addWaypoint">"Add waypoint"</string>
+    <string name="aLocation">"bölge"</string>
+    <string name="app_name">"OwnTracks"</string>
+    <string name="backgroundLocationRestrictionNotificationText">"This version of Android restricts OwnTracks from receiving locations when started in the background until the app is opened. Click this notification to open the app and start tracking location."</string>
+    <string name="backgroundLocationRestrictionNotificationTitle">"Location Tracking Paused"</string>
+    <string name="batteryOptimizationWhitelistDialogButtonLabel">"Battery optimization settings"</string>
+    <string name="batteryOptimizationWhitelistDialogMessage">"Whitelisting OwnTracks from battery optimization may help it more reliably track locations and maintain contact with the server."</string>
+    <string name="batteryOptimizationWhitelistDialogTitle">"Battery Optimization"</string>
+    <string name="cancel">"İptal"</string>
+    <string name="clear_log">"Temizle"</string>
+    <string name="configurationManagement">"Konfigürasyon yönetimi"</string>
+    <string name="CONNECTED">"Bağlandı"</string>
+    <string name="CONNECTING">"Bağlanıyor"</string>
+    <string name="contact_image">"Contact Image"</string>
+    <string name="contactDetailsAccuracy">"Accuracy"</string>
+    <string name="contactDetailsAccuracyValue">"%d m"</string>
+    <string name="contactDetailsAltitude">"Altitude"</string>
+    <string name="contactDetailsAltitudeValue">"%,d m"</string>
+    <string name="contactDetailsBattery">"Battery"</string>
+    <string name="contactDetailsBatteryValue">"%d %%"</string>
+    <string name="contactDetailsBearing">"Bearing"</string>
+    <string name="contactDetailsBearingValue">"%,.0f°"</string>
+    <string name="contactDetailsDistance">"Mesafe"</string>
+    <string name="contactDetailsDistanceUnitKilometres">"km"</string>
+    <string name="contactDetailsDistanceUnitMeters">"m"</string>
+    <string name="contactDetailsDistanceValue">"%1$,.2f %2$s"</string>
+    <string name="contactDetailsSpeed">"Hız"</string>
+    <string name="contactDetailsSpeedValue">"%d kph"</string>
+    <string name="contactDetailsTopic">"Identifier"</string>
+    <string name="contactDetailsTrackerId">"Tracker ID"</string>
+    <string name="contactLocationUnknown">"No location is available"</string>
+    <string name="currentLocationButtonLabel">"Current location"</string>
+    <string name="description">"Description"</string>
+    <string name="deviceLocationDisabledDialogMessage">"Location services on this device are currently disabled, so OwnTracks is unable to track your current location.
+
+To allow this, please enable Location in the device settings."</string>
+    <string name="deviceLocationDisabledDialogPositiveButtonLabel">"Location Settings"</string>
+    <string name="deviceLocationDisabledDialogTitle">"Device location disabled"</string>
+    <string name="DISCONNECTED">"Disconnected"</string>
+    <string name="DISCONNECTED_USERDISCONNECT">"Disconnected"</string>
+    <string name="DISCONNECTING">"Disconnecting"</string>
+    <string name="divider">"Divider"</string>
+    <string name="done_heading">"Tamamlandı"</string>
+    <string name="enjoy_description">"Select preferences from the menu (or use the link below) and configure OwnTracks for your server before using it"</string>
+    <string name="ERROR">"Error"</string>
+    <string name="ERROR_CONFIGURATION">"Configuration incomplete"</string>
+    <string name="ERROR_DATADISABLED">"Data connection not available"</string>
+    <string name="errorPreferencesImportFailed">"Import failed"</string>
+    <string name="events">"Etkinlikler"</string>
+    <string name="exportConfiguration">"Dışa aktar"</string>
+    <string name="exportConfigurationSubject">"OwnTracks Configuration File"</string>
+    <string name="exportLogFilePrompt">"Export log file"</string>
+    <string name="exportLogFileSubject">"OwnTracks Log File"</string>
+    <string name="exportWaypointsToEndpoint">"Publish Waypoints"</string>
+    <string name="fixProblemLabel">"Düzelt"</string>
+    <string name="geocoderDisabled">"Geocoder service is disabled"</string>
+    <string name="geocoderError">"An error was received from the geocoder service: %s"</string>
+    <string name="geocoderExceptionError">"An error was received from the geocoder service. Check the logs for more details"</string>
+    <string name="geocoderIPAddressRejected">"The client IP address was rejected"</string>
+    <string name="geocoderProblemNotificationTitle">"Geocoder Problem"</string>
+    <string name="geocoderRateLimited">"Geocoder service has been rate limited. Not retrying until %s"</string>
+    <string name="geocoderUnavailable">"Geocoder service is temporarily unavailable"</string>
+    <string name="icon_description_done">"Tamamlandı"</string>
+    <string name="icon_description_owntracks">"OwnTracks"</string>
+    <string name="icon_description_warning">"Uyarı"</string>
+    <string name="IDLE">"Boşta"</string>
+    <string name="importConfig">"İçe aktar"</string>
+    <string name="INITIAL">"Başlatılıyor"</string>
+    <string name="latitude">"Enlem"</string>
+    <string name="locationPermissionNotGrantedNotification">"Location permission not granted"</string>
+    <string name="locationPermissionRequestDialogMessage">"To track your current location, please grant OwnTracks location permissions."</string>
+    <string name="locationPermissionRequestDialogTitle">"Location permission request"</string>
+    <string name="logViewerActivityTitle">"Logs"</string>
+    <string name="longitude">"Boylam"</string>
+    <string name="mapLayerDialogTitle">"Harita Katmanları"</string>
+    <string name="mapLayerGoogleMapDefaultLabel">"Google Default"</string>
+    <string name="mapLayerGoogleMapHybridLabel">"Google Hybrid"</string>
+    <string name="mapLayerGoogleMapTerrainLabel">"Google Terrain"</string>
+    <string name="mapLayerOpenStreetMapLabel">"OpenStreetMap"</string>
+    <string name="mapLayerOpenStreetMapWikimediaLabel">"Wikimedia"</string>
+    <string name="menuClear">"Temizle"</string>
+    <string name="menuContactNavigate">"Navigate"</string>
+    <string name="mode_heading">"Mod"</string>
+    <string name="mode_http_private_label">"HTTP"</string>
+    <string name="mode_mqtt_private_label">"MQTT"</string>
+    <string name="monitoring_manual">"Manual monitoring mode"</string>
+    <string name="monitoring_move">"Move monitoring mode"</string>
+    <string name="monitoring_quiet">"Quiet monitoring mode"</string>
+    <string name="monitoring_significant">"Significant changes monitoring mode"</string>
+    <string name="monitoringModeDialogManualDescription">"Only region transitions published automatically, not locations"</string>
+    <string name="monitoringModeDialogManualTitle">"Manual"</string>
+    <string name="monitoringModeDialogMoveDescription">"High frequency and accuracy, but high power usage"</string>
+    <string name="monitoringModeDialogMoveTitle">"Move"</string>
+    <string name="monitoringModeDialogQuietDescription">"No events automatically published"</string>
+    <string name="monitoringModeDialogQuietTitle">"Quiet"</string>
+    <string name="monitoringModeDialogSignificantDescription">"Balanced power usage and accuracy / frequency"</string>
+    <string name="monitoringModeDialogSignificantTitle">"Significant Changes"</string>
+    <string name="monitoringModeDialogTitle">"Monitoring Mode"</string>
+    <string name="na">"Not available"</string>
+    <string name="next">"İleri"</string>
+    <string name="noBrowserInstalled">"No suitable browser installed"</string>
+    <string name="noNavigationApp">"no suitable app installed"</string>
+    <string name="notificationChangeMonitoring">"Change Monitoring"</string>
+    <string name="notificationChannelErrors">"Hatalar"</string>
+    <string name="notificationChannelEventsDescription">"Region transmissions"</string>
+    <string name="notificationChannelOngoing">"Ongoing"</string>
+    <string name="notificationChannelOngoingDescription">"Required to receive location updates in the background"</string>
+    <plurals name="notificationEventsTitle">
+        <item quantity="one">"%1$d new event"</item>
+        <item quantity="other">"%1$d new events"</item>
+    </plurals>
+    <string name="play_services_not_available">"Google Play Services are not available"</string>
+    <string name="play_services_now_available">"Google Play Services are now available"</string>
+    <string name="play_services_update_required">"Google Play Services update is required"</string>
+    <string name="preferencesAdvanced">"Advanced"</string>
+    <string name="preferencesAdvancedAutostartWarning">"This version of Android restricts OwnTracks from receiving locations when automatically started on device boot until the app is opened."</string>
+    <string name="preferencesAutostart">"Autostart"</string>
+    <string name="preferencesAutostartSummary">"Automatically start on device boot"</string>
+    <string name="preferencesBrokerPassword">"Password"</string>
+    <string name="preferencesCaCrtPath">"CA certificate"</string>
+    <string name="preferencesCategoryAdvancedEncryption">"Encryption"</string>
+    <string name="preferencesCategoryAdvancedLocator">"Locator"</string>
+    <string name="preferencesCategoryAdvancedMisc">"Çeşitli"</string>
+    <string name="preferencesCategoryAdvancedServices">"Servisler"</string>
+    <string name="preferencesCategoryNotificationBackground">"Arka plan bildirimleri"</string>
+    <string name="preferencesCategoryNotificationErrors">"Hatalar &amp; Konular"</string>
+    <string name="preferencesCategoryNotificationOngoing">"Ongoing notification"</string>
+    <string name="preferencesChangelog">"Değişiklik günlüğü"</string>
+    <string name="preferencesCleanSessionEnabled">"Temiz Oturum"</string>
+    <string name="preferencesClientCrtPassword">"Client certificate password"</string>
+    <string name="preferencesClientCrtPath">"Client certificate"</string>
+    <string name="preferencesClientId">"Client ID"</string>
+    <string name="preferencesDebugLog">"Debug log"</string>
+    <string name="preferencesDeviceName">"Device ID"</string>
+    <string name="preferencesDocumentation">"Documentation"</string>
+    <string name="preferencesEditor">"Editör"</string>
+    <string name="preferencesEditorDescription">"Set a single value for the specified key. Some changes might require an restart of the app."</string>
+    <string name="preferencesEditorKey">"Key"</string>
+    <string name="preferencesEditorKeyError">"Invalid key specified"</string>
+    <string name="preferencesEditorValue">"Value"</string>
+    <string name="preferencesEditorValueError">"Invalid value specified"</string>
+    <string name="preferencesEnableMapRotation">"Enable Map Rotation"</string>
+    <string name="preferencesEnableMapRotationSummary">"Allow the map to be rotated"</string>
+    <string name="preferencesEncryptionKey">"Encryption Key"</string>
+    <string name="preferencesEncryptionKeyDialogMessage">"Encryption key is cut off after 32 characters."</string>
+    <string name="preferencesEncryptionKeySummary">"Symmetric key for payload encryption"</string>
+    <string name="preferencesExperimental">"Experimental"</string>
+    <string name="preferencesExportFailed">"Preferences export failed"</string>
+    <string name="preferencesExportSuccess">"Dışa aktarma başarılı"</string>
+    <string name="preferencesHost">"Host"</string>
+    <string name="preferencesIdentification">"Identification"</string>
+    <string name="preferencesIgnoreInaccurateLocations">"Inaccurate locations"</string>
+    <string name="preferencesIgnoreInaccurateLocationsDialog">"Ignore location, if the accuracy is greater than the given meters"</string>
+    <string name="preferencesIgnoreInaccurateLocationsSummary">"Ignore inaccurate locations"</string>
+    <string name="preferencesKeepalive">"Keepalive"</string>
+    <string name="preferencesKeepaliveValidationError">"Keepalive should be a minimum of %d"</string>
+    <string name="preferencesLicenses">"Kütüphaneler"</string>
+    <string name="preferencesLicensesSummary">"Thanks to the authors of included libraries"</string>
+    <string name="preferencesLoadFailed">"Unable to load effective configuration"</string>
+    <string name="preferencesLocatorDisplacement">"Minimal location displacement"</string>
+    <string name="preferencesLocatorDisplacementDialog">"How far should the device travel (in metres) before receiving another location"</string>
+    <string name="preferencesLocatorDisplacementSummary">"Minimum distance between location updates"</string>
+    <string name="preferencesLocatorInterval">"Location interval"</string>
+    <string name="preferencesLocatorIntervalDialog">"How often should locations be requested from the device (seconds)"</string>
+    <string name="preferencesLocatorIntervalSummary">"Interval between location updates"</string>
+    <string name="preferencesMap">"Map"</string>
+    <string name="preferencesMoveModeLocatorInterval">"Location interval (Move mode)"</string>
+    <string name="preferencesMoveModeLocatorIntervalDialog">"How often should locations be requested from the device whilst in Move mode (seconds)"</string>
+    <string name="preferencesMoveModeLocatorIntervalSummary">"Interval between location updates in Move mode"</string>
+
+    <!-- Fuzzy -->
+    <string name="preferencesNotification">"Bildirimler"</string>
+
+    <!-- Fuzzy -->
+    <string name="preferencesNotificationEvents">"Etkinlikler"</string>
+
+    <!-- Fuzzy -->
+    <string name="preferencesNotificationEventsSummary">"Notify about received events"</string>
+    <string name="preferencesNotificationGeocoderErrors">"Geocoder errors"</string>
+    <string name="preferencesNotificationGeocoderErrorsSummary">"Display geocoder errors, rate limits &amp; quota exceeded events"</string>
+
+    <!-- Fuzzy -->
+    <string name="preferencesNotificationLocation">"Last reported location"</string>
+    <string name="preferencesNotificationLocationSummary">"Display last reported location and time"</string>
+    <string name="preferencesOpencageGeocoderApiKey">"OpenCage API Key"</string>
+    <string name="preferencesOpencageGeocoderApiKeyDialog">"If set OpenCage is used to resolve location adresses instead of Google. Requires restart."</string>
+    <string name="preferencesOpencageGeocoderApiKeySummary">"API key for OpenCage Reverse Geocoder"</string>
+    <string name="preferencesParameters">"Parameters"</string>
+    <string name="preferencesPegLocatorFastestIntervalToInterval">"Limit max locator frequency"</string>
+    <string name="preferencesPegLocatorFastestIntervalToIntervalSummary">"Request that the location provider deliver updates no faster than the requested locator interval"</string>
+    <string name="preferencesPort">"Port"</string>
+    <string name="preferencesProfileId">"Mod"</string>
+    <string name="preferencesPubExtendedData">"Extended data"</string>
+    <string name="preferencesPubExtendedDataSummary">"Include extended data in location reports"</string>
+    <string name="preferencesRemoteCommand">"Remote commands"</string>
+    <string name="preferencesRemoteCommandSummary">"Enable remote commands"</string>
+    <string name="preferencesRemoteConfiguration">"Remote configuration"</string>
+    <string name="preferencesRemoteConfigurationSummary">"Enable configuration to be updated remotely (requires remote commands)"</string>
+    <string name="preferencesReporting">"Reporting"</string>
+    <string name="preferencesRepository">"Source Code"</string>
+    <string name="preferencesRepublishOnRecconect">"Publish location on MQTT connect"</string>
+    <string name="preferencesRepublishOnRecconectSummary">"Publish the last known location and current extended data immediately on connecting to MQTT"</string>
+    <string name="preferencesReverseGeocodeProvider">"Reverse Geocode Provider"</string>
+    <string name="preferencesSecurity">"Security"</string>
+    <string name="preferencesServer">"Connection"</string>
+    <string name="preferencesShowRegionsOnMap">"Show Regions"</string>
+    <string name="preferencesShowRegionsOnMapSummary">"Draw region circles on the map"</string>
+    <string name="preferencesTheme">"Theme"</string>
+    <string name="preferencesTrackerId">"Tracker ID"</string>
+    <string name="preferencesTwitter" translatable="false">"Twitter"</string>
+    <string name="preferencesMastodon" translatable="false">"Mastodon"</string>
+    <string name="preferencesUrl" translatable="false">"URL"</string>
+    <string name="preferencesUserUsername">"Username"</string>
+    <string name="preferencesWebsocket">"Use WebSockets"</string>
+    <string name="publish">"Report"</string>
+    <string name="radius">"Radius"</string>
+    <string name="reconnect">"Reconnect"</string>
+    <string name="region_inside">"Currently inside"</string>
+    <string name="region_outside">"Currently outside"</string>
+    <string name="region_unknown">"Status unknown"</string>
+    <string name="save">"Kaydet"</string>
+    <string name="seconds">"Saniye"</string>
+    <string name="select">"Seç"</string>
+    <string name="show_options">"Seçenekleri göster"</string>
+    <string name="status_background_service_started_hint">"Background service started"</string>
+    <string name="status_battery_optimization_whitelisted_hint">"Battery optimization whitelisted"</string>
+    <string name="status_endpoint_queue_hint">"Endpoint queue"</string>
+    <string name="status_endpoint_state_hint">"Endpoint state"</string>
+    <string name="status_endpoint_state_message_hint">"Endpoint state message"</string>
+    <string name="status_last_background_update_hint">"Location service last background update"</string>
+    <string name="statusBatteryDozeWhiteListDisabled">"Hayır"</string>
+    <string name="statusBatteryDozeWhiteListEnabled">"Evet"</string>
+    <string name="title_activity_about">"Hakkında"</string>
+    <string name="title_activity_contacts">"Arkadaşlar"</string>
+    <string name="title_activity_load">"İçe Aktar"</string>
+    <string name="title_activity_map">"Harita"</string>
+    <string name="title_activity_preferences">"Tercihler"</string>
+    <string name="title_activity_region">"Bölge"</string>
+    <string name="title_activity_regions">"Bölgeler"</string>
+    <string name="title_activity_status">"Durum"</string>
+    <string name="title_exit">"Uygulamadan çık"</string>
+    <string name="tls" translatable="false">"TLS"</string>
+    <string name="transitionEntering">"enters"</string>
+    <string name="transitionLeaving">"leaves"</string>
+    <string name="unableToCopyCertificate">"Unable to copy certificate to internal storage"</string>
+    <string name="version">"Versiyon"</string>
+    <string name="viewLogs">"Günlükleri Görüntüle"</string>
+    <string name="waypointListPlaceholder">"No regions defined yet"</string>
+    <string name="welcome_connection_setup_description">"OwnTracks works by sending your location data to a server that you (or someone you trust) owns, making sure you remain in control of your data.
+
+Make sure you know the connection details of your server, whether it's accessible over HTTPS or MQTT and any login credentials.
+
+Once you've completed this welcome section, you'll need to configure the application with details of the server, available in Preferences→Connection.
+
+For more details, take a look at the OwnTracks Booklet."</string>
+    <string name="welcome_connection_setup_learn_more_button_label">"Open Booklet"</string>
+    <string name="welcome_connection_setup_title">"Set up a connection"</string>
+    <string name="welcome_description">"The following steps will help you to get started with OwnTracks"</string>
+    <string name="welcome_finish_open_preferences_button_label">"Open Preferences"</string>
+    <string name="welcome_heading">"Welcome"</string>
+    <string name="welcome_play_description">"OwnTracks requires Google Play Services"</string>
+    <string name="welcome_play_heading">"Google Play Services"</string>
+    <string name="welcome_version_description">"Due to OS limitations, some features might work in a restricted manner.
+
+A permanent notification will be shown to keep running in the background. It can be disabled in the systems notification preferences."</string>
+    <string name="welcome_version_learn_more">"Learn more"</string>
+    <string name="welcome_version_title">"Restrictions"</string>
+    <string name="welcomeFixIssue">"Fix"</string>
+    <string name="workmanagerInitializationErrorDialogMessage">"Some components failed to initialize properly, so OwnTracks may not work properly. It may be necessary to re-install the application or clear the user data.
+
+Please check the logs for more details."</string>
+    <string name="workmanagerInitializationErrorDialogOpenSettingsLabel">"Open Application Settings"</string>
+    <string name="workmanagerInitializationErrorDialogTitle">"Initialization Error"</string>
+</resources>
