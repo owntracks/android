@@ -6,7 +6,9 @@ data class StringMaxTwoAlphaNumericChars(@JsonValue private val input: String) {
     val value: String
 
     init {
-        value = input.filter { Character.isLetterOrDigit(it) }.toString().substring(0, 2)
+        value = input.filter { Character.isLetterOrDigit(it) }
+            .toString()
+            .take(2)
     }
 
     override fun toString(): String {
