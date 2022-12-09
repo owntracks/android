@@ -765,6 +765,7 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
 
     @Override
     public IBinder onBind(Intent intent) {
+        super.onBind(intent);
         Timber.d("Background service bound");
         return localServiceBinder;
     }
