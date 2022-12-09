@@ -178,7 +178,7 @@ class OSMMapFragment internal constructor(
         override fun destroy() {}
 
         private fun Context.safeGetDisplay(): Display? {
-            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 display
             } else {
                 ((getSystemService(Context.DISPLAY_SERVICE)) as DisplayManager).displays.firstOrNull()
