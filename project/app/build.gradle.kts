@@ -244,7 +244,7 @@ dependencies {
 
     androidTestUtil(libs.bundles.androidx.test.util)
 
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.1.5")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.0")
 }
 
 // Publishing
