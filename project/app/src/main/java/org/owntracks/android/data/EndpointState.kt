@@ -1,8 +1,9 @@
 package org.owntracks.android.data
 
 import android.content.Context
-import org.eclipse.paho.client.mqttv3.MqttException
 import java.util.*
+import org.eclipse.paho.client.mqttv3.MqttException
+import org.owntracks.android.R
 
 enum class EndpointState {
     INITIAL, IDLE, CONNECTING, CONNECTED, DISCONNECTED, ERROR, ERROR_DATADISABLED, ERROR_CONFIGURATION;
@@ -30,13 +31,17 @@ enum class EndpointState {
         return this
     }
 
-    fun getLabel(context: Context): String {
-        val res = context.resources
-        val resId = res.getIdentifier(name, "string", context.packageName)
-        return if (0 != resId) {
-            res.getString(resId)
-        } else name
-    }
+    fun getLabel(context: Context): String =
+        when (this) {
+            INITIAL -> context.resources.getString(R.string.INITIAL)
+            IDLE -> context.resources.getString(R.string.IDLE)
+            CONNECTING -> context.resources.getString(R.string.CONNECTING)
+            CONNECTED -> context.resources.getString(R.string.CONNECTED)
+            DISCONNECTED -> context.resources.getString(R.string.DISCONNECTED)
+            ERROR -> context.resources.getString(R.string.ERROR)
+            ERROR_DATADISABLED -> context.resources.getString(R.string.ERROR_DATADISABLED)
+            ERROR_CONFIGURATION -> context.resources.getString(R.string.ERROR_CONFIGURATION)
+        }
 
     fun withError(error: Throwable): EndpointState {
         this.error = error
