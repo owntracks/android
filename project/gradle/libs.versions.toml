@@ -70,7 +70,6 @@ jackson-threetenbp = { module = "com.github.joschi.jackson:jackson-datatype-thre
 threetenbp = { module = "org.threeten:threetenbp", version.ref = "threetenbp" }
 
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
-kotlin-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutines" }
 kotlin-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlin-coroutines" }
 
 jaxb-core = { module = "com.sun.xml.bind:jaxb-core", version.ref = "jaxb" }
@@ -124,7 +123,7 @@ bouncycastle = { module = "org.bouncycastle:bcprov-jdk14", version.ref = "bouncy
 
 [bundles]
 jackson = ["jackson-core", "jackson-databind", "jackson-module-kotlin", "jackson-datatype-jsr310", "jackson-threetenbp", "threetenbp"]
-kotlin = ["kotlin-coroutines-core", "kotlin-coroutines-android", "kotlin-reflect"]
+kotlin = ["kotlin-coroutines-android", "kotlin-reflect"]
 jaxb-annotation-processors = ["jaxb-api", "jaxb-core", "jaxb-impl"]
 kapt-hilt = ["hilt-compiler", "hilt-androidx"]
 hilt = ["hilt-android", "hilt-work"]
