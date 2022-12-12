@@ -34,8 +34,8 @@ import org.owntracks.android.databinding.GoogleMapFragmentBinding
 import org.owntracks.android.gms.location.toGMSLatLng
 import org.owntracks.android.location.LatLng
 import org.owntracks.android.location.toLatLng
-import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.preferences.Preferences
+import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.ui.map.osm.OSMMapFragment
 import timber.log.Timber
 
@@ -149,9 +149,10 @@ class GoogleMapFragment internal constructor(
 
             setMapStyle()
 
-            viewModel.initMapStartingLocation().run {
-                moveCamera(toCameraUpdate())
-            }
+            viewModel.initMapStartingLocation()
+                .run {
+                    moveCamera(toCameraUpdate())
+                }
 
             setOnMarkerClickListener {
                 it.tag?.run {
@@ -187,8 +188,10 @@ class GoogleMapFragment internal constructor(
             }
 
             // We need to specifically re-draw any contact markers and regions now that we've re-init the map
-            viewModel.allContacts.value?.values?.toSet()?.run(::updateAllMarkers)
-            viewModel.regions.value?.toSet()?.run(::drawRegions)
+            viewModel.allContacts.value?.values?.toSet()
+                ?.run(::updateAllMarkers)
+            viewModel.regions.value?.toSet()
+                ?.run(::drawRegions)
         }
     }
 
@@ -208,13 +211,15 @@ class GoogleMapFragment internal constructor(
                 addMarker(
                     MarkerOptions()
                         .position(latLng.toGMSLatLng())
-                        .anchor(0.5f, 0.5f).visible(false)
+                        .anchor(0.5f, 0.5f)
+                        .visible(false)
                 )!!.also { it.tag = id }
-            }.run {
-                position = latLng.toGMSLatLng()
-                setIcon(BitmapDescriptorFactory.fromBitmap(image))
-                isVisible = true
             }
+                .run {
+                    position = latLng.toGMSLatLng()
+                    setIcon(BitmapDescriptorFactory.fromBitmap(image))
+                    isVisible = true
+                }
         }
     }
 
@@ -273,16 +278,24 @@ class GoogleMapFragment internal constructor(
                 regions.forEach { region ->
                     RegionOnMap(
                         MarkerOptions().apply {
-                            position(region.location.toLatLng().toGMSLatLng())
+                            position(
+                                region.location.toLatLng()
+                                    .toGMSLatLng()
+                            )
                             anchor(0.5f, 1.0f)
                             title(region.description)
-                        }.let { addMarker(it)!! },
+                        }
+                            .let { addMarker(it)!! },
                         CircleOptions().apply {
-                            center(region.location.toLatLng().toGMSLatLng())
+                            center(
+                                region.location.toLatLng()
+                                    .toGMSLatLng()
+                            )
                             radius(region.geofenceRadius.toDouble())
                             fillColor(getRegionColor())
                             strokeWidth(0.0f)
-                        }.let { addCircle(it) }
+                        }
+                            .let { addCircle(it) }
                     ).run(regionsOnMap::add)
                 }
             }

@@ -1,12 +1,14 @@
 package org.owntracks.android.location
 
+import java.time.Duration
+
 data class LocationRequest(
-    var fastestInterval: Long? = null,
+    var fastestInterval: Duration? = null,
     var smallestDisplacement: Float? = null,
     var numUpdates: Int? = null,
-    var expirationDuration: Long? = null,
+    var expirationDuration: Duration? = null,
     var priority: Int = PRIORITY_BALANCED_POWER_ACCURACY,
-    val interval: Long,
+    val interval: Duration,
     var waitForAccurateLocation: Boolean? = null
 ) {
     companion object {

@@ -4,10 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Location
 import android.os.Looper
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer
 import org.owntracks.android.location.LocationRequest.Companion.PRIORITY_BALANCED_POWER_ACCURACY
@@ -22,43 +18,41 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient(
     override fun actuallyRequestLocationUpdates(
         locationRequest: LocationRequest,
         clientCallBack: LocationCallback,
-        looper: Looper?
+        looper: Looper
     ) {
-        GlobalScope.launch {
-            withContext(Dispatchers.Main) {
-                gpsMyLocationProvider.stopLocationProvider()
-                val listener = IMyLocationConsumer { location, _ ->
-                    clientCallBack.onLocationResult(LocationResult(location))
-                }
-                gpsMyLocationProvider.clearLocationSources()
-                when (locationRequest.priority) {
+        Timber.v("actuallyRequestLocationUpdates Thread : %s", Thread.currentThread())
 
-                    PRIORITY_HIGH_ACCURACY -> {
-                        gpsMyLocationProvider.addLocationSource("gps")
-                        gpsMyLocationProvider.addLocationSource("network")
-                        gpsMyLocationProvider.addLocationSource("passive")
-                    }
-                    PRIORITY_BALANCED_POWER_ACCURACY -> {
-                        gpsMyLocationProvider.addLocationSource("gps")
-                        gpsMyLocationProvider.addLocationSource("network")
-                        gpsMyLocationProvider.addLocationSource("passive")
-                    }
-                    else -> {
-                        gpsMyLocationProvider.addLocationSource("network")
-                        gpsMyLocationProvider.addLocationSource("passive")
-                    }
-                }
-                gpsMyLocationProvider.locationUpdateMinTime = locationRequest.interval ?: 30_000
-                gpsMyLocationProvider.locationUpdateMinDistance =
-                    locationRequest.smallestDisplacement
-                        ?: 10f
-                gpsMyLocationProvider.startLocationProvider(listener)
-                callbackMap[clientCallBack] = listener
+        gpsMyLocationProvider.stopLocationProvider()
+        val listener = IMyLocationConsumer { location, _ ->
+            clientCallBack.onLocationResult(LocationResult(location))
+        }
+        gpsMyLocationProvider.clearLocationSources()
+        when (locationRequest.priority) {
+            PRIORITY_HIGH_ACCURACY -> {
+                gpsMyLocationProvider.addLocationSource("gps")
+                gpsMyLocationProvider.addLocationSource("network")
+                gpsMyLocationProvider.addLocationSource("passive")
+            }
+            PRIORITY_BALANCED_POWER_ACCURACY -> {
+                gpsMyLocationProvider.addLocationSource("gps")
+                gpsMyLocationProvider.addLocationSource("network")
+                gpsMyLocationProvider.addLocationSource("passive")
+            }
+            else -> {
+                gpsMyLocationProvider.addLocationSource("network")
+                gpsMyLocationProvider.addLocationSource("passive")
             }
         }
+        gpsMyLocationProvider.locationUpdateMinTime = locationRequest.interval.toMillis()
+        gpsMyLocationProvider.locationUpdateMinDistance =
+            locationRequest.smallestDisplacement
+                ?: 10f
+        gpsMyLocationProvider.startLocationProvider(listener)
+        callbackMap[clientCallBack] = listener
     }
 
     override fun removeLocationUpdates(clientCallBack: LocationCallback) {
+        Timber.v("removeLocationUpdates")
         callbackMap[clientCallBack]?.run {
             gpsMyLocationProvider.stopLocationProvider()
             callbackMap.remove(clientCallBack)

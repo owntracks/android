@@ -13,12 +13,14 @@ fun LocationRequest.toGMSLocationRequest(): com.google.android.gms.location.Loca
     }
 
     val gmsLocationRequestBuilder =
-        com.google.android.gms.location.LocationRequest.Builder(gmsPriority, interval)
+        com.google.android.gms.location.LocationRequest.Builder(gmsPriority, interval.toMillis())
 
     numUpdates?.run(gmsLocationRequestBuilder::setMaxUpdates)
-    expirationDuration?.run(gmsLocationRequestBuilder::setDurationMillis)
+    expirationDuration?.let { it.toMillis() }
+        ?.run(gmsLocationRequestBuilder::setDurationMillis)
     smallestDisplacement?.run(gmsLocationRequestBuilder::setMinUpdateDistanceMeters)
-    fastestInterval?.run(gmsLocationRequestBuilder::setMinUpdateIntervalMillis)
+    fastestInterval?.let { it.toMillis() }
+        ?.run(gmsLocationRequestBuilder::setMinUpdateIntervalMillis)
     waitForAccurateLocation?.run(gmsLocationRequestBuilder::setWaitForAccurateLocation)
 
     return gmsLocationRequestBuilder.build()

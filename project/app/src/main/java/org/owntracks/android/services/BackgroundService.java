@@ -13,7 +13,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.location.Location;
@@ -58,8 +57,8 @@ import org.owntracks.android.location.geofencing.GeofencingRequest;
 import org.owntracks.android.model.FusedContact;
 import org.owntracks.android.model.messages.MessageLocation;
 import org.owntracks.android.model.messages.MessageTransition;
-import org.owntracks.android.preferences.types.MonitoringMode;
 import org.owntracks.android.preferences.Preferences;
+import org.owntracks.android.preferences.types.MonitoringMode;
 import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.DateFormatter;
 import org.owntracks.android.support.Events;
@@ -67,6 +66,7 @@ import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.ServiceBridge;
 import org.owntracks.android.ui.map.MapActivity;
 
+import java.time.Duration;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -533,9 +533,9 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
                 null,
                 null,
                 1,
-                TimeUnit.MINUTES.toMillis(1),
+                Duration.ofMinutes(1),
                 LocationRequest.PRIORITY_HIGH_ACCURACY,
-                1,
+                Duration.ofMinutes(1),
                 null);
 
         Timber.d("On demand location request");
@@ -544,6 +544,7 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
     }
 
     private boolean setupLocationRequest() {
+        Timber.v("setupLocationRequest");
         if (missingLocationPermission()) {
             Timber.e("missing location permission");
             return false;
@@ -556,25 +557,25 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
         MonitoringMode monitoring = preferences.getMonitoring();
 
 
-        Long interval = null;
-        Long fastestInterval = null;
+        Duration interval = null;
+        Duration fastestInterval = null;
         Float smallestDisplacement = null;
         Integer priority = null;
 
         switch (monitoring) {
             case QUIET:
             case MANUAL:
-                interval = TimeUnit.SECONDS.toMillis(preferences.getLocatorInterval());
+                interval = Duration.ofSeconds(preferences.getLocatorInterval());
                 smallestDisplacement = (float) preferences.getLocatorDisplacement();
                 priority = LocationRequest.PRIORITY_LOW_POWER;
                 break;
             case SIGNIFICANT:
-                interval = TimeUnit.SECONDS.toMillis(preferences.getLocatorInterval());
+                interval = Duration.ofSeconds(preferences.getLocatorInterval());
                 smallestDisplacement = (float) preferences.getLocatorDisplacement();
-                priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY;;
+                priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY;
                 break;
             case MOVE:
-                interval = TimeUnit.SECONDS.toMillis(preferences.getMoveModeLocatorInterval());
+                interval = Duration.ofSeconds(preferences.getMoveModeLocatorInterval());
                 priority = LocationRequest.PRIORITY_HIGH_ACCURACY;
                 break;
         }
@@ -733,7 +734,7 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
             Timber.d("locator preferences changed. Resetting location request.");
             setupLocationRequest();
         }
-        if (properties.contains("mode")) {
+        if (properties.contains("monitoring")) {
             removeGeofences();
             setupGeofences();
             setupLocationRequest();

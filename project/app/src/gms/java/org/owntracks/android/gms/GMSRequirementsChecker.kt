@@ -4,9 +4,9 @@ import android.content.Context
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import dagger.hilt.android.scopes.ActivityScoped
-import org.owntracks.android.support.OSSRequirementsChecker
-import org.owntracks.android.preferences.Preferences
 import javax.inject.Inject
+import org.owntracks.android.preferences.Preferences
+import org.owntracks.android.support.OSSRequirementsChecker
 
 @ActivityScoped
 class GMSRequirementsChecker @Inject constructor(

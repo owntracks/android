@@ -7,7 +7,7 @@ abstract class LocationProviderClient {
     fun requestLocationUpdates(
         locationRequest: LocationRequest,
         clientCallBack: LocationCallback,
-        looper: Looper?
+        looper: Looper
     ) {
         removeLocationUpdates(clientCallBack)
         actuallyRequestLocationUpdates(locationRequest, clientCallBack, looper)
@@ -16,7 +16,7 @@ abstract class LocationProviderClient {
     protected abstract fun actuallyRequestLocationUpdates(
         locationRequest: LocationRequest,
         clientCallBack: LocationCallback,
-        looper: Looper?
+        looper: Looper
     )
 
     abstract fun removeLocationUpdates(clientCallBack: LocationCallback)

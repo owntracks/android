@@ -7,11 +7,11 @@ import android.os.Looper
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.Tasks
+import java.util.concurrent.ExecutionException
 import org.owntracks.android.location.LocationCallback
 import org.owntracks.android.location.LocationProviderClient
 import org.owntracks.android.location.LocationRequest
 import timber.log.Timber
-import java.util.concurrent.ExecutionException
 
 /**
  * An implementation of [LocationProviderClient] that uses a [FusedLocationProviderClient] to request
@@ -39,13 +39,11 @@ class GMSLocationProviderClient(
     override fun actuallyRequestLocationUpdates(
         locationRequest: LocationRequest,
         clientCallBack: LocationCallback,
-        looper: Looper?
+        looper: Looper
     ) {
-        Timber.d("Requesting location updates priority=${locationRequest.priority}, interval=${locationRequest.interval} clientCallback=${clientCallBack.hashCode()}")
-        if (looper == null) {
-            Timber.e("No looper provided, can't request GMS location updates")
-            return
-        }
+        Timber.d(
+            "Requesting location updates priority=${locationRequest.priority}, interval=${locationRequest.interval} clientCallback=${clientCallBack.hashCode()}"
+        )
         val gmsCallBack = GMSLocationCallback(clientCallBack)
         callbackMap[clientCallBack.hashCode()] = gmsCallBack
         val gmsLocationRequest = locationRequest.toGMSLocationRequest()
@@ -54,9 +52,12 @@ class GMSLocationProviderClient(
             gmsLocationRequest,
             gmsCallBack,
             looper
-        ).addOnCompleteListener {
-            Timber.d("GMS Background location update request completed: Success=${it.isSuccessful} Cancelled=${it.isCanceled}")
-        }
+        )
+            .addOnCompleteListener {
+                Timber.d(
+                    "GMS Background location update request completed: Success=${it.isSuccessful} Cancelled=${it.isCanceled}"
+                )
+            }
     }
 
     override fun removeLocationUpdates(clientCallBack: LocationCallback) {
