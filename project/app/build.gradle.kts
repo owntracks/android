@@ -19,6 +19,7 @@ val shardIndex = System.getenv("CIRCLE_NODE_INDEX") ?: "0"
 
 android {
     compileSdk = 33
+    namespace = "org.owntracks.android"
 
     defaultConfig {
         applicationId = "org.owntracks.android"
