@@ -46,6 +46,7 @@ preferencex = "1.1.0"
 r8 = "3.3.75"
 guava = "31.1-jre"
 bouncycastle = "1.72"
+desguar-jdk = "1.2.2"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -56,6 +57,7 @@ triplet = { id = "com.github.triplet.play", version.ref = "triplet" }
 
 [libraries]
 android-gradle-api = { module = "com.android.tools.build:gradle-api", version.ref = "agp" }
+desugar = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desguar-jdk"}
 
 hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
