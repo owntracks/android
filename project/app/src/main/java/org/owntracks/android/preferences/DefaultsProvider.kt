@@ -41,7 +41,7 @@ interface DefaultsProvider {
             Preferences::info -> true
             Preferences::keepalive -> 3600
             Preferences::locatorDisplacement -> 500
-            Preferences::locatorInterval -> 900
+            Preferences::locatorInterval -> 60
             Preferences::mode -> ConnectionMode.MQTT
             Preferences::monitoring -> MonitoringMode.SIGNIFICANT
             Preferences::moveModeLocatorInterval -> 10
