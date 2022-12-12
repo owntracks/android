@@ -29,6 +29,11 @@ class SharedPreferencesStore @Inject constructor(@ApplicationContext private val
             "org.owntracks.android.preferences.http"
         )
         with(sharedPreferences.edit()) {
+            if (sharedPreferences.contains("setupNotCompleted")) {
+                val oldValue = sharedPreferences.getBoolean("setupNotCompleted", true)
+                putBoolean("setupCompleted", !oldValue)
+                remove("setupNotCompleted")
+            }
             val nonEmptyLegacyPreferences =
                 oldSharedPreferenceNames
                     .map { context.getSharedPreferences(it, Context.MODE_PRIVATE) }
@@ -65,6 +70,8 @@ class SharedPreferencesStore @Inject constructor(@ApplicationContext private val
                         val deleted = context.deleteSharedPreferences(it)
                         if (!deleted) {
                             Timber.e("Failed to delete shared preference $it")
+                        } else {
+                            Timber.i("Deleted legacy preference file $it")
                         }
                     }
                 }
