@@ -46,7 +46,7 @@ preferencex = "1.1.0"
 r8 = "3.3.75"
 guava = "31.1-jre"
 bouncycastle = "1.72"
-desguar-jdk = "1.2.2"
+desguar-jdk = "2.0.0"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
