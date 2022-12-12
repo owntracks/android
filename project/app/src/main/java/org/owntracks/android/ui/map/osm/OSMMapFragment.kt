@@ -17,6 +17,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
+import kotlin.math.roundToInt
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.DelayedMapListener
 import org.osmdroid.events.MapListener
@@ -44,15 +45,14 @@ import org.owntracks.android.databinding.OsmMapFragmentBinding
 import org.owntracks.android.location.LatLng
 import org.owntracks.android.location.toGeoPoint
 import org.owntracks.android.location.toLatLng
-import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.preferences.Preferences
+import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.ui.map.*
 import timber.log.Timber
-import kotlin.math.roundToInt
 
 class OSMMapFragment internal constructor(
     private val preferences: Preferences,
-    contactImageBindingAdapter: ContactImageBindingAdapter,
+    contactImageBindingAdapter: ContactImageBindingAdapter
 ) :
     MapFragment<OsmMapFragmentBinding>(contactImageBindingAdapter) {
     override val layout: Int
@@ -93,17 +93,19 @@ class OSMMapFragment internal constructor(
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?,
+        savedInstanceState: Bundle?
     ): View {
-        Configuration.getInstance().apply {
-            load(requireContext(), PreferenceManager.getDefaultSharedPreferences(requireContext()))
-            osmdroidBasePath.resolve("tiles").run {
-                if (exists()) {
-                    deleteRecursively()
-                }
+        Configuration.getInstance()
+            .apply {
+                load(requireContext(), PreferenceManager.getDefaultSharedPreferences(requireContext()))
+                osmdroidBasePath.resolve("tiles")
+                    .run {
+                        if (exists()) {
+                            deleteRecursively()
+                        }
+                    }
+                osmdroidTileCache = requireContext().noBackupFilesDir.resolve("osmdroid/tiles")
             }
-            osmdroidTileCache = requireContext().noBackupFilesDir.resolve("osmdroid/tiles")
-        }
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
@@ -238,12 +240,14 @@ class OSMMapFragment internal constructor(
                             resources,
                             R.drawable.location_dot,
                             null
-                        )?.toBitmap(bitmapDimension.roundToInt(), bitmapDimension.roundToInt())
+                        )
+                            ?.toBitmap(bitmapDimension.roundToInt(), bitmapDimension.roundToInt())
                         val arrow = ResourcesCompat.getDrawable(
                             resources,
                             R.drawable.location_dot_arrow,
                             null
-                        )?.toBitmap(bitmapDimension.roundToInt(), bitmapDimension.roundToInt())
+                        )
+                            ?.toBitmap(bitmapDimension.roundToInt(), bitmapDimension.roundToInt())
                         setDirectionIcon(arrow)
                         setPersonIcon(dot)
                         setPersonAnchor(0.5f, 0.5f)
@@ -281,9 +285,10 @@ class OSMMapFragment internal constructor(
             setMultiTouchControls(true)
             isTilesScaledToDpi = true
             tilesScaleFactor = preferences.osmTileScaleFactor
-            viewModel.initMapStartingLocation().run {
-                controller.animateTo(latLng.toGeoPoint(), zoom, 0, rotation)
-            }
+            viewModel.initMapStartingLocation()
+                .run {
+                    controller.animateTo(latLng.toGeoPoint(), zoom, 0, rotation)
+                }
         }
         setMapStyle()
     }
@@ -308,7 +313,8 @@ class OSMMapFragment internal constructor(
                  */
 
                 overlays.add(
-                    overlays.filterIsInstance<MyLocationNewOverlay>().indexOfFirst { true },
+                    overlays.filterIsInstance<MyLocationNewOverlay>()
+                        .indexOfFirst { true },
                     Marker(this).apply {
                         this.id = id
                         position = latLng.toGeoPoint()
@@ -321,9 +327,10 @@ class OSMMapFragment internal constructor(
                     }
                 )
             }
-            overlays.firstOrNull { it is Marker && it.id == id }?.run {
-                (this as Marker).icon = BitmapDrawable(resources, image)
-            }
+            overlays.firstOrNull { it is Marker && it.id == id }
+                ?.run {
+                    (this as Marker).icon = BitmapDrawable(resources, image)
+                }
             invalidate()
         }
     }
@@ -379,25 +386,29 @@ class OSMMapFragment internal constructor(
                         Polygon(this).apply {
                             id = "regionpolygon-${region.id}"
                             points = Polygon.pointsAsCircle(
-                                region.location.toLatLng().toGeoPoint(),
+                                region.location.toLatLng()
+                                    .toGeoPoint(),
                                 region.geofenceRadius.toDouble()
                             )
                             fillPaint.color = getRegionColor()
                             outlinePaint.strokeWidth = 0f
                             setOnClickListener { _, mapView, _ ->
                                 mapView.overlays.filterIsInstance<Marker>()
-                                    .first { it.id == "regionmarker-${region.id}" }.showInfoWindow()
+                                    .first { it.id == "regionmarker-${region.id}" }
+                                    .showInfoWindow()
                                 true
                             }
                         },
                         Marker(this).apply {
                             id = "regionmarker-${region.id}"
-                            position = region.location.toLatLng().toGeoPoint()
+                            position = region.location.toLatLng()
+                                .toGeoPoint()
                             title = region.description
                             setInfoWindow(MarkerInfoWindow(R.layout.osm_region_bubble, this@run))
                         }
                     )
-                }.let { overlays.addAll(0, it) }
+                }
+                    .let { overlays.addAll(0, it) }
             }
         }
     }
@@ -416,13 +427,5 @@ class OSMMapFragment internal constructor(
     companion object {
         const val MIN_ZOOM_LEVEL: Double = 5.0
         const val MAX_ZOOM_LEVEL: Double = 21.0
-    }
-}
-
-private fun Context.safeGetDisplay(): Display? {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        display
-    } else {
-        ((getSystemService(Context.DISPLAY_SERVICE)) as DisplayManager).displays.firstOrNull()
     }
 }
