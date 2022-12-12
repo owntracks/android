@@ -44,6 +44,7 @@ class PreferenceDataStoreShim @Inject constructor(private val preferences: Prefe
     }
 
     override fun getStringSet(key: String?, defValues: MutableSet<String>?): MutableSet<String>? {
+        @Suppress("UNCHECKED_CAST")
         return (key?.run(preferences::getPreferenceByName) ?: defValues) as MutableSet<String>?
     }
 
