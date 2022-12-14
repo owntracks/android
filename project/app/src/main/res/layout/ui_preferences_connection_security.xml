@@ -1,27 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <data>
+
         <import type="android.view.View" />
+
         <variable
             name="vm"
             type="org.owntracks.android.ui.preferences.connection.dialog.ConnectionSecurityViewModel" />
     </data>
 
     <LinearLayout
+        style="@style/DialogView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:descendantFocusability="beforeDescendants"
         android:focusableInTouchMode="true"
-        android:orientation="vertical"
-        style="@style/DialogView"
-        >
+        android:orientation="vertical">
 
         <RelativeLayout
             android:id="@+id/tlsWrapper"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:orientation="vertical">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
@@ -36,63 +39,65 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
+                android:layout_gravity="end"
                 android:checked="@{vm.tls}"
-                android:onCheckedChanged="@{vm::onTlsCheckedChanged}"
-                android:layout_gravity="end" />
+                android:onCheckedChanged="@{vm::onTlsCheckedChanged}" />
         </RelativeLayout>
 
-
-        <com.rengwuxian.materialedittext.MaterialEditText
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tlsCaCrt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:cursorVisible="false"
-            android:focusable="false"
-            android:focusableInTouchMode="false"
+            android:layout_marginTop="@dimen/default_spacing"
             android:hint="@string/preferencesCaCrtPath"
-            android:inputType="textVisiblePassword"
-            android:text="@{vm.tlsCaCrtName}"
-            android:visibility="@{vm.tls}"
-            android:onClick="@{vm::onTlsCaCrtNameClick}"
-            android:windowSoftInputMode="stateAlwaysHidden"
-            app:met_baseColor="@color/textPrimary"
-            app:met_floatingLabel="highlight"
-            app:met_floatingLabelAlwaysShown="false"
-            app:met_floatingLabelText="@string/preferencesCaCrtPath"
-            app:met_primaryColor="@color/accent"  />
+            android:visibility="@{vm.tls}">
 
-        <com.rengwuxian.materialedittext.MaterialEditText
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:editable="false"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:onClick="@{vm::onTlsCaCrtNameClick}"
+                android:text="@{vm.tlsCaCrtName}" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tlsClientCrt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:cursorVisible="false"
-            android:focusable="false"
-            android:focusableInTouchMode="false"
+            android:layout_marginTop="@dimen/default_spacing"
             android:hint="@string/preferencesClientCrtPath"
-            android:visibility="@{vm.tls}"
-            android:inputType="textVisiblePassword"
-            android:onClick="@{(view) ->  vm.onTlsClientCrtNameClick(view)}"
-            android:text="@{vm.tlsClientCrtName}"
-            android:windowSoftInputMode="stateAlwaysHidden"
-            app:met_baseColor="@color/textPrimary"
-            app:met_floatingLabel="highlight"
-            app:met_floatingLabelAlwaysShown="false"
-            app:met_floatingLabelText="@string/preferencesClientCrtPath"
-            app:met_primaryColor="@color/accent" />
+            android:visibility="@{vm.tls}">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:editable="false"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:onClick="@{vm::onTlsClientCrtNameClick}"
+                android:text="@{vm.tlsClientCrtName}" />
+
+        </com.google.android.material.textfield.TextInputLayout>
 
 
-        <com.rengwuxian.materialedittext.MaterialEditText
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tlsClientCrtPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/default_spacing"
             android:hint="@string/preferencesClientCrtPassword"
-            android:inputType="textPassword"
-            android:text="@={vm.tlsClientCrtPassword}"
-            android:visibility="@{vm.tls}"
-            app:met_baseColor="@color/textPrimary"
-            app:met_floatingLabel="highlight"
-            app:met_primaryColor="@color/accent"
-            app:met_singleLineEllipsis="true" />
+            android:visibility="@{vm.tls}">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:text="@={vm.tlsClientCrtPassword}" />
+
+        </com.google.android.material.textfield.TextInputLayout>
 
     </LinearLayout>
 </layout>

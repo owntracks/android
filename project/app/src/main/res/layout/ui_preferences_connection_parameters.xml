@@ -3,19 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+
         <variable
             name="vm"
             type="org.owntracks.android.ui.preferences.connection.dialog.ConnectionParametersViewModel" />
     </data>
 
     <LinearLayout
+        style="@style/DialogView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:orientation="vertical"
-        style="@style/DialogView"
-        >
+        android:orientation="vertical">
 
         <RelativeLayout
             android:id="@+id/tlsWrapper"
@@ -40,18 +40,22 @@
                 android:checked="@={vm.cleanSession}" />
         </RelativeLayout>
 
-        <com.rengwuxian.materialedittext.MaterialEditText
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/keepalive"
-            android:nextFocusUp="@id/keepalive"
-            android:nextFocusLeft="@id/keepalive"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/default_spacing"
             android:hint="@string/preferencesKeepalive"
-            android:inputType="textNoSuggestions|number"
-            android:text="@={vm.keepaliveText}"
-            app:met_baseColor="@color/textPrimary"
-            app:met_floatingLabel="highlight"
-            app:met_helperText="@string/seconds"
-            app:met_primaryColor="@color/accent" />
+            app:helperText="@string/seconds">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/keepaliveText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textNoSuggestions|number"
+                android:text="@={vm.keepaliveText}" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
     </LinearLayout>
 </layout>

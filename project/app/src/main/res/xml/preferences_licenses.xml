@@ -107,14 +107,6 @@
             android:data="https://joschi.github.io/jackson-datatype-threetenbp/" />
     </Preference>
     <Preference
-        android:summary="Rengwuxian"
-        android:title="MaterialEditText"
-        app:iconSpaceReserved="false">
-        <intent
-            android:action="android.intent.action.VIEW"
-            android:data="https://github.com/rengwuxian/MaterialEditText" />
-    </Preference>
-    <Preference
         android:summary="Mikepenz"
         android:title="MaterialDrawer"
         app:iconSpaceReserved="false">

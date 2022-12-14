@@ -18,49 +18,61 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <com.rengwuxian.materialedittext.MaterialEditText
+
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/host"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/preferencesHost"
-            android:inputType="textVisiblePassword|textNoSuggestions"
-            android:text="@={vm.hostText}"
-            app:met_baseColor="@color/textPrimary"
-            app:met_floatingLabel="highlight"
-            app:met_floatingLabelText="@string/preferencesHost"
-            app:met_primaryColor="@color/accent" />
+            android:layout_marginTop="@dimen/default_spacing"
+            android:hint="@string/preferencesHost">
 
-        <com.rengwuxian.materialedittext.MaterialEditText
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textVisiblePassword|textNoSuggestions"
+                android:text="@={vm.hostText}" />
 
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/port"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:digits="0123456789"
-            android:hint="@string/preferencesPort"
-            android:inputType="number|textNoSuggestions"
-            android:maxLength="5"
-            android:text="@={vm.portText}"
-            app:met_baseColor="@color/textPrimary"
-            app:met_floatingLabel="highlight"
-            app:met_primaryColor="@color/accent" />
+            android:layout_marginTop="@dimen/default_spacing"
+            android:hint="@string/preferencesPort">
 
-        <com.rengwuxian.materialedittext.MaterialEditText
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:digits="0123456789"
+                android:inputType="number|textNoSuggestions"
+                android:maxLength="5"
+                android:text="@={vm.portText}" />
 
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/clientId"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/preferencesClientId"
+            android:layout_marginTop="@dimen/default_spacing"
+            android:hint="@string/preferencesClientId">
 
-            android:inputType="textNoSuggestions"
-            android:text="@={vm.clientId}"
-            app:met_baseColor="@color/textPrimary"
-            app:met_floatingLabel="highlight"
-            app:met_primaryColor="@color/accent" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textNoSuggestions"
+                android:text="@={vm.clientId}" />
+
+        </com.google.android.material.textfield.TextInputLayout>
 
         <RelativeLayout
             android:id="@+id/tlsWrapper"
             android:layout_width="match_parent"
             android:layout_height="48dp"
+            android:layout_marginTop="@dimen/default_spacing"
             android:orientation="vertical">
 
             <TextView

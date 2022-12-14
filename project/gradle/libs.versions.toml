@@ -39,7 +39,6 @@ square-tape2 = "2.0.0-beta1"
 apache-httpcore = "5.2"
 commons-codec = "1.15"
 libsodium = "2.0.2"
-materialedittext = "2.1.4"
 materialize = "1.2.1"
 materialdrawer = "6.1.2"
 preferencex = "1.1.0"
@@ -107,7 +106,6 @@ timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 square-tape2 = { module = "com.squareup.tape2:tape", version.ref = "square-tape2" }
 libsodium = { module = "com.github.joshjdevl.libsodiumjni:libsodium-jni-aar", version.ref = "libsodium" }
 
-widgets-materialedittext = { module = "com.rengwuxian.materialedittext:library", version.ref = "materialedittext" }
 widgets-materialdrawer = { module = "com.mikepenz:materialdrawer", version.ref = "materialdrawer" }
 widgets-materialize = { module = "com.mikepenz:materialize", version.ref = "materialize" }
 widgets-preferencex = { module = "com.takisoft.preferencex:preferencex", version.ref = "preferencex" }

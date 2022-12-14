@@ -9,8 +9,6 @@ import androidx.databinding.BindingAdapter;
 import androidx.databinding.BindingConversion;
 import androidx.databinding.InverseMethod;
 
-import com.rengwuxian.materialedittext.MaterialEditText;
-
 import org.owntracks.android.R;
 import org.owntracks.android.location.geofencing.Geofence;
 import org.owntracks.android.preferences.types.ConnectionMode;
@@ -69,11 +67,6 @@ public class BindingConversions {
     @BindingConversion
     public static Integer convertToIntegerZeroIsEmpty(String d) {
         return convertToInteger(d);
-    }
-
-    @BindingAdapter("met_helperText")
-    public static void setVisibility(MaterialEditText view, String text) {
-        view.setHelperText(text);
     }
 
     @BindingAdapter("android:visibility")

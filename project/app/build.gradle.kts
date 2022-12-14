@@ -217,7 +217,6 @@ dependencies {
     implementation(libs.bouncycastle)
 
     // Widget libraries
-    implementation(libs.widgets.materialedittext)
     implementation(libs.widgets.materialdrawer) { artifact { type = "aar" } }
     implementation(libs.widgets.materialize) { artifact { type = "aar" } }
     implementation(libs.widgets.preferencex)

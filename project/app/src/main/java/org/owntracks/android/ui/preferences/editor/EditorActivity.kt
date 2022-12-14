@@ -9,18 +9,19 @@ import android.view.MenuItem
 import android.widget.ArrayAdapter
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.AppCompatAutoCompleteTextView
 import androidx.core.app.ShareCompat
 import com.google.android.material.snackbar.Snackbar
-import com.rengwuxian.materialedittext.MaterialAutoCompleteTextView
-import com.rengwuxian.materialedittext.MaterialEditText
+import com.google.android.material.textfield.MaterialAutoCompleteTextView
+import com.google.android.material.textfield.TextInputEditText
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.*
 import org.owntracks.android.BuildConfig
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiPreferencesEditorBinding
 import org.owntracks.android.ui.base.BaseActivity
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import timber.log.Timber
-import java.util.*
 
 @AndroidEntryPoint
 class EditorActivity :
@@ -77,17 +78,18 @@ class EditorActivity :
         val layout = inflater.inflate(R.layout.ui_preferences_editor_dialog, null)
 
         // Set autocomplete items
-        val inputKeyView: MaterialAutoCompleteTextView = layout.findViewById(R.id.inputKey)
+        val inputKeyView = layout.findViewById<MaterialAutoCompleteTextView >(R.id.inputKey)
         inputKeyView.setAdapter(
             ArrayAdapter(
                 this,
                 android.R.layout.simple_dropdown_item_1line,
-                preferences.allConfigKeys.map { it.name }.toList()
+                preferences.allConfigKeys.map { it.name }
+                    .toList()
             )
         )
         builder.setTitle(R.string.preferencesEditor)
             .setPositiveButton(R.string.accept) { dialog: DialogInterface, _: Int ->
-                val inputValue: MaterialEditText = layout.findViewById(R.id.inputValue)
+                val inputValue = layout.findViewById<TextInputEditText>(R.id.inputValue)
                 val key = inputKeyView.text.toString()
                 val value = inputValue.text.toString()
                 try {
@@ -115,14 +117,16 @@ class EditorActivity :
                         findViewById(R.id.effectiveConfiguration),
                         R.string.preferencesExportSuccess,
                         Snackbar.LENGTH_SHORT
-                    ).show()
+                    )
+                        .show()
                 }
                 RESULT_CANCELED -> {
                     Snackbar.make(
                         findViewById(R.id.effectiveConfiguration),
                         R.string.preferencesExportFailed,
                         Snackbar.LENGTH_SHORT
-                    ).show()
+                    )
+                        .show()
                 }
             }
             revokeExportUriPermissions()
@@ -136,7 +140,8 @@ class EditorActivity :
     }
 
     private fun getRandomHexString(): String {
-        return Random().nextInt(0X1000000).toString(16)
+        return Random().nextInt(0X1000000)
+            .toString(16)
     }
 
     override fun exportConfigurationToFile(): Boolean {
@@ -160,7 +165,8 @@ class EditorActivity :
             findViewById(R.id.effectiveConfiguration),
             R.string.preferencesLoadFailed,
             Snackbar.LENGTH_SHORT
-        ).show()
+        )
+            .show()
     }
 
     private fun displayPreferencesValueForKeySetFailedKey() {
@@ -168,7 +174,8 @@ class EditorActivity :
             findViewById(R.id.effectiveConfiguration),
             R.string.preferencesEditorKeyError,
             Snackbar.LENGTH_SHORT
-        ).show()
+        )
+            .show()
     }
 
     private fun displayPreferencesValueForKeySetFailedValue() {
@@ -176,6 +183,7 @@ class EditorActivity :
             findViewById(R.id.effectiveConfiguration),
             R.string.preferencesEditorValueError,
             Snackbar.LENGTH_SHORT
-        ).show()
+        )
+            .show()
     }
 }

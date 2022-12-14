@@ -2,18 +2,18 @@ package org.owntracks.android.ui.preferences.connection;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.DataBindingUtil;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.rengwuxian.materialedittext.MaterialEditText;
-import com.rengwuxian.materialedittext.validation.METValidator;
+import com.google.android.material.textfield.TextInputLayout;
 
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiPreferencesConnectionBinding;
@@ -23,10 +23,9 @@ import org.owntracks.android.databinding.UiPreferencesConnectionIdentificationBi
 import org.owntracks.android.databinding.UiPreferencesConnectionModeBinding;
 import org.owntracks.android.databinding.UiPreferencesConnectionParametersBinding;
 import org.owntracks.android.databinding.UiPreferencesConnectionSecurityBinding;
+import org.owntracks.android.preferences.Preferences;
 import org.owntracks.android.preferences.types.ConnectionMode;
 import org.owntracks.android.services.MessageProcessor;
-import org.owntracks.android.services.MessageProcessorEndpointHttp;
-import org.owntracks.android.preferences.Preferences;
 import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.preferences.connection.dialog.BaseDialogViewModel;
@@ -147,22 +146,40 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
                 .setTitle(R.string.preferencesParameters)
                 .setPositiveButton(R.string.accept, dialogBinding.getVm())
                 .setNegativeButton(R.string.cancel, dialogBinding.getVm()).create();
-        MaterialEditText keepAliveEditText = dialogBinding.getRoot().findViewById(R.id.keepalive);
-        keepAliveEditText.addValidator(new METValidator(getString(R.string.preferencesKeepaliveValidationError, preferences.getExperimentalFeatures().contains(Preferences.EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE) ? 1 : preferences.getMinimumKeepaliveSeconds())) {
+        TextInputLayout keepAliveEditText = dialogBinding.getRoot().findViewById(R.id.keepalive);
+
+        keepAliveEditText.getEditText().addTextChangedListener(new TextWatcher() {
             @Override
-            public boolean isValid(@NonNull CharSequence text, boolean isEmpty) {
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence text, int start, int before, int count) {
+                Boolean valid = false;
                 try {
                     int intValue = Integer.parseInt(text.toString());
-                    return isEmpty || preferences.keepAliveInRange(intValue) || (preferences.getExperimentalFeatures().contains(Preferences.EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE) && intValue >= 1);
+                    if (preferences.keepAliveInRange(intValue) || (preferences.getExperimentalFeatures().contains(Preferences.EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE) && intValue >= 1)) {
+                        valid = true;
+                    }
                 } catch (NumberFormatException e) {
-                    return false;
+                }
+                if (valid) {
+                    keepAliveEditText.setErrorEnabled(false);
+                } else {
+                    keepAliveEditText.setErrorEnabled(true);
+                    keepAliveEditText.setError(getString(R.string.preferencesKeepaliveValidationError, preferences.getExperimentalFeatures().contains(Preferences.EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE) ? 1 : preferences.getMinimumKeepaliveSeconds()));
                 }
             }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
         });
-        keepAliveEditText.setAutoValidate(true);
         dialog.show();
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-            if (keepAliveEditText.validate()) {
+            if (!keepAliveEditText.isErrorEnabled()) {
                 connectionParametersViewModel.save();
                 dialog.dismiss();
             }

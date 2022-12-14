@@ -4,34 +4,34 @@
 
     <data>
 
-        <import type="android.view.View" />
-
         <variable
             name="vm"
             type="org.owntracks.android.ui.preferences.connection.dialog.ConnectionHostHttpDialogViewModel" />
     </data>
 
     <LinearLayout
-        android:id="@+id/content_frame"
+        style="@style/DialogView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        style="@style/DialogView"
-    >
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:orientation="vertical">
 
-        <EditText
-            style="@style/Widget.AppCompat.EditText"
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/url"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/preferencesUrl"
-            android:inputType="textUri|textNoSuggestions"
-            android:text="@={vm.urlText}"
-            android:importantForAutofill="no"
-            app:met_baseColor="@color/textPrimary"
-            app:met_floatingLabel="highlight"
-            app:met_floatingLabelText="@string/preferencesUrl"
-            app:met_primaryColor="@color/accent" />
+            android:layout_marginTop="@dimen/default_spacing"
+            android:hint="@string/preferencesUrl">
 
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/keepaliveText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:importantForAutofill="no"
+                android:inputType="textUri|textNoSuggestions"
+                android:text="@={vm.urlText}" />
+
+        </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 </layout>

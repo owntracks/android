@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical" android:layout_width="match_parent"
+    style="@style/DialogView"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    style="@style/DialogView">
+    android:orientation="vertical">
 
 
     <TextView
@@ -11,29 +12,35 @@
         android:layout_height="wrap_content"
         android:text="@string/preferencesEditorDescription" />
 
-    <com.rengwuxian.materialedittext.MaterialAutoCompleteTextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:met_baseColor="@color/textPrimary"
-        app:met_primaryColor="@color/accent"
-        android:id="@+id/inputKey"
-        android:inputType="textUri|textNoSuggestions"
-        app:met_floatingLabel="highlight"
-        app:met_floatingLabelText="@string/preferencesEditorKey"
-        android:completionThreshold="1"
-        android:hint="@string/preferencesEditorKey"
-         />
+    <com.google.android.material.textfield.TextInputLayout
 
-    <com.rengwuxian.materialedittext.MaterialEditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:met_baseColor="@color/textPrimary"
-        app:met_primaryColor="@color/accent"
-        android:id="@+id/inputValue"
-        android:inputType="textUri|textNoSuggestions"
-        app:met_floatingLabel="highlight"
-        app:met_floatingLabelText="@string/preferencesEditorValue"
-        android:hint="@string/preferencesEditorValue"
-        />
+        android:layout_marginTop="@dimen/default_spacing"
+        android:hint="@string/preferencesEditorKey">
+
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            android:id="@+id/inputKey"
+            style="@style/Widget.MaterialComponents.AutoCompleteTextView.FilledBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:completionThreshold="1"
+            android:inputType="textUri|textNoSuggestions" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/default_spacing"
+        android:hint="@string/preferencesEditorValue">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/inputValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textUri|textNoSuggestions" />
+
+    </com.google.android.material.textfield.TextInputLayout>
 
 </LinearLayout>

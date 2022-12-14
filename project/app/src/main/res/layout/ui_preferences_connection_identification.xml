@@ -12,62 +12,74 @@
     </data>
 
     <LinearLayout
+        style="@style/DialogView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        style="@style/DialogView"
-        >
+        android:orientation="vertical">
 
-        <com.rengwuxian.materialedittext.MaterialEditText
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/username"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/preferencesUserUsername"
-            android:inputType="textVisiblePassword|textNoSuggestions"
-            android:text="@={vm.username}"
-            app:met_baseColor="@color/textPrimary"
-            app:met_floatingLabel="highlight"
-            app:met_primaryColor="@color/accent" />
+            android:layout_marginTop="@dimen/default_spacing"
+            android:hint="@string/preferencesUserUsername">
 
-        <com.rengwuxian.materialedittext.MaterialEditText
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textVisiblePassword|textNoSuggestions"
+                android:text="@={vm.username}" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/preferencesBrokerPassword"
-            android:inputType="textPassword"
-            android:text="@={vm.password}"
-            app:met_baseColor="@color/textPrimary"
-            app:met_floatingLabel="highlight"
-            app:met_primaryColor="@color/accent" />
+            android:layout_marginTop="@dimen/default_spacing"
+            android:hint="@string/preferencesBrokerPassword">
 
-        <com.rengwuxian.materialedittext.MaterialEditText
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:text="@={vm.password}" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/deviceId"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-            android:hint="@string/preferencesDeviceName"
-            android:inputType="textVisiblePassword"
-            android:text="@={vm.deviceId}"
-            app:met_baseColor="@color/textPrimary"
-            app:met_floatingLabel="highlight"
-            app:met_floatingLabelAlwaysShown="false"
-            app:met_floatingLabelText="@string/preferencesDeviceName"
-            app:met_primaryColor="@color/accent" />
+            android:layout_marginTop="@dimen/default_spacing"
+            android:hint="@string/preferencesDeviceName">
 
-        <com.rengwuxian.materialedittext.MaterialEditText
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+                android:inputType="textVisiblePassword"
+                android:text="@={vm.deviceId}" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/trackerId"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-            android:hint="@string/preferencesTrackerId"
-            android:inputType="textVisiblePassword"
-            android:maxLength="2"
-            android:text="@={vm.trackerId}"
-            app:met_baseColor="@color/textPrimary"
-            app:met_floatingLabel="highlight"
-            app:met_floatingLabelAlwaysShown="false"
-            app:met_floatingLabelText="@string/preferencesTrackerId"
-            app:met_primaryColor="@color/accent" />
+            android:layout_marginTop="@dimen/default_spacing"
+            android:hint="@string/preferencesTrackerId">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+                android:inputType="textVisiblePassword"
+                android:maxLength="2"
+                android:text="@={vm.trackerId}" />
+
+        </com.google.android.material.textfield.TextInputLayout>
 
     </LinearLayout>
 </layout>
