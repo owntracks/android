@@ -12,7 +12,7 @@ jobs:
     if: ${{ !github.event.pull_request.head.repo.fork && github.event.label && ( github.event.label.name == 'smoke-test-required' || github.event.label.name == 'integration-test-required') }}
     steps:
       - name: Run CircleCI pipeline
-        uses: CircleCI-Public/trigger-circleci-pipeline-action@v1.0.5
+        uses: CircleCI-Public/trigger-circleci-pipeline-action@v1.0.6
         with:
           GHA_Meta: ${{ github.event.label.name }}
         env:
