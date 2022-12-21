@@ -1,7 +1,6 @@
 package org.owntracks.android.ui.map
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener

@@ -1,7 +1,5 @@
 package org.owntracks.android.support;
 
-
-import android.content.SharedPreferences;
 import android.util.Base64;
 
 import androidx.annotation.NonNull;
