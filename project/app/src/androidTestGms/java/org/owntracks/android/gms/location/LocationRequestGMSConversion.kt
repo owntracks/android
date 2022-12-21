@@ -3,6 +3,7 @@ package org.owntracks.android.gms.location
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.google.android.gms.location.Priority
+import java.time.Duration
 import java.util.concurrent.TimeUnit
 import org.junit.Assert.*
 import org.junit.Test
@@ -16,12 +17,12 @@ class LocationRequestGMSConversion {
     @Test
     fun canConvertLocationRequestToGMS() =
         LocationRequest(
-            fastestInterval = 1_000,
+            fastestInterval = Duration.ofSeconds(1),
             smallestDisplacement = 50f,
             numUpdates = 50,
-            expirationDuration = TimeUnit.MINUTES.toMillis(2),
+            expirationDuration = Duration.ofMinutes(2),
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY,
-            interval = 30_000
+            interval = Duration.ofSeconds(30)
         )
             .toGMSLocationRequest()
             .run {
@@ -38,9 +39,9 @@ class LocationRequestGMSConversion {
         LocationRequest(
             smallestDisplacement = 50f,
             numUpdates = 50,
-            expirationDuration = TimeUnit.MINUTES.toMillis(2),
+            expirationDuration = Duration.ofMinutes(2),
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY,
-            interval = 30_000
+            interval = Duration.ofSeconds(30)
         )
             .toGMSLocationRequest()
             .run {
