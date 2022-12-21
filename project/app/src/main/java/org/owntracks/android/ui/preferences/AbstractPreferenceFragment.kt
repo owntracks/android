@@ -10,6 +10,7 @@ abstract class AbstractPreferenceFragment : PreferenceFragmentCompat() {
 
     @Inject
     lateinit var preferences: Preferences
+
     @Inject
     lateinit var preferenceDataStore: PreferenceDataStoreShim
 

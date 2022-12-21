@@ -123,14 +123,6 @@
             android:data="https://github.com/mikepenz/Materialize" />
     </Preference>
     <Preference
-        android:summary="Takisoft"
-        android:title="AndroidX Preference eXtended"
-        app:iconSpaceReserved="false">
-        <intent
-            android:action="android.intent.action.VIEW"
-            android:data="https://github.com/takisoft/preferencex-android" />
-    </Preference>
-    <Preference
         android:summary="Reverse Geocoding API"
         android:title="OpenCage Geocoder"
         app:iconSpaceReserved="false">

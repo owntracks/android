@@ -41,7 +41,6 @@ commons-codec = "1.15"
 libsodium = "2.0.2"
 materialize = "1.2.1"
 materialdrawer = "6.1.2"
-preferencex = "1.1.0"
 r8 = "3.3.75"
 guava = "31.1-jre"
 bouncycastle = "1.72"
@@ -108,7 +107,6 @@ libsodium = { module = "com.github.joshjdevl.libsodiumjni:libsodium-jni-aar", ve
 
 widgets-materialdrawer = { module = "com.mikepenz:materialdrawer", version.ref = "materialdrawer" }
 widgets-materialize = { module = "com.mikepenz:materialize", version.ref = "materialize" }
-widgets-preferencex = { module = "com.takisoft.preferencex:preferencex", version.ref = "preferencex" }
 
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito-kotlin" }
 kmqtt = { module = "com.github.davidepianca98.KMQTT:kmqtt", version.ref = "kmqtt" }
