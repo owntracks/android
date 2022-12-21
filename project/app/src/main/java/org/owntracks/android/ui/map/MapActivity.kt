@@ -20,6 +20,7 @@ import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.VisibleForTesting
@@ -118,9 +119,10 @@ class MapActivity :
         EntryPointAccessors.fromActivity(
             this,
             MapActivityEntryPoint::class.java
-        ).let {
-            supportFragmentManager.fragmentFactory = it.fragmentFactory
-        }
+        )
+            .let {
+                supportFragmentManager.fragmentFactory = it.fragmentFactory
+            }
 
         super.onCreate(savedInstanceState)
 
@@ -238,6 +240,31 @@ class MapActivity :
             .cancel(BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG, 0)
 
         notifyOnWorkManagerInitFailure(this)
+
+        onBackPressedDispatcher.addCallback(this) {
+            if (bottomSheetBehavior == null) {
+                finish()
+            } else {
+                when (bottomSheetBehavior?.state) {
+                    BottomSheetBehavior.STATE_HIDDEN -> finish()
+                    BottomSheetBehavior.STATE_COLLAPSED -> {
+                        setBottomSheetHidden()
+                    }
+                    BottomSheetBehavior.STATE_DRAGGING -> {
+                        // Noop
+                    }
+                    BottomSheetBehavior.STATE_EXPANDED -> {
+                        setBottomSheetCollapsed()
+                    }
+                    BottomSheetBehavior.STATE_HALF_EXPANDED -> {
+                        setBottomSheetCollapsed()
+                    }
+                    BottomSheetBehavior.STATE_SETTLING -> {
+                        // Noop
+                    }
+                }
+            }
+        }
     }
 
     internal fun checkAndRequestMyLocationCapability(explicitUserAction: Boolean): Boolean =
@@ -272,7 +299,8 @@ class MapActivity :
                         }
                         .setNegativeButton(android.R.string.cancel) { _, _ ->
                             preferences.userDeclinedEnableLocationServices = true
-                        }.create()
+                        }
+                        .create()
                 }
                 if (!locationServicesAlertDialog.isShowing) {
                     locationServicesAlertDialog.show()
@@ -345,13 +373,15 @@ class MapActivity :
             binding!!.mapCoordinatorLayout,
             getString(R.string.locationPermissionNotGrantedNotification),
             Snackbar.LENGTH_LONG
-        ).setAction(getString(R.string.fixProblemLabel)) {
-            startActivity(
-                Intent(ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                    data = Uri.parse("package:$packageName")
-                }
-            )
-        }.show()
+        )
+            .setAction(getString(R.string.fixProblemLabel)) {
+                startActivity(
+                    Intent(ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        data = Uri.parse("package:$packageName")
+                    }
+                )
+            }
+            .show()
     }
 
     val explicitLocationPermissionRequest =
@@ -453,26 +483,27 @@ class MapActivity :
     }
 
     fun updateMonitoringModeMenu() {
-        menu?.findItem(R.id.menu_monitoring)?.run {
-            when (preferences.monitoring) {
-                MonitoringMode.QUIET -> {
-                    setIcon(R.drawable.ic_baseline_stop_36)
-                    setTitle(R.string.monitoring_quiet)
-                }
-                MonitoringMode.MANUAL -> {
-                    setIcon(R.drawable.ic_baseline_pause_36)
-                    setTitle(R.string.monitoring_manual)
-                }
-                MonitoringMode.SIGNIFICANT -> {
-                    setIcon(R.drawable.ic_baseline_play_arrow_36)
-                    setTitle(R.string.monitoring_significant)
-                }
-                MonitoringMode.MOVE -> {
-                    setIcon(R.drawable.ic_step_forward_2)
-                    setTitle(R.string.monitoring_move)
+        menu?.findItem(R.id.menu_monitoring)
+            ?.run {
+                when (preferences.monitoring) {
+                    MonitoringMode.QUIET -> {
+                        setIcon(R.drawable.ic_baseline_stop_36)
+                        setTitle(R.string.monitoring_quiet)
+                    }
+                    MonitoringMode.MANUAL -> {
+                        setIcon(R.drawable.ic_baseline_pause_36)
+                        setTitle(R.string.monitoring_manual)
+                    }
+                    MonitoringMode.SIGNIFICANT -> {
+                        setIcon(R.drawable.ic_baseline_play_arrow_36)
+                        setTitle(R.string.monitoring_significant)
+                    }
+                    MonitoringMode.MOVE -> {
+                        setIcon(R.drawable.ic_step_forward_2)
+                        setTitle(R.string.monitoring_move)
+                    }
                 }
             }
-        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -531,14 +562,16 @@ class MapActivity :
                             binding!!.mapCoordinatorLayout,
                             getString(R.string.noNavigationApp),
                             Snackbar.LENGTH_SHORT
-                        ).show()
+                        )
+                            .show()
                     }
                 } ?: run {
                     Snackbar.make(
                         binding!!.mapCoordinatorLayout,
                         getString(R.string.contactLocationUnknown),
                         Snackbar.LENGTH_SHORT
-                    ).show()
+                    )
+                        .show()
                 }
                 true
             }
@@ -592,31 +625,6 @@ class MapActivity :
             popupMenu.menu.removeItem(R.id.menu_navigate)
         }
         popupMenu.show()
-    }
-
-    override fun onBackPressed() {
-        if (bottomSheetBehavior == null) {
-            super.onBackPressed()
-        } else {
-            when (bottomSheetBehavior?.state) {
-                BottomSheetBehavior.STATE_HIDDEN -> super.onBackPressed()
-                BottomSheetBehavior.STATE_COLLAPSED -> {
-                    setBottomSheetHidden()
-                }
-                BottomSheetBehavior.STATE_DRAGGING -> {
-                    // Noop
-                }
-                BottomSheetBehavior.STATE_EXPANDED -> {
-                    setBottomSheetCollapsed()
-                }
-                BottomSheetBehavior.STATE_HALF_EXPANDED -> {
-                    setBottomSheetCollapsed()
-                }
-                BottomSheetBehavior.STATE_SETTLING -> {
-                    // Noop
-                }
-            }
-        }
     }
 
     override fun onStart() {

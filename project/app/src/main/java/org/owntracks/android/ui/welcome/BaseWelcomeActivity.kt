@@ -4,16 +4,17 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.viewpager2.widget.ViewPager2
+import javax.inject.Inject
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiWelcomeBinding
 import org.owntracks.android.support.RequirementsChecker
 import org.owntracks.android.ui.map.MapActivity
-import javax.inject.Inject
 
 abstract class BaseWelcomeActivity : AppCompatActivity() {
     private val viewModel: WelcomeViewModel by viewModels()
@@ -47,28 +48,29 @@ abstract class BaseWelcomeActivity : AppCompatActivity() {
         }
 
         binding =
-            DataBindingUtil.setContentView<UiWelcomeBinding>(this, R.layout.ui_welcome).apply {
-                vm = viewModel
-                lifecycleOwner = this@BaseWelcomeActivity
-                viewPager.adapter = WelcomeAdapter(this@BaseWelcomeActivity).apply {
-                    addFragmentsToAdapter(this)
+            DataBindingUtil.setContentView<UiWelcomeBinding>(this, R.layout.ui_welcome)
+                .apply {
+                    vm = viewModel
+                    lifecycleOwner = this@BaseWelcomeActivity
+                    viewPager.adapter = WelcomeAdapter(this@BaseWelcomeActivity).apply {
+                        addFragmentsToAdapter(this)
+                    }
+                    viewPager.registerOnPageChangeCallback(object :
+                            ViewPager2.OnPageChangeCallback() {
+                            override fun onPageSelected(position: Int) {
+                                viewModel.moveToPage(position)
+                                super.onPageSelected(position)
+                            }
+                        })
+                    btnNext.setOnClickListener { viewModel.nextPage() }
+                    btnDone.setOnClickListener {
+                        startActivity(
+                            Intent(this@BaseWelcomeActivity, MapActivity::class.java).apply {
+                                flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                            }
+                        )
+                    }
                 }
-                viewPager.registerOnPageChangeCallback(object :
-                        ViewPager2.OnPageChangeCallback() {
-                        override fun onPageSelected(position: Int) {
-                            viewModel.moveToPage(position)
-                            super.onPageSelected(position)
-                        }
-                    })
-                btnNext.setOnClickListener { viewModel.nextPage() }
-                btnDone.setOnClickListener {
-                    startActivity(
-                        Intent(this@BaseWelcomeActivity, MapActivity::class.java).apply {
-                            flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-                        }
-                    )
-                }
-            }
 
         viewModel.currentFragmentPosition.observe(this) { position: Int ->
             binding.viewPager.currentItem = position
@@ -76,6 +78,13 @@ abstract class BaseWelcomeActivity : AppCompatActivity() {
         }
 
         buildPagerIndicator()
+        onBackPressedDispatcher.addCallback(this) {
+            if (binding.viewPager.currentItem == 0) {
+                finish()
+            } else {
+                viewModel.previousPage()
+            }
+        }
     }
 
     abstract fun addFragmentsToAdapter(welcomeAdapter: WelcomeAdapter)
@@ -115,13 +124,5 @@ abstract class BaseWelcomeActivity : AppCompatActivity() {
             binding.circles.addView(circle)
         }
         setPagerIndicator(0)
-    }
-
-    override fun onBackPressed() {
-        if (binding.viewPager.currentItem == 0) {
-            finish()
-        } else {
-            viewModel.previousPage()
-        }
     }
 }
