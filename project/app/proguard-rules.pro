@@ -69,8 +69,8 @@
 -dontwarn org.openjsse.net.ssl.OpenJSSE
 
 # Bouncycastle
--keep class org.bouncycastle.jcajce.provider.** { *; }
--keep class org.bouncycastle.jce.provider.** { *; }
+-keep class org.bouncycastle.jcajce.** { *; }
+-keep class org.bouncycastle.jce.** { *; }
 
 -dontwarn javax.naming.**
 
