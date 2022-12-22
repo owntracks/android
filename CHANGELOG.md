@@ -8,6 +8,7 @@
 - The config editor text is now selectable
 - No need to restart the app once loading in a config any more!
 - Add an option for a location message to be republished on reconnection to MQTT (#1273, #1178)
+- MyLocation button now differentiates between no location, location available and following
 
 ### Bug fixes
 

@@ -47,9 +47,6 @@ abstract class MapFragment<V : ViewDataBinding> internal constructor(
         binding = DataBindingUtil.inflate(inflater, layout, container, false)
         binding.lifecycleOwner = this.viewLifecycleOwner
 
-        viewModel.myLocationEnabled.observe(viewLifecycleOwner, {
-            initMap()
-        })
         viewModel.mapCenter.observe(viewLifecycleOwner, this::updateCamera)
         viewModel.allContacts.observe(viewLifecycleOwner, { contacts ->
             updateAllMarkers(contacts.values.toSet())

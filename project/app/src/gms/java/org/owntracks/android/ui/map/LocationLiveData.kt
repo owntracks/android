@@ -78,7 +78,7 @@ class LocationLiveData(
         super.onInactive()
     }
 
-    inner class Callback : LocationCallback() {
+    private inner class Callback : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
             super.onLocationResult(locationResult)
             value = locationResult.lastLocation

@@ -29,6 +29,7 @@ import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.setPadding
+import androidx.databinding.BindingAdapter
 import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
 import androidx.test.espresso.IdlingResource
@@ -36,10 +37,10 @@ import androidx.test.espresso.idling.CountingIdlingResource
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
-import javax.inject.Inject
 import kotlinx.coroutines.launch
 import org.owntracks.android.BR
 import org.owntracks.android.R
@@ -61,6 +62,7 @@ import org.owntracks.android.ui.mixins.ServiceStarter
 import org.owntracks.android.ui.mixins.WorkManagerInitExceptionNotifier
 import org.owntracks.android.ui.welcome.WelcomeActivity
 import timber.log.Timber
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MapActivity :
@@ -113,7 +115,7 @@ class MapActivity :
     }
 
     private var onBottomSheetLabelTextSizeChangedListener:
-        AutoResizingTextViewWithListener.OnTextSizeChangedListener? = null
+            AutoResizingTextViewWithListener.OnTextSizeChangedListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         EntryPointAccessors.fromActivity(
@@ -155,7 +157,9 @@ class MapActivity :
                 if (checkAndRequestLocationPermissions(true)) {
                     checkAndRequestLocationServicesEnabled(true)
                 }
-                mapViewModel.onMenuCenterDeviceClicked()
+                if (mapViewModel.myLocationStatus.value != MyLocationStatus.DISABLED) {
+                    mapViewModel.onMyLocationClicked()
+                }
             }
 
             binding.fabMapLayers.setOnClickListener {
@@ -269,17 +273,30 @@ class MapActivity :
 
     internal fun checkAndRequestMyLocationCapability(explicitUserAction: Boolean): Boolean =
         checkAndRequestLocationPermissions(explicitUserAction) &&
-            checkAndRequestLocationServicesEnabled(explicitUserAction)
+                checkAndRequestLocationServicesEnabled(explicitUserAction)
 
     private val locationServicesLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             // We have to check permissions again here, because it may have been revoked in the
             // period between asking for location services and returning here.
             if (checkAndRequestLocationPermissions(false)) {
-                mapViewModel.myLocationIsNowEnabled()
+                mapViewModel.requestLocationUpdatesForBlueDot()
             }
         }
 
+    /**
+     * Performs a check that the device has location services enabled. This can be called either because the user has
+     * explicitly done something that requires the location services (clicked on the MyLocation FAB), or because some
+     * other action has happened and we need to re-check that the location service is enabled (e.g. onResume, or location
+     * has become unavailable).
+     *
+     * This check may trigger a request and prompt the user to enable location services. This prompt should be raised
+     * either if it's an explicit request, or if the user hasn't previously declined to enable location services.
+     *
+     * @param explicitUserAction Indicates whether or not the user has triggered something explicitly causing a location services check
+     * @return indication as to whether location services are enabled. This will return false immediately if a
+     * prompt to enable to raised, even if the user says "yes" to the prompt.
+     */
     private fun checkAndRequestLocationServicesEnabled(explicitUserAction: Boolean): Boolean {
         return if (!requirementsChecker.isLocationServiceEnabled()) {
             Timber.d(Exception(), "Location Services disabled")
@@ -312,6 +329,86 @@ class MapActivity :
         }
     }
 
+    /**
+     * A callback that's fired when the activity is resumed with the result of a location permissioned check resulting
+     * from an expclit user action. We want to trigger a services check if the location permission was granted
+     */
+    val explicitLocationPermissionRequest =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            when {
+                permissions[ACCESS_COARSE_LOCATION] ?: false || permissions[ACCESS_FINE_LOCATION] ?: false -> {
+                    checkAndRequestLocationServicesEnabled(true)
+                    userGrantedPermissions()
+                }
+                else -> {
+                    userDeclinedPermissions()
+                }
+            }
+        }
+
+    /**
+     * A callback that's fired when the activity is resumed with the result of a location permission check not triggered
+     * by an explicit user action.
+     */
+    val locationPermissionRequest =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            when {
+                permissions[ACCESS_COARSE_LOCATION] ?: false || permissions[ACCESS_FINE_LOCATION] ?: false -> {
+                    userGrantedPermissions()
+                }
+                else -> {
+                    userDeclinedPermissions()
+                }
+            }
+        }
+
+    /**
+     * User has granted location permission. Ask the viewmodel to start requesting locations, set the viewmode to
+     * [ViewMode.Device] and tell the service to reinitialize locations.
+     *
+     */
+    private fun userGrantedPermissions() {
+        mapViewModel.requestLocationUpdatesForBlueDot()
+        mapViewModel.onMyLocationClicked()
+        mapViewModel.updateMyLocationStatus()
+        service?.reInitializeLocationRequests()
+    }
+
+    /**
+     * User has declined to enable location permissions. Snackbar the user with the option of trying again (in case they
+     * didn't mean to).
+     *
+     */
+    private fun userDeclinedPermissions() {
+        preferences.userDeclinedEnableLocationPermissions = true
+        Snackbar.make(
+            binding!!.mapCoordinatorLayout,
+            getString(R.string.locationPermissionNotGrantedNotification),
+            Snackbar.LENGTH_LONG
+        )
+            .setAction(getString(R.string.fixProblemLabel)) {
+                startActivity(
+                    Intent(ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        data = Uri.parse("package:$packageName")
+                    }
+                )
+            }
+            .show()
+    }
+
+    /**
+     * Performs a check that the user has granted location permissions. This can be called either because the user has
+     * explicitly done something that requires location permissions (clicked on the MyLocation FAB), or because some other
+     * action has happened and we need to re-check location permissions (e.g. user has enabled location services).
+     *
+     * This check may trigger a request and prompt the user to grant location permissions. This prompt should be raised
+     * either if it's an explicit request for something that needs permissions, or if the user hasn't previously denied
+     * location permission.
+     *
+     * @param explicitUserAction Indicates whether or not the user has triggered something explicitly causing a permissions check
+     * @return indication as to whether location permissions have been granted. This will return false immediately if a
+     * prompt to enable to raised, even if the user says "yes" to the prompt.
+     */
     private fun checkAndRequestLocationPermissions(explicitUserAction: Boolean): Boolean {
         if (!requirementsChecker.isLocationPermissionCheckPassed()) {
             Timber.d("No location permission")
@@ -361,53 +458,6 @@ class MapActivity :
         }
     }
 
-    private fun userGrantedPermissions() {
-        mapViewModel.myLocationIsNowEnabled()
-        service?.reInitializeLocationRequests()
-        previouslyHadLocationPermissions = true
-    }
-
-    private fun userDeclinedPermissions() {
-        preferences.userDeclinedEnableLocationPermissions = true
-        Snackbar.make(
-            binding!!.mapCoordinatorLayout,
-            getString(R.string.locationPermissionNotGrantedNotification),
-            Snackbar.LENGTH_LONG
-        )
-            .setAction(getString(R.string.fixProblemLabel)) {
-                startActivity(
-                    Intent(ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                        data = Uri.parse("package:$packageName")
-                    }
-                )
-            }
-            .show()
-    }
-
-    val explicitLocationPermissionRequest =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            when {
-                permissions[ACCESS_COARSE_LOCATION] ?: false || permissions[ACCESS_FINE_LOCATION] ?: false -> {
-                    checkAndRequestLocationServicesEnabled(true)
-                    userGrantedPermissions()
-                }
-                else -> {
-                    userDeclinedPermissions()
-                }
-            }
-        }
-    val locationPermissionRequest =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            when {
-                permissions[ACCESS_COARSE_LOCATION] ?: false || permissions[ACCESS_FINE_LOCATION] ?: false -> {
-                    userGrantedPermissions()
-                }
-                else -> {
-                    userDeclinedPermissions()
-                }
-            }
-        }
-
     override fun onResume() {
         val mapFragment =
             supportFragmentManager.fragmentFactory.instantiate(
@@ -433,10 +483,11 @@ class MapActivity :
         }
         super.onResume()
         updateMonitoringModeMenu()
-        updateMyLocationButton()
+        mapViewModel.updateMyLocationStatus()
+
         if (!previouslyHadLocationPermissions && requirementsChecker.isLocationPermissionCheckPassed()) {
             previouslyHadLocationPermissions = true
-            mapViewModel.myLocationIsNowEnabled()
+            mapViewModel.requestLocationUpdatesForBlueDot()
             service?.reInitializeLocationRequests()
         }
     }
@@ -463,23 +514,8 @@ class MapActivity :
         inflater.inflate(R.menu.activity_map, menu)
         this.menu = menu
         updateMonitoringModeMenu()
-        updateMyLocationButton()
+        mapViewModel.updateMyLocationStatus()
         return true
-    }
-
-    /**
-     * sets the my location menu item icon based on whether location permissions have been granted
-     * and the location service is enabled
-     */
-    private fun updateMyLocationButton() {
-        binding?.fabMyLocation?.setImageResource(
-
-            if (requirementsChecker.isLocationPermissionCheckPassed() && requirementsChecker.isLocationServiceEnabled()) {
-                R.drawable.ic_baseline_my_location_24
-            } else {
-                R.drawable.ic_baseline_location_disabled_24
-            }
-        )
     }
 
     fun updateMonitoringModeMenu() {
@@ -651,5 +687,15 @@ class MapActivity :
 
     companion object {
         const val BUNDLE_KEY_CONTACT_ID = "BUNDLE_KEY_CONTACT_ID"
+
+        @JvmStatic
+        @BindingAdapter("locationIcon")
+        fun setIcon(view: FloatingActionButton, status: MyLocationStatus) {
+            when (status) {
+                MyLocationStatus.DISABLED -> view.setImageResource(R.drawable.ic_baseline_location_disabled_24)
+                MyLocationStatus.AVAILABLE -> view.setImageResource(R.drawable.ic_baseline_location_searching_24)
+                MyLocationStatus.FOLLOWING -> view.setImageResource(R.drawable.ic_baseline_my_location_24)
+            }
+        }
     }
 }

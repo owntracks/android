@@ -23,11 +23,12 @@ import org.owntracks.android.location.toLatLng
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.model.messages.MessageClear
 import org.owntracks.android.model.messages.MessageLocation.Companion.REPORT_TYPE_USER
+import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ConnectionMode
+import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.services.LocationProcessor
 import org.owntracks.android.services.MessageProcessor
-import org.owntracks.android.preferences.types.MonitoringMode
-import org.owntracks.android.preferences.Preferences
+import org.owntracks.android.support.RequirementsChecker
 import org.owntracks.android.support.SimpleIdlingResource
 import timber.log.Timber
 import javax.inject.Inject
@@ -43,7 +44,8 @@ class MapViewModel @Inject constructor(
     private val locationRepo: LocationRepo,
     private val waypointsRepo: WaypointsRepo,
     @ApplicationContext private val applicationContext: Context,
-) : ViewModel(){
+    private val requirementsChecker: RequirementsChecker,
+) : ViewModel() {
     // controls who the currently selected contact is
     private val mutableCurrentContact = MutableLiveData<FusedContact?>()
     val currentContact: LiveData<FusedContact?>
@@ -74,15 +76,15 @@ class MapViewModel @Inject constructor(
     val relativeContactBearing: LiveData<Float>
         get() = mutableRelativeContactBearing
 
-    // Controls whether the myLocation button on the map is enabled
-    private val mutableMyLocationEnabled = MutableLiveData(false)
-    val myLocationEnabled: LiveData<Boolean>
-        get() = mutableMyLocationEnabled
-
     // Controls the current map layer style
     private val mutableMapLayerStyle = MutableLiveData<MapLayerStyle>(preferences.mapLayerStyle)
     val mapLayerStyle: LiveData<MapLayerStyle>
         get() = mutableMapLayerStyle
+
+    // Controls the status of the MyLocation FAB on the map
+    private val mutableMyLocationStatus = MutableLiveData<MyLocationStatus>(MyLocationStatus.DISABLED)
+    val myLocationStatus: LiveData<MyLocationStatus>
+        get() = mutableMyLocationStatus
 
     val currentLocation = LocationLiveData(applicationContext, viewModelScope)
     val regions = waypointsRepo.allLive
@@ -108,6 +110,21 @@ class MapViewModel @Inject constructor(
 
     val viewMode: ViewMode by locationRepo::viewMode
 
+    fun updateMyLocationStatus() {
+        mutableMyLocationStatus.postValue(
+            if (requirementsChecker.isLocationPermissionCheckPassed() &&
+                requirementsChecker.isLocationServiceEnabled()
+            ) {
+                if (viewMode == ViewMode.Device) {
+                    MyLocationStatus.FOLLOWING
+                } else {
+                    MyLocationStatus.AVAILABLE
+                }
+            } else {
+                MyLocationStatus.DISABLED
+            }
+        )
+    }
 
     val preferenceChangeListener = object : Preferences.OnPreferenceChangeListener {
         override fun onPreferenceChanged(properties: List<String>) {
@@ -120,6 +137,7 @@ class MapViewModel @Inject constructor(
             }
         }
     }
+
     init {
         preferences.registerOnPreferenceChangedListener(preferenceChangeListener)
     }
@@ -155,6 +173,14 @@ class MapViewModel @Inject constructor(
         }
     }
 
+    /**
+     * User has clicked on the MyLocation FAB, so we should set the viewMode to be device.
+     *
+     */
+    fun onMyLocationClicked() {
+        setViewModeDevice()
+    }
+
     private fun setViewModeContact(contactId: String, center: Boolean) {
         val c = contactsRepo.getById(contactId)
         if (c != null) setViewModeContact(c, center) else Timber.e(
@@ -171,12 +197,14 @@ class MapViewModel @Inject constructor(
         refreshGeocodeForContact(contact)
         updateActiveContactDistanceAndBearing(contact)
         if (center && contact.latLng != null) mutableMapCenter.postValue(contact.latLng)
+        updateMyLocationStatus()
     }
 
     private fun setViewModeFree() {
         Timber.d("setting view mode: VIEW_FREE")
         locationRepo.viewMode = ViewMode.Free
         clearActiveContact()
+        updateMyLocationStatus()
     }
 
     private fun setViewModeDevice() {
@@ -188,23 +216,21 @@ class MapViewModel @Inject constructor(
         } ?: run {
             Timber.e("no location available")
         }
+        updateMyLocationStatus()
     }
 
     @MainThread
     fun setLiveContact(contactId: String?) {
         contactId?.let {
             locationRepo.viewMode = ViewMode.Contact(true)
-            contactsRepo.getById(it)?.run(mutableCurrentContact::setValue)
+            contactsRepo.getById(it)
+                ?.run(mutableCurrentContact::setValue)
         }
     }
 
     private fun clearActiveContact() {
         mutableCurrentContact.postValue(null)
         mutableBottomSheetHidden.postValue(true)
-    }
-
-    fun onMenuCenterDeviceClicked() {
-        setViewModeDevice()
     }
 
     fun onClearContactClicked() {
@@ -257,26 +283,47 @@ class MapViewModel @Inject constructor(
         setViewModeFree()
     }
 
+    /**
+     * User has clicked on a marker on the map. Should set the view mode to contact, but not center the map
+     *
+     * @param id identifier of the marker that was clicked on
+     */
     fun onMarkerClick(id: String) {
         setViewModeContact(id, false)
     }
 
+    /**
+     * User has long clicked on the bottom contact sheet. This should trigger centering the map on the currently active contact
+     */
     fun onBottomSheetLongClick() {
         mutableCurrentContact.value?.run {
             setViewModeContact(id, true)
         }
     }
 
-    fun myLocationIsNowEnabled() {
-        mutableMyLocationEnabled.postValue(true)
+    /**
+     * Start requesting location updates for the blue dot
+     *
+     */
+    fun requestLocationUpdatesForBlueDot() {
         viewModelScope.launch { currentLocation.requestLocationUpdates() }
     }
 
+    /**
+     * Moves the blue dot on the map to the given location
+     *
+     * @param latLng location to move the blue dot to
+     */
     fun setCurrentBlueDotLocation(latLng: LatLng) {
         locationIdlingResource.setIdleState(true)
         locationRepo.currentBlueDotOnMapLocation = latLng
     }
 
+    /**
+     * Updates the stored mapView to the given location zoom and rotation. Triggered when the map is moved from the [MapFragment]
+     *
+     * @param mapLocationZoomLevelAndRotation the current map location, zoom and rotation values
+     */
     fun setMapLocationFromMapMoveEvent(mapLocationZoomLevelAndRotation: MapLocationZoomLevelAndRotation) {
         locationRepo.mapViewWindowLocationAndZoom = mapLocationZoomLevelAndRotation
     }
@@ -286,8 +333,10 @@ class MapViewModel @Inject constructor(
             ?: locationRepo.currentBlueDotOnMapLocation?.let {
                 MapLocationZoomLevelAndRotation(it, STARTING_ZOOM)
             } ?: locationRepo.currentPublishedLocation.value?.let {
-                MapLocationZoomLevelAndRotation(it.toLatLng(),
-                    STARTING_ZOOM)
+                MapLocationZoomLevelAndRotation(
+                    it.toLatLng(),
+                    STARTING_ZOOM
+                )
             } ?: MapLocationZoomLevelAndRotation(
                 LatLng(
                     STARTING_LATITUDE,

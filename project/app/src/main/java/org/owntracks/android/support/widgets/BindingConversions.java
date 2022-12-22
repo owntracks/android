@@ -9,6 +9,8 @@ import androidx.databinding.BindingAdapter;
 import androidx.databinding.BindingConversion;
 import androidx.databinding.InverseMethod;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import org.owntracks.android.R;
 import org.owntracks.android.location.geofencing.Geofence;
 import org.owntracks.android.preferences.types.ConnectionMode;
@@ -118,7 +120,6 @@ public class BindingConversions {
     public static void setDate(TextView view, long date) {
         setDate(view, new Date(TimeUnit.SECONDS.toMillis(date)));
     }
-
 
     public static int convertModeIdToLabelResId(ConnectionMode modeId) {
         switch (modeId) {

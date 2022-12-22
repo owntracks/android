@@ -106,7 +106,9 @@ class OSMMapFragment internal constructor(
                     }
                 osmdroidTileCache = requireContext().noBackupFilesDir.resolve("osmdroid/tiles")
             }
-        return super.onCreateView(inflater, container, savedInstanceState)
+        val view = super.onCreateView(inflater, container, savedInstanceState)
+        initMap()
+        return view
     }
 
     private fun setMapStyle() {
