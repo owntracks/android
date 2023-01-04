@@ -7,6 +7,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.res.ColorStateList
 import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.net.Uri
@@ -29,6 +30,7 @@ import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.setPadding
+import androidx.core.widget.ImageViewCompat
 import androidx.databinding.BindingAdapter
 import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
@@ -41,6 +43,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 import org.owntracks.android.BR
 import org.owntracks.android.R
@@ -62,7 +65,6 @@ import org.owntracks.android.ui.mixins.ServiceStarter
 import org.owntracks.android.ui.mixins.WorkManagerInitExceptionNotifier
 import org.owntracks.android.ui.welcome.WelcomeActivity
 import timber.log.Timber
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MapActivity :
@@ -115,7 +117,7 @@ class MapActivity :
     }
 
     private var onBottomSheetLabelTextSizeChangedListener:
-            AutoResizingTextViewWithListener.OnTextSizeChangedListener? = null
+        AutoResizingTextViewWithListener.OnTextSizeChangedListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         EntryPointAccessors.fromActivity(
@@ -273,7 +275,7 @@ class MapActivity :
 
     internal fun checkAndRequestMyLocationCapability(explicitUserAction: Boolean): Boolean =
         checkAndRequestLocationPermissions(explicitUserAction) &&
-                checkAndRequestLocationServicesEnabled(explicitUserAction)
+            checkAndRequestLocationServicesEnabled(explicitUserAction)
 
     private val locationServicesLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -691,11 +693,19 @@ class MapActivity :
         @JvmStatic
         @BindingAdapter("locationIcon")
         fun setIcon(view: FloatingActionButton, status: MyLocationStatus) {
+            val tint = when (status) {
+                MyLocationStatus.FOLLOWING -> view.resources.getColor(R.color.fabMyLocationForegroundActiveTint, null)
+                else -> view.resources.getColor(R.color.fabMyLocationForegroundInActiveTint, null)
+            }
             when (status) {
                 MyLocationStatus.DISABLED -> view.setImageResource(R.drawable.ic_baseline_location_disabled_24)
                 MyLocationStatus.AVAILABLE -> view.setImageResource(R.drawable.ic_baseline_location_searching_24)
                 MyLocationStatus.FOLLOWING -> view.setImageResource(R.drawable.ic_baseline_my_location_24)
             }
+            ImageViewCompat.setImageTintList(
+                view,
+                ColorStateList.valueOf(tint)
+            )
         }
     }
 }

@@ -42,12 +42,11 @@
             android:contentDescription="@string/currentLocationButtonLabel"
             android:tint="@color/primary"
             android:tooltipText="@string/currentLocationButtonLabel"
-            app:backgroundTint="@android:color/white"
+            app:backgroundTint="@color/fabMyLocationBackground"
             app:layout_anchor="@+id/bottomSheetLayout"
             app:layout_anchorGravity="end|bottom"
-            app:tint="@color/primary"
-            app:useCompatPadding="true"
-            app:locationIcon="@{vm.myLocationStatus}"/>
+            app:locationIcon="@{vm.myLocationStatus}"
+            app:useCompatPadding="true" />
 
 
         <androidx.fragment.app.FragmentContainerView
