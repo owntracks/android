@@ -38,7 +38,8 @@ class ClickableCompassOverlay(
             .let { coords ->
                 rect.apply {
                     offset(coords[0], coords[1])
-                }.contains(x, y)
+                }
+                    .contains(x, y)
             }
 
     override fun onSingleTapConfirmed(e: MotionEvent?, mapView: MapView?): Boolean =
@@ -53,16 +54,16 @@ class ClickableCompassOverlay(
                 return false
             }
         } ?: false
-}
 
-// https://stackoverflow.com/a/35522422/352740
-private inline fun <T1 : Any, T2 : Any, R : Any> letBoth(
-    p1: T1?,
-    p2: T2?,
-    block: (T1, T2) -> R?
-): R? {
-    return if (p1 != null && p2 != null) block(p1, p2) else null
-}
+    // https://stackoverflow.com/a/35522422/352740
+    private inline fun <T1 : Any, T2 : Any, R : Any> letBoth(
+        p1: T1?,
+        p2: T2?,
+        block: (T1, T2) -> R?
+    ): R? {
+        return if (p1 != null && p2 != null) block(p1, p2) else null
+    }
 
-private fun Rect.contains(x: Float, y: Float): Boolean =
-    x >= this.left && x <= this.right && y <= this.bottom && y >= this.top
+    private fun Rect.contains(x: Float, y: Float): Boolean =
+        x >= this.left && x <= this.right && y <= this.bottom && y >= this.top
+}
