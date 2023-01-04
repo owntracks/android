@@ -2,12 +2,12 @@ package org.owntracks.android.data.repos
 
 import android.location.Location
 import androidx.lifecycle.MutableLiveData
+import javax.inject.Inject
+import javax.inject.Singleton
 import org.greenrobot.eventbus.EventBus
 import org.owntracks.android.location.LatLng
 import org.owntracks.android.ui.map.MapLocationZoomLevelAndRotation
 import org.owntracks.android.ui.map.MapViewModel
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 class LocationRepo @Inject constructor(private val eventBus: EventBus) {
@@ -31,7 +31,6 @@ class LocationRepo @Inject constructor(private val eventBus: EventBus) {
      * the map being moved due to being in DEVICE or CONTACT modes
      */
     var mapViewWindowLocationAndZoom: MapLocationZoomLevelAndRotation? = null
-
 
     /**
      * The view mode of the map

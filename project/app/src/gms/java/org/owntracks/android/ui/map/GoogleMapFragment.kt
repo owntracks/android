@@ -96,7 +96,6 @@ class GoogleMapFragment internal constructor(
     override fun onMapReady(googleMap: GoogleMap) {
         this.googleMap = googleMap
         initMap()
-        viewModel.onMapReady()
     }
 
     private fun setMapStyle() {

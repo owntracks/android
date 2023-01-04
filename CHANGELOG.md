@@ -13,6 +13,7 @@
 ### Bug fixes
 
 - Labels on the contact sheet should all be the same size as each other (#1277)
+- Clicking on a contact marker in the contacts activity doesn't always center the map on the marker (#1349, #1280)
 
 ## Version 2.4.10
 

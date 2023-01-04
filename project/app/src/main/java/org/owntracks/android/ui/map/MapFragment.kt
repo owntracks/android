@@ -43,7 +43,6 @@ abstract class MapFragment<V : ViewDataBinding> internal constructor(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         binding = DataBindingUtil.inflate(inflater, layout, container, false)
         binding.lifecycleOwner = this.viewLifecycleOwner
 

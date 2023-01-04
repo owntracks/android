@@ -12,6 +12,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+import kotlin.math.asin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.owntracks.android.data.repos.ContactsRepo
@@ -31,8 +33,6 @@ import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.support.RequirementsChecker
 import org.owntracks.android.support.SimpleIdlingResource
 import timber.log.Timber
-import javax.inject.Inject
-import kotlin.math.asin
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
@@ -44,7 +44,7 @@ class MapViewModel @Inject constructor(
     private val locationRepo: LocationRepo,
     private val waypointsRepo: WaypointsRepo,
     @ApplicationContext private val applicationContext: Context,
-    private val requirementsChecker: RequirementsChecker,
+    private val requirementsChecker: RequirementsChecker
 ) : ViewModel() {
     // controls who the currently selected contact is
     private val mutableCurrentContact = MutableLiveData<FusedContact?>()
@@ -262,7 +262,7 @@ class MapViewModel @Inject constructor(
 
     private fun updateActiveContactDistanceAndBearing(
         currentLocation: Location,
-        contact: FusedContact,
+        contact: FusedContact
     ) {
         contact.messageLocation?.run {
             val distanceBetween = FloatArray(2)
@@ -329,10 +329,16 @@ class MapViewModel @Inject constructor(
     }
 
     fun initMapStartingLocation(): MapLocationZoomLevelAndRotation =
-        locationRepo.mapViewWindowLocationAndZoom
-            ?: locationRepo.currentBlueDotOnMapLocation?.let {
-                MapLocationZoomLevelAndRotation(it, STARTING_ZOOM)
-            } ?: locationRepo.currentPublishedLocation.value?.let {
+        if (viewMode == ViewMode.Contact(true) && currentContact.value?.latLng != null) {
+            MapLocationZoomLevelAndRotation(
+                currentContact.value!!.latLng!!,
+                locationRepo.mapViewWindowLocationAndZoom?.zoom ?: STARTING_ZOOM
+            )
+        } else {
+            locationRepo.mapViewWindowLocationAndZoom
+                ?: locationRepo.currentBlueDotOnMapLocation?.let {
+                    MapLocationZoomLevelAndRotation(it, STARTING_ZOOM)
+                } ?: locationRepo.currentPublishedLocation.value?.let {
                 MapLocationZoomLevelAndRotation(
                     it.toLatLng(),
                     STARTING_ZOOM
@@ -344,6 +350,7 @@ class MapViewModel @Inject constructor(
                 ),
                 STARTING_ZOOM
             )
+        }
 
     val orientationSensorEventListener = object : SensorEventListener {
         override fun onSensorChanged(maybeEvent: SensorEvent?) {
