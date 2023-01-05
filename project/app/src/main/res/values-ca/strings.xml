@@ -160,7 +160,6 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="preferencesEncryptionKeyDialogMessage">"La clau d'encriptació es talla als 32 caracters"</string>
     <string name="preferencesEncryptionKeySummary">"Clau simètrica d'encriptació de càrrega"</string>
     <string name="preferencesExperimental">"Experimental"</string>
-    <string name="preferencesExportFailed">"Error en exportar preferències"</string>
     <string name="preferencesExportSuccess">"Exportació reeixida"</string>
     <string name="preferencesHost">"Amfitrió"</string>
     <string name="preferencesIdentification">"Identificació"</string>

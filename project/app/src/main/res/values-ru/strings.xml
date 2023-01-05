@@ -172,7 +172,6 @@
     <string name="preferencesEncryptionKeyDialogMessage">"Ключ шифрования обрезается после 32 символов."</string>
     <string name="preferencesEncryptionKeySummary">"Ключ симметрического шифрования данных"</string>
     <string name="preferencesExperimental">"Экспериментальные"</string>
-    <string name="preferencesExportFailed">"Не удалось экспортировать настройки"</string>
     <string name="preferencesExportSuccess">"Настройки экспортированы"</string>
     <string name="preferencesHost">"Адрес"</string>
     <string name="preferencesIdentification">"Идентификация"</string>

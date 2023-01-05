@@ -152,7 +152,6 @@
     <string name="preferencesEncryptionKeyDialogMessage">"32번째 글자 이후에는 잘립니다"</string>
     <string name="preferencesEncryptionKeySummary">"페이로드 암호화를 위한 공통 키"</string>
     <string name="preferencesExperimental">"시험 단계"</string>
-    <string name="preferencesExportFailed">"환경 설정을 내보내지 못했습니다"</string>
     <string name="preferencesExportSuccess">"내보내기에 성공했습니다"</string>
     <string name="preferencesHost">"호스트"</string>
     <string name="preferencesIdentification">"자격 증명"</string>

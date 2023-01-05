@@ -140,7 +140,6 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="preferencesEncryptionKeyDialogMessage">"Schlüssel wird nach 32 Zeichen abgeschnitten"</string>
     <string name="preferencesEncryptionKeySummary">"Symmetrischer Schlüssel für Inhalts-Verschlüsselung"</string>
     <string name="preferencesExperimental">"Experimentell"</string>
-    <string name="preferencesExportFailed">"Einstellungs-Export fehlgeschlagen"</string>
     <string name="preferencesExportSuccess">"Export erfolgreich"</string>
     <string name="preferencesHost">"Hostname"</string>
     <string name="preferencesIdentification">"Identifikation"</string>

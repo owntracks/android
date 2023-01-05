@@ -114,7 +114,6 @@
     <string name="preferencesEncryptionKey">"Clave de encriptación"</string>
     <string name="preferencesEncryptionKeyDialogMessage">"La clave se corta después de 32 caracteres"</string>
     <string name="preferencesEncryptionKeySummary">"Clave simétrica para encriptación del payload"</string>
-    <string name="preferencesExportFailed">"Fallo al exportar las preferencias"</string>
     <string name="preferencesExportSuccess">"Preferencias exportadas"</string>
     <string name="preferencesHost">"Host"</string>
     <string name="preferencesIdentification">"Identificación"</string>

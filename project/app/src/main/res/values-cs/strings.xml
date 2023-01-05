@@ -160,7 +160,6 @@ Chcete-li to umožnit, zapněte polohu v nastavení zařízení."</string>
     <string name="preferencesEncryptionKeyDialogMessage">"Šifrovací klíč je zkrácen na 32 znaků"</string>
     <string name="preferencesEncryptionKeySummary">"Symetrický klíč pro šifrování dat"</string>
     <string name="preferencesExperimental">"Experimentální"</string>
-    <string name="preferencesExportFailed">"Export nastavení selhal"</string>
     <string name="preferencesExportSuccess">"Export byl úspěšný"</string>
     <string name="preferencesHost">"Server"</string>
     <string name="preferencesIdentification">"Identifikace"</string>

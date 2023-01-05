@@ -158,7 +158,6 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="preferencesEncryptionKeyDialogMessage">"Krypteringsnøgle er afskåret efter 32 karakterer."</string>
     <string name="preferencesEncryptionKeySummary">"Symmetrisk nøgle for dekryptering"</string>
     <string name="preferencesExperimental">"Eksperimentel"</string>
-    <string name="preferencesExportFailed">"Præferenceeksport fejlede"</string>
     <string name="preferencesExportSuccess">"Eksport lykkedes"</string>
     <string name="preferencesHost">"Vært"</string>
     <string name="preferencesIdentification">"Identifikation"</string>

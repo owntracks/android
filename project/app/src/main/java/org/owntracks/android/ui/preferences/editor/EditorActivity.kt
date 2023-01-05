@@ -9,7 +9,6 @@ import android.view.MenuItem
 import android.widget.ArrayAdapter
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.AppCompatAutoCompleteTextView
 import androidx.core.app.ShareCompat
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
@@ -78,7 +77,7 @@ class EditorActivity :
         val layout = inflater.inflate(R.layout.ui_preferences_editor_dialog, null)
 
         // Set autocomplete items
-        val inputKeyView = layout.findViewById<MaterialAutoCompleteTextView >(R.id.inputKey)
+        val inputKeyView = layout.findViewById<MaterialAutoCompleteTextView>(R.id.inputKey)
         inputKeyView.setAdapter(
             ArrayAdapter(
                 this,
@@ -120,14 +119,7 @@ class EditorActivity :
                     )
                         .show()
                 }
-                RESULT_CANCELED -> {
-                    Snackbar.make(
-                        findViewById(R.id.effectiveConfiguration),
-                        R.string.preferencesExportFailed,
-                        Snackbar.LENGTH_SHORT
-                    )
-                        .show()
-                }
+                RESULT_CANCELED -> {}
             }
             revokeExportUriPermissions()
         }

@@ -158,7 +158,6 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesEncryptionKeyDialogMessage">"Encryption key is cut off after 32 characters."</string>
     <string name="preferencesEncryptionKeySummary">"Symmetric key for payload encryption"</string>
     <string name="preferencesExperimental">"Experimental"</string>
-    <string name="preferencesExportFailed">"Preferences export failed"</string>
     <string name="preferencesExportSuccess">"Dışa aktarma başarılı"</string>
     <string name="preferencesHost">"Host"</string>
     <string name="preferencesIdentification">"Identification"</string>

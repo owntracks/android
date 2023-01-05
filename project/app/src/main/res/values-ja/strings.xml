@@ -140,7 +140,6 @@
     <string name="preferencesEncryptionKeyDialogMessage">"32文字目より後は切り捨てられます。"</string>
     <string name="preferencesEncryptionKeySummary">"ペイロード暗号化のための共通鍵"</string>
     <string name="preferencesExperimental">"試験段階"</string>
-    <string name="preferencesExportFailed">"環境設定のエクスポートに失敗しました"</string>
     <string name="preferencesExportSuccess">"エクスポートに成功しました"</string>
     <string name="preferencesHost">"ホスト"</string>
     <string name="preferencesIdentification">"認証情報"</string>
