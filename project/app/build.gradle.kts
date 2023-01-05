@@ -266,20 +266,3 @@ val codesTask = tasks.register<GetLatestVersionCodeMinusOne>("getLatestVersionCo
     codes.set(file("build/intermediates/gpp/gmsRelease/available-version-codes.txt"))
     outCode.set(file("build/intermediates/version-code-minus-one.txt"))
 }
-
-androidComponents {
-    onVariants { variant ->
-        val minusOne = System.getenv("MAKE_APK_SAME_VERSION_CODE_AS_GOOGLE_PLAY")
-        if (!minusOne.isNullOrEmpty()) {
-            for (output in variant.outputs) {
-                output.versionCode.set(
-                    codesTask.flatMap { it.outCode }
-                        .map {
-                            it.asFile.readText()
-                                .toInt()
-                        }
-                )
-            }
-        }
-    }
-}
