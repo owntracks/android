@@ -31,11 +31,7 @@ jobs:
         with:
           build-root-directory: project
           gradle-dependencies-cache-key: |
-            project/app/build.gradle.kts
-            project/build.gradle.kts
-            project/buildSrc/build.gradle.kts
             project/gradle/libs.versions.toml
-            project/gradle/wrapper/gradle-wrapper.properties
           arguments: |
             --scan
             assembleDebug
@@ -67,11 +63,7 @@ jobs:
         with:
           build-root-directory: project
           gradle-dependencies-cache-key: |
-            project/app/build.gradle.kts
-            project/build.gradle.kts
-            project/buildSrc/build.gradle.kts
             project/gradle/libs.versions.toml
-            project/gradle/wrapper/gradle-wrapper.properties
           arguments: |
             --scan
             jacocoTestGmsReleaseUnitTestReport
@@ -96,11 +88,7 @@ jobs:
         with:
           build-root-directory: project
           gradle-dependencies-cache-key: |
-            project/app/build.gradle.kts
-            project/build.gradle.kts
-            project/buildSrc/build.gradle.kts
             project/gradle/libs.versions.toml
-            project/gradle/wrapper/gradle-wrapper.properties
           arguments: |
             --scan
             jacocoTestGmsReleaseUnitTestReport
