@@ -7,6 +7,6 @@
 	 -v $(pwd)/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro \
 	 -v $(pwd)/mosquitto.password:/mosquitto/config/mosquitto.password:ro \
 	 -v $(pwd)/rootCA.pem:/mosquitto/config/rootCA.pem:ro \
-	 -v $(pwd)/10.0.2.2-key.pem:/mosquitto/config/10.0.2.2-key.pem:ro \
-	 -v $(pwd)/10.0.2.2.pem:/mosquitto/config/10.0.2.2.pem:ro \
+	 -v $(pwd)/_wildcard.docker.local-key.pem:/mosquitto/config/key.pem:ro \
+	 -v $(pwd)/_wildcard.docker.local.pem:/mosquitto/config/cert.pem:ro \
 	 eclipse-mosquitto:2.0.15-openssl
