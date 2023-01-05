@@ -26,12 +26,19 @@ jobs:
         with:
           distribution: "temurin"
           java-version: "17"
+      - name: Create keystore
+        run: |
+          echo -n $KEYSTORE_BASE64 | base64 -d > project/owntracks.release.keystore.jks
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
       - name: Gradle build
         uses: burrunan/gradle-cache-action@v1
+        env:
+          KEYSTORE_PASSPHRASE: ${{ secrets.KEYSTORE_PASSPHRASE }}
         with:
           build-root-directory: project
           gradle-dependencies-cache-key: |
-            project/gradle/libs.versions.toml
+            libs.versions.toml
           arguments: |
             --scan
             assembleDebug
@@ -46,7 +53,9 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: apks
-          path: project/app/build/outputs/apk/*.apk
+          path: |
+            project/app/build/outputs/apk/oss/release/app-oss-release.apk
+            project/app/build/outputs/apk/gms/release/app-gms-release.apk
 
   unit-test:
     name: Unit test
@@ -62,8 +71,7 @@ jobs:
         uses: burrunan/gradle-cache-action@v1
         with:
           build-root-directory: project
-          gradle-dependencies-cache-key: |
-            project/gradle/libs.versions.toml
+          read-only: true
           arguments: |
             --scan
             jacocoTestGmsReleaseUnitTestReport
@@ -87,11 +95,10 @@ jobs:
         uses: burrunan/gradle-cache-action@v1
         with:
           build-root-directory: project
-          gradle-dependencies-cache-key: |
-            project/gradle/libs.versions.toml
+          read-only: true
           arguments: |
             --scan
-            jacocoTestGmsReleaseUnitTestReport
+            lint
       - name: Upload lint report
         uses: actions/upload-artifact@v3
         with:
@@ -111,4 +118,4 @@ jobs:
           name: apks
       - name: Scan OSS APK
         run: |
-          /usr/local/bin/fdroid scanner project/app/build/outputs/apk/oss/release/app-oss-release.apk
+          /usr/local/bin/fdroid scanner oss/release/app-oss-release.apk
