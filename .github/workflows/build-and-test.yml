@@ -1,0 +1,114 @@
+---
+name: Build and Test
+
+"on":
+  push:
+    paths:
+      - ".github/workflows/build-and-test.yml"
+      - "project/app/src/**"
+      - "project/app/*.pro"
+      - "project/buildSrc/src/**"
+      - "project/*.gradle.kts"
+      - "project/gradle/wrapper/gradle-wrapper.properties"
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build-release:
+    name: Build release
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Gradle build
+        uses: burrunan/gradle-cache-action@v1
+        with:
+          build-root-directory: project
+          gradle-dependencies-cache-key: |
+            project/app/build.gradle.kts
+            project/build.gradle.kts
+            project/buildSrc/build.gradle.kts
+            project/gradle/libs.versions.toml
+            project/gradle/wrapper/gradle-wrapper.properties
+          arguments: |
+            --scan
+            assembleDebug
+            assembleRelease
+            assembleAndroidTest
+            assembleGmsReleaseUnitTest
+            :app:compileOssReleaseSources
+            :app:packageGmsReleaseBundle
+            :app:assembleGmsDebugAndroidTest
+            :app:assembleOssDebugAndroidTest
+      - name: Upload apk artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: apks
+          path: project/app/build/outputs/apk/*.apk
+
+  unit-test:
+    name: Unit test
+    needs: build-release
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Gradle build
+        uses: burrunan/gradle-cache-action@v1
+        with:
+          build-root-directory: project
+          gradle-dependencies-cache-key: |
+            project/app/build.gradle.kts
+            project/build.gradle.kts
+            project/buildSrc/build.gradle.kts
+            project/gradle/libs.versions.toml
+            project/gradle/wrapper/gradle-wrapper.properties
+          arguments: |
+            --scan
+            jacocoTestGmsReleaseUnitTestReport
+      - name: Upload lint report
+        uses: actions/upload-artifact@v3
+        with:
+          name: unit-test-report
+          path: project/app/build/test-results/testGmsReleaseUnitTest/
+
+  lint:
+    name: Android lint
+    needs: build-release
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Gradle build
+        uses: burrunan/gradle-cache-action@v1
+        with:
+          build-root-directory: project
+          gradle-dependencies-cache-key: |
+            project/app/build.gradle.kts
+            project/build.gradle.kts
+            project/buildSrc/build.gradle.kts
+            project/gradle/libs.versions.toml
+            project/gradle/wrapper/gradle-wrapper.properties
+          arguments: |
+            --scan
+            jacocoTestGmsReleaseUnitTestReport
+      - name: Upload lint report
+        uses: actions/upload-artifact@v3
+        with:
+          name: lint-report
+          path: project/app/build/reports/lint-results.html
+
+  fdroid-scanner:
+    name: F-Droid scanner
+    runs-on: ubuntu-latest
+    needs: build-release
+    container:
+      image: registry.gitlab.com/fdroid/docker-executable-fdroidserver:master
+    steps:
+      - name: Download APK
+        uses: actions/download-artifact@v3
+        with:
+          name: apks
+      - name: Scan OSS APK
+        run: |
+          /usr/local/bin/fdroid scanner project/app/build/outputs/apk/oss/release/app-oss-release.apk
