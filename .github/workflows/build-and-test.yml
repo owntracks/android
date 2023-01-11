@@ -38,7 +38,7 @@ jobs:
         with:
           build-root-directory: project
           gradle-dependencies-cache-key: |
-            libs.versions.toml
+            project/gradle/libs.versions.toml
           arguments: |
             --scan
             assembleDebug
@@ -71,6 +71,8 @@ jobs:
         uses: burrunan/gradle-cache-action@v1
         with:
           build-root-directory: project
+          gradle-dependencies-cache-key: |
+            project/gradle/libs.versions.toml
           read-only: true
           arguments: |
             --scan
@@ -95,6 +97,8 @@ jobs:
         uses: burrunan/gradle-cache-action@v1
         with:
           build-root-directory: project
+          gradle-dependencies-cache-key: |
+            project/gradle/libs.versions.toml
           read-only: true
           arguments: |
             --scan
