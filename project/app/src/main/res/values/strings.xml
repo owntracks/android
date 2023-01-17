@@ -210,8 +210,8 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesRemoteConfigurationSummary">"Enable configuration to be updated remotely (requires remote commands)"</string>
     <string name="preferencesReporting">"Reporting"</string>
     <string name="preferencesRepository">"Source Code"</string>
-    <string name="preferencesRepublishOnRecconect">"Publish location on MQTT connect"</string>
-    <string name="preferencesRepublishOnRecconectSummary">"Publish the last known location and current extended data immediately on connecting to MQTT"</string>
+    <string name="preferencesRepublishOnReconnect">"Publish location on MQTT connect"</string>
+    <string name="preferencesRepublishOnReconnectSummary">"Publish the last known location and current extended data immediately on connecting to MQTT"</string>
     <string name="preferencesReverseGeocodeProvider">"Reverse Geocode Provider"</string>
     <string name="preferencesSecurity">"Security"</string>
     <string name="preferencesServer">"Connection"</string>
