@@ -210,8 +210,6 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesRemoteConfigurationSummary">"Enable configuration to be updated remotely (requires remote commands)"</string>
     <string name="preferencesReporting">"Reporting"</string>
     <string name="preferencesRepository">"Source Code"</string>
-    <string name="preferencesRepublishOnRecconect">"Publish location on MQTT connect"</string>
-    <string name="preferencesRepublishOnRecconectSummary">"Publish the last known location and current extended data immediately on connecting to MQTT"</string>
     <string name="preferencesReverseGeocodeProvider">"Reverse Geocode Provider"</string>
     <string name="preferencesSecurity">"Security"</string>
     <string name="preferencesServer">"Connection"</string>
@@ -248,7 +246,6 @@ To allow this, please enable Location in the device settings."</string>
     <string name="title_activity_regions">"Bölgeler"</string>
     <string name="title_activity_status">"Durum"</string>
     <string name="title_exit">"Uygulamadan çık"</string>
-    <string name="tls" translatable="false">"TLS"</string>
     <string name="transitionEntering">"enters"</string>
     <string name="transitionLeaving">"leaves"</string>
     <string name="unableToCopyCertificate">"Unable to copy certificate to internal storage"</string>

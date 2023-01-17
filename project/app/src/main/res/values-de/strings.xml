@@ -85,6 +85,9 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="locationPermissionRequestDialogTitle">"Erlaubnis für Positionsermittlung"</string>
     <string name="logViewerActivityTitle">"Logs"</string>
     <string name="longitude">"Längengrad"</string>
+    <string name="mapLayerDialogTitle">"Kartenlayer"</string>
+    <string name="mapLayerOpenStreetMapLabel">"OpenStreetMap"</string>
+    <string name="mapLayerOpenStreetMapWikimediaLabel">"Wikimedia"</string>
     <string name="menuClear">"Entfernen"</string>
     <string name="menuContactNavigate">"Navigieren"</string>
     <string name="mode_heading">"Modus"</string>
@@ -154,6 +157,7 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="preferencesLocatorInterval">"Standort Intervall"</string>
     <string name="preferencesLocatorIntervalDialog">"Wie häufig sollen Standorte vom Gerät bezogen werden? (Sekunden)"</string>
     <string name="preferencesLocatorIntervalSummary">"Intervall zwischen Standortupdates"</string>
+    <string name="preferencesMap">"Karte"</string>
     <string name="preferencesMoveModeLocatorInterval">"Standort Intervall (Bewegungsmodus)"</string>
     <string name="preferencesMoveModeLocatorIntervalDialog">"Wie häufig sollen Standorte im Bewegungsmodus vom Gerät abgefragt werden (Sekunden)"</string>
     <string name="preferencesMoveModeLocatorIntervalSummary">"Intervall zwischen Standortupdates im Bewegungsmodus"</string>

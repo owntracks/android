@@ -32,4 +32,5 @@ for lang in $(curl -s -X POST https://api.poeditor.com/v2/languages/list \
         -d options="[{\"unquoted\":0}]" | jq -r .result.url)
 
     curl -s -o project/app/src/main/res/values-"${locale}"/strings.xml "${URL}"
+    sed -i '$a\' project/app/src/main/res/values-"${locale}"/strings.xml
 done
