@@ -12,15 +12,17 @@ import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.contrib.RecyclerViewActions
-import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
+import java.util.concurrent.TimeUnit
 import org.owntracks.android.R
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
 
 fun scrollToPreferenceWithText(textResource: Int) {
     onView(withId(androidx.preference.R.id.recycler_view))
@@ -82,18 +84,25 @@ inline fun IdlingResource?.with(timeoutSeconds: Long = 30, block: () -> Unit) {
     }
     IdlingPolicies.setIdlingResourceTimeout(timeoutSeconds, TimeUnit.SECONDS)
     try {
-        this?.run { IdlingRegistry.getInstance().register(this) }
+        this?.run {
+            IdlingRegistry.getInstance()
+                .register(this)
+        }
         block()
     } finally {
-        this?.run { IdlingRegistry.getInstance().unregister(this) }
+        this?.run {
+            IdlingRegistry.getInstance()
+                .unregister(this)
+        }
     }
 }
 
 fun disableDeviceLocation() {
-    val cmd = if (android.os.Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
+    val cmd = if (android.os.Build.VERSION.SDK_INT > Build.VERSION_CODES.O) {
         "settings put secure location_mode 0"
-    else
+    } else {
         "settings put secure location_providers_allowed -gps"
+    }
 
     InstrumentationRegistry.getInstrumentation().uiAutomation
         .executeShellCommand(cmd)
@@ -101,10 +110,11 @@ fun disableDeviceLocation() {
 }
 
 fun enableDeviceLocation() {
-    val cmd = if (android.os.Build.VERSION.SDK_INT > Build.VERSION_CODES.O)
+    val cmd = if (android.os.Build.VERSION.SDK_INT > Build.VERSION_CODES.O) {
         "settings put secure location_mode 3"
-    else
+    } else {
         "settings put secure location_providers_allowed +gps"
+    }
 
     InstrumentationRegistry.getInstrumentation().uiAutomation
         .executeShellCommand(cmd)

@@ -10,6 +10,7 @@ import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDr
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import com.adevinta.android.barista.interaction.PermissionGranter
+import java.util.concurrent.TimeUnit
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
@@ -21,7 +22,6 @@ import org.owntracks.android.testutils.*
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.clickOnDrawerAndWait
 import org.owntracks.android.ui.map.MapActivity
-import java.util.concurrent.TimeUnit
 
 @LargeTest
 @SmokeTest
@@ -73,11 +73,7 @@ class LocationMessageRetryTest :
             clickOnAndWait(R.id.menu_report)
         }
 
-        baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.with(
-            TimeUnit.MINUTES.toSeconds(
-                2
-            )
-        ) {
+        baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.with(TimeUnit.MINUTES.toSeconds(2)) {
             openDrawer()
             clickOnAndWait(R.string.title_activity_status)
         }
@@ -93,7 +89,8 @@ class LocationMessageRetryTest :
                 requestCounter += 1
                 if (requestCounter >= 3) {
                     MockResponse().setResponseCode(200)
-                        .setHeader("Content-type", "application/json").setBody(responseBody)
+                        .setHeader("Content-type", "application/json")
+                        .setBody(responseBody)
                 } else {
                     errorResponse
                 }

@@ -61,7 +61,7 @@ class GoogleMapFragment internal constructor(
                 locationObserver = object : Observer<Location> {
                     override fun onChanged(location: Location) {
                         onLocationChangedListener.onLocationChanged(location)
-                        viewModel.setCurrentBlueDotLocation(location.toLatLng())
+                        viewModel.setCurrentBlueDotLocation(location.toLatLng(), location.isMock)
                         if (viewModel.viewMode == MapViewModel.ViewMode.Device) {
                             updateCamera(location.toLatLng())
                         }

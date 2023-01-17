@@ -214,7 +214,7 @@ class MapViewModel @Inject constructor(
         currentLocation.value?.apply {
             mutableMapCenter.postValue(this.toLatLng())
         } ?: run {
-            Timber.e("no location available")
+            Timber.w("no location available")
         }
         updateMyLocationStatus()
     }
@@ -314,8 +314,10 @@ class MapViewModel @Inject constructor(
      *
      * @param latLng location to move the blue dot to
      */
-    fun setCurrentBlueDotLocation(latLng: LatLng) {
-        locationIdlingResource.setIdleState(true)
+    fun setCurrentBlueDotLocation(latLng: LatLng, isMock: Boolean) {
+        if (isMock) {
+            locationIdlingResource.setIdleState(true)
+        }
         locationRepo.currentBlueDotOnMapLocation = latLng
     }
 

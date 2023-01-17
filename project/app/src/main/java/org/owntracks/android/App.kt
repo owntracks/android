@@ -42,9 +42,6 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
     lateinit var runThingsOnOtherThreads: RunThingsOnOtherThreads
 
     @Inject
-    lateinit var messageProcessor: MessageProcessor
-
-    @Inject
     lateinit var workerFactory: WorkerFactory
 
     @Inject
@@ -113,10 +110,6 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
                     .build()
             )
         }
-
-        // Running this on a background thread will deadlock FirebaseJobDispatcher.
-        // Initialize will call Scheduler to connect off the main thread anyway.
-        runThingsOnOtherThreads.postOnMainHandlerDelayed({ messageProcessor.initialize() }, 510)
 
         preferences.registerOnPreferenceChangedListener(this)
 

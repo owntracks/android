@@ -53,17 +53,19 @@ public class LocationProcessor {
     }
 
     public void publishLocationMessage(@Nullable String trigger) {
+        publishLocationMessage(trigger, locationRepo.getCurrentPublishedLocation().getValue());
+    }
+
+    public void publishLocationMessage(@Nullable String trigger, @NonNull Location location) {
         Timber.v("publishLocationMessage. trigger: %s. ThreadID: %s", trigger, Thread.currentThread());
         if (locationRepo.getCurrentPublishedLocation().getValue() == null) {
-            Timber.e("no location available");
+            Timber.e("no location available, can't publish location");
             return;
         }
 
-        Location currentLocation = locationRepo.getCurrentPublishedLocation().getValue();
         List<WaypointModel> loadedWaypoints = waypointsRepo.getAllWithGeofences();
 
-        assert currentLocation != null;
-        if (ignoreLowAccuracy(currentLocation)) {
+        if (ignoreLowAccuracy(location)) {
             return;
         }
 
@@ -72,8 +74,8 @@ public class LocationProcessor {
             for (WaypointModel waypoint : loadedWaypoints) {
                 onWaypointTransition(
                         waypoint,
-                        currentLocation,
-                        currentLocation.distanceTo(waypoint.getLocation()) <= (waypoint.getGeofenceRadius() + currentLocation.getAccuracy()) ? Geofence.GEOFENCE_TRANSITION_ENTER : Geofence.GEOFENCE_TRANSITION_EXIT,
+                        location,
+                        location.distanceTo(waypoint.getLocation()) <= (waypoint.getGeofenceRadius() + location.getAccuracy()) ? Geofence.GEOFENCE_TRANSITION_ENTER : Geofence.GEOFENCE_TRANSITION_EXIT,
                         MessageTransition.TRIGGER_LOCATION
                 );
             }
@@ -92,13 +94,13 @@ public class LocationProcessor {
         MessageLocation message;
 
         if (preferences.getPubExtendedData()) {
-            message = MessageLocation.fromLocationAndWifiInfo(currentLocation, wifiInfoProvider);
+            message = MessageLocation.fromLocationAndWifiInfo(location, wifiInfoProvider);
             message.setBattery(deviceMetricsProvider.getBatteryLevel());
             message.setBatteryStatus(deviceMetricsProvider.getBatteryStatus());
             message.setConn(deviceMetricsProvider.getConnectionType());
             message.setMonitoringMode(preferences.getMonitoring());
         } else {
-            message = MessageLocation.fromLocation(currentLocation, Build.VERSION.SDK_INT);
+            message = MessageLocation.fromLocation(location, Build.VERSION.SDK_INT);
         }
         message.setTrigger(trigger);
         message.setTrackerId(preferences.getTid().getValue());
@@ -118,9 +120,9 @@ public class LocationProcessor {
         return l;
     }
 
-    public void onLocationChanged(@NonNull Location l, @Nullable String reportType) {
-        locationRepo.setCurrentPublishedLocation(l);
-        publishLocationMessage(reportType);
+    public void onLocationChanged(@NonNull Location location, @Nullable String reportType) {
+        locationRepo.setCurrentPublishedLocation(location);
+        publishLocationMessage(reportType, location);
     }
 
 

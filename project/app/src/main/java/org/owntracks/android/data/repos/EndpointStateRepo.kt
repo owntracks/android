@@ -1,10 +1,11 @@
 package org.owntracks.android.data.repos
 
 import androidx.lifecycle.MutableLiveData
-import org.owntracks.android.data.EndpointState
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
+import org.owntracks.android.data.EndpointState
+import timber.log.Timber
 
 @Singleton
 class EndpointStateRepo @Inject constructor() {

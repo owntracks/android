@@ -244,7 +244,7 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
 
             switch (intent.getAction()) {
                 case INTENT_ACTION_SEND_LOCATION_USER:
-                    locationProcessor.publishLocationMessage(MessageLocation.REPORT_TYPE_USER);
+                    locationProcessor.publishLocationMessage(MessageLocation.REPORT_TYPE_USER, locationRepo.getCurrentPublishedLocation().getValue());
                     return;
                 case INTENT_ACTION_SEND_EVENT_CIRCULAR:
                     onGeofencingEvent(GeofencingEvent.fromIntent(intent));

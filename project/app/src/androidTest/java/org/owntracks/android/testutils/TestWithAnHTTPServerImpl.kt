@@ -55,8 +55,7 @@ class TestWithAnHTTPServerImpl : TestWithAnHTTPServer {
         )
         sleep(500)
         clickOnAndWait(R.id.save)
-        openDrawer()
-        clickOnAndWait(R.string.title_activity_status)
+        clickOnAndWait(android.R.id.button1)
     }
 
     class MockJSONResponseDispatcher(private val responses: Map<String, String>) :

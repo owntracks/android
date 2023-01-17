@@ -309,6 +309,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
 
     @Override
     public void checkConfigurationComplete() throws ConfigurationIncompleteException {
+        loadEndpointUrl();
         if (this.httpEndpoint == null) {
             throw new ConfigurationIncompleteException("HTTP Endpoint is missing");
         }
