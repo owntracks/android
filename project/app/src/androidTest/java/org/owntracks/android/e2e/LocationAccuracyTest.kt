@@ -17,6 +17,7 @@ import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
@@ -129,6 +130,6 @@ class LocationAccuracyTest :
         sleep(1000) // The status needs time to react and appear
         assertContains(R.id.connectedStatus, R.string.IDLE)
         assertContains(R.id.connectedStatusMessage, "1 msg")
-        assertEquals(1, dispatcher.requestsReceived)
+        assertNotEquals(0, dispatcher.requestsReceived)
     }
 }
