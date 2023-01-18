@@ -64,7 +64,7 @@ class OSMMapFragment internal constructor(
             val locationProvider: IMyLocationProvider = this
             locationObserver = Observer<Location> { location ->
                 myLocationConsumer?.onLocationChanged(location, locationProvider)
-                viewModel.setCurrentBlueDotLocation(location.toLatLng(), location.isMock)
+                viewModel.setCurrentBlueDotLocation(location.toLatLng())
                 if (viewModel.viewMode == MapViewModel.ViewMode.Device) {
                     updateCamera(location.toLatLng())
                 }
