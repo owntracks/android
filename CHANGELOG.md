@@ -4,7 +4,7 @@
 
 ### New features
 
-- When displayed, LanLngs now are limited to 6 significant figures, because more precision than that is a bit silly (#1278, #1279)
+- When displayed, LanLngs now are limited to 4 decimal places, because more precision than that is a bit silly (#1278, #1279)
 - The config editor text is now selectable
 - No need to restart the app once loading in a config any more!
 - Add an option for a location message to be republished on reconnection to MQTT (#1273, #1178)
@@ -16,6 +16,7 @@
 - Labels on the contact sheet should all be the same size as each other (#1277)
 - Clicking on a contact marker in the contacts activity doesn't always center the map on the marker (#1349, #1280)
 - Don't show an error message on non-error conditions exporting config (#1280)
+- We should probably round latL
 
 ## Version 2.4.10
 

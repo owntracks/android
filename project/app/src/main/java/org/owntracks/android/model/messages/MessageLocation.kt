@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import java.lang.ref.WeakReference
 import java.math.BigDecimal
-import java.math.MathContext
+import java.math.RoundingMode
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 import org.jetbrains.annotations.NotNull
@@ -93,7 +93,7 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
 
     @get:JsonIgnore
     internal val fallbackGeocode: String
-        get() = "${latitude.roundToSignificantDigits(6)}, ${longitude.roundToSignificantDigits(6)}"
+        get() = "${latitude.roundForDisplay()}, ${longitude.roundForDisplay()}"
 
     @get:JsonIgnore
     var hasGeocode: Boolean = false
@@ -178,7 +178,7 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
         const val CONN_TYPE_MOBILE = "m"
     }
 
-    private fun Double.roundToSignificantDigits(digits: Int): String =
-        BigDecimal(this).round(MathContext(digits))
+    private fun Double.roundForDisplay(): String =
+        BigDecimal(this).setScale(4, RoundingMode.HALF_UP)
             .toString()
 }
