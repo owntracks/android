@@ -1,5 +1,6 @@
 package org.owntracks.android.services;
 
+import static org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CLIENT_ALREADY_DISCONNECTED;
 import static org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CLIENT_DISCONNECT_PROHIBITED;
 import static org.owntracks.android.preferences.DefaultsProvider.DEFAULT_SUB_TOPIC;
 import static org.owntracks.android.support.RunThingsOnOtherThreads.NETWORK_HANDLER_THREAD_NAME;
@@ -39,10 +40,13 @@ import org.owntracks.android.support.SocketFactory;
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException;
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
 
+import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.KeyManagementException;
@@ -273,6 +277,9 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
                     this.mqttClient.disconnect().waitForCompletion();
                 } catch (MqttException e) {
                     Timber.d(e, "Error disconnecting from mqtt client.");
+                    if (e.getReasonCode() == REASON_CODE_CLIENT_ALREADY_DISCONNECTED) {
+                        Timber.d("Client already disconnected");
+                    }
                     if (e.getReasonCode() == REASON_CODE_CLIENT_DISCONNECT_PROHIBITED) {
                         Timber.w("Disconnect existing mqtt client would deadlock, not continuing connect");
                         throw e;
@@ -290,7 +297,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
         try {
             MqttConnectOptions mqttConnectOptions = getMqttConnectOptions();
-            Timber.v("MQTT connecting synchronously");
+            Timber.v("MQTT connecting synchronously %s", mqttConnectOptions);
             IMqttToken token = this.mqttClient.connect(mqttConnectOptions);
             token.waitForCompletion();
         } catch (MqttException e) {
