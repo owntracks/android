@@ -249,8 +249,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
     @WorkerThread
     private synchronized void connectToBroker() throws MqttConnectionException, ConfigurationIncompleteException, AlreadyConnectingToBrokerException {
         connectionIdlingResource.setIdleState(false);
-        boolean isUiThread = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? Looper.getMainLooper().isCurrentThread()
-                : Thread.currentThread() == Looper.getMainLooper().getThread();
+        boolean isUiThread = Looper.getMainLooper().isCurrentThread();
 
         if (isConnected()) {
             Timber.d("already connected to broker");

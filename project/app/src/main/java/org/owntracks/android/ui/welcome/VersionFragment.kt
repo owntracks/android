@@ -4,7 +4,6 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.view.LayoutInflater
@@ -21,33 +20,31 @@ import javax.inject.Inject
 class VersionFragment @Inject constructor() : WelcomeFragment() {
     private val viewModel: WelcomeViewModel by activityViewModels()
     private lateinit var binding: UiWelcomeVersionBinding
-    override fun shouldBeDisplayed(context: Context): Boolean =
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+    override fun shouldBeDisplayed(context: Context): Boolean = true
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        binding = UiWelcomeVersionBinding.inflate(inflater, container, false).apply {
-            uiFragmentWelcomeVersionButtonLearnMore.setOnClickListener {
-                try {
-                    startActivity(
-                        Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse(getString(R.string.documentationUrlAndroid))
+        binding = UiWelcomeVersionBinding.inflate(inflater, container, false)
+            .apply {
+                uiFragmentWelcomeVersionButtonLearnMore.setOnClickListener {
+                    try {
+                        startActivity(
+                            Intent(
+                                Intent.ACTION_VIEW, Uri.parse(getString(R.string.documentationUrlAndroid))
+                            )
                         )
-                    )
-                } catch (e: ActivityNotFoundException) {
-                    Snackbar.make(
-                        root,
-                        getString(R.string.noBrowserInstalled),
-                        Snackbar.LENGTH_SHORT
-                    ).show()
+                    } catch (e: ActivityNotFoundException) {
+                        Snackbar.make(
+                            root, getString(R.string.noBrowserInstalled), Snackbar.LENGTH_SHORT
+                        )
+                            .show()
+                    }
                 }
+                screenDesc.movementMethod = ScrollingMovementMethod()
             }
-            screenDesc.movementMethod = ScrollingMovementMethod()
-        }
         return binding.root
     }
 

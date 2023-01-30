@@ -17,9 +17,6 @@ import androidx.work.Configuration
 import androidx.work.WorkerFactory
 import dagger.hilt.EntryPoints
 import dagger.hilt.android.HiltAndroidApp
-import java.security.Security
-import javax.inject.Inject
-import javax.inject.Provider
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.conscrypt.Conscrypt
 import org.owntracks.android.di.CustomBindingComponentBuilder
@@ -33,6 +30,9 @@ import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.RunThingsOnOtherThreads
 import org.owntracks.android.ui.AppShortcuts
 import timber.log.Timber
+import java.security.Security
+import javax.inject.Inject
+import javax.inject.Provider
 
 @HiltAndroidApp
 class App : Application(), Configuration.Provider, Preferences.OnPreferenceChangeListener {
@@ -59,25 +59,14 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
 
     val workManagerFailedToInitialize = MutableLiveData(false)
 
-    @SuppressLint("RestrictedApi")
     override fun onCreate() {
         // Make sure we use Conscrypt for advanced TLS features on all devices.
-        // X509ExtendedTrustManager not available pre-24, fall back to device. https://github.com/google/conscrypt/issues/603
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            Security.insertProviderAt(
-                Conscrypt.newProviderBuilder()
-                    .provideTrustManager(true)
-                    .build(),
-                1
-            )
-        } else {
-            Security.insertProviderAt(
-                Conscrypt.newProviderBuilder()
-                    .provideTrustManager(false)
-                    .build(),
-                1
-            )
-        }
+        Security.insertProviderAt(
+            Conscrypt.newProviderBuilder()
+                .provideTrustManager(true)
+                .build(),
+            1
+        )
 
         // Bring in a real version of BC and don't use the device version.
         Security.removeProvider("BC")
@@ -153,7 +142,7 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
             // User has to actively configure this in the notification channel settings.
             val ongoingNotificationChannelName =
                 if (getString(R.string.notificationChannelOngoing).trim()
-                    .isNotEmpty()
+                        .isNotEmpty()
                 ) getString(R.string.notificationChannelOngoing) else "Ongoing"
             NotificationChannel(
                 NOTIFICATION_CHANNEL_ONGOING,
@@ -170,7 +159,7 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
                 .run { notificationManager.createNotificationChannel(this) }
 
             val eventsNotificationChannelName = if (getString(R.string.events).trim()
-                .isNotEmpty()
+                    .isNotEmpty()
             ) getString(R.string.events) else "Events"
             NotificationChannel(
                 NOTIFICATION_CHANNEL_EVENTS,
@@ -188,7 +177,7 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
 
             val errorNotificationChannelName =
                 if (getString(R.string.notificationChannelErrors).trim()
-                    .isNotEmpty()
+                        .isNotEmpty()
                 ) getString(R.string.notificationChannelErrors) else "Errors"
             NotificationChannel(
                 GeocoderProvider.ERROR_NOTIFICATION_CHANNEL_ID,

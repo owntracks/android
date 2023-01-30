@@ -117,7 +117,7 @@ class GeocoderProvider @Inject constructor(
                     context,
                     0,
                     activityLaunchIntent,
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT else PendingIntent.FLAG_UPDATE_CURRENT
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
                 )
             )
             .setPriority(PRIORITY_LOW)

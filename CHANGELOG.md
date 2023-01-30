@@ -1,9 +1,10 @@
 # Changelog
 
-## Version 2.4.11
+## Version 2.5.0
 
 ### New features
 
+- Minimum device version is now SDK v24 (Android 7.0 Nougat)
 - When displayed, LanLngs now are limited to 4 decimal places, because more precision than that is a bit silly (#1278, #1279)
 - The config editor text is now selectable
 - No need to restart the app once loading in a config any more!
@@ -51,7 +52,7 @@
 
 - OpenStreetMap now available as a map layer (!). Layer style toggle switch between the different Google Maps layer styles (Default, Hybrid, Satellite, Terrain), OpenStreetMap and Wikimedia. (#1181)
 - OSM map now uses a blue dot and arrow for current location (#1078)
-- Use new Google Maps renderer on gms flavour: https://developers.google.com/maps/documentation/android-sdk/renderer
+- Use new Google Maps renderer on gms flavour: <https://developers.google.com/maps/documentation/android-sdk/renderer>
 - Add preference to draw regions on the map (#1068)
 - Add a preference to prevent location updates any faster than the requested interval (#1168)
 - UI for mode changing is now clearer, using a bottom sheet dialog popup with explanation notes on each mode (#1197)
@@ -69,7 +70,7 @@ Target Android SDK is now 31.
 
 ### New features
 
-- Location updates will now contain the app's mode as a field if extended data reporting is enabled (#1160). Documentation change at https://github.com/owntracks/booklet/commit/d4876781f801a8b006587e26ca3fba27328596b0
+- Location updates will now contain the app's mode as a field if extended data reporting is enabled (#1160). Documentation change at <https://github.com/owntracks/booklet/commit/d4876781f801a8b006587e26ca3fba27328596b0>
 - The minimum locator displacement configuration value is now exposed in the preferences (\*#1177)
 
 ### Bug fixes

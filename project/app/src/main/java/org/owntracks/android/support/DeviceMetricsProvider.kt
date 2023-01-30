@@ -37,10 +37,11 @@ class DeviceMetricsProvider @Inject internal constructor(@ApplicationContext pri
     val connectionType: String?
         get() {
             val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                cm.run {
-                    try {
-                        cm.getNetworkCapabilities(cm.activeNetwork)?.run {
+
+            cm.run {
+                try {
+                    cm.getNetworkCapabilities(cm.activeNetwork)
+                        ?.run {
                             if (!hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
                                 return MessageLocation.CONN_TYPE_OFFLINE
                             }
@@ -51,24 +52,12 @@ class DeviceMetricsProvider @Inject internal constructor(@ApplicationContext pri
                                 return MessageLocation.CONN_TYPE_WIFI
                             }
                         }
-                        // Android bug: https://issuetracker.google.com/issues/175055271
-                        // ConnectivityManager::getNetworkCapabilities apparently throws a SecurityException
-                    } catch (e: SecurityException) {
-                        Timber.e(e, "Exception fetching networkcapabilities")
-                    }
-                }
-                return null
-            } else @Suppress("DEPRECATION") {
-
-                val activeNetworkInfo = cm.activeNetworkInfo ?: return null
-                if (!activeNetworkInfo.isConnected) {
-                    return MessageLocation.CONN_TYPE_OFFLINE
-                }
-                return when (activeNetworkInfo.type) {
-                    ConnectivityManager.TYPE_WIFI -> MessageLocation.CONN_TYPE_WIFI
-                    ConnectivityManager.TYPE_MOBILE -> MessageLocation.CONN_TYPE_MOBILE
-                    else -> null
+                    // Android bug: https://issuetracker.google.com/issues/175055271
+                    // ConnectivityManager::getNetworkCapabilities apparently throws a SecurityException
+                } catch (e: SecurityException) {
+                    Timber.e(e, "Exception fetching networkcapabilities")
                 }
             }
+            return null
         }
 }

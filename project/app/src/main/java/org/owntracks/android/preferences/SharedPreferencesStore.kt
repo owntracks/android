@@ -2,12 +2,11 @@ package org.owntracks.android.preferences
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.os.Build
 import androidx.preference.PreferenceManager
 import dagger.hilt.android.qualifiers.ApplicationContext
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
-import timber.log.Timber
 
 /***
  * Implements a PreferencesStore that uses a SharedPreferecnces as a backend.
@@ -66,13 +65,11 @@ class SharedPreferencesStore @Inject constructor(@ApplicationContext private val
                     }
                 }
                 oldSharedPreferenceNames.forEach {
-                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        val deleted = context.deleteSharedPreferences(it)
-                        if (!deleted) {
-                            Timber.e("Failed to delete shared preference $it")
-                        } else {
-                            Timber.i("Deleted legacy preference file $it")
-                        }
+                    val deleted = context.deleteSharedPreferences(it)
+                    if (!deleted) {
+                        Timber.e("Failed to delete shared preference $it")
+                    } else {
+                        Timber.i("Deleted legacy preference file $it")
                     }
                 }
             }

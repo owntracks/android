@@ -117,7 +117,7 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
 
     private boolean hasBeenStartedExplicitly = false;
 
-    private static final int updateCurrentIntentFlags = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT : PendingIntent.FLAG_UPDATE_CURRENT;
+    private static final int updateCurrentIntentFlags = PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT;
 
     @Inject
     Preferences preferences;
@@ -433,15 +433,9 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
 
         // Deliver notification
         Notification n = eventsNotificationCompatBuilder.build();
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            sendEventStackNotification(title, text, new Date(timestampInMs));
-        } else {
-            notificationManagerCompat.notify(notificationEventsID++, n);
-        }
+        sendEventStackNotification(title, text, new Date(timestampInMs));
     }
 
-    @RequiresApi(23)
     private void sendEventStackNotification(String title, String text, Date timestamp) {
         Timber.v("SDK_INT >= 23, building stack notification");
 
@@ -716,9 +710,7 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            eventsNotificationCompatBuilder.setColor(getColor(com.mikepenz.materialize.R.color.primary));
-        }
+        eventsNotificationCompatBuilder.setColor(getColor(com.mikepenz.materialize.R.color.primary));
         return eventsNotificationCompatBuilder;
     }
 

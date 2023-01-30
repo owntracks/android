@@ -46,7 +46,7 @@ class MessageLocationTest {
             on { verticalAccuracyMeters } doReturn 10.0f
         }
 
-        val messageLocation = MessageLocation.fromLocation(location, Build.VERSION_CODES.LOLLIPOP)
+        val messageLocation = MessageLocation.fromLocation(location, Build.VERSION_CODES.N)
         assertEquals(51.0, messageLocation.latitude, 0.0)
         assertEquals(0.3, messageLocation.longitude, 0.0)
         assertEquals(5, messageLocation.accuracy)

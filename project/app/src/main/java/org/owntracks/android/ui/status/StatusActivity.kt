@@ -1,6 +1,5 @@
 package org.owntracks.android.ui.status
 
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -25,21 +24,20 @@ class StatusActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
         setSupportActionBar(binding.appbar.toolbar)
         drawerProvider.attach(binding.appbar.toolbar)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            binding.dozeWhiteListed.setOnClickListener {
-                MaterialAlertDialogBuilder(this)
-                    .setIcon(R.drawable.ic_baseline_battery_charging_full_24)
-                    .setTitle(getString(R.string.batteryOptimizationWhitelistDialogTitle))
-                    .setMessage(getString(R.string.batteryOptimizationWhitelistDialogMessage))
-                    .setCancelable(true)
-                    .setPositiveButton(getString(R.string.batteryOptimizationWhitelistDialogButtonLabel)) { _, _ ->
-                        if (viewModel.dozeWhitelisted.value == true) {
-                            startActivity(batteryOptimizationIntents.settingsIntent)
-                        } else {
-                            startActivity(batteryOptimizationIntents.directPackageIntent)
-                        }
-                    }.show()
-            }
+        binding.dozeWhiteListed.setOnClickListener {
+            MaterialAlertDialogBuilder(this)
+                .setIcon(R.drawable.ic_baseline_battery_charging_full_24)
+                .setTitle(getString(R.string.batteryOptimizationWhitelistDialogTitle))
+                .setMessage(getString(R.string.batteryOptimizationWhitelistDialogMessage))
+                .setCancelable(true)
+                .setPositiveButton(getString(R.string.batteryOptimizationWhitelistDialogButtonLabel)) { _, _ ->
+                    if (viewModel.dozeWhitelisted.value == true) {
+                        startActivity(batteryOptimizationIntents.settingsIntent)
+                    } else {
+                        startActivity(batteryOptimizationIntents.directPackageIntent)
+                    }
+                }
+                .show()
         }
     }
 

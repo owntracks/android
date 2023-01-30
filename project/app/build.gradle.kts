@@ -23,11 +23,11 @@ android {
 
     defaultConfig {
         applicationId = "org.owntracks.android"
-        minSdk = 21
+        minSdk = 24
         targetSdk = 33
 
-        versionCode = 20411000
-        versionName = "2.4.11"
+        versionCode = 20500000
+        versionName = "2.5.0"
 
         val locales = listOf("en", "de", "fr", "es", "ru", "ca", "pl", "cs", "ja", "pt", "zh", "da", "tr", "ko")
         buildConfigField(

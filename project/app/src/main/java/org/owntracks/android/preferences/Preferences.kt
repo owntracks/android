@@ -433,7 +433,10 @@ class Preferences @Inject constructor(
     fun notifyChanged(property: KProperty<*>) {
         val properties = listOf(property.name)
         synchronized(listeners) {
-            listeners.forEach { it.key.onPreferenceChanged(properties) }
+            listeners.forEach {
+            Timber.d("Calling listener ${it.key}")
+                it.key.onPreferenceChanged(properties)
+            }
         }
     }
 

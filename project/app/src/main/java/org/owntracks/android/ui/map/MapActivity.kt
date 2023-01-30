@@ -420,37 +420,32 @@ class MapActivity :
                 val permissionRequester =
                     if (explicitUserAction) explicitLocationPermissionRequest else locationPermissionRequest
                 val permissions = arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if (shouldShowRequestPermissionRationale(ACCESS_FINE_LOCATION)) {
-                        // The user may have denied us once already, so show a rationale
-                        if (!this::locationPermissionsRationaleAlertDialog.isInitialized) {
-                            locationPermissionsRationaleAlertDialog =
-                                MaterialAlertDialogBuilder(this)
-                                    .setCancelable(true)
-                                    .setIcon(R.drawable.ic_baseline_location_disabled_24)
-                                    .setTitle(
-                                        getString(R.string.locationPermissionRequestDialogTitle)
-                                    )
-                                    .setMessage(R.string.locationPermissionRequestDialogMessage)
-                                    .setPositiveButton(
-                                        android.R.string.ok
-                                    ) { _, _ ->
-                                        permissionRequester.launch(permissions)
-                                    }
-                                    .setNegativeButton(android.R.string.cancel) { _, _ ->
-                                        preferences.userDeclinedEnableLocationPermissions = true
-                                    }
-                                    .create()
-                        }
-                        if (!locationPermissionsRationaleAlertDialog.isShowing) {
-                            locationPermissionsRationaleAlertDialog.show()
-                        }
-                    } else {
-                        // No need to show rationale, just request
-                        permissionRequester.launch(permissions)
+                if (shouldShowRequestPermissionRationale(ACCESS_FINE_LOCATION)) {
+                    // The user may have denied us once already, so show a rationale
+                    if (!this::locationPermissionsRationaleAlertDialog.isInitialized) {
+                        locationPermissionsRationaleAlertDialog =
+                            MaterialAlertDialogBuilder(this)
+                                .setCancelable(true)
+                                .setIcon(R.drawable.ic_baseline_location_disabled_24)
+                                .setTitle(
+                                    getString(R.string.locationPermissionRequestDialogTitle)
+                                )
+                                .setMessage(R.string.locationPermissionRequestDialogMessage)
+                                .setPositiveButton(
+                                    android.R.string.ok
+                                ) { _, _ ->
+                                    permissionRequester.launch(permissions)
+                                }
+                                .setNegativeButton(android.R.string.cancel) { _, _ ->
+                                    preferences.userDeclinedEnableLocationPermissions = true
+                                }
+                                .create()
+                    }
+                    if (!locationPermissionsRationaleAlertDialog.isShowing) {
+                        locationPermissionsRationaleAlertDialog.show()
                     }
                 } else {
-                    // Older android, so no rationale mech. Just request.
+                    // No need to show rationale, just request
                     permissionRequester.launch(permissions)
                 }
             }

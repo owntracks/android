@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.location.Location
-import android.os.Build
 import android.os.PowerManager
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -37,10 +36,9 @@ class StatusViewModel @Inject constructor(
     }
 
     private fun isIgnoringBatteryOptimizations(): Boolean {
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
-            (getApplication<Application>().applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager).isIgnoringBatteryOptimizations(
-                getApplication<Application>().applicationContext.packageName
-            )
+        return (getApplication<Application>().applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager).isIgnoringBatteryOptimizations(
+            getApplication<Application>().applicationContext.packageName
+        )
     }
 
     fun viewLogs() {
