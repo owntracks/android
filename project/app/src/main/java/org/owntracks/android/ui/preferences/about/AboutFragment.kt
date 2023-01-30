@@ -1,5 +1,6 @@
 package org.owntracks.android.ui.preferences.about
 
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -14,11 +15,13 @@ class AboutFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.about, rootKey)
         val versionPreference = findPreference<Preference>(UI_PREFERENCE_VERSION)
-        val versionName = requireActivity().packageManager.getPackageInfo(requireActivity().packageName, 0).versionName
+        val versionName =
+            requireActivity().packageManager.getPackageInfoCompat(requireActivity().packageName, 0).versionName
         versionPreference?.intent?.data = Uri.parse(getString(R.string.changelogUrl))
         versionPreference?.setSummaryProvider { _ ->
             try {
                 val pm = requireActivity().packageManager
+
                 @Suppress("DEPRECATION")
                 val versionCode =
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
@@ -41,4 +44,13 @@ class AboutFragment : PreferenceFragmentCompat() {
         const val UI_PREFERENCE_VERSION = "version"
         const val UI_PREFERENCE_TRANSLATION = "translation"
     }
+
+    // https://stackoverflow.com/a/74741495
+    private fun PackageManager.getPackageInfoCompat(packageName: String, flags: Int = 0): PackageInfo =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(flags.toLong()))
+        } else {
+            @Suppress("DEPRECATION") getPackageInfo(packageName, flags)
+        }
 }
+
