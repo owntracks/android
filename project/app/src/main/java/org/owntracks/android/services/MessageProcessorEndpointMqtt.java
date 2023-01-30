@@ -429,7 +429,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
 
         Timber.d("Releasing connectinglock");
         connectingLock.release();
-        changeState(EndpointState.CONNECTED);
+        changeState(EndpointState.CONNECTED.withMessage(this.mqttClient.getServerURI()));
         connectionIdlingResource.setIdleState(true);
 
         sendMessageConnectPressure = 0; // allow new connection attempts from queueMessageForSending

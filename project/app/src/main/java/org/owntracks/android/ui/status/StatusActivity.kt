@@ -17,7 +17,7 @@ class StatusActivity : AppCompatActivity() {
     @Inject
     lateinit var drawerProvider: DrawerProvider
     val viewModel: StatusViewModel by viewModels()
-    val batteryOptimizationIntents by lazy { BatteryOptimizingIntents(this) }
+    private val batteryOptimizationIntents by lazy { BatteryOptimizingIntents(this) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding: UiStatusBinding = DataBindingUtil.setContentView(this, R.layout.ui_status)
