@@ -6,7 +6,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ServiceBridge @Inject internal constructor() {
+class ServiceBridge @Inject internal constructor(private val runThingsOnOtherThreads: RunThingsOnOtherThreads) {
     private var serviceWeakReference: WeakReference<ServiceBridgeInterface?> = WeakReference(null)
 
     interface ServiceBridgeInterface {
@@ -22,6 +22,6 @@ class ServiceBridge @Inject internal constructor() {
             Timber.e("missing service reference")
             return
         }
-        serviceWeakReference.get()?.requestOnDemandLocationUpdate()
+        runThingsOnOtherThreads.postOnMainHandlerDelayed({serviceWeakReference.get()?.requestOnDemandLocationUpdate()})
     }
 }
