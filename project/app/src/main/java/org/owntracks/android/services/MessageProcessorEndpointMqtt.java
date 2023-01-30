@@ -13,6 +13,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.WorkerThread;
 import androidx.test.espresso.IdlingResource;
 
+import com.fasterxml.jackson.core.JsonParseException;
+
 import org.eclipse.paho.client.mqttv3.IMqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
@@ -194,6 +196,8 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
                 onMessageReceived(m);
             } catch (Parser.EncryptionException e) {
                 Timber.e(e, "Decryption failure message: %s ", message);
+            } catch (JsonParseException e) {
+                Timber.w(e, "Malformed JSON message received");
             } catch (IOException e) {
                 if (message.getPayload().length == 0) {
                     Timber.d("clear message received: %s", topic);
@@ -282,13 +286,14 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
                 try {
                     this.mqttClient.disconnect().waitForCompletion();
                 } catch (MqttException e) {
-                    Timber.d(e, "Error disconnecting from mqtt client.");
                     if (e.getReasonCode() == REASON_CODE_CLIENT_ALREADY_DISCONNECTED) {
                         Timber.d("Client already disconnected");
                     }
-                    if (e.getReasonCode() == REASON_CODE_CLIENT_DISCONNECT_PROHIBITED) {
+                    else if (e.getReasonCode() == REASON_CODE_CLIENT_DISCONNECT_PROHIBITED) {
                         Timber.w("Disconnect existing mqtt client would deadlock, not continuing connect");
                         throw e;
+                    } else {
+                        Timber.d(e, "Error disconnecting from mqtt client.");
                     }
                 }
             }

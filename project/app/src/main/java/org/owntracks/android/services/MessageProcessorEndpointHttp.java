@@ -18,6 +18,7 @@ import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.SocketFactory;
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException;
 
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collections;
@@ -97,19 +98,19 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
         SocketFactory.SocketFactoryOptions socketFactoryOptions = new SocketFactory.SocketFactoryOptions();
 
         if (tlsCaCrt.length() > 0) {
-            try {
-                socketFactoryOptions.withCaInputStream(applicationContext.openFileInput(tlsCaCrt));
-            } catch (FileNotFoundException e) {
+            try (FileInputStream tlsCaCertInputStream = applicationContext.openFileInput(tlsCaCrt)) {
+                socketFactoryOptions.withCaInputStream(tlsCaCertInputStream);
+            } catch (IOException e) {
                 Timber.e(e);
                 return null;
             }
         }
 
         if (tlsClientCrt.length() > 0) {
-            try {
-                socketFactoryOptions.withClientP12InputStream(applicationContext.openFileInput(tlsClientCrt)).withClientP12Password(preferences.getTlsClientCrtPassword());
-            } catch (FileNotFoundException e1) {
-                Timber.e(e1);
+            try (FileInputStream tlsClientCrtStream = applicationContext.openFileInput(tlsClientCrt)) {
+                socketFactoryOptions.withClientP12InputStream(tlsClientCrtStream).withClientP12Password(preferences.getTlsClientCrtPassword());
+            } catch (IOException e) {
+                Timber.e(e);
                 return null;
             }
         }

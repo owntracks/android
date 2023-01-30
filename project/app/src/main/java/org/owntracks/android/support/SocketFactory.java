@@ -126,7 +126,6 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
                 Timber.v("Alias: %s", o);
             }
         } else {
-            Timber.v("Client .p12 sideload: false, using null client cert");
             kmf.init(null,null);
         }
 
