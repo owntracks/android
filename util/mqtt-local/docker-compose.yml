@@ -1,0 +1,61 @@
+---
+version: "3.0"
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2.0.15-openssl
+    ports:
+      - 1883:1883
+      - 8883:8883
+      - 8080:8080
+      - 8081:8081
+    volumes:
+      - ${PWD}/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ${PWD}/mosquitto.password:/mosquitto/config/mosquitto.password:ro
+      - ${PWD}/rootCA.pem:/mosquitto/config/rootCA.pem:ro
+      - ${PWD}/_wildcard.docker.local-key.pem:/mosquitto/config/key.pem:ro
+      - ${PWD}/_wildcard.docker.local.pem:/mosquitto/config/cert.pem:ro
+  nginx:
+    depends_on:
+      mosquitto:
+        condition: service_started
+    image: nginx
+    ports: 
+      - 8888:8888
+    volumes:
+      - ${PWD}/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ${PWD}/_wildcard.docker.local-key.pem:/tls/key.pem:ro
+      - ${PWD}/_wildcard.docker.local.pem:/tls/cert.pem:ro
+  caddy:
+    depends_on:
+      mosquitto:
+        condition: service_started
+    image: caddy
+    ports: 
+      - 8889:8889
+    volumes:
+      - ${PWD}/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ${PWD}/_wildcard.docker.local-key.pem:/tls/key.pem:ro
+      - ${PWD}/_wildcard.docker.local.pem:/tls/cert.pem:ro
+      - ${PWD}/rootCA.pem:/tls/ca.pem:ro
+  owntracks-recorder:
+    depends_on:
+      mosquitto:
+        condition: service_started
+    image: owntracks/recorder
+    ports: 
+      - 8083:8083
+    environment:
+      - OTR_HOST=mosquitto
+      - OTR_PORT=1883
+      - OTR_USER=test
+      - OTR_PASS=test
+  owntracks-frontend:
+    depends_on:
+      owntracks-recorder:
+        condition: service_started
+    image: owntracks/frontend
+    ports:
+      - "8000:80"
+    environment:
+      - SERVER_HOST=owntracks-recorder
+      - SERVER_PORT=8083      

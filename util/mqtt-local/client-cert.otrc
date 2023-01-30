@@ -7,7 +7,7 @@
   "port" : 8883,
   "tls" : true,
   "tlsCaCrt" : "rootCA.pem",
-  "tlsClientCrt" : "toot-client.p12",
+  "tlsClientCrt" : "test-client.p12",
   "tlsClientCrtPassword" : "changeit",
   "username" : "test",
   "ws" : false
