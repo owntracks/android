@@ -91,10 +91,12 @@ abstract class PreferencesStore :
                     )
                 } as T
             } catch (e: java.lang.ClassCastException) {
-                getAndSetDefault<T>(preferences, property)
+                getAndSetDefault(preferences, property)
+            } catch (e: java.lang.IllegalArgumentException) {
+                getAndSetDefault(preferences, property)
             }
         } else {
-            getAndSetDefault<T>(preferences, property)
+            getAndSetDefault(preferences, property)
         }
 
     /**
@@ -105,7 +107,7 @@ abstract class PreferencesStore :
      * @param property the actual field on the [Preferences] class
      * @return the default value of the property
      */
-    fun <T> getAndSetDefault(
+    private fun <T> getAndSetDefault(
         preferences: Preferences,
         property: KProperty<*>
     ): T {

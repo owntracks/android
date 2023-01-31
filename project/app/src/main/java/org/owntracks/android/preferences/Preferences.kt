@@ -6,6 +6,13 @@ import android.os.Build.VERSION.SDK_INT
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
 import dagger.hilt.android.qualifiers.ApplicationContext
+import org.owntracks.android.BuildConfig
+import org.owntracks.android.model.messages.MessageConfiguration
+import org.owntracks.android.preferences.types.*
+import org.owntracks.android.services.worker.Scheduler.MIN_PERIODIC_INTERVAL_MILLIS
+import org.owntracks.android.ui.AppShortcuts
+import org.owntracks.android.ui.map.MapLayerStyle
+import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -18,20 +25,6 @@ import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.jvm.jvmErasure
 import kotlin.reflect.typeOf
 import kotlin.time.Duration.Companion.milliseconds
-import org.owntracks.android.BuildConfig
-import org.owntracks.android.model.messages.MessageConfiguration
-import org.owntracks.android.preferences.types.AppTheme
-import org.owntracks.android.preferences.types.ConnectionMode
-import org.owntracks.android.preferences.types.FromConfiguration
-import org.owntracks.android.preferences.types.MonitoringMode
-import org.owntracks.android.preferences.types.MqttProtocolLevel
-import org.owntracks.android.preferences.types.MqttQos
-import org.owntracks.android.preferences.types.ReverseGeocodeProvider
-import org.owntracks.android.preferences.types.StringMaxTwoAlphaNumericChars
-import org.owntracks.android.services.worker.Scheduler.MIN_PERIODIC_INTERVAL_MILLIS
-import org.owntracks.android.ui.AppShortcuts
-import org.owntracks.android.ui.map.MapLayerStyle
-import timber.log.Timber
 
 @Singleton
 class Preferences @Inject constructor(
@@ -91,7 +84,7 @@ class Preferences @Inject constructor(
         allConfigKeys.filterIsInstance<KMutableProperty<*>>()
             .filter { configuration.containsKey(it.name) }
             .forEach {
-                val configValue = configuration.get(it.name)
+                val configValue = configuration[it.name]
                 if (configValue == null) {
                     resetPreference(it.name)
                 } else {
