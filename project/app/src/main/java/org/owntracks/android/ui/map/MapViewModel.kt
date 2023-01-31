@@ -104,8 +104,6 @@ class MapViewModel @Inject constructor(
         MutableLiveData(preferences.mode)
     }
 
-    fun getCurrentConnectionMode(): LiveData<ConnectionMode> = currentConnectionMode
-
     val locationIdlingResource = SimpleIdlingResource("locationIdlingResource", false)
 
     val viewMode: ViewMode by locationRepo::viewMode
@@ -169,6 +167,7 @@ class MapViewModel @Inject constructor(
 
     fun sendLocation() {
         currentLocation.value?.run {
+            Timber.d("Sending current location from user request: $this")
             locationProcessor.onLocationChanged(this, REPORT_TYPE_USER)
         }
     }
@@ -315,6 +314,7 @@ class MapViewModel @Inject constructor(
      * @param latLng location to move the blue dot to
      */
     fun setCurrentBlueDotLocation(latLng: LatLng) {
+        Timber.v("Idling location")
         locationIdlingResource.setIdleState(true)
         locationRepo.currentBlueDotOnMapLocation = latLng
     }

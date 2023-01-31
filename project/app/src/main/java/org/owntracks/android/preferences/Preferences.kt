@@ -32,14 +32,14 @@ class Preferences @Inject constructor(
     private val preferencesStore: PreferencesStore,
     private val appShortcuts: AppShortcuts
 ) {
-    val allConfigKeys =
-        Preferences::class.declaredMemberProperties
-            .filter { it.annotations.any { it is Preference } }
+    val allConfigKeys = Preferences::class.declaredMemberProperties.filter { it.annotations.any { it is Preference } }
 
-    val mqttExportedConfigKeys = allConfigKeys.filter { it.annotations.any { it is Preference && it.exportModeMqtt } }
-    val httpExportedConfigKeys = allConfigKeys.filter { it.annotations.any { it is Preference && it.exportModeHttp } }
+    private val mqttExportedConfigKeys =
+        allConfigKeys.filter { it.annotations.any { annotation -> annotation is Preference && annotation.exportModeMqtt } }
+    private val httpExportedConfigKeys =
+        allConfigKeys.filter { it.annotations.any { annotation -> annotation is Preference && annotation.exportModeHttp } }
 
-    private val CONTENT = Any()
+    private val placeholder = Any()
     private val listeners = WeakHashMap<OnPreferenceChangeListener, Any>()
 
     /*
@@ -47,12 +47,9 @@ class Preferences @Inject constructor(
     the value in the underlying backing store to be the default, as only the backing store knows
     which properties have not already been set
      */
-    fun initializeDefaults() {
+    private fun initializeDefaults() {
         Timber.d("Initializing defaults for unset preferences")
-        allConfigKeys.forEach {
-            Timber.d("Initializing defaults for $it")
-            it.get(this)
-        }
+        allConfigKeys.forEach { it.get(this) }
     }
 
     /**
@@ -65,8 +62,7 @@ class Preferences @Inject constructor(
         try {
             importPreference(
                 allConfigKeys.filterIsInstance<KMutableProperty<*>>()
-                    .first { it.name == key },
-                value
+                    .first { it.name == key }, value
             )
         } catch (e: NoSuchElementException) {
             Timber.e("Unable to import $key with value $value as the key is not a valid preference.")
@@ -88,14 +84,14 @@ class Preferences @Inject constructor(
                 if (configValue == null) {
                     resetPreference(it.name)
                 } else {
+                    Timber.d("Importing configuration key ${it.name} -> $configValue")
                     try {
                         // We need to convert the imported config value into an enum if the type of the preference is
                         // actually an enum
                         importPreference(it, configValue)
                     } catch (e: java.lang.IllegalArgumentException) {
                         Timber.w(
-                            "Trying to import wrong type of preference for ${it.name}. " +
-                                "Expected ${it.getter.returnType} but given ${configValue.javaClass}. Ignoring."
+                            "Trying to import wrong type of preference for ${it.name}. Expected ${it.getter.returnType} but given ${configValue.javaClass}. Ignoring."
                         )
                     }
                 }
@@ -112,32 +108,22 @@ class Preferences @Inject constructor(
         if (it.returnType.isSubtypeOf(typeOf<Enum<*>>())) {
             // Find the companion object method annotated with FromConfiguration with a single parameter
             // that's the same type as the configuration value
-            val conversionMethod = it.returnType.jvmErasure
-                .companionObject
-                ?.members
-                ?.first {
-                    it.annotations.any { it is FromConfiguration } &&
-                        it.parameters.size == 2 &&
-                        it.parameters.any {
-                            it.type.jvmErasure == value.javaClass.kotlin
-                        }
+            val conversionMethod = it.returnType.jvmErasure.companionObject?.members?.first { method ->
+                method.annotations.any { it is FromConfiguration } && method.parameters.size == 2 && method.parameters.any {
+                    it.type.jvmErasure == value.javaClass.kotlin
                 }
-            val enumValue =
-                conversionMethod?.call(it.returnType.jvmErasure.companionObjectInstance, value)
+            }
+            val enumValue = conversionMethod?.call(it.returnType.jvmErasure.companionObjectInstance, value)
             it.setter.call(this, enumValue)
-        } else if (
-            it.returnType.isSubtypeOf(typeOf<StringMaxTwoAlphaNumericChars>()) && value is String
-        ) {
+        } else if (it.returnType.isSubtypeOf(typeOf<StringMaxTwoAlphaNumericChars>()) && value is String) {
             it.setter.call(this, StringMaxTwoAlphaNumericChars(value))
         } else if (value is String) {
             if (it.returnType.isSubtypeOf(typeOf<Set<*>>())) {
-                it.setter.call(
-                    this,
+                it.setter.call(this,
                     value.split(",")
                         .map { it.trim() }
                         .filter { it.isNotBlank() }
-                        .toSortedSet()
-                )
+                        .toSortedSet())
             } else if (it.returnType.isSubtypeOf(typeOf<Boolean>())) {
                 it.setter.call(
                     this,
@@ -360,15 +346,12 @@ class Preferences @Inject constructor(
     val pubRetainEvents: Boolean = false
     val pubTopicBaseWithUserDetails: String
         get() {
-            return pubTopicBase.replace(
-                "%u",
-                username.ifBlank { "user" }
-            )
+            return pubTopicBase.replace("%u", username.ifBlank { "user" })
                 .replace("%d", deviceId)
         }
 
     val eventTopicSuffix = "/event"
-    val commandTopicSuffix = "/cmd"
+    private val commandTopicSuffix = "/cmd"
     val infoTopicSuffix = "/info"
     val waypointsTopicSuffix = "/waypoints"
 
@@ -402,7 +385,7 @@ class Preferences @Inject constructor(
     // https://stackoverflow.com/a/3104265/352740
     fun registerOnPreferenceChangedListener(listener: OnPreferenceChangeListener) {
         synchronized(listeners) {
-            listeners.put(listener, CONTENT)
+            listeners.put(listener, placeholder)
         }
     }
 
@@ -413,8 +396,7 @@ class Preferences @Inject constructor(
     }
 
     fun exportToMessage(): MessageConfiguration {
-        return MessageConfiguration()
-            .apply { set("_build", BuildConfig.VERSION_CODE) }
+        return MessageConfiguration().apply { set("_build", BuildConfig.VERSION_CODE) }
             .apply {
                 when (mode) {
                     ConnectionMode.MQTT -> mqttExportedConfigKeys
@@ -427,20 +409,16 @@ class Preferences @Inject constructor(
         val properties = listOf(property.name)
         synchronized(listeners) {
             listeners.forEach {
-            Timber.d("Calling listener ${it.key}")
                 it.key.onPreferenceChanged(properties)
             }
         }
     }
 
     companion object {
-        const val EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI =
-            "showExperimentalPreferenceUI"
+        const val EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI = "showExperimentalPreferenceUI"
         const val EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE = "allowSmallKeepalive"
-        const val EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION =
-            "bearingArrowFollowsDeviceOrientation"
-        const val EXPERIMENTAL_FEATURE_ENABLE_APP_SHORTCUTS =
-            "enableAppShortcuts"
+        const val EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION = "bearingArrowFollowsDeviceOrientation"
+        const val EXPERIMENTAL_FEATURE_ENABLE_APP_SHORTCUTS = "enableAppShortcuts"
 
         internal val EXPERIMENTAL_FEATURES = setOf(
             EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI,
@@ -458,8 +436,7 @@ class Preferences @Inject constructor(
     @Target(AnnotationTarget.PROPERTY)
     @Retention(AnnotationRetention.RUNTIME)
     annotation class Preference(
-        val exportModeMqtt: Boolean = true,
-        val exportModeHttp: Boolean = true
+        val exportModeMqtt: Boolean = true, val exportModeHttp: Boolean = true
     )
 
     interface OnPreferenceChangeListener {

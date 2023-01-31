@@ -10,11 +10,10 @@
 
         <variable
             name="vm"
-            type="org.owntracks.android.ui.preferences.load.LoadMvvm.ViewModel" />
+            type="org.owntracks.android.ui.preferences.load.LoadViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:id="@+id/frame"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
 
@@ -23,7 +22,6 @@
             layout="@layout/appbar" />
 
         <RelativeLayout
-            android:id="@id/spinner"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
@@ -38,6 +36,7 @@
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:visibility="@{vm.configurationImportStatus==ImportStatus.SUCCESS ? View.VISIBLE : View.GONE}"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <TextView
@@ -48,6 +47,21 @@
                 android:text="@{vm.displayedConfiguration}"
                 android:textIsSelectable="true" />
 
+        </ScrollView>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="@{vm.configurationImportStatus==ImportStatus.FAILED ? View.VISIBLE : View.GONE}"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <TextView
+                android:id="@+id/importError"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/default_spacing"
+                android:text="@{String.format(@string/errorPreferencesImportFailed, vm.importError)}"
+                android:textIsSelectable="true" />
         </ScrollView>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

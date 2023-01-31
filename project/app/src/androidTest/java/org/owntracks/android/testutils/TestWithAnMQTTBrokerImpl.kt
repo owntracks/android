@@ -4,14 +4,9 @@ import android.content.Intent
 import android.net.Uri
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
-import java.net.ConnectException
-import java.net.InetSocketAddress
-import java.net.Socket
-import kotlin.concurrent.thread
 import kotlinx.coroutines.DelicateCoroutinesApi
 import mqtt.broker.Broker
 import mqtt.broker.interfaces.Authentication
-import mqtt.broker.interfaces.BytesMetrics
 import mqtt.broker.interfaces.PacketInterceptor
 import mqtt.packets.MQTTPacket
 import mqtt.packets.Qos
@@ -22,6 +17,10 @@ import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.support.Parser
 import org.owntracks.android.ui.clickOnAndWait
 import timber.log.Timber
+import java.net.ConnectException
+import java.net.InetSocketAddress
+import java.net.Socket
+import kotlin.concurrent.thread
 
 @ExperimentalUnsignedTypes
 class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
@@ -34,14 +33,9 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
     override lateinit var broker: Broker
 
     override fun <E : MessageBase> Collection<E>.sendFromBroker(broker: Broker) {
-        map(Parser(null)::toJsonBytes)
-            .forEach {
+        map(Parser(null)::toJsonBytes).forEach {
                 broker.publish(
-                    false,
-                    "owntracks/someuser/somedevice",
-                    Qos.AT_LEAST_ONCE,
-                    MQTT5Properties(),
-                    it.toUByteArray()
+                    false, "owntracks/someuser/somedevice", Qos.AT_LEAST_ONCE, MQTT5Properties(), it.toUByteArray()
                 )
             }
     }
@@ -79,34 +73,23 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
     }
 
     private fun createNewBroker(): Broker =
-        Broker(
-            host = "127.0.0.1",
-            port = mqttPort,
-            authentication = object : Authentication {
-                override fun authenticate(
-                    clientId: String,
-                    username: String?,
-                    password: UByteArray?
-                ): Boolean {
-                    return username == mqttUsername && password.contentEquals(
-                        mqttTestPassword.toByteArray()
-                            .toUByteArray()
-                    )
-                }
-            },
-            packetInterceptor = object : PacketInterceptor {
-                override fun packetReceived(
-                    clientId: String,
-                    username: String?,
-                    password: UByteArray?,
-                    packet: MQTTPacket
-                ) {
-                    Timber
-                        .d("MQTT Packet received $packet")
-                    mqttPacketsReceived.add(packet)
-                }
+        Broker(host = "127.0.0.1", port = mqttPort, authentication = object : Authentication {
+            override fun authenticate(
+                clientId: String, username: String?, password: UByteArray?
+            ): Boolean {
+                return username == mqttUsername && password.contentEquals(
+                    mqttTestPassword.toByteArray()
+                        .toUByteArray()
+                )
             }
-        )
+        }, packetInterceptor = object : PacketInterceptor {
+            override fun packetReceived(
+                clientId: String, username: String?, password: UByteArray?, packet: MQTTPacket
+            ) {
+                Timber.d("MQTT Packet received $packet")
+                mqttPacketsReceived.add(packet)
+            }
+        })
 
     override fun stopBroker() {
         shouldBeRunning = false
@@ -116,8 +99,7 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
         }
         Timber.i("Waiting to join thread")
         brokerThread.join()
-        Timber
-            .i("MQTT Broker stopped")
+        Timber.i("MQTT Broker stopped")
     }
 
     override fun configureMQTTConnectionToLocal(password: String) {
@@ -137,15 +119,12 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
             }
             """.trimIndent()
         )
-        InstrumentationRegistry.getInstrumentation().targetContext.startActivity(
-            Intent(Intent.ACTION_VIEW).apply {
-                data = Uri.parse("owntracks:///config?inline=$config")
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            }
-        )
+        InstrumentationRegistry.getInstrumentation().targetContext.startActivity(Intent(Intent.ACTION_VIEW).apply {
+            data = Uri.parse("owntracks:///config?inline=$config")
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        })
         sleep(500)
         clickOnAndWait(R.id.save)
-        clickOnAndWait(android.R.id.button1)
     }
 
     // This will use the right password, so we should test for success

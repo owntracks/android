@@ -14,8 +14,6 @@ import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDr
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
 import com.adevinta.android.barista.interaction.PermissionGranter.allowPermissionsIfNeeded
 import com.adevinta.android.barista.rule.flaky.AllowFlaky
-import java.time.Instant
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.DelicateCoroutinesApi
 import mqtt.packets.Qos
 import mqtt.packets.mqtt.MQTTPublish
@@ -30,18 +28,11 @@ import org.owntracks.android.R
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.model.messages.MessageTransition
 import org.owntracks.android.support.Parser
-import org.owntracks.android.testutils.GPSMockDeviceLocation
-import org.owntracks.android.testutils.MockDeviceLocation
-import org.owntracks.android.testutils.TestWithAnActivity
-import org.owntracks.android.testutils.TestWithAnMQTTBroker
-import org.owntracks.android.testutils.TestWithAnMQTTBrokerImpl
-import org.owntracks.android.testutils.reportLocationFromMap
-import org.owntracks.android.testutils.setNotFirstStartPreferences
-import org.owntracks.android.testutils.stopAndroidSetupProcess
-import org.owntracks.android.testutils.waitUntilActivityVisible
-import org.owntracks.android.testutils.with
+import org.owntracks.android.testutils.*
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.map.MapActivity
+import java.time.Instant
+import java.util.concurrent.TimeUnit
 
 @Suppress("DEPRECATION")
 @kotlin.ExperimentalUnsignedTypes
@@ -103,6 +94,7 @@ class MQTTTransitionEventTests :
         allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
 
         configureMQTTConnectionToLocalWithGeneratedPassword()
+        waitUntilActivityVisible<MapActivity>()
 
         reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource)
 
@@ -155,9 +147,7 @@ class MQTTTransitionEventTests :
         val regionDescription = "Test Region"
 
         configureMQTTConnectionToLocalWithGeneratedPassword()
-
-        openDrawer()
-        clickOnAndWait(R.string.title_activity_map)
+        waitUntilActivityVisible<MapActivity>()
 
         baristaRule.activityTestRule.activity.locationIdlingResource.with {
             waitUntilActivityVisible<MapActivity>()

@@ -11,26 +11,20 @@ import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDr
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import com.adevinta.android.barista.interaction.PermissionGranter.allowPermissionsIfNeeded
 import com.adevinta.android.barista.rule.flaky.AllowFlaky
-import java.util.concurrent.TimeUnit
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
 import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotEquals
+import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.preferences.Preferences
-import org.owntracks.android.testutils.GPSMockDeviceLocation
-import org.owntracks.android.testutils.MockDeviceLocation
-import org.owntracks.android.testutils.TestWithAnActivity
-import org.owntracks.android.testutils.TestWithAnHTTPServer
-import org.owntracks.android.testutils.TestWithAnHTTPServerImpl
-import org.owntracks.android.testutils.setNotFirstStartPreferences
-import org.owntracks.android.testutils.with
+import org.owntracks.android.testutils.*
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.map.MapActivity
+import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -57,6 +51,7 @@ class LocationAccuracyTest :
         override fun dispatch(request: RecordedRequest): MockResponse {
             val errorResponse = MockResponse().setResponseCode(404)
             requestBodies.add(request)
+            Timber.v("Received request $request")
             return responses[request.path]?.let {
                 MockResponse().setResponseCode(200)
                     .setHeader("Content-type", "application/json")
@@ -82,9 +77,12 @@ class LocationAccuracyTest :
         initializeMockLocationProvider(baristaRule.activityTestRule.activity.applicationContext)
 
         configureHTTPConnectionToLocal()
+        waitUntilActivityVisible<MapActivity>()
 
         baristaRule.activityTestRule.activity.locationIdlingResource.with {
             setMockLocation(52.0, 0.0, 100f)
+            clickOnAndWait(R.id.menu_monitoring)
+            clickOnAndWait(R.id.fabMonitoringModeMove)
             clickOnAndWait(R.id.menu_report)
         }
         baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.with(TimeUnit.MINUTES.toSeconds(2)) {
@@ -98,6 +96,7 @@ class LocationAccuracyTest :
     }
 
     @Test
+    @AllowFlaky(attempts=2)
     fun testReportingLocationInsideLocationAccuracyThreshold() {
         val dispatcher = LoggingMockJSONResponseDispatcher(mapOf("/" to "{}"))
         startServer(dispatcher)
@@ -114,9 +113,12 @@ class LocationAccuracyTest :
         initializeMockLocationProvider(baristaRule.activityTestRule.activity.applicationContext)
 
         configureHTTPConnectionToLocal()
+        waitUntilActivityVisible<MapActivity>()
 
         baristaRule.activityTestRule.activity.locationIdlingResource.with {
             setMockLocation(52.0, 0.0, 25f)
+            clickOnAndWait(R.id.menu_monitoring)
+            clickOnAndWait(R.id.fabMonitoringModeMove)
             clickOnAndWait(R.id.menu_report)
         }
         baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.with(TimeUnit.MINUTES.toSeconds(2)) {

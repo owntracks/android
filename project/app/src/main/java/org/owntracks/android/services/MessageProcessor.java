@@ -196,6 +196,7 @@ public class MessageProcessor implements Preferences.OnPreferenceChangeListener 
     private void loadOutgoingMessageProcessor() {
         Timber.d("Reloading outgoing message processor. ThreadID: %s", Thread.currentThread());
         if (endpoint != null) {
+            Timber.d("Destroying previous endpoint");
             endpoint.onDestroy();
         }
 
@@ -374,7 +375,7 @@ public class MessageProcessor implements Preferences.OnPreferenceChangeListener 
     }
 
     void onEndpointStateChanged(EndpointState newState) {
-        Timber.d("message:%s, ", newState.getMessage());
+        Timber.d("onEndpointStateChanged. Newstate = %s",newState);
         endpointStateRepo.setState(newState);
     }
 

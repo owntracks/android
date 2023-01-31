@@ -82,6 +82,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
         try {
             checkConfigurationComplete();
         } catch (ConfigurationIncompleteException e) {
+            Timber.w("HTTP Configuration incomplete: %s", e.getMessage());
             messageProcessor.onEndpointStateChanged(EndpointState.ERROR_CONFIGURATION.withError(e));
         }
     }
@@ -281,8 +282,6 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
     @Override
     public void onDestroy() {
         scheduler.cancelHttpTasks();
-        preferences.unregisterOnPreferenceChangedListener(this);
-
     }
 
 

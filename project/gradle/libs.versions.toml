@@ -55,7 +55,7 @@ triplet = { id = "com.github.triplet.play", version.ref = "triplet" }
 
 [libraries]
 android-gradle-api = { module = "com.android.tools.build:gradle-api", version.ref = "agp" }
-desugar = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desguar-jdk"}
+desugar = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desguar-jdk" }
 
 hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
@@ -71,6 +71,7 @@ threetenbp = { module = "org.threeten:threetenbp", version.ref = "threetenbp" }
 
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlin-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlin-coroutines" }
+kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlin-coroutines" }
 
 jaxb-core = { module = "com.sun.xml.bind:jaxb-core", version.ref = "jaxb" }
 jaxb-impl = { module = "com.sun.xml.bind:jaxb-impl", version.ref = "jaxb" }

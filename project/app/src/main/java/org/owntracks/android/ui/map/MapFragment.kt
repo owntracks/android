@@ -67,7 +67,7 @@ abstract class MapFragment<V : ViewDataBinding> internal constructor(
         return binding.root
     }
 
-    private fun updateAllMarkers(contacts: Set<FusedContact>) {
+    internal fun updateAllMarkers(contacts: Set<FusedContact>) {
         contacts.forEach {
             updateMarkerForContact(it)
             if (it == viewModel.currentContact.value) {

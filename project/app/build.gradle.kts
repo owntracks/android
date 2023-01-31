@@ -231,6 +231,7 @@ dependencies {
 
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.androidx.core.testing)
+    testImplementation(libs.kotlin.coroutines.test)
 
     androidTestImplementation(libs.bundles.androidx.test)
     androidTestImplementation(libs.barista) {

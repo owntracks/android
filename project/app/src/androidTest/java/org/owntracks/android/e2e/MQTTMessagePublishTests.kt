@@ -20,8 +20,6 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import com.adevinta.android.barista.interaction.PermissionGranter
-import com.adevinta.android.barista.rule.flaky.AllowFlaky
-import java.time.Instant
 import kotlinx.coroutines.DelicateCoroutinesApi
 import mqtt.packets.Qos
 import mqtt.packets.mqtt.MQTTPublish
@@ -43,6 +41,7 @@ import org.owntracks.android.support.Parser
 import org.owntracks.android.testutils.*
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.map.MapActivity
+import java.time.Instant
 
 @ExperimentalUnsignedTypes
 @LargeTest
@@ -79,6 +78,7 @@ class MQTTMessagePublishTests :
         initializeMockLocationProvider(app)
 
         configureMQTTConnectionToLocalWithGeneratedPassword()
+        waitUntilActivityVisible<MapActivity>()
 
         app.mqttConnectionIdlingResource!!.with {
             baristaRule.activityTestRule.activity.locationIdlingResource.with {
@@ -111,6 +111,7 @@ class MQTTMessagePublishTests :
 
         PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
         configureMQTTConnectionToLocalWithGeneratedPassword()
+        waitUntilActivityVisible<MapActivity>()
 
         reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource)
 
@@ -147,6 +148,7 @@ class MQTTMessagePublishTests :
         PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
 
         configureMQTTConnectionToLocalWithGeneratedPassword()
+        waitUntilActivityVisible<MapActivity>()
 
         reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource)
 
@@ -204,6 +206,7 @@ class MQTTMessagePublishTests :
 
         PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
         configureMQTTConnectionToLocalWithGeneratedPassword()
+        waitUntilActivityVisible<MapActivity>()
 
         reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource)
 

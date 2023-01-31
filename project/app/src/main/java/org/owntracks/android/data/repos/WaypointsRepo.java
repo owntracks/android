@@ -2,6 +2,7 @@ package org.owntracks.android.data.repos;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.LiveData;
 
 import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.data.WaypointModel;
@@ -22,7 +23,7 @@ public abstract class WaypointsRepo {
     public abstract WaypointModel get(long tst);
     protected abstract List<WaypointModel> getAll();
     public abstract List<WaypointModel> getAllWithGeofences();
-    public abstract ObjectBoxLiveData<WaypointModel> getAllLive();
+    public abstract LiveData<List<WaypointModel>> getAllLive();
     public abstract Query<WaypointModel> getAllQuery();
 
     public void insert(WaypointModel w) {

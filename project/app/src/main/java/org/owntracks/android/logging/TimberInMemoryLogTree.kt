@@ -3,15 +3,21 @@ package org.owntracks.android.logging
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import org.owntracks.android.BuildConfig
 import timber.log.Timber
 import timber.log.Timber.DebugTree
 
 class TimberInMemoryLogTree(private val debugBuild: Boolean) : DebugTree() {
+    companion object {
+        const val LOG_PREFIX = "FARTSHOES"
+    }
+
     private val buffer = LogRingBuffer(1_000)
     private val mutableLiveLogs = MutableLiveData(buffer.all())
     val liveLogs: LiveData<List<LogEntry>> = mutableLiveLogs
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-        super.log(priority, tag, message, t)
+        val prefix = if (BuildConfig.DEBUG) LOG_PREFIX else ""
+        super.log(priority, "${prefix}_$tag", message, t)
         // Verbose messages are loggable in this impl, so we want them going to logcat. But not to our buffer.
         if (priority >= Log.DEBUG) {
             buffer.add(LogEntry(priority, tag, message))

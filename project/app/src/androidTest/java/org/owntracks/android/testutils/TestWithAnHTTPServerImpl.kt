@@ -11,7 +11,6 @@ import okhttp3.mockwebserver.RecordedRequest
 import org.eclipse.paho.client.mqttv3.internal.websocket.Base64
 import org.owntracks.android.R
 import org.owntracks.android.ui.clickOnAndWait
-import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber
 
 class TestWithAnHTTPServerImpl : TestWithAnHTTPServer {
@@ -55,7 +54,6 @@ class TestWithAnHTTPServerImpl : TestWithAnHTTPServer {
         )
         sleep(500)
         clickOnAndWait(R.id.save)
-        clickOnAndWait(android.R.id.button1)
     }
 
     class MockJSONResponseDispatcher(private val responses: Map<String, String>) :

@@ -58,7 +58,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="ERROR">"Error"</string>
     <string name="ERROR_CONFIGURATION">"Configuration incomplete"</string>
     <string name="ERROR_DATADISABLED">"Data connection not available"</string>
-    <string name="errorPreferencesImportFailed">"Import failed"</string>
+    <string name="errorPreferencesImportFailed">"Import failed: %s"</string>
     <string name="events">"Events"</string>
     <string name="exportConfiguration">"Export"</string>
     <string name="exportConfigurationSubject">"OwnTracks Configuration File"</string>
@@ -80,6 +80,8 @@ To allow this, please enable Location in the device settings."</string>
     <string name="importConfig">"Import"</string>
     <string name="INITIAL">"Initializing"</string>
     <string name="latitude">"Latitude"</string>
+    <string name="loadActivityNoFileExplorerFound">No file explorer app found</string>
+    <string name="loadActivitySelectAFile">Select a file</string>
     <string name="locationPermissionNotGrantedNotification">"Location permission not granted"</string>
     <string name="locationPermissionRequestDialogMessage">"To track your current location, please grant OwnTracks location permissions."</string>
     <string name="locationPermissionRequestDialogTitle">"Location permission request"</string>
@@ -164,6 +166,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesIgnoreInaccurateLocations">"Inaccurate locations"</string>
     <string name="preferencesIgnoreInaccurateLocationsDialog">"Ignore location, if the accuracy is greater than the given meters"</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">"Ignore inaccurate locations"</string>
+    <string name="preferencesImportNoURIGiven">"No URI given for importing configuration"</string>
     <string name="preferencesKeepalive">"Keepalive"</string>
     <string name="preferencesKeepaliveValidationError">"Keepalive should be a minimum of %d"</string>
     <string name="preferencesLicenses">"Libraries"</string>

@@ -63,12 +63,8 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MapActivity :
-    BaseActivity<UiMapBinding?, NoOpViewModel>(),
-    View.OnClickListener,
-    View.OnLongClickListener,
-    PopupMenu.OnMenuItemClickListener,
-    WorkManagerInitExceptionNotifier by WorkManagerInitExceptionNotifier.Impl(),
+class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), View.OnClickListener, View.OnLongClickListener,
+    PopupMenu.OnMenuItemClickListener, WorkManagerInitExceptionNotifier by WorkManagerInitExceptionNotifier.Impl(),
     ServiceStarter by ServiceStarter.Impl() {
     private val mapViewModel: MapViewModel by viewModels()
     private var previouslyHadLocationPermissions: Boolean = false
@@ -112,13 +108,12 @@ class MapActivity :
         }
     }
 
-    private var onBottomSheetLabelTextSizeChangedListener:
-        AutoResizingTextViewWithListener.OnTextSizeChangedListener? = null
+    private var onBottomSheetLabelTextSizeChangedListener: AutoResizingTextViewWithListener.OnTextSizeChangedListener? =
+        null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         EntryPointAccessors.fromActivity(
-            this,
-            MapActivityEntryPoint::class.java
+            this, MapActivityEntryPoint::class.java
         )
             .let {
                 supportFragmentManager.fragmentFactory = it.fragmentFactory
@@ -162,8 +157,7 @@ class MapActivity :
 
             binding.fabMapLayers.setOnClickListener {
                 MapLayerBottomSheetDialog().show(
-                    supportFragmentManager,
-                    "layerBottomSheetDialog"
+                    supportFragmentManager, "layerBottomSheetDialog"
                 )
             }
 
@@ -174,21 +168,18 @@ class MapActivity :
                 R.id.contactDetailsBearing,
                 R.id.contactDetailsSpeed,
                 R.id.contactDetailsDistance
-            )
-                .map { binding.bottomSheetLayout.findViewById<View>(it) }
+            ).map { binding.bottomSheetLayout.findViewById<View>(it) }
                 .map { it.findViewById<AutoResizingTextViewWithListener>(R.id.label) }
 
             onBottomSheetLabelTextSizeChangedListener =
                 object : AutoResizingTextViewWithListener.OnTextSizeChangedListener {
                     @SuppressLint("RestrictedApi")
                     override fun onTextSizeChanged(view: View, newSize: Float) {
-                        labels
-                            .filter { it != view }
+                        labels.filter { it != view }
                             .filter { it.textSize > newSize || it.configurationChangedFlag }
                             .forEach {
                                 it.setAutoSizeTextTypeUniformWithPresetSizes(
-                                    intArrayOf(newSize.toInt()),
-                                    TypedValue.COMPLEX_UNIT_PX
+                                    intArrayOf(newSize.toInt()), TypedValue.COMPLEX_UNIT_PX
                                 )
                                 it.configurationChangedFlag = false
                             }
@@ -271,17 +262,17 @@ class MapActivity :
     }
 
     internal fun checkAndRequestMyLocationCapability(explicitUserAction: Boolean): Boolean =
-        checkAndRequestLocationPermissions(explicitUserAction) &&
-            checkAndRequestLocationServicesEnabled(explicitUserAction)
+        checkAndRequestLocationPermissions(explicitUserAction) && checkAndRequestLocationServicesEnabled(
+            explicitUserAction
+        )
 
-    private val locationServicesLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            // We have to check permissions again here, because it may have been revoked in the
-            // period between asking for location services and returning here.
-            if (checkAndRequestLocationPermissions(false)) {
-                mapViewModel.requestLocationUpdatesForBlueDot()
-            }
+    private val locationServicesLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        // We have to check permissions again here, because it may have been revoked in the
+        // period between asking for location services and returning here.
+        if (checkAndRequestLocationPermissions(false)) {
+            mapViewModel.requestLocationUpdatesForBlueDot()
         }
+    }
 
     /**
      * Performs a check that the device has location services enabled. This can be called either because the user has
@@ -301,8 +292,7 @@ class MapActivity :
             Timber.d(Exception(), "Location Services disabled")
             if ((explicitUserAction || !preferences.userDeclinedEnableLocationServices)) {
                 if (!this::locationServicesAlertDialog.isInitialized) {
-                    locationServicesAlertDialog = MaterialAlertDialogBuilder(this)
-                        .setCancelable(true)
+                    locationServicesAlertDialog = MaterialAlertDialogBuilder(this).setCancelable(true)
                         .setIcon(R.drawable.ic_baseline_location_disabled_24)
                         .setTitle(getString(R.string.deviceLocationDisabledDialogTitle))
                         .setMessage(getString(R.string.deviceLocationDisabledDialogMessage))
@@ -386,11 +376,9 @@ class MapActivity :
             Snackbar.LENGTH_LONG
         )
             .setAction(getString(R.string.fixProblemLabel)) {
-                startActivity(
-                    Intent(ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                        data = Uri.parse("package:$packageName")
-                    }
-                )
+                startActivity(Intent(ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.parse("package:$packageName")
+                })
             }
             .show()
     }
@@ -420,23 +408,21 @@ class MapActivity :
                 if (shouldShowRequestPermissionRationale(ACCESS_FINE_LOCATION)) {
                     // The user may have denied us once already, so show a rationale
                     if (!this::locationPermissionsRationaleAlertDialog.isInitialized) {
-                        locationPermissionsRationaleAlertDialog =
-                            MaterialAlertDialogBuilder(this)
-                                .setCancelable(true)
-                                .setIcon(R.drawable.ic_baseline_location_disabled_24)
-                                .setTitle(
-                                    getString(R.string.locationPermissionRequestDialogTitle)
-                                )
-                                .setMessage(R.string.locationPermissionRequestDialogMessage)
-                                .setPositiveButton(
-                                    android.R.string.ok
-                                ) { _, _ ->
-                                    permissionRequester.launch(permissions)
-                                }
-                                .setNegativeButton(android.R.string.cancel) { _, _ ->
-                                    preferences.userDeclinedEnableLocationPermissions = true
-                                }
-                                .create()
+                        locationPermissionsRationaleAlertDialog = MaterialAlertDialogBuilder(this).setCancelable(true)
+                            .setIcon(R.drawable.ic_baseline_location_disabled_24)
+                            .setTitle(
+                                getString(R.string.locationPermissionRequestDialogTitle)
+                            )
+                            .setMessage(R.string.locationPermissionRequestDialogMessage)
+                            .setPositiveButton(
+                                android.R.string.ok
+                            ) { _, _ ->
+                                permissionRequester.launch(permissions)
+                            }
+                            .setNegativeButton(android.R.string.cancel) { _, _ ->
+                                preferences.userDeclinedEnableLocationPermissions = true
+                            }
+                            .create()
                     }
                     if (!locationPermissionsRationaleAlertDialog.isShowing) {
                         locationPermissionsRationaleAlertDialog.show()
@@ -453,11 +439,9 @@ class MapActivity :
     }
 
     override fun onResume() {
-        val mapFragment =
-            supportFragmentManager.fragmentFactory.instantiate(
-                this.classLoader,
-                MapFragment::class.java.name
-            )
+        val mapFragment = supportFragmentManager.fragmentFactory.instantiate(
+            this.classLoader, MapFragment::class.java.name
+        )
         supportFragmentManager.commit(true) {
             replace(R.id.mapFragment, mapFragment, "map")
         }
@@ -548,8 +532,7 @@ class MapActivity :
             }
             R.id.menu_monitoring -> {
                 MonitoringModeBottomSheetDialog().show(
-                    supportFragmentManager,
-                    "modeBottomSheetDialog"
+                    supportFragmentManager, "modeBottomSheetDialog"
                 )
                 true
             }
@@ -582,16 +565,13 @@ class MapActivity :
                 c.value?.latLng?.run {
                     try {
                         val intent = Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse("google.navigation:q=$latitude,$longitude")
+                            Intent.ACTION_VIEW, Uri.parse("google.navigation:q=$latitude,$longitude")
                         )
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         startActivity(intent)
                     } catch (e: ActivityNotFoundException) {
                         Snackbar.make(
-                            binding!!.mapCoordinatorLayout,
-                            getString(R.string.noNavigationApp),
-                            Snackbar.LENGTH_SHORT
+                            binding!!.mapCoordinatorLayout, getString(R.string.noNavigationApp), Snackbar.LENGTH_SHORT
                         )
                             .show()
                     }
@@ -619,9 +599,7 @@ class MapActivity :
         binding!!.mapFragment.setPaddingRelative(0, 0, 0, binding!!.bottomSheetLayout.height)
         orientationSensor?.let {
             sensorManager?.registerListener(
-                mapViewModel.orientationSensorEventListener,
-                it,
-                500_000
+                mapViewModel.orientationSensorEventListener, it, 500_000
             )
         }
     }
@@ -660,9 +638,7 @@ class MapActivity :
     override fun onStart() {
         super.onStart()
         bindService(
-            Intent(this, BackgroundService::class.java),
-            serviceConnection,
-            Context.BIND_AUTO_CREATE
+            Intent(this, BackgroundService::class.java), serviceConnection, Context.BIND_AUTO_CREATE
         )
     }
 
@@ -695,8 +671,7 @@ class MapActivity :
                 MyLocationStatus.FOLLOWING -> view.setImageResource(R.drawable.ic_baseline_my_location_24)
             }
             ImageViewCompat.setImageTintList(
-                view,
-                ColorStateList.valueOf(tint)
+                view, ColorStateList.valueOf(tint)
             )
         }
     }

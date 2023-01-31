@@ -49,7 +49,11 @@ public class LocationProcessor {
 
     private boolean ignoreLowAccuracy(@NonNull Location l) {
         int threshold = preferences.getIgnoreInaccurateLocations();
-        return threshold > 0 && l.getAccuracy() > threshold;
+        boolean ignore = threshold > 0 && l.getAccuracy() > threshold;
+        if (ignore) {
+            Timber.d("Ignoring location (acc=%f) because it's below accuracy threshold of %d", l.getAccuracy(), threshold);
+        }
+        return ignore;
     }
 
     public void publishLocationMessage(@Nullable String trigger) {
