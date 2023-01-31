@@ -185,7 +185,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         public void messageArrived(String topic, MqttMessage message) {
             try {
                 MessageBase m = parser.fromJson(message.getPayload());
-                Timber.tag("TOOT").w("message received: %s", m);
+                Timber.w("message received: %s", m);
                 if (!m.isValidMessage()) {
                     Timber.e("message failed validation");
                     return;
@@ -475,7 +475,7 @@ public class MessageProcessorEndpointMqtt extends MessageProcessorEndpoint imple
         } else {
             Set<String> topics = new TreeSet<>();
             topics.add(subTopics);
-            if (subTopics == DEFAULT_SUB_TOPIC) {
+            if (subTopics.equals(DEFAULT_SUB_TOPIC)) {
                 if (subscribeToInfo) {
                     topics.add(subTopics + infoTopicSuffix);
                 }

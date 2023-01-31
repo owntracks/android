@@ -57,7 +57,7 @@
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
-            tools:node="remove"></provider>
+            tools:node="remove" />
 
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"
@@ -101,6 +101,7 @@
 
         <activity
             android:name=".ui.preferences.load.LoadActivity"
+            android:label="@string/importConfig"
             android:configChanges="orientation"
             android:exported="true"
             android:launchMode="singleTask">

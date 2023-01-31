@@ -14,17 +14,16 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.android.material.textfield.TextInputEditText
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.*
 import org.owntracks.android.BuildConfig
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiPreferencesEditorBinding
 import org.owntracks.android.ui.base.BaseActivity
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import timber.log.Timber
+import java.util.*
 
 @AndroidEntryPoint
-class EditorActivity :
-    BaseActivity<UiPreferencesEditorBinding?, EditorMvvm.ViewModel<EditorMvvm.View?>?>(),
+class EditorActivity : BaseActivity<UiPreferencesEditorBinding?, EditorMvvm.ViewModel<EditorMvvm.View?>?>(),
     EditorMvvm.View {
     private var configExportUri: Uri? = null
 
@@ -43,20 +42,20 @@ class EditorActivity :
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
+        return when (item.itemId) {
             R.id.exportConfigurationFile -> {
                 exportConfigurationToFile()
-                return true
+                true
             }
             R.id.importConfigurationFile -> {
                 showImportConfigurationFilePickerView()
-                return true
+                true
             }
             R.id.importConfigurationSingleValue -> {
                 showEditorView()
-                return true
+                true
             }
-            else -> return false
+            else -> false
         }
     }
 
@@ -78,14 +77,10 @@ class EditorActivity :
 
         // Set autocomplete items
         val inputKeyView = layout.findViewById<MaterialAutoCompleteTextView>(R.id.inputKey)
-        inputKeyView.setAdapter(
-            ArrayAdapter(
-                this,
-                android.R.layout.simple_dropdown_item_1line,
-                preferences.allConfigKeys.map { it.name }
-                    .toList()
-            )
-        )
+        inputKeyView.setAdapter(ArrayAdapter(this,
+            android.R.layout.simple_dropdown_item_1line,
+            preferences.allConfigKeys.map { it.name }
+                .toList()))
         builder.setTitle(R.string.preferencesEditor)
             .setPositiveButton(R.string.accept) { dialog: DialogInterface, _: Int ->
                 val inputValue = layout.findViewById<TextInputEditText>(R.id.inputValue)
@@ -154,27 +149,21 @@ class EditorActivity :
 
     override fun displayLoadFailed() {
         Snackbar.make(
-            findViewById(R.id.effectiveConfiguration),
-            R.string.preferencesLoadFailed,
-            Snackbar.LENGTH_SHORT
+            findViewById(R.id.effectiveConfiguration), R.string.preferencesLoadFailed, Snackbar.LENGTH_SHORT
         )
             .show()
     }
 
     private fun displayPreferencesValueForKeySetFailedKey() {
         Snackbar.make(
-            findViewById(R.id.effectiveConfiguration),
-            R.string.preferencesEditorKeyError,
-            Snackbar.LENGTH_SHORT
+            findViewById(R.id.effectiveConfiguration), R.string.preferencesEditorKeyError, Snackbar.LENGTH_SHORT
         )
             .show()
     }
 
     private fun displayPreferencesValueForKeySetFailedValue() {
         Snackbar.make(
-            findViewById(R.id.effectiveConfiguration),
-            R.string.preferencesEditorValueError,
-            Snackbar.LENGTH_SHORT
+            findViewById(R.id.effectiveConfiguration), R.string.preferencesEditorValueError, Snackbar.LENGTH_SHORT
         )
             .show()
     }

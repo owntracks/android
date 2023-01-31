@@ -2,16 +2,12 @@ package org.owntracks.android.ui.map
 
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
-import android.content.ActivityNotFoundException
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
+import android.annotation.SuppressLint
+import android.content.*
 import android.content.res.ColorStateList
 import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.provider.Settings
@@ -43,7 +39,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
-import javax.inject.Inject
 import kotlinx.coroutines.launch
 import org.owntracks.android.BR
 import org.owntracks.android.R
@@ -65,6 +60,7 @@ import org.owntracks.android.ui.mixins.ServiceStarter
 import org.owntracks.android.ui.mixins.WorkManagerInitExceptionNotifier
 import org.owntracks.android.ui.welcome.WelcomeActivity
 import timber.log.Timber
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MapActivity :
@@ -184,6 +180,7 @@ class MapActivity :
 
             onBottomSheetLabelTextSizeChangedListener =
                 object : AutoResizingTextViewWithListener.OnTextSizeChangedListener {
+                    @SuppressLint("RestrictedApi")
                     override fun onTextSizeChanged(view: View, newSize: Float) {
                         labels
                             .filter { it != view }
@@ -335,7 +332,7 @@ class MapActivity :
      * A callback that's fired when the activity is resumed with the result of a location permissioned check resulting
      * from an expclit user action. We want to trigger a services check if the location permission was granted
      */
-    val explicitLocationPermissionRequest =
+    private val explicitLocationPermissionRequest =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             when {
                 permissions[ACCESS_COARSE_LOCATION] ?: false || permissions[ACCESS_FINE_LOCATION] ?: false -> {
@@ -352,7 +349,7 @@ class MapActivity :
      * A callback that's fired when the activity is resumed with the result of a location permission check not triggered
      * by an explicit user action.
      */
-    val locationPermissionRequest =
+    private val locationPermissionRequest =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             when {
                 permissions[ACCESS_COARSE_LOCATION] ?: false || permissions[ACCESS_FINE_LOCATION] ?: false -> {
@@ -366,7 +363,7 @@ class MapActivity :
 
     /**
      * User has granted location permission. Ask the viewmodel to start requesting locations, set the viewmode to
-     * [ViewMode.Device] and tell the service to reinitialize locations.
+     * [MapViewModel.ViewMode.Device] and tell the service to reinitialize locations.
      *
      */
     private fun userGrantedPermissions() {
@@ -515,7 +512,7 @@ class MapActivity :
         return true
     }
 
-    fun updateMonitoringModeMenu() {
+    private fun updateMonitoringModeMenu() {
         menu?.findItem(R.id.menu_monitoring)
             ?.run {
                 when (preferences.monitoring) {
@@ -675,7 +672,7 @@ class MapActivity :
     }
 
     @get:VisibleForTesting
-    val locationIdlingResource: IdlingResource?
+    val locationIdlingResource: IdlingResource
         get() = mapViewModel.locationIdlingResource
 
     @get:VisibleForTesting

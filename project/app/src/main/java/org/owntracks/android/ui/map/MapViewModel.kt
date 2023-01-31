@@ -12,8 +12,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import javax.inject.Inject
-import kotlin.math.asin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.owntracks.android.data.repos.ContactsRepo
@@ -33,6 +31,8 @@ import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.support.RequirementsChecker
 import org.owntracks.android.support.SimpleIdlingResource
 import timber.log.Timber
+import javax.inject.Inject
+import kotlin.math.asin
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
@@ -42,7 +42,7 @@ class MapViewModel @Inject constructor(
     private val geocoderProvider: GeocoderProvider,
     private val preferences: Preferences,
     private val locationRepo: LocationRepo,
-    private val waypointsRepo: WaypointsRepo,
+    waypointsRepo: WaypointsRepo,
     @ApplicationContext private val applicationContext: Context,
     private val requirementsChecker: RequirementsChecker
 ) : ViewModel() {

@@ -47,7 +47,7 @@ abstract class MapFragment<V : ViewDataBinding> internal constructor(
         binding.lifecycleOwner = this.viewLifecycleOwner
 
         viewModel.mapCenter.observe(viewLifecycleOwner, this::updateCamera)
-        viewModel.allContacts.observe(viewLifecycleOwner, { contacts ->
+        viewModel.allContacts.observe(viewLifecycleOwner) { contacts ->
             updateAllMarkers(contacts.values.toSet())
 
             /*
@@ -57,17 +57,17 @@ abstract class MapFragment<V : ViewDataBinding> internal constructor(
             if (viewModel.viewMode == MapViewModel.ViewMode.Contact(true)) {
                 viewModel.currentContact.value?.latLng?.run(this::updateCamera)
             }
-        })
+        }
 
-        viewModel.regions.observe(viewLifecycleOwner, { regions ->
+        viewModel.regions.observe(viewLifecycleOwner) { regions ->
             drawRegions(regions.toSet())
-        })
+        }
         viewModel.mapLayerStyle.observe(viewLifecycleOwner, this::setMapLayerType)
         viewModel.onMapReady()
         return binding.root
     }
 
-    protected fun updateAllMarkers(contacts: Set<FusedContact>) {
+    private fun updateAllMarkers(contacts: Set<FusedContact>) {
         contacts.forEach {
             updateMarkerForContact(it)
             if (it == viewModel.currentContact.value) {
