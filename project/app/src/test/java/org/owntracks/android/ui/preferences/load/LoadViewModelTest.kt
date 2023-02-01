@@ -16,7 +16,6 @@ import org.owntracks.android.preferences.InMemoryPreferencesStore
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.PreferencesStore
 import org.owntracks.android.support.Parser
-import org.owntracks.android.ui.NoopAppShortcuts
 import java.net.URI
 
 
@@ -41,7 +40,7 @@ class LoadViewModelTest {
     fun `Given an inline OwnTracks config URL with invalid JSON, when loading it into the LoadViewModel, then the error is correctly set`() =
         runTest {
             val parser = Parser(null)
-            val preferences = Preferences(mockContext, preferencesStore, NoopAppShortcuts())
+            val preferences = Preferences(preferencesStore)
             val vm = LoadViewModel(preferences, parser, InMemoryWaypointsRepo(eventBus), UnconfinedTestDispatcher())
             vm.extractPreferences(URI("owntracks:///config?inline=e30="))
             assertEquals(ImportStatus.FAILED, vm.configurationImportStatus.value)
@@ -52,7 +51,7 @@ class LoadViewModelTest {
     fun `Given an inline OwnTracks config URL with a simple MessageConfiguration JSON, when loading it into the LoadViewModel, then the correct config is displayed`() =
         runTest {
             val parser = Parser(null)
-            val preferences = Preferences(mockContext, preferencesStore, NoopAppShortcuts())
+            val preferences = Preferences(preferencesStore)
             val vm = LoadViewModel(preferences, parser, InMemoryWaypointsRepo(eventBus), UnconfinedTestDispatcher())
             vm.extractPreferences(URI("owntracks:///config?inline=eyJfdHlwZSI6ImNvbmZpZ3VyYXRpb24ifQ"))
             val expectedConfig = """
@@ -68,7 +67,7 @@ class LoadViewModelTest {
     fun `Given an inline OwnTracks config URL with a simple MessageWaypoints JSON, when loading it into the LoadViewModel, then the correct waypoints are displayed`() =
         runTest {
             val parser = Parser(null)
-            val preferences = Preferences(mockContext, preferencesStore, NoopAppShortcuts())
+            val preferences = Preferences(preferencesStore)
             val vm = LoadViewModel(preferences, parser, InMemoryWaypointsRepo(eventBus), UnconfinedTestDispatcher())
             vm.extractPreferences(URI("owntracks:///config?inline=eyJfdHlwZSI6IndheXBvaW50cyIsIndheXBvaW50cyI6W3siX3R5cGUiOiJ3YXlwb2ludCIsImRlc2MiOiJUZXN0IFdheXBvaW50IiwibGF0Ijo1MSwibG9uIjowLCJyYWQiOjQ1MCwidHN0IjoxNTk4NDUxMzcyfV19"))
             val expectedConfig = """
@@ -91,7 +90,7 @@ class LoadViewModelTest {
     fun `Given a configuration ByteArray with a simple configuration, when loading it into the LoadViewModel, then the correct config is displayed`() =
         runTest {
             val parser = Parser(null)
-            val preferences = Preferences(mockContext, preferencesStore, NoopAppShortcuts())
+            val preferences = Preferences(preferencesStore)
             val vm = LoadViewModel(preferences, parser, InMemoryWaypointsRepo(eventBus), UnconfinedTestDispatcher())
             val expectedConfig = """
             {
@@ -107,7 +106,7 @@ class LoadViewModelTest {
     fun `Given a configuration with waypoints, when loading and then saving into the LoadViewModel, then the preferences and waypointsrepo are updated`() =
         runTest {
             val parser = Parser(null)
-            val preferences = Preferences(mockContext, preferencesStore, NoopAppShortcuts())
+            val preferences = Preferences(preferencesStore)
             val waypointsRepo = InMemoryWaypointsRepo(eventBus)
             val vm = LoadViewModel(preferences, parser, waypointsRepo, UnconfinedTestDispatcher())
             val config = """

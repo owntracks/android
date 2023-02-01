@@ -17,14 +17,14 @@ import javax.inject.Singleton
 class AppShortcutsImpl @Inject constructor() : AppShortcuts {
     private val logViewerId = "logs"
     private val preferencesId = "preferences"
-    override fun enableLogViewerShortcut(applicationContext: Context) {
-        addshortCut(
+    override fun enableShortcuts(applicationContext: Context) {
+        addShortCut(
             logViewerId,
             R.string.viewLogs,
             LogViewerActivity::class.java,
             applicationContext
         )
-        addshortCut(
+        addShortCut(
             preferencesId,
             R.string.title_activity_preferences,
             PreferencesActivity::class.java,
@@ -32,7 +32,7 @@ class AppShortcutsImpl @Inject constructor() : AppShortcuts {
         )
     }
 
-    private fun addshortCut(
+    private fun addShortCut(
         id: String,
         @StringRes label: Int,
         activity: Class<*>,
@@ -57,13 +57,5 @@ class AppShortcutsImpl @Inject constructor() : AppShortcuts {
                 .build()
         )
         Timber.d("Adding logViewer application shortcut. Success=$success")
-    }
-
-    override fun disableLogViewerShortcut(applicationContext: Context) {
-        ShortcutManagerCompat.removeDynamicShortcuts(
-            applicationContext,
-            listOf(logViewerId, preferencesId)
-        )
-        Timber.d("Removing logViewer application shortcut")
     }
 }

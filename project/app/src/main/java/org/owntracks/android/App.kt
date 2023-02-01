@@ -107,15 +107,7 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
         preferences.registerOnPreferenceChangedListener(this)
 
         setThemeFromPreferences()
-
-        if (preferences.experimentalFeatures.contains(
-                Preferences.EXPERIMENTAL_FEATURE_ENABLE_APP_SHORTCUTS
-            )
-        ) {
-            appShortcuts.enableLogViewerShortcut(this)
-        } else {
-            appShortcuts.disableLogViewerShortcut(this)
-        }
+        appShortcuts.enableShortcuts(this)
 
         // Notifications can be sent from multiple places, so let's make sure we've got the channels in place
         createNotificationChannels()

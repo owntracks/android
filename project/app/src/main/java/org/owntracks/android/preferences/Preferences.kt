@@ -1,16 +1,13 @@
 package org.owntracks.android.preferences
 
-import android.content.Context
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-import dagger.hilt.android.qualifiers.ApplicationContext
 import org.owntracks.android.BuildConfig
 import org.owntracks.android.model.messages.MessageConfiguration
 import org.owntracks.android.preferences.types.*
 import org.owntracks.android.services.worker.Scheduler.MIN_PERIODIC_INTERVAL_MILLIS
-import org.owntracks.android.ui.AppShortcuts
 import org.owntracks.android.ui.map.MapLayerStyle
 import timber.log.Timber
 import java.util.*
@@ -27,12 +24,9 @@ import kotlin.reflect.typeOf
 import kotlin.time.Duration.Companion.milliseconds
 
 @Singleton
-class Preferences @Inject constructor(
-    @ApplicationContext private val applicationContext: Context,
-    private val preferencesStore: PreferencesStore,
-    private val appShortcuts: AppShortcuts
-) {
-    val allConfigKeys = Preferences::class.declaredMemberProperties.filter { it.annotations.any { it is Preference } }
+class Preferences @Inject constructor(private val preferencesStore: PreferencesStore) {
+    val allConfigKeys =
+        Preferences::class.declaredMemberProperties.filter { it.annotations.any { annotation -> annotation is Preference } }
 
     private val mqttExportedConfigKeys =
         allConfigKeys.filter { it.annotations.any { annotation -> annotation is Preference && annotation.exportModeMqtt } }
@@ -318,7 +312,7 @@ class Preferences @Inject constructor(
     @Preference(exportModeHttp = false)
     var ws: Boolean by preferencesStore
 
-    // Preferences we store but don't export / imnport
+    // Preferences we store but don't export / import
     var firstStart: Boolean by preferencesStore
     var setupCompleted: Boolean by preferencesStore
 
@@ -418,13 +412,11 @@ class Preferences @Inject constructor(
         const val EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI = "showExperimentalPreferenceUI"
         const val EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE = "allowSmallKeepalive"
         const val EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION = "bearingArrowFollowsDeviceOrientation"
-        const val EXPERIMENTAL_FEATURE_ENABLE_APP_SHORTCUTS = "enableAppShortcuts"
 
         internal val EXPERIMENTAL_FEATURES = setOf(
             EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI,
             EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE,
             EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION,
-            EXPERIMENTAL_FEATURE_ENABLE_APP_SHORTCUTS
         )
 
         val SYSTEM_NIGHT_AUTO_MODE by lazy {

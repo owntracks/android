@@ -141,9 +141,7 @@ class PreferencesActivityTests :
         val defaultGeocoder = baristaRule.activityTestRule.activity.applicationContext.let {
             DefaultsProviderImpl().getDefaultValue<ReverseGeocodeProvider>(
                 Preferences(
-                    it,
-                    SharedPreferencesStore(it),
-                    AppShortcutsImpl()
+                    SharedPreferencesStore(it)
                 ),
                 Preferences::reverseGeocodeProvider
             )

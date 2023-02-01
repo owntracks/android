@@ -22,7 +22,6 @@ import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.support.ContactBitmapAndName
 import org.owntracks.android.support.ContactBitmapAndNameMemoryCache
 import org.owntracks.android.support.Events.EndpointChanged
-import org.owntracks.android.ui.NoopAppShortcuts
 
 class MemoryContactsRepoTest {
 
@@ -51,7 +50,7 @@ class MemoryContactsRepoTest {
             on { resources } doReturn mockResources
             on { packageName } doReturn javaClass.canonicalName
         }
-        preferences = Preferences(mockContext, InMemoryPreferencesStore(), NoopAppShortcuts())
+        preferences = Preferences(InMemoryPreferencesStore())
 
         messageLocation = MessageLocation()
         messageLocation.accuracy = 10

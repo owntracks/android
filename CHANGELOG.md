@@ -11,6 +11,7 @@
 - Add an option for a location message to be republished on reconnection to MQTT (#1273, #1178)
 - MyLocation button now differentiates between no location, location available and following
 - Added korean translation
+- Shortcuts to preferences and logs on the launcher icon
 - Waypoints can be imported on the config import screen (#1284)
 
 ### Bug fixes

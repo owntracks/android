@@ -18,7 +18,6 @@ import org.owntracks.android.preferences.types.MqttProtocolLevel
 import org.owntracks.android.preferences.types.MqttQos
 import org.owntracks.android.preferences.types.ReverseGeocodeProvider
 import org.owntracks.android.preferences.types.StringMaxTwoAlphaNumericChars
-import org.owntracks.android.ui.NoopAppShortcuts
 import org.owntracks.android.ui.map.MapLayerStyle
 
 @RunWith(Parameterized::class)
@@ -40,7 +39,7 @@ class PreferencesGettersAndSetters(val parameter: Parameter) {
 
     @Test
     fun `when setting a preference ensure that the preference is set correctly on export`() {
-        val preferences = Preferences(mockContext, preferencesStore, NoopAppShortcuts())
+        val preferences = Preferences(preferencesStore)
         val setter =
             Preferences::class.java.getMethod("set${parameter.preferenceMethodName}", parameter.preferenceType.java)
         if (parameter.httpOnlyMode) {
@@ -53,7 +52,7 @@ class PreferencesGettersAndSetters(val parameter: Parameter) {
 
     @Test
     fun `when importing a configuration ensure that the supplied preference is set to the given value`() {
-        val preferences = Preferences(mockContext, preferencesStore, NoopAppShortcuts())
+        val preferences = Preferences(preferencesStore)
         val messageConfiguration = MessageConfiguration()
         messageConfiguration[parameter.preferenceName] = parameter.preferenceValueInConfiguration
         preferences.importConfiguration(messageConfiguration)

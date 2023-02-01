@@ -13,7 +13,6 @@ import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.preferences.types.MqttProtocolLevel
 import org.owntracks.android.preferences.types.MqttQos
 import org.owntracks.android.support.Parser
-import org.owntracks.android.ui.NoopAppShortcuts
 
 class ImportExportTest {
     private lateinit var mockContext: Context
@@ -88,7 +87,7 @@ class ImportExportTest {
               "ws": false
             }
         """.trimIndent()
-        val preferences = Preferences(mockContext, preferencesStore, NoopAppShortcuts())
+        val preferences = Preferences(preferencesStore)
         val parser = Parser(null)
         preferences.importConfiguration(parser.fromJson(input) as MessageConfiguration)
         preferences.run {
@@ -131,7 +130,7 @@ class ImportExportTest {
 
     @Test
     fun `given a preferences instance, when exporting it, then the exported JSON message has the same values set`() {
-        val preferences = Preferences(mockContext, preferencesStore, NoopAppShortcuts())
+        val preferences = Preferences(preferencesStore)
         preferences.run {
             autostartOnBoot = true
             cleanSession = false
