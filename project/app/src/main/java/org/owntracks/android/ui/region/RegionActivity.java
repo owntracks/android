@@ -11,17 +11,11 @@ import androidx.annotation.Nullable;
 import org.owntracks.android.R;
 import org.owntracks.android.databinding.UiRegionBinding;
 import org.owntracks.android.ui.base.BaseActivity;
-import org.owntracks.android.ui.base.navigator.Navigator;
-
-import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
 public class RegionActivity extends BaseActivity<UiRegionBinding, RegionMvvm.ViewModel<RegionMvvm.View>> implements RegionMvvm.View {
-    @Inject
-    Navigator navigator;
-
     private MenuItem saveButton;
 
     @Override
@@ -31,7 +25,7 @@ public class RegionActivity extends BaseActivity<UiRegionBinding, RegionMvvm.Vie
         bindAndAttachContentView(R.layout.ui_region, savedInstanceState);
         setSupportToolbar(binding.appbar.toolbar);
 
-        Bundle b = navigator.getExtrasBundle(getIntent());
+        Bundle b = getIntent().getExtras();
         if (b != null) {
             viewModel.loadWaypoint(b.getLong("waypointId", 0));
         }

@@ -4,12 +4,14 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
             name="vm"
             type="org.owntracks.android.ui.regions.RegionsViewModel" />
     </data>
 
-    <LinearLayout
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -22,6 +24,7 @@
             android:id="@+id/recyclerView"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
+            android:visibility="@{vm.waypointsList.empty ? View.GONE : View.VISIBLE}"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
         <TextView
@@ -30,6 +33,6 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="@string/waypointListPlaceholder"
-            android:visibility="gone" />
-    </LinearLayout>
+            android:visibility="@{vm.waypointsList.empty ? View.VISIBLE : View.GONE}" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
 </layout>
