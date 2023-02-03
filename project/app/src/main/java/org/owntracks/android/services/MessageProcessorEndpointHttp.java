@@ -287,23 +287,25 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
 
     @Override
     public void onPreferenceChanged(@NonNull List<String> properties) {
-        List<String> propertiesThatTriggerAURLReload = List.of(
-                "url",
-                "username",
-                "password",
-                "deviceId"
-        );
-        List<String> propertiesThatShouldResetTheClient = List.of(
-                "tlsClientCrt",
-                "tlsClientCrtPassword",
-                "tlsCaCrt"
-        );
+        if (preferences.getMode()==ConnectionMode.HTTP) {
+            List<String> propertiesThatTriggerAURLReload = List.of(
+                    "url",
+                    "username",
+                    "password",
+                    "deviceId"
+            );
+            List<String> propertiesThatShouldResetTheClient = List.of(
+                    "tlsClientCrt",
+                    "tlsClientCrtPassword",
+                    "tlsCaCrt"
+            );
 
-        if (!propertiesThatTriggerAURLReload.stream().filter(properties::contains).collect(Collectors.toSet()).isEmpty()) {
-            messageProcessor.resetMessageSleepBlock();
-            loadEndpointUrl();
-        } else if (!propertiesThatShouldResetTheClient.stream().filter(properties::contains).collect(Collectors.toSet()).isEmpty()) {
-            mHttpClient = null;
+            if (!propertiesThatTriggerAURLReload.stream().filter(properties::contains).collect(Collectors.toSet()).isEmpty()) {
+                messageProcessor.resetMessageSleepBlock();
+                loadEndpointUrl();
+            } else if (!propertiesThatShouldResetTheClient.stream().filter(properties::contains).collect(Collectors.toSet()).isEmpty()) {
+                mHttpClient = null;
+            }
         }
     }
 
