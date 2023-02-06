@@ -13,7 +13,6 @@ import androidx.test.uiautomator.Until
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
 import com.adevinta.android.barista.interaction.PermissionGranter.allowPermissionsIfNeeded
-import com.adevinta.android.barista.rule.flaky.AllowFlaky
 import kotlinx.coroutines.DelicateCoroutinesApi
 import mqtt.packets.Qos
 import mqtt.packets.mqtt.MQTTPublish
@@ -34,8 +33,7 @@ import org.owntracks.android.ui.map.MapActivity
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 
-@Suppress("DEPRECATION")
-@kotlin.ExperimentalUnsignedTypes
+@ExperimentalUnsignedTypes
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class MQTTTransitionEventTests :
@@ -69,24 +67,23 @@ class MQTTTransitionEventTests :
         // Cancel notifications
         (app.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancelAll()
         // Close the notification shade
+        @Suppress("DEPRECATION")
         app.sendBroadcast(Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS))
     }
 
     @Before
     fun clearLocalData() {
-        app
-            .filesDir
-            .listFiles()
+        app.filesDir.listFiles()
             ?.forEach { it.delete(); }
     }
 
     @Before
     fun stopAndroidSetup() {
         stopAndroidSetupProcess()
+        disableHeadsupNotifications()
     }
 
     @Test
-    @AllowFlaky(attempts = 1)
     fun given_an_MQTT_configured_client_when_the_broker_sends_a_transition_message_then_a_notification_appears() { // ktlint-disable max-line-length
         setNotFirstStartPreferences()
         launchActivity()
@@ -94,9 +91,10 @@ class MQTTTransitionEventTests :
         allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
 
         configureMQTTConnectionToLocalWithGeneratedPassword()
-        waitUntilActivityVisible<MapActivity>()
 
-        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource)
+        app.mqttConnectionIdlingResource.with {
+            reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource)
+        }
 
         listOf(
             MessageLocation().apply {
@@ -113,8 +111,7 @@ class MQTTTransitionEventTests :
                 trigger = "l"
                 timestamp = Instant.parse("2006-01-02T15:04:05Z").epochSecond
             }
-        )
-            .map(Parser(null)::toJsonBytes)
+        ).map(Parser(null)::toJsonBytes)
             .forEach {
                 broker.publish(
                     false,
@@ -130,8 +127,7 @@ class MQTTTransitionEventTests :
             Until.hasObject(By.textStartsWith("2006-01-02")),
             TimeUnit.SECONDS.toMillis(30)
         )
-        val notification =
-            uiDevice.findObject(By.textStartsWith("2006-01-02 15:04 ce enters Transition!"))
+        val notification = uiDevice.findObject(By.textStartsWith("2006-01-02 15:04 ce enters Transition!"))
         assertNotNull(notification)
     }
 
@@ -141,7 +137,7 @@ class MQTTTransitionEventTests :
         launchActivity()
         allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
 
-        initializeMockLocationProvider(baristaRule.activityTestRule.activity.applicationContext)
+        initializeMockLocationProvider(app)
         val regionLatitude = 48.0
         val regionLongitude = -1.0
         val regionDescription = "Test Region"
@@ -149,13 +145,9 @@ class MQTTTransitionEventTests :
         configureMQTTConnectionToLocalWithGeneratedPassword()
         waitUntilActivityVisible<MapActivity>()
 
-        baristaRule.activityTestRule.activity.locationIdlingResource.with {
-            waitUntilActivityVisible<MapActivity>()
+        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource) {
             setMockLocation(51.0, 0.0)
-            clickOnAndWait(R.id.fabMyLocation)
         }
-
-        clickOnAndWait(R.id.menu_report)
 
         openDrawer()
         clickOnAndWait(R.string.title_activity_regions)
@@ -168,30 +160,19 @@ class MQTTTransitionEventTests :
 
         clickOnAndWait(R.id.save)
 
-        openDrawer()
-        clickOnAndWait(R.string.title_activity_map)
-        baristaRule.activityTestRule.activity.locationIdlingResource.with {
-            waitUntilActivityVisible<MapActivity>()
+        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource) {
             setMockLocation(regionLatitude, regionLongitude)
-            clickOnAndWait(R.id.fabMyLocation)
         }
-
-        clickOnAndWait(R.id.menu_report)
 
         assertTrue(
             "Packet has been received that is a transition message with the correct details",
-            mqttPacketsReceived
-                .filterIsInstance<MQTTPublish>()
+            mqttPacketsReceived.filterIsInstance<MQTTPublish>()
                 .map {
                     Pair(it.topicName, Parser(null).fromJson((it.payload)!!.toByteArray()))
                 }
                 .any {
                     it.second.let { message ->
-                        message is MessageTransition &&
-                            message.description == regionDescription &&
-                            message.latitude == regionLatitude &&
-                            message.longitude == regionLongitude &&
-                            message.event == "enter"
+                        message is MessageTransition && message.description == regionDescription && message.latitude == regionLatitude && message.longitude == regionLongitude && message.event == "enter"
                     } && it.first == "owntracks/$mqttUsername/$deviceId/event"
                 }
         )

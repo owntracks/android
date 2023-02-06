@@ -13,6 +13,7 @@ import org.owntracks.android.data.EndpointState;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.data.repos.EndpointStateRepo;
 import org.owntracks.android.data.repos.WaypointsRepo;
+import org.owntracks.android.di.IoDispatcher;
 import org.owntracks.android.model.messages.MessageBase;
 import org.owntracks.android.model.messages.MessageCard;
 import org.owntracks.android.model.messages.MessageClear;
@@ -26,6 +27,7 @@ import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.ServiceBridge;
+import org.owntracks.android.support.SimpleIdlingResource;
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException;
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
 
@@ -33,20 +35,21 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import dagger.Lazy;
 import dagger.hilt.android.qualifiers.ApplicationContext;
+import kotlin.Unit;
+import kotlinx.coroutines.CoroutineDispatcher;
 import timber.log.Timber;
 
 @Singleton
@@ -64,6 +67,7 @@ public class MessageProcessor implements Preferences.OnPreferenceChangeListener 
     private final ServiceBridge serviceBridge;
     private final CountingIdlingResource outgoingQueueIdlingResource;
     private final RunThingsOnOtherThreads runThingsOnOtherThreads;
+    private final CoroutineDispatcher ioDispatcher;
     private MessageProcessorEndpoint endpoint;
 
     private boolean acceptMessages = false;
@@ -79,8 +83,8 @@ public class MessageProcessor implements Preferences.OnPreferenceChangeListener 
     private ScheduledFuture<?> waitFuture = null;
     private long retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT;
 
-    private MessageProcessorEndpoint httpEndpoint;
-    private MessageProcessorEndpoint mqttEndpoint;
+    private final MessageProcessorEndpoint httpEndpoint;
+    private final MessageProcessorEndpoint mqttEndpoint;
 
     @Inject
     public MessageProcessor(
@@ -95,7 +99,8 @@ public class MessageProcessor implements Preferences.OnPreferenceChangeListener 
             ServiceBridge serviceBridge,
             RunThingsOnOtherThreads runThingsOnOtherThreads,
             CountingIdlingResource outgoingQueueIdlingResource,
-            Lazy<LocationProcessor> locationProcessorLazy
+            Lazy<LocationProcessor> locationProcessorLazy,
+            @IoDispatcher CoroutineDispatcher ioDispatcher
     ) {
         this.applicationContext = applicationContext;
         this.preferences = preferences;
@@ -110,6 +115,7 @@ public class MessageProcessor implements Preferences.OnPreferenceChangeListener 
         this.outgoingQueueIdlingResource = outgoingQueueIdlingResource;
         this.eventBus.register(this);
         this.runThingsOnOtherThreads = runThingsOnOtherThreads;
+        this.ioDispatcher = ioDispatcher;
 
         outgoingQueue = new BlockingDequeThatAlsoSometimesPersistsThingsToDiskMaybe(10000, applicationContext.getFilesDir(), parser);
         synchronized (outgoingQueue) {
@@ -119,72 +125,44 @@ public class MessageProcessor implements Preferences.OnPreferenceChangeListener 
             Timber.d("Initializing the outgoingqueueidlingresource at %s", outgoingQueue.size());
         }
         preferences.registerOnPreferenceChangedListener(this);
-        httpEndpoint = new MessageProcessorEndpointHttp(this, this.parser, this.preferences, this.scheduler, this.applicationContext);
-        mqttEndpoint = new MessageProcessorEndpointMqtt(this, this.parser, this.preferences, this.scheduler, this.eventBus, this.runThingsOnOtherThreads, this.applicationContext);
+        httpEndpoint = new MessageProcessorEndpointHttp(this, this.parser, this.preferences, this.scheduler, this.applicationContext, this.endpointStateRepo);
+        mqttEndpoint = new MQTTMessageProcessorEndpoint(this, this.endpointStateRepo, this.scheduler, this.preferences, this.parser, this.ioDispatcher, applicationContext);
     }
 
     synchronized public void initialize() {
         if (!initialized) {
             Timber.d("Initializing MessageProcessor");
-            onEndpointStateChanged(EndpointState.INITIAL);
+            endpointStateRepo.setState(EndpointState.INITIAL);
             reconnect();
             initialized = true;
         }
     }
 
-    public void reconnect() {
-        reconnect(null);
-    }
-
-    public void reconnect(Semaphore completionNotifier) {
+    /**
+     * Called either by the connection activity user button, or by receiving a RECONNECT message
+     */
+    public CompletableFuture<Unit> reconnect() {
         if (endpoint == null) {
             loadOutgoingMessageProcessor(); // The processor should take care of the reconnect on init
-        } else if (endpoint instanceof MessageProcessorEndpointMqtt) {
-            ((MessageProcessorEndpointMqtt) endpoint).reconnect(completionNotifier);
-        } else if (completionNotifier != null) {
-            // This is not an MQTT endpoint, but we've been given a notifier. Just release it.
-            completionNotifier.release();
-        }
-    }
-
-    public boolean statefulReconnectAndSendKeepalive() {
-        if (endpoint == null)
-            loadOutgoingMessageProcessor();
-
-        if (endpoint instanceof MessageProcessorEndpointMqtt) {
-            Semaphore lock = new Semaphore(1);
-            lock.acquireUninterruptibly();
-            ((MessageProcessorEndpointMqtt) endpoint).reconnectAndSendKeepalive(lock);
-            try {
-                // Above method may re-trigger itself on a different thread, so we want to wait until
-                // that's complete.
-                Timber.d("Waiting for reconnect worker to complete");
-                lock.acquire();
-                Timber.d("Waiting done");
-                return true;
-            } catch (InterruptedException e) {
-                Timber.w(e, "Interrupted waiting for reconnect future to complete");
-                return false;
-            }
+            return null;
+        } else if (endpoint instanceof MQTTMessageProcessorEndpoint) {
+            return ((MQTTMessageProcessorEndpoint) endpoint).reconnect();
         } else {
-            return true;
+            return null;
         }
     }
 
     public boolean statefulCheckConnection() {
-        if (endpoint == null)
-            loadOutgoingMessageProcessor();
-
         if (endpoint instanceof StatefulServiceMessageProcessor)
             return ((StatefulServiceMessageProcessor) endpoint).checkConnection();
         else
             return true;
     }
 
-    public boolean isEndpointConfigurationComplete() {
+    public boolean isEndpointReady() {
         try {
             if (this.endpoint != null) {
-                this.endpoint.checkConfigurationComplete();
+                this.endpoint.getEndpointConfiguration();
                 return true;
             }
         } catch (ConfigurationIncompleteException e) {
@@ -197,7 +175,7 @@ public class MessageProcessor implements Preferences.OnPreferenceChangeListener 
         Timber.d("Reloading outgoing message processor. ThreadID: %s", Thread.currentThread());
         if (endpoint != null) {
             Timber.d("Destroying previous endpoint");
-            endpoint.onDestroy();
+            endpoint.deactivate();
         }
 
         endpointStateRepo.setQueueLength(outgoingQueue.size());
@@ -218,14 +196,14 @@ public class MessageProcessor implements Preferences.OnPreferenceChangeListener 
             backgroundDequeueThread.start();
         }
 
-        this.endpoint.onCreateFromProcessor();
+        this.endpoint.activate();
         acceptMessages = true;
     }
 
     public void queueMessageForSending(MessageBase message) {
         if (!acceptMessages) return;
         outgoingQueueIdlingResource.increment();
-        Timber.d("Queueing messageId:%s, queueLength:%s, ThreadID: %s", message.getMessageId(), outgoingQueue.size(), Thread.currentThread());
+        Timber.d("Queueing messageId:%s, current queueLength:%s", message.getMessageId(), outgoingQueue.size());
         synchronized (outgoingQueue) {
             if (!outgoingQueue.offer(message)) {
                 MessageBase droppedMessage = outgoingQueue.poll();
@@ -234,8 +212,8 @@ public class MessageProcessor implements Preferences.OnPreferenceChangeListener 
                     Timber.e("Still can't put message onto the queue. Dropping: %s", message);
                 }
             }
+            endpointStateRepo.setQueueLength(outgoingQueue.size());
         }
-        endpointStateRepo.setQueueLength(outgoingQueue.size());
     }
 
     // Should be on the background thread here, because we block
@@ -250,6 +228,8 @@ public class MessageProcessor implements Preferences.OnPreferenceChangeListener 
             try {
                 MessageBase message;
                 message = this.outgoingQueue.take(); // <--- blocks
+                Timber.v("Taken message off queue: %s", message);
+                endpointStateRepo.setQueueLength(outgoingQueue.size() + 1);
                 if (!previousMessageFailed) {
                     retriesToGo = message.getNumberOfRetries();
                 }
@@ -279,7 +259,7 @@ public class MessageProcessor implements Preferences.OnPreferenceChangeListener 
                     previousMessageFailed = false;
                     retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT;
                 } catch (OutgoingMessageSendingException | ConfigurationIncompleteException e) {
-                    Timber.w(("Error sending message. Re-queueing"));
+                    Timber.w("Error sending message. Re-queueing");
                     // Let's do a little dance to hammer this failed message back onto the head of the
                     // queue. If someone's queued something on the tail in the meantime and the queue
                     // is now empty, then throw that latest message away.
@@ -319,14 +299,13 @@ public class MessageProcessor implements Preferences.OnPreferenceChangeListener 
                     }
                     retryWait = Math.min(2 * retryWait, SEND_FAILURE_BACKOFF_MAX_WAIT);
                 } else {
-                    synchronized (outgoingQueueIdlingResource) {
-                        try {
-                            if (!outgoingQueueIdlingResource.isIdleNow()) {
-                                outgoingQueueIdlingResource.decrement();
-                            }
-                        } catch (IllegalStateException e) {
-                            Timber.w(e, "outgoingQueueIdlingResource is invalid");
+                    try {
+                        if (!outgoingQueueIdlingResource.isIdleNow()) {
+                            Timber.v("Decrementing outgoingQueueIdlingResource");
+                            outgoingQueueIdlingResource.decrement();
                         }
+                    } catch (IllegalStateException e) {
+                        Timber.w(e, "outgoingQueueIdlingResource is invalid");
                     }
                 }
             } catch (InterruptedException e) {
@@ -342,9 +321,9 @@ public class MessageProcessor implements Preferences.OnPreferenceChangeListener 
      * Resets the retry backoff timer back to the initial value, because we've most likely had a
      * reconnection event.
      */
-    public void resetMessageSleepBlock() {
+    public void notifyOutgoingMessageQueue() {
         if (waitFuture != null && waitFuture.cancel(false)) {
-            Timber.d("Resetting message send loop wait. Thread: %s", Thread.currentThread());
+            Timber.d("Resetting message send loop wait.");
             retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT;
             synchronized (locker) {
                 locker.notify();
@@ -359,8 +338,7 @@ public class MessageProcessor implements Preferences.OnPreferenceChangeListener 
         loadOutgoingMessageProcessor();
     }
 
-    void onMessageDelivered(MessageBase messageBase) {
-        Timber.d("onMessageDelivered in MessageProcessor Noop. ThreadID: %s", Thread.currentThread());
+    void onMessageDelivered() {
         endpointStateRepo.setQueueLength(outgoingQueue.size());
     }
 
@@ -372,11 +350,6 @@ public class MessageProcessor implements Preferences.OnPreferenceChangeListener 
     void onMessageDeliveryFailed(String messageId) {
         Timber.e("Message delivery failed. queueLength: %s, messageId: %s", outgoingQueue.size() + 1, messageId);
         endpointStateRepo.setQueueLength(outgoingQueue.size());
-    }
-
-    void onEndpointStateChanged(EndpointState newState) {
-        Timber.d("onEndpointStateChanged. Newstate = %s",newState);
-        endpointStateRepo.setState(newState);
     }
 
     void processIncomingMessage(MessageBase message) {
@@ -487,20 +460,20 @@ public class MessageProcessor implements Preferences.OnPreferenceChangeListener 
         backgroundDequeueThread.interrupt();
     }
 
-    @Nullable
-    public IdlingResource getMqttConnectionIdlingResource() {
-        if (this.endpoint instanceof MessageProcessorEndpointMqtt) {
-            return ((MessageProcessorEndpointMqtt) this.endpoint).getMqttConnectionIdlingResource();
-        } else {
-            return null;
-        }
-    }
-
     @Override
     public void onPreferenceChanged(@NonNull List<String> properties) {
         if (properties.contains("mode")) {
             acceptMessages = false;
             loadOutgoingMessageProcessor();
+        }
+    }
+
+    @NonNull
+    public IdlingResource getMqttConnectionIdlingResource() {
+        if (this.endpoint instanceof MQTTMessageProcessorEndpoint) {
+            return ((MQTTMessageProcessorEndpoint) this.endpoint).getMqttConnectionIdlingResource();
+        } else {
+            return new SimpleIdlingResource("alwaysIdle", true);
         }
     }
 }

@@ -18,10 +18,6 @@ annotation class WorkerKey(val value: KClass<out ListenableWorker>)
 @InstallIn(SingletonComponent::class)
 @Module
 interface WorkerModule {
-    @Binds
-    @IntoMap
-    @WorkerKey(MQTTMaybeReconnectAndPingWorker::class)
-    fun bindMQTTMaybeReconnectAndPingWorkerFactory(factory: MQTTMaybeReconnectAndPingWorker.Factory): ChildWorkerFactory
 
     @Binds
     @IntoMap

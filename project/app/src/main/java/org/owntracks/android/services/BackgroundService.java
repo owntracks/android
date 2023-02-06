@@ -27,7 +27,6 @@ import android.text.style.StyleSpan;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -231,7 +230,7 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
             lastQueueLength = queueLength;
             updateOngoingNotification();
         });
-        endpointStateRepo.getEndpointState().observe(this, state -> updateOngoingNotification());
+        endpointStateRepo.getEndpointStateLiveData().observe(this, state -> updateOngoingNotification());
 
         endpointStateRepo.setServiceStartedNow();
 
@@ -374,7 +373,7 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
         }
 
         // Show monitoring mode if endpoint state is not interesting
-        EndpointState lastEndpointState = endpointStateRepo.getEndpointState().getValue();
+        EndpointState lastEndpointState = endpointStateRepo.getEndpointStateLiveData().getValue();
         if (lastEndpointState == EndpointState.CONNECTED || lastEndpointState == EndpointState.IDLE) {
             builder.setContentText(getMonitoringLabel(preferences.getMonitoring()));
         } else if (lastEndpointState == EndpointState.ERROR && lastEndpointState.getMessage() != null) {

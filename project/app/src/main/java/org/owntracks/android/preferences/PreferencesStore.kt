@@ -122,7 +122,24 @@ abstract class PreferencesStore :
      */
     operator fun <T> setValue(preferences: Preferences, property: KProperty<*>, value: T) {
         setValueWithoutNotifying(preferences, property, value)
-        preferences.notifyChanged(property)
+        setterTransaction?.apply { addProperty(property) } ?: run {
+            preferences.notifyChanged(setOf(property))
+        }
+    }
+
+    var setterTransaction: Transaction? = null
+
+    class Transaction internal constructor(private val preferences: Preferences) {
+        fun addProperty(property: KProperty<*>) {
+            propertiesToNotify.add(property)
+        }
+
+        fun commit() {
+            Timber.d("Committing prefrences transaction for $propertiesToNotify")
+            preferences.notifyChanged(propertiesToNotify)
+        }
+
+        private val propertiesToNotify = mutableSetOf<KProperty<*>>()
     }
 
     @Suppress("UNCHECKED_CAST")

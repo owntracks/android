@@ -37,13 +37,17 @@ class LoadViewModel @Inject constructor(
     private val waypointsRepo: WaypointsRepo,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
+    val importStatusIdlingResource = SimpleIdlingResource("importStatus", true)
+
     private val loadIdlingResource = SimpleIdlingResource("loadIdlingResource", true)
     private var configuration: MessageConfiguration? = null
 
     private val mutableConfig = MutableLiveData("")
     val displayedConfiguration: LiveData<String> = mutableConfig
+
     private val mutableImportStatus = MutableLiveData(ImportStatus.LOADING)
     val configurationImportStatus: LiveData<ImportStatus> = mutableImportStatus
+
     private val mutableImportError = MutableLiveData<String>()
     val importError: LiveData<String> = mutableImportError
 
@@ -77,6 +81,7 @@ class LoadViewModel @Inject constructor(
 
     fun saveConfiguration() {
         viewModelScope.launch(ioDispatcher) {
+            importStatusIdlingResource.setIdleState(false)
             mutableImportStatus.postValue(ImportStatus.LOADING)
             Timber.d("Saving configuration $configuration")
             configuration?.run {
@@ -87,6 +92,7 @@ class LoadViewModel @Inject constructor(
             }
             Timber.d("Setting importstatus to saved")
             mutableImportStatus.postValue(ImportStatus.SAVED)
+            importStatusIdlingResource.setIdleState(true)
         }
     }
 
@@ -148,7 +154,8 @@ class LoadViewModel @Inject constructor(
                                 override fun onFailure(call: Call, e: IOException) {
                                     configurationImportFailed(
                                         Exception(
-                                            "Failure fetching config from remote URL", e
+                                            "Failure fetching config from remote URL",
+                                            e
                                         )
                                     )
                                 }
@@ -161,7 +168,8 @@ class LoadViewModel @Inject constructor(
                                                 configurationImportFailed(
                                                     IOException(
                                                         String.format(
-                                                            "Unexpected status code: %s", response
+                                                            "Unexpected status code: %s",
+                                                            response
                                                         )
                                                     )
                                                 )

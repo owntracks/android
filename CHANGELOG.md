@@ -13,13 +13,13 @@
 - Added korean translation
 - Shortcuts to preferences and logs on the launcher icon
 - Waypoints can be imported on the config import screen (#1284)
+- MQTT connection now reacts to changes in the device's default network, explicitly doing a reconnect
 
 ### Bug fixes
 
 - Labels on the contact sheet should all be the same size as each other (#1277)
 - Clicking on a contact marker in the contacts activity doesn't always center the map on the marker (#1349, #1280)
 - Don't show an error message on non-error conditions exporting config (#1280)
-- We should probably round latL
 
 ## Version 2.4.10
 

@@ -48,6 +48,10 @@ enum class EndpointState {
     }
 
     override fun toString(): String {
-        return "${super.toString()} ($message)"
+        return if (message != null) {
+            "${super.toString()} ($message)"
+        } else {
+            super.toString()
+        }
     }
 }

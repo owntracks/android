@@ -2,6 +2,7 @@ package org.owntracks.android.ui.preferences.load
 
 import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import java.net.URI
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -16,8 +17,6 @@ import org.owntracks.android.preferences.InMemoryPreferencesStore
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.PreferencesStore
 import org.owntracks.android.support.Parser
-import java.net.URI
-
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class LoadViewModelTest {
@@ -58,7 +57,8 @@ class LoadViewModelTest {
             {
               "_type" : "configuration",
               "waypoints" : [ ]
-            }""".trimIndent()
+            }
+            """.trimIndent()
             assertEquals(ImportStatus.SUCCESS, vm.configurationImportStatus.value)
             assertEquals(expectedConfig, vm.displayedConfiguration.value)
         }
@@ -69,7 +69,11 @@ class LoadViewModelTest {
             val parser = Parser(null)
             val preferences = Preferences(preferencesStore)
             val vm = LoadViewModel(preferences, parser, InMemoryWaypointsRepo(eventBus), UnconfinedTestDispatcher())
-            vm.extractPreferences(URI("owntracks:///config?inline=eyJfdHlwZSI6IndheXBvaW50cyIsIndheXBvaW50cyI6W3siX3R5cGUiOiJ3YXlwb2ludCIsImRlc2MiOiJUZXN0IFdheXBvaW50IiwibGF0Ijo1MSwibG9uIjowLCJyYWQiOjQ1MCwidHN0IjoxNTk4NDUxMzcyfV19"))
+            vm.extractPreferences(
+                URI(
+                    "owntracks:///config?inline=eyJfdHlwZSI6IndheXBvaW50cyIsIndheXBvaW50cyI6W3siX3R5cGUiOiJ3YXlwb2ludCIsImRlc2MiOiJUZXN0IFdheXBvaW50IiwibGF0Ijo1MSwibG9uIjowLCJyYWQiOjQ1MCwidHN0IjoxNTk4NDUxMzcyfV19" // ktlint-disable max-line-length
+                )
+            )
             val expectedConfig = """
             {
               "_type" : "waypoints",
@@ -81,7 +85,8 @@ class LoadViewModelTest {
                 "rad" : 450,
                 "tst" : 1598451372
               } ]
-            }""".trimIndent()
+            }
+            """.trimIndent()
             assertEquals(ImportStatus.SUCCESS, vm.configurationImportStatus.value)
             assertEquals(expectedConfig, vm.displayedConfiguration.value)
         }
@@ -96,7 +101,8 @@ class LoadViewModelTest {
             {
               "_type" : "configuration",
               "waypoints" : [ ]
-            }""".trimIndent()
+            }
+            """.trimIndent()
             vm.extractPreferences(expectedConfig.toByteArray())
             assertEquals(ImportStatus.SUCCESS, vm.configurationImportStatus.value)
             assertEquals(expectedConfig, vm.displayedConfiguration.value)
@@ -123,7 +129,8 @@ class LoadViewModelTest {
                 }
               ],
               "clientId": "testClientId"
-            }""".trimIndent()
+            }
+            """.trimIndent()
             vm.extractPreferences(config.toByteArray())
             vm.saveConfiguration()
             assertEquals(ImportStatus.SAVED, vm.configurationImportStatus.value)

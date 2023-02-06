@@ -9,12 +9,9 @@ import androidx.databinding.BindingAdapter;
 import androidx.databinding.BindingConversion;
 import androidx.databinding.InverseMethod;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
 import org.owntracks.android.R;
 import org.owntracks.android.location.geofencing.Geofence;
 import org.owntracks.android.preferences.types.ConnectionMode;
-import org.owntracks.android.services.MessageProcessorEndpointMqtt;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

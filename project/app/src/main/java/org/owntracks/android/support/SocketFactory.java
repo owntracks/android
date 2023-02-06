@@ -31,6 +31,7 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
         private InputStream caCrtInputStream;
         private InputStream caClientP12InputStream;
         private String caClientP12Password;
+        private int socketTimeout;
 
         public SocketFactoryOptions withCaInputStream(InputStream stream) {
             this.caCrtInputStream = stream;
@@ -42,6 +43,12 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
         }
         public SocketFactoryOptions withClientP12Password(String password) {
             this.caClientP12Password = password;
+            return this;
+        }
+
+        public SocketFactoryOptions withSocketTimeout(int timeoutInSeconds) {
+            Timber.d("Setting socketfactory timeout to %d", timeoutInSeconds);
+            this.socketTimeout = timeoutInSeconds;
             return this;
         }
 
@@ -68,10 +75,12 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
         boolean hasClientP12Password() {
             return (caClientP12Password != null) && !caClientP12Password.equals("");
         }
+        int getSocketTimeout() { return socketTimeout; }
     }
 
 
     private final TrustManagerFactory tmf;
+    private int socketTimeout;
 
     public SocketFactory(SocketFactoryOptions options) throws KeyStoreException, NoSuchAlgorithmException, IOException, KeyManagementException, java.security.cert.CertificateException, UnrecoverableKeyException {
         Timber.v("initializing CustomSocketFactory");
@@ -79,6 +88,8 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
         tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
 
         KeyManagerFactory kmf = KeyManagerFactory.getInstance("X509");
+
+        socketTimeout = options.getSocketTimeout();
 
         if(options.hasCaCrt()) {
             Timber.v("options.hasCaCrt(): true");
@@ -151,44 +162,55 @@ public class SocketFactory extends javax.net.ssl.SSLSocketFactory{
 
     @Override
     public Socket createSocket() throws IOException{
-        SSLSocket r = (SSLSocket)this.factory.createSocket();
-        r.setEnabledProtocols(protocols);
-        return r;
+        SSLSocket socket = (SSLSocket)this.factory.createSocket();
+        socket.setEnabledProtocols(protocols);
+        Timber.d("Creating socket with timeout %d", socketTimeout);
+        socket.setSoTimeout(socketTimeout);
+        return socket;
     }
 
     @Override
     public Socket createSocket(Socket s, String host, int port, boolean autoClose) throws IOException {
-        SSLSocket r = (SSLSocket)this.factory.createSocket(s, host, port, autoClose);
-        r.setEnabledProtocols(protocols);
-        return r;
+        SSLSocket socket = (SSLSocket)this.factory.createSocket(s, host, port, autoClose);
+        socket.setEnabledProtocols(protocols);
+        Timber.d("Creating socket with timeout %d", socketTimeout);
+        socket.setSoTimeout(socketTimeout);
+        return socket;
     }
 
     @Override
     public Socket createSocket(String host, int port) throws IOException {
-
-        SSLSocket r = (SSLSocket)this.factory.createSocket(host, port);
-        r.setEnabledProtocols(protocols);
-        return r;
+        SSLSocket socket = (SSLSocket)this.factory.createSocket(host, port);
+        socket.setEnabledProtocols(protocols);
+        Timber.d("Creating socket with timeout %d", socketTimeout);
+        socket.setSoTimeout(socketTimeout);
+        return socket;
     }
 
     @Override
     public Socket createSocket(String host, int port, InetAddress localHost, int localPort) throws IOException {
-        SSLSocket r = (SSLSocket)this.factory.createSocket(host, port, localHost, localPort);
-        r.setEnabledProtocols(protocols);
-        return r;
+        SSLSocket socket = (SSLSocket)this.factory.createSocket(host, port, localHost, localPort);
+        socket.setEnabledProtocols(protocols);
+        Timber.d("Creating socket with timeout %d", socketTimeout);
+        socket.setSoTimeout(socketTimeout);
+        return socket;
     }
 
     @Override
     public Socket createSocket(InetAddress host, int port) throws IOException {
-        SSLSocket r = (SSLSocket)this.factory.createSocket(host, port);
-        r.setEnabledProtocols(protocols);
-        return r;
+        SSLSocket socket = (SSLSocket)this.factory.createSocket(host, port);
+        socket.setEnabledProtocols(protocols);
+        Timber.d("Creating socket with timeout %d", socketTimeout);
+        socket.setSoTimeout(socketTimeout);
+        return socket;
     }
 
     @Override
     public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort) throws IOException {
-        SSLSocket r = (SSLSocket)this.factory.createSocket(address, port, localAddress,localPort);
-        r.setEnabledProtocols(protocols);
-        return r;
+        SSLSocket socket = (SSLSocket)this.factory.createSocket(address, port, localAddress,localPort);
+        socket.setEnabledProtocols(protocols);
+        Timber.d("Creating socket with timeout %d", socketTimeout);
+        socket.setSoTimeout(socketTimeout);
+        return socket;
     }
 }

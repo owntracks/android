@@ -7,10 +7,7 @@ import com.adevinta.android.barista.assertion.BaristaRecyclerViewAssertions.asse
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
-import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickBack
-import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickDialogPositiveButton
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
-import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import com.adevinta.android.barista.interaction.PermissionGranter
 import org.junit.After
@@ -20,7 +17,6 @@ import org.owntracks.android.R
 import org.owntracks.android.testutils.*
 import org.owntracks.android.ui.clickBackAndWait
 import org.owntracks.android.ui.clickOnAndWait
-import org.owntracks.android.ui.clickOnDrawerAndWait
 import org.owntracks.android.ui.map.MapActivity
 
 @LargeTest
@@ -50,31 +46,17 @@ class ContactActivityTests :
         launchActivity()
 
         PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
-        initializeMockLocationProvider(baristaRule.activityTestRule.activity.applicationContext)
+        initializeMockLocationProvider(app)
+        configureHTTPConnectionToLocal()
 
-        openDrawer()
-        clickOnAndWait(R.string.title_activity_preferences)
-        clickOnAndWait(R.string.preferencesServer)
-        clickOnAndWait(R.string.mode_heading)
-        clickOnAndWait(R.string.mode_http_private_label)
-        clickDialogPositiveButton()
-        clickOnAndWait(R.string.preferencesHost)
-        writeTo(R.id.url, "http://localhost:$webserverPort/")
-        clickDialogPositiveButton()
-        clickBack()
-
-        openDrawer()
-        clickOnDrawerAndWait(R.string.title_activity_map)
-
-        baristaRule.activityTestRule.activity.locationIdlingResource.with {
+        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource) {
             setMockLocation(51.0, 0.0)
-            clickOnAndWait(R.id.menu_report)
         }
 
         baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.with {
             openDrawer()
+            clickOnAndWait(R.string.title_activity_contacts)
         }
-        clickOnAndWait(R.string.title_activity_contacts)
         sleep(3_000)
         assertRecyclerViewItemCount(R.id.contactsRecyclerView, 1)
 

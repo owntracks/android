@@ -21,11 +21,14 @@ import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 fun scrollToPreferenceWithText(textResource: Int) {
     onView(withId(androidx.preference.R.id.recycler_view)).perform(
         RecyclerViewActions.actionOnItem<RecyclerView.ViewHolder>(
-            hasDescendant(withText(textResource)), ViewActions.scrollTo()
+            hasDescendant(withText(textResource)),
+            ViewActions.scrollTo()
         )
     )
 }
@@ -39,20 +42,19 @@ fun setNotFirstStartPreferences() {
         .apply()
 }
 
-
-fun reportLocationFromMap(locationIdlingResource: IdlingResource?) {
+fun reportLocationFromMap(locationIdlingResource: IdlingResource?, mockLocationFunction: () -> Unit = {}) {
     if (getCurrentActivity() !is MapActivity) {
         openDrawer()
         clickOnAndWait(R.string.title_activity_map)
     }
-    Timber.d("Waiting for location")
+    waitUntilActivityVisible<MapActivity>()
+    mockLocationFunction()
+    clickOnAndWait(R.id.menu_monitoring)
+    clickOnAndWait(R.id.fabMonitoringModeMove)
     locationIdlingResource.with {
-        waitUntilActivityVisible<MapActivity>()
         clickOnAndWait(R.id.fabMyLocation)
+        clickOnAndWait(R.id.menu_report)
     }
-    Timber.d("location now available")
-    clickOnAndWait(R.id.menu_report)
-
 }
 
 const val TIMEOUT = 5000L
@@ -86,26 +88,27 @@ fun getCurrentActivity(): Activity? {
     return currentActivity
 }
 
-
 /**
  * Runs the given code block once the [IdlingResource] is idle
  *
- * @param timeoutSeconds time to wait for the [IdlingResource] to be idle
+ * @param timeout time to wait for the [IdlingResource] to be idle
  * @param block function to execute once idle
  */
-inline fun IdlingResource?.with(timeoutSeconds: Long = 30, block: () -> Unit) {
+inline fun IdlingResource?.with(timeout: Duration = 30.seconds, block: () -> Unit) {
     if (this == null) {
         Timber.w("Idling resource is null")
     }
-    IdlingPolicies.setIdlingResourceTimeout(timeoutSeconds, TimeUnit.SECONDS)
+    IdlingPolicies.setIdlingResourceTimeout(timeout.inWholeSeconds, TimeUnit.SECONDS)
     try {
         this?.run {
+            Timber.i("Registering idling resource ${this.name}")
             IdlingRegistry.getInstance()
                 .register(this)
         }
         block()
     } finally {
         this?.run {
+            Timber.i("Unregistering idling resource ${this.name}")
             IdlingRegistry.getInstance()
                 .unregister(this)
         }
@@ -125,6 +128,13 @@ fun disableDeviceLocation() {
 
 fun stopAndroidSetupProcess() {
     getInstrumentation().uiAutomation.executeShellCommand("am force-stop com.google.android.setupwizard")
+        .close()
+    getInstrumentation().uiAutomation.executeShellCommand("am force-stop com.android.systemui")
+        .close()
+}
+
+fun disableHeadsupNotifications() {
+    getInstrumentation().uiAutomation.executeShellCommand("settings put global heads_up_notifications_enabled 0")
         .close()
 }
 

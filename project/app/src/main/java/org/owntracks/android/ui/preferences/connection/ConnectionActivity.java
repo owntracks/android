@@ -215,7 +215,7 @@ public class ConnectionActivity extends BaseActivity<UiPreferencesConnectionBind
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.connect) {
-            if (messageProcessor.isEndpointConfigurationComplete()) {
+            if (messageProcessor.isEndpointReady()) {
                 messageProcessor.reconnect();
             } else {
                 Snackbar.make(findViewById(R.id.scrollView),

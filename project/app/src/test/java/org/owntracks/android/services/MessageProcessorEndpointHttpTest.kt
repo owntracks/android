@@ -1,20 +1,26 @@
 package org.owntracks.android.services
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.owntracks.android.data.repos.EndpointStateRepo
 import org.owntracks.android.model.messages.MessageLocation
+import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.EncryptionProvider
 import org.owntracks.android.support.Parser
-import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
 
 class MessageProcessorEndpointHttpTest {
+    @get:Rule
+    val instantExecutorRule = InstantTaskExecutorRule()
+
     @Mock
     private lateinit var testPreferences: Preferences
 
@@ -26,6 +32,8 @@ class MessageProcessorEndpointHttpTest {
 
     @Mock
     private lateinit var encryptionProvider: EncryptionProvider
+
+    private val endpointStateRepo = EndpointStateRepo()
 
     private var parser: Parser? = null
     private lateinit var messageLocation: MessageLocation
@@ -60,8 +68,8 @@ class MessageProcessorEndpointHttpTest {
     @Test
     fun `Given a simple request, the auth headers are not set`() {
         val messageProcessorEndpointHttp =
-            MessageProcessorEndpointHttp(messageProcessor, parser, testPreferences, scheduler, null)
-        messageProcessorEndpointHttp.checkConfigurationComplete()
+            MessageProcessorEndpointHttp(messageProcessor, parser, testPreferences, scheduler, null, endpointStateRepo)
+        messageProcessorEndpointHttp.getEndpointConfiguration()
         val request = messageProcessorEndpointHttp.getRequest(messageLocation)
         assertNotNull(request)
         assertNull(request!!.header(MessageProcessorEndpointHttp.HEADER_AUTHORIZATION))
@@ -76,8 +84,8 @@ class MessageProcessorEndpointHttpTest {
         `when`(testPreferences.username).thenReturn("username")
         `when`(testPreferences.deviceId).thenReturn("device")
         val messageProcessorEndpointHttp =
-            MessageProcessorEndpointHttp(messageProcessor, parser, testPreferences, scheduler, null)
-        messageProcessorEndpointHttp.checkConfigurationComplete()
+            MessageProcessorEndpointHttp(messageProcessor, parser, testPreferences, scheduler, null, endpointStateRepo)
+        messageProcessorEndpointHttp.getEndpointConfiguration()
         val request = messageProcessorEndpointHttp.getRequest(messageLocation)
         assertNotNull(request)
         assertEquals(request!!.header(MessageProcessorEndpointHttp.HEADER_USERNAME), "username")
@@ -89,8 +97,8 @@ class MessageProcessorEndpointHttpTest {
         `when`(testPreferences.username).thenReturn("username")
         `when`(testPreferences.password).thenReturn("password")
         val messageProcessorEndpointHttp =
-            MessageProcessorEndpointHttp(messageProcessor, parser, testPreferences, scheduler, null)
-        messageProcessorEndpointHttp.checkConfigurationComplete()
+            MessageProcessorEndpointHttp(messageProcessor, parser, testPreferences, scheduler, null, endpointStateRepo)
+        messageProcessorEndpointHttp.getEndpointConfiguration()
         val request = messageProcessorEndpointHttp.getRequest(messageLocation)
         assertNotNull(request)
         assertEquals(
@@ -108,8 +116,8 @@ class MessageProcessorEndpointHttpTest {
         `when`(testPreferences.password).thenReturn("password_ignored")
         `when`(testPreferences.url).thenReturn("http://username_url:password_url@example.com/owntracks/test")
         val messageProcessorEndpointHttp =
-            MessageProcessorEndpointHttp(messageProcessor, parser, testPreferences, scheduler, null)
-        messageProcessorEndpointHttp.checkConfigurationComplete()
+            MessageProcessorEndpointHttp(messageProcessor, parser, testPreferences, scheduler, null, endpointStateRepo)
+        messageProcessorEndpointHttp.getEndpointConfiguration()
         val request = messageProcessorEndpointHttp.getRequest(messageLocation)
         assertNotNull(request)
         assertEquals(
@@ -130,8 +138,8 @@ class MessageProcessorEndpointHttpTest {
     @Test
     fun `Given no auth details, the auth HTTP header is not set`() {
         val messageProcessorEndpointHttp =
-            MessageProcessorEndpointHttp(messageProcessor, parser, testPreferences, scheduler, null)
-        messageProcessorEndpointHttp.checkConfigurationComplete()
+            MessageProcessorEndpointHttp(messageProcessor, parser, testPreferences, scheduler, null, endpointStateRepo)
+        messageProcessorEndpointHttp.getEndpointConfiguration()
         val request = messageProcessorEndpointHttp.getRequest(messageLocation)
         assertNotNull(request)
         assertNull(request!!.header(MessageProcessorEndpointHttp.HEADER_AUTHORIZATION))
@@ -147,9 +155,10 @@ class MessageProcessorEndpointHttpTest {
                 parser,
                 testPreferences,
                 scheduler,
-                null
+                null,
+                endpointStateRepo
             )
-            messageProcessorEndpointHttp.checkConfigurationComplete()
+            messageProcessorEndpointHttp.getEndpointConfiguration()
         }
     }
 }

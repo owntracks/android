@@ -61,7 +61,7 @@ public class LocationProcessor {
     }
 
     public void publishLocationMessage(@Nullable String trigger, @NonNull Location location) {
-        Timber.v("publishLocationMessage. trigger: %s. ThreadID: %s", trigger, Thread.currentThread());
+        Timber.v("publishLocationMessage. trigger: %s", trigger);
         if (locationRepo.getCurrentPublishedLocation().getValue() == null) {
             Timber.e("no location available, can't publish location");
             return;

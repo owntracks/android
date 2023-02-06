@@ -42,6 +42,7 @@ class TestWithAnHTTPServerImpl : TestWithAnHTTPServer {
             {
                 "_type": "configuration",
                 "mode": 3,
+                "connectionTimeoutSeconds": 2,
                 "url": "http://localhost:${mockWebServer.port}"
             }
             """.trimIndent()

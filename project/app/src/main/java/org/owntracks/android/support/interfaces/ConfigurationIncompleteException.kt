@@ -1,3 +1,3 @@
 package org.owntracks.android.support.interfaces
 
-class ConfigurationIncompleteException(message: String?) : Exception(message)
+class ConfigurationIncompleteException(e: Exception) : Exception(e)

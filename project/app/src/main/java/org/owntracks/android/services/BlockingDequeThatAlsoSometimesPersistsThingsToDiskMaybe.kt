@@ -59,12 +59,14 @@ class BlockingDequeThatAlsoSometimesPersistsThingsToDiskMaybe(
     }
 
     private fun diskBackedQueueOrNull(file: File) = try {
-        QueueFile.Builder(file).build()
+        QueueFile.Builder(file)
+            .build()
     } catch (e: IOException) {
         Timber.e("Error initializing queue storage at $file. Re-initializing")
         file.delete()
         try {
-            QueueFile.Builder(file).build()
+            QueueFile.Builder(file)
+                .build()
         } catch (e: Exception) {
             null
         }
@@ -72,9 +74,9 @@ class BlockingDequeThatAlsoSometimesPersistsThingsToDiskMaybe(
 
     override fun offer(messageBase: MessageBase?): Boolean {
         synchronized(parallelDiskQueue) {
-            val result = super.offer(messageBase)
+            val result = super.offerLast(messageBase)
             if (!result) {
-                return result
+                return false
             }
             try {
                 messageBase?.run(parallelDiskQueue::add)
@@ -83,7 +85,7 @@ class BlockingDequeThatAlsoSometimesPersistsThingsToDiskMaybe(
                 super.removeFirst()
                 return false
             }
-            return result
+            return true
         }
     }
 

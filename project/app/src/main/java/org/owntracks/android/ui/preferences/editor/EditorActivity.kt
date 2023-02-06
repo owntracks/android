@@ -148,22 +148,24 @@ class EditorActivity : BaseActivity<UiPreferencesEditorBinding?, EditorMvvm.View
     }
 
     override fun displayLoadFailed() {
-        Snackbar.make(
-            findViewById(R.id.effectiveConfiguration), R.string.preferencesLoadFailed, Snackbar.LENGTH_SHORT
-        )
+        Snackbar.make(findViewById(R.id.effectiveConfiguration), R.string.preferencesLoadFailed, Snackbar.LENGTH_SHORT)
             .show()
     }
 
     private fun displayPreferencesValueForKeySetFailedKey() {
         Snackbar.make(
-            findViewById(R.id.effectiveConfiguration), R.string.preferencesEditorKeyError, Snackbar.LENGTH_SHORT
+            findViewById(R.id.effectiveConfiguration),
+            R.string.preferencesEditorKeyError,
+            Snackbar.LENGTH_SHORT
         )
             .show()
     }
 
     private fun displayPreferencesValueForKeySetFailedValue() {
         Snackbar.make(
-            findViewById(R.id.effectiveConfiguration), R.string.preferencesEditorValueError, Snackbar.LENGTH_SHORT
+            findViewById(R.id.effectiveConfiguration),
+            R.string.preferencesEditorValueError,
+            Snackbar.LENGTH_SHORT
         )
             .show()
     }

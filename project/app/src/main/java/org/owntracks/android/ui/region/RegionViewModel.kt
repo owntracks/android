@@ -28,8 +28,8 @@ class RegionViewModel @Inject constructor(
 
     fun loadWaypoint(id: Long) {
         Timber.d("Loading waypoint $id")
-        waypointsRepo[id]?.also {
-            waypoint.postValue(it)
+        waypointsRepo[id]?.apply {
+            waypoint.postValue(this)
         } ?: run {
             Timber.w("Waypoint $id not found in the repo")
         }

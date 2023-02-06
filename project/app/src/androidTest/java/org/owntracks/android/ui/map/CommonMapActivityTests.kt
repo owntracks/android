@@ -10,7 +10,6 @@ import com.adevinta.android.barista.assertion.BaristaDrawerAssertions.assertDraw
 import com.adevinta.android.barista.assertion.BaristaEnabledAssertions
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
-import com.adevinta.android.barista.interaction.BaristaDrawerInteractions
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions
 import com.adevinta.android.barista.interaction.PermissionGranter
@@ -126,14 +125,12 @@ class CommonMapActivityTests :
         setNotFirstStartPreferences()
         launchActivity()
         PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
-        initializeMockLocationProvider(baristaRule.activityTestRule.activity.applicationContext)
-        baristaRule.activityTestRule.activity.locationIdlingResource.with {
+        initializeMockLocationProvider(app)
+        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource) {
             setMockLocation(51.0, 0.0)
-            clickOnAndWait(R.id.fabMyLocation)
         }
 
         openDrawer()
-
         clickOnDrawerAndWait(R.string.title_activity_regions)
 
         clickOnAndWait(R.id.add)

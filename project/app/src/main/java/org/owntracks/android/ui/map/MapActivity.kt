@@ -562,7 +562,7 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), View.OnClickLi
             }
             R.id.menu_navigate -> {
                 val c = mapViewModel.currentContact
-                c.value?.latLng?.run {
+                c.value?.latLng?.apply {
                     try {
                         val intent = Intent(
                             Intent.ACTION_VIEW, Uri.parse("google.navigation:q=$latitude,$longitude")

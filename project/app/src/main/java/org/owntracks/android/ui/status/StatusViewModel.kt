@@ -9,12 +9,12 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.util.*
+import javax.inject.Inject
 import org.owntracks.android.data.EndpointState
 import org.owntracks.android.data.repos.EndpointStateRepo
 import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.ui.status.logs.LogViewerActivity
-import java.util.*
-import javax.inject.Inject
 
 @HiltViewModel
 class StatusViewModel @Inject constructor(
@@ -23,10 +23,12 @@ class StatusViewModel @Inject constructor(
     locationRepo: LocationRepo
 ) :
     AndroidViewModel(application) {
-    val endpointState: LiveData<EndpointState> = endpointStateRepo.endpointState
+    val endpointState: LiveData<EndpointState> = endpointStateRepo.endpointStateLiveData
     val endpointQueueLength: LiveData<Int> = endpointStateRepo.endpointQueueLength
     val serviceStarted: LiveData<Date> = endpointStateRepo.serviceStartedDate
     val currentLocation: LiveData<Location> = locationRepo.currentPublishedLocation
+    private val powerManager =
+        (getApplication<Application>().applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager)
     internal val dozeWhitelisted: MutableLiveData<Boolean> = MutableLiveData()
 
     fun getDozeWhitelisted(): LiveData<Boolean> = dozeWhitelisted
@@ -36,7 +38,7 @@ class StatusViewModel @Inject constructor(
     }
 
     private fun isIgnoringBatteryOptimizations(): Boolean {
-        return (getApplication<Application>().applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager).isIgnoringBatteryOptimizations(
+        return powerManager.isIgnoringBatteryOptimizations(
             getApplication<Application>().applicationContext.packageName
         )
     }

@@ -37,18 +37,16 @@ class SharedPreferencesStore @Inject constructor(@ApplicationContext private val
                 oldSharedPreferenceNames
                     .map { context.getSharedPreferences(it, Context.MODE_PRIVATE) }
                     .filter { it.all.isNotEmpty() }
-                    .also {
-                        it.forEach {
-                            it.all.forEach { (key, value) ->
-                                Timber.d("Migrating legacy preference $key from $it")
-                                when (value) {
-                                    is String -> putString(key, value)
-                                    is Set<*> -> putStringSet(key, value as Set<String>)
-                                    is Boolean -> putBoolean(key, value)
-                                    is Int -> putInt(key, value)
-                                    is Long -> putLong(key, value)
-                                    is Float -> putFloat(key, value)
-                                }
+                    .onEach {
+                        it.all.forEach { (key, value) ->
+                            Timber.d("Migrating legacy preference $key from $it")
+                            when (value) {
+                                is String -> putString(key, value)
+                                is Set<*> -> putStringSet(key, value as Set<String>)
+                                is Boolean -> putBoolean(key, value)
+                                is Int -> putInt(key, value)
+                                is Long -> putLong(key, value)
+                                is Float -> putFloat(key, value)
                             }
                         }
                     }

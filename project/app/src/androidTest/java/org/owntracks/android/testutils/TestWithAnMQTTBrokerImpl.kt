@@ -3,7 +3,6 @@ package org.owntracks.android.testutils
 import android.content.Intent
 import android.net.Uri
 import androidx.test.platform.app.InstrumentationRegistry
-import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import kotlinx.coroutines.DelicateCoroutinesApi
 import mqtt.broker.Broker
 import mqtt.broker.interfaces.Authentication
@@ -16,6 +15,7 @@ import org.owntracks.android.R
 import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.support.Parser
 import org.owntracks.android.ui.clickOnAndWait
+import org.owntracks.android.ui.preferences.load.LoadActivity
 import timber.log.Timber
 import java.net.ConnectException
 import java.net.InetSocketAddress
@@ -34,10 +34,14 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
 
     override fun <E : MessageBase> Collection<E>.sendFromBroker(broker: Broker) {
         map(Parser(null)::toJsonBytes).forEach {
-                broker.publish(
-                    false, "owntracks/someuser/somedevice", Qos.AT_LEAST_ONCE, MQTT5Properties(), it.toUByteArray()
-                )
-            }
+            broker.publish(
+                false,
+                "owntracks/someuser/somedevice",
+                Qos.AT_LEAST_ONCE,
+                MQTT5Properties(),
+                it.toUByteArray()
+            )
+        }
     }
 
     private lateinit var brokerThread: Thread
@@ -73,23 +77,33 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
     }
 
     private fun createNewBroker(): Broker =
-        Broker(host = "127.0.0.1", port = mqttPort, authentication = object : Authentication {
-            override fun authenticate(
-                clientId: String, username: String?, password: UByteArray?
-            ): Boolean {
-                return username == mqttUsername && password.contentEquals(
-                    mqttTestPassword.toByteArray()
-                        .toUByteArray()
-                )
+        Broker(
+            host = "127.0.0.1",
+            port = mqttPort,
+            authentication = object : Authentication {
+                override fun authenticate(
+                    clientId: String,
+                    username: String?,
+                    password: UByteArray?
+                ): Boolean {
+                    return username == mqttUsername && password.contentEquals(
+                        mqttTestPassword.toByteArray()
+                            .toUByteArray()
+                    )
+                }
+            },
+            packetInterceptor = object : PacketInterceptor {
+                override fun packetReceived(
+                    clientId: String,
+                    username: String?,
+                    password: UByteArray?,
+                    packet: MQTTPacket
+                ) {
+                    Timber.d("MQTT Packet received $packet ${String(packet.toByteArray().toByteArray())}")
+                    mqttPacketsReceived.add(packet)
+                }
             }
-        }, packetInterceptor = object : PacketInterceptor {
-            override fun packetReceived(
-                clientId: String, username: String?, password: UByteArray?, packet: MQTTPacket
-            ) {
-                Timber.d("MQTT Packet received $packet")
-                mqttPacketsReceived.add(packet)
-            }
-        })
+        )
 
     override fun stopBroker() {
         shouldBeRunning = false
@@ -109,22 +123,29 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
                 "_type": "configuration",
                 "clientId": "$mqttClientId",
                 "deviceId": "$deviceId",
+                "tid": "$deviceId",
                 "host": "127.0.0.1",
                 "password": "$password",
                 "port": $mqttPort,
                 "mqttProtocolLevel": 4,
                 "username": "$mqttUsername",
                 "tls": false,
-                "mqttConnectionTimeout": 50
+                "keepalive": 5,
+                "connectionTimeoutSeconds": 2
             }
             """.trimIndent()
         )
-        InstrumentationRegistry.getInstrumentation().targetContext.startActivity(Intent(Intent.ACTION_VIEW).apply {
-            data = Uri.parse("owntracks:///config?inline=$config")
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        })
-        sleep(500)
-        clickOnAndWait(R.id.save)
+        InstrumentationRegistry.getInstrumentation().targetContext.startActivity(
+            Intent(Intent.ACTION_VIEW).apply {
+                data = Uri.parse("owntracks:///config?inline=$config")
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+        )
+        waitUntilActivityVisible<LoadActivity>()
+        val activity = getCurrentActivity() as LoadActivity
+        activity.importStatusIdlingResource.with {
+            clickOnAndWait(R.id.save)
+        }
     }
 
     // This will use the right password, so we should test for success

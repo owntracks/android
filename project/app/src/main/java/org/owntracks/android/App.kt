@@ -182,15 +182,6 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
         }
     }
 
-    @get:VisibleForTesting
-    val mqttConnectionIdlingResource: IdlingResource?
-        get() = messageProcessor.mqttConnectionIdlingResource
-
-
-    companion object {
-        const val NOTIFICATION_CHANNEL_ONGOING = "O"
-        const val NOTIFICATION_CHANNEL_EVENTS = "E"
-    }
 
     @SuppressLint("RestrictedApi")
     override fun getWorkManagerConfiguration(): Configuration =
@@ -207,5 +198,14 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
             Timber.d("Theme changed. Setting theme to ${preferences.theme}")
             setThemeFromPreferences()
         }
+    }
+
+    @get:VisibleForTesting
+    val mqttConnectionIdlingResource: IdlingResource?
+        get() = messageProcessor.mqttConnectionIdlingResource
+
+    companion object {
+        const val NOTIFICATION_CHANNEL_ONGOING = "O"
+        const val NOTIFICATION_CHANNEL_EVENTS = "E"
     }
 }

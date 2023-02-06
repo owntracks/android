@@ -9,3 +9,4 @@ max_line_length = 120
 ij_kotlin_method_call_chain_wrap = split_into_lines
 ktlint_ignore_back_ticked_identifier = true
 ktlint_code_style = android
+disabled_rules = no-wildcard-imports

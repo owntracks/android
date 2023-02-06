@@ -8,8 +8,8 @@ import androidx.annotation.Nullable;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import org.owntracks.android.BuildConfig;
-import org.owntracks.android.R;
 import org.owntracks.android.data.EndpointState;
+import org.owntracks.android.data.repos.EndpointStateRepo;
 import org.owntracks.android.model.messages.MessageBase;
 import org.owntracks.android.preferences.Preferences;
 import org.owntracks.android.preferences.types.ConnectionMode;
@@ -19,7 +19,6 @@ import org.owntracks.android.support.SocketFactory;
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -64,26 +63,28 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
     private final Parser parser;
     private final Scheduler scheduler;
     private final Context applicationContext;
+    private final EndpointStateRepo endpointStateRepo;
     private HttpUrl httpEndpoint;
 
-    public MessageProcessorEndpointHttp(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, Context applicationContext) {
+    public MessageProcessorEndpointHttp(MessageProcessor messageProcessor, Parser parser, Preferences preferences, Scheduler scheduler, Context applicationContext, EndpointStateRepo endpointStateRepo) {
         super(messageProcessor);
         this.parser = parser;
         this.preferences = preferences;
         this.scheduler = scheduler;
         this.applicationContext = applicationContext;
+        this.endpointStateRepo = endpointStateRepo;
 
         preferences.registerOnPreferenceChangedListener(this);
         loadEndpointUrl();
     }
 
     @Override
-    public void onCreateFromProcessor() {
+    public void activate() {
         try {
-            checkConfigurationComplete();
+            getEndpointConfiguration();
         } catch (ConfigurationIncompleteException e) {
             Timber.w("HTTP Configuration incomplete: %s", e.getMessage());
-            messageProcessor.onEndpointStateChanged(EndpointState.ERROR_CONFIGURATION.withError(e));
+            endpointStateRepo.setState(EndpointState.ERROR_CONFIGURATION.withError(e));
         }
     }
 
@@ -168,17 +169,17 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
                 httpEndpointHeaderPassword = preferences.getPassword();
             }
 
-            messageProcessor.onEndpointStateChanged(EndpointState.IDLE);
+            endpointStateRepo.setState(EndpointState.IDLE);
         } catch (IllegalArgumentException e) {
             httpEndpoint = null;
-            messageProcessor.onEndpointStateChanged(EndpointState.ERROR_CONFIGURATION.withError(e));
+            endpointStateRepo.setState(EndpointState.ERROR_CONFIGURATION.withError(e));
         }
     }
 
     @Nullable
     Request getRequest(MessageBase message) {
         try {
-            this.checkConfigurationComplete();
+            this.getEndpointConfiguration();
         } catch (ConfigurationIncompleteException e) {
             return null;
         }
@@ -188,7 +189,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
         try {
             body = message.toJson(parser);
         } catch (IOException e) { // Message serialization failed. This shouldn't happen.
-            messageProcessor.onEndpointStateChanged(EndpointState.ERROR.withMessage(e.getMessage()));
+            endpointStateRepo.setState(EndpointState.ERROR.withMessage(e.getMessage()));
             return null;
         }
 
@@ -215,7 +216,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
             return request.build();
         } catch (Exception e) {
             Timber.e(e, "invalid header specified");
-            messageProcessor.onEndpointStateChanged(EndpointState.ERROR_CONFIGURATION.withError(e));
+            endpointStateRepo.setState(EndpointState.ERROR_CONFIGURATION.withError(e));
             httpEndpoint = null;
             return null;
         }
@@ -226,7 +227,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
         return str != null && str.length() > 0;
     }
 
-    void sendMessage(MessageBase message) throws OutgoingMessageSendingException {
+    public void sendMessage(MessageBase message) throws OutgoingMessageSendingException {
         message.addMqttPreferences(preferences);
         // HTTP messages carry the topic field in the body of the message, rather than MQTT which
         // simply publishes the message to that topic.
@@ -235,7 +236,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
         long startTime = System.nanoTime();
         Request request = getRequest(message);
         if (request == null) {
-            messageProcessor.onMessageDeliveryFailedFinal(message.getMessageId());
+            getMessageProcessor().onMessageDeliveryFailedFinal(message.getMessageId());
             return;
         }
         try (Response response = getHttpClient().newCall(request).execute()) {
@@ -249,38 +250,38 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
                     try {
                         MessageBase[] result = parser.fromJson(response.body().byteStream());
                         //TODO apply i18n here
-                        messageProcessor.onEndpointStateChanged(EndpointState.IDLE.withMessage(String.format(Locale.ROOT, "Response %d, (%d msgs received)", response.code(), result.length)));
+                        endpointStateRepo.setState(EndpointState.IDLE.withMessage(String.format(Locale.ROOT, "Response %d, (%d msgs received)", response.code(), result.length)));
                         for (MessageBase aResult : result) {
                             onMessageReceived(aResult);
                         }
                     } catch (JsonProcessingException e) {
                         Timber.e("JsonParseException HTTP status: %s", response.code());
-                        messageProcessor.onEndpointStateChanged(EndpointState.IDLE.withMessage(String.format(Locale.ROOT, "HTTP status %d, JsonParseException", response.code())));
+                        endpointStateRepo.setState(EndpointState.IDLE.withMessage(String.format(Locale.ROOT, "HTTP status %d, JsonParseException", response.code())));
                     } catch (Parser.EncryptionException e) {
                         Timber.e("JsonParseException HTTP status: %s", response.code());
-                        messageProcessor.onEndpointStateChanged(EndpointState.ERROR.withMessage(String.format(Locale.ROOT, "HTTP status: %d, EncryptionException", response.code())));
+                        endpointStateRepo.setState(EndpointState.ERROR.withMessage(String.format(Locale.ROOT, "HTTP status: %d, EncryptionException", response.code())));
                     }
                 }
                 // Server could be contacted but returned non success HTTP code
             } else {
                 Exception httpException = new Exception(String.format("HTTP request failed. Status: %s", response.code()));
                 Timber.e(httpException);
-                messageProcessor.onEndpointStateChanged(EndpointState.ERROR.withMessage(String.format(Locale.ROOT, "HTTP code %d", response.code())));
-                messageProcessor.onMessageDeliveryFailed(messageId);
+                endpointStateRepo.setState(EndpointState.ERROR.withMessage(String.format(Locale.ROOT, "HTTP code %d", response.code())));
+                getMessageProcessor().onMessageDeliveryFailed(messageId);
                 throw new OutgoingMessageSendingException(httpException);
             }
             // Message was not send
         } catch (IOException e) {
             Timber.e(e, "HTTP Delivery failed ");
-            messageProcessor.onEndpointStateChanged(EndpointState.ERROR.withError(e));
-            messageProcessor.onMessageDeliveryFailed(messageId);
+            endpointStateRepo.setState(EndpointState.ERROR.withError(e));
+            getMessageProcessor().onMessageDeliveryFailed(messageId);
             throw new OutgoingMessageSendingException(e);
         }
-        messageProcessor.onMessageDelivered(message);
+        getMessageProcessor().onMessageDelivered();
     }
 
     @Override
-    public void onDestroy() {
+    public void deactivate() {
         scheduler.cancelHttpTasks();
     }
 
@@ -301,7 +302,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
             );
 
             if (!propertiesThatTriggerAURLReload.stream().filter(properties::contains).collect(Collectors.toSet()).isEmpty()) {
-                messageProcessor.resetMessageSleepBlock();
+                getMessageProcessor().notifyOutgoingMessageQueue();
                 loadEndpointUrl();
             } else if (!propertiesThatShouldResetTheClient.stream().filter(properties::contains).collect(Collectors.toSet()).isEmpty()) {
                 mHttpClient = null;
@@ -310,15 +311,15 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
     }
 
     @Override
-    public void checkConfigurationComplete() throws ConfigurationIncompleteException {
+    public ConnectionConfiguration getEndpointConfiguration() throws ConfigurationIncompleteException {
         loadEndpointUrl();
         if (this.httpEndpoint == null) {
-            throw new ConfigurationIncompleteException("HTTP Endpoint is missing");
+            throw new ConfigurationIncompleteException(new Exception("HTTP Endpoint is missing")); // STOPSHIP: 06/02/2023 Fix this exception type
         }
+        return null;
     }
-
     @Override
-    ConnectionMode getModeId() {
+    public ConnectionMode getModeId() {
         return ConnectionMode.HTTP;
     }
 

@@ -70,7 +70,7 @@ class MQTTMessagePublishTests :
     @Test
     fun given_an_MQTT_configured_client_when_the_report_button_is_pressed_then_the_broker_receives_a_packet_with_the_correct_location_message_in() { // ktlint-disable max-line-length
         val mockLatitude = 51.0
-        val mockLongitude = 1.0
+        val mockLongitude = 0.0
         setNotFirstStartPreferences()
         launchActivity()
 
@@ -78,23 +78,19 @@ class MQTTMessagePublishTests :
         initializeMockLocationProvider(app)
 
         configureMQTTConnectionToLocalWithGeneratedPassword()
-        waitUntilActivityVisible<MapActivity>()
 
-        app.mqttConnectionIdlingResource!!.with {
-            baristaRule.activityTestRule.activity.locationIdlingResource.with {
-                setMockLocation(mockLatitude, mockLongitude)
-                clickOnAndWait(R.id.fabMyLocation)
-            }
+        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource) {
+            setMockLocation(mockLatitude, mockLongitude)
         }
 
-        waitUntilActivityVisible<MapActivity>()
-
-        clickOnAndWait(R.id.menu_report)
+        baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.with {
+            openDrawer()
+            clickOnAndWait(R.string.title_activity_contacts)
+        }
 
         assertTrue(
             "Packet has been received that is a location message with the correct latlng in it",
-            mqttPacketsReceived
-                .filterIsInstance<MQTTPublish>()
+            mqttPacketsReceived.filterIsInstance<MQTTPublish>()
                 .map {
                     Parser(null).fromJson((it.payload)!!.toByteArray())
                 }
@@ -111,12 +107,14 @@ class MQTTMessagePublishTests :
 
         PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
         configureMQTTConnectionToLocalWithGeneratedPassword()
-        waitUntilActivityVisible<MapActivity>()
+        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource) {
+            setMockLocation(51.0, 0.0)
+        }
 
-        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource)
-
-        openDrawer()
-        clickOnAndWait(R.string.title_activity_contacts)
+        baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.with {
+            openDrawer()
+            clickOnAndWait(R.string.title_activity_contacts)
+        }
 
         val messageCard = MessageCard().apply {
             name = "TestName"
@@ -148,12 +146,16 @@ class MQTTMessagePublishTests :
         PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
 
         configureMQTTConnectionToLocalWithGeneratedPassword()
-        waitUntilActivityVisible<MapActivity>()
 
-        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource)
+        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource) {
+            setMockLocation(51.0, 0.0)
+        }
 
-        openDrawer()
-        clickOnAndWait(R.string.title_activity_contacts)
+        app.mqttConnectionIdlingResource.with {
+            openDrawer()
+            clickOnAndWait(R.string.title_activity_contacts)
+        }
+
         listOf(
             MessageLocation().apply {
                 latitude = 52.123
@@ -164,16 +166,15 @@ class MQTTMessagePublishTests :
                 name = "TestName"
                 face = OWNTRACKS_ICON_BASE64
             }
-        )
-            .map {
-                Pair(
-                    Parser(null).toJsonBytes(it),
-                    when (it) {
-                        is MessageCard -> "owntracks/someuser/somedevice/info"
-                        else -> "owntracks/someuser/somedevice"
-                    }
-                )
-            }
+        ).map {
+            Pair(
+                Parser(null).toJsonBytes(it),
+                when (it) {
+                    is MessageCard -> "owntracks/someuser/somedevice/info"
+                    else -> "owntracks/someuser/somedevice"
+                }
+            )
+        }
             .forEach {
                 broker.publish(
                     false,
@@ -206,12 +207,15 @@ class MQTTMessagePublishTests :
 
         PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
         configureMQTTConnectionToLocalWithGeneratedPassword()
-        waitUntilActivityVisible<MapActivity>()
+        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource) {
+            setMockLocation(51.0, 0.0)
+        }
 
-        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource)
+        baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.with {
+            openDrawer()
+            clickOnAndWait(R.string.title_activity_contacts)
+        }
 
-        openDrawer()
-        clickOnAndWait(R.string.title_activity_contacts)
         listOf(
             MessageLocation().apply {
                 latitude = 52.123
@@ -276,10 +280,11 @@ class MQTTMessagePublishTests :
         PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
         configureMQTTConnectionToLocal("not the right password")
         waitUntilActivityVisible<MapActivity>()
-        openDrawer()
-        clickOnAndWait(R.string.title_activity_status)
+        app.mqttConnectionIdlingResource.with {
+            openDrawer()
+            clickOnAndWait(R.string.title_activity_status)
+        }
         assertContains(R.id.connectedStatus, R.string.ERROR)
-        assertContains(R.id.connectedStatusMessage, "Connection lost")
     }
 
     private fun clickOnRegardlessOfVisibility(@IdRes id: Int) {
@@ -291,20 +296,18 @@ class MQTTMessagePublishTests :
                 )
             )
         )
-            .perform(
-                object : ViewAction {
-                    override fun getConstraints(): Matcher<View> {
-                        return isEnabled() // no constraints, they are checked above
-                    }
-
-                    override fun getDescription(): String {
-                        return "click plus button"
-                    }
-
-                    override fun perform(uiController: UiController?, view: View) {
-                        view.performClick()
-                    }
+            .perform(object : ViewAction {
+                override fun getConstraints(): Matcher<View> {
+                    return isEnabled() // no constraints, they are checked above
                 }
-            )
+
+                override fun getDescription(): String {
+                    return "click plus button"
+                }
+
+                override fun perform(uiController: UiController?, view: View) {
+                    view.performClick()
+                }
+            })
     }
 }
