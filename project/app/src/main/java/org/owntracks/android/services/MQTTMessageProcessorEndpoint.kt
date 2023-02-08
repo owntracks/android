@@ -250,7 +250,8 @@ class MQTTMessageProcessorEndpoint(
                     mqttConnectionConfiguration.clientId,
                     MqttDefaultFilePersistence(applicationContext.noBackupFilesDir.absolutePath),
                     ScheduledExecutorPingSender(executorService),
-                    executorService
+                    executorService,
+                    AndroidHighResolutionTimer()
                 ).apply {
                     Timber.i("Connecting to $mqttConnectionConfiguration")
                     connect(mqttConnectionConfiguration.getConnectOptions(applicationContext)).waitForCompletion()
