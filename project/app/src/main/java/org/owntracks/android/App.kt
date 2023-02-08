@@ -17,6 +17,9 @@ import androidx.work.Configuration
 import androidx.work.WorkerFactory
 import dagger.hilt.EntryPoints
 import dagger.hilt.android.HiltAndroidApp
+import java.security.Security
+import javax.inject.Inject
+import javax.inject.Provider
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.conscrypt.Conscrypt
 import org.owntracks.android.di.CustomBindingComponentBuilder
@@ -30,9 +33,6 @@ import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.RunThingsOnOtherThreads
 import org.owntracks.android.ui.AppShortcuts
 import timber.log.Timber
-import java.security.Security
-import javax.inject.Inject
-import javax.inject.Provider
 
 @HiltAndroidApp
 class App : Application(), Configuration.Provider, Preferences.OnPreferenceChangeListener {
@@ -135,7 +135,11 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
             val ongoingNotificationChannelName =
                 if (getString(R.string.notificationChannelOngoing).trim()
                         .isNotEmpty()
-                ) getString(R.string.notificationChannelOngoing) else "Ongoing"
+                ) {
+                    getString(R.string.notificationChannelOngoing)
+                } else {
+                    "Ongoing"
+                }
             NotificationChannel(
                 NOTIFICATION_CHANNEL_ONGOING,
                 ongoingNotificationChannelName,
@@ -152,7 +156,11 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
 
             val eventsNotificationChannelName = if (getString(R.string.events).trim()
                     .isNotEmpty()
-            ) getString(R.string.events) else "Events"
+            ) {
+                getString(R.string.events)
+            } else {
+                "Events"
+            }
             NotificationChannel(
                 NOTIFICATION_CHANNEL_EVENTS,
                 eventsNotificationChannelName,
@@ -170,7 +178,11 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
             val errorNotificationChannelName =
                 if (getString(R.string.notificationChannelErrors).trim()
                         .isNotEmpty()
-                ) getString(R.string.notificationChannelErrors) else "Errors"
+                ) {
+                    getString(R.string.notificationChannelErrors)
+                } else {
+                    "Errors"
+                }
             NotificationChannel(
                 GeocoderProvider.ERROR_NOTIFICATION_CHANNEL_ID,
                 errorNotificationChannelName,
@@ -181,7 +193,6 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
                 .run { notificationManager.createNotificationChannel(this) }
         }
     }
-
 
     @SuppressLint("RestrictedApi")
     override fun getWorkManagerConfiguration(): Configuration =

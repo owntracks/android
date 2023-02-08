@@ -56,6 +56,6 @@ class AppShortcutsImpl @Inject constructor() : AppShortcuts {
                 )
                 .build()
         )
-        Timber.d("Adding logViewer application shortcut. Success=$success")
+        Timber.d("Adding $id application shortcut. Success=$success")
     }
 }
