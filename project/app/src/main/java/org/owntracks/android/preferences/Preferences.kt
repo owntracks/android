@@ -58,15 +58,11 @@ class Preferences @Inject constructor(private val preferencesStore: PreferencesS
      * @param value value to try and set
      */
     fun importKeyValue(key: String, value: Any) {
-        try {
-            importPreference(
-                allConfigKeys.filterIsInstance<KMutableProperty<*>>()
-                    .first { it.name == key },
-                value
-            )
-        } catch (e: NoSuchElementException) {
-            Timber.e("Unable to import $key with value $value as the key is not a valid preference.")
-        }
+        importPreference(
+            allConfigKeys.filterIsInstance<KMutableProperty<*>>()
+                .first { it.name == key },
+            value
+        )
     }
 
     /**

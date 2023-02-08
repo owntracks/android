@@ -8,8 +8,11 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.ArrayAdapter
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ShareCompat
+import androidx.databinding.DataBindingUtil
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.android.material.textfield.TextInputEditText
@@ -17,22 +20,29 @@ import dagger.hilt.android.AndroidEntryPoint
 import org.owntracks.android.BuildConfig
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiPreferencesEditorBinding
-import org.owntracks.android.ui.base.BaseActivity
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import timber.log.Timber
 import java.util.*
 
 @AndroidEntryPoint
-class EditorActivity : BaseActivity<UiPreferencesEditorBinding?, EditorMvvm.ViewModel<EditorMvvm.View?>?>(),
-    EditorMvvm.View {
+class EditorActivity : AppCompatActivity() {
+    private val viewModel: EditorViewModel by viewModels()
     private var configExportUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        disablesAnimation()
-        bindAndAttachContentView(R.layout.ui_preferences_editor, savedInstanceState)
-        setHasEventBus(false)
-        setSupportToolbar(binding!!.appbar.toolbar)
+        DataBindingUtil.setContentView<UiPreferencesEditorBinding>(this, R.layout.ui_preferences_editor)
+            .apply {
+                vm = viewModel
+                lifecycleOwner = this@EditorActivity
+                setSupportActionBar(appbar.toolbar)
+                supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            }
+        viewModel.configLoadError.observe(this) {
+            if (it != null) {
+                displayLoadFailed()
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -59,11 +69,6 @@ class EditorActivity : BaseActivity<UiPreferencesEditorBinding?, EditorMvvm.View
         }
     }
 
-    override fun onSupportNavigateUp(): Boolean {
-        finish()
-        return true
-    }
-
     private fun showImportConfigurationFilePickerView() {
         val b = Bundle()
         b.putBoolean(LoadActivity.FLAG_IN_APP, true)
@@ -77,20 +82,22 @@ class EditorActivity : BaseActivity<UiPreferencesEditorBinding?, EditorMvvm.View
 
         // Set autocomplete items
         val inputKeyView = layout.findViewById<MaterialAutoCompleteTextView>(R.id.inputKey)
-        inputKeyView.setAdapter(ArrayAdapter(this,
-            android.R.layout.simple_dropdown_item_1line,
-            preferences.allConfigKeys.map { it.name }
-                .toList()))
+        inputKeyView.setAdapter(
+            ArrayAdapter(
+                this,
+                android.R.layout.simple_dropdown_item_1line,
+                viewModel.preferenceKeys
+            )
+        )
         builder.setTitle(R.string.preferencesEditor)
             .setPositiveButton(R.string.accept) { dialog: DialogInterface, _: Int ->
                 val inputValue = layout.findViewById<TextInputEditText>(R.id.inputValue)
                 val key = inputKeyView.text.toString()
                 val value = inputValue.text.toString()
                 try {
-                    preferences.importKeyValue(key, value)
-                    viewModel!!.onPreferencesValueForKeySetSuccessful()
+                    viewModel.setNewPreferenceValue(key, value)
                     dialog.dismiss()
-                } catch (e: IllegalAccessException) {
+                } catch (e: NoSuchElementException) {
                     Timber.w(e)
                     displayPreferencesValueForKeySetFailedKey()
                 } catch (e: IllegalArgumentException) {
@@ -131,7 +138,7 @@ class EditorActivity : BaseActivity<UiPreferencesEditorBinding?, EditorMvvm.View
             .toString(16)
     }
 
-    override fun exportConfigurationToFile(): Boolean {
+    private fun exportConfigurationToFile(): Boolean {
         revokeExportUriPermissions()
         val key = getRandomHexString()
         configExportUri = Uri.parse("content://${BuildConfig.APPLICATION_ID}.config/$key")
@@ -147,7 +154,7 @@ class EditorActivity : BaseActivity<UiPreferencesEditorBinding?, EditorMvvm.View
         return true
     }
 
-    override fun displayLoadFailed() {
+    private fun displayLoadFailed() {
         Snackbar.make(findViewById(R.id.effectiveConfiguration), R.string.preferencesLoadFailed, Snackbar.LENGTH_SHORT)
             .show()
     }

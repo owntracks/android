@@ -1,56 +1,57 @@
 package org.owntracks.android.ui.preferences.editor
 
-import android.os.Bundle
-import androidx.databinding.Bindable
-import dagger.hilt.android.scopes.ActivityScoped
-import org.owntracks.android.BR
-import org.owntracks.android.R
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import org.owntracks.android.data.repos.WaypointsRepo
-import org.owntracks.android.support.Parser
 import org.owntracks.android.preferences.Preferences
-import org.owntracks.android.ui.base.viewmodel.BaseViewModel
+import org.owntracks.android.support.Parser
 import timber.log.Timber
-import java.io.IOException
 import javax.inject.Inject
 
-@ActivityScoped
+@HiltViewModel
 class EditorViewModel @Inject constructor(
     private val preferences: Preferences,
-    private val parser: Parser
-) : BaseViewModel<EditorMvvm.View?>(), EditorMvvm.ViewModel<EditorMvvm.View?> {
-    @get:Bindable
-    @Bindable
-    override var effectiveConfiguration: String? = null
-        private set
+    private val parser: Parser,
+    private val waypointsRepo: WaypointsRepo
+) : ViewModel(), Preferences.OnPreferenceChangeListener {
+    private val mutableEffectiveConfiguration = MutableLiveData<String>()
+    val effectiveConfiguration: LiveData<String> = mutableEffectiveConfiguration
 
-    @Inject
-    lateinit var waypointsRepo: WaypointsRepo
+    private val mutableConfigLoadError = MutableLiveData<Exception>()
+    val configLoadError: LiveData<Exception> = mutableConfigLoadError
 
-    override fun attachView(savedInstanceState: Bundle?, view: EditorMvvm.View?) {
-        super.attachView(savedInstanceState, view!!)
+    init {
+        preferences.registerOnPreferenceChangedListener(this)
         updateEffectiveConfiguration()
     }
+
+    override fun onCleared() {
+        super.onCleared()
+        preferences.unregisterOnPreferenceChangedListener(this)
+    }
+
+    val preferenceKeys = preferences.allConfigKeys.map { it.name }
+        .toList()
 
     private fun updateEffectiveConfiguration() {
         try {
             val message = preferences.exportToMessage()
             message.waypoints = waypointsRepo.exportToMessage()
             message[preferences::password.name] = "********"
-            setEffectiveConfiguration(parser.toUnencryptedJsonPretty(message))
-        } catch (e: IOException) {
+            mutableEffectiveConfiguration.postValue(parser.toUnencryptedJsonPretty(message))
+        } catch (e: Exception) {
             Timber.e(e)
-            view!!.displayLoadFailed()
+            mutableConfigLoadError.postValue(e)
         }
     }
 
-    @Bindable
-    private fun setEffectiveConfiguration(effectiveConfiguration: String) {
-        this.effectiveConfiguration = effectiveConfiguration
-        notifyPropertyChanged(BR.effectiveConfiguration)
+    fun setNewPreferenceValue(key: String, value: String) {
+        preferences.importKeyValue(key, value)
     }
 
-    override fun onPreferencesValueForKeySetSuccessful() {
+    override fun onPreferenceChanged(properties: List<String>) {
         updateEffectiveConfiguration()
-        notifyPropertyChanged(BR.effectiveConfiguration)
     }
 }

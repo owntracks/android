@@ -96,6 +96,17 @@ class ConfigEditorActivityTests : TestWithAnActivity<EditorActivity>(EditorActiv
         writeTo(R.id.inputKey, Preferences::osmTileScaleFactor.name)
         writeTo(R.id.inputValue, "not a float")
         clickDialogPositiveButton()
+        assertContains(com.google.android.material.R.id.snackbar_text, R.string.preferencesEditorValueError)
+    }
+
+    @Test
+    fun configurationManagementShowsAnErrorWhenSettingAnInvalidKey() {
+        openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
+        clickOn(R.string.preferencesEditor)
+        writeTo(R.id.inputKey, "Not a valid key")
+        writeTo(R.id.inputValue, "not a float")
+        clickDialogPositiveButton()
+        assertContains(com.google.android.material.R.id.snackbar_text, R.string.preferencesEditorKeyError)
     }
 
     @Test
