@@ -16,35 +16,38 @@ import org.owntracks.android.R
  */
 interface WorkManagerInitExceptionNotifier {
     fun notifyOnWorkManagerInitFailure(appCompatActivity: AppCompatActivity)
-    class Impl() : WorkManagerInitExceptionNotifier {
+    class Impl : WorkManagerInitExceptionNotifier {
         override fun notifyOnWorkManagerInitFailure(appCompatActivity: AppCompatActivity) {
             (appCompatActivity.applicationContext as App).workManagerFailedToInitialize.observe(
-                appCompatActivity,
-                { value ->
-                    if (value) {
-                        MaterialAlertDialogBuilder(appCompatActivity)
-                            .setIcon(R.drawable.ic_baseline_warning_24)
-                            .setTitle(appCompatActivity.getString(R.string.workmanagerInitializationErrorDialogTitle))
-                            .setMessage(appCompatActivity.getString(R.string.workmanagerInitializationErrorDialogMessage))
-                            .setPositiveButton(appCompatActivity.getString(R.string.workmanagerInitializationErrorDialogOpenSettingsLabel)) { _, _ ->
-                                appCompatActivity.startActivity(
-                                    Intent(
-                                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                                    ).apply {
-                                        data =
-                                            Uri.fromParts(
-                                                "package",
-                                                appCompatActivity.packageName,
-                                                ""
-                                            )
-                                    }
-                                )
-                            }
-                            .setCancelable(true)
-                            .show()
-                    }
+                appCompatActivity
+            ) { value ->
+                if (value) {
+                    MaterialAlertDialogBuilder(appCompatActivity).setIcon(R.drawable.ic_baseline_warning_24)
+                        .setTitle(appCompatActivity.getString(R.string.workmanagerInitializationErrorDialogTitle))
+                        .setMessage(
+                            appCompatActivity.getString(R.string.workmanagerInitializationErrorDialogMessage)
+                        )
+                        .setPositiveButton(
+                            appCompatActivity.getString(
+                                R.string.workmanagerInitializationErrorDialogOpenSettingsLabel
+                            )
+                        ) { _, _ ->
+                            appCompatActivity.startActivity(
+                                Intent(
+                                    Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                                ).apply {
+                                    data = Uri.fromParts(
+                                        "package",
+                                        appCompatActivity.packageName,
+                                        ""
+                                    )
+                                }
+                            )
+                        }
+                        .setCancelable(true)
+                        .show()
                 }
-            )
+            }
         }
     }
 }

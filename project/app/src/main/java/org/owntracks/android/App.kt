@@ -198,7 +198,7 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
     override fun getWorkManagerConfiguration(): Configuration =
         Configuration.Builder()
             .setWorkerFactory(workerFactory)
-            .setInitializationExceptionHandler { throwable ->
+            .setInitializationExceptionHandler { throwable: Throwable ->
                 Timber.e(throwable, "Exception thrown when initializing WorkManager")
                 workManagerFailedToInitialize.postValue(true)
             }
