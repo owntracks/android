@@ -219,8 +219,8 @@
     <string name="preferencesReverseGeocodeProvider">"Геокодирование"</string>
     <string name="preferencesSecurity">"Безопасность"</string>
     <string name="preferencesServer">"Подключение к серверу"</string>
-    <string name="preferencesShowRegionsOnMap">"Показывать места"</string>
-    <string name="preferencesShowRegionsOnMapSummary">"Отображать окружность для известных мест на карте"</string>
+    <string name="preferencesShowWaypointsOnMap">"Показывать места"</string>
+    <string name="preferencesShowWaypointsOnMapSummary">"Отображать окружность для известных мест на карте"</string>
     <string name="preferencesTheme">"Тема"</string>
 
     <!-- but contactDetailsTrackerId is untranslated? -->
@@ -230,9 +230,9 @@
     <string name="publish">"Сообщить местоположение"</string>
     <string name="radius">"Радиус"</string>
     <string name="reconnect">"Переподключение"</string>
-    <string name="region_inside">"Сейчас в этом месте"</string>
-    <string name="region_outside">"Сейчас вне этого места"</string>
-    <string name="region_unknown">"Статус неизвестен"</string>
+    <string name="waypoint_region_inside">"Сейчас в этом месте"</string>
+    <string name="waypoint_region_outside">"Сейчас вне этого места"</string>
+    <string name="waypoint_region_unknown">"Статус неизвестен"</string>
     <string name="save">"Сохранить"</string>
     <string name="seconds">"Секунд"</string>
     <string name="select">"Выбрать"</string>
@@ -250,8 +250,8 @@
     <string name="title_activity_load">"Импорт"</string>
     <string name="title_activity_map">"Карта"</string>
     <string name="title_activity_preferences">"Настройки"</string>
-    <string name="title_activity_region">"Место"</string>
-    <string name="title_activity_regions">"Места"</string>
+    <string name="title_activity_waypoint">"Место"</string>
+    <string name="title_activity_waypoints">"Места"</string>
     <string name="title_activity_status">"Статус"</string>
     <string name="title_exit">"Выход"</string>
     <string name="transitionEntering">"прибыл(а) в"</string>

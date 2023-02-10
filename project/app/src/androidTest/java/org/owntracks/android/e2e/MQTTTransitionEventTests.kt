@@ -13,6 +13,8 @@ import androidx.test.uiautomator.Until
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
 import com.adevinta.android.barista.interaction.PermissionGranter.allowPermissionsIfNeeded
+import java.time.Instant
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.DelicateCoroutinesApi
 import mqtt.packets.Qos
 import mqtt.packets.mqtt.MQTTPublish
@@ -30,8 +32,6 @@ import org.owntracks.android.support.Parser
 import org.owntracks.android.testutils.*
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.map.MapActivity
-import java.time.Instant
-import java.util.concurrent.TimeUnit
 
 @ExperimentalUnsignedTypes
 @LargeTest
@@ -138,9 +138,9 @@ class MQTTTransitionEventTests :
         allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
 
         initializeMockLocationProvider(app)
-        val regionLatitude = 48.0
-        val regionLongitude = -1.0
-        val regionDescription = "Test Region"
+        val waypointLatitude = 48.0
+        val waypointLongitude = -1.0
+        val waypointDescription = "Test Region"
 
         configureMQTTConnectionToLocalWithGeneratedPassword()
         waitUntilActivityVisible<MapActivity>()
@@ -150,18 +150,18 @@ class MQTTTransitionEventTests :
         }
 
         openDrawer()
-        clickOnAndWait(R.string.title_activity_regions)
+        clickOnAndWait(R.string.title_activity_waypoints)
         clickOnAndWait(R.id.add)
 
-        writeTo(R.id.description, regionDescription)
-        writeTo(R.id.latitude, regionLatitude.toString())
-        writeTo(R.id.longitude, regionLongitude.toString())
+        writeTo(R.id.description, waypointDescription)
+        writeTo(R.id.latitude, waypointLatitude.toString())
+        writeTo(R.id.longitude, waypointLongitude.toString())
         writeTo(R.id.radius, "100")
 
         clickOnAndWait(R.id.save)
 
         reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource) {
-            setMockLocation(regionLatitude, regionLongitude)
+            setMockLocation(waypointLatitude, waypointLongitude)
         }
 
         assertTrue(
@@ -172,7 +172,7 @@ class MQTTTransitionEventTests :
                 }
                 .any {
                     it.second.let { message ->
-                        message is MessageTransition && message.description == regionDescription && message.latitude == regionLatitude && message.longitude == regionLongitude && message.event == "enter"
+                        message is MessageTransition && message.description == waypointDescription && message.latitude == waypointLatitude && message.longitude == waypointLongitude && message.event == "enter"
                     } && it.first == "owntracks/$mqttUsername/$deviceId/event"
                 }
         )

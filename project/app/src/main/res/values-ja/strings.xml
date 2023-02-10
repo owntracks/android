@@ -190,9 +190,9 @@
     <string name="publish">"レポート"</string>
     <string name="radius">"半径"</string>
     <string name="reconnect">"再接続"</string>
-    <string name="region_inside">"範囲内にいます"</string>
-    <string name="region_outside">"範囲外にいます"</string>
-    <string name="region_unknown">"ステータス不明"</string>
+    <string name="waypoint_region_inside">"範囲内にいます"</string>
+    <string name="waypoint_region_outside">"範囲外にいます"</string>
+    <string name="waypoint_region_unknown">"ステータス不明"</string>
     <string name="save">"保存"</string>
     <string name="seconds">"秒"</string>
     <string name="select">"選択"</string>
@@ -210,8 +210,8 @@
     <string name="title_activity_load">"インポート"</string>
     <string name="title_activity_map">"マップ"</string>
     <string name="title_activity_preferences">"環境設定"</string>
-    <string name="title_activity_region">"リージョン"</string>
-    <string name="title_activity_regions">"リージョン一覧"</string>
+    <string name="title_activity_waypoint">"リージョン"</string>
+    <string name="title_activity_waypoints">"リージョン一覧"</string>
     <string name="title_activity_status">"ステータス"</string>
     <string name="title_exit">"アプリを終了"</string>
     <string name="unableToCopyCertificate">"証明書を内部ストレージにコピーできません"</string>

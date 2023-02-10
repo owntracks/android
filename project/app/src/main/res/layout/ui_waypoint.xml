@@ -7,7 +7,7 @@
 
         <variable
             name="vm"
-            type="org.owntracks.android.ui.region.RegionViewModel" />
+            type="org.owntracks.android.ui.waypoint.WaypointViewModel" />
     </data>
 
     <LinearLayout

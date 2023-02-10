@@ -192,9 +192,9 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="publish">"Bericht"</string>
     <string name="radius">"Radius"</string>
     <string name="reconnect">"Neu verbinden"</string>
-    <string name="region_inside">"Aktuell innerhalb"</string>
-    <string name="region_outside">"Aktuell außerhalb"</string>
-    <string name="region_unknown">"Status unbekannt"</string>
+    <string name="waypoint_region_inside">"Aktuell innerhalb"</string>
+    <string name="waypoint_region_outside">"Aktuell außerhalb"</string>
+    <string name="waypoint_region_unknown">"Status unbekannt"</string>
     <string name="save">"Speichern"</string>
     <string name="seconds">"Sekunden"</string>
     <string name="select">"Auswählen"</string>
@@ -212,8 +212,8 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="title_activity_load">"Konfigurations import"</string>
     <string name="title_activity_map">"Karte"</string>
     <string name="title_activity_preferences">"Einstellungen"</string>
-    <string name="title_activity_region">"Ort"</string>
-    <string name="title_activity_regions">"Orte"</string>
+    <string name="title_activity_waypoint">"Ort"</string>
+    <string name="title_activity_waypoints">"Orte"</string>
     <string name="title_activity_status">"Status"</string>
     <string name="title_exit">"App beenden"</string>
     <string name="transitionEntering">"betritt"</string>

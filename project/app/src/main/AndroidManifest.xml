@@ -68,16 +68,16 @@
             android:value="true" />
 
         <activity
-            android:name=".ui.regions.RegionsActivity"
-            android:label="@string/title_activity_regions"
+            android:name=".ui.waypoints.WaypointsActivity"
+            android:label="@string/title_activity_waypoints"
             android:launchMode="singleTop" />
         <activity
-            android:name=".ui.region.RegionActivity"
-            android:label="@string/title_activity_region"
+            android:name=".ui.waypoint.WaypointActivity"
+            android:label="@string/title_activity_waypoint"
             android:launchMode="singleTop">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.regions.RegionsActivity" />
+                android:value=".ui.waypoints.WaypointsActivity" />
         </activity>
         <activity
             android:name=".ui.preferences.PreferencesActivity"

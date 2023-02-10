@@ -59,7 +59,7 @@ abstract class MapFragment<V : ViewDataBinding> internal constructor(
             }
         }
 
-        viewModel.regions.observe(viewLifecycleOwner) { regions ->
+        viewModel.waypoints.observe(viewLifecycleOwner) { regions ->
             drawRegions(regions.toSet())
         }
         viewModel.mapLayerStyle.observe(viewLifecycleOwner, this::setMapLayerType)

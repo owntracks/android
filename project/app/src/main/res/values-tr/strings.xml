@@ -213,8 +213,8 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesReverseGeocodeProvider">"Reverse Geocode Provider"</string>
     <string name="preferencesSecurity">"Security"</string>
     <string name="preferencesServer">"Connection"</string>
-    <string name="preferencesShowRegionsOnMap">"Show Regions"</string>
-    <string name="preferencesShowRegionsOnMapSummary">"Draw region circles on the map"</string>
+    <string name="preferencesShowWaypointsOnMap">"Show Regions"</string>
+    <string name="preferencesShowWaypointsOnMapSummary">"Draw region circles on the map"</string>
     <string name="preferencesTheme">"Theme"</string>
     <string name="preferencesTrackerId">"Tracker ID"</string>
     <string name="preferencesUserUsername">"Username"</string>
@@ -222,9 +222,9 @@ To allow this, please enable Location in the device settings."</string>
     <string name="publish">"Report"</string>
     <string name="radius">"Radius"</string>
     <string name="reconnect">"Reconnect"</string>
-    <string name="region_inside">"Currently inside"</string>
-    <string name="region_outside">"Currently outside"</string>
-    <string name="region_unknown">"Status unknown"</string>
+    <string name="waypoint_region_inside">"Currently inside"</string>
+    <string name="waypoint_region_outside">"Currently outside"</string>
+    <string name="waypoint_region_unknown">"Status unknown"</string>
     <string name="save">"Kaydet"</string>
     <string name="seconds">"Saniye"</string>
     <string name="select">"Seç"</string>
@@ -242,8 +242,8 @@ To allow this, please enable Location in the device settings."</string>
     <string name="title_activity_load">"İçe Aktar"</string>
     <string name="title_activity_map">"Harita"</string>
     <string name="title_activity_preferences">"Tercihler"</string>
-    <string name="title_activity_region">"Bölge"</string>
-    <string name="title_activity_regions">"Bölgeler"</string>
+    <string name="title_activity_waypoint">"Bölge"</string>
+    <string name="title_activity_waypoints">"Bölgeler"</string>
     <string name="title_activity_status">"Durum"</string>
     <string name="title_exit">"Uygulamadan çık"</string>
     <string name="transitionEntering">"enters"</string>

@@ -159,9 +159,9 @@
     <string name="publish">"Reportar"</string>
     <string name="radius">"Radio"</string>
     <string name="reconnect">"Reconectar"</string>
-    <string name="region_inside">"Actualmente dentro"</string>
-    <string name="region_outside">"Actualmente fuera"</string>
-    <string name="region_unknown">"Estado desconocido"</string>
+    <string name="waypoint_region_inside">"Actualmente dentro"</string>
+    <string name="waypoint_region_outside">"Actualmente fuera"</string>
+    <string name="waypoint_region_unknown">"Estado desconocido"</string>
     <string name="save">"Guardar"</string>
     <string name="seconds">"Segundos"</string>
     <string name="select">"Seleccione"</string>
@@ -177,8 +177,8 @@
     <string name="title_activity_load">"Importar"</string>
     <string name="title_activity_map">"Mapa"</string>
     <string name="title_activity_preferences">"Preferencias"</string>
-    <string name="title_activity_region">"Región"</string>
-    <string name="title_activity_regions">"Regiones"</string>
+    <string name="title_activity_waypoint">"Región"</string>
+    <string name="title_activity_waypoints">"Regiones"</string>
     <string name="title_activity_status">"Estado"</string>
     <string name="title_exit">"Salir de la aplicación"</string>
     <string name="transitionEntering">"entra"</string>

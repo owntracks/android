@@ -207,8 +207,8 @@ Chcete-li to umožnit, zapněte polohu v nastavení zařízení."</string>
     <string name="preferencesReverseGeocodeProvider">"Poskytovatel reverzního geokódu"</string>
     <string name="preferencesSecurity">"Zabezpečení"</string>
     <string name="preferencesServer">"Připojení"</string>
-    <string name="preferencesShowRegionsOnMap">"Ukázat oblasti"</string>
-    <string name="preferencesShowRegionsOnMapSummary">"Vykreslit kruhy oblasti na mapě"</string>
+    <string name="preferencesShowWaypointsOnMap">"Ukázat oblasti"</string>
+    <string name="preferencesShowWaypointsOnMapSummary">"Vykreslit kruhy oblasti na mapě"</string>
     <string name="preferencesTheme">"Vzhled aplikace"</string>
     <string name="preferencesTrackerId">"Tracker ID"</string>
     <string name="preferencesUserUsername">"Uživatelské jméno"</string>
@@ -216,9 +216,9 @@ Chcete-li to umožnit, zapněte polohu v nastavení zařízení."</string>
     <string name="publish">"Ohlásit"</string>
     <string name="radius">"Poloměr"</string>
     <string name="reconnect">"Znovu připojit"</string>
-    <string name="region_inside">"Nyní vevnitř"</string>
-    <string name="region_outside">"Nyní venku"</string>
-    <string name="region_unknown">"Stav neznámý"</string>
+    <string name="waypoint_region_inside">"Nyní vevnitř"</string>
+    <string name="waypoint_region_outside">"Nyní venku"</string>
+    <string name="waypoint_region_unknown">"Stav neznámý"</string>
     <string name="save">"Uložit"</string>
     <string name="seconds">"Vteřin"</string>
     <string name="select">"Vybrat"</string>
@@ -236,8 +236,8 @@ Chcete-li to umožnit, zapněte polohu v nastavení zařízení."</string>
     <string name="title_activity_load">"Import"</string>
     <string name="title_activity_map">"Mapa"</string>
     <string name="title_activity_preferences">"Nastavení"</string>
-    <string name="title_activity_region">"Oblast"</string>
-    <string name="title_activity_regions">"Oblasti"</string>
+    <string name="title_activity_waypoint">"Oblast"</string>
+    <string name="title_activity_waypoints">"Oblasti"</string>
     <string name="title_activity_status">"Status"</string>
     <string name="title_exit">"Ukončit aplikaci"</string>
     <string name="transitionEntering">"vstupuje"</string>

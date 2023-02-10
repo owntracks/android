@@ -8,7 +8,7 @@
 
         <variable
             name="vm"
-            type="org.owntracks.android.ui.regions.RegionsViewModel" />
+            type="org.owntracks.android.ui.waypoints.WaypointsViewModel" />
     </data>
 
     <androidx.appcompat.widget.LinearLayoutCompat

@@ -1,4 +1,4 @@
-package org.owntracks.android.ui.region
+package org.owntracks.android.ui.waypoint
 
 import android.content.DialogInterface
 import android.os.Bundle
@@ -12,20 +12,20 @@ import androidx.databinding.DataBindingUtil
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import org.owntracks.android.R
-import org.owntracks.android.databinding.UiRegionBinding
+import org.owntracks.android.databinding.UiWaypointBinding
 
 @AndroidEntryPoint
-class RegionActivity : AppCompatActivity() {
+class WaypointActivity : AppCompatActivity() {
     private var saveButton: MenuItem? = null
     private var deleteButton: MenuItem? = null
-    private val viewModel: RegionViewModel by viewModels()
+    private val viewModel: WaypointViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        DataBindingUtil.setContentView<UiRegionBinding>(this, R.layout.ui_region)
+        DataBindingUtil.setContentView<UiWaypointBinding>(this, R.layout.ui_waypoint)
             .apply {
                 vm = viewModel
-                lifecycleOwner = this@RegionActivity
+                lifecycleOwner = this@WaypointActivity
                 setSupportActionBar(appbar.toolbar)
                 description.addTextChangedListener(object : TextWatcher {
                     override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -64,9 +64,9 @@ class RegionActivity : AppCompatActivity() {
             }
             R.id.delete -> {
                 MaterialAlertDialogBuilder(this) // set message, title, and icon
-                    .setTitle(R.string.deleteRegionTitle)
-                    .setMessage(R.string.deleteRegionConfirmation)
-                    .setPositiveButton(R.string.deleteRegionTitle) { dialog: DialogInterface, _: Int ->
+                    .setTitle(R.string.deleteWaypointTitle)
+                    .setMessage(R.string.deleteWaypointConfirmation)
+                    .setPositiveButton(R.string.deleteWaypointTitle) { dialog: DialogInterface, _: Int ->
                         viewModel.delete()
                         dialog.dismiss()
                         finish()

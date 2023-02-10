@@ -4,7 +4,7 @@
     <item
         android:id="@+id/delete"
         android:icon="@drawable/ic_baseline_delete_24"
-        android:title="@string/deleteRegionTitle"
+        android:title="@string/deleteWaypointTitle"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/save"

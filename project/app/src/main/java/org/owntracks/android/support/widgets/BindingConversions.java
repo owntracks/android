@@ -88,13 +88,13 @@ public class BindingConversions {
     public static void setLastTransition(TextView view, int transition) {
         switch (transition) {
             case 0:
-                view.setText(view.getResources().getString(R.string.region_unknown));
+                view.setText(view.getResources().getString(R.string.waypoint_region_unknown));
                 break;
             case Geofence.GEOFENCE_TRANSITION_ENTER:
-                view.setText(view.getResources().getString(R.string.region_inside));
+                view.setText(view.getResources().getString(R.string.waypoint_region_inside));
                 break;
             case Geofence.GEOFENCE_TRANSITION_EXIT:
-                view.setText(view.getResources().getString(R.string.region_outside));
+                view.setText(view.getResources().getString(R.string.waypoint_region_outside));
                 break;
 
         }

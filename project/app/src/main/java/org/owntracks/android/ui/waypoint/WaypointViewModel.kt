@@ -1,4 +1,4 @@
-package org.owntracks.android.ui.region
+package org.owntracks.android.ui.waypoint
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,7 +10,7 @@ import org.owntracks.android.data.repos.WaypointsRepo
 import timber.log.Timber
 
 @HiltViewModel
-class RegionViewModel @Inject constructor(
+class WaypointViewModel @Inject constructor(
     private val waypointsRepo: WaypointsRepo,
     private val locationRepo: LocationRepo
 ) : ViewModel() {

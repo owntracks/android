@@ -6,8 +6,8 @@
     <androidx.preference.SwitchPreferenceCompat
         app:iconSpaceReserved="false"
         app:key="showRegionsOnMap"
-        app:summary="@string/preferencesShowRegionsOnMapSummary"
-        app:title="@string/preferencesShowRegionsOnMap" />
+        app:summary="@string/preferencesShowWaypointsOnMapSummary"
+        app:title="@string/preferencesShowWaypointsOnMap" />
 
     <androidx.preference.SwitchPreferenceCompat
         app:iconSpaceReserved="false"

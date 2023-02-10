@@ -205,8 +205,8 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="preferencesReverseGeocodeProvider">"Udbyder af baglæns geokodning"</string>
     <string name="preferencesSecurity">"Sikkerhed"</string>
     <string name="preferencesServer">"Forbindelse"</string>
-    <string name="preferencesShowRegionsOnMap">"Vis Regioner"</string>
-    <string name="preferencesShowRegionsOnMapSummary">"Vis regionscirkler på kortet"</string>
+    <string name="preferencesShowWaypointsOnMap">"Vis Regioner"</string>
+    <string name="preferencesShowWaypointsOnMapSummary">"Vis regionscirkler på kortet"</string>
     <string name="preferencesTheme">"Tema"</string>
     <string name="preferencesTrackerId">"Tracker ID"</string>
     <string name="preferencesUserUsername">"Brugernavn"</string>
@@ -214,9 +214,9 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="publish">"Rapport"</string>
     <string name="radius">"Radius"</string>
     <string name="reconnect">"Genforbind"</string>
-    <string name="region_inside">"I øjeblikket indenfor"</string>
-    <string name="region_outside">"I øjeblikket udenfor"</string>
-    <string name="region_unknown">"Ukendt status"</string>
+    <string name="waypoint_region_inside">"I øjeblikket indenfor"</string>
+    <string name="waypoint_region_outside">"I øjeblikket udenfor"</string>
+    <string name="waypoint_region_unknown">"Ukendt status"</string>
     <string name="save">"Gem"</string>
     <string name="seconds">"Sekunder"</string>
     <string name="select">"Vælg"</string>
@@ -234,8 +234,8 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="title_activity_load">"Import"</string>
     <string name="title_activity_map">"Kort"</string>
     <string name="title_activity_preferences">"Præferencer"</string>
-    <string name="title_activity_region">"Region"</string>
-    <string name="title_activity_regions">"Regioner"</string>
+    <string name="title_activity_waypoint">"Region"</string>
+    <string name="title_activity_waypoints">"Regioner"</string>
     <string name="title_activity_status">"Status"</string>
     <string name="title_exit">"Luk app"</string>
     <string name="transitionEntering">"bevæger sig ind i"</string>

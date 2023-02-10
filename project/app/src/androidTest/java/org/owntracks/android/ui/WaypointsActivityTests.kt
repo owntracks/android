@@ -10,11 +10,11 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.testutils.TestWithAnActivity
-import org.owntracks.android.ui.regions.RegionsActivity
+import org.owntracks.android.ui.waypoints.WaypointsActivity
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class RegionsActivityTests : TestWithAnActivity<RegionsActivity>(RegionsActivity::class.java) {
+class WaypointsActivityTests : TestWithAnActivity<WaypointsActivity>(WaypointsActivity::class.java) {
     @Test
     fun initialRegionsActivityIsEmpty() {
         assertDisplayed(R.string.waypointListPlaceholder)
@@ -22,50 +22,50 @@ class RegionsActivityTests : TestWithAnActivity<RegionsActivity>(RegionsActivity
     }
 
     @Test
-    fun whenAddingARegionThenTheRegionIsShown() {
-        val regionName = "test region"
+    fun whenAddingAWaypointThenTheWaypointIsShown() {
+        val waypointName = "test waypoint"
         val latitude = 51.123
         val longitude = 0.456
         val radius = 159
         clickOnAndWait(R.id.add)
-        writeTo(R.id.description, regionName)
+        writeTo(R.id.description, waypointName)
         writeTo(R.id.latitude, latitude.toString())
         writeTo(R.id.longitude, longitude.toString())
         writeTo(R.id.radius, radius.toString())
 
         clickOnAndWait(R.id.save)
 
-        assertDisplayed(regionName)
+        assertDisplayed(waypointName)
 
-        clickOnAndWait(regionName)
+        clickOnAndWait(waypointName)
 
-        assertContains(R.id.description, regionName)
+        assertContains(R.id.description, waypointName)
         assertContains(R.id.latitude, latitude.toString())
         assertContains(R.id.longitude, longitude.toString())
         assertContains(R.id.radius, radius.toString())
     }
 
     @Test
-    fun whenAddingARegionAndThenDeletingItThenTheRegionIsNotShown() {
-        val regionName = "test region to be deleted"
+    fun whenAddingAWaypointAndThenDeletingItThenTheWaypointIsNotShown() {
+        val waypointName = "test waypoint to be deleted"
         val latitude = 51.123
         val longitude = 0.456
         val radius = 159
         clickOnAndWait(R.id.add)
-        writeTo(R.id.description, regionName)
+        writeTo(R.id.description, waypointName)
         writeTo(R.id.latitude, latitude.toString())
         writeTo(R.id.longitude, longitude.toString())
         writeTo(R.id.radius, radius.toString())
 
         clickOnAndWait(R.id.save)
 
-        assertDisplayed(regionName)
+        assertDisplayed(waypointName)
 
-        clickOnAndWait(regionName)
+        clickOnAndWait(waypointName)
 
         clickOnAndWait(R.id.delete)
-        clickOnAndWait(R.string.deleteRegionTitle)
+        clickOnAndWait(R.string.deleteWaypointTitle)
 
-        assertNotDisplayed(regionName)
+        assertNotDisplayed(waypointName)
     }
 }

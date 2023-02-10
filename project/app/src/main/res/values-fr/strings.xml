@@ -191,8 +191,8 @@
 
     <!-- In french, connection is "connexion" -->
     <string name="preferencesServer">"Connection"</string>
-    <string name="preferencesShowRegionsOnMap">"Afficher les régions"</string>
-    <string name="preferencesShowRegionsOnMapSummary">"Dessiner des cercles de régions sur la carte"</string>
+    <string name="preferencesShowWaypointsOnMap">"Afficher les régions"</string>
+    <string name="preferencesShowWaypointsOnMapSummary">"Dessiner des cercles de régions sur la carte"</string>
     <string name="preferencesTheme">"Thème"</string>
     <string name="preferencesTrackerId">"Tracker ID"</string>
     <string name="preferencesUserUsername">"Nom d'utilisateur"</string>
@@ -202,11 +202,11 @@
     <string name="reconnect">"Reconnecter"</string>
 
     <!-- Fuzzy -->
-    <string name="region_inside">"Actuellement à l'intérieur"</string>
+    <string name="waypoint_region_inside">"Actuellement à l'intérieur"</string>
 
     <!-- Fuzzy -->
-    <string name="region_outside">"Actuellement à l'extérieur"</string>
-    <string name="region_unknown">"Statut inconnu"</string>
+    <string name="waypoint_region_outside">"Actuellement à l'extérieur"</string>
+    <string name="waypoint_region_unknown">"Statut inconnu"</string>
     <string name="save">"Sauvegarder"</string>
     <string name="seconds">"Secondes"</string>
     <string name="select">"Sélectionner"</string>
@@ -229,8 +229,8 @@
 Importer"</string>
     <string name="title_activity_map">"Carte"</string>
     <string name="title_activity_preferences">"Préférences"</string>
-    <string name="title_activity_region">"Région"</string>
-    <string name="title_activity_regions">"Régions"</string>
+    <string name="title_activity_waypoint">"Région"</string>
+    <string name="title_activity_waypoints">"Régions"</string>
     <string name="title_activity_status">"Statut"</string>
     <string name="title_exit">"Quitter"</string>
     <string name="transitionEntering">"entré"</string>

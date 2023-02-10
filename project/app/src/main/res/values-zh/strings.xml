@@ -127,9 +127,9 @@
     <string name="preferencesWebsocket">"使用 WebSockets"</string>
     <string name="radius">"半径"</string>
     <string name="reconnect">"重新连接"</string>
-    <string name="region_inside">"目前位于"</string>
-    <string name="region_outside">"目前不在"</string>
-    <string name="region_unknown">"未知状态"</string>
+    <string name="waypoint_region_inside">"目前位于"</string>
+    <string name="waypoint_region_outside">"目前不在"</string>
+    <string name="waypoint_region_unknown">"未知状态"</string>
     <string name="save">"保存"</string>
     <string name="seconds">"秒"</string>
     <string name="status_background_service_started_hint">"后台服务启动时间"</string>
@@ -140,8 +140,8 @@
     <string name="title_activity_load">"导入"</string>
     <string name="title_activity_map">"地图"</string>
     <string name="title_activity_preferences">"首选项"</string>
-    <string name="title_activity_region">"区域"</string>
-    <string name="title_activity_regions">"区域"</string>
+    <string name="title_activity_waypoint">"区域"</string>
+    <string name="title_activity_waypoints">"区域"</string>
     <string name="title_activity_status">"状态"</string>
     <string name="title_exit">"退出应用"</string>
     <string name="transitionEntering">"到达"</string>

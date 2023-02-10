@@ -211,8 +211,8 @@ Aby to umożliwić, włącz lokalizację w ustawieniach urządzenia."</string>
     <string name="preferencesReverseGeocodeProvider">"Dostawca usługi odwrotnego geokodowania"</string>
     <string name="preferencesSecurity">"Bezpieczeństwo"</string>
     <string name="preferencesServer">"Połączenie"</string>
-    <string name="preferencesShowRegionsOnMap">"Pokaż obszary"</string>
-    <string name="preferencesShowRegionsOnMapSummary">"Rysuj okręgi obszarów na mapie"</string>
+    <string name="preferencesShowWaypointsOnMap">"Pokaż obszary"</string>
+    <string name="preferencesShowWaypointsOnMapSummary">"Rysuj okręgi obszarów na mapie"</string>
     <string name="preferencesTheme">"Motyw"</string>
     <string name="preferencesTrackerId">"ID Trackera"</string>
     <string name="preferencesUserUsername">"Nazwa użytkownika"</string>
@@ -220,9 +220,9 @@ Aby to umożliwić, włącz lokalizację w ustawieniach urządzenia."</string>
     <string name="publish">"Zgłoś"</string>
     <string name="radius">"Zasięg"</string>
     <string name="reconnect">"Połącz ponownie"</string>
-    <string name="region_inside">"Aktualnie wewnątrz"</string>
-    <string name="region_outside">"Aktualnie na zewnątrz"</string>
-    <string name="region_unknown">"Status nieznany"</string>
+    <string name="waypoint_region_inside">"Aktualnie wewnątrz"</string>
+    <string name="waypoint_region_outside">"Aktualnie na zewnątrz"</string>
+    <string name="waypoint_region_unknown">"Status nieznany"</string>
     <string name="save">"Zapisz"</string>
     <string name="seconds">"Sekundy"</string>
     <string name="select">"Wybierz"</string>
@@ -240,8 +240,8 @@ Aby to umożliwić, włącz lokalizację w ustawieniach urządzenia."</string>
     <string name="title_activity_load">"Import"</string>
     <string name="title_activity_map">"Mapa"</string>
     <string name="title_activity_preferences">"Ustawienia"</string>
-    <string name="title_activity_region">"Obszar"</string>
-    <string name="title_activity_regions">"Obszary"</string>
+    <string name="title_activity_waypoint">"Obszar"</string>
+    <string name="title_activity_waypoints">"Obszary"</string>
     <string name="title_activity_status">"Status"</string>
     <string name="title_exit">"Wyjdź z aplikacji"</string>
     <string name="transitionEntering">"wchodzi"</string>

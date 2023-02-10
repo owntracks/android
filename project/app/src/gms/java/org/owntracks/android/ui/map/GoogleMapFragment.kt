@@ -9,25 +9,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
-import com.google.android.gms.maps.CameraUpdate
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.GoogleMap.MAP_TYPE_HYBRID
-import com.google.android.gms.maps.GoogleMap.MAP_TYPE_NORMAL
-import com.google.android.gms.maps.GoogleMap.MAP_TYPE_SATELLITE
-import com.google.android.gms.maps.GoogleMap.MAP_TYPE_TERRAIN
+import com.google.android.gms.maps.*
+import com.google.android.gms.maps.GoogleMap.*
 import com.google.android.gms.maps.GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE
-import com.google.android.gms.maps.LocationSource
-import com.google.android.gms.maps.MapsInitializer
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.OnMapsSdkInitializedCallback
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.Circle
-import com.google.android.gms.maps.model.CircleOptions
-import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import org.owntracks.android.R
 import org.owntracks.android.data.WaypointModel
 import org.owntracks.android.databinding.GoogleMapFragmentBinding
@@ -47,7 +32,7 @@ class GoogleMapFragment internal constructor(
     OnMapReadyCallback,
     OnMapsSdkInitializedCallback {
 
-    data class RegionOnMap(val marker: Marker, val circle: Circle)
+    data class WaypointOnMap(val marker: Marker, val circle: Circle)
 
     override val layout: Int
         get() = R.layout.google_map_fragment
@@ -58,13 +43,11 @@ class GoogleMapFragment internal constructor(
             override fun activate(
                 onLocationChangedListener: LocationSource.OnLocationChangedListener
             ) {
-                locationObserver = object : Observer<Location> {
-                    override fun onChanged(location: Location) {
-                        onLocationChangedListener.onLocationChanged(location)
-                        viewModel.setCurrentBlueDotLocation(location.toLatLng())
-                        if (viewModel.viewMode == MapViewModel.ViewMode.Device) {
-                            updateCamera(location.toLatLng())
-                        }
+                locationObserver = Observer<Location> { location ->
+                    onLocationChangedListener.onLocationChanged(location)
+                    viewModel.setCurrentBlueDotLocation(location.toLatLng())
+                    if (viewModel.viewMode == MapViewModel.ViewMode.Device) {
+                        updateCamera(location.toLatLng())
                     }
                 }
                 locationObserver?.run {
@@ -80,7 +63,7 @@ class GoogleMapFragment internal constructor(
 
     private var googleMap: GoogleMap? = null
     private val markersOnMap: MutableMap<String, Marker> = HashMap()
-    private val regionsOnMap: MutableList<RegionOnMap> = mutableListOf()
+    private val regionsOnMap: MutableList<WaypointOnMap> = mutableListOf()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -100,9 +83,9 @@ class GoogleMapFragment internal constructor(
 
     private fun setMapStyle() {
         if (resources
-            .configuration
-            .uiMode
-            .and(Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+                .configuration
+                .uiMode
+                .and(Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
         ) {
             googleMap?.setMapStyle(
                 MapStyleOptions.loadRawResourceStyle(
@@ -119,9 +102,13 @@ class GoogleMapFragment internal constructor(
                 .target(this.latLng.toGMSLatLng())
                 .zoom(convertStandardZoomToGoogleZoom(this.zoom).toFloat())
                 .bearing(
-                    if (preferences.enableMapRotation) convertBetweenStandardRotationAndBearing(
-                        this.rotation
-                    ) else 0f
+                    if (preferences.enableMapRotation) {
+                        convertBetweenStandardRotationAndBearing(
+                            this.rotation
+                        )
+                    } else {
+                        0f
+                    }
                 )
                 .build()
         )
@@ -189,18 +176,18 @@ class GoogleMapFragment internal constructor(
             // We need to specifically re-draw any contact markers and regions now that we've re-init the map
             viewModel.allContacts.value?.values?.toSet()
                 ?.run(::updateAllMarkers)
-            viewModel.regions.value?.toSet()
+            viewModel.waypoints.value?.toSet()
                 ?.run(::drawRegions)
         }
     }
 
-    override fun updateCamera(latLng: org.owntracks.android.location.LatLng) {
+    override fun updateCamera(latLng: LatLng) {
         googleMap?.moveCamera(CameraUpdateFactory.newLatLng(latLng.toGMSLatLng()))
     }
 
     override fun updateMarkerOnMap(
         id: String,
-        latLng: org.owntracks.android.location.LatLng,
+        latLng: LatLng,
         image: Bitmap
     ) {
         googleMap?.run { // If we don't have a google Map, we can't add markers to it
@@ -275,7 +262,7 @@ class GoogleMapFragment internal constructor(
                     it.marker.remove()
                 }
                 regions.forEach { region ->
-                    RegionOnMap(
+                    WaypointOnMap(
                         MarkerOptions().apply {
                             position(
                                 region.location.toLatLng()

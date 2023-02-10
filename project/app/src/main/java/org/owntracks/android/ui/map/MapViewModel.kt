@@ -1,17 +1,18 @@
 package org.owntracks.android.ui.map
 
-import android.content.Context
+import android.app.Application
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.location.Location
 import androidx.annotation.MainThread
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+import kotlin.math.asin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.owntracks.android.data.repos.ContactsRepo
@@ -31,8 +32,6 @@ import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.support.RequirementsChecker
 import org.owntracks.android.support.SimpleIdlingResource
 import timber.log.Timber
-import javax.inject.Inject
-import kotlin.math.asin
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
@@ -43,9 +42,9 @@ class MapViewModel @Inject constructor(
     private val preferences: Preferences,
     private val locationRepo: LocationRepo,
     waypointsRepo: WaypointsRepo,
-    @ApplicationContext private val applicationContext: Context,
+    application: Application,
     private val requirementsChecker: RequirementsChecker
-) : ViewModel() {
+) : AndroidViewModel(application) {
     // controls who the currently selected contact is
     private val mutableCurrentContact = MutableLiveData<FusedContact?>()
     val currentContact: LiveData<FusedContact?>
@@ -86,8 +85,8 @@ class MapViewModel @Inject constructor(
     val myLocationStatus: LiveData<MyLocationStatus>
         get() = mutableMyLocationStatus
 
-    val currentLocation = LocationLiveData(applicationContext, viewModelScope)
-    val regions = waypointsRepo.allLive
+    val currentLocation = LocationLiveData(application, viewModelScope)
+    val waypoints = waypointsRepo.allLive
     val allContacts = contactsRepo.all
 
     val scope: CoroutineScope
@@ -124,7 +123,7 @@ class MapViewModel @Inject constructor(
         )
     }
 
-    val preferenceChangeListener = object : Preferences.OnPreferenceChangeListener {
+    private val preferenceChangeListener = object : Preferences.OnPreferenceChangeListener {
         override fun onPreferenceChanged(properties: List<String>) {
             if (properties.contains("monitoring")) {
                 mutableCurrentMonitoringMode.postValue(preferences.monitoring)
@@ -182,10 +181,14 @@ class MapViewModel @Inject constructor(
 
     private fun setViewModeContact(contactId: String, center: Boolean) {
         val c = contactsRepo.getById(contactId)
-        if (c != null) setViewModeContact(c, center) else Timber.e(
-            "contact not found %s, ",
-            contactId
-        )
+        if (c != null) {
+            setViewModeContact(c, center)
+        } else {
+            Timber.e(
+                "contact not found %s, ",
+                contactId
+            )
+        }
     }
 
     private fun setViewModeContact(contact: FusedContact, center: Boolean) {

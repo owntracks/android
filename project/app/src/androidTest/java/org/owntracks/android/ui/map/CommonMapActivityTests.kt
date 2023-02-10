@@ -131,10 +131,10 @@ class CommonMapActivityTests :
         }
 
         openDrawer()
-        clickOnDrawerAndWait(R.string.title_activity_regions)
+        clickOnDrawerAndWait(R.string.title_activity_waypoints)
 
         clickOnAndWait(R.id.add)
-        BaristaEditTextInteractions.writeTo(R.id.description, "testregion")
+        BaristaEditTextInteractions.writeTo(R.id.description, "testwaypoint")
         BaristaEditTextInteractions.writeTo(R.id.latitude, "51.0")
         BaristaEditTextInteractions.writeTo(R.id.longitude, "0")
         BaristaEditTextInteractions.writeTo(R.id.radius, "250")
@@ -145,7 +145,7 @@ class CommonMapActivityTests :
 
         clickOnDrawerAndWait(R.string.title_activity_preferences)
         clickOnAndWait(R.string.title_activity_map)
-        clickOnAndWait(R.string.preferencesShowRegionsOnMap)
+        clickOnAndWait(R.string.preferencesShowWaypointsOnMap)
         openDrawer()
         clickOnDrawerAndWait(R.string.title_activity_map)
         assertDisplayed(R.id.mapCoordinatorLayout)

@@ -207,8 +207,8 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="preferencesReverseGeocodeProvider">"Proveïdor de geocodificació inversa"</string>
     <string name="preferencesSecurity">"Seguretat"</string>
     <string name="preferencesServer">"Connexió"</string>
-    <string name="preferencesShowRegionsOnMap">"Mostra regions"</string>
-    <string name="preferencesShowRegionsOnMapSummary">" preferencesShowRegionsOnMapSummary "</string>
+    <string name="preferencesShowWaypointsOnMap">"Mostra regions"</string>
+    <string name="preferencesShowWaypointsOnMapSummary">" preferencesShowRegionsOnMapSummary "</string>
     <string name="preferencesTheme">"Tema"</string>
     <string name="preferencesTrackerId">"Tracker ID"</string>
     <string name="preferencesUserUsername">"Nom d'usuari"</string>
@@ -216,9 +216,9 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="publish">"Informe"</string>
     <string name="radius">"Radi"</string>
     <string name="reconnect">"Reconnectar"</string>
-    <string name="region_inside">"Actualment dins"</string>
-    <string name="region_outside">"Actualment fora"</string>
-    <string name="region_unknown">"Estat desconegut"</string>
+    <string name="waypoint_region_inside">"Actualment dins"</string>
+    <string name="waypoint_region_outside">"Actualment fora"</string>
+    <string name="waypoint_region_unknown">"Estat desconegut"</string>
     <string name="save">"Desa"</string>
     <string name="seconds">"Segons"</string>
     <string name="select">"Seleccionar"</string>
@@ -236,8 +236,8 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="title_activity_load">"Importar"</string>
     <string name="title_activity_map">"Mapa"</string>
     <string name="title_activity_preferences">"Preferències"</string>
-    <string name="title_activity_region">"Regió"</string>
-    <string name="title_activity_regions">"Regions"</string>
+    <string name="title_activity_waypoint">"Regió"</string>
+    <string name="title_activity_waypoints">"Regions"</string>
     <string name="title_activity_status">"Estat"</string>
     <string name="title_exit">"Sortir"</string>
     <string name="transitionEntering">"entra"</string>

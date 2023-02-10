@@ -100,8 +100,8 @@
     <string name="title_activity_load">"Importar"</string>
     <string name="title_activity_map">"Mapa"</string>
     <string name="title_activity_preferences">"Preferências"</string>
-    <string name="title_activity_region">"Região"</string>
-    <string name="title_activity_regions">"Regiões"</string>
+    <string name="title_activity_waypoint">"Região"</string>
+    <string name="title_activity_waypoints">"Regiões"</string>
     <string name="title_activity_status">"Estado"</string>
     <string name="title_exit">"Sair"</string>
     <string name="transitionEntering">"Entradas"</string>
