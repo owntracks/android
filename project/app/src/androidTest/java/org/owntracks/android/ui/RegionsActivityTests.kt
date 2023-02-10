@@ -5,9 +5,7 @@ import androidx.test.filters.LargeTest
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
-import com.adevinta.android.barista.interaction.BaristaClickInteractions.longClickOn
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
@@ -48,7 +46,6 @@ class RegionsActivityTests : TestWithAnActivity<RegionsActivity>(RegionsActivity
     }
 
     @Test
-    @Ignore("Switch from long click to delete to a specific action in the waypoint")
     fun whenAddingARegionAndThenDeletingItThenTheRegionIsNotShown() {
         val regionName = "test region to be deleted"
         val latitude = 51.123
@@ -64,9 +61,10 @@ class RegionsActivityTests : TestWithAnActivity<RegionsActivity>(RegionsActivity
 
         assertDisplayed(regionName)
 
-        longClickOn(regionName)
+        clickOnAndWait(regionName)
 
-        clickOnAndWait("Delete")
+        clickOnAndWait(R.id.delete)
+        clickOnAndWait(R.string.deleteRegionTitle)
 
         assertNotDisplayed(regionName)
     }

@@ -1,17 +1,16 @@
 package org.owntracks.android.ui.regions
 
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import org.owntracks.android.R
 import org.owntracks.android.data.WaypointModel
 import org.owntracks.android.databinding.UiRegionsBinding
@@ -19,7 +18,6 @@ import org.owntracks.android.support.DrawerProvider
 import org.owntracks.android.ui.base.BaseRecyclerViewAdapterWithClickHandler
 import org.owntracks.android.ui.base.ClickHasBeenHandled
 import org.owntracks.android.ui.region.RegionActivity
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class RegionsActivity : AppCompatActivity(), BaseRecyclerViewAdapterWithClickHandler.ClickListener<WaypointModel> {
@@ -65,25 +63,13 @@ class RegionsActivity : AppCompatActivity(), BaseRecyclerViewAdapterWithClickHan
     }
 
     override fun onClick(
-        thing: WaypointModel, view: View, longClick: Boolean
+        thing: WaypointModel,
+        view: View,
+        longClick: Boolean
     ): ClickHasBeenHandled {
-        if (longClick) {
-            AlertDialog.Builder(this) //set message, title, and icon
-                .setTitle(R.string.deleteRegionTitle)
-                .setMessage(R.string.deleteRegionConfirmation)
-                .setPositiveButton(R.string.deleteRegionTitle) { dialog: DialogInterface, _: Int ->
-                    viewModel.delete(thing)
-                    dialog.dismiss()
-                }
-                .setNegativeButton(R.string.cancel) { dialog: DialogInterface, _: Int -> dialog.dismiss() }
-                .create()
-                .show()
-        } else {
-            val intent = Intent(this, RegionActivity::class.java)
-            intent.putExtra("waypointId", thing.tst)
-            startActivity(intent)
-        }
+        val intent = Intent(this, RegionActivity::class.java)
+        intent.putExtra("waypointId", thing.tst)
+        startActivity(intent)
         return true
     }
 }
-

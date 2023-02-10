@@ -3,15 +3,16 @@ package org.owntracks.android.ui.region
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import org.owntracks.android.data.WaypointModel
 import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.data.repos.WaypointsRepo
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class RegionViewModel @Inject constructor(
-    private val waypointsRepo: WaypointsRepo, private val locationRepo: LocationRepo
+    private val waypointsRepo: WaypointsRepo,
+    private val locationRepo: LocationRepo
 ) : ViewModel() {
     val waypoint = MutableLiveData(getEmptyWaypoint())
 
@@ -35,8 +36,16 @@ class RegionViewModel @Inject constructor(
         }
     }
 
+    fun delete() {
+        waypointsRepo.delete(waypoint.value)
+    }
+
     fun canSaveWaypoint(): Boolean {
         return waypoint.value?.description?.isNotEmpty() ?: false
+    }
+
+    fun canDeleteWaypoint(): Boolean {
+        return waypoint.value?.id?.run { this != 0L } ?: false
     }
 
     fun saveWaypoint() {
