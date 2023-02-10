@@ -17,6 +17,7 @@ import org.owntracks.android.databinding.UiRegionsBinding
 import org.owntracks.android.support.DrawerProvider
 import org.owntracks.android.ui.base.BaseRecyclerViewAdapterWithClickHandler
 import org.owntracks.android.ui.base.ClickHasBeenHandled
+import org.owntracks.android.ui.preferences.load.LoadActivity
 import org.owntracks.android.ui.region.RegionActivity
 
 @AndroidEntryPoint
@@ -51,11 +52,15 @@ class RegionsActivity : AppCompatActivity(), BaseRecyclerViewAdapterWithClickHan
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.add -> {
-                this.startActivity(Intent(this, RegionActivity::class.java))
+                startActivity(Intent(this, RegionActivity::class.java))
                 true
             }
             R.id.exportWaypointsService -> {
                 viewModel.exportWaypoints()
+                true
+            }
+            R.id.importWaypoints -> {
+                startActivity(Intent(this, LoadActivity::class.java))
                 true
             }
             else -> super.onOptionsItemSelected(item)

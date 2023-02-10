@@ -10,6 +10,12 @@
         android:title="@string/addWaypoint">
     </item>
     <item
+        android:id="@+id/importWaypoints"
+        android:orderInCategory="1"
+        app:showAsAction="never"
+        android:title="@string/waypointsImport">
+    </item>
+    <item
         android:id="@+id/exportWaypointsService"
         android:orderInCategory="1"
         app:showAsAction="never"
