@@ -16,7 +16,7 @@ class MqttConnectionConfigurationTest {
         Assert.assertEquals(
             setOf(
                 "owntracks/+/+",
-                "owntracks/+/+/events",
+                "owntracks/+/+/event",
                 "owntracks/+/+/info",
                 "owntracks/+/+/waypoints"
             ),
