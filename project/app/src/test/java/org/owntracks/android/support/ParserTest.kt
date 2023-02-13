@@ -25,8 +25,32 @@ import org.owntracks.android.preferences.types.MqttQos
 import org.owntracks.android.support.Parser.EncryptionException
 
 class ParserTest {
-    private lateinit var extendedMessageLocation: MessageLocation
-    private lateinit var messageLocation: MessageLocation
+    private val extendedMessageLocation = MessageLocation(MessageCreatedAtNow(FakeFixedClock())).apply {
+        accuracy = 10
+        altitude = 20
+        latitude = 50.1
+        longitude = 60.2
+        timestamp = 123456789
+        velocity = 5.6.toInt()
+        verticalAccuracy = 1.7.toInt()
+        inregions = listOf("Testregion1", "Testregion2")
+        battery = 30
+        batteryStatus = BatteryStatus.CHARGING
+        bssid = "12:34:56:78"
+        conn = "TestConn"
+        monitoringMode = MonitoringMode.SIGNIFICANT
+        ssid = "Wifi SSID"
+    }
+    private val messageLocation = MessageLocation(MessageCreatedAtNow(FakeFixedClock())).apply {
+        accuracy = 10
+        altitude = 20
+        latitude = 50.1
+        longitude = 60.2
+        timestamp = 123456789
+        velocity = 5.6.toInt()
+        verticalAccuracy = 1.7.toInt()
+        inregions = listOf("Testregion1", "Testregion2")
+    }
 
     @Mock
     private lateinit var testPreferences: Preferences
@@ -40,28 +64,6 @@ class ParserTest {
 
     @Before
     fun setupMessageLocation() {
-        val regions: MutableList<String> = LinkedList()
-        regions.add("Testregion1")
-        regions.add("Testregion2")
-        messageLocation = MessageLocation(MessageCreatedAtNow(FakeFixedClock())).apply {
-            accuracy = 10
-            altitude = 20
-            latitude = 50.1
-            longitude = 60.2
-            timestamp = 123456789
-            velocity = 5.6.toInt()
-            verticalAccuracy = 1.7.toInt()
-            inregions = regions
-        }
-
-        extendedMessageLocation = messageLocation.apply {
-            battery = 30
-            batteryStatus = BatteryStatus.CHARGING
-            bssid = "12:34:56:78"
-            conn = "TestConn"
-            monitoringMode = MonitoringMode.SIGNIFICANT
-            ssid = "Wifi SSID"
-        }
     }
 
     @Before
@@ -102,6 +104,7 @@ class ParserTest {
         assertEquals(expected, parser.toUnencryptedJsonPretty(extendedMessageLocation))
     }
 
+    @Test
     fun `Parser can serialize non-extended location message to a pretty JSON message`() {
         val parser = Parser(null)
 
@@ -111,8 +114,7 @@ class ParserTest {
               "_type" : "location",
               "acc" : 10,
               "alt" : 20,
-              "batt" : 30,
-              "bs" : 2,
+              "batt" : 0,
               "created_at" : 25,
               "inregions" : [ "Testregion1", "Testregion2" ],
               "lat" : 50.1,
