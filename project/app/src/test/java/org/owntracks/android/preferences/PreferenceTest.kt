@@ -1,10 +1,7 @@
 package org.owntracks.android.preferences
 
 import android.content.Context
-import android.content.res.Resources
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.doReturn
@@ -12,7 +9,6 @@ import org.mockito.kotlin.mock
 import org.owntracks.android.model.messages.MessageConfiguration
 
 class PreferenceTest {
-    private lateinit var mockResources: Resources
     private lateinit var mockContext: Context
     private lateinit var preferencesStore: PreferencesStore
 

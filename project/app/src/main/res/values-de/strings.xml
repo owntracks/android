@@ -50,8 +50,6 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="deviceLocationDisabledDialogPositiveButtonLabel">"Standorteinstellungen"</string>
     <string name="deviceLocationDisabledDialogTitle">"Positionsmeldungen nicht aktiviert"</string>
     <string name="DISCONNECTED">"Getrennt"</string>
-    <string name="DISCONNECTED_USERDISCONNECT">"Getrennt"</string>
-    <string name="DISCONNECTING">"Trennen"</string>
     <string name="divider">"Teiler"</string>
     <string name="done_heading">"Fertig"</string>
 
@@ -209,7 +207,6 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="statusBatteryDozeWhiteListEnabled">"Ja"</string>
     <string name="title_activity_about">"Über"</string>
     <string name="title_activity_contacts">"Freunde"</string>
-    <string name="title_activity_load">"Konfigurations import"</string>
     <string name="title_activity_map">"Karte"</string>
     <string name="title_activity_preferences">"Einstellungen"</string>
     <string name="title_activity_waypoint">"Ort"</string>

@@ -20,6 +20,7 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import com.adevinta.android.barista.interaction.PermissionGranter
+import java.time.Instant
 import kotlinx.coroutines.DelicateCoroutinesApi
 import mqtt.packets.Qos
 import mqtt.packets.mqtt.MQTTPublish
@@ -41,7 +42,6 @@ import org.owntracks.android.support.Parser
 import org.owntracks.android.testutils.*
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.map.MapActivity
-import java.time.Instant
 
 @ExperimentalUnsignedTypes
 @LargeTest

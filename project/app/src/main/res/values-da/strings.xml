@@ -50,8 +50,6 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="deviceLocationDisabledDialogPositiveButtonLabel">"Positionsindstillinger"</string>
     <string name="deviceLocationDisabledDialogTitle">"Enhedsposition slået fra"</string>
     <string name="DISCONNECTED">"Afbryder"</string>
-    <string name="DISCONNECTED_USERDISCONNECT">"Afbryder"</string>
-    <string name="DISCONNECTING">"Afbryder"</string>
     <string name="divider">"Opdeler"</string>
     <string name="done_heading">"Færdig"</string>
     <string name="enjoy_description">"Vælg præferencer fra menuen (eller brug linket herunder) og forbind OwnTracks til din server før du bruger det"</string>
@@ -231,7 +229,6 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="statusBatteryDozeWhiteListEnabled">"Ja"</string>
     <string name="title_activity_about">"Om"</string>
     <string name="title_activity_contacts">"Venner"</string>
-    <string name="title_activity_load">"Import"</string>
     <string name="title_activity_map">"Kort"</string>
     <string name="title_activity_preferences">"Præferencer"</string>
     <string name="title_activity_waypoint">"Region"</string>

@@ -32,8 +32,6 @@
     <string name="currentLocationButtonLabel">"当前位置"</string>
     <string name="description">"描述"</string>
     <string name="DISCONNECTED">"已断开"</string>
-    <string name="DISCONNECTED_USERDISCONNECT">"已断开"</string>
-    <string name="DISCONNECTING">"正在断开"</string>
     <string name="done_heading">"完成"</string>
 
     <!-- Fuzzy -->
@@ -137,7 +135,6 @@
     <string name="status_last_background_update_hint">"后台服务最后一次定位时间"</string>
     <string name="title_activity_about">"关于"</string>
     <string name="title_activity_contacts">"好友"</string>
-    <string name="title_activity_load">"导入"</string>
     <string name="title_activity_map">"地图"</string>
     <string name="title_activity_preferences">"首选项"</string>
     <string name="title_activity_waypoint">"区域"</string>

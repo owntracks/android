@@ -62,8 +62,6 @@
     <string name="deviceLocationDisabledDialogPositiveButtonLabel">"Настройки"</string>
     <string name="deviceLocationDisabledDialogTitle">"Определение местоположения отключено"</string>
     <string name="DISCONNECTED">"Отключен"</string>
-    <string name="DISCONNECTED_USERDISCONNECT">"Отключен"</string>
-    <string name="DISCONNECTING">"Отключение"</string>
     <string name="divider">"Разделитель"</string>
     <string name="done_heading">"Готово"</string>
 
@@ -247,7 +245,6 @@
     <string name="statusBatteryDozeWhiteListEnabled">"Да"</string>
     <string name="title_activity_about">"Информация"</string>
     <string name="title_activity_contacts">"Друзья"</string>
-    <string name="title_activity_load">"Импорт"</string>
     <string name="title_activity_map">"Карта"</string>
     <string name="title_activity_preferences">"Настройки"</string>
     <string name="title_activity_waypoint">"Место"</string>

@@ -48,8 +48,6 @@
     <string name="deviceLocationDisabledDialogPositiveButtonLabel">"Paramètres de localisation"</string>
     <string name="deviceLocationDisabledDialogTitle">"Localisation désactivée"</string>
     <string name="DISCONNECTED">"Déconnecté"</string>
-    <string name="DISCONNECTED_USERDISCONNECT">"Déconnecté"</string>
-    <string name="DISCONNECTING">"Déconnexion"</string>
     <string name="divider">"Diviseur"</string>
     <string name="done_heading">"Terminé"</string>
     <string name="enjoy_description">"Sélectionnez les préférences dans le menu et configurez OwnTracks pour votre serveur avant de l'utiliser"</string>
@@ -225,8 +223,6 @@
     <!-- Fuzzy -->
     <string name="title_activity_about">"A propos"</string>
     <string name="title_activity_contacts">"Amis"</string>
-    <string name="title_activity_load">"I
-Importer"</string>
     <string name="title_activity_map">"Carte"</string>
     <string name="title_activity_preferences">"Préférences"</string>
     <string name="title_activity_waypoint">"Région"</string>

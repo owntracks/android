@@ -52,8 +52,6 @@ Aby to umożliwić, włącz lokalizację w ustawieniach urządzenia."</string>
     <string name="deviceLocationDisabledDialogPositiveButtonLabel">"Ustawienia lokalizacji"</string>
     <string name="deviceLocationDisabledDialogTitle">"Lokalizacja urządzenia wyłączona"</string>
     <string name="DISCONNECTED">"Rozłączony"</string>
-    <string name="DISCONNECTED_USERDISCONNECT">"Rozłączony"</string>
-    <string name="DISCONNECTING">"Rozłączanie"</string>
     <string name="divider">"Separator"</string>
     <string name="done_heading">"Gotowe"</string>
 
@@ -237,7 +235,6 @@ Aby to umożliwić, włącz lokalizację w ustawieniach urządzenia."</string>
     <string name="statusBatteryDozeWhiteListEnabled">"Tak"</string>
     <string name="title_activity_about">"O aplikacji"</string>
     <string name="title_activity_contacts">"Znajomi"</string>
-    <string name="title_activity_load">"Import"</string>
     <string name="title_activity_map">"Mapa"</string>
     <string name="title_activity_preferences">"Ustawienia"</string>
     <string name="title_activity_waypoint">"Obszar"</string>

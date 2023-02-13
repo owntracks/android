@@ -6,7 +6,6 @@
     <color name="log_info_tag_color">#00aa00</color>
     <color name="log_warning_tag_color">#aaaa00</color>
     <!-- https://paletton.com/#uid=53D0n0kmN-+hrHfkdDlptylsRwF -->
-    <color name="textPrimary">#de000000</color>
 
     <color name="OTPrimaryBlue">#3f72b5</color>
     <color name="OTDarkerBlue">#305e9f</color>

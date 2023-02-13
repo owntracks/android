@@ -51,8 +51,6 @@ Chcete-li to umožnit, zapněte polohu v nastavení zařízení."</string>
     <string name="deviceLocationDisabledDialogPositiveButtonLabel">"Nastavení polohy"</string>
     <string name="deviceLocationDisabledDialogTitle">"Poloha zařízení zakázána"</string>
     <string name="DISCONNECTED">"Odpojeno"</string>
-    <string name="DISCONNECTED_USERDISCONNECT">"Odpojeno"</string>
-    <string name="DISCONNECTING">"Odpojování"</string>
     <string name="divider">"Oddělovač"</string>
     <string name="done_heading">"Hotovo"</string>
     <string name="enjoy_description">"Zvolte nabídku Nastavení a nakonfigurujte Owntracks před tím, než jej začnete používat"</string>
@@ -233,7 +231,6 @@ Chcete-li to umožnit, zapněte polohu v nastavení zařízení."</string>
     <string name="statusBatteryDozeWhiteListEnabled">"Ano"</string>
     <string name="title_activity_about">"O aplikaci"</string>
     <string name="title_activity_contacts">"Přátelé"</string>
-    <string name="title_activity_load">"Import"</string>
     <string name="title_activity_map">"Mapa"</string>
     <string name="title_activity_preferences">"Nastavení"</string>
     <string name="title_activity_waypoint">"Oblast"</string>

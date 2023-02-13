@@ -23,8 +23,6 @@
     <string name="currentLocationButtonLabel">"Localização atual"</string>
     <string name="description">"Descrição"</string>
     <string name="DISCONNECTED">"Desconectado"</string>
-    <string name="DISCONNECTED_USERDISCONNECT">"Desconectado"</string>
-    <string name="DISCONNECTING">"Desconectando"</string>
     <string name="done_heading">"Feito"</string>
     <string name="ERROR">"Erro"</string>
     <string name="errorPreferencesImportFailed">"Importação falhada"</string>
@@ -97,7 +95,6 @@
     <string name="seconds">"Segundos"</string>
     <string name="title_activity_about">"Acerca de"</string>
     <string name="title_activity_contacts">"Amigos"</string>
-    <string name="title_activity_load">"Importar"</string>
     <string name="title_activity_map">"Mapa"</string>
     <string name="title_activity_preferences">"Preferências"</string>
     <string name="title_activity_waypoint">"Região"</string>

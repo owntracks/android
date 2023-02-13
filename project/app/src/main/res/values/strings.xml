@@ -52,8 +52,6 @@ To allow this, please enable Location in the device settings."</string>
     <string name="deviceLocationDisabledDialogPositiveButtonLabel">"Location Settings"</string>
     <string name="deviceLocationDisabledDialogTitle">"Device location disabled"</string>
     <string name="DISCONNECTED">"Disconnected"</string>
-    <string name="DISCONNECTED_USERDISCONNECT">"Disconnected"</string>
-    <string name="DISCONNECTING">"Disconnecting"</string>
     <string name="divider">"Divider"</string>
     <string name="done_heading">"Done"</string>
     <string name="enjoy_description">"Select preferences from the menu (or use the link below) and configure OwnTracks for your server before using it"</string>
@@ -246,7 +244,6 @@ To allow this, please enable Location in the device settings."</string>
     <string name="statusBatteryDozeWhiteListEnabled">"Yes"</string>
     <string name="title_activity_about">"About"</string>
     <string name="title_activity_contacts">"Friends"</string>
-    <string name="title_activity_load">"Import"</string>
     <string name="title_activity_map">"Map"</string>
     <string name="title_activity_preferences">"Preferences"</string>
     <string name="title_activity_waypoint">"Waypoint"</string>

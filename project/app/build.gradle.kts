@@ -164,6 +164,7 @@ android {
 }
 
 kapt {
+    useBuildCache = true
     correctErrorTypes = true
     arguments {
         arg("eventBusIndex", "org.owntracks.android.EventBusIndex")

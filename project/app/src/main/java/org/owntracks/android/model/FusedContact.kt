@@ -17,10 +17,6 @@ class FusedContact(id: String?) : BaseObservable() {
     internal var messageCard: MessageCard? = null
 
     @get:Bindable
-    @set:Bindable
-    var imageProvider = 0
-
-    @get:Bindable
     var tst: Long = 0
         private set
 

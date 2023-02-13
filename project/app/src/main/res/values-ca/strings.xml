@@ -50,8 +50,6 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="deviceLocationDisabledDialogPositiveButtonLabel">"Configuració d'ubicació"</string>
     <string name="deviceLocationDisabledDialogTitle">"La ubicació del dispositiu està desactivada"</string>
     <string name="DISCONNECTED">"Desconnectat"</string>
-    <string name="DISCONNECTED_USERDISCONNECT">"Desconnectat"</string>
-    <string name="DISCONNECTING">"Desconnectant"</string>
     <string name="divider">"Divisor"</string>
     <string name="done_heading">"Fet"</string>
 
@@ -233,7 +231,6 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="statusBatteryDozeWhiteListEnabled">"Si"</string>
     <string name="title_activity_about">"Sobre"</string>
     <string name="title_activity_contacts">"Amics"</string>
-    <string name="title_activity_load">"Importar"</string>
     <string name="title_activity_map">"Mapa"</string>
     <string name="title_activity_preferences">"Preferències"</string>
     <string name="title_activity_waypoint">"Regió"</string>

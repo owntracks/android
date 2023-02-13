@@ -33,8 +33,6 @@
     <string name="currentLocationButtonLabel">"Ubicación actual"</string>
     <string name="description">"Descripción"</string>
     <string name="DISCONNECTED">"Desconectado"</string>
-    <string name="DISCONNECTED_USERDISCONNECT">"Desconectado"</string>
-    <string name="DISCONNECTING">"Desconectando"</string>
     <string name="divider">"Divisor"</string>
     <string name="done_heading">"Hecho"</string>
 
@@ -174,7 +172,6 @@
     <string name="status_last_background_update_hint">"Ultima actualización en segundo plano del servicio de ubicación"</string>
     <string name="title_activity_about">"Información"</string>
     <string name="title_activity_contacts">"Amigos"</string>
-    <string name="title_activity_load">"Importar"</string>
     <string name="title_activity_map">"Mapa"</string>
     <string name="title_activity_preferences">"Preferencias"</string>
     <string name="title_activity_waypoint">"Región"</string>

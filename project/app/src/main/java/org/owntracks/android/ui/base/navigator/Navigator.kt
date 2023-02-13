@@ -13,8 +13,4 @@ class Navigator @Inject constructor(@ActivityContext private val activity: Conte
     fun startActivityForResult(intent: Intent?, requestCode: Int) {
         (activity as Activity).startActivityForResult(intent, requestCode)
     }
-
-    companion object {
-        private const val EXTRA_ARGS = "_args"
-    }
 }

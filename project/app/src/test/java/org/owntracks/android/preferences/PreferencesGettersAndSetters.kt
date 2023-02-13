@@ -2,7 +2,6 @@ package org.owntracks.android.preferences
 
 import android.content.Context
 import android.content.pm.ShortcutManager
-import android.content.res.Resources
 import kotlin.reflect.KClass
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -12,17 +11,11 @@ import org.junit.runners.Parameterized
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.owntracks.android.model.messages.MessageConfiguration
-import org.owntracks.android.preferences.types.ConnectionMode
-import org.owntracks.android.preferences.types.MonitoringMode
-import org.owntracks.android.preferences.types.MqttProtocolLevel
-import org.owntracks.android.preferences.types.MqttQos
-import org.owntracks.android.preferences.types.ReverseGeocodeProvider
-import org.owntracks.android.preferences.types.StringMaxTwoAlphaNumericChars
+import org.owntracks.android.preferences.types.*
 import org.owntracks.android.ui.map.MapLayerStyle
 
 @RunWith(Parameterized::class)
-class PreferencesGettersAndSetters(val parameter: Parameter) {
-    private lateinit var mockResources: Resources
+class PreferencesGettersAndSetters(private val parameter: Parameter) {
     private lateinit var mockContext: Context
     private lateinit var preferencesStore: PreferencesStore
     private lateinit var shortcutService: ShortcutManager

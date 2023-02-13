@@ -1,8 +1,7 @@
 package org.owntracks.android.support
 
-import org.owntracks.android.data.WaypointModel
-import org.owntracks.android.preferences.types.ConnectionMode
 import java.util.*
+import org.owntracks.android.data.WaypointModel
 
 class Events {
     abstract class E internal constructor() {
@@ -16,6 +15,4 @@ class Events {
     class WaypointAdded(m: WaypointModel) : WaypointEvent(m)
     class WaypointUpdated(m: WaypointModel) : WaypointEvent(m)
     class WaypointRemoved(m: WaypointModel) : WaypointEvent(m)
-
-    class WelcomeNextDoneButtonsEnableToggle(val nextEnabled: Boolean = true, val doneEnabled: Boolean = false) : E()
 }

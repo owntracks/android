@@ -49,8 +49,6 @@
     <string name="deviceLocationDisabledDialogPositiveButtonLabel">"位置情報設定"</string>
     <string name="deviceLocationDisabledDialogTitle">"デバイスの位置情報が無効になっています"</string>
     <string name="DISCONNECTED">"切断済み"</string>
-    <string name="DISCONNECTED_USERDISCONNECT">"切断済み"</string>
-    <string name="DISCONNECTING">"切断中"</string>
     <string name="done_heading">"完了"</string>
 
     <!-- Fuzzy -->
@@ -207,7 +205,6 @@
     <string name="statusBatteryDozeWhiteListEnabled">"はい"</string>
     <string name="title_activity_about">"アプリについて"</string>
     <string name="title_activity_contacts">"友だち"</string>
-    <string name="title_activity_load">"インポート"</string>
     <string name="title_activity_map">"マップ"</string>
     <string name="title_activity_preferences">"環境設定"</string>
     <string name="title_activity_waypoint">"リージョン"</string>

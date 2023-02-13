@@ -2,7 +2,7 @@ package org.owntracks.android.model
 
 import com.fasterxml.jackson.annotation.JsonValue
 
-enum class CommandAction(val value: String) {
+enum class CommandAction(@JsonValue val value: String) {
     /**
      * The owntracks model for command actions
      */
@@ -10,10 +10,5 @@ enum class CommandAction(val value: String) {
     SET_WAYPOINTS("setWaypoints"),
     SET_CONFIGURATION("setConfiguration"),
     RECONNECT("reconnect"),
-    WAYPOINTS("waypoints");
-
-    @JsonValue
-    fun getVal(): String {
-        return value
-    }
+    WAYPOINTS("waypoints")
 }

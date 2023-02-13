@@ -51,8 +51,6 @@
     <string name="deviceLocationDisabledDialogPositiveButtonLabel">"위치 설정"</string>
     <string name="deviceLocationDisabledDialogTitle">"기기 위치 정보가 사용 중지되었습니다"</string>
     <string name="DISCONNECTED">"연결 해제됨"</string>
-    <string name="DISCONNECTED_USERDISCONNECT">"연결 해제됨"</string>
-    <string name="DISCONNECTING">"연결 해제 중"</string>
     <string name="done_heading">"완료"</string>
     <string name="enjoy_description">"메뉴에서 기본 설정을 선택하고(또는 아래 링크 사용) 사용하기 전에 서버에 대해 OwnTracks를 구성하십시오"</string>
     <string name="ERROR">"오류"</string>
@@ -225,7 +223,6 @@
     <string name="statusBatteryDozeWhiteListEnabled">"예"</string>
     <string name="title_activity_about">"앱 정보"</string>
     <string name="title_activity_contacts">"친구"</string>
-    <string name="title_activity_load">"가져오기"</string>
     <string name="title_activity_map">"지도"</string>
     <string name="title_activity_preferences">"환경 설정"</string>
     <string name="title_activity_waypoint">"지역"</string>
