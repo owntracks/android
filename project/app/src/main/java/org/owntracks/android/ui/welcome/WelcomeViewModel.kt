@@ -4,12 +4,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import org.owntracks.android.preferences.Preferences
 import javax.inject.Inject
+import org.owntracks.android.preferences.Preferences
 
 @HiltViewModel
 class WelcomeViewModel @Inject constructor(
-    private val preferences: Preferences,
+    private val preferences: Preferences
 ) : ViewModel() {
     private val mutableCurrentFragmentPosition: MutableLiveData<Int> = MutableLiveData(0)
     val currentFragmentPosition: LiveData<Int> = mutableCurrentFragmentPosition

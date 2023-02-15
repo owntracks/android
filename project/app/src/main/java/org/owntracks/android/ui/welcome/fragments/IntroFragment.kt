@@ -1,28 +1,24 @@
-package org.owntracks.android.ui.welcome
+package org.owntracks.android.ui.welcome.fragments
 
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.activityViewModels
 import dagger.hilt.android.AndroidEntryPoint
-import org.owntracks.android.databinding.UiWelcomeIntroBinding
 import javax.inject.Inject
+import org.owntracks.android.databinding.UiWelcomeIntroBinding
 
 @AndroidEntryPoint
 class IntroFragment @Inject constructor() : WelcomeFragment() {
-    private val viewModel: WelcomeViewModel by activityViewModels()
-    private lateinit var binding: UiWelcomeIntroBinding
     override fun shouldBeDisplayed(context: Context) = true
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?,
+        savedInstanceState: Bundle?
     ): View {
-        binding = UiWelcomeIntroBinding.inflate(inflater, container, false)
-        return binding.root
+        return UiWelcomeIntroBinding.inflate(inflater, container, false).root
     }
 
     override fun onResume() {

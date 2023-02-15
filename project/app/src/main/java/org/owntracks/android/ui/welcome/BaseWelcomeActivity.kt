@@ -15,10 +15,12 @@ import org.owntracks.android.R
 import org.owntracks.android.databinding.UiWelcomeBinding
 import org.owntracks.android.support.RequirementsChecker
 import org.owntracks.android.ui.map.MapActivity
+import org.owntracks.android.ui.welcome.fragments.*
 
 abstract class BaseWelcomeActivity : AppCompatActivity() {
     private val viewModel: WelcomeViewModel by viewModels()
     private lateinit var binding: UiWelcomeBinding
+    abstract val fragmentList: List<WelcomeFragment>
 
     @Inject
     lateinit var requirementsChecker: RequirementsChecker
@@ -30,7 +32,10 @@ abstract class BaseWelcomeActivity : AppCompatActivity() {
     lateinit var connectionSetupFragment: ConnectionSetupFragment
 
     @Inject
-    lateinit var versionFragment: VersionFragment
+    lateinit var notificationPermissionFragment: NotificationPermissionFragment
+
+    @Inject
+    lateinit var osRestrictionsFragment: OSRestrictionsFragment
 
     @Inject
     lateinit var finishFragment: FinishFragment
@@ -87,7 +92,9 @@ abstract class BaseWelcomeActivity : AppCompatActivity() {
         }
     }
 
-    abstract fun addFragmentsToAdapter(welcomeAdapter: WelcomeAdapter)
+    private fun addFragmentsToAdapter(welcomeAdapter: WelcomeAdapter) {
+        welcomeAdapter.setupFragments(fragmentList)
+    }
 
     private fun setPagerIndicator(position: Int) {
         val itemCount = (binding.viewPager.adapter?.itemCount ?: 0) // TODO Can we globalize

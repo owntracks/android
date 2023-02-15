@@ -1,23 +1,21 @@
-package org.owntracks.android.ui.welcome
+package org.owntracks.android.ui.welcome.fragments
 
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiWelcomePlayBinding
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class PlayFragment @Inject constructor() : WelcomeFragment() {
-    private val viewModel: WelcomeViewModel by activityViewModels()
     private val playFragmentViewModel: PlayFragmentViewModel by viewModels()
     private lateinit var binding: UiWelcomePlayBinding
     private val googleAPI = GoogleApiAvailability.getInstance()
@@ -27,14 +25,16 @@ class PlayFragment @Inject constructor() : WelcomeFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
+        savedInstanceState: Bundle?
+    ): View {
         binding = UiWelcomePlayBinding.inflate(inflater, container, false)
-        binding.vm = playFragmentViewModel
-        binding.lifecycleOwner = this.viewLifecycleOwner
-        binding.recover.setOnClickListener {
-            requestFix()
-        }
+            .apply {
+                vm = playFragmentViewModel
+                lifecycleOwner = this@PlayFragment.viewLifecycleOwner
+                recover.setOnClickListener {
+                    requestFix()
+                }
+            }
         return binding.root
     }
 
@@ -42,7 +42,7 @@ class PlayFragment @Inject constructor() : WelcomeFragment() {
         checkGooglePlayservicesIsAvailable()
     }
 
-    fun requestFix() {
+    private fun requestFix() {
         val result = googleAPI.isGooglePlayServicesAvailable(requireContext())
 
         if (!googleAPI.showErrorDialogFragment(
@@ -55,7 +55,8 @@ class PlayFragment @Inject constructor() : WelcomeFragment() {
                 binding.root,
                 getString(R.string.play_services_not_available),
                 Snackbar.LENGTH_SHORT
-            ).show()
+            )
+                .show()
         }
         checkGooglePlayservicesIsAvailable()
     }
@@ -93,7 +94,6 @@ class PlayFragment @Inject constructor() : WelcomeFragment() {
 
     override fun onResume() {
         super.onResume()
-
         checkGooglePlayservicesIsAvailable()
     }
 

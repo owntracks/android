@@ -273,6 +273,9 @@ For more details, take a look at the OwnTracks Booklet."</string>
     <string name="welcome_description">"The following steps will help you to get started with OwnTracks"</string>
     <string name="welcome_finish_open_preferences_button_label">"Open Preferences"</string>
     <string name="welcome_heading">"Welcome"</string>
+    <string name="welcome_notification_permission_title">Placeholder</string>
+    <string name="welcome_notification_permission_description">placeholder</string>
+    <string name="welcome_notification_permission_request">Request</string>
     <string name="welcome_play_description">"OwnTracks requires Google Play Services"</string>
     <string name="welcome_play_heading">"Google Play Services"</string>
     <string name="welcome_version_description">"Due to OS limitations, some features might work in a restricted manner.

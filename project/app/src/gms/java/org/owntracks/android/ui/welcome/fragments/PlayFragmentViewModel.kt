@@ -1,4 +1,4 @@
-package org.owntracks.android.ui.welcome
+package org.owntracks.android.ui.welcome.fragments
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -21,6 +21,6 @@ class PlayFragmentViewModel @Inject constructor() : ViewModel() {
     private val mutableMessage = MutableLiveData<String>()
     val message: LiveData<String> = mutableMessage
 
-    private val mutablePlayServicesFixAvailable = MutableLiveData<Boolean>(false)
+    private val mutablePlayServicesFixAvailable = MutableLiveData(false)
     val playServicesFixAvailable: LiveData<Boolean> = mutablePlayServicesFixAvailable
 }

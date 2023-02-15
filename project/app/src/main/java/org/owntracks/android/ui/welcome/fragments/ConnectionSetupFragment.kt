@@ -1,4 +1,4 @@
-package org.owntracks.android.ui.welcome
+package org.owntracks.android.ui.welcome.fragments
 
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -9,43 +9,42 @@ import android.text.method.ScrollingMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.activityViewModels
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import org.owntracks.android.R
-import org.owntracks.android.databinding.UiWelcomeVersionBinding
 import javax.inject.Inject
+import org.owntracks.android.R
+import org.owntracks.android.databinding.UiWelcomeConnectionSetupBinding
 
 @AndroidEntryPoint
-class VersionFragment @Inject constructor() : WelcomeFragment() {
-    private val viewModel: WelcomeViewModel by activityViewModels()
-    private lateinit var binding: UiWelcomeVersionBinding
+class ConnectionSetupFragment @Inject constructor() : WelcomeFragment() {
     override fun shouldBeDisplayed(context: Context): Boolean = true
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?,
+        savedInstanceState: Bundle?
     ): View {
-        binding = UiWelcomeVersionBinding.inflate(inflater, container, false)
+        return UiWelcomeConnectionSetupBinding.inflate(inflater, container, false)
             .apply {
-                uiFragmentWelcomeVersionButtonLearnMore.setOnClickListener {
+                welcomeConnectionSetupLearnMoreButton.setOnClickListener {
                     try {
                         startActivity(
                             Intent(
-                                Intent.ACTION_VIEW, Uri.parse(getString(R.string.documentationUrlAndroid))
+                                Intent.ACTION_VIEW,
+                                Uri.parse(getString(R.string.documentationUrl))
                             )
                         )
                     } catch (e: ActivityNotFoundException) {
                         Snackbar.make(
-                            root, getString(R.string.noBrowserInstalled), Snackbar.LENGTH_SHORT
+                            root,
+                            getString(R.string.noBrowserInstalled),
+                            Snackbar.LENGTH_SHORT
                         )
                             .show()
                     }
                 }
                 screenDesc.movementMethod = ScrollingMovementMethod()
-            }
-        return binding.root
+            }.root
     }
 
     override fun onResume() {

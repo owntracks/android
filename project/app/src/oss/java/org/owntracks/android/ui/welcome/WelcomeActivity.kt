@@ -4,14 +4,14 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class WelcomeActivity : BaseWelcomeActivity() {
-    override fun addFragmentsToAdapter(welcomeAdapter: WelcomeAdapter) {
-        welcomeAdapter.setupFragments(
-            listOf(
-                introFragment,
-                connectionSetupFragment,
-                versionFragment,
-                finishFragment
-            )
+
+    override val fragmentList by lazy {
+        listOf(
+            introFragment,
+            connectionSetupFragment,
+            notificationPermissionFragment,
+            osRestrictionsFragment,
+            finishFragment
         )
     }
 }

@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <data>
-
-        <import type="org.owntracks.android.App" />
-    </data>
-
     <RelativeLayout
         android:id="@+id/welcome_fragment"
         android:layout_width="match_parent"
@@ -21,9 +16,9 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="?attr/welcomeIconMargin"
             android:layout_marginBottom="?attr/welcomeIconMargin"
-            android:contentDescription="@string/welcome_version_title"
+            android:contentDescription="@string/welcome_notification_permission_title"
             android:scaleType="centerInside"
-            android:src="@drawable/ic_baseline_android_48" />
+            android:src="@drawable/ic_baseline_notifications_48" />
 
         <TextView
             android:id="@+id/screen_heading"
@@ -34,14 +29,14 @@
             android:gravity="bottom|center_horizontal"
             android:paddingLeft="24dp"
             android:paddingRight="24dp"
-            android:text="@string/welcome_version_title"
+            android:text="@string/welcome_notification_permission_title"
             android:textSize="24sp" />
 
         <TextView
             android:id="@+id/screen_desc"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@id/ui_fragment_welcome_version_button_learn_more"
+            android:layout_above="@id/ui_fragment_welcome_notification_permissions_request"
             android:layout_below="@+id/screen_heading"
             android:layout_alignStart="@+id/screen_heading"
             android:layout_marginBottom="8dp"
@@ -51,16 +46,16 @@
             android:paddingLeft="24dp"
             android:paddingRight="24dp"
             android:scrollbars="vertical"
-            android:text="@string/welcome_version_description"
+            android:text="@string/welcome_notification_permission_description"
             android:textSize="16sp" />
 
         <Button
-            android:id="@+id/ui_fragment_welcome_version_button_learn_more"
+            android:id="@+id/ui_fragment_welcome_notification_permissions_request"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:text="@string/welcome_version_learn_more" />
+            android:text="@string/welcome_notification_permission_request" />
 
     </RelativeLayout>
 </layout>
