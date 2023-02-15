@@ -4,11 +4,12 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.LocationManager
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.location.LocationManagerCompat
 import dagger.hilt.android.scopes.ActivityScoped
-import org.owntracks.android.preferences.Preferences
 import javax.inject.Inject
+import org.owntracks.android.preferences.Preferences
 
 @ActivityScoped
 open class OSSRequirementsChecker @Inject constructor(
@@ -16,7 +17,7 @@ open class OSSRequirementsChecker @Inject constructor(
     open val context: Context
 ) : RequirementsChecker {
     override fun areRequirementsMet(): Boolean {
-        return isLocationPermissionCheckPassed() && preferences.setupCompleted
+        return isLocationPermissionCheckPassed() && isNotificationsEnabled() && preferences.setupCompleted
     }
 
     override fun isLocationPermissionCheckPassed(): Boolean = ContextCompat.checkSelfPermission(
@@ -33,4 +34,6 @@ open class OSSRequirementsChecker @Inject constructor(
         } ?: false
 
     override fun isPlayServicesCheckPassed(): Boolean = true
+    override fun isNotificationsEnabled(): Boolean = NotificationManagerCompat.from(context)
+        .areNotificationsEnabled()
 }

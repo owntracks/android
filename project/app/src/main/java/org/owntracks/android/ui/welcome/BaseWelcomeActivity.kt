@@ -56,12 +56,12 @@ abstract class BaseWelcomeActivity : AppCompatActivity() {
                         addFragmentsToAdapter(this)
                     }
                     viewPager.registerOnPageChangeCallback(object :
-                            ViewPager2.OnPageChangeCallback() {
-                            override fun onPageSelected(position: Int) {
-                                viewModel.moveToPage(position)
-                                super.onPageSelected(position)
-                            }
-                        })
+                        ViewPager2.OnPageChangeCallback() {
+                        override fun onPageSelected(position: Int) {
+                            viewModel.moveToPage(position)
+                            super.onPageSelected(position)
+                        }
+                    })
                     btnNext.setOnClickListener { viewModel.nextPage() }
                     btnDone.setOnClickListener {
                         startActivity(
