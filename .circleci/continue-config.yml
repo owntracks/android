@@ -289,7 +289,7 @@ jobs:
             else
               gradletask="create${FLAVOR^}DebugCoverageReport"
             fi
-            echo "export GRADLE_TEST_COMMAND=\"./gradlew $gradletask --scan --no-daemon --max-workers 2\"" >> $BASH_ENV
+            echo "export GRADLE_TEST_COMMAND=\"./gradlew $gradletask --scan --info --stacktrace --no-daemon --max-workers 2\"" >> $BASH_ENV
             source $BASH_ENV
             echo "Gradle test command: $GRADLE_TEST_COMMAND"
 
