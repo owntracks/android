@@ -49,6 +49,20 @@
             android:text="@string/welcome_notification_permission_description"
             android:textSize="16sp" />
 
+        <TextView
+            android:id="@+id/ui_fragment_welcome_notification_permissions_message"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/screen_desc"
+            android:layout_alignStart="@+id/screen_desc"
+            android:gravity="center_horizontal"
+            android:lineSpacingMultiplier="1.2"
+            android:paddingLeft="24dp"
+            android:paddingRight="24dp"
+            android:text="@string/welcome_notification_permission_granted"
+            android:textSize="16sp"
+            android:visibility="invisible" />
+
         <Button
             android:id="@+id/ui_fragment_welcome_notification_permissions_request"
             android:layout_width="wrap_content"

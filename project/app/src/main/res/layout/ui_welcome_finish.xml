@@ -24,7 +24,7 @@
             android:layout_marginBottom="?attr/welcomeIconMargin"
             android:contentDescription="@string/icon_description_done"
             android:scaleType="fitXY"
-            android:src="@drawable/ic_baseline_done_all_24" />
+            android:src="@drawable/ic_baseline_done_all_48" />
 
         <TextView
             android:id="@+id/screen_heading"

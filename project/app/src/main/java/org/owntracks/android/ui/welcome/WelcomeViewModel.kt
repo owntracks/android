@@ -33,19 +33,26 @@ class WelcomeViewModel @Inject constructor(
         moveToPage((currentFragmentPosition.value?.minus(1)) ?: 0)
     }
 
-    fun setWelcomeCanProceed() {
-        mutableNextEnabled.postValue(true)
-        mutableDoneEnabled.postValue(false)
+    fun setWelcomeState(progressState: ProgressState) {
+        when (progressState) {
+            ProgressState.PERMITTED -> {
+                mutableNextEnabled.postValue(true)
+                mutableDoneEnabled.postValue(false)
+            }
+            ProgressState.NOT_PERMITTED -> {
+                mutableNextEnabled.postValue(false)
+                mutableDoneEnabled.postValue(false)
+            }
+            ProgressState.FINISHED -> {
+                mutableNextEnabled.postValue(false)
+                mutableDoneEnabled.postValue(true)
+            }
+        }
     }
 
-    fun setWelcomeCannotProceed() {
-        mutableNextEnabled.postValue(true)
-        mutableDoneEnabled.postValue(false)
-    }
-
-    fun setWelcomeIsAtEnd() {
-        preferences.setupCompleted = true
-        mutableNextEnabled.postValue(false)
-        mutableDoneEnabled.postValue(true)
+    enum class ProgressState {
+        PERMITTED,
+        NOT_PERMITTED,
+        FINISHED
     }
 }

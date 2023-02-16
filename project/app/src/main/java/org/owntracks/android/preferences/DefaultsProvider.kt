@@ -80,6 +80,7 @@ interface DefaultsProvider {
             Preferences::url -> ""
             Preferences::userDeclinedEnableLocationPermissions -> false
             Preferences::userDeclinedEnableLocationServices -> false
+            Preferences::userDeclinedEnableNotificationPermissions -> false
             Preferences::username -> ""
             Preferences::ws -> false
             else -> {

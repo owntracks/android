@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import org.owntracks.android.databinding.UiWelcomeIntroBinding
+import org.owntracks.android.ui.welcome.WelcomeViewModel
 
 @AndroidEntryPoint
 class IntroFragment @Inject constructor() : WelcomeFragment() {
@@ -23,6 +24,6 @@ class IntroFragment @Inject constructor() : WelcomeFragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.setWelcomeCanProceed()
+        viewModel.setWelcomeState(WelcomeViewModel.ProgressState.PERMITTED)
     }
 }

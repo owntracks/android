@@ -10,6 +10,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import org.owntracks.android.databinding.UiWelcomeFinishBinding
 import org.owntracks.android.ui.preferences.PreferencesActivity
+import org.owntracks.android.ui.welcome.WelcomeViewModel
 
 @AndroidEntryPoint
 class FinishFragment @Inject constructor() : WelcomeFragment() {
@@ -23,7 +24,7 @@ class FinishFragment @Inject constructor() : WelcomeFragment() {
         return UiWelcomeFinishBinding.inflate(inflater, container, false)
             .apply {
                 uiFragmentWelcomeFinishOpenPreferences.setOnClickListener {
-                    viewModel.setWelcomeIsAtEnd()
+                    viewModel.setWelcomeState(WelcomeViewModel.ProgressState.FINISHED)
                     startActivity(
                         Intent(requireContext(), PreferencesActivity::class.java).apply {
                             flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -35,6 +36,6 @@ class FinishFragment @Inject constructor() : WelcomeFragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.setWelcomeIsAtEnd()
+        viewModel.setWelcomeState(WelcomeViewModel.ProgressState.FINISHED)
     }
 }

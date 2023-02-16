@@ -324,6 +324,9 @@ class Preferences @Inject constructor(private val preferencesStore: PreferencesS
     @Preference(exportModeMqtt = false, exportModeHttp = false)
     var userDeclinedEnableLocationServices: Boolean by preferencesStore
 
+    @Preference(exportModeMqtt = false, exportModeHttp = false)
+    var userDeclinedEnableNotificationPermissions: Boolean by preferencesStore
+
     @Preference
     var username: String by preferencesStore
 

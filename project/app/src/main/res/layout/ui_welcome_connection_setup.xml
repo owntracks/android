@@ -21,7 +21,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="?attr/welcomeIconMargin"
             android:layout_marginBottom="?attr/welcomeIconMargin"
-            android:contentDescription="@string/welcome_version_title"
+            android:contentDescription="@string/welcome_connection_setup_title"
             android:scaleType="centerInside"
             android:src="@drawable/ic_baseline_miscellaneous_services_24" />
 

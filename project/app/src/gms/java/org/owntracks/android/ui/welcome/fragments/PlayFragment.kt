@@ -13,6 +13,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiWelcomePlayBinding
+import org.owntracks.android.ui.welcome.WelcomeViewModel
 
 @AndroidEntryPoint
 class PlayFragment @Inject constructor() : WelcomeFragment() {
@@ -66,14 +67,14 @@ class PlayFragment @Inject constructor() : WelcomeFragment() {
             when (val result = googleAPI.isGooglePlayServicesAvailable(requireContext())) {
                 ConnectionResult.SUCCESS -> {
                     playFragmentViewModel.setPlayServicesAvailable(getString(R.string.play_services_now_available))
-                    true
+                    WelcomeViewModel.ProgressState.PERMITTED
                 }
                 ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED, ConnectionResult.SERVICE_UPDATING -> {
                     playFragmentViewModel.setPlayServicesNotAvailable(
                         true,
                         getString(R.string.play_services_update_required)
                     )
-                    false
+                    WelcomeViewModel.ProgressState.NOT_PERMITTED
                 }
                 else -> {
                     playFragmentViewModel.setPlayServicesNotAvailable(
@@ -82,14 +83,10 @@ class PlayFragment @Inject constructor() : WelcomeFragment() {
                         ),
                         getString(R.string.play_services_not_available)
                     )
-                    false
+                    WelcomeViewModel.ProgressState.NOT_PERMITTED
                 }
             }
-        if (nextEnabled) {
-            viewModel.setWelcomeCanProceed()
-        } else {
-            viewModel.setWelcomeCannotProceed()
-        }
+        viewModel.setWelcomeState(nextEnabled)
     }
 
     override fun onResume() {

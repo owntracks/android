@@ -14,6 +14,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiWelcomeConnectionSetupBinding
+import org.owntracks.android.ui.welcome.WelcomeViewModel
 
 @AndroidEntryPoint
 class ConnectionSetupFragment @Inject constructor() : WelcomeFragment() {
@@ -49,6 +50,6 @@ class ConnectionSetupFragment @Inject constructor() : WelcomeFragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.setWelcomeCanProceed()
+        viewModel.setWelcomeState(WelcomeViewModel.ProgressState.PERMITTED)
     }
 }

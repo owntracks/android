@@ -273,9 +273,12 @@ For more details, take a look at the OwnTracks Booklet."</string>
     <string name="welcome_description">"The following steps will help you to get started with OwnTracks"</string>
     <string name="welcome_finish_open_preferences_button_label">"Open Preferences"</string>
     <string name="welcome_heading">"Welcome"</string>
-    <string name="welcome_notification_permission_title">Placeholder</string>
-    <string name="welcome_notification_permission_description">placeholder</string>
-    <string name="welcome_notification_permission_request">Request</string>
+    <string name="welcome_notification_permission_title">"Notification permissions"</string>
+    <string name="welcome_notification_permission_description">"To function fully, OwnTracks needs your permission in order to display some notifications.
+
+A permanent notification will be displayed in order to keep the location tracking and connection alive, and you can also choose to enable notifications for contacts transitioning between waypoints."</string>
+    <string name="welcome_notification_permission_granted">"Notification permissions granted"</string>
+    <string name="welcome_notification_permission_request">"Request"</string>
     <string name="welcome_play_description">"OwnTracks requires Google Play Services"</string>
     <string name="welcome_play_heading">"Google Play Services"</string>
     <string name="welcome_version_description">"Due to OS limitations, some features might work in a restricted manner.
