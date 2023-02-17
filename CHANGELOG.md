@@ -15,6 +15,7 @@
 - Waypoints can be imported on the config import screen (#1284)
 - MQTT connection now reacts to changes in the device's default network, explicitly doing a reconnect
 - Waypoint delete UX made a little easier. Explicit button in the waypoint activity, rather than a long-press
+- Notification permissions are requested sensibly on Android 13+
 
 ### Bug fixes
 
