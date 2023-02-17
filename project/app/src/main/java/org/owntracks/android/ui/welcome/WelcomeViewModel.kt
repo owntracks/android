@@ -44,6 +44,7 @@ class WelcomeViewModel @Inject constructor(
                 mutableDoneEnabled.postValue(false)
             }
             ProgressState.FINISHED -> {
+                preferences.setupCompleted = true
                 mutableNextEnabled.postValue(false)
                 mutableDoneEnabled.postValue(true)
             }

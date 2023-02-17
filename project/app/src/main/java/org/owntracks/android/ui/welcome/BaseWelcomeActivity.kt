@@ -13,6 +13,7 @@ import androidx.viewpager2.widget.ViewPager2
 import javax.inject.Inject
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiWelcomeBinding
+import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.RequirementsChecker
 import org.owntracks.android.ui.map.MapActivity
 import org.owntracks.android.ui.welcome.fragments.*
@@ -40,9 +41,12 @@ abstract class BaseWelcomeActivity : AppCompatActivity() {
     @Inject
     lateinit var finishFragment: FinishFragment
 
+    @Inject
+    lateinit var preferences: Preferences
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (requirementsChecker.areRequirementsMet()) {
+        if (preferences.setupCompleted) {
             startActivity(
                 Intent(this, MapActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK

@@ -61,6 +61,7 @@ import org.owntracks.android.preferences.types.MonitoringMode;
 import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.DateFormatter;
 import org.owntracks.android.support.Events;
+import org.owntracks.android.support.RequirementsChecker;
 import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.ServiceBridge;
 import org.owntracks.android.ui.map.MapActivity;
@@ -296,6 +297,7 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
     }
 
     private void notifyUserOfBackgroundLocationRestriction() {
+
         Intent activityLaunchIntent = new Intent(getApplicationContext(), MapActivity.class);
         activityLaunchIntent.setAction("android.intent.action.MAIN");
         activityLaunchIntent.addCategory("android.intent.category.LAUNCHER");
