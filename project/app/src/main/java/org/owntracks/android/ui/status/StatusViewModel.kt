@@ -2,7 +2,6 @@ package org.owntracks.android.ui.status
 
 import android.app.Application
 import android.content.Context
-import android.content.Intent
 import android.location.Location
 import android.os.PowerManager
 import androidx.lifecycle.AndroidViewModel
@@ -14,7 +13,6 @@ import javax.inject.Inject
 import org.owntracks.android.data.EndpointState
 import org.owntracks.android.data.repos.EndpointStateRepo
 import org.owntracks.android.data.repos.LocationRepo
-import org.owntracks.android.ui.status.logs.LogViewerActivity
 
 @HiltViewModel
 class StatusViewModel @Inject constructor(
@@ -41,14 +39,5 @@ class StatusViewModel @Inject constructor(
         return powerManager.isIgnoringBatteryOptimizations(
             getApplication<Application>().applicationContext.packageName
         )
-    }
-
-    fun viewLogs() {
-        val intent =
-            Intent(
-                getApplication<Application>().applicationContext,
-                LogViewerActivity::class.java
-            ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        getApplication<Application>().applicationContext.startActivity(intent)
     }
 }

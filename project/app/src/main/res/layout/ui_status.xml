@@ -171,13 +171,13 @@
                     android:src="@android:drawable/divider_horizontal_bright" />
 
                 <TextView
+                    android:id="@+id/viewLogsButton"
                     style="@style/ListItemPrimary"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
-                    android:onClick="@{() -> vm.viewLogs()}"
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:paddingTop="@dimen/activity_vertical_margin"
                     android:paddingRight="@dimen/activity_horizontal_margin"
