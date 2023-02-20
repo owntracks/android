@@ -39,6 +39,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 import org.owntracks.android.BR
 import org.owntracks.android.R
@@ -60,11 +61,14 @@ import org.owntracks.android.ui.mixins.ServiceStarter
 import org.owntracks.android.ui.mixins.WorkManagerInitExceptionNotifier
 import org.owntracks.android.ui.welcome.WelcomeActivity
 import timber.log.Timber
-import javax.inject.Inject
 
 @AndroidEntryPoint
-class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), View.OnClickListener, View.OnLongClickListener,
-    PopupMenu.OnMenuItemClickListener, WorkManagerInitExceptionNotifier by WorkManagerInitExceptionNotifier.Impl(),
+class MapActivity :
+    BaseActivity<UiMapBinding?, NoOpViewModel>(),
+    View.OnClickListener,
+    View.OnLongClickListener,
+    PopupMenu.OnMenuItemClickListener,
+    WorkManagerInitExceptionNotifier by WorkManagerInitExceptionNotifier.Impl(),
     ServiceStarter by ServiceStarter.Impl() {
     private val mapViewModel: MapViewModel by viewModels()
     private var previouslyHadLocationPermissions: Boolean = false
@@ -113,7 +117,8 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), View.OnClickLi
 
     override fun onCreate(savedInstanceState: Bundle?) {
         EntryPointAccessors.fromActivity(
-            this, MapActivityEntryPoint::class.java
+            this,
+            MapActivityEntryPoint::class.java
         )
             .let {
                 supportFragmentManager.fragmentFactory = it.fragmentFactory
@@ -157,7 +162,8 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), View.OnClickLi
 
             binding.fabMapLayers.setOnClickListener {
                 MapLayerBottomSheetDialog().show(
-                    supportFragmentManager, "layerBottomSheetDialog"
+                    supportFragmentManager,
+                    "layerBottomSheetDialog"
                 )
             }
 
@@ -179,7 +185,8 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), View.OnClickLi
                             .filter { it.textSize > newSize || it.configurationChangedFlag }
                             .forEach {
                                 it.setAutoSizeTextTypeUniformWithPresetSizes(
-                                    intArrayOf(newSize.toInt()), TypedValue.COMPLEX_UNIT_PX
+                                    intArrayOf(newSize.toInt()),
+                                    TypedValue.COMPLEX_UNIT_PX
                                 )
                                 it.configurationChangedFlag = false
                             }
@@ -376,9 +383,11 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), View.OnClickLi
             Snackbar.LENGTH_LONG
         )
             .setAction(getString(R.string.fixProblemLabel)) {
-                startActivity(Intent(ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                    data = Uri.parse("package:$packageName")
-                })
+                startActivity(
+                    Intent(ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        data = Uri.parse("package:$packageName")
+                    }
+                )
             }
             .show()
     }
@@ -440,7 +449,8 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), View.OnClickLi
 
     override fun onResume() {
         val mapFragment = supportFragmentManager.fragmentFactory.instantiate(
-            this.classLoader, MapFragment::class.java.name
+            this.classLoader,
+            MapFragment::class.java.name
         )
         supportFragmentManager.commit(true) {
             replace(R.id.mapFragment, mapFragment, "map")
@@ -532,7 +542,8 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), View.OnClickLi
             }
             R.id.menu_monitoring -> {
                 MonitoringModeBottomSheetDialog().show(
-                    supportFragmentManager, "modeBottomSheetDialog"
+                    supportFragmentManager,
+                    "modeBottomSheetDialog"
                 )
                 true
             }
@@ -565,13 +576,16 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), View.OnClickLi
                 c.value?.latLng?.apply {
                     try {
                         val intent = Intent(
-                            Intent.ACTION_VIEW, Uri.parse("google.navigation:q=$latitude,$longitude")
+                            Intent.ACTION_VIEW,
+                            Uri.parse("google.navigation:q=$latitude,$longitude")
                         )
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         startActivity(intent)
                     } catch (e: ActivityNotFoundException) {
                         Snackbar.make(
-                            binding!!.mapCoordinatorLayout, getString(R.string.noNavigationApp), Snackbar.LENGTH_SHORT
+                            binding!!.mapCoordinatorLayout,
+                            getString(R.string.noNavigationApp),
+                            Snackbar.LENGTH_SHORT
                         )
                             .show()
                     }
@@ -599,7 +613,9 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), View.OnClickLi
         binding!!.mapFragment.setPaddingRelative(0, 0, 0, binding!!.bottomSheetLayout.height)
         orientationSensor?.let {
             sensorManager?.registerListener(
-                mapViewModel.orientationSensorEventListener, it, 500_000
+                mapViewModel.orientationSensorEventListener,
+                it,
+                500_000
             )
         }
     }
@@ -638,7 +654,9 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), View.OnClickLi
     override fun onStart() {
         super.onStart()
         bindService(
-            Intent(this, BackgroundService::class.java), serviceConnection, Context.BIND_AUTO_CREATE
+            Intent(this, BackgroundService::class.java),
+            serviceConnection,
+            Context.BIND_AUTO_CREATE
         )
     }
 
@@ -671,7 +689,8 @@ class MapActivity : BaseActivity<UiMapBinding?, NoOpViewModel>(), View.OnClickLi
                 MyLocationStatus.FOLLOWING -> view.setImageResource(R.drawable.ic_baseline_my_location_24)
             }
             ImageViewCompat.setImageTintList(
-                view, ColorStateList.valueOf(tint)
+                view,
+                ColorStateList.valueOf(tint)
             )
         }
     }

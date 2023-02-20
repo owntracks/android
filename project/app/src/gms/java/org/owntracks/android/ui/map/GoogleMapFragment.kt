@@ -27,8 +27,7 @@ import timber.log.Timber
 class GoogleMapFragment internal constructor(
     private val preferences: Preferences,
     contactImageBindingAdapter: ContactImageBindingAdapter
-) :
-    MapFragment<GoogleMapFragmentBinding>(contactImageBindingAdapter),
+) : MapFragment<GoogleMapFragmentBinding>(contactImageBindingAdapter),
     OnMapReadyCallback,
     OnMapsSdkInitializedCallback {
 
@@ -82,11 +81,7 @@ class GoogleMapFragment internal constructor(
     }
 
     private fun setMapStyle() {
-        if (resources
-                .configuration
-                .uiMode
-                .and(Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
-        ) {
+        if (resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES) {
             googleMap?.setMapStyle(
                 MapStyleOptions.loadRawResourceStyle(
                     requireContext(),
@@ -96,29 +91,27 @@ class GoogleMapFragment internal constructor(
         }
     }
 
-    private fun MapLocationZoomLevelAndRotation.toCameraUpdate(): CameraUpdate =
-        CameraUpdateFactory.newCameraPosition(
-            CameraPosition.builder()
-                .target(this.latLng.toGMSLatLng())
-                .zoom(convertStandardZoomToGoogleZoom(this.zoom).toFloat())
-                .bearing(
-                    if (preferences.enableMapRotation) {
-                        convertBetweenStandardRotationAndBearing(
-                            this.rotation
-                        )
-                    } else {
-                        0f
-                    }
-                )
-                .build()
-        )
+    private fun MapLocationZoomLevelAndRotation.toCameraUpdate(): CameraUpdate = CameraUpdateFactory.newCameraPosition(
+        CameraPosition.builder()
+            .target(this.latLng.toGMSLatLng())
+            .zoom(convertStandardZoomToGoogleZoom(this.zoom).toFloat())
+            .bearing(
+                if (preferences.enableMapRotation) {
+                    convertBetweenStandardRotationAndBearing(
+                        this.rotation
+                    )
+                } else {
+                    0f
+                }
+            )
+            .build()
+    )
 
     @SuppressLint("MissingPermission")
     override fun initMap() {
         MapsInitializer.initialize(requireContext(), MapsInitializer.Renderer.LATEST, this)
         this.googleMap?.run {
-            val myLocationEnabled =
-                (requireActivity() as MapActivity).checkAndRequestMyLocationCapability(false)
+            val myLocationEnabled = (requireActivity() as MapActivity).checkAndRequestMyLocationCapability(false)
             Timber.d("GoogleMapFragment initMap hasLocationCapability=$myLocationEnabled")
             setMaxZoomPreference(MAX_ZOOM_LEVEL.toFloat())
             setMinZoomPreference(MIN_ZOOM_LEVEL.toFloat())
@@ -195,8 +188,7 @@ class GoogleMapFragment internal constructor(
             markersOnMap.values.removeAll { it.tag == null }
             markersOnMap.getOrPut(id) {
                 addMarker(
-                    MarkerOptions()
-                        .position(latLng.toGMSLatLng())
+                    MarkerOptions().position(latLng.toGMSLatLng())
                         .anchor(0.5f, 0.5f)
                         .visible(false)
                 )!!.also { it.tag = id }
@@ -301,8 +293,7 @@ class GoogleMapFragment internal constructor(
      * @param input
      * @return an equivalent bearing
      */
-    private fun convertBetweenStandardRotationAndBearing(input: Float): Float =
-        -input % 360
+    private fun convertBetweenStandardRotationAndBearing(input: Float): Float = -input % 360
 
     /**
      * Converts standard (OSM) zoom to Google Maps zoom level. Simple linear conversion
@@ -344,7 +335,8 @@ class GoogleMapFragment internal constructor(
         if (!fromRange.contains(point)) {
             throw Exception("Given point $point is not in fromRange $fromRange")
         }
-        return ((point - fromRange.start) / (fromRange.endInclusive - fromRange.start)) * (toRange.endInclusive - toRange.start) + toRange.start
+        return ((point - fromRange.start) / (fromRange.endInclusive - fromRange.start)) *
+            (toRange.endInclusive - toRange.start) + toRange.start
     }
 
     override fun setMapLayerType(mapLayerStyle: MapLayerStyle) {

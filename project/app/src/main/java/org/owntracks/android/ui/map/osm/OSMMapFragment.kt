@@ -7,12 +7,8 @@ import android.hardware.display.DisplayManager
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
-import android.view.Display
-import android.view.LayoutInflater
+import android.view.*
 import android.view.MotionEvent.ACTION_BUTTON_RELEASE
-import android.view.Surface
-import android.view.View
-import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.Observer
@@ -26,11 +22,7 @@ import org.osmdroid.events.ZoomEvent
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
-import org.osmdroid.views.overlay.CopyrightOverlay
-import org.osmdroid.views.overlay.Marker
-import org.osmdroid.views.overlay.Polygon
-import org.osmdroid.views.overlay.ScaleBarOverlay
-import org.osmdroid.views.overlay.TilesOverlay
+import org.osmdroid.views.overlay.*
 import org.osmdroid.views.overlay.compass.CompassOverlay
 import org.osmdroid.views.overlay.compass.IOrientationConsumer
 import org.osmdroid.views.overlay.compass.IOrientationProvider
@@ -112,7 +104,9 @@ class OSMMapFragment internal constructor(
     }
 
     private fun setMapStyle() {
-        if (resources.configuration.uiMode.and(android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES) {
+        if (resources.configuration.uiMode.and(android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
+            android.content.res.Configuration.UI_MODE_NIGHT_YES
+        ) {
             mapView?.run {
                 overlayManager.tilesOverlay.setColorFilter(TilesOverlay.INVERT_COLORS)
             }
@@ -150,13 +144,12 @@ class OSMMapFragment internal constructor(
         }
     })
 
-    class MapRotationOrientationProvider(private val context: Context) : IOrientationProvider {
-        val display = context.safeGetDisplay()
+    class MapRotationOrientationProvider(context: Context) : IOrientationProvider {
+        private val display = context.safeGetDisplay()
         private var myOrientationConsumer: IOrientationConsumer? = null
         private var lastOrientation = 0f
         fun updateOrientation(orientation: Float) {
-            val correctedOrientation = orientation
-            lastOrientation = -(correctedOrientation + displayRotationToDegrees())
+            lastOrientation = -(orientation + displayRotationToDegrees())
             myOrientationConsumer?.onOrientationChanged(lastOrientation, this)
         }
 
@@ -191,7 +184,7 @@ class OSMMapFragment internal constructor(
     }
 
     val orientationProvider by lazy { MapRotationOrientationProvider(requireContext()) }
-    val compassOrientationMapListener = object : MapListener {
+    private val compassOrientationMapListener = object : MapListener {
         private fun updateOrientation() {
             mapView?.mapOrientation?.run {
                 orientationProvider.updateOrientation(this)
@@ -214,8 +207,8 @@ class OSMMapFragment internal constructor(
             (requireActivity() as MapActivity).checkAndRequestMyLocationCapability(false)
         Timber.d("OSMMapFragment initMap locationEnabled=$myLocationEnabled")
         mapView = this.binding.osmMapView.apply {
-            minZoomLevel = MIN_ZOOM_LEVEL.toDouble()
-            maxZoomLevel = MAX_ZOOM_LEVEL.toDouble()
+            minZoomLevel = MIN_ZOOM_LEVEL
+            maxZoomLevel = MAX_ZOOM_LEVEL
             viewModel.mapLayerStyle.value?.run {
                 setMapLayerType(this)
             }
