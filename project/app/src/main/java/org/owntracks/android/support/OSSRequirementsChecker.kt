@@ -15,7 +15,7 @@ open class OSSRequirementsChecker @Inject constructor(
     open val context: Context
 ) : RequirementsChecker {
 
-    override fun isLocationPermissionCheckPassed(): Boolean = ContextCompat.checkSelfPermission(
+    override fun hasLocationPermissions(): Boolean = ContextCompat.checkSelfPermission(
         context,
         Manifest.permission.ACCESS_FINE_LOCATION
     ) == PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(

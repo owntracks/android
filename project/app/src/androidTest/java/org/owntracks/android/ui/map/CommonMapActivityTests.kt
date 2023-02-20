@@ -35,7 +35,7 @@ class CommonMapActivityTests :
     fun monitoringModeButtonShowsDialogAndAllowsUsToSelectQuietMode() {
         setNotFirstStartPreferences()
         launchActivity()
-        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+        grantMapActivityPermissions()
         assertDisplayed(R.id.menu_monitoring)
         clickOn(R.id.menu_monitoring)
 
@@ -51,7 +51,7 @@ class CommonMapActivityTests :
     fun monitoringModeButtonShowsDialogAndAllowsUsToSelectManualMode() {
         setNotFirstStartPreferences()
         launchActivity()
-        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+        grantMapActivityPermissions()
         assertDisplayed(R.id.menu_monitoring)
         clickOn(R.id.menu_monitoring)
 
@@ -67,7 +67,7 @@ class CommonMapActivityTests :
     fun monitoringModeButtonShowsDialogAndAllowsUsToSelectSignificantMode() {
         setNotFirstStartPreferences()
         launchActivity()
-        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+        grantMapActivityPermissions()
         assertDisplayed(R.id.menu_monitoring)
         clickOn(R.id.menu_monitoring)
 
@@ -85,7 +85,7 @@ class CommonMapActivityTests :
     fun monitoringModeButtonShowsDialogAndAllowsUsToSelectMoveMode() {
         setNotFirstStartPreferences()
         launchActivity()
-        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+        grantMapActivityPermissions()
         assertDisplayed(R.id.menu_monitoring)
         clickOn(R.id.menu_monitoring)
 
@@ -101,7 +101,7 @@ class CommonMapActivityTests :
     fun mapCanSwitchToNightMode() {
         setNotFirstStartPreferences()
         launchActivity()
-        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+        grantMapActivityPermissions()
         assertDrawerIsClosed()
 
         openDrawer()
@@ -124,7 +124,7 @@ class CommonMapActivityTests :
     fun regionsCanBeDrawnOnMap() {
         setNotFirstStartPreferences()
         launchActivity()
-        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+        grantMapActivityPermissions()
         initializeMockLocationProvider(app)
         reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource) {
             setMockLocation(51.0, 0.0)

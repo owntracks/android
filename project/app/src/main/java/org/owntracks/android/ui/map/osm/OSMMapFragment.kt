@@ -203,8 +203,7 @@ class OSMMapFragment internal constructor(
     }
 
     override fun initMap() {
-        val myLocationEnabled =
-            (requireActivity() as MapActivity).checkAndRequestMyLocationCapability(false)
+        val myLocationEnabled = viewModel.hasLocationPermission()
         Timber.d("OSMMapFragment initMap locationEnabled=$myLocationEnabled")
         mapView = this.binding.osmMapView.apply {
             minZoomLevel = MIN_ZOOM_LEVEL

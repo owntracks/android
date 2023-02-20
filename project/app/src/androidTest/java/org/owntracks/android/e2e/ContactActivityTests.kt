@@ -45,7 +45,7 @@ class ContactActivityTests :
         setNotFirstStartPreferences()
         launchActivity()
 
-        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+        grantMapActivityPermissions()
         initializeMockLocationProvider(app)
         configureHTTPConnectionToLocal()
 

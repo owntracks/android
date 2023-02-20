@@ -74,7 +74,7 @@ class MQTTMessagePublishTests :
         setNotFirstStartPreferences()
         launchActivity()
 
-        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+        grantMapActivityPermissions()
         initializeMockLocationProvider(app)
 
         configureMQTTConnectionToLocalWithGeneratedPassword()
@@ -105,7 +105,7 @@ class MQTTMessagePublishTests :
         setNotFirstStartPreferences()
         launchActivity()
 
-        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+        grantMapActivityPermissions()
         configureMQTTConnectionToLocalWithGeneratedPassword()
         reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource) {
             setMockLocation(51.0, 0.0)
@@ -143,7 +143,7 @@ class MQTTMessagePublishTests :
             .putString(Preferences::reverseGeocodeProvider.name, "None")
             .apply()
         launchActivity()
-        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+        grantMapActivityPermissions()
 
         configureMQTTConnectionToLocalWithGeneratedPassword()
 
@@ -205,7 +205,7 @@ class MQTTMessagePublishTests :
             .apply()
         launchActivity()
 
-        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+        grantMapActivityPermissions()
         configureMQTTConnectionToLocalWithGeneratedPassword()
         reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource) {
             setMockLocation(51.0, 0.0)
@@ -277,7 +277,7 @@ class MQTTMessagePublishTests :
         setNotFirstStartPreferences()
         launchActivity()
 
-        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+        grantMapActivityPermissions()
         configureMQTTConnectionToLocal("not the right password")
         waitUntilActivityVisible<MapActivity>()
         app.mqttConnectionIdlingResource.with {

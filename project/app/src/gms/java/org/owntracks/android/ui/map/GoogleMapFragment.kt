@@ -111,7 +111,7 @@ class GoogleMapFragment internal constructor(
     override fun initMap() {
         MapsInitializer.initialize(requireContext(), MapsInitializer.Renderer.LATEST, this)
         this.googleMap?.run {
-            val myLocationEnabled = (requireActivity() as MapActivity).checkAndRequestMyLocationCapability(false)
+            val myLocationEnabled = viewModel.hasLocationPermission()
             Timber.d("GoogleMapFragment initMap hasLocationCapability=$myLocationEnabled")
             setMaxZoomPreference(MAX_ZOOM_LEVEL.toFloat())
             setMinZoomPreference(MIN_ZOOM_LEVEL.toFloat())

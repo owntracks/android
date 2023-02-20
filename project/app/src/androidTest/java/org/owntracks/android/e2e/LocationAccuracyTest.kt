@@ -67,7 +67,7 @@ class LocationAccuracyTest :
 
         launchActivity()
 
-        allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+        grantMapActivityPermissions()
         initializeMockLocationProvider(app)
 
         configureHTTPConnectionToLocal()
@@ -114,7 +114,7 @@ class LocationAccuracyTest :
 
         launchActivity()
 
-        allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+        grantMapActivityPermissions()
         initializeMockLocationProvider(app)
 
         configureHTTPConnectionToLocal()

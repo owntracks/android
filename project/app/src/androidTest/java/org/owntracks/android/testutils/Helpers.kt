@@ -1,5 +1,6 @@
 package org.owntracks.android.testutils
 
+import android.Manifest
 import android.app.Activity
 import android.os.Build
 import androidx.preference.PreferenceManager
@@ -15,14 +16,15 @@ import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
 import androidx.test.runner.lifecycle.Stage
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
+import com.adevinta.android.barista.interaction.PermissionGranter
+import java.util.concurrent.TimeUnit
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import org.owntracks.android.R
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 
 fun scrollToPreferenceWithText(textResource: Int) {
     onView(withId(androidx.preference.R.id.recycler_view)).perform(
@@ -147,4 +149,9 @@ fun enableDeviceLocation() {
 
     getInstrumentation().uiAutomation.executeShellCommand(cmd)
         .close()
+}
+
+fun grantMapActivityPermissions() {
+    PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.POST_NOTIFICATIONS)
+    PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
 }

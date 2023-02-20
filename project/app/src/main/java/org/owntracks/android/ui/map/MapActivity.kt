@@ -1,13 +1,13 @@
 package org.owntracks.android.ui.map
 
-import android.Manifest.permission.ACCESS_COARSE_LOCATION
-import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.Manifest.permission.*
 import android.annotation.SuppressLint
 import android.content.*
 import android.content.res.ColorStateList
 import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.provider.Settings
@@ -22,12 +22,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.setPadding
 import androidx.core.widget.ImageViewCompat
 import androidx.databinding.BindingAdapter
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
 import androidx.test.espresso.IdlingResource
@@ -41,22 +43,21 @@ import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import javax.inject.Inject
 import kotlinx.coroutines.launch
-import org.owntracks.android.BR
 import org.owntracks.android.R
 import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.databinding.UiMapBinding
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.model.FusedContact
+import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.Preferences.Companion.EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.services.BackgroundService.BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG
 import org.owntracks.android.support.ContactImageBindingAdapter
+import org.owntracks.android.support.DrawerProvider
 import org.owntracks.android.support.RequirementsChecker
 import org.owntracks.android.support.RunThingsOnOtherThreads
-import org.owntracks.android.ui.base.BaseActivity
-import org.owntracks.android.ui.base.viewmodel.NoOpViewModel
 import org.owntracks.android.ui.mixins.ServiceStarter
 import org.owntracks.android.ui.mixins.WorkManagerInitExceptionNotifier
 import org.owntracks.android.ui.welcome.WelcomeActivity
@@ -64,20 +65,20 @@ import timber.log.Timber
 
 @AndroidEntryPoint
 class MapActivity :
-    BaseActivity<UiMapBinding?, NoOpViewModel>(),
+    AppCompatActivity(),
     View.OnClickListener,
     View.OnLongClickListener,
     PopupMenu.OnMenuItemClickListener,
     WorkManagerInitExceptionNotifier by WorkManagerInitExceptionNotifier.Impl(),
     ServiceStarter by ServiceStarter.Impl() {
-    private val mapViewModel: MapViewModel by viewModels()
+    private val viewModel: MapViewModel by viewModels()
     private var previouslyHadLocationPermissions: Boolean = false
     private var service: BackgroundService? = null
-    lateinit var locationLifecycleObserver: LocationLifecycleObserver
     private var bottomSheetBehavior: BottomSheetBehavior<LinearLayoutCompat>? = null
     private var menu: Menu? = null
     private var sensorManager: SensorManager? = null
     private var orientationSensor: Sensor? = null
+    private lateinit var binding: UiMapBinding
 
     private lateinit var locationServicesAlertDialog: AlertDialog
     private lateinit var locationPermissionsRationaleAlertDialog: AlertDialog
@@ -100,6 +101,12 @@ class MapActivity :
     @Inject
     lateinit var requirementsChecker: RequirementsChecker
 
+    @Inject
+    lateinit var preferences: Preferences
+
+    @Inject
+    lateinit var drawerProvider: DrawerProvider
+
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             Timber.d("Service connected to MapActivity")
@@ -111,9 +118,6 @@ class MapActivity :
             service = null
         }
     }
-
-    private var onBottomSheetLabelTextSizeChangedListener: AutoResizingTextViewWithListener.OnTextSizeChangedListener? =
-        null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         EntryPointAccessors.fromActivity(
@@ -131,53 +135,55 @@ class MapActivity :
             finish()
             return
         }
-        bindAndAttachContentView(R.layout.ui_map, savedInstanceState)
 
-        binding?.also { binding ->
-            setSupportToolbar(binding.appbar.toolbar, false, true)
-            setDrawer(binding.appbar.toolbar)
-            bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetLayout)
-            binding.setVariable(BR.vm, mapViewModel)
-            binding.contactPeek.contactRow.setOnClickListener(this)
-            binding.contactPeek.contactRow.setOnLongClickListener(this)
-            binding.moreButton.setOnClickListener { v: View -> showPopupMenu(v) }
-            setBottomSheetHidden()
-
-            // Need to set the appbar layout behaviour to be non-drag, so that we can drag the map
-            val behavior = AppBarLayout.Behavior()
-            behavior.setDragCallback(object : AppBarLayout.Behavior.DragCallback() {
-                override fun canDrag(appBarLayout: AppBarLayout): Boolean {
-                    return false
+        binding = DataBindingUtil.setContentView<UiMapBinding>(this, R.layout.ui_map)
+            .apply {
+                vm = viewModel
+                lifecycleOwner = this@MapActivity
+                appbar.toolbar.run {
+                    setSupportActionBar(this)
+                    drawerProvider.attach(this)
                 }
-            })
+                supportActionBar?.setDisplayShowTitleEnabled(false)
+                bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetLayout)
+                contactPeek.contactRow.setOnClickListener(this@MapActivity)
+                contactPeek.contactRow.setOnLongClickListener(this@MapActivity)
+                moreButton.setOnClickListener { v: View -> showPopupMenu(v) }
 
-            binding.fabMyLocation.setOnClickListener {
-                if (checkAndRequestLocationPermissions(true)) {
-                    checkAndRequestLocationServicesEnabled(true)
+                // Need to set the appbar layout behaviour to be non-drag, so that we can drag the map
+                AppBarLayout.Behavior()
+                    .setDragCallback(object : AppBarLayout.Behavior.DragCallback() {
+                        override fun canDrag(appBarLayout: AppBarLayout): Boolean {
+                            return false
+                        }
+                    })
+
+                fabMyLocation.setOnClickListener {
+                    if (checkAndRequestLocationPermissions(true)) {
+                        checkAndRequestLocationServicesEnabled(true)
+                    }
+                    if (viewModel.myLocationStatus.value != MyLocationStatus.DISABLED) {
+                        viewModel.onMyLocationClicked()
+                    }
                 }
-                if (mapViewModel.myLocationStatus.value != MyLocationStatus.DISABLED) {
-                    mapViewModel.onMyLocationClicked()
+
+                fabMapLayers.setOnClickListener {
+                    MapLayerBottomSheetDialog().show(
+                        supportFragmentManager,
+                        "layerBottomSheetDialog"
+                    )
                 }
-            }
 
-            binding.fabMapLayers.setOnClickListener {
-                MapLayerBottomSheetDialog().show(
-                    supportFragmentManager,
-                    "layerBottomSheetDialog"
-                )
-            }
+                val labels = listOf(
+                    R.id.contactDetailsAccuracy,
+                    R.id.contactDetailsAltitude,
+                    R.id.contactDetailsBattery,
+                    R.id.contactDetailsBearing,
+                    R.id.contactDetailsSpeed,
+                    R.id.contactDetailsDistance
+                ).map { bottomSheetLayout.findViewById<View>(it) }
+                    .map { it.findViewById<AutoResizingTextViewWithListener>(R.id.label) }
 
-            val labels = listOf(
-                R.id.contactDetailsAccuracy,
-                R.id.contactDetailsAltitude,
-                R.id.contactDetailsBattery,
-                R.id.contactDetailsBearing,
-                R.id.contactDetailsSpeed,
-                R.id.contactDetailsDistance
-            ).map { binding.bottomSheetLayout.findViewById<View>(it) }
-                .map { it.findViewById<AutoResizingTextViewWithListener>(R.id.label) }
-
-            onBottomSheetLabelTextSizeChangedListener =
                 object : AutoResizingTextViewWithListener.OnTextSizeChangedListener {
                     @SuppressLint("RestrictedApi")
                     override fun onTextSizeChanged(view: View, newSize: Float) {
@@ -192,16 +198,13 @@ class MapActivity :
                             }
                     }
                 }.also { listener -> labels.forEach { it.withListener(listener) } }
-        }
+            }
 
-        locationLifecycleObserver = LocationLifecycleObserver(activityResultRegistry)
-        lifecycle.addObserver(locationLifecycleObserver)
+        setBottomSheetHidden()
 
-        // Watch various things that the mapViewModel owns
-
-        mapViewModel.currentContact.observe(this) { contact: FusedContact? ->
+        viewModel.currentContact.observe(this) { contact: FusedContact? ->
             contact?.let {
-                binding?.contactPeek?.run {
+                binding.contactPeek.run {
                     image.setImageResource(0) // Remove old image before async loading the new one
                     lifecycleScope.launch {
                         contactImageBindingAdapter.run {
@@ -213,24 +216,24 @@ class MapActivity :
                 }
             }
         }
-        mapViewModel.bottomSheetHidden.observe(this) { o: Boolean? ->
+        viewModel.bottomSheetHidden.observe(this) { o: Boolean? ->
             if (o == null || o) {
                 setBottomSheetHidden()
             } else {
                 setBottomSheetCollapsed()
             }
         }
-        mapViewModel.currentLocation.observe(this) { location ->
+        viewModel.currentLocation.observe(this) { location ->
             if (location == null) {
                 disableLocationMenus()
             } else {
                 enableLocationMenus()
-                binding?.vm?.run {
+                binding.vm?.run {
                     updateActiveContactDistanceAndBearing(location)
                 }
             }
         }
-        mapViewModel.currentMonitoringMode.observe(this) {
+        viewModel.currentMonitoringMode.observe(this) {
             updateMonitoringModeMenu()
         }
 
@@ -268,16 +271,11 @@ class MapActivity :
         }
     }
 
-    internal fun checkAndRequestMyLocationCapability(explicitUserAction: Boolean): Boolean =
-        checkAndRequestLocationPermissions(explicitUserAction) && checkAndRequestLocationServicesEnabled(
-            explicitUserAction
-        )
-
     private val locationServicesLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         // We have to check permissions again here, because it may have been revoked in the
         // period between asking for location services and returning here.
         if (checkAndRequestLocationPermissions(false)) {
-            mapViewModel.requestLocationUpdatesForBlueDot()
+            viewModel.requestLocationUpdatesForBlueDot()
         }
     }
 
@@ -364,9 +362,9 @@ class MapActivity :
      *
      */
     private fun userGrantedPermissions() {
-        mapViewModel.requestLocationUpdatesForBlueDot()
-        mapViewModel.onMyLocationClicked()
-        mapViewModel.updateMyLocationStatus()
+        viewModel.requestLocationUpdatesForBlueDot()
+        viewModel.onMyLocationClicked()
+        viewModel.updateMyLocationStatus()
         service?.reInitializeLocationRequests()
     }
 
@@ -378,7 +376,7 @@ class MapActivity :
     private fun userDeclinedPermissions() {
         preferences.userDeclinedEnableLocationPermissions = true
         Snackbar.make(
-            binding!!.mapCoordinatorLayout,
+            binding.mapCoordinatorLayout,
             getString(R.string.locationPermissionNotGrantedNotification),
             Snackbar.LENGTH_LONG
         )
@@ -406,7 +404,7 @@ class MapActivity :
      * prompt to enable to raised, even if the user says "yes" to the prompt.
      */
     private fun checkAndRequestLocationPermissions(explicitUserAction: Boolean): Boolean {
-        if (!requirementsChecker.isLocationPermissionCheckPassed()) {
+        if (!requirementsChecker.hasLocationPermissions()) {
             Timber.d("No location permission")
             // We don't have location permission
             if ((explicitUserAction || !preferences.userDeclinedEnableLocationPermissions)) {
@@ -465,20 +463,35 @@ class MapActivity :
                 orientationSensor?.run { Timber.d("Got a rotation vector sensor") }
             }
         } else {
-            sensorManager?.unregisterListener(mapViewModel.orientationSensorEventListener)
+            sensorManager?.unregisterListener(viewModel.orientationSensorEventListener)
             sensorManager = null
             orientationSensor = null
         }
         super.onResume()
         updateMonitoringModeMenu()
-        mapViewModel.updateMyLocationStatus()
+        viewModel.updateMyLocationStatus()
 
-        if (!previouslyHadLocationPermissions && requirementsChecker.isLocationPermissionCheckPassed()) {
-            previouslyHadLocationPermissions = true
-            mapViewModel.requestLocationUpdatesForBlueDot()
-            service?.reInitializeLocationRequests()
+        if (!requirementsChecker.isNotificationsEnabled() &&
+            !preferences.userDeclinedEnableNotificationPermissions &&
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+        ) {
+            notificationPermissionRequest.launch(POST_NOTIFICATIONS)
+        } else {
+            if (checkAndRequestLocationPermissions(false)) {
+                checkAndRequestLocationServicesEnabled(false)
+            }
+            if (!previouslyHadLocationPermissions && requirementsChecker.hasLocationPermissions()) {
+                previouslyHadLocationPermissions = true
+                viewModel.requestLocationUpdatesForBlueDot()
+                service?.reInitializeLocationRequests()
+            }
         }
     }
+
+    private val notificationPermissionRequest =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+            preferences.userDeclinedEnableNotificationPermissions = !it
+        }
 
     private fun handleIntentExtras(intent: Intent) {
         Timber.v("handleIntentExtras")
@@ -487,7 +500,7 @@ class MapActivity :
             Timber.v("intent has extras from drawerProvider")
             val contactId = b.getString(BUNDLE_KEY_CONTACT_ID)
             if (contactId != null) {
-                mapViewModel.setLiveContact(contactId)
+                viewModel.setLiveContact(contactId)
             }
         }
     }
@@ -502,7 +515,7 @@ class MapActivity :
         inflater.inflate(R.menu.activity_map, menu)
         this.menu = menu
         updateMonitoringModeMenu()
-        mapViewModel.updateMyLocationStatus()
+        viewModel.updateMyLocationStatus()
         return true
     }
 
@@ -533,7 +546,7 @@ class MapActivity :
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_report -> {
-                mapViewModel.sendLocation()
+                viewModel.sendLocation()
                 true
             }
             android.R.id.home -> {
@@ -552,14 +565,14 @@ class MapActivity :
     }
 
     private fun disableLocationMenus() {
-        binding?.fabMyLocation?.isEnabled = false
+        binding.fabMyLocation.isEnabled = false
         menu?.run {
             findItem(R.id.menu_report).setEnabled(false).icon?.alpha = 128
         }
     }
 
     private fun enableLocationMenus() {
-        binding?.fabMyLocation?.isEnabled = true
+        binding.fabMyLocation.isEnabled = true
         menu?.run {
             findItem(R.id.menu_report).setEnabled(true).icon?.alpha = 255
         }
@@ -568,11 +581,11 @@ class MapActivity :
     override fun onMenuItemClick(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_clear -> {
-                mapViewModel.onClearContactClicked()
+                viewModel.onClearContactClicked()
                 false
             }
             R.id.menu_navigate -> {
-                val c = mapViewModel.currentContact
+                val c = viewModel.currentContact
                 c.value?.latLng?.apply {
                     try {
                         val intent = Intent(
@@ -583,7 +596,7 @@ class MapActivity :
                         startActivity(intent)
                     } catch (e: ActivityNotFoundException) {
                         Snackbar.make(
-                            binding!!.mapCoordinatorLayout,
+                            binding.mapCoordinatorLayout,
                             getString(R.string.noNavigationApp),
                             Snackbar.LENGTH_SHORT
                         )
@@ -591,7 +604,7 @@ class MapActivity :
                     }
                 } ?: run {
                     Snackbar.make(
-                        binding!!.mapCoordinatorLayout,
+                        binding.mapCoordinatorLayout,
                         getString(R.string.contactLocationUnknown),
                         Snackbar.LENGTH_SHORT
                     )
@@ -604,16 +617,16 @@ class MapActivity :
     }
 
     override fun onLongClick(view: View): Boolean {
-        mapViewModel.onBottomSheetLongClick()
+        viewModel.onBottomSheetLongClick()
         return true
     }
 
     private fun setBottomSheetExpanded() {
         bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_EXPANDED
-        binding!!.mapFragment.setPaddingRelative(0, 0, 0, binding!!.bottomSheetLayout.height)
+        binding.mapFragment.setPaddingRelative(0, 0, 0, binding.bottomSheetLayout.height)
         orientationSensor?.let {
             sensorManager?.registerListener(
-                mapViewModel.orientationSensorEventListener,
+                viewModel.orientationSensorEventListener,
                 it,
                 500_000
             )
@@ -627,15 +640,15 @@ class MapActivity :
 
     private fun setBottomSheetCollapsed() {
         bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_COLLAPSED
-        binding!!.mapFragment.setPadding(0)
-        sensorManager?.unregisterListener(mapViewModel.orientationSensorEventListener)
+        binding.mapFragment.setPadding(0)
+        sensorManager?.unregisterListener(viewModel.orientationSensorEventListener)
     }
 
     private fun setBottomSheetHidden() {
         bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_HIDDEN
-        binding!!.mapFragment.setPadding(0)
+        binding.mapFragment.setPadding(0)
         menu?.run { close() }
-        sensorManager?.unregisterListener(mapViewModel.orientationSensorEventListener)
+        sensorManager?.unregisterListener(viewModel.orientationSensorEventListener)
     }
 
     private fun showPopupMenu(v: View) {
@@ -645,7 +658,7 @@ class MapActivity :
         if (preferences.mode == ConnectionMode.HTTP) {
             popupMenu.menu.removeItem(R.id.menu_clear)
         }
-        if (!mapViewModel.contactHasLocation()) {
+        if (!viewModel.contactHasLocation()) {
             popupMenu.menu.removeItem(R.id.menu_navigate)
         }
         popupMenu.show()
@@ -667,7 +680,7 @@ class MapActivity :
 
     @get:VisibleForTesting
     val locationIdlingResource: IdlingResource
-        get() = mapViewModel.locationIdlingResource
+        get() = viewModel.locationIdlingResource
 
     @get:VisibleForTesting
     val outgoingQueueIdlingResource: IdlingResource

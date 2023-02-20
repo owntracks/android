@@ -43,27 +43,31 @@ abstract class MapFragment<V : ViewDataBinding> internal constructor(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = DataBindingUtil.inflate(inflater, layout, container, false)
-        binding.lifecycleOwner = this.viewLifecycleOwner
+        binding = DataBindingUtil.inflate<V>(inflater, layout, container, false)
+            .apply {
+                lifecycleOwner = this@MapFragment
+            }
 
-        viewModel.mapCenter.observe(viewLifecycleOwner, this::updateCamera)
-        viewModel.allContacts.observe(viewLifecycleOwner) { contacts ->
-            updateAllMarkers(contacts.values.toSet())
+        viewModel.apply {
+            mapCenter.observe(viewLifecycleOwner, this@MapFragment::updateCamera)
+            allContacts.observe(viewLifecycleOwner) { contacts ->
+                updateAllMarkers(contacts.values.toSet())
 
-            /*
+                /*
             allContacts gets fired whenever any marker location changes, so we can update the camera
             if we're following one.
              */
-            if (viewModel.viewMode == MapViewModel.ViewMode.Contact(true)) {
-                viewModel.currentContact.value?.latLng?.run(this::updateCamera)
+                if (viewMode == MapViewModel.ViewMode.Contact(true)) {
+                    currentContact.value?.latLng?.run(this@MapFragment::updateCamera)
+                }
             }
-        }
 
-        viewModel.waypoints.observe(viewLifecycleOwner) { regions ->
-            drawRegions(regions.toSet())
+            waypoints.observe(viewLifecycleOwner) { regions ->
+                drawRegions(regions.toSet())
+            }
+            mapLayerStyle.observe(viewLifecycleOwner, this@MapFragment::setMapLayerType)
+            onMapReady()
         }
-        viewModel.mapLayerStyle.observe(viewLifecycleOwner, this::setMapLayerType)
-        viewModel.onMapReady()
         return binding.root
     }
 

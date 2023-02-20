@@ -88,7 +88,7 @@ class MQTTTransitionEventTests :
         setNotFirstStartPreferences()
         launchActivity()
 
-        allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+        grantMapActivityPermissions()
 
         configureMQTTConnectionToLocalWithGeneratedPassword()
 
@@ -135,7 +135,7 @@ class MQTTTransitionEventTests :
     fun given_an_MQTT_configured_client_when_the_location_enters_a_geofence_a_transition_message_is_sent() { // ktlint-disable max-line-length
         setNotFirstStartPreferences()
         launchActivity()
-        allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+        grantMapActivityPermissions()
 
         initializeMockLocationProvider(app)
         val waypointLatitude = 48.0

@@ -36,7 +36,7 @@ class OSSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
             disableDeviceLocation()
             setNotFirstStartPreferences()
             launchActivity()
-            PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+            grantMapActivityPermissions()
             assertDisplayed(R.string.deviceLocationDisabledDialogTitle)
             clickDialogNegativeButton()
             assertDisplayed(R.id.osm_map_view)
@@ -55,7 +55,7 @@ class OSSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
                 .putBoolean(Preferences::userDeclinedEnableLocationServices.name, true)
                 .apply()
             launchActivity()
-            PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+            grantMapActivityPermissions()
             assertNotExist(R.string.deviceLocationDisabledDialogTitle)
             assertDisplayed(R.id.osm_map_view)
         } finally {

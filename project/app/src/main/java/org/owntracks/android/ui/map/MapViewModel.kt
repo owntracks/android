@@ -109,7 +109,7 @@ class MapViewModel @Inject constructor(
 
     fun updateMyLocationStatus() {
         mutableMyLocationStatus.postValue(
-            if (requirementsChecker.isLocationPermissionCheckPassed() &&
+            if (requirementsChecker.hasLocationPermissions() &&
                 requirementsChecker.isLocationServiceEnabled()
             ) {
                 if (viewMode == ViewMode.Device) {
@@ -122,6 +122,8 @@ class MapViewModel @Inject constructor(
             }
         )
     }
+
+    fun hasLocationPermission() = requirementsChecker.hasLocationPermissions()
 
     private val preferenceChangeListener = object : Preferences.OnPreferenceChangeListener {
         override fun onPreferenceChanged(properties: List<String>) {

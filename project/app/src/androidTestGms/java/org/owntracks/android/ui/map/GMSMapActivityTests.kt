@@ -12,6 +12,7 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickDialogNegativeButton
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
+import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import com.adevinta.android.barista.interaction.PermissionGranter
 import org.junit.FixMethodOrder
 import org.junit.Test
@@ -19,10 +20,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 import org.owntracks.android.R
 import org.owntracks.android.preferences.Preferences
-import org.owntracks.android.testutils.TestWithAnActivity
-import org.owntracks.android.testutils.disableDeviceLocation
-import org.owntracks.android.testutils.enableDeviceLocation
-import org.owntracks.android.testutils.setNotFirstStartPreferences
+import org.owntracks.android.testutils.*
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -32,7 +30,7 @@ class GMSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
     fun statusActivityCanBeLaunchedFromMapActivityDrawer() {
         setNotFirstStartPreferences()
         launchActivity()
-        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+        grantMapActivityPermissions()
         assertDrawerIsClosed()
         openDrawer()
 
@@ -53,7 +51,7 @@ class GMSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
     fun preferencesActivityCanBeLaunchedFromMapActivityDrawer() {
         setNotFirstStartPreferences()
         launchActivity()
-        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+        grantMapActivityPermissions()
         assertDrawerIsClosed()
 
         openDrawer()
@@ -78,7 +76,7 @@ class GMSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
     fun welcomeActivityShouldNotRunWhenFirstStartPreferencesSet() {
         setNotFirstStartPreferences()
         launchActivity()
-        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+        grantMapActivityPermissions()
         assertDisplayed(R.id.google_map_view)
     }
 
@@ -88,7 +86,7 @@ class GMSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
             disableDeviceLocation()
             setNotFirstStartPreferences()
             launchActivity()
-            PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+            grantMapActivityPermissions()
             assertDisplayed(R.string.deviceLocationDisabledDialogTitle)
             clickDialogNegativeButton()
             assertDisplayed(R.id.google_map_view)
@@ -107,7 +105,7 @@ class GMSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
                 .putBoolean(Preferences::userDeclinedEnableLocationServices.name, true)
                 .apply()
             launchActivity()
-            PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+            grantMapActivityPermissions()
             assertNotExist(R.string.deviceLocationDisabledDialogTitle)
             assertDisplayed(R.id.google_map_view)
         } finally {
@@ -119,7 +117,7 @@ class GMSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
     fun mapCanSwitchLayerStyleToOsmAndBackAgain() {
         setNotFirstStartPreferences()
         launchActivity()
-        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+        grantMapActivityPermissions()
         assertDisplayed(R.id.google_map_view)
         clickOn(R.id.fabMapLayers)
         clickOn(R.id.fabMapLayerOpenStreetMap)
@@ -138,7 +136,7 @@ class GMSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
             .putString(Preferences::mapLayerStyle.name, MapLayerStyle.OpenStreetMapNormal.name)
             .apply()
         launchActivity()
-        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+        grantMapActivityPermissions()
         assertDisplayed(R.id.osm_map_view)
     }
 }
