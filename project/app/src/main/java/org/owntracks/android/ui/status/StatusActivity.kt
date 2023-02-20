@@ -129,6 +129,10 @@ class StatusActivity : AppCompatActivity() {
                             REASON_CODE_SSL_CONFIG_ERROR -> view.context.getString(
                                 R.string.statusEndpointStateMessageTLSConfigError
                             )
+                            REASON_CODE_CONNECTION_LOST -> view.context.getString(
+                                R.string.statusEndpointStateMessageConnectionLost,
+                                mqttException.toString()
+                            )
                             else -> e.toString()
                         }
                     }

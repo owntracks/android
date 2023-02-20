@@ -234,28 +234,8 @@ public class MessageProcessor implements Preferences.OnPreferenceChangeListener 
                     retriesToGo = message.getNumberOfRetries();
                 }
 
-                /*
-                We need to run the actual network sending part on a different thread because the
-                implementation might not be thread-safe. So we wrap `sendMessage()` up in a callable
-                and a FutureTask and then dispatch it off to the network thread, and block on the
-                return, handling any exceptions that might have been thrown.
-                */
-                Callable<Void> sendMessageCallable = () -> {
-                    this.endpoint.sendMessage(message);
-                    return null;
-                };
-                FutureTask<Void> futureTask = new FutureTask<>(sendMessageCallable);
-                runThingsOnOtherThreads.postOnNetworkHandlerDelayed(futureTask, 1);
                 try {
-                    try {
-                        futureTask.get();
-                    } catch (ExecutionException e) {
-                        if (e.getCause() != null) {
-                            throw e.getCause();
-                        } else {
-                            throw new Exception("sendMessage failed, but no exception actually given");
-                        }
-                    }
+                    endpoint.sendMessage(message);
                     previousMessageFailed = false;
                     retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT;
                 } catch (OutgoingMessageSendingException | ConfigurationIncompleteException e) {

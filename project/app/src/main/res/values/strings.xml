@@ -243,6 +243,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="status_endpoint_state_message_hint">"Endpoint state message"</string>
     <string name="statusEndpointStateMessageAuthenticationFailed">"Authentication failed"</string>
     <string name="statusEndpointStateMessageClientTimeout">"Client timeout"</string>
+    <string name="statusEndpointStateMessageConnectionLost">"Connection lost: %s"</string>
     <string name="statusEndpointStateMessageInvalidClientId">"Invalid client Id"</string>
     <string name="statusEndpointStateMessageInvalidProtocolVersion">"Invalid MQTT protocol version"</string>
     <string name="statusEndpointStateMessageMalformedHostPort">"Invalid hostname &amp; port"</string>
