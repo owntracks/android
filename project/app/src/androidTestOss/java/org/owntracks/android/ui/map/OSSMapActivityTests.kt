@@ -1,6 +1,5 @@
 package org.owntracks.android.ui.map
 
-import android.Manifest
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import androidx.preference.PreferenceManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -14,10 +13,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.preferences.Preferences
-import org.owntracks.android.testutils.TestWithAnActivity
-import org.owntracks.android.testutils.disableDeviceLocation
-import org.owntracks.android.testutils.enableDeviceLocation
-import org.owntracks.android.testutils.setNotFirstStartPreferences
+import org.owntracks.android.testutils.*
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
