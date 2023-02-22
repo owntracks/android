@@ -209,7 +209,7 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="preferencesShowWaypointsOnMapSummary">" preferencesShowRegionsOnMapSummary "</string>
     <string name="preferencesTheme">"Tema"</string>
     <string name="preferencesTrackerId">"Tracker ID"</string>
-    <string name="preferencesUserUsername">"Nom d'usuari"</string>
+    <string name="preferencesUsername">"Nom d'usuari"</string>
     <string name="preferencesWebsocket">"Utilitza WebSockets"</string>
     <string name="publish">"Informe"</string>
     <string name="radius">"Radi"</string>

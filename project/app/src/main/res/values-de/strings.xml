@@ -185,7 +185,7 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="preferencesServer">"Verbindung"</string>
     <string name="preferencesTheme">"Aussehen"</string>
     <string name="preferencesTrackerId">"Tracker-ID"</string>
-    <string name="preferencesUserUsername">"Benutzername"</string>
+    <string name="preferencesUsername">"Benutzername"</string>
     <string name="preferencesWebsocket">"WebSockets nutzen"</string>
     <string name="publish">"Bericht"</string>
     <string name="radius">"Radius"</string>

@@ -201,7 +201,7 @@
     <string name="preferencesShowWaypointsOnMapSummary">"지도에 지역 반경 그리기"</string>
     <string name="preferencesTheme">"테마"</string>
     <string name="preferencesTrackerId">"트래커 ID"</string>
-    <string name="preferencesUserUsername">"사용자 이름"</string>
+    <string name="preferencesUsername">"사용자 이름"</string>
     <string name="preferencesWebsocket">"WebSockets 사용"</string>
     <string name="publish">"보고서"</string>
     <string name="radius">"반경"</string>

@@ -215,7 +215,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesShowWaypointsOnMapSummary">"Draw region circles on the map"</string>
     <string name="preferencesTheme">"Theme"</string>
     <string name="preferencesTrackerId">"Tracker ID"</string>
-    <string name="preferencesUserUsername">"Username"</string>
+    <string name="preferencesUsername">"Username"</string>
     <string name="preferencesWebsocket">"Use WebSockets"</string>
     <string name="publish">"Report"</string>
     <string name="radius">"Radius"</string>

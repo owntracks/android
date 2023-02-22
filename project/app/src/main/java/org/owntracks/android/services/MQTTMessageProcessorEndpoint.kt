@@ -272,33 +272,37 @@ class MQTTMessageProcessorEndpoint(
                 endpointStateRepo.setState(EndpointState.CONNECTING)
                 try {
                     val executorService = ScheduledThreadPoolExecutor(8)
-                    val mqttClient = MqttAsyncClient(
+                    MqttAsyncClient(
                         mqttConnectionConfiguration.connectionString,
                         mqttConnectionConfiguration.clientId,
                         MqttDefaultFilePersistence(applicationContext.noBackupFilesDir.absolutePath),
                         ScheduledExecutorPingSender(executorService),
                         executorService,
                         AndroidHighResolutionTimer()
-                    ).apply {
-                        Timber.i("Connecting to $mqttConnectionConfiguration")
-                        connect(mqttConnectionConfiguration.getConnectOptions(applicationContext)).waitForCompletion()
-                        Timber.i("Connected. Subscribing to ${mqttConnectionConfiguration.topicsToSubscribeTo}")
-                        endpointStateRepo.setState(EndpointState.CONNECTED)
-                        setCallback(mqttCallback)
-                        subscribe(
-                            mqttConnectionConfiguration.topicsToSubscribeTo.toTypedArray(),
-                            IntArray(mqttConnectionConfiguration.topicsToSubscribeTo.size) {
-                                mqttConnectionConfiguration.subQos.value
-                            }
-                        ).waitForCompletion()
-                        Timber.i("Subscribed")
-
-                        messageProcessor.notifyOutgoingMessageQueue()
-                        if (preferences.publishLocationOnConnect) {
-                            messageProcessor.publishLocationMessage(null) // TODO fix the trigger here
+                    )
+                        .also {
+                            mqttClientAndConfiguration = MqttClientAndConfiguration(it, mqttConnectionConfiguration)
                         }
-                    }
-                    mqttClientAndConfiguration = MqttClientAndConfiguration(mqttClient, mqttConnectionConfiguration)
+                        .apply {
+                            Timber.i("Connecting to $mqttConnectionConfiguration")
+                            connect(mqttConnectionConfiguration.getConnectOptions(applicationContext))
+                                .waitForCompletion()
+                            Timber.i("Connected. Subscribing to ${mqttConnectionConfiguration.topicsToSubscribeTo}")
+                            endpointStateRepo.setState(EndpointState.CONNECTED)
+                            setCallback(mqttCallback)
+                            subscribe(
+                                mqttConnectionConfiguration.topicsToSubscribeTo.toTypedArray(),
+                                IntArray(mqttConnectionConfiguration.topicsToSubscribeTo.size) {
+                                    mqttConnectionConfiguration.subQos.value
+                                }
+                            ).waitForCompletion()
+                            Timber.i("Subscribed")
+
+                            messageProcessor.notifyOutgoingMessageQueue()
+                            if (preferences.publishLocationOnConnect) {
+                                messageProcessor.publishLocationMessage(null) // TODO fix the trigger here
+                            }
+                        }
                 } catch (e: Exception) {
                     when (e) {
                         is MqttSecurityException -> {
@@ -310,7 +314,7 @@ class MQTTMessageProcessorEndpoint(
                     }
                     endpointStateRepo.setState(EndpointState.ERROR.withError(e))
                 }
-            }.apply { Timber.d("MQTT connected in $this") }
+            }.apply { Timber.d("MQTT connection attempt completed in $this") }
         }
     }
 

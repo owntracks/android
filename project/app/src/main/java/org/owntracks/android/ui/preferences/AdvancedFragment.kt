@@ -35,10 +35,14 @@ class AdvancedFragment @Inject constructor() : AbstractPreferenceFragment(), Pre
             Preference.OnPreferenceChangeListener { preference, newValue ->
                 if (newValue is Boolean) {
                     when (preference.key) {
-                        Preferences::cmd.name -> if (!newValue) remoteConfigurationPreference?.isChecked =
-                            false
-                        Preferences::remoteConfiguration.name -> if (newValue) remoteCommandPreference?.isChecked =
-                            true
+                        Preferences::cmd.name -> if (!newValue) {
+                            remoteConfigurationPreference?.isChecked =
+                                false
+                        }
+                        Preferences::remoteConfiguration.name -> if (newValue) {
+                            remoteCommandPreference?.isChecked =
+                                true
+                        }
                     }
                 }
                 true

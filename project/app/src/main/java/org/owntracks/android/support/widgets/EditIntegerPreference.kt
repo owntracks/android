@@ -5,8 +5,7 @@ import android.util.AttributeSet
 import androidx.preference.EditTextPreference
 import timber.log.Timber
 
-class EditIntegerPreference(context: Context, attrs: AttributeSet?) :
-    EditTextPreference(context, attrs) {
+class EditIntegerPreference(context: Context, attrs: AttributeSet?) : EditTextPreference(context, attrs) {
     override fun persistString(value: String?): Boolean {
         return try {
             persistInt(Integer.valueOf(value ?: "0"))
@@ -16,14 +15,11 @@ class EditIntegerPreference(context: Context, attrs: AttributeSet?) :
     }
 
     override fun getPersistedString(defaultReturnValue: String?): String? {
-        try {
-            return getPersistedInt(0).toString()
+        return try {
+            getPersistedInt(0).toString()
         } catch (e: ClassCastException) {
-            Timber.e(
-                "Error retrieving string preference %s, returning default",
-                this.key
-            )
-            return defaultReturnValue
+            Timber.e("Error retrieving string preference $key, returning default")
+            defaultReturnValue
         }
     }
 }

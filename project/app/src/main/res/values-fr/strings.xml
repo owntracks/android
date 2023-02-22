@@ -193,7 +193,7 @@
     <string name="preferencesShowWaypointsOnMapSummary">"Dessiner des cercles de régions sur la carte"</string>
     <string name="preferencesTheme">"Thème"</string>
     <string name="preferencesTrackerId">"Tracker ID"</string>
-    <string name="preferencesUserUsername">"Nom d'utilisateur"</string>
+    <string name="preferencesUsername">"Nom d'utilisateur"</string>
     <string name="preferencesWebsocket">"WebSockets"</string>
     <string name="publish">"Envoyer"</string>
     <string name="radius">"Rayon"</string>

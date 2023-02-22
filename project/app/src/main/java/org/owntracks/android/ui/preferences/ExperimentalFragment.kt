@@ -3,9 +3,9 @@ package org.owntracks.android.ui.preferences
 import android.os.Bundle
 import androidx.preference.SwitchPreferenceCompat
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import org.owntracks.android.R
 import org.owntracks.android.preferences.Preferences.Companion.EXPERIMENTAL_FEATURES
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class ExperimentalFragment @Inject constructor() : AbstractPreferenceFragment() {

@@ -87,7 +87,7 @@
     <string name="preferencesSecurity">"Segurança"</string>
     <string name="preferencesServer">"Conexão"</string>
     <string name="preferencesTrackerId">"ID Tracker"</string>
-    <string name="preferencesUserUsername">"Utilizador"</string>
+    <string name="preferencesUsername">"Utilizador"</string>
     <string name="preferencesWebsocket">"Usa Websockets"</string>
     <string name="publish">"Reportar"</string>
     <string name="radius">"Raio"</string>

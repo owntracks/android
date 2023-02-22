@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="connectionModeValues" translatable="false">
+        <item>0</item>
+        <item>3</item>
+    </string-array>
     <string-array name="geocoderValues" translatable="false">
         <item>None</item>
         <item>Device</item>

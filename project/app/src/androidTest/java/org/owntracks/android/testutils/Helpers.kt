@@ -15,7 +15,10 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
 import androidx.test.runner.lifecycle.Stage
+import com.adevinta.android.barista.interaction.BaristaDialogInteractions
+import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickDialogPositiveButton
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
+import com.adevinta.android.barista.interaction.BaristaEditTextInteractions
 import com.adevinta.android.barista.interaction.PermissionGranter
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
@@ -33,6 +36,13 @@ fun scrollToPreferenceWithText(textResource: Int) {
             ViewActions.scrollTo()
         )
     )
+}
+
+fun writeToPreference(textResource: Int, value: String) {
+    scrollToPreferenceWithText(textResource)
+    clickOnAndWait(textResource)
+    BaristaEditTextInteractions.writeTo(android.R.id.edit, value)
+    clickDialogPositiveButton()
 }
 
 fun setNotFirstStartPreferences() {

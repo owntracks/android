@@ -137,6 +137,9 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesCategoryAdvancedLocator">"Locator"</string>
     <string name="preferencesCategoryAdvancedMisc">"Misc"</string>
     <string name="preferencesCategoryAdvancedServices">"Services"</string>
+    <string name="preferencesCategoryConnectionEndpoint">"Endpoint"</string>
+    <string name="preferencesCategoryConnectionIdentification">"Identification"</string>
+    <string name="preferencesCategoryConnectionCredentials">"Credentials"</string>
     <string name="preferencesCategoryNotificationBackground">"Background notifications"</string>
     <string name="preferencesCategoryNotificationErrors">"Errors &amp; Issues"</string>
     <string name="preferencesCategoryNotificationOngoing">"Ongoing notification"</string>
@@ -199,6 +202,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesNotificationLocationSummary">"Display last reported location and time"</string>
     <string name="preferencesNotificationPermissionRequestSummary">"Tap here to request notification permission"</string>
     <string name="preferencesNotificationPermissionRequest">"Notification permission disabled"</string>
+    <string name="preferencesNotSet">"Not set"</string>
     <string name="preferencesOpencageGeocoderApiKey">"OpenCage API Key"</string>
     <string name="preferencesOpencageGeocoderApiKeyDialog">"If set OpenCage is used to resolve location adresses instead of Google. Requires restart."</string>
     <string name="preferencesOpencageGeocoderApiKeySummary">"API key for OpenCage Reverse Geocoder"</string>
@@ -220,6 +224,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesReverseGeocodeProvider">"Reverse Geocode Provider"</string>
     <string name="preferencesSecurity">"Security"</string>
     <string name="preferencesServer">"Connection"</string>
+    <string name="preferencesSet">"Set"</string>
     <string name="preferencesShowWaypointsOnMap">"Show Waypoints"</string>
     <string name="preferencesShowWaypointsOnMapSummary">"Draw waypoint circles on the map"</string>
     <string name="preferencesTheme">"Theme"</string>
@@ -227,7 +232,8 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesTwitter" translatable="false">"Twitter"</string>
     <string name="preferencesMastodon" translatable="false">"Mastodon"</string>
     <string name="preferencesUrl" translatable="false">"URL"</string>
-    <string name="preferencesUserUsername">"Username"</string>
+    <string name="preferencesUrlValidationError">"Invalid URL"</string>
+    <string name="preferencesUsername">"Username"</string>
     <string name="preferencesWebsocket">"Use WebSockets"</string>
     <string name="publish">"Report"</string>
     <string name="radius">"Radius"</string>
@@ -254,6 +260,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="statusEndpointStateMessageSubscribeFailed">"Subscribe failed"</string>
     <string name="statusEndpointStateMessageTLSConfigError">"TLS config error"</string>
     <string name="statusEndpointStateMessageTLSError">"TLS Error: %s"</string>
+    <string name="statusEndpointStateMessageTLSBadClientCertPassword">"TLS Error: Bad client certificate password"</string>
     <string name="statusEndpointStateMessageUnableToConnect">"Unable to connect"</string>
     <string name="statusEndpointStateMessageUnknownHost">"Unknown host"</string>
     <string name="status_last_background_update_hint">"Location service last background update"</string>

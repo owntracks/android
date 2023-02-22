@@ -207,7 +207,7 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="preferencesShowWaypointsOnMapSummary">"Vis regionscirkler på kortet"</string>
     <string name="preferencesTheme">"Tema"</string>
     <string name="preferencesTrackerId">"Tracker ID"</string>
-    <string name="preferencesUserUsername">"Brugernavn"</string>
+    <string name="preferencesUsername">"Brugernavn"</string>
     <string name="preferencesWebsocket">"Brug WebSockets"</string>
     <string name="publish">"Rapport"</string>
     <string name="radius">"Radius"</string>

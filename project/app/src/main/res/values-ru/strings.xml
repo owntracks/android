@@ -223,7 +223,7 @@
 
     <!-- but contactDetailsTrackerId is untranslated? -->
     <string name="preferencesTrackerId">"Метка на карте"</string>
-    <string name="preferencesUserUsername">"Пользователь"</string>
+    <string name="preferencesUsername">"Пользователь"</string>
     <string name="preferencesWebsocket">"Использовать WebSockets"</string>
     <string name="publish">"Сообщить местоположение"</string>
     <string name="radius">"Радиус"</string>

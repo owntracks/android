@@ -209,7 +209,7 @@ Chcete-li to umožnit, zapněte polohu v nastavení zařízení."</string>
     <string name="preferencesShowWaypointsOnMapSummary">"Vykreslit kruhy oblasti na mapě"</string>
     <string name="preferencesTheme">"Vzhled aplikace"</string>
     <string name="preferencesTrackerId">"Tracker ID"</string>
-    <string name="preferencesUserUsername">"Uživatelské jméno"</string>
+    <string name="preferencesUsername">"Uživatelské jméno"</string>
     <string name="preferencesWebsocket">"Použít WebSockets"</string>
     <string name="publish">"Ohlásit"</string>
     <string name="radius">"Poloměr"</string>

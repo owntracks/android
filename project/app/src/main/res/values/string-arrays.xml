@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="connectionModes">
+        <item>MQTT</item>
+        <item>HTTP</item>
+    </string-array>
     <string-array name="geocoders">
         <item>None</item>
         <item>Device (Google)</item>

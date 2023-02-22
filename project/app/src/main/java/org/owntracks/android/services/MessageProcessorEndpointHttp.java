@@ -1,5 +1,7 @@
 package org.owntracks.android.services;
 
+import static java.lang.Math.max;
+
 import android.content.Context;
 
 import androidx.annotation.NonNull;
@@ -18,8 +20,10 @@ import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.SocketFactory;
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -101,7 +105,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
 
         if (tlsCaCrt.length() > 0) {
             try (FileInputStream tlsCaCertInputStream = applicationContext.openFileInput(tlsCaCrt)) {
-                socketFactoryOptions.withCaInputStream(tlsCaCertInputStream);
+                socketFactoryOptions.withCaCertificate(readAllBytes(tlsCaCertInputStream));
             } catch (IOException e) {
                 Timber.e(e);
                 return null;
@@ -110,7 +114,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
 
         if (tlsClientCrt.length() > 0) {
             try (FileInputStream tlsClientCrtStream = applicationContext.openFileInput(tlsClientCrt)) {
-                socketFactoryOptions.withClientP12InputStream(tlsClientCrtStream).withClientP12Password(preferences.getTlsClientCrtPassword());
+                socketFactoryOptions.withClientP12Certificate(readAllBytes(tlsClientCrtStream)).withClientP12Password(preferences.getTlsClientCrtPassword());
             } catch (IOException e) {
                 Timber.e(e);
                 return null;
@@ -122,6 +126,17 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
         } catch (Exception e) {
             return null;
         }
+    }
+
+    private byte[] readAllBytes(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream(max(inputStream.available(), 8 * 1024));
+        byte[] buffer = new byte[8 * 1024];
+        int bytes = inputStream.read(buffer);
+        while (bytes >= 0) {
+            out.write(buffer, 0, bytes);
+            bytes = inputStream.read(buffer);
+        }
+        return out.toByteArray();
     }
 
     private OkHttpClient getHttpClient() {
@@ -288,7 +303,7 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
 
     @Override
     public void onPreferenceChanged(@NonNull List<String> properties) {
-        if (preferences.getMode()==ConnectionMode.HTTP) {
+        if (preferences.getMode() == ConnectionMode.HTTP) {
             List<String> propertiesThatTriggerAURLReload = List.of(
                     "url",
                     "username",
@@ -314,10 +329,11 @@ public class MessageProcessorEndpointHttp extends MessageProcessorEndpoint imple
     public ConnectionConfiguration getEndpointConfiguration() throws ConfigurationIncompleteException {
         loadEndpointUrl();
         if (this.httpEndpoint == null) {
-            throw new ConfigurationIncompleteException(new Exception("HTTP Endpoint is missing")); // STOPSHIP: 06/02/2023 Fix this exception type
+            throw new ConfigurationIncompleteException(new Exception("HTTP Endpoint is missing"));
         }
         return null;
     }
+
     @Override
     public ConnectionMode getModeId() {
         return ConnectionMode.HTTP;

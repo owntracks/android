@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:title="@string/preferencesServer">
+
+    <IntListPreference
+        app:entries="@array/connectionModes"
+        app:entryValues="@array/connectionModeValues"
+        app:iconSpaceReserved="false"
+        app:key="mode"
+        app:title="@string/preferencesProfileId"
+        app:useSimpleSummaryProvider="true" />
+
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:key="preferenceGroupEndpoint"
+        app:title="@string/preferencesCategoryConnectionEndpoint">
+        <EditTextPreference
+            android:key="url"
+            android:title="@string/preferencesUrl"
+            app:dialogLayout="@layout/preference_edit_uri"
+            app:iconSpaceReserved="false"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            android:key="host"
+            android:title="@string/preferencesHost"
+            app:dialogLayout="@layout/preference_edit_text"
+            app:iconSpaceReserved="false"
+            app:useSimpleSummaryProvider="true" />
+        <org.owntracks.android.support.widgets.EditIntegerPreference
+            app:dialogLayout="@layout/preference_edit_number"
+            app:iconSpaceReserved="false"
+            app:key="port"
+            app:title="@string/preferencesPort"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            android:key="clientId"
+            android:title="@string/preferencesClientId"
+            app:dialogLayout="@layout/preference_edit_text"
+            app:iconSpaceReserved="false"
+            app:useSimpleSummaryProvider="true" />
+        <SwitchPreferenceCompat
+            android:key="ws"
+            android:title="@string/preferencesWebsocket"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="@string/preferencesCategoryConnectionIdentification">
+        <EditTextPreference
+            android:key="deviceId"
+            android:title="@string/preferencesDeviceName"
+            app:dialogLayout="@layout/preference_edit_text"
+            app:iconSpaceReserved="false"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            android:key="tid"
+            android:title="@string/preferencesTrackerId"
+            app:dialogLayout="@layout/preference_edit_text_two_alphanumeric"
+            app:iconSpaceReserved="false"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="@string/preferencesCategoryConnectionCredentials">
+        <EditTextPreference
+            android:key="username"
+            android:title="@string/preferencesUsername"
+            app:dialogLayout="@layout/preference_edit_text"
+            app:iconSpaceReserved="false"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            android:key="password"
+            android:title="@string/preferencesBrokerPassword"
+            app:dialogLayout="@layout/preference_edit_password"
+            app:iconSpaceReserved="false"
+            app:useSimpleSummaryProvider="false" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:key="preferenceGroupTLS"
+        app:title="@string/tls">
+        <SwitchPreferenceCompat
+            android:key="tls"
+            android:title="@string/tls"
+            app:iconSpaceReserved="false" />
+        <org.owntracks.android.ui.preferences.FilePickerPreference
+            android:key="tlsCaCrt"
+            android:title="@string/preferencesCaCrtPath"
+            app:dependency="tls"
+            app:iconSpaceReserved="false" />
+        <org.owntracks.android.ui.preferences.FilePickerPreference
+            android:key="tlsClientCrt"
+            android:title="@string/preferencesClientCrtPath"
+            app:dependency="tls"
+            app:iconSpaceReserved="false" />
+        <EditTextPreference
+            android:key="tlsClientCrtPassword"
+            android:title="@string/preferencesClientCrtPassword"
+            app:dependency="tls"
+            app:dialogLayout="@layout/preference_edit_password"
+            app:iconSpaceReserved="false"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="preferenceGroupParameters"
+        app:iconSpaceReserved="false"
+        app:title="@string/preferencesParameters">
+        <org.owntracks.android.support.widgets.EditIntegerPreference
+            app:dialogLayout="@layout/preference_edit_number"
+            app:dialogMessage="@string/preferencesMoveModeLocatorIntervalDialog"
+            app:iconSpaceReserved="false"
+            app:key="keepalive"
+            app:title="@string/preferencesKeepalive"
+            app:useSimpleSummaryProvider="true" />
+        <SwitchPreferenceCompat
+            android:key="cleanSession"
+            android:title="@string/preferencesCleanSessionEnabled"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

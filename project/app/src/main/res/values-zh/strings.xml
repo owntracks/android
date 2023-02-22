@@ -121,7 +121,7 @@
     <string name="preferencesSecurity">"安全性"</string>
     <string name="preferencesServer">"连接"</string>
     <string name="preferencesTheme">"主题"</string>
-    <string name="preferencesUserUsername">"用户名"</string>
+    <string name="preferencesUsername">"用户名"</string>
     <string name="preferencesWebsocket">"使用 WebSockets"</string>
     <string name="radius">"半径"</string>
     <string name="reconnect">"重新连接"</string>

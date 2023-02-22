@@ -1,18 +1,25 @@
 package org.owntracks.android.ui.preferences
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.MenuProvider
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiPreferencesBinding
 import org.owntracks.android.support.DrawerProvider
 import org.owntracks.android.ui.mixins.ServiceStarter
 import org.owntracks.android.ui.mixins.WorkManagerInitExceptionNotifier
-import javax.inject.Inject
+import org.owntracks.android.ui.status.StatusActivity
 
 @AndroidEntryPoint
 open class PreferencesActivity :
@@ -44,14 +51,18 @@ open class PreferencesActivity :
             if (supportFragmentManager.fragments.isEmpty()) {
                 setToolbarTitle(title)
             } else {
-                setToolbarTitle((supportFragmentManager.fragments[0] as PreferenceFragmentCompat).preferenceScreen.title)
+                setToolbarTitle(
+                    (supportFragmentManager.fragments[0] as PreferenceFragmentCompat).preferenceScreen.title
+                )
             }
         }
         val fragmentTransaction = supportFragmentManager.beginTransaction()
             .replace(R.id.content_frame, startFragment!!, null)
         fragmentTransaction.commit()
         supportFragmentManager.executePendingTransactions()
+        // We may have come here straight from the WelcomeActivity, so start the service.
         startService(this)
+
         notifyOnWorkManagerInitFailure(this)
     }
 
@@ -74,6 +85,7 @@ open class PreferencesActivity :
             .replace(R.id.content_frame, fragment)
             .addToBackStack(pref.key)
             .commit()
+
         return true
     }
 }

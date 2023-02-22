@@ -11,6 +11,6 @@ enum class ConnectionMode(@JsonValue val value: Int) {
         @FromConfiguration
         fun getByValue(value: Int): ConnectionMode =
             ConnectionMode.values()
-                .firstOrNull { it.value == value } ?: ConnectionMode.MQTT
+                .firstOrNull { it.value == value } ?: MQTT
     }
 }

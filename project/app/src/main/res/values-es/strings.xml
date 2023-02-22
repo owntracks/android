@@ -152,7 +152,7 @@
     <string name="preferencesSecurity">"Seguridad"</string>
     <string name="preferencesServer">"Conexión"</string>
     <string name="preferencesTrackerId">"Tracker ID"</string>
-    <string name="preferencesUserUsername">"Nombre de Usuario"</string>
+    <string name="preferencesUsername">"Nombre de Usuario"</string>
     <string name="preferencesWebsocket">"Usar WebSockets"</string>
     <string name="publish">"Reportar"</string>
     <string name="radius">"Radio"</string>

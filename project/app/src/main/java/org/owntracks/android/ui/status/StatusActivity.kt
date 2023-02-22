@@ -11,6 +11,7 @@ import androidx.databinding.BindingAdapter
 import androidx.databinding.DataBindingUtil
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.IOException
 import java.net.SocketTimeoutException
 import java.net.URISyntaxException
 import java.net.UnknownHostException
@@ -90,17 +91,26 @@ class StatusActivity : AppCompatActivity() {
                             else -> e.toString()
                         }
                     }
-                    is MqttException -> when (val mqttException = e.cause) {
+                    is MqttException -> when (val cause = e.cause) {
                         is UnknownHostException -> view.context.getString(
                             R.string.statusEndpointStateMessageUnknownHost
                         )
                         is SocketTimeoutException -> view.context.getString(
                             R.string.statusEndpointStateMessageSocketTimeout
                         )
-                        is SSLException -> view.context.getString(
-                            R.string.statusEndpointStateMessageTLSError,
-                            mqttException.message
-                        )
+                        is SSLException -> {
+                            if (cause.message != null && cause.message!!.contains("TLSV1_ALERT_CERTIFICATE_REQUIRED")) {
+                                view.context.getString(
+                                    R.string.statusEndpointStateMessageTLSError,
+                                    "TLSV1_ALERT_CERTIFICATE_REQUIRED"
+                                )
+                            } else {
+                                view.context.getString(
+                                    R.string.statusEndpointStateMessageTLSError,
+                                    cause.message
+                                )
+                            }
+                        }
                         else -> when (e.reasonCode.toShort()) {
                             REASON_CODE_INVALID_PROTOCOL_VERSION -> view.context.getString(
                                 R.string.statusEndpointStateMessageInvalidProtocolVersion
@@ -131,9 +141,16 @@ class StatusActivity : AppCompatActivity() {
                             )
                             REASON_CODE_CONNECTION_LOST -> view.context.getString(
                                 R.string.statusEndpointStateMessageConnectionLost,
-                                mqttException.toString()
+                                cause.toString()
                             )
                             else -> e.toString()
+                        }
+                    }
+                    is IOException -> {
+                        if (e.message == "PKCS12 key store mac invalid - wrong password or corrupted file.") {
+                            view.context.getString(R.string.statusEndpointStateMessageTLSBadClientCertPassword)
+                        } else {
+                            e.toString()
                         }
                     }
                     else -> e.toString()

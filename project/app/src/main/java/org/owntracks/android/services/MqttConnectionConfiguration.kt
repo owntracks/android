@@ -89,7 +89,9 @@ data class MqttConnectionConfiguration constructor(
             if (tlsCaCrt.isNotEmpty()) {
                 try {
                     context.openFileInput(tlsCaCrt)
-                        .use { socketFactoryOptions.withCaInputStream(it) }
+                        .use {
+                            socketFactoryOptions.withCaCertificate(it.readBytes())
+                        }
 
                     /* The default for paho is to validate hostnames as per the HTTPS spec. However, this causes
                     a bit of a breakage for some users using self-signed certificates, where the verification of
@@ -103,7 +105,7 @@ data class MqttConnectionConfiguration constructor(
                     isHttpsHostnameVerificationEnabled = false
                     context.openFileInput(tlsCaCrt)
                         .use { caFileInputStream ->
-                            val ca = CertificateFactory.getInstance("X.509")
+                            val ca = CertificateFactory.getInstance("X.509", "BC")
                                 .generateCertificate(caFileInputStream) as X509Certificate
                             sslHostnameVerifier = MqttHostnameVerifier(ca)
                         }
@@ -114,7 +116,7 @@ data class MqttConnectionConfiguration constructor(
             if (tlsClientCrt.isNotEmpty()) {
                 context.openFileInput(tlsClientCrt)
                     .use {
-                        socketFactoryOptions.withClientP12InputStream(it)
+                        socketFactoryOptions.withClientP12Certificate(it.readBytes())
                             .withClientP12Password(tlsClientCrtPassword)
                     }
             }

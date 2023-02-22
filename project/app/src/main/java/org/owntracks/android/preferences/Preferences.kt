@@ -4,12 +4,6 @@ import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-import org.owntracks.android.BuildConfig
-import org.owntracks.android.model.messages.MessageConfiguration
-import org.owntracks.android.preferences.types.*
-import org.owntracks.android.services.worker.Scheduler.Companion.MIN_PERIODIC_INTERVAL
-import org.owntracks.android.ui.map.MapLayerStyle
-import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -21,6 +15,12 @@ import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.jvm.jvmErasure
 import kotlin.reflect.typeOf
+import org.owntracks.android.BuildConfig
+import org.owntracks.android.model.messages.MessageConfiguration
+import org.owntracks.android.preferences.types.*
+import org.owntracks.android.services.worker.Scheduler.Companion.MIN_PERIODIC_INTERVAL
+import org.owntracks.android.ui.map.MapLayerStyle
+import timber.log.Timber
 
 @Singleton
 class Preferences @Inject constructor(private val preferencesStore: PreferencesStore) {
@@ -73,33 +73,36 @@ class Preferences @Inject constructor(private val preferencesStore: PreferencesS
      * @param configuration the [MessageConfiguration] to import
      */
     fun importConfiguration(configuration: MessageConfiguration) {
-        val txn = PreferencesStore.Transaction(this)
-        preferencesStore.setterTransaction = txn
-        try {
-            allConfigKeys.filterIsInstance<KMutableProperty<*>>()
-                .filter { configuration.containsKey(it.name) }
-                .forEach {
-                    val configValue = configuration[it.name]
-                    if (configValue == null) {
-                        resetPreference(it.name)
-                    } else {
-                        Timber.d("Importing configuration key ${it.name} -> $configValue")
-                        try {
-                            // We need to convert the imported config value into an enum if the type of the preference is
-                            // actually an enum
-                            importPreference(it, configValue)
-                        } catch (e: java.lang.IllegalArgumentException) {
-                            Timber.w(
-                                "Trying to import wrong type of preference for ${it.name}. " +
-                                    "Expected ${it.getter.returnType} but given ${configValue.javaClass}. Ignoring."
-                            )
+        PreferencesStore.Transaction(this, preferencesStore)
+            .use {
+                allConfigKeys.filterIsInstance<KMutableProperty<*>>()
+                    .filter { configuration.containsKey(it.name) }
+                    .forEach {
+                        val configValue = configuration[it.name]
+                        if (configValue == null) {
+                            resetPreference(it.name)
+                        } else {
+                            Timber.d("Importing configuration key ${it.name} -> $configValue")
+                            try {
+                                // We need to convert the imported config value into an enum if the type of the preference is
+                                // actually an enum
+                                importPreference(it, configValue)
+                            } catch (e: java.lang.IllegalArgumentException) {
+                                Timber.w(
+                                    "Trying to import wrong type of preference for ${it.name}. " +
+                                        "Expected ${it.getter.returnType} but given ${configValue.javaClass}. Ignoring."
+                                )
+                            }
                         }
                     }
-                }
-            txn.commit()
-        } finally {
-            preferencesStore.setterTransaction = null
-        }
+            }
+    }
+
+    fun atomic(things: Set<SetterAndValue<out Any>>) {
+        PreferencesStore.Transaction(this, preferencesStore)
+            .use {
+                things.forEach { (t, u) -> t.setter.call(u) }
+            }
     }
 
     /**

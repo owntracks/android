@@ -1,11 +1,12 @@
 package org.owntracks.android.preferences
 
 import android.content.SharedPreferences
+import java.io.Closeable
+import kotlin.reflect.KProperty
+import kotlin.reflect.typeOf
 import org.owntracks.android.preferences.types.*
 import org.owntracks.android.ui.map.MapLayerStyle
 import timber.log.Timber
-import kotlin.reflect.KProperty
-import kotlin.reflect.typeOf
 
 /**
  * Allows a preferences class to read and write values from some sort of store
@@ -129,17 +130,31 @@ abstract class PreferencesStore :
 
     var setterTransaction: Transaction? = null
 
-    class Transaction internal constructor(private val preferences: Preferences) {
+    class Transaction internal constructor(
+        private val preferences: Preferences,
+        private val preferencesStore: PreferencesStore
+    ) : Closeable {
+        init {
+            preferencesStore.setterTransaction = this
+        }
+
         fun addProperty(property: KProperty<*>) {
             propertiesToNotify.add(property)
         }
 
-        fun commit() {
-            Timber.d("Committing prefrences transaction for $propertiesToNotify")
+        private fun commit() {
+            Timber.d("Committing preferences transaction for $propertiesToNotify")
             preferences.notifyChanged(propertiesToNotify)
         }
 
         private val propertiesToNotify = mutableSetOf<KProperty<*>>()
+        override fun close() {
+            try {
+                commit()
+            } finally {
+                preferencesStore.setterTransaction = null
+            }
+        }
     }
 
     @Suppress("UNCHECKED_CAST")

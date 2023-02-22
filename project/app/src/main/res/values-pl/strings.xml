@@ -213,7 +213,7 @@ Aby to umożliwić, włącz lokalizację w ustawieniach urządzenia."</string>
     <string name="preferencesShowWaypointsOnMapSummary">"Rysuj okręgi obszarów na mapie"</string>
     <string name="preferencesTheme">"Motyw"</string>
     <string name="preferencesTrackerId">"ID Trackera"</string>
-    <string name="preferencesUserUsername">"Nazwa użytkownika"</string>
+    <string name="preferencesUsername">"Nazwa użytkownika"</string>
     <string name="preferencesWebsocket">"Używaj WebSockets"</string>
     <string name="publish">"Zgłoś"</string>
     <string name="radius">"Zasięg"</string>
