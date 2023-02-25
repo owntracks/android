@@ -265,7 +265,7 @@ jobs:
         default: oss
       parallelism:
         type: integer
-        default: 4
+        default: 1
       android-api-version:
         type: string
         default: "29"
