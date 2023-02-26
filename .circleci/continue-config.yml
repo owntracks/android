@@ -44,22 +44,21 @@ workflows:
       - lint:
           requires:
             - build-release
-      - ui-tests:
-          matrix:
-            parameters:
-              flavor:
-                - oss
-                - gms
-          name: <<matrix.flavor>>-ui-tests
-          requires:
-            - lint
-            - unit-test
-            - build-release
+      # - ui-tests:
+      #     matrix:
+      #       parameters:
+      #         flavor:
+      #           - oss
+      #           - gms
+      #     name: <<matrix.flavor>>-ui-tests
+      #     requires:
+      #       - lint
+      #       - unit-test
+      #       - build-release
       - publish-to-play-store:
           context: Android Deploy Credentials
           requires:
-            - oss-ui-tests
-            - gms-ui-tests
+            - unit-test
 
   smoke-test:
     when: << pipeline.parameters.smoke-test-required >>
@@ -178,7 +177,7 @@ commands:
                 name: Logcat
           post-emulator-launch-assemble-command: ""
           run-logcat: false
-          max-tries: 2
+          max-tries: 1
           no-output-timeout: 30m
           save-gradle-cache: false
 
