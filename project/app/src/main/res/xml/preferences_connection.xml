@@ -15,16 +15,16 @@
         app:iconSpaceReserved="false"
         app:key="preferenceGroupEndpoint"
         app:title="@string/preferencesCategoryConnectionEndpoint">
-        <EditTextPreference
+        <ValidatingEditTextPreference
+            android:inputType="textPassword"
             android:key="url"
+            android:lines="1"
             android:title="@string/preferencesUrl"
-            app:dialogLayout="@layout/preference_edit_uri"
             app:iconSpaceReserved="false"
             app:useSimpleSummaryProvider="true" />
         <EditTextPreference
             android:key="host"
             android:title="@string/preferencesHost"
-            app:dialogLayout="@layout/preference_edit_text"
             app:iconSpaceReserved="false"
             app:useSimpleSummaryProvider="true" />
         <org.owntracks.android.support.widgets.EditIntegerPreference
@@ -33,10 +33,9 @@
             app:key="port"
             app:title="@string/preferencesPort"
             app:useSimpleSummaryProvider="true" />
-        <EditTextPreference
+        <ValidatingEditTextPreference
             android:key="clientId"
             android:title="@string/preferencesClientId"
-            app:dialogLayout="@layout/preference_edit_text"
             app:iconSpaceReserved="false"
             app:useSimpleSummaryProvider="true" />
         <SwitchPreferenceCompat
@@ -47,13 +46,12 @@
     <PreferenceCategory
         app:iconSpaceReserved="false"
         app:title="@string/preferencesCategoryConnectionIdentification">
-        <EditTextPreference
+        <ValidatingEditTextPreference
             android:key="deviceId"
             android:title="@string/preferencesDeviceName"
-            app:dialogLayout="@layout/preference_edit_text"
             app:iconSpaceReserved="false"
             app:useSimpleSummaryProvider="true" />
-        <EditTextPreference
+        <ValidatingEditTextPreference
             android:key="tid"
             android:title="@string/preferencesTrackerId"
             app:dialogLayout="@layout/preference_edit_text_two_alphanumeric"
@@ -63,13 +61,13 @@
     <PreferenceCategory
         app:iconSpaceReserved="false"
         app:title="@string/preferencesCategoryConnectionCredentials">
-        <EditTextPreference
+        <ValidatingEditTextPreference
             android:key="username"
             android:title="@string/preferencesUsername"
             app:dialogLayout="@layout/preference_edit_text"
             app:iconSpaceReserved="false"
             app:useSimpleSummaryProvider="true" />
-        <EditTextPreference
+        <ValidatingEditTextPreference
             android:key="password"
             android:title="@string/preferencesBrokerPassword"
             app:dialogLayout="@layout/preference_edit_password"
@@ -94,11 +92,10 @@
             android:title="@string/preferencesClientCrtPath"
             app:dependency="tls"
             app:iconSpaceReserved="false" />
-        <EditTextPreference
+        <ValidatingEditTextPreference
             android:key="tlsClientCrtPassword"
             android:title="@string/preferencesClientCrtPassword"
             app:dependency="tls"
-            app:dialogLayout="@layout/preference_edit_password"
             app:iconSpaceReserved="false"
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
@@ -107,7 +104,6 @@
         app:iconSpaceReserved="false"
         app:title="@string/preferencesParameters">
         <org.owntracks.android.support.widgets.EditIntegerPreference
-            app:dialogLayout="@layout/preference_edit_number"
             app:dialogMessage="@string/preferencesMoveModeLocatorIntervalDialog"
             app:iconSpaceReserved="false"
             app:key="keepalive"

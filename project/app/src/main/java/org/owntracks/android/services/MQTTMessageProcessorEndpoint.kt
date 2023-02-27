@@ -16,7 +16,6 @@ import kotlinx.coroutines.future.asCompletableFuture
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import org.eclipse.paho.client.mqttv3.*
-import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence
 import org.owntracks.android.data.EndpointState
 import org.owntracks.android.data.repos.EndpointStateRepo
 import org.owntracks.android.di.IoDispatcher
@@ -148,25 +147,15 @@ class MQTTMessageProcessorEndpoint(
                     try {
                         Timber.d("Publishing message id=${message.messageId}")
                         measureTime {
-                            while (true) {
-                                try {
-                                    mqttClient.publish(
-                                        message.topic,
-                                        message.toJsonBytes(parser),
-                                        message.qos,
-                                        message.retained
-                                    )
-                                        .also { Timber.v("MQTT message sent with messageId=${it.messageId}") }
-                                    break
-                                } catch (e: MqttException) {
-                                    if (e.reasonCode.toShort() == MqttException.REASON_CODE_MAX_INFLIGHT) {
-                                        throw e
-                                        // We need to try again. Bug in the MQTT client: https://github.com/eclipse/paho.mqtt.java/issues/551
-                                    } else {
-                                        throw e
-                                    }
+                            mqttClient.publish(
+                                message.topic,
+                                message.toJsonBytes(parser),
+                                message.qos,
+                                message.retained
+                            )
+                                .also {
+                                    Timber.v("MQTT message sent with messageId=${it.messageId}. ")
                                 }
-                            }
                         }.apply { Timber.i("Message id=${message.messageId} sent in $this") }
                         messageProcessor.onMessageDelivered()
                     } catch (e: Exception) {
@@ -174,8 +163,10 @@ class MQTTMessageProcessorEndpoint(
                         when (e) {
                             is IOException -> messageProcessor.onMessageDeliveryFailedFinal(message.messageId)
                             is MqttException -> {
-                                messageProcessor.onMessageDeliveryFailed(message.messageId)
-                                reconnect(mqttConnectionConfiguration)
+                                if (e.reasonCode.toShort() != MqttException.REASON_CODE_MAX_INFLIGHT) {
+                                    messageProcessor.onMessageDeliveryFailed(message.messageId)
+                                    reconnect(mqttConnectionConfiguration)
+                                }
                                 throw OutgoingMessageSendingException(e)
                             }
                             else -> {
@@ -275,7 +266,7 @@ class MQTTMessageProcessorEndpoint(
                     MqttAsyncClient(
                         mqttConnectionConfiguration.connectionString,
                         mqttConnectionConfiguration.clientId,
-                        MqttDefaultFilePersistence(applicationContext.noBackupFilesDir.absolutePath),
+                        NonCrashyMqttFilePersistence(applicationContext.noBackupFilesDir.absolutePath),
                         ScheduledExecutorPingSender(executorService),
                         executorService,
                         AndroidHighResolutionTimer()

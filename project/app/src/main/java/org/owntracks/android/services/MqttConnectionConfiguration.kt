@@ -35,7 +35,8 @@ data class MqttConnectionConfiguration constructor(
     val tlsClientCrtPassword: String,
     val willTopic: String,
     val topicsToSubscribeTo: Set<String>,
-    val subQos: MqttQos
+    val subQos: MqttQos,
+    val maxInFlight: Int = 10
 ) : ConnectionConfiguration {
     private val scheme = if (ws) {
         if (tls) "wss" else "ws"
@@ -80,6 +81,7 @@ data class MqttConnectionConfiguration constructor(
                 0,
                 false
             )
+            maxInflight = maxInFlight
             setSocketFactory(context)
         }
 
