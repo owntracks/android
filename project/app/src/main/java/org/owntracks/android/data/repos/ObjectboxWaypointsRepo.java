@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.data.MyObjectBox;
 import org.owntracks.android.data.WaypointModel;
 import org.owntracks.android.data.WaypointModel_;
@@ -31,8 +30,7 @@ public class ObjectboxWaypointsRepo extends WaypointsRepo {
     private final Box<org.owntracks.android.data.WaypointModel> box;
 
     @Inject
-    public ObjectboxWaypointsRepo(@ApplicationContext Context context, EventBus eventBus, Preferences preferences) {
-        super(eventBus);
+    public ObjectboxWaypointsRepo(@ApplicationContext Context context, Preferences preferences) {
         BoxStore boxStore = MyObjectBox.builder().androidContext(context).build();
         this.box = boxStore.boxFor(org.owntracks.android.data.WaypointModel.class);
         this.preferences = preferences;

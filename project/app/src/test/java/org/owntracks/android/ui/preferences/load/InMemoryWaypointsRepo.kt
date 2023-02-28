@@ -2,16 +2,14 @@ package org.owntracks.android.ui.preferences.load
 
 import androidx.lifecycle.LiveData
 import io.objectbox.query.Query
-import org.greenrobot.eventbus.EventBus
 import org.owntracks.android.data.WaypointModel
 import org.owntracks.android.data.repos.WaypointsRepo
 
-class InMemoryWaypointsRepo(eventBus: EventBus?) : WaypointsRepo(eventBus) {
+class InMemoryWaypointsRepo() : WaypointsRepo() {
     private val waypoints = mutableListOf<WaypointModel>()
     override fun get(tst: Long): WaypointModel? = waypoints.firstOrNull { it.tst == tst }
 
-
-    public override fun getAll()= waypoints
+    public override fun getAll() = waypoints
 
     override fun getAllWithGeofences(): MutableList<WaypointModel> {
         TODO("Not yet implemented")

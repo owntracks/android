@@ -4,13 +4,12 @@ import android.location.Location
 import androidx.lifecycle.MutableLiveData
 import javax.inject.Inject
 import javax.inject.Singleton
-import org.greenrobot.eventbus.EventBus
 import org.owntracks.android.location.LatLng
 import org.owntracks.android.ui.map.MapLocationZoomLevelAndRotation
 import org.owntracks.android.ui.map.MapViewModel
 
 @Singleton
-class LocationRepo @Inject constructor(private val eventBus: EventBus) {
+class LocationRepo @Inject constructor() {
     /**
      * The last location that was published to the network
      */
@@ -21,7 +20,6 @@ class LocationRepo @Inject constructor(private val eventBus: EventBus) {
 
     fun setCurrentPublishedLocation(l: Location) {
         currentPublishedLocation.postValue(l)
-        eventBus.postSticky(l)
     }
 
     var currentBlueDotOnMapLocation: LatLng? = null

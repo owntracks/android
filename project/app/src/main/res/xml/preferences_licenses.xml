@@ -35,14 +35,6 @@
             android:data="https://dagger.dev/hilt/" />
     </Preference>
     <Preference
-        android:summary="Greenrobot"
-        android:title="EventBus"
-        app:iconSpaceReserved="false">
-        <intent
-            android:action="android.intent.action.VIEW"
-            android:data="https://github.com/greenrobot/EventBus" />
-    </Preference>
-    <Preference
         android:summary="Eclipse Foundation"
         android:title="Paho MQTTv3.1 Java Client"
         app:iconSpaceReserved="false">

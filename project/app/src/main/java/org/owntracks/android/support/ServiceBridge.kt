@@ -1,9 +1,10 @@
 package org.owntracks.android.support
 
-import timber.log.Timber
 import java.lang.ref.WeakReference
 import javax.inject.Inject
 import javax.inject.Singleton
+import org.owntracks.android.model.messages.MessageTransition
+import timber.log.Timber
 
 @Singleton
 class ServiceBridge @Inject internal constructor(private val runThingsOnOtherThreads: RunThingsOnOtherThreads) {
@@ -11,6 +12,7 @@ class ServiceBridge @Inject internal constructor(private val runThingsOnOtherThr
 
     interface ServiceBridgeInterface {
         fun requestOnDemandLocationUpdate()
+        fun sendEventNotification(message: MessageTransition)
     }
 
     fun bind(service: ServiceBridgeInterface) {
@@ -18,10 +20,22 @@ class ServiceBridge @Inject internal constructor(private val runThingsOnOtherThr
     }
 
     fun requestOnDemandLocationFix() {
-        if (serviceWeakReference.get() == null) {
-            Timber.e("missing service reference")
-            return
-        }
-        runThingsOnOtherThreads.postOnMainHandlerDelayed({serviceWeakReference.get()?.requestOnDemandLocationUpdate()})
+        serviceWeakReference.get()
+            ?.apply {
+                runThingsOnOtherThreads.postOnMainHandlerDelayed({
+                    requestOnDemandLocationUpdate()
+                })
+            }
+            ?.run { Timber.e("missing service reference") }
+    }
+
+    fun sendEventNotification(message: MessageTransition) {
+        serviceWeakReference.get()
+            ?.apply {
+                runThingsOnOtherThreads.postOnMainHandlerDelayed({
+                    sendEventNotification(message)
+                })
+            }
+            ?.run { Timber.e("missing service reference") }
     }
 }

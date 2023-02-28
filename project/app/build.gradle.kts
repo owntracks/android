@@ -166,9 +166,6 @@ android {
 kapt {
     useBuildCache = true
     correctErrorTypes = true
-    arguments {
-        arg("eventBusIndex", "org.owntracks.android.EventBusIndex")
-    }
 }
 
 tasks.withType<Test> {
@@ -198,14 +195,12 @@ dependencies {
     // Mapping
     implementation(libs.osmdroid)
 
-    // Utility libraries
-    implementation(libs.bundles.hilt)
-    implementation(libs.eventbus)
-
     // Connectivity
     implementation(libs.paho.mqttclient)
     implementation(libs.okhttp)
 
+    // Utility libraries
+    implementation(libs.bundles.hilt)
     implementation(libs.bundles.jackson)
     implementation(libs.square.tape2)
     implementation(libs.timber)
@@ -225,7 +220,6 @@ dependencies {
     kapt(libs.bundles.jaxb.annotation.processors)
 
     // Preprocessors
-    kapt(libs.eventbus.annotationprocessor)
     kapt(libs.bundles.kapt.hilt)
 
     kaptTest(libs.bundles.kapt.hilt)

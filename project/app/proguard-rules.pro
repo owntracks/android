@@ -7,16 +7,6 @@
   public protected private *;
 }
 
-## EventBus
--keepattributes *Annotation*
--keepclassmembers class * {
-    @org.greenrobot.eventbus.Subscribe <methods>;
-}
--keep enum org.greenrobot.eventbus.ThreadMode { *; }
-
-# Accessed via reflection, avoid renaming or removal
--keep class org.greenrobot.eventbus.android.AndroidComponentsImpl
-
 ## Jackson
 -keepattributes *Annotation*,EnclosingMethod,Signature
 -keepnames class com.fasterxml.jackson.** { *; }

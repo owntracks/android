@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.res.Resources
 import android.util.DisplayMetrics
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import org.greenrobot.eventbus.EventBus
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -28,7 +27,6 @@ class MemoryContactsRepoTest {
     private lateinit var mockResources: Resources
     private lateinit var mockContext: Context
     private lateinit var messageLocation: MessageLocation
-    private lateinit var eventBus: EventBus
     private lateinit var contactBitmapAndNameMemoryCache: ContactBitmapAndNameMemoryCache
     private var contactsRepo: ContactsRepo? = null
 
@@ -36,7 +34,6 @@ class MemoryContactsRepoTest {
 
     @Before
     fun setup() {
-        eventBus = mock {}
         val mockDisplayMetrics = DisplayMetrics()
         mockDisplayMetrics.densityDpi = 160
         mockResources = mock {
@@ -60,7 +57,7 @@ class MemoryContactsRepoTest {
 
         contactBitmapAndNameMemoryCache = ContactBitmapAndNameMemoryCache()
 
-        contactsRepo = MemoryContactsRepo(eventBus, contactBitmapAndNameMemoryCache, preferences)
+        contactsRepo = MemoryContactsRepo(contactBitmapAndNameMemoryCache, preferences)
     }
 
     @Test

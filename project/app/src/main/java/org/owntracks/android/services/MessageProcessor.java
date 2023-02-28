@@ -6,7 +6,6 @@ import androidx.annotation.NonNull;
 import androidx.test.espresso.IdlingResource;
 import androidx.test.espresso.idling.CountingIdlingResource;
 
-import org.greenrobot.eventbus.EventBus;
 import org.owntracks.android.data.EndpointState;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.data.repos.EndpointStateRepo;
@@ -22,7 +21,6 @@ import org.owntracks.android.preferences.Preferences;
 import org.owntracks.android.preferences.types.ConnectionMode;
 import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.Parser;
-import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.ServiceBridge;
 import org.owntracks.android.support.SimpleIdlingResource;
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException;
@@ -48,22 +46,14 @@ import timber.log.Timber;
 
 @Singleton
 public class MessageProcessor implements Preferences.OnPreferenceChangeListener {
-    private final EventBus eventBus;
     private final ContactsRepo contactsRepo;
     private final WaypointsRepo waypointsRepo;
-    private final Context applicationContext;
     private final Preferences preferences;
-    private final Parser parser;
-    private final Scheduler scheduler;
     private final Lazy<LocationProcessor> locationProcessorLazy;
-
     private final EndpointStateRepo endpointStateRepo;
     private final ServiceBridge serviceBridge;
     private final CountingIdlingResource outgoingQueueIdlingResource;
-    private final RunThingsOnOtherThreads runThingsOnOtherThreads;
-    private final CoroutineDispatcher ioDispatcher;
     private MessageProcessorEndpoint endpoint;
-
     private boolean acceptMessages = false;
     private final BlockingDeque<MessageBase> outgoingQueue;
     private Thread backgroundDequeueThread;
@@ -83,7 +73,6 @@ public class MessageProcessor implements Preferences.OnPreferenceChangeListener 
     @Inject
     public MessageProcessor(
             @ApplicationContext Context applicationContext,
-            EventBus eventBus,
             ContactsRepo contactsRepo,
             Preferences preferences,
             WaypointsRepo waypointsRepo,
@@ -91,25 +80,17 @@ public class MessageProcessor implements Preferences.OnPreferenceChangeListener 
             Scheduler scheduler,
             EndpointStateRepo endpointStateRepo,
             ServiceBridge serviceBridge,
-            RunThingsOnOtherThreads runThingsOnOtherThreads,
             CountingIdlingResource outgoingQueueIdlingResource,
             Lazy<LocationProcessor> locationProcessorLazy,
             @IoDispatcher CoroutineDispatcher ioDispatcher
     ) {
-        this.applicationContext = applicationContext;
         this.preferences = preferences;
-        this.eventBus = eventBus;
         this.contactsRepo = contactsRepo;
         this.waypointsRepo = waypointsRepo;
-        this.parser = parser;
-        this.scheduler = scheduler;
         this.locationProcessorLazy = locationProcessorLazy;
         this.endpointStateRepo = endpointStateRepo;
         this.serviceBridge = serviceBridge;
         this.outgoingQueueIdlingResource = outgoingQueueIdlingResource;
-        this.eventBus.register(this);
-        this.runThingsOnOtherThreads = runThingsOnOtherThreads;
-        this.ioDispatcher = ioDispatcher;
 
         outgoingQueue = new BlockingDequeThatAlsoSometimesPersistsThingsToDiskMaybe(10000, applicationContext.getFilesDir(), parser);
         synchronized (outgoingQueue) {
@@ -119,8 +100,8 @@ public class MessageProcessor implements Preferences.OnPreferenceChangeListener 
             Timber.d("Initializing the outgoingqueueidlingresource at %s", outgoingQueue.size());
         }
         preferences.registerOnPreferenceChangedListener(this);
-        httpEndpoint = new MessageProcessorEndpointHttp(this, this.parser, this.preferences, this.scheduler, this.applicationContext, this.endpointStateRepo);
-        mqttEndpoint = new MQTTMessageProcessorEndpoint(this, this.endpointStateRepo, this.scheduler, this.preferences, this.parser, this.ioDispatcher, applicationContext);
+        httpEndpoint = new MessageProcessorEndpointHttp(this, parser, this.preferences, scheduler, applicationContext, this.endpointStateRepo);
+        mqttEndpoint = new MQTTMessageProcessorEndpoint(this, this.endpointStateRepo, scheduler, this.preferences, parser, ioDispatcher, applicationContext);
     }
 
     synchronized public void initialize() {
@@ -376,7 +357,6 @@ public class MessageProcessor implements Preferences.OnPreferenceChangeListener 
                         break;
                     }
                     serviceBridge.requestOnDemandLocationFix();
-
                     break;
                 case WAYPOINTS:
                     locationProcessorLazy.get().publishWaypointsMessage();
@@ -419,7 +399,7 @@ public class MessageProcessor implements Preferences.OnPreferenceChangeListener 
     }
 
     private void processIncomingMessage(MessageTransition message) {
-        eventBus.post(message);
+        serviceBridge.sendEventNotification(message);
     }
 
     void stopSendingMessages() {

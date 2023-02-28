@@ -1,6 +1,5 @@
 package org.owntracks.android.e2e
 
-import android.Manifest
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
@@ -12,7 +11,6 @@ import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
-import com.adevinta.android.barista.interaction.PermissionGranter.allowPermissionsIfNeeded
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.DelicateCoroutinesApi

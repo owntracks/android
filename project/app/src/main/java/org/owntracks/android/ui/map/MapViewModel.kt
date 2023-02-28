@@ -76,12 +76,12 @@ class MapViewModel @Inject constructor(
         get() = mutableRelativeContactBearing
 
     // Controls the current map layer style
-    private val mutableMapLayerStyle = MutableLiveData<MapLayerStyle>(preferences.mapLayerStyle)
+    private val mutableMapLayerStyle = MutableLiveData(preferences.mapLayerStyle)
     val mapLayerStyle: LiveData<MapLayerStyle>
         get() = mutableMapLayerStyle
 
     // Controls the status of the MyLocation FAB on the map
-    private val mutableMyLocationStatus = MutableLiveData<MyLocationStatus>(MyLocationStatus.DISABLED)
+    private val mutableMyLocationStatus = MutableLiveData(MyLocationStatus.DISABLED)
     val myLocationStatus: LiveData<MyLocationStatus>
         get() = mutableMyLocationStatus
 

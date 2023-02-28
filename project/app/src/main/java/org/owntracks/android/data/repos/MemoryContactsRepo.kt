@@ -2,23 +2,18 @@ package org.owntracks.android.data.repos
 
 import androidx.annotation.MainThread
 import androidx.lifecycle.MutableLiveData
-import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
+import javax.inject.Inject
+import javax.inject.Singleton
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.ContactBitmapAndName
 import org.owntracks.android.support.ContactBitmapAndNameMemoryCache
-import org.owntracks.android.support.Events.*
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 class MemoryContactsRepo @Inject constructor(
-    private val eventBus: EventBus,
     private val contactsBitmapAndNameMemoryCache: ContactBitmapAndNameMemoryCache,
     private val preferences: Preferences
 ) : ContactsRepo, Preferences.OnPreferenceChangeListener {
@@ -61,7 +56,6 @@ class MemoryContactsRepo @Inject constructor(
                 contact.id,
                 ContactBitmapAndName.CardBitmap(messageCard.name, null)
             )
-            eventBus.post(contact)
         } else {
             contact = FusedContact(id)
             contact.messageCard = messageCard
@@ -80,7 +74,6 @@ class MemoryContactsRepo @Inject constructor(
             // If timestamp of last location message is <= the new location message, skip update. We either received an old or already known message.
             if (fusedContact.setMessageLocation(messageLocation)) {
                 all.postValue(contacts)
-                eventBus.post(fusedContact)
             }
         } else {
             fusedContact = FusedContact(id).apply {
@@ -98,7 +91,6 @@ class MemoryContactsRepo @Inject constructor(
     }
 
     init {
-        eventBus.register(this)
         preferences.registerOnPreferenceChangedListener(this)
     }
 

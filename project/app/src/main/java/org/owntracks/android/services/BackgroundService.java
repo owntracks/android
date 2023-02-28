@@ -32,9 +32,6 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.lifecycle.LifecycleService;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 import org.jetbrains.annotations.NotNull;
 import org.owntracks.android.R;
 import org.owntracks.android.data.EndpointState;
@@ -60,8 +57,6 @@ import org.owntracks.android.preferences.Preferences;
 import org.owntracks.android.preferences.types.MonitoringMode;
 import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.DateFormatter;
-import org.owntracks.android.support.Events;
-import org.owntracks.android.support.RequirementsChecker;
 import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.ServiceBridge;
 import org.owntracks.android.ui.map.MapActivity;
@@ -121,9 +116,6 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
 
     @Inject
     Preferences preferences;
-
-    @Inject
-    EventBus eventBus;
 
     @Inject
     Scheduler scheduler;
@@ -204,11 +196,38 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
 
         setupGeofences();
 
-        eventBus.register(this);
-
         messageProcessor.initialize();
 
         preferences.registerOnPreferenceChangedListener(this);
+
+        endpointStateRepo.getEndpointQueueLength().observe(this, queueLength -> {
+            lastQueueLength = queueLength;
+            updateOngoingNotification();
+        });
+        endpointStateRepo.getEndpointStateLiveData().observe(this, state -> updateOngoingNotification());
+
+        endpointStateRepo.setServiceStartedNow();
+
+        waypointsRepo.getOperations().observe(this, operation -> {
+            switch (operation.getOperation()) {
+                case INSERT:
+                case UPDATE:
+                    locationProcessor.publishWaypointMessage(operation.getWaypoint());
+                    break;
+            }
+            if (operation.getWaypoint().hasGeofence()) {
+                removeGeofences();
+                setupGeofences();
+            }
+        });
+
+        locationRepo.getCurrentPublishedLocation().observe(this, location -> {
+            MessageLocation messageLocation = MessageLocation.fromLocation(location, Build.VERSION.SDK_INT);
+            if (lastLocationMessage == null || lastLocationMessage.getTimestamp() < messageLocation.getTimestamp()) {
+                this.lastLocationMessage = messageLocation;
+                geocoderProvider.resolve(messageLocation, this);
+            }
+        });
     }
 
 
@@ -223,18 +242,9 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-
         if (intent != null) {
             handleIntent(intent);
         }
-        endpointStateRepo.getEndpointQueueLength().observe(this, queueLength -> {
-            lastQueueLength = queueLength;
-            updateOngoingNotification();
-        });
-        endpointStateRepo.getEndpointStateLiveData().observe(this, state -> updateOngoingNotification());
-
-        endpointStateRepo.setServiceStartedNow();
-
         return START_STICKY;
     }
 
@@ -401,7 +411,8 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
         return getString(R.string.na);
     }
 
-    private void sendEventNotification(MessageTransition message) {
+    @Override
+    public void sendEventNotification(MessageTransition message) {
         NotificationCompat.Builder builder = getEventsNotificationBuilder();
 
         if (builder == null) {
@@ -637,47 +648,6 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
 
     private void removeGeofences() {
         geofencingClient.removeGeofences(getGeofencePendingIntent());
-    }
-
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void onEvent(Events.WaypointAdded e) {
-        locationProcessor.publishWaypointMessage(e.getWaypointModel()); // TODO: move to waypointsRepo
-        if (e.getWaypointModel().hasGeofence()) {
-            removeGeofences();
-            setupGeofences();
-        }
-    }
-
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void onEvent(Events.WaypointUpdated e) {
-        locationProcessor.publishWaypointMessage(e.getWaypointModel()); // TODO: move to waypointsRepo
-        removeGeofences();
-        setupGeofences();
-    }
-
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void onEvent(Events.WaypointRemoved e) {
-        if (e.getWaypointModel().hasGeofence()) {
-            removeGeofences();
-            setupGeofences();
-        }
-    }
-
-
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void onEvent(MessageTransition message) {
-        Timber.d("transition isIncoming:%s topic:%s", message.isIncoming(), message.getTopic());
-        if (message.isIncoming())
-            sendEventNotification(message);
-    }
-
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void onEvent(Location location) {
-        MessageLocation messageLocation = MessageLocation.fromLocation(location, Build.VERSION.SDK_INT);
-        if (lastLocationMessage == null || lastLocationMessage.getTimestamp() < messageLocation.getTimestamp()) {
-            this.lastLocationMessage = messageLocation;
-            geocoderProvider.resolve(messageLocation, this);
-        }
     }
 
     public void onGeocodingProviderResult(MessageLocation m) {

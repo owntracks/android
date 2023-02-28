@@ -37,7 +37,7 @@ class WaypointViewModel @Inject constructor(
     }
 
     fun delete() {
-        waypointsRepo.delete(waypoint.value)
+        waypoint.value?.let { waypointsRepo.delete(it) }
     }
 
     fun canSaveWaypoint(): Boolean {
