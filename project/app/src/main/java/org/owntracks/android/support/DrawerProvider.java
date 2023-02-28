@@ -18,7 +18,6 @@ import com.mikepenz.materialdrawer.model.SecondarySwitchDrawerItem;
 import org.owntracks.android.R;
 import org.owntracks.android.services.BackgroundService;
 import org.owntracks.android.services.worker.Scheduler;
-import org.owntracks.android.ui.base.BaseActivity;
 import org.owntracks.android.ui.contacts.ContactsActivity;
 import org.owntracks.android.ui.map.MapActivity;
 import org.owntracks.android.ui.preferences.PreferencesActivity;
@@ -116,7 +115,7 @@ public class DrawerProvider {
                         return true;
                     }
 
-                    Class<BaseActivity> targetclass = (Class<BaseActivity>) drawerItem.getTag();
+                    Class<AppCompatActivity> targetclass = (Class<AppCompatActivity>) drawerItem.getTag();
 
                     if (activity.getClass() == targetclass) {
                         return false;

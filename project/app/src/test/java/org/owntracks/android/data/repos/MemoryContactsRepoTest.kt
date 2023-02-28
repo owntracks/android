@@ -5,9 +5,7 @@ import android.content.res.Resources
 import android.util.DisplayMetrics
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import org.greenrobot.eventbus.EventBus
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -21,7 +19,6 @@ import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.support.ContactBitmapAndName
 import org.owntracks.android.support.ContactBitmapAndNameMemoryCache
-import org.owntracks.android.support.Events.EndpointChanged
 
 class MemoryContactsRepoTest {
 
@@ -127,7 +124,7 @@ class MemoryContactsRepoTest {
     @Test
     fun `given a non-empty repo, when the endpoint change event is called, the repo is emptied`() {
         contactsRepo!!.update(CONTACT_ID, messageLocation)
-        (contactsRepo as MemoryContactsRepo?)!!.onEventMainThread(EndpointChanged())
+        preferences.mode = ConnectionMode.HTTP
         assertTrue(contactsRepo!!.all.value!!.isEmpty())
     }
 

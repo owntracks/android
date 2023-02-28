@@ -663,11 +663,6 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
         }
     }
 
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    public void onEvent(Events.MonitoringChanged e) {
-        setupLocationRequest();
-        updateOngoingNotification();
-    }
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onEvent(MessageTransition message) {

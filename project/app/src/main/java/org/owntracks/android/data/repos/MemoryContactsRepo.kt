@@ -97,11 +97,6 @@ class MemoryContactsRepo @Inject constructor(
         }
     }
 
-    @Subscribe(threadMode = ThreadMode.BACKGROUND)
-    fun onEventMainThread(@Suppress("UNUSED_PARAMETER") e: EndpointChanged?) {
-        clearAll()
-    }
-
     init {
         eventBus.register(this)
         preferences.registerOnPreferenceChangedListener(this)

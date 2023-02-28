@@ -7,8 +7,6 @@ import androidx.test.espresso.IdlingResource;
 import androidx.test.espresso.idling.CountingIdlingResource;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 import org.owntracks.android.data.EndpointState;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.data.repos.EndpointStateRepo;
@@ -23,7 +21,6 @@ import org.owntracks.android.model.messages.MessageTransition;
 import org.owntracks.android.preferences.Preferences;
 import org.owntracks.android.preferences.types.ConnectionMode;
 import org.owntracks.android.services.worker.Scheduler;
-import org.owntracks.android.support.Events;
 import org.owntracks.android.support.Parser;
 import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.ServiceBridge;
@@ -34,11 +31,8 @@ import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -309,13 +303,6 @@ public class MessageProcessor implements Preferences.OnPreferenceChangeListener 
                 locker.notify();
             }
         }
-    }
-
-    @SuppressWarnings("UnusedParameters")
-    @Subscribe(priority = 10, threadMode = ThreadMode.ASYNC)
-    public void onEvent(Events.EndpointChanged event) {
-        acceptMessages = false;
-        loadOutgoingMessageProcessor();
     }
 
     void onMessageDelivered() {
