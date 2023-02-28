@@ -27,46 +27,40 @@ abstract class WaypointsRepo protected constructor() {
 
     fun insert(w: WaypointModel) {
         w.run {
-            insert_impl(this)
+            insertImpl(this)
             mutableOperations.postValue(WaypointAndOperation(Operation.INSERT, this))
         }
     }
 
     fun update(w: WaypointModel, notify: Boolean) {
         w.run {
-            update_impl(this)
+            updateImpl(this)
             if (notify) {
                 mutableOperations.postValue(WaypointAndOperation(Operation.UPDATE, this))
             }
         }
-        update_impl(w)
+        updateImpl(w)
     }
 
     fun delete(w: WaypointModel) {
         w.run {
-            delete_impl(this)
+            deleteImpl(this)
             mutableOperations.postValue(WaypointAndOperation(Operation.DELETE, this))
         }
-        delete_impl(w)
+        deleteImpl(w)
     }
 
     fun importFromMessage(waypoints: MessageWaypointCollection?) {
-        if (waypoints == null) return
-        for (m in waypoints) {
-            // Delete existing waypoint if one with the same tst already exists
-            val exisiting = get(m.timestamp)
-            exisiting?.let { delete(it) }
-            insert(toDaoObject(m))
+        waypoints?.forEach {
+            get(it.timestamp)?.run {
+                delete(this)
+                insert(toDaoObject(it))
+            }
         }
     }
 
-    fun exportToMessage(): MessageWaypointCollection {
-        val messages = MessageWaypointCollection()
-        for (waypoint in all) {
-            messages.add(fromDaoObject(waypoint))
-        }
-        return messages
-    }
+    fun exportToMessage(): MessageWaypointCollection =
+        MessageWaypointCollection().apply { addAll(all.map(::fromDaoObject)) }
 
     private fun toDaoObject(messageWaypoint: MessageWaypoint): WaypointModel {
         return WaypointModel(
@@ -91,7 +85,7 @@ abstract class WaypointsRepo protected constructor() {
         return message
     }
 
-    protected abstract fun insert_impl(w: WaypointModel?)
-    protected abstract fun update_impl(w: WaypointModel?)
-    protected abstract fun delete_impl(w: WaypointModel?)
+    protected abstract fun insertImpl(w: WaypointModel)
+    protected abstract fun updateImpl(w: WaypointModel)
+    protected abstract fun deleteImpl(w: WaypointModel)
 }

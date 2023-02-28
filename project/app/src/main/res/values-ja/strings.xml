@@ -140,7 +140,6 @@
     <string name="preferencesExperimental">"試験段階"</string>
     <string name="preferencesExportSuccess">"エクスポートに成功しました"</string>
     <string name="preferencesHost">"ホスト"</string>
-    <string name="preferencesIdentification">"認証情報"</string>
     <string name="preferencesIgnoreInaccurateLocations">"低精度な位置情報"</string>
     <string name="preferencesIgnoreInaccurateLocationsDialog">"位置情報の精度が指定されたメートル値よりも大きい場合、当該位置情報を無視します"</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">"低精度な位置情報を無視する"</string>
@@ -179,7 +178,6 @@
     <string name="preferencesReporting">"レポート"</string>
     <string name="preferencesRepository">"ソースコード"</string>
     <string name="preferencesReverseGeocodeProvider">"逆ジオコーディングのプロバイダ"</string>
-    <string name="preferencesSecurity">"セキュリティ"</string>
     <string name="preferencesServer">"接続"</string>
     <string name="preferencesTheme">"テーマ"</string>
     <string name="preferencesTrackerId">"トラッカーID"</string>

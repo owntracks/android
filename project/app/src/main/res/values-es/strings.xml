@@ -114,7 +114,6 @@
     <string name="preferencesEncryptionKeySummary">"Clave simétrica para encriptación del payload"</string>
     <string name="preferencesExportSuccess">"Preferencias exportadas"</string>
     <string name="preferencesHost">"Host"</string>
-    <string name="preferencesIdentification">"Identificación"</string>
     <string name="preferencesIgnoreInaccurateLocations">"Ubicación imprecisa"</string>
     <string name="preferencesIgnoreInaccurateLocationsDialog">"Ignorar ubicación por encima del umbral"</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">"Ignorar ubicaciones imprecisas"</string>
@@ -149,7 +148,6 @@
     <string name="preferencesReporting">"Reportando"</string>
     <string name="preferencesRepository">"Código fuente"</string>
     <string name="preferencesReverseGeocodeProvider">"Geocodificación"</string>
-    <string name="preferencesSecurity">"Seguridad"</string>
     <string name="preferencesServer">"Conexión"</string>
     <string name="preferencesTrackerId">"Tracker ID"</string>
     <string name="preferencesUsername">"Nombre de Usuario"</string>

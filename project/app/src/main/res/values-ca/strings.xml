@@ -160,7 +160,6 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="preferencesExperimental">"Experimental"</string>
     <string name="preferencesExportSuccess">"Exportació reeixida"</string>
     <string name="preferencesHost">"Amfitrió"</string>
-    <string name="preferencesIdentification">"Identificació"</string>
     <string name="preferencesIgnoreInaccurateLocations">"Ubicacions incorrectes "</string>
     <string name="preferencesIgnoreInaccurateLocationsDialog">"Ignora ubicació si la precisió és superior als metre determinats"</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">"Ignorar ubicacions incorrectes "</string>
@@ -203,7 +202,6 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="preferencesReporting">"Informes"</string>
     <string name="preferencesRepository">"Codi font"</string>
     <string name="preferencesReverseGeocodeProvider">"Proveïdor de geocodificació inversa"</string>
-    <string name="preferencesSecurity">"Seguretat"</string>
     <string name="preferencesServer">"Connexió"</string>
     <string name="preferencesShowWaypointsOnMap">"Mostra regions"</string>
     <string name="preferencesShowWaypointsOnMapSummary">" preferencesShowRegionsOnMapSummary "</string>

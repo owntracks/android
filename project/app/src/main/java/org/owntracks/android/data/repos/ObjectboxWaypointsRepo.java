@@ -77,7 +77,7 @@ public class ObjectboxWaypointsRepo extends WaypointsRepo {
                                     cursor.getInt(columnList.indexOf("GEOFENCE_RADIUS")), 0, 0);
 
                             Timber.v("Migration for model %s", w.toString());
-                            insert_impl(w);
+                            insertImpl(w);
                         } catch (UniqueViolationException exception) {
                             Timber.v("UniqueViolationException during insert");
                         }
@@ -119,17 +119,17 @@ public class ObjectboxWaypointsRepo extends WaypointsRepo {
     }
 
     @Override
-    public void insert_impl(org.owntracks.android.data.WaypointModel w) {
+    public void insertImpl(org.owntracks.android.data.WaypointModel w) {
         box.put(w);
     }
 
     @Override
-    public void update_impl(org.owntracks.android.data.WaypointModel w) {
+    public void updateImpl(org.owntracks.android.data.WaypointModel w) {
         box.put(w);
     }
 
     @Override
-    public void delete_impl(org.owntracks.android.data.WaypointModel w) {
+    public void deleteImpl(org.owntracks.android.data.WaypointModel w) {
         box.remove(w);
     }
 

@@ -172,7 +172,6 @@
     <string name="preferencesExperimental">"Экспериментальные"</string>
     <string name="preferencesExportSuccess">"Настройки экспортированы"</string>
     <string name="preferencesHost">"Адрес"</string>
-    <string name="preferencesIdentification">"Идентификация"</string>
     <string name="preferencesIgnoreInaccurateLocations">"Неточные местоположения"</string>
     <string name="preferencesIgnoreInaccurateLocationsDialog">"Игнорировать местоположение, если неточность его определения превышает указанное количество метров"</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">"Игнорировать неточные местоположения"</string>
@@ -215,7 +214,6 @@
     <string name="preferencesReporting">"Отчеты"</string>
     <string name="preferencesRepository">"Исходный код"</string>
     <string name="preferencesReverseGeocodeProvider">"Геокодирование"</string>
-    <string name="preferencesSecurity">"Безопасность"</string>
     <string name="preferencesServer">"Подключение к серверу"</string>
     <string name="preferencesShowWaypointsOnMap">"Показывать места"</string>
     <string name="preferencesShowWaypointsOnMapSummary">"Отображать окружность для известных мест на карте"</string>

@@ -5,23 +5,19 @@ import io.objectbox.query.Query
 import org.owntracks.android.data.WaypointModel
 import org.owntracks.android.data.repos.WaypointsRepo
 
-class InMemoryWaypointsRepo() : WaypointsRepo() {
+class InMemoryWaypointsRepo : WaypointsRepo() {
     private val waypoints = mutableListOf<WaypointModel>()
     override fun get(tst: Long): WaypointModel? = waypoints.firstOrNull { it.tst == tst }
+    override val all: List<WaypointModel>
+        get() = TODO("Not yet implemented")
+    override val allWithGeofences: List<WaypointModel>
+        get() = TODO("Not yet implemented")
+    override val allLive: LiveData<List<WaypointModel>>
+        get() = TODO("Not yet implemented")
+    override val allQuery: Query<WaypointModel?>?
+        get() = TODO("Not yet implemented")
 
-    public override fun getAll() = waypoints
-
-    override fun getAllWithGeofences(): MutableList<WaypointModel> {
-        TODO("Not yet implemented")
-    }
-
-    override fun getAllLive(): LiveData<List<WaypointModel>> {
-        TODO("Not yet implemented")
-    }
-
-    override fun getAllQuery(): Query<WaypointModel> {
-        TODO("Not yet implemented")
-    }
+    fun getAll() = waypoints
 
     override fun insert_impl(w: WaypointModel?) {
         waypoints.add(w!!)

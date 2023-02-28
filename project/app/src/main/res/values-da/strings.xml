@@ -158,7 +158,6 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="preferencesExperimental">"Eksperimentel"</string>
     <string name="preferencesExportSuccess">"Eksport lykkedes"</string>
     <string name="preferencesHost">"Vært"</string>
-    <string name="preferencesIdentification">"Identifikation"</string>
     <string name="preferencesIgnoreInaccurateLocations">"Upræcise positioner"</string>
     <string name="preferencesIgnoreInaccurateLocationsDialog">"Ignorér position hvis præcisionen er større end de angivne meter"</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">"Ignorér upræcise positioner"</string>
@@ -201,7 +200,6 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="preferencesReporting">"Rapportering"</string>
     <string name="preferencesRepository">"Klidekode"</string>
     <string name="preferencesReverseGeocodeProvider">"Udbyder af baglæns geokodning"</string>
-    <string name="preferencesSecurity">"Sikkerhed"</string>
     <string name="preferencesServer">"Forbindelse"</string>
     <string name="preferencesShowWaypointsOnMap">"Vis Regioner"</string>
     <string name="preferencesShowWaypointsOnMapSummary">"Vis regionscirkler på kortet"</string>

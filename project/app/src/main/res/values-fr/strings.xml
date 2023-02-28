@@ -142,7 +142,6 @@
     <string name="preferencesExperimental">"Expérimental"</string>
     <string name="preferencesExportSuccess">"Exportation réussie"</string>
     <string name="preferencesHost">"Hôte"</string>
-    <string name="preferencesIdentification">"Identification"</string>
     <string name="preferencesIgnoreInaccurateLocations">"Emplacements inexacts"</string>
     <string name="preferencesIgnoreInaccurateLocationsDialog">"Ignorer l'emplacement, si la précision est supérieure aux mètres donnés"</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">"Ignorer les emplacements inexacts"</string>
@@ -185,7 +184,6 @@
     <string name="preferencesReporting">"Rapports"</string>
     <string name="preferencesRepository">"Code source"</string>
     <string name="preferencesReverseGeocodeProvider">"Fournisseur de géocodage inversé"</string>
-    <string name="preferencesSecurity">"Sécurité"</string>
 
     <!-- In french, connection is "connexion" -->
     <string name="preferencesServer">"Connection"</string>

@@ -160,7 +160,6 @@ Chcete-li to umožnit, zapněte polohu v nastavení zařízení."</string>
     <string name="preferencesExperimental">"Experimentální"</string>
     <string name="preferencesExportSuccess">"Export byl úspěšný"</string>
     <string name="preferencesHost">"Server"</string>
-    <string name="preferencesIdentification">"Identifikace"</string>
     <string name="preferencesIgnoreInaccurateLocations">"Nepřesné polohy"</string>
     <string name="preferencesIgnoreInaccurateLocationsDialog">"Ignorovat polohu, pokud je přesnost horší než zadaný počet metrů"</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">"Ignorovat nepřesné polohy"</string>
@@ -203,7 +202,6 @@ Chcete-li to umožnit, zapněte polohu v nastavení zařízení."</string>
     <string name="preferencesReporting">"Hlášení"</string>
     <string name="preferencesRepository">"Zdrojový kód"</string>
     <string name="preferencesReverseGeocodeProvider">"Poskytovatel reverzního geokódu"</string>
-    <string name="preferencesSecurity">"Zabezpečení"</string>
     <string name="preferencesServer">"Připojení"</string>
     <string name="preferencesShowWaypointsOnMap">"Ukázat oblasti"</string>
     <string name="preferencesShowWaypointsOnMapSummary">"Vykreslit kruhy oblasti na mapě"</string>

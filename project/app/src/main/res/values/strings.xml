@@ -165,7 +165,6 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesExperimental">"Experimental"</string>
     <string name="preferencesExportSuccess">"Export successful"</string>
     <string name="preferencesHost">"Host"</string>
-    <string name="preferencesIdentification">"Identification"</string>
     <string name="preferencesIgnoreInaccurateLocations">"Inaccurate locations"</string>
     <string name="preferencesIgnoreInaccurateLocationsDialog">"Ignore location, if the accuracy is greater than the given meters"</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">"Ignore inaccurate locations"</string>
@@ -222,7 +221,6 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesRepublishOnReconnect">"Publish location on MQTT connect"</string>
     <string name="preferencesRepublishOnReconnectSummary">"Publish the last known location and current extended data immediately on connecting to MQTT"</string>
     <string name="preferencesReverseGeocodeProvider">"Reverse Geocode Provider"</string>
-    <string name="preferencesSecurity">"Security"</string>
     <string name="preferencesServer">"Connection"</string>
     <string name="preferencesSet">"Set"</string>
     <string name="preferencesShowWaypointsOnMap">"Show Waypoints"</string>

@@ -199,7 +199,7 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
             } ?: run {
                 Snackbar.make(
                     requireView(),
-                    "Unable to copy certificate to local storage",
+                    R.string.unableToCopyCertificate,
                     Snackbar.LENGTH_LONG
                 )
             }

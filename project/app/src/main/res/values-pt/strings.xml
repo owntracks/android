@@ -66,7 +66,6 @@
     <string name="preferencesEncryptionKey">"Chave encriptação"</string>
     <string name="preferencesExportSuccess">"Exportação bem sucedida"</string>
     <string name="preferencesHost">"Anfitrião"</string>
-    <string name="preferencesIdentification">"Identificação"</string>
     <string name="preferencesKeepalive">"Manter acordado"</string>
     <string name="preferencesLicenses">"Bibliotecas"</string>
     <string name="preferencesLicensesSummary">"Agradecemos aos autores das bibliotecas incluídas"</string>
@@ -84,7 +83,6 @@
     <string name="preferencesRemoteCommandSummary">"Habilitar comandos remotos"</string>
     <string name="preferencesReporting">"Reporte"</string>
     <string name="preferencesRepository">"Código fonte"</string>
-    <string name="preferencesSecurity">"Segurança"</string>
     <string name="preferencesServer">"Conexão"</string>
     <string name="preferencesTrackerId">"ID Tracker"</string>
     <string name="preferencesUsername">"Utilizador"</string>

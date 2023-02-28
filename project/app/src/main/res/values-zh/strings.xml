@@ -118,7 +118,6 @@
     <string name="preferencesReporting">"上报"</string>
     <string name="preferencesRepository">"源代码"</string>
     <string name="preferencesReverseGeocodeProvider">"逆地理编码服务提供商"</string>
-    <string name="preferencesSecurity">"安全性"</string>
     <string name="preferencesServer">"连接"</string>
     <string name="preferencesTheme">"主题"</string>
     <string name="preferencesUsername">"用户名"</string>

@@ -143,7 +143,6 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="preferencesExperimental">"Experimentell"</string>
     <string name="preferencesExportSuccess">"Export erfolgreich"</string>
     <string name="preferencesHost">"Hostname"</string>
-    <string name="preferencesIdentification">"Identifikation"</string>
     <string name="preferencesIgnoreInaccurateLocations">"Ungenaue Positionen"</string>
     <string name="preferencesIgnoreInaccurateLocationsDialog">"Ungenaue Position ignorierne wenn sie ungenauer als die angegebenen Meter ist"</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">"Ungenaue Positionen ignorieren"</string>
@@ -181,7 +180,6 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="preferencesReporting">"Berichte"</string>
     <string name="preferencesRepository">"Quelltext"</string>
     <string name="preferencesReverseGeocodeProvider">"Geocodierung"</string>
-    <string name="preferencesSecurity">"Sicherheit"</string>
     <string name="preferencesServer">"Verbindung"</string>
     <string name="preferencesTheme">"Aussehen"</string>
     <string name="preferencesTrackerId">"Tracker-ID"</string>

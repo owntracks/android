@@ -158,7 +158,6 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesExperimental">"Experimental"</string>
     <string name="preferencesExportSuccess">"Dışa aktarma başarılı"</string>
     <string name="preferencesHost">"Host"</string>
-    <string name="preferencesIdentification">"Identification"</string>
     <string name="preferencesIgnoreInaccurateLocations">"Inaccurate locations"</string>
     <string name="preferencesIgnoreInaccurateLocationsDialog">"Ignore location, if the accuracy is greater than the given meters"</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">"Ignore inaccurate locations"</string>
@@ -209,7 +208,6 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesReporting">"Reporting"</string>
     <string name="preferencesRepository">"Source Code"</string>
     <string name="preferencesReverseGeocodeProvider">"Reverse Geocode Provider"</string>
-    <string name="preferencesSecurity">"Security"</string>
     <string name="preferencesServer">"Connection"</string>
     <string name="preferencesShowWaypointsOnMap">"Show Regions"</string>
     <string name="preferencesShowWaypointsOnMapSummary">"Draw region circles on the map"</string>

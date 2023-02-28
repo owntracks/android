@@ -164,7 +164,6 @@ Aby to umożliwić, włącz lokalizację w ustawieniach urządzenia."</string>
     <string name="preferencesExperimental">"Eksperymentalne"</string>
     <string name="preferencesExportSuccess">"Eksport udany"</string>
     <string name="preferencesHost">"Host"</string>
-    <string name="preferencesIdentification">"Identyfikacja"</string>
     <string name="preferencesIgnoreInaccurateLocations">"Niedokładne lokalizacje"</string>
     <string name="preferencesIgnoreInaccurateLocationsDialog">"Ignoruj lokalizację, jeśli dokładność jest większa niż podana liczba metrów"</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">"Ignoruj niedokładne lokalizacje"</string>
@@ -207,7 +206,6 @@ Aby to umożliwić, włącz lokalizację w ustawieniach urządzenia."</string>
     <string name="preferencesReporting">"Raportowanie"</string>
     <string name="preferencesRepository">"Kod źródłowy"</string>
     <string name="preferencesReverseGeocodeProvider">"Dostawca usługi odwrotnego geokodowania"</string>
-    <string name="preferencesSecurity">"Bezpieczeństwo"</string>
     <string name="preferencesServer">"Połączenie"</string>
     <string name="preferencesShowWaypointsOnMap">"Pokaż obszary"</string>
     <string name="preferencesShowWaypointsOnMapSummary">"Rysuj okręgi obszarów na mapie"</string>
