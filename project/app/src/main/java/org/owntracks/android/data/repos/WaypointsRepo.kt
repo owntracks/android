@@ -54,8 +54,8 @@ abstract class WaypointsRepo protected constructor() {
         waypoints?.forEach {
             get(it.timestamp)?.run {
                 delete(this)
-                insert(toDaoObject(it))
             }
+            insert(toDaoObject(it))
         }
     }
 
