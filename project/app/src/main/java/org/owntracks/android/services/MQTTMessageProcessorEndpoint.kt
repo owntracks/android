@@ -18,7 +18,10 @@ import kotlinx.coroutines.sync.withPermit
 import org.eclipse.paho.client.mqttv3.*
 import org.owntracks.android.data.EndpointState
 import org.owntracks.android.data.repos.EndpointStateRepo
-import org.owntracks.android.di.IoDispatcher
+import org.owntracks.android.di.ApplicationScope
+import org.owntracks.android.di.CoroutineScopes
+import org.owntracks.android.di.DispatcherModule
+import org.owntracks.android.di.SingletonModule
 import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageClear
@@ -38,13 +41,13 @@ class MQTTMessageProcessorEndpoint(
     private val scheduler: Scheduler,
     private val preferences: Preferences,
     private val parser: Parser,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @ApplicationScope private val scope: CoroutineScope,
+    @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationContext private val applicationContext: Context
 ) : MessageProcessorEndpoint(messageProcessor),
     StatefulServiceMessageProcessor,
     Preferences.OnPreferenceChangeListener {
     private val connectingLock = Semaphore(1)
-    private val scope = GlobalScope // TODO use serv ice lifecycle scope
     private val connectivityManager =
         applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     private val networkChangeCallback = object : ConnectivityManager.NetworkCallback() {

@@ -6,20 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.launch
-import okhttp3.*
-import org.apache.commons.codec.binary.Base64
-import org.apache.hc.core5.net.URIBuilder
-import org.owntracks.android.data.repos.WaypointsRepo
-import org.owntracks.android.di.IoDispatcher
-import org.owntracks.android.model.messages.MessageConfiguration
-import org.owntracks.android.model.messages.MessageWaypoints
-import org.owntracks.android.preferences.Preferences
-import org.owntracks.android.support.Parser
-import org.owntracks.android.support.Parser.EncryptionException
-import org.owntracks.android.support.SimpleIdlingResource
-import timber.log.Timber
 import java.io.BufferedReader
 import java.io.FileInputStream
 import java.io.IOException
@@ -29,13 +15,27 @@ import java.net.URL
 import java.nio.charset.StandardCharsets
 import java.util.*
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.launch
+import okhttp3.*
+import org.apache.commons.codec.binary.Base64
+import org.apache.hc.core5.net.URIBuilder
+import org.owntracks.android.data.repos.WaypointsRepo
+import org.owntracks.android.di.CoroutineScopes
+import org.owntracks.android.model.messages.MessageConfiguration
+import org.owntracks.android.model.messages.MessageWaypoints
+import org.owntracks.android.preferences.Preferences
+import org.owntracks.android.support.Parser
+import org.owntracks.android.support.Parser.EncryptionException
+import org.owntracks.android.support.SimpleIdlingResource
+import timber.log.Timber
 
 @HiltViewModel
 class LoadViewModel @Inject constructor(
     private val preferences: Preferences,
     private val parser: Parser,
     private val waypointsRepo: WaypointsRepo,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
     val importStatusIdlingResource = SimpleIdlingResource("importStatus", true)
 

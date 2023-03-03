@@ -23,8 +23,7 @@ import kotlin.reflect.KProperty
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import org.owntracks.android.R
-import org.owntracks.android.di.IoDispatcher
-import org.owntracks.android.di.MainDispatcher
+import org.owntracks.android.di.CoroutineScopes
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.services.MessageProcessor
@@ -36,11 +35,11 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
     lateinit var messageProcessor: MessageProcessor
 
     @Inject
-    @IoDispatcher
+    @CoroutineScopes.IoDispatcher
     lateinit var ioDispatcher: CoroutineDispatcher
 
     @Inject
-    @MainDispatcher
+    @CoroutineScopes.MainDispatcher
     lateinit var mainDispatcher: CoroutineDispatcher
 
     private lateinit var menuProvider: PreferencesMenuProvider

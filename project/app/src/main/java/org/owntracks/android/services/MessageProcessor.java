@@ -10,7 +10,10 @@ import org.owntracks.android.data.EndpointState;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.data.repos.EndpointStateRepo;
 import org.owntracks.android.data.repos.WaypointsRepo;
-import org.owntracks.android.di.IoDispatcher;
+import org.owntracks.android.di.ApplicationScope;
+import org.owntracks.android.di.CoroutineScopes;
+import org.owntracks.android.di.DispatcherModule;
+import org.owntracks.android.di.SingletonModule;
 import org.owntracks.android.model.messages.MessageBase;
 import org.owntracks.android.model.messages.MessageCard;
 import org.owntracks.android.model.messages.MessageClear;
@@ -42,6 +45,7 @@ import dagger.Lazy;
 import dagger.hilt.android.qualifiers.ApplicationContext;
 import kotlin.Unit;
 import kotlinx.coroutines.CoroutineDispatcher;
+import kotlinx.coroutines.CoroutineScope;
 import timber.log.Timber;
 
 @Singleton
@@ -82,7 +86,8 @@ public class MessageProcessor implements Preferences.OnPreferenceChangeListener 
             ServiceBridge serviceBridge,
             CountingIdlingResource outgoingQueueIdlingResource,
             Lazy<LocationProcessor> locationProcessorLazy,
-            @IoDispatcher CoroutineDispatcher ioDispatcher
+            @CoroutineScopes.IoDispatcher CoroutineDispatcher ioDispatcher,
+            @ApplicationScope CoroutineScope scope
     ) {
         this.preferences = preferences;
         this.contactsRepo = contactsRepo;
@@ -101,7 +106,7 @@ public class MessageProcessor implements Preferences.OnPreferenceChangeListener 
         }
         preferences.registerOnPreferenceChangedListener(this);
         httpEndpoint = new MessageProcessorEndpointHttp(this, parser, this.preferences, scheduler, applicationContext, this.endpointStateRepo);
-        mqttEndpoint = new MQTTMessageProcessorEndpoint(this, this.endpointStateRepo, scheduler, this.preferences, parser, ioDispatcher, applicationContext);
+        mqttEndpoint = new MQTTMessageProcessorEndpoint(this, this.endpointStateRepo, scheduler, this.preferences, parser, scope, ioDispatcher, applicationContext);
     }
 
     synchronized public void initialize() {
