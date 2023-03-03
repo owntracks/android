@@ -1,5 +1,6 @@
 package org.owntracks.android.ui
 
+import androidx.preference.PreferenceManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
@@ -84,6 +85,10 @@ class PreferencesActivityTests : TestWithAnActivity<PreferencesActivity>(Prefere
 
     @Test
     fun settingSimpleHTTPConfigSettingsCanBeShownInEditor() {
+        PreferenceManager.getDefaultSharedPreferences(app)
+            .edit()
+            .putBoolean(Preferences::notificationEvents.name, false)
+            .apply()
         clickOnAndWait(R.string.preferencesServer)
         clickOnAndWait(R.string.mode_heading)
         clickOnAndWait(R.string.mode_http_private_label)
@@ -102,6 +107,7 @@ class PreferencesActivityTests : TestWithAnActivity<PreferencesActivity>(Prefere
 
         clickOnAndWait(R.string.preferencesNotification)
         clickOnAndWait(R.string.preferencesNotificationEvents)
+
         clickBackAndWait()
 
         // This is an ugly hack, but there's some race conditions on underpowered hardware
@@ -139,7 +145,7 @@ class PreferencesActivityTests : TestWithAnActivity<PreferencesActivity>(Prefere
         assertContains(R.id.effectiveConfiguration, "\"password\" : \"********\"")
         assertContains(R.id.effectiveConfiguration, "\"deviceId\" : \"testDeviceId\"")
         assertContains(R.id.effectiveConfiguration, "\"tid\" : \"t1\"")
-        assertContains(R.id.effectiveConfiguration, "\"notificationEvents\" : false")
+        assertContains(R.id.effectiveConfiguration, "\"notificationEvents\" : true")
         assertContains(R.id.effectiveConfiguration, "\"pubExtendedData\" : false")
         assertContains(R.id.effectiveConfiguration, "\"ignoreInaccurateLocations\" : 950")
         assertContains(R.id.effectiveConfiguration, "\"locatorInterval\" : 123")

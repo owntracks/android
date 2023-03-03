@@ -82,8 +82,6 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
     private static final int NOTIFICATION_ID_EVENT_GROUP = 2;
     public static final String BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG = "backgroundRestrictionNotification";
 
-    private static int notificationEventsID = 3;
-
     private final String NOTIFICATION_GROUP_EVENTS = "events";
 
     // NEW ACTIONS ALSO HAVE TO BE ADDED TO THE SERVICE INTENT FILTER

@@ -3,19 +3,18 @@ package org.owntracks.android.testutils
 import android.Manifest
 import android.app.Activity
 import android.os.Build
+import android.view.View
+import android.widget.Checkable
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.test.espresso.*
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.IdlingPolicies
-import androidx.test.espresso.IdlingRegistry
-import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
 import androidx.test.runner.lifecycle.Stage
-import com.adevinta.android.barista.interaction.BaristaDialogInteractions
 import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickDialogPositiveButton
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions
@@ -23,6 +22,9 @@ import com.adevinta.android.barista.interaction.PermissionGranter
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import org.hamcrest.BaseMatcher
+import org.hamcrest.CoreMatchers.isA
+import org.hamcrest.Description
 import org.owntracks.android.R
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.ui.clickOnAndWait
@@ -139,10 +141,10 @@ fun disableDeviceLocation() {
 }
 
 fun stopAndroidSetupProcess() {
-    getInstrumentation().uiAutomation.executeShellCommand("am force-stop com.google.android.setupwizard")
-        .close()
-    getInstrumentation().uiAutomation.executeShellCommand("am force-stop com.android.systemui")
-        .close()
+    listOf("com.google.android.setupwizard", "com.android.systemui", "com.android.vending").forEach {
+        getInstrumentation().uiAutomation.executeShellCommand("am force-stop $it")
+            .close()
+    }
 }
 
 fun disableHeadsupNotifications() {
@@ -164,4 +166,29 @@ fun enableDeviceLocation() {
 fun grantMapActivityPermissions() {
     PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.POST_NOTIFICATIONS)
     PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+}
+
+// https://stackoverflow.com/a/39650813/352740
+fun setChecked(checked: Boolean): ViewAction {
+    return object : ViewAction {
+        override fun getConstraints(): BaseMatcher<View> {
+            return object : BaseMatcher<View>() {
+                override fun matches(item: Any?): Boolean {
+                    return isA(Checkable::class.java).matches(item)
+                }
+
+                override fun describeMismatch(item: Any?, mismatchDescription: Description?) {}
+                override fun describeTo(description: Description?) {}
+            }
+        }
+
+        override fun getDescription(): String {
+            return ""
+        }
+
+        override fun perform(uiController: UiController?, view: View) {
+            val checkableView = view as Checkable
+            checkableView.isChecked = checked
+        }
+    }
 }

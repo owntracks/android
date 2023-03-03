@@ -98,13 +98,6 @@ class Preferences @Inject constructor(private val preferencesStore: PreferencesS
             }
     }
 
-    fun atomic(things: Set<SetterAndValue<out Any>>) {
-        PreferencesStore.Transaction(this, preferencesStore)
-            .use {
-                things.forEach { (t, u) -> t.setter.call(u) }
-            }
-    }
-
     /**
      * Imports an untyped value to a known preference type
      *
@@ -160,7 +153,7 @@ class Preferences @Inject constructor(private val preferencesStore: PreferencesS
             .get(this)
     }
 
-    fun resetPreference(name: String) {
+    private fun resetPreference(name: String) {
         preferencesStore.remove(name)
     }
 
@@ -391,7 +384,7 @@ class Preferences @Inject constructor(private val preferencesStore: PreferencesS
             return pubTopicBaseWithUserDetails + waypointsTopicSuffix
         }
 
-    val minimumKeepaliveSeconds = MIN_PERIODIC_INTERVAL.inWholeSeconds
+    private val minimumKeepaliveSeconds = MIN_PERIODIC_INTERVAL.inWholeSeconds
     fun keepAliveInRange(i: Int): Boolean = i >= minimumKeepaliveSeconds
 
     fun setMonitoringNext() {

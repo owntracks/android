@@ -17,7 +17,8 @@ fun clickOnDrawerAndWait(text: Int) {
             withId(com.mikepenz.materialdrawer.R.id.material_drawer_name),
             withText(text)
         )
-    ).perform(click())
+    )
+        .perform(click())
     sleep(sleepMillis)
 }
 

@@ -34,10 +34,6 @@ class RunThingsOnOtherThreads @Inject constructor(@ApplicationContext appContext
         mainHandler.postDelayed(r, delayMilliseconds)
     }
 
-    fun postOnNetworkHandlerDelayed(r: Runnable, delayMilliseconds: Long = 0) {
-        networkHandler.postDelayed(r, delayMilliseconds)
-    }
-
     fun postOnServiceHandlerDelayed(r: Runnable, delayMilliseconds: Long = 0) {
         backgroundHandler.postDelayed(r, delayMilliseconds)
     }
