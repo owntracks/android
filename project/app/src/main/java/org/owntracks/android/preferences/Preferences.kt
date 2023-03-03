@@ -395,7 +395,7 @@ class Preferences @Inject constructor(private val preferencesStore: PreferencesS
     fun keepAliveInRange(i: Int): Boolean = i >= minimumKeepaliveSeconds
 
     fun setMonitoringNext() {
-        monitoring.next()
+        monitoring = monitoring.next()
     }
 
     // SharedPreferencesImpl stores its listeners as a list of WeakReferences. So we shouldn't use a
