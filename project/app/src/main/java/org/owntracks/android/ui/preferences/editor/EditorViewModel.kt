@@ -51,7 +51,7 @@ class EditorViewModel @Inject constructor(
         preferences.importKeyValue(key, value)
     }
 
-    override fun onPreferenceChanged(properties: List<String>) {
+    override fun onPreferenceChanged(properties: Set<String>) {
         updateEffectiveConfiguration()
     }
 }

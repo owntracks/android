@@ -204,7 +204,7 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
             }
             .build()
 
-    override fun onPreferenceChanged(properties: List<String>) {
+    override fun onPreferenceChanged(properties: Set<String>) {
         if (properties.contains(Preferences::theme.name)) {
             Timber.d("Theme changed. Setting theme to ${preferences.theme}")
             setThemeFromPreferences()

@@ -126,7 +126,7 @@ class MapViewModel @Inject constructor(
     fun hasLocationPermission() = requirementsChecker.hasLocationPermissions()
 
     private val preferenceChangeListener = object : Preferences.OnPreferenceChangeListener {
-        override fun onPreferenceChanged(properties: List<String>) {
+        override fun onPreferenceChanged(properties: Set<String>) {
             if (properties.contains("monitoring")) {
                 mutableCurrentMonitoringMode.postValue(preferences.monitoring)
             }

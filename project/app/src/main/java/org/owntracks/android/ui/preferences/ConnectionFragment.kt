@@ -241,7 +241,7 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
         }
     }
 
-    override fun onPreferenceChanged(properties: List<String>) {
+    override fun onPreferenceChanged(properties: Set<String>) {
         if (Preferences::mode.name in properties) {
             setPreferenceVisibility()
         }

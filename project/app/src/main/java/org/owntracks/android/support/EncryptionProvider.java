@@ -19,6 +19,7 @@ import static org.libsodium.jni.SodiumConstants.XSALSA20_POLY1305_SECRETBOX_KEYB
 import static org.libsodium.jni.SodiumConstants.XSALSA20_POLY1305_SECRETBOX_NONCEBYTES;
 
 import java.util.List;
+import java.util.Set;
 
 @Singleton
 public class EncryptionProvider {
@@ -103,7 +104,7 @@ public class EncryptionProvider {
         }
 
         @Override
-        public void onPreferenceChanged(@NonNull List<String> properties) {
+        public void onPreferenceChanged(@NonNull Set<String> properties) {
             if (properties.contains("encryptionKey")) {
                 initializeSecretBox();
             }

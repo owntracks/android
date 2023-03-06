@@ -63,7 +63,7 @@ class AdvancedFragment @Inject constructor() : AbstractPreferenceFragment(), Pre
             preferences.reverseGeocodeProvider == ReverseGeocodeProvider.OPENCAGE
     }
 
-    override fun onPreferenceChanged(properties: List<String>) {
+    override fun onPreferenceChanged(properties: Set<String>) {
         if (properties.contains(Preferences::reverseGeocodeProvider.name)) {
             setOpenCageAPIKeyPreferenceVisibility()
         }

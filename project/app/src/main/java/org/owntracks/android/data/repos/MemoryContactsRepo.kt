@@ -94,7 +94,7 @@ class MemoryContactsRepo @Inject constructor(
         preferences.registerOnPreferenceChangedListener(this)
     }
 
-    override fun onPreferenceChanged(properties: List<String>) {
+    override fun onPreferenceChanged(properties: Set<String>) {
         if (properties.contains("mode")) {
             clearAll()
         }

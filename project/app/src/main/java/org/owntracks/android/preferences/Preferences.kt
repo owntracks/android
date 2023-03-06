@@ -417,7 +417,7 @@ class Preferences @Inject constructor(private val preferencesStore: PreferencesS
     }
 
     fun notifyChanged(properties: Set<KProperty<*>>) {
-        val propertyNames = properties.map { it.name }
+        val propertyNames = properties.map { it.name }.toSet()
         synchronized(listeners) {
             listeners.toMap() // TODO migrate the notifications to async, so we can get rid of this clone
                 .forEach {
@@ -454,6 +454,6 @@ class Preferences @Inject constructor(private val preferencesStore: PreferencesS
     )
 
     interface OnPreferenceChangeListener {
-        fun onPreferenceChanged(properties: List<String>)
+        fun onPreferenceChanged(properties: Set<String>)
     }
 }

@@ -146,8 +146,8 @@ class GeocoderProvider @Inject constructor(
         }
     }
 
-    val preferenceChangeListener = object : Preferences.OnPreferenceChangeListener {
-        override fun onPreferenceChanged(properties: List<String>) {
+    private val preferenceChangeListener = object : Preferences.OnPreferenceChangeListener {
+        override fun onPreferenceChanged(properties: Set<String>) {
             if (properties.intersect(setOf("reverseGeocodeProvider","opencageApiKey")).isNotEmpty()) {
                 setGeocoderProvider(context, preferences)
             }

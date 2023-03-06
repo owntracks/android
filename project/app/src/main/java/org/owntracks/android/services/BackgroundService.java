@@ -65,6 +65,7 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -679,7 +680,7 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
     }
 
     @Override
-    public void onPreferenceChanged(@NonNull List<String> properties) {
+    public void onPreferenceChanged(@NonNull Set<String> properties) {
         List<String> propertiesWeCareAbout = List.of(
                 "locatorInterval",
                 "locatorDisplacement",

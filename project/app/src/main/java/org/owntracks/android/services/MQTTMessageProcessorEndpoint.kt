@@ -188,7 +188,7 @@ class MQTTMessageProcessorEndpoint(
         }
     }
 
-    override fun onPreferenceChanged(properties: List<String>) {
+    override fun onPreferenceChanged(properties: Set<String>) {
         if (preferences.mode != ConnectionMode.MQTT) {
             return
         }

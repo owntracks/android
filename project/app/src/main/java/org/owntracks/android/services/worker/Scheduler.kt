@@ -95,7 +95,7 @@ class Scheduler @Inject constructor(
         private const val ONETIME_TASK_MQTT_RECONNECT = "PERIODIC_TASK_MQTT_RECONNECT"
     }
 
-    override fun onPreferenceChanged(properties: List<String>) {
+    override fun onPreferenceChanged(properties: Set<String>) {
         if (properties.contains(Preferences::ping.name)) {
             workManager.cancelAllWorkByTag(PERIODIC_TASK_SEND_LOCATION_PING)
             scheduleLocationPing()

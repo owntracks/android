@@ -31,6 +31,7 @@ import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
@@ -413,7 +414,7 @@ public class MessageProcessor implements Preferences.OnPreferenceChangeListener 
     }
 
     @Override
-    public void onPreferenceChanged(@NonNull List<String> properties) {
+    public void onPreferenceChanged(@NonNull Set<String> properties) {
         if (properties.contains("mode")) {
             acceptMessages = false;
             loadOutgoingMessageProcessor();
