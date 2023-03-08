@@ -411,7 +411,7 @@ class MapActivity :
                 // We should prompt for permission
                 val permissionRequester =
                     if (explicitUserAction) explicitLocationPermissionRequest else locationPermissionRequest
-                val permissions = arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION)
+                val permissions = arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION, ACCESS_BACKGROUND_LOCATION)
                 if (shouldShowRequestPermissionRationale(ACCESS_FINE_LOCATION)) {
                     // The user may have denied us once already, so show a rationale
                     if (!this::locationPermissionsRationaleAlertDialog.isInitialized) {

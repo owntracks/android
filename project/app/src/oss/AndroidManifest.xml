@@ -2,7 +2,4 @@
 
 	<!-- To request to be whitelisted from battery optimizations -->
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
-
-    <!-- To receive location in background service in oss -->
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 </manifest>

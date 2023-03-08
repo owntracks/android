@@ -3,12 +3,12 @@ package org.owntracks.android.services.worker
 import android.content.Context
 import androidx.work.*
 import dagger.hilt.android.qualifiers.ApplicationContext
-import org.owntracks.android.preferences.Preferences
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.time.Duration.Companion.milliseconds
+import org.owntracks.android.preferences.Preferences
+import timber.log.Timber
 
 @Singleton
 class Scheduler @Inject constructor(
@@ -36,11 +36,12 @@ class Scheduler @Inject constructor(
             .addTag(PERIODIC_TASK_SEND_LOCATION_PING)
             .setConstraints(anyNetworkConstraint)
             .build()
-        Timber.d("WorkManager queue task $PERIODIC_TASK_SEND_LOCATION_PING as ${pingWorkRequest.id} with interval ${preferences.ping} minutes")
+        Timber.d(
+            "WorkManager queue task $PERIODIC_TASK_SEND_LOCATION_PING as ${pingWorkRequest.id} with interval ${preferences.ping} minutes"
+        )
         workManager.cancelAllWorkByTag(PERIODIC_TASK_SEND_LOCATION_PING)
         workManager.enqueue(pingWorkRequest)
     }
-
 
     /**
      * Cancels all WorkManager tasks. Called on app exit

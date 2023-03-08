@@ -337,7 +337,7 @@ class MQTTMessageProcessorEndpoint(
     override fun checkConnection(): Boolean {
         return mqttClientAndConfiguration?.mqttClient?.run {
             var success = false
-            checkPing(
+            val token = checkPing(
                 null,
                 object : IMqttActionListener {
                     override fun onSuccess(asyncActionToken: IMqttToken?) {
@@ -348,7 +348,12 @@ class MQTTMessageProcessorEndpoint(
                         success = false
                     }
                 }
-            )?.apply { waitForCompletion() } ?: run { Timber.w("MQTT checkPing token was null") }
+            )
+            if (token != null) {
+                token.waitForCompletion()
+            } else {
+                Timber.w("MQTT checkPing token was null")
+            }
             return success
         } ?: false
     }
