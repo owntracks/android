@@ -20,8 +20,6 @@ import org.owntracks.android.data.EndpointState
 import org.owntracks.android.data.repos.EndpointStateRepo
 import org.owntracks.android.di.ApplicationScope
 import org.owntracks.android.di.CoroutineScopes
-import org.owntracks.android.di.DispatcherModule
-import org.owntracks.android.di.SingletonModule
 import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageClear
@@ -47,9 +45,13 @@ class MQTTMessageProcessorEndpoint(
 ) : MessageProcessorEndpoint(messageProcessor),
     StatefulServiceMessageProcessor,
     Preferences.OnPreferenceChangeListener {
+    val mqttConnectionIdlingResource: SimpleIdlingResource = SimpleIdlingResource("mqttConnection", true)
+    override val modeId: ConnectionMode = ConnectionMode.MQTT
     private val connectingLock = Semaphore(1)
     private val connectivityManager =
         applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    private var mqttClientAndConfiguration: MqttClientAndConfiguration? = null
+
     private val networkChangeCallback = object : ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) {
             super.onAvailable(network)
@@ -70,12 +72,9 @@ class MQTTMessageProcessorEndpoint(
         }
     }
 
-    val mqttConnectionIdlingResource: SimpleIdlingResource = SimpleIdlingResource("mqttConnection", true)
-    private var mqttClientAndConfiguration: MqttClientAndConfiguration? = null
-
     override fun activate() {
         Timber.v("MQTT Activate")
-        preferences.registerOnPreferenceChangedListener(this@MQTTMessageProcessorEndpoint)
+        preferences.registerOnPreferenceChangedListener(this)
         connectivityManager.registerDefaultNetworkCallback(networkChangeCallback)
         scope.launch {
             try {
@@ -94,7 +93,7 @@ class MQTTMessageProcessorEndpoint(
 
     override fun deactivate() {
         Timber.v("MQTT Deactivate")
-        preferences.unregisterOnPreferenceChangedListener(this@MQTTMessageProcessorEndpoint)
+        preferences.unregisterOnPreferenceChangedListener(this)
         connectivityManager.unregisterNetworkCallback(networkChangeCallback)
         scope.launch {
             connectingLock.withPermit {
@@ -122,15 +121,12 @@ class MQTTMessageProcessorEndpoint(
     }
 
     override fun getEndpointConfiguration(): MqttConnectionConfiguration {
-        Timber.v("MQTT getEndpointConfiguration")
         val configuration = preferences.toMqttConnectionConfiguration()
         configuration.validate() // Throws an exception if not valid
         return configuration
     }
 
     override fun onFinalizeMessage(message: MessageBase): MessageBase = message
-
-    override val modeId: ConnectionMode = ConnectionMode.MQTT
 
     override fun sendMessage(message: MessageBase) {
         Timber.i("Sending message $message")

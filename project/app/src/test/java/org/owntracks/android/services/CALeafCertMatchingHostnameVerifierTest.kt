@@ -11,7 +11,7 @@ import javax.net.ssl.SSLSession
 import javax.net.ssl.SSLSessionContext
 import javax.security.cert.X509Certificate
 
-class MqttHostnameVerifierTest {
+class CALeafCertMatchingHostnameVerifierTest {
     private val letsEncryptRootCert = this.javaClass.getResource("/letsEncryptRootCA.pem")!!.readBytes()
     private val letsEncryptSignedLeaf = this.javaClass.getResource("/letsEncryptSignedLeafX509Certificate.pem")!!.readBytes()
     private val selfSignedCert = this.javaClass.getResource("/selfSignedX509Certificate.pem")!!.readBytes()
@@ -21,7 +21,7 @@ class MqttHostnameVerifierTest {
         val testCA = CertificateFactory.getInstance("X.509").generateCertificate(ByteArrayInputStream(letsEncryptRootCert))
         val testLeaf = CertificateFactory.getInstance("X.509").generateCertificate(ByteArrayInputStream(letsEncryptSignedLeaf))
         val sslSession = TestSSLSession(listOf(testLeaf, testCA))
-        assertTrue(MqttHostnameVerifier(testCA).verify("valid-isrgrootx1.letsencrypt.org", sslSession))
+        assertTrue(CALeafCertMatchingHostnameVerifier(testCA).verify("valid-isrgrootx1.letsencrypt.org", sslSession))
     }
 
     @Test
@@ -29,21 +29,21 @@ class MqttHostnameVerifierTest {
         val testCA = CertificateFactory.getInstance("X.509").generateCertificate(ByteArrayInputStream(letsEncryptRootCert))
         val testLeaf = CertificateFactory.getInstance("X.509").generateCertificate(ByteArrayInputStream(letsEncryptSignedLeaf))
         val sslSession = TestSSLSession(listOf(testLeaf, testCA))
-        assertFalse(MqttHostnameVerifier(testCA).verify("host.evil.org", sslSession))
+        assertFalse(CALeafCertMatchingHostnameVerifier(testCA).verify("host.evil.org", sslSession))
     }
 
     @Test
     fun `Given a self-signed certificate, MqttHostnameVerifier should skip validation and succeed even if hostnames are different`() {
         val selfSigned = CertificateFactory.getInstance("X.509").generateCertificate(ByteArrayInputStream(selfSignedCert))
         val sslSession = TestSSLSession(listOf(selfSigned))
-        assertTrue(MqttHostnameVerifier(selfSigned).verify("host.evil.org", sslSession))
+        assertTrue(CALeafCertMatchingHostnameVerifier(selfSigned).verify("host.evil.org", sslSession))
     }
 
     @Test
     fun `Given a self-signed certificate, MqttHostnameVerifier should skip validation and succeed even if hostnames are the same`() {
         val selfSigned = CertificateFactory.getInstance("X.509").generateCertificate(ByteArrayInputStream(selfSignedCert))
         val sslSession = TestSSLSession(listOf(selfSigned))
-        assertTrue(MqttHostnameVerifier(selfSigned).verify("test.example.com", sslSession))
+        assertTrue(CALeafCertMatchingHostnameVerifier(selfSigned).verify("test.example.com", sslSession))
     }
 
     private class TestSSLSession(private val testPeerCertificates: List<Certificate>) : SSLSession {

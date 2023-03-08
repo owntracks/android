@@ -16,11 +16,11 @@ import androidx.databinding.DataBindingUtil
 import androidx.test.espresso.IdlingResource
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.IOException
+import java.net.URI
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiPreferencesLoadBinding
 import timber.log.Timber
-import java.io.IOException
-import java.net.URI
 
 @SuppressLint("GoogleAppIndexingApiWarning")
 @AndroidEntryPoint
@@ -30,17 +30,17 @@ class LoadActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView<UiPreferencesLoadBinding?>(this, R.layout.ui_preferences_load).apply {
-            vm = viewModel
-            lifecycleOwner = this@LoadActivity
-            setSupportActionBar(appbar.toolbar)
-        }
+        binding = DataBindingUtil.setContentView<UiPreferencesLoadBinding?>(this, R.layout.ui_preferences_load)
+            .apply {
+                vm = viewModel
+                lifecycleOwner = this@LoadActivity
+                setSupportActionBar(appbar.toolbar)
+            }
         viewModel.displayedConfiguration.observe(this) { invalidateOptionsMenu() }
         viewModel.configurationImportStatus.observe(this) {
             invalidateOptionsMenu()
             Timber.d("ImportStatus is $it")
             if (it == ImportStatus.SAVED) {
-
                 finish()
             }
         }
@@ -111,12 +111,15 @@ class LoadActivity : AppCompatActivity() {
             try {
                 filePickerResultLauncher.launch(
                     Intent.createChooser(
-                        pickerIntent, getString(R.string.loadActivitySelectAFile)
+                        pickerIntent,
+                        getString(R.string.loadActivitySelectAFile)
                     )
                 )
             } catch (ex: ActivityNotFoundException) {
                 Snackbar.make(
-                    binding.root, R.string.loadActivityNoFileExplorerFound, Snackbar.LENGTH_SHORT
+                    binding.root,
+                    R.string.loadActivityNoFileExplorerFound,
+                    Snackbar.LENGTH_SHORT
                 )
                     .show()
             }
@@ -136,7 +139,6 @@ class LoadActivity : AppCompatActivity() {
             finish()
         }
     }
-
 
     @Throws(IOException::class)
     private fun getContentFromURI(uri: Uri): ByteArray {

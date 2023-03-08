@@ -8,7 +8,7 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import org.owntracks.android.services.MessageProcessorEndpointHttp
+import org.owntracks.android.services.HttpMessageProcessorEndpoint
 import org.threeten.bp.Instant
 import org.threeten.bp.temporal.ChronoUnit
 import timber.log.Timber
@@ -50,7 +50,7 @@ class OpenCageGeocoder @JvmOverloads internal constructor(
             .build()
         val request = Request.Builder()
             .url(url)
-            .header("User-Agent", MessageProcessorEndpointHttp.USERAGENT)
+            .header("User-Agent", HttpMessageProcessorEndpoint.USERAGENT)
             .get()
             .build()
         return try {

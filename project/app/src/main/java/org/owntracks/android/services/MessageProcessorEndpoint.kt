@@ -1,10 +1,10 @@
 package org.owntracks.android.services
 
+import java.io.IOException
 import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
 import org.owntracks.android.support.interfaces.OutgoingMessageProcessor
-import java.io.IOException
 
 abstract class MessageProcessorEndpoint internal constructor(val messageProcessor: MessageProcessor) :
     OutgoingMessageProcessor {
@@ -18,7 +18,9 @@ abstract class MessageProcessorEndpoint internal constructor(val messageProcesso
     abstract val modeId: ConnectionMode?
 
     @Throws(
-        ConfigurationIncompleteException::class, OutgoingMessageSendingException::class, IOException::class
+        ConfigurationIncompleteException::class,
+        OutgoingMessageSendingException::class,
+        IOException::class
     )
     abstract fun sendMessage(message: MessageBase)
 }

@@ -1,11 +1,9 @@
 package org.owntracks.android.e2e
 
-import android.Manifest
 import androidx.preference.PreferenceManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
-import com.adevinta.android.barista.interaction.PermissionGranter.allowPermissionsIfNeeded
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest

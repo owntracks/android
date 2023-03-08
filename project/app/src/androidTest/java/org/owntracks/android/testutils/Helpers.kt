@@ -29,6 +29,7 @@ import org.owntracks.android.R
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.map.MapActivity
+import org.owntracks.android.ui.preferences.load.LoadActivity
 import timber.log.Timber
 
 fun scrollToPreferenceWithText(textResource: Int) {
@@ -57,7 +58,7 @@ fun setNotFirstStartPreferences() {
 }
 
 fun reportLocationFromMap(locationIdlingResource: IdlingResource?, mockLocationFunction: () -> Unit = {}) {
-    if (getCurrentActivity() !is MapActivity) {
+    if (getCurrentActivity() !is MapActivity && getCurrentActivity() !is LoadActivity) {
         openDrawer()
         clickOnAndWait(R.string.title_activity_map)
     }

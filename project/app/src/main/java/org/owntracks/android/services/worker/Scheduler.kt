@@ -47,16 +47,7 @@ class Scheduler @Inject constructor(
      */
     fun cancelAllTasks() {
         cancelMqttTasks()
-        cancelHttpTasks()
         workManager.cancelAllWorkByTag(PERIODIC_TASK_SEND_LOCATION_PING)
-    }
-
-    /**
-     * Called when the HTTP endpoint deactivates
-     */
-    fun cancelHttpTasks() {
-        Timber.d("canceling ONEOFF_TASK_SEND_MESSAGE_HTTP tasks")
-        workManager.cancelAllWorkByTag(ONEOFF_TASK_SEND_MESSAGE_HTTP)
     }
 
     /**
@@ -88,7 +79,6 @@ class Scheduler @Inject constructor(
 
     companion object {
         val MIN_PERIODIC_INTERVAL = PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS.milliseconds
-        private const val ONEOFF_TASK_SEND_MESSAGE_HTTP = "SEND_MESSAGE_HTTP"
         private const val ONEOFF_TASK_SEND_MESSAGE_MQTT = "SEND_MESSAGE_MQTT"
         private const val PERIODIC_TASK_SEND_LOCATION_PING = "PERIODIC_TASK_SEND_LOCATION_PING"
         private const val PERIODIC_TASK_MQTT_KEEPALIVE = "PERIODIC_TASK_MQTT_KEEPALIVE"

@@ -12,8 +12,6 @@ import org.owntracks.android.data.repos.EndpointStateRepo;
 import org.owntracks.android.data.repos.WaypointsRepo;
 import org.owntracks.android.di.ApplicationScope;
 import org.owntracks.android.di.CoroutineScopes;
-import org.owntracks.android.di.DispatcherModule;
-import org.owntracks.android.di.SingletonModule;
 import org.owntracks.android.model.messages.MessageBase;
 import org.owntracks.android.model.messages.MessageCard;
 import org.owntracks.android.model.messages.MessageClear;
@@ -106,7 +104,7 @@ public class MessageProcessor implements Preferences.OnPreferenceChangeListener 
             Timber.d("Initializing the outgoingqueueidlingresource at %s", outgoingQueue.size());
         }
         preferences.registerOnPreferenceChangedListener(this);
-        httpEndpoint = new MessageProcessorEndpointHttp(this, parser, this.preferences, scheduler, applicationContext, this.endpointStateRepo);
+        httpEndpoint = new HttpMessageProcessorEndpoint(this, parser, this.preferences, applicationContext, this.endpointStateRepo, scope, ioDispatcher);
         mqttEndpoint = new MQTTMessageProcessorEndpoint(this, this.endpointStateRepo, scheduler, this.preferences, parser, scope, ioDispatcher, applicationContext);
     }
 

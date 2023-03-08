@@ -212,7 +212,7 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
     }
 
     @get:VisibleForTesting
-    val mqttConnectionIdlingResource: IdlingResource?
+    val mqttConnectionIdlingResource: IdlingResource
         get() = messageProcessor.mqttConnectionIdlingResource
 
     companion object {
