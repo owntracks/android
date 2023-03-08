@@ -1,8 +1,10 @@
 package org.owntracks.android.ui.preferences
 
+import android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import androidx.core.content.PermissionChecker
 import androidx.preference.EditTextPreference
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
@@ -53,7 +55,10 @@ class AdvancedFragment @Inject constructor() : AbstractPreferenceFragment(), Pre
             remoteCommandAndConfigurationChangeListener
 
         findPreference<Preference>("autostartWarning")?.isVisible =
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && PermissionChecker.checkSelfPermission(
+                requireActivity(),
+                ACCESS_BACKGROUND_LOCATION
+            ) == PermissionChecker.PERMISSION_DENIED
 
         setOpenCageAPIKeyPreferenceVisibility()
     }

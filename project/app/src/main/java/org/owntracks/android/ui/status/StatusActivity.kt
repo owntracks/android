@@ -1,7 +1,9 @@
 package org.owntracks.android.ui.status
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.viewModels
@@ -22,6 +24,7 @@ import org.eclipse.paho.client.mqttv3.MqttException.*
 import org.owntracks.android.R
 import org.owntracks.android.data.EndpointState
 import org.owntracks.android.databinding.UiStatusBinding
+import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.services.MqttConnectionConfiguration
 import org.owntracks.android.support.DrawerProvider
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
@@ -31,11 +34,16 @@ import org.owntracks.android.ui.status.logs.LogViewerActivity
 class StatusActivity : AppCompatActivity() {
     @Inject
     lateinit var drawerProvider: DrawerProvider
+
+    @Inject
+    lateinit var preferences: Preferences
+
     val viewModel: StatusViewModel by viewModels()
     private val batteryOptimizationIntents by lazy { BatteryOptimizingIntents(this) }
+    private lateinit var binding: UiStatusBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        DataBindingUtil.setContentView<UiStatusBinding>(this, R.layout.ui_status)
+        binding = DataBindingUtil.setContentView<UiStatusBinding>(this, R.layout.ui_status)
             .apply {
                 vm = viewModel
                 lifecycleOwner = this@StatusActivity
@@ -66,12 +74,20 @@ class StatusActivity : AppCompatActivity() {
                         ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     )
                 }
+                locationPermissions.setOnClickListener {
+                    startActivity(
+                        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                            data = Uri.parse("package:$packageName")
+                        }
+                    )
+                }
             }
     }
 
     override fun onResume() {
         super.onResume()
         viewModel.refreshDozeModeWhitelisted()
+        viewModel.refreshLocationPermissions()
     }
 
     companion object {

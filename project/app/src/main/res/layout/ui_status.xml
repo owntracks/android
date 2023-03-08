@@ -145,6 +145,9 @@
                     android:id="@+id/dozeWhiteListed"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:orientation="vertical">
 
                     <TextView
@@ -165,6 +168,35 @@
                         android:paddingRight="@dimen/activity_horizontal_margin"
                         android:paddingBottom="@dimen/activity_horizontal_margin"
                         android:text="@string/status_battery_optimization_whitelisted_hint" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/locationPermissions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/ListItemPrimary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="none"
+                        android:paddingLeft="@dimen/activity_horizontal_margin"
+                        android:paddingRight="@dimen/activity_horizontal_margin"
+                        android:text="@{vm.locationPermissions}" />
+
+                    <TextView
+                        style="@style/ListItemSecondary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:paddingLeft="@dimen/activity_horizontal_margin"
+                        android:paddingRight="@dimen/activity_horizontal_margin"
+                        android:paddingBottom="@dimen/activity_horizontal_margin"
+                        android:text="@string/statusLocationPermissions" />
                 </LinearLayout>
 
                 <ImageView

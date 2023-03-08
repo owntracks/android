@@ -264,6 +264,13 @@ To allow this, please enable Location in the device settings."</string>
     <string name="status_last_background_update_hint">"Location service last background update"</string>
     <string name="statusBatteryDozeWhiteListDisabled">"No"</string>
     <string name="statusBatteryDozeWhiteListEnabled">"Yes"</string>
+    <string name="statusLocationPermissions">"Location permissions granted"</string>
+    <string name="statusLocationPermissionsNone">"None"</string>
+    <string name="statusLocationPermissionsCoarseForeground">"Approximate"</string>
+    <string name="statusLocationPermissionsFineForeground">"Precise"</string>
+    <string name="statusLocationPermissionsCoarseBackground">"Approximate in background"</string>
+    <string name="statusLocationPermissionsFineBackground">"Precise in background"</string>
+    <string name="statusLocationPermissionsUnknown">"Unknown"</string>
     <string name="title_activity_about">"About"</string>
     <string name="title_activity_contacts">"Friends"</string>
     <string name="title_activity_map">"Map"</string>

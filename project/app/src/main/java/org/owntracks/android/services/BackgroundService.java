@@ -306,7 +306,6 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
     }
 
     private void notifyUserOfBackgroundLocationRestriction() {
-
         Intent activityLaunchIntent = new Intent(getApplicationContext(), MapActivity.class);
         activityLaunchIntent.setAction("android.intent.action.MAIN");
         activityLaunchIntent.addCategory("android.intent.category.LAUNCHER");

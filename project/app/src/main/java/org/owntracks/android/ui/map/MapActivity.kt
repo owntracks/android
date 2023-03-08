@@ -44,9 +44,7 @@ import dagger.hilt.android.EntryPointAccessors
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 import org.owntracks.android.R
-import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.databinding.UiMapBinding
-import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.Preferences.Companion.EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION
@@ -57,7 +55,6 @@ import org.owntracks.android.services.BackgroundService.BACKGROUND_LOCATION_REST
 import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.support.DrawerProvider
 import org.owntracks.android.support.RequirementsChecker
-import org.owntracks.android.support.RunThingsOnOtherThreads
 import org.owntracks.android.ui.mixins.ServiceStarter
 import org.owntracks.android.ui.mixins.WorkManagerInitExceptionNotifier
 import org.owntracks.android.ui.welcome.WelcomeActivity
@@ -84,16 +81,7 @@ class MapActivity :
     private lateinit var locationPermissionsRationaleAlertDialog: AlertDialog
 
     @Inject
-    lateinit var locationRepo: LocationRepo
-
-    @Inject
-    lateinit var runThingsOnOtherThreads: RunThingsOnOtherThreads
-
-    @Inject
     lateinit var contactImageBindingAdapter: ContactImageBindingAdapter
-
-    @Inject
-    lateinit var geocoderProvider: GeocoderProvider
 
     @Inject
     lateinit var countingIdlingResource: CountingIdlingResource
@@ -411,7 +399,7 @@ class MapActivity :
                 // We should prompt for permission
                 val permissionRequester =
                     if (explicitUserAction) explicitLocationPermissionRequest else locationPermissionRequest
-                val permissions = arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION, ACCESS_BACKGROUND_LOCATION)
+                val permissions = arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION)
                 if (shouldShowRequestPermissionRationale(ACCESS_FINE_LOCATION)) {
                     // The user may have denied us once already, so show a rationale
                     if (!this::locationPermissionsRationaleAlertDialog.isInitialized) {
