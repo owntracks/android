@@ -55,6 +55,8 @@ import org.owntracks.android.services.BackgroundService.BACKGROUND_LOCATION_REST
 import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.support.DrawerProvider
 import org.owntracks.android.support.RequirementsChecker
+import org.owntracks.android.ui.mixins.ActivityResultCallerWithLocationPermissionCallback
+import org.owntracks.android.ui.mixins.LocationPermissionRequester
 import org.owntracks.android.ui.mixins.ServiceStarter
 import org.owntracks.android.ui.mixins.WorkManagerInitExceptionNotifier
 import org.owntracks.android.ui.welcome.WelcomeActivity
@@ -66,9 +68,11 @@ class MapActivity :
     View.OnClickListener,
     View.OnLongClickListener,
     PopupMenu.OnMenuItemClickListener,
+    ActivityResultCallerWithLocationPermissionCallback,
     WorkManagerInitExceptionNotifier by WorkManagerInitExceptionNotifier.Impl(),
     ServiceStarter by ServiceStarter.Impl() {
     private val viewModel: MapViewModel by viewModels()
+    private val locationPermissionRequester = LocationPermissionRequester(this)
     private var previouslyHadLocationPermissions: Boolean = false
     private var service: BackgroundService? = null
     private var bottomSheetBehavior: BottomSheetBehavior<LinearLayoutCompat>? = null
@@ -78,7 +82,6 @@ class MapActivity :
     private lateinit var binding: UiMapBinding
 
     private lateinit var locationServicesAlertDialog: AlertDialog
-    private lateinit var locationPermissionsRationaleAlertDialog: AlertDialog
 
     @Inject
     lateinit var contactImageBindingAdapter: ContactImageBindingAdapter
@@ -312,44 +315,14 @@ class MapActivity :
     }
 
     /**
-     * A callback that's fired when the activity is resumed with the result of a location permissioned check resulting
-     * from an expclit user action. We want to trigger a services check if the location permission was granted
-     */
-    private val explicitLocationPermissionRequest =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            when {
-                permissions[ACCESS_COARSE_LOCATION] ?: false || permissions[ACCESS_FINE_LOCATION] ?: false -> {
-                    checkAndRequestLocationServicesEnabled(true)
-                    userGrantedPermissions()
-                }
-                else -> {
-                    userDeclinedPermissions()
-                }
-            }
-        }
-
-    /**
-     * A callback that's fired when the activity is resumed with the result of a location permission check not triggered
-     * by an explicit user action.
-     */
-    private val locationPermissionRequest =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            when {
-                permissions[ACCESS_COARSE_LOCATION] ?: false || permissions[ACCESS_FINE_LOCATION] ?: false -> {
-                    userGrantedPermissions()
-                }
-                else -> {
-                    userDeclinedPermissions()
-                }
-            }
-        }
-
-    /**
-     * User has granted location permission. Ask the viewmodel to start requesting locations, set the viewmode to
+     * User has granted location permission. Ask the viewmodel to start requesting locations, set the [MapViewModel.ViewMode] to
      * [MapViewModel.ViewMode.Device] and tell the service to reinitialize locations.
      *
      */
-    private fun userGrantedPermissions() {
+    override fun locationPermissionGranted(code: Int) {
+        if (code == EXPLICIT_LOCATION_PERMISSION_REQUEST) {
+            checkAndRequestLocationServicesEnabled(true)
+        }
         viewModel.requestLocationUpdatesForBlueDot()
         viewModel.onMyLocationClicked()
         viewModel.updateMyLocationStatus()
@@ -357,11 +330,11 @@ class MapActivity :
     }
 
     /**
-     * User has declined to enable location permissions. Snackbar the user with the option of trying again (in case they
+     * User has declined to enable location permissions. [Snackbar] the user with the option of trying again (in case they
      * didn't mean to).
      *
      */
-    private fun userDeclinedPermissions() {
+    override fun locationPermissionDenied(code: Int) {
         preferences.userDeclinedEnableLocationPermissions = true
         Snackbar.make(
             binding.mapCoordinatorLayout,
@@ -392,44 +365,22 @@ class MapActivity :
      * prompt to enable to raised, even if the user says "yes" to the prompt.
      */
     private fun checkAndRequestLocationPermissions(explicitUserAction: Boolean): Boolean {
-        if (!requirementsChecker.hasLocationPermissions()) {
+        return if (!requirementsChecker.hasLocationPermissions()) {
             Timber.d("No location permission")
             // We don't have location permission
             if ((explicitUserAction || !preferences.userDeclinedEnableLocationPermissions)) {
-                // We should prompt for permission
-                val permissionRequester =
-                    if (explicitUserAction) explicitLocationPermissionRequest else locationPermissionRequest
-                val permissions = arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION)
-                if (shouldShowRequestPermissionRationale(ACCESS_FINE_LOCATION)) {
-                    // The user may have denied us once already, so show a rationale
-                    if (!this::locationPermissionsRationaleAlertDialog.isInitialized) {
-                        locationPermissionsRationaleAlertDialog = MaterialAlertDialogBuilder(this).setCancelable(true)
-                            .setIcon(R.drawable.ic_baseline_location_disabled_24)
-                            .setTitle(
-                                getString(R.string.locationPermissionRequestDialogTitle)
-                            )
-                            .setMessage(R.string.locationPermissionRequestDialogMessage)
-                            .setPositiveButton(
-                                android.R.string.ok
-                            ) { _, _ ->
-                                permissionRequester.launch(permissions)
-                            }
-                            .setNegativeButton(android.R.string.cancel) { _, _ ->
-                                preferences.userDeclinedEnableLocationPermissions = true
-                            }
-                            .create()
-                    }
-                    if (!locationPermissionsRationaleAlertDialog.isShowing) {
-                        locationPermissionsRationaleAlertDialog.show()
-                    }
-                } else {
-                    // No need to show rationale, just request
-                    permissionRequester.launch(permissions)
-                }
+                locationPermissionRequester.requestLocationPermissions(
+                    if (explicitUserAction) {
+                        EXPLICIT_LOCATION_PERMISSION_REQUEST
+                    } else {
+                        IMPLICIT_LOCATION_PERMISSION_REQUEST
+                    },
+                    this
+                ) { shouldShowRequestPermissionRationale(it) }
             }
-            return false
+            false
         } else {
-            return true
+            true
         }
     }
 
@@ -676,6 +627,8 @@ class MapActivity :
 
     companion object {
         const val BUNDLE_KEY_CONTACT_ID = "BUNDLE_KEY_CONTACT_ID"
+        const val IMPLICIT_LOCATION_PERMISSION_REQUEST = 1
+        const val EXPLICIT_LOCATION_PERMISSION_REQUEST = 2
 
         @JvmStatic
         @BindingAdapter("locationIcon")
