@@ -81,7 +81,7 @@ class HttpMessageProcessorEndpointTest {
                     testPreferences,
                     application,
                     endpointStateRepo,
-                    this.backgroundScope,
+                    this,
                     StandardTestDispatcher()
                 )
             val configuration = httpMessageProcessorEndpoint.getEndpointConfiguration()
@@ -106,7 +106,7 @@ class HttpMessageProcessorEndpointTest {
                 testPreferences,
                 application,
                 endpointStateRepo,
-                this.backgroundScope,
+                this,
                 StandardTestDispatcher()
             )
         val configuration = httpMessageProcessorEndpoint.getEndpointConfiguration()
@@ -128,7 +128,7 @@ class HttpMessageProcessorEndpointTest {
                 testPreferences,
                 application,
                 endpointStateRepo,
-                this.backgroundScope,
+                this,
                 StandardTestDispatcher()
             )
         val configuration = httpMessageProcessorEndpoint.getEndpointConfiguration()
@@ -156,7 +156,7 @@ class HttpMessageProcessorEndpointTest {
                 testPreferences,
                 application,
                 endpointStateRepo,
-                this.backgroundScope,
+                this,
                 StandardTestDispatcher()
             )
         val configuration = httpMessageProcessorEndpoint.getEndpointConfiguration()
@@ -187,7 +187,7 @@ class HttpMessageProcessorEndpointTest {
                 testPreferences,
                 application,
                 endpointStateRepo,
-                this.backgroundScope,
+                this,
                 StandardTestDispatcher()
             )
         val configuration = httpMessageProcessorEndpoint.getEndpointConfiguration()
@@ -209,7 +209,7 @@ class HttpMessageProcessorEndpointTest {
                     testPreferences,
                     application,
                     endpointStateRepo,
-                    this.backgroundScope,
+                    this,
                     StandardTestDispatcher()
                 )
             httpMessageProcessorEndpoint.getEndpointConfiguration()

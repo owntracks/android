@@ -40,9 +40,6 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
     lateinit var preferences: Preferences
 
     @Inject
-    lateinit var runThingsOnOtherThreads: RunThingsOnOtherThreads
-
-    @Inject
     lateinit var workerFactory: WorkerFactory
 
     @Inject
@@ -56,6 +53,9 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
 
     @Inject
     lateinit var messageProcessor: MessageProcessor
+
+    @Inject
+    lateinit var notificationManager: NotificationManagerCompat
 
     val workManagerFailedToInitialize = MutableLiveData(false)
 
@@ -128,7 +128,6 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
     }
 
     private fun createNotificationChannels() {
-        val notificationManager = NotificationManagerCompat.from(this)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             // Importance min will show normal priority notification for foreground service. See https://developer.android.com/reference/android/app/NotificationManager#IMPORTANCE_MIN
             // User has to actively configure this in the notification channel settings.

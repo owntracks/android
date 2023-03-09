@@ -15,11 +15,11 @@ class TestOpenCageGeocoder {
 
     @Test
     fun `Given an incomplete OpenCage Response, when deserialized then no error is thrown`() {
-        var openCageJSON = """
+        val openCageJSON = """
             {"documentation":"https://opencagedata.com/api","rate":{"reset":123}}
         """.trimIndent()
 
-        val deserialized = OpenCageGeocoder("").deserializeOpenCageResponse(openCageJSON)
+        val deserialized = OpenCageGeocoder("", OkHttpClient()).deserializeOpenCageResponse(openCageJSON)
         assertNull(deserialized.formatted)
         assertNull(deserialized.results)
         assertNotNull(deserialized.rate)
@@ -30,12 +30,17 @@ class TestOpenCageGeocoder {
 
     @Test
     fun `Given a successful response from OpenCage, the correct formatted address is returned`() {
-        val openCageJSON = this.javaClass.getResource("/openCage/opencageResult.json")!!.readText()
+        val openCageJSON = this.javaClass.getResource("/openCage/opencageResult.json")!!
+            .readText()
         assertNotNull(openCageJSON)
 
         val httpResponse = Response.Builder()
             .body(openCageJSON.toResponseBody("application/json".toMediaTypeOrNull()))
-            .request(Request.Builder().url("https://example.com").build())
+            .request(
+                Request.Builder()
+                    .url("https://example.com")
+                    .build()
+            )
             .protocol(Protocol.HTTP_1_1)
             .code(200)
             .message("Ok")
@@ -57,12 +62,17 @@ class TestOpenCageGeocoder {
     @Test
     fun `Given a disabled response from OpenCage, a disabled message is returned`() {
         val openCageJSON =
-            this.javaClass.getResource("/openCage/opencageDisabledResult.json")!!.readText()
+            this.javaClass.getResource("/openCage/opencageDisabledResult.json")!!
+                .readText()
         assertNotNull(openCageJSON)
 
         val httpResponse = Response.Builder()
             .body(openCageJSON.toResponseBody("application/json".toMediaTypeOrNull()))
-            .request(Request.Builder().url("https://example.com").build())
+            .request(
+                Request.Builder()
+                    .url("https://example.com")
+                    .build()
+            )
             .protocol(Protocol.HTTP_1_1)
             .code(403)
             .message("Ok")
@@ -86,7 +96,11 @@ class TestOpenCageGeocoder {
 
         val httpResponse = Response.Builder()
             .body(openCageJSON.toResponseBody("application/json".toMediaTypeOrNull()))
-            .request(Request.Builder().url("https://example.com").build())
+            .request(
+                Request.Builder()
+                    .url("https://example.com")
+                    .build()
+            )
             .protocol(Protocol.HTTP_1_1)
             .code(403)
             .message("Ok")
@@ -104,12 +118,17 @@ class TestOpenCageGeocoder {
     @Test
     fun `Given a rate limited response from OpenCage, a rate limited message is returned with an appropriate expiry`() {
         val openCageJSON =
-            this.javaClass.getResource("/openCage/opencageRateLimitedResult.json")!!.readText()
+            this.javaClass.getResource("/openCage/opencageRateLimitedResult.json")!!
+                .readText()
         assertNotNull(openCageJSON)
 
         val httpResponse = Response.Builder()
             .body(openCageJSON.toResponseBody("application/json".toMediaTypeOrNull()))
-            .request(Request.Builder().url("https://example.com").build())
+            .request(
+                Request.Builder()
+                    .url("https://example.com")
+                    .build()
+            )
             .protocol(Protocol.HTTP_1_1)
             .code(429)
             .message("Ok")
@@ -123,18 +142,26 @@ class TestOpenCageGeocoder {
         val response = geocoder.reverse(0.0, 0.0)
         assert(response is GeocodeResult.Fault.RateLimited)
         assert((response as GeocodeResult.Fault.RateLimited).until > Instant.now())
-        assert(response.until < Instant.now().plus(5, ChronoUnit.MINUTES))
+        assert(
+            response.until < Instant.now()
+                .plus(5, ChronoUnit.MINUTES)
+        )
     }
 
     @Test
     fun `Given a quota response from OpenCage, a quota limited message is returned with an appropriate expiry`() {
         val openCageJSON =
-            this.javaClass.getResource("/openCage/opencageOutOfQuotaResult.json")!!.readText()
+            this.javaClass.getResource("/openCage/opencageOutOfQuotaResult.json")!!
+                .readText()
         assertNotNull(openCageJSON)
 
         val httpResponse = Response.Builder()
             .body(openCageJSON.toResponseBody("application/json".toMediaTypeOrNull()))
-            .request(Request.Builder().url("https://example.com").build())
+            .request(
+                Request.Builder()
+                    .url("https://example.com")
+                    .build()
+            )
             .protocol(Protocol.HTTP_1_1)
             .code(402)
             .message("Ok")

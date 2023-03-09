@@ -10,8 +10,10 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.*
+import okhttp3.OkHttpClient
 import org.owntracks.android.R
 import org.owntracks.android.di.ApplicationScope
+import org.owntracks.android.di.CoroutineScopes
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ReverseGeocodeProvider
@@ -26,11 +28,12 @@ import timber.log.Timber
 class GeocoderProvider @Inject constructor(
     @ApplicationContext private val context: Context,
     private val preferences: Preferences,
-    @ApplicationScope private val scope: CoroutineScope
+    private val notificationManager: NotificationManagerCompat,
+    @ApplicationScope private val scope: CoroutineScope,
+    @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val httpClient: OkHttpClient
 ) {
-    private val ioDispatcher = Dispatchers.IO
     private var lastRateLimitedNotificationTime: Instant? = null
-    private var notificationManager: NotificationManagerCompat
     private var geocoder: Geocoder = GeocoderNone()
 
     private var job: Job? = null
@@ -41,7 +44,8 @@ class GeocoderProvider @Inject constructor(
             withContext(ioDispatcher) {
                 geocoder = when (preferences.reverseGeocodeProvider) {
                     ReverseGeocodeProvider.OPENCAGE -> OpenCageGeocoder(
-                        preferences.opencageApiKey
+                        preferences.opencageApiKey,
+                        httpClient
                     )
                     ReverseGeocodeProvider.DEVICE -> DeviceGeocoder(context)
                     ReverseGeocodeProvider.NONE -> GeocoderNone()
@@ -142,7 +146,7 @@ class GeocoderProvider @Inject constructor(
             backgroundService.onGeocodingProviderResult(messageLocation)
             return
         }
-        MainScope().launch {
+        scope.launch {
             val result = geocoderResolve(messageLocation)
             messageLocation.geocode = geocodeResultToText(result)
             backgroundService.onGeocodingProviderResult(messageLocation)
@@ -163,7 +167,6 @@ class GeocoderProvider @Inject constructor(
     init {
         setGeocoderProvider(context, preferences)
         preferences.registerOnPreferenceChangedListener(preferenceChangeListener)
-        notificationManager = NotificationManagerCompat.from(context)
     }
 
     companion object {
