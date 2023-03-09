@@ -3,13 +3,15 @@ package org.owntracks.android.geocoding
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_LOW
 import androidx.core.app.NotificationManagerCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.*
 import org.owntracks.android.R
+import org.owntracks.android.di.ApplicationScope
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ReverseGeocodeProvider
@@ -19,13 +21,12 @@ import org.threeten.bp.Instant
 import org.threeten.bp.ZoneOffset.UTC
 import org.threeten.bp.format.DateTimeFormatter
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 class GeocoderProvider @Inject constructor(
     @ApplicationContext private val context: Context,
     private val preferences: Preferences,
+    @ApplicationScope private val scope: CoroutineScope
 ) {
     private val ioDispatcher = Dispatchers.IO
     private var lastRateLimitedNotificationTime: Instant? = null
@@ -36,7 +37,7 @@ class GeocoderProvider @Inject constructor(
 
     private fun setGeocoderProvider(context: Context, preferences: Preferences) {
         Timber.i("Setting geocoding provider to ${preferences.reverseGeocodeProvider}")
-        job = GlobalScope.launch {
+        job = scope.launch {
             withContext(ioDispatcher) {
                 geocoder = when (preferences.reverseGeocodeProvider) {
                     ReverseGeocodeProvider.OPENCAGE -> OpenCageGeocoder(
@@ -67,7 +68,10 @@ class GeocoderProvider @Inject constructor(
     }
 
     private fun maybeCreateErrorNotification(result: GeocodeResult) {
-        if (result is GeocodeResult.Formatted || result is GeocodeResult.Empty || !preferences.notificationGeocoderErrors) {
+        if (result is GeocodeResult.Formatted ||
+            result is GeocodeResult.Empty ||
+            !preferences.notificationGeocoderErrors
+        ) {
             notificationManager.cancel(GEOCODE_ERROR_NOTIFICATION_TAG, 0)
             return
         }
@@ -148,7 +152,9 @@ class GeocoderProvider @Inject constructor(
 
     private val preferenceChangeListener = object : Preferences.OnPreferenceChangeListener {
         override fun onPreferenceChanged(properties: Set<String>) {
-            if (properties.intersect(setOf("reverseGeocodeProvider","opencageApiKey")).isNotEmpty()) {
+            if (properties.intersect(setOf("reverseGeocodeProvider", "opencageApiKey"))
+                    .isNotEmpty()
+            ) {
                 setGeocoderProvider(context, preferences)
             }
         }
