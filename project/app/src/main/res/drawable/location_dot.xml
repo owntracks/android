@@ -11,7 +11,7 @@
         A6,6 0 1,1 5,12" />
 
     <path
-        android:fillColor="#105FFF"
+        android:fillColor="@color/BlueDot"
         android:pathData="M6,12
         A4,4 0 1,1 18,12
         A4,4 0 1,1 6,12" />

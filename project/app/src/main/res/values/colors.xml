@@ -11,7 +11,8 @@
     <color name="OTDarkerBlue">#305e9f</color>
     <color name="OTAccent">#31aba6</color>
     <color name="MapRegion">#407f7fff</color>
+    <color name="BlueDot">#4285f4</color>
     <color name="fabMyLocationBackground">#ffffffff</color>
-    <color name="fabMyLocationForegroundActiveTint">#ff105fff</color>
+    <color name="fabMyLocationForegroundActiveTint">@color/BlueDot</color>
     <color name="fabMyLocationForegroundInActiveTint">#ff3e4245</color>
 </resources>
