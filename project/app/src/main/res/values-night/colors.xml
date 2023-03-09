@@ -2,6 +2,6 @@
 <resources>
     <color name="MapRegion">#404f4f9f</color>
     <color name="fabMyLocationBackground">#ff2a2b2e</color>
-    <color name="fabMyLocationForegroundActiveTint">#ff105fff</color>
+    <color name="fabMyLocationForegroundActiveTint">@color/OTPrimaryBlue</color>
     <color name="fabMyLocationForegroundInActiveTint">#ffe7eaed</color>
 </resources>

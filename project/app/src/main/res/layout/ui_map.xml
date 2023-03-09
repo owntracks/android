@@ -40,12 +40,14 @@
             android:layout_height="wrap_content"
             android:layout_gravity="top"
             android:contentDescription="@string/currentLocationButtonLabel"
-            android:tint="@color/primary"
             android:tooltipText="@string/currentLocationButtonLabel"
             app:backgroundTint="@color/fabMyLocationBackground"
+
             app:layout_anchor="@+id/bottomSheetLayout"
             app:layout_anchorGravity="end|bottom"
             app:locationIcon="@{vm.myLocationStatus}"
+            app:strokeColor="@color/md_pink_400"
+            app:strokeWidth="3dp"
             app:useCompatPadding="true" />
 
 
