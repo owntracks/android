@@ -5,7 +5,7 @@ plugins {
     kotlin("android")
     kotlin("kapt")
     id("io.objectbox")
-    id("com.hiya.jacoco-android")
+    id("com.dicedmelon.gradle.jacoco-android") version "0.1.5"
 }
 
 apply<EspressoScreenshotsPlugin>()
@@ -124,7 +124,6 @@ android {
         execution = "ANDROIDX_TEST_ORCHESTRATOR"
         animationsDisabled = true
         unitTests {
-            isIncludeAndroidResources = true
             isIncludeAndroidResources = true
         }
     }

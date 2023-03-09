@@ -3,6 +3,7 @@ package org.owntracks.android.ui.map
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.owntracks.android.ui.map.MapLayerStyle
 
 class MapViewModelTest {
     @Test

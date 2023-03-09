@@ -13,6 +13,7 @@ import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.preferences.types.MqttProtocolLevel
 import org.owntracks.android.preferences.types.MqttQos
 import org.owntracks.android.support.Parser
+import org.owntracks.android.ui.map.MapLayerStyle
 
 class ImportExportTest {
     private lateinit var mockContext: Context
@@ -193,7 +194,7 @@ class ImportExportTest {
               "keepalive" : 900,
               "locatorDisplacement" : 5,
               "locatorInterval" : 60,
-              "mapLayerStyle" : "GoogleMapDefault",
+              "mapLayerStyle" : "${defaultMapLayerStyle.name}",
               "mode" : 0,
               "monitoring" : 1,
               "moveModeLocatorInterval" : 10,
@@ -214,7 +215,7 @@ class ImportExportTest {
               "pubTopicBase" : "owntracks/%u/%d",
               "publishLocationOnConnect" : false,
               "remoteConfiguration" : true,
-              "reverseGeocodeProvider" : "Device",
+              "reverseGeocodeProvider" : "${defaultReverseGeocodeProvider.value}",
               "showRegionsOnMap" : false,
               "sub" : true,
               "subQos" : 2,

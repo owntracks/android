@@ -22,7 +22,7 @@ class PreferencesGettersAndSetters(private val parameter: Parameter) {
 
     @Before
     fun createMocks() {
-        shortcutService = mock<ShortcutManager> {}
+        shortcutService = mock {}
         mockContext = mock {
             on { packageName } doReturn javaClass.canonicalName
             on { getSystemService(Context.SHORTCUT_SERVICE) } doReturn shortcutService
@@ -257,22 +257,6 @@ class PreferencesGettersAndSetters(private val parameter: Parameter) {
                     1000,
                     Int::class,
                     false
-                ),
-                Parameter(
-                    "MapLayerStyle",
-                    "mapLayerStyle",
-                    MapLayerStyle.GoogleMapHybrid,
-                    MapLayerStyle::class,
-                    false,
-                    preferenceValueInConfiguration = "GoogleMapHybrid"
-                ),
-                Parameter(
-                    "MapLayerStyle",
-                    "mapLayerStyle",
-                    MapLayerStyle.GoogleMapDefault,
-                    MapLayerStyle::class,
-                    false,
-                    preferenceValueInConfiguration = "Nonsense"
                 ),
                 Parameter(
                     "Mode",
