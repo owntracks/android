@@ -14,6 +14,7 @@ class WelcomeActivity : BaseWelcomeActivity() {
         listOf(
             introFragment,
             connectionSetupFragment,
+            locationPermissionFragment,
             notificationPermissionFragment,
             osRestrictionsFragment,
             playFragment,

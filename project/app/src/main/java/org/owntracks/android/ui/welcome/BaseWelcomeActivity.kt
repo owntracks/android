@@ -33,6 +33,9 @@ abstract class BaseWelcomeActivity : AppCompatActivity() {
     lateinit var connectionSetupFragment: ConnectionSetupFragment
 
     @Inject
+    lateinit var locationPermissionFragment: LocationPermissionFragment
+
+    @Inject
     lateinit var notificationPermissionFragment: NotificationPermissionFragment
 
     @Inject

@@ -18,6 +18,7 @@
 - Notification permissions are requested sensibly on Android 13+
 - Google Play Store build numbers will now just increment from 40800000, rather than reflect the version string
 - Background location permission! (Hurray!)
+- Prompt for location permissions in the welcome screen
 
 ### Bug fixes
 
