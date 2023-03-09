@@ -102,9 +102,10 @@ class HttpMessageProcessorEndpoint(
         // simply publishes the message to that topic.
         message.setTopicVisible()
         if (httpClientAndConfiguration == null) {
-            throw Exception("Http client not yet initialized")
+            throw OutgoingMessageSendingException(Exception("Http client not yet initialized"))
         }
         httpClientAndConfiguration?.run {
+            endpointStateRepo.setState(EndpointState.CONNECTING)
             Timber.d("Publishing message id=${message.messageId}")
             client.newCall(getRequest(configuration, message))
                 .execute()
