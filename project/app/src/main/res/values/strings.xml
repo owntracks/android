@@ -268,8 +268,8 @@ To allow this, please enable Location in the device settings."</string>
     <string name="statusLocationPermissionsNone">"None"</string>
     <string name="statusLocationPermissionsCoarseForeground">"Approximate"</string>
     <string name="statusLocationPermissionsFineForeground">"Precise"</string>
-    <string name="statusLocationPermissionsCoarseBackground">"Approximate in background"</string>
-    <string name="statusLocationPermissionsFineBackground">"Precise in background"</string>
+    <string name="statusLocationPermissionsCoarseBackground">"Approximate (available in background)"</string>
+    <string name="statusLocationPermissionsFineBackground">"Precise (available in background)"</string>
     <string name="statusLocationPermissionsUnknown">"Unknown"</string>
     <string name="title_activity_about">"About"</string>
     <string name="title_activity_contacts">"Friends"</string>
