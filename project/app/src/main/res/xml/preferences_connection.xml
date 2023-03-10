@@ -16,7 +16,7 @@
         app:key="preferenceGroupEndpoint"
         app:title="@string/preferencesCategoryConnectionEndpoint">
         <ValidatingEditTextPreference
-            android:inputType="textPassword"
+            android:inputType="textUri"
             android:key="url"
             android:lines="1"
             android:title="@string/preferencesUrl"
