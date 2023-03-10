@@ -37,7 +37,7 @@ interface DefaultsProvider {
             Preferences::firstStart -> true
             Preferences::host -> ""
             Preferences::ignoreInaccurateLocations -> 0
-            Preferences::ignoreStaleLocations -> 0
+            Preferences::ignoreStaleLocations -> 0f
             Preferences::info -> true
             Preferences::keepalive -> 3600
             Preferences::locatorDisplacement -> 500
