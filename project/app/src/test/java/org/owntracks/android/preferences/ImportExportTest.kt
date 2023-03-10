@@ -220,7 +220,7 @@ class ImportExportTest {
               "sub" : true,
               "subQos" : 2,
               "subTopic" : "owntracks/+/+",
-              "theme" : 0,
+              "theme" : 2,
               "tid" : "wn",
               "tls" : false,
               "tlsCaCrt" : "",

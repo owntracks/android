@@ -68,7 +68,7 @@ interface DefaultsProvider {
             Preferences::sub -> true
             Preferences::subQos -> MqttQos.TWO
             Preferences::subTopic -> DEFAULT_SUB_TOPIC
-            Preferences::theme -> AppTheme.LIGHT
+            Preferences::theme -> AppTheme.AUTO
             Preferences::tls -> true
             Preferences::tlsCaCrt -> ""
             Preferences::tlsClientCrt -> ""
