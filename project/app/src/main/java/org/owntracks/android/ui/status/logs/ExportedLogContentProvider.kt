@@ -8,9 +8,9 @@ import android.net.Uri
 import android.os.ParcelFileDescriptor
 import android.provider.OpenableColumns
 import android.util.Log
+import java.io.FileOutputStream
 import org.owntracks.android.logging.TimberInMemoryLogTree
 import timber.log.Timber
-import java.io.FileOutputStream
 
 class ExportedLogContentProvider : ContentProvider() {
 
@@ -25,7 +25,7 @@ class ExportedLogContentProvider : ContentProvider() {
                 it.priority >= Log.INFO
             }
         }
-        ?.joinToString("\n") { it.toString() }
+        ?.joinToString("\n") { it.toExportedString() }
         ?.toByteArray()
 
     override fun insert(uri: Uri, values: ContentValues?): Uri? {
@@ -37,7 +37,7 @@ class ExportedLogContentProvider : ContentProvider() {
         projection: Array<out String>?,
         selection: String?,
         selectionArgs: Array<out String>?,
-        sortOrder: String?,
+        sortOrder: String?
     ): Cursor? =
         logForUri(uri)?.let {
             val m = MatrixCursor(arrayOf(OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE), 1)
@@ -51,7 +51,7 @@ class ExportedLogContentProvider : ContentProvider() {
         uri: Uri,
         values: ContentValues?,
         selection: String?,
-        selectionArgs: Array<out String>?,
+        selectionArgs: Array<out String>?
     ): Int {
         return 0
     }

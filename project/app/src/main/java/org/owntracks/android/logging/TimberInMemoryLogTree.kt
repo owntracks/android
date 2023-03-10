@@ -20,7 +20,7 @@ class TimberInMemoryLogTree(private val debugBuild: Boolean) : DebugTree() {
         super.log(priority, "${prefix}_$tag", message, t)
         // Verbose messages are loggable in this impl, so we want them going to logcat. But not to our buffer.
         if (priority >= Log.DEBUG) {
-            buffer.add(LogEntry(priority, tag, message))
+            buffer.add(LogEntry(priority, tag, message, Thread.currentThread().name))
             mutableLiveLogs.postValue(buffer.all())
         }
     }

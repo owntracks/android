@@ -14,11 +14,11 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.*
 import org.owntracks.android.BuildConfig
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiPreferencesLogsBinding
 import org.owntracks.android.logging.LogEntry
-import java.util.*
 
 @AndroidEntryPoint
 class LogViewerActivity : AppCompatActivity() {
@@ -40,10 +40,11 @@ class LogViewerActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView<UiPreferencesLogsBinding?>(
             this,
             R.layout.ui_preferences_logs
-        ).apply {
-            lifecycleOwner = this@LogViewerActivity
-            setSupportActionBar(appbar.toolbar)
-        }
+        )
+            .apply {
+                lifecycleOwner = this@LogViewerActivity
+                setSupportActionBar(appbar.toolbar)
+            }
 
         supportActionBar?.apply {
             setDisplayShowHomeEnabled(true)
@@ -60,7 +61,8 @@ class LogViewerActivity : AppCompatActivity() {
                 resources.getColor(R.color.log_error_tag_color)
             )
         )
-        viewModel.logLines().observe(this, ::updateAdapterWithLogLines)
+        viewModel.logLines()
+            .observe(this, ::updateAdapterWithLogLines)
 
         binding.logsRecyclerView.apply {
             recyclerView = this
@@ -133,7 +135,8 @@ class LogViewerActivity : AppCompatActivity() {
     }
 
     private fun getRandomHexString(): String {
-        return Random().nextInt(0X1000000).toString(16)
+        return Random().nextInt(0X1000000)
+            .toString(16)
     }
 
     private fun revokeExportUriPermissions() {

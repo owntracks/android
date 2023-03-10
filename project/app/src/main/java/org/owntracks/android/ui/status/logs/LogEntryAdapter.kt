@@ -18,7 +18,7 @@ import org.owntracks.android.logging.LogEntry
  * RecyclerView Adapter that manages the LogLines displayed to the user.
  */
 class LogEntryAdapter(
-    private val logPalette: LogPalette,
+    private val logPalette: LogPalette
 ) : RecyclerView.Adapter<LogEntryAdapter.ViewHolder>() {
     private var longestLogEntry: Int = 0
     private val logLines = mutableListOf<LogEntry>()
@@ -28,10 +28,11 @@ class LogEntryAdapter(
         val expandedForMultiline = lines
             .flatMap { logEntry ->
                 logEntry.message.split("\n")
-                    .map { LogEntry(logEntry.priority, logEntry.tag, it, logEntry.time) }
+                    .map { LogEntry(logEntry.priority, logEntry.tag, it, logEntry.threadName, logEntry.time) }
             }
         longestLogEntry =
-            expandedForMultiline.maxByOrNull { it.toString().length }.toString().length
+            expandedForMultiline.maxByOrNull { it.toString().length }
+                .toString().length
         logLines.addAll(expandedForMultiline)
         notifyDataSetChanged()
     }
@@ -50,7 +51,8 @@ class LogEntryAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
-            LayoutInflater.from(parent.context).inflate(R.layout.log_viewer_entry, parent, false)
+            LayoutInflater.from(parent.context)
+                .inflate(R.layout.log_viewer_entry, parent, false)
         )
     }
 
@@ -61,23 +63,33 @@ class LogEntryAdapter(
                 if (position > 0 && this[position - 1].tag == line.tag && line.message.startsWith(
                         "\tat "
                     )
-                )
-                    SpannableString(line.message.prependIndent().padEnd(longestLogEntry))
-                else
-                    SpannableString(line.toString().padEnd(longestLogEntry)).apply {
-                        setSpan(
-                            StyleSpan(Typeface.BOLD),
-                            line.time.length,
-                            line.time.length + "${line.priorityChar} ${line.tag}:".length,
-                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                        )
-                        setSpan(
-                            ForegroundColorSpan(levelToColor(line.priority)),
-                            line.time.length,
-                            line.time.length + "${line.priorityChar} ${line.tag}:".length,
-                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                        )
+                ) {
+                    SpannableString(
+                        line.message.prependIndent()
+                            .padEnd(longestLogEntry)
+                    )
+                } else {
+                    SpannableString(
+                        line.toString()
+                            .padEnd(longestLogEntry)
+                    ).apply {
+                        line.sliceLength()
+                            .let {
+                                setSpan(
+                                    StyleSpan(Typeface.BOLD),
+                                    it.first,
+                                    it.second,
+                                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                                )
+                                setSpan(
+                                    ForegroundColorSpan(levelToColor(line.priority)),
+                                    it.first,
+                                    it.second,
+                                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                                )
+                            }
                     }
+                }
 
             holder.layout.apply {
                 findViewById<TextView>(R.id.log_msg).apply {

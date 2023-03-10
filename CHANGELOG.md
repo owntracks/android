@@ -19,6 +19,7 @@
 - Google Play Store build numbers will now just increment from 40800000, rather than reflect the version string
 - Background location permission! (Hurray!)
 - Prompt for location permissions in the welcome screen
+- An exported log file also contains the threadname for each logentry
 
 ### Bug fixes
 
