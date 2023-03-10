@@ -202,7 +202,11 @@ class HttpMessageProcessorEndpoint(
                 .isNotEmpty()
         ) {
             scope.launch(ioDispatcher) {
-                httpClientAndConfiguration = setClientAndConfiguration(applicationContext, preferences)
+                try {
+                    httpClientAndConfiguration = setClientAndConfiguration(applicationContext, preferences)
+                } catch (e: ConfigurationIncompleteException) {
+                    Timber.d(e, "Configuration is incomplete, not doing anything with this preference change yet")
+                }
                 messageProcessor.notifyOutgoingMessageQueue()
             }
         }
