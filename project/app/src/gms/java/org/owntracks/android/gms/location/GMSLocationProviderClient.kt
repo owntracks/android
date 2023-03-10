@@ -42,7 +42,8 @@ class GMSLocationProviderClient(
         looper: Looper
     ) {
         Timber.d(
-            "Requesting location updates priority=${locationRequest.priority}, interval=${locationRequest.interval} clientCallback=${clientCallBack.hashCode()}"
+            "Requesting location updates priority=${locationRequest.priority}, " +
+                "interval=${locationRequest.interval} clientCallback=${clientCallBack.hashCode()}"
         )
         val gmsCallBack = GMSLocationCallback(clientCallBack)
         callbackMap[clientCallBack.hashCode()] = gmsCallBack
@@ -55,7 +56,8 @@ class GMSLocationProviderClient(
         )
             .addOnCompleteListener {
                 Timber.d(
-                    "GMS Background location update request completed: Success=${it.isSuccessful} Cancelled=${it.isCanceled}"
+                    "GMS Background location update request completed: " +
+                        "Success=${it.isSuccessful} Cancelled=${it.isCanceled}"
                 )
             }
     }

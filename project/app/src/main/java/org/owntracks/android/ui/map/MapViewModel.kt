@@ -30,7 +30,6 @@ import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.services.LocationProcessor
 import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.support.RequirementsChecker
-import org.owntracks.android.support.SimpleIdlingResource
 import timber.log.Timber
 
 @HiltViewModel
@@ -102,8 +101,6 @@ class MapViewModel @Inject constructor(
     private val currentConnectionMode: MutableLiveData<ConnectionMode> by lazy {
         MutableLiveData(preferences.mode)
     }
-
-    val locationIdlingResource = SimpleIdlingResource("locationIdlingResource", false)
 
     val viewMode: ViewMode by locationRepo::viewMode
 
@@ -319,8 +316,6 @@ class MapViewModel @Inject constructor(
      * @param latLng location to move the blue dot to
      */
     fun setCurrentBlueDotLocation(latLng: LatLng) {
-        Timber.v("Idling location")
-        locationIdlingResource.setIdleState(true)
         locationRepo.currentBlueDotOnMapLocation = latLng
     }
 

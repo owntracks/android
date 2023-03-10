@@ -126,7 +126,7 @@ class CommonMapActivityTests :
         launchActivity()
         grantMapActivityPermissions()
         initializeMockLocationProvider(app)
-        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource) {
+        reportLocationFromMap(app.locationIdlingResource) {
             setMockLocation(51.0, 0.0)
         }
 

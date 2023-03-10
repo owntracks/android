@@ -88,7 +88,7 @@ inline fun <reified T : Activity> waitUntilActivityVisible() {
             )
         }
     }
-    Timber.d("${T::class.java.simpleName} is now visible visible")
+    Timber.d("${T::class.java.simpleName} is now visible")
 }
 
 fun getCurrentActivity(): Activity? {

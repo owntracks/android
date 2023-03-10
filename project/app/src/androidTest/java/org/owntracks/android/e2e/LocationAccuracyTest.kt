@@ -70,11 +70,11 @@ class LocationAccuracyTest :
 
         configureHTTPConnectionToLocal()
 
-        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource) {
+        reportLocationFromMap(app.locationIdlingResource) {
             setMockLocation(inaccurateMockLatitude, inaccurateMockLongitude, 100f)
         }
 
-        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource) {
+        reportLocationFromMap(app.locationIdlingResource) {
             setMockLocation(accurateMockLatitude, accurateMockLongitude, 3f)
         }
 
@@ -116,7 +116,7 @@ class LocationAccuracyTest :
         initializeMockLocationProvider(app)
 
         configureHTTPConnectionToLocal()
-        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource) {
+        reportLocationFromMap(app.locationIdlingResource) {
             setMockLocation(mockLatitude, mockLongitude, 25f)
         }
         assertTrue(

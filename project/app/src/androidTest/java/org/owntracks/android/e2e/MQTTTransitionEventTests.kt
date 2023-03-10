@@ -91,7 +91,7 @@ class MQTTTransitionEventTests :
         configureMQTTConnectionToLocalWithGeneratedPassword()
 
         app.mqttConnectionIdlingResource.with {
-            reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource)
+            reportLocationFromMap(app.locationIdlingResource)
         }
 
         listOf(
@@ -143,7 +143,7 @@ class MQTTTransitionEventTests :
         configureMQTTConnectionToLocalWithGeneratedPassword()
         waitUntilActivityVisible<MapActivity>()
 
-        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource) {
+        reportLocationFromMap(app.locationIdlingResource) {
             setMockLocation(51.0, 0.0)
         }
 
@@ -158,7 +158,7 @@ class MQTTTransitionEventTests :
 
         clickOnAndWait(R.id.save)
 
-        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource) {
+        reportLocationFromMap(app.locationIdlingResource) {
             setMockLocation(waypointLatitude, waypointLongitude)
         }
 

@@ -47,7 +47,7 @@ class ContactActivityTests :
         initializeMockLocationProvider(app)
         configureHTTPConnectionToLocal()
 
-        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource) {
+        reportLocationFromMap(app.locationIdlingResource) {
             setMockLocation(51.0, 0.0)
         }
 

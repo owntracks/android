@@ -79,7 +79,7 @@ class MQTTMessagePublishTests :
 
         configureMQTTConnectionToLocalWithGeneratedPassword()
 
-        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource) {
+        reportLocationFromMap(app.locationIdlingResource) {
             setMockLocation(mockLatitude, mockLongitude)
         }
 
@@ -107,7 +107,7 @@ class MQTTMessagePublishTests :
 
         grantMapActivityPermissions()
         configureMQTTConnectionToLocalWithGeneratedPassword()
-        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource) {
+        reportLocationFromMap(app.locationIdlingResource) {
             setMockLocation(51.0, 0.0)
         }
 
@@ -147,7 +147,7 @@ class MQTTMessagePublishTests :
 
         configureMQTTConnectionToLocalWithGeneratedPassword()
 
-        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource) {
+        reportLocationFromMap(app.locationIdlingResource) {
             setMockLocation(51.0, 0.0)
         }
 
@@ -207,7 +207,7 @@ class MQTTMessagePublishTests :
 
         grantMapActivityPermissions()
         configureMQTTConnectionToLocalWithGeneratedPassword()
-        reportLocationFromMap(baristaRule.activityTestRule.activity.locationIdlingResource) {
+        reportLocationFromMap(app.locationIdlingResource) {
             setMockLocation(51.0, 0.0)
         }
 

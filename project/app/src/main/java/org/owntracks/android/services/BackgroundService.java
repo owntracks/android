@@ -59,6 +59,7 @@ import org.owntracks.android.services.worker.Scheduler;
 import org.owntracks.android.support.DateFormatter;
 import org.owntracks.android.support.RunThingsOnOtherThreads;
 import org.owntracks.android.support.ServiceBridge;
+import org.owntracks.android.support.SimpleIdlingResource;
 import org.owntracks.android.ui.map.MapActivity;
 
 import java.time.Duration;
@@ -152,6 +153,9 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
     @Inject
     LocationProviderClient locationProviderClient;
 
+    @Inject
+    SimpleIdlingResource locationIdlingResource;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -170,6 +174,8 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
             @Override
             public void onLocationResult(@NotNull LocationResult locationResult) {
                 Timber.d("location result received: %s", locationResult);
+                Timber.v("Idling location");
+                locationIdlingResource.setIdleState(true);
                 onLocationChanged(locationResult.getLastLocation(), MessageLocation.REPORT_TYPE_DEFAULT);
             }
         };

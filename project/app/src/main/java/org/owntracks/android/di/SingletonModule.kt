@@ -13,6 +13,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import okhttp3.OkHttpClient
+import org.owntracks.android.support.SimpleIdlingResource
 import org.owntracks.android.ui.AppShortcuts
 import org.owntracks.android.ui.AppShortcutsImpl
 
@@ -22,23 +23,22 @@ class SingletonModule {
 
     @Provides
     @Singleton
-    fun provideOutgoingQueueIdlingResource(): CountingIdlingResource {
-        return CountingIdlingResource("outgoingQueueIdlingResource", false)
-    }
+    fun provideOutgoingQueueIdlingResource(): CountingIdlingResource =
+        CountingIdlingResource("outgoingQueueIdlingResource", false)
 
     @Provides
     @Singleton
-    fun provideAppShortcuts(): AppShortcuts {
-        return AppShortcutsImpl()
-    }
+    fun provideLocationIdlingResource(): SimpleIdlingResource = SimpleIdlingResource("locationIdlingResource", false)
+
+    @Provides
+    @Singleton
+    fun provideAppShortcuts(): AppShortcuts = AppShortcutsImpl()
 
     @ApplicationScope
     @Provides
     fun providesCoroutineScope(
         @CoroutineScopes.DefaultDispatcher defaultDispatcher: CoroutineDispatcher
-    ): CoroutineScope {
-        return CoroutineScope(SupervisorJob() + defaultDispatcher)
-    }
+    ): CoroutineScope = CoroutineScope(SupervisorJob() + defaultDispatcher)
 
     @Provides
     fun provideNotificationManager(

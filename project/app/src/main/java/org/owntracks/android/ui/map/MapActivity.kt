@@ -618,10 +618,6 @@ class MapActivity :
     }
 
     @get:VisibleForTesting
-    val locationIdlingResource: IdlingResource
-        get() = viewModel.locationIdlingResource
-
-    @get:VisibleForTesting
     val outgoingQueueIdlingResource: IdlingResource
         get() = countingIdlingResource
 
