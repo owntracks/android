@@ -82,7 +82,7 @@ abstract class PreferencesStore :
                         ) ?: ""
                     )
                     else -> throw UnsupportedPreferenceTypeException(
-                        "Trying to get roperty ${property.name} has type ${property.returnType}"
+                        "Trying to get property ${property.name} has type ${property.returnType}"
                     )
                 } as T
             } catch (e: java.lang.ClassCastException) {

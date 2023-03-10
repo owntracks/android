@@ -111,7 +111,7 @@ class MQTTMessageProcessorEndpoint(
                     try {
                         mqttClient.disconnect()
                     } catch (e: MqttException) {
-                        Timber.i("Could not disconnect from client, because ${e.message}. Closing")
+                        Timber.d(e,"Could not disconnect from client. Closing")
                     }
                     endpointStateRepo.setState(EndpointState.DISCONNECTED)
                     mqttClient.close(true)
@@ -274,7 +274,7 @@ class MQTTMessageProcessorEndpoint(
                             mqttClientAndConfiguration = MqttClientAndConfiguration(it, mqttConnectionConfiguration)
                         }
                         .apply {
-                            Timber.i("Connecting to $mqttConnectionConfiguration")
+                            Timber.i("Connecting to ${mqttConnectionConfiguration.connectionString}")
                             connect(mqttConnectionConfiguration.getConnectOptions(applicationContext))
                                 .waitForCompletion()
                             Timber.i("Connected. Subscribing to ${mqttConnectionConfiguration.topicsToSubscribeTo}")
