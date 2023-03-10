@@ -31,22 +31,23 @@ interface ConnectionConfiguration {
         tlsClientCrt: String,
         tlsClientCrtPassword: String,
         context: Context
-    ): SocketFactory {
-        val socketFactoryOptions = SocketFactory.SocketFactoryOptions()
-            .withSocketTimeout(connectionTimeoutSeconds)
-        if (tls) {
-            if (tlsCaCrt != null) {
-                socketFactoryOptions.withCaCertificate(tlsCaCrt.encoded)
-            }
-        }
-        if (tlsClientCrt.isNotEmpty()) {
-            context.openFileInput(tlsClientCrt)
-                .use {
-                    socketFactoryOptions.withClientP12Certificate(it.readBytes())
-                        .withClientP12Password(tlsClientCrtPassword)
+    ): SocketFactory =
+        SocketFactory(
+            SocketFactory.SocketFactoryOptions()
+                .apply {
+                    socketTimeout = connectionTimeoutSeconds
+                    if (tls) {
+                        if (tlsCaCrt != null) {
+                            caCrt = tlsCaCrt.encoded
+                        }
+                        if (tlsClientCrt.isNotEmpty()) {
+                            context.openFileInput(tlsClientCrt)
+                                .use {
+                                    clientP12Certificate = it.readBytes()
+                                    caClientP12Password = tlsClientCrtPassword
+                                }
+                        }
+                    }
                 }
-        }
-
-        return SocketFactory(socketFactoryOptions)
-    }
+        )
 }
