@@ -18,7 +18,6 @@ plugins {
     alias(libs.plugins.hilt.android).apply(false)
     alias(libs.plugins.objectbox).apply(false)
     alias(libs.plugins.triplet).apply(false)
-    id("com.hiya.jacoco-android").version("0.2").apply(false)
 }
 
 extensions.findByName("buildScan")?.withGroovyBuilder {
