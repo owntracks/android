@@ -16,7 +16,6 @@ androidx-core-testing = "2.2.0"
 androidx-preference = "1.2.0"
 androidx-work = "2.7.1"
 androidx-fragment = "1.5.5"
-androidx-lifecycle = "2.5.1"
 androidx-test-junit = "1.1.5"
 androidx-test-core-ktx = "1.5.0"
 androidx-test-rules = "1.5.0"
@@ -82,7 +81,6 @@ androidx-work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref
 androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "androidx-fragment" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
 androidx-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "androidx-core-testing" }
-androidx-lifecycle = { module = "androidx.lifecycle:lifecycle-common-java8", version.ref = "androidx-lifecycle" }
 
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 okhttp-mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "okhttp" }
@@ -124,7 +122,7 @@ kotlin = ["kotlin-coroutines-android", "kotlin-coroutines-jdk8", "kotlin-reflect
 jaxb-annotation-processors = ["jaxb-api", "jaxb-core", "jaxb-impl"]
 kapt-hilt = ["hilt-compiler", "hilt-androidx"]
 hilt = ["hilt-android", "hilt-work"]
-androidx = ["androidx-core-ktx", "androidx-preference", "androidx-work-runtime", "androidx-fragment-ktx", "androidx-lifecycle"]
+androidx = ["androidx-core-ktx", "androidx-preference", "androidx-work-runtime", "androidx-fragment-ktx"]
 androidx-test = ["androidx-test-junit", "androidx-test-core-ktx", "androidx-test-rules", "androidx-test-runner"]
 androidx-test-util = ["androidx-test-services", "androidx-test-orchestrator"]
 buildscript = ["r8", "guava"]
