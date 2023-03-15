@@ -1,14 +1,13 @@
 package org.owntracks.android.geocoding
 
-import timber.log.Timber
 import java.math.BigDecimal
 import java.math.RoundingMode
+import timber.log.Timber
 
 abstract class CachingGeocoder : Geocoder {
     private val cache = GeocoderLRUCache(40)
 
-    @Synchronized
-    override fun reverse(latitude: Double, longitude: Double): GeocodeResult {
+    override suspend fun reverse(latitude: Double, longitude: Double): GeocodeResult {
         val result = cache.computeAndOnlyStoreNonErrors(
             Pair(
                 latitude.toBigDecimal().setScale(4, RoundingMode.HALF_EVEN),

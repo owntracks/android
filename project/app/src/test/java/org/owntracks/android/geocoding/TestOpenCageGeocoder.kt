@@ -1,5 +1,7 @@
 package org.owntracks.android.geocoding
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -11,10 +13,11 @@ import org.mockito.kotlin.mock
 import org.threeten.bp.Instant
 import org.threeten.bp.temporal.ChronoUnit
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class TestOpenCageGeocoder {
 
     @Test
-    fun `Given an incomplete OpenCage Response, when deserialized then no error is thrown`() {
+    fun `Given an incomplete OpenCage Response, when deserialized then no error is thrown`() = runTest {
         val openCageJSON = """
             {"documentation":"https://opencagedata.com/api","rate":{"reset":123}}
         """.trimIndent()
@@ -29,7 +32,7 @@ class TestOpenCageGeocoder {
     }
 
     @Test
-    fun `Given a successful response from OpenCage, the correct formatted address is returned`() {
+    fun `Given a successful response from OpenCage, the correct formatted address is returned`() = runTest {
         val openCageJSON = this.javaClass.getResource("/openCage/opencageResult.json")!!
             .readText()
         assertNotNull(openCageJSON)
@@ -60,7 +63,7 @@ class TestOpenCageGeocoder {
     }
 
     @Test
-    fun `Given a disabled response from OpenCage, a disabled message is returned`() {
+    fun `Given a disabled response from OpenCage, a disabled message is returned`() = runTest {
         val openCageJSON =
             this.javaClass.getResource("/openCage/opencageDisabledResult.json")!!
                 .readText()
@@ -88,7 +91,7 @@ class TestOpenCageGeocoder {
     }
 
     @Test
-    fun `Given an IP Address Rejected response from OpenCage, a rejected message is returned`() {
+    fun `Given an IP Address Rejected response from OpenCage, a rejected message is returned`() = runTest {
         val openCageJSON =
             this.javaClass.getResource("/openCage/opencageIPAddressRejectedResult.json")!!
                 .readText()
@@ -116,7 +119,7 @@ class TestOpenCageGeocoder {
     }
 
     @Test
-    fun `Given a rate limited response from OpenCage, a rate limited message is returned with an appropriate expiry`() {
+    fun `Given a rate limited response from OpenCage, a rate limited message is returned with an appropriate expiry`() = runTest {
         val openCageJSON =
             this.javaClass.getResource("/openCage/opencageRateLimitedResult.json")!!
                 .readText()
@@ -149,7 +152,7 @@ class TestOpenCageGeocoder {
     }
 
     @Test
-    fun `Given a quota response from OpenCage, a quota limited message is returned with an appropriate expiry`() {
+    fun `Given a quota response from OpenCage, a quota limited message is returned with an appropriate expiry`() = runTest {
         val openCageJSON =
             this.javaClass.getResource("/openCage/opencageOutOfQuotaResult.json")!!
                 .readText()

@@ -8,7 +8,7 @@
         <import type="android.view.View" />
 
         <variable
-            name="label"
+            name="title"
             type="String" />
 
         <variable
@@ -35,7 +35,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="start"
 
-            android:contentDescription="@{label}"
+            android:contentDescription="@{title}"
             android:rotation="@{iconRotation}"
             android:src="@{icon}"
             android:visibility="@{icon !=null ? View.VISIBLE : View.INVISIBLE}"
@@ -78,7 +78,7 @@
                 android:paddingStart="0dp"
                 android:paddingEnd="@dimen/activity_horizontal_margin"
                 android:paddingBottom="@dimen/activity_horizontal_margin"
-                android:text="@{label}"
+                android:text="@{title}"
                 android:textIsSelectable="true"
                 app:autoSizeMaxTextSize="16sp"
                 app:autoSizeMinTextSize="1sp"

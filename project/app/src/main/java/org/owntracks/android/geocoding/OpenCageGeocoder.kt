@@ -14,7 +14,7 @@ import org.threeten.bp.Instant
 import org.threeten.bp.temporal.ChronoUnit
 import timber.log.Timber
 
-class OpenCageGeocoder @JvmOverloads internal constructor(
+class OpenCageGeocoder internal constructor(
     private val apiKey: String,
     private val httpClient: OkHttpClient
 ) : CachingGeocoder() {
@@ -65,8 +65,8 @@ class OpenCageGeocoder @JvmOverloads internal constructor(
                                 responseBody?.let {
                                     val deserializedOpenCageResponse = deserializeOpenCageResponse(it)
                                     Timber.d("Opencage HTTP response: $it")
-                                    deserializedOpenCageResponse.formatted?.let {
-                                        GeocodeResult.Formatted(it)
+                                    deserializedOpenCageResponse.formatted?.let { formatted ->
+                                        GeocodeResult.Formatted(formatted)
                                     } ?: GeocodeResult.Empty
                                 } ?: GeocodeResult.Empty
                             }

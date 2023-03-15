@@ -89,97 +89,93 @@ class StatusActivity : AppCompatActivity() {
         viewModel.refreshDozeModeWhitelisted()
         viewModel.refreshLocationPermissions()
     }
+}
 
-    companion object {
-        @JvmStatic
-        @BindingAdapter("app:endpointState")
-        fun setText(view: TextView, endpointState: EndpointState) {
-            view.text = if (endpointState.error != null) {
-                when (val e = endpointState.error) {
-                    is ConfigurationIncompleteException -> {
-                        when (e.cause) {
-                            is MqttConnectionConfiguration.MissingHostException -> view.context.getString(
-                                R.string.statusEndpointStateMessageMissingHost
-                            )
-                            is URISyntaxException -> view.context.getString(
-                                R.string.statusEndpointStateMessageMalformedHostPort
-                            )
-                            else -> e.toString()
-                        }
-                    }
-                    is MqttException -> when (val cause = e.cause) {
-                        is UnknownHostException -> view.context.getString(
-                            R.string.statusEndpointStateMessageUnknownHost
-                        )
-                        is SocketTimeoutException -> view.context.getString(
-                            R.string.statusEndpointStateMessageSocketTimeout
-                        )
-                        is SSLException -> {
-                            if (cause.message != null && cause.message!!.contains("TLSV1_ALERT_CERTIFICATE_REQUIRED")) {
-                                view.context.getString(
-                                    R.string.statusEndpointStateMessageTLSError,
-                                    "TLSV1_ALERT_CERTIFICATE_REQUIRED"
-                                )
-                            } else {
-                                view.context.getString(
-                                    R.string.statusEndpointStateMessageTLSError,
-                                    cause.message
-                                )
-                            }
-                        }
-                        else -> when (e.reasonCode.toShort()) {
-                            REASON_CODE_INVALID_PROTOCOL_VERSION -> view.context.getString(
-                                R.string.statusEndpointStateMessageInvalidProtocolVersion
-                            )
-                            REASON_CODE_INVALID_CLIENT_ID -> view.context.getString(
-                                R.string.statusEndpointStateMessageInvalidClientId
-                            )
-                            REASON_CODE_FAILED_AUTHENTICATION -> view.context.getString(
-                                R.string.statusEndpointStateMessageAuthenticationFailed
-                            )
-                            REASON_CODE_NOT_AUTHORIZED -> view.context.getString(
-                                R.string.statusEndpointStateMessageNotAuthorized
-                            )
-                            REASON_CODE_SUBSCRIBE_FAILED -> view.context.getString(
-                                R.string.statusEndpointStateMessageSubscribeFailed
-                            )
-                            REASON_CODE_CLIENT_TIMEOUT -> view.context.getString(
-                                R.string.statusEndpointStateMessageClientTimeout
-                            )
-                            REASON_CODE_WRITE_TIMEOUT -> view.context.getString(
-                                R.string.statusEndpointStateMessageServerTimeout
-                            )
-                            REASON_CODE_SERVER_CONNECT_ERROR -> view.context.getString(
-                                R.string.statusEndpointStateMessageUnableToConnect
-                            )
-                            REASON_CODE_SSL_CONFIG_ERROR -> view.context.getString(
-                                R.string.statusEndpointStateMessageTLSConfigError
-                            )
-                            REASON_CODE_CONNECTION_LOST -> view.context.getString(
-                                R.string.statusEndpointStateMessageConnectionLost,
-                                cause.toString()
-                            )
-                            else -> e.toString()
-                        }
-                    }
-                    is IOException -> {
-                        if (e.message == "PKCS12 key store mac invalid - wrong password or corrupted file.") {
-                            view.context.getString(R.string.statusEndpointStateMessageTLSBadClientCertPassword)
-                        } else {
-                            e.toString()
-                        }
-                    }
+@BindingAdapter("endpointState")
+fun LinearLayout.setVisibility(endpointState: EndpointState) {
+    isVisible = !(endpointState.error == null && endpointState.message == null)
+}
+
+@BindingAdapter("endpointState")
+fun TextView.setText(endpointState: EndpointState) {
+    text = if (endpointState.error != null) {
+        when (val e = endpointState.error) {
+            is ConfigurationIncompleteException -> {
+                when (e.cause) {
+                    is MqttConnectionConfiguration.MissingHostException -> context.getString(
+                        R.string.statusEndpointStateMessageMissingHost
+                    )
+                    is URISyntaxException -> context.getString(
+                        R.string.statusEndpointStateMessageMalformedHostPort
+                    )
                     else -> e.toString()
                 }
-            } else {
-                endpointState.message
             }
+            is MqttException -> when (val cause = e.cause) {
+                is UnknownHostException -> context.getString(
+                    R.string.statusEndpointStateMessageUnknownHost
+                )
+                is SocketTimeoutException -> context.getString(
+                    R.string.statusEndpointStateMessageSocketTimeout
+                )
+                is SSLException -> {
+                    if (cause.message != null && cause.message!!.contains("TLSV1_ALERT_CERTIFICATE_REQUIRED")) {
+                        context.getString(
+                            R.string.statusEndpointStateMessageTLSError,
+                            "TLSV1_ALERT_CERTIFICATE_REQUIRED"
+                        )
+                    } else {
+                        context.getString(
+                            R.string.statusEndpointStateMessageTLSError,
+                            cause.message
+                        )
+                    }
+                }
+                else -> when (e.reasonCode.toShort()) {
+                    REASON_CODE_INVALID_PROTOCOL_VERSION -> context.getString(
+                        R.string.statusEndpointStateMessageInvalidProtocolVersion
+                    )
+                    REASON_CODE_INVALID_CLIENT_ID -> context.getString(
+                        R.string.statusEndpointStateMessageInvalidClientId
+                    )
+                    REASON_CODE_FAILED_AUTHENTICATION -> context.getString(
+                        R.string.statusEndpointStateMessageAuthenticationFailed
+                    )
+                    REASON_CODE_NOT_AUTHORIZED -> context.getString(
+                        R.string.statusEndpointStateMessageNotAuthorized
+                    )
+                    REASON_CODE_SUBSCRIBE_FAILED -> context.getString(
+                        R.string.statusEndpointStateMessageSubscribeFailed
+                    )
+                    REASON_CODE_CLIENT_TIMEOUT -> context.getString(
+                        R.string.statusEndpointStateMessageClientTimeout
+                    )
+                    REASON_CODE_WRITE_TIMEOUT -> context.getString(
+                        R.string.statusEndpointStateMessageServerTimeout
+                    )
+                    REASON_CODE_SERVER_CONNECT_ERROR -> context.getString(
+                        R.string.statusEndpointStateMessageUnableToConnect
+                    )
+                    REASON_CODE_SSL_CONFIG_ERROR -> context.getString(
+                        R.string.statusEndpointStateMessageTLSConfigError
+                    )
+                    REASON_CODE_CONNECTION_LOST -> context.getString(
+                        R.string.statusEndpointStateMessageConnectionLost,
+                        cause.toString()
+                    )
+                    else -> e.toString()
+                }
+            }
+            is IOException -> {
+                if (e.message == "PKCS12 key store mac invalid - wrong password or corrupted file.") {
+                    context.getString(R.string.statusEndpointStateMessageTLSBadClientCertPassword)
+                } else {
+                    e.toString()
+                }
+            }
+            else -> e.toString()
         }
-
-        @JvmStatic
-        @BindingAdapter("app:endpointState")
-        fun setVisibility(view: LinearLayout, endpointState: EndpointState) {
-            view.isVisible = !(endpointState.error == null && endpointState.message == null)
-        }
+    } else {
+        endpointState.message
     }
 }
