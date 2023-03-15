@@ -206,6 +206,7 @@ dependencies {
     implementation(libs.libsodium)
     implementation(libs.apache.httpcore)
     implementation(libs.commons.codec)
+    implementation(libs.androidx.room.runtime)
 
     // The BC version shipped under com.android is half-broken. Weird certificate issues etc.
     // To solve, we bring in our own version of BC
@@ -220,6 +221,7 @@ dependencies {
 
     // Preprocessors
     kapt(libs.bundles.kapt.hilt)
+    kapt(libs.androidx.room.compiler)
 
     kaptTest(libs.bundles.kapt.hilt)
 

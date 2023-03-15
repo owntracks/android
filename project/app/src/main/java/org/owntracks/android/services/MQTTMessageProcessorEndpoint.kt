@@ -265,7 +265,7 @@ class MQTTMessageProcessorEndpoint(
                     MqttAsyncClient(
                         mqttConnectionConfiguration.connectionString,
                         mqttConnectionConfiguration.clientId,
-                        NonCrashyMqttFilePersistence(applicationContext.noBackupFilesDir.absolutePath),
+                        RoomMqttClientPersistence(applicationContext),
                         ScheduledExecutorPingSender(executorService),
                         executorService,
                         AndroidHighResolutionTimer()

@@ -23,6 +23,7 @@ androidx-test-runner = "1.5.2"
 androidx-test-orchestrator = "1.4.2"
 androidx-test-services = "1.4.2"
 androidx-test-espresso = "3.5.1"
+androidx-room = "2.5.0"
 okhttp = "4.10.0"
 osmdroid = "6.1.14"
 conscrypt = "2.5.2"
@@ -92,6 +93,9 @@ androidx-test-runner = { module = "androidx.test:runner", version.ref = "android
 androidx-test-services = { module = "androidx.test.services:test-services", version.ref = "androidx-test-services" }
 androidx-test-orchestrator = { module = "androidx.test:orchestrator", version.ref = "androidx-test-orchestrator" }
 androidx-test-espresso-idling = { module = "androidx.test.espresso:espresso-idling-resource", version.ref = "androidx-test-espresso" }
+
+androidx-room-runtime = {module = "androidx.room:room-runtime", version.ref="androidx-room"}
+androidx-room-compiler = {module = "androidx.room:room-compiler", version.ref="androidx-room"}
 
 osmdroid = { module = "org.osmdroid:osmdroid-android", version.ref = "osmdroid" }
 google-material = { module = "com.google.android.material:material", version.ref = "google-material" }
