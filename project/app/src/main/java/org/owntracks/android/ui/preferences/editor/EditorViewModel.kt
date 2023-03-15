@@ -4,11 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import org.owntracks.android.data.repos.WaypointsRepo
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.Parser
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class EditorViewModel @Inject constructor(
@@ -40,6 +40,8 @@ class EditorViewModel @Inject constructor(
             val message = preferences.exportToMessage()
             message.waypoints = waypointsRepo.exportToMessage()
             message[preferences::password.name] = "********"
+            message[preferences::tlsClientCrtPassword.name] = "********"
+            message[preferences::encryptionKey.name] = "********"
             mutableEffectiveConfiguration.postValue(parser.toUnencryptedJsonPretty(message))
         } catch (e: Exception) {
             Timber.e(e)

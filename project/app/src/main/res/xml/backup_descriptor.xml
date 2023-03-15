@@ -3,6 +3,6 @@
     <exclude domain="root" />
     <exclude domain="file" />
     <exclude domain="database" />
-    <include domain="sharedpref" />
+    <include domain="sharedpref" path="." requireFlags="clientSideEncryption"/>
     <exclude domain="external" />
 </full-backup-content>

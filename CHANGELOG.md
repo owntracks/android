@@ -26,6 +26,7 @@
 - Labels on the contact sheet should all be the same size as each other (#1277)
 - Clicking on a contact marker in the contacts activity doesn't always center the map on the marker (#1349, #1280)
 - Don't show an error message on non-error conditions exporting config (#1280)
+- Both cloud and local backup should work now
 
 ## Version 2.4.10
 

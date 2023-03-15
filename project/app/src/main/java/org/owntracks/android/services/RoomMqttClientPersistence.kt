@@ -69,7 +69,7 @@ class RoomMqttClientPersistence(applicationContext: Context) : MqttClientPersist
     }
 
     override fun close() {
-        db.close()
+        // NOOP
     }
 
     override fun open(clientId: String?, serverURI: String?) {
