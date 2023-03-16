@@ -49,6 +49,7 @@
         <ValidatingEditTextPreference
             android:key="deviceId"
             android:title="@string/preferencesDeviceName"
+            app:dialogLayout="@layout/preference_edit_text"
             app:iconSpaceReserved="false"
             app:useSimpleSummaryProvider="true" />
         <ValidatingEditTextPreference

@@ -114,6 +114,11 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
             }
     }
 
+    /**
+     * Called when an edit text wants to display a preference dialog. For []ValidatingEditTextPreference],
+     *
+     * @param preference
+     */
     override fun onDisplayPreferenceDialog(preference: Preference) {
         when (preference.key) {
             Preferences::url.name -> {
@@ -131,10 +136,34 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
                     preference.key
                 )
             }
+            Preferences::deviceId.name -> {
+                actuallyDisplayPreferenceDialog(
+                    ValidatingEditTextPreferenceDialogFragmentCompat(
+                        R.string.preferencesDeviceNameValidationError
+                    ) { deviceName -> deviceName.isNotBlank() },
+                    preference.key
+                )
+            }
+            Preferences::tid.name -> {
+                actuallyDisplayPreferenceDialog(
+                    ValidatingEditTextPreferenceDialogFragmentCompat(
+                        R.string.preferencesTrackerIdValidationError,
+                        maxLength = 2
+                    ) { deviceName -> deviceName.isNotBlank() },
+                    preference.key
+                )
+            }
+
             else -> super.onDisplayPreferenceDialog(preference)
         }
     }
 
+    /**
+     * Display a dialog fragment for the preference
+     *
+     * @param fragment the dialog to display
+     * @param key the preference key for which this is a dialog
+     */
     private fun actuallyDisplayPreferenceDialog(fragment: Fragment, key: String) {
         fragment.apply {
             arguments = Bundle(1).apply { putString("key", key) }

@@ -150,6 +150,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesClientId">"Client ID"</string>
     <string name="preferencesDebugLog">"Debug log"</string>
     <string name="preferencesDeviceName">"Device ID"</string>
+    <string name="preferencesDeviceNameValidationError">"Can't be empty"</string>
     <string name="preferencesDocumentation">"Documentation"</string>
     <string name="preferencesEditor">"Editor"</string>
     <string name="preferencesEditorDescription">"Set a single value for the specified key. Some changes might require an restart of the app."</string>
@@ -228,6 +229,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesShowWaypointsOnMapSummary">"Draw waypoint circles on the map"</string>
     <string name="preferencesTheme">"Theme"</string>
     <string name="preferencesTrackerId">"Tracker ID"</string>
+    <string name="preferencesTrackerIdValidationError">"Must be one or two characters"</string>
     <string name="preferencesTwitter" translatable="false">"Twitter"</string>
     <string name="preferencesMastodon" translatable="false">"Mastodon"</string>
     <string name="preferencesUrl" translatable="false">"URL"</string>

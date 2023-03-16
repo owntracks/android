@@ -14,6 +14,7 @@ class ValidatingEditTextPreference : EditTextPreference {
 
     private val attributes = SparseArray<TypedValue>()
 
+    @Suppress("unused")
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(
         context,
         attrs,
@@ -63,8 +64,12 @@ class ValidatingEditTextPreference : EditTextPreference {
         this.onBindEditTextListener = onBindEditTextListener
     }
 
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : this(context, attrs, defStyleAttr, 0)
+    @Suppress("unused")
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
-    constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, R.attr.editTextPreferenceStyle)
-    constructor(context: Context) : this(context, null)
+    @Suppress("unused")
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+
+    @Suppress("unused")
+    constructor(context: Context) : super(context)
 }
