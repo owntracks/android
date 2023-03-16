@@ -20,6 +20,7 @@
 - Background location permission! (Hurray!)
 - Prompt for location permissions in the welcome screen
 - An exported log file also contains the threadname for each logentry
+- Certificates are stored in-line in the config, rather than just the names. This should help import/export
 
 ### Bug fixes
 

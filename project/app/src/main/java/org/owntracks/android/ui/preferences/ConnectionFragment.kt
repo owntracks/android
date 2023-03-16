@@ -2,16 +2,15 @@ package org.owntracks.android.ui.preferences
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.provider.OpenableColumns
+import android.util.Base64
+import android.util.Base64.NO_WRAP
 import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.preference.EditTextPreference
 import androidx.preference.Preference
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -49,25 +48,21 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
         menuProvider = PreferencesMenuProvider(requireActivity(), messageProcessor)
     }
 
+    private val booleanSummaryProperties = setOf(
+        Preferences::password,
+        Preferences::tlsClientCrtPassword,
+        Preferences::tlsCaCrt,
+        Preferences::tlsClientCrt
+    )
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         super.onCreatePreferences(savedInstanceState, rootKey)
         setPreferencesFromResource(R.xml.preferences_connection, rootKey)
         setPreferenceVisibility()
 
-        setOf(Preferences::password, Preferences::tlsClientCrtPassword).forEach { property ->
-            findPreference<EditTextPreference>(property.name)?.apply {
-                setSummaryProvider {
-                    requireContext().getString(
-                        if (property.getter.call(preferences)
-                                .isBlank()
-                        ) {
-                            R.string.preferencesNotSet
-                        } else {
-                            R.string.preferencesSet
-                        }
-                    )
-                }
-            }
+        // Set the initial summaries
+        booleanSummaryProperties.forEach { property ->
+            setBooleanIndicatorSummary(property)
         }
 
         mapOf(
@@ -76,7 +71,6 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
         )
             .forEach { (property, launcher) ->
                 findPreference<FilePickerPreference>(property.name)?.apply {
-                    setSummary(property)
                     setOnPreferenceClickListener {
                         PopupMenu(it.context, view)
                             .apply {
@@ -95,6 +89,7 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
                                                     Timber.w(e, "Unable to remove certificate file $filename")
                                                 }
                                                 property.setter.call(preferences, "")
+                                                setBooleanIndicatorSummary(property)
                                             }
                                         }
                                         R.id.select -> {
@@ -158,42 +153,23 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
         }
     }
 
-    private val caCrtLauncher = getLauncher(Preferences::tlsCaCrt, "ca.crt")
-    private val clientCertLauncher = getLauncher(Preferences::tlsClientCrt, "client.p12")
-    private fun uriToFilename(uri: Uri, defaultFilename: String): String {
-        if (uri.scheme.equals("content")) {
-            requireContext().applicationContext.contentResolver.query(uri, null, null, null, null)
-                .use { cursor ->
-                    if (cursor != null && cursor.moveToFirst()) {
-                        val index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-                        if (index < 0) {
-                            throw IndexOutOfBoundsException("DISPLAY_NAME column not present in data store")
-                        }
-                        return cursor.getString(index)
-                    }
-                }
-        }
-        return defaultFilename
-    }
+    private val caCrtLauncher = getFilePickerLauncher(Preferences::tlsCaCrt)
+    private val clientCertLauncher = getFilePickerLauncher(Preferences::tlsClientCrt)
 
-    private fun getLauncher(property: KMutableProperty<String>, defaultFilename: String) =
+    private fun getFilePickerLauncher(property: KMutableProperty<String>) =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             val maybeContentUri = it.data?.data
             maybeContentUri?.also { contentUri ->
-                val filename = uriToFilename(contentUri, defaultFilename)
                 lifecycleScope.launch(ioDispatcher) {
                     requireContext().applicationContext.run {
                         contentResolver.openInputStream(contentUri)
                             .use { inputStream ->
-                                openFileOutput(filename, Context.MODE_PRIVATE)
-                                    .use { fileOutputStream ->
-                                        Timber.i("Writing content to local storage")
-                                        inputStream!!.copyTo(fileOutputStream)
-                                    }
+                                inputStream?.run {
+                                    property.setter.call(preferences, Base64.encodeToString(readBytes(), NO_WRAP))
+                                    setBooleanIndicatorSummary(property)
+                                }
                             }
                     }
-                    property.setter.call(preferences, filename)
-                    setSummary(property)
                 }
             } ?: run {
                 Snackbar.make(
@@ -204,11 +180,23 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
             }
         }
 
-    private fun setSummary(preference: KProperty<String>) {
+    /**
+     * Sets the summary for a preference that should either show "Set" or "Not set"
+     *
+     * @param preference
+     */
+    private fun setBooleanIndicatorSummary(preference: KProperty<String>) {
         lifecycleScope.launch(mainDispatcher) {
             findPreference<Preference>(preference.name)?.summary =
-                preference.getter.call(preferences)
-                    .ifBlank { requireContext().getString(R.string.preferencesNotSet) }
+                requireContext().getString(
+                    if (preference.getter.call(preferences)
+                            .isBlank()
+                    ) {
+                        R.string.preferencesNotSet
+                    } else {
+                        R.string.preferencesSet
+                    }
+                )
         }
     }
 
@@ -245,12 +233,12 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
         if (Preferences::mode.name in properties) {
             setPreferenceVisibility()
         }
-        if (Preferences::tlsCaCrt.name in properties) {
-            setSummary(Preferences::tlsCaCrt)
-        }
-        if (Preferences::tlsClientCrt.name in properties) {
-            setSummary(Preferences::tlsClientCrt)
-        }
+        // Set the summaries of the changed booleanSummary properties
+        booleanSummaryProperties.map { it.name }
+            .intersect(properties)
+            .forEach { propertyName ->
+                setBooleanIndicatorSummary(booleanSummaryProperties.first { it.name == propertyName })
+            }
     }
 
     companion object {

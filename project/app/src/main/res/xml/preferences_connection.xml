@@ -96,8 +96,9 @@
             android:key="tlsClientCrtPassword"
             android:title="@string/preferencesClientCrtPassword"
             app:dependency="tls"
+            app:dialogLayout="@layout/preference_edit_password"
             app:iconSpaceReserved="false"
-            app:useSimpleSummaryProvider="true" />
+            app:useSimpleSummaryProvider="false" />
     </PreferenceCategory>
     <PreferenceCategory
         android:key="preferenceGroupParameters"

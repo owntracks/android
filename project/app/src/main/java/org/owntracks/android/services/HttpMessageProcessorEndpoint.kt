@@ -1,6 +1,7 @@
 package org.owntracks.android.services
 
 import android.content.Context
+import android.util.Base64
 import com.fasterxml.jackson.core.JsonProcessingException
 import java.io.IOException
 import java.util.*
@@ -218,13 +219,14 @@ class HttpMessageProcessorEndpoint(
     ): HttpClientAndConfiguration {
         val httpConfiguration = getEndpointConfiguration()
 
-        val ca = httpConfiguration.getCaCert(context, preferences.tlsCaCrt)
+        val ca = httpConfiguration.getCaCert(preferences.tlsCaCrt)
+        val tlsClientCrtBytes = httpConfiguration.getClientCert(preferences.tlsClientCrt)
         val hostnameVerifier = ca?.run { CALeafCertMatchingHostnameVerifier(this) }
         val socketFactory = httpConfiguration.getSocketFactory(
             preferences.connectionTimeoutSeconds,
             preferences.tls,
             ca,
-            preferences.tlsClientCrt,
+            tlsClientCrtBytes,
             preferences.tlsClientCrtPassword,
             context
         )

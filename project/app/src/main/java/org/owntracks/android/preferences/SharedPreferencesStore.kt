@@ -2,11 +2,12 @@ package org.owntracks.android.preferences
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Base64
 import androidx.preference.PreferenceManager
 import dagger.hilt.android.qualifiers.ApplicationContext
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
+import timber.log.Timber
 
 /***
  * Implements a PreferencesStore that uses a SharedPreferecnces as a backend.
@@ -19,6 +20,34 @@ class SharedPreferencesStore @Inject constructor(@ApplicationContext private val
 
     init {
         migrateToSingleSharedPreferences()
+        migrateCertificatesToInline()
+    }
+
+    private fun migrateCertificatesToInline() {
+        listOf(Preferences::tlsCaCrt.name, Preferences::tlsClientCrt.name).forEach { preferenceName ->
+            sharedPreferences.getString(preferenceName, null)
+                ?.run {
+                    val crtFileExists = try {
+                        context.getFileStreamPath(this)
+                            .exists()
+                    } catch (e: IllegalArgumentException) {
+                        false
+                    }
+                    if (crtFileExists && this.isNotBlank()) {
+                        context.openFileInput(this)
+                            .use { fileInputStream ->
+                                Timber.i("Migrating $preferenceName to inline base64")
+                                sharedPreferences.edit()
+                                    .putString(
+                                        preferenceName,
+                                        Base64.encodeToString(fileInputStream.readBytes(), Base64.NO_WRAP)
+                                    )
+                                    .commit()
+                            }
+                        context.deleteFile(this)
+                    }
+                }
+        }
     }
 
     @Suppress("UNCHECKED_CAST")
