@@ -2,7 +2,7 @@ package org.owntracks.android.ui.preferences.editor
 
 import android.content.DialogInterface
 import android.content.Intent
-import android.net.Uri
+import android.content.Intent.*
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -11,23 +11,33 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ShareCompat
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.android.material.textfield.TextInputEditText
 import dagger.hilt.android.AndroidEntryPoint
-import org.owntracks.android.BuildConfig
+import javax.inject.Inject
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiPreferencesEditorBinding
+import org.owntracks.android.di.CoroutineScopes
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import timber.log.Timber
-import java.util.*
 
 @AndroidEntryPoint
 class EditorActivity : AppCompatActivity() {
     private val viewModel: EditorViewModel by viewModels()
-    private var configExportUri: Uri? = null
+
+    @Inject
+    @CoroutineScopes.MainDispatcher
+    lateinit var mainDispatcher: CoroutineDispatcher
+
+    @Inject
+    @CoroutineScopes.IoDispatcher
+    lateinit var ioDispatcher: CoroutineDispatcher
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -110,47 +120,64 @@ class EditorActivity : AppCompatActivity() {
         builder.show()
     }
 
-    private val shareIntentActivityLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            when (it.resultCode) {
+    private val saveIntentActivityLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityResult ->
+            when (activityResult.resultCode) {
                 RESULT_OK -> {
+                    val exportedConfig = viewModel.effectiveConfiguration.value
+                    if (exportedConfig != null) {
+                        activityResult.data?.data?.apply {
+                            lifecycleScope.launch(ioDispatcher) {
+                                contentResolver.openOutputStream(this@apply)
+                                    ?.use {
+                                        it.write(exportedConfig.toByteArray())
+                                    }
+                                withContext(mainDispatcher) {
+                                    Snackbar.make(
+                                        findViewById(R.id.effectiveConfiguration),
+                                        R.string.preferencesExportSuccess,
+                                        Snackbar.LENGTH_SHORT
+                                    )
+                                        .show()
+                                }
+                            }
+                        } ?: run {
+                            Timber.e("Could not export config, save location was null")
+                            Snackbar.make(
+                                findViewById(R.id.effectiveConfiguration),
+                                R.string.preferencesExportError,
+                                Snackbar.LENGTH_SHORT
+                            )
+                                .show()
+                        }
+                    } else {
+                        Timber.e("Could not export config, config was null")
+                        Snackbar.make(
+                            findViewById(R.id.effectiveConfiguration),
+                            R.string.preferencesExportError,
+                            Snackbar.LENGTH_SHORT
+                        )
+                            .show()
+                    }
+                }
+                RESULT_CANCELED -> {
+                    Timber.e("Could not export config, export was cancelled")
                     Snackbar.make(
                         findViewById(R.id.effectiveConfiguration),
-                        R.string.preferencesExportSuccess,
+                        R.string.preferencesExportError,
                         Snackbar.LENGTH_SHORT
                     )
                         .show()
                 }
-                RESULT_CANCELED -> {}
             }
-            revokeExportUriPermissions()
         }
-
-    private fun revokeExportUriPermissions() {
-        configExportUri?.let {
-            revokeUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            configExportUri = null
-        }
-    }
-
-    private fun getRandomHexString(): String {
-        return Random().nextInt(0X1000000)
-            .toString(16)
-    }
 
     private fun exportConfigurationToFile(): Boolean {
-        revokeExportUriPermissions()
-        val key = getRandomHexString()
-        configExportUri = Uri.parse("content://${BuildConfig.APPLICATION_ID}.config/$key")
-        val shareIntent = ShareCompat.IntentBuilder(this)
-            .setType("text/plain")
-            .setSubject(getString(R.string.exportConfigurationSubject))
-            .setChooserTitle(R.string.exportConfiguration)
-            .setStream(configExportUri)
-            .createChooserIntent()
-            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        grantUriPermission("android", configExportUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        shareIntentActivityLauncher.launch(shareIntent)
+        val shareIntent = Intent(ACTION_CREATE_DOCUMENT).apply {
+            type = "*/*"
+            putExtra(EXTRA_TITLE, "config.otrc")
+        }
+        saveIntentActivityLauncher.launch(shareIntent)
         return true
     }
 

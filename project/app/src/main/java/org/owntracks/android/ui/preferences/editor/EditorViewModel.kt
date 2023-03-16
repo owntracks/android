@@ -39,9 +39,6 @@ class EditorViewModel @Inject constructor(
         try {
             val message = preferences.exportToMessage()
             message.waypoints = waypointsRepo.exportToMessage()
-            message[preferences::password.name] = "********"
-            message[preferences::tlsClientCrtPassword.name] = "********"
-            message[preferences::encryptionKey.name] = "********"
             mutableEffectiveConfiguration.postValue(parser.toUnencryptedJsonPretty(message))
         } catch (e: Exception) {
             Timber.e(e)

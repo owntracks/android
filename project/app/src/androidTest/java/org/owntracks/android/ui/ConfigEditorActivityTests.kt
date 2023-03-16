@@ -13,7 +13,6 @@ import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickDialogPositiveButton
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
 import org.hamcrest.CoreMatchers.allOf
-import org.hamcrest.CoreMatchers.`is`
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
@@ -120,15 +119,8 @@ class ConfigEditorActivityTests : TestWithAnActivity<EditorActivity>(EditorActiv
     @Test
     fun editorCanExportConfig() {
         val chooserIntentMatcher = allOf(
-            hasAction(Intent.ACTION_CHOOSER),
-            hasExtra(
-                `is`(Intent.EXTRA_INTENT),
-                allOf(
-                    hasAction(Intent.ACTION_SEND),
-                    hasType("text/plain")
-                )
-            ),
-            hasExtra(Intent.EXTRA_TITLE, "Export")
+            hasAction(Intent.ACTION_CREATE_DOCUMENT),
+            hasExtra(Intent.EXTRA_TITLE, "config.otrc")
         )
         intending(anyIntent()).respondWithFunction { Instrumentation.ActivityResult(0, null) }
 

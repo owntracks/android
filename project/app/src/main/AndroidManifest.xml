@@ -260,11 +260,7 @@
             android:authorities="${applicationId}.log"
             android:exported="false"
             android:grantUriPermissions="true" />
-        <provider
-            android:name=".ui.preferences.editor.ExportedConfigContentProvider"
-            android:authorities="${applicationId}.config"
-            android:exported="false"
-            android:grantUriPermissions="true" />
+
     </application>
 
 </manifest>

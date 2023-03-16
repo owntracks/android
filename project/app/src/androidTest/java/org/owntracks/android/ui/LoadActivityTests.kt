@@ -15,6 +15,8 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotExist
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import com.adevinta.android.barista.interaction.PermissionGranter.allowPermissionsIfNeeded
+import java.io.File
+import java.io.FileWriter
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -25,8 +27,6 @@ import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.ui.preferences.load.LoadActivity
-import java.io.File
-import java.io.FileWriter
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -106,7 +106,8 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
     fun loadActivityCanLoadConfigFromOwntracksInlineConfigURL() {
         launchActivity(
             Intent(
-                Intent.ACTION_VIEW, Uri.parse(
+                Intent.ACTION_VIEW,
+                Uri.parse(
                     "owntracks:///config?inline=eyJfdHlwZSI6ImNvbmZpZ3VyYXRpb24iLCJ3YXlwb2ludHMiOlt7Il90eXBlIjoid2F5cG9pbnQiLCJkZXNjIjoid29yayIsImxhdCI6NTEuNSwibG9uIjotMC4wMiwicmFkIjoxNTAsInRzdCI6MTUwNTkxMDcwOTAwMH0seyJfdHlwZSI6IndheXBvaW50IiwiZGVzYyI6ImhvbWUiLCJsYXQiOjUzLjYsImxvbiI6LTEuNSwicmFkIjoxMDAsInRzdCI6MTU1ODM1MTI3M31dLCJhdXRoIjp0cnVlLCJhdXRvc3RhcnRPbkJvb3QiOnRydWUsImNvbm5lY3Rpb25UaW1lb3V0U2Vjb25kcyI6MzQsImNsZWFuU2Vzc2lvbiI6ZmFsc2UsImNsaWVudElkIjoiZW11bGF0b3IiLCJjbWQiOnRydWUsImRlYnVnTG9nIjp0cnVlLCJkZXZpY2VJZCI6InRlc3RkZXZpY2UiLCJmdXNlZFJlZ2lvbkRldGVjdGlvbiI6dHJ1ZSwiZ2VvY29kZUVuYWJsZWQiOnRydWUsImhvc3QiOiJ0ZXN0aG9zdC5leGFtcGxlLmNvbSIsImlnbm9yZUluYWNjdXJhdGVMb2NhdGlvbnMiOjE1MCwiaWdub3JlU3RhbGVMb2NhdGlvbnMiOjAsImtlZXBhbGl2ZSI6OTAwLCJsb2NhdG9yRGlzcGxhY2VtZW50Ijo1LCJsb2NhdG9ySW50ZXJ2YWwiOjYwLCJtb2RlIjowLCJtb25pdG9yaW5nIjoxLCJlbmFibGVNYXBSb3RhdGlvbiI6ZmFsc2UsIm9zbVRpbGVTY2FsZUZhY3RvciI6My4zNTIsIm1vdmVNb2RlTG9jYXRvckludGVydmFsIjoxMCwibXF0dFByb3RvY29sTGV2ZWwiOjMsIm5vdGlmaWNhdGlvbkhpZ2hlclByaW9yaXR5IjpmYWxzZSwibm90aWZpY2F0aW9uTG9jYXRpb24iOnRydWUsIm9wZW5jYWdlQXBpS2V5IjoiIiwicGFzc3dvcmQiOiJwYXNzd29yZCIsInBpbmciOjMwLCJwb3J0IjoxODgzLCJwdWJFeHRlbmRlZERhdGEiOnRydWUsInB1YlFvcyI6MSwicHViUmV0YWluIjp0cnVlLCJwdWJUb3BpY0Jhc2UiOiJvd250cmFja3MvJXUvJWQiLCJyZW1vdGVDb25maWd1cmF0aW9uIjp0cnVlLCJzdWIiOnRydWUsInN1YlFvcyI6Miwic3ViVG9waWMiOiJvd250cmFja3MvKy8rIiwidGxzIjpmYWxzZSwidXNlUGFzc3dvcmQiOnRydWUsInVzZXJuYW1lIjoidXNlcm5hbWUiLCJ3cyI6ZmFsc2V9" // ktlint-disable max-line-length
                 )
             )
@@ -120,7 +121,8 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
     fun loadActivityShowsErrorWhenLoadingFromInlineConfigURLContainingInvalidJSON() {
         launchActivity(
             Intent(
-                Intent.ACTION_VIEW, Uri.parse("owntracks:///config?inline=e30k")
+                Intent.ACTION_VIEW,
+                Uri.parse("owntracks:///config?inline=e30k")
             )
         )
         assertContains(
@@ -135,7 +137,8 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
     fun loadActivityShowsErrorWhenLoadingFromInlineConfigURLContaninigInvalidBase64() {
         launchActivity(
             Intent(
-                Intent.ACTION_VIEW, Uri.parse("owntracks:///config?inline=aaaaaaaaaaaaaaaaaaaaaaaaa")
+                Intent.ACTION_VIEW,
+                Uri.parse("owntracks:///config?inline=aaaaaaaaaaaaaaaaaaaaaaaaa")
             )
         )
         assertContains(
@@ -153,7 +156,8 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
 
         launchActivity(
             Intent(
-                Intent.ACTION_VIEW, Uri.parse("owntracks:///config?url=http%3A%2F%2Flocalhost%3A8080%2Fmyconfig.otrc")
+                Intent.ACTION_VIEW,
+                Uri.parse("owntracks:///config?url=http%3A%2F%2Flocalhost%3A8080%2Fmyconfig.otrc")
             )
         )
         sleep(1000)
@@ -169,7 +173,8 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
 
         launchActivity(
             Intent(
-                Intent.ACTION_VIEW, Uri.parse("owntracks:///config?url=http%3A%2F%2Flocalhost%3A8080%2Fnotfound")
+                Intent.ACTION_VIEW,
+                Uri.parse("owntracks:///config?url=http%3A%2F%2Flocalhost%3A8080%2Fnotfound")
             )
         )
         sleep(1000)
@@ -185,7 +190,8 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
         localConfig.writeText(servedConfig)
         launchActivity(
             Intent(
-                Intent.ACTION_VIEW, Uri.parse("file://${localConfig.absoluteFile}")
+                Intent.ACTION_VIEW,
+                Uri.parse("file://${localConfig.absoluteFile}")
             )
         )
         assertContains(R.id.effectiveConfiguration, expectedConfig)
@@ -208,7 +214,8 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
                 put(MediaStore.Downloads.IS_PENDING, 1)
             }
             val contentUri = context.contentResolver.insert(
-                MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY), contentValues
+                MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY),
+                contentValues
             )
             contentUri?.let {
                 context.contentResolver.openFileDescriptor(it, "w")
@@ -223,7 +230,8 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
             launchActivity(Intent(Intent.ACTION_VIEW, contentUri))
         } else {
             allowPermissionsIfNeeded(WRITE_EXTERNAL_STORAGE)
-            @Suppress("DEPRECATION") val downloadsDir =
+            @Suppress("DEPRECATION")
+            val downloadsDir =
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
             val configFile = downloadsDir.resolve(configFilename)
             FileWriter(configFile).use {

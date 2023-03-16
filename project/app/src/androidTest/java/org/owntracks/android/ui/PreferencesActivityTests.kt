@@ -63,7 +63,7 @@ class PreferencesActivityTests : TestWithAnActivity<PreferencesActivity>(Prefere
         assertContains(R.id.effectiveConfiguration, "\"port\" : 1234")
         assertContains(R.id.effectiveConfiguration, "\"clientId\" : \"test-clientId\"")
         assertContains(R.id.effectiveConfiguration, "\"username\" : \"testUsername\"")
-        assertContains(R.id.effectiveConfiguration, "\"password\" : \"********\"")
+        assertContains(R.id.effectiveConfiguration, "\"password\" : \"testPassword\"")
         assertContains(R.id.effectiveConfiguration, "\"deviceId\" : \"testDeviceId\"")
         assertContains(R.id.effectiveConfiguration, "\"tid\" : \"t5\"")
 
@@ -142,7 +142,7 @@ class PreferencesActivityTests : TestWithAnActivity<PreferencesActivity>(Prefere
 
         assertContains(R.id.effectiveConfiguration, "\"url\" : \"https://www.example.com:8080/\"")
         assertContains(R.id.effectiveConfiguration, "\"username\" : \"testUsername\"")
-        assertContains(R.id.effectiveConfiguration, "\"password\" : \"********\"")
+        assertContains(R.id.effectiveConfiguration, "\"password\" : \"testPassword\"")
         assertContains(R.id.effectiveConfiguration, "\"deviceId\" : \"testDeviceId\"")
         assertContains(R.id.effectiveConfiguration, "\"tid\" : \"t1\"")
         assertContains(R.id.effectiveConfiguration, "\"notificationEvents\" : true")
