@@ -384,8 +384,9 @@ class Preferences @Inject constructor(private val preferencesStore: PreferencesS
             return pubTopicBaseWithUserDetails + waypointsTopicSuffix
         }
 
-    private val minimumKeepaliveSeconds = MIN_PERIODIC_INTERVAL.inWholeSeconds
-    fun keepAliveInRange(i: Int): Boolean = i >= minimumKeepaliveSeconds
+    val minimumKeepaliveSeconds = MIN_PERIODIC_INTERVAL.inWholeSeconds
+    fun keepAliveInRange(i: Int): Boolean =
+        i >= if (EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE in experimentalFeatures) 1 else minimumKeepaliveSeconds
 
     fun setMonitoringNext() {
         monitoring = monitoring.next()
@@ -417,7 +418,8 @@ class Preferences @Inject constructor(private val preferencesStore: PreferencesS
     }
 
     fun notifyChanged(properties: Set<KProperty<*>>) {
-        val propertyNames = properties.map { it.name }.toSet()
+        val propertyNames = properties.map { it.name }
+            .toSet()
         synchronized(listeners) {
             listeners.toMap() // TODO migrate the notifications to async, so we can get rid of this clone
                 .forEach {

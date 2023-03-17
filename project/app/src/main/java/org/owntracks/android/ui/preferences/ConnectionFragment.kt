@@ -8,19 +8,17 @@ import android.util.Base64.NO_WRAP
 import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.PopupMenu
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
+import androidx.preference.ValidatingEditTextPreference
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import java.net.MalformedURLException
-import java.net.URL
 import javax.inject.Inject
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KProperty
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.owntracks.android.R
 import org.owntracks.android.di.CoroutineScopes
 import org.owntracks.android.preferences.Preferences
@@ -64,6 +62,39 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
         booleanSummaryProperties.forEach { property ->
             setBooleanIndicatorSummary(property)
         }
+
+        // Set the validators on the preferences that need them
+        mapOf(
+            Preferences::url.name to { input: String -> input.toHttpUrlOrNull() != null },
+            Preferences::port.name to { port ->
+                port.isNotBlank() && port.toIntOrNull() != null && (1..65535).contains(
+                    port.toInt()
+                )
+            },
+            Preferences::deviceId.name to { input: String -> input.isNotBlank() },
+            Preferences::host.name to { input: String -> input.isNotBlank() },
+            Preferences::tid.name to { input: String -> input.isNotBlank() && input.length <= 2 },
+            Preferences::clientId.name to { input: String -> input.isNotBlank() },
+            Preferences::keepalive.name to { input: String ->
+                input.toIntOrNull() != null && preferences.keepAliveInRange(
+                    input.toInt()
+                )
+            }
+        ).forEach { (preferenceName, validator) ->
+            findPreference<ValidatingEditTextPreference>(preferenceName)?.apply {
+                validationFunction = validator
+            }
+        }
+
+        findPreference<ValidatingEditTextPreference>(Preferences::keepalive.name)?.validationErrorArgs =
+            if (preferences.experimentalFeatures.contains(
+                    Preferences.EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE
+                )
+            ) {
+                1
+            } else {
+                preferences.minimumKeepaliveSeconds
+            }
 
         mapOf(
             Preferences::tlsCaCrt to caCrtLauncher,
@@ -120,72 +151,28 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
      * @param preference
      */
     override fun onDisplayPreferenceDialog(preference: Preference) {
-        when (preference.key) {
-            Preferences::url.name -> {
-                actuallyDisplayPreferenceDialog(
-                    ValidatingEditTextPreferenceDialogFragmentCompat(
-                        R.string.preferencesUrlValidationError
-                    ) { url ->
-                        try {
-                            URL(url)
-                            true
-                        } catch (e: MalformedURLException) {
-                            false
-                        }
-                    },
-                    preference.key
-                )
+        when (preference) {
+            is ValidatingEditTextPreference -> {
+                ValidatingEditTextPreferenceDialogFragmentCompat(preference).apply {
+                    arguments = Bundle(1).apply { putString("key", preference.key) }
+                    setTargetFragment(this@ConnectionFragment, 0)
+                }
+                    .show(parentFragmentManager, FRAGMENT_DIALOG)
             }
-            Preferences::deviceId.name -> {
-                actuallyDisplayPreferenceDialog(
-                    ValidatingEditTextPreferenceDialogFragmentCompat(
-                        R.string.preferencesDeviceNameValidationError
-                    ) { deviceName -> deviceName.isNotBlank() },
-                    preference.key
-                )
-            }
-            Preferences::tid.name -> {
-                actuallyDisplayPreferenceDialog(
-                    ValidatingEditTextPreferenceDialogFragmentCompat(
-                        R.string.preferencesTrackerIdValidationError,
-                        maxLength = 2
-                    ) { deviceName -> deviceName.isNotBlank() },
-                    preference.key
-                )
-            }
-
             else -> super.onDisplayPreferenceDialog(preference)
         }
     }
 
+    private val caCrtLauncher = createFilePickerLauncher(Preferences::tlsCaCrt)
+    private val clientCertLauncher = createFilePickerLauncher(Preferences::tlsClientCrt)
+
     /**
-     * Display a dialog fragment for the preference
+     * Creates a filepicker activity launcher for selecting a file from the local device and adding the content
+     * to the given preference property
      *
-     * @param fragment the dialog to display
-     * @param key the preference key for which this is a dialog
+     * @param property preference to be set with the base64 contents of the file
      */
-    private fun actuallyDisplayPreferenceDialog(fragment: Fragment, key: String) {
-        fragment.apply {
-            arguments = Bundle(1).apply { putString("key", key) }
-            setTargetFragment(this@ConnectionFragment, 0)
-        }
-
-        when (fragment) {
-            is DialogFragment -> {
-                fragment.show(parentFragmentManager, FRAGMENT_DIALOG)
-            }
-            else -> {
-                parentFragmentManager.beginTransaction()
-                    .add(fragment, FRAGMENT_DIALOG)
-                    .commit()
-            }
-        }
-    }
-
-    private val caCrtLauncher = getFilePickerLauncher(Preferences::tlsCaCrt)
-    private val clientCertLauncher = getFilePickerLauncher(Preferences::tlsClientCrt)
-
-    private fun getFilePickerLauncher(property: KMutableProperty<String>) =
+    private fun createFilePickerLauncher(property: KMutableProperty<String>) =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             val maybeContentUri = it.data?.data
             maybeContentUri?.also { contentUri ->
@@ -242,6 +229,10 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
         requireActivity().addMenuProvider(menuProvider)
     }
 
+    /**
+     * Show / hide preferences based on which mode is set
+     *
+     */
     private fun setPreferenceVisibility() {
         listOf(
             "preferenceGroupTLS",

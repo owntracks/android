@@ -148,9 +148,10 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesClientCrtPassword">"Client certificate password"</string>
     <string name="preferencesClientCrtPath">"Client certificate"</string>
     <string name="preferencesClientId">"Client ID"</string>
+    <string name="preferencesClientIdValidationError">"Cannot be empty"</string>
     <string name="preferencesDebugLog">"Debug log"</string>
     <string name="preferencesDeviceName">"Device ID"</string>
-    <string name="preferencesDeviceNameValidationError">"Can't be empty"</string>
+    <string name="preferencesDeviceNameValidationError">"Cannot be empty"</string>
     <string name="preferencesDocumentation">"Documentation"</string>
     <string name="preferencesEditor">"Editor"</string>
     <string name="preferencesEditorDescription">"Set a single value for the specified key. Some changes might require an restart of the app."</string>
@@ -167,6 +168,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesExportSuccess">"Export successful"</string>
     <string name="preferencesExportError">"Error exporting configuration"</string>
     <string name="preferencesHost">"Host"</string>
+    <string name="preferencesHostValidationError">"Cannot be empty"</string>
     <string name="preferencesIgnoreInaccurateLocations">"Inaccurate locations"</string>
     <string name="preferencesIgnoreInaccurateLocationsDialog">"Ignore location, if the accuracy is greater than the given meters"</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">"Ignore inaccurate locations"</string>
@@ -211,6 +213,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesPegLocatorFastestIntervalToInterval">"Limit max locator frequency"</string>
     <string name="preferencesPegLocatorFastestIntervalToIntervalSummary">"Request that the location provider deliver updates no faster than the requested locator interval"</string>
     <string name="preferencesPort">"Port"</string>
+    <string name="preferencesPortValidationError">"Port must be a number between 1 and 65535"</string>
     <string name="preferencesProfileId">"Mode"</string>
     <string name="preferencesPubExtendedData">"Extended data"</string>
     <string name="preferencesPubExtendedDataSummary">"Include extended data in location reports"</string>
@@ -233,7 +236,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesTwitter" translatable="false">"Twitter"</string>
     <string name="preferencesMastodon" translatable="false">"Mastodon"</string>
     <string name="preferencesUrl" translatable="false">"URL"</string>
-    <string name="preferencesUrlValidationError">"Invalid URL"</string>
+    <string name="preferencesUrlValidationError">"Invalid HTTP URL"</string>
     <string name="preferencesUsername">"Username"</string>
     <string name="preferencesWebsocket">"Use WebSockets"</string>
     <string name="publish">"Report"</string>

@@ -16,28 +16,37 @@
         app:key="preferenceGroupEndpoint"
         app:title="@string/preferencesCategoryConnectionEndpoint">
         <ValidatingEditTextPreference
-            android:inputType="textUri"
+            android:inputType="textUri|textNoSuggestions"
             android:key="url"
             android:lines="1"
             android:title="@string/preferencesUrl"
             app:iconSpaceReserved="false"
-            app:useSimpleSummaryProvider="true" />
-        <EditTextPreference
+            app:useSimpleSummaryProvider="true"
+            app:validationError="@string/preferencesUrlValidationError" />
+        <ValidatingEditTextPreference
+            android:digits="ABCDEFGHIJKLMNOPQRSTUVWX1Z1234567890abcdefghijklmnopqrstuvwxyz-."
             android:key="host"
+            android:lines="1"
             android:title="@string/preferencesHost"
             app:iconSpaceReserved="false"
-            app:useSimpleSummaryProvider="true" />
+            app:useSimpleSummaryProvider="true"
+            app:validationError="@string/preferencesHostValidationError" />
         <org.owntracks.android.support.widgets.EditIntegerPreference
-            app:dialogLayout="@layout/preference_edit_number"
+            android:digits="0123456789"
+            android:inputType="number"
+            android:lines="1"
             app:iconSpaceReserved="false"
             app:key="port"
             app:title="@string/preferencesPort"
-            app:useSimpleSummaryProvider="true" />
+            app:useSimpleSummaryProvider="true"
+            app:validationError="@string/preferencesPortValidationError" />
         <ValidatingEditTextPreference
+            android:digits="ABCDEFGHIJKLMNOPQRSTUVWX1Z1234567890abcdefghijklmnopqrstuvwxyz"
             android:key="clientId"
             android:title="@string/preferencesClientId"
             app:iconSpaceReserved="false"
-            app:useSimpleSummaryProvider="true" />
+            app:useSimpleSummaryProvider="true"
+            app:validationError="@string/preferencesClientIdValidationError" />
         <SwitchPreferenceCompat
             android:key="ws"
             android:title="@string/preferencesWebsocket"
@@ -47,17 +56,21 @@
         app:iconSpaceReserved="false"
         app:title="@string/preferencesCategoryConnectionIdentification">
         <ValidatingEditTextPreference
+            android:digits="ABCDEFGHIJKLMNOPQRSTUVWX1Z1234567890abcdefghijklmnopqrstuvwxyz"
             android:key="deviceId"
             android:title="@string/preferencesDeviceName"
-            app:dialogLayout="@layout/preference_edit_text"
             app:iconSpaceReserved="false"
-            app:useSimpleSummaryProvider="true" />
+            app:useSimpleSummaryProvider="true"
+            app:validationError="@string/preferencesDeviceNameValidationError" />
         <ValidatingEditTextPreference
+            android:digits="ABCDEFGHIJKLMNOPQRSTUVWX1Z1234567890abcdefghijklmnopqrstuvwxyz"
             android:key="tid"
+            android:lines="1"
+            android:maxLength="2"
             android:title="@string/preferencesTrackerId"
-            app:dialogLayout="@layout/preference_edit_text_two_alphanumeric"
             app:iconSpaceReserved="false"
-            app:useSimpleSummaryProvider="true" />
+            app:useSimpleSummaryProvider="true"
+            app:validationError="@string/preferencesTrackerIdValidationError" />
     </PreferenceCategory>
     <PreferenceCategory
         app:iconSpaceReserved="false"
@@ -65,13 +78,12 @@
         <ValidatingEditTextPreference
             android:key="username"
             android:title="@string/preferencesUsername"
-            app:dialogLayout="@layout/preference_edit_text"
             app:iconSpaceReserved="false"
             app:useSimpleSummaryProvider="true" />
         <ValidatingEditTextPreference
+            android:inputType="textPassword"
             android:key="password"
             android:title="@string/preferencesBrokerPassword"
-            app:dialogLayout="@layout/preference_edit_password"
             app:iconSpaceReserved="false"
             app:useSimpleSummaryProvider="false" />
     </PreferenceCategory>
@@ -94,10 +106,10 @@
             app:dependency="tls"
             app:iconSpaceReserved="false" />
         <ValidatingEditTextPreference
+            android:inputType="textPassword"
             android:key="tlsClientCrtPassword"
             android:title="@string/preferencesClientCrtPassword"
             app:dependency="tls"
-            app:dialogLayout="@layout/preference_edit_password"
             app:iconSpaceReserved="false"
             app:useSimpleSummaryProvider="false" />
     </PreferenceCategory>
@@ -106,11 +118,13 @@
         app:iconSpaceReserved="false"
         app:title="@string/preferencesParameters">
         <org.owntracks.android.support.widgets.EditIntegerPreference
+            android:inputType="number"
             app:dialogMessage="@string/preferencesMoveModeLocatorIntervalDialog"
             app:iconSpaceReserved="false"
             app:key="keepalive"
             app:title="@string/preferencesKeepalive"
-            app:useSimpleSummaryProvider="true" />
+            app:useSimpleSummaryProvider="true"
+            app:validationError="@string/preferencesKeepaliveValidationError" />
         <SwitchPreferenceCompat
             android:key="cleanSession"
             android:title="@string/preferencesCleanSessionEnabled"
