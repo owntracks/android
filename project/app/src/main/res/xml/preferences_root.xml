@@ -7,7 +7,7 @@
         app:defaultValue="@integer/defaultTheme"
         app:entries="@array/themeLabels"
         app:entryValues="@array/themeValues"
-        app:iconSpaceReserved="false"
+        app:icon="@drawable/ic_baseline_palette_24"
         app:key="theme"
         app:title="@string/preferencesTheme"
         app:useSimpleSummaryProvider="true" />
@@ -15,34 +15,33 @@
         android:key="connectionScreen"
         android:title="@string/preferencesServer"
         app:fragment="org.owntracks.android.ui.preferences.ConnectionFragment"
-        app:iconSpaceReserved="false" />
+        app:icon="@drawable/ic_baseline_settings_ethernet_24" />
     <Preference
         android:key="mapScreen"
         android:title="@string/preferencesMap"
         app:fragment="org.owntracks.android.ui.preferences.MapFragment"
-        app:iconSpaceReserved="false" />
+        app:icon="@drawable/ic_baseline_map_24" />
     <Preference
         android:key="reportingScreen"
         android:title="@string/preferencesReporting"
         app:fragment="org.owntracks.android.ui.preferences.ReportingFragment"
-        app:iconSpaceReserved="false" />
+        app:icon="@drawable/ic_baseline_send_24" />
     <Preference
         android:key="notificationScreen"
         android:title="@string/preferencesNotification"
         app:fragment="org.owntracks.android.ui.preferences.NotificationFragment"
-        app:iconSpaceReserved="false" />
+        app:icon="@drawable/ic_baseline_notifications_24" />
     <Preference
         android:key="advancedScreen"
         android:title="@string/preferencesAdvanced"
-        app:fragment="org.owntracks.android.ui.preferences.AdvancedFragment"
-        app:iconSpaceReserved="false" />
+        app:icon="@drawable/ic_baseline_settings_suggest_24"
+        app:fragment="org.owntracks.android.ui.preferences.AdvancedFragment" />
     <Preference
         android:key="experimentalScreen"
         android:title="@string/preferencesExperimental"
-        app:fragment="org.owntracks.android.ui.preferences.ExperimentalFragment"
-        app:iconSpaceReserved="false" />
+        app:fragment="org.owntracks.android.ui.preferences.ExperimentalFragment" />
     <Preference
         android:key="configuration"
-        android:title="@string/configurationManagement"
-        app:iconSpaceReserved="false" />
+        app:icon="@drawable/ic_baseline_import_export_24"
+        android:title="@string/configurationManagement" />
 </PreferenceScreen>
