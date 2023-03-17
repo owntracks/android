@@ -47,11 +47,6 @@ class FusedContact(id: String?) : BaseObservable() {
     val geocodedLocation: String?
         get() = messageLocation?.geocode
 
-    @Bindable
-    fun getMessageCard(): MessageCard? {
-        return messageCard
-    }
-
     @get:Bindable
     val fusedName: String
         get() = messageCard?.name ?: trackerId
@@ -62,13 +57,14 @@ class FusedContact(id: String?) : BaseObservable() {
 
     @get:Bindable
     val trackerId: String
-        get() = messageLocation?.trackerId ?: id.replace("/", "").let {
-            return if (it.length > 2) {
-                it.substring(it.length - 2)
-            } else {
-                it
+        get() = messageLocation?.trackerId ?: id.replace("/", "")
+            .let {
+                return if (it.length > 2) {
+                    it.substring(it.length - 2)
+                } else {
+                    it
+                }
             }
-        }
     val latLng: LatLng?
         get() = messageLocation?.run { LatLng(latitude, longitude) }
 
