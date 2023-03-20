@@ -111,8 +111,6 @@ open class ValidatingEditTextPreference : EditTextPreference {
             dstart: Int,
             dend: Int
         ): CharSequence {
-            Timber.w("$source $start $end $dstart $dend $dest")
-
             return source?.toList()
                 ?.filter { chars.contains(it) }
                 ?.joinToString("") ?: ""
