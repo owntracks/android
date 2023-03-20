@@ -6,13 +6,11 @@ import android.net.Network
 import com.fasterxml.jackson.core.JsonParseException
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.IOException
-import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.stream.Collectors
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 import kotlinx.coroutines.*
-import kotlinx.coroutines.future.asCompletableFuture
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import org.eclipse.paho.client.mqttv3.*
@@ -56,7 +54,9 @@ class MQTTMessageProcessorEndpoint(
         override fun onAvailable(network: Network) {
             super.onAvailable(network)
             if (endpointStateRepo.endpointState == EndpointState.DISCONNECTED) {
-                reconnect()
+                scope.launch {
+                    reconnect()
+                }
             }
         }
 
@@ -87,6 +87,8 @@ class MQTTMessageProcessorEndpoint(
             } catch (e: ConfigurationIncompleteException) {
                 Timber.w(e, "MQTT Configuration not complete, cannot activate")
                 endpointStateRepo.setState(EndpointState.ERROR_CONFIGURATION.withError(e))
+            } catch(e: Exception) {
+                Timber.w(e, "MQTT Configuration not complete, cannot activate")
             }
         }
     }
@@ -111,7 +113,7 @@ class MQTTMessageProcessorEndpoint(
                     try {
                         mqttClient.disconnect()
                     } catch (e: MqttException) {
-                        Timber.d(e,"Could not disconnect from client. Closing")
+                        Timber.d(e, "Could not disconnect from client. Closing")
                     }
                     endpointStateRepo.setState(EndpointState.DISCONNECTED)
                     mqttClient.close(true)
@@ -210,10 +212,12 @@ class MQTTMessageProcessorEndpoint(
                 .isNotEmpty()
         ) {
             Timber.d("MQTT preferences changed. Reconnecting to broker")
-            try {
-                reconnect(getEndpointConfiguration())
-            } catch (e: Exception) {
-                endpointStateRepo.setState(EndpointState.ERROR_CONFIGURATION.withError(e))
+            scope.launch {
+                try {
+                    reconnect(getEndpointConfiguration())
+                } catch (e: Exception) {
+                    endpointStateRepo.setState(EndpointState.ERROR_CONFIGURATION.withError(e))
+                }
             }
         }
     }
@@ -308,29 +312,29 @@ class MQTTMessageProcessorEndpoint(
         }
     }
 
-    override fun reconnect(): CompletableFuture<Unit>? {
-        return if (mqttClientAndConfiguration != null) {
-            reconnect(mqttClientAndConfiguration!!.mqttConnectionConfiguration)
-        } else {
+    override suspend fun reconnect(): Boolean {
+        return mqttClientAndConfiguration?.mqttConnectionConfiguration?.run {
+            reconnect(this)
+            true
+        } ?: run {
             try {
                 reconnect(getEndpointConfiguration())
+                true
             } catch (e: ConfigurationIncompleteException) {
                 Timber.w(e, "MQTT Configuration not complete, cannot activate")
                 endpointStateRepo.setState(EndpointState.ERROR_CONFIGURATION.withError(e))
-                null
+                false
             }
-        }?.asCompletableFuture()
+        }
     }
 
-    private fun reconnect(mqttConnectionConfiguration: MqttConnectionConfiguration): Job {
+    private suspend fun reconnect(mqttConnectionConfiguration: MqttConnectionConfiguration) {
         Timber.v("MQTT reconnect with configuration $mqttConnectionConfiguration")
-        return scope.launch {
-            connectingLock.withPermit {
-                mqttConnectionIdlingResource.setIdleState(false)
-                disconnect()
-                connectToBroker(mqttConnectionConfiguration)
-                mqttConnectionIdlingResource.setIdleState(true)
-            }
+        connectingLock.withPermit {
+            mqttConnectionIdlingResource.setIdleState(false)
+            disconnect()
+            connectToBroker(mqttConnectionConfiguration)
+            mqttConnectionIdlingResource.setIdleState(true)
         }
     }
 

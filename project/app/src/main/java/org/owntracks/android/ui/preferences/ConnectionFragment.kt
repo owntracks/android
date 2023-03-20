@@ -43,7 +43,7 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        menuProvider = PreferencesMenuProvider(requireActivity(), messageProcessor)
+        menuProvider = PreferencesMenuProvider(this, messageProcessor)
     }
 
     private val booleanSummaryProperties = setOf(

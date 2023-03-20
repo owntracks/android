@@ -20,13 +20,10 @@ class MQTTReconnectWorker @AssistedInject constructor(
     override suspend fun doWork(): Result {
         Timber.i("MQTT reconnect worker job started")
         if (!messageProcessor.isEndpointReady) return Result.failure()
-        messageProcessor
-            .reconnect()
-            .join()
-        return try {
-            if (messageProcessor.statefulCheckConnection()) Result.success() else Result.retry()
-        } catch (e: InterruptedException) {
-            Result.failure()
+        return if (messageProcessor.reconnect() == true) {
+            Result.success()
+        } else {
+            Result.retry()
         }.also { Timber.i("MQTT reconnect worker job completed, status $it") }
     }
 
