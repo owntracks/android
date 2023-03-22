@@ -1,7 +1,6 @@
 package org.owntracks.android.services
 
 import android.content.Context
-import android.util.Base64
 import com.fasterxml.jackson.core.JsonProcessingException
 import java.io.IOException
 import java.util.*
@@ -108,75 +107,80 @@ class HttpMessageProcessorEndpoint(
         httpClientAndConfiguration?.run {
             endpointStateRepo.setState(EndpointState.CONNECTING)
             Timber.d("Publishing message id=${message.messageId}")
-            client.newCall(getRequest(configuration, message))
-                .execute()
-                .use { response ->
-                    Timber.d("HTTP response received: $response")
-                    if (!response.isSuccessful) {
-                        val httpException =
-                            Exception("HTTP request failed. Status: ${response.code}")
-                        Timber.e(httpException)
-                        endpointStateRepo.setState(
-                            EndpointState.ERROR.withMessage(
-                                String.format(
-                                    Locale.ROOT,
-                                    "HTTP code %d",
-                                    response.code
+            try {
+                client.newCall(getRequest(configuration, message))
+                    .execute()
+                    .use { response ->
+                        Timber.d("HTTP response received: $response")
+                        if (!response.isSuccessful) {
+                            val httpException =
+                                Exception("HTTP request failed. Status: ${response.code}")
+                            Timber.e(httpException)
+                            endpointStateRepo.setState(
+                                EndpointState.ERROR.withMessage(
+                                    String.format(
+                                        Locale.ROOT,
+                                        "HTTP code %d",
+                                        response.code
+                                    )
                                 )
                             )
-                        )
-                        messageProcessor.onMessageDeliveryFailed(message.messageId)
-                        throw OutgoingMessageSendingException(httpException)
-                    } else {
-                        if (response.body != null) {
-                            try {
-                                val result = parser.fromJson(response.body!!.byteStream())
-                                // TODO apply i18n here
-                                endpointStateRepo.setState(
-                                    EndpointState.IDLE.withMessage(
-                                        String.format(
-                                            Locale.ROOT,
-                                            "Response %d, (%d msgs received)",
-                                            response.code,
-                                            result.size
+                            messageProcessor.onMessageDeliveryFailed(message.messageId)
+                            throw OutgoingMessageSendingException(httpException)
+                        } else {
+                            if (response.body != null) {
+                                try {
+                                    val result = parser.fromJson(response.body!!.byteStream())
+                                    // TODO apply i18n here
+                                    endpointStateRepo.setState(
+                                        EndpointState.IDLE.withMessage(
+                                            String.format(
+                                                Locale.ROOT,
+                                                "Response %d, (%d msgs received)",
+                                                response.code,
+                                                result.size
+                                            )
                                         )
                                     )
-                                )
-                                for (aResult in result) {
-                                    onMessageReceived(aResult)
+                                    for (aResult in result) {
+                                        onMessageReceived(aResult)
+                                    }
+                                } catch (e: JsonProcessingException) {
+                                    Timber.e("JsonParseException HTTP status: %s", response.code)
+                                    endpointStateRepo.setState(
+                                        EndpointState.IDLE.withMessage(
+                                            String.format(
+                                                Locale.ROOT,
+                                                "HTTP status %d, JsonParseException",
+                                                response.code
+                                            )
+                                        )
+                                    )
+                                } catch (e: Parser.EncryptionException) {
+                                    Timber.e("JsonParseException HTTP status: %s", response.code)
+                                    endpointStateRepo.setState(
+                                        EndpointState.ERROR.withMessage(
+                                            String.format(
+                                                Locale.ROOT,
+                                                "HTTP status: %d, EncryptionException",
+                                                response.code
+                                            )
+                                        )
+                                    )
+                                } catch (e: IOException) {
+                                    Timber.e(e, "HTTP Delivery failed")
+                                    endpointStateRepo.setState(EndpointState.ERROR.withError(e))
+                                    messageProcessor.onMessageDeliveryFailed(message.messageId)
+                                    throw OutgoingMessageSendingException(e)
                                 }
-                            } catch (e: JsonProcessingException) {
-                                Timber.e("JsonParseException HTTP status: %s", response.code)
-                                endpointStateRepo.setState(
-                                    EndpointState.IDLE.withMessage(
-                                        String.format(
-                                            Locale.ROOT,
-                                            "HTTP status %d, JsonParseException",
-                                            response.code
-                                        )
-                                    )
-                                )
-                            } catch (e: Parser.EncryptionException) {
-                                Timber.e("JsonParseException HTTP status: %s", response.code)
-                                endpointStateRepo.setState(
-                                    EndpointState.ERROR.withMessage(
-                                        String.format(
-                                            Locale.ROOT,
-                                            "HTTP status: %d, EncryptionException",
-                                            response.code
-                                        )
-                                    )
-                                )
-                            } catch (e: IOException) {
-                                Timber.e(e, "HTTP Delivery failed")
-                                endpointStateRepo.setState(EndpointState.ERROR.withError(e))
-                                messageProcessor.onMessageDeliveryFailed(message.messageId)
-                                throw OutgoingMessageSendingException(e)
                             }
                         }
+                        messageProcessor.onMessageDelivered()
                     }
-                    messageProcessor.onMessageDelivered()
-                }
+            } catch (e: Exception) {
+                // Sometimes we get an exception just on the execute() call
+                throw OutgoingMessageSendingException(e)
+            }
         }
     }
 

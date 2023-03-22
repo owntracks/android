@@ -108,6 +108,7 @@ fun TextView.setText(endpointState: EndpointState) {
                     is URISyntaxException -> context.getString(
                         R.string.statusEndpointStateMessageMalformedHostPort
                     )
+                    is IllegalArgumentException -> e.cause!!.message
                     else -> e.toString()
                 }
             }

@@ -8,6 +8,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.IOException
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.stream.Collectors
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 import kotlinx.coroutines.*
@@ -82,13 +83,15 @@ class MQTTMessageProcessorEndpoint(
                 connectingLock.withPermit {
                     mqttConnectionIdlingResource.setIdleState(false)
                     connectToBroker(configuration)
-                    mqttConnectionIdlingResource.setIdleState(true)
                 }
             } catch (e: ConfigurationIncompleteException) {
                 Timber.w(e, "MQTT Configuration not complete, cannot activate")
                 endpointStateRepo.setState(EndpointState.ERROR_CONFIGURATION.withError(e))
-            } catch(e: Exception) {
-                Timber.w(e, "MQTT Configuration not complete, cannot activate")
+            } catch (e: Exception) {
+                Timber.w(e, "Unable to connect to MQTT. Cannot activate")
+                scheduler.scheduleMqttReconnect()
+            } finally {
+                mqttConnectionIdlingResource.setIdleState(true)
             }
         }
     }
@@ -148,6 +151,10 @@ class MQTTMessageProcessorEndpoint(
                     try {
                         Timber.d("Publishing message id=${message.messageId}")
                         measureTime {
+                            while (mqttClient.inFlightMessageCount >= mqttConnectionConfiguration.maxInFlight) {
+                                Timber.v("Pausing to wait for inflight to drop below max")
+                                delay(100.milliseconds)
+                            }
                             mqttClient.publish(
                                 message.topic,
                                 message.toJsonBytes(parser),
@@ -216,7 +223,12 @@ class MQTTMessageProcessorEndpoint(
                 try {
                     reconnect(getEndpointConfiguration())
                 } catch (e: Exception) {
-                    endpointStateRepo.setState(EndpointState.ERROR_CONFIGURATION.withError(e))
+                    when (e) {
+                        is ConfigurationIncompleteException -> endpointStateRepo.setState(
+                            EndpointState.ERROR_CONFIGURATION.withError(e)
+                        )
+                        else -> endpointStateRepo.setState(EndpointState.ERROR.withError(e))
+                    }
                 }
             }
         }
@@ -307,24 +319,25 @@ class MQTTMessageProcessorEndpoint(
                         }
                     }
                     endpointStateRepo.setState(EndpointState.ERROR.withError(e))
+                    throw e
                 }
             }.apply { Timber.d("MQTT connection attempt completed in $this") }
         }
     }
 
     override suspend fun reconnect(): Boolean {
-        return mqttClientAndConfiguration?.mqttConnectionConfiguration?.run {
-            reconnect(this)
-            true
-        } ?: run {
-            try {
+        return try {
+            mqttClientAndConfiguration?.mqttConnectionConfiguration?.run {
+                reconnect(this)
+                true
+            } ?: run {
                 reconnect(getEndpointConfiguration())
                 true
-            } catch (e: ConfigurationIncompleteException) {
-                Timber.w(e, "MQTT Configuration not complete, cannot activate")
-                endpointStateRepo.setState(EndpointState.ERROR_CONFIGURATION.withError(e))
-                false
             }
+        } catch (e: Exception) {
+            Timber.w(e, "Failed to reconnect")
+            endpointStateRepo.setState(EndpointState.ERROR.withError(e))
+            false
         }
     }
 
@@ -333,8 +346,11 @@ class MQTTMessageProcessorEndpoint(
         connectingLock.withPermit {
             mqttConnectionIdlingResource.setIdleState(false)
             disconnect()
-            connectToBroker(mqttConnectionConfiguration)
-            mqttConnectionIdlingResource.setIdleState(true)
+            try {
+                connectToBroker(mqttConnectionConfiguration)
+            } finally {
+                mqttConnectionIdlingResource.setIdleState(true)
+            }
         }
     }
 
