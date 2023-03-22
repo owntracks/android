@@ -13,13 +13,12 @@ import org.owntracks.android.R
 import org.owntracks.android.databinding.UiContactsBinding
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.support.DrawerProvider
-import org.owntracks.android.ui.base.BaseAdapter
 import org.owntracks.android.ui.map.MapActivity
 
 @AndroidEntryPoint
 class ContactsActivity :
     AppCompatActivity(),
-    BaseAdapter.ClickListener<FusedContact?> {
+    AdapterClickListener<FusedContact> {
     @Inject
     lateinit var drawerProvider: DrawerProvider
 
@@ -46,11 +45,11 @@ class ContactsActivity :
         })
     }
 
-    override fun onClick(fusedContact: FusedContact, view: View, longClick: Boolean) {
+    override fun onClick(item: FusedContact, view: View, longClick: Boolean) {
         startActivity(
             Intent(this, MapActivity::class.java).putExtra(
                 "_args",
-                Bundle().apply { putString(MapActivity.BUNDLE_KEY_CONTACT_ID, fusedContact.id) }
+                Bundle().apply { putString(MapActivity.BUNDLE_KEY_CONTACT_ID, item.id) }
             )
         )
     }

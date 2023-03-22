@@ -9,10 +9,9 @@ import kotlinx.coroutines.CoroutineScope
 import org.owntracks.android.BR
 import org.owntracks.android.R
 import org.owntracks.android.model.FusedContact
-import org.owntracks.android.ui.base.BaseAdapter
 
 internal class ContactsAdapter(
-    private val clickListener: BaseAdapter.ClickListener<FusedContact?>,
+    private val clickListener: AdapterClickListener<FusedContact>,
     private val coroutineScope: CoroutineScope
 ) :
     RecyclerView.Adapter<ContactsAdapter.FusedContactViewHolder>() {
@@ -46,10 +45,10 @@ internal class ContactsAdapter(
     ) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(
-            fusedContact: FusedContact?,
-            clickListener: BaseAdapter.ClickListener<FusedContact?>
+            fusedContact: FusedContact,
+            clickListener: AdapterClickListener<FusedContact>
         ) {
-            fusedContact?.run {
+            fusedContact.run {
                 binding.setVariable(BR.contact, this)
                 binding.setVariable(BR.coroutineScope, coroutineScope)
                 binding.root.setOnClickListener {
