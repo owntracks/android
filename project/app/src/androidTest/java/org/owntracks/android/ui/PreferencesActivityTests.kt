@@ -38,7 +38,7 @@ class PreferencesActivityTests : TestWithAnActivity<PreferencesActivity>(Prefere
 
         writeToPreference(R.string.preferencesHost, "mqtt.example.com")
         writeToPreference(R.string.preferencesPort, "1234")
-        writeToPreference(R.string.preferencesClientId, "test-clientId")
+        writeToPreference(R.string.preferencesClientId, "test-clientId") // This hyphen will get squelched
 
         scrollToPreferenceWithText(R.string.preferencesWebsocket)
         clickOnAndWait(R.string.preferencesWebsocket)
@@ -61,7 +61,7 @@ class PreferencesActivityTests : TestWithAnActivity<PreferencesActivity>(Prefere
 
         assertContains(R.id.effectiveConfiguration, "\"host\" : \"mqtt.example.com\"")
         assertContains(R.id.effectiveConfiguration, "\"port\" : 1234")
-        assertContains(R.id.effectiveConfiguration, "\"clientId\" : \"test-clientId\"")
+        assertContains(R.id.effectiveConfiguration, "\"clientId\" : \"testclientId\"")
         assertContains(R.id.effectiveConfiguration, "\"username\" : \"testUsername\"")
         assertContains(R.id.effectiveConfiguration, "\"password\" : \"testPassword\"")
         assertContains(R.id.effectiveConfiguration, "\"deviceId\" : \"testDeviceId\"")

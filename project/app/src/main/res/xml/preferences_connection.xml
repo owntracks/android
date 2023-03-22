@@ -41,8 +41,9 @@
             app:useSimpleSummaryProvider="true"
             app:validationError="@string/preferencesPortValidationError" />
         <ValidatingEditTextPreference
-            android:digits="ABCDEFGHIJKLMNOPQRSTUVWX1Z1234567890abcdefghijklmnopqrstuvwxyz"
+            android:digits="0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
             android:key="clientId"
+            android:maxLength="23"
             android:title="@string/preferencesClientId"
             app:iconSpaceReserved="false"
             app:useSimpleSummaryProvider="true"
