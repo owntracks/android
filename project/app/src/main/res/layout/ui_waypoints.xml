@@ -20,8 +20,8 @@
             android:id="@+id/appbar"
             layout="@layout/appbar" />
 
-        <org.owntracks.android.support.widgets.RecyclerView
-            android:id="@+id/recyclerView"
+        <org.owntracks.android.support.widgets.RecyclerViewWithEmptyPlaceholder
+            android:id="@+id/waypointsRecyclerView"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:visibility="@{vm.waypointsList.empty ? View.GONE : View.VISIBLE}"

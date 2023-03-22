@@ -37,9 +37,9 @@ class WaypointsActivity : AppCompatActivity(), BaseRecyclerViewAdapterWithClickH
                 lifecycleOwner = this@WaypointsActivity
                 setSupportActionBar(appbar.toolbar)
                 drawerProvider.attach(appbar.toolbar)
-                recyclerView.layoutManager = LinearLayoutManager(this@WaypointsActivity)
-                recyclerView.adapter = recyclerViewAdapter
-                recyclerView.setEmptyView(placeholder)
+                waypointsRecyclerView.layoutManager = LinearLayoutManager(this@WaypointsActivity)
+                waypointsRecyclerView.adapter = recyclerViewAdapter
+                waypointsRecyclerView.emptyView = placeholder
             }
         viewModel.waypointsList.observe(this, recyclerViewAdapter::setData)
     }
