@@ -6,20 +6,12 @@ import androidx.test.espresso.idling.CountingIdlingResource
 import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.BlockingDeque
-import java.util.concurrent.Executors
-import java.util.concurrent.ScheduledFuture
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.locks.Condition
-import java.util.concurrent.locks.ReentrantLock
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.concurrent.withLock
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.owntracks.android.data.EndpointState
 import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.data.repos.EndpointStateRepo
@@ -35,7 +27,6 @@ import org.owntracks.android.support.Parser
 import org.owntracks.android.support.ServiceBridge
 import org.owntracks.android.support.SimpleIdlingResource
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
-import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor
 import timber.log.Timber
 
 @Singleton
@@ -50,24 +41,18 @@ class MessageProcessor @Inject constructor(
     private val serviceBridge: ServiceBridge,
     private val outgoingQueueIdlingResource: CountingIdlingResource,
     private val locationProcessorLazy: Lazy<LocationProcessor>,
-    @IoDispatcher ioDispatcher: CoroutineDispatcher,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val scope: CoroutineScope
 ) : Preferences.OnPreferenceChangeListener {
     private var endpoint: MessageProcessorEndpoint? = null
     private var acceptMessages = false
     private val outgoingQueue: BlockingDeque<MessageBase>
-    private var backgroundDequeueThread: Thread? = null
+    private var dequeueAndSenderJob: Job? = null
+    private var retryDelayJob: Job? = null
     private var initialized = false
-    private var waitFuture: ScheduledFuture<*>? = null
     private var retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT
     private val httpEndpoint: MessageProcessorEndpoint
     private val mqttEndpoint: MessageProcessorEndpoint
-    private val locker = LockerWithCondition()
-
-    data class LockerWithCondition(
-        val lock: ReentrantLock = ReentrantLock(),
-        val condition: Condition = lock.newCondition()
-    )
 
     init {
         outgoingQueue = BlockingDequeThatAlsoSometimesPersistsThingsToDiskMaybe(
@@ -133,14 +118,6 @@ class MessageProcessor @Inject constructor(
         }
     }
 
-    fun statefulCheckConnection(): Boolean {
-        return if (endpoint is StatefulServiceMessageProcessor) {
-            (endpoint as StatefulServiceMessageProcessor).checkConnection()
-        } else {
-            true
-        }
-    }
-
     val isEndpointReady: Boolean
         get() {
             try {
@@ -157,32 +134,31 @@ class MessageProcessor @Inject constructor(
     private fun loadOutgoingMessageProcessor() {
         Timber.d("Reloading outgoing message processor")
         endpoint?.deactivate()
-            .also { Timber.d("Destroying previous endpoint") }
+            .also {
+                Timber.d("Destroying previous endpoint")
+            }
         endpointStateRepo.setQueueLength(outgoingQueue.size)
         endpoint = when (preferences.mode) {
             ConnectionMode.HTTP -> httpEndpoint
             ConnectionMode.MQTT -> mqttEndpoint
         }
-        if (backgroundDequeueThread == null || !backgroundDequeueThread!!.isAlive) {
-            // Create the background thread that will handle outbound messages
-            backgroundDequeueThread = Thread({ sendAvailableMessages() }, "backgroundDequeueThread").apply { start() }
-        }
-        endpoint!!.activate()
-        acceptMessages = true
+
+        dequeueAndSenderJob =
+            scope.launch(ioDispatcher) { sendAvailableMessages() }
+        endpoint?.activate()
+            ?.run { acceptMessages = true }
     }
 
     fun queueMessageForSending(message: MessageBase) {
         if (!acceptMessages) return
         outgoingQueueIdlingResource.increment()
-        Timber.d(
-            "Queueing messageId:${message.messageId}, current queueLength:${outgoingQueue.size}"
-        )
+        Timber.d("Queueing messageId:${message.messageId}, current queueLength:${outgoingQueue.size}")
         synchronized(outgoingQueue) {
             if (!outgoingQueue.offer(message)) {
                 val droppedMessage = outgoingQueue.poll()
                 Timber.e("Outgoing queue full. Dropping oldest message: $droppedMessage")
                 if (!outgoingQueue.offer(message)) {
-                    Timber.e("Still can't put message onto the queue. Dropping: $message")
+                    Timber.e("Still can't put message onto the queue. Dropping: ${message.messageId}")
                 }
             }
             endpointStateRepo.setQueueLength(outgoingQueue.size)
@@ -190,67 +166,71 @@ class MessageProcessor @Inject constructor(
     }
 
     // Should be on the background thread here, because we block
-    private fun sendAvailableMessages() {
+    private suspend fun sendAvailableMessages() {
         Timber.d("Starting outbound message loop.")
-        var previousMessageFailed = false
+        var messageFailedLastTime = false
         var retriesToGo = 0
-        val scheduler = Executors.newSingleThreadScheduledExecutor()
         while (true) {
             try {
+                @Suppress("BlockingMethodInNonBlockingContext") // We're in ioDispatcher here
                 val message: MessageBase = outgoingQueue.take() // <--- blocks
-                Timber.v("Taken message off queue: $message")
+                Timber.d("Taken message off queue: ${message.messageId}")
                 endpointStateRepo.setQueueLength(outgoingQueue.size + 1)
-                if (!previousMessageFailed) {
+                // reset the retry logic if the last message succeeded
+                if (!messageFailedLastTime) {
                     retriesToGo = message.numberOfRetries
-                }
-                try {
-                    previousMessageFailed = false
                     retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT
+                }
+                messageFailedLastTime = false
+                try {
                     endpoint!!.sendMessage(message)
                 } catch (e: Exception) {
                     when (e) {
                         is OutgoingMessageSendingException,
                         is ConfigurationIncompleteException -> {
-                            Timber.w("Error sending message. Re-queueing")
+                            Timber.w("Error sending message ${message.messageId}. Re-queueing")
                             synchronized(outgoingQueue) {
                                 if (!outgoingQueue.offerFirst(message)) {
                                     val tailMessage = outgoingQueue.removeLast()
                                     Timber.w(
                                         "Queue full when trying to re-queue failed message. " +
-                                            "Dropping last message: $tailMessage"
+                                            "Dropping last message: ${tailMessage.messageId}"
                                     )
                                     if (!outgoingQueue.offerFirst(message)) {
                                         Timber.e(
-                                            "Couldn't restore failed message back onto the queue, dropping: $message"
+                                            "Couldn't restore failed message ${message.messageId} back onto the " +
+                                                "queue, dropping: "
                                         )
                                     }
                                 }
                             }
-                            previousMessageFailed = true
+                            messageFailedLastTime = true
+                            Timber.i("Waiting for $retryWait before retrying ${message.messageId}")
+
+                            scope.launch {
+                                delay(retryWait)
+                            }
+                                .run {
+                                    retryDelayJob = this
+                                    join()
+                                }
+                            retryWait = (retryWait * 2).coerceAtMost(SEND_FAILURE_BACKOFF_MAX_WAIT)
                             retriesToGo -= 1
                         }
                         else -> {
-                            Timber.e(e, "Couldn't send message. Dropping and moving on")
+                            Timber.e(e, "Couldn't send message ${message.messageId}. Dropping")
                             retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT
-                            previousMessageFailed = false
+                            messageFailedLastTime = false
                         }
                     }
                 }
 
-                if (previousMessageFailed && retriesToGo <= 0) {
-                    previousMessageFailed = false
-                } else if (previousMessageFailed) {
-                    Timber.i("Waiting for $retryWait before retrying")
-                    waitFuture = scheduler.schedule(
-                        {
-                            locker.lock.withLock { locker.condition.await() }
-                        },
-                        retryWait.inWholeMilliseconds,
-                        TimeUnit.MILLISECONDS
-                    )
-                    locker.lock.withLock { locker.condition.await() }
-                    retryWait = (retryWait).coerceAtMost(SEND_FAILURE_BACKOFF_MAX_WAIT)
-                } else {
+                if (retriesToGo <= 0) {
+                    messageFailedLastTime = false
+                    Timber.w("Ran out of retries for sending ${message.messageId}. Dropping")
+                }
+
+                if (!messageFailedLastTime) {
                     try {
                         if (!outgoingQueueIdlingResource.isIdleNow) {
                             Timber.v("Decrementing outgoingQueueIdlingResource")
@@ -261,11 +241,10 @@ class MessageProcessor @Inject constructor(
                     }
                 }
             } catch (e: InterruptedException) {
-                Timber.i(e, "Outgoing message loop interrupted")
+                Timber.w(e, "Outgoing message loop interrupted")
                 break
             }
         }
-        scheduler.shutdown()
         Timber.w("Exiting outgoing message loop")
     }
 
@@ -274,11 +253,10 @@ class MessageProcessor @Inject constructor(
      * reconnection event.
      */
     fun notifyOutgoingMessageQueue() {
-        waitFuture?.run {
-            cancel(false)
+        retryDelayJob?.run {
+            cancel(CancellationException("Connectivity changed"))
             Timber.d("Resetting message send loop wait.")
             retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT
-            locker.lock.withLock { locker.condition.signal() }
         }
     }
 
@@ -297,11 +275,7 @@ class MessageProcessor @Inject constructor(
     }
 
     fun processIncomingMessage(message: MessageBase) {
-        Timber.i(
-            "Received incoming message: %s on %s",
-            message.javaClass.simpleName,
-            message.contactKey
-        )
+        Timber.i("Received incoming message: ${message.javaClass.simpleName} on ${message.contactKey}")
         when (message) {
             is MessageClear -> {
                 processIncomingMessage(message)
@@ -356,44 +330,42 @@ class MessageProcessor @Inject constructor(
             Timber.e("Invalid action message received")
             return
         }
-        if (message.action != null) {
-            when (message.action) {
-                CommandAction.REPORT_LOCATION -> {
-                    if (message.modeId !== ConnectionMode.MQTT) {
-                        Timber.e("command not supported in HTTP mode: ${message.action})")
-                    } else {
-                        serviceBridge.requestOnDemandLocationFix()
-                    }
+        when (message.action) {
+            CommandAction.REPORT_LOCATION -> {
+                if (message.modeId !== ConnectionMode.MQTT) {
+                    Timber.e("command not supported in HTTP mode: ${message.action})")
+                } else {
+                    serviceBridge.requestOnDemandLocationFix()
                 }
-                CommandAction.WAYPOINTS -> locationProcessorLazy.get()
-                    .publishWaypointsMessage()
-                CommandAction.SET_WAYPOINTS -> if (message.waypoints != null) {
+            }
+            CommandAction.WAYPOINTS -> locationProcessorLazy.get()
+                .publishWaypointsMessage()
+            CommandAction.SET_WAYPOINTS -> if (message.waypoints != null) {
+                waypointsRepo.importFromMessage(message.waypoints!!.waypoints)
+            }
+            CommandAction.SET_CONFIGURATION -> {
+                if (!preferences.remoteConfiguration) {
+                    Timber.w("Received a remote configuration command but remote config setting is disabled")
+                }
+                if (message.configuration != null) {
+                    preferences.importConfiguration(message.configuration!!)
+                } else {
+                    Timber.w("No configuration provided")
+                }
+                if (message.waypoints != null) {
                     waypointsRepo.importFromMessage(message.waypoints!!.waypoints)
                 }
-                CommandAction.SET_CONFIGURATION -> {
-                    if (!preferences.remoteConfiguration) {
-                        Timber.w("Received a remote configuration command but remote config setting is disabled")
-                    }
-                    if (message.configuration != null) {
-                        preferences.importConfiguration(message.configuration!!)
-                    } else {
-                        Timber.w("No configuration provided")
-                    }
-                    if (message.waypoints != null) {
-                        waypointsRepo.importFromMessage(message.waypoints!!.waypoints)
-                    }
-                }
-                CommandAction.RECONNECT -> {
-                    if (message.modeId !== ConnectionMode.HTTP) {
-                        Timber.e("command not supported in HTTP mode: ${message.action}")
-                    } else {
-                        scope.launch {
-                            reconnect()
-                        }
-                    }
-                }
-                else -> {}
             }
+            CommandAction.RECONNECT -> {
+                if (message.modeId !== ConnectionMode.HTTP) {
+                    Timber.e("command not supported in HTTP mode: ${message.action}")
+                } else {
+                    scope.launch {
+                        reconnect()
+                    }
+                }
+            }
+            else -> {}
         }
     }
 
@@ -408,7 +380,7 @@ class MessageProcessor @Inject constructor(
 
     fun stopSendingMessages() {
         Timber.d("Interrupting background sending thread")
-        backgroundDequeueThread!!.interrupt()
+        dequeueAndSenderJob?.cancel()
     }
 
     override fun onPreferenceChanged(properties: Set<String>) {

@@ -61,21 +61,21 @@ class Scheduler @Inject constructor(
             Timber.d("Cancelling task tag (all mqtt tasks) $PERIODIC_TASK_MQTT_KEEPALIVE")
             cancelAllWorkByTag(PERIODIC_TASK_MQTT_KEEPALIVE)
             Timber.d("Cancelling task tag (all mqtt tasks) $ONETIME_TASK_MQTT_RECONNECT")
-            cancelAllWorkByTag(ONETIME_TASK_MQTT_RECONNECT)
+            cancelUniqueWork(ONETIME_TASK_MQTT_RECONNECT)
         }
     }
 
     fun scheduleMqttReconnect() {
-        val mqttReconnectWorkRequest: WorkRequest = OneTimeWorkRequest.Builder(MQTTReconnectWorker::class.java)
-            .addTag(ONETIME_TASK_MQTT_RECONNECT)
-            .setBackoffCriteria(BackoffPolicy.LINEAR, 5, TimeUnit.SECONDS)
-            .setConstraints(anyNetworkConstraint)
-            .build()
-        Timber.d("WorkManager queue task $ONETIME_TASK_MQTT_RECONNECT as ${mqttReconnectWorkRequest.id}")
-        workManager.apply {
-            cancelAllWorkByTag(ONETIME_TASK_MQTT_RECONNECT)
-            enqueue(mqttReconnectWorkRequest)
-        }
+        workManager.enqueueUniqueWork(
+            ONETIME_TASK_MQTT_RECONNECT,
+            ExistingWorkPolicy.REPLACE,
+            OneTimeWorkRequest.Builder(MQTTReconnectWorker::class.java)
+                .addTag(ONETIME_TASK_MQTT_RECONNECT)
+                .setBackoffCriteria(BackoffPolicy.LINEAR, 5, TimeUnit.SECONDS)
+                .setConstraints(anyNetworkConstraint)
+                .build()
+        )
+            .apply { Timber.d("WorkManager queue task $ONETIME_TASK_MQTT_RECONNECT") }
     }
 
     companion object {
