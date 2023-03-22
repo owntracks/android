@@ -64,11 +64,11 @@ jobs:
           name: lint-report
           path: project/app/build/reports/lint-results.html
       - name: Upload coverage
-        uses: codecov/codecov-action@v3.1.1
+        uses: codecov/codecov-action@v3
         files: ./project/app/build/jacoco/jacoco.xml
         flags: unittests
       - name: JUnit Report Action
-        uses: mikepenz/action-junit-report@v3.7.5
+        uses: mikepenz/action-junit-report@v3
         if: success() || failure() # always run even if the previous step fails
         with:
           report_paths: '**/build/test-results/test*ReleaseUnitTest/TEST-*.xml'
