@@ -76,5 +76,5 @@ jobs:
           configuration_path: .circleci/continue-config.yml
 workflows:
   setup-build-workflow:
-    jobs:
-      - setup-build-job
+    jobs: []
+      # - setup-build-job

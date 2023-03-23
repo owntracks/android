@@ -19,7 +19,7 @@ name: Build and Test
 jobs:
   build-test-lint:
     name: Build release
-    runs-on: macos-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-java@v3
@@ -65,14 +65,14 @@ jobs:
           path: project/app/build/reports/lint-results.html
       - name: Upload coverage
         uses: codecov/codecov-action@v3
-        files: ./project/app/build/jacoco/jacoco.xml
-        flags: unittests
+        with:
+          files: ./project/app/build/jacoco/jacoco.xml
+          flags: unittests
       - name: JUnit Report Action
         uses: mikepenz/action-junit-report@v3
         if: success() || failure() # always run even if the previous step fails
         with:
-          report_paths: '**/build/test-results/test*ReleaseUnitTest/TEST-*.xml'
-
+          report_paths: "**/build/test-results/test*ReleaseUnitTest/TEST-*.xml"
 
   fdroid-scanner:
     name: F-Droid scanner
