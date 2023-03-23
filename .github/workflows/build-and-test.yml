@@ -33,25 +33,22 @@ jobs:
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
       - name: Gradle build
-        uses: burrunan/gradle-cache-action@v1
+        run: |
+          ./project/gradlew -p project \
+            --scan \
+              assembleDebug \
+              assembleRelease \
+              assembleAndroidTest \
+              assembleGmsReleaseUnitTest \
+              :app:compileOssReleaseSources \
+              :app:packageGmsReleaseBundle \
+              :app:assembleGmsDebugAndroidTest \
+              :app:assembleOssDebugAndroidTest \
+              jacocoTestGmsReleaseUnitTestReport \
+              lint
         env:
           KEYSTORE_PASSPHRASE: ${{ secrets.KEYSTORE_PASSPHRASE }}
-        with:
-          build-root-directory: project
-          gradle-dependencies-cache-key: |
-            project/gradle/libs.versions.toml
-          arguments: |
-            --scan
-            assembleDebug
-            assembleRelease
-            assembleAndroidTest
-            assembleGmsReleaseUnitTest
-            :app:compileOssReleaseSources
-            :app:packageGmsReleaseBundle
-            :app:assembleGmsDebugAndroidTest
-            :app:assembleOssDebugAndroidTest
-            jacocoTestGmsReleaseUnitTestReport
-            lint
+
       - name: Upload apk artifact
         uses: actions/upload-artifact@v3
         with:
