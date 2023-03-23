@@ -42,7 +42,6 @@
     <string name="errorPreferencesImportFailed">"导入失败"</string>
     <string name="events">"事件"</string>
     <string name="exportConfiguration">"导出"</string>
-    <string name="exportConfigurationSubject">"OwnTracks配置文件"</string>
     <string name="exportLogFilePrompt">"导出日志文件"</string>
     <string name="geocoderDisabled">"未开启地理编码服务"</string>
     <string name="geocoderError">"地理编码服务返回错误信息：%s"</string>
@@ -128,7 +127,6 @@
     <string name="waypoint_region_outside">"目前不在"</string>
     <string name="waypoint_region_unknown">"未知状态"</string>
     <string name="save">"保存"</string>
-    <string name="seconds">"秒"</string>
     <string name="status_background_service_started_hint">"后台服务启动时间"</string>
     <string name="status_battery_optimization_whitelisted_hint">"未优化电池使用量"</string>
     <string name="status_last_background_update_hint">"后台服务最后一次定位时间"</string>

@@ -59,7 +59,6 @@
     <string name="errorPreferencesImportFailed">"インポートに失敗しました"</string>
     <string name="events">"イベント"</string>
     <string name="exportConfiguration">"エクスポート"</string>
-    <string name="exportConfigurationSubject">"OwnTracks構成ファイル"</string>
     <string name="exportLogFilePrompt">"ログファイルをエクスポート"</string>
     <string name="exportLogFileSubject">"OwnTracksログファイル"</string>
     <string name="exportWaypointsToEndpoint">"ウェイポイントを公開"</string>
@@ -190,7 +189,6 @@
     <string name="waypoint_region_outside">"範囲外にいます"</string>
     <string name="waypoint_region_unknown">"ステータス不明"</string>
     <string name="save">"保存"</string>
-    <string name="seconds">"秒"</string>
     <string name="select">"選択"</string>
     <string name="show_options">"オプションを見る"</string>
     <string name="status_background_service_started_hint">"バックグラウンドサービスの開始時刻"</string>

@@ -61,7 +61,6 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="errorPreferencesImportFailed">"Import fehlgeschlagen"</string>
     <string name="events">"Ereignisse"</string>
     <string name="exportConfiguration">"Exportieren"</string>
-    <string name="exportConfigurationSubject">"OwnTracks Configuration Files"</string>
     <string name="exportLogFilePrompt">"Logdatei exportieren"</string>
     <string name="exportLogFileSubject">"OwnTracks Log File"</string>
     <string name="exportWaypointsToEndpoint">"Orte veröffentlichen"</string>
@@ -192,7 +191,6 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="waypoint_region_outside">"Aktuell außerhalb"</string>
     <string name="waypoint_region_unknown">"Status unbekannt"</string>
     <string name="save">"Speichern"</string>
-    <string name="seconds">"Sekunden"</string>
     <string name="select">"Auswählen"</string>
     <string name="show_options">"Optionen anzeigen"</string>
     <string name="status_background_service_started_hint">"Standortservice gestartet"</string>

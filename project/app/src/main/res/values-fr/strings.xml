@@ -57,7 +57,6 @@
     <string name="errorPreferencesImportFailed">"L'importation a échoué"</string>
     <string name="events">"Événements"</string>
     <string name="exportConfiguration">"Exporter"</string>
-    <string name="exportConfigurationSubject">"Fichier de configuration OwnTracks"</string>
     <string name="exportLogFilePrompt">"Exporter le journal"</string>
     <string name="exportLogFileSubject">"Fichier de log Owntracks"</string>
     <string name="exportWaypointsToEndpoint">"Envoyer POIs"</string>
@@ -204,7 +203,6 @@
     <string name="waypoint_region_outside">"Actuellement à l'extérieur"</string>
     <string name="waypoint_region_unknown">"Statut inconnu"</string>
     <string name="save">"Sauvegarder"</string>
-    <string name="seconds">"Secondes"</string>
     <string name="select">"Sélectionner"</string>
 
     <!-- Fuzzy -->

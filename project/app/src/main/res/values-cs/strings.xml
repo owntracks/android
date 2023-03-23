@@ -60,7 +60,6 @@ Chcete-li to umožnit, zapněte polohu v nastavení zařízení."</string>
     <string name="errorPreferencesImportFailed">"Import selhal"</string>
     <string name="events">"Události"</string>
     <string name="exportConfiguration">"Export"</string>
-    <string name="exportConfigurationSubject">"Konfigurační soubor OwnTracks"</string>
     <string name="exportLogFilePrompt">"Exportovat soubor protokolu"</string>
     <string name="exportLogFileSubject">"Soubor protokolu OwnTracks"</string>
     <string name="exportWaypointsToEndpoint">"Zveřejnit body na trase"</string>
@@ -216,7 +215,6 @@ Chcete-li to umožnit, zapněte polohu v nastavení zařízení."</string>
     <string name="waypoint_region_outside">"Nyní venku"</string>
     <string name="waypoint_region_unknown">"Stav neznámý"</string>
     <string name="save">"Uložit"</string>
-    <string name="seconds">"Vteřin"</string>
     <string name="select">"Vybrat"</string>
     <string name="show_options">"Zobrazit možnosti"</string>
     <string name="status_background_service_started_hint">"Služba byla spuštěna za pozadí"</string>

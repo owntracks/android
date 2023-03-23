@@ -59,7 +59,6 @@ To allow this, please enable Location in the device settings."</string>
     <string name="errorPreferencesImportFailed">"Import failed"</string>
     <string name="events">"Etkinlikler"</string>
     <string name="exportConfiguration">"Dışa aktar"</string>
-    <string name="exportConfigurationSubject">"OwnTracks Configuration File"</string>
     <string name="exportLogFilePrompt">"Export log file"</string>
     <string name="exportLogFileSubject">"OwnTracks Log File"</string>
     <string name="exportWaypointsToEndpoint">"Publish Waypoints"</string>
@@ -222,7 +221,6 @@ To allow this, please enable Location in the device settings."</string>
     <string name="waypoint_region_outside">"Currently outside"</string>
     <string name="waypoint_region_unknown">"Status unknown"</string>
     <string name="save">"Kaydet"</string>
-    <string name="seconds">"Saniye"</string>
     <string name="select">"Seç"</string>
     <string name="show_options">"Seçenekleri göster"</string>
     <string name="status_background_service_started_hint">"Background service started"</string>

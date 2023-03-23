@@ -59,7 +59,6 @@
     <string name="errorPreferencesImportFailed">"가져오기에 실패했습니다"</string>
     <string name="events">"이벤트"</string>
     <string name="exportConfiguration">"내보내기"</string>
-    <string name="exportConfigurationSubject">"OwnTracks 구성 파일"</string>
     <string name="exportLogFilePrompt">"로그 파일 내보내기"</string>
     <string name="exportLogFileSubject">"OwnTracks 로그 파일"</string>
     <string name="exportWaypointsToEndpoint">"웨이포인트 공개"</string>
@@ -208,7 +207,6 @@
     <string name="waypoint_region_outside">"범위를 벗어났습니다"</string>
     <string name="waypoint_region_unknown">"상태 알 수 없음"</string>
     <string name="save">"저장"</string>
-    <string name="seconds">"초"</string>
     <string name="select">"선택"</string>
     <string name="show_options">"옵션 보기"</string>
     <string name="status_background_service_started_hint">"백그라운드 서비스 시작 시간"</string>

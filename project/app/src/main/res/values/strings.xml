@@ -61,7 +61,6 @@ To allow this, please enable Location in the device settings."</string>
     <string name="errorPreferencesImportFailed">"Import failed: %s"</string>
     <string name="events">"Events"</string>
     <string name="exportConfiguration">"Export"</string>
-    <string name="exportConfigurationSubject">"OwnTracks Configuration File"</string>
     <string name="exportLogFilePrompt">"Export log file"</string>
     <string name="exportLogFileSubject">"OwnTracks Log File"</string>
     <string name="exportWaypointsToEndpoint">"Publish Waypoints"</string>
@@ -243,7 +242,6 @@ To allow this, please enable Location in the device settings."</string>
     <string name="radius">"Radius"</string>
     <string name="reconnect">"Reconnect"</string>
     <string name="save">"Save"</string>
-    <string name="seconds">"Seconds"</string>
     <string name="select">"Select"</string>
     <string name="show_options">"Show options"</string>
     <string name="status_background_service_started_hint">"Background service started"</string>

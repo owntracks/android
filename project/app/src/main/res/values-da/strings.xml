@@ -59,7 +59,6 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="errorPreferencesImportFailed">"Import fejlet"</string>
     <string name="events">"Begivenheder"</string>
     <string name="exportConfiguration">"Eksportér"</string>
-    <string name="exportConfigurationSubject">"OwnTracks Konfigurationsfil"</string>
     <string name="exportLogFilePrompt">"Eksportér logfil"</string>
     <string name="exportLogFileSubject">"OwnTracks logfil"</string>
     <string name="exportWaypointsToEndpoint">"Offentliggør rutepunkter"</string>
@@ -214,7 +213,6 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="waypoint_region_outside">"I øjeblikket udenfor"</string>
     <string name="waypoint_region_unknown">"Ukendt status"</string>
     <string name="save">"Gem"</string>
-    <string name="seconds">"Sekunder"</string>
     <string name="select">"Vælg"</string>
     <string name="show_options">"Vis muligheder"</string>
     <string name="status_background_service_started_hint">"Baggrundsservice startet"</string>

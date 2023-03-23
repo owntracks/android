@@ -73,7 +73,6 @@
     <string name="errorPreferencesImportFailed">"Не удалось импортировать настройки"</string>
     <string name="events">"События"</string>
     <string name="exportConfiguration">"Экспорт"</string>
-    <string name="exportConfigurationSubject">"Файл конфигурации OwnTracks"</string>
     <string name="exportLogFilePrompt">"Экспорт файла журнала"</string>
     <string name="exportLogFileSubject">"Файл журнала OwnTracks"</string>
     <string name="exportWaypointsToEndpoint">"Опубликовать места"</string>
@@ -230,7 +229,6 @@
     <string name="waypoint_region_outside">"Сейчас вне этого места"</string>
     <string name="waypoint_region_unknown">"Статус неизвестен"</string>
     <string name="save">"Сохранить"</string>
-    <string name="seconds">"Секунд"</string>
     <string name="select">"Выбрать"</string>
     <string name="show_options">"Показать настройки"</string>
     <string name="status_background_service_started_hint">"Дата и время запуска фонового процесса"</string>
