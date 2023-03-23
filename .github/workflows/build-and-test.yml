@@ -12,6 +12,7 @@ name: Build and Test
       - "project/gradle/wrapper/gradle-wrapper.properties"
     branches:
       - master
+      - gh-readonly-queue/master/**
   pull_request:
     branches:
       - master
