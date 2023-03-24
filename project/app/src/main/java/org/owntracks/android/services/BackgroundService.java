@@ -36,11 +36,11 @@ import androidx.lifecycle.LifecycleService;
 import org.jetbrains.annotations.NotNull;
 import org.owntracks.android.R;
 import org.owntracks.android.data.EndpointState;
-import org.owntracks.android.data.WaypointModel;
+import org.owntracks.android.data.waypoints.WaypointModel;
 import org.owntracks.android.data.repos.ContactsRepo;
 import org.owntracks.android.data.repos.EndpointStateRepo;
 import org.owntracks.android.data.repos.LocationRepo;
-import org.owntracks.android.data.repos.WaypointsRepo;
+import org.owntracks.android.data.waypoints.WaypointsRepo;
 import org.owntracks.android.geocoding.GeocoderProvider;
 import org.owntracks.android.location.LocationAvailability;
 import org.owntracks.android.location.LocationCallback;
@@ -238,7 +238,7 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
                     locationProcessor.publishWaypointMessage(operation.getWaypoint());
                     break;
             }
-            if (operation.getWaypoint().hasGeofence()) {
+            if (operation.getWaypoint().getGeofenceRadius() > 0) {
                 removeGeofences();
                 setupGeofences();
             }
@@ -512,25 +512,26 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
     }
 
     private void onGeofencingEvent(@Nullable final GeofencingEvent event) {
-        if (event == null) {
-            Timber.e("geofencingEvent null");
-            return;
-        }
-
-        if (event.hasError()) {
-            Timber.e("geofencingEvent hasError: %s", event.getErrorCode());
-            return;
-        }
-
-        final int transition = event.getGeofenceTransition();
-        for (int index = 0; index < event.getTriggeringGeofences().size(); index++) {
-            WaypointModel w = waypointsRepo.get(Long.parseLong(event.getTriggeringGeofences().get(index).getRequestId()));
-            if (w == null) {
-                Timber.e("waypoint id %s not found for geofence event", event.getTriggeringGeofences().get(index).getRequestId());
-                continue;
-            }
-            locationProcessor.onWaypointTransition(w, event.getTriggeringLocation(), transition, MessageTransition.TRIGGER_CIRCULAR);
-        }
+        // STOPSHIP: 24/03/2023 Fix geofencing
+//        if (event == null) {
+//            Timber.e("geofencingEvent null");
+//            return;
+//        }
+//
+//        if (event.hasError()) {
+//            Timber.e("geofencingEvent hasError: %s", event.getErrorCode());
+//            return;
+//        }
+//
+//        final int transition = event.getGeofenceTransition();
+//        for (int index = 0; index < event.getTriggeringGeofences().size(); index++) {
+//            WaypointModel w = waypointsRepo.get(Long.parseLong(event.getTriggeringGeofences().get(index).getRequestId()));
+//            if (w == null) {
+//                Timber.e("waypoint id %s not found for geofence event", event.getTriggeringGeofences().get(index).getRequestId());
+//                continue;
+//            }
+//            locationProcessor.onWaypointTransition(w, event.getTriggeringLocation(), transition, MessageTransition.TRIGGER_CIRCULAR);
+//        }
     }
 
     void onLocationChanged(@Nullable Location location, @Nullable String reportType) {
@@ -628,27 +629,28 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
         }
 
         LinkedList<Geofence> geofences = new LinkedList<>();
-        List<WaypointModel> loadedWaypoints = waypointsRepo.getAllWithGeofences();
+        List<WaypointModel> loadedWaypoints = waypointsRepo.getAllLive().getValue();
 
+        if (loadedWaypoints!=null) {
+            for (WaypointModel w : loadedWaypoints) {
+                Timber.d("id:%s, desc:%s, lat:%s, lon:%s, rad:%s", w.getId(), w.getDescription(), w.getGeofenceLatitude(), w.getGeofenceLongitude(), w.getGeofenceRadius());
 
-        for (WaypointModel w : loadedWaypoints) {
-            Timber.d("id:%s, desc:%s, lat:%s, lon:%s, rad:%s", w.getId(), w.getDescription(), w.getGeofenceLatitude(), w.getGeofenceLongitude(), w.getGeofenceRadius());
-
-            try {
-                geofences.add(
-                        new Geofence(
-                                Long.toString(w.getId()),
-                                Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT,
-                                (int) TimeUnit.MINUTES.toMillis(2),
-                                w.getGeofenceLatitude(),
-                                w.getGeofenceLongitude(),
-                                (float) w.getGeofenceRadius(),
-                                Geofence.NEVER_EXPIRE,
-                                null
-                        )
-                );
-            } catch (IllegalArgumentException e) {
-                Timber.e(e, "Invalid geofence parameter");
+                try {
+                    geofences.add(
+                            new Geofence(
+                                    Long.toString(w.getId()),
+                                    Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT,
+                                    (int) TimeUnit.MINUTES.toMillis(2),
+                                    w.getGeofenceLatitude(),
+                                    w.getGeofenceLongitude(),
+                                    (float) w.getGeofenceRadius(),
+                                    Geofence.NEVER_EXPIRE,
+                                    null
+                            )
+                    );
+                } catch (IllegalArgumentException e) {
+                    Timber.e(e, "Invalid geofence parameter");
+                }
             }
         }
 

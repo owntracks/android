@@ -2,10 +2,12 @@ package org.owntracks.android.ui.waypoints
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import org.owntracks.android.data.WaypointModel
-import org.owntracks.android.data.repos.WaypointsRepo
+import kotlinx.coroutines.launch
+import org.owntracks.android.data.waypoints.WaypointModel
+import org.owntracks.android.data.waypoints.WaypointsRepo
 import org.owntracks.android.services.LocationProcessor
 
 @HiltViewModel
@@ -15,6 +17,8 @@ class WaypointsViewModel @Inject constructor(
 ) : ViewModel() {
     val waypointsList: LiveData<List<WaypointModel>> = waypointsRepo.allLive
     fun exportWaypoints() {
-        locationProcessor.publishWaypointsMessage()
+        viewModelScope.launch {
+            locationProcessor.publishWaypointsMessage()
+        }
     }
 }

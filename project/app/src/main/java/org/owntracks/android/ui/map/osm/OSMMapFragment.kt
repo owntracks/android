@@ -32,7 +32,7 @@ import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import org.owntracks.android.R
-import org.owntracks.android.data.WaypointModel
+import org.owntracks.android.data.waypoints.WaypointModel
 import org.owntracks.android.databinding.OsmMapFragmentBinding
 import org.owntracks.android.location.LatLng
 import org.owntracks.android.location.toGeoPoint
@@ -380,7 +380,7 @@ class OSMMapFragment internal constructor(
                         Polygon(this).apply {
                             id = "regionpolygon-${region.id}"
                             points = Polygon.pointsAsCircle(
-                                region.location.toLatLng()
+                                region.getLocation().toLatLng()
                                     .toGeoPoint(),
                                 region.geofenceRadius.toDouble()
                             )
@@ -395,7 +395,7 @@ class OSMMapFragment internal constructor(
                         },
                         Marker(this).apply {
                             id = "regionmarker-${region.id}"
-                            position = region.location.toLatLng()
+                            position = region.getLocation().toLatLng()
                                 .toGeoPoint()
                             title = region.description
                             setInfoWindow(MarkerInfoWindow(R.layout.osm_region_bubble, this@run))

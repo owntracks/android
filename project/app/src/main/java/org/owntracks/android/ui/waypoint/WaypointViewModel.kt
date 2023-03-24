@@ -1,12 +1,15 @@
 package org.owntracks.android.ui.waypoint
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import org.owntracks.android.data.WaypointModel
+import kotlinx.coroutines.launch
 import org.owntracks.android.data.repos.LocationRepo
-import org.owntracks.android.data.repos.WaypointsRepo
+import org.owntracks.android.data.waypoints.WaypointModel
+import org.owntracks.android.data.waypoints.WaypointsRepo
 import timber.log.Timber
 
 @HiltViewModel
@@ -14,43 +17,53 @@ class WaypointViewModel @Inject constructor(
     private val waypointsRepo: WaypointsRepo,
     private val locationRepo: LocationRepo
 ) : ViewModel() {
-    val waypoint = MutableLiveData(getEmptyWaypoint())
 
-    private fun getEmptyWaypoint(): WaypointModel = WaypointModel().apply {
-        val currentLocation = locationRepo.currentBlueDotOnMapLocation
-        if (currentLocation != null) {
-            geofenceLatitude = currentLocation.latitude
-            geofenceLongitude = currentLocation.longitude
-        } else {
-            geofenceLatitude = 0.0
-            geofenceLongitude = 0.0
-        }
-    }
+    val waypoint: LiveData<WaypointModel>
+        get() = mutableWaypoint
+    private val mutableWaypoint = MutableLiveData<WaypointModel>()
 
     fun loadWaypoint(id: Long) {
-        Timber.d("Loading waypoint $id")
-        waypointsRepo[id]?.apply {
-            waypoint.postValue(this)
-        } ?: run {
-            Timber.w("Waypoint $id not found in the repo")
+        viewModelScope.launch {
+            Timber.d("Loading waypoint $id")
+            waypointsRepo.get(id)
+                ?.apply {
+                    mutableWaypoint.postValue(this)
+                } ?: run {
+                Timber.w("Waypoint $id not found in the repo")
+            }
         }
     }
 
     fun delete() {
-        waypoint.value?.let { waypointsRepo.delete(it) }
+        viewModelScope.launch {
+            waypoint.value?.run { waypointsRepo.delete(this) }
+        }
     }
 
     fun canSaveWaypoint(): Boolean {
-        return waypoint.value?.description?.isNotEmpty() ?: false
+        return true
+//        return waypoint.value?.description?.isNotEmpty() ?: false
     }
 
     fun canDeleteWaypoint(): Boolean {
         return waypoint.value?.id?.run { this != 0L } ?: false
     }
 
-    fun saveWaypoint() {
-        if (canSaveWaypoint()) {
-            waypoint.value?.run(waypointsRepo::insert)
+    fun saveWaypoint(
+        description: String,
+        latitude: Double,
+        longitude: Double,
+        radius: Int
+    ) {
+        viewModelScope.launch {
+            waypointsRepo.insert(
+                (waypoint.value ?: WaypointModel()).apply {
+                    this.description = description
+                    this.geofenceLatitude = latitude
+                    this.geofenceLongitude = longitude
+                    this.geofenceRadius = radius
+                }
+            )
         }
     }
 }

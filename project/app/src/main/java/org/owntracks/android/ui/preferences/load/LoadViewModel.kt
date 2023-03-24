@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 import okhttp3.*
 import org.apache.commons.codec.binary.Base64
 import org.apache.hc.core5.net.URIBuilder
-import org.owntracks.android.data.repos.WaypointsRepo
+import org.owntracks.android.data.waypoints.WaypointsRepo
 import org.owntracks.android.di.CoroutineScopes
 import org.owntracks.android.model.messages.MessageConfiguration
 import org.owntracks.android.model.messages.MessageWaypoints

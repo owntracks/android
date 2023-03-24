@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import org.owntracks.android.R
-import org.owntracks.android.data.WaypointModel
+import org.owntracks.android.data.waypoints.WaypointModel
 import org.owntracks.android.databinding.UiWaypointsBinding
 import org.owntracks.android.support.DrawerProvider
 import org.owntracks.android.ui.base.BaseRecyclerViewAdapterWithClickHandler

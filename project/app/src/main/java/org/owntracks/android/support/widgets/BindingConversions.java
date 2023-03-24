@@ -30,17 +30,15 @@ public class BindingConversions {
     }
 
     @BindingConversion
-    @InverseMethod("convertToIntegerZeroIsEmpty")
-    public static String convertToStringZeroIsEmpty(@Nullable Integer d) {
-        return d != null && d > 0 ? d.toString() : EMPTY_STRING;
-    }
-
-
-    @BindingConversion
     public static String convertToString(@Nullable Long d) {
         return d != null ? d.toString() : EMPTY_STRING;
     }
 
+
+    @BindingConversion
+    public static String convertToString(@Nullable Double d) {
+        return d != null ? d.toString() : EMPTY_STRING;
+    }
 
     @BindingConversion
     public static String convertToString(boolean d) {
@@ -71,17 +69,6 @@ public class BindingConversions {
     @BindingAdapter("android:visibility")
     public static void setVisibility(View view, boolean visible) {
         view.setVisibility(visible ? View.VISIBLE : View.GONE);
-    }
-
-    @BindingAdapter("relativeTimeSpanString")
-    public static void setRelativeTimeSpanString(TextView view, long tstSeconds) {
-        if (tstSeconds == 0) {
-            view.setText("");
-        } else if (DateUtils.isToday(TimeUnit.SECONDS.toMillis(tstSeconds))) {
-            view.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(TimeUnit.SECONDS.toMillis(tstSeconds)));
-        } else {
-            view.setText(DateFormat.getDateInstance(DateFormat.SHORT).format(TimeUnit.SECONDS.toMillis(tstSeconds)));
-        }
     }
 
     @BindingAdapter("lastTransition")

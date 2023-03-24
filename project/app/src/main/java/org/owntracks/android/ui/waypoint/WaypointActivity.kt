@@ -4,13 +4,18 @@ import android.content.DialogInterface
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.text.format.DateUtils
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.BindingAdapter
 import androidx.databinding.DataBindingUtil
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import java.text.DateFormat
+import java.time.Instant
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiWaypointBinding
 
@@ -19,10 +24,11 @@ class WaypointActivity : AppCompatActivity() {
     private var saveButton: MenuItem? = null
     private var deleteButton: MenuItem? = null
     private val viewModel: WaypointViewModel by viewModels()
+    private lateinit var binding: UiWaypointBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        DataBindingUtil.setContentView<UiWaypointBinding>(this, R.layout.ui_waypoint)
+        binding = DataBindingUtil.setContentView<UiWaypointBinding>(this, R.layout.ui_waypoint)
             .apply {
                 vm = viewModel
                 lifecycleOwner = this@WaypointActivity
@@ -58,7 +64,15 @@ class WaypointActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.save -> {
-                viewModel.saveWaypoint()
+                viewModel.saveWaypoint(
+                    binding.description.text.toString(),
+                    binding.latitude.text.toString()
+                        .toDouble(),
+                    binding.longitude.text.toString()
+                        .toDouble(),
+                    binding.radius.text.toString()
+                        .toIntOrNull() ?: 1
+                )
                 finish()
                 true
             }
@@ -95,4 +109,31 @@ class WaypointActivity : AppCompatActivity() {
             isEnabled = viewModel.canDeleteWaypoint()
             icon?.alpha = if (isEnabled) 255 else 130
         }
+}
+
+@BindingAdapter("relativeTimeSpanString")
+fun TextView.setRelativeTimeSpanString(instant: Instant) {
+    text = if (instant == Instant.MIN) {
+        ""
+    } else if (DateUtils.isToday(instant.toEpochMilli())) {
+        DateFormat.getTimeInstance(DateFormat.SHORT)
+            .format(instant.toEpochMilli())
+    } else {
+        DateFormat.getDateInstance(DateFormat.SHORT)
+            .format(instant.toEpochMilli())
+    }
+}
+
+@BindingAdapter("relativeTimeSpanString")
+fun TextView.setRelativeTimeSpanString(epochSeconds: Long) {
+    val instant = Instant.ofEpochSecond(epochSeconds)
+    text = if (instant == Instant.MIN) {
+        ""
+    } else if (DateUtils.isToday(instant.toEpochMilli())) {
+        DateFormat.getTimeInstance(DateFormat.SHORT)
+            .format(instant.toEpochMilli())
+    } else {
+        DateFormat.getDateInstance(DateFormat.SHORT)
+            .format(instant.toEpochMilli())
+    }
 }

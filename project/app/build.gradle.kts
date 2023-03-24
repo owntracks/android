@@ -46,6 +46,11 @@ android {
                 "shardIndex" to shardIndex
             )
         )
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments["room.schemaLocation"] = "$projectDir/schemas"
+            }
+        }
     }
 
     signingConfigs {

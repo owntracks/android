@@ -242,23 +242,29 @@ class MQTTMessageProcessorEndpoint(
         }
 
         override fun messageArrived(topic: String, message: MqttMessage) {
-            Timber.d("Received MQTT message on $topic: ${message.id}")
-            if (message.payload.isEmpty()) {
-                onMessageReceived(MessageClear().apply { this.topic = topic.replace(MessageCard.BASETOPIC_SUFFIX, "") })
-            }
-            try {
-                onMessageReceived(
-                    parser.fromJson(message.payload)
-                        .apply {
-                            this.topic = topic
-                            this.retained = message.isRetained
-                            this.qos = message.qos
+            scope.launch {
+                Timber.d("Received MQTT message on $topic: ${message.id}")
+                if (message.payload.isEmpty()) {
+                    onMessageReceived(
+                        MessageClear().apply {
+                            this.topic = topic.replace(MessageCard.BASETOPIC_SUFFIX, "")
                         }
-                )
-            } catch (e: Parser.EncryptionException) {
-                Timber.e("Enable to decrypt received message ${message.id} on $topic")
-            } catch (e: JsonParseException) {
-                Timber.e("Malformed JSON message received ${message.id} on $topic")
+                    )
+                }
+                try {
+                    onMessageReceived(
+                        parser.fromJson(message.payload)
+                            .apply {
+                                this.topic = topic
+                                this.retained = message.isRetained
+                                this.qos = message.qos
+                            }
+                    )
+                } catch (e: Parser.EncryptionException) {
+                    Timber.e("Enable to decrypt received message ${message.id} on $topic")
+                } catch (e: JsonParseException) {
+                    Timber.e("Malformed JSON message received ${message.id} on $topic")
+                }
             }
         }
 
