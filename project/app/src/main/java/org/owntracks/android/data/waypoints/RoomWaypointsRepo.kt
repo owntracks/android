@@ -30,7 +30,7 @@ class RoomWaypointsRepo @Inject constructor(
         @Query("SELECT * FROM WaypointModel")
         fun all(): List<WaypointModel>
 
-        @Insert(onConflict = OnConflictStrategy.REPLACE)
+        @Insert()
         fun insert(waypointModel: WaypointModel)
 
         @Delete
