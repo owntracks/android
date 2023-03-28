@@ -60,12 +60,11 @@ class LocationProcessor @Inject constructor(
             Timber.e("no location available, can't publish location")
             return
         }
-        val loadedWaypoints = waypointsRepo.allLive.value
+        val loadedWaypoints = waypointsRepo.all
         if (ignoreLowAccuracy(location)) return
 
         // Check if publish would trigger a region if fusedRegionDetection is enabled
-        if (loadedWaypoints != null &&
-            loadedWaypoints.isNotEmpty() &&
+        if (loadedWaypoints.isNotEmpty() &&
             preferences.fusedRegionDetection &&
             MessageLocation.REPORT_TYPE_CIRCULAR != trigger
         ) {
