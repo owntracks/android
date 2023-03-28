@@ -59,6 +59,9 @@ class WaypointActivity : AppCompatActivity() {
 
         if (intent.hasExtra("waypointId")) {
             viewModel.loadWaypoint(intent.getLongExtra("waypointId", 0))
+            viewModel.waypoint.observe(this) {
+                setDeleteButtonEnabledStatus()
+            }
         }
     }
 
