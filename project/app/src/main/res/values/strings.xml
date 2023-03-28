@@ -239,7 +239,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesUsername">"Username"</string>
     <string name="preferencesWebsocket">"Use WebSockets"</string>
     <string name="publish">"Report"</string>
-    <string name="radius">"Radius"</string>
+    <string name="radius">"Radius (m)"</string>
     <string name="reconnect">"Reconnect"</string>
     <string name="save">"Save"</string>
     <string name="select">"Select"</string>

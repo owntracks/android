@@ -94,8 +94,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:digits="0123456789"
-                        android:inputType="numberDecimal" />
-                    <!--                        android:text="@{vm.waypoint.geofenceRadius}" -->
+                        android:inputType="numberDecimal"
+                        android:text="@{String.valueOf(vm.waypoint.geofenceRadius)}" />
                 </com.google.android.material.textfield.TextInputLayout>
 
 

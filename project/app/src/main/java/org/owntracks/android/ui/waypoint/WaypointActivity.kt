@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.BindingAdapter
 import androidx.databinding.DataBindingUtil
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.textfield.TextInputEditText
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.DateFormat
 import java.time.Instant
@@ -25,21 +26,30 @@ class WaypointActivity : AppCompatActivity() {
     private var deleteButton: MenuItem? = null
     private val viewModel: WaypointViewModel by viewModels()
     private lateinit var binding: UiWaypointBinding
+    private lateinit var textFields: List<TextInputEditText>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = DataBindingUtil.setContentView<UiWaypointBinding>(this, R.layout.ui_waypoint)
             .apply {
+                textFields = listOf(
+                    description,
+                    radius,
+                    latitude,
+                    longitude
+                )
                 vm = viewModel
                 lifecycleOwner = this@WaypointActivity
                 setSupportActionBar(appbar.toolbar)
-                description.addTextChangedListener(object : TextWatcher {
+                val textWatcher = object : TextWatcher {
                     override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
                     override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
                     override fun afterTextChanged(s: Editable) {
                         setSaveButtonEnabledStatus()
                     }
-                })
+                }
+                textFields.forEach { it.addTextChangedListener(textWatcher) }
             }
 
         supportActionBar?.run {
@@ -98,17 +108,16 @@ class WaypointActivity : AppCompatActivity() {
         }
     }
 
-    private fun setSaveButtonEnabledStatus() =
-        saveButton?.run {
-            isEnabled = viewModel.canSaveWaypoint()
-            icon?.alpha = if (isEnabled) 255 else 130
-        }
+    private fun setSaveButtonEnabledStatus() = saveButton?.run {
+        isEnabled = !textFields.map { it.text }
+            .any { it.isNullOrBlank() }
+        icon?.alpha = if (isEnabled) 255 else 130
+    }
 
-    private fun setDeleteButtonEnabledStatus() =
-        deleteButton?.apply {
-            isEnabled = viewModel.canDeleteWaypoint()
-            icon?.alpha = if (isEnabled) 255 else 130
-        }
+    private fun setDeleteButtonEnabledStatus() = deleteButton?.apply {
+        isEnabled = viewModel.canDeleteWaypoint()
+        icon?.alpha = if (isEnabled) 255 else 130
+    }
 }
 
 @BindingAdapter("relativeTimeSpanString")

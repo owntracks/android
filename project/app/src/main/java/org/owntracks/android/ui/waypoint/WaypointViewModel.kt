@@ -10,17 +10,29 @@ import kotlinx.coroutines.launch
 import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.data.waypoints.WaypointModel
 import org.owntracks.android.data.waypoints.WaypointsRepo
+import org.owntracks.android.location.LatLng
 import timber.log.Timber
 
 @HiltViewModel
 class WaypointViewModel @Inject constructor(
     private val waypointsRepo: WaypointsRepo,
-    private val locationRepo: LocationRepo
+    locationRepo: LocationRepo
 ) : ViewModel() {
+
+    private val initialLocation = locationRepo.currentBlueDotOnMapLocation?.run {
+        LatLng(latitude, longitude)
+    } ?: LatLng(0.0, 0.0)
 
     val waypoint: LiveData<WaypointModel>
         get() = mutableWaypoint
-    private val mutableWaypoint = MutableLiveData<WaypointModel>()
+    private val mutableWaypoint =
+        MutableLiveData(
+            WaypointModel(
+                geofenceLatitude = initialLocation.latitude,
+                geofenceLongitude = initialLocation.longitude,
+                geofenceRadius = 20
+            )
+        )
 
     fun loadWaypoint(id: Long) {
         viewModelScope.launch {
@@ -38,11 +50,6 @@ class WaypointViewModel @Inject constructor(
         viewModelScope.launch {
             waypoint.value?.run { waypointsRepo.delete(this) }
         }
-    }
-
-    fun canSaveWaypoint(): Boolean {
-        return true
-//        return waypoint.value?.description?.isNotEmpty() ?: false
     }
 
     fun canDeleteWaypoint(): Boolean {

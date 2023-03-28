@@ -37,9 +37,11 @@ class WaypointsActivity : AppCompatActivity(), BaseRecyclerViewAdapterWithClickH
                 lifecycleOwner = this@WaypointsActivity
                 setSupportActionBar(appbar.toolbar)
                 drawerProvider.attach(appbar.toolbar)
-                waypointsRecyclerView.layoutManager = LinearLayoutManager(this@WaypointsActivity)
-                waypointsRecyclerView.adapter = recyclerViewAdapter
-                waypointsRecyclerView.emptyView = placeholder
+                waypointsRecyclerView.apply {
+                    layoutManager = LinearLayoutManager(this@WaypointsActivity)
+                    adapter = recyclerViewAdapter
+                    emptyView = placeholder
+                }
             }
         viewModel.waypointsList.observe(this, recyclerViewAdapter::setData)
     }
@@ -72,9 +74,7 @@ class WaypointsActivity : AppCompatActivity(), BaseRecyclerViewAdapterWithClickH
         view: View,
         longClick: Boolean
     ): ClickHasBeenHandled {
-        val intent = Intent(this, WaypointActivity::class.java)
-        intent.putExtra("waypointId", thing.tst)
-        startActivity(intent)
+        startActivity(Intent(this, WaypointActivity::class.java).putExtra("waypointId", thing.id))
         return true
     }
 }

@@ -30,8 +30,8 @@ class RoomWaypointsRepo @Inject constructor(
         @Query("SELECT * FROM WaypointModel")
         fun all(): List<WaypointModel>
 
-        @Insert()
-        fun insert(waypointModel: WaypointModel)
+        @Upsert
+        fun upsert(waypointModel: WaypointModel)
 
         @Delete
         fun delete(waypointModel: WaypointModel)
@@ -68,11 +68,11 @@ class RoomWaypointsRepo @Inject constructor(
 
     override suspend fun insertImpl(waypointModel: WaypointModel) = withContext(ioDispatcher) {
         db.waypointDao()
-            .insert(waypointModel)
+            .upsert(waypointModel)
     }
 
     override suspend fun updateImpl(waypointModel: WaypointModel) = withContext(ioDispatcher) { db.waypointDao() }
-        .insert(waypointModel)
+        .upsert(waypointModel)
 
     override suspend fun deleteImpl(waypointModel: WaypointModel) = withContext(ioDispatcher) {
         db.waypointDao()
