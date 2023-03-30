@@ -5,7 +5,12 @@ import org.owntracks.android.location.geofencing.GeofencingRequest
 
 fun GeofencingRequest.toGMSGeofencingRequest(): com.google.android.gms.location.GeofencingRequest {
     val builder = com.google.android.gms.location.GeofencingRequest.Builder()
-    this.geofences?.run { builder.addGeofences(this.toMutableList().map { it.toGMSGeofence() }) }
+    this.geofences?.run {
+        builder.addGeofences(
+            this.toMutableList()
+                .map { it.toGMSGeofence() }
+        )
+    }
     this.initialTrigger?.run { builder.setInitialTrigger(this) }
     return builder.build()
 }
@@ -24,9 +29,9 @@ fun Geofence.toGMSGeofence(): com.google.android.gms.location.Geofence {
             }
         }
     }
-    this.expirationDuration?.run { builder.setExpirationDuration(this) }
-    this.transitionTypes?.run { builder.setTransitionTypes(this) }
-    this.notificationResponsiveness?.run { builder.setNotificationResponsiveness(this) }
-    this.loiteringDelay?.run { builder.setLoiteringDelay(this) }
+    this.expirationDuration?.run(builder::setExpirationDuration)
+    this.transitionTypes?.run(builder::setTransitionTypes)
+    this.notificationResponsiveness?.run(builder::setNotificationResponsiveness)
+    this.loiteringDelay?.run(builder::setLoiteringDelay)
     return builder.build()
 }

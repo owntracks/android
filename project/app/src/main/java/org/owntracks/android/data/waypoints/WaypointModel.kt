@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.time.Instant
+import org.owntracks.android.location.geofencing.Geofence
 
 @Entity(indices = [Index(value = ["tst"], unique = true)])
 data class WaypointModel(
@@ -24,5 +25,5 @@ data class WaypointModel(
         accuracy = geofenceRadius.toFloat()
     }
 
-    fun isUnknown(): Boolean = lastTransition == 0
+    fun isUnknown(): Boolean = lastTransition == Geofence.GEOFENCE_TRANSITION_UNKNOWN
 }

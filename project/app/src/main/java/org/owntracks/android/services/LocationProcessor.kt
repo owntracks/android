@@ -3,7 +3,6 @@ package org.owntracks.android.services
 import android.location.Location
 import android.os.Build
 import java.time.Instant
-import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -68,7 +67,7 @@ class LocationProcessor @Inject constructor(
             preferences.fusedRegionDetection &&
             MessageLocation.REPORT_TYPE_CIRCULAR != trigger
         ) {
-            for (waypoint in loadedWaypoints) {
+            loadedWaypoints.forEach { waypoint ->
                 onWaypointTransition(
                     waypoint,
                     location,
@@ -104,17 +103,14 @@ class LocationProcessor @Inject constructor(
         }
         message.trigger = trigger
         message.trackerId = preferences.tid.value
-        message.inregions = calculateInregions(loadedWaypoints ?: emptyList())
+        message.inregions = calculateInregions(loadedWaypoints)
         messageProcessor.queueMessageForSending(message)
     }
 
-    private fun calculateInregions(loadedWaypoints: List<WaypointModel>): List<String> {
-        val l = LinkedList<String>()
-        for (w in loadedWaypoints) {
-            if (w.lastTransition == Geofence.GEOFENCE_TRANSITION_ENTER) l.add(w.description)
-        }
-        return l
-    }
+    private fun calculateInregions(loadedWaypoints: List<WaypointModel>): List<String> =
+        loadedWaypoints.filter { it.lastTransition == Geofence.GEOFENCE_TRANSITION_ENTER }
+            .map { it.description }
+            .toList()
 
     fun onLocationChanged(location: Location, reportType: String?) {
         locationRepo.setCurrentPublishedLocation(location)
@@ -127,8 +123,9 @@ class LocationProcessor @Inject constructor(
         transition: Int,
         trigger: String
     ) {
-        Timber.v(
-            "geofence ${waypointModel.tst}/${waypointModel.description} transition:${if (transition == Geofence.GEOFENCE_TRANSITION_ENTER) "enter" else "exit"}, trigger:$trigger"
+        Timber.d(
+            "geofence ${waypointModel.tst}/${waypointModel.description} transition:" +
+                "${if (transition == Geofence.GEOFENCE_TRANSITION_ENTER) "enter" else "exit"}, trigger:$trigger"
         )
         if (ignoreLowAccuracy(location)) {
             Timber.d("ignoring transition: low accuracy ")
@@ -136,13 +133,11 @@ class LocationProcessor @Inject constructor(
         }
 
         scope.launch {
-            // Don't send transition if the region is already triggered
             // If the region status is unknown, send transition only if the device is inside
-            if (transition == waypointModel.lastTransition || waypointModel.isUnknown() && transition == Geofence.GEOFENCE_TRANSITION_EXIT) {
-                Timber.d("ignoring initial or duplicate transition: ${waypointModel.description}")
+            if (waypointModel.isUnknown() && transition == Geofence.GEOFENCE_TRANSITION_ENTER) {
                 waypointModel.lastTransition = transition
                 waypointsRepo.update(waypointModel, false)
-            } else {
+            } else if (transition != waypointModel.lastTransition) {
                 waypointModel.lastTransition = transition
                 waypointModel.lastTriggered = Instant.now()
                 waypointsRepo.update(waypointModel, false)

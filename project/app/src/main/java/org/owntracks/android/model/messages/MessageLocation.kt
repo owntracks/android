@@ -166,8 +166,7 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
         const val REPORT_TYPE_CIRCULAR = "c"
         const val REPORT_TYPE_PING = "p"
 
-        @JvmField
-        val REPORT_TYPE_DEFAULT: String? = null
+        const val REPORT_TYPE_DEFAULT: String = ""
         const val CONN_TYPE_OFFLINE = "o"
         const val CONN_TYPE_WIFI = "w"
         const val CONN_TYPE_MOBILE = "m"

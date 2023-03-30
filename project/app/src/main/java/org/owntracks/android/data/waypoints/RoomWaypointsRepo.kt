@@ -71,14 +71,21 @@ class RoomWaypointsRepo @Inject constructor(
             .upsert(waypointModel)
     }
 
-    override suspend fun updateImpl(waypointModel: WaypointModel) = withContext(ioDispatcher) { db.waypointDao() }
-        .upsert(waypointModel)
+    override suspend fun updateImpl(waypointModel: WaypointModel) = withContext(ioDispatcher) {
+        db.waypointDao()
+            .upsert(waypointModel)
+    }
 
     override suspend fun deleteImpl(waypointModel: WaypointModel) = withContext(ioDispatcher) {
         db.waypointDao()
             .delete(waypointModel)
     }
 
+    /**
+     * A converter that tells Room how to store [java.time.Instant]
+     *
+     * @constructor Create empty Local date time converter
+     */
     class LocalDateTimeConverter {
         @TypeConverter
         fun toInstant(epochSeconds: Long): Instant = Instant.ofEpochSecond(epochSeconds)
