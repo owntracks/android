@@ -164,9 +164,11 @@ class MapViewModel @Inject constructor(
     }
 
     fun sendLocation() {
-        currentLocation.value?.run {
-            Timber.d("Sending current location from user request: $this")
-            locationProcessor.onLocationChanged(this, REPORT_TYPE_USER)
+        viewModelScope.launch {
+            currentLocation.value?.run {
+                Timber.d("Sending current location from user request: $this")
+                locationProcessor.onLocationChanged(this, REPORT_TYPE_USER)
+            }
         }
     }
 

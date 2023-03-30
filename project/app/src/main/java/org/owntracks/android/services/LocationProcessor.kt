@@ -49,7 +49,7 @@ class LocationProcessor @Inject constructor(
     }
 
     @JvmOverloads
-    fun publishLocationMessage(
+    suspend fun publishLocationMessage(
         trigger: String?,
         location: Location? = locationRepo.currentPublishedLocation.value
     ) {
@@ -59,7 +59,7 @@ class LocationProcessor @Inject constructor(
             Timber.e("no location available, can't publish location")
             return
         }
-        val loadedWaypoints = waypointsRepo.all
+        val loadedWaypoints = withContext(ioDispatcher) { waypointsRepo.all }
         if (ignoreLowAccuracy(location)) return
 
         // Check if publish would trigger a region if fusedRegionDetection is enabled
@@ -112,7 +112,7 @@ class LocationProcessor @Inject constructor(
             .map { it.description }
             .toList()
 
-    fun onLocationChanged(location: Location, reportType: String?) {
+    suspend fun onLocationChanged(location: Location, reportType: String?) {
         locationRepo.setCurrentPublishedLocation(location)
         publishLocationMessage(reportType, location)
     }

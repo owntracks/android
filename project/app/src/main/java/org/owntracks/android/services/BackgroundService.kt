@@ -40,7 +40,6 @@ import org.owntracks.android.data.waypoints.WaypointsRepo
 import org.owntracks.android.data.waypoints.WaypointsRepo.WaypointAndOperation
 import org.owntracks.android.di.CoroutineScopes
 import org.owntracks.android.geocoding.GeocoderProvider
-import org.owntracks.android.gms.location.geofencing.GeofencingBroadcastReceiver
 import org.owntracks.android.location.*
 import org.owntracks.android.location.geofencing.Geofence
 import org.owntracks.android.location.geofencing.GeofencingClient
@@ -206,10 +205,12 @@ class BackgroundService :
             Timber.v("intent received with action:%s", intent.action)
             when (intent.action) {
                 INTENT_ACTION_SEND_LOCATION_USER -> {
-                    locationProcessor.publishLocationMessage(
-                        MessageLocation.REPORT_TYPE_USER,
-                        locationRepo.currentPublishedLocation.value
-                    )
+                    lifecycleScope.launch {
+                        locationProcessor.publishLocationMessage(
+                            MessageLocation.REPORT_TYPE_USER,
+                            locationRepo.currentPublishedLocation.value
+                        )
+                    }
                     return
                 }
                 INTENT_ACTION_SEND_EVENT_CIRCULAR -> {
@@ -536,7 +537,9 @@ class BackgroundService :
     fun onLocationChanged(location: Location, reportType: String) {
         Timber.v("location update received: $location, report type $reportType")
         if (location.time > locationRepo.currentLocationTime) {
-            locationProcessor.onLocationChanged(location, reportType)
+            lifecycleScope.launch {
+                locationProcessor.onLocationChanged(location, reportType)
+            }
         } else {
             Timber.v("Not re-sending message with same timestamp as last")
         }
@@ -614,24 +617,6 @@ class BackgroundService :
         return true
     }
 
-    private val geofencePendingIntent: PendingIntent
-        get() {
-            val geofenceIntent = Intent(this, GeofencingBroadcastReceiver::class.java)
-            geofenceIntent.action = INTENT_ACTION_SEND_EVENT_CIRCULAR
-            var intentFlags = 0
-            intentFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-            } else {
-                PendingIntent.FLAG_UPDATE_CURRENT
-            }
-            return PendingIntent.getBroadcast(
-                this,
-                INTENT_REQUEST_CODE_GEOFENCE,
-                geofenceIntent,
-                intentFlags
-            )
-        }
-
     private suspend fun setupGeofences() {
         if (missingLocationPermission()) {
             Timber.e("missing location permission")
@@ -654,7 +639,7 @@ class BackgroundService :
                 try {
                     geofences.add(
                         Geofence(
-                            java.lang.Long.toString(id),
+                            id.toString(),
                             Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT,
                             TimeUnit.MINUTES.toMillis(2)
                                 .toInt(),
@@ -669,10 +654,10 @@ class BackgroundService :
                     Timber.e(e, "Invalid geofence parameter")
                 }
             }
-            geofencingClient.removeGeofences(geofencePendingIntent)
+            geofencingClient.removeGeofences(this@BackgroundService)
             if (geofences.size > 0) {
                 val request = GeofencingRequest(Geofence.GEOFENCE_TRANSITION_ENTER, geofences)
-                geofencingClient.addGeofences(request, geofencePendingIntent)
+                geofencingClient.addGeofences(request, this@BackgroundService)
             }
         }
     }
@@ -698,7 +683,7 @@ class BackgroundService :
 
     private val eventsNotificationBuilder: NotificationCompat.Builder?
         get() {
-            if (!preferences!!.notificationEvents) return null
+            if (!preferences.notificationEvents) return null
             if (eventsNotificationCompatBuilder != null) return eventsNotificationCompatBuilder
             val openIntent = Intent(this, MapActivity::class.java)
             openIntent.action = "android.intent.action.MAIN"
@@ -721,7 +706,7 @@ class BackgroundService :
         }
 
     override fun onPreferenceChanged(properties: Set<String>) {
-        val propertiesWeCareAbout = java.util.List.of(
+        val propertiesWeCareAbout = listOf(
             "locatorInterval",
             "locatorDisplacement",
             "moveModeLocatorInterval",
@@ -769,7 +754,6 @@ class BackgroundService :
     }
 
     companion object {
-        private const val INTENT_REQUEST_CODE_GEOFENCE = 1264
         private const val INTENT_REQUEST_CODE_CLEAR_EVENTS = 1263
         private const val NOTIFICATION_ID_ONGOING = 1
         private const val NOTIFICATION_ID_EVENT_GROUP = 2

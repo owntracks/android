@@ -1,8 +1,8 @@
 package org.owntracks.android.location
 
 import android.location.Location
-import org.osmdroid.util.GeoPoint
 import kotlin.math.abs
+import org.osmdroid.util.GeoPoint
 
 class LatLng(latitude: Double, longitude: Double) {
     private val actualLatitude: Double = when {
