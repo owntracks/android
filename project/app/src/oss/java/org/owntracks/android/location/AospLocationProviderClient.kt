@@ -20,35 +20,35 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient(
         clientCallBack: LocationCallback,
         looper: Looper
     ) {
-        Timber.v("actuallyRequestLocationUpdates Thread : %s", Thread.currentThread())
-
-        gpsMyLocationProvider.stopLocationProvider()
         val listener = IMyLocationConsumer { location, _ ->
             clientCallBack.onLocationResult(LocationResult(location))
         }
-        gpsMyLocationProvider.clearLocationSources()
-        when (locationRequest.priority) {
-            PRIORITY_HIGH_ACCURACY -> {
-                gpsMyLocationProvider.addLocationSource("gps")
-                gpsMyLocationProvider.addLocationSource("network")
-                gpsMyLocationProvider.addLocationSource("passive")
+        val success = gpsMyLocationProvider.run {
+            stopLocationProvider()
+            clearLocationSources()
+            when (locationRequest.priority) {
+                PRIORITY_HIGH_ACCURACY -> {
+                    addLocationSource("gps")
+                    addLocationSource("network")
+                    addLocationSource("passive")
+                }
+                PRIORITY_BALANCED_POWER_ACCURACY -> {
+                    addLocationSource("gps")
+                    addLocationSource("network")
+                    addLocationSource("passive")
+                }
+                else -> {
+                    addLocationSource("network")
+                    addLocationSource("passive")
+                }
             }
-            PRIORITY_BALANCED_POWER_ACCURACY -> {
-                gpsMyLocationProvider.addLocationSource("gps")
-                gpsMyLocationProvider.addLocationSource("network")
-                gpsMyLocationProvider.addLocationSource("passive")
-            }
-            else -> {
-                gpsMyLocationProvider.addLocationSource("network")
-                gpsMyLocationProvider.addLocationSource("passive")
-            }
+            locationUpdateMinTime = locationRequest.interval.toMillis()
+            locationUpdateMinDistance = locationRequest.smallestDisplacement ?: 10f
+            startLocationProvider(listener)
         }
-        gpsMyLocationProvider.locationUpdateMinTime = locationRequest.interval.toMillis()
-        gpsMyLocationProvider.locationUpdateMinDistance =
-            locationRequest.smallestDisplacement
-                ?: 10f
-        gpsMyLocationProvider.startLocationProvider(listener)
-        callbackMap[clientCallBack] = listener
+        if (success) {
+            callbackMap[clientCallBack] = listener
+        }
     }
 
     override fun removeLocationUpdates(clientCallBack: LocationCallback) {

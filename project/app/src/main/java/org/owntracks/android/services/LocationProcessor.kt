@@ -54,13 +54,13 @@ class LocationProcessor @Inject constructor(
         location: Location? = locationRepo.currentPublishedLocation.value
     ) {
         if (location == null) return
-        Timber.v("publishLocationMessage. trigger: %s", trigger)
         if (locationRepo.currentPublishedLocation.value == null) {
             Timber.e("no location available, can't publish location")
             return
         }
         val loadedWaypoints = withContext(ioDispatcher) { waypointsRepo.all }
         if (ignoreLowAccuracy(location)) return
+        Timber.d("publishLocationMessage for $location triggered by $trigger")
 
         // Check if publish would trigger a region if fusedRegionDetection is enabled
         if (loadedWaypoints.isNotEmpty() &&
@@ -112,6 +112,12 @@ class LocationProcessor @Inject constructor(
             .map { it.description }
             .toList()
 
+    /**
+     * Called when a new location is received from the device, or directly from the user via the map
+     *
+     * @param location received from the device
+     * @param reportType type of report that
+     */
     suspend fun onLocationChanged(location: Location, reportType: String?) {
         locationRepo.setCurrentPublishedLocation(location)
         publishLocationMessage(reportType, location)

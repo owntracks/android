@@ -2,7 +2,6 @@ package org.owntracks.android.services
 
 import android.Manifest
 import android.app.Notification
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -66,13 +65,11 @@ class BackgroundService :
     LifecycleService(),
     ServiceBridgeInterface,
     Preferences.OnPreferenceChangeListener {
-    private var locationCallback: LocationCallback? = null
-    private var locationCallbackOnDemand: LocationCallback? = null
+    private lateinit var locationCallback: LocationCallback
+    private lateinit var locationCallbackOnDemand: LocationCallback
     private var lastLocationMessage: MessageLocation? = null
-    private var activeNotificationCompatBuilder: NotificationCompat.Builder? = null
-    private var eventsNotificationCompatBuilder: NotificationCompat.Builder? = null
-    private var notificationManager: NotificationManager? = null
-    private var notificationManagerCompat: NotificationManagerCompat? = null
+
+    private lateinit var notificationManagerCompat: NotificationManagerCompat
     private val activeNotifications = LinkedList<Spannable>()
     private var lastQueueLength = 0
     private var hasBeenStartedExplicitly = false
@@ -123,18 +120,78 @@ class BackgroundService :
     @CoroutineScopes.IoDispatcher
     lateinit var ioDispatcher: CoroutineDispatcher
 
+    // Active notification intents and builder
+    private val resultIntent by lazy {
+        Intent(this, MapActivity::class.java).setAction("android.intent.action.MAIN")
+            .addCategory("android.intent.category.LAUNCHER")
+            .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+    }
+    private val resultPendingIntent by lazy {
+        PendingIntent.getActivity(
+            this,
+            0,
+            resultIntent,
+            updateCurrentIntentFlags
+        )
+    }
+    private val publishPendingIntent by lazy {
+        PendingIntent.getService(
+            this,
+            0,
+            Intent().setAction(INTENT_ACTION_SEND_LOCATION_USER),
+            updateCurrentIntentFlags
+        )
+    }
+    private val changeMonitoringPendingIntent by lazy {
+        PendingIntent.getService(
+            this,
+            0,
+            Intent().setAction(
+                INTENT_ACTION_CHANGE_MONITORING
+            ),
+            updateCurrentIntentFlags
+        )
+    }
+    private val activeNotificationCompatBuilder: NotificationCompat.Builder by lazy {
+        NotificationCompat.Builder(this, App.NOTIFICATION_CHANNEL_ONGOING)
+            .setContentIntent(resultPendingIntent)
+            .setSortKey("a")
+            .addAction(
+                R.drawable.ic_baseline_publish_24,
+                getString(R.string.publish),
+                publishPendingIntent
+            )
+            .addAction(
+                R.drawable.ic_owntracks_80,
+                getString(R.string.notificationChangeMonitoring),
+                changeMonitoringPendingIntent
+            )
+            .setSmallIcon(R.drawable.ic_owntracks_80)
+            .setPriority(
+                if (preferences.notificationHigherPriority) {
+                    NotificationCompat.PRIORITY_DEFAULT
+                } else {
+                    NotificationCompat.PRIORITY_MIN
+                }
+            )
+            .setSound(null, AudioManager.STREAM_NOTIFICATION)
+            .setOngoing(true)
+            .setColor(getColor(R.color.OTPrimaryBlue))
+            .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+    }
+
     override fun onCreate() {
         super.onCreate()
         serviceBridge.bind(this)
         notificationManagerCompat = NotificationManagerCompat.from(this)
-        notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         locationCallback = object : LocationCallback {
             override fun onLocationAvailability(locationAvailability: LocationAvailability) {
-                Timber.d("location availability %s", locationAvailability)
+                Timber.d("location availability $locationAvailability")
             }
 
             override fun onLocationResult(locationResult: LocationResult) {
-                Timber.d("location result received: %s", locationResult)
+                Timber.d("location result received: $locationResult")
                 Timber.v("Idling location")
                 locationIdlingResource.setIdleState(true)
                 onLocationChanged(locationResult.lastLocation, MessageLocation.REPORT_TYPE_DEFAULT)
@@ -143,7 +200,7 @@ class BackgroundService :
         locationCallbackOnDemand = object : LocationCallback {
             override fun onLocationAvailability(locationAvailability: LocationAvailability) {}
             override fun onLocationResult(locationResult: LocationResult) {
-                Timber.d("BackgroundService On-demand location result received: %s", locationResult)
+                Timber.d("BackgroundService On-demand location result received: locationResult")
                 onLocationChanged(locationResult.lastLocation, MessageLocation.REPORT_TYPE_RESPONSE)
             }
         }
@@ -200,9 +257,14 @@ class BackgroundService :
         return START_STICKY
     }
 
+    /**
+     * We've been sent a start command with an intent, which usually means we've got to do something depending on the action
+     *
+     * @param intent that was passed to the service start command
+     */
     private fun handleIntent(intent: Intent) {
         if (intent.action != null) {
-            Timber.v("intent received with action:%s", intent.action)
+            Timber.v("intent received with action:${intent.action}")
             when (intent.action) {
                 INTENT_ACTION_SEND_LOCATION_USER -> {
                     lifecycleScope.launch {
@@ -213,6 +275,7 @@ class BackgroundService :
                     }
                     return
                 }
+                // This comes from the [GeofencingBroadcastReceiver]
                 INTENT_ACTION_SEND_EVENT_CIRCULAR -> {
                     lifecycleScope.launch {
                         onGeofencingEvent(fromIntent(intent))
@@ -241,10 +304,7 @@ class BackgroundService :
                         preferences.setMonitoringNext()
                     }
                     hasBeenStartedExplicitly = true
-                    notificationManager!!.cancel(
-                        BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG,
-                        0
-                    )
+                    notificationManagerCompat.cancel(BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG, 0)
                     return
                 }
                 INTENT_ACTION_BOOT_COMPLETED, INTENT_ACTION_PACKAGE_REPLACED -> {
@@ -262,7 +322,7 @@ class BackgroundService :
                     exit()
                     return
                 }
-                else -> Timber.v("unhandled intent action received: %s", intent.action)
+                else -> {}
             }
         } else {
             hasBeenStartedExplicitly = true
@@ -276,10 +336,11 @@ class BackgroundService :
     }
 
     private fun notifyUserOfBackgroundLocationRestriction() {
-        val activityLaunchIntent = Intent(applicationContext, MapActivity::class.java)
-        activityLaunchIntent.action = "android.intent.action.MAIN"
-        activityLaunchIntent.addCategory("android.intent.category.LAUNCHER")
-        activityLaunchIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+        val activityLaunchIntent =
+            Intent(applicationContext, MapActivity::class.java)
+                .setAction("android.intent.action.MAIN")
+                .addCategory("android.intent.category.LAUNCHER")
+                .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
         val notificationText = getString(R.string.backgroundLocationRestrictionNotificationText)
         val notificationTitle = getString(R.string.backgroundLocationRestrictionNotificationTitle)
         val notification = NotificationCompat.Builder(
@@ -305,86 +366,37 @@ class BackgroundService :
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setSilent(true)
             .build()
-        notificationManager!!.notify(
-            BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG,
-            0,
-            notification
-        )
+        notificationManagerCompat.notify(BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG, 0, notification)
     }
 
-    private val ongoingNotificationBuilder: NotificationCompat.Builder?
-        get() {
-            if (activeNotificationCompatBuilder != null) return activeNotificationCompatBuilder
-            val resultIntent = Intent(this, MapActivity::class.java)
-            resultIntent.action = "android.intent.action.MAIN"
-            resultIntent.addCategory("android.intent.category.LAUNCHER")
-            resultIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-            val resultPendingIntent =
-                PendingIntent.getActivity(this, 0, resultIntent, updateCurrentIntentFlags)
-            val publishIntent = Intent()
-            publishIntent.action = INTENT_ACTION_SEND_LOCATION_USER
-            val publishPendingIntent =
-                PendingIntent.getService(this, 0, publishIntent, updateCurrentIntentFlags)
-            publishIntent.action = INTENT_ACTION_CHANGE_MONITORING
-            val changeMonitoringPendingIntent =
-                PendingIntent.getService(this, 0, publishIntent, updateCurrentIntentFlags)
-            activeNotificationCompatBuilder =
-                NotificationCompat.Builder(this, App.NOTIFICATION_CHANNEL_ONGOING)
-                    .setContentIntent(resultPendingIntent)
-                    .setSortKey("a")
-                    .addAction(
-                        R.drawable.ic_baseline_publish_24,
-                        getString(R.string.publish),
-                        publishPendingIntent
-                    )
-                    .addAction(
-                        R.drawable.ic_owntracks_80,
-                        getString(R.string.notificationChangeMonitoring),
-                        changeMonitoringPendingIntent
-                    )
-                    .setSmallIcon(R.drawable.ic_owntracks_80)
-                    .setPriority(
-                        if (preferences.notificationHigherPriority) {
-                            NotificationCompat.PRIORITY_DEFAULT
-                        } else {
-                            NotificationCompat.PRIORITY_MIN
-                        }
-                    )
-                    .setSound(null, AudioManager.STREAM_NOTIFICATION)
-                    .setOngoing(true)
-            activeNotificationCompatBuilder!!.setColor(getColor(com.mikepenz.materialize.R.color.primary))
-                .setCategory(NotificationCompat.CATEGORY_SERVICE)
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            return activeNotificationCompatBuilder
-        }
-
     private fun updateOngoingNotification() {
-        notificationManager!!.notify(NOTIFICATION_ID_ONGOING, ongoingNotification)
+        notificationManagerCompat.notify(NOTIFICATION_ID_ONGOING, ongoingNotification)
     }
 
     // Show monitoring mode if endpoint state is not interesting
-    private val ongoingNotification: Notification?
-        get() {
-            val builder = ongoingNotificationBuilder ?: return null
-            if (lastLocationMessage != null && preferences.notificationLocation) {
-                builder.setContentTitle(lastLocationMessage!!.geocode)
-                builder.setWhen(TimeUnit.SECONDS.toMillis(lastLocationMessage!!.timestamp))
-                builder.setNumber(lastQueueLength)
-            } else {
-                builder.setContentTitle(getString(R.string.app_name))
+    private val ongoingNotification: Notification
+        get() =
+            activeNotificationCompatBuilder.apply {
+                if (lastLocationMessage != null && preferences.notificationLocation) {
+                    setContentTitle(lastLocationMessage!!.geocode)
+                    setWhen(TimeUnit.SECONDS.toMillis(lastLocationMessage!!.timestamp))
+                    setNumber(lastQueueLength)
+                } else {
+                    setContentTitle(getString(R.string.app_name))
+                }
+                // Show monitoring mode if endpoint state is not interesting
+                val lastEndpointState = endpointStateRepo.endpointStateLiveData.value
+                if (lastEndpointState === EndpointState.CONNECTED || lastEndpointState === EndpointState.IDLE) {
+                    setContentText(getMonitoringLabel(preferences.monitoring))
+                } else if (lastEndpointState === EndpointState.ERROR && lastEndpointState.message != null) {
+                    setContentText(
+                        lastEndpointState.getLabel(this@BackgroundService) + ": " + lastEndpointState.message
+                    )
+                } else {
+                    setContentText(lastEndpointState!!.getLabel(this@BackgroundService))
+                }
             }
-
-            // Show monitoring mode if endpoint state is not interesting
-            val lastEndpointState = endpointStateRepo.endpointStateLiveData.value
-            if (lastEndpointState === EndpointState.CONNECTED || lastEndpointState === EndpointState.IDLE) {
-                builder.setContentText(getMonitoringLabel(preferences.monitoring))
-            } else if (lastEndpointState === EndpointState.ERROR && lastEndpointState.message != null) {
-                builder.setContentText(lastEndpointState.getLabel(this) + ": " + lastEndpointState.message)
-            } else {
-                builder.setContentText(lastEndpointState!!.getLabel(this))
-            }
-            return builder.build()
-        }
+                .build()
 
     private fun getMonitoringLabel(mode: MonitoringMode): String {
         return when (mode) {
@@ -396,73 +408,49 @@ class BackgroundService :
     }
 
     override fun sendEventNotification(message: MessageTransition) {
-        val builder = eventsNotificationBuilder
-        if (builder == null) {
-            Timber.e("no builder returned")
+        Timber.d("Sending event notification for $message")
+        if (!preferences.notificationEvents) {
             return
         }
-        val c = contactsRepo.getById(message.contactKey)
+        val contact = contactsRepo.getById(message.contactKey)
         val timestampInMs = TimeUnit.SECONDS.toMillis(message.timestamp)
-        var location = message.description
-        if (location == null) {
-            location = getString(R.string.aLocation)
-        }
-        var title = message.trackerId
-        if (c != null) {
-            title = c.fusedName
-        } else if (title == null) {
-            title = message.contactKey
-        }
-        val text = String.format(
-            "%s %s",
-            getString(
-                if (message.getTransition() == Geofence.GEOFENCE_TRANSITION_ENTER) {
-                    R.string.transitionEntering
-                } else {
-                    R.string.transitionLeaving
-                }
-            ),
-            location
+        val location = message.description ?: getString(R.string.aLocation)
+        val title = contact?.fusedName ?: message.trackerId ?: message.contactKey
+        val transitionText = getString(
+            if (message.getTransition() == Geofence.GEOFENCE_TRANSITION_ENTER) {
+                R.string.transitionEntering
+            } else {
+                R.string.transitionLeaving
+            }
         )
-        eventsNotificationCompatBuilder!!.setContentTitle(title)
-        eventsNotificationCompatBuilder!!.setContentText(text)
-        eventsNotificationCompatBuilder!!.setWhen(TimeUnit.SECONDS.toMillis(message.timestamp))
-        eventsNotificationCompatBuilder!!.setShowWhen(true)
-        eventsNotificationCompatBuilder!!.setGroup(NOTIFICATION_GROUP_EVENTS)
-
-        // Deliver notification
-        val n = eventsNotificationCompatBuilder!!.build()
-        sendEventStackNotification(title, text, Date(timestampInMs))
-    }
-
-    private fun sendEventStackNotification(title: String, text: String, timestamp: Date) {
-        Timber.v("SDK_INT >= 23, building stack notification")
-        val whenStr = formatDate(timestamp)
-        val newLine: Spannable = SpannableString(String.format("%s %s %s", whenStr, title, text))
-        newLine.setSpan(
-            StyleSpan(Typeface.BOLD),
-            0,
-            whenStr.length + 1,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        val eventText = "$transitionText $location"
+        val whenStr = formatDate(timestampInMs)
+        activeNotifications.push(
+            SpannableString("$whenStr $title $eventText").apply {
+                setSpan(
+                    StyleSpan(Typeface.BOLD),
+                    0,
+                    whenStr.length + 1,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
         )
-        activeNotifications.push(newLine)
-        Timber.v("groupedNotifications: %s", activeNotifications.size)
+        Timber.v("groupedNotifications: ${activeNotifications.size}")
         val summary = resources.getQuantityString(
             R.plurals.notificationEventsTitle,
             activeNotifications.size,
             activeNotifications.size
         )
         val inbox = NotificationCompat.InboxStyle()
-        inbox.setSummaryText(summary)
-        for (n in activeNotifications) {
-            inbox.addLine(n)
-        }
-        val builder = NotificationCompat.Builder(this, App.NOTIFICATION_CHANNEL_EVENTS)
+            .setSummaryText(summary)
+        activeNotifications.forEach { inbox.addLine(it) }
+
+        NotificationCompat.Builder(this, App.NOTIFICATION_CHANNEL_EVENTS)
             .setContentTitle(getString(R.string.events))
             .setContentText(summary)
             .setGroup(NOTIFICATION_GROUP_EVENTS) // same as group of single notifications
             .setGroupSummary(true)
-            .setColor(getColor(com.mikepenz.materialize.R.color.primary))
+            .setColor(getColor(R.color.OTPrimaryBlue))
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setSmallIcon(R.drawable.ic_owntracks_80)
@@ -489,12 +477,14 @@ class BackgroundService :
                     updateCurrentIntentFlags
                 )
             )
-        val stackNotification = builder.build()
-        notificationManagerCompat!!.notify(
-            NOTIFICATION_GROUP_EVENTS,
-            NOTIFICATION_ID_EVENT_GROUP,
-            stackNotification
-        )
+            .build()
+            .run {
+                notificationManagerCompat.notify(
+                    NOTIFICATION_GROUP_EVENTS,
+                    NOTIFICATION_ID_EVENT_GROUP,
+                    this
+                )
+            }
     }
 
     private fun clearEventStackNotification() {
@@ -518,6 +508,7 @@ class BackgroundService :
                 try {
                     waypointsRepo.get(requestId.toLong())
                         ?.run {
+                            Timber.d("onWaypointTransition triggered by geofencing event")
                             locationProcessor.onWaypointTransition(
                                 this,
                                 event.triggeringLocation,
@@ -562,7 +553,7 @@ class BackgroundService :
         Timber.d("On demand location request")
         locationProviderClient.requestLocationUpdates(
             request,
-            locationCallbackOnDemand!!,
+            locationCallbackOnDemand,
             runThingsOnOtherThreads.getBackgroundLooper()
         )
     }
@@ -607,11 +598,11 @@ class BackgroundService :
             interval,
             null
         )
-        Timber.d("location update request params: %s", request)
+        Timber.d("location update request params: $request")
         locationProviderClient.flushLocations()
         locationProviderClient.requestLocationUpdates(
             request,
-            locationCallback!!,
+            locationCallback,
             runThingsOnOtherThreads.getBackgroundLooper()
         )
         return true
@@ -629,12 +620,7 @@ class BackgroundService :
             val geofences = LinkedList<Geofence>()
             for ((id, description, geofenceLatitude, geofenceLongitude, geofenceRadius) in waypoints) {
                 Timber.d(
-                    "id:%s, desc:%s, lat:%s, lon:%s, rad:%s",
-                    id,
-                    description,
-                    geofenceLatitude,
-                    geofenceLongitude,
-                    geofenceRadius
+                    "id:$id, desc:$description, lat:$geofenceLatitude, lon:$geofenceLongitude, rad:$geofenceRadius"
                 )
                 try {
                     geofences.add(
@@ -680,30 +666,6 @@ class BackgroundService :
             updateOngoingNotification()
         }
     }
-
-    private val eventsNotificationBuilder: NotificationCompat.Builder?
-        get() {
-            if (!preferences.notificationEvents) return null
-            if (eventsNotificationCompatBuilder != null) return eventsNotificationCompatBuilder
-            val openIntent = Intent(this, MapActivity::class.java)
-            openIntent.action = "android.intent.action.MAIN"
-            openIntent.addCategory("android.intent.category.LAUNCHER")
-            openIntent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-            val openPendingIntent =
-                PendingIntent.getActivity(this, 0, openIntent, updateCurrentIntentFlags)
-            eventsNotificationCompatBuilder =
-                NotificationCompat.Builder(this, App.NOTIFICATION_CHANNEL_EVENTS)
-                    .setContentIntent(openPendingIntent)
-                    .setSmallIcon(R.drawable.ic_baseline_add_24)
-                    .setAutoCancel(true)
-                    .setShowWhen(true)
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                    .setCategory(NotificationCompat.CATEGORY_SERVICE)
-                    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            eventsNotificationCompatBuilder!!.color =
-                getColor(com.mikepenz.materialize.R.color.primary)
-            return eventsNotificationCompatBuilder
-        }
 
     override fun onPreferenceChanged(properties: Set<String>) {
         val propertiesWeCareAbout = listOf(

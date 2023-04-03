@@ -18,8 +18,8 @@ class LocationRepo @Inject constructor() {
     val currentLocationTime: Long
         get() = currentPublishedLocation.value?.time ?: 0
 
-    fun setCurrentPublishedLocation(l: Location) {
-        currentPublishedLocation.postValue(l)
+    fun setCurrentPublishedLocation(location: Location) {
+        currentPublishedLocation.value = location
     }
 
     var currentBlueDotOnMapLocation: LatLng? = null
