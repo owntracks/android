@@ -142,13 +142,13 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_15
+        targetCompatibility = JavaVersion.VERSION_15
         isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        jvmTarget = JavaVersion.VERSION_15.toString()
     }
 
     flavorDimensions.add("locationProvider")
@@ -211,6 +211,7 @@ dependencies {
     implementation(libs.apache.httpcore)
     implementation(libs.commons.codec)
     implementation(libs.androidx.room.runtime)
+    implementation("com.growse:lmdb-kt:0.1-SNAPSHOT")
 
     // The BC version shipped under com.android is half-broken. Weird certificate issues etc.
     // To solve, we bring in our own version of BC
