@@ -11,9 +11,7 @@ class InMemoryWaypointsRepo : WaypointsRepo() {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getByTst(instant: Instant): WaypointModel? {
-        TODO("Not yet implemented")
-    }
+    override suspend fun getByTst(instant: Instant): WaypointModel? = waypoints.firstOrNull { it.tst == instant }
 
     override val all: List<WaypointModel>
         get() = waypoints

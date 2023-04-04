@@ -49,7 +49,7 @@ class FusedContact(id: String?) : BaseObservable() {
 
     @get:Bindable
     val fusedName: String
-        get() = messageCard?.name ?: trackerId
+        get() = (messageCard?.name ?: trackerId)
 
     @get:Bindable
     val fusedLocationAccuracy: Int

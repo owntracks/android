@@ -285,7 +285,7 @@ class MapActivity :
      */
     private fun checkAndRequestLocationServicesEnabled(explicitUserAction: Boolean): Boolean {
         return if (!requirementsChecker.isLocationServiceEnabled()) {
-            Timber.d(Exception(), "Location Services disabled")
+            Timber.d("Location Services disabled")
             if ((explicitUserAction || !preferences.userDeclinedEnableLocationServices)) {
                 if (!this::locationServicesAlertDialog.isInitialized) {
                     locationServicesAlertDialog = MaterialAlertDialogBuilder(this).setCancelable(true)

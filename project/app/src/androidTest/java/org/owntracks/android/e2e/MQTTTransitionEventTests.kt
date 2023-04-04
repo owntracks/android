@@ -157,7 +157,6 @@ class MQTTTransitionEventTests :
         writeTo(R.id.radius, "100")
 
         clickOnAndWait(R.id.save)
-
         reportLocationFromMap(app.locationIdlingResource) {
             setMockLocation(waypointLatitude, waypointLongitude)
         }

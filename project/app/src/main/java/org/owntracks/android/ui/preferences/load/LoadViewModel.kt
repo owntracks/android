@@ -54,6 +54,9 @@ class LoadViewModel @Inject constructor(
     private fun setConfiguration(json: String) {
         when (val message = parser.fromJson(json.toByteArray())) {
             is MessageConfiguration -> {
+                if (message.hasTrackerId()) {
+                    message[preferences::tid.name] = message.trackerId
+                }
                 configuration = message
                 try {
                     mutableConfig.postValue(parser.toUnencryptedJsonPretty(message))
@@ -90,7 +93,7 @@ class LoadViewModel @Inject constructor(
                     waypointsRepo.importFromMessage(waypoints)
                 }
             }
-            Timber.d("Setting importstatus to saved")
+            Timber.d("Setting ImportStatus to saved")
             mutableImportStatus.postValue(ImportStatus.SAVED)
             importStatusIdlingResource.setIdleState(true)
         }

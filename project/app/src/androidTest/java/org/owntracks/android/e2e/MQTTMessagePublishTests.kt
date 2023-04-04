@@ -246,7 +246,6 @@ class MQTTMessagePublishTests :
 
         openDrawer()
         clickOnAndWait(R.string.title_activity_contacts)
-
         assertRecyclerViewItemCount(R.id.contactsRecyclerView, 1)
         assertDisplayedAtPosition(R.id.contactsRecyclerView, 0, R.id.name, deviceId)
 

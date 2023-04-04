@@ -91,23 +91,24 @@ class LocationProcessor @Inject constructor(
             Timber.v("message suppressed by monitoring settings: manual")
             return
         }
-        val message: MessageLocation
-        if (preferences.pubExtendedData) {
-            message = fromLocationAndWifiInfo(location, wifiInfoProvider)
-            message.battery = deviceMetricsProvider.batteryLevel
-            message.batteryStatus = deviceMetricsProvider.batteryStatus
-            message.conn = deviceMetricsProvider.connectionType
-            message.monitoringMode = preferences.monitoring
+        val message = if (preferences.pubExtendedData) {
+            fromLocationAndWifiInfo(location, wifiInfoProvider).apply {
+                battery = deviceMetricsProvider.batteryLevel
+                batteryStatus = deviceMetricsProvider.batteryStatus
+                conn = deviceMetricsProvider.connectionType
+                monitoringMode = preferences.monitoring
+            }
         } else {
-            message = fromLocation(location, Build.VERSION.SDK_INT)
+            fromLocation(location, Build.VERSION.SDK_INT)
+        }.apply {
+            this.trigger = trigger
+            trackerId = preferences.tid.value
+            inregions = calculateInRegions(loadedWaypoints)
         }
-        message.trigger = trigger
-        message.trackerId = preferences.tid.value
-        message.inregions = calculateInregions(loadedWaypoints)
         messageProcessor.queueMessageForSending(message)
     }
 
-    private fun calculateInregions(loadedWaypoints: List<WaypointModel>): List<String> =
+    private fun calculateInRegions(loadedWaypoints: List<WaypointModel>): List<String> =
         loadedWaypoints.filter { it.lastTransition == Geofence.GEOFENCE_TRANSITION_ENTER }
             .map { it.description }
             .toList()
@@ -139,11 +140,13 @@ class LocationProcessor @Inject constructor(
         }
 
         scope.launch {
-            // If the region status is unknown, send transition only if the device is inside
-            if (waypointModel.isUnknown() && transition == Geofence.GEOFENCE_TRANSITION_ENTER) {
+            // If the transition hasn't changed, or has moved from unknown to exit, don't notify.
+            if (transition == waypointModel.lastTransition ||
+                (waypointModel.isUnknown() && transition == Geofence.GEOFENCE_TRANSITION_EXIT)
+            ) {
                 waypointModel.lastTransition = transition
                 waypointsRepo.update(waypointModel, false)
-            } else if (transition != waypointModel.lastTransition) {
+            } else {
                 waypointModel.lastTransition = transition
                 waypointModel.lastTriggered = Instant.now()
                 waypointsRepo.update(waypointModel, false)
