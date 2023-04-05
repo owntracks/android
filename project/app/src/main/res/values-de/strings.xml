@@ -17,6 +17,8 @@
     <string name="backgroundLocationRestrictionNotificationText">"Diese Version von Android limitiert OwnTracks Standortzugriff im Hintergrund, bis die App geöffnet wird. Antippen dieser Benachrichtigung öffnet die App und fängt an den Standort aufzuzeichnen."</string>
     <string name="backgroundLocationRestrictionNotificationTitle">"Standortverfolgung pausiert"</string>
     <string name="batteryOptimizationWhitelistDialogButtonLabel">"Akkuoptimierungseinstellungen"</string>
+
+    <!-- Fuzzy -->
     <string name="batteryOptimizationWhitelistDialogMessage">"Es kann von Vorteil sein OwnTracks von der Akkuoptimierung zu entfernen damit es Kontakt mit dem Server beibehalten kann."</string>
     <string name="batteryOptimizationWhitelistDialogTitle">"Batterieoptimierung"</string>
     <string name="cancel">"Abbrechen"</string>
@@ -182,14 +184,13 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="preferencesServer">"Verbindung"</string>
     <string name="preferencesTheme">"Aussehen"</string>
     <string name="preferencesTrackerId">"Tracker-ID"</string>
+
+    <!-- Fuzzy -->
     <string name="preferencesUsername">"Benutzername"</string>
     <string name="preferencesWebsocket">"WebSockets nutzen"</string>
     <string name="publish">"Bericht"</string>
     <string name="radius">"Radius"</string>
     <string name="reconnect">"Neu verbinden"</string>
-    <string name="waypoint_region_inside">"Aktuell innerhalb"</string>
-    <string name="waypoint_region_outside">"Aktuell außerhalb"</string>
-    <string name="waypoint_region_unknown">"Status unbekannt"</string>
     <string name="save">"Speichern"</string>
     <string name="select">"Auswählen"</string>
     <string name="show_options">"Optionen anzeigen"</string>
@@ -205,15 +206,28 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="title_activity_contacts">"Freunde"</string>
     <string name="title_activity_map">"Karte"</string>
     <string name="title_activity_preferences">"Einstellungen"</string>
-    <string name="title_activity_waypoint">"Ort"</string>
-    <string name="title_activity_waypoints">"Orte"</string>
     <string name="title_activity_status">"Status"</string>
+
+    <!-- Fuzzy -->
+    <string name="title_activity_waypoint">"Ort"</string>
+
+    <!-- Fuzzy -->
+    <string name="title_activity_waypoints">"Orte"</string>
     <string name="title_exit">"App beenden"</string>
     <string name="transitionEntering">"betritt"</string>
     <string name="transitionLeaving">"verlässt"</string>
     <string name="unableToCopyCertificate">"Kopieren des Zertifikats auf internen Speicher fehlgeschlagen"</string>
     <string name="version">"Version"</string>
     <string name="viewLogs">"Logs ansehen"</string>
+
+    <!-- Fuzzy -->
+    <string name="waypoint_region_inside">"Aktuell innerhalb"</string>
+
+    <!-- Fuzzy -->
+    <string name="waypoint_region_outside">"Aktuell außerhalb"</string>
+
+    <!-- Fuzzy -->
+    <string name="waypoint_region_unknown">"Status unbekannt"</string>
     <string name="waypointListPlaceholder">"Keine Orte angelegt"</string>
     <string name="welcome_description">"Die folgenden Schritte werden Dir helfen, OwnTracks einzurichten"</string>
     <string name="welcome_heading">"Willkommen"</string>

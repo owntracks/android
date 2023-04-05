@@ -119,13 +119,12 @@
     <string name="preferencesReverseGeocodeProvider">"逆地理编码服务提供商"</string>
     <string name="preferencesServer">"连接"</string>
     <string name="preferencesTheme">"主题"</string>
+
+    <!-- Fuzzy -->
     <string name="preferencesUsername">"用户名"</string>
     <string name="preferencesWebsocket">"使用 WebSockets"</string>
     <string name="radius">"半径"</string>
     <string name="reconnect">"重新连接"</string>
-    <string name="waypoint_region_inside">"目前位于"</string>
-    <string name="waypoint_region_outside">"目前不在"</string>
-    <string name="waypoint_region_unknown">"未知状态"</string>
     <string name="save">"保存"</string>
     <string name="status_background_service_started_hint">"后台服务启动时间"</string>
     <string name="status_battery_optimization_whitelisted_hint">"未优化电池使用量"</string>
@@ -134,15 +133,28 @@
     <string name="title_activity_contacts">"好友"</string>
     <string name="title_activity_map">"地图"</string>
     <string name="title_activity_preferences">"首选项"</string>
-    <string name="title_activity_waypoint">"区域"</string>
-    <string name="title_activity_waypoints">"区域"</string>
     <string name="title_activity_status">"状态"</string>
+
+    <!-- Fuzzy -->
+    <string name="title_activity_waypoint">"区域"</string>
+
+    <!-- Fuzzy -->
+    <string name="title_activity_waypoints">"区域"</string>
     <string name="title_exit">"退出应用"</string>
     <string name="transitionEntering">"到达"</string>
     <string name="transitionLeaving">"离开"</string>
     <string name="unableToCopyCertificate">"无法将证书复制到内部存储空间"</string>
     <string name="version">"版本"</string>
     <string name="viewLogs">"查看日志"</string>
+
+    <!-- Fuzzy -->
+    <string name="waypoint_region_inside">"目前位于"</string>
+
+    <!-- Fuzzy -->
+    <string name="waypoint_region_outside">"目前不在"</string>
+
+    <!-- Fuzzy -->
+    <string name="waypoint_region_unknown">"未知状态"</string>
     <string name="waypointListPlaceholder">"还未定义区域"</string>
 
     <!-- Fuzzy -->

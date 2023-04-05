@@ -17,6 +17,8 @@
     <string name="backgroundLocationRestrictionNotificationText">"This version of Android restricts OwnTracks from receiving locations when started in the background until the app is opened. Click this notification to open the app and start tracking location."</string>
     <string name="backgroundLocationRestrictionNotificationTitle">"Location Tracking Paused"</string>
     <string name="batteryOptimizationWhitelistDialogButtonLabel">"Battery optimization settings"</string>
+
+    <!-- Fuzzy -->
     <string name="batteryOptimizationWhitelistDialogMessage">"Whitelisting OwnTracks from battery optimization may help it more reliably track locations and maintain contact with the server."</string>
     <string name="batteryOptimizationWhitelistDialogTitle">"Battery Optimization"</string>
     <string name="cancel">"İptal"</string>
@@ -208,18 +210,21 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesRepository">"Source Code"</string>
     <string name="preferencesReverseGeocodeProvider">"Reverse Geocode Provider"</string>
     <string name="preferencesServer">"Connection"</string>
+
+    <!-- Fuzzy -->
     <string name="preferencesShowWaypointsOnMap">"Show Regions"</string>
+
+    <!-- Fuzzy -->
     <string name="preferencesShowWaypointsOnMapSummary">"Draw region circles on the map"</string>
     <string name="preferencesTheme">"Theme"</string>
     <string name="preferencesTrackerId">"Tracker ID"</string>
+
+    <!-- Fuzzy -->
     <string name="preferencesUsername">"Username"</string>
     <string name="preferencesWebsocket">"Use WebSockets"</string>
     <string name="publish">"Report"</string>
     <string name="radius">"Radius"</string>
     <string name="reconnect">"Reconnect"</string>
-    <string name="waypoint_region_inside">"Currently inside"</string>
-    <string name="waypoint_region_outside">"Currently outside"</string>
-    <string name="waypoint_region_unknown">"Status unknown"</string>
     <string name="save">"Kaydet"</string>
     <string name="select">"Seç"</string>
     <string name="show_options">"Seçenekleri göster"</string>
@@ -235,15 +240,28 @@ To allow this, please enable Location in the device settings."</string>
     <string name="title_activity_contacts">"Arkadaşlar"</string>
     <string name="title_activity_map">"Harita"</string>
     <string name="title_activity_preferences">"Tercihler"</string>
-    <string name="title_activity_waypoint">"Bölge"</string>
-    <string name="title_activity_waypoints">"Bölgeler"</string>
     <string name="title_activity_status">"Durum"</string>
+
+    <!-- Fuzzy -->
+    <string name="title_activity_waypoint">"Bölge"</string>
+
+    <!-- Fuzzy -->
+    <string name="title_activity_waypoints">"Bölgeler"</string>
     <string name="title_exit">"Uygulamadan çık"</string>
     <string name="transitionEntering">"enters"</string>
     <string name="transitionLeaving">"leaves"</string>
     <string name="unableToCopyCertificate">"Unable to copy certificate to internal storage"</string>
     <string name="version">"Versiyon"</string>
     <string name="viewLogs">"Günlükleri Görüntüle"</string>
+
+    <!-- Fuzzy -->
+    <string name="waypoint_region_inside">"Currently inside"</string>
+
+    <!-- Fuzzy -->
+    <string name="waypoint_region_outside">"Currently outside"</string>
+
+    <!-- Fuzzy -->
+    <string name="waypoint_region_unknown">"Status unknown"</string>
     <string name="waypointListPlaceholder">"No regions defined yet"</string>
     <string name="welcome_connection_setup_description">"OwnTracks works by sending your location data to a server that you (or someone you trust) owns, making sure you remain in control of your data.
 

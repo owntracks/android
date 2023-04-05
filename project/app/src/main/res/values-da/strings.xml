@@ -17,6 +17,8 @@
     <string name="backgroundLocationRestrictionNotificationText">"Denne version af Android blokerer OwnTracks fra at modtage positioner i baggrunden før app'en er blevet åbnet. Tryk på denne notifikation for at åbne app'en og starte sporing af position."</string>
     <string name="backgroundLocationRestrictionNotificationTitle">"Positionssporing pauseret"</string>
     <string name="batteryOptimizationWhitelistDialogButtonLabel">"Batterioptimering indstillinger"</string>
+
+    <!-- Fuzzy -->
     <string name="batteryOptimizationWhitelistDialogMessage">"Fritagelse fra batterioptimering kan hjælpe OwnTracks med at spore position mere pålideligt og holde kontakt med serveren."</string>
     <string name="batteryOptimizationWhitelistDialogTitle">"Batterioptimering"</string>
     <string name="cancel">"Anullér"</string>
@@ -200,18 +202,21 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="preferencesRepository">"Klidekode"</string>
     <string name="preferencesReverseGeocodeProvider">"Udbyder af baglæns geokodning"</string>
     <string name="preferencesServer">"Forbindelse"</string>
+
+    <!-- Fuzzy -->
     <string name="preferencesShowWaypointsOnMap">"Vis Regioner"</string>
+
+    <!-- Fuzzy -->
     <string name="preferencesShowWaypointsOnMapSummary">"Vis regionscirkler på kortet"</string>
     <string name="preferencesTheme">"Tema"</string>
     <string name="preferencesTrackerId">"Tracker ID"</string>
+
+    <!-- Fuzzy -->
     <string name="preferencesUsername">"Brugernavn"</string>
     <string name="preferencesWebsocket">"Brug WebSockets"</string>
     <string name="publish">"Rapport"</string>
     <string name="radius">"Radius"</string>
     <string name="reconnect">"Genforbind"</string>
-    <string name="waypoint_region_inside">"I øjeblikket indenfor"</string>
-    <string name="waypoint_region_outside">"I øjeblikket udenfor"</string>
-    <string name="waypoint_region_unknown">"Ukendt status"</string>
     <string name="save">"Gem"</string>
     <string name="select">"Vælg"</string>
     <string name="show_options">"Vis muligheder"</string>
@@ -227,15 +232,28 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="title_activity_contacts">"Venner"</string>
     <string name="title_activity_map">"Kort"</string>
     <string name="title_activity_preferences">"Præferencer"</string>
-    <string name="title_activity_waypoint">"Region"</string>
-    <string name="title_activity_waypoints">"Regioner"</string>
     <string name="title_activity_status">"Status"</string>
+
+    <!-- Fuzzy -->
+    <string name="title_activity_waypoint">"Region"</string>
+
+    <!-- Fuzzy -->
+    <string name="title_activity_waypoints">"Regioner"</string>
     <string name="title_exit">"Luk app"</string>
     <string name="transitionEntering">"bevæger sig ind i"</string>
     <string name="transitionLeaving">"forlader"</string>
     <string name="unableToCopyCertificate">"Kan ikke kopiere certifikat til internt lager"</string>
     <string name="version">"Version"</string>
     <string name="viewLogs">"Se Logs"</string>
+
+    <!-- Fuzzy -->
+    <string name="waypoint_region_inside">"I øjeblikket indenfor"</string>
+
+    <!-- Fuzzy -->
+    <string name="waypoint_region_outside">"I øjeblikket udenfor"</string>
+
+    <!-- Fuzzy -->
+    <string name="waypoint_region_unknown">"Ukendt status"</string>
     <string name="waypointListPlaceholder">"Ingen regioner defineret endnu"</string>
     <string name="welcome_connection_setup_description">"OwnTracks fungerer ved at sende din position til en server som du (eller en du stoler på) ejer, hvilket sikrer at du kontrollerer din data.
 

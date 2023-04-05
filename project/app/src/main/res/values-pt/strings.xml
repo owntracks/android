@@ -85,6 +85,8 @@
     <string name="preferencesRepository">"Código fonte"</string>
     <string name="preferencesServer">"Conexão"</string>
     <string name="preferencesTrackerId">"ID Tracker"</string>
+
+    <!-- Fuzzy -->
     <string name="preferencesUsername">"Utilizador"</string>
     <string name="preferencesWebsocket">"Usa Websockets"</string>
     <string name="publish">"Reportar"</string>
@@ -94,9 +96,13 @@
     <string name="title_activity_contacts">"Amigos"</string>
     <string name="title_activity_map">"Mapa"</string>
     <string name="title_activity_preferences">"Preferências"</string>
-    <string name="title_activity_waypoint">"Região"</string>
-    <string name="title_activity_waypoints">"Regiões"</string>
     <string name="title_activity_status">"Estado"</string>
+
+    <!-- Fuzzy -->
+    <string name="title_activity_waypoint">"Região"</string>
+
+    <!-- Fuzzy -->
+    <string name="title_activity_waypoints">"Regiões"</string>
     <string name="title_exit">"Sair"</string>
     <string name="transitionEntering">"Entradas"</string>
     <string name="transitionLeaving">"Saidas"</string>

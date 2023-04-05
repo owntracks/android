@@ -21,6 +21,8 @@
     <string name="backgroundLocationRestrictionNotificationText">"Ваша версия Android ограничивает возможность определения местоположения при автоматическом запуске приложения до его открытия. Нажмите на это уведомление, чтобы открыть OwnTracks и начать отслеживание местоположения."</string>
     <string name="backgroundLocationRestrictionNotificationTitle">"Отслеживание местоположения приостановлено"</string>
     <string name="batteryOptimizationWhitelistDialogButtonLabel">"Настройки оптимизации энергопотребления"</string>
+
+    <!-- Fuzzy -->
     <string name="batteryOptimizationWhitelistDialogMessage">"Добавление OwnTracks в исключения сервиса оптимизации энергопотребления может помочь надежно отслеживать ваши местоположения и обеспечит бесперебойную связь с сервером."</string>
     <string name="batteryOptimizationWhitelistDialogTitle">"Оптимизация энергопотребления"</string>
     <string name="cancel">"Отмена"</string>
@@ -214,20 +216,23 @@
     <string name="preferencesRepository">"Исходный код"</string>
     <string name="preferencesReverseGeocodeProvider">"Геокодирование"</string>
     <string name="preferencesServer">"Подключение к серверу"</string>
+
+    <!-- Fuzzy -->
     <string name="preferencesShowWaypointsOnMap">"Показывать места"</string>
+
+    <!-- Fuzzy -->
     <string name="preferencesShowWaypointsOnMapSummary">"Отображать окружность для известных мест на карте"</string>
     <string name="preferencesTheme">"Тема"</string>
 
     <!-- but contactDetailsTrackerId is untranslated? -->
     <string name="preferencesTrackerId">"Метка на карте"</string>
+
+    <!-- Fuzzy -->
     <string name="preferencesUsername">"Пользователь"</string>
     <string name="preferencesWebsocket">"Использовать WebSockets"</string>
     <string name="publish">"Сообщить местоположение"</string>
     <string name="radius">"Радиус"</string>
     <string name="reconnect">"Переподключение"</string>
-    <string name="waypoint_region_inside">"Сейчас в этом месте"</string>
-    <string name="waypoint_region_outside">"Сейчас вне этого места"</string>
-    <string name="waypoint_region_unknown">"Статус неизвестен"</string>
     <string name="save">"Сохранить"</string>
     <string name="select">"Выбрать"</string>
     <string name="show_options">"Показать настройки"</string>
@@ -243,15 +248,28 @@
     <string name="title_activity_contacts">"Друзья"</string>
     <string name="title_activity_map">"Карта"</string>
     <string name="title_activity_preferences">"Настройки"</string>
-    <string name="title_activity_waypoint">"Место"</string>
-    <string name="title_activity_waypoints">"Места"</string>
     <string name="title_activity_status">"Статус"</string>
+
+    <!-- Fuzzy -->
+    <string name="title_activity_waypoint">"Место"</string>
+
+    <!-- Fuzzy -->
+    <string name="title_activity_waypoints">"Места"</string>
     <string name="title_exit">"Выход"</string>
     <string name="transitionEntering">"прибыл(а) в"</string>
     <string name="transitionLeaving">"покинул(а)"</string>
     <string name="unableToCopyCertificate">"Невозможно скопировать сертификат во внутреннее хранилище"</string>
     <string name="version">"Версия"</string>
     <string name="viewLogs">"Просмотр журнала"</string>
+
+    <!-- Fuzzy -->
+    <string name="waypoint_region_inside">"Сейчас в этом месте"</string>
+
+    <!-- Fuzzy -->
+    <string name="waypoint_region_outside">"Сейчас вне этого места"</string>
+
+    <!-- Fuzzy -->
+    <string name="waypoint_region_unknown">"Статус неизвестен"</string>
     <string name="waypointListPlaceholder">"Места еще не обозначены"</string>
     <string name="welcome_connection_setup_description">"OwnTracks в процессе работы отправляет данные о вашем местоположении на сервер, которым владеете вы или кто-то, кому вы доверяете, тем самым гарантируя, что ваши данные контролируются только вами.
 

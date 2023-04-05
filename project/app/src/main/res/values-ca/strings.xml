@@ -17,6 +17,8 @@
     <string name="backgroundLocationRestrictionNotificationText">"Aquesta versió d'Android impedeix a OwnTracks rebre ubicacions quan s'inicia en segon pla fins que s'obre l'aplicació. Feu clic a aquesta notificació per obrir l'aplicació i començar a fer el seguiment de la ubicació."</string>
     <string name="backgroundLocationRestrictionNotificationTitle">"Seguiment d'ubicació en pausa"</string>
     <string name="batteryOptimizationWhitelistDialogButtonLabel">"Configuració d'optimització de la bateria"</string>
+
+    <!-- Fuzzy -->
     <string name="batteryOptimizationWhitelistDialogMessage">"Posar OwnTracks a la llista de l'optimització de la bateria pot ajudar-lo a fer un seguiment més fiable de les ubicacions i del contacte principal amb el servidor."</string>
     <string name="batteryOptimizationWhitelistDialogTitle">"Optimització de la bateria"</string>
     <string name="cancel">"Cancel·la"</string>
@@ -200,20 +202,25 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="preferencesRemoteConfigurationSummary">"Activa la configuració per actualitzar-se remotament (requereix comandes remotes) "</string>
     <string name="preferencesReporting">"Informes"</string>
     <string name="preferencesRepository">"Codi font"</string>
+    <string name="preferencesRepublishOnReconnect">"Publicar la ubicació a MQTT connect"</string>
+    <string name="preferencesRepublishOnReconnectSummary">"Publiqueu la darrera ubicació coneguda i les dades actuals ampliades immediatament en connectar-vos a MQTT"</string>
     <string name="preferencesReverseGeocodeProvider">"Proveïdor de geocodificació inversa"</string>
     <string name="preferencesServer">"Connexió"</string>
+
+    <!-- Fuzzy -->
     <string name="preferencesShowWaypointsOnMap">"Mostra regions"</string>
+
+    <!-- Fuzzy -->
     <string name="preferencesShowWaypointsOnMapSummary">" preferencesShowRegionsOnMapSummary "</string>
     <string name="preferencesTheme">"Tema"</string>
     <string name="preferencesTrackerId">"Tracker ID"</string>
+
+    <!-- Fuzzy -->
     <string name="preferencesUsername">"Nom d'usuari"</string>
     <string name="preferencesWebsocket">"Utilitza WebSockets"</string>
     <string name="publish">"Informe"</string>
     <string name="radius">"Radi"</string>
     <string name="reconnect">"Reconnectar"</string>
-    <string name="waypoint_region_inside">"Actualment dins"</string>
-    <string name="waypoint_region_outside">"Actualment fora"</string>
-    <string name="waypoint_region_unknown">"Estat desconegut"</string>
     <string name="save">"Desa"</string>
     <string name="select">"Seleccionar"</string>
     <string name="show_options">"Veure opcions"</string>
@@ -229,15 +236,28 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="title_activity_contacts">"Amics"</string>
     <string name="title_activity_map">"Mapa"</string>
     <string name="title_activity_preferences">"Preferències"</string>
-    <string name="title_activity_waypoint">"Regió"</string>
-    <string name="title_activity_waypoints">"Regions"</string>
     <string name="title_activity_status">"Estat"</string>
+
+    <!-- Fuzzy -->
+    <string name="title_activity_waypoint">"Regió"</string>
+
+    <!-- Fuzzy -->
+    <string name="title_activity_waypoints">"Regions"</string>
     <string name="title_exit">"Sortir"</string>
     <string name="transitionEntering">"entra"</string>
     <string name="transitionLeaving">"surt"</string>
     <string name="unableToCopyCertificate">"Impossible copiar certificat a emmagatzematge intern"</string>
     <string name="version">"Versió"</string>
     <string name="viewLogs">"Veure informes"</string>
+
+    <!-- Fuzzy -->
+    <string name="waypoint_region_inside">"Actualment dins"</string>
+
+    <!-- Fuzzy -->
+    <string name="waypoint_region_outside">"Actualment fora"</string>
+
+    <!-- Fuzzy -->
+    <string name="waypoint_region_unknown">"Estat desconegut"</string>
     <string name="waypointListPlaceholder">"Cap regió definida"</string>
     <string name="welcome_connection_setup_description">"OwnTracks funciona enviant les vostres dades d'ubicació a un servidor vostre (o d'algú de la vostra confiança), per estar segurs que manteniu el control de les vostres dades.
 

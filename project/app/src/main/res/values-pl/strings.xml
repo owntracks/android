@@ -19,6 +19,8 @@
     <string name="backgroundLocationRestrictionNotificationText">"Ta wersja Androida ogranicza OwnTracks możliwość odbierania lokalizacji po uruchomieniu w tle, dopóki aplikacja nie zostanie otwarta. Kliknij to powiadomienie, aby otworzyć aplikację i rozpocząć śledzenie lokalizacji."</string>
     <string name="backgroundLocationRestrictionNotificationTitle">"Śledzenie pozycji wstrzymane"</string>
     <string name="batteryOptimizationWhitelistDialogButtonLabel">"Ustawienia optymalizacji baterii"</string>
+
+    <!-- Fuzzy -->
     <string name="batteryOptimizationWhitelistDialogMessage">"Dodanie OwnTracks do białej listy procesu optymalizacji baterii może pomóc w dokładniejszym śledzeniu pozycji i komunikacji z serwerem."</string>
     <string name="batteryOptimizationWhitelistDialogTitle">"Optymalizacja baterii"</string>
     <string name="cancel">"Anuluj"</string>
@@ -206,18 +208,21 @@ Aby to umożliwić, włącz lokalizację w ustawieniach urządzenia."</string>
     <string name="preferencesRepository">"Kod źródłowy"</string>
     <string name="preferencesReverseGeocodeProvider">"Dostawca usługi odwrotnego geokodowania"</string>
     <string name="preferencesServer">"Połączenie"</string>
+
+    <!-- Fuzzy -->
     <string name="preferencesShowWaypointsOnMap">"Pokaż obszary"</string>
+
+    <!-- Fuzzy -->
     <string name="preferencesShowWaypointsOnMapSummary">"Rysuj okręgi obszarów na mapie"</string>
     <string name="preferencesTheme">"Motyw"</string>
     <string name="preferencesTrackerId">"ID Trackera"</string>
+
+    <!-- Fuzzy -->
     <string name="preferencesUsername">"Nazwa użytkownika"</string>
     <string name="preferencesWebsocket">"Używaj WebSockets"</string>
     <string name="publish">"Zgłoś"</string>
     <string name="radius">"Zasięg"</string>
     <string name="reconnect">"Połącz ponownie"</string>
-    <string name="waypoint_region_inside">"Aktualnie wewnątrz"</string>
-    <string name="waypoint_region_outside">"Aktualnie na zewnątrz"</string>
-    <string name="waypoint_region_unknown">"Status nieznany"</string>
     <string name="save">"Zapisz"</string>
     <string name="select">"Wybierz"</string>
     <string name="show_options">"Pokaż opcje"</string>
@@ -233,15 +238,28 @@ Aby to umożliwić, włącz lokalizację w ustawieniach urządzenia."</string>
     <string name="title_activity_contacts">"Znajomi"</string>
     <string name="title_activity_map">"Mapa"</string>
     <string name="title_activity_preferences">"Ustawienia"</string>
-    <string name="title_activity_waypoint">"Obszar"</string>
-    <string name="title_activity_waypoints">"Obszary"</string>
     <string name="title_activity_status">"Status"</string>
+
+    <!-- Fuzzy -->
+    <string name="title_activity_waypoint">"Obszar"</string>
+
+    <!-- Fuzzy -->
+    <string name="title_activity_waypoints">"Obszary"</string>
     <string name="title_exit">"Wyjdź z aplikacji"</string>
     <string name="transitionEntering">"wchodzi"</string>
     <string name="transitionLeaving">"opuszcza"</string>
     <string name="unableToCopyCertificate">"Nie można skopiować certyfikatu do pamięci wewnętrznej"</string>
     <string name="version">"Wersja"</string>
     <string name="viewLogs">"Zobacz logi"</string>
+
+    <!-- Fuzzy -->
+    <string name="waypoint_region_inside">"Aktualnie wewnątrz"</string>
+
+    <!-- Fuzzy -->
+    <string name="waypoint_region_outside">"Aktualnie na zewnątrz"</string>
+
+    <!-- Fuzzy -->
+    <string name="waypoint_region_unknown">"Status nieznany"</string>
     <string name="waypointListPlaceholder">"Nie zdefiniowano obszarów"</string>
     <string name="welcome_connection_setup_description">"OwnTracks działa poprzez wysyłanie danych o Twojej lokalizacji do serwera, którego właścicielem jesteś Ty (lub ktoś, komu ufasz), co daje Ci pewność, że zachowujesz kontrolę nad swoimi danymi.
 

@@ -18,6 +18,8 @@
     <string name="backgroundLocationRestrictionNotificationText">"Tato verze Androidu omezuje OwnTracks zjišťovat polohu při spuštění na pozadí, dokud není aplikace otevřena. Kliknutím na toto oznámení otevřete aplikaci a zahájíte sledování polohy."</string>
     <string name="backgroundLocationRestrictionNotificationTitle">"Sledování polohy pozastaveno"</string>
     <string name="batteryOptimizationWhitelistDialogButtonLabel">"Nastavení optimalizace baterie"</string>
+
+    <!-- Fuzzy -->
     <string name="batteryOptimizationWhitelistDialogMessage">"Vyjmutí OwnTracks z optimalizace baterie může pomoci spolehlivěji sledovat polohu a udržet spojení se serverem."</string>
     <string name="batteryOptimizationWhitelistDialogTitle">"Optimalizace baterie"</string>
     <string name="cancel">"Zrušit"</string>
@@ -200,20 +202,25 @@ Chcete-li to umožnit, zapněte polohu v nastavení zařízení."</string>
     <string name="preferencesRemoteConfigurationSummary">"Zapnout vzdálenou aktualizaci konfigurace (Vyžaduje vzdálené příkazy)"</string>
     <string name="preferencesReporting">"Hlášení"</string>
     <string name="preferencesRepository">"Zdrojový kód"</string>
+    <string name="preferencesRepublishOnReconnect">"Po připojení k MQTT zveřejni polohu"</string>
+    <string name="preferencesRepublishOnReconnectSummary">"Ihned po připojení k MQTT zveřejni poslední známou polohu a rozšířená data"</string>
     <string name="preferencesReverseGeocodeProvider">"Poskytovatel reverzního geokódu"</string>
     <string name="preferencesServer">"Připojení"</string>
+
+    <!-- Fuzzy -->
     <string name="preferencesShowWaypointsOnMap">"Ukázat oblasti"</string>
+
+    <!-- Fuzzy -->
     <string name="preferencesShowWaypointsOnMapSummary">"Vykreslit kruhy oblasti na mapě"</string>
     <string name="preferencesTheme">"Vzhled aplikace"</string>
     <string name="preferencesTrackerId">"Tracker ID"</string>
+
+    <!-- Fuzzy -->
     <string name="preferencesUsername">"Uživatelské jméno"</string>
     <string name="preferencesWebsocket">"Použít WebSockets"</string>
     <string name="publish">"Ohlásit"</string>
     <string name="radius">"Poloměr"</string>
     <string name="reconnect">"Znovu připojit"</string>
-    <string name="waypoint_region_inside">"Nyní vevnitř"</string>
-    <string name="waypoint_region_outside">"Nyní venku"</string>
-    <string name="waypoint_region_unknown">"Stav neznámý"</string>
     <string name="save">"Uložit"</string>
     <string name="select">"Vybrat"</string>
     <string name="show_options">"Zobrazit možnosti"</string>
@@ -229,15 +236,28 @@ Chcete-li to umožnit, zapněte polohu v nastavení zařízení."</string>
     <string name="title_activity_contacts">"Přátelé"</string>
     <string name="title_activity_map">"Mapa"</string>
     <string name="title_activity_preferences">"Nastavení"</string>
-    <string name="title_activity_waypoint">"Oblast"</string>
-    <string name="title_activity_waypoints">"Oblasti"</string>
     <string name="title_activity_status">"Status"</string>
+
+    <!-- Fuzzy -->
+    <string name="title_activity_waypoint">"Oblast"</string>
+
+    <!-- Fuzzy -->
+    <string name="title_activity_waypoints">"Oblasti"</string>
     <string name="title_exit">"Ukončit aplikaci"</string>
     <string name="transitionEntering">"vstupuje"</string>
     <string name="transitionLeaving">"opouští"</string>
     <string name="unableToCopyCertificate">"Nelze nakopírovat certifikát do vnitřního úložiště"</string>
     <string name="version">"Verze"</string>
     <string name="viewLogs">"Zobrazit protokoly"</string>
+
+    <!-- Fuzzy -->
+    <string name="waypoint_region_inside">"Nyní vevnitř"</string>
+
+    <!-- Fuzzy -->
+    <string name="waypoint_region_outside">"Nyní venku"</string>
+
+    <!-- Fuzzy -->
+    <string name="waypoint_region_unknown">"Stav neznámý"</string>
     <string name="waypointListPlaceholder">"Oblasti nejsou definovány"</string>
     <string name="welcome_connection_setup_description">"Služba OwnTracks funguje tak, že odesílá data o vaší poloze na server, který vlastníte vy (nebo někdo, komu důvěřujete), takže máte svá data i nadále pod kontrolou.
 

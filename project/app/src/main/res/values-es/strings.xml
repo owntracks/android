@@ -150,14 +150,13 @@
     <string name="preferencesReverseGeocodeProvider">"Geocodificación"</string>
     <string name="preferencesServer">"Conexión"</string>
     <string name="preferencesTrackerId">"Tracker ID"</string>
+
+    <!-- Fuzzy -->
     <string name="preferencesUsername">"Nombre de Usuario"</string>
     <string name="preferencesWebsocket">"Usar WebSockets"</string>
     <string name="publish">"Reportar"</string>
     <string name="radius">"Radio"</string>
     <string name="reconnect">"Reconectar"</string>
-    <string name="waypoint_region_inside">"Actualmente dentro"</string>
-    <string name="waypoint_region_outside">"Actualmente fuera"</string>
-    <string name="waypoint_region_unknown">"Estado desconocido"</string>
     <string name="save">"Guardar"</string>
     <string name="select">"Seleccione"</string>
     <string name="show_options">"Mostrar opciones"</string>
@@ -171,15 +170,28 @@
     <string name="title_activity_contacts">"Amigos"</string>
     <string name="title_activity_map">"Mapa"</string>
     <string name="title_activity_preferences">"Preferencias"</string>
-    <string name="title_activity_waypoint">"Región"</string>
-    <string name="title_activity_waypoints">"Regiones"</string>
     <string name="title_activity_status">"Estado"</string>
+
+    <!-- Fuzzy -->
+    <string name="title_activity_waypoint">"Región"</string>
+
+    <!-- Fuzzy -->
+    <string name="title_activity_waypoints">"Regiones"</string>
     <string name="title_exit">"Salir de la aplicación"</string>
     <string name="transitionEntering">"entra"</string>
     <string name="transitionLeaving">"sale"</string>
     <string name="unableToCopyCertificate">"No se pudo copiar el certificado al almacenamiento interno"</string>
     <string name="version">"Versión"</string>
     <string name="viewLogs">"Ver registros"</string>
+
+    <!-- Fuzzy -->
+    <string name="waypoint_region_inside">"Actualmente dentro"</string>
+
+    <!-- Fuzzy -->
+    <string name="waypoint_region_outside">"Actualmente fuera"</string>
+
+    <!-- Fuzzy -->
+    <string name="waypoint_region_unknown">"Estado desconocido"</string>
     <string name="waypointListPlaceholder">"No hay regiones definidas"</string>
     <string name="welcome_description">"Los siguientes pasos te ayudarán a comenzar con OwnTracks"</string>
     <string name="welcome_heading">"Bienvenido"</string>

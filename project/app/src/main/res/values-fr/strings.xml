@@ -186,22 +186,21 @@
 
     <!-- In french, connection is "connexion" -->
     <string name="preferencesServer">"Connection"</string>
+
+    <!-- Fuzzy -->
     <string name="preferencesShowWaypointsOnMap">"Afficher les régions"</string>
+
+    <!-- Fuzzy -->
     <string name="preferencesShowWaypointsOnMapSummary">"Dessiner des cercles de régions sur la carte"</string>
     <string name="preferencesTheme">"Thème"</string>
     <string name="preferencesTrackerId">"Tracker ID"</string>
+
+    <!-- Fuzzy -->
     <string name="preferencesUsername">"Nom d'utilisateur"</string>
     <string name="preferencesWebsocket">"WebSockets"</string>
     <string name="publish">"Envoyer"</string>
     <string name="radius">"Rayon"</string>
     <string name="reconnect">"Reconnecter"</string>
-
-    <!-- Fuzzy -->
-    <string name="waypoint_region_inside">"Actuellement à l'intérieur"</string>
-
-    <!-- Fuzzy -->
-    <string name="waypoint_region_outside">"Actuellement à l'extérieur"</string>
-    <string name="waypoint_region_unknown">"Statut inconnu"</string>
     <string name="save">"Sauvegarder"</string>
     <string name="select">"Sélectionner"</string>
 
@@ -221,15 +220,28 @@
     <string name="title_activity_contacts">"Amis"</string>
     <string name="title_activity_map">"Carte"</string>
     <string name="title_activity_preferences">"Préférences"</string>
-    <string name="title_activity_waypoint">"Région"</string>
-    <string name="title_activity_waypoints">"Régions"</string>
     <string name="title_activity_status">"Statut"</string>
+
+    <!-- Fuzzy -->
+    <string name="title_activity_waypoint">"Région"</string>
+
+    <!-- Fuzzy -->
+    <string name="title_activity_waypoints">"Régions"</string>
     <string name="title_exit">"Quitter"</string>
     <string name="transitionEntering">"entré"</string>
     <string name="transitionLeaving">"sorti"</string>
     <string name="unableToCopyCertificate">"Impossible de copier le certificat sur le stockage interne"</string>
     <string name="version">"Version"</string>
     <string name="viewLogs">"Voir le journal"</string>
+
+    <!-- Fuzzy -->
+    <string name="waypoint_region_inside">"Actuellement à l'intérieur"</string>
+
+    <!-- Fuzzy -->
+    <string name="waypoint_region_outside">"Actuellement à l'extérieur"</string>
+
+    <!-- Fuzzy -->
+    <string name="waypoint_region_unknown">"Statut inconnu"</string>
     <string name="waypointListPlaceholder">"Aucune région définie"</string>
     <string name="welcome_connection_setup_title">"Configurer une connexion"</string>
     <string name="welcome_description">"Les étapes suivantes vous aideront à démarrer avec OwnTracks"</string>
