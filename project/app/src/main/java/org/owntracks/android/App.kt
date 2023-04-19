@@ -20,8 +20,10 @@ import dagger.hilt.android.HiltAndroidApp
 import java.security.Security
 import javax.inject.Inject
 import javax.inject.Provider
+import kotlinx.coroutines.Job
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.conscrypt.Conscrypt
+import org.owntracks.android.data.waypoints.RoomWaypointsRepo
 import org.owntracks.android.di.CustomBindingComponentBuilder
 import org.owntracks.android.di.CustomBindingEntryPoint
 import org.owntracks.android.geocoding.GeocoderProvider
@@ -59,6 +61,9 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
 
     @Inject
     lateinit var locationIdleResource: SimpleIdlingResource
+
+    @Inject
+    lateinit var waypointsRepo: RoomWaypointsRepo
 
     val workManagerFailedToInitialize = MutableLiveData(false)
 
@@ -112,6 +117,12 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
         setThemeFromPreferences()
         appShortcuts.enableShortcuts(this)
 
+        waypointsRepo.migrateFromLegacyStorage()
+            .invokeOnCompletion {
+                Timber.tag("TOOT")
+                    .i("Migration Complete")
+            }
+
         // Notifications can be sent from multiple places, so let's make sure we've got the channels in place
         createNotificationChannels()
     }
@@ -121,9 +132,11 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
             AppTheme.AUTO -> AppCompatDelegate.setDefaultNightMode(
                 Preferences.SYSTEM_NIGHT_AUTO_MODE
             )
+
             AppTheme.DARK -> AppCompatDelegate.setDefaultNightMode(
                 AppCompatDelegate.MODE_NIGHT_YES
             )
+
             AppTheme.LIGHT -> AppCompatDelegate.setDefaultNightMode(
                 AppCompatDelegate.MODE_NIGHT_NO
             )

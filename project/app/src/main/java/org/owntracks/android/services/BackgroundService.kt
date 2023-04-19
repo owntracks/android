@@ -26,6 +26,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.stream.Collectors
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -219,14 +220,14 @@ class BackgroundService :
         // Every time a waypoint is inserted, updated or deleted, we need to update the geofences, and maybe publish that
         // waypoint
         waypointsRepo.operations.observe(this) { (operation, waypoint): WaypointAndOperation ->
-            when (operation) {
-                WaypointsRepo.Operation.INSERT,
-                WaypointsRepo.Operation.UPDATE -> locationProcessor.publishWaypointMessage(waypoint)
-                else -> {}
-            }
-            lifecycleScope.launch {
-                setupGeofences()
-            }
+//            when (operation) {
+//                WaypointsRepo.Operation.INSERT,
+//                WaypointsRepo.Operation.UPDATE -> locationProcessor.publishWaypointMessage(waypoint)
+//                else -> {}
+//            }
+//            lifecycleScope.launch {
+//                setupGeofences()
+//            }
         }
         lifecycleScope.launch {
             setupGeofences()
@@ -615,33 +616,21 @@ class BackgroundService :
         }
         withContext(ioDispatcher) {
             val waypoints = waypointsRepo.all
-
             Timber.i("Setting up geofences for ${waypoints.size} waypoints")
-            val geofences = LinkedList<Geofence>()
-            for ((id, description, geofenceLatitude, geofenceLongitude, geofenceRadius) in waypoints) {
-                Timber.d(
-                    "id:$id, desc:$description, lat:$geofenceLatitude, lon:$geofenceLongitude, rad:$geofenceRadius"
+            val geofences = waypoints.map {
+                Geofence(
+                    it.id.toString(),
+                    Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT,
+                    2.minutes.inWholeMilliseconds.toInt(),
+                    it.geofenceLatitude,
+                    it.geofenceLongitude,
+                    it.geofenceRadius.toFloat(),
+                    Geofence.NEVER_EXPIRE,
+                    null
                 )
-                try {
-                    geofences.add(
-                        Geofence(
-                            id.toString(),
-                            Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT,
-                            TimeUnit.MINUTES.toMillis(2)
-                                .toInt(),
-                            geofenceLatitude,
-                            geofenceLongitude,
-                            geofenceRadius.toFloat(),
-                            Geofence.NEVER_EXPIRE,
-                            null
-                        )
-                    )
-                } catch (e: IllegalArgumentException) {
-                    Timber.e(e, "Invalid geofence parameter")
-                }
-            }
+            }.toList()
             geofencingClient.removeGeofences(this@BackgroundService)
-            if (geofences.size > 0) {
+            if (geofences.isNotEmpty()) {
                 val request = GeofencingRequest(Geofence.GEOFENCE_TRANSITION_ENTER, geofences)
                 geofencingClient.addGeofences(request, this@BackgroundService)
             }

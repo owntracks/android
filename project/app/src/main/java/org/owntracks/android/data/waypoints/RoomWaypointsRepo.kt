@@ -3,18 +3,27 @@ package org.owntracks.android.data.waypoints
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.growse.lmdb_kt.Environment
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.owntracks.android.di.ApplicationScope
 import org.owntracks.android.di.CoroutineScopes
+import timber.log.Timber
 
 @Singleton
 class RoomWaypointsRepo @Inject constructor(
-    @ApplicationContext applicationContext: Context,
-    @CoroutineScopes.IoDispatcher val ioDispatcher: CoroutineDispatcher
+    @ApplicationContext private val applicationContext: Context,
+    @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @ApplicationScope private val scope: CoroutineScope
 ) : WaypointsRepo() {
     @Dao
     interface WaypointDao {
@@ -35,6 +44,9 @@ class RoomWaypointsRepo @Inject constructor(
 
         @Delete
         fun delete(waypointModel: WaypointModel)
+
+        @Insert
+        fun insertAll(waypoints: List<WaypointModel>)
     }
 
     @Database(entities = [WaypointModel::class], version = 1)
@@ -79,6 +91,68 @@ class RoomWaypointsRepo @Inject constructor(
     override suspend fun deleteImpl(waypointModel: WaypointModel) = withContext(ioDispatcher) {
         db.waypointDao()
             .delete(waypointModel)
+    }
+
+    private suspend fun insertAll(waypoints: List<WaypointModel>) = withContext(ioDispatcher) {
+        db.waypointDao()
+            .insertAll(waypoints)
+    }
+
+    fun migrateFromLegacyStorage(): Job {
+        return scope.launch(ioDispatcher) {
+            try {
+                Environment(
+                    applicationContext.filesDir.resolve("objectbox/objectbox")
+                        .toString(),
+                    readOnly = true,
+                    locking = false
+                ).use {
+                    it.beginTransaction()
+                        .dump()
+                        .filter { entry ->
+                            entry.key.bytes.slice(0..3) ==
+                                listOf<Byte>(0x18, 0, 0, 0x4)
+                        }
+                        .map { lmdbEntry ->
+                            makeModel(lmdbEntry.value)
+                        }
+                        .toList()
+                        .run {
+                            this@RoomWaypointsRepo.insertAll(this)
+                        }
+                }
+            } catch (throwable: Throwable) {
+                Timber.tag("TOOT")
+                    .e(throwable, "Error importing waypoints from legacy storage")
+            }
+        }
+    }
+
+    private fun makeModel(value: ByteArray): WaypointModel {
+        ByteBuffer.wrap(value)
+            .run {
+                order(ByteOrder.LITTLE_ENDIAN)
+                position(0x20)
+                val id = long
+                val longitude = double
+                val latitude = double
+                val lastTransition = int
+                val radius = int
+                val tst = long
+                position(0x54)
+                val descriptionLength = int
+                val description = ByteArray(descriptionLength)
+                get(description)
+                return WaypointModel(
+                    id,
+                    String(description),
+                    latitude,
+                    longitude,
+                    radius,
+                    lastTransition = lastTransition,
+                    tst = Instant.ofEpochSecond(tst)
+                )
+            }
     }
 
     /**

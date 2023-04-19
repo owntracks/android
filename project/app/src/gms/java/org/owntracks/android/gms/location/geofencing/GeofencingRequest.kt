@@ -24,7 +24,8 @@ fun Geofence.toGMSGeofence(): com.google.android.gms.location.Geofence {
                 builder.setCircularRegion(
                     this.circularLatitude,
                     this.circularLongitude,
-                    this.circularRadius
+                    //GMS geofences need to have a radius of at least 1
+                    if (this.circularRadius < 1) 1f else this.circularRadius
                 )
             }
         }
