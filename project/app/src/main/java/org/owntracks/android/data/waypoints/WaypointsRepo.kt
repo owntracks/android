@@ -2,9 +2,8 @@ package org.owntracks.android.data.waypoints
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 import java.time.Instant
+import kotlinx.coroutines.flow.StateFlow
 import org.owntracks.android.model.messages.MessageWaypoint
 import org.owntracks.android.support.MessageWaypointCollection
 

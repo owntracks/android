@@ -3,6 +3,8 @@ package org.owntracks.android.data.waypoints
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import java.time.Instant
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class InMemoryWaypointsRepo : WaypointsRepo() {
     private val waypoints = mutableListOf<WaypointModel>()
@@ -30,4 +32,7 @@ class InMemoryWaypointsRepo : WaypointsRepo() {
     override suspend fun deleteImpl(waypointModel: WaypointModel) {
         TODO("Not yet implemented")
     }
+
+    override val migrationCompleteFlow: StateFlow<Boolean>
+        get() = MutableStateFlow(true)
 }

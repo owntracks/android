@@ -13,7 +13,6 @@ import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -48,7 +47,7 @@ class RoomWaypointsRepo @Inject constructor(
         @Delete
         fun delete(waypointModel: WaypointModel)
 
-        @Insert
+        @Insert(onConflict = OnConflictStrategy.REPLACE)
         fun insertAll(waypoints: List<WaypointModel>)
 
         @Query("SELECT COUNT(*) FROM WaypointModel")
@@ -105,41 +104,59 @@ class RoomWaypointsRepo @Inject constructor(
     fun migrateFromLegacyStorage(): Job {
         return scope.launch(ioDispatcher) {
             try {
-                Environment(
-                    applicationContext.filesDir.resolve("objectbox/objectbox")
-                        .toString(),
-                    readOnly = true,
-                    locking = false
-                ).use {
-                    it.beginTransaction()
-                        .dump()
-                        .filter { entry ->
-                            entry.key.bytes.slice(0..3) ==
-                                listOf<Byte>(0x18, 0, 0, 0x4)
-                        }
-                        .map { lmdbEntry ->
-                            deserializeWaypointModel(lmdbEntry.value)
-                        }
-                        .toList()
-                        .run {
-                            db.waypointDao()
-                                .insertAll(this)
-                                .also {
-                                    Timber.tag("TOOT")
-                                        .i(
-                                            "Waypoints Migration complete. Tried to insert ${this.size}, ended up with ${
-                                                db.waypointDao()
-                                                    .getRowCount()
-                                            } waypoints in the repo"
-                                        )
-                                }
-                        }
+                val objectboxPath = applicationContext.filesDir.resolve("objectbox/objectbox")
+                if (objectboxPath.exists() && objectboxPath.canRead() && objectboxPath.isDirectory) {
+                    Environment(
+                        applicationContext.filesDir.resolve("objectbox/objectbox")
+                            .toString(),
+                        readOnly = true,
+                        locking = false
+                    ).use {
+                        it.beginTransaction()
+                            .dump()
+                            .filter { entry ->
+                                entry.key.bytes.slice(0..3) ==
+                                    listOf<Byte>(0x18, 0, 0, 0x4)
+                            }
+                            .map { lmdbEntry ->
+                                deserializeWaypointModel(lmdbEntry.value)
+                            }
+                            .toList()
+                            .also {
+                                Timber.tag("TOOT")
+                                    .w(
+                                        "Ids are: ${
+                                            it.map { it.id }
+                                                .joinToString(",")
+                                        }"
+                                    )
+                            }
+                            .run {
+                                db.waypointDao()
+                                    .insertAll(this)
+                                    .also {
+                                        Timber.tag("TOOT")
+                                            .i(
+                                                "Waypoints Migration complete. Tried to insert ${this.size}, ended up with ${
+                                                    db.waypointDao()
+                                                        .getRowCount()
+                                                } waypoints in the repo"
+                                            )
+                                    }
+                            }
+                            .run {
+                                val deleted = applicationContext.filesDir.resolve("objectbox")
+                                    .deleteRecursively()
+                                Timber.tag("TOOT")
+                                    .d("Deleting legacy waypoints database file. Success=$deleted")
+                            }
+                    }
                 }
             } catch (throwable: Throwable) {
                 Timber.tag("TOOT")
                     .e(throwable, "Error importing waypoints from legacy storage")
             } finally {
-                _migrationCompleteFlow.compareAndSet(false, true)
+                _migrationCompleteFlow.compareAndSet(expect = false, update = true)
             }
         }
     }
