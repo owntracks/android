@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.StrictMode
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.MutableLiveData
@@ -20,7 +21,6 @@ import dagger.hilt.android.HiltAndroidApp
 import java.security.Security
 import javax.inject.Inject
 import javax.inject.Provider
-import kotlinx.coroutines.Job
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.conscrypt.Conscrypt
 import org.owntracks.android.data.waypoints.RoomWaypointsRepo
@@ -119,8 +119,26 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
 
         waypointsRepo.migrateFromLegacyStorage()
             .invokeOnCompletion {
-                Timber.tag("TOOT")
-                    .i("Migration Complete")
+                it?.run {
+                    NotificationCompat.Builder(
+                        applicationContext,
+                        GeocoderProvider.ERROR_NOTIFICATION_CHANNEL_ID
+                    )
+                        .setContentTitle(getString(R.string.waypointMigrationErrorNotificationTitle))
+                        .setContentText(getString(R.string.waypointMigrationErrorNotificationText))
+                        .setAutoCancel(true)
+                        .setSmallIcon(R.drawable.ic_owntracks_80)
+                        .setStyle(
+                            NotificationCompat.BigTextStyle()
+                                .bigText(getString(R.string.waypointMigrationErrorNotificationText))
+                        )
+                        .setPriority(NotificationCompat.PRIORITY_LOW)
+                        .setSilent(true)
+                        .build()
+                        .run {
+                            notificationManager.notify("WaypointsMigrationNotification", 0, this)
+                        }
+                }
             }
 
         // Notifications can be sent from multiple places, so let's make sure we've got the channels in place

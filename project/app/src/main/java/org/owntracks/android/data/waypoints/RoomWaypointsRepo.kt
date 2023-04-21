@@ -13,6 +13,9 @@ import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.owntracks.android.di.ApplicationScope
@@ -47,6 +50,9 @@ class RoomWaypointsRepo @Inject constructor(
 
         @Insert
         fun insertAll(waypoints: List<WaypointModel>)
+
+        @Query("SELECT COUNT(*) FROM WaypointModel")
+        fun getRowCount(): Int
     }
 
     @Database(entities = [WaypointModel::class], version = 1)
@@ -93,10 +99,8 @@ class RoomWaypointsRepo @Inject constructor(
             .delete(waypointModel)
     }
 
-    private suspend fun insertAll(waypoints: List<WaypointModel>) = withContext(ioDispatcher) {
-        db.waypointDao()
-            .insertAll(waypoints)
-    }
+    private val _migrationCompleteFlow = MutableStateFlow(false)
+    override val migrationCompleteFlow: StateFlow<Boolean> = _migrationCompleteFlow
 
     fun migrateFromLegacyStorage(): Job {
         return scope.launch(ioDispatcher) {
@@ -114,26 +118,38 @@ class RoomWaypointsRepo @Inject constructor(
                                 listOf<Byte>(0x18, 0, 0, 0x4)
                         }
                         .map { lmdbEntry ->
-                            makeModel(lmdbEntry.value)
+                            deserializeWaypointModel(lmdbEntry.value)
                         }
                         .toList()
                         .run {
-                            this@RoomWaypointsRepo.insertAll(this)
+                            db.waypointDao()
+                                .insertAll(this)
+                                .also {
+                                    Timber.tag("TOOT")
+                                        .i(
+                                            "Waypoints Migration complete. Tried to insert ${this.size}, ended up with ${
+                                                db.waypointDao()
+                                                    .getRowCount()
+                                            } waypoints in the repo"
+                                        )
+                                }
                         }
                 }
             } catch (throwable: Throwable) {
                 Timber.tag("TOOT")
                     .e(throwable, "Error importing waypoints from legacy storage")
+            } finally {
+                _migrationCompleteFlow.compareAndSet(false, true)
             }
         }
     }
 
-    private fun makeModel(value: ByteArray): WaypointModel {
+    private fun deserializeWaypointModel(value: ByteArray): WaypointModel {
         ByteBuffer.wrap(value)
             .run {
                 order(ByteOrder.LITTLE_ENDIAN)
-                position(0x20)
-                val id = long
+                val id = 0L
+                position(0x28)
                 val longitude = double
                 val latitude = double
                 val lastTransition = int

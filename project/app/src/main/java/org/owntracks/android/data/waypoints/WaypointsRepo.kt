@@ -2,6 +2,8 @@ package org.owntracks.android.data.waypoints
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import java.time.Instant
 import org.owntracks.android.model.messages.MessageWaypoint
 import org.owntracks.android.support.MessageWaypointCollection
@@ -91,4 +93,5 @@ abstract class WaypointsRepo protected constructor() {
     protected abstract suspend fun insertImpl(waypointModel: WaypointModel)
     protected abstract suspend fun updateImpl(waypointModel: WaypointModel)
     protected abstract suspend fun deleteImpl(waypointModel: WaypointModel)
+    abstract val migrationCompleteFlow: StateFlow<Boolean>
 }

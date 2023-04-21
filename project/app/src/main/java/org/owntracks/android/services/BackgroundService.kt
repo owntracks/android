@@ -22,7 +22,7 @@ import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.Duration
-import java.util.*
+import java.util.LinkedList
 import java.util.concurrent.TimeUnit
 import java.util.stream.Collectors
 import javax.inject.Inject
@@ -40,7 +40,11 @@ import org.owntracks.android.data.waypoints.WaypointsRepo
 import org.owntracks.android.data.waypoints.WaypointsRepo.WaypointAndOperation
 import org.owntracks.android.di.CoroutineScopes
 import org.owntracks.android.geocoding.GeocoderProvider
-import org.owntracks.android.location.*
+import org.owntracks.android.location.LocationAvailability
+import org.owntracks.android.location.LocationCallback
+import org.owntracks.android.location.LocationProviderClient
+import org.owntracks.android.location.LocationRequest
+import org.owntracks.android.location.LocationResult
 import org.owntracks.android.location.geofencing.Geofence
 import org.owntracks.android.location.geofencing.GeofencingClient
 import org.owntracks.android.location.geofencing.GeofencingEvent
@@ -219,16 +223,24 @@ class BackgroundService :
 
         // Every time a waypoint is inserted, updated or deleted, we need to update the geofences, and maybe publish that
         // waypoint
-        waypointsRepo.operations.observe(this) { (operation, waypoint): WaypointAndOperation ->
-//            when (operation) {
-//                WaypointsRepo.Operation.INSERT,
-//                WaypointsRepo.Operation.UPDATE -> locationProcessor.publishWaypointMessage(waypoint)
-//                else -> {}
-//            }
-//            lifecycleScope.launch {
-//                setupGeofences()
-//            }
+        lifecycleScope.launchWhenCreated {
+            waypointsRepo.migrationCompleteFlow.collect {
+                if (it) {
+                    Timber.tag("TOOT").d("Listening for new waypoints")
+                    waypointsRepo.operations.observe(this@BackgroundService) { (operation, waypoint): WaypointAndOperation ->
+                        when (operation) {
+                            WaypointsRepo.Operation.INSERT,
+                            WaypointsRepo.Operation.UPDATE -> locationProcessor.publishWaypointMessage(waypoint)
+                            else -> {}
+                        }
+                        lifecycleScope.launch {
+                            setupGeofences()
+                        }
+                    }
+                }
+            }
         }
+
         lifecycleScope.launch {
             setupGeofences()
         }
@@ -283,14 +295,17 @@ class BackgroundService :
                     }
                     return
                 }
+
                 INTENT_ACTION_CLEAR_NOTIFICATIONS -> {
                     clearEventStackNotification()
                     return
                 }
+
                 INTENT_ACTION_REREQUEST_LOCATION_UPDATES -> {
                     setupLocationRequest()
                     return
                 }
+
                 INTENT_ACTION_CHANGE_MONITORING -> {
                     if (intent.hasExtra("monitoring")) {
                         val newMode = getByValue(
@@ -308,6 +323,7 @@ class BackgroundService :
                     notificationManagerCompat.cancel(BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG, 0)
                     return
                 }
+
                 INTENT_ACTION_BOOT_COMPLETED, INTENT_ACTION_PACKAGE_REPLACED -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
                         !hasBeenStartedExplicitly && ActivityCompat.checkSelfPermission(
@@ -319,10 +335,12 @@ class BackgroundService :
                     }
                     return
                 }
+
                 INTENT_ACTION_EXIT -> {
                     exit()
                     return
                 }
+
                 else -> {}
             }
         } else {
@@ -577,11 +595,13 @@ class BackgroundService :
                 smallestDisplacement = preferences.locatorDisplacement.toFloat()
                 priority = LocationRequest.PRIORITY_LOW_POWER
             }
+
             MonitoringMode.SIGNIFICANT -> {
                 interval = Duration.ofSeconds(preferences.locatorInterval.toLong())
                 smallestDisplacement = preferences.locatorDisplacement.toFloat()
                 priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
             }
+
             MonitoringMode.MOVE -> {
                 interval = Duration.ofSeconds(preferences.moveModeLocatorInterval.toLong())
                 priority = LocationRequest.PRIORITY_HIGH_ACCURACY
@@ -628,7 +648,8 @@ class BackgroundService :
                     Geofence.NEVER_EXPIRE,
                     null
                 )
-            }.toList()
+            }
+                .toList()
             geofencingClient.removeGeofences(this@BackgroundService)
             if (geofences.isNotEmpty()) {
                 val request = GeofencingRequest(Geofence.GEOFENCE_TRANSITION_ENTER, geofences)

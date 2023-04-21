@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import org.owntracks.android.data.waypoints.WaypointModel
 import org.owntracks.android.data.waypoints.WaypointsRepo
 import org.owntracks.android.services.LocationProcessor
+import timber.log.Timber
 
 @HiltViewModel
 class WaypointsViewModel @Inject constructor(
@@ -16,6 +17,7 @@ class WaypointsViewModel @Inject constructor(
     private val locationProcessor: LocationProcessor
 ) : ViewModel() {
     val waypointsList: LiveData<List<WaypointModel>> = waypointsRepo.allLive
+
     fun exportWaypoints() {
         viewModelScope.launch {
             locationProcessor.publishWaypointsMessage()
