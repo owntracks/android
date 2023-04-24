@@ -130,15 +130,10 @@ class LocationProcessor @Inject constructor(
         transition: Int,
         trigger: String
     ) {
-        Timber.d(
-            "geofence ${waypointModel.tst}/${waypointModel.description} transition:" +
-                "${if (transition == Geofence.GEOFENCE_TRANSITION_ENTER) "enter" else "exit"}, trigger:$trigger"
-        )
         if (ignoreLowAccuracy(location)) {
             Timber.d("ignoring transition: low accuracy ")
             return
         }
-
         scope.launch {
             // If the transition hasn't changed, or has moved from unknown to exit, don't notify.
             if (transition == waypointModel.lastTransition ||
