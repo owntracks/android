@@ -122,39 +122,26 @@ class RoomWaypointsRepo @Inject constructor(
                                 deserializeWaypointModel(lmdbEntry.value)
                             }
                             .toList()
-                            .also {
-                                Timber.tag("TOOT")
-                                    .w(
-                                        "Ids are: ${
-                                            it.map { it.id }
-                                                .joinToString(",")
-                                        }"
-                                    )
-                            }
                             .run {
                                 db.waypointDao()
                                     .insertAll(this)
-                                    .also {
-                                        Timber.tag("TOOT")
-                                            .i(
-                                                "Waypoints Migration complete. Tried to insert ${this.size}, ended up with ${
-                                                    db.waypointDao()
-                                                        .getRowCount()
-                                                } waypoints in the repo"
-                                            )
-                                    }
+                                Timber
+                                    .i(
+                                        "Waypoints Migration complete. Tried to insert ${this.size}, ended up with ${
+                                            db.waypointDao()
+                                                .getRowCount()
+                                        } waypoints in the repo"
+                                    )
                             }
                             .run {
                                 val deleted = applicationContext.filesDir.resolve("objectbox")
                                     .deleteRecursively()
-                                Timber.tag("TOOT")
-                                    .d("Deleting legacy waypoints database file. Success=$deleted")
+                                Timber.d("Deleting legacy waypoints database file. Success=$deleted")
                             }
                     }
                 }
             } catch (throwable: Throwable) {
-                Timber.tag("TOOT")
-                    .e(throwable, "Error importing waypoints from legacy storage")
+                Timber.e(throwable, "Error importing waypoints from legacy storage")
             } finally {
                 _migrationCompleteFlow.compareAndSet(expect = false, update = true)
             }

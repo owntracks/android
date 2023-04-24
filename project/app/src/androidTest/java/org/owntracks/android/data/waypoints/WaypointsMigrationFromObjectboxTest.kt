@@ -33,6 +33,8 @@ class WaypointsMigrationFromObjectboxTest : TestWithAnActivity<MapActivity>(MapA
                     }
                 }
             }
+        app.migrateWaypoints()
+        setNotFirstStartPreferences()
         launchActivity()
         grantMapActivityPermissions()
         openDrawer()
@@ -42,8 +44,7 @@ class WaypointsMigrationFromObjectboxTest : TestWithAnActivity<MapActivity>(MapA
 
     @Test
     fun migratingAnObjectboxWithSinglePointProducesOneWaypoint() {
-        setNotFirstStartPreferences()
-        val dataBytes = this.javaClass.getResource("/objectbox-lmdbs/1-waypoint/data.mdb")!!
+        val dataBytes = this.javaClass.getResource("/objectbox-lmdbs/single-waypoint/data.mdb")!!
             .readBytes()
         InstrumentationRegistry.getInstrumentation().targetContext.filesDir.resolve("objectbox/objectbox/")
             .run {
@@ -54,11 +55,61 @@ class WaypointsMigrationFromObjectboxTest : TestWithAnActivity<MapActivity>(MapA
                     }
                 }
             }
+        app.migrateWaypoints()
+        setNotFirstStartPreferences()
         launchActivity()
         grantMapActivityPermissions()
         openDrawer()
         clickOn(R.string.title_activity_waypoints)
         assertDisplayed(R.id.waypointsRecyclerView)
         assertRecyclerViewItemCount(R.id.waypointsRecyclerView, 1)
+    }
+
+    @Test
+    fun migratingAnObjectboxWith10PointsProduces50Waypoints() {
+        setNotFirstStartPreferences()
+        val dataBytes = this.javaClass.getResource("/objectbox-lmdbs/10-waypoints/data.mdb")!!
+            .readBytes()
+        InstrumentationRegistry.getInstrumentation().targetContext.filesDir.resolve("objectbox/objectbox/")
+            .run {
+                mkdirs()
+                resolve("data.mdb").run {
+                    outputStream().use {
+                        it.write(dataBytes)
+                    }
+                }
+            }
+        app.migrateWaypoints()
+        setNotFirstStartPreferences()
+        launchActivity()
+        grantMapActivityPermissions()
+        openDrawer()
+        clickOn(R.string.title_activity_waypoints)
+        assertDisplayed(R.id.waypointsRecyclerView)
+        assertRecyclerViewItemCount(R.id.waypointsRecyclerView, 10)
+    }
+
+    @Test
+    fun migratingAnObjectboxWith5000PointsProduces5000Waypoints() {
+        setNotFirstStartPreferences()
+        val dataBytes = this.javaClass.getResource("/objectbox-lmdbs/5000-waypoints/data.mdb")!!
+            .readBytes()
+        InstrumentationRegistry.getInstrumentation().targetContext.filesDir.resolve("objectbox/objectbox/")
+            .run {
+                mkdirs()
+                resolve("data.mdb").run {
+                    outputStream().use {
+                        it.write(dataBytes)
+                    }
+                }
+            }
+        app.migrateWaypoints()
+        setNotFirstStartPreferences()
+        launchActivity()
+        grantMapActivityPermissions()
+        openDrawer()
+        clickOn(R.string.title_activity_waypoints)
+        assertDisplayed(R.id.waypointsRecyclerView)
+        assertRecyclerViewItemCount(R.id.waypointsRecyclerView, 5000)
     }
 }
