@@ -11,6 +11,7 @@ import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -102,7 +103,10 @@ class RoomWaypointsRepo @Inject constructor(
     override val migrationCompleteFlow: StateFlow<Boolean> = _migrationCompleteFlow
 
     fun migrateFromLegacyStorage(): Job {
-        return scope.launch(ioDispatcher) {
+        val handler = CoroutineExceptionHandler { _, exception ->
+            Timber.e(exception, "Error migrating waypoints")
+        }
+        return scope.launch(ioDispatcher + handler) {
             try {
                 val objectboxPath = applicationContext.filesDir.resolve("objectbox/objectbox")
                 if (objectboxPath.exists() && objectboxPath.canRead() && objectboxPath.isDirectory) {
@@ -140,8 +144,6 @@ class RoomWaypointsRepo @Inject constructor(
                             }
                     }
                 }
-            } catch (throwable: Throwable) {
-                Timber.e(throwable, "Error importing waypoints from legacy storage")
             } finally {
                 _migrationCompleteFlow.compareAndSet(expect = false, update = true)
             }
