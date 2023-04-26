@@ -1,24 +1,16 @@
 # CI pipelines / flow
 
-OwnTracks Android uses [CircleCI](https://app.circleci.com/pipelines/github/owntracks/android) to run builds, unit tests, integration tests and publish jobs. Main reason is that espresso testing on an android emulator was the most stable / flexible on Circle's platform (as opposed to travis or GHA).
+OwnTracks Android uses Github Actions to build, test and release.
 
-## CircleCI jobs
+## jobs
 
-### Build release
+### Build, test & lint
 
-Assembles the debug and release variants of both GMS and OSS flavours. Also compiles the test sources.
-
-### Unit test
-
-Runs the unit tests and generates a coverage report for codecov.io.
+Assembles the debug and release variants of both GMS and OSS flavours. Also compiles the test sources, then runs the unit tests (with coverage) and the Android lint.
 
 ### F-Droid scan
 
 Runs the [F-Droid server scanner](https://gitlab.com/fdroid/fdroidserver) against the OSS Release APK to make sure that no non-free components snuk into the release.
-
-### Lint
-
-Runs the Android lint and fails on new issues.
 
 ### UI tests
 
@@ -42,15 +34,11 @@ There's 3 GHA workflows that help manage PRs and releases.
 
 ### Android Release
 
-Triggered by a version tag, this workflow creates a Github Release, fetches the APKs from the corresponding CircleCI workflow and attaches them to the release, and finally promotes the Play Store build between either internal and beta, beta and production or internal and production (depending on whether it's a beta tag or not)
+Triggered by a version tag, this workflow creates a Github Release, fetches the APKs from the corresponding CircleCI workflow and attaches them to the release, and finally promotes the Play Store build between either internal and beta, beta and production or internal and production (depending on whether it's a beta tag or not).
 
 ### Auto-Label PRs
 
 Labels new PRs with the approprate test required label depending on what's changed.
-
-### Test PRs
-
-Triggered by a PR being labelled, this workflow triggeres a CircleCI build depending on whether the label was `smoke-test-required` or `intergration-test-required`.
 
 ## Forked PRs
 

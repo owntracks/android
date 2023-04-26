@@ -17,10 +17,15 @@ name: Build and Test
     branches:
       - master
 
+# if: ${{ !github.event.pull_request.head.repo.fork && github.event.label && ( github.event.label.name == 'smoke-test-required' || github.event.label.name == 'integration-test-required') }}
+
 jobs:
   build-test-lint:
-    name: Build release
-    runs-on: self-hosted
+    name: Build, test & lint
+    runs-on: macos-latest
+    permissions:
+      contents: read
+      checks: write
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-java@v3
@@ -32,6 +37,8 @@ jobs:
           echo -n $KEYSTORE_BASE64 | base64 -d > project/owntracks.release.keystore.jks
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+      - name: Gradle cache
+        uses: gradle/gradle-build-action@v2
       - name: Gradle build
         run: |
           ./project/gradlew -p project \
@@ -43,9 +50,7 @@ jobs:
               :app:compileOssReleaseSources \
               :app:packageGmsReleaseBundle \
               :app:assembleGmsDebugAndroidTest \
-              :app:assembleOssDebugAndroidTest \
-              jacocoTestGmsReleaseUnitTestReport \
-              lint
+              :app:assembleOssDebugAndroidTest
         env:
           KEYSTORE_PASSPHRASE: ${{ secrets.KEYSTORE_PASSPHRASE }}
 
@@ -56,21 +61,28 @@ jobs:
           path: |
             project/app/build/outputs/apk/oss/release/app-oss-release.apk
             project/app/build/outputs/apk/gms/release/app-gms-release.apk
+
+      - name: Unit Test
+        run: ./project/gradlew -p project app:createGmsDebugUnitTestCoverageReport
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./project/app/build/reports/coverage/test/gms/debug/report.xml
+          flags: unittests
+      - name: JUnit Report Action
+        uses: mikepenz/action-junit-report@v3
+        if: always()
+        with:
+          report_paths: "**/build/test-results/test*UnitTest/TEST-*.xml"
+
+      - name: Lint
+        run: ./project/gradlew -p project lint
+
       - name: Upload lint report
         uses: actions/upload-artifact@v3
         with:
           name: lint-report
-          path: project/app/build/reports/lint-results.html
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./project/app/build/jacoco/jacoco.xml
-          flags: unittests
-      - name: JUnit Report Action
-        uses: mikepenz/action-junit-report@v3
-        if: success() || failure() # always run even if the previous step fails
-        with:
-          report_paths: "**/build/test-results/test*ReleaseUnitTest/TEST-*.xml"
+          path: project/app/build/reports/lint-results-gmsDebug.html
 
   fdroid-scanner:
     name: F-Droid scanner
@@ -85,4 +97,4 @@ jobs:
           name: apks
       - name: Scan OSS APK
         run: |
-          /usr/local/bin/fdroid scanner oss/release/app-oss-release.apk
+          . /etc/profile.d/bsenv.sh && GRADLE_USER_HOME=${home_vagrant}/.gradle ${fdroidserver}/fdroid scanner oss/release/app-oss-release.apk
