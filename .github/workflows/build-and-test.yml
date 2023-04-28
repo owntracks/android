@@ -69,6 +69,7 @@ jobs:
         with:
           files: ./project/app/build/reports/coverage/test/gms/debug/report.xml
           flags: unittests
+
       - name: JUnit Report Action
         uses: mikepenz/action-junit-report@v3
         if: always()
@@ -98,3 +99,79 @@ jobs:
       - name: Scan OSS APK
         run: |
           . /etc/profile.d/bsenv.sh && GRADLE_USER_HOME=${home_vagrant}/.gradle ${fdroidserver}/fdroid scanner oss/release/app-oss-release.apk
+
+  espresso-test:
+    name: "Espresso test"
+    runs-on: macos-latest
+    needs: build-test-lint
+    strategy:
+      matrix:
+        android-api: [31]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: 17
+
+      - name: Gradle cache
+        uses: gradle/gradle-build-action@v2
+
+      - name: AVD cache
+        uses: actions/cache@v3
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ matrix.android-api }}
+
+      - name: create AVD and generate snapshot for caching
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.android-api }}
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          profile: pixel_3a
+          target: google_apis
+          disable-animations: true
+          arch: x86_64
+          sdcard-path-or-size: 1000M
+          script: echo "Generated AVD snapshot for caching."
+
+      - name: Espresso Test
+        uses: reactivecircus/android-emulator-runner@v2
+        timeout-minutes: 60
+        with:
+          api-level: ${{ matrix.android-api }}
+          force-avd-creation: false
+          script: |
+            adb uninstall org.owntracks.android || echo "org.owntracks.android not installed"
+            adb uninstall org.owntracks.android.test || echo "org.owntracks.android.test not installed"
+            ./gradlew createGmsDebugCoverageReport --scan
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          profile: pixel_3a
+          target: google_apis
+          disable-animations: true
+          arch: x86_64
+          sdcard-path-or-size: 1000M
+
+      - name: Upload connected test result artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: espresso-test-reports-${{ matrix.android-api }}
+          path: app/build/reports/androidTests/connected/
+        if: always()
+      - name: Upload connected test XML
+        uses: actions/upload-artifact@v3
+        with:
+          name: espresso-test-xml-${{ matrix.android-api }}
+          path: app/build/outputs/androidTest-results/connected/**/*.xml
+      - name: Upload connected test coverage artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: espresso-test-coverage-${{ matrix.android-api }}
+          path: ./project/app/build/reports/coverage/androidTest/
+        if: always()
