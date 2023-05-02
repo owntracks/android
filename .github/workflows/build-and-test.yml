@@ -136,6 +136,7 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           profile: pixel_3a
           target: google_apis
+          ram-size: 3096M
           disable-animations: true
           arch: x86_64
           sdcard-path-or-size: 1000M
@@ -150,10 +151,11 @@ jobs:
           script: |
             adb uninstall org.owntracks.android || echo "org.owntracks.android not installed"
             adb uninstall org.owntracks.android.test || echo "org.owntracks.android.test not installed"
-            ./gradlew createGmsDebugCoverageReport --scan
+            ./project/gradlew -p project createGmsDebugCoverageReport --scan   -Pandroid.testInstrumentationRunnerArguments.annotation=org.owntracks.android.testutils.SmokeTest
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           profile: pixel_3a
           target: google_apis
+          ram-size: 3096M
           disable-animations: true
           arch: x86_64
           sdcard-path-or-size: 1000M
@@ -162,13 +164,8 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: espresso-test-reports-${{ matrix.android-api }}
-          path: app/build/reports/androidTests/connected/
+          path: ./project/app/build/reports/androidTests/connected/
         if: always()
-      - name: Upload connected test XML
-        uses: actions/upload-artifact@v3
-        with:
-          name: espresso-test-xml-${{ matrix.android-api }}
-          path: app/build/outputs/androidTest-results/connected/**/*.xml
       - name: Upload connected test coverage artifact
         uses: actions/upload-artifact@v3
         with:
