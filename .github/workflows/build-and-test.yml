@@ -2,6 +2,10 @@
 name: Build and Test
 
 "on":
+  pull_request:
+    types:
+      - labeled
+      - synchronize
   push:
     paths:
       - ".github/workflows/build-and-test.yml"
@@ -13,11 +17,6 @@ name: Build and Test
     branches:
       - master
       - gh-readonly-queue/master/**
-  pull_request:
-    branches:
-      - master
-
-# if: ${{ !github.event.pull_request.head.repo.fork && github.event.label && ( github.event.label.name == 'smoke-test-required' || github.event.label.name == 'integration-test-required') }}
 
 jobs:
   build-test-lint:
@@ -52,7 +51,10 @@ jobs:
               :app:assembleGmsDebugAndroidTest \
               :app:assembleOssDebugAndroidTest \
               :app:packageGmsDebugAndroidTest \
-              :app:packageOssDebugAndroidTest
+              :app:packageOssDebugAndroidTest \
+              lint \
+              app:createGmsDebugUnitTestCoverageReport
+
         env:
           KEYSTORE_PASSPHRASE: ${{ secrets.KEYSTORE_PASSPHRASE }}
 
@@ -64,13 +66,13 @@ jobs:
             project/app/build/outputs/apk/oss/release/app-oss-release.apk
             project/app/build/outputs/apk/gms/release/app-gms-release.apk
 
-      - name: Unit Test
-        run: ./project/gradlew -p project app:createGmsDebugUnitTestCoverageReport
       - name: Upload coverage
+        if: ${{ (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'integration-test-required')) || (github.event_name == 'push' && github.ref == 'refs/heads/master') }}
         uses: codecov/codecov-action@v3
         with:
           files: ./project/app/build/reports/coverage/test/gms/debug/report.xml
           flags: unittests
+          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: JUnit Report Action
         uses: mikepenz/action-junit-report@v3
@@ -78,14 +80,12 @@ jobs:
         with:
           report_paths: "**/build/test-results/test*UnitTest/TEST-*.xml"
 
-      - name: Lint
-        run: ./project/gradlew -p project lint
-
       - name: Upload lint report
         uses: actions/upload-artifact@v3
         with:
           name: lint-report
           path: project/app/build/reports/lint-results-gmsDebug.html
+        if: always()
 
   fdroid-scanner:
     name: F-Droid scanner
@@ -108,7 +108,7 @@ jobs:
     needs: build-test-lint
     strategy:
       matrix:
-        android-api: [31]
+        android-api: [29]
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 17
@@ -135,41 +135,58 @@ jobs:
         with:
           api-level: ${{ matrix.android-api }}
           force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
           profile: pixel_3a
           target: google_apis
-          ram-size: 3096M
+          ram-size: 6000M
           disable-animations: true
           arch: x86_64
           sdcard-path-or-size: 1000M
+          emulator-build: 9936625
           script: echo "Generated AVD snapshot for caching."
 
       - name: Espresso Test
         uses: reactivecircus/android-emulator-runner@v2
         timeout-minutes: 60
+        env:
+          TEST_OPTIONS: ${{ contains(github.event.pull_request.labels.*.name, 'integration-test-required') && '-Pandroid.testInstrumentationRunnerArguments.annotation=org.owntracks.android.testutils.SmokeTest' || '' }}
         with:
           api-level: ${{ matrix.android-api }}
           force-avd-creation: false
-          script: |
-            adb uninstall org.owntracks.android || echo "org.owntracks.android not installed"
-            adb uninstall org.owntracks.android.test || echo "org.owntracks.android.test not installed"
-            adb logcat -c
-            adb logcat > device.log &
-            ./project/gradlew -p project createGmsDebugCoverageReport --scan   -Pandroid.testInstrumentationRunnerArguments.annotation=org.owntracks.android.testutils.SmokeTest
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
           profile: pixel_3a
           target: google_apis
-          ram-size: 3096M
+          ram-size: 6000M
           disable-animations: true
           arch: x86_64
+          cores: 3
           sdcard-path-or-size: 1000M
+          emulator-build: 9936625
+          script: |
+            adb logcat -d > emulator-startup.log
+            adb shell settings put global bluetooth_on 0
+            adb shell rm -rf /sdcard/googletest || echo "Couldn't delete googletest folder"
+            adb uninstall org.owntracks.android.debug || echo "org.owntracks.android not installed"
+            adb uninstall org.owntracks.android.debug.test || echo "org.owntracks.android.test not installed"
+            adb logcat -c
+            adb logcat > emulator.log & echo $! > logcat_file.pid
+            adb logcat "*:S MonitoringInstr:V AndroidJUnitRunner:V TestRequestBuilder:V TestExecutor:V TestRunner:V" --format=color & echo $! > logcat_console.pid
+            echo 0 > gradle.exit # Set a default exit code.
+            ./project/gradlew -p project createGmsDebugCoverageReport $TEST_OPTIONS --max-workers=1 --stacktrace --scan --no-daemon || echo $? > gradle.exit
+            # Stop capturing logcat output.
+            kill $(cat logcat_file.pid)    || echo "::warning file=.github/workflows/ci.yml::Logcat process $(cat logcat_file.pid) didn't exist."
+            kill $(cat logcat_console.pid) || echo "::warning file=.github/workflows/ci.yml::Logcat process $(cat logcat_console.pid) didn't exist."
+            adb logcat -d --buffer=crash --format=color
+            exit $(cat gradle.exit)
 
       - name: Upload logcat
+        if: always()
         uses: actions/upload-artifact@v3
         with:
           name: logcat-${{ matrix.android-api }}
-          path: ./device.log
-        if: always()
+          path: |            
+            ${{ github.workspace }}/emulator.log
+            ${{ github.workspace }}/emulator-startup.log
 
       - name: Upload connected test result artifact
         uses: actions/upload-artifact@v3
@@ -177,9 +194,22 @@ jobs:
           name: espresso-test-reports-${{ matrix.android-api }}
           path: ./project/app/build/reports/androidTests/connected/
         if: always()
+      - name: Espresso JUnit Report
+        uses: mikepenz/action-junit-report@v3
+        if: always()
+        with:
+          report_paths: app/build/outputs/androidTest-results/connected/*.xml
       - name: Upload connected test coverage artifact
         uses: actions/upload-artifact@v3
         with:
           name: espresso-test-coverage-${{ matrix.android-api }}
           path: ./project/app/build/reports/coverage/androidTest/
         if: always()
+      - name: Upload coverage
+        if: ${{ (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'integration-test-required')) || (github.event_name == 'push' && github.ref == 'refs/heads/master') }}
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./project/app/build/reports/coverage/androidTest/gms/debug/connected/report.xml
+          flags: uitests
+          token: ${{ secrets.CODECOV_TOKEN }}
+
