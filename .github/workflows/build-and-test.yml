@@ -151,6 +151,8 @@ jobs:
           script: |
             adb uninstall org.owntracks.android || echo "org.owntracks.android not installed"
             adb uninstall org.owntracks.android.test || echo "org.owntracks.android.test not installed"
+            adb logcat -c
+            adb logcat > device.log &
             ./project/gradlew -p project createGmsDebugCoverageReport --scan   -Pandroid.testInstrumentationRunnerArguments.annotation=org.owntracks.android.testutils.SmokeTest
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           profile: pixel_3a
@@ -159,6 +161,13 @@ jobs:
           disable-animations: true
           arch: x86_64
           sdcard-path-or-size: 1000M
+
+      - name: Upload logcat
+        uses: actions/upload-artifact@v3
+        with:
+          name: logcat-${{ matrix.android-api }}
+          path: ./device.log
+        if: always()
 
       - name: Upload connected test result artifact
         uses: actions/upload-artifact@v3
