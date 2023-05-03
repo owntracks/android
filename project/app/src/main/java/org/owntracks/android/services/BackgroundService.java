@@ -172,12 +172,14 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
 
     @Override
     public void onCreate() {
+        Timber.i("Backgroundservice onCreate");
         ServiceEntrypoint entrypoint = EntryPoints.get(getApplicationContext(), ServiceEntrypoint.class);
         this.preferences = entrypoint.preferences();
         this.endpointStateRepo = entrypoint.endpointStateRepo();
+        Timber.i("backgroundservice has injected. calling startForeground");
         startForeground(NOTIFICATION_ID_ONGOING, getOngoingNotification());
+        Timber.i("backgroundservice super.oncreate");
         super.onCreate();
-        Timber.v("Background service onCreate. ThreadID: %s", Thread.currentThread());
         serviceBridge.bind(this);
 
         notificationManagerCompat = NotificationManagerCompat.from(this);
