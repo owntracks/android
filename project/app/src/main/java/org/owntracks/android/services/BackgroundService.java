@@ -11,6 +11,7 @@ import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -72,7 +73,13 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import dagger.hilt.EntryPoint;
+import dagger.hilt.EntryPoints;
+import dagger.hilt.InstallIn;
 import dagger.hilt.android.AndroidEntryPoint;
+import dagger.hilt.android.EntryPointAccessors;
+import dagger.hilt.android.components.ServiceComponent;
+import dagger.hilt.components.SingletonComponent;
 import timber.log.Timber;
 
 @AndroidEntryPoint
@@ -156,8 +163,19 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
     @Inject
     SimpleIdlingResource locationIdlingResource;
 
+    @EntryPoint
+    @InstallIn(SingletonComponent.class)
+    interface ServiceEntrypoint {
+        Preferences preferences();
+        EndpointStateRepo endpointStateRepo();
+    }
+
     @Override
     public void onCreate() {
+        ServiceEntrypoint entrypoint = EntryPoints.get(getApplicationContext(), ServiceEntrypoint.class);
+        this.preferences = entrypoint.preferences();
+        this.endpointStateRepo = entrypoint.endpointStateRepo();
+        startForeground(NOTIFICATION_ID_ONGOING, getOngoingNotification());
         super.onCreate();
         Timber.v("Background service onCreate. ThreadID: %s", Thread.currentThread());
         serviceBridge.bind(this);
@@ -192,8 +210,6 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
                 onLocationChanged(locationResult.getLastLocation(), MessageLocation.REPORT_TYPE_RESPONSE);
             }
         };
-
-        startForeground(NOTIFICATION_ID_ONGOING, getOngoingNotification());
 
         setupLocationRequest();
 
@@ -359,13 +375,10 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
                 .setSmallIcon(R.drawable.ic_owntracks_80)
                 .setPriority(preferences.getNotificationHigherPriority() ? NotificationCompat.PRIORITY_DEFAULT : NotificationCompat.PRIORITY_MIN)
                 .setSound(null, AudioManager.STREAM_NOTIFICATION)
-                .setOngoing(true);
-
-        if (android.os.Build.VERSION.SDK_INT >= 23) {
-            activeNotificationCompatBuilder.setColor(getColor(com.mikepenz.materialize.R.color.primary))
-                    .setCategory(NotificationCompat.CATEGORY_SERVICE)
-                    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
-        }
+                .setOngoing(true)
+                .setColor(getColor(com.mikepenz.materialize.R.color.primary))
+                .setCategory(NotificationCompat.CATEGORY_SERVICE)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 
         return activeNotificationCompatBuilder;
     }

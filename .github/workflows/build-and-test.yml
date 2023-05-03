@@ -50,7 +50,9 @@ jobs:
               :app:compileOssReleaseSources \
               :app:packageGmsReleaseBundle \
               :app:assembleGmsDebugAndroidTest \
-              :app:assembleOssDebugAndroidTest
+              :app:assembleOssDebugAndroidTest \
+              :app:packageGmsDebugAndroidTest \
+              :app:packageOssDebugAndroidTest
         env:
           KEYSTORE_PASSPHRASE: ${{ secrets.KEYSTORE_PASSPHRASE }}
 
