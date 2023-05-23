@@ -21,7 +21,7 @@ name: Build and Test
 jobs:
   build-test-lint:
     name: Build, test & lint
-    runs-on: macos-latest
+    runs-on: self-hosted
     permissions:
       contents: read
       checks: write
@@ -36,12 +36,9 @@ jobs:
           echo -n $KEYSTORE_BASE64 | base64 -d > project/owntracks.release.keystore.jks
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
-      - name: Gradle cache
-        uses: gradle/gradle-build-action@v2
       - name: Gradle build
         run: |
           ./project/gradlew -p project \
-            --scan \
               assembleDebug \
               assembleRelease \
               assembleAndroidTest \
@@ -53,7 +50,7 @@ jobs:
               :app:packageGmsDebugAndroidTest \
               :app:packageOssDebugAndroidTest \
               lint \
-              app:createGmsDebugUnitTestCoverageReport
+              app:createGmsDebugUnitTestCoverageReport --scan --stacktrace
 
         env:
           KEYSTORE_PASSPHRASE: ${{ secrets.KEYSTORE_PASSPHRASE }}
@@ -104,12 +101,16 @@ jobs:
 
   espresso-test:
     name: "Espresso test"
-    runs-on: macos-latest
+    runs-on: self-hosted
+    permissions:
+      contents: read
+      checks: write
     needs: build-test-lint
     strategy:
       matrix:
-        android-api: [29]
+        android-api: [31]
     steps:
+      - run: echo "/android-sdk/platform-tools/" >> $GITHUB_PATH
       - uses: actions/checkout@v3
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -117,20 +118,14 @@ jobs:
           distribution: "temurin"
           java-version: 17
 
-      - name: Gradle cache
-        uses: gradle/gradle-build-action@v2
-
-      - name: AVD cache
-        uses: actions/cache@v3
-        id: avd-cache
+      - name: "Check snapshot exists"
+        id: check_snapshot_exists
+        uses: andstor/file-existence-action@v2
         with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-${{ matrix.android-api }}
+          files: "/android-sdk/user_home/avd/test-${{ matrix.android-api }}.avd/snapshots/default_boot/screenshot.png"
 
-      - name: create AVD and generate snapshot for caching
-        if: steps.avd-cache.outputs.cache-hit != 'true'
+      - name: Create AVD and generate snapshot for caching
+        if: steps.check_snapshot_exists.outputs.files_exists == 'false'
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.android-api }}
@@ -139,11 +134,12 @@ jobs:
           profile: pixel_3a
           target: google_apis
           ram-size: 6000M
+          avd-name: test-${{ matrix.android-api }}
           disable-animations: true
           arch: x86_64
           sdcard-path-or-size: 1000M
-          emulator-build: 9936625
-          script: echo "Generated AVD snapshot for caching."
+          script: |
+            echo "Created AVD snapshot"
 
       - name: Espresso Test
         uses: reactivecircus/android-emulator-runner@v2
@@ -159,7 +155,7 @@ jobs:
           ram-size: 6000M
           disable-animations: true
           arch: x86_64
-          cores: 3
+          cores: 2
           sdcard-path-or-size: 1000M
           emulator-build: 9936625
           script: |

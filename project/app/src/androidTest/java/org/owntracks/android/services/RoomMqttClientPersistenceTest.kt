@@ -58,7 +58,7 @@ class RoomMqttClientPersistenceTest {
     @Test
     fun mqttClientPersistenceRemoveTest() {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        RoomMqttClientPersistence(context).run {
+        RoomMqttClientPersistence(context, true).run {
             val key1 = "testKey1"
             val header1 = "header1".toByteArray()
             val payload1 = "payload1".toByteArray()

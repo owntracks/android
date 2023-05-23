@@ -12,13 +12,15 @@ import org.eclipse.paho.client.mqttv3.internal.MqttPersistentData
 /**
  * Implementation of [MqttClientPersistence] that stores data in a Room database
  */
-class RoomMqttClientPersistence(applicationContext: Context) : MqttClientPersistence {
+class RoomMqttClientPersistence(applicationContext: Context, mainThreadQueries: Boolean = false) :
+    MqttClientPersistence {
 
     private val db = Room.databaseBuilder(
         applicationContext,
         MqttPersistableDatabase::class.java,
         "pahoMqttPersistence"
     )
+        .apply { if (mainThreadQueries) this.allowMainThreadQueries() }
         .build()
 
     @Entity

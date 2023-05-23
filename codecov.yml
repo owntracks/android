@@ -1,9 +1,5 @@
----
 codecov:
   notify:
-    after_n_builds: 3 # Unit and 2 Espresso
-coverage:
-  status:
-    project:
-      status:
-        threshold: 1%
+    after_n_builds: 2
+    wait_for_ci: yes
+  max_report_age: off
