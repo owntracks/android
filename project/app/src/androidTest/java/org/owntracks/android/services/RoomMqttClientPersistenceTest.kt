@@ -14,7 +14,7 @@ class RoomMqttClientPersistenceTest {
     @Test
     fun mqttClientPersistenceReadWriteWithNullPayloadTest() {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        RoomMqttClientPersistence(context).run {
+        RoomMqttClientPersistence(context, true).run {
             val key = "testKey"
             val header = "header".toByteArray()
             put(key, MqttPersistentData(key, header, 0, header.size, null, 0, 0))
@@ -28,7 +28,7 @@ class RoomMqttClientPersistenceTest {
     @Test
     fun mqttClientPersistenceReadWriteWithPayloadTest() {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        RoomMqttClientPersistence(context).run {
+        RoomMqttClientPersistence(context, true).run {
             val key = "testKey"
             val header = "header".toByteArray()
             val payload = "payload".toByteArray()
@@ -43,7 +43,7 @@ class RoomMqttClientPersistenceTest {
     @Test
     fun mqttClientPersistenceClearTest() {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        RoomMqttClientPersistence(context).run {
+        RoomMqttClientPersistence(context, true).run {
             val key = "testKey"
             val header = "header".toByteArray()
             val payload = "payload".toByteArray()
@@ -69,21 +69,21 @@ class RoomMqttClientPersistenceTest {
             put(key2, MqttPersistentData(key2, header2, 0, header2.size, payload1, 0, payload2.size))
 
             remove(key1)
-
             val result = keys()
             assertNotNull(result)
-            result.toList().run {
-                assert(contains(key2))
-                assert(!contains(key1))
-                assertEquals(1, size)
-            }
+            result.toList()
+                .run {
+                    assert(contains(key2))
+                    assert(!contains(key1))
+                    assertEquals(1, size)
+                }
         }
     }
 
     @Test
     fun mqttClientPersistenceContainsKeyTest() {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        RoomMqttClientPersistence(context).run {
+        RoomMqttClientPersistence(context, true).run {
             val key1 = "testKey1"
             val header1 = "header1".toByteArray()
             val payload1 = "payload1".toByteArray()
