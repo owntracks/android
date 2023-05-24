@@ -36,22 +36,24 @@ jobs:
           echo -n $KEYSTORE_BASE64 | base64 -d > project/owntracks.release.keystore.jks
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
-      - name: Gradle build
-        run: |
-          ./project/gradlew -p project \
-              assembleDebug \
-              assembleRelease \
-              assembleAndroidTest \
-              assembleGmsReleaseUnitTest \
-              :app:compileOssReleaseSources \
-              :app:packageGmsReleaseBundle \
-              :app:assembleGmsDebugAndroidTest \
-              :app:assembleOssDebugAndroidTest \
-              :app:packageGmsDebugAndroidTest \
-              :app:packageOssDebugAndroidTest \
-              lint \
-              app:createGmsDebugUnitTestCoverageReport --scan --stacktrace
 
+      - name: Gradle build
+        uses: gradle/gradle-build-action@v2
+        with:
+          build-root-directory: project
+          arguments: |
+            assembleDebug
+            assembleRelease
+            assembleAndroidTest
+            assembleGmsReleaseUnitTest
+            :app:compileOssReleaseSources
+            :app:packageGmsReleaseBundle
+            :app:assembleGmsDebugAndroidTest
+            :app:assembleOssDebugAndroidTest
+            :app:packageGmsDebugAndroidTest
+            :app:packageOssDebugAndroidTest
+            lint
+            app:createGmsDebugUnitTestCoverageReport --scan --stacktrace
         env:
           KEYSTORE_PASSPHRASE: ${{ secrets.KEYSTORE_PASSPHRASE }}
 
@@ -145,7 +147,7 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         timeout-minutes: 60
         env:
-          TEST_OPTIONS: ${{ contains(github.event.pull_request.labels.*.name, 'integration-test-required') && '-Pandroid.testInstrumentationRunnerArguments.annotation=org.owntracks.android.testutils.SmokeTest' || '' }}
+          TEST_OPTIONS: ${{ contains(github.event.pull_request.labels.*.name, 'smoke-test-required') && '-Pandroid.testInstrumentationRunnerArguments.annotation=org.owntracks.android.testutils.SmokeTest' || '' }}
         with:
           api-level: ${{ matrix.android-api }}
           force-avd-creation: false
