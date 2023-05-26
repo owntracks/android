@@ -12,7 +12,7 @@ There are two build flavours for OwnTracks:
 
 Both flavours are published as an APK to Github releases.
 The `gms` flavour is distributed via the [Google Play Store](https://play.google.com/store/apps/details?id=org.owntracks.android).
-The `oss` flavour is distributed via [F-Droid](https://f-droid.org/packages/org.owntracks.android/).
+The `oss` flavour is distributed via [F-Droid](https://f-droid.org/packages/org.owntracks.android/). *N.B. this is currently unavailable until we remove a specific closed-source dependency. See [#1288](https://github.com/owntracks/android/issues/1298)*
 
 ## Contributing
 
