@@ -95,6 +95,11 @@ class Preferences @Inject constructor(private val preferencesStore: PreferencesS
                             }
                         }
                     }
+                // `tid` isn't included in the [MessageConfiguration] map, so need to handle separately
+                configuration.trackerId?.run {
+                    Timber.d("Importing configuration key ${Preferences::tid.name} -> $this")
+                    importPreference(Preferences::tid, this)
+                }
             }
     }
 
