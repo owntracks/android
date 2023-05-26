@@ -27,7 +27,7 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
     MessageBase(), MessageWithCreatedAt by dep {
 
     @JsonIgnore
-    override val numberOfRetries: Int = 10_080 // This should last a week at 1 attempt per minute
+    override val numberOfRetries: Int = 100_000 // This should last a few weeks at 1 attempt per minute
 
     @JsonProperty("t")
     var trigger: String? = null

@@ -56,7 +56,7 @@ class MessageProcessor @Inject constructor(
 
     init {
         outgoingQueue = BlockingDequeThatAlsoSometimesPersistsThingsToDiskMaybe(
-            10000,
+            100_000,
             applicationContext.filesDir,
             parser
         )
