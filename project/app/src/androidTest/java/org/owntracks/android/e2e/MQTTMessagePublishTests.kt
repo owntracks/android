@@ -1,6 +1,5 @@
 package org.owntracks.android.e2e
 
-import android.Manifest
 import android.view.View
 import androidx.annotation.IdRes
 import androidx.preference.PreferenceManager
@@ -19,8 +18,8 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
-import com.adevinta.android.barista.interaction.PermissionGranter
 import java.time.Instant
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.DelicateCoroutinesApi
 import mqtt.packets.Qos
 import mqtt.packets.mqtt.MQTTPublish
@@ -259,7 +258,7 @@ class MQTTMessagePublishTests :
             }
         ).sendFromBroker(broker)
 
-        sleep(1000)
+        sleep(1.seconds.inWholeMilliseconds)
 
         assertRecyclerViewItemCount(R.id.contactsRecyclerView, 2)
         assertDisplayedAtPosition(R.id.contactsRecyclerView, 1, R.id.name, "TestName")

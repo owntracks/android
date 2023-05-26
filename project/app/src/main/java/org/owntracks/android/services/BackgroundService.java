@@ -627,8 +627,6 @@ public class BackgroundService extends LifecycleService implements ServiceBridge
             return;
         }
 
-        Timber.d("loader thread:%s, isMain:%s", Looper.myLooper(), Looper.myLooper() == Looper.getMainLooper());
-
         LinkedList<Geofence> geofences = new LinkedList<>();
         List<WaypointModel> loadedWaypoints = waypointsRepo.getAllWithGeofences();
 

@@ -2,12 +2,12 @@ package org.owntracks.android.model.messages
 
 import androidx.databinding.BaseObservable
 import com.fasterxml.jackson.annotation.*
-import okhttp3.internal.toHexString
-import org.owntracks.android.support.Parser
-import org.owntracks.android.preferences.Preferences
-import org.owntracks.android.preferences.types.ConnectionMode
 import java.io.IOException
 import java.util.*
+import okhttp3.internal.toHexString
+import org.owntracks.android.preferences.Preferences
+import org.owntracks.android.preferences.types.ConnectionMode
+import org.owntracks.android.support.Parser
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
@@ -33,7 +33,10 @@ abstract class MessageBase : BaseObservable() {
 
     @get:JsonIgnore
     @JsonIgnore
-    val messageId = "${System.currentTimeMillis()}-${Random().nextInt(0X1000000).toHexString()}"
+    val messageId = "${System.currentTimeMillis()}-${
+        Random().nextInt(0X1000000)
+            .toHexString()
+    }"
 
     @JsonIgnore
     open var topic: String = ""
@@ -115,7 +118,7 @@ abstract class MessageBase : BaseObservable() {
 
     @JsonIgnore
     override fun toString(): String {
-        return String.format("%s id=%s", this.javaClass.name, messageId)
+        return String.format("${this.javaClass.name} id=$messageId")
     }
 
     open fun addMqttPreferences(preferences: Preferences) {}

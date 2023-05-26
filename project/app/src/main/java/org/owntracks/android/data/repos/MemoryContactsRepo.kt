@@ -27,7 +27,7 @@ class MemoryContactsRepo @Inject constructor(
 
     @Synchronized
     private fun put(id: String, contact: FusedContact) {
-        Timber.v("new contact allocated id:%s, tid:%s", id, contact.trackerId)
+        Timber.v("new contact allocated id=$id, tid=${contact.trackerId}")
         contacts[id] = contact
         all.postValue(contacts)
     }
@@ -42,7 +42,7 @@ class MemoryContactsRepo @Inject constructor(
 
     @Synchronized
     override fun remove(id: String) {
-        Timber.v("removing contact: %s", id)
+        Timber.v("removing contact: $id")
         contacts.remove(id)
         all.postValue(contacts)
     }

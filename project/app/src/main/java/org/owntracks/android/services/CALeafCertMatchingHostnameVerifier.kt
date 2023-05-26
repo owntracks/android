@@ -18,7 +18,7 @@ class CALeafCertMatchingHostnameVerifier(caCertificate: Certificate) : HostnameV
 
     override fun verify(hostname: String?, session: SSLSession?): Boolean {
         val peerCertificates = session?.peerCertificates
-        if (peerCertificates == null || peerCertificates.isEmpty()) {
+        if (peerCertificates.isNullOrEmpty()) {
             Timber.e("No server peer certificates presented for SSL session.")
             return OkHostnameVerifier.INSTANCE.verify(emptyArray(), hostname, session)
         }
