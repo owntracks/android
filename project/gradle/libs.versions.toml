@@ -41,7 +41,7 @@ libsodium = "2.0.2"
 materialize = "1.2.1"
 materialdrawer = "6.1.2"
 r8 = "8.0.40"
-guava = "31.1-jre"
+guava = "32.0.0-jre"
 bouncycastle = "1.73"
 desguar-jdk = "1.2.3"
 
