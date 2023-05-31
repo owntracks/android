@@ -14,6 +14,7 @@ name: Build and Test
       - "project/buildSrc/src/**"
       - "project/*.gradle.kts"
       - "project/gradle/wrapper/gradle-wrapper.properties"
+      - "project/gradle/libs.versions.toml"
     branches:
       - master
       - gh-readonly-queue/master/**
