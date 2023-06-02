@@ -192,7 +192,7 @@ jobs:
       - name: Upload connected test result artifact
         uses: actions/upload-artifact@v3
         with:
-          name: espresso-test-reports-${{ matrix.android-api }}
+          name: espresso-test-reports-${{ matrix.android-api }}-${{ matrix.flavour }}
           path: ./project/app/build/reports/androidTests/connected/
         if: always()
       - name: Espresso JUnit Report
@@ -203,7 +203,7 @@ jobs:
       - name: Upload connected test coverage artifact
         uses: ./.github/actions/upload-artifact
         with:
-          name: espresso-test-coverage-${{ matrix.android-api }}
+          name: espresso-test-coverage-${{ matrix.android-api }}-${{ matrix.flavour }}
           path: ./project/app/build/reports/coverage/androidTest/
         if: always()
       - name: Upload coverage
@@ -237,6 +237,8 @@ jobs:
           GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
       - name: Gradle build
         uses: gradle/gradle-build-action@v2
+        env:
+          KEYSTORE_PASSPHRASE: ${{ secrets.KEYSTORE_PASSPHRASE }}
         with:
           build-root-directory: project
           arguments: |
