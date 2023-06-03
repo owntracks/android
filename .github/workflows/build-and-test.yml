@@ -115,6 +115,9 @@ jobs:
         flavour: [Oss, Gms]
     steps:
       - run: echo "/android-sdk/platform-tools/" >> $GITHUB_PATH
+      - run: /android-sdk/cmdline-tools/latest/bin/sdkmanager "platforms;android-$API"
+        env:
+          API: ${{ matrix.android-api }}
       - uses: actions/checkout@v3
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -126,7 +129,7 @@ jobs:
         id: check_snapshot_exists
         uses: andstor/file-existence-action@v2
         with:
-          files: "/android-sdk/user_home/avd/test-${{ matrix.android-api }}.avd/snapshots/default_boot/screenshot.png"
+          files: "/android-sdk/user_home/avd/owntracks-test-${{ matrix.android-api }}-${{ matrix.flavour }}.avd/snapshots/default_boot/screenshot.png"
 
       - name: Create AVD and generate snapshot for caching
         if: steps.check_snapshot_exists.outputs.files_exists == 'false'
@@ -136,11 +139,12 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
           profile: pixel_3a
-          target: google_apis
+          target: ${{ matrix.flavour == 'Gms' && 'google_apis' || 'default' }}
           ram-size: 6000M
-          avd-name: test-${{ matrix.android-api }}
+          avd-name: owntracks-test-${{ matrix.android-api }}-${{ matrix.flavour }}
           disable-animations: true
           arch: x86_64
+          cores: 2
           sdcard-path-or-size: 1000M
           script: |
             echo "Created AVD snapshot"
@@ -159,10 +163,10 @@ jobs:
           target: ${{ matrix.flavour == 'Gms' && 'google_apis' || 'default' }}
           ram-size: 6000M
           disable-animations: true
+          avd-name: owntracks-test-${{ matrix.android-api }}-${{ matrix.flavour }}
           arch: x86_64
           cores: 2
           sdcard-path-or-size: 1000M
-          emulator-build: 9936625
           script: |
             adb logcat -d > emulator-startup.log
             adb shell settings put global bluetooth_on 0
@@ -185,7 +189,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: logcat-${{ matrix.android-api }}-${{ matrix.flavour }}
-          path: |            
+          path: |
             ${{ github.workspace }}/emulator.log
             ${{ github.workspace }}/emulator-startup.log
 
