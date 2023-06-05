@@ -3,6 +3,10 @@ package org.owntracks.android.testutils
 import android.content.Intent
 import android.net.Uri
 import androidx.test.platform.app.InstrumentationRegistry
+import java.net.ConnectException
+import java.net.InetSocketAddress
+import java.net.Socket
+import kotlin.concurrent.thread
 import kotlinx.coroutines.DelicateCoroutinesApi
 import mqtt.broker.Broker
 import mqtt.broker.interfaces.Authentication
@@ -17,10 +21,6 @@ import org.owntracks.android.support.Parser
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import timber.log.Timber
-import java.net.ConnectException
-import java.net.InetSocketAddress
-import java.net.Socket
-import kotlin.concurrent.thread
 
 @ExperimentalUnsignedTypes
 class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
@@ -143,7 +143,7 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
         )
         waitUntilActivityVisible<LoadActivity>()
         val activity = getCurrentActivity() as LoadActivity
-        activity.importStatusIdlingResource.with {
+        activity.importStatusIdlingResource.use {
             clickOnAndWait(R.id.save)
         }
     }

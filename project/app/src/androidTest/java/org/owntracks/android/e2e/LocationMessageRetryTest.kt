@@ -54,7 +54,7 @@ class LocationMessageRetryTest :
             setMockLocation(51.0, 0.0)
         }
 
-        baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.with(2.minutes) {
+        baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.use(2.minutes) {
             openDrawer()
             clickOnAndWait(R.string.title_activity_status)
         }

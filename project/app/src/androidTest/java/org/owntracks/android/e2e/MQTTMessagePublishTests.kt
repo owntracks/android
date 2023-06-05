@@ -82,7 +82,7 @@ class MQTTMessagePublishTests :
             setMockLocation(mockLatitude, mockLongitude)
         }
 
-        baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.with {
+        baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.use {
             openDrawer()
             clickOnAndWait(R.string.title_activity_contacts)
         }
@@ -110,7 +110,7 @@ class MQTTMessagePublishTests :
             setMockLocation(51.0, 0.0)
         }
 
-        baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.with {
+        baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.use {
             openDrawer()
             clickOnAndWait(R.string.title_activity_contacts)
         }
@@ -150,7 +150,7 @@ class MQTTMessagePublishTests :
             setMockLocation(51.0, 0.0)
         }
 
-        app.mqttConnectionIdlingResource.with {
+        app.mqttConnectionIdlingResource.use {
             openDrawer()
             clickOnAndWait(R.string.title_activity_contacts)
         }
@@ -210,7 +210,7 @@ class MQTTMessagePublishTests :
             setMockLocation(51.0, 0.0)
         }
 
-        baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.with {
+        baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.use {
             openDrawer()
             clickOnAndWait(R.string.title_activity_contacts)
         }
@@ -278,7 +278,7 @@ class MQTTMessagePublishTests :
         grantMapActivityPermissions()
         configureMQTTConnectionToLocal("not the right password")
         waitUntilActivityVisible<MapActivity>()
-        app.mqttConnectionIdlingResource.with {
+        app.mqttConnectionIdlingResource.use {
             openDrawer()
             clickOnAndWait(R.string.title_activity_status)
         }

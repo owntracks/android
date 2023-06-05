@@ -12,7 +12,6 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.owntracks.android.model.messages.MessageConfiguration
 import org.owntracks.android.preferences.types.*
-import org.owntracks.android.ui.map.MapLayerStyle
 
 @RunWith(Parameterized::class)
 class PreferencesGettersAndSetters(private val parameter: Parameter) {

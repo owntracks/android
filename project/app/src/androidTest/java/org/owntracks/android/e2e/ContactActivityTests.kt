@@ -51,7 +51,7 @@ class ContactActivityTests :
             setMockLocation(51.0, 0.0)
         }
 
-        baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.with {
+        baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.use {
             openDrawer()
             clickOnAndWait(R.string.title_activity_contacts)
         }

@@ -90,7 +90,7 @@ class MQTTTransitionEventTests :
 
         configureMQTTConnectionToLocalWithGeneratedPassword()
 
-        app.mqttConnectionIdlingResource.with {
+        app.mqttConnectionIdlingResource.use {
             reportLocationFromMap(app.locationIdlingResource)
         }
 

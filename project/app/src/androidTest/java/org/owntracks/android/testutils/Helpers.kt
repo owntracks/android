@@ -70,7 +70,7 @@ fun reportLocationFromMap(locationIdlingResource: IdlingResource?, mockLocationF
     mockLocationFunction()
     clickOnAndWait(R.id.menu_monitoring)
     clickOnAndWait(R.id.fabMonitoringModeMove)
-    locationIdlingResource.with {
+    locationIdlingResource.use {
         clickOnAndWait(R.id.fabMyLocation)
         clickOnAndWait(R.id.menu_report)
     }
@@ -99,9 +99,8 @@ fun getCurrentActivity(): Activity? {
     var currentActivity: Activity? = null
     getInstrumentation().runOnMainSync {
         run {
-            currentActivity = ActivityLifecycleMonitorRegistry.getInstance()
-                .getActivitiesInStage(Stage.RESUMED)
-                .elementAtOrNull(0)
+            currentActivity =
+                ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(Stage.RESUMED).elementAtOrNull(0)
         }
     }
     return currentActivity
@@ -113,7 +112,7 @@ fun getCurrentActivity(): Activity? {
  * @param timeout time to wait for the [IdlingResource] to be idle
  * @param block function to execute once idle
  */
-inline fun IdlingResource?.with(timeout: Duration = 30.seconds, block: () -> Unit) {
+inline fun IdlingResource?.use(timeout: Duration = 30.seconds, block: () -> Unit) {
     if (this == null) {
         Timber.w("Idling resource is null")
     }
@@ -121,15 +120,13 @@ inline fun IdlingResource?.with(timeout: Duration = 30.seconds, block: () -> Uni
     try {
         this?.run {
             Timber.i("Registering idling resource ${this.name}")
-            IdlingRegistry.getInstance()
-                .register(this)
+            IdlingRegistry.getInstance().register(this)
         }
         block()
     } finally {
         this?.run {
             Timber.i("Unregistering idling resource ${this.name}")
-            IdlingRegistry.getInstance()
-                .unregister(this)
+            IdlingRegistry.getInstance().unregister(this)
         }
     }
 }
@@ -141,14 +138,12 @@ fun disableDeviceLocation() {
         "settings put secure location_providers_allowed -gps"
     }
 
-    getInstrumentation().uiAutomation.executeShellCommand(cmd)
-        .close()
+    getInstrumentation().uiAutomation.executeShellCommand(cmd).close()
 }
 
 fun stopAndroidSetupProcess() {
     listOf("com.google.android.setupwizard", "com.android.systemui", "com.android.vending").forEach {
-        getInstrumentation().uiAutomation.executeShellCommand("am force-stop $it")
-            .close()
+        getInstrumentation().uiAutomation.executeShellCommand("am force-stop $it").close()
     }
 }
 
@@ -164,8 +159,7 @@ fun enableDeviceLocation() {
         "settings put secure location_providers_allowed +gps"
     }
 
-    getInstrumentation().uiAutomation.executeShellCommand(cmd)
-        .close()
+    getInstrumentation().uiAutomation.executeShellCommand(cmd).close()
 }
 
 fun grantMapActivityPermissions() {
@@ -209,8 +203,7 @@ fun writeFileToDevice(filename: String, content: ByteArray): Uri? {
         return null
     } else {
         PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        val downloadsDir =
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         val configFile = downloadsDir.resolve(filename)
         FileWriter(configFile).use {
             it.write(String(content))

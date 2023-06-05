@@ -141,6 +141,9 @@ class RoomWaypointsRepo @Inject constructor(
     private fun deserializeWaypointModel(value: ByteArray): WaypointModel {
         ByteBuffer.wrap(value).run {
             order(ByteOrder.LITTLE_ENDIAN)
+            val rootTableAddr = int
+            position(rootTableAddr - 4)
+            val vTableLocation = int
             val id = 0L
             position(0x28)
             val longitude = double
