@@ -10,6 +10,8 @@ import java.nio.ByteOrder
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -65,43 +67,36 @@ class RoomWaypointsRepo @Inject constructor(
         applicationContext,
         WaypointDatabase::class.java,
         "waypoints"
-    )
-        .build()
+    ).build()
 
-    override suspend fun getByTst(instant: Instant): WaypointModel? = db.waypointDao()
-        .getByTst(instant)
+    override suspend fun getByTst(instant: Instant): WaypointModel? = db.waypointDao().getByTst(instant)
 
     override suspend fun get(id: Long): WaypointModel? = withContext(ioDispatcher) {
-        db.waypointDao()
-            .get(id)
+        db.waypointDao().get(id)
     }
 
     override val all: List<WaypointModel>
-        get() = db.waypointDao()
-            .all()
+        get() = db.waypointDao().all()
 
     override val allLive: LiveData<List<WaypointModel>>
-        get() = db.waypointDao()
-            .allLive()
+        get() = db.waypointDao().allLive()
 
     override suspend fun insertImpl(waypointModel: WaypointModel) = withContext(ioDispatcher) {
-        db.waypointDao()
-            .upsert(waypointModel)
+        db.waypointDao().upsert(waypointModel)
     }
 
     override suspend fun updateImpl(waypointModel: WaypointModel) = withContext(ioDispatcher) {
-        db.waypointDao()
-            .upsert(waypointModel)
+        db.waypointDao().upsert(waypointModel)
     }
 
     override suspend fun deleteImpl(waypointModel: WaypointModel) = withContext(ioDispatcher) {
-        db.waypointDao()
-            .delete(waypointModel)
+        db.waypointDao().delete(waypointModel)
     }
 
     private val _migrationCompleteFlow = MutableStateFlow(false)
     override val migrationCompleteFlow: StateFlow<Boolean> = _migrationCompleteFlow
 
+    @OptIn(ExperimentalTime::class)
     fun migrateFromLegacyStorage(): Job {
         val handler = CoroutineExceptionHandler { _, exception ->
             Timber.e(exception, "Error migrating waypoints")
@@ -110,38 +105,31 @@ class RoomWaypointsRepo @Inject constructor(
             try {
                 val objectboxPath = applicationContext.filesDir.resolve("objectbox/objectbox")
                 if (objectboxPath.exists() && objectboxPath.canRead() && objectboxPath.isDirectory) {
-                    Environment(
-                        applicationContext.filesDir.resolve("objectbox/objectbox")
-                            .toString(),
-                        readOnly = true,
-                        locking = false
-                    ).use {
-                        it.beginTransaction()
-                            .dump()
-                            .filter { entry ->
-                                entry.key.bytes.slice(0..3) ==
-                                    listOf<Byte>(0x18, 0, 0, 0x4)
-                            }
-                            .map { lmdbEntry ->
+                    val migrationDuration = measureTimedValue {
+                        Environment(
+                            applicationContext.filesDir.resolve("objectbox/objectbox").toString(),
+                            readOnly = true,
+                            locking = false
+                        ).use {
+                            it.beginTransaction().dump().filter { entry ->
+                                // This is the magic we're looking for at the start of an LMDB key to indicate it's a waypoint
+                                entry.key.bytes.slice(0..3) == listOf<Byte>(0x18, 0, 0, 0x4)
+                            }.map { lmdbEntry ->
                                 deserializeWaypointModel(lmdbEntry.value)
-                            }
-                            .toList()
-                            .run {
-                                db.waypointDao()
-                                    .insertAll(this)
-                                Timber
-                                    .i(
-                                        "Waypoints Migration complete. Tried to insert ${this.size}, ended up with ${
-                                            db.waypointDao()
-                                                .getRowCount()
-                                        } waypoints in the repo"
-                                    )
-                            }
-                            .run {
-                                val deleted = applicationContext.filesDir.resolve("objectbox")
-                                    .deleteRecursively()
+                            }.toList().run {
+                                db.waypointDao().insertAll(this)
+                                this.size
+                            }.run {
+                                val deleted = applicationContext.filesDir.resolve("objectbox").deleteRecursively()
                                 Timber.d("Deleting legacy waypoints database file. Success=$deleted")
+                                this
                             }
+                        }
+                    }
+                    db.waypointDao().getRowCount().let { rowCount ->
+                        Timber.i(
+                            "Waypoints Migration complete in ${migrationDuration.duration}. Tried to insert ${migrationDuration.value}, ended up with $rowCount waypoints in the repo" // ktlint-disable max-line-length
+                        )
                     }
                 }
             } finally {
@@ -151,30 +139,29 @@ class RoomWaypointsRepo @Inject constructor(
     }
 
     private fun deserializeWaypointModel(value: ByteArray): WaypointModel {
-        ByteBuffer.wrap(value)
-            .run {
-                order(ByteOrder.LITTLE_ENDIAN)
-                val id = 0L
-                position(0x28)
-                val longitude = double
-                val latitude = double
-                val lastTransition = int
-                val radius = int
-                val tst = long
-                position(0x54)
-                val descriptionLength = int
-                val description = ByteArray(descriptionLength)
-                get(description)
-                return WaypointModel(
-                    id,
-                    String(description),
-                    latitude,
-                    longitude,
-                    radius,
-                    lastTransition = lastTransition,
-                    tst = Instant.ofEpochSecond(tst)
-                )
-            }
+        ByteBuffer.wrap(value).run {
+            order(ByteOrder.LITTLE_ENDIAN)
+            val id = 0L
+            position(0x28)
+            val longitude = double
+            val latitude = double
+            val lastTransition = int
+            val radius = int
+            val tst = long
+            position(0x54)
+            val descriptionLength = int
+            val description = ByteArray(descriptionLength)
+            get(description)
+            return WaypointModel(
+                id,
+                String(description),
+                latitude,
+                longitude,
+                radius,
+                lastTransition = lastTransition,
+                tst = Instant.ofEpochSecond(tst)
+            )
+        }
     }
 
     /**

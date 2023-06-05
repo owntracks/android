@@ -66,10 +66,7 @@ import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber
 
 @AndroidEntryPoint
-class BackgroundService :
-    LifecycleService(),
-    ServiceBridgeInterface,
-    Preferences.OnPreferenceChangeListener {
+class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preferences.OnPreferenceChangeListener {
     private lateinit var locationCallback: LocationCallback
     private lateinit var locationCallbackOnDemand: LocationCallback
     private var lastLocationMessage: MessageLocation? = null
@@ -229,8 +226,9 @@ class BackgroundService :
                     Timber.tag("TOOT").d("Listening for new waypoints")
                     waypointsRepo.operations.observe(this@BackgroundService) { (operation, waypoint): WaypointAndOperation ->
                         when (operation) {
-                            WaypointsRepo.Operation.INSERT,
-                            WaypointsRepo.Operation.UPDATE -> locationProcessor.publishWaypointMessage(waypoint)
+                            WaypointsRepo.Operation.INSERT, WaypointsRepo.Operation.UPDATE -> locationProcessor.publishWaypointMessage(
+                                waypoint
+                            )
                             else -> {}
                         }
                         lifecycleScope.launch {
@@ -325,8 +323,7 @@ class BackgroundService :
                 }
 
                 INTENT_ACTION_BOOT_COMPLETED, INTENT_ACTION_PACKAGE_REPLACED -> {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
-                        !hasBeenStartedExplicitly && ActivityCompat.checkSelfPermission(
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !hasBeenStartedExplicitly && ActivityCompat.checkSelfPermission(
                             this,
                             Manifest.permission.ACCESS_BACKGROUND_LOCATION
                         ) == PackageManager.PERMISSION_DENIED
@@ -356,8 +353,7 @@ class BackgroundService :
 
     private fun notifyUserOfBackgroundLocationRestriction() {
         val activityLaunchIntent =
-            Intent(applicationContext, MapActivity::class.java)
-                .setAction("android.intent.action.MAIN")
+            Intent(applicationContext, MapActivity::class.java).setAction("android.intent.action.MAIN")
                 .addCategory("android.intent.category.LAUNCHER")
                 .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
         val notificationText = getString(R.string.backgroundLocationRestrictionNotificationText)
@@ -371,8 +367,7 @@ class BackgroundService :
             .setAutoCancel(true)
             .setSmallIcon(R.drawable.ic_owntracks_80)
             .setStyle(
-                NotificationCompat.BigTextStyle()
-                    .bigText(notificationText)
+                NotificationCompat.BigTextStyle().bigText(notificationText)
             )
             .setContentIntent(
                 PendingIntent.getActivity(
@@ -394,28 +389,26 @@ class BackgroundService :
 
     // Show monitoring mode if endpoint state is not interesting
     private val ongoingNotification: Notification
-        get() =
-            activeNotificationCompatBuilder.apply {
-                if (lastLocationMessage != null && preferences.notificationLocation) {
-                    setContentTitle(lastLocationMessage!!.geocode)
-                    setWhen(TimeUnit.SECONDS.toMillis(lastLocationMessage!!.timestamp))
-                    setNumber(lastQueueLength)
-                } else {
-                    setContentTitle(getString(R.string.app_name))
-                }
-                // Show monitoring mode if endpoint state is not interesting
-                val lastEndpointState = endpointStateRepo.endpointStateLiveData.value
-                if (lastEndpointState === EndpointState.CONNECTED || lastEndpointState === EndpointState.IDLE) {
-                    setContentText(getMonitoringLabel(preferences.monitoring))
-                } else if (lastEndpointState === EndpointState.ERROR && lastEndpointState.message != null) {
-                    setContentText(
-                        lastEndpointState.getLabel(this@BackgroundService) + ": " + lastEndpointState.message
-                    )
-                } else {
-                    setContentText(lastEndpointState!!.getLabel(this@BackgroundService))
-                }
+        get() = activeNotificationCompatBuilder.apply {
+            if (lastLocationMessage != null && preferences.notificationLocation) {
+                setContentTitle(lastLocationMessage!!.geocode)
+                setWhen(TimeUnit.SECONDS.toMillis(lastLocationMessage!!.timestamp))
+                setNumber(lastQueueLength)
+            } else {
+                setContentTitle(getString(R.string.app_name))
             }
-                .build()
+            // Show monitoring mode if endpoint state is not interesting
+            val lastEndpointState = endpointStateRepo.endpointStateLiveData.value
+            if (lastEndpointState === EndpointState.CONNECTED || lastEndpointState === EndpointState.IDLE) {
+                setContentText(getMonitoringLabel(preferences.monitoring))
+            } else if (lastEndpointState === EndpointState.ERROR && lastEndpointState.message != null) {
+                setContentText(
+                    lastEndpointState.getLabel(this@BackgroundService) + ": " + lastEndpointState.message
+                )
+            } else {
+                setContentText(lastEndpointState!!.getLabel(this@BackgroundService))
+            }
+        }.build()
 
     private fun getMonitoringLabel(mode: MonitoringMode): String {
         return when (mode) {
@@ -460,8 +453,7 @@ class BackgroundService :
             activeNotifications.size,
             activeNotifications.size
         )
-        val inbox = NotificationCompat.InboxStyle()
-            .setSummaryText(summary)
+        val inbox = NotificationCompat.InboxStyle().setSummaryText(summary)
         activeNotifications.forEach { inbox.addLine(it) }
 
         NotificationCompat.Builder(this, App.NOTIFICATION_CHANNEL_EVENTS)
@@ -480,8 +472,7 @@ class BackgroundService :
             .setContentIntent(
                 PendingIntent.getActivity(
                     this,
-                    System.currentTimeMillis()
-                        .toInt() / 1000,
+                    System.currentTimeMillis().toInt() / 1000,
                     Intent(this, MapActivity::class.java),
                     updateCurrentIntentFlags
                 )
@@ -525,16 +516,15 @@ class BackgroundService :
             val requestId = triggeringGeofence.requestId
             if (requestId != null) {
                 try {
-                    waypointsRepo.get(requestId.toLong())
-                        ?.run {
-                            Timber.d("onWaypointTransition triggered by geofencing event")
-                            locationProcessor.onWaypointTransition(
-                                this,
-                                event.triggeringLocation,
-                                transition,
-                                MessageTransition.TRIGGER_CIRCULAR
-                            )
-                        } ?: run {
+                    waypointsRepo.get(requestId.toLong())?.run {
+                        Timber.d("onWaypointTransition triggered by geofencing event")
+                        locationProcessor.onWaypointTransition(
+                            this,
+                            event.triggeringLocation,
+                            transition,
+                            MessageTransition.TRIGGER_CIRCULAR
+                        )
+                    } ?: run {
                         Timber.e("waypoint id $requestId not found for geofence event")
                     }
                 } catch (e: NumberFormatException) {
@@ -648,8 +638,7 @@ class BackgroundService :
                     Geofence.NEVER_EXPIRE,
                     null
                 )
-            }
-                .toList()
+            }.toList()
             geofencingClient.removeGeofences(this@BackgroundService)
             if (geofences.isNotEmpty()) {
                 val request = GeofencingRequest(Geofence.GEOFENCE_TRANSITION_ENTER, geofences)
@@ -663,11 +652,10 @@ class BackgroundService :
             ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_DENIED &&
-                ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ) == PackageManager.PERMISSION_DENIED
+            ) == PackageManager.PERMISSION_DENIED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_DENIED
             )
     }
 
@@ -684,12 +672,9 @@ class BackgroundService :
             "moveModeLocatorInterval",
             "pegLocatorFastestIntervalToInterval"
         )
-        if (!propertiesWeCareAbout.stream()
-                .filter { o: String -> properties.contains(o) }
-                .collect(
-                    Collectors.toSet()
-                )
-                .isEmpty()
+        if (!propertiesWeCareAbout.stream().filter { o: String -> properties.contains(o) }.collect(
+                Collectors.toSet()
+            ).isEmpty()
         ) {
             Timber.d("locator preferences changed. Resetting location request.")
             setupLocationRequest()
@@ -729,26 +714,19 @@ class BackgroundService :
         private const val INTENT_REQUEST_CODE_CLEAR_EVENTS = 1263
         private const val NOTIFICATION_ID_ONGOING = 1
         private const val NOTIFICATION_ID_EVENT_GROUP = 2
-        const val BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG =
-            "backgroundRestrictionNotification"
+        const val BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG = "backgroundRestrictionNotification"
 
         private const val NOTIFICATION_GROUP_EVENTS = "events"
 
         // NEW ACTIONS ALSO HAVE TO BE ADDED TO THE SERVICE INTENT FILTER
-        private const val INTENT_ACTION_CLEAR_NOTIFICATIONS =
-            "org.owntracks.android.CLEAR_NOTIFICATIONS"
-        private const val INTENT_ACTION_SEND_LOCATION_USER =
-            "org.owntracks.android.SEND_LOCATION_USER"
+        private const val INTENT_ACTION_CLEAR_NOTIFICATIONS = "org.owntracks.android.CLEAR_NOTIFICATIONS"
+        private const val INTENT_ACTION_SEND_LOCATION_USER = "org.owntracks.android.SEND_LOCATION_USER"
         const val INTENT_ACTION_SEND_EVENT_CIRCULAR = "org.owntracks.android.SEND_EVENT_CIRCULAR"
-        const val INTENT_ACTION_REREQUEST_LOCATION_UPDATES =
-            "org.owntracks.android.REREQUEST_LOCATION_UPDATES"
-        private const val INTENT_ACTION_CHANGE_MONITORING =
-            "org.owntracks.android.CHANGE_MONITORING"
+        const val INTENT_ACTION_REREQUEST_LOCATION_UPDATES = "org.owntracks.android.REREQUEST_LOCATION_UPDATES"
+        private const val INTENT_ACTION_CHANGE_MONITORING = "org.owntracks.android.CHANGE_MONITORING"
         private const val INTENT_ACTION_EXIT = "org.owntracks.android.EXIT"
         private const val INTENT_ACTION_BOOT_COMPLETED = "android.intent.action.BOOT_COMPLETED"
-        private const val INTENT_ACTION_PACKAGE_REPLACED =
-            "android.intent.action.MY_PACKAGE_REPLACED"
-        private const val updateCurrentIntentFlags =
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        private const val INTENT_ACTION_PACKAGE_REPLACED = "android.intent.action.MY_PACKAGE_REPLACED"
+        private const val updateCurrentIntentFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
     }
 }
