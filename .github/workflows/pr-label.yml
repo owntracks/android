@@ -12,6 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Labeler
-        uses: actions/labeler@v4.0.4
+        uses: actions/labeler@v4.1.0
         with:
           repo-token: "${{ secrets.PAT }}"
