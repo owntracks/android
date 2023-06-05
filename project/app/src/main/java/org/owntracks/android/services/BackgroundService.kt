@@ -20,7 +20,11 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
+import dagger.hilt.EntryPoint
+import dagger.hilt.EntryPoints
+import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.components.SingletonComponent
 import java.time.Duration
 import java.util.LinkedList
 import java.util.concurrent.TimeUnit
@@ -183,7 +187,24 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
     }
 
+    @EntryPoint
+    @InstallIn(SingletonComponent::class)
+    internal interface ServiceEntrypoint {
+        fun preferences(): Preferences
+        fun endpointStateRepo(): EndpointStateRepo
+    }
+
     override fun onCreate() {
+        Timber.d("Backgroundservice onCreate")
+        val entrypoint = EntryPoints.get(
+            applicationContext,
+            ServiceEntrypoint::class.java
+        )
+        preferences = entrypoint.preferences()
+        endpointStateRepo = entrypoint.endpointStateRepo()
+        Timber.d("backgroundservice has injected. calling startForeground")
+        startForeground(NOTIFICATION_ID_ONGOING, ongoingNotification)
+        Timber.d("backgroundservice super.oncreate")
         super.onCreate()
         serviceBridge.bind(this)
         notificationManagerCompat = NotificationManagerCompat.from(this)
@@ -206,7 +227,6 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
                 onLocationChanged(locationResult.lastLocation, MessageLocation.REPORT_TYPE_RESPONSE)
             }
         }
-        startForeground(NOTIFICATION_ID_ONGOING, ongoingNotification)
         setupLocationRequest()
         scheduler.scheduleLocationPing()
         messageProcessor.initialize()
