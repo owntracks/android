@@ -239,6 +239,7 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
         waypointsRepo.migrateFromLegacyStorage()
             .invokeOnCompletion {
                 it?.run {
+                    Timber.e(it, "Error migrating waypoints")
                     NotificationCompat.Builder(
                         applicationContext,
                         GeocoderProvider.ERROR_NOTIFICATION_CHANNEL_ID

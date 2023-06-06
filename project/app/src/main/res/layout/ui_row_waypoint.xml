@@ -48,7 +48,7 @@
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:textSize="12sp"
-                android:visibility="@{waypoint.lastTriggered.isAfter(Instant.MIN) ? View.VISIBLE : View.GONE}"
+                android:visibility="@{waypoint.lastTriggered != null ? View.VISIBLE : View.GONE}"
                 app:relativeTimeSpanString="@{waypoint.lastTriggered}" />
         </RelativeLayout>
 

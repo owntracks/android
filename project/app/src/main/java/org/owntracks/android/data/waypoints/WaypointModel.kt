@@ -14,7 +14,7 @@ data class WaypointModel(
     var geofenceLatitude: Double = 0.0,
     var geofenceLongitude: Double = 0.0,
     var geofenceRadius: Int = 0,
-    var lastTriggered: Instant = Instant.MIN,
+    var lastTriggered: Instant? = null,
     var lastTransition: Int = 0,
     val tst: Instant = Instant.now()
 

@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "44d4b1e0b9f6061e32e43574f5112dfd",
+    "identityHash": "74b6c5a8045c765fbeeb381941b8e5ec",
     "entities": [
       {
         "tableName": "WaypointModel",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `description` TEXT NOT NULL, `geofenceLatitude` REAL NOT NULL, `geofenceLongitude` REAL NOT NULL, `geofenceRadius` INTEGER NOT NULL, `lastTriggered` INTEGER NOT NULL, `lastTransition` INTEGER NOT NULL, `tst` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `description` TEXT NOT NULL, `geofenceLatitude` REAL NOT NULL, `geofenceLongitude` REAL NOT NULL, `geofenceRadius` INTEGER NOT NULL, `lastTriggered` INTEGER, `lastTransition` INTEGER NOT NULL, `tst` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -42,7 +42,7 @@
             "fieldPath": "lastTriggered",
             "columnName": "lastTriggered",
             "affinity": "INTEGER",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "lastTransition",
@@ -80,7 +80,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '44d4b1e0b9f6061e32e43574f5112dfd')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '74b6c5a8045c765fbeeb381941b8e5ec')"
     ]
   }
 }

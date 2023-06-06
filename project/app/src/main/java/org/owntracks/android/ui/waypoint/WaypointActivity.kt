@@ -31,26 +31,25 @@ class WaypointActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = DataBindingUtil.setContentView<UiWaypointBinding>(this, R.layout.ui_waypoint)
-            .apply {
-                textFields = listOf(
-                    description,
-                    radius,
-                    latitude,
-                    longitude
-                )
-                vm = viewModel
-                lifecycleOwner = this@WaypointActivity
-                setSupportActionBar(appbar.toolbar)
-                val textWatcher = object : TextWatcher {
-                    override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-                    override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-                    override fun afterTextChanged(s: Editable) {
-                        setSaveButtonEnabledStatus()
-                    }
+        binding = DataBindingUtil.setContentView<UiWaypointBinding>(this, R.layout.ui_waypoint).apply {
+            textFields = listOf(
+                description,
+                radius,
+                latitude,
+                longitude
+            )
+            vm = viewModel
+            lifecycleOwner = this@WaypointActivity
+            setSupportActionBar(appbar.toolbar)
+            val textWatcher = object : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+                override fun afterTextChanged(s: Editable) {
+                    setSaveButtonEnabledStatus()
                 }
-                textFields.forEach { it.addTextChangedListener(textWatcher) }
             }
+            textFields.forEach { it.addTextChangedListener(textWatcher) }
+        }
 
         supportActionBar?.run {
             setDisplayShowHomeEnabled(true)
@@ -79,12 +78,9 @@ class WaypointActivity : AppCompatActivity() {
             R.id.save -> {
                 viewModel.saveWaypoint(
                     binding.description.text.toString(),
-                    binding.latitude.text.toString()
-                        .toDouble(),
-                    binding.longitude.text.toString()
-                        .toDouble(),
-                    binding.radius.text.toString()
-                        .toIntOrNull() ?: 1
+                    binding.latitude.text.toString().toDouble(),
+                    binding.longitude.text.toString().toDouble(),
+                    binding.radius.text.toString().toIntOrNull() ?: 1
                 )
                 finish()
                 true
@@ -112,8 +108,7 @@ class WaypointActivity : AppCompatActivity() {
     }
 
     private fun setSaveButtonEnabledStatus() = saveButton?.run {
-        isEnabled = !textFields.map { it.text }
-            .any { it.isNullOrBlank() }
+        isEnabled = !textFields.map { it.text }.any { it.isNullOrBlank() }
         icon?.alpha = if (isEnabled) 255 else 130
     }
 
@@ -124,21 +119,19 @@ class WaypointActivity : AppCompatActivity() {
 }
 
 @BindingAdapter("relativeTimeSpanString")
-fun TextView.setRelativeTimeSpanString(instant: Instant) {
-    text = if (instant == Instant.MIN) {
+fun TextView.setRelativeTimeSpanString(instant: Instant?) {
+    text = if (instant == null || instant == Instant.MIN) {
         ""
     } else if (DateUtils.isToday(instant.toEpochMilli())) {
-        DateFormat.getTimeInstance(DateFormat.SHORT)
-            .format(instant.toEpochMilli())
+        DateFormat.getTimeInstance(DateFormat.SHORT).format(instant.toEpochMilli())
     } else {
-        DateFormat.getDateInstance(DateFormat.SHORT)
-            .format(instant.toEpochMilli())
+        DateFormat.getDateInstance(DateFormat.SHORT).format(instant.toEpochMilli())
     }
 }
 
 @BindingAdapter("relativeTimeSpanString")
-fun TextView.setRelativeTimeSpanString(epochSeconds: Long) {
-    val instant = Instant.ofEpochSecond(epochSeconds)
+fun TextView.setRelativeTimeSpanString(epochSeconds: Long?) {
+    val instant = epochSeconds?.run(Instant::ofEpochSecond) ?: Instant.MIN
     text = if (instant == Instant.MIN) {
         ""
     } else if (DateUtils.isToday(instant.toEpochMilli())) {
