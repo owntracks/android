@@ -3,6 +3,9 @@ package org.owntracks.android.data.waypoints
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.google.flatbuffers.Constants
+import com.google.flatbuffers.FlatBufferBuilder
+import com.google.flatbuffers.Table
 import com.growse.lmdb_kt.Environment
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.nio.ByteBuffer
@@ -138,34 +141,18 @@ class RoomWaypointsRepo @Inject constructor(
         }
     }
 
-    private fun deserializeWaypointModel(value: ByteArray): WaypointModel {
-        ByteBuffer.wrap(value).run {
-            order(ByteOrder.LITTLE_ENDIAN)
-            val rootTableAddr = int
-            position(rootTableAddr - 4)
-            val vTableLocation = int
-            val id = 0L
-            position(0x28)
-            val longitude = double
-            val latitude = double
-            val lastTransition = int
-            val radius = int
-            val tst = long
-            position(0x54)
-            val descriptionLength = int
-            val description = ByteArray(descriptionLength)
-            get(description)
-            return WaypointModel(
+    private fun deserializeWaypointModel(value: ByteArray): WaypointModel =
+        ByteBuffer.wrap(value).run { FbWaypointModel.getRootAsFbWaypointModel(this) }.run {
+            WaypointModel(
                 id,
-                String(description),
-                latitude,
-                longitude,
-                radius,
-                lastTransition = lastTransition,
-                tst = Instant.ofEpochSecond(tst)
+                description ?: "",
+                geofenceLatitude,
+                geofenceLongitude,
+                geofenceRadius,
+                Instant.ofEpochSecond(lastTriggered),
+                lastTransition
             )
         }
-    }
 
     /**
      * A converter that tells Room how to store [java.time.Instant]
@@ -179,4 +166,133 @@ class RoomWaypointsRepo @Inject constructor(
         @TypeConverter
         fun toEpochSeconds(instant: Instant): Long = instant.epochSecond
     }
+
+    @Suppress("unused")
+    class FbWaypointModel : Table() {
+
+        fun __init(_i: Int, _bb: ByteBuffer) {
+            __reset(_i, _bb)
+        }
+        fun __assign(_i: Int, _bb: ByteBuffer): FbWaypointModel {
+            __init(_i, _bb)
+            return this
+        }
+        val id: Long
+            get() {
+                val o = __offset(4)
+                return if (o != 0) bb.getLong(o + bb_pos) else 0L
+            }
+        val description: String?
+            get() {
+                val o = __offset(6)
+                return if (o != 0) {
+                    __string(o + bb_pos)
+                } else {
+                    null
+                }
+            }
+        val descriptionAsByteBuffer: ByteBuffer get() = __vector_as_bytebuffer(6, 1)
+        fun descriptionInByteBuffer(_bb: ByteBuffer): ByteBuffer = __vector_in_bytebuffer(_bb, 6, 1)
+        val geofenceLatitude: Double
+            get() {
+                val o = __offset(8)
+                return if (o != 0) bb.getDouble(o + bb_pos) else 0.0
+            }
+        val geofenceLongitude: Double
+            get() {
+                val o = __offset(10)
+                return if (o != 0) bb.getDouble(o + bb_pos) else 0.0
+            }
+        val geofenceRadius: Int
+            get() {
+                val o = __offset(12)
+                return if (o != 0) bb.getInt(o + bb_pos) else 0
+            }
+        val lastTriggered: Long
+            get() {
+                val o = __offset(14)
+                return if (o != 0) bb.getLong(o + bb_pos) else 0L
+            }
+        val lastTransition: Int
+            get() {
+                val o = __offset(16)
+                return if (o != 0) bb.getInt(o + bb_pos) else 0
+            }
+        val tst: Long
+            get() {
+                val o = __offset(18)
+                return if (o != 0) bb.getLong(o + bb_pos) else 0L
+            }
+        companion object {
+            fun validateVersion() = Constants.FLATBUFFERS_23_5_26()
+            fun getRootAsFbWaypointModel(_bb: ByteBuffer): FbWaypointModel = getRootAsFbWaypointModel(
+                _bb,
+                FbWaypointModel()
+            )
+            fun getRootAsFbWaypointModel(_bb: ByteBuffer, obj: FbWaypointModel): FbWaypointModel {
+                _bb.order(ByteOrder.LITTLE_ENDIAN)
+                return (obj.__assign(_bb.getInt(_bb.position()) + _bb.position(), _bb))
+            }
+            fun createFbWaypointModel(
+                builder: FlatBufferBuilder,
+                id: Long,
+                descriptionOffset: Int,
+                geofenceLatitude: Double,
+                geofenceLongitude: Double,
+                geofenceRadius: Int,
+                lastTriggered: Long,
+                lastTransition: Int,
+                tst: Long
+            ): Int {
+                builder.startTable(8)
+                addTst(builder, tst)
+                addLastTriggered(builder, lastTriggered)
+                addGeofenceLongitude(builder, geofenceLongitude)
+                addGeofenceLatitude(builder, geofenceLatitude)
+                addId(builder, id)
+                addLastTransition(builder, lastTransition)
+                addGeofenceRadius(builder, geofenceRadius)
+                addDescription(builder, descriptionOffset)
+                return endFbWaypointModel(builder)
+            }
+            fun startFbWaypointModel(builder: FlatBufferBuilder) = builder.startTable(8)
+            fun addId(builder: FlatBufferBuilder, id: Long) = builder.addLong(0, id, 0L)
+            fun addDescription(builder: FlatBufferBuilder, description: Int) = builder.addOffset(1, description, 0)
+            fun addGeofenceLatitude(builder: FlatBufferBuilder, geofenceLatitude: Double) = builder.addDouble(
+                2,
+                geofenceLatitude,
+                0.0
+            )
+            fun addGeofenceLongitude(builder: FlatBufferBuilder, geofenceLongitude: Double) = builder.addDouble(
+                3,
+                geofenceLongitude,
+                0.0
+            )
+            fun addGeofenceRadius(builder: FlatBufferBuilder, geofenceRadius: Int) = builder.addInt(
+                4,
+                geofenceRadius,
+                0
+            )
+            fun addLastTriggered(builder: FlatBufferBuilder, lastTriggered: Long) = builder.addLong(
+                5,
+                lastTriggered,
+                0L
+            )
+            fun addLastTransition(builder: FlatBufferBuilder, lastTransition: Int) = builder.addInt(
+                6,
+                lastTransition,
+                0
+            )
+            fun addTst(builder: FlatBufferBuilder, tst: Long) = builder.addLong(7, tst, 0L)
+            fun endFbWaypointModel(builder: FlatBufferBuilder): Int {
+                val o = builder.endTable()
+                return o
+            }
+            fun finishFbWaypointModelBuffer(builder: FlatBufferBuilder, offset: Int) = builder.finish(offset)
+            fun finishSizePrefixedFbWaypointModelBuffer(builder: FlatBufferBuilder, offset: Int) = builder.finishSizePrefixed(
+                offset
+            )
+        }
+    }
 }
+// automatically generated by the FlatBuffers compiler, do not modify

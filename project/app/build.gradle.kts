@@ -212,6 +212,7 @@ dependencies {
     implementation(libs.commons.codec)
     implementation(libs.androidx.room.runtime)
     implementation("com.growse:lmdb-kt:0.1-SNAPSHOT")
+    implementation("com.google.flatbuffers:flatbuffers-java:23.5.26")
 
     // The BC version shipped under com.android is half-broken. Weird certificate issues etc.
     // To solve, we bring in our own version of BC

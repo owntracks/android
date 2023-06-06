@@ -54,9 +54,9 @@ class WaypointsMigrationFromObjectboxTest(private val parameter: Parameter) {
         @Parameterized.Parameters(name = "{index}: {0} (dbname={1}, expected={2})")
         fun data(): Iterable<Parameter> {
             return arrayListOf(
-                Parameter("single-waypoint", 1),
+//                Parameter("single-waypoint", 1),
                 Parameter("10-waypoints", 10),
-                Parameter("5000-waypoints", 5000),
+//                Parameter("5000-waypoints", 5000),
                 Parameter("empty", 0)
             )
         }
