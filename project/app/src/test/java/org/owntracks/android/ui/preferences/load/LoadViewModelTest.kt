@@ -140,23 +140,24 @@ class LoadViewModelTest {
         }
 
     @Test
-    fun `Given a configuration with a tid parameter set, when loading and then saving into the LoadViewModel, then the preferences tid `() = runTest {
-        val parser = Parser(null)
-        val preferences = Preferences(preferencesStore)
-        val waypointsRepo = InMemoryWaypointsRepo()
-        val vm = LoadViewModel(preferences, parser, waypointsRepo, UnconfinedTestDispatcher())
-        val config = """
+    fun `Given a configuration with a tid parameter set, when loading and then saving into the LoadViewModel, then the preferences tid `() =
+        runTest {
+            val parser = Parser(null)
+            val preferences = Preferences(preferencesStore)
+            val waypointsRepo = InMemoryWaypointsRepo()
+            val vm = LoadViewModel(preferences, parser, waypointsRepo, UnconfinedTestDispatcher())
+            val config = """
             {
               "_type":"configuration",
               "waypoints":[ ],
               "clientId": "testClientId",
               "tid": "testTid"
             }
-        """.trimIndent()
-        vm.extractPreferences(config.toByteArray())
-        vm.saveConfiguration()
-        advanceUntilIdle()
-        assertEquals(ImportStatus.SAVED, vm.configurationImportStatus.value)
-        assertEquals("testTid", preferences.tid)
-    }
+            """.trimIndent()
+            vm.extractPreferences(config.toByteArray())
+            vm.saveConfiguration()
+            advanceUntilIdle()
+            assertEquals(ImportStatus.SAVED, vm.configurationImportStatus.value)
+            assertEquals("te", preferences.tid.value)
+        }
 }
