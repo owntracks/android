@@ -99,6 +99,9 @@ class RoomWaypointsRepo @Inject constructor(
     private val _migrationCompleteFlow = MutableStateFlow(false)
     override val migrationCompleteFlow: StateFlow<Boolean> = _migrationCompleteFlow
 
+    private fun ByteArray.toHex(): String =
+        joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
+
     @OptIn(ExperimentalTime::class)
     fun migrateFromLegacyStorage(): Job {
         val handler = CoroutineExceptionHandler { _, exception ->
@@ -108,6 +111,9 @@ class RoomWaypointsRepo @Inject constructor(
             try {
                 val objectboxPath = applicationContext.filesDir.resolve("objectbox/objectbox")
                 if (objectboxPath.exists() && objectboxPath.canRead() && objectboxPath.isDirectory) {
+                    Timber.d(
+                        "DATAFILE CONTENTS: ${applicationContext.filesDir.resolve("objectbox/objectbox/data.mdb").readBytes().toHex()}"
+                    )
                     val migrationDuration = measureTimedValue {
                         Environment(
                             applicationContext.filesDir.resolve("objectbox/objectbox").toString(),
