@@ -153,7 +153,7 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         timeout-minutes: 60
         env:
-          TEST_OPTIONS: ${{ contains(github.event.pull_request.labels.*.name, 'smoke-test-required') && '-Pandroid.testInstrumentationRunnerArguments.annotation=org.owntracks.android.testutils.SmokeTest' || '' }}
+          TEST_OPTIONS: ${{ (contains(github.event.pull_request.labels.*.name, 'smoke-test-required') && !contains(github.event.pull_request.labels.*.name, 'integration-test-required')) && '-Pandroid.testInstrumentationRunnerArguments.annotation=org.owntracks.android.testutils.SmokeTest' || '' }}
           FLAVOUR: ${{ matrix.flavour }}
         with:
           api-level: ${{ matrix.android-api }}
