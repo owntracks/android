@@ -111,9 +111,6 @@ class RoomWaypointsRepo @Inject constructor(
             try {
                 val objectboxPath = applicationContext.filesDir.resolve("objectbox/objectbox")
                 if (objectboxPath.exists() && objectboxPath.canRead() && objectboxPath.isDirectory) {
-                    Timber.d(
-                        "DATAFILE CONTENTS: ${applicationContext.filesDir.resolve("objectbox/objectbox/data.mdb").readBytes().toHex()}"
-                    )
                     val migrationDuration = measureTimedValue {
                         Environment(
                             applicationContext.filesDir.resolve("objectbox/objectbox").toString(),

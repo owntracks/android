@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso
 import androidx.test.platform.app.InstrumentationRegistry
+import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -35,7 +36,7 @@ class WaypointsMigrationFromObjectboxTest(private val parameter: Parameter) {
             }
         }
         val dispatcher = EspressoTrackedDispatcher(Dispatchers.IO)
-        dispatcher.idlingResource.use {
+        dispatcher.idlingResource.use(2.minutes) {
             val roomWaypointsRepo = RoomWaypointsRepo(
                 context,
                 dispatcher,

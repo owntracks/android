@@ -92,7 +92,7 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
         Timber.plant(TimberInMemoryLogTree(BuildConfig.DEBUG))
 
         if (BuildConfig.DEBUG) {
-            System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "trace")
+            System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "debug")
             org.slf4j.LoggerFactory.getLogger(this::class.java).trace("SLF4J logging at trace level")
             Timber.e("StrictMode enabled in DEBUG build")
             StrictMode.setThreadPolicy(
