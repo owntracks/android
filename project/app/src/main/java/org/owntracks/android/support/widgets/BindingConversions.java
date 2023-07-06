@@ -21,49 +21,14 @@ import java.util.concurrent.TimeUnit;
 public class BindingConversions {
     private static final String EMPTY_STRING = "";
 
-
-    // XX to String
-    @BindingConversion
-    @InverseMethod("convertToInteger")
-    public static String convertToString(@Nullable Integer d) {
-        return d != null ? java.text.NumberFormat.getIntegerInstance().format(d) : EMPTY_STRING;
-    }
-
-    @BindingConversion
-    public static String convertToString(@Nullable Long d) {
-        return d != null ? d.toString() : EMPTY_STRING;
-    }
-
-
     @BindingConversion
     public static String convertToString(@Nullable Double d) {
         return d != null ? d.toString() : EMPTY_STRING;
     }
 
     @BindingConversion
-    public static String convertToString(boolean d) {
-        return String.valueOf(d);
-    }
-
-    @BindingConversion
     public static String convertToString(String s) {
         return s != null ? s : EMPTY_STRING;
-    }
-
-
-    // XX to Integer
-    @BindingConversion
-    public static Integer convertToInteger(String d) {
-        try {
-            return Integer.parseInt(d);
-        } catch (NumberFormatException e) {
-            return 0;
-        }
-    }
-
-    @BindingConversion
-    public static Integer convertToIntegerZeroIsEmpty(String d) {
-        return convertToInteger(d);
     }
 
     @BindingAdapter("android:visibility")
@@ -74,16 +39,11 @@ public class BindingConversions {
     @BindingAdapter("lastTransition")
     public static void setLastTransition(TextView view, int transition) {
         switch (transition) {
-            case 0:
-                view.setText(view.getResources().getString(R.string.waypoint_region_unknown));
-                break;
-            case Geofence.GEOFENCE_TRANSITION_ENTER:
-                view.setText(view.getResources().getString(R.string.waypoint_region_inside));
-                break;
-            case Geofence.GEOFENCE_TRANSITION_EXIT:
-                view.setText(view.getResources().getString(R.string.waypoint_region_outside));
-                break;
-
+            case 0 -> view.setText(view.getResources().getString(R.string.waypoint_region_unknown));
+            case Geofence.GEOFENCE_TRANSITION_ENTER ->
+                    view.setText(view.getResources().getString(R.string.waypoint_region_inside));
+            case Geofence.GEOFENCE_TRANSITION_EXIT ->
+                    view.setText(view.getResources().getString(R.string.waypoint_region_outside));
         }
     }
 

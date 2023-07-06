@@ -142,7 +142,12 @@ fun disableDeviceLocation() {
 }
 
 fun stopAndroidSetupProcess() {
-    listOf("com.google.android.setupwizard", "com.android.systemui", "com.android.vending").forEach {
+    listOf(
+        "com.google.android.setupwizard",
+        "com.android.systemui",
+        "com.android.vending",
+        "com.google.android.apps.wellbeing"
+    ).forEach {
         getInstrumentation().uiAutomation.executeShellCommand("am force-stop $it").close()
     }
 }
