@@ -99,9 +99,6 @@ class RoomWaypointsRepo @Inject constructor(
     private val _migrationCompleteFlow = MutableStateFlow(false)
     override val migrationCompleteFlow: StateFlow<Boolean> = _migrationCompleteFlow
 
-    private fun ByteArray.toHex(): String =
-        joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
-
     @OptIn(ExperimentalTime::class)
     fun migrateFromLegacyStorage(): Job {
         val handler = CoroutineExceptionHandler { _, exception ->

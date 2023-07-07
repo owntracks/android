@@ -65,13 +65,4 @@ public class BindingConversions {
         setDate(view, new Date(TimeUnit.SECONDS.toMillis(date)));
     }
 
-    public static int convertModeIdToLabelResId(ConnectionMode modeId) {
-        switch (modeId) {
-            case HTTP:
-                return R.string.mode_http_private_label;
-            case MQTT:
-            default:
-                return R.string.mode_mqtt_private_label;
-        }
-    }
 }
