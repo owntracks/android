@@ -9,8 +9,7 @@
         <receiver
             android:name=".gms.location.geofencing.GeofencingBroadcastReceiver"
             android:enabled="true"
-            android:exported="true"
-            android:permission="" />
+            android:exported="false" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/GOOGLE_MAPS_API_KEY" />
