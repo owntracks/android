@@ -16,14 +16,14 @@ plugins {
     alias(libs.plugins.android.application).apply(false)
     alias(libs.plugins.kotlin.android).apply(false)
     alias(libs.plugins.hilt.android).apply(false)
-    alias(libs.plugins.objectbox).apply(false)
     alias(libs.plugins.triplet).apply(false)
 }
 
-extensions.findByName("buildScan")?.withGroovyBuilder {
-    setProperty("termsOfServiceUrl", "https://gradle.com/terms-of-service")
-    setProperty("termsOfServiceAgree", "yes")
-}
+extensions.findByName("buildScan")
+    ?.withGroovyBuilder {
+        setProperty("termsOfServiceUrl", "https://gradle.com/terms-of-service")
+        setProperty("termsOfServiceAgree", "yes")
+    }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions {

@@ -239,7 +239,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesUsername">"Username"</string>
     <string name="preferencesWebsocket">"Use WebSockets"</string>
     <string name="publish">"Report"</string>
-    <string name="radius">"Radius"</string>
+    <string name="radius">"Radius (m)"</string>
     <string name="reconnect">"Reconnect"</string>
     <string name="save">"Save"</string>
     <string name="select">"Select"</string>
@@ -325,6 +325,8 @@ A permanent notification will be displayed in order to keep the location trackin
 A permanent notification will be shown to keep running in the background. It can be disabled in the systems notification preferences."</string>
     <string name="welcome_version_learn_more">"Learn more"</string>
     <string name="welcome_version_title">"Restrictions"</string>
+    <string name="waypointMigrationErrorNotificationTitle">"Error migrating waypoints"</string>
+    <string name="waypointMigrationErrorNotificationText">"An error occurred whilst migrating waypoints. Some may not have been migrated, so check the logs and re-add."</string>
     <string name="welcomeFixIssue">"Fix"</string>
     <string name="workmanagerInitializationErrorDialogMessage">"Some components failed to initialize properly, so OwnTracks may not work properly. It may be necessary to re-install the application or clear the user data.
 

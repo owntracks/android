@@ -21,30 +21,9 @@ import java.util.concurrent.TimeUnit;
 public class BindingConversions {
     private static final String EMPTY_STRING = "";
 
-
-    // XX to String
     @BindingConversion
-    @InverseMethod("convertToInteger")
-    public static String convertToString(@Nullable Integer d) {
-        return d != null ? java.text.NumberFormat.getIntegerInstance().format(d) : EMPTY_STRING;
-    }
-
-    @BindingConversion
-    @InverseMethod("convertToIntegerZeroIsEmpty")
-    public static String convertToStringZeroIsEmpty(@Nullable Integer d) {
-        return d != null && d > 0 ? d.toString() : EMPTY_STRING;
-    }
-
-
-    @BindingConversion
-    public static String convertToString(@Nullable Long d) {
+    public static String convertToString(@Nullable Double d) {
         return d != null ? d.toString() : EMPTY_STRING;
-    }
-
-
-    @BindingConversion
-    public static String convertToString(boolean d) {
-        return String.valueOf(d);
     }
 
     @BindingConversion
@@ -52,51 +31,19 @@ public class BindingConversions {
         return s != null ? s : EMPTY_STRING;
     }
 
-
-    // XX to Integer
-    @BindingConversion
-    public static Integer convertToInteger(String d) {
-        try {
-            return Integer.parseInt(d);
-        } catch (NumberFormatException e) {
-            return 0;
-        }
-    }
-
-    @BindingConversion
-    public static Integer convertToIntegerZeroIsEmpty(String d) {
-        return convertToInteger(d);
-    }
-
     @BindingAdapter("android:visibility")
     public static void setVisibility(View view, boolean visible) {
         view.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
-    @BindingAdapter("relativeTimeSpanString")
-    public static void setRelativeTimeSpanString(TextView view, long tstSeconds) {
-        if (tstSeconds == 0) {
-            view.setText("");
-        } else if (DateUtils.isToday(TimeUnit.SECONDS.toMillis(tstSeconds))) {
-            view.setText(DateFormat.getTimeInstance(DateFormat.SHORT).format(TimeUnit.SECONDS.toMillis(tstSeconds)));
-        } else {
-            view.setText(DateFormat.getDateInstance(DateFormat.SHORT).format(TimeUnit.SECONDS.toMillis(tstSeconds)));
-        }
-    }
-
     @BindingAdapter("lastTransition")
     public static void setLastTransition(TextView view, int transition) {
         switch (transition) {
-            case 0:
-                view.setText(view.getResources().getString(R.string.waypoint_region_unknown));
-                break;
-            case Geofence.GEOFENCE_TRANSITION_ENTER:
-                view.setText(view.getResources().getString(R.string.waypoint_region_inside));
-                break;
-            case Geofence.GEOFENCE_TRANSITION_EXIT:
-                view.setText(view.getResources().getString(R.string.waypoint_region_outside));
-                break;
-
+            case 0 -> view.setText(view.getResources().getString(R.string.waypoint_region_unknown));
+            case Geofence.GEOFENCE_TRANSITION_ENTER ->
+                    view.setText(view.getResources().getString(R.string.waypoint_region_inside));
+            case Geofence.GEOFENCE_TRANSITION_EXIT ->
+                    view.setText(view.getResources().getString(R.string.waypoint_region_outside));
         }
     }
 
@@ -118,13 +65,4 @@ public class BindingConversions {
         setDate(view, new Date(TimeUnit.SECONDS.toMillis(date)));
     }
 
-    public static int convertModeIdToLabelResId(ConnectionMode modeId) {
-        switch (modeId) {
-            case HTTP:
-                return R.string.mode_http_private_label;
-            case MQTT:
-            default:
-                return R.string.mode_mqtt_private_label;
-        }
-    }
 }

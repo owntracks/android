@@ -51,7 +51,7 @@ import org.owntracks.android.preferences.Preferences.Companion.EXPERIMENTAL_FEAT
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.services.BackgroundService
-import org.owntracks.android.services.BackgroundService.BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG
+import org.owntracks.android.services.BackgroundService.Companion.BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG
 import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.support.DrawerProvider
 import org.owntracks.android.support.RequirementsChecker
@@ -285,7 +285,7 @@ class MapActivity :
      */
     private fun checkAndRequestLocationServicesEnabled(explicitUserAction: Boolean): Boolean {
         return if (!requirementsChecker.isLocationServiceEnabled()) {
-            Timber.d(Exception(), "Location Services disabled")
+            Timber.d("Location Services disabled")
             if ((explicitUserAction || !preferences.userDeclinedEnableLocationServices)) {
                 if (!this::locationServicesAlertDialog.isInitialized) {
                     locationServicesAlertDialog = MaterialAlertDialogBuilder(this).setCancelable(true)

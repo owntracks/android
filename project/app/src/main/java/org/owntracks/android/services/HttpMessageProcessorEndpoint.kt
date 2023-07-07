@@ -142,9 +142,7 @@ class HttpMessageProcessorEndpoint(
                                             )
                                         )
                                     )
-                                    for (aResult in result) {
-                                        onMessageReceived(aResult)
-                                    }
+                                    scope.launch { result.forEach { onMessageReceived(it) } }
                                 } catch (e: JsonProcessingException) {
                                     Timber.e("JsonParseException HTTP status: %s", response.code)
                                     endpointStateRepo.setState(

@@ -15,7 +15,7 @@ import timber.log.Timber
 
 /**
  * An implementation of [LocationProviderClient] that uses a [FusedLocationProviderClient] to request
- * loctaion updates
+ * location updates
  *
  * @property fusedLocationProviderClient instance of Google location client to use to request updates
  */

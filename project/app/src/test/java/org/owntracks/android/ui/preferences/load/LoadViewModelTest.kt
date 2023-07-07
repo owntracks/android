@@ -5,6 +5,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import java.net.URI
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -12,6 +13,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.owntracks.android.data.waypoints.InMemoryWaypointsRepo
 import org.owntracks.android.preferences.InMemoryPreferencesStore
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.PreferencesStore
@@ -131,8 +133,31 @@ class LoadViewModelTest {
             """.trimIndent()
             vm.extractPreferences(config.toByteArray())
             vm.saveConfiguration()
+            advanceUntilIdle()
             assertEquals(ImportStatus.SAVED, vm.configurationImportStatus.value)
             assertEquals(1, waypointsRepo.all.size)
             assertEquals("testClientId", preferences.clientId)
+        }
+
+    @Test
+    fun `Given a configuration with a tid parameter set, when loading and then saving into the LoadViewModel, then the preferences tid `() =
+        runTest {
+            val parser = Parser(null)
+            val preferences = Preferences(preferencesStore)
+            val waypointsRepo = InMemoryWaypointsRepo()
+            val vm = LoadViewModel(preferences, parser, waypointsRepo, UnconfinedTestDispatcher())
+            val config = """
+            {
+              "_type":"configuration",
+              "waypoints":[ ],
+              "clientId": "testClientId",
+              "tid": "testTid"
+            }
+            """.trimIndent()
+            vm.extractPreferences(config.toByteArray())
+            vm.saveConfiguration()
+            advanceUntilIdle()
+            assertEquals(ImportStatus.SAVED, vm.configurationImportStatus.value)
+            assertEquals("te", preferences.tid.value)
         }
 }

@@ -6,8 +6,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.data.repos.MemoryContactsRepo
-import org.owntracks.android.data.repos.ObjectboxWaypointsRepo
-import org.owntracks.android.data.repos.WaypointsRepo
+import org.owntracks.android.data.waypoints.RoomWaypointsRepo
+import org.owntracks.android.data.waypoints.WaypointsRepo
 import org.owntracks.android.preferences.PreferencesStore
 import org.owntracks.android.preferences.SharedPreferencesStore
 
@@ -18,7 +18,7 @@ abstract class ReposAndContextModule {
     abstract fun bindSharedPreferencesStoreModule(sharedPreferencesStore: SharedPreferencesStore): PreferencesStore
 
     @Binds
-    abstract fun bindWaypointsRepo(objectboxWaypointsRepo: ObjectboxWaypointsRepo): WaypointsRepo
+    abstract fun bindWaypointsRepo(waypointsRepo: RoomWaypointsRepo): WaypointsRepo
 
     @Binds
     abstract fun bindMemoryContactsRepo(memoryContactsRepo: MemoryContactsRepo): ContactsRepo

@@ -1,12 +1,7 @@
 package org.owntracks.android.ui
 
-import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-import android.content.ContentValues
 import android.content.Intent
 import android.net.Uri
-import android.os.Environment
-import android.os.ParcelFileDescriptor
-import android.provider.MediaStore
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -14,9 +9,7 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotExist
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
-import com.adevinta.android.barista.interaction.PermissionGranter.allowPermissionsIfNeeded
 import java.io.File
-import java.io.FileWriter
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -26,6 +19,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.testutils.TestWithAnActivity
+import org.owntracks.android.testutils.writeFileToDevice
 import org.owntracks.android.ui.preferences.load.LoadActivity
 
 @LargeTest
@@ -201,45 +195,12 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
 
     @Test
     fun loadActivityCanLoadConfigFromContentURL() {
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val configFilename = "espresso-testconfig.otrc"
-        if (android.os.Build.VERSION.SDK_INT >= 29) {
-            context.contentResolver.delete(
-                MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY),
-                "${MediaStore.Downloads.DISPLAY_NAME}=?",
-                arrayOf(configFilename)
+        launchActivity(
+            Intent(
+                Intent.ACTION_VIEW,
+                writeFileToDevice("espresso-testconfig.otrc", servedConfig.toByteArray())
             )
-            val contentValues = ContentValues().apply {
-                put(MediaStore.Downloads.DISPLAY_NAME, configFilename)
-                put(MediaStore.Downloads.IS_PENDING, 1)
-            }
-            val contentUri = context.contentResolver.insert(
-                MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY),
-                contentValues
-            )
-            contentUri?.let {
-                context.contentResolver.openFileDescriptor(it, "w")
-                    .use { parcelFileDescriptor ->
-                        ParcelFileDescriptor.AutoCloseOutputStream(parcelFileDescriptor)
-                            .write(servedConfig.toByteArray())
-                    }
-                contentValues.clear()
-                contentValues.put(MediaStore.Downloads.IS_PENDING, 0)
-                context.contentResolver.update(it, contentValues, null, null)
-            }
-            launchActivity(Intent(Intent.ACTION_VIEW, contentUri))
-        } else {
-            allowPermissionsIfNeeded(WRITE_EXTERNAL_STORAGE)
-            @Suppress("DEPRECATION")
-            val downloadsDir =
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-            val configFile = downloadsDir.resolve(configFilename)
-            FileWriter(configFile).use {
-                it.write(servedConfig)
-            }
-            launchActivity(Intent(Intent.ACTION_VIEW, Uri.fromFile(configFile)))
-        }
-
+        )
         assertContains(R.id.effectiveConfiguration, expectedConfig)
         assertDisplayed(R.id.save)
         assertDisplayed(R.id.close)

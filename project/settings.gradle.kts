@@ -8,7 +8,6 @@ pluginManagement {
         eachPlugin {
             when (requested.id.id) {
                 "dagger.hilt.android.plugin" -> useModule("com.google.dagger:hilt-android-gradle-plugin:${requested.version}")
-                "io.objectbox" -> useModule("io.objectbox:objectbox-gradle-plugin:${requested.version}")
             }
         }
     }
@@ -20,6 +19,7 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven("https://jitpack.io")
+        maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
         jcenter()
     }
 }

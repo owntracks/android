@@ -15,7 +15,7 @@ import kotlinx.coroutines.*
 import org.owntracks.android.data.EndpointState
 import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.data.repos.EndpointStateRepo
-import org.owntracks.android.data.repos.WaypointsRepo
+import org.owntracks.android.data.waypoints.WaypointsRepo
 import org.owntracks.android.di.ApplicationScope
 import org.owntracks.android.di.CoroutineScopes.IoDispatcher
 import org.owntracks.android.model.CommandAction
@@ -274,7 +274,7 @@ class MessageProcessor @Inject constructor(
         endpointStateRepo.setQueueLength(outgoingQueue.size)
     }
 
-    fun processIncomingMessage(message: MessageBase) {
+    suspend fun processIncomingMessage(message: MessageBase) {
         Timber.i("Received incoming message: ${message.javaClass.simpleName} on ${message.contactKey}")
         when (message) {
             is MessageClear -> {
@@ -315,7 +315,7 @@ class MessageProcessor @Inject constructor(
         contactsRepo.update(message.contactKey, message)
     }
 
-    private fun processIncomingMessage(message: MessageCmd) {
+    private suspend fun processIncomingMessage(message: MessageCmd) {
         if (!preferences.cmd) {
             Timber.w("remote commands are disabled")
             return
@@ -369,7 +369,7 @@ class MessageProcessor @Inject constructor(
         }
     }
 
-    fun publishLocationMessage(trigger: String?) {
+    suspend fun publishLocationMessage(trigger: String?) {
         locationProcessorLazy.get()
             .publishLocationMessage(trigger)
     }

@@ -3,7 +3,7 @@ package org.owntracks.android.ui.waypoints
 import androidx.databinding.ViewDataBinding
 import org.owntracks.android.BR
 import org.owntracks.android.R
-import org.owntracks.android.data.WaypointModel
+import org.owntracks.android.data.waypoints.WaypointModel
 import org.owntracks.android.ui.base.BaseRecyclerViewAdapterWithClickHandler
 import org.owntracks.android.ui.base.BaseRecyclerViewHolder
 

@@ -2,16 +2,22 @@ package org.owntracks.android.testutils
 
 import android.Manifest
 import android.app.Activity
+import android.content.ContentValues
+import android.net.Uri
 import android.os.Build
-import android.view.View
-import android.widget.Checkable
+import android.os.Environment
+import android.provider.MediaStore
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.test.espresso.*
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.IdlingPolicies
+import androidx.test.espresso.IdlingRegistry
+import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.contrib.RecyclerViewActions
-import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
 import androidx.test.runner.lifecycle.Stage
@@ -19,12 +25,10 @@ import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickD
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions
 import com.adevinta.android.barista.interaction.PermissionGranter
+import java.io.FileWriter
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-import org.hamcrest.BaseMatcher
-import org.hamcrest.CoreMatchers.isA
-import org.hamcrest.Description
 import org.owntracks.android.R
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.ui.clickOnAndWait
@@ -66,7 +70,7 @@ fun reportLocationFromMap(locationIdlingResource: IdlingResource?, mockLocationF
     mockLocationFunction()
     clickOnAndWait(R.id.menu_monitoring)
     clickOnAndWait(R.id.fabMonitoringModeMove)
-    locationIdlingResource.with {
+    locationIdlingResource.use {
         clickOnAndWait(R.id.fabMyLocation)
         clickOnAndWait(R.id.menu_report)
     }
@@ -95,9 +99,8 @@ fun getCurrentActivity(): Activity? {
     var currentActivity: Activity? = null
     getInstrumentation().runOnMainSync {
         run {
-            currentActivity = ActivityLifecycleMonitorRegistry.getInstance()
-                .getActivitiesInStage(Stage.RESUMED)
-                .elementAtOrNull(0)
+            currentActivity =
+                ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(Stage.RESUMED).elementAtOrNull(0)
         }
     }
     return currentActivity
@@ -109,7 +112,7 @@ fun getCurrentActivity(): Activity? {
  * @param timeout time to wait for the [IdlingResource] to be idle
  * @param block function to execute once idle
  */
-inline fun IdlingResource?.with(timeout: Duration = 30.seconds, block: () -> Unit) {
+inline fun IdlingResource?.use(timeout: Duration = 30.seconds, block: () -> Unit) {
     if (this == null) {
         Timber.w("Idling resource is null")
     }
@@ -117,15 +120,13 @@ inline fun IdlingResource?.with(timeout: Duration = 30.seconds, block: () -> Uni
     try {
         this?.run {
             Timber.i("Registering idling resource ${this.name}")
-            IdlingRegistry.getInstance()
-                .register(this)
+            IdlingRegistry.getInstance().register(this)
         }
         block()
     } finally {
         this?.run {
             Timber.i("Unregistering idling resource ${this.name}")
-            IdlingRegistry.getInstance()
-                .unregister(this)
+            IdlingRegistry.getInstance().unregister(this)
         }
     }
 }
@@ -137,14 +138,17 @@ fun disableDeviceLocation() {
         "settings put secure location_providers_allowed -gps"
     }
 
-    getInstrumentation().uiAutomation.executeShellCommand(cmd)
-        .close()
+    getInstrumentation().uiAutomation.executeShellCommand(cmd).close()
 }
 
 fun stopAndroidSetupProcess() {
-    listOf("com.google.android.setupwizard", "com.android.systemui", "com.android.vending").forEach {
-        getInstrumentation().uiAutomation.executeShellCommand("am force-stop $it")
-            .close()
+    listOf(
+        "com.google.android.setupwizard",
+        "com.android.systemui",
+        "com.android.vending",
+        "com.google.android.apps.wellbeing"
+    ).forEach {
+        getInstrumentation().uiAutomation.executeShellCommand("am force-stop $it").close()
     }
 }
 
@@ -160,11 +164,55 @@ fun enableDeviceLocation() {
         "settings put secure location_providers_allowed +gps"
     }
 
-    getInstrumentation().uiAutomation.executeShellCommand(cmd)
-        .close()
+    getInstrumentation().uiAutomation.executeShellCommand(cmd).close()
 }
 
 fun grantMapActivityPermissions() {
     PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.POST_NOTIFICATIONS)
     PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+}
+
+/**
+ * Write file to device
+ *
+ * Eurgh. So. on API>29, Android likes to maintain the state of the persistent storage in *two* places. There's the
+ * "what on earth is actually on the filesystem" and then there's also the "What's in the internal content database".
+ * There's a whole content framework thingie that's meant to help manage this. In theory, you use this API, and it sorts
+ * everything out.
+ *
+ * But! The contentResolver query can *only* see files that were created by the current app install. Which means if you've
+ * got files left over from a previous espresso run, you can't overwrite them!
+ *
+ * @param filename to write to the downloads folder
+ * @param content bytearray to write
+ * @return Uri of the file that was written
+ */
+fun writeFileToDevice(filename: String, content: ByteArray): Uri? {
+    val context = getInstrumentation().targetContext
+    if (Build.VERSION.SDK_INT >= 29) {
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Downloads.DISPLAY_NAME, filename)
+            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+        }
+        context.contentResolver.run {
+            // Insert *always* creates a new file, and appends a number to the display name if it already exists.
+            insert(
+                MediaStore.Downloads.EXTERNAL_CONTENT_URI,
+                contentValues,
+                null
+            )?.let {
+                openOutputStream(it, "wt").use { output -> output?.write(content) }
+                return it
+            }
+        }
+        return null
+    } else {
+        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        val configFile = downloadsDir.resolve(filename)
+        FileWriter(configFile).use {
+            it.write(String(content))
+        }
+        return Uri.fromFile(configFile)
+    }
 }

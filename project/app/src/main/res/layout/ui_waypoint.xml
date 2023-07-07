@@ -42,7 +42,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textVisiblePassword"
-                        android:text="@={vm.waypoint.description}" />
+                        android:text="@{vm.waypoint.description}" />
+
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -56,8 +57,10 @@
                         android:id="@+id/latitude"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:digits="0123456789."
                         android:inputType="numberDecimal|numberSigned"
-                        android:text="@={vm.waypoint.geofenceLatitudeAsStr}" />
+                        android:text="@{vm.waypoint.geofenceLatitude}" />
+
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -71,9 +74,11 @@
                         android:id="@+id/longitude"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:digits="0123456789."
                         android:enabled="true"
                         android:inputType="numberDecimal|numberSigned"
-                        android:text="@={vm.waypoint.geofenceLongitudeAsStr}" />
+                        android:text="@{vm.waypoint.geofenceLongitude}" />
+
                 </com.google.android.material.textfield.TextInputLayout>
 
 
@@ -90,7 +95,7 @@
                         android:layout_height="wrap_content"
                         android:digits="0123456789"
                         android:inputType="numberDecimal"
-                        android:text='@={org.owntracks.android.support.widgets.BindingConversions.convertToStringZeroIsEmpty(vm.waypoint.geofenceRadius)}' />
+                        android:text="@{String.valueOf(vm.waypoint.geofenceRadius)}" />
                 </com.google.android.material.textfield.TextInputLayout>
 
 

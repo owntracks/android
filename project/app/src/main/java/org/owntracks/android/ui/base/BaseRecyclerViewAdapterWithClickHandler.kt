@@ -7,6 +7,7 @@ import androidx.annotation.LayoutRes
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
+import timber.log.Timber
 
 typealias ClickHasBeenHandled = Boolean
 
@@ -25,7 +26,10 @@ abstract class BaseRecyclerViewAdapterWithClickHandler<T, VH : BaseRecyclerViewH
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH = viewHolderConstructor(
         DataBindingUtil.inflate(
-            LayoutInflater.from(parent.context), viewHolderLayout, parent, false
+            LayoutInflater.from(parent.context),
+            viewHolderLayout,
+            parent,
+            false
         )
     )
 

@@ -13,7 +13,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import org.owntracks.android.R
-import org.owntracks.android.data.WaypointModel
+import org.owntracks.android.data.waypoints.WaypointModel
 import org.owntracks.android.location.LatLng
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.support.ContactImageBindingAdapter

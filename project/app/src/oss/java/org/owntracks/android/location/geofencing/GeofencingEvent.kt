@@ -2,7 +2,6 @@ package org.owntracks.android.location.geofencing
 
 import android.content.Intent
 import android.location.Location
-import timber.log.Timber
 
 data class GeofencingEvent(
     val errorCode: Int?,
@@ -10,14 +9,13 @@ data class GeofencingEvent(
     val triggeringGeofences: List<Geofence>?,
     val triggeringLocation: Location?
 ) {
-    fun hasError(): Boolean = errorCode != null && errorCode >= 0
+    fun hasError(): Boolean = true
 
+    // OSS doesn't support triggering geofences with events, so we just return a stub with an error code set
     companion object {
         @JvmStatic
-        @Suppress("UNUSED_PARAMETER")
-        fun fromIntent(intent: Intent): GeofencingEvent? {
-            Timber.w("Decoding a geofencing event from an intent on non-GMS currently not supported")
-            return null
+        fun fromIntent(intent: Intent): GeofencingEvent {
+            return GeofencingEvent(1, null, null, null)
         }
     }
 }

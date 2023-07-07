@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.owntracks.android.App
 import org.owntracks.android.R
+import timber.log.Timber
 
 /**
  * Provides a mixin for activities that want to notify the user that the WorkManager initialization

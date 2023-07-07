@@ -32,7 +32,7 @@ enum class MapLayerStyle {
         @FromConfiguration
         fun getByValue(value: String): MapLayerStyle =
             MapLayerStyle.values()
-                .firstOrNull { it.name == value } ?: MapLayerStyle.GoogleMapDefault
+                .firstOrNull { it.name == value } ?: GoogleMapDefault
     }
 }
 

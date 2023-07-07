@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.StrictMode
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.MutableLiveData
@@ -22,6 +23,7 @@ import javax.inject.Inject
 import javax.inject.Provider
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.conscrypt.Conscrypt
+import org.owntracks.android.data.waypoints.RoomWaypointsRepo
 import org.owntracks.android.di.CustomBindingComponentBuilder
 import org.owntracks.android.di.CustomBindingEntryPoint
 import org.owntracks.android.geocoding.GeocoderProvider
@@ -60,14 +62,15 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
     @Inject
     lateinit var locationIdleResource: SimpleIdlingResource
 
+    @Inject
+    lateinit var waypointsRepo: RoomWaypointsRepo
+
     val workManagerFailedToInitialize = MutableLiveData(false)
 
     override fun onCreate() {
         // Make sure we use Conscrypt for advanced TLS features on all devices.
         Security.insertProviderAt(
-            Conscrypt.newProviderBuilder()
-                .provideTrustManager(true)
-                .build(),
+            Conscrypt.newProviderBuilder().provideTrustManager(true).build(),
             1
         )
 
@@ -77,8 +80,7 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
 
         super.onCreate()
 
-        val dataBindingComponent = bindingComponentProvider.get()
-            .build()
+        val dataBindingComponent = bindingComponentProvider.get().build()
         val dataBindingEntryPoint = EntryPoints.get(
             dataBindingComponent,
             CustomBindingEntryPoint::class.java
@@ -88,14 +90,13 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
 
         scheduler.cancelAllTasks()
         Timber.plant(TimberInMemoryLogTree(BuildConfig.DEBUG))
+
         if (BuildConfig.DEBUG) {
+            System.setProperty(org.slf4j.simple.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "debug")
+            org.slf4j.LoggerFactory.getLogger(this::class.java).trace("SLF4J logging at trace level")
             Timber.e("StrictMode enabled in DEBUG build")
             StrictMode.setThreadPolicy(
-                StrictMode.ThreadPolicy.Builder()
-                    .detectNetwork()
-                    .penaltyFlashScreen()
-                    .penaltyDialog()
-                    .build()
+                StrictMode.ThreadPolicy.Builder().detectNetwork().penaltyFlashScreen().penaltyDialog().build()
             )
             StrictMode.setVmPolicy(
                 StrictMode.VmPolicy.Builder()
@@ -112,6 +113,8 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
         setThemeFromPreferences()
         appShortcuts.enableShortcuts(this)
 
+        migrateWaypoints()
+
         // Notifications can be sent from multiple places, so let's make sure we've got the channels in place
         createNotificationChannels()
     }
@@ -121,9 +124,11 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
             AppTheme.AUTO -> AppCompatDelegate.setDefaultNightMode(
                 Preferences.SYSTEM_NIGHT_AUTO_MODE
             )
+
             AppTheme.DARK -> AppCompatDelegate.setDefaultNightMode(
                 AppCompatDelegate.MODE_NIGHT_YES
             )
+
             AppTheme.LIGHT -> AppCompatDelegate.setDefaultNightMode(
                 AppCompatDelegate.MODE_NIGHT_NO
             )
@@ -135,9 +140,7 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
             // Importance min will show normal priority notification for foreground service. See https://developer.android.com/reference/android/app/NotificationManager#IMPORTANCE_MIN
             // User has to actively configure this in the notification channel settings.
             val ongoingNotificationChannelName =
-                if (getString(R.string.notificationChannelOngoing).trim()
-                        .isNotEmpty()
-                ) {
+                if (getString(R.string.notificationChannelOngoing).trim().isNotEmpty()) {
                     getString(R.string.notificationChannelOngoing)
                 } else {
                     "Ongoing"
@@ -153,12 +156,9 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
                 enableVibration(false)
                 setShowBadge(false)
                 setSound(null, null)
-            }
-                .run { notificationManager.createNotificationChannel(this) }
+            }.run { notificationManager.createNotificationChannel(this) }
 
-            val eventsNotificationChannelName = if (getString(R.string.events).trim()
-                    .isNotEmpty()
-            ) {
+            val eventsNotificationChannelName = if (getString(R.string.events).trim().isNotEmpty()) {
                 getString(R.string.events)
             } else {
                 "Events"
@@ -174,37 +174,31 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
                 enableVibration(false)
                 setShowBadge(true)
                 setSound(null, null)
-            }
-                .run { notificationManager.createNotificationChannel(this) }
+            }.run { notificationManager.createNotificationChannel(this) }
 
-            val errorNotificationChannelName =
-                if (getString(R.string.notificationChannelErrors).trim()
-                        .isNotEmpty()
-                ) {
-                    getString(R.string.notificationChannelErrors)
-                } else {
-                    "Errors"
-                }
+            val errorNotificationChannelName = if (getString(R.string.notificationChannelErrors).trim().isNotEmpty()) {
+                getString(R.string.notificationChannelErrors)
+            } else {
+                "Errors"
+            }
             NotificationChannel(
                 GeocoderProvider.ERROR_NOTIFICATION_CHANNEL_ID,
                 errorNotificationChannelName,
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
                 lockscreenVisibility = Notification.VISIBILITY_PRIVATE
-            }
-                .run { notificationManager.createNotificationChannel(this) }
+            }.run { notificationManager.createNotificationChannel(this) }
         }
     }
 
     @SuppressLint("RestrictedApi")
-    override fun getWorkManagerConfiguration(): Configuration =
-        Configuration.Builder()
-            .setWorkerFactory(workerFactory)
-            .setInitializationExceptionHandler { throwable: Throwable ->
-                Timber.e(throwable, "Exception thrown when initializing WorkManager")
-                workManagerFailedToInitialize.postValue(true)
-            }
-            .build()
+    override fun getWorkManagerConfiguration(): Configuration = Configuration.Builder()
+        .setWorkerFactory(workerFactory)
+        .setInitializationExceptionHandler { throwable: Throwable ->
+            Timber.e(throwable, "Exception thrown when initializing WorkManager")
+            workManagerFailedToInitialize.postValue(true)
+        }
+        .build()
 
     override fun onPreferenceChanged(properties: Set<String>) {
         if (properties.contains(Preferences::theme.name)) {
@@ -220,6 +214,37 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
     @get:VisibleForTesting
     val locationIdlingResource: IdlingResource
         get() = locationIdleResource
+
+    /**
+     * Migrate waypoints. We need a way to call this from an espresso test after it's written the test files
+     * so have this visible for testing so it can be called post-startup
+     */
+    @VisibleForTesting
+    fun migrateWaypoints() {
+        waypointsRepo.migrateFromLegacyStorage().invokeOnCompletion {
+            it?.run {
+                Timber.e(it, "Error migrating waypoints")
+                NotificationCompat.Builder(
+                    applicationContext,
+                    GeocoderProvider.ERROR_NOTIFICATION_CHANNEL_ID
+                )
+                    .setContentTitle(getString(R.string.waypointMigrationErrorNotificationTitle))
+                    .setContentText(getString(R.string.waypointMigrationErrorNotificationText))
+                    .setAutoCancel(true)
+                    .setSmallIcon(R.drawable.ic_owntracks_80)
+                    .setStyle(
+                        NotificationCompat.BigTextStyle()
+                            .bigText(getString(R.string.waypointMigrationErrorNotificationText))
+                    )
+                    .setPriority(NotificationCompat.PRIORITY_LOW)
+                    .setSilent(true)
+                    .build()
+                    .run {
+                        notificationManager.notify("WaypointsMigrationNotification", 0, this)
+                    }
+            }
+        }
+    }
 
     companion object {
         const val NOTIFICATION_CHANNEL_ONGOING = "O"

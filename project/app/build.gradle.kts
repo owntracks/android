@@ -4,7 +4,7 @@ plugins {
     id("com.github.triplet.play")
     kotlin("android")
     kotlin("kapt")
-    id("io.objectbox")
+    id("com.dicedmelon.gradle.jacoco-android") version "0.1.5"
 }
 
 apply<EspressoScreenshotsPlugin>()
@@ -46,6 +46,11 @@ android {
                 "shardIndex" to shardIndex
             )
         )
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments["room.schemaLocation"] = "$projectDir/schemas"
+            }
+        }
     }
 
     signingConfigs {
@@ -137,13 +142,13 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_15
+        targetCompatibility = JavaVersion.VERSION_15
         isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        jvmTarget = JavaVersion.VERSION_15.toString()
     }
 
     flavorDimensions.add("locationProvider")
@@ -206,6 +211,10 @@ dependencies {
     implementation(libs.apache.httpcore)
     implementation(libs.commons.codec)
     implementation(libs.androidx.room.runtime)
+    implementation("com.growse:lmdb-kt:0.1.1-SNAPSHOT")
+    implementation("org.slf4j:slf4j-simple:2.0.7")
+    implementation("at.favre.lib:slf4j-timber:1.0.0")
+    implementation("com.google.flatbuffers:flatbuffers-java:23.5.26")
 
     // The BC version shipped under com.android is half-broken. Weird certificate issues etc.
     // To solve, we bring in our own version of BC

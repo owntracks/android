@@ -15,7 +15,7 @@ import timber.log.Timber
 @Singleton
 class MemoryContactsRepo @Inject constructor(
     private val contactsBitmapAndNameMemoryCache: ContactBitmapAndNameMemoryCache,
-    private val preferences: Preferences
+    preferences: Preferences
 ) : ContactsRepo, Preferences.OnPreferenceChangeListener {
 
     private val contacts = mutableMapOf<String, FusedContact>()

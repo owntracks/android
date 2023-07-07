@@ -2,9 +2,8 @@
 agp = "7.4.2"
 hilt = "2.44.2"
 hilt-work = "1.0.0"
-kotlin = "1.6.21"
+kotlin = "1.8.10"
 kotlin-coroutines = "1.6.4"
-objectbox = "3.1.2"
 triplet = "3.8.4"
 jackson = "2.13.4"
 jackson-threetenbp = "2.12.5"
@@ -49,12 +48,11 @@ desguar-jdk = "2.0.3"
 android-application = { id = "com.android.application", version.ref = "agp" }
 hilt-android = { id = "dagger.hilt.android.plugin", version.ref = "hilt" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-objectbox = { id = "io.objectbox", version.ref = "objectbox" }
 triplet = { id = "com.github.triplet.play", version.ref = "triplet" }
 
 [libraries]
 android-gradle-api = { module = "com.android.tools.build:gradle-api", version.ref = "agp" }
-desugar = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desguar-jdk" }
+desugar = { module = "com.android.tools:desugar_jdk_libs_nio", version.ref = "desguar-jdk" }
 
 hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }

@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import org.owntracks.android.data.repos.WaypointsRepo
+import org.owntracks.android.data.waypoints.WaypointsRepo
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.Parser
 import timber.log.Timber

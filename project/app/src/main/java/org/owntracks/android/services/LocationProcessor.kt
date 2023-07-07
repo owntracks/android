@@ -2,13 +2,19 @@ package org.owntracks.android.services
 
 import android.location.Location
 import android.os.Build
-import java.util.*
+import java.time.Instant
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
-import org.owntracks.android.data.WaypointModel
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.owntracks.android.data.repos.LocationRepo
-import org.owntracks.android.data.repos.WaypointsRepo
+import org.owntracks.android.data.waypoints.WaypointModel
+import org.owntracks.android.data.waypoints.WaypointsRepo
+import org.owntracks.android.di.ApplicationScope
+import org.owntracks.android.di.CoroutineScopes
 import org.owntracks.android.location.geofencing.Geofence
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.model.messages.MessageLocation.Companion.fromLocation
@@ -29,7 +35,9 @@ class LocationProcessor @Inject constructor(
     private val locationRepo: LocationRepo,
     private val waypointsRepo: WaypointsRepo,
     private val deviceMetricsProvider: DeviceMetricsProvider,
-    private val wifiInfoProvider: WifiInfoProvider
+    private val wifiInfoProvider: WifiInfoProvider,
+    @ApplicationScope private val scope: CoroutineScope,
+    @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) {
     private fun ignoreLowAccuracy(l: Location): Boolean {
         val threshold = preferences.ignoreInaccurateLocations
@@ -41,26 +49,29 @@ class LocationProcessor @Inject constructor(
     }
 
     @JvmOverloads
-    fun publishLocationMessage(
+    suspend fun publishLocationMessage(
         trigger: String?,
         location: Location? = locationRepo.currentPublishedLocation.value
     ) {
         if (location == null) return
-        Timber.v("publishLocationMessage. trigger: %s", trigger)
         if (locationRepo.currentPublishedLocation.value == null) {
             Timber.e("no location available, can't publish location")
             return
         }
-        val loadedWaypoints = waypointsRepo.allWithGeofences
+        val loadedWaypoints = withContext(ioDispatcher) { waypointsRepo.all }
         if (ignoreLowAccuracy(location)) return
+        Timber.d("publishLocationMessage for $location triggered by $trigger")
 
         // Check if publish would trigger a region if fusedRegionDetection is enabled
-        if (loadedWaypoints.isNotEmpty() && preferences.fusedRegionDetection && MessageLocation.REPORT_TYPE_CIRCULAR != trigger) {
-            for (waypoint in loadedWaypoints) {
+        if (loadedWaypoints.isNotEmpty() &&
+            preferences.fusedRegionDetection &&
+            MessageLocation.REPORT_TYPE_CIRCULAR != trigger
+        ) {
+            loadedWaypoints.forEach { waypoint ->
                 onWaypointTransition(
                     waypoint,
                     location,
-                    if (location.distanceTo(waypoint.location) <= waypoint.geofenceRadius + location.accuracy) {
+                    if (location.distanceTo(waypoint.getLocation()) <= waypoint.geofenceRadius + location.accuracy) {
                         Geofence.GEOFENCE_TRANSITION_ENTER
                     } else {
                         Geofence.GEOFENCE_TRANSITION_EXIT
@@ -80,32 +91,35 @@ class LocationProcessor @Inject constructor(
             Timber.v("message suppressed by monitoring settings: manual")
             return
         }
-        val message: MessageLocation
-        if (preferences.pubExtendedData) {
-            message = fromLocationAndWifiInfo(location, wifiInfoProvider)
-            message.battery = deviceMetricsProvider.batteryLevel
-            message.batteryStatus = deviceMetricsProvider.batteryStatus
-            message.conn = deviceMetricsProvider.connectionType
-            message.monitoringMode = preferences.monitoring
+        val message = if (preferences.pubExtendedData) {
+            fromLocationAndWifiInfo(location, wifiInfoProvider).apply {
+                battery = deviceMetricsProvider.batteryLevel
+                batteryStatus = deviceMetricsProvider.batteryStatus
+                conn = deviceMetricsProvider.connectionType
+                monitoringMode = preferences.monitoring
+            }
         } else {
-            message = fromLocation(location, Build.VERSION.SDK_INT)
+            fromLocation(location, Build.VERSION.SDK_INT)
+        }.apply {
+            this.trigger = trigger
+            trackerId = preferences.tid.value
+            inregions = calculateInRegions(loadedWaypoints)
         }
-        message.trigger = trigger
-        message.trackerId = preferences.tid.value
-        message.inregions = calculateInregions(loadedWaypoints)
         messageProcessor.queueMessageForSending(message)
     }
 
-    // TODO: refactor to use ObjectBox query directly
-    private fun calculateInregions(loadedWaypoints: List<WaypointModel>): List<String> {
-        val l = LinkedList<String>()
-        for (w in loadedWaypoints) {
-            if (w.lastTransition == Geofence.GEOFENCE_TRANSITION_ENTER) l.add(w.description)
-        }
-        return l
-    }
+    private fun calculateInRegions(loadedWaypoints: List<WaypointModel>): List<String> =
+        loadedWaypoints.filter { it.lastTransition == Geofence.GEOFENCE_TRANSITION_ENTER }
+            .map { it.description }
+            .toList()
 
-    fun onLocationChanged(location: Location, reportType: String?) {
+    /**
+     * Called when a new location is received from the device, or directly from the user via the map
+     *
+     * @param location received from the device
+     * @param reportType type of report that
+     */
+    suspend fun onLocationChanged(location: Location, reportType: String?) {
         locationRepo.setCurrentPublishedLocation(location)
         publishLocationMessage(reportType, location)
     }
@@ -116,32 +130,30 @@ class LocationProcessor @Inject constructor(
         transition: Int,
         trigger: String
     ) {
-        Timber.v(
-            "geofence ${waypointModel.tst}/${waypointModel.description} transition:${if (transition == Geofence.GEOFENCE_TRANSITION_ENTER) "enter" else "exit"}, trigger:$trigger"
-        )
         if (ignoreLowAccuracy(location)) {
             Timber.d("ignoring transition: low accuracy ")
             return
         }
-
-        // Don't send transition if the region is already triggered
-        // If the region status is unknown, send transition only if the device is inside
-        if (transition == waypointModel.lastTransition || waypointModel.isUnknown && transition == Geofence.GEOFENCE_TRANSITION_EXIT) {
-            Timber.d("ignoring initial or duplicate transition: %s", waypointModel.description)
-            waypointModel.lastTransition = transition
-            waypointsRepo.update(waypointModel, false)
-            return
-        }
-        waypointModel.lastTransition = transition
-        waypointModel.setLastTriggeredNow()
-        waypointsRepo.update(waypointModel, false)
-        if (preferences.monitoring === MonitoringMode.QUIET) {
-            Timber.v("message suppressed by monitoring settings: %s", preferences.monitoring)
-            return
-        }
-        publishTransitionMessage(waypointModel, location, transition, trigger)
-        if (trigger == MessageTransition.TRIGGER_CIRCULAR) {
-            publishLocationMessage(MessageLocation.REPORT_TYPE_CIRCULAR)
+        scope.launch {
+            // If the transition hasn't changed, or has moved from unknown to exit, don't notify.
+            if (transition == waypointModel.lastTransition ||
+                (waypointModel.isUnknown() && transition == Geofence.GEOFENCE_TRANSITION_EXIT)
+            ) {
+                waypointModel.lastTransition = transition
+                waypointsRepo.update(waypointModel, false)
+            } else {
+                waypointModel.lastTransition = transition
+                waypointModel.lastTriggered = Instant.now()
+                waypointsRepo.update(waypointModel, false)
+                if (preferences.monitoring === MonitoringMode.QUIET) {
+                    Timber.v("message suppressed by monitoring settings: %s", preferences.monitoring)
+                } else {
+                    publishTransitionMessage(waypointModel, location, transition, trigger)
+                    if (trigger == MessageTransition.TRIGGER_CIRCULAR) {
+                        publishLocationMessage(MessageLocation.REPORT_TYPE_CIRCULAR)
+                    }
+                }
+            }
         }
     }
 
@@ -150,7 +162,7 @@ class LocationProcessor @Inject constructor(
     }
 
     private fun publishTransitionMessage(
-        w: WaypointModel,
+        waypointModel: WaypointModel,
         triggeringLocation: Location,
         transition: Int,
         trigger: String
@@ -164,27 +176,29 @@ class LocationProcessor @Inject constructor(
                 longitude = triggeringLocation.longitude
                 accuracy = triggeringLocation.accuracy
                 timestamp = TimeUnit.MILLISECONDS.toSeconds(triggeringLocation.time)
-                waypointTimestamp = w.tst
-                description = w.description
+                waypointTimestamp = waypointModel.tst.epochSecond
+                description = waypointModel.description
             }
         )
     }
 
-    fun publishWaypointsMessage() {
+    suspend fun publishWaypointsMessage() {
         messageProcessor.queueMessageForSending(
             MessageWaypoints().apply {
                 waypoints = MessageWaypointCollection().apply {
-                    addAll(
-                        waypointsRepo.allWithGeofences.map {
-                            MessageWaypoint().apply {
-                                description = it.description
-                                latitude = it.geofenceLatitude
-                                longitude = it.geofenceLongitude
-                                radius = it.geofenceRadius
-                                timestamp = it.tst
+                    withContext(ioDispatcher) {
+                        addAll(
+                            waypointsRepo.all.map {
+                                MessageWaypoint().apply {
+                                    description = it.description
+                                    latitude = it.geofenceLatitude
+                                    longitude = it.geofenceLongitude
+                                    radius = it.geofenceRadius
+                                    timestamp = it.tst.epochSecond
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             }
         )

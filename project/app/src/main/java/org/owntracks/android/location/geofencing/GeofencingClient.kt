@@ -1,8 +1,8 @@
 package org.owntracks.android.location.geofencing
 
-import android.app.PendingIntent
+import android.content.Context
 
 interface GeofencingClient {
-    fun removeGeofences(GeofencePendingIntent: PendingIntent)
-    fun addGeofences(request: GeofencingRequest, GeofencePendingIntent: PendingIntent)
+    fun removeGeofences(context: Context)
+    fun addGeofences(request: GeofencingRequest, context: Context)
 }

@@ -10,13 +10,14 @@ import timber.log.Timber
  * Provides a mixin for Activities that want to be able to start the service
  */
 interface ServiceStarter {
-    fun startService(context: Context)
+    fun startService(context: Context, action: String? = null, intent: Intent? = null)
     class Impl : ServiceStarter {
-        override fun startService(context: Context) {
+        override fun startService(context: Context, action: String?, intent: Intent?) {
             Timber.i("starting service")
             ContextCompat.startForegroundService(
                 context,
-                Intent(context, BackgroundService::class.java)
+                (intent ?: Intent()).setClass(context, BackgroundService::class.java)
+                    .apply { action?.also { this.action = it } }
             )
         }
     }

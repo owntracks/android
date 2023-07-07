@@ -4,11 +4,13 @@
 
     <data>
 
+        <import type="java.time.Instant" />
+
         <import type="android.view.View" />
 
         <variable
             name="waypoint"
-            type="org.owntracks.android.data.WaypointModel" />
+            type="org.owntracks.android.data.waypoints.WaypointModel" />
     </data>
 
     <LinearLayout
@@ -46,7 +48,7 @@
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:textSize="12sp"
-                android:visibility="@{waypoint.lastTriggered > 0 ? View.VISIBLE : View.GONE}"
+                android:visibility="@{waypoint.lastTriggered != null ? View.VISIBLE : View.GONE}"
                 app:relativeTimeSpanString="@{waypoint.lastTriggered}" />
         </RelativeLayout>
 
