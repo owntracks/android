@@ -51,14 +51,13 @@ class LogViewerActivity : AppCompatActivity() {
             setDisplayHomeAsUpEnabled(true)
         }
 
-        @Suppress("DEPRECATION")
         logAdapter = LogEntryAdapter(
             LogPalette(
-                resources.getColor(com.mikepenz.materialize.R.color.primary),
-                resources.getColor(R.color.log_debug_tag_color),
-                resources.getColor(R.color.log_info_tag_color),
-                resources.getColor(R.color.log_warning_tag_color),
-                resources.getColor(R.color.log_error_tag_color)
+                resources.getColor(R.color.log_default_color, null),
+                resources.getColor(R.color.log_debug_tag_color, null),
+                resources.getColor(R.color.log_info_tag_color, null),
+                resources.getColor(R.color.log_warning_tag_color, null),
+                resources.getColor(R.color.log_error_tag_color, null)
             )
         )
         viewModel.logLines()

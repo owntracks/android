@@ -37,7 +37,6 @@ square-tape2 = "2.0.0-beta1"
 apache-httpcore = "5.2.2"
 commons-codec = "1.16.0"
 libsodium = "2.0.2"
-materialize = "1.2.1"
 materialdrawer = "6.1.2"
 r8 = "8.0.40"
 guava = "32.0.0-jre"
@@ -105,7 +104,6 @@ square-tape2 = { module = "com.squareup.tape2:tape", version.ref = "square-tape2
 libsodium = { module = "com.github.joshjdevl.libsodiumjni:libsodium-jni-aar", version.ref = "libsodium" }
 
 widgets-materialdrawer = { module = "com.mikepenz:materialdrawer", version.ref = "materialdrawer" }
-widgets-materialize = { module = "com.mikepenz:materialize", version.ref = "materialize" }
 
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito-kotlin" }
 kmqtt = { module = "com.github.davidepianca98.KMQTT:kmqtt", version.ref = "kmqtt" }

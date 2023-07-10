@@ -99,14 +99,6 @@
             android:data="https://github.com/mikepenz/MaterialDrawer" />
     </Preference>
     <Preference
-        android:summary="Mikepenz"
-        android:title="Materialize"
-        app:iconSpaceReserved="false">
-        <intent
-            android:action="android.intent.action.VIEW"
-            android:data="https://github.com/mikepenz/Materialize" />
-    </Preference>
-    <Preference
         android:summary="Reverse Geocoding API"
         android:title="OpenCage Geocoder"
         app:iconSpaceReserved="false">
