@@ -4,7 +4,7 @@ plugins {
     id("com.github.triplet.play")
     kotlin("android")
     kotlin("kapt")
-    id("com.dicedmelon.gradle.jacoco-android") version "0.1.5"
+//    id("com.dicedmelon.gradle.jacoco-android") version "0.1.5"
 }
 
 apply<EspressoScreenshotsPlugin>()
@@ -142,13 +142,13 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_15
-        targetCompatibility = JavaVersion.VERSION_15
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
         isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_15.toString()
+        jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
     flavorDimensions.add("locationProvider")
