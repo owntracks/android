@@ -265,10 +265,3 @@ play {
 
     resolutionStrategy.set(com.github.triplet.gradle.androidpublisher.ResolutionStrategy.AUTO)
 }
-
-val codesTask = tasks.register<GetLatestVersionCodeMinusOne>("getLatestVersionCodeMinusOne") {
-    dependsOn("processGmsReleaseVersionCodes")
-
-    codes.set(file("build/intermediates/gpp/gmsRelease/available-version-codes.txt"))
-    outCode.set(file("build/intermediates/version-code-minus-one.txt"))
-}
