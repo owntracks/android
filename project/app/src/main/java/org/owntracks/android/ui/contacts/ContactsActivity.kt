@@ -39,10 +39,10 @@ class ContactsActivity :
                     adapter = contactsAdapter
                 }
             }
-        vm.contacts.observe({ this.lifecycle }, { contacts: Map<String, FusedContact> ->
+        vm.contacts.observe(this) { contacts: Map<String, FusedContact> ->
             contactsAdapter.setContactList(contacts.values)
             vm.refreshGeocodes()
-        })
+        }
     }
 
     override fun onClick(item: FusedContact, view: View, longClick: Boolean) {
