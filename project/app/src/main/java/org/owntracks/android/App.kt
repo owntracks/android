@@ -15,6 +15,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.MutableLiveData
 import androidx.test.espresso.IdlingResource
 import androidx.work.Configuration
+import androidx.work.InitializationExceptionHandler
 import androidx.work.WorkerFactory
 import dagger.hilt.EntryPoints
 import dagger.hilt.android.HiltAndroidApp
@@ -194,10 +195,12 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
     @SuppressLint("RestrictedApi")
     override fun getWorkManagerConfiguration(): Configuration = Configuration.Builder()
         .setWorkerFactory(workerFactory)
-        .setInitializationExceptionHandler { throwable: Throwable ->
-            Timber.e(throwable, "Exception thrown when initializing WorkManager")
-            workManagerFailedToInitialize.postValue(true)
-        }
+        .setInitializationExceptionHandler(
+            InitializationExceptionHandler { throwable ->
+                Timber.e(throwable, "Exception thrown when initializing WorkManager")
+                workManagerFailedToInitialize.postValue(true)
+            }
+        )
         .build()
 
     override fun onPreferenceChanged(properties: Set<String>) {
