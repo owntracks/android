@@ -10,7 +10,7 @@ import org.owntracks.android.preferences.types.StringMaxTwoAlphaNumericChars
 
 /**
  * The whole reason this exists is to give an [androidx.preference.PreferenceFragmentCompat] a thing that it can poke
- * values into when UI preferences get twiddled. The default behaviour is to interact with [SharedPreferences] directly
+ * values into when UI preferences get twiddled. The default behaviour is to interact with [android.content.SharedPreferences] directly
  * which doesn't really suit us as we've shimmed that (to provide abstraction and type saftey). If you supply
  * [androidx.preference.PreferenceFragmentCompat] with a [androidx.preference.PreferenceDataStore] instead, it'll use
  * that to read/write preferences from, so we create our own that wraps around [Preferences]
@@ -46,10 +46,11 @@ class PreferenceDataStoreShim @Inject constructor(private val preferences: Prefe
         return stringPreferenceValue as String
     }
 
-    override fun getStringSet(key: String?, defValues: MutableSet<String>?): MutableSet<String>? {
-        @Suppress("UNCHECKED_CAST")
-        return (key?.run(preferences::getPreferenceByName) ?: defValues) as MutableSet<String>?
-    }
+    @Suppress("UNCHECKED_CAST")
+    override fun getStringSet(key: String?, defValues: MutableSet<String>?): MutableSet<String>? = (
+        key?.run(preferences::getPreferenceByName)
+            ?: defValues
+        ) as MutableSet<String>?
 
     override fun getLong(key: String?, defValue: Long): Long {
         return (key?.run(preferences::getPreferenceByName) ?: defValue) as Long

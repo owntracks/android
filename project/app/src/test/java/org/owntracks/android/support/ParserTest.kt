@@ -63,10 +63,6 @@ class ParserTest {
     private val objectMapper = ObjectMapper()
 
     @Before
-    fun setupMessageLocation() {
-    }
-
-    @Before
     fun setupEncryptionProvider() {
         testPreferences = mock {
             on { encryptionKey } doReturn "testEncryptionKey"
@@ -788,8 +784,8 @@ class ParserTest {
         assertFalse(message.waypoints.isEmpty())
         assertEquals(2, message.waypoints.size)
         assertFalse(message.hasTrackerId())
-        assertEquals(true, message.get("autostartOnBoot"))
-        assertEquals(5, message.get("locatorDisplacement"))
+        assertEquals(true, message["autostartOnBoot"])
+        assertEquals(5, message["locatorDisplacement"])
     }
 
     @Test
@@ -947,13 +943,13 @@ class ParserTest {
                 .asText()
         )
         assertEquals(
-            message.latitude.toDouble(),
+            message.latitude,
             jsonNode.get("lat")
                 .asDouble(),
             0.00001
         )
         assertEquals(
-            message.longitude.toDouble(),
+            message.longitude,
             jsonNode.get("lon")
                 .asDouble(),
             0.00001

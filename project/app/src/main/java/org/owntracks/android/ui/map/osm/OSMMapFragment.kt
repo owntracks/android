@@ -54,7 +54,7 @@ class OSMMapFragment internal constructor(
     private val osmMapLocationSource: IMyLocationProvider = object : IMyLocationProvider {
         override fun startLocationProvider(myLocationConsumer: IMyLocationConsumer?): Boolean {
             val locationProvider: IMyLocationProvider = this
-            locationObserver = Observer<Location> { location ->
+            locationObserver = Observer { location ->
                 myLocationConsumer?.onLocationChanged(location, locationProvider)
                 viewModel.setCurrentBlueDotLocation(location.toLatLng())
                 if (viewModel.viewMode == MapViewModel.ViewMode.Device) {
@@ -408,7 +408,6 @@ class OSMMapFragment internal constructor(
     }
 
     override fun setMapLayerType(mapLayerStyle: MapLayerStyle) {
-        @Suppress("REDUNDANT_ELSE_IN_WHEN")
         when (mapLayerStyle) {
             MapLayerStyle.OpenStreetMapNormal -> binding.osmMapView.setTileSource(TileSourceFactory.MAPNIK)
             MapLayerStyle.OpenStreetMapWikimedia -> binding.osmMapView.setTileSource(

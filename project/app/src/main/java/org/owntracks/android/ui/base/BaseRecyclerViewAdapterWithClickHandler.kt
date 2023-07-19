@@ -7,7 +7,6 @@ import androidx.annotation.LayoutRes
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
-import timber.log.Timber
 
 typealias ClickHasBeenHandled = Boolean
 

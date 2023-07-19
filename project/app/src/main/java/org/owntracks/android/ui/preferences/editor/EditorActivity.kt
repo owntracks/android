@@ -172,13 +172,12 @@ class EditorActivity : AppCompatActivity() {
             }
         }
 
-    private fun exportConfigurationToFile(): Boolean {
+    private fun exportConfigurationToFile() {
         val shareIntent = Intent(ACTION_CREATE_DOCUMENT).apply {
             type = "*/*"
             putExtra(EXTRA_TITLE, "config.otrc")
         }
         saveIntentActivityLauncher.launch(shareIntent)
-        return true
     }
 
     private fun displayLoadFailed() {

@@ -28,9 +28,9 @@ class ScreenshotTakingOnTestEndRule : TestWatcher() {
     }
 
     /**
-     * Writes the contents of the [Bitmap] to a compressed png file to the given [PlatformTestStorage]
+     * Writes the contents of the [Bitmap] to a compressed png file to the given [TestStorage]
      *
-     * @param testStorage the [PlatformTestStorage] to use
+     * @param testStorage the [TestStorage] to use
      * @param name a descriptive base name for the resulting file
      * @throws IOException if bitmap could not be compressed or written to storage
      */

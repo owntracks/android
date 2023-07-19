@@ -22,7 +22,7 @@ open class GPSMockDeviceLocation : MockDeviceLocation {
             locationProvidersToMock.forEach { provider ->
                 try {
                     removeTestProvider(provider)
-                } catch (e: IllegalArgumentException) {
+                } catch (_: IllegalArgumentException) {
                 }
                 addTestProvider(
                     provider,

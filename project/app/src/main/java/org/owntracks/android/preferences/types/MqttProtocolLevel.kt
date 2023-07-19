@@ -11,6 +11,6 @@ enum class MqttProtocolLevel(@JsonValue val value: Int) {
         @FromConfiguration
         fun getByValue(value: Int): MqttProtocolLevel =
             MqttProtocolLevel.values()
-                .firstOrNull { it.value == value } ?: MqttProtocolLevel.MQTT_3_1
+                .firstOrNull { it.value == value } ?: MQTT_3_1
     }
 }

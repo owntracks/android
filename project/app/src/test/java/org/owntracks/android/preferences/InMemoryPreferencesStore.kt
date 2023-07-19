@@ -36,7 +36,7 @@ class InMemoryPreferencesStore : PreferencesStore() {
         valueMap[key] = value
     }
 
-    override fun getString(key: String, default: String): String? {
+    override fun getString(key: String, default: String): String {
         return valueMap[key] as String? ?: default
     }
 

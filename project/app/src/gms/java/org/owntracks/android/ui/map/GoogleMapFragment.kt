@@ -42,7 +42,7 @@ class GoogleMapFragment internal constructor(
             override fun activate(
                 onLocationChangedListener: LocationSource.OnLocationChangedListener
             ) {
-                locationObserver = Observer<Location> { location ->
+                locationObserver = Observer { location ->
                     onLocationChangedListener.onLocationChanged(location)
                     viewModel.setCurrentBlueDotLocation(location.toLatLng())
                     if (viewModel.viewMode == MapViewModel.ViewMode.Device) {

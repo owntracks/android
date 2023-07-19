@@ -31,7 +31,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <!-- Not actively requested. Has to be enabled manually. Access to broker certificates in private storage on older APIs or on devices not providing files through content:// URIs -->
 
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <!-- To locate the device -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -105,9 +105,9 @@
 
         <activity
             android:name=".ui.preferences.load.LoadActivity"
-            android:label="@string/importConfig"
             android:configChanges="orientation"
             android:exported="true"
+            android:label="@string/importConfig"
             android:launchMode="singleTask">
 
             <!-- Support two dots in file name: -->
@@ -234,13 +234,6 @@
             </intent-filter>
 
         </activity>
-
-
-        <activity
-            android:name=".ui.preferences.connection.ConnectionActivity"
-            android:clearTaskOnLaunch="true"
-            android:label="@string/preferencesServer"
-            android:launchMode="singleTask" />
 
         <activity
             android:name=".ui.status.logs.LogViewerActivity"

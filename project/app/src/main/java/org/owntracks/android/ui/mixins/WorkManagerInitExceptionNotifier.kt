@@ -7,11 +7,10 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.owntracks.android.App
 import org.owntracks.android.R
-import timber.log.Timber
 
 /**
  * Provides a mixin for activities that want to notify the user that the WorkManager initialization
- * failed. Usually used by activities that might be the "first" activity viewed by the user ([MapActivity], [PreferencesActivity] etc.)
+ * failed. Usually used by activities that might be the "first" activity viewed by the user ([org.owntracks.android.ui.map.MapActivity], [org.owntracks.android.ui.preferences.PreferencesActivity] etc.)
  *
  * @constructor Create empty Work manager init exception notifier
  */

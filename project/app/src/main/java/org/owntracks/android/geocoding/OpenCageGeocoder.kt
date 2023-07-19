@@ -144,11 +144,10 @@ class OpenCageGeocoder internal constructor(
     internal class OpenCageResponse {
         val rate: Rate? = null
 
-        @Suppress("MemberVisibilityCanBePrivate")
         val results: List<OpenCageResult>? = null
         val status: Status? = null
         val formatted: String?
-            get() = if (results != null && results.isNotEmpty()) results[0].formatted else null
+            get() = if (!results.isNullOrEmpty()) results[0].formatted else null
     }
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

@@ -1,20 +1,23 @@
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.variant.AndroidComponentsExtension
+import java.io.File
+import java.util.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Exec
 import org.gradle.kotlin.dsl.register
-import java.io.File
-import java.util.*
 
 class EspressoScreenshotsPlugin : Plugin<Project> {
     // This is where the androidx test files service puts saved bitmaps
     @Suppress("SdCardPath")
     private val screenshotsDeviceFolder = "/sdcard/googletest/test_outputfiles"
 
+    private fun String.titleCase() = this.replaceFirstChar {
+        if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
+    }
+
     override fun apply(project: Project) {
-        val android: ApplicationExtension =
-            project.extensions.getByType(ApplicationExtension::class.java)
+        val android: ApplicationExtension = project.extensions.getByType(ApplicationExtension::class.java)
         val androidComponents = project.extensions.getByType(AndroidComponentsExtension::class.java)
 
         // This is where AGP writes out connected test reports
@@ -24,43 +27,39 @@ class EspressoScreenshotsPlugin : Plugin<Project> {
                 val flavorName = this.name
                 val flavorTestReportPath = reportsDirectoryPath.format(flavorName)
                 project.run {
+                    val adbExecutable = androidComponents.sdkComponents.adb.get().asFile.invariantSeparatorsPath
 
-                    val adbExecutable =
-                        androidComponents.sdkComponents.adb.get().asFile.invariantSeparatorsPath
-
-                    tasks.register<Exec>("clear${flavorName.capitalize(Locale.ROOT)}Screenshots") {
+                    tasks.register<Exec>("clear${flavorName.titleCase()}Screenshots") {
                         group = "reporting"
-                        description =
-                            "Removes $flavorName screenshots from connected device"
+                        description = "Removes $flavorName screenshots from connected device"
                         executable = adbExecutable
                         args(
-                            "shell", "rm", "-rf", screenshotsDeviceFolder
+                            "shell",
+                            "rm",
+                            "-rf",
+                            screenshotsDeviceFolder
                         )
                     }
 
-                    tasks.register<Exec>("fetch${flavorName.capitalize(Locale.ROOT)}Screenshots") {
+                    tasks.register<Exec>("fetch${flavorName.titleCase()}Screenshots") {
                         group = "reporting"
                         description = "Fetches $flavorName espresso screenshots from the device"
                         executable = adbExecutable
                         args(
-                            "pull", screenshotsDeviceFolder, reportsDirectoryPath.format(flavorName)
+                            "pull",
+                            screenshotsDeviceFolder,
+                            reportsDirectoryPath.format(flavorName)
                         )
                         doFirst {
                             File(flavorTestReportPath).mkdirs()
                         }
                     }
 
-                    tasks.register<EmbedScreenshotsInTestReport>(
-                        "embed${
-                        flavorName.capitalize(
-                            Locale.ROOT
-                        )
-                        }Screenshots"
-                    ) {
+                    tasks.register<EmbedScreenshotsInTestReport>("embed${flavorName.titleCase()}Screenshots") {
                         group = "reporting"
                         description = "Embeds the $flavorName screenshots in the test report"
-                        dependsOn("fetch${flavorName.capitalize(Locale.ROOT)}Screenshots")
-                        finalizedBy("clear${flavorName.capitalize(Locale.ROOT)}Screenshots")
+                        dependsOn("fetch${flavorName.titleCase()}Screenshots")
+                        finalizedBy("clear${flavorName.titleCase()}Screenshots")
                         reportsPath = flavorTestReportPath
                     }
                 }

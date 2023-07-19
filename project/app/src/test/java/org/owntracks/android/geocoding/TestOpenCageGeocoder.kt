@@ -1,6 +1,5 @@
 package org.owntracks.android.geocoding
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -13,7 +12,6 @@ import org.mockito.kotlin.mock
 import org.threeten.bp.Instant
 import org.threeten.bp.temporal.ChronoUnit
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class TestOpenCageGeocoder {
 
     @Test

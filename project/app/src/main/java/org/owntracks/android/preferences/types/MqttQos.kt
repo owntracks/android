@@ -12,6 +12,6 @@ enum class MqttQos(@JsonValue val value: Int) {
         @FromConfiguration
         fun getByValue(value: Int): MqttQos =
             MqttQos.values()
-                .firstOrNull { it.value == value } ?: MqttQos.ONE
+                .firstOrNull { it.value == value } ?: ONE
     }
 }

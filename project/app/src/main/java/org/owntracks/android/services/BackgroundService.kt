@@ -18,8 +18,10 @@ import android.text.style.StyleSpan
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.EntryPoint
 import dagger.hilt.EntryPoints
 import dagger.hilt.InstallIn
@@ -55,6 +57,8 @@ import org.owntracks.android.location.geofencing.GeofencingEvent
 import org.owntracks.android.location.geofencing.GeofencingEvent.Companion.fromIntent
 import org.owntracks.android.location.geofencing.GeofencingRequest
 import org.owntracks.android.model.messages.MessageLocation
+import org.owntracks.android.model.messages.MessageLocation.Companion.REPORT_TYPE_DEFAULT
+import org.owntracks.android.model.messages.MessageLocation.Companion.REPORT_TYPE_RESPONSE
 import org.owntracks.android.model.messages.MessageLocation.Companion.fromLocation
 import org.owntracks.android.model.messages.MessageTransition
 import org.owntracks.android.preferences.Preferences
@@ -202,9 +206,9 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
         )
         preferences = entrypoint.preferences()
         endpointStateRepo = entrypoint.endpointStateRepo()
-        Timber.d("backgroundservice has injected. calling startForeground")
+        Timber.d("BackgroundService has injected. calling startForeground")
         startForeground(NOTIFICATION_ID_ONGOING, ongoingNotification)
-        Timber.d("backgroundservice super.oncreate")
+        Timber.d("BackgroundService super.OnCreate")
         super.onCreate()
         serviceBridge.bind(this)
         notificationManagerCompat = NotificationManagerCompat.from(this)
@@ -217,14 +221,14 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
                 Timber.d("location result received: $locationResult")
                 Timber.v("Idling location")
                 locationIdlingResource.setIdleState(true)
-                onLocationChanged(locationResult.lastLocation, MessageLocation.REPORT_TYPE_DEFAULT)
+                onLocationChanged(locationResult.lastLocation, REPORT_TYPE_DEFAULT)
             }
         }
         locationCallbackOnDemand = object : LocationCallback {
             override fun onLocationAvailability(locationAvailability: LocationAvailability) {}
             override fun onLocationResult(locationResult: LocationResult) {
                 Timber.d("BackgroundService On-demand location result received: locationResult")
-                onLocationChanged(locationResult.lastLocation, MessageLocation.REPORT_TYPE_RESPONSE)
+                onLocationChanged(locationResult.lastLocation, REPORT_TYPE_RESPONSE)
             }
         }
         setupLocationRequest()
@@ -238,28 +242,27 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
         endpointStateRepo.endpointStateLiveData.observe(this) { updateOngoingNotification() }
         endpointStateRepo.setServiceStartedNow()
 
-        // Every time a waypoint is inserted, updated or deleted, we need to update the geofences, and maybe publish that
-        // waypoint
-        lifecycleScope.launchWhenCreated {
-            waypointsRepo.migrationCompleteFlow.collect {
-                if (it) {
-                    Timber.tag("TOOT").d("Listening for new waypoints")
-                    waypointsRepo.operations.observe(this@BackgroundService) { (operation, waypoint): WaypointAndOperation ->
-                        when (operation) {
-                            WaypointsRepo.Operation.INSERT, WaypointsRepo.Operation.UPDATE -> locationProcessor.publishWaypointMessage(
-                                waypoint
-                            )
-                            else -> {}
-                        }
-                        lifecycleScope.launch {
-                            setupGeofences()
+        lifecycleScope.launch {
+            // Every time a waypoint is inserted, updated or deleted, we need to update the geofences, and maybe publish that
+            // waypoint
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                waypointsRepo.migrationCompleteFlow.collect {
+                    if (it) {
+                        waypointsRepo.operations.observe(this@BackgroundService) {
+                                (operation, waypoint): WaypointAndOperation ->
+                            when (operation) {
+                                WaypointsRepo.Operation.INSERT, WaypointsRepo.Operation.UPDATE ->
+                                    locationProcessor.publishWaypointMessage(waypoint)
+                                else -> {}
+                            }
+                            lifecycleScope.launch {
+                                setupGeofences()
+                            }
                         }
                     }
                 }
             }
-        }
 
-        lifecycleScope.launch {
             setupGeofences()
         }
 
@@ -372,6 +375,11 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
     }
 
     private fun notifyUserOfBackgroundLocationRestriction() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) { return }
         val activityLaunchIntent =
             Intent(applicationContext, MapActivity::class.java).setAction("android.intent.action.MAIN")
                 .addCategory("android.intent.category.LAUNCHER")
@@ -404,7 +412,13 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
     }
 
     private fun updateOngoingNotification() {
-        notificationManagerCompat.notify(NOTIFICATION_ID_ONGOING, ongoingNotification)
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            notificationManagerCompat.notify(NOTIFICATION_ID_ONGOING, ongoingNotification)
+        }
     }
 
     // Show monitoring mode if endpoint state is not interesting
@@ -441,9 +455,11 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
 
     override fun sendEventNotification(message: MessageTransition) {
         Timber.d("Sending event notification for $message")
-        if (!preferences.notificationEvents) {
-            return
-        }
+        if (!preferences.notificationEvents || ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) { return }
         val contact = contactsRepo.getById(message.contactKey)
         val timestampInMs = TimeUnit.SECONDS.toMillis(message.timestamp)
         val location = message.description ?: getString(R.string.aLocation)
@@ -566,7 +582,7 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
     }
 
     override fun requestOnDemandLocationUpdate() {
-        if (missingLocationPermission()) {
+        if (locationPermissionIsMissing()) {
             Timber.e("missing location permission")
             return
         }
@@ -589,7 +605,7 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
 
     private fun setupLocationRequest(): Boolean {
         Timber.v("setupLocationRequest")
-        if (missingLocationPermission()) {
+        if (locationPermissionIsMissing()) {
             Timber.e("missing location permission")
             return false
         }
@@ -640,7 +656,7 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
     }
 
     private suspend fun setupGeofences() {
-        if (missingLocationPermission()) {
+        if (locationPermissionIsMissing()) {
             Timber.e("missing location permission")
             return
         }
@@ -667,7 +683,7 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
         }
     }
 
-    private fun missingLocationPermission(): Boolean {
+    private fun locationPermissionIsMissing(): Boolean {
         return (
             ActivityCompat.checkSelfPermission(
                 this,
@@ -692,9 +708,9 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
             "moveModeLocatorInterval",
             "pegLocatorFastestIntervalToInterval"
         )
-        if (!propertiesWeCareAbout.stream().filter { o: String -> properties.contains(o) }.collect(
+        if (propertiesWeCareAbout.stream().filter { o: String -> properties.contains(o) }.collect(
                 Collectors.toSet()
-            ).isEmpty()
+            ).isNotEmpty()
         ) {
             Timber.d("locator preferences changed. Resetting location request.")
             setupLocationRequest()
@@ -709,9 +725,8 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
         runThingsOnOtherThreads.postOnServiceHandlerDelayed({
             if (setupLocationRequest()) {
                 Timber.d("Getting last location")
-                val lastLocation = locationProviderClient.getLastLocation()
-                if (lastLocation != null) {
-                    onLocationChanged(lastLocation, MessageLocation.REPORT_TYPE_DEFAULT)
+                locationProviderClient.getLastLocation()?.run {
+                    onLocationChanged(this, REPORT_TYPE_DEFAULT)
                 }
             }
         }, 0)

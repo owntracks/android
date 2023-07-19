@@ -1,6 +1,5 @@
 package org.owntracks.android.ui.map
 
-import android.Manifest
 import androidx.preference.PreferenceManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -12,8 +11,6 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickDialogNegativeButton
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
-import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
-import com.adevinta.android.barista.interaction.PermissionGranter
 import org.junit.FixMethodOrder
 import org.junit.Test
 import org.junit.runner.RunWith

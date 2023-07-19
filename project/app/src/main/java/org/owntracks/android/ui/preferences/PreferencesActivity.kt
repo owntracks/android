@@ -1,13 +1,7 @@
 package org.owntracks.android.ui.preferences
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.MenuProvider
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.preference.Preference
@@ -19,7 +13,6 @@ import org.owntracks.android.databinding.UiPreferencesBinding
 import org.owntracks.android.support.DrawerProvider
 import org.owntracks.android.ui.mixins.ServiceStarter
 import org.owntracks.android.ui.mixins.WorkManagerInitExceptionNotifier
-import org.owntracks.android.ui.status.StatusActivity
 
 @AndroidEntryPoint
 open class PreferencesActivity :

@@ -212,10 +212,7 @@ dependencies {
     implementation(libs.apache.httpcore)
     implementation(libs.commons.codec)
     implementation(libs.androidx.room.runtime)
-    implementation("com.growse:lmdb-kt:0.1.1-SNAPSHOT")
-    implementation("org.slf4j:slf4j-simple:2.0.7")
-    implementation("at.favre.lib:slf4j-timber:1.0.1")
-    implementation("com.google.flatbuffers:flatbuffers-java:23.5.26")
+    implementation(libs.bundles.objectbox.migration)
 
     // The BC version shipped under com.android is half-broken. Weird certificate issues etc.
     // To solve, we bring in our own version of BC

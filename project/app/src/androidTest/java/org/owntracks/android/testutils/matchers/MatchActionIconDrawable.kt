@@ -19,7 +19,7 @@ import org.hamcrest.Matcher
  * @return an espresso matcher
  */
 // https://stackoverflow.com/a/34063950/352740
-fun withActionIconDrawable(@DrawableRes resourceId: Int): Matcher<View?>? {
+fun withActionIconDrawable(@DrawableRes resourceId: Int): Matcher<View?> {
     return object : BoundedMatcher<View?, ActionMenuItemView>(ActionMenuItemView::class.java) {
         override fun describeTo(description: Description) {
             description.appendText("has image drawable resource $resourceId")
@@ -42,10 +42,7 @@ private fun sameBitmap(
     resourceId: Int,
     view: View
 ): Boolean {
-    val otherDrawable: Drawable? = context.resources.getDrawable(resourceId, null)
-    if (otherDrawable == null) {
-        return false
-    }
+    val otherDrawable: Drawable = context.resources.getDrawable(resourceId, null) ?: return false
 
     val actualDrawable = when (drawable) {
         is StateListDrawable -> {

@@ -43,6 +43,10 @@ r8 = "8.0.40"
 guava = "32.0.0-jre"
 bouncycastle = "1.75"
 desguar-jdk = "2.0.3"
+lmdb-kt = "0.1.1-SNAPSHOT"
+slf4j-simple = "2.0.7"
+slf4j-timber = "1.0.1"
+flatbuffers = "23.5.26"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -92,8 +96,8 @@ androidx-test-services = { module = "androidx.test.services:test-services", vers
 androidx-test-orchestrator = { module = "androidx.test:orchestrator", version.ref = "androidx-test-orchestrator" }
 androidx-test-espresso-idling = { module = "androidx.test.espresso:espresso-idling-resource", version.ref = "androidx-test-espresso" }
 
-androidx-room-runtime = {module = "androidx.room:room-runtime", version.ref="androidx-room"}
-androidx-room-compiler = {module = "androidx.room:room-compiler", version.ref="androidx-room"}
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidx-room" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidx-room" }
 
 osmdroid = { module = "org.osmdroid:osmdroid-android", version.ref = "osmdroid" }
 google-material = { module = "com.google.android.material:material", version.ref = "google-material" }
@@ -118,6 +122,13 @@ guava = { module = "com.google.guava:guava", version.ref = "guava" }
 conscrypt = { module = "org.conscrypt:conscrypt-android", version.ref = "conscrypt" }
 bouncycastle = { module = "org.bouncycastle:bcprov-jdk14", version.ref = "bouncycastle" }
 
+
+lmdb-kt = { module = "com.growse:lmdb-kt", version.ref = "lmdb-kt" }
+slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j-simple" }
+slf4j-timber = { module = "at.favre.lib:slf4j-timber", version.ref = "slf4j-timber" }
+flatbuffers = { module = "com.google.flatbuffers:flatbuffers-java", version.ref = "flatbuffers" }
+
+
 [bundles]
 jackson = ["jackson-core", "jackson-databind", "jackson-module-kotlin", "jackson-datatype-jsr310", "jackson-threetenbp", "threetenbp"]
 kotlin = ["kotlin-coroutines-android", "kotlin-coroutines-jdk8", "kotlin-reflect"]
@@ -128,3 +139,4 @@ androidx = ["androidx-core-ktx", "androidx-preference", "androidx-work-runtime",
 androidx-test = ["androidx-test-junit", "androidx-test-core-ktx", "androidx-test-rules", "androidx-test-runner"]
 androidx-test-util = ["androidx-test-services", "androidx-test-orchestrator"]
 buildscript = ["r8", "guava"]
+objectbox-migration = ["lmdb-kt", "slf4j-simple", "slf4j-timber", "flatbuffers"]

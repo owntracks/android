@@ -7,11 +7,11 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.BatteryManager
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+import javax.inject.Singleton
 import org.owntracks.android.model.BatteryStatus
 import org.owntracks.android.model.messages.MessageLocation
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 class DeviceMetricsProvider @Inject internal constructor(@ApplicationContext private val context: Context) {
@@ -55,7 +55,7 @@ class DeviceMetricsProvider @Inject internal constructor(@ApplicationContext pri
                     // Android bug: https://issuetracker.google.com/issues/175055271
                     // ConnectivityManager::getNetworkCapabilities apparently throws a SecurityException
                 } catch (e: SecurityException) {
-                    Timber.e(e, "Exception fetching networkcapabilities")
+                    Timber.e(e, "Exception fetching NetworkCapabilities")
                 }
             }
             return null

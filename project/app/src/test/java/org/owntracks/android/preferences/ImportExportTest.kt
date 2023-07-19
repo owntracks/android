@@ -13,7 +13,6 @@ import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.preferences.types.MqttProtocolLevel
 import org.owntracks.android.preferences.types.MqttQos
 import org.owntracks.android.support.Parser
-import org.owntracks.android.ui.map.MapLayerStyle
 
 class ImportExportTest {
     private lateinit var mockContext: Context

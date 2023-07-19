@@ -1,14 +1,17 @@
 package org.owntracks.android
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Application
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.StrictMode
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.databinding.DataBindingUtil
@@ -224,27 +227,33 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
      */
     @VisibleForTesting
     fun migrateWaypoints() {
-        waypointsRepo.migrateFromLegacyStorage().invokeOnCompletion {
-            it?.run {
-                Timber.e(it, "Error migrating waypoints")
-                NotificationCompat.Builder(
-                    applicationContext,
-                    GeocoderProvider.ERROR_NOTIFICATION_CHANNEL_ID
-                )
-                    .setContentTitle(getString(R.string.waypointMigrationErrorNotificationTitle))
-                    .setContentText(getString(R.string.waypointMigrationErrorNotificationText))
-                    .setAutoCancel(true)
-                    .setSmallIcon(R.drawable.ic_owntracks_80)
-                    .setStyle(
-                        NotificationCompat.BigTextStyle()
-                            .bigText(getString(R.string.waypointMigrationErrorNotificationText))
+        waypointsRepo.migrateFromLegacyStorage().invokeOnCompletion { throwable ->
+            if (ActivityCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                throwable?.run {
+                    Timber.e(throwable, "Error migrating waypoints")
+                    NotificationCompat.Builder(
+                        applicationContext,
+                        GeocoderProvider.ERROR_NOTIFICATION_CHANNEL_ID
                     )
-                    .setPriority(NotificationCompat.PRIORITY_LOW)
-                    .setSilent(true)
-                    .build()
-                    .run {
-                        notificationManager.notify("WaypointsMigrationNotification", 0, this)
-                    }
+                        .setContentTitle(getString(R.string.waypointMigrationErrorNotificationTitle))
+                        .setContentText(getString(R.string.waypointMigrationErrorNotificationText))
+                        .setAutoCancel(true)
+                        .setSmallIcon(R.drawable.ic_owntracks_80)
+                        .setStyle(
+                            NotificationCompat.BigTextStyle()
+                                .bigText(getString(R.string.waypointMigrationErrorNotificationText))
+                        )
+                        .setPriority(NotificationCompat.PRIORITY_LOW)
+                        .setSilent(true)
+                        .build()
+                        .run {
+                            notificationManager.notify("WaypointsMigrationNotification", 0, this)
+                        }
+                }
             }
         }
     }

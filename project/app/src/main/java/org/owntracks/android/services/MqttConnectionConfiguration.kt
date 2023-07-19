@@ -1,7 +1,6 @@
 package org.owntracks.android.services
 
 import android.content.Context
-import android.util.Base64
 import java.net.URI
 import java.net.URISyntaxException
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions

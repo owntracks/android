@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -32,7 +33,8 @@
             app:fabSize="normal"
             app:layout_anchor="@+id/fabMyLocation"
             app:layout_anchorGravity="top|end"
-            app:useCompatPadding="true" />
+            app:useCompatPadding="true"
+            tools:targetApi="o" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fabMyLocation"
@@ -42,13 +44,13 @@
             android:contentDescription="@string/currentLocationButtonLabel"
             android:tooltipText="@string/currentLocationButtonLabel"
             app:backgroundTint="@color/fabMyLocationBackground"
-
             app:layout_anchor="@+id/bottomSheetLayout"
             app:layout_anchorGravity="end|bottom"
             app:locationIcon="@{vm.myLocationStatus}"
             app:strokeColor="@color/md_pink_400"
             app:strokeWidth="3dp"
-            app:useCompatPadding="true" />
+            app:useCompatPadding="true"
+            tools:targetApi="o" />
 
 
         <androidx.fragment.app.FragmentContainerView
@@ -98,15 +100,15 @@
                         android:id="@+id/contactDetailsAccuracy"
                         layout="@layout/ui_contactsheet_parameter"
                         app:icon="@{@drawable/ic_baseline_my_location_24}"
-                        app:title="@{@string/contactDetailsAccuracy}"
-                        app:textValue="@{String.format(@string/contactDetailsAccuracyValue,vm.currentContact.messageLocation.accuracy)}" />
+                        app:textValue="@{String.format(@string/contactDetailsAccuracyValue,vm.currentContact.messageLocation.accuracy)}"
+                        app:title="@{@string/contactDetailsAccuracy}" />
 
                     <include
                         android:id="@+id/contactDetailsAltitude"
                         layout="@layout/ui_contactsheet_parameter"
                         app:icon="@{@drawable/ic_baseline_airplanemode_active_24}"
-                        app:title="@{@string/contactDetailsAltitude}"
-                        app:textValue="@{String.format(@string/contactDetailsAltitudeValue, vm.currentContact.messageLocation.altitude)}" />
+                        app:textValue="@{String.format(@string/contactDetailsAltitudeValue, vm.currentContact.messageLocation.altitude)}"
+                        app:title="@{@string/contactDetailsAltitude}" />
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
                 <androidx.appcompat.widget.LinearLayoutCompat
@@ -122,15 +124,15 @@
                         android:id="@+id/contactDetailsBattery"
                         layout="@layout/ui_contactsheet_parameter"
                         app:icon="@{@drawable/ic_baseline_battery_std_24}"
-                        app:title="@{@string/contactDetailsBattery}"
-                        app:textValue="@{String.format(@string/contactDetailsBatteryValue,vm.currentContact.messageLocation.battery)}" />
+                        app:textValue="@{String.format(@string/contactDetailsBatteryValue,vm.currentContact.messageLocation.battery)}"
+                        app:title="@{@string/contactDetailsBattery}" />
 
                     <include
                         android:id="@+id/contactDetailsSpeed"
                         layout="@layout/ui_contactsheet_parameter"
                         app:icon="@{@drawable/ic_baseline_speed_24}"
-                        app:title="@{@string/contactDetailsSpeed}"
-                        app:textValue="@{String.format(@string/contactDetailsSpeedValue,vm.currentContact.messageLocation.velocity)}" />
+                        app:textValue="@{String.format(@string/contactDetailsSpeedValue,vm.currentContact.messageLocation.velocity)}"
+                        app:title="@{@string/contactDetailsSpeed}" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -148,16 +150,16 @@
                         android:id="@+id/contactDetailsDistance"
                         layout="@layout/ui_contactsheet_parameter"
                         app:icon="@{@drawable/ic_baseline_architecture_24}"
-                        app:title="@{@string/contactDetailsDistance}"
-                        app:textValue="@{String.format(@string/contactDetailsDistanceValue, vm.contactDistance > 1000f ? (vm.contactDistance / 1000) : vm.contactDistance, vm.contactDistance > 1000f ? @string/contactDetailsDistanceUnitKilometres : @string/contactDetailsDistanceUnitMeters)}" />
+                        app:textValue="@{String.format(@string/contactDetailsDistanceValue, vm.contactDistance > 1000f ? (vm.contactDistance / 1000) : vm.contactDistance, vm.contactDistance > 1000f ? @string/contactDetailsDistanceUnitKilometres : @string/contactDetailsDistanceUnitMeters)}"
+                        app:title="@{@string/contactDetailsDistance}" />
 
                     <include
                         android:id="@+id/contactDetailsBearing"
                         layout="@layout/ui_contactsheet_parameter"
                         app:icon="@{@drawable/ic_baseline_arrow_upward_24}"
                         app:iconRotation="@{vm.relativeContactBearing}"
-                        app:title="@{@string/contactDetailsBearing}"
-                        app:textValue="@{String.format(@string/contactDetailsBearingValue, vm.contactBearing)}" />
+                        app:textValue="@{String.format(@string/contactDetailsBearingValue, vm.contactBearing)}"
+                        app:title="@{@string/contactDetailsBearing}" />
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
             </androidx.appcompat.widget.LinearLayoutCompat>
@@ -172,14 +174,14 @@
                 <include
                     layout="@layout/ui_contactsheet_parameter"
                     app:icon="@{@drawable/ic_outline_label_24}"
-                    app:title="@{@string/contactDetailsTrackerId}"
-                    app:textValue="@{vm.currentContact.trackerId}" />
+                    app:textValue="@{vm.currentContact.trackerId}"
+                    app:title="@{@string/contactDetailsTrackerId}" />
 
                 <include
                     layout="@layout/ui_contactsheet_parameter"
                     app:icon="@{@drawable/ic_baseline_perm_identity_24}"
-                    app:title="@{@string/contactDetailsTopic}"
-                    app:textValue="@{vm.currentContact.id}" />
+                    app:textValue="@{vm.currentContact.id}"
+                    app:title="@{@string/contactDetailsTopic}" />
 
                 <ImageView
                     android:id="@+id/moreButton"

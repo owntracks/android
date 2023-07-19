@@ -2,7 +2,6 @@ package org.owntracks.android.services
 
 import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -20,7 +19,6 @@ import org.owntracks.android.support.EncryptionProvider
 import org.owntracks.android.support.Parser
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class HttpMessageProcessorEndpointTest {
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule()

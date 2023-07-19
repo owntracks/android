@@ -1,5 +1,6 @@
 package org.owntracks.android.ui.map
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Canvas
@@ -16,6 +17,7 @@ import androidx.appcompat.widget.AppCompatTextView
  *
  * @constructor As [TextView]
  */
+@SuppressLint("RestrictedApi")
 class AutoResizingTextViewWithListener : AppCompatTextView {
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
         context,

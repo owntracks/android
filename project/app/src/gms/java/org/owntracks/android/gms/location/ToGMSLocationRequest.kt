@@ -16,10 +16,10 @@ fun LocationRequest.toGMSLocationRequest(): com.google.android.gms.location.Loca
         com.google.android.gms.location.LocationRequest.Builder(gmsPriority, interval.toMillis())
 
     numUpdates?.run(gmsLocationRequestBuilder::setMaxUpdates)
-    expirationDuration?.let { it.toMillis() }
+    expirationDuration?.toMillis()
         ?.run(gmsLocationRequestBuilder::setDurationMillis)
     smallestDisplacement?.run(gmsLocationRequestBuilder::setMinUpdateDistanceMeters)
-    fastestInterval?.let { it.toMillis() }
+    fastestInterval?.toMillis()
         ?.run(gmsLocationRequestBuilder::setMinUpdateIntervalMillis)
     waitForAccurateLocation?.run(gmsLocationRequestBuilder::setWaitForAccurateLocation)
 

@@ -10,7 +10,7 @@ import timber.log.Timber
 
 class FusedContact(id: String?) : BaseObservable() {
     @get:Bindable
-    val id: String = if (id != null && id.isNotEmpty()) id else "NOID"
+    val id: String = if (!id.isNullOrEmpty()) id else "NOID"
 
     @get:Bindable
     var messageLocation: MessageLocation? = null

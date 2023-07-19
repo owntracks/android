@@ -184,11 +184,11 @@ class PreferencesActivityTests : TestWithAnActivity<PreferencesActivity>(Prefere
             )
         }
         val expected = baristaRule.activityTestRule.activity.resources.run {
-            getStringArray(R.array.geocoders).get(
+            getStringArray(R.array.geocoders)[
                 getStringArray(R.array.geocoderValues).indexOfFirst {
                     it == defaultGeocoder.value
                 }
-            )
+            ]
         }
         assertContains(android.R.id.summary, expected)
     }

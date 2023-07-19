@@ -9,7 +9,6 @@ import kotlinx.coroutines.launch
 import org.owntracks.android.data.waypoints.WaypointModel
 import org.owntracks.android.data.waypoints.WaypointsRepo
 import org.owntracks.android.services.LocationProcessor
-import timber.log.Timber
 
 @HiltViewModel
 class WaypointsViewModel @Inject constructor(

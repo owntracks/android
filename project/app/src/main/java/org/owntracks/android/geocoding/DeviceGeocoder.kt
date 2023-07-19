@@ -31,7 +31,7 @@ class DeviceGeocoder internal constructor(context: Context) : CachingGeocoder() 
         return try {
             @Suppress("DEPRECATION") // The non-deprecated version needs API 33
             addresses = geocoder.getFromLocation(latitude.toDouble(), longitude.toDouble(), 1)
-            if (addresses != null && addresses.isNotEmpty()) {
+            if (!addresses.isNullOrEmpty()) {
                 val g = StringBuilder()
                 val a = addresses[0]
                 if (a.getAddressLine(0) != null) g.append(a.getAddressLine(0))

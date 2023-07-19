@@ -9,14 +9,14 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.owntracks.android.databinding.ModeBottomSheetDialogBinding
 import org.owntracks.android.preferences.types.MonitoringMode
 
-class MonitoringModeBottomSheetDialog() : BottomSheetDialogFragment() {
-    protected val viewModel: MapViewModel by activityViewModels()
+class MonitoringModeBottomSheetDialog : BottomSheetDialogFragment() {
+    private val viewModel: MapViewModel by activityViewModels()
     private lateinit var binding: ModeBottomSheetDialogBinding
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = ModeBottomSheetDialogBinding.inflate(inflater, container, false)
         mapOf(
             binding.fabMonitoringModeQuiet to MonitoringMode.QUIET,

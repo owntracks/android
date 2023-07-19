@@ -11,7 +11,6 @@ import android.util.TypedValue
 import android.util.TypedValue.*
 import androidx.annotation.StringRes
 import androidx.core.util.forEach
-import timber.log.Timber
 
 open class ValidatingEditTextPreference : EditTextPreference {
     private var onBindEditTextListener: OnBindEditTextListener? = null
@@ -22,7 +21,6 @@ open class ValidatingEditTextPreference : EditTextPreference {
 
     var validationErrorArgs: Any? = null
 
-    @Suppress("unused")
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(
         context,
         attrs,
@@ -130,10 +128,8 @@ open class ValidatingEditTextPreference : EditTextPreference {
         return attributes[org.owntracks.android.R.attr.validationError].data
     }
 
-    @Suppress("unused")
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : this(context, attrs, defStyleAttr, 0)
 
-    @Suppress("unused")
     constructor(context: Context, attrs: AttributeSet?) : this(
         context,
         attrs,
