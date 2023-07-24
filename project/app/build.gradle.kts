@@ -139,7 +139,8 @@ android {
             setExceptionFormat("full")
         }
         reports.junitXml.required.set(true)
-        reports.html.required.set(false)
+        reports.html.required.set(true)
+        outputs.upToDateWhen { false }
     }
 
     compileOptions {
@@ -173,12 +174,10 @@ kapt {
 }
 
 tasks.withType<Test> {
-    systemProperties["junit.jupiter.execution.parallel.enabled"] = true
-    systemProperties["junit.jupiter.execution.parallel.mode.default"] = "concurrent"
-    maxParallelForks = (
-        Runtime.getRuntime()
-            .availableProcessors() / 2
-        ).takeIf { it > 0 } ?: 1
+    systemProperties["junit.jupiter.execution.parallel.enabled"] = false
+    systemProperties["junit.jupiter.execution.parallel.mode.default"] = "same_thread"
+    systemProperties["junit.jupiter.execution.parallel.mode.classes.default"] = "concurrent"
+    maxParallelForks = 1
 }
 
 tasks.withType<JavaCompile>()
