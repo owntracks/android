@@ -106,7 +106,7 @@ android {
         addKtx = true
     }
 
-    packagingOptions {
+    packaging {
         resources.excludes.add("META-INF/*")
         jniLibs.useLegacyPackaging = false
     }
@@ -164,6 +164,13 @@ android {
         }
         create("oss") {
             dimension = "locationProvider"
+        }
+    }
+    playConfigs {
+        register("gms") {
+            enabled.set(true)
+            track.set("internal")
+            resolutionStrategy.set(com.github.triplet.gradle.androidpublisher.ResolutionStrategy.AUTO)
         }
     }
 }
@@ -248,16 +255,7 @@ dependencies {
 }
 
 // Publishing
-val serviceAccountCredentials = file("owntracks-android-gcloud-creds.json")
-
+// Handled now in the android / playConfigs block
 play {
-    if (this@Build_gradle.serviceAccountCredentials.exists()) {
-        enabled.set(true)
-        serviceAccountCredentials.set(this@Build_gradle.serviceAccountCredentials)
-    } else {
-        enabled.set(false)
-    }
-    track.set("internal")
-
-    resolutionStrategy.set(com.github.triplet.gradle.androidpublisher.ResolutionStrategy.AUTO)
+    enabled.set(false)
 }

@@ -15,6 +15,7 @@ name: Build and Test
       - "project/buildSrc/src/**"
       - "project/*.gradle.kts"
       - "project/app/*.gradle.kts"
+      - "project/gradle.properties"
       - "project/gradle/wrapper/gradle-wrapper.properties"
       - "project/gradle/libs.versions.toml"
     branches:
@@ -33,11 +34,6 @@ jobs:
         with:
           distribution: "temurin"
           java-version: "17"
-      - name: Create keystore
-        run: |
-          echo -n $KEYSTORE_BASE64 | base64 -d > project/owntracks.release.keystore.jks
-        env:
-          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
 
       - name: Gradle build
         uses: gradle/gradle-build-action@v2
@@ -45,27 +41,21 @@ jobs:
           build-root-directory: project
           arguments: |
             assembleDebug
-            assembleRelease
-            assembleAndroidTest
-            assembleGmsReleaseUnitTest
+            assembleAndroidTest            
             :app:compileOssReleaseSources
-            :app:packageGmsReleaseBundle
             :app:assembleGmsDebugAndroidTest
             :app:assembleOssDebugAndroidTest
             :app:packageGmsDebugAndroidTest
             :app:packageOssDebugAndroidTest
             lint
             app:createGmsDebugUnitTestCoverageReport --scan --stacktrace
-        env:
-          KEYSTORE_PASSPHRASE: ${{ secrets.KEYSTORE_PASSPHRASE }}
 
       - name: Upload apk artifact
         uses: actions/upload-artifact@v3
         with:
           name: apks
           path: |
-            project/app/build/outputs/apk/oss/release/app-oss-release.apk
-            project/app/build/outputs/apk/gms/release/app-gms-release.apk
+            ./project/app/build/outputs/apk/oss/debug/app-oss-debug.apk
 
       - name: Upload coverage
         if: ${{ (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'integration-test-required')) || (github.event_name == 'push' && github.ref == 'refs/heads/master') }}
@@ -99,9 +89,10 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: apks
+      - run: find -name app-oss-debug.apk
       - name: Scan OSS APK
         run: |
-          . /etc/profile.d/bsenv.sh && GRADLE_USER_HOME=${home_vagrant}/.gradle ${fdroidserver}/fdroid scanner oss/release/app-oss-release.apk
+          . /etc/profile.d/bsenv.sh && GRADLE_USER_HOME=${home_vagrant}/.gradle ${fdroidserver}/fdroid scanner app-oss-debug.apk
 
   espresso-test:
     name: "Espresso test"
@@ -238,15 +229,14 @@ jobs:
       - name: Create keystore
         run: |
           echo -n $KEYSTORE_BASE64 | base64 -d > project/owntracks.release.keystore.jks
-          echo -n $GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS > project/app/owntracks-android-gcloud-creds.json
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
-          GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
       - name: Gradle build
         uses: gradle/gradle-build-action@v2
         env:
           KEYSTORE_PASSPHRASE: ${{ secrets.KEYSTORE_PASSPHRASE }}
+          ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
         with:
           build-root-directory: project
           arguments: |
-            publishGmsReleaseBundle --stacktrace
+            publishGmsReleaseBundle --stacktrace --scan
