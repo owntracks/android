@@ -30,6 +30,7 @@
 - Both cloud and local backup should work now
 - Config export actually exports to a local file now, rather than just a somewhat useless "share"
 - `conn` value correctly filled out as `o` (offline) when there's no network connection (#1442)
+- `batt` is ommitted from locations if extended data is disabled (#741)
 
 ## Version 2.4.10
 

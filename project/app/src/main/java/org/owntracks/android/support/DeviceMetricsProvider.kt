@@ -15,11 +15,11 @@ import timber.log.Timber
 
 @Singleton
 class DeviceMetricsProvider @Inject internal constructor(@ApplicationContext private val context: Context) {
-    val batteryLevel: Int
+    val batteryLevel: Int?
         get() {
-            val intentFilter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
-            val batteryStatus = context.registerReceiver(null, intentFilter)
-            return batteryStatus?.getIntExtra(BatteryManager.EXTRA_LEVEL, 0) ?: 0
+            return context
+                .registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+                ?.getIntExtra(BatteryManager.EXTRA_LEVEL, 0)
         }
     val batteryStatus: BatteryStatus
         get() {

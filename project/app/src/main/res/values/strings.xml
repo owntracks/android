@@ -215,7 +215,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesPortValidationError">"Port must be a number between 1 and 65535"</string>
     <string name="preferencesProfileId">"Mode"</string>
     <string name="preferencesPubExtendedData">"Extended data"</string>
-    <string name="preferencesPubExtendedDataSummary">"Include extended data in location reports"</string>
+    <string name="preferencesPubExtendedDataSummary">"Include battery status, connection type and monitoring mode in location reports"</string>
     <string name="preferencesRemoteCommand">"Remote commands"</string>
     <string name="preferencesRemoteCommandSummary">"Enable remote commands"</string>
     <string name="preferencesRemoteConfiguration">"Remote configuration"</string>

@@ -33,7 +33,7 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
     var trigger: String? = null
 
     @JsonProperty("batt")
-    var battery = 0
+    var battery: Int? = null
 
     @JsonProperty("bs")
     var batteryStatus: BatteryStatus? = null

@@ -110,7 +110,6 @@ class ParserTest {
               "_type" : "location",
               "acc" : 10,
               "alt" : 20,
-              "batt" : 0,
               "created_at" : 25,
               "inregions" : [ "Testregion1", "Testregion2" ],
               "lat" : 50.1,
@@ -157,7 +156,7 @@ class ParserTest {
         assertEquals("s5", message.trackerId)
         assertEquals(1600, message.accuracy.toLong())
         assertEquals(0.0, message.altitude.toDouble(), 0.0)
-        assertEquals(99, message.battery.toLong())
+        assertEquals(99, message.battery)
         assertEquals(BatteryStatus.FULL, message.batteryStatus)
         assertEquals("w", message.conn)
         assertEquals(52.3153748, message.latitude, 0.0)
@@ -422,7 +421,7 @@ class ParserTest {
         assertEquals("s5", messageLocation.trackerId)
         assertEquals(1600, messageLocation.accuracy.toLong())
         assertEquals(0.0, messageLocation.altitude.toDouble(), 0.0)
-        assertEquals(99, messageLocation.battery.toLong())
+        assertEquals(99, messageLocation.battery)
         assertEquals("w", messageLocation.conn)
         assertEquals(52.3153748, messageLocation.latitude, 0.0)
         assertEquals(5.0408462, messageLocation.longitude, 0.0)
