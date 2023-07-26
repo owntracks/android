@@ -34,30 +34,32 @@ class DeviceMetricsProvider @Inject internal constructor(@ApplicationContext pri
             }
         }
 
-    val connectionType: String?
+    val connectionType: String
         get() {
             val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-            cm.run {
+            return cm.run {
                 try {
-                    cm.getNetworkCapabilities(cm.activeNetwork)
+                    cm.getNetworkCapabilities(cm.activeNetwork).also {
+                        Timber.i("Capabilities are $it")
+                    }
                         ?.run {
-                            if (!hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
-                                return MessageLocation.CONN_TYPE_OFFLINE
-                            }
-                            if (hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
-                                return MessageLocation.CONN_TYPE_MOBILE
-                            }
-                            if (hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-                                return MessageLocation.CONN_TYPE_WIFI
+                            if (hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
+                                if (hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                                    MessageLocation.CONN_TYPE_WIFI
+                                } else {
+                                    MessageLocation.CONN_TYPE_MOBILE
+                                }
+                            } else {
+                                MessageLocation.CONN_TYPE_OFFLINE
                             }
                         }
                     // Android bug: https://issuetracker.google.com/issues/175055271
                     // ConnectivityManager::getNetworkCapabilities apparently throws a SecurityException
                 } catch (e: SecurityException) {
                     Timber.e(e, "Exception fetching NetworkCapabilities")
+                    null
                 }
-            }
-            return null
+            } ?: MessageLocation.CONN_TYPE_OFFLINE
         }
 }

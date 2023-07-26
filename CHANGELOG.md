@@ -29,6 +29,7 @@
 - Don't show an error message on non-error conditions exporting config (#1280)
 - Both cloud and local backup should work now
 - Config export actually exports to a local file now, rather than just a somewhat useless "share"
+- `conn` value correctly filled out as `o` (offline) when there's no network connection (#1442)
 
 ## Version 2.4.10
 
