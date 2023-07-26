@@ -1,3 +1,5 @@
+import kotlin.io.path.isRegularFile
+
 plugins {
     id("com.android.application")
     id("dagger.hilt.android.plugin")
@@ -9,8 +11,7 @@ plugins {
 
 apply<EspressoScreenshotsPlugin>()
 
-val googleMapsAPIKey = extra.get("google_maps_api_key")
-    ?.toString() ?: "PLACEHOLDER_API_KEY"
+val googleMapsAPIKey = extra.get("google_maps_api_key")?.toString() ?: "PLACEHOLDER_API_KEY"
 
 val gmsImplementation: Configuration by configurations.creating
 val numShards = System.getenv("CIRCLE_NODE_TOTAL") ?: "0"
@@ -28,13 +29,16 @@ android {
         versionCode = 20500000
         versionName = "2.5.0"
 
-        val locales = listOf("en", "de", "fr", "es", "ru", "ca", "pl", "cs", "ja", "pt", "zh", "da", "tr", "ko")
+        val localeCount = fileTree("src/main/res/")
+            .map {
+                it.toPath()
+            }.count { it.isRegularFile() && it.fileName.toString() == "strings.xml" }
         buildConfigField(
-            "String[]",
-            "TRANSLATION_ARRAY",
-            "new String[]{\"" + locales.joinToString("\",\"") + "\"}"
+            "int",
+            "TRANSLATION_COUNT",
+            localeCount.toString()
         )
-        resourceConfigurations.addAll(locales)
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments.putAll(
             mapOf(
@@ -51,6 +55,10 @@ android {
                 arguments["room.schemaLocation"] = "$projectDir/schemas"
             }
         }
+    }
+
+    androidResources {
+        generateLocaleConfig = true
     }
 
     signingConfigs {
@@ -187,10 +195,9 @@ tasks.withType<Test> {
     maxParallelForks = 1
 }
 
-tasks.withType<JavaCompile>()
-    .configureEach {
-        options.isFork = true
-    }
+tasks.withType<JavaCompile>().configureEach {
+    options.isFork = true
+}
 
 dependencies {
     implementation(libs.bundles.kotlin)

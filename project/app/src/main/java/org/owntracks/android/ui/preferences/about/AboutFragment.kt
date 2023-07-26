@@ -7,7 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import org.owntracks.android.BuildConfig.TRANSLATION_ARRAY
+import org.owntracks.android.BuildConfig.TRANSLATION_COUNT
 import org.owntracks.android.R
 
 class AboutFragment : PreferenceFragmentCompat() {
@@ -34,8 +34,7 @@ class AboutFragment : PreferenceFragmentCompat() {
         }
 
         findPreference<Preference>(UI_PREFERENCE_TRANSLATION)?.setSummaryProvider {
-            val langCount = TRANSLATION_ARRAY.size
-            resources.getQuantityString(R.plurals.aboutTranslationsSummary, langCount, langCount)
+            resources.getQuantityString(R.plurals.aboutTranslationsSummary, TRANSLATION_COUNT, TRANSLATION_COUNT)
         }
     }
 
