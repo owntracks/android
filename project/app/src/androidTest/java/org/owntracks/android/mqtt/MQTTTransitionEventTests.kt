@@ -1,4 +1,4 @@
-package org.owntracks.android.e2e
+package org.owntracks.android.mqtt
 
 import android.app.NotificationManager
 import android.content.Context

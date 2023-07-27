@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import com.fasterxml.jackson.core.JsonParseException
+import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.IOException
 import java.util.concurrent.ScheduledThreadPoolExecutor
@@ -261,9 +262,11 @@ class MQTTMessageProcessorEndpoint(
                             }
                     )
                 } catch (e: Parser.EncryptionException) {
-                    Timber.e("Enable to decrypt received message ${message.id} on $topic")
+                    Timber.w("Enable to decrypt received message ${message.id} on $topic")
                 } catch (e: JsonParseException) {
-                    Timber.e("Malformed JSON message received ${message.id} on $topic")
+                    Timber.w("Malformed JSON message received ${message.id} on $topic")
+                } catch (e: InvalidFormatException) {
+                    Timber.w("Malformed JSON message received ${message.id} on $topic")
                 }
             }
         }
