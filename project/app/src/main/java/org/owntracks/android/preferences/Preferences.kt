@@ -367,7 +367,7 @@ class Preferences @Inject constructor(private val preferencesStore: PreferencesS
         }
 
     val eventTopicSuffix = "/event"
-    private val commandTopicSuffix = "/cmd"
+    val commandTopicSuffix = "/cmd"
     val infoTopicSuffix = "/info"
     val waypointsTopicSuffix = "/waypoints"
 
