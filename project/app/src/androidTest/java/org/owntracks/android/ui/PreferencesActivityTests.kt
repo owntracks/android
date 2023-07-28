@@ -13,6 +13,7 @@ import org.owntracks.android.preferences.DefaultsProviderImpl
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.SharedPreferencesStore
 import org.owntracks.android.preferences.types.ReverseGeocodeProvider
+import org.owntracks.android.support.SimpleIdlingResource
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.scrollToPreferenceWithText
 import org.owntracks.android.testutils.writeToPreference
@@ -178,7 +179,8 @@ class PreferencesActivityTests : TestWithAnActivity<PreferencesActivity>(Prefere
         val defaultGeocoder = baristaRule.activityTestRule.activity.applicationContext.let {
             DefaultsProviderImpl().getDefaultValue<ReverseGeocodeProvider>(
                 Preferences(
-                    SharedPreferencesStore(it)
+                    SharedPreferencesStore(it),
+                    SimpleIdlingResource("unused", true)
                 ),
                 Preferences::reverseGeocodeProvider
             )

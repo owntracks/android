@@ -7,6 +7,7 @@ import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.BlockingDeque
 import javax.inject.Inject
+import javax.inject.Named
 import javax.inject.Singleton
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
@@ -39,7 +40,7 @@ class MessageProcessor @Inject constructor(
     scheduler: Scheduler,
     private val endpointStateRepo: EndpointStateRepo,
     private val serviceBridge: ServiceBridge,
-    private val outgoingQueueIdlingResource: CountingIdlingResource,
+    @Named("outgoingQueueIdlingResource") private val outgoingQueueIdlingResource: CountingIdlingResource,
     private val locationProcessorLazy: Lazy<LocationProcessor>,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val scope: CoroutineScope

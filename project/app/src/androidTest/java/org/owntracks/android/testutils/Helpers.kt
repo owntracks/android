@@ -3,6 +3,7 @@ package org.owntracks.android.testutils
 import android.Manifest
 import android.app.Activity
 import android.content.ContentValues
+import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -52,9 +53,12 @@ fun writeToPreference(textResource: Int, value: String) {
     clickDialogPositiveButton()
 }
 
+fun getPreferences(): SharedPreferences = PreferenceManager.getDefaultSharedPreferences(
+    getInstrumentation().targetContext
+)
+
 fun setNotFirstStartPreferences() {
-    val context = getInstrumentation().targetContext
-    PreferenceManager.getDefaultSharedPreferences(context)
+    getPreferences()
         .edit()
         .putBoolean(Preferences::firstStart.name, false)
         .putBoolean(Preferences::setupCompleted.name, true)

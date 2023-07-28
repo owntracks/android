@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Named
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -21,10 +22,34 @@ import org.owntracks.android.ui.AppShortcutsImpl
 @Module
 class SingletonModule {
 
+    /**
+     * This idling resource is idled when the outgoing message queue becomes empty
+     *
+     * @return a [CountingIdlingResource] representing the size of the outgoing message queue
+     */
     @Provides
+    @Named("outgoingQueueIdlingResource")
     @Singleton
     fun provideOutgoingQueueIdlingResource(): CountingIdlingResource =
         CountingIdlingResource("outgoingQueueIdlingResource", false)
+
+    /**
+     * This idling resource is idled when a message with is published in response to a remote command. Useful for tests that
+     * want to trigger a response message and then wait for the app to publish it.
+     *
+     * @return a [SimpleIdlingResource]
+     */
+    @Provides
+    @Named("publishResponseMessageIdlingResource")
+    @Singleton
+    fun provideResponseMessageIdlingResource(): SimpleIdlingResource =
+        SimpleIdlingResource("publishResponseMessageIdlingResource", false)
+
+    @Provides
+    @Named("importConfigurationIdlingResource")
+    @Singleton
+    fun provideImportConfigurationIdlingResource(): SimpleIdlingResource =
+        SimpleIdlingResource("importConfigurationIdlingResource", false)
 
     @Provides
     @Singleton

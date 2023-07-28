@@ -18,16 +18,18 @@ import org.owntracks.android.preferences.InMemoryPreferencesStore
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ReverseGeocodeProvider
 import org.owntracks.android.services.BackgroundService
+import org.owntracks.android.support.SimpleIdlingResource
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TestGeocoderProvider {
+    private val mockIdlingResource = SimpleIdlingResource("mock", true)
 
     @Test
     fun `Given a preference for the None Geocoder, when resolving a location via the GeocoderProvider, then the LatLng is returned`() =
         runTest {
             val mockContext: Context = mock {}
             val notificationManager: NotificationManagerCompat = mock {}
-            val preferences = Preferences(InMemoryPreferencesStore())
+            val preferences = Preferences(InMemoryPreferencesStore(), mockIdlingResource)
             preferences.reverseGeocodeProvider = ReverseGeocodeProvider.NONE
             val provider = GeocoderProvider(
                 mockContext,
@@ -52,7 +54,7 @@ class TestGeocoderProvider {
         runTest {
             val mockContext: Context = mock {}
             val notificationManager: NotificationManagerCompat = mock {}
-            val preferences = Preferences(InMemoryPreferencesStore())
+            val preferences = Preferences(InMemoryPreferencesStore(), mockIdlingResource)
             preferences.reverseGeocodeProvider = ReverseGeocodeProvider.NONE
             val provider = GeocoderProvider(
                 mockContext,
@@ -94,7 +96,7 @@ class TestGeocoderProvider {
 
             val mockContext: Context = mock {}
             val notificationManager: NotificationManagerCompat = mock {}
-            val preferences = Preferences(InMemoryPreferencesStore())
+            val preferences = Preferences(InMemoryPreferencesStore(), mockIdlingResource)
             preferences.reverseGeocodeProvider = ReverseGeocodeProvider.OPENCAGE
             val provider = GeocoderProvider(
                 mockContext,

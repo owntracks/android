@@ -5,6 +5,7 @@ import android.os.Build
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import javax.inject.Named
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -26,6 +27,7 @@ import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.support.DeviceMetricsProvider
 import org.owntracks.android.support.MessageWaypointCollection
+import org.owntracks.android.support.SimpleIdlingResource
 import timber.log.Timber
 
 @Singleton
@@ -37,7 +39,8 @@ class LocationProcessor @Inject constructor(
     private val deviceMetricsProvider: DeviceMetricsProvider,
     private val wifiInfoProvider: WifiInfoProvider,
     @ApplicationScope private val scope: CoroutineScope,
-    @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @Named("publishResponseMessageIdlingResource") private val publishResponseMessageIdlingResource: SimpleIdlingResource
 ) {
     private fun ignoreLowAccuracy(l: Location): Boolean {
         val threshold = preferences.ignoreInaccurateLocations
@@ -106,6 +109,9 @@ class LocationProcessor @Inject constructor(
             inregions = calculateInRegions(loadedWaypoints)
         }
         messageProcessor.queueMessageForSending(message)
+        if (trigger == MessageLocation.ReportType.RESPONSE) {
+            publishResponseMessageIdlingResource.setIdleState(true)
+        }
     }
 
     private fun calculateInRegions(loadedWaypoints: List<WaypointModel>): List<String> =
@@ -202,5 +208,6 @@ class LocationProcessor @Inject constructor(
                 }
             }
         )
+        publishResponseMessageIdlingResource.setIdleState(true)
     }
 }

@@ -7,6 +7,7 @@ import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.owntracks.android.model.messages.MessageConfiguration
+import org.owntracks.android.support.SimpleIdlingResource
 
 class PreferenceTest {
     private lateinit var mockContext: Context
@@ -20,16 +21,18 @@ class PreferenceTest {
         preferencesStore = InMemoryPreferencesStore()
     }
 
+    private val mockIdlingresource = SimpleIdlingResource("mock", true)
+
     @Test
     fun `given a single key value, when importing to preferences, then that value can be retrieved from the preferences`() {
-        val preferences = Preferences(preferencesStore)
+        val preferences = Preferences(preferencesStore, mockIdlingresource)
         preferences.importKeyValue("ignoreStaleLocations", 195.4f)
         assertEquals(195.4f, preferences.ignoreStaleLocations, 0.001f)
     }
 
     @Test
     fun `given a configuration message, when importing to preferences, all the keys in the config should be added`() {
-        val preferences = Preferences(preferencesStore)
+        val preferences = Preferences(preferencesStore, mockIdlingresource)
         val messageConfiguration = MessageConfiguration()
         messageConfiguration["autostartOnBoot"] = true
         messageConfiguration["host"] = "testhost"
@@ -42,7 +45,7 @@ class PreferenceTest {
 
     @Test
     fun `given a configuration message with an entry value of null, when importing to preferences, the config value should be cleared`() {
-        val preferences = Preferences(preferencesStore)
+        val preferences = Preferences(preferencesStore, mockIdlingresource)
         val messageConfiguration = MessageConfiguration()
         messageConfiguration["host"] = null
         preferences.host = "testHost"
@@ -52,7 +55,7 @@ class PreferenceTest {
 
     @Test
     fun `given a configuration message with an invalid key, when importing to preferences, it should be ignored`() {
-        val preferences = Preferences(preferencesStore)
+        val preferences = Preferences(preferencesStore, mockIdlingresource)
         val messageConfiguration = MessageConfiguration()
         messageConfiguration["Invalid"] = "invalid"
         preferences.importConfiguration(messageConfiguration)
@@ -61,7 +64,7 @@ class PreferenceTest {
 
     @Test
     fun `given a configuration message with a value of the wrong type, when importing to preferences, it should be ignored`() {
-        val preferences = Preferences(preferencesStore)
+        val preferences = Preferences(preferencesStore, mockIdlingresource)
         val messageConfiguration = MessageConfiguration()
         messageConfiguration["host"] = 4
         preferences.importConfiguration(messageConfiguration)
@@ -119,7 +122,7 @@ class PreferenceTest {
 
     @Test
     fun `given an MQTT configuration message, when imported and then exported, the config is merged and all the preference keys are present`() {
-        val preferences = Preferences(preferencesStore)
+        val preferences = Preferences(preferencesStore, mockIdlingresource)
         val messageConfiguration = MessageConfiguration()
         messageConfiguration["autostartOnBoot"] = true
         messageConfiguration["host"] = "testhost"
@@ -150,7 +153,7 @@ class PreferenceTest {
 
     @Test
     fun `given an HTTP configuration message, when imported and then exported, the config is merged and all the preference keys are present`() {
-        val preferences = Preferences(preferencesStore)
+        val preferences = Preferences(preferencesStore, mockIdlingresource)
         val messageConfiguration = MessageConfiguration()
         messageConfiguration["autostartOnBoot"] = true
         messageConfiguration["host"] = "testhost"
@@ -181,7 +184,7 @@ class PreferenceTest {
 
     @Test
     fun `given a Preferences object with no username set, when asking for the topic, the correct username placeholder is populated`() {
-        val preferences = Preferences(preferencesStore)
+        val preferences = Preferences(preferencesStore, mockIdlingresource)
         preferences.autostartOnBoot = true
         preferences.username = ""
         preferences.deviceId = "myDevice"
@@ -191,7 +194,7 @@ class PreferenceTest {
 
     @Test
     fun `given an empty Preferences object, when asking for a value, then the default value is returned`() {
-        val preferences = Preferences(preferencesStore)
+        val preferences = Preferences(preferencesStore, mockIdlingresource)
         assertEquals(false, preferences.debugLog)
     }
 }

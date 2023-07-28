@@ -18,6 +18,7 @@ import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.support.ContactBitmapAndName
 import org.owntracks.android.support.ContactBitmapAndNameMemoryCache
+import org.owntracks.android.support.SimpleIdlingResource
 
 class MemoryContactsRepoTest {
 
@@ -29,7 +30,7 @@ class MemoryContactsRepoTest {
     private lateinit var messageLocation: MessageLocation
     private lateinit var contactBitmapAndNameMemoryCache: ContactBitmapAndNameMemoryCache
     private var contactsRepo: ContactsRepo? = null
-
+    private val mockIdlingResource = SimpleIdlingResource("mock", true)
     private lateinit var preferences: Preferences
 
     @Before
@@ -44,7 +45,7 @@ class MemoryContactsRepoTest {
             on { resources } doReturn mockResources
             on { packageName } doReturn javaClass.canonicalName
         }
-        preferences = Preferences(InMemoryPreferencesStore())
+        preferences = Preferences(InMemoryPreferencesStore(), mockIdlingResource)
 
         messageLocation = MessageLocation()
         messageLocation.accuracy = 10

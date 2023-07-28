@@ -12,12 +12,14 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.owntracks.android.model.messages.MessageConfiguration
 import org.owntracks.android.preferences.types.*
+import org.owntracks.android.support.SimpleIdlingResource
 
 @RunWith(Parameterized::class)
 class PreferencesGettersAndSetters(private val parameter: Parameter) {
     private lateinit var mockContext: Context
     private lateinit var preferencesStore: PreferencesStore
     private lateinit var shortcutService: ShortcutManager
+    private val mockIdlingResource = SimpleIdlingResource("mock", true)
 
     @Before
     fun createMocks() {
@@ -31,7 +33,7 @@ class PreferencesGettersAndSetters(private val parameter: Parameter) {
 
     @Test
     fun `when setting a preference ensure that the preference is set correctly on export`() {
-        val preferences = Preferences(preferencesStore)
+        val preferences = Preferences(preferencesStore, mockIdlingResource)
         val setter =
             Preferences::class.java.getMethod("set${parameter.preferenceMethodName}", parameter.preferenceType.java)
         if (parameter.httpOnlyMode) {
@@ -44,7 +46,7 @@ class PreferencesGettersAndSetters(private val parameter: Parameter) {
 
     @Test
     fun `when importing a configuration ensure that the supplied preference is set to the given value`() {
-        val preferences = Preferences(preferencesStore)
+        val preferences = Preferences(preferencesStore, mockIdlingResource)
         val messageConfiguration = MessageConfiguration()
         messageConfiguration[parameter.preferenceName] = parameter.preferenceValueInConfiguration
         preferences.importConfiguration(messageConfiguration)

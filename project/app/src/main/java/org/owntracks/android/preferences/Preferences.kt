@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
 import java.util.*
 import javax.inject.Inject
+import javax.inject.Named
 import javax.inject.Singleton
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KProperty
@@ -19,11 +20,16 @@ import org.owntracks.android.BuildConfig
 import org.owntracks.android.model.messages.MessageConfiguration
 import org.owntracks.android.preferences.types.*
 import org.owntracks.android.services.worker.Scheduler.Companion.MIN_PERIODIC_INTERVAL
+import org.owntracks.android.support.SimpleIdlingResource
 import org.owntracks.android.ui.map.MapLayerStyle
 import timber.log.Timber
 
 @Singleton
-class Preferences @Inject constructor(private val preferencesStore: PreferencesStore) {
+class Preferences @Inject constructor(
+    private val preferencesStore: PreferencesStore,
+    @Named("importConfigurationIdlingResource")
+    private val importConfigurationIdlingResource: SimpleIdlingResource
+) {
     val allConfigKeys =
         Preferences::class.declaredMemberProperties.filter {
             it.annotations.any { annotation -> annotation is Preference }
@@ -101,6 +107,7 @@ class Preferences @Inject constructor(private val preferencesStore: PreferencesS
                     importPreference(Preferences::tid, this)
                 }
             }
+        importConfigurationIdlingResource.setIdleState(true)
     }
 
     /**
