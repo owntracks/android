@@ -12,4 +12,3 @@ ij_kotlin_line_break_after_multiline_when_entry = false
 ij_kotlin_method_parameters_wrap = on_every_item
 ktlint_ignore_back_ticked_identifier = true
 ktlint_code_style = android
-disabled_rules = no-wildcard-imports
