@@ -50,7 +50,7 @@ class LocationProcessor @Inject constructor(
 
     @JvmOverloads
     suspend fun publishLocationMessage(
-        trigger: String?,
+        trigger: MessageLocation.ReportType,
         location: Location? = locationRepo.currentPublishedLocation.value
     ) {
         if (location == null) return
@@ -65,7 +65,7 @@ class LocationProcessor @Inject constructor(
         // Check if publish would trigger a region if fusedRegionDetection is enabled
         if (loadedWaypoints.isNotEmpty() &&
             preferences.fusedRegionDetection &&
-            MessageLocation.REPORT_TYPE_CIRCULAR != trigger
+            trigger != MessageLocation.ReportType.CIRCULAR
         ) {
             loadedWaypoints.forEach { waypoint ->
                 onWaypointTransition(
@@ -80,13 +80,13 @@ class LocationProcessor @Inject constructor(
                 )
             }
         }
-        if (preferences.monitoring === MonitoringMode.QUIET && MessageLocation.REPORT_TYPE_USER != trigger) {
+        if (preferences.monitoring === MonitoringMode.QUIET && MessageLocation.ReportType.USER != trigger) {
             Timber.v("message suppressed by monitoring settings: quiet")
             return
         }
         if (preferences.monitoring === MonitoringMode.MANUAL &&
-            MessageLocation.REPORT_TYPE_USER != trigger &&
-            MessageLocation.REPORT_TYPE_CIRCULAR != trigger
+            MessageLocation.ReportType.USER != trigger &&
+            MessageLocation.ReportType.CIRCULAR != trigger
         ) {
             Timber.v("message suppressed by monitoring settings: manual")
             return
@@ -119,7 +119,7 @@ class LocationProcessor @Inject constructor(
      * @param location received from the device
      * @param reportType type of report that
      */
-    suspend fun onLocationChanged(location: Location, reportType: String?) {
+    suspend fun onLocationChanged(location: Location, reportType: MessageLocation.ReportType) {
         locationRepo.setCurrentPublishedLocation(location)
         publishLocationMessage(reportType, location)
     }
@@ -150,7 +150,7 @@ class LocationProcessor @Inject constructor(
                 } else {
                     publishTransitionMessage(waypointModel, location, transition, trigger)
                     if (trigger == MessageTransition.TRIGGER_CIRCULAR) {
-                        publishLocationMessage(MessageLocation.REPORT_TYPE_CIRCULAR)
+                        publishLocationMessage(MessageLocation.ReportType.CIRCULAR)
                     }
                 }
             }

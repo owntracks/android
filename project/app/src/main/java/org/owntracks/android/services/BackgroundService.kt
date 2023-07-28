@@ -57,8 +57,6 @@ import org.owntracks.android.location.geofencing.GeofencingEvent
 import org.owntracks.android.location.geofencing.GeofencingEvent.Companion.fromIntent
 import org.owntracks.android.location.geofencing.GeofencingRequest
 import org.owntracks.android.model.messages.MessageLocation
-import org.owntracks.android.model.messages.MessageLocation.Companion.REPORT_TYPE_DEFAULT
-import org.owntracks.android.model.messages.MessageLocation.Companion.REPORT_TYPE_RESPONSE
 import org.owntracks.android.model.messages.MessageLocation.Companion.fromLocation
 import org.owntracks.android.model.messages.MessageTransition
 import org.owntracks.android.preferences.Preferences
@@ -221,14 +219,14 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
                 Timber.d("location result received: $locationResult")
                 Timber.v("Idling location")
                 locationIdlingResource.setIdleState(true)
-                onLocationChanged(locationResult.lastLocation, REPORT_TYPE_DEFAULT)
+                onLocationChanged(locationResult.lastLocation, MessageLocation.ReportType.DEFAULT)
             }
         }
         locationCallbackOnDemand = object : LocationCallback {
             override fun onLocationAvailability(locationAvailability: LocationAvailability) {}
             override fun onLocationResult(locationResult: LocationResult) {
                 Timber.d("BackgroundService On-demand location result received: locationResult")
-                onLocationChanged(locationResult.lastLocation, REPORT_TYPE_RESPONSE)
+                onLocationChanged(locationResult.lastLocation, MessageLocation.ReportType.RESPONSE)
             }
         }
         setupLocationRequest()
@@ -303,7 +301,7 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
                 INTENT_ACTION_SEND_LOCATION_USER -> {
                     lifecycleScope.launch {
                         locationProcessor.publishLocationMessage(
-                            MessageLocation.REPORT_TYPE_USER,
+                            MessageLocation.ReportType.USER,
                             locationRepo.currentPublishedLocation.value
                         )
                     }
@@ -570,7 +568,7 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
         }
     }
 
-    fun onLocationChanged(location: Location, reportType: String) {
+    fun onLocationChanged(location: Location, reportType: MessageLocation.ReportType) {
         Timber.v("location update received: $location, report type $reportType")
         if (location.time > locationRepo.currentLocationTime) {
             lifecycleScope.launch {
@@ -726,7 +724,7 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
             if (setupLocationRequest()) {
                 Timber.d("Getting last location")
                 locationProviderClient.getLastLocation()?.run {
-                    onLocationChanged(this, REPORT_TYPE_DEFAULT)
+                    onLocationChanged(this, MessageLocation.ReportType.DEFAULT)
                 }
             }
         }, 0)

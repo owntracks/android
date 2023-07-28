@@ -161,7 +161,7 @@ class ParserTest {
         assertEquals("w", message.conn)
         assertEquals(52.3153748, message.latitude, 0.0)
         assertEquals(5.0408462, message.longitude, 0.0)
-        assertEquals("p", message.trigger)
+        assertEquals(MessageLocation.ReportType.PING, message.trigger)
         assertEquals(0f, message.verticalAccuracy.toFloat(), 0f)
         assertEquals(2, message.inregions?.size)
     }
@@ -425,7 +425,7 @@ class ParserTest {
         assertEquals("w", messageLocation.conn)
         assertEquals(52.3153748, messageLocation.latitude, 0.0)
         assertEquals(5.0408462, messageLocation.longitude, 0.0)
-        assertEquals("p", messageLocation.trigger)
+        assertEquals(MessageLocation.ReportType.PING, messageLocation.trigger)
         assertEquals(0f, messageLocation.verticalAccuracy.toFloat(), 0f)
         assertEquals(2f, messageLocation.velocity.toFloat(), 0f)
     }

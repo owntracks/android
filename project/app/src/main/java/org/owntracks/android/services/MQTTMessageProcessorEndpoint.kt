@@ -23,6 +23,7 @@ import org.owntracks.android.di.CoroutineScopes
 import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageClear
+import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.services.worker.Scheduler
@@ -315,7 +316,8 @@ class MQTTMessageProcessorEndpoint(
 
                             messageProcessor.notifyOutgoingMessageQueue()
                             if (preferences.publishLocationOnConnect) {
-                                messageProcessor.publishLocationMessage(null) // TODO fix the trigger here
+                                // TODO fix the trigger here
+                                messageProcessor.publishLocationMessage(MessageLocation.ReportType.DEFAULT)
                             }
                         }
                 } catch (e: Exception) {

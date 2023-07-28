@@ -20,7 +20,7 @@ class SendLocationPingWorker @AssistedInject constructor(
 ) : CoroutineWorker(context, workerParams) {
     override suspend fun doWork(): Result {
         Timber.d("SendLocationPingWorker started. ThreadID: %s", Thread.currentThread())
-        locationProcessor.publishLocationMessage(MessageLocation.REPORT_TYPE_PING)
+        locationProcessor.publishLocationMessage(MessageLocation.ReportType.PING)
         return Result.success()
     }
 

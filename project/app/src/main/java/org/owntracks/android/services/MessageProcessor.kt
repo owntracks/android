@@ -369,9 +369,8 @@ class MessageProcessor @Inject constructor(
         }
     }
 
-    suspend fun publishLocationMessage(trigger: String?) {
-        locationProcessorLazy.get()
-            .publishLocationMessage(trigger)
+    suspend fun publishLocationMessage(trigger: MessageLocation.ReportType) {
+        locationProcessorLazy.get().publishLocationMessage(trigger)
     }
 
     private fun processIncomingMessage(message: MessageTransition) {
