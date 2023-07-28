@@ -40,20 +40,17 @@ class DeviceMetricsProvider @Inject internal constructor(@ApplicationContext pri
 
             return cm.run {
                 try {
-                    cm.getNetworkCapabilities(cm.activeNetwork).also {
-                        Timber.i("Capabilities are $it")
-                    }
-                        ?.run {
-                            if (hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
-                                if (hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-                                    MessageLocation.CONN_TYPE_WIFI
-                                } else {
-                                    MessageLocation.CONN_TYPE_MOBILE
-                                }
+                    cm.getNetworkCapabilities(cm.activeNetwork) ?.run {
+                        if (hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
+                            if (hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                                MessageLocation.CONN_TYPE_WIFI
                             } else {
-                                MessageLocation.CONN_TYPE_OFFLINE
+                                MessageLocation.CONN_TYPE_MOBILE
                             }
+                        } else {
+                            MessageLocation.CONN_TYPE_OFFLINE
                         }
+                    }
                     // Android bug: https://issuetracker.google.com/issues/175055271
                     // ConnectivityManager::getNetworkCapabilities apparently throws a SecurityException
                 } catch (e: SecurityException) {
