@@ -1,6 +1,7 @@
 package org.owntracks.android.e2e
 
 import androidx.preference.PreferenceManager
+import androidx.test.espresso.Espresso
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -115,13 +116,18 @@ class LocationAccuracyTest :
         grantMapActivityPermissions()
         initializeMockLocationProvider(app)
 
+        setMockLocation(mockLatitude, mockLongitude, 25f)
         configureHTTPConnectionToLocal()
         reportLocationFromMap(app.locationIdlingResource) {
             setMockLocation(mockLatitude, mockLongitude, 25f)
         }
+        baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.use {
+            Espresso.onIdle()
+        }
+        val bodies = dispatcher.requestBodies.map { it.body.readUtf8() }
         assertTrue(
-            dispatcher.requestBodies.any {
-                JSONObject(it.body.readUtf8()).run {
+            bodies.any {
+                JSONObject(it).run {
                     getInt("acc") == 25 && getDouble("lat") == mockLatitude && getDouble("lon") == mockLongitude
                 }
             }

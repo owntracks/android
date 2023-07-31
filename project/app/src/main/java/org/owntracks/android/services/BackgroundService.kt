@@ -217,8 +217,10 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
 
             override fun onLocationResult(locationResult: LocationResult) {
                 Timber.d("location result received: $locationResult")
-                Timber.v("Idling location")
-                locationIdlingResource.setIdleState(true)
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || locationResult.lastLocation.isMock) {
+                    Timber.v("Idling location")
+                    locationIdlingResource.setIdleState(true)
+                }
                 onLocationChanged(locationResult.lastLocation, MessageLocation.ReportType.DEFAULT)
             }
         }
