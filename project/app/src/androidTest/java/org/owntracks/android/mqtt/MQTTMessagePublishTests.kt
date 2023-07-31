@@ -3,8 +3,10 @@ package org.owntracks.android.mqtt
 import android.view.View
 import androidx.annotation.IdRes
 import androidx.preference.PreferenceManager
+import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onData
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
 import androidx.test.espresso.UiController
 import androidx.test.espresso.ViewAction
 import androidx.test.espresso.action.ViewActions.click
@@ -17,6 +19,7 @@ import com.adevinta.android.barista.assertion.BaristaRecyclerViewAssertions.asse
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
+import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import java.time.Instant
 import kotlin.time.Duration.Companion.seconds
@@ -36,6 +39,7 @@ import org.owntracks.android.R
 import org.owntracks.android.model.BatteryStatus
 import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageLocation
+import org.owntracks.android.model.messages.MessageWaypoints
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.Parser
 import org.owntracks.android.testutils.*
@@ -283,6 +287,56 @@ class MQTTMessagePublishTests :
             clickOnAndWait(R.string.title_activity_status)
         }
         assertContains(R.id.connectedStatus, R.string.ERROR)
+    }
+
+    @OptIn(ExperimentalUnsignedTypes::class)
+    @Test
+    fun given_an_MQTT_configured_client_when_the_user_publishes_waypoints_then_the_broker_receives_a_waypoint_message() { // ktlint-disable max-line-length
+        setNotFirstStartPreferences()
+        launchActivity()
+
+        grantMapActivityPermissions()
+        configureMQTTConnectionToLocalWithGeneratedPassword()
+        waitUntilActivityVisible<MapActivity>()
+
+        openDrawer()
+        clickOnAndWait(R.string.title_activity_waypoints)
+
+        clickOnAndWait(R.id.add)
+        writeTo(R.id.description, "test waypoint")
+        writeTo(R.id.latitude, "51.0")
+        writeTo(R.id.longitude, "1.0")
+        writeTo(R.id.radius, "20")
+
+        clickOnAndWait(R.id.save)
+
+        clickOnAndWait(R.id.add)
+        writeTo(R.id.description, "test waypoint 2")
+        writeTo(R.id.latitude, "20.123456789")
+        writeTo(R.id.longitude, "1.234567")
+        writeTo(R.id.radius, "20.987")
+
+        clickOnAndWait(R.id.save)
+
+        baristaRule.activityTestRule.activity.publishResponseMessageIdlingResource.setIdleState(false)
+
+        openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
+        clickOnAndWait(R.string.exportWaypointsToEndpoint)
+
+        baristaRule.activityTestRule.activity.publishResponseMessageIdlingResource.use {
+            Espresso.onIdle()
+        }
+
+        baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.use {
+            val packets = mqttPacketsReceived.filterIsInstance<MQTTPublish>().map {
+                Parser(null).fromJson((it.payload)!!.toByteArray())
+            }
+            assertTrue(
+                packets.any {
+                    it is MessageWaypoints
+                }
+            )
+        }
     }
 
     private fun clickOnRegardlessOfVisibility(@IdRes id: Int) {

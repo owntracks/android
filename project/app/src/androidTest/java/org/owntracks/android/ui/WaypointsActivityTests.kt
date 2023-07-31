@@ -6,15 +6,21 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
+import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.testutils.TestWithAnActivity
+import org.owntracks.android.testutils.TestWithAnMQTTBroker
+import org.owntracks.android.testutils.TestWithAnMQTTBrokerImpl
 import org.owntracks.android.ui.waypoints.WaypointsActivity
 
+@OptIn(ExperimentalUnsignedTypes::class)
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class WaypointsActivityTests : TestWithAnActivity<WaypointsActivity>(WaypointsActivity::class.java) {
+class WaypointsActivityTests :
+    TestWithAnActivity<WaypointsActivity>(WaypointsActivity::class.java),
+    TestWithAnMQTTBroker by TestWithAnMQTTBrokerImpl() {
     @Test
     fun initialRegionsActivityIsEmpty() {
         assertDisplayed(R.string.waypointListPlaceholder)
@@ -67,5 +73,10 @@ class WaypointsActivityTests : TestWithAnActivity<WaypointsActivity>(WaypointsAc
         clickOnAndWait(R.string.deleteWaypointTitle)
 
         assertNotDisplayed(waypointName)
+    }
+
+    @After
+    fun mqttAfter() {
+        stopBroker()
     }
 }

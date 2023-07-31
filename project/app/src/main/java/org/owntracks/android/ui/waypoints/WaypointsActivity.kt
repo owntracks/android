@@ -6,15 +6,19 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
+import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.test.espresso.idling.CountingIdlingResource
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import javax.inject.Named
 import org.owntracks.android.R
 import org.owntracks.android.data.waypoints.WaypointModel
 import org.owntracks.android.databinding.UiWaypointsBinding
 import org.owntracks.android.support.DrawerProvider
+import org.owntracks.android.support.SimpleIdlingResource
 import org.owntracks.android.ui.base.BaseRecyclerViewAdapterWithClickHandler
 import org.owntracks.android.ui.base.ClickHasBeenHandled
 import org.owntracks.android.ui.preferences.load.LoadActivity
@@ -24,6 +28,16 @@ import org.owntracks.android.ui.waypoint.WaypointActivity
 class WaypointsActivity : AppCompatActivity(), BaseRecyclerViewAdapterWithClickHandler.ClickListener<WaypointModel> {
     @Inject
     lateinit var drawerProvider: DrawerProvider
+
+    @Inject
+    @Named("outgoingQueueIdlingResource")
+    @get:VisibleForTesting
+    lateinit var outgoingQueueIdlingResource: CountingIdlingResource
+
+    @Inject
+    @Named("publishResponseMessageIdlingResource")
+    @get:VisibleForTesting
+    lateinit var publishResponseMessageIdlingResource: SimpleIdlingResource
 
     private val viewModel: WaypointsViewModel by viewModels()
     private lateinit var recyclerViewAdapter: WaypointsAdapter

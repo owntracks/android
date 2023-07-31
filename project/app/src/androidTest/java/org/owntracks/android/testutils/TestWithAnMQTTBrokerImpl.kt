@@ -106,14 +106,16 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
         )
 
     override fun stopBroker() {
-        shouldBeRunning = false
-        Timber.i("Requesting MQTT Broker stop")
-        if (this::broker.isInitialized) {
-            broker.stop()
+        if (::brokerThread.isInitialized) {
+            shouldBeRunning = false
+            Timber.i("Requesting MQTT Broker stop")
+            if (this::broker.isInitialized) {
+                broker.stop()
+            }
+            Timber.i("Waiting to join thread")
+            brokerThread.join()
+            Timber.i("MQTT Broker stopped")
         }
-        Timber.i("Waiting to join thread")
-        brokerThread.join()
-        Timber.i("MQTT Broker stopped")
     }
 
     override fun configureMQTTConnectionToLocal(password: String) {

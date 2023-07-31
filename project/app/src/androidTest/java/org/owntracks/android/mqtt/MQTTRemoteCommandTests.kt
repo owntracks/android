@@ -4,6 +4,8 @@ import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
+import com.adevinta.android.barista.interaction.BaristaEditTextInteractions
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -129,6 +131,26 @@ class MQTTRemoteCommandTests :
         clickOnAndWait(R.id.menu_monitoring)
         clickOnAndWait(R.id.fabMonitoringModeSignificantChanges)
         configureMQTTConnectionToLocalWithGeneratedPassword()
+        openDrawer()
+        clickOnAndWait(R.string.title_activity_waypoints)
+
+        clickOnAndWait(R.id.add)
+        BaristaEditTextInteractions.writeTo(R.id.description, "test waypoint")
+        BaristaEditTextInteractions.writeTo(R.id.latitude, "51.123")
+        BaristaEditTextInteractions.writeTo(R.id.longitude, "0.456")
+        BaristaEditTextInteractions.writeTo(R.id.radius, "20")
+        clickOnAndWait(R.id.save)
+
+        clickOnAndWait(R.id.add)
+        BaristaEditTextInteractions.writeTo(R.id.description, "test waypoint 2")
+        BaristaEditTextInteractions.writeTo(R.id.latitude, "51.00")
+        BaristaEditTextInteractions.writeTo(R.id.longitude, "0.4")
+        BaristaEditTextInteractions.writeTo(R.id.radius, "25")
+        clickOnAndWait(R.id.save)
+
+        openDrawer()
+        clickOnAndWait(R.string.title_activity_map)
+
         baristaRule.activityTestRule.activity.publishResponseMessageIdlingResource.setIdleState(false)
         listOf(
             """
