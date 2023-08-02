@@ -3,18 +3,17 @@ package org.owntracks.android.data.waypoints
 import android.app.Notification
 import android.app.NotificationManager
 import android.content.Context
-import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.assertion.BaristaRecyclerViewAssertions
+import com.adevinta.android.barista.assertion.BaristaRecyclerViewAssertions.assertRecyclerViewItemCount
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions
 import kotlin.random.Random
 import org.junit.Assert
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
@@ -110,15 +109,7 @@ class WaypointsMigrationFromObjectboxTestWithFullUI : TestWithAnActivity<MapActi
         BaristaDrawerInteractions.openDrawer()
         clickOn(R.string.title_activity_waypoints)
         assertDisplayed(R.id.waypointsRecyclerView)
-        BaristaRecyclerViewAssertions.assertRecyclerViewItemCount(R.id.waypointsRecyclerView, 5000)
-    }
-
-    @Before
-    fun clearNotifications() {
-        // Cancel notifications
-        (app.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancelAll()
-        // Close the notification shade
-        @Suppress("DEPRECATION") app.sendBroadcast(Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS))
+        assertRecyclerViewItemCount(R.id.waypointsRecyclerView, 5000)
     }
 
     @Test

@@ -41,6 +41,7 @@ class MessageProcessor @Inject constructor(
     private val endpointStateRepo: EndpointStateRepo,
     private val serviceBridge: ServiceBridge,
     @Named("outgoingQueueIdlingResource") private val outgoingQueueIdlingResource: CountingIdlingResource,
+    @Named("importConfigurationIdlingResource") private val importConfigurationIdlingResource: SimpleIdlingResource,
     private val locationProcessorLazy: Lazy<LocationProcessor>,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val scope: CoroutineScope
@@ -347,26 +348,21 @@ class MessageProcessor @Inject constructor(
             CommandAction.SET_CONFIGURATION -> {
                 if (!preferences.remoteConfiguration) {
                     Timber.w("Received a remote configuration command but remote config setting is disabled")
-                }
-                if (message.configuration != null) {
-                    preferences.importConfiguration(message.configuration!!)
                 } else {
-                    Timber.w("No configuration provided")
-                }
-                if (message.waypoints != null) {
-                    waypointsRepo.importFromMessage(message.waypoints!!.waypoints)
-                }
-            }
-            CommandAction.RECONNECT -> {
-                if (message.modeId !== ConnectionMode.HTTP) {
-                    Timber.e("command not supported in HTTP mode: ${message.action}")
-                } else {
-                    scope.launch {
-                        reconnect()
+                    if (message.configuration != null) {
+                        preferences.importConfiguration(message.configuration!!)
+                    } else {
+                        Timber.i("No remote configuration provided")
+                    }
+                    if (message.waypoints != null) {
+                        waypointsRepo.importFromMessage(message.waypoints!!.waypoints)
+                    } else {
+                        Timber.d("No remote waypoints provided")
                     }
                 }
+                importConfigurationIdlingResource.setIdleState(true)
             }
-            else -> {}
+            else -> { }
         }
     }
 

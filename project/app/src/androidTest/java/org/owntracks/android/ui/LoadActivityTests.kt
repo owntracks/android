@@ -93,8 +93,69 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
 }
     """.trimIndent()
 
+    //language=JSON
     private val servedConfig =
-        """{"_type":"configuration","waypoints":[{"_type":"waypoint","desc":"work","lat":51.5,"lon":-0.02,"rad":150,"tst":1505910709000},{"_type":"waypoint","desc":"home","lat":53.6,"lon":-1.5,"rad":100,"tst":1558351273}],"auth":true,"autostartOnBoot":true,"connectionTimeoutSeconds":34,"cleanSession":false,"clientId":"emulator","cmd":true,"debugLog":true,"deviceId":"testdevice","fusedRegionDetection":true,"geocodeEnabled":true,"host":"testhost.example.com","ignoreInaccurateLocations":150,"ignoreStaleLocations":0,"keepalive":900,"locatorDisplacement":5,"locatorInterval":60,"mode":0,"monitoring":1,"enableMapRotation":false,"osmTileScaleFactor":3.352,"moveModeLocatorInterval":10,"mqttProtocolLevel":3,"notificationHigherPriority":false,"notificationLocation":true,"opencageApiKey":"","password":"password","ping":30,"port":1883,"pubExtendedData":true,"pubQos":1,"pubRetain":true,"pubTopicBase":"owntracks/%u/%d","remoteConfiguration":true,"sub":true,"subQos":2,"subTopic":"owntracks/+/+","tls":false,"usePassword":true,"username":"username","ws":false}""" // ktlint-disable max-line-length
+        """{
+  "_type": "configuration",
+  "waypoints": [
+    {
+      "_type": "waypoint",
+      "desc": "work",
+      "lat": 51.5,
+      "lon": -0.02,
+      "rad": 150,
+      "tst": 1505910709000
+    },
+    {
+      "_type": "waypoint",
+      "desc": "home",
+      "lat": 53.6,
+      "lon": -1.5,
+      "rad": 100,
+      "tst": 1558351273
+    }
+  ],
+  "auth": true,
+  "autostartOnBoot": true,
+  "connectionTimeoutSeconds": 34,
+  "cleanSession": false,
+  "clientId": "emulator",
+  "cmd": true,
+  "debugLog": true,
+  "deviceId": "testdevice",
+  "fusedRegionDetection": true,
+  "geocodeEnabled": true,
+  "host": "testhost.example.com",
+  "ignoreInaccurateLocations": 150,
+  "ignoreStaleLocations": 0,
+  "keepalive": 900,
+  "locatorDisplacement": 5,
+  "locatorInterval": 60,
+  "mode": 0,
+  "monitoring": 1,
+  "enableMapRotation": false,
+  "osmTileScaleFactor": 3.352,
+  "moveModeLocatorInterval": 10,
+  "mqttProtocolLevel": 3,
+  "notificationHigherPriority": false,
+  "notificationLocation": true,
+  "opencageApiKey": "",
+  "password": "password",
+  "ping": 30,
+  "port": 1883,
+  "pubExtendedData": true,
+  "pubQos": 1,
+  "pubRetain": true,
+  "pubTopicBase": "owntracks/%u/%d",
+  "remoteConfiguration": true,
+  "sub": true,
+  "subQos": 2,
+  "subTopic": "owntracks/+/+",
+  "tls": false,
+  "usePassword": true,
+  "username": "username",
+  "ws": false
+}""" // ktlint-disable max-line-length
 
     @Test
     fun loadActivityCanLoadConfigFromOwntracksInlineConfigURL() {

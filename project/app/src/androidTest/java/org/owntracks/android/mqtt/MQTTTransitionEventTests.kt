@@ -2,9 +2,7 @@ package org.owntracks.android.mqtt
 
 import android.app.Notification
 import android.app.NotificationManager
-import android.content.Context
 import android.content.Context.NOTIFICATION_SERVICE
-import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
@@ -51,15 +49,6 @@ class MQTTTransitionEventTests :
     @After
     fun uninitMockLocation() {
         unInitializeMockLocationProvider()
-    }
-
-    @Before
-    fun clearNotifications() {
-        // Cancel notifications
-        (app.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancelAll()
-        // Close the notification shade
-        @Suppress("DEPRECATION")
-        app.sendBroadcast(Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS))
     }
 
     @Before

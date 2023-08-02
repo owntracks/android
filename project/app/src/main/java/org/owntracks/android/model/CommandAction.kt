@@ -9,6 +9,5 @@ enum class CommandAction(@JsonValue val value: String) {
     REPORT_LOCATION("reportLocation"),
     SET_WAYPOINTS("setWaypoints"),
     SET_CONFIGURATION("setConfiguration"),
-    RECONNECT("reconnect"),
     WAYPOINTS("waypoints")
 }
