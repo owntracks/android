@@ -24,6 +24,7 @@ import dagger.hilt.EntryPoints
 import dagger.hilt.android.HiltAndroidApp
 import java.security.Security
 import javax.inject.Inject
+import javax.inject.Named
 import javax.inject.Provider
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.conscrypt.Conscrypt
@@ -64,7 +65,9 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
     lateinit var notificationManager: NotificationManagerCompat
 
     @Inject
-    lateinit var locationIdleResource: SimpleIdlingResource
+    @get:VisibleForTesting
+    @Named("mockLocationIdlingResource")
+    lateinit var mockLocationIdlingResource: SimpleIdlingResource
 
     @Inject
     lateinit var waypointsRepo: RoomWaypointsRepo
@@ -216,10 +219,6 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
     @get:VisibleForTesting
     val mqttConnectionIdlingResource: IdlingResource
         get() = messageProcessor.mqttConnectionIdlingResource
-
-    @get:VisibleForTesting
-    val locationIdlingResource: IdlingResource
-        get() = locationIdleResource
 
     /**
      * Migrate waypoints. We need a way to call this from an espresso test after it's written the test files

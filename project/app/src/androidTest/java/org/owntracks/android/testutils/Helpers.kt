@@ -7,6 +7,7 @@ import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.os.ParcelFileDescriptor
 import android.provider.MediaStore
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
@@ -26,7 +27,10 @@ import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickD
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions
 import com.adevinta.android.barista.interaction.PermissionGranter
+import java.io.BufferedInputStream
+import java.io.FileInputStream
 import java.io.FileWriter
+import java.io.InputStream
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -71,6 +75,7 @@ fun reportLocationFromMap(locationIdlingResource: IdlingResource?, mockLocationF
         clickOnAndWait(R.string.title_activity_map)
     }
     waitUntilActivityVisible<MapActivity>()
+
     mockLocationFunction()
     clickOnAndWait(R.id.menu_monitoring)
     clickOnAndWait(R.id.fabMonitoringModeMove)
@@ -142,7 +147,9 @@ fun disableDeviceLocation() {
         "settings put secure location_providers_allowed -gps"
     }
 
-    getInstrumentation().uiAutomation.executeShellCommand(cmd).close()
+    getInstrumentation().uiAutomation.executeShellCommand(cmd).use {
+        it.dumpOutputToLog("disable devicelocation")
+    }
 }
 
 fun stopAndroidSetupProcess() {
@@ -152,13 +159,17 @@ fun stopAndroidSetupProcess() {
         "com.android.vending",
         "com.google.android.apps.wellbeing"
     ).forEach {
-        getInstrumentation().uiAutomation.executeShellCommand("am force-stop $it").close()
+        getInstrumentation().uiAutomation.executeShellCommand("am force-stop $it").use { pfd ->
+            pfd.dumpOutputToLog("Force-stop $it")
+        }
     }
 }
 
 fun disableHeadsupNotifications() {
-    getInstrumentation().uiAutomation.executeShellCommand("settings put global heads_up_notifications_enabled 0")
-        .close()
+    getInstrumentation().uiAutomation
+        .executeShellCommand("settings put global heads_up_notifications_enabled 0").use {
+            it.dumpOutputToLog("disable heads_up_notifications")
+        }
 }
 
 fun enableDeviceLocation() {
@@ -168,7 +179,9 @@ fun enableDeviceLocation() {
         "settings put secure location_providers_allowed +gps"
     }
 
-    getInstrumentation().uiAutomation.executeShellCommand(cmd).close()
+    getInstrumentation().uiAutomation.executeShellCommand(cmd).use {
+        it.dumpOutputToLog("enable devicelocation")
+    }
 }
 
 fun grantMapActivityPermissions() {
@@ -219,4 +232,30 @@ fun writeFileToDevice(filename: String, content: ByteArray): Uri? {
         }
         return Uri.fromFile(configFile)
     }
+}
+
+fun ParcelFileDescriptor.dumpOutputToLog(name: String) {
+    Timber.d("$name command output: ${this.getOutput()}")
+}
+
+fun ParcelFileDescriptor.getOutput(): String {
+    FileInputStream(fileDescriptor).use { fileInputStream ->
+        BufferedInputStream(fileInputStream).use { bufferedInputStream ->
+            return bufferedInputStream.readAllAsString()
+        }
+    }
+}
+
+private fun InputStream.readAllAsString(): String {
+    var contents = ""
+    val byteArray = ByteArray(1024)
+    var bytesRead: Int
+    while (true) {
+        bytesRead = read(byteArray)
+        if (bytesRead < 0) {
+            break
+        }
+        contents += String(byteArray, 0, bytesRead)
+    }
+    return contents
 }

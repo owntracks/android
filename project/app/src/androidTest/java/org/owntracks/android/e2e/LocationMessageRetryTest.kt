@@ -50,7 +50,7 @@ class LocationMessageRetryTest :
 
         configureHTTPConnectionToLocal()
 
-        reportLocationFromMap(app.locationIdlingResource) {
+        reportLocationFromMap(app.mockLocationIdlingResource) {
             setMockLocation(51.0, 0.0)
         }
 

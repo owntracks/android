@@ -50,38 +50,39 @@ class LocationAccuracyTest :
     }
 
     @Test
-    fun testReportingLocationOutsideLocationAccuracyThreshold() {
+    fun given_an_inaccurate_and_accurate_location_when_publishing_then_only_the_location_only_the_accurate_location_is_published() {
         val dispatcher = LoggingMockJSONResponseDispatcher(mapOf("/" to "{}"))
         val inaccurateMockLatitude = 52.0
         val inaccurateMockLongitude = 0.0
-        val accurateMockLatitude = 52.1
-        val accurateMockLongitude = 0.1
-        startServer(dispatcher)
-        setNotFirstStartPreferences()
+        val accurateMockLatitude = 22.1
+        val accurateMockLongitude = 5.1
 
         PreferenceManager.getDefaultSharedPreferences(InstrumentationRegistry.getInstrumentation().targetContext)
             .edit()
             .putInt(Preferences::ignoreInaccurateLocations.name, 50)
             .apply()
 
-        launchActivity()
+        setupForHttp(dispatcher)
 
-        grantMapActivityPermissions()
-        initializeMockLocationProvider(app)
-
-        configureHTTPConnectionToLocal()
-
-        reportLocationFromMap(app.locationIdlingResource) {
+        reportLocationFromMap(app.mockLocationIdlingResource) {
             setMockLocation(inaccurateMockLatitude, inaccurateMockLongitude, 100f)
         }
 
-        reportLocationFromMap(app.locationIdlingResource) {
+        app.mockLocationIdlingResource.setIdleState(false)
+
+        reportLocationFromMap(app.mockLocationIdlingResource) {
             setMockLocation(accurateMockLatitude, accurateMockLongitude, 3f)
+        }
+
+        baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.use {
+            Espresso.onIdle()
         }
 
         dispatcher.requestBodies.map { it.body.readUtf8() }
             .run {
+                Timber.d("HTTP request bodies: $this")
                 assertTrue(
+                    "Published location contains location under accuracy threshold (lat=$accurateMockLatitude, lon=$accurateMockLongitude)", // ktlint-disable max-line-length
                     any {
                         it.isNotEmpty() && JSONObject(it).run {
                             getDouble("lat") == accurateMockLatitude && getDouble("lon") == accurateMockLongitude
@@ -89,6 +90,7 @@ class LocationAccuracyTest :
                     }
                 )
                 assertFalse(
+                    "Published location doesn't contain location over accuracy threshold",
                     any {
                         it.isNotEmpty() && JSONObject(it).run {
                             getDouble("lat") == inaccurateMockLatitude && getDouble("lon") == inaccurateMockLongitude
@@ -103,22 +105,14 @@ class LocationAccuracyTest :
         val dispatcher = LoggingMockJSONResponseDispatcher(mapOf("/" to "{}"))
         val mockLatitude = 51.0
         val mockLongitude = 0.0
-        startServer(dispatcher)
-        setNotFirstStartPreferences()
-
         PreferenceManager.getDefaultSharedPreferences(InstrumentationRegistry.getInstrumentation().targetContext)
             .edit()
             .putInt(Preferences::ignoreInaccurateLocations.name, 50)
             .apply()
 
-        launchActivity()
+        setupForHttp(dispatcher)
 
-        grantMapActivityPermissions()
-        initializeMockLocationProvider(app)
-
-        setMockLocation(mockLatitude, mockLongitude, 25f)
-        configureHTTPConnectionToLocal()
-        reportLocationFromMap(app.locationIdlingResource) {
+        reportLocationFromMap(app.mockLocationIdlingResource) {
             setMockLocation(mockLatitude, mockLongitude, 25f)
         }
         baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.use {
@@ -132,5 +126,14 @@ class LocationAccuracyTest :
                 }
             }
         )
+    }
+    private fun setupForHttp(dispatcher: LoggingMockJSONResponseDispatcher) {
+        startServer(dispatcher)
+        setNotFirstStartPreferences()
+        launchActivity()
+        grantMapActivityPermissions()
+        initializeMockLocationProvider(app)
+        configureHTTPConnectionToLocal()
+        waitUntilActivityVisible<MapActivity>()
     }
 }

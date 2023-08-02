@@ -1,16 +1,15 @@
 package org.owntracks.android.mqtt
 
+import android.app.Notification
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Context.NOTIFICATION_SERVICE
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.uiautomator.By
-import androidx.test.uiautomator.UiDevice
-import androidx.test.uiautomator.Until
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
+import com.adevinta.android.barista.interaction.BaristaSleepInteractions
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -18,7 +17,6 @@ import mqtt.packets.Qos
 import mqtt.packets.mqtt.MQTTPublish
 import mqtt.packets.mqttv5.MQTT5Properties
 import org.junit.After
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -38,11 +36,6 @@ class MQTTTransitionEventTests :
     TestWithAnActivity<MapActivity>(MapActivity::class.java, false),
     TestWithAnMQTTBroker by TestWithAnMQTTBrokerImpl(),
     MockDeviceLocation by GPSMockDeviceLocation() {
-    private val uiDevice by lazy {
-        UiDevice.getInstance(
-            InstrumentationRegistry.getInstrumentation()
-        )
-    }
 
     @DelicateCoroutinesApi
     @Before
@@ -85,14 +78,9 @@ class MQTTTransitionEventTests :
     fun given_an_MQTT_configured_client_when_the_broker_sends_a_transition_message_then_a_notification_appears() { // ktlint-disable max-line-length
         setNotFirstStartPreferences()
         launchActivity()
-
         grantMapActivityPermissions()
-
         configureMQTTConnectionToLocalWithGeneratedPassword()
-
-        app.mqttConnectionIdlingResource.use {
-            reportLocationFromMap(app.locationIdlingResource)
-        }
+        waitUntilActivityVisible<MapActivity>()
 
         listOf(
             MessageLocation().apply {
@@ -119,31 +107,36 @@ class MQTTTransitionEventTests :
                     it.toUByteArray()
                 )
             }
-        val success = uiDevice.openNotification()
-        assertTrue(success)
-        uiDevice.wait(
-            Until.hasObject(By.textStartsWith("2006-01-02")),
-            TimeUnit.SECONDS.toMillis(30)
+        BaristaSleepInteractions.sleep(10, TimeUnit.SECONDS)
+
+        val notificationManager = app.getSystemService(
+            NOTIFICATION_SERVICE
+        ) as NotificationManager
+        assertTrue(
+            "Event notification is displayed",
+            notificationManager.activeNotifications.any {
+                it.notification.extras.getString(Notification.EXTRA_TITLE) == "Events" &&
+                    it.notification.extras.getCharSequenceArray(Notification.EXTRA_TEXT_LINES)?.any { line ->
+                        line.toString() == "2006-01-02 15:04 ce enters Transition!"
+                    } ?: false
+            }
         )
-        val notification = uiDevice.findObject(By.textStartsWith("2006-01-02 15:04 ce enters Transition!"))
-        assertNotNull(notification)
     }
 
     @Test
     fun given_an_MQTT_configured_client_when_the_location_enters_a_geofence_a_transition_message_is_sent() { // ktlint-disable max-line-length
-        setNotFirstStartPreferences()
-        launchActivity()
-        grantMapActivityPermissions()
-
-        initializeMockLocationProvider(app)
         val waypointLatitude = 48.0
         val waypointLongitude = -1.0
         val waypointDescription = "Test Region"
 
+        setNotFirstStartPreferences()
+        launchActivity()
+        grantMapActivityPermissions()
+        initializeMockLocationProvider(app)
         configureMQTTConnectionToLocalWithGeneratedPassword()
         waitUntilActivityVisible<MapActivity>()
 
-        reportLocationFromMap(app.locationIdlingResource) {
+        reportLocationFromMap(app.mockLocationIdlingResource) {
             setMockLocation(51.0, 0.0)
         }
 
@@ -157,7 +150,7 @@ class MQTTTransitionEventTests :
         writeTo(R.id.radius, "100")
 
         clickOnAndWait(R.id.save)
-        reportLocationFromMap(app.locationIdlingResource) {
+        reportLocationFromMap(app.mockLocationIdlingResource) {
             setMockLocation(waypointLatitude, waypointLongitude)
         }
 

@@ -67,7 +67,6 @@ import org.owntracks.android.support.DateFormatter.formatDate
 import org.owntracks.android.support.RunThingsOnOtherThreads
 import org.owntracks.android.support.ServiceBridge
 import org.owntracks.android.support.ServiceBridge.ServiceBridgeInterface
-import org.owntracks.android.support.SimpleIdlingResource
 import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber
 
@@ -120,9 +119,6 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
 
     @Inject
     lateinit var locationProviderClient: LocationProviderClient
-
-    @Inject
-    lateinit var locationIdlingResource: SimpleIdlingResource
 
     @Inject
     @CoroutineScopes.IoDispatcher
@@ -217,10 +213,6 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
 
             override fun onLocationResult(locationResult: LocationResult) {
                 Timber.d("location result received: $locationResult")
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || locationResult.lastLocation.isMock) {
-                    Timber.v("Idling location")
-                    locationIdlingResource.setIdleState(true)
-                }
                 onLocationChanged(locationResult.lastLocation, MessageLocation.ReportType.DEFAULT)
             }
         }

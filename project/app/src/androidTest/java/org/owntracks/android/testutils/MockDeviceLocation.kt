@@ -12,8 +12,9 @@ interface MockDeviceLocation {
         InstrumentationRegistry
             .getInstrumentation()
             .uiAutomation
-            .executeShellCommand("appops set ${context.packageName} android:mock_location allow")
-            .close()
+            .executeShellCommand("appops set ${context.packageName} android:mock_location allow").use {
+                it.dumpOutputToLog("setPackageMockLocationProvider")
+            }
         sleep(100)
     }
 }

@@ -53,7 +53,11 @@ class SingletonModule {
 
     @Provides
     @Singleton
-    fun provideLocationIdlingResource(): SimpleIdlingResource = SimpleIdlingResource("locationIdlingResource", false)
+    @Named("mockLocationIdlingResource")
+    fun provideLocationIdlingResource(): SimpleIdlingResource = SimpleIdlingResource(
+        "mockLocationIdlingResource",
+        false
+    )
 
     @Provides
     @Singleton

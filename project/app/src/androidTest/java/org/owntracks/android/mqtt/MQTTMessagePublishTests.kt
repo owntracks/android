@@ -72,17 +72,11 @@ class MQTTMessagePublishTests :
 
     @Test
     fun given_an_MQTT_configured_client_when_the_report_button_is_pressed_then_the_broker_receives_a_packet_with_the_correct_location_message_in() { // ktlint-disable max-line-length
+        setup()
         val mockLatitude = 51.0
         val mockLongitude = 0.0
-        setNotFirstStartPreferences()
-        launchActivity()
 
-        grantMapActivityPermissions()
-        initializeMockLocationProvider(app)
-
-        configureMQTTConnectionToLocalWithGeneratedPassword()
-
-        reportLocationFromMap(app.locationIdlingResource) {
+        reportLocationFromMap(app.mockLocationIdlingResource) {
             setMockLocation(mockLatitude, mockLongitude)
         }
 
@@ -105,12 +99,9 @@ class MQTTMessagePublishTests :
 
     @Test
     fun given_an_MQTT_configured_client_when_the_broker_sends_a_message_card_without_a_location_then_a_new_contact_appears() { // ktlint-disable max-line-length
-        setNotFirstStartPreferences()
-        launchActivity()
+        setup()
 
-        grantMapActivityPermissions()
-        configureMQTTConnectionToLocalWithGeneratedPassword()
-        reportLocationFromMap(app.locationIdlingResource) {
+        reportLocationFromMap(app.mockLocationIdlingResource) {
             setMockLocation(51.0, 0.0)
         }
 
@@ -140,17 +131,13 @@ class MQTTMessagePublishTests :
 
     @Test
     fun given_an_MQTT_configured_client_when_the_broker_sends_a_message_card_with_a_location_then_a_new_contact_appears() { // ktlint-disable max-line-length
-        setNotFirstStartPreferences()
         PreferenceManager.getDefaultSharedPreferences(app)
             .edit()
             .putString(Preferences::reverseGeocodeProvider.name, "None")
             .apply()
-        launchActivity()
-        grantMapActivityPermissions()
+        setup()
 
-        configureMQTTConnectionToLocalWithGeneratedPassword()
-
-        reportLocationFromMap(app.locationIdlingResource) {
+        reportLocationFromMap(app.mockLocationIdlingResource) {
             setMockLocation(51.0, 0.0)
         }
 
@@ -201,16 +188,13 @@ class MQTTMessagePublishTests :
 
     @Test
     fun given_an_MQTT_configured_client_when_the_broker_sends_a_location_for_a_cleared_contact_then_a_the_contact_returns_with_the_correct_details() { // ktlint-disable max-line-length
-        setNotFirstStartPreferences()
         PreferenceManager.getDefaultSharedPreferences(app)
             .edit()
             .putString(Preferences::reverseGeocodeProvider.name, "None")
             .apply()
-        launchActivity()
 
-        grantMapActivityPermissions()
-        configureMQTTConnectionToLocalWithGeneratedPassword()
-        reportLocationFromMap(app.locationIdlingResource) {
+        setup()
+        reportLocationFromMap(app.mockLocationIdlingResource) {
             setMockLocation(51.0, 0.0)
         }
 
@@ -278,7 +262,6 @@ class MQTTMessagePublishTests :
     fun given_an_MQTT_configured_client_when_the_wrong_credentials_are_used_then_the_status_screen_shows_that_the_broker_is_not_connected() { // ktlint-disable max-line-length
         setNotFirstStartPreferences()
         launchActivity()
-
         grantMapActivityPermissions()
         configureMQTTConnectionToLocal("not the right password")
         waitUntilActivityVisible<MapActivity>()
@@ -292,12 +275,7 @@ class MQTTMessagePublishTests :
     @OptIn(ExperimentalUnsignedTypes::class)
     @Test
     fun given_an_MQTT_configured_client_when_the_user_publishes_waypoints_then_the_broker_receives_a_waypoint_message() { // ktlint-disable max-line-length
-        setNotFirstStartPreferences()
-        launchActivity()
-
-        grantMapActivityPermissions()
-        configureMQTTConnectionToLocalWithGeneratedPassword()
-        waitUntilActivityVisible<MapActivity>()
+        setup()
 
         openDrawer()
         clickOnAndWait(R.string.title_activity_waypoints)
@@ -337,6 +315,15 @@ class MQTTMessagePublishTests :
                 }
             )
         }
+    }
+
+    private fun setup() {
+        setNotFirstStartPreferences()
+        launchActivity()
+        grantMapActivityPermissions()
+        initializeMockLocationProvider(app)
+        configureMQTTConnectionToLocalWithGeneratedPassword()
+        waitUntilActivityVisible<MapActivity>()
     }
 
     private fun clickOnRegardlessOfVisibility(@IdRes id: Int) {

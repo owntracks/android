@@ -125,7 +125,7 @@ class CommonMapActivityTests :
         launchActivity()
         grantMapActivityPermissions()
         initializeMockLocationProvider(app)
-        reportLocationFromMap(app.locationIdlingResource) {
+        reportLocationFromMap(app.mockLocationIdlingResource) {
             setMockLocation(51.0, 0.0)
         }
 

@@ -1,20 +1,17 @@
 package org.owntracks.android.data.waypoints
 
+import android.app.Notification
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.uiautomator.By
-import androidx.test.uiautomator.UiDevice
-import androidx.test.uiautomator.Until
 import com.adevinta.android.barista.assertion.BaristaRecyclerViewAssertions
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions
-import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 import org.junit.Assert
 import org.junit.Before
@@ -29,11 +26,6 @@ import org.owntracks.android.ui.map.MapActivity
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class WaypointsMigrationFromObjectboxTestWithFullUI : TestWithAnActivity<MapActivity>(MapActivity::class.java, false) {
-    private val uiDevice by lazy {
-        UiDevice.getInstance(
-            InstrumentationRegistry.getInstrumentation()
-        )
-    }
 
     @Test
     fun migratingAnEmptyObjectboxProducesZeroWaypoints() {
@@ -148,15 +140,16 @@ class WaypointsMigrationFromObjectboxTestWithFullUI : TestWithAnActivity<MapActi
         BaristaDrawerInteractions.openDrawer()
         clickOn(R.string.title_activity_waypoints)
         assertNotDisplayed(R.id.waypointsRecyclerView)
-        val success = uiDevice.openNotification()
-        Assert.assertTrue(success)
-        uiDevice.wait(
-            Until.hasObject(By.textStartsWith(app.getString(R.string.waypointMigrationErrorNotificationTitle))),
-            TimeUnit.SECONDS.toMillis(5)
+
+        val notificationManager = app.getSystemService(
+            Context.NOTIFICATION_SERVICE
+        ) as NotificationManager
+        Assert.assertTrue(
+            "Event notification is displayed",
+            notificationManager.activeNotifications.any {
+                it.notification.extras.getString(Notification.EXTRA_TITLE) == "Error migrating waypoints" &&
+                    it.notification.extras.getString(Notification.EXTRA_TEXT) == "An error occurred whilst migrating waypoints. Some may not have been migrated, so check the logs and re-add."
+            }
         )
-        val notification = uiDevice.findObject(
-            By.textStartsWith(app.getString(R.string.waypointMigrationErrorNotificationText))
-        )
-        Assert.assertNotNull(notification)
     }
 }

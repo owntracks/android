@@ -40,7 +40,8 @@ class LocationProcessor @Inject constructor(
     private val wifiInfoProvider: WifiInfoProvider,
     @ApplicationScope private val scope: CoroutineScope,
     @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    @Named("publishResponseMessageIdlingResource") private val publishResponseMessageIdlingResource: SimpleIdlingResource
+    @Named("publishResponseMessageIdlingResource") private val publishResponseMessageIdlingResource: SimpleIdlingResource,
+    @Named("mockLocationIdlingResource") private val mockLocationIdlingResource: SimpleIdlingResource
 ) {
     private fun ignoreLowAccuracy(l: Location): Boolean {
         val threshold = preferences.ignoreInaccurateLocations
@@ -57,6 +58,11 @@ class LocationProcessor @Inject constructor(
         location: Location? = locationRepo.currentPublishedLocation.value
     ) {
         if (location == null) return
+        Timber.v("Maybe publishing $location")
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || location.isMock) {
+            Timber.v("Idling location")
+            mockLocationIdlingResource.setIdleState(true)
+        }
         if (locationRepo.currentPublishedLocation.value == null) {
             Timber.e("no location available, can't publish location")
             return
@@ -94,6 +100,7 @@ class LocationProcessor @Inject constructor(
             Timber.v("message suppressed by monitoring settings: manual")
             return
         }
+
         val message = if (preferences.pubExtendedData) {
             fromLocationAndWifiInfo(location, wifiInfoProvider).apply {
                 battery = deviceMetricsProvider.batteryLevel
@@ -108,6 +115,7 @@ class LocationProcessor @Inject constructor(
             trackerId = preferences.tid.value
             inregions = calculateInRegions(loadedWaypoints)
         }
+        Timber.v("Actually publishing location $location")
         messageProcessor.queueMessageForSending(message)
         if (trigger == MessageLocation.ReportType.RESPONSE) {
             publishResponseMessageIdlingResource.setIdleState(true)
