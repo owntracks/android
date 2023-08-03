@@ -9,14 +9,12 @@ import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDr
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions
 import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.DelicateCoroutinesApi
 import mqtt.packets.Qos
 import mqtt.packets.mqtt.MQTTPublish
 import mqtt.packets.mqttv5.MQTT5Properties
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
@@ -44,16 +42,16 @@ class MQTTRemoteCommandTests :
     TestWithAnActivity<MapActivity>(MapActivity::class.java, false),
     TestWithAnMQTTBroker by TestWithAnMQTTBrokerImpl(),
     MockDeviceLocation by GPSMockDeviceLocation() {
-    @Before
-    @OptIn(DelicateCoroutinesApi::class)
-    fun mqttBefore() {
-        startBroker()
-    }
-
-    @After
-    fun mqttAfter() {
-        stopBroker()
-    }
+//    @Before
+//    @OptIn(DelicateCoroutinesApi::class)
+//    fun mqttBefore() {
+//        startBroker()
+//    }
+//
+//    @After
+//    fun mqttAfter() {
+//        stopBroker()
+//    }
 
     @After
     fun uninitMockLocation() {

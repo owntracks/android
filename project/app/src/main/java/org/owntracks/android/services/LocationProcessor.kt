@@ -58,7 +58,7 @@ class LocationProcessor @Inject constructor(
         location: Location? = locationRepo.currentPublishedLocation.value
     ) {
         if (location == null) return
-        Timber.v("Maybe publishing $location")
+        Timber.v("Maybe publishing $location with trigger $trigger")
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || location.isMock) {
             Timber.v("Idling location")
             mockLocationIdlingResource.setIdleState(true)
@@ -115,12 +115,18 @@ class LocationProcessor @Inject constructor(
             trackerId = preferences.tid.value
             inregions = calculateInRegions(loadedWaypoints)
         }
-        Timber.v("Actually publishing location $location")
+        Timber.v("Actually publishing location $location triggered by $trigger")
         messageProcessor.queueMessageForSending(message)
-        if (trigger == MessageLocation.ReportType.RESPONSE) {
+        if (responseMessageTypes.contains(trigger)) {
             publishResponseMessageIdlingResource.setIdleState(true)
         }
     }
+
+    private val responseMessageTypes = listOf(
+        MessageLocation.ReportType.RESPONSE,
+        MessageLocation.ReportType.USER,
+        MessageLocation.ReportType.CIRCULAR
+    )
 
     private fun calculateInRegions(loadedWaypoints: List<WaypointModel>): List<String> =
         loadedWaypoints.filter { it.lastTransition == Geofence.GEOFENCE_TRANSITION_ENTER }
@@ -160,7 +166,7 @@ class LocationProcessor @Inject constructor(
                 waypointModel.lastTriggered = Instant.now()
                 waypointsRepo.update(waypointModel, false)
                 if (preferences.monitoring === MonitoringMode.QUIET) {
-                    Timber.v("message suppressed by monitoring settings: %s", preferences.monitoring)
+                    Timber.v("message suppressed by monitoring settings: ${preferences.monitoring}")
                 } else {
                     publishTransitionMessage(waypointModel, location, transition, trigger)
                     if (trigger == MessageTransition.TRIGGER_CIRCULAR) {

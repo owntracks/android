@@ -23,7 +23,6 @@ import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writ
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import java.time.Instant
 import kotlin.time.Duration.Companion.seconds
-import kotlinx.coroutines.DelicateCoroutinesApi
 import mqtt.packets.Qos
 import mqtt.packets.mqtt.MQTTPublish
 import mqtt.packets.mqttv5.MQTT5Properties
@@ -32,7 +31,6 @@ import org.hamcrest.CoreMatchers.anything
 import org.hamcrest.Matcher
 import org.junit.After
 import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
@@ -54,16 +52,16 @@ class MQTTMessagePublishTests :
     TestWithAnMQTTBroker by TestWithAnMQTTBrokerImpl(),
     MockDeviceLocation by GPSMockDeviceLocation() {
 
-    @DelicateCoroutinesApi
-    @Before
-    fun mqttBefore() {
-        startBroker()
-    }
-
-    @After
-    fun mqttAfter() {
-        stopBroker()
-    }
+//    @DelicateCoroutinesApi
+//    @Before
+//    fun mqttBefore() {
+//        startBroker()
+//    }
+//
+//    @After
+//    fun mqttAfter() {
+//        stopBroker()
+//    }
 
     @After
     fun uninitMockLocation() {

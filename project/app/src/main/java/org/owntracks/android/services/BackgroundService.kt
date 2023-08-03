@@ -309,16 +309,6 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
                     return
                 }
 
-                INTENT_ACTION_CLEAR_NOTIFICATIONS -> {
-                    clearEventStackNotification()
-                    return
-                }
-
-                INTENT_ACTION_REREQUEST_LOCATION_UPDATES -> {
-                    setupLocationRequest()
-                    return
-                }
-
                 INTENT_ACTION_CHANGE_MONITORING -> {
                     if (intent.hasExtra("monitoring")) {
                         val newMode = getByValue(
@@ -505,16 +495,6 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
                     updateCurrentIntentFlags
                 )
             )
-            .setDeleteIntent(
-                PendingIntent.getService(
-                    this,
-                    INTENT_REQUEST_CODE_CLEAR_EVENTS,
-                    Intent(this, BackgroundService::class.java).setAction(
-                        INTENT_ACTION_CLEAR_NOTIFICATIONS
-                    ),
-                    updateCurrentIntentFlags
-                )
-            )
             .build()
             .run {
                 notificationManagerCompat.notify(
@@ -523,11 +503,6 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
                     this
                 )
             }
-    }
-
-    private fun clearEventStackNotification() {
-        Timber.v("clearing notification stack")
-        activeNotifications.clear()
     }
 
     private suspend fun onGeofencingEvent(event: GeofencingEvent) {
@@ -738,7 +713,6 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
     }
 
     companion object {
-        private const val INTENT_REQUEST_CODE_CLEAR_EVENTS = 1263
         private const val NOTIFICATION_ID_ONGOING = 1
         private const val NOTIFICATION_ID_EVENT_GROUP = 2
         const val BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG = "backgroundRestrictionNotification"
@@ -746,10 +720,8 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
         private const val NOTIFICATION_GROUP_EVENTS = "events"
 
         // NEW ACTIONS ALSO HAVE TO BE ADDED TO THE SERVICE INTENT FILTER
-        private const val INTENT_ACTION_CLEAR_NOTIFICATIONS = "org.owntracks.android.CLEAR_NOTIFICATIONS"
         private const val INTENT_ACTION_SEND_LOCATION_USER = "org.owntracks.android.SEND_LOCATION_USER"
         const val INTENT_ACTION_SEND_EVENT_CIRCULAR = "org.owntracks.android.SEND_EVENT_CIRCULAR"
-        const val INTENT_ACTION_REREQUEST_LOCATION_UPDATES = "org.owntracks.android.REREQUEST_LOCATION_UPDATES"
         private const val INTENT_ACTION_CHANGE_MONITORING = "org.owntracks.android.CHANGE_MONITORING"
         private const val INTENT_ACTION_EXIT = "org.owntracks.android.EXIT"
         private const val INTENT_ACTION_BOOT_COMPLETED = "android.intent.action.BOOT_COMPLETED"

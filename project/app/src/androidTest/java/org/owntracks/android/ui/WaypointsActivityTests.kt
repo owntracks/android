@@ -6,7 +6,6 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
-import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
@@ -75,8 +74,8 @@ class WaypointsActivityTests :
         assertNotDisplayed(waypointName)
     }
 
-    @After
-    fun mqttAfter() {
-        stopBroker()
-    }
+//    @After
+//    fun mqttAfter() {
+//        stopBroker()
+//    }
 }
