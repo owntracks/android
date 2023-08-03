@@ -43,7 +43,6 @@ import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.data.repos.EndpointStateRepo
 import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.data.waypoints.WaypointsRepo
-import org.owntracks.android.data.waypoints.WaypointsRepo.WaypointAndOperation
 import org.owntracks.android.di.CoroutineScopes
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.location.LocationAvailability
@@ -241,10 +240,12 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
                 waypointsRepo.migrationCompleteFlow.collect {
                     if (it) {
                         waypointsRepo.operations.observe(this@BackgroundService) {
-                                (operation, waypoint): WaypointAndOperation ->
-                            when (operation) {
-                                WaypointsRepo.Operation.INSERT, WaypointsRepo.Operation.UPDATE ->
-                                    locationProcessor.publishWaypointMessage(waypoint)
+                                waypointOperation ->
+                            when (waypointOperation) {
+                                is WaypointsRepo.WaypointOperation.Insert ->
+                                    locationProcessor.publishWaypointMessage(waypointOperation.waypoint)
+                                is WaypointsRepo.WaypointOperation.Update ->
+                                    locationProcessor.publishWaypointMessage(waypointOperation.waypoint)
                                 else -> {}
                             }
                             lifecycleScope.launch {

@@ -21,6 +21,10 @@ class InMemoryWaypointsRepo : WaypointsRepo() {
     override val allLive: LiveData<List<WaypointModel>>
         get() = MutableLiveData(waypoints)
 
+    override suspend fun clearImpl() {
+        waypoints.clear()
+    }
+
     override suspend fun insertImpl(waypointModel: WaypointModel) {
         waypoints.add(waypointModel)
     }

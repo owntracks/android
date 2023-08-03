@@ -47,6 +47,9 @@ class RoomWaypointsRepo @Inject constructor(
         @Query("SELECT * FROM WaypointModel")
         fun all(): List<WaypointModel>
 
+        @Query("DELETE FROM WaypointModel")
+        fun deleteAll()
+
         @Upsert
         fun upsert(waypointModel: WaypointModel)
 
@@ -83,6 +86,10 @@ class RoomWaypointsRepo @Inject constructor(
 
     override val allLive: LiveData<List<WaypointModel>>
         get() = db.waypointDao().allLive()
+
+    override suspend fun clearImpl() {
+        db.waypointDao().deleteAll()
+    }
 
     override suspend fun insertImpl(waypointModel: WaypointModel) = withContext(ioDispatcher) {
         db.waypointDao().upsert(waypointModel)

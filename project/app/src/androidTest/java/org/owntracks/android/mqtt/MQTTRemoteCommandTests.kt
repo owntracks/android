@@ -5,6 +5,7 @@ import androidx.preference.PreferenceManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.adevinta.android.barista.assertion.BaristaRecyclerViewAssertions.assertRecyclerViewItemCount
+import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions
@@ -42,16 +43,6 @@ class MQTTRemoteCommandTests :
     TestWithAnActivity<MapActivity>(MapActivity::class.java, false),
     TestWithAnMQTTBroker by TestWithAnMQTTBrokerImpl(),
     MockDeviceLocation by GPSMockDeviceLocation() {
-//    @Before
-//    @OptIn(DelicateCoroutinesApi::class)
-//    fun mqttBefore() {
-//        startBroker()
-//    }
-//
-//    @After
-//    fun mqttAfter() {
-//        stopBroker()
-//    }
 
     @After
     fun uninitMockLocation() {
@@ -251,6 +242,55 @@ class MQTTRemoteCommandTests :
         openDrawer()
         clickOnAndWait(R.string.title_activity_waypoints)
         assertRecyclerViewItemCount(R.id.waypointsRecyclerView, 4)
+    }
+
+    @Test
+    fun given_an_MQTT_configured_client_when_the_broker_sends_a_clear_waypoints_command_message_then_the_waypoints_are_cleared() { // ktlint-disable max-line-length
+        setupTestActivity()
+
+        clickOnAndWait(R.id.menu_monitoring)
+        clickOnAndWait(R.id.fabMonitoringModeSignificantChanges)
+
+        openDrawer()
+        clickOnAndWait(R.string.title_activity_waypoints)
+
+        clickOnAndWait(R.id.add)
+        BaristaEditTextInteractions.writeTo(R.id.description, "test waypoint")
+        BaristaEditTextInteractions.writeTo(R.id.latitude, "51.123")
+        BaristaEditTextInteractions.writeTo(R.id.longitude, "0.456")
+        BaristaEditTextInteractions.writeTo(R.id.radius, "20")
+        clickOnAndWait(R.id.save)
+
+        clickOnAndWait(R.id.add)
+        BaristaEditTextInteractions.writeTo(R.id.description, "test waypoint 2")
+        BaristaEditTextInteractions.writeTo(R.id.latitude, "51.00")
+        BaristaEditTextInteractions.writeTo(R.id.longitude, "0.4")
+        BaristaEditTextInteractions.writeTo(R.id.radius, "25")
+        clickOnAndWait(R.id.save)
+
+        openDrawer()
+        clickOnAndWait(R.string.title_activity_map)
+
+        listOf(
+            //language=JSON
+            """
+  {
+    "_type": "cmd",
+    "action": "clearWaypoints"
+  }
+            """.trimIndent()
+        ).forEach {
+            broker.publish(
+                false,
+                "owntracks/$mqttUsername/$deviceId/cmd",
+                Qos.AT_LEAST_ONCE,
+                MQTT5Properties(),
+                it.toByteArray().toUByteArray()
+            )
+        }
+        openDrawer()
+        clickOnAndWait(R.string.title_activity_waypoints)
+        assertNotDisplayed(R.id.waypointsRecyclerView)
     }
 
     @Test

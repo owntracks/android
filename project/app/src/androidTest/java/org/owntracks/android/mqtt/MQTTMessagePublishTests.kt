@@ -52,17 +52,6 @@ class MQTTMessagePublishTests :
     TestWithAnMQTTBroker by TestWithAnMQTTBrokerImpl(),
     MockDeviceLocation by GPSMockDeviceLocation() {
 
-//    @DelicateCoroutinesApi
-//    @Before
-//    fun mqttBefore() {
-//        startBroker()
-//    }
-//
-//    @After
-//    fun mqttAfter() {
-//        stopBroker()
-//    }
-
     @After
     fun uninitMockLocation() {
         unInitializeMockLocationProvider()

@@ -8,26 +8,25 @@ import org.owntracks.android.model.messages.MessageWaypoint
 import org.owntracks.android.support.MessageWaypointCollection
 
 abstract class WaypointsRepo protected constructor() {
-    enum class Operation {
-        INSERT,
-        UPDATE,
-        DELETE
+    sealed class WaypointOperation {
+        data class Insert(val waypoint: WaypointModel) : WaypointOperation()
+        data class Update(val waypoint: WaypointModel) : WaypointOperation()
+        data class Delete(val waypoint: WaypointModel) : WaypointOperation()
+        object Clear : WaypointOperation()
     }
-
-    data class WaypointAndOperation(val operation: Operation, val waypoint: WaypointModel)
 
     abstract suspend fun get(id: Long): WaypointModel?
     abstract suspend fun getByTst(instant: Instant): WaypointModel?
     abstract val all: List<WaypointModel>
     abstract val allLive: LiveData<List<WaypointModel>>
 
-    private val mutableOperations = MutableLiveData<WaypointAndOperation>()
-    val operations: LiveData<WaypointAndOperation> = mutableOperations
+    private val mutableOperations = MutableLiveData<WaypointOperation>()
+    val operations: LiveData<WaypointOperation> = mutableOperations
 
     suspend fun insert(waypointModel: WaypointModel) {
         waypointModel.run {
             insertImpl(this@run)
-            mutableOperations.postValue(WaypointAndOperation(Operation.INSERT, this@run))
+            mutableOperations.postValue(WaypointOperation.Insert(this@run))
         }
     }
 
@@ -35,7 +34,7 @@ abstract class WaypointsRepo protected constructor() {
         waypointModel.run {
             updateImpl(this@run)
             if (notify) {
-                mutableOperations.postValue(WaypointAndOperation(Operation.UPDATE, this@run))
+                mutableOperations.postValue(WaypointOperation.Update(this@run))
             }
         }
     }
@@ -43,8 +42,13 @@ abstract class WaypointsRepo protected constructor() {
     suspend fun delete(waypointModel: WaypointModel) {
         waypointModel.run {
             deleteImpl(this@run)
-            mutableOperations.postValue(WaypointAndOperation(Operation.DELETE, this@run))
+            mutableOperations.postValue(WaypointOperation.Delete(this@run))
         }
+    }
+
+    suspend fun clearAll() {
+        clearImpl()
+        mutableOperations.postValue(WaypointOperation.Clear)
     }
 
     /**
@@ -89,6 +93,7 @@ abstract class WaypointsRepo protected constructor() {
         return message
     }
 
+    protected abstract suspend fun clearImpl()
     protected abstract suspend fun insertImpl(waypointModel: WaypointModel)
     protected abstract suspend fun updateImpl(waypointModel: WaypointModel)
     protected abstract suspend fun deleteImpl(waypointModel: WaypointModel)

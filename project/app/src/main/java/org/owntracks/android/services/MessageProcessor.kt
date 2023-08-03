@@ -342,8 +342,8 @@ class MessageProcessor @Inject constructor(
             }
             CommandAction.WAYPOINTS -> locationProcessorLazy.get()
                 .publishWaypointsMessage()
-            CommandAction.SET_WAYPOINTS -> if (message.waypoints != null) {
-                waypointsRepo.importFromMessage(message.waypoints!!.waypoints)
+            CommandAction.SET_WAYPOINTS -> message.waypoints?.run {
+                waypointsRepo.importFromMessage(waypoints)
             }
             CommandAction.SET_CONFIGURATION -> {
                 if (!preferences.remoteConfiguration) {
@@ -362,7 +362,10 @@ class MessageProcessor @Inject constructor(
                 }
                 importConfigurationIdlingResource.setIdleState(true)
             }
-            else -> { }
+            CommandAction.CLEAR_WAYPOINTS -> {
+                waypointsRepo.clearAll()
+            }
+            null -> {}
         }
     }
 
