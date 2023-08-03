@@ -120,6 +120,7 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
 
     override fun configureMQTTConnectionToLocal(password: String) {
         val config = Base64.encode(
+            //language=JSON
             """
             {
                 "_type": "configuration",

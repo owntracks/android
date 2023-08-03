@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.util.*
-import org.intellij.lang.annotations.Language
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -76,7 +75,7 @@ class ParserTest {
     fun `Parser can serialize extended location message to a pretty JSON message`() {
         val parser = Parser(null)
 
-        @Language("JSON")
+        //language=JSON
         val expected = """
             {
               "_type" : "location",
@@ -104,7 +103,7 @@ class ParserTest {
     fun `Parser can serialize non-extended location message to a pretty JSON message`() {
         val parser = Parser(null)
 
-        @Language("JSON")
+        //language=JSON
         val expected = """
             {
               "_type" : "location",
@@ -127,7 +126,7 @@ class ParserTest {
         `when`(encryptionProvider.isPayloadEncryptionEnabled).thenReturn(false)
         val parser = Parser(encryptionProvider)
 
-        @Language("JSON")
+        //language=JSON
         val input = """
             {
                 "_type": "location",
@@ -386,7 +385,7 @@ class ParserTest {
     @Test
     fun `Parser can deserialize an encrypted location message`() {
         `when`(encryptionProvider.isPayloadEncryptionEnabled).thenReturn(true)
-        @Language("JSON")
+        //language=JSON
         val messageLocationJSON = """
                 {
                   "_type": "location",
@@ -407,7 +406,7 @@ class ParserTest {
         `when`(encryptionProvider.decrypt("TestCipherText")).thenReturn(messageLocationJSON)
         val parser = Parser(encryptionProvider)
 
-        @Language("JSON")
+        //language=JSON
         val input = """
             {
               "_type": "encrypted",
@@ -457,7 +456,7 @@ class ParserTest {
         `when`(encryptionProvider.isPayloadEncryptionEnabled).thenReturn(false)
         val parser = Parser(encryptionProvider)
 
-        @Language("JSON")
+        //language=JSON
         val input = """
             {
               "_type": "encrypted",
@@ -469,7 +468,7 @@ class ParserTest {
 
     @Test
     fun `Parser can deserialize multiple location messages in same document`() {
-        @Language("JSON")
+        //language=JSON
         val multipleMessageLocationJSON = """
             [
               {
@@ -519,7 +518,7 @@ class ParserTest {
     fun `Parser can deserialize a reportLocation cmd message`() {
         val parser = Parser(encryptionProvider)
 
-        @Language("JSON")
+        //language=JSON
         val input = """
             {
               "_type": "cmd",
@@ -539,7 +538,7 @@ class ParserTest {
     fun `Parser can deserialize a setWaypoints cmd message`() {
         val parser = Parser(encryptionProvider)
 
-        @Language("JSON")
+        //language=JSON
         val input =
             """
             {
@@ -563,7 +562,7 @@ class ParserTest {
     fun `Parser can deserialize a setConfiguration message`() {
         val parser = Parser(encryptionProvider)
 
-        @Language("JSON")
+        //language=JSON
         val input = """
             {
               "_type": "cmd",
@@ -586,7 +585,7 @@ class ParserTest {
     fun `Parser throws exception when given cmd with invalid action`() {
         val parser = Parser(encryptionProvider)
 
-        @Language("JSON")
+        //language=JSON
         val input = """
             {
               "_type": "cmd",
@@ -604,7 +603,7 @@ class ParserTest {
     fun `Parser can deserialize a transition message`() {
         val parser = Parser(encryptionProvider)
 
-        @Language("JSON")
+        //language=JSON
         val input = """
             {
               "_type": "transition",
@@ -715,7 +714,7 @@ class ParserTest {
     fun `Parser can deserialize a configuration message`() {
         val parser = Parser(encryptionProvider)
 
-        @Language("JSON")
+        //language=JSON
         val input = """
             {
               "_type": "configuration",
@@ -895,7 +894,7 @@ class ParserTest {
     fun `Parser can deserialize a waypoint message`() {
         val parser = Parser(encryptionProvider)
 
-        @Language("JSON")
+        //language=JSON
         val input = """
             {
               "_type": "waypoint",
@@ -991,7 +990,7 @@ class ParserTest {
     fun `Parser can deserialize a MessageCard`() {
         val parser = Parser(encryptionProvider)
 
-        @Language("JSON")
+        //language=JSON
         val input = """
             {
               "_type": "card",
@@ -1021,7 +1020,7 @@ class ParserTest {
     fun `Parser can deserialize an Unknown message`() {
         val parser = Parser(encryptionProvider)
 
-        @Language("JSON")
+        //language=JSON
         val message = parser.fromJson(
             """
             {

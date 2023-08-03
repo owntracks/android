@@ -66,7 +66,10 @@ class MessageLocationTest {
         }
 
         val mockWifiManager: WifiManager = mock {
-            on { connectionInfo } doReturn wifiInfo
+            on {
+                @Suppress("DEPRECATION")
+                connectionInfo
+            } doReturn wifiInfo
         }
 
         val mockContext: Context = mock {
@@ -93,7 +96,10 @@ class MessageLocationTest {
         }
 
         val mockWifiManager: WifiManager = mock {
-            on { connectionInfo } doReturn wifiInfo
+            on {
+                @Suppress("DEPRECATION")
+                connectionInfo
+            } doReturn wifiInfo
         }
 
         val mockContext: Context = mock {

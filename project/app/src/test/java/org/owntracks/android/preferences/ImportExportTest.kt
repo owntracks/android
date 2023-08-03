@@ -1,7 +1,6 @@
 package org.owntracks.android.preferences
 
 import android.content.Context
-import org.intellij.lang.annotations.Language
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -28,7 +27,7 @@ class ImportExportTest {
 
     @Test
     fun `given a JSON configuration message, when importing it, then the preferences values are set to the same values`() {
-        @Language("JSON")
+        //language=JSON
         val input = """
             {
               "_type": "configuration",
@@ -173,7 +172,7 @@ class ImportExportTest {
         val parser = Parser(null)
         val json = parser.toUnencryptedJsonPretty(message)
 
-        @Language("JSON")
+        //language=JSON
         val expected = """
             {
               "_type" : "configuration",

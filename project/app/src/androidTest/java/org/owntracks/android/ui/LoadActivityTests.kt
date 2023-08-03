@@ -32,6 +32,7 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
         mockWebServer.shutdown()
     }
 
+    //language=JSON
     private val expectedConfig = """
 {
   "_type" : "configuration",
