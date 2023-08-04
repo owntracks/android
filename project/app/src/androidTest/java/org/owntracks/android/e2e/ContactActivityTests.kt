@@ -7,7 +7,6 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
-import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -57,7 +56,7 @@ class ContactActivityTests :
             openDrawer()
             clickOnAndWait(R.string.title_activity_contacts)
         }
-        sleep(3_000)
+
         assertRecyclerViewItemCount(R.id.contactsRecyclerView, 1)
 
         clickOnAndWait("aa")

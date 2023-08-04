@@ -75,10 +75,10 @@ fun reportLocationFromMap(locationIdlingResource: IdlingResource?, mockLocationF
         clickOnAndWait(R.string.title_activity_map)
     }
     waitUntilActivityVisible<MapActivity>()
-
-    mockLocationFunction()
     clickOnAndWait(R.id.menu_monitoring)
     clickOnAndWait(R.id.fabMonitoringModeMove)
+    mockLocationFunction()
+
     locationIdlingResource.use {
         clickOnAndWait(R.id.fabMyLocation)
         clickOnAndWait(R.id.menu_report)
