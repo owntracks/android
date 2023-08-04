@@ -540,7 +540,7 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
 
     fun onLocationChanged(location: Location, reportType: MessageLocation.ReportType) {
         Timber.v("location update received: $location, report type $reportType")
-        if (location.time > locationRepo.currentLocationTime) {
+        if (location.time > locationRepo.currentLocationTime || reportType != MessageLocation.ReportType.DEFAULT) {
             lifecycleScope.launch {
                 locationProcessor.onLocationChanged(location, reportType)
             }
