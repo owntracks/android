@@ -14,6 +14,9 @@ import androidx.test.espresso.idling.CountingIdlingResource
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import javax.inject.Named
+import kotlin.time.ComparableTimeMark
+import kotlin.time.ExperimentalTime
+import kotlin.time.TimeSource
 import org.owntracks.android.R
 import org.owntracks.android.data.waypoints.WaypointModel
 import org.owntracks.android.databinding.UiWaypointsBinding
@@ -21,11 +24,20 @@ import org.owntracks.android.support.DrawerProvider
 import org.owntracks.android.support.SimpleIdlingResource
 import org.owntracks.android.ui.base.BaseRecyclerViewAdapterWithClickHandler
 import org.owntracks.android.ui.base.ClickHasBeenHandled
+import org.owntracks.android.ui.base.RecyclerViewLayoutCompleteListener
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import org.owntracks.android.ui.waypoint.WaypointActivity
+import timber.log.Timber
 
+@OptIn(ExperimentalTime::class)
 @AndroidEntryPoint
-class WaypointsActivity : AppCompatActivity(), BaseRecyclerViewAdapterWithClickHandler.ClickListener<WaypointModel> {
+class WaypointsActivity :
+    AppCompatActivity(),
+    BaseRecyclerViewAdapterWithClickHandler.ClickListener<WaypointModel>,
+    RecyclerViewLayoutCompleteListener.RecyclerViewIdlingCallback {
+    private var recyclerViewStartLayoutInstant: ComparableTimeMark? = null
+    private var layoutCompleteListener: RecyclerViewLayoutCompleteListener? = null
+
     @Inject
     lateinit var drawerProvider: DrawerProvider
 
@@ -45,6 +57,7 @@ class WaypointsActivity : AppCompatActivity(), BaseRecyclerViewAdapterWithClickH
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         recyclerViewAdapter = WaypointsAdapter(this)
+
         DataBindingUtil.setContentView<UiWaypointsBinding>(this, R.layout.ui_waypoints)
             .apply {
                 vm = viewModel
@@ -55,9 +68,24 @@ class WaypointsActivity : AppCompatActivity(), BaseRecyclerViewAdapterWithClickH
                     layoutManager = LinearLayoutManager(this@WaypointsActivity)
                     adapter = recyclerViewAdapter
                     emptyView = placeholder
+                    viewTreeObserver.addOnGlobalLayoutListener {
+                        Timber.v("global layout changed")
+                        if (recyclerViewStartLayoutInstant != null) {
+                            this@WaypointsActivity.recyclerViewStartLayoutInstant?.run {
+                                Timber.d("Completed waypoints layout in ${this.elapsedNow()}")
+                            }
+                            this@WaypointsActivity.recyclerViewStartLayoutInstant = null
+                        }
+                        layoutCompleteListener?.run {
+                            onLayoutCompleted()
+                        }
+                    }
                 }
             }
-        viewModel.waypointsList.observe(this, recyclerViewAdapter::setData)
+        viewModel.waypointsList.observe(this) {
+            recyclerViewStartLayoutInstant = TimeSource.Monotonic.markNow()
+            recyclerViewAdapter.setData(it)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -91,4 +119,22 @@ class WaypointsActivity : AppCompatActivity(), BaseRecyclerViewAdapterWithClickH
         startActivity(Intent(this, WaypointActivity::class.java).putExtra("waypointId", thing.id))
         return true
     }
+
+    override fun setRecyclerViewLayoutCompleteListener(
+        listener: RecyclerViewLayoutCompleteListener
+    ) {
+        this.layoutCompleteListener = listener
+    }
+
+    override fun removeRecyclerViewLayoutCompleteListener(
+        listener: RecyclerViewLayoutCompleteListener
+    ) {
+        if (this.layoutCompleteListener == listener) {
+            this.layoutCompleteListener = null
+        }
+    }
+
+    override var isRecyclerViewLayoutCompleted: Boolean
+        get() = (recyclerViewStartLayoutInstant == null).also { Timber.v("Being asked if I'm idle, saying $it") }
+        set(value) { recyclerViewStartLayoutInstant = if (!value) TimeSource.Monotonic.markNow() else null }
 }

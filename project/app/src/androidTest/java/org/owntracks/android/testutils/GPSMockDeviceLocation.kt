@@ -68,7 +68,7 @@ open class GPSMockDeviceLocation : MockDeviceLocation {
                 LocationCompat.setBearingAccuracyDegrees(this, 0f)
                 LocationCompat.setSpeedAccuracyMetersPerSecond(this, 1f)
             }
-            Timber.tag("TOOT").i("Setting mock GPS location for $provider to $location")
+            Timber.i("Setting mock GPS location for $provider to $location")
             locationManager!!.setTestProviderLocation(
                 provider,
                 location

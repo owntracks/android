@@ -74,6 +74,9 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
 
     val workManagerFailedToInitialize = MutableLiveData(false)
 
+    @get:VisibleForTesting
+    val migrationIdlingResource: SimpleIdlingResource = SimpleIdlingResource("waypointsMigration", false)
+
     override fun onCreate() {
         // Make sure we use Conscrypt for advanced TLS features on all devices.
         Security.insertProviderAt(
@@ -226,7 +229,11 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
      */
     @VisibleForTesting
     fun migrateWaypoints() {
+        Timber.v("UnIdling migrationIdlingResource")
+        migrationIdlingResource.setIdleState(false)
         waypointsRepo.migrateFromLegacyStorage().invokeOnCompletion { throwable ->
+            Timber.v("Idling migrationIdlingResource")
+            migrationIdlingResource.setIdleState(true)
             if (ActivityCompat.checkSelfPermission(
                     this,
                     Manifest.permission.POST_NOTIFICATIONS
