@@ -21,41 +21,26 @@ open class GPSMockDeviceLocation : MockDeviceLocation {
         setPackageAsMockLocationProvider(context)
         locationManager?.run {
             locationProvidersToMock.forEach { provider ->
-                try {
-                    removeTestProvider(provider)
-                } catch (_: IllegalArgumentException) {
-                }
                 addTestProvider(
                     provider,
-                    true,
-                    true,
+                    false,
+                    false,
                     false,
                     false,
                     true,
                     true,
                     true,
-                    Criteria.POWER_LOW,
-                    Criteria.ACCURACY_LOW
+                    Criteria.POWER_HIGH,
+                    Criteria.ACCURACY_FINE
                 )
-                Timber.d("Enabling location Test Provider")
+                Timber.d("Enabling location Test Provider called $provider")
                 setTestProviderEnabled(provider, true)
             }
         }
     }
 
-    override fun unInitializeMockLocationProvider() {
-        locationProvidersToMock.forEach {
-            locationManager?.run {
-                setTestProviderEnabled(it, false)
-                removeTestProvider(it)
-            }
-        }
-    }
-
     override fun setMockLocation(latitude: Double, longitude: Double, accuracy: Float) {
-        listOf(
-            LocationManager.GPS_PROVIDER
-        ).forEach { provider ->
+        locationProvidersToMock.forEach { provider ->
             val location = Location(provider).apply {
                 this.latitude = latitude
                 this.longitude = longitude

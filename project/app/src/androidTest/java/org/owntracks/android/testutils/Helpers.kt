@@ -79,7 +79,7 @@ fun reportLocationFromMap(locationIdlingResource: IdlingResource?, mockLocationF
     clickOnAndWait(R.id.fabMonitoringModeMove)
     mockLocationFunction()
 
-    locationIdlingResource.use {
+    locationIdlingResource.use(15.seconds) {
         clickOnAndWait(R.id.fabMyLocation)
         clickOnAndWait(R.id.menu_report)
     }

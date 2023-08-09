@@ -29,7 +29,6 @@ import mqtt.packets.mqttv5.MQTT5Properties
 import org.hamcrest.CoreMatchers
 import org.hamcrest.CoreMatchers.anything
 import org.hamcrest.Matcher
-import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -51,11 +50,6 @@ class MQTTMessagePublishTests :
     TestWithAnActivity<MapActivity>(MapActivity::class.java, false),
     TestWithAnMQTTBroker by TestWithAnMQTTBrokerImpl(),
     MockDeviceLocation by GPSMockDeviceLocation() {
-
-    @After
-    fun uninitMockLocation() {
-        unInitializeMockLocationProvider()
-    }
 
     @Test
     fun given_an_MQTT_configured_client_when_the_report_button_is_pressed_then_the_broker_receives_a_packet_with_the_correct_location_message_in() { // ktlint-disable max-line-length

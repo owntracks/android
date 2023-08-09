@@ -7,7 +7,6 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
-import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
@@ -22,15 +21,6 @@ class ContactActivityTests :
     TestWithAnActivity<MapActivity>(MapActivity::class.java, false),
     TestWithAnHTTPServer by TestWithAnHTTPServerImpl(),
     MockDeviceLocation by GPSMockDeviceLocation() {
-    @After
-    fun stopMockWebserver() {
-        stopServer()
-    }
-
-    @After
-    fun removeMockLocationProvider() {
-        unInitializeMockLocationProvider()
-    }
 
     private val locationResponse = """
         {"_type":"location","acc":20,"al":0,"batt":100,"bs":0,"conn":"w","created_at":1610748273,"lat":51.2,"lon":-4,"tid":"aa","tst":1610799026,"vac":40,"vel":7}

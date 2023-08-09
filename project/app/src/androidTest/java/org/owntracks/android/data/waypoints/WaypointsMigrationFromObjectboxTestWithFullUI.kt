@@ -21,6 +21,7 @@ import org.owntracks.android.testutils.setNotFirstStartPreferences
 import org.owntracks.android.testutils.use
 import org.owntracks.android.testutils.waitUntilActivityVisible
 import org.owntracks.android.ui.waypoints.WaypointsActivity
+import timber.log.Timber
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -161,7 +162,7 @@ class WaypointsMigrationFromObjectboxTestWithFullUI : TestWithAnActivity<Waypoin
         ) as NotificationManager
         Assert.assertTrue(
             "Event notification is displayed",
-            notificationManager.activeNotifications.any {
+            notificationManager.activeNotifications.also { Timber.i("Current Notifications: $it") }.any {
                 it.notification.extras.getString(Notification.EXTRA_TITLE) == "Error migrating waypoints" &&
                     it.notification.extras.getString(Notification.EXTRA_TEXT) == "An error occurred whilst migrating waypoints. Some may not have been migrated, so check the logs and re-add."
             }

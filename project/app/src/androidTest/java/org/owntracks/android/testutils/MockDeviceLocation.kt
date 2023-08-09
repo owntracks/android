@@ -6,7 +6,6 @@ import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 
 interface MockDeviceLocation {
     fun initializeMockLocationProvider(context: Context)
-    fun unInitializeMockLocationProvider()
     fun setMockLocation(latitude: Double, longitude: Double, accuracy: Float = 5f)
     fun setPackageAsMockLocationProvider(context: Context) {
         InstrumentationRegistry

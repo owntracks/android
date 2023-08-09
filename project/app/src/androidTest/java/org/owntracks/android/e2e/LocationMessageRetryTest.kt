@@ -9,7 +9,6 @@ import kotlin.time.Duration.Companion.minutes
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.RecordedRequest
-import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
@@ -24,16 +23,6 @@ class LocationMessageRetryTest :
     TestWithAnActivity<MapActivity>(MapActivity::class.java, false),
     TestWithAnHTTPServer by TestWithAnHTTPServerImpl(),
     MockDeviceLocation by GPSMockDeviceLocation() {
-
-    @After
-    fun stopMockWebserver() {
-        stopServer()
-    }
-
-    @After
-    fun removeMockLocationProvider() {
-        unInitializeMockLocationProvider()
-    }
 
     //language=JSON
     private val locationResponse = """

@@ -19,14 +19,18 @@ class GeofencingRequestGMSConversion {
             Geofence(
                 requestId = "first",
                 expirationDuration = 1000L,
-                circularLatitude = 51.0, circularLongitude = 0.0, circularRadius = 100f,
+                circularLatitude = 51.0,
+                circularLongitude = 0.0,
+                circularRadius = 100f,
                 transitionTypes = Geofence.GEOFENCE_TRANSITION_DWELL,
                 loiteringDelay = 20
             ),
             Geofence(
                 requestId = "second",
                 expirationDuration = 500000L,
-                circularLatitude = 53.8573, circularLongitude = 4.83487, circularRadius = 20.5f,
+                circularLatitude = 53.8573,
+                circularLongitude = 4.83487,
+                circularRadius = 20.5f,
                 transitionTypes = Geofence.GEOFENCE_TRANSITION_ENTER
             )
 
@@ -44,7 +48,9 @@ class GeofencingRequestGMSConversion {
         val geofence = Geofence(
             requestId = "first",
             expirationDuration = 1000L,
-            circularLatitude = 51.0, circularLongitude = 0.0, circularRadius = 100f,
+            circularLatitude = 51.0,
+            circularLongitude = 0.0,
+            circularRadius = 100f,
             transitionTypes = Geofence.GEOFENCE_TRANSITION_DWELL,
             loiteringDelay = 20
         )

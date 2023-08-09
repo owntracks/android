@@ -13,7 +13,6 @@ import java.util.concurrent.TimeUnit
 import mqtt.packets.Qos
 import mqtt.packets.mqtt.MQTTPublish
 import mqtt.packets.mqttv5.MQTT5Properties
-import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -43,11 +42,6 @@ class MQTTRemoteCommandTests :
     TestWithAnActivity<MapActivity>(MapActivity::class.java, false),
     TestWithAnMQTTBroker by TestWithAnMQTTBrokerImpl(),
     MockDeviceLocation by GPSMockDeviceLocation() {
-
-    @After
-    fun uninitMockLocation() {
-        unInitializeMockLocationProvider()
-    }
 
     @Test
     fun given_an_MQTT_configured_client_when_the_broker_sends_an_invalid_command_message_then_nothing_happens() {

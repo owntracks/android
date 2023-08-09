@@ -13,6 +13,7 @@ import mqtt.broker.interfaces.Authentication
 import mqtt.broker.interfaces.PacketInterceptor
 import mqtt.packets.MQTTPacket
 import mqtt.packets.Qos
+import mqtt.packets.mqtt.MQTTPublish
 import mqtt.packets.mqttv5.MQTT5Properties
 import org.eclipse.paho.client.mqttv3.internal.websocket.Base64
 import org.owntracks.android.R
@@ -31,6 +32,7 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
     private val mqttTestPassword = "testPassword"
     override val mqttPacketsReceived: MutableList<MQTTPacket> = mutableListOf()
     override lateinit var broker: Broker
+    override val packetReceivedIdlingResource = LatchingIdlingResourceWithData("mqttPacketReceivedIdlingResource")
 
     override fun <E : MessageBase> Collection<E>.sendFromBroker(broker: Broker) {
         map(Parser(null)::toJsonBytes).forEach {
@@ -99,8 +101,18 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
                     password: UByteArray?,
                     packet: MQTTPacket
                 ) {
-                    Timber.d("MQTT Packet received $packet ${String(packet.toByteArray().toByteArray())}")
-                    mqttPacketsReceived.add(packet)
+                    synchronized(mqttPacketsReceived) {
+                        val packetString = String(packet.toByteArray().toByteArray())
+                        Timber.v("MQTT Packet received $packet $packetString")
+                        mqttPacketsReceived.add(packet)
+                        val magic = packetReceivedIdlingResource.data ?: ""
+                        if (packet is MQTTPublish && packetString.contains(magic)) {
+                            Timber.v("packet contains magic string $magic. Unlatching")
+                            packetReceivedIdlingResource.unlatch()
+                        }
+
+                        Timber.d("Total MQTT Packets received is ${mqttPacketsReceived.size}")
+                    }
                 }
             }
         )

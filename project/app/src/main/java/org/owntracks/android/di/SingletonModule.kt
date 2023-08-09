@@ -31,7 +31,7 @@ class SingletonModule {
     @Named("outgoingQueueIdlingResource")
     @Singleton
     fun provideOutgoingQueueIdlingResource(): CountingIdlingResource =
-        CountingIdlingResource("outgoingQueueIdlingResource", false)
+        CountingIdlingResource("outgoingQueueIdlingResource", true)
 
     /**
      * This idling resource is idled when a message with is published in response to a remote command. Useful for tests that

@@ -1,6 +1,7 @@
 package org.owntracks.android.testutils
 
 import okhttp3.mockwebserver.Dispatcher
+import org.junit.After
 
 interface TestWithAnHTTPServer {
     /**
@@ -30,4 +31,9 @@ interface TestWithAnHTTPServer {
      * The port on which the webserver is listening
      */
     val webserverPort: Int
+
+    @After
+    fun stopMockWebserver() {
+        stopServer()
+    }
 }

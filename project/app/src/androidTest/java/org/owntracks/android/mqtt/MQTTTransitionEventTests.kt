@@ -13,7 +13,6 @@ import java.util.concurrent.TimeUnit
 import mqtt.packets.Qos
 import mqtt.packets.mqtt.MQTTPublish
 import mqtt.packets.mqttv5.MQTT5Properties
-import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -33,11 +32,6 @@ class MQTTTransitionEventTests :
     TestWithAnActivity<MapActivity>(MapActivity::class.java, false),
     TestWithAnMQTTBroker by TestWithAnMQTTBrokerImpl(),
     MockDeviceLocation by GPSMockDeviceLocation() {
-
-    @After
-    fun uninitMockLocation() {
-        unInitializeMockLocationProvider()
-    }
 
     @Before
     fun clearLocalData() {

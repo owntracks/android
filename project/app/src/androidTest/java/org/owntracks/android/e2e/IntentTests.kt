@@ -7,6 +7,7 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlin.time.Duration.Companion.seconds
 import mqtt.packets.mqtt.MQTTPublish
 import org.junit.Assert
 import org.junit.Test
@@ -39,31 +40,28 @@ class IntentTests :
     fun given_an_application_instance_when_sending_a_send_location_intent_then_a_location_message_is_published_with_the_user_trigger() {
         setupTestActivity()
 
-        baristaRule.activityTestRule.activity.publishResponseMessageIdlingResource.setIdleState(false)
+        packetReceivedIdlingResource.latch("\"t\":\"u\"")
         ContextCompat.startForegroundService(
             app,
             Intent(app, BackgroundService::class.java).apply {
                 action = "org.owntracks.android.SEND_LOCATION_USER"
             }
         )
-        baristaRule.activityTestRule.activity.publishResponseMessageIdlingResource.use {
+        packetReceivedIdlingResource.use(10.seconds) {
             Espresso.onIdle()
         }
-        val toot = Parser(null).fromJson(
-            "{\"_type\":\"location\",\"BSSID\":\"02:00:00:00:00:00\",\"SSID\":\"<unknown ssid>\",\"acc\":1988,\"alt\":0,\"batt\":100,\"bs\":0,\"conn\":\"w\",\"created_at\":1691067259,\"lat\":51.4837067,\"lon\":-3.168095,\"m\":1,\"t\":\"u\",\"tid\":\"aa\",\"tst\":1691067257,\"vac\":0,\"vel\":0}"
+
+        Assert.assertTrue(
+            mqttPacketsReceived.also {
+                Timber.v("MQTT Packets received: $it")
+            }.filterIsInstance<MQTTPublish>().map {
+                Parser(null).fromJson((it.payload)!!.toByteArray())
+            }.also {
+                Timber.w("packets: $it")
+            }.any {
+                it is MessageLocation && it.trigger == MessageLocation.ReportType.USER
+            }
         )
-        Timber.w("TOOT $toot")
-        baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.use {
-            Assert.assertTrue(
-                mqttPacketsReceived.filterIsInstance<MQTTPublish>().map {
-                    Parser(null).fromJson((it.payload)!!.toByteArray())
-                }.also {
-                    Timber.w("packets: $it")
-                }.any {
-                    it is MessageLocation && it.trigger == MessageLocation.ReportType.USER
-                }
-            )
-        }
     }
 
     @Test

@@ -16,6 +16,7 @@ interface TestWithAnMQTTBroker {
     val mqttUsername: String
     val mqttClientId: String
     val deviceId: String
+    val packetReceivedIdlingResource: LatchingIdlingResourceWithData
     fun <E : MessageBase> Collection<E>.sendFromBroker(broker: Broker)
 
     @DelicateCoroutinesApi

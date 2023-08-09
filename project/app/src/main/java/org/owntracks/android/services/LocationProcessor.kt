@@ -47,7 +47,11 @@ class LocationProcessor @Inject constructor(
         val threshold = preferences.ignoreInaccurateLocations
         val ignore = threshold > 0 && l.accuracy > threshold
         if (ignore) {
-            Timber.d("Ignoring location (acc=${l.accuracy}) because it's below accuracy threshold of $threshold")
+            Timber.i(
+                "Ignoring location (acc=${l.accuracy}) because it's below accuracy threshold of $threshold"
+            )
+        } else {
+            Timber.v("Location accuracy ${l.accuracy} is within accuracy $threshold")
         }
         return ignore
     }
@@ -115,7 +119,9 @@ class LocationProcessor @Inject constructor(
             trackerId = preferences.tid.value
             inregions = calculateInRegions(loadedWaypoints)
         }
-        Timber.v("Actually publishing location $location triggered by $trigger")
+        Timber.v(
+            "Actually publishing location $location triggered by $trigger as messageId=${message.messageId}"
+        )
         messageProcessor.queueMessageForSending(message)
         if (responseMessageTypes.contains(trigger)) {
             publishResponseMessageIdlingResource.setIdleState(true)

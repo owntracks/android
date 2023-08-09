@@ -11,7 +11,6 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions
-import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
@@ -25,10 +24,6 @@ import org.owntracks.android.ui.clickOnDrawerAndWait
 class CommonMapActivityTests :
     TestWithAnActivity<MapActivity>(MapActivity::class.java, false),
     MockDeviceLocation by GPSMockDeviceLocation() {
-    @After
-    fun removeMockLocationProvider() {
-        unInitializeMockLocationProvider()
-    }
 
     @Test
     fun monitoringModeButtonShowsDialogAndAllowsUsToSelectQuietMode() {
