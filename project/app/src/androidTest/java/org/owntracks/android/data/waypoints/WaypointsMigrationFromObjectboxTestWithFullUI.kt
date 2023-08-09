@@ -162,10 +162,16 @@ class WaypointsMigrationFromObjectboxTestWithFullUI : TestWithAnActivity<Waypoin
         ) as NotificationManager
         Assert.assertTrue(
             "Event notification is displayed",
-            notificationManager.activeNotifications.also { Timber.i("Current Notifications: $it") }.any {
-                it.notification.extras.getString(Notification.EXTRA_TITLE) == "Error migrating waypoints" &&
-                    it.notification.extras.getString(Notification.EXTRA_TEXT) == "An error occurred whilst migrating waypoints. Some may not have been migrated, so check the logs and re-add."
-            }
+            notificationManager.activeNotifications.map { it.notification }
+                .also { notifications ->
+                    notifications.map {
+                        it.extras.getString(Notification.EXTRA_TITLE)
+                    }.run { Timber.i("Current Notifications: $this") }
+                }
+                .any { notification ->
+                    notification.extras.getString(Notification.EXTRA_TITLE) == "Error migrating waypoints" &&
+                        notification.extras.getString(Notification.EXTRA_TEXT) == "An error occurred whilst migrating waypoints. Some may not have been migrated, so check the logs and re-add."
+                }
         )
     }
 }

@@ -232,8 +232,6 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
         Timber.v("UnIdling migrationIdlingResource")
         migrationIdlingResource.setIdleState(false)
         waypointsRepo.migrateFromLegacyStorage().invokeOnCompletion { throwable ->
-            Timber.v("Idling migrationIdlingResource")
-            migrationIdlingResource.setIdleState(true)
             if (ActivityCompat.checkSelfPermission(
                     this,
                     Manifest.permission.POST_NOTIFICATIONS
@@ -260,7 +258,11 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
                             notificationManager.notify("WaypointsMigrationNotification", 0, this)
                         }
                 }
+            } else {
+                Timber.w("notification permissions not granted, can't display waypoints migration error notification")
             }
+            Timber.v("Idling migrationIdlingResource")
+            migrationIdlingResource.setIdleState(true)
         }
     }
 
