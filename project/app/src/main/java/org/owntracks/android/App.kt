@@ -69,6 +69,9 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
     @Named("mockLocationIdlingResource")
     lateinit var mockLocationIdlingResource: SimpleIdlingResource
 
+    @get:VisibleForTesting
+    val preferenceSetIdlingResource: SimpleIdlingResource = SimpleIdlingResource("preferenceSetIdlingResource", true)
+
     @Inject
     lateinit var waypointsRepo: RoomWaypointsRepo
 
@@ -217,6 +220,8 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
             Timber.d("Theme changed. Setting theme to ${preferences.theme}")
             setThemeFromPreferences()
         }
+        Timber.v("Idling preferenceSetIdlingResource because of $properties")
+        preferenceSetIdlingResource.setIdleState(true)
     }
 
     @get:VisibleForTesting

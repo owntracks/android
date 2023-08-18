@@ -68,20 +68,23 @@ class IntentTests :
     fun given_an_application_instance_when_sending_a_change_monitoring_intent_with_no_specific_mode_then_the_app_changes_monitoring_mode_to_the_next() {
         setupTestActivity()
 
+        app.preferenceSetIdlingResource.setIdleState(false)
         ContextCompat.startForegroundService(
             app,
             Intent(app, BackgroundService::class.java).apply {
                 action = "org.owntracks.android.CHANGE_MONITORING"
             }
         )
-        onView(ViewMatchers.withId(R.id.menu_monitoring))
-            .check(ViewAssertions.matches(withActionIconDrawable(R.drawable.ic_step_forward_2)))
+        app.preferenceSetIdlingResource.use {
+            onView(ViewMatchers.withId(R.id.menu_monitoring))
+                .check(ViewAssertions.matches(withActionIconDrawable(R.drawable.ic_step_forward_2)))
+        }
     }
 
     @Test
     fun given_an_application_instance_when_sending_a_change_monitoring_intent_with_quiet_mode_specified_then_the_app_changes_monitoring_mode_to_quiet() {
         setupTestActivity()
-
+        app.preferenceSetIdlingResource.setIdleState(false)
         ContextCompat.startForegroundService(
             app,
             Intent(app, BackgroundService::class.java).apply {
@@ -89,8 +92,10 @@ class IntentTests :
                 putExtra("monitoring", -1)
             }
         )
-        onView(ViewMatchers.withId(R.id.menu_monitoring))
-            .check(ViewAssertions.matches(withActionIconDrawable(R.drawable.ic_baseline_stop_36)))
+        app.preferenceSetIdlingResource.use {
+            onView(ViewMatchers.withId(R.id.menu_monitoring))
+                .check(ViewAssertions.matches(withActionIconDrawable(R.drawable.ic_baseline_stop_36)))
+        }
     }
 
     private fun setupTestActivity() {
