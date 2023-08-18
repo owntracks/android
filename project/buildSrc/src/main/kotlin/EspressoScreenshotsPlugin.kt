@@ -65,7 +65,7 @@ class EspressoScreenshotsPlugin : Plugin<Project> {
                 }
             }
             if (!org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.getCurrentOperatingSystem().isWindows) {
-                project.tasks.whenTaskAdded {
+                project.tasks.configureEach {
                     when (name) {
                         "connectedGmsDebugAndroidTest" -> finalizedBy("embedGmsScreenshots")
                         "connectedOssDebugAndroidTest" -> finalizedBy("embedOssScreenshots")
