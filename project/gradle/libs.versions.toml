@@ -2,7 +2,7 @@
 agp = "8.1.0"
 androidx-core = "1.10.1"
 androidx-core-testing = "2.2.0"
-androidx-fragment = "1.6.0"
+androidx-fragment = "1.6.1"
 androidx-preference = "1.2.0"
 androidx-room = "2.5.2"
 androidx-test-core-ktx = "1.5.0"
