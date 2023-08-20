@@ -42,7 +42,7 @@ jobs:
           build-root-directory: project
           arguments: |
             assembleDebug
-            assembleAndroidTest            
+            assembleAndroidTest
             :app:compileOssReleaseSources
             :app:assembleGmsDebugAndroidTest
             :app:assembleOssDebugAndroidTest
@@ -98,7 +98,7 @@ jobs:
   espresso-test:
     name: "Espresso test"
     runs-on: self-hosted
-    if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/master') || github.event_name == 'pull_request' }}
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' || github.event_name == 'pull_request' || github.event_name == 'merge_group' }}
     permissions:
       contents: read
       checks: write
@@ -150,7 +150,8 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         timeout-minutes: 60
         env:
-          TEST_OPTIONS: ${{ (contains(github.event.pull_request.labels.*.name, 'smoke-test-required') && !contains(github.event.pull_request.labels.*.name, 'integration-test-required')) && '-Pandroid.testInstrumentationRunnerArguments.annotation=org.owntracks.android.testutils.SmokeTest' || '' }}
+          # Only run the smoke tests on merge group events
+          TEST_OPTIONS: ${{ (github.event_name == 'merge_group' || (contains(github.event.pull_request.labels.*.name, 'smoke-test-required') && !contains(github.event.pull_request.labels.*.name, 'integration-test-required'))) && '-Pandroid.testInstrumentationRunnerArguments.annotation=org.owntracks.android.testutils.SmokeTest' || '' }}
           FLAVOUR: ${{ matrix.flavour }}
         with:
           api-level: ${{ matrix.android-api }}
