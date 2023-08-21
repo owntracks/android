@@ -47,7 +47,6 @@ import org.owntracks.android.R
 import org.owntracks.android.databinding.UiMapBinding
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.preferences.Preferences
-import org.owntracks.android.preferences.Preferences.Companion.EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.services.BackgroundService
@@ -405,19 +404,10 @@ class MapActivity :
         supportFragmentManager.commit(true) {
             replace(R.id.mapFragment, mapFragment, "map")
         }
-        if (preferences.experimentalFeatures.contains(
-                EXPERIMENTAL_FEATURE_BEARING_ARROW_FOLLOWS_DEVICE_ORIENTATION
-            )
-        ) {
-            sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-            sensorManager?.let {
-                orientationSensor = it.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
-                orientationSensor?.run { Timber.d("Got a rotation vector sensor") }
-            }
-        } else {
-            sensorManager?.unregisterListener(viewModel.orientationSensorEventListener)
-            sensorManager = null
-            orientationSensor = null
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        sensorManager?.let {
+            orientationSensor = it.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
+            orientationSensor?.run { Timber.d("Got a rotation vector sensor") }
         }
         super.onResume()
         updateMonitoringModeMenu()
