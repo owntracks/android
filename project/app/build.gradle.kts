@@ -26,7 +26,7 @@ android {
         minSdk = 24
         targetSdk = 33
 
-        versionCode = 20500000
+        versionCode = 420500000
         versionName = "2.5.0"
 
         val localeCount = fileTree("src/main/res/")
