@@ -17,6 +17,9 @@ val gmsImplementation: Configuration by configurations.creating
 val numShards = System.getenv("CIRCLE_NODE_TOTAL") ?: "0"
 val shardIndex = System.getenv("CIRCLE_NODE_INDEX") ?: "0"
 
+val packageVersionCode: Int = System.getenv("VERSION_CODE")?.toInt() ?: 420500000
+val manuallySetVersion: Boolean = System.getenv("VERSION_CODE") != null
+
 android {
     compileSdk = 33
     namespace = "org.owntracks.android"
@@ -26,7 +29,7 @@ android {
         minSdk = 24
         targetSdk = 33
 
-        versionCode = 420500000
+        versionCode = packageVersionCode
         versionName = "2.5.0"
 
         val localeCount = fileTree("src/main/res/")
@@ -178,7 +181,11 @@ android {
         register("gms") {
             enabled.set(true)
             track.set("internal")
-            resolutionStrategy.set(com.github.triplet.gradle.androidpublisher.ResolutionStrategy.AUTO)
+            if (manuallySetVersion) {
+                resolutionStrategy.set(com.github.triplet.gradle.androidpublisher.ResolutionStrategy.IGNORE)
+            } else {
+                resolutionStrategy.set(com.github.triplet.gradle.androidpublisher.ResolutionStrategy.AUTO)
+            }
         }
     }
 }

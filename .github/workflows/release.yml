@@ -7,6 +7,7 @@ on:
     tags:
       - v[0-9]+.[0-9]+.[0-9]+
       - v[0-9]+.[0-9]+.[0-9]+-beta[0-9]+
+      - release-test-tag
 
 jobs:
   release:
@@ -38,16 +39,44 @@ jobs:
           java-version: 17
           distribution: "temurin"
 
-      - name: Decrypt secrets
-        env:
-          GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
-        run: |
-          echo -n $GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS > project/app/owntracks-android-gcloud-creds.json
+      - name: Set up Python
+        uses: actions/setup-python@v4
 
-      - name: Fetch APK from CircleCI
-        run: .github/workflows/fetch-apks.sh
+      - name: Install python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r .github/google-play-api/requirements.txt
+
+      - name: Get current version code from internal track
+        if: ${{ !contains(github.ref, 'beta') && steps.tagCount.outputs.beta_tag_count == 0 }}
         env:
-          CIRCLE_CI_TOKEN: "${{ secrets.CIRCLE_CI_TOKEN }}"
+          ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
+        run: |
+          echo VERSION_CODE=$(python .github/google-play-api/google-play-api.py internal) >> $GITHUB_ENV"
+
+      - name: Get current version code from beta track
+        if: ${{ !contains(github.ref, 'beta') && steps.tagCount.outputs.beta_tag_count >= 0 }}
+        env:
+          ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
+        run: |
+          echo VERSION_CODE=$(python .github/google-play-api/google-play-api.py beta) >> $GITHUB_ENV"
+
+          - name: Create keystore
+          run: |
+            echo -n $KEYSTORE_BASE64 | base64 -d > project/owntracks.release.keystore.jks
+          env:
+            KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+
+      - name: Build release APKs
+        uses: gradle/gradle-build-action@v2
+        env:
+          KEYSTORE_PASSPHRASE: ${{ secrets.KEYSTORE_PASSPHRASE }}
+          ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
+          version_code: ${{ setps.version-code-generator.versionCode}}
+        with:
+          build-root-directory: project
+          arguments: |
+            assembleRelease --stacktrace --scan
 
       - name: Create release
         id: create_release
@@ -67,8 +96,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: ./gms.apk
-          asset_name: owntracks-release-gms.apk
+          asset_path: ./project/app/build/outputs/apk/gms/release/app-gms-release.apk
+          asset_name: owntracks-release-gms-${VERSION_CODE}.apk
           asset_content_type: application/vnd.android.package-archive
       - name: Upload OSS Release Asset
         uses: actions/upload-release-asset@v1
@@ -76,18 +105,20 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: ./oss.apk
-          asset_name: owntracks-release-oss.apk
+          asset_path: ./project/app/build/outputs/apk/oss/release/app-oss-release.apk
+          asset_name: owntracks-release-oss-${VERSION_CODE}.apk
           asset_content_type: application/vnd.android.package-archive
 
       - name: Promote play store beta from internal
         run: ./gradlew promoteGmsReleaseArtifact --from-track internal --promote-track beta --release-status completed
         working-directory: project
         if: ${{ contains(github.ref, 'beta') }}
+
       - name: Promote play store production from beta
         run: ./gradlew promoteArtifact --from-track beta --promote-track production --release-status completed
         working-directory: project
         if: ${{ !contains(github.ref, 'beta') && steps.tagCount.outputs.beta_tag_count > 0 }}
+
       - name: Promote play store production from internal
         run: ./gradlew promoteArtifact --from-track internal --promote-track production --release-status completed
         working-directory: project
