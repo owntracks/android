@@ -2,13 +2,13 @@ package org.owntracks.android.geocoding
 
 import android.content.Context
 import android.location.Address
+import java.math.BigDecimal
+import java.util.*
 import org.threeten.bp.Instant
 import org.threeten.bp.temporal.ChronoUnit
 import timber.log.Timber
-import java.math.BigDecimal
-import java.util.*
 
-class DeviceGeocoder internal constructor(context: Context?) : CachingGeocoder() {
+class DeviceGeocoder internal constructor(context: Context) : CachingGeocoder() {
     private val geocoder: android.location.Geocoder =
         android.location.Geocoder(context, Locale.getDefault())
     private var tripResetTimestamp: Instant = Instant.MIN

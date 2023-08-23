@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 2.4.11
+
+- Bumped targetSdk to 33 to comply with Google Play Store policies
+
 ## Version 2.4.10
 
 ### New features

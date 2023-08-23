@@ -18,21 +18,20 @@ jacoco {
     toolVersion = rootJacocoVersion
 }
 
-
 val gmsImplementation: Configuration by configurations.creating
 val numShards = System.getenv("CIRCLE_NODE_TOTAL") ?: "0"
 val shardIndex = System.getenv("CIRCLE_NODE_INDEX") ?: "0"
 
 android {
-    compileSdk = 31
+    compileSdk = 33
 
     defaultConfig {
         applicationId = "org.owntracks.android"
         minSdk = 21
-        targetSdk = 31
+        targetSdk = 33
 
-        versionCode = 20410000
-        versionName = "2.4.10"
+        versionCode = 420411000
+        versionName = "2.4.11"
 
         val locales = listOf("en", "de", "fr", "es", "ru", "ca", "pl", "cs", "ja", "pt", "zh", "da")
         buildConfigField(
@@ -244,7 +243,6 @@ dependencies {
     androidTestUtil(libs.bundles.androidx.test.util)
 }
 
-
 // Publishing
 val serviceAccountCredentials = file("owntracks-android-gcloud-creds.json")
 
@@ -272,8 +270,10 @@ androidComponents {
         val minusOne = System.getenv("MAKE_APK_SAME_VERSION_CODE_AS_GOOGLE_PLAY")
         if (!minusOne.isNullOrEmpty()) {
             for (output in variant.outputs) {
-                output.versionCode.set(codesTask.flatMap { it.outCode }
-                    .map { it.asFile.readText().toInt() })
+                output.versionCode.set(
+                    codesTask.flatMap { it.outCode }
+                        .map { it.asFile.readText().toInt() }
+                )
             }
         }
     }

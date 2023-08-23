@@ -32,13 +32,13 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 import org.owntracks.android.BR
 import org.owntracks.android.R
 import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.databinding.UiMapBinding
 import org.owntracks.android.geocoding.GeocoderProvider
-import org.owntracks.android.location.toLatLng
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.services.BackgroundService.BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG
@@ -54,7 +54,6 @@ import org.owntracks.android.ui.mixins.ServiceStarter
 import org.owntracks.android.ui.mixins.WorkManagerInitExceptionNotifier
 import org.owntracks.android.ui.welcome.WelcomeActivity
 import timber.log.Timber
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MapActivity :
@@ -228,8 +227,12 @@ class MapActivity :
                         .setIcon(R.drawable.ic_baseline_location_disabled_24)
                         .setTitle(getString(R.string.deviceLocationDisabledDialogTitle))
                         .setMessage(getString(R.string.deviceLocationDisabledDialogMessage))
-                        .setPositiveButton(getString(R.string.deviceLocationDisabledDialogPositiveButtonLabel)) { _, _ ->
-                            locationServicesLauncher.launch(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                        .setPositiveButton(
+                            getString(R.string.deviceLocationDisabledDialogPositiveButtonLabel)
+                        ) { _, _ ->
+                            locationServicesLauncher.launch(
+                                Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                            )
                         }
                         .setNegativeButton(android.R.string.cancel) { _, _ ->
                             preferences.userDeclinedEnableLocationServices = true
@@ -262,7 +265,9 @@ class MapActivity :
                                 MaterialAlertDialogBuilder(this)
                                     .setCancelable(true)
                                     .setIcon(R.drawable.ic_baseline_location_disabled_24)
-                                    .setTitle(getString(R.string.locationPermissionRequestDialogTitle))
+                                    .setTitle(
+                                        getString(R.string.locationPermissionRequestDialogTitle)
+                                    )
                                     .setMessage(R.string.locationPermissionRequestDialogMessage)
                                     .setPositiveButton(
                                         android.R.string.ok
@@ -458,14 +463,14 @@ class MapActivity :
     private fun disableLocationMenus() {
         binding?.fabMyLocation?.isEnabled = false
         menu?.run {
-            findItem(R.id.menu_report).setEnabled(false).icon.alpha = 128
+            findItem(R.id.menu_report).setEnabled(false).icon?.alpha = 128
         }
     }
 
     private fun enableLocationMenus() {
         binding?.fabMyLocation?.isEnabled = true
         menu?.run {
-            findItem(R.id.menu_report).setEnabled(true).icon.alpha = 255
+            findItem(R.id.menu_report).setEnabled(true).icon?.alpha = 255
         }
     }
 
