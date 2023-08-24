@@ -1,8 +1,17 @@
 # Changelog
 
+## Version 2.4.12
+
+### Bug fixes
+
+- Fixed Google Maps layers not showing (#1460)
+- Added new APK signing key to the docs (#1461)
+- Added specific notification permission request (#1462)
+
 ## Version 2.4.11
 
 - Bumped targetSdk to 33 to comply with Google Play Store policies
+- APK signing key updated to `1F:C4:DE:52:D0:DA:A3:3A:9C:0E:3D:67:21:7A:77:C8:95:B4:62:66:EF:02:0F:AD:0D:48:21:6A:6A:D6:CB:70`
 
 ## Version 2.4.10
 
@@ -37,7 +46,7 @@
 
 - OpenStreetMap now available as a map layer (!). Layer style toggle switch between the different Google Maps layer styles (Default, Hybrid, Satellite, Terrain), OpenStreetMap and Wikimedia. (#1181)
 - OSM map now uses a blue dot and arrow for current location (#1078)
-- Use new Google Maps renderer on gms flavour: https://developers.google.com/maps/documentation/android-sdk/renderer
+- Use new Google Maps renderer on gms flavour: <https://developers.google.com/maps/documentation/android-sdk/renderer>
 - Add preference to draw regions on the map (#1068)
 - Add a preference to prevent location updates any faster than the requested interval (#1168)
 - UI for mode changing is now clearer, using a bottom sheet dialog popup with explanation notes on each mode (#1197)
@@ -55,7 +64,7 @@ Target Android SDK is now 31.
 
 ### New features
 
-- Location updates will now contain the app's mode as a field if extended data reporting is enabled (#1160). Documentation change at https://github.com/owntracks/booklet/commit/d4876781f801a8b006587e26ca3fba27328596b0
+- Location updates will now contain the app's mode as a field if extended data reporting is enabled (#1160). Documentation change at <https://github.com/owntracks/booklet/commit/d4876781f801a8b006587e26ca3fba27328596b0>
 - The minimum locator displacement configuration value is now exposed in the preferences (\*#1177)
 
 ### Bug fixes
