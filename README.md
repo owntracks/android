@@ -11,6 +11,12 @@ There are two build flavours for OwnTracks:
 
 Both flavours are published as an APK to Github releases.
 
+### Signing keys
+
+* Google Play store-distributed builds are signed with Google's App signing key: `02:FD:16:4A:95:46:17:F0:B7:94:57:97:37:C9:7A:07:B8:31:83:1D:0A:05:90:C3:8D:07:2B:FE:29:01:08:F1`
+* APKs attached to Github Releases are signed with our own key: `1F:C4:DE:52:D0:DA:A3:3A:9C:0E:3D:67:21:7A:77:C8:95:B4:62:66:EF:02:0F:AD:0D:48:21:6A:6A:D6:CB:70`
+* F-Droid builds are signed with their own key, details at <https://f-droid.org/en/docs/Release_Channels_and_Signing_Keys/>
+
 ## Contributing
 
 Pull requests welcome! Please see [CONTRIBUTING.md](https://github.com/owntracks/android/blob/master/CONTRIBUTING.md) for details on how to build the project locally.

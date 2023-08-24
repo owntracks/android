@@ -35,6 +35,19 @@
 - `conn` value correctly filled out as `o` (offline) when there's no network connection (#1442)
 - `batt` is ommitted from locations if extended data is disabled (#741)
 
+## Version 2.4.12
+
+### Bug fixes
+
+- Fixed Google Maps layers not showing (#1460)
+- Added new APK signing key to the docs (#1461)
+- Added specific notification permission request (#1462)
+
+## Version 2.4.11
+
+- Bumped targetSdk to 33 to comply with Google Play Store policies
+- APK signing key updated to `1F:C4:DE:52:D0:DA:A3:3A:9C:0E:3D:67:21:7A:77:C8:95:B4:62:66:EF:02:0F:AD:0D:48:21:6A:6A:D6:CB:70`
+
 ## Version 2.4.10
 
 ### New features
