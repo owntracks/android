@@ -28,7 +28,7 @@ fun withActionIconDrawable(@DrawableRes resourceId: Int): Matcher<View?>? {
         override fun matchesSafely(actionMenuItemView: ActionMenuItemView): Boolean {
             return sameBitmap(
                 actionMenuItemView.context,
-                actionMenuItemView.itemData.icon,
+                actionMenuItemView.itemData.icon!!,
                 resourceId,
                 actionMenuItemView
             )
@@ -74,7 +74,8 @@ private fun sameBitmap(
 private fun getBitmapFromDrawable(drawable: Drawable): Bitmap =
     Bitmap.createBitmap(
         drawable.intrinsicWidth,
-        drawable.intrinsicHeight, Bitmap.Config.ARGB_8888
+        drawable.intrinsicHeight,
+        Bitmap.Config.ARGB_8888
     ).apply {
         val canvas = Canvas(this)
         drawable.setBounds(0, 0, canvas.width, canvas.height)
