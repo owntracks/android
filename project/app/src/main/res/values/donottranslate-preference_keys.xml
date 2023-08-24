@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="preferenceKeyUserDeclinedEnableNotificationPermissions">userDeclinedEnableNotificationPermissions</string>
     <string name="preferenceKeyAuth">auth</string>
     <string name="preferenceKeyAutostartOnBoot">autostartOnBoot</string>
     <string name="preferenceKeyCleanSession">cleanSession</string>

@@ -368,12 +368,27 @@ class MapActivity :
         super.onResume()
         updateMonitoringModeMenu()
         updateMyLocationButton()
-        if (!previouslyHadLocationPermissions && requirementsChecker.isLocationPermissionCheckPassed()) {
-            previouslyHadLocationPermissions = true
-            mapViewModel.myLocationIsNowEnabled()
-            service?.reInitializeLocationRequests()
+        if (!requirementsChecker.isNotificationsEnabled() &&
+            !preferences.userDeclinedEnableNotificationPermissions &&
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+        ) {
+            notificationPermissionRequest.launch(POST_NOTIFICATIONS)
+        } else {
+            if (checkAndRequestLocationPermissions(false)) {
+                checkAndRequestLocationServicesEnabled(false)
+            }
+            if (!previouslyHadLocationPermissions && requirementsChecker.isLocationPermissionCheckPassed()) {
+                previouslyHadLocationPermissions = true
+                mapViewModel.myLocationIsNowEnabled()
+                service?.reInitializeLocationRequests()
+            }
         }
     }
+
+    private val notificationPermissionRequest =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+            preferences.userDeclinedEnableNotificationPermissions = !it
+        }
 
     private fun handleIntentExtras(intent: Intent) {
         Timber.v("handleIntentExtras")

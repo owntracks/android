@@ -32,6 +32,8 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <!-- Not actively requested. Has to be enabled manually. Access to broker certificates in private storage on older APIs or on devices not providing files through content:// URIs -->
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <!-- To locate the device -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />

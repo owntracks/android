@@ -9,6 +9,14 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.lang.reflect.InvocationTargetException
+import java.lang.reflect.Method
+import java.lang.reflect.ParameterizedType
+import java.lang.reflect.Type
+import java.util.*
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import javax.inject.Singleton
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions
 import org.greenrobot.eventbus.EventBus
 import org.owntracks.android.BuildConfig
@@ -23,14 +31,6 @@ import org.owntracks.android.support.preferences.PreferencesStore
 import org.owntracks.android.ui.AppShortcuts
 import org.owntracks.android.ui.map.MapLayerStyle
 import timber.log.Timber
-import java.lang.reflect.InvocationTargetException
-import java.lang.reflect.Method
-import java.lang.reflect.ParameterizedType
-import java.lang.reflect.Type
-import java.util.*
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 @SuppressLint("NonConstantResourceId")
@@ -91,11 +91,15 @@ class Preferences @Inject constructor(
     // SharedPreferencesImpl stores its listeners as a list of WeakReferences. So we shouldn't use a
     // lambda as a listener, as that'll just get GC'd and then mysteriously disappear
     // https://stackoverflow.com/a/3104265/352740
-    fun registerOnPreferenceChangedListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
+    fun registerOnPreferenceChangedListener(
+        listener: SharedPreferences.OnSharedPreferenceChangeListener
+    ) {
         preferencesStore.registerOnSharedPreferenceChangeListener(listener)
     }
 
-    fun unregisterOnPreferenceChangedListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
+    fun unregisterOnPreferenceChangedListener(
+        listener: SharedPreferences.OnSharedPreferenceChangeListener
+    ) {
         preferencesStore.unregisterOnSharedPreferenceChangeListener(listener)
     }
 
@@ -203,7 +207,9 @@ class Preferences @Inject constructor(
                         ) {
                             importMethod.invoke(
                                 this,
-                                MonitoringMode.getByValue(messageConfiguration[configurationKey] as Int)
+                                MonitoringMode.getByValue(
+                                    messageConfiguration[configurationKey] as Int
+                                )
                             )
                         } else {
                             importMethod.invoke(this, messageConfiguration[configurationKey])
@@ -212,8 +218,8 @@ class Preferences @Inject constructor(
                 } catch (e: IllegalArgumentException) {
                     Timber.e(
                         "Tried to import $configurationKey but value is wrong type. Expected: ${
-                        methods.getValue(configurationKey).parameterTypes.first().canonicalName
-                        }, given ${messageConfiguration[configurationKey]?.javaClass?.canonicalName}",
+                            methods.getValue(configurationKey).parameterTypes.first().canonicalName
+                        }, given ${messageConfiguration[configurationKey]?.javaClass?.canonicalName}"
                     )
                 }
             }
@@ -508,12 +514,18 @@ class Preferences @Inject constructor(
                 if (Character.isLetterOrDigit(shortTrackerId[0]) && Character.isLetterOrDigit(
                         shortTrackerId[1]
                     )
-                ) setString(R.string.preferenceKeyTrackerId, shortTrackerId)
+                ) {
+                    setString(R.string.preferenceKeyTrackerId, shortTrackerId)
+                }
             } else {
-                if (len > 0 && Character.isLetterOrDigit(trackerId[0])) setString(
-                    R.string.preferenceKeyTrackerId,
-                    trackerId
-                ) else setString(R.string.preferenceKeyTrackerId, "")
+                if (len > 0 && Character.isLetterOrDigit(trackerId[0])) {
+                    setString(
+                        R.string.preferenceKeyTrackerId,
+                        trackerId
+                    )
+                } else {
+                    setString(R.string.preferenceKeyTrackerId, "")
+                }
             }
         }
 
@@ -527,8 +539,11 @@ class Preferences @Inject constructor(
     private val trackerIdDefault: String
         get() {
             val deviceId: String = deviceId
-            return if (deviceId.length >= 2) deviceId.substring(deviceId.length - 2) // defaults to the last two characters of configured deviceId.
-            else "na" // Empty trackerId won't be included in the message.
+            return if (deviceId.length >= 2) {
+                deviceId.substring(deviceId.length - 2) // defaults to the last two characters of configured deviceId.
+            } else {
+                "na" // Empty trackerId won't be included in the message.
+            }
         }
 
     @get:Export(keyResId = R.string.preferenceKeyPort, exportModeMqtt = true)
@@ -560,7 +575,11 @@ class Preferences @Inject constructor(
                     mqttProtocolLevel == MqttConnectOptions.MQTT_VERSION_DEFAULT ||
                     mqttProtocolLevel == MqttConnectOptions.MQTT_VERSION_3_1 ||
                     mqttProtocolLevel == MqttConnectOptions.MQTT_VERSION_3_1_1
-                ) mqttProtocolLevel else MqttConnectOptions.MQTT_VERSION_DEFAULT
+                ) {
+                    mqttProtocolLevel
+                } else {
+                    MqttConnectOptions.MQTT_VERSION_DEFAULT
+                }
             )
         }
 
@@ -657,6 +676,14 @@ class Preferences @Inject constructor(
         get() = getStringOrDefault(R.string.preferenceKeyTLSCaCrt, R.string.valEmpty)
         set(name) {
             setString(R.string.preferenceKeyTLSCaCrt, name)
+        }
+    var userDeclinedEnableNotificationPermissions: Boolean
+        get() = getBooleanOrDefault(
+            R.string.preferenceKeyUserDeclinedEnableNotificationPermissions,
+            R.bool.valFalse
+        )
+        set(value) {
+            setBoolean(R.string.preferenceKeyUserDeclinedEnableNotificationPermissions, value)
         }
 
     @get:Export(keyResId = R.string.preferenceKeyHost, exportModeMqtt = true)
@@ -918,8 +945,12 @@ class Preferences @Inject constructor(
             setInt(R.string.preferenceKeyTheme, actualValue)
             when (actualValue) {
                 NIGHT_MODE_AUTO -> AppCompatDelegate.setDefaultNightMode(SYSTEM_NIGHT_AUTO_MODE)
-                NIGHT_MODE_ENABLE -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                NIGHT_MODE_DISABLE -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                NIGHT_MODE_ENABLE -> AppCompatDelegate.setDefaultNightMode(
+                    AppCompatDelegate.MODE_NIGHT_YES
+                )
+                NIGHT_MODE_DISABLE -> AppCompatDelegate.setDefaultNightMode(
+                    AppCompatDelegate.MODE_NIGHT_NO
+                )
             }
         }
 
@@ -989,7 +1020,10 @@ class Preferences @Inject constructor(
     )
     @set:Import(keyResId = R.string.preferenceKeyEnableMapRotation)
     var enableMapRotation: Boolean
-        get() = getBooleanOrDefault(R.string.preferenceKeyEnableMapRotation, R.bool.valEnableMapRotation)
+        get() = getBooleanOrDefault(
+            R.string.preferenceKeyEnableMapRotation,
+            R.bool.valEnableMapRotation
+        )
         set(newValue) {
             setBoolean(R.string.preferenceKeyEnableMapRotation, newValue)
         }
@@ -1293,7 +1327,9 @@ class Preferences @Inject constructor(
             NIGHT_MODE_DISABLE,
             NIGHT_MODE_ENABLE
         )
-        val SYSTEM_NIGHT_AUTO_MODE by lazy { if (SDK_INT > Build.VERSION_CODES.Q) MODE_NIGHT_FOLLOW_SYSTEM else MODE_NIGHT_AUTO_BATTERY }
+        val SYSTEM_NIGHT_AUTO_MODE by lazy {
+            if (SDK_INT > Build.VERSION_CODES.Q) MODE_NIGHT_FOLLOW_SYSTEM else MODE_NIGHT_AUTO_BATTERY
+        }
 
         const val MQTT_MIN_QOS = 0
         const val MQTT_MAX_QOS = 2

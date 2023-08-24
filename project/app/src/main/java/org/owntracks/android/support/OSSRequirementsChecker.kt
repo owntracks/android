@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.LocationManager
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.location.LocationManagerCompat
 import dagger.hilt.android.scopes.ActivityScoped
@@ -32,4 +33,6 @@ open class OSSRequirementsChecker @Inject constructor(
         } ?: false
 
     override fun isPlayServicesCheckPassed(): Boolean = true
+    override fun isNotificationsEnabled(): Boolean = NotificationManagerCompat.from(context)
+        .areNotificationsEnabled()
 }
