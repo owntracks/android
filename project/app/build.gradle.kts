@@ -6,12 +6,11 @@ plugins {
     id("com.github.triplet.play")
     kotlin("android")
     kotlin("kapt")
-//    id("com.dicedmelon.gradle.jacoco-android") version "0.1.5"
 }
 
 apply<EspressoScreenshotsPlugin>()
 
-val googleMapsAPIKey = extra.get("google_maps_api_key")?.toString() ?: "PLACEHOLDER_API_KEY"
+val googleMapsAPIKey = System.getenv("GOOGLE_MAPS_API_KEY")?.toString() ?: extra.get("google_maps_api_key")?.toString() ?: "PLACEHOLDER_API_KEY"
 
 val gmsImplementation: Configuration by configurations.creating
 val numShards = System.getenv("CIRCLE_NODE_TOTAL") ?: "0"

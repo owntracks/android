@@ -1,11 +1,18 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base",
+    "config:recommended",
     ":disableRateLimiting",
     ":rebaseStalePrs",
     ":disableDependencyDashboard"
   ],
   "assignees": ["growse"],
-  "ignoreDeps": ["android"]
+  "ignoreDeps": ["android"],
+  "packageRules": [
+    {
+      "matchDatasources": ["pypi"],
+      "matchFileNames": [".github/google-play-api/requirements.txt"],
+      "automerge": true
+    }
+  ]
 }
