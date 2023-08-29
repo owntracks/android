@@ -55,6 +55,8 @@ import org.owntracks.android.location.geofencing.GeofencingClient
 import org.owntracks.android.location.geofencing.GeofencingEvent
 import org.owntracks.android.location.geofencing.GeofencingEvent.Companion.fromIntent
 import org.owntracks.android.location.geofencing.GeofencingRequest
+import org.owntracks.android.location.geofencing.Latitude
+import org.owntracks.android.location.geofencing.Longitude
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.model.messages.MessageLocation.Companion.fromLocation
 import org.owntracks.android.model.messages.MessageTransition
@@ -636,8 +638,8 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
                     it.id.toString(),
                     Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT,
                     2.minutes.inWholeMilliseconds.toInt(),
-                    it.geofenceLatitude,
-                    it.geofenceLongitude,
+                    Latitude(it.geofenceLatitude),
+                    Longitude(it.geofenceLongitude),
                     it.geofenceRadius.toFloat(),
                     Geofence.NEVER_EXPIRE,
                     null

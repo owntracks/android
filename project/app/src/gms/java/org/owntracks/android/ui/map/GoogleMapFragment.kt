@@ -18,6 +18,8 @@ import org.owntracks.android.data.waypoints.WaypointModel
 import org.owntracks.android.databinding.GoogleMapFragmentBinding
 import org.owntracks.android.gms.location.toGMSLatLng
 import org.owntracks.android.location.LatLng
+import org.owntracks.android.location.geofencing.Latitude
+import org.owntracks.android.location.geofencing.Longitude
 import org.owntracks.android.location.toLatLng
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.ContactImageBindingAdapter
@@ -152,8 +154,8 @@ class GoogleMapFragment internal constructor(
                     this.cameraPosition.run {
                         MapLocationZoomLevelAndRotation(
                             LatLng(
-                                target.latitude,
-                                target.longitude
+                                Latitude(target.latitude),
+                                Longitude(target.longitude)
                             ),
                             convertGoogleZoomToStandardZoom(zoom.toDouble()),
                             convertBetweenStandardRotationAndBearing(bearing)

@@ -8,6 +8,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.location.geofencing.Geofence
 import org.owntracks.android.location.geofencing.GeofencingRequest
+import org.owntracks.android.location.geofencing.Latitude
+import org.owntracks.android.location.geofencing.Longitude
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
@@ -19,8 +21,8 @@ class GeofencingRequestGMSConversion {
             Geofence(
                 requestId = "first",
                 expirationDuration = 1000L,
-                circularLatitude = 51.0,
-                circularLongitude = 0.0,
+                circularLatitude = Latitude(51.0),
+                circularLongitude = Longitude(0.0),
                 circularRadius = 100f,
                 transitionTypes = Geofence.GEOFENCE_TRANSITION_DWELL,
                 loiteringDelay = 20
@@ -28,8 +30,8 @@ class GeofencingRequestGMSConversion {
             Geofence(
                 requestId = "second",
                 expirationDuration = 500000L,
-                circularLatitude = 53.8573,
-                circularLongitude = 4.83487,
+                circularLatitude = Latitude(53.8573),
+                circularLongitude = Longitude(4.83487),
                 circularRadius = 20.5f,
                 transitionTypes = Geofence.GEOFENCE_TRANSITION_ENTER
             )
@@ -48,8 +50,23 @@ class GeofencingRequestGMSConversion {
         val geofence = Geofence(
             requestId = "first",
             expirationDuration = 1000L,
-            circularLatitude = 51.0,
-            circularLongitude = 0.0,
+            circularLatitude = Latitude(51.0),
+            circularLongitude = Longitude(0.0),
+            circularRadius = 100f,
+            transitionTypes = Geofence.GEOFENCE_TRANSITION_DWELL,
+            loiteringDelay = 20
+        )
+        val gmsGeofence = geofence.toGMSGeofence()
+        assertEquals("first", gmsGeofence.requestId)
+    }
+
+    @Test
+    fun canConvertGeofenceWithWeirdlongitudeToGMS() {
+        val geofence = Geofence(
+            requestId = "first",
+            expirationDuration = 1000L,
+            circularLatitude = Latitude(51.0),
+            circularLongitude = Longitude(1234.0),
             circularRadius = 100f,
             transitionTypes = Geofence.GEOFENCE_TRANSITION_DWELL,
             loiteringDelay = 20

@@ -23,8 +23,8 @@ data class GeofencingEvent(
                         it.requestId,
                         it.transitionTypes,
                         it.notificationResponsiveness,
-                        it.latitude,
-                        it.longitude,
+                        Latitude(it.latitude),
+                        Longitude(it.longitude),
                         it.radius,
                         it.expirationTime,
                         it.loiteringDelay

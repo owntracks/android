@@ -3,23 +3,15 @@ package org.owntracks.android.location
 import android.location.Location
 import kotlin.math.abs
 import org.osmdroid.util.GeoPoint
+import org.owntracks.android.location.geofencing.Latitude
+import org.owntracks.android.location.geofencing.Longitude
 
-class LatLng(latitude: Double, longitude: Double) {
-    private val actualLatitude: Double = when {
-        latitude % 360 <= 90 -> {
-            latitude % 360
-        }
-        latitude % 360 <= 270 -> {
-            180 + (-1 * (latitude % 360))
-        }
-        else -> -360 + (latitude % 360)
-    }
-    private val actualLongitude: Double = ((longitude + 180) % 360) - 180
-
+class LatLng(private val _latitude: Latitude, private val _longitude: Longitude) {
+    constructor(latitude: Double, longitude: Double) : this(Latitude(latitude), Longitude(longitude))
     val latitude: Double
-        get() = actualLatitude
+        get() = _latitude.value
     val longitude
-        get() = actualLongitude
+        get() = _longitude.value
 
     override fun toString(): String {
         return "LatLng $latitude, $longitude"

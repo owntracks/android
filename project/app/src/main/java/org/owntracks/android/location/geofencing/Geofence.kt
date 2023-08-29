@@ -1,11 +1,29 @@
 package org.owntracks.android.location.geofencing
 
+class Latitude(private val latitude: Double) {
+    val value: Double
+        get() = when {
+            latitude % 360 <= 90 -> {
+                latitude % 360
+            }
+            latitude % 360 <= 270 -> {
+                180 + (-1 * (latitude % 360))
+            }
+            else -> -360 + (latitude % 360)
+        }
+}
+
+data class Longitude(private val longitude: Double) {
+    val value: Double
+        get() = ((longitude + 180) % 360) - 180
+}
+
 data class Geofence(
     val requestId: String? = null,
     val transitionTypes: Int? = null,
     val notificationResponsiveness: Int? = null,
-    val circularLatitude: Double? = null,
-    val circularLongitude: Double? = null,
+    val circularLatitude: Latitude? = null,
+    val circularLongitude: Longitude? = null,
     val circularRadius: Float? = null,
     val expirationDuration: Long? = null,
     val loiteringDelay: Int? = null
