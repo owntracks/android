@@ -449,6 +449,7 @@ class MapActivity :
 
     public override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        service?.clearEventStackNotification()
         handleIntentExtras(intent)
     }
 

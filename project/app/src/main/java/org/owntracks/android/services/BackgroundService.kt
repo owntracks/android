@@ -508,6 +508,11 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
             }
     }
 
+    fun clearEventStackNotification() {
+        Timber.v("clearing notification stack")
+        activeNotifications.clear()
+    }
+
     private suspend fun onGeofencingEvent(event: GeofencingEvent) {
         if (event.hasError()) {
             Timber.e("geofencingEvent hasError: ${event.errorCode}")
