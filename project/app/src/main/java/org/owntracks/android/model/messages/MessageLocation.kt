@@ -5,11 +5,10 @@ import android.location.Location
 import android.os.Build
 import com.fasterxml.jackson.annotation.*
 import java.lang.ref.WeakReference
-import java.math.BigDecimal
-import java.math.RoundingMode
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 import org.jetbrains.annotations.NotNull
+import org.owntracks.android.location.roundForDisplay
 import org.owntracks.android.model.BatteryStatus
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.preferences.Preferences
@@ -171,8 +170,4 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
         PING("p"), // Issued by the periodic ping worker
         DEFAULT("")
     }
-
-    private fun Double.roundForDisplay(): String =
-        BigDecimal(this).setScale(4, RoundingMode.HALF_UP)
-            .toString()
 }

@@ -183,24 +183,51 @@
                     app:textValue="@{vm.currentContact.id}"
                     app:title="@{@string/contactDetailsTopic}" />
 
-                <ImageView
-                    android:id="@+id/moreButton"
-                    style="@style/Widget.AppCompat.Button.Borderless"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_marginStart="-12dp"
-                    android:layout_marginBottom="8dp"
-                    android:adjustViewBounds="true"
-                    android:background="?selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/show_options"
-                    android:padding="12dp"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/ic_baseline_more_horiz_24"
-                    android:tintMode="src_in"
-                    android:visibility="@{vm.contactPeekPopupmenuVisibility() ? View.VISIBLE : View.GONE}" />
+                <include
+                    layout="@layout/ui_contactsheet_parameter"
+                    android:visibility="@{vm.currentContact.latLng!=null ?  View.VISIBLE : View.GONE}"
+                    app:icon="@{@drawable/outline_location_on_24}"
+                    app:textValue="@{vm.currentContact.latLng}"
+                    app:title="@{@string/contactDetailsCoordinates}" />
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="16dp">
+
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/contactNavigateButton"
+                        style="?attr/materialButtonOutlinedStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="@string/menuContactNavigate"
+                        android:visibility="@{vm.currentContact.latLng!=null ?  View.VISIBLE : View.GONE}"
+                        app:icon="@drawable/baseline_navigation_24" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/contactClearButton"
+                        style="?attr/materialButtonOutlinedStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="4dp"
+                        android:layout_toEndOf="@id/contactNavigateButton"
+                        android:text="@string/menuClear"
+                        app:icon="@drawable/baseline_clear_24" />
+
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/contactShareButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/ic_baseline_share_24"
+                        android:visibility="@{vm.currentContact.latLng!=null ?  View.VISIBLE : View.GONE}"
+                        app:fabSize="mini" />
+                </RelativeLayout>
             </androidx.appcompat.widget.LinearLayoutCompat>
-
-
         </androidx.appcompat.widget.LinearLayoutCompat>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

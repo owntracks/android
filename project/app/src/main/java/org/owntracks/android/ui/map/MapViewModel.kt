@@ -244,13 +244,6 @@ class MapViewModel @Inject constructor(
         clearActiveContact()
     }
 
-    fun contactPeekPopupmenuVisibility(): Boolean =
-        mutableCurrentContact.value?.messageLocation != null || preferences.mode != ConnectionMode.HTTP
-
-    fun contactHasLocation(): Boolean {
-        return mutableCurrentContact.value?.messageLocation != null
-    }
-
     private fun updateActiveContactDistanceAndBearing(contact: FusedContact) {
         currentLocation.value?.run {
             updateActiveContactDistanceAndBearing(this, contact)

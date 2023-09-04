@@ -223,7 +223,6 @@ Chcete-li to umožnit, zapněte polohu v nastavení zařízení."</string>
     <string name="reconnect">"Znovu připojit"</string>
     <string name="save">"Uložit"</string>
     <string name="select">"Vybrat"</string>
-    <string name="show_options">"Zobrazit možnosti"</string>
     <string name="status_background_service_started_hint">"Služba byla spuštěna za pozadí"</string>
     <string name="status_battery_optimization_whitelisted_hint">"Výjimka z optimalizace baterie"</string>
     <string name="status_endpoint_queue_hint">"Fronta spojení"</string>

@@ -330,10 +330,11 @@ class OSMMapFragment internal constructor(
     }
 
     override fun removeMarkerFromMap(id: String) {
-        mapView?.run {
-            overlays.removeAll { it is Marker && it.id == id }
-        }
+        mapView?. overlays?.removeAll { it is Marker && it.id == id }
     }
+
+    override fun currentMarkersOnMap(): Set<String> =
+        mapView?.overlays?.filterIsInstance<Marker>()?.map { it.id }?.toSet() ?: emptySet()
 
     override fun onResume() {
         super.onResume()

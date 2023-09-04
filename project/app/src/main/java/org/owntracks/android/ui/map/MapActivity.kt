@@ -13,7 +13,6 @@ import android.os.IBinder
 import android.provider.Settings
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import android.util.TypedValue
-import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -24,7 +23,6 @@ import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.LinearLayoutCompat
-import androidx.appcompat.widget.PopupMenu
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.setPadding
 import androidx.core.widget.ImageViewCompat
@@ -45,9 +43,9 @@ import javax.inject.Named
 import kotlinx.coroutines.launch
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiMapBinding
+import org.owntracks.android.location.roundForDisplay
 import org.owntracks.android.model.FusedContact
 import org.owntracks.android.preferences.Preferences
-import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.services.BackgroundService.Companion.BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG
@@ -67,7 +65,6 @@ class MapActivity :
     AppCompatActivity(),
     View.OnClickListener,
     View.OnLongClickListener,
-    PopupMenu.OnMenuItemClickListener,
     ActivityResultCallerWithLocationPermissionCallback,
     WorkManagerInitExceptionNotifier by WorkManagerInitExceptionNotifier.Impl(),
     ServiceStarter by ServiceStarter.Impl() {
@@ -151,7 +148,24 @@ class MapActivity :
                 bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetLayout)
                 contactPeek.contactRow.setOnClickListener(this@MapActivity)
                 contactPeek.contactRow.setOnLongClickListener(this@MapActivity)
-                moreButton.setOnClickListener { v: View -> showPopupMenu(v) }
+                contactClearButton.setOnClickListener { viewModel.onClearContactClicked() }
+                contactShareButton.setOnClickListener {
+                    startActivity(
+                        Intent.createChooser(
+                            Intent().apply {
+                                action = Intent.ACTION_SEND
+                                type = "text/plain"
+                                putExtra(
+                                    Intent.EXTRA_TEXT,
+                                    viewModel.currentContact.value?.latLng?.toDisplayString() ?: R.string.na
+                                )
+                            },
+                            "Share Location"
+                        )
+                    )
+                }
+
+                contactNavigateButton.setOnClickListener { navigateToCurrentContact() }
 
                 // Need to set the appbar layout behaviour to be non-drag, so that we can drag the map
                 AppBarLayout.Behavior()
@@ -271,6 +285,33 @@ class MapActivity :
                     }
                 }
             }
+        }
+    }
+
+    private fun navigateToCurrentContact() {
+        viewModel.currentContact.value?.latLng?.apply {
+            try {
+                val intent = Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("google.navigation:q=${latitude.roundForDisplay()},${longitude.roundForDisplay()}")
+                )
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(intent)
+            } catch (e: ActivityNotFoundException) {
+                Snackbar.make(
+                    binding.mapCoordinatorLayout,
+                    getString(R.string.noNavigationApp),
+                    Snackbar.LENGTH_SHORT
+                )
+                    .show()
+            }
+        } ?: run {
+            Snackbar.make(
+                binding.mapCoordinatorLayout,
+                getString(R.string.contactLocationUnknown),
+                Snackbar.LENGTH_SHORT
+            )
+                .show()
         }
     }
 
@@ -521,44 +562,6 @@ class MapActivity :
         }
     }
 
-    override fun onMenuItemClick(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.menu_clear -> {
-                viewModel.onClearContactClicked()
-                false
-            }
-            R.id.menu_navigate -> {
-                val c = viewModel.currentContact
-                c.value?.latLng?.apply {
-                    try {
-                        val intent = Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse("google.navigation:q=$latitude,$longitude")
-                        )
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        startActivity(intent)
-                    } catch (e: ActivityNotFoundException) {
-                        Snackbar.make(
-                            binding.mapCoordinatorLayout,
-                            getString(R.string.noNavigationApp),
-                            Snackbar.LENGTH_SHORT
-                        )
-                            .show()
-                    }
-                } ?: run {
-                    Snackbar.make(
-                        binding.mapCoordinatorLayout,
-                        getString(R.string.contactLocationUnknown),
-                        Snackbar.LENGTH_SHORT
-                    )
-                        .show()
-                }
-                true
-            }
-            else -> false
-        }
-    }
-
     override fun onLongClick(view: View): Boolean {
         viewModel.onBottomSheetLongClick()
         return true
@@ -592,19 +595,6 @@ class MapActivity :
         binding.mapFragment.setPadding(0)
         menu?.run { close() }
         sensorManager?.unregisterListener(viewModel.orientationSensorEventListener)
-    }
-
-    private fun showPopupMenu(v: View) {
-        val popupMenu = PopupMenu(this, v, Gravity.START)
-        popupMenu.menuInflater.inflate(R.menu.menu_popup_contacts, popupMenu.menu)
-        popupMenu.setOnMenuItemClickListener(this)
-        if (preferences.mode == ConnectionMode.HTTP) {
-            popupMenu.menu.removeItem(R.id.menu_clear)
-        }
-        if (!viewModel.contactHasLocation()) {
-            popupMenu.menu.removeItem(R.id.menu_navigate)
-        }
-        popupMenu.show()
     }
 
     override fun onStart() {

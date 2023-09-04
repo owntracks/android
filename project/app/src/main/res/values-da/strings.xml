@@ -219,7 +219,6 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="reconnect">"Genforbind"</string>
     <string name="save">"Gem"</string>
     <string name="select">"Vælg"</string>
-    <string name="show_options">"Vis muligheder"</string>
     <string name="status_background_service_started_hint">"Baggrundsservice startet"</string>
     <string name="status_battery_optimization_whitelisted_hint">"Fritaget fra batterioptimering"</string>
     <string name="status_endpoint_queue_hint">"Endpoint-kø"</string>

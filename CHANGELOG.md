@@ -24,6 +24,7 @@
 - Removed the undocumented `REREQUEST_LOCATION_UPDATES` intent
 - Added `clearWaypoints` remote command (#1022)
 - Contact direction arrow now moves with device to point in the actual direction of the contact
+- Share button added to contact sheet (#1465)
 
 ### Bug fixes
 

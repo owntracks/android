@@ -1,6 +1,8 @@
 package org.owntracks.android.location
 
 import android.location.Location
+import java.math.BigDecimal
+import java.math.RoundingMode
 import kotlin.math.abs
 import org.osmdroid.util.GeoPoint
 import org.owntracks.android.location.geofencing.Latitude
@@ -16,6 +18,8 @@ class LatLng(private val _latitude: Latitude, private val _longitude: Longitude)
     override fun toString(): String {
         return "LatLng $latitude, $longitude"
     }
+
+    fun toDisplayString(): String = "${latitude.roundForDisplay()}, ${longitude.roundForDisplay()}"
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -37,3 +41,7 @@ fun LatLng.toGeoPoint(): GeoPoint {
 fun Double.equalsDelta(other: Double) = abs(this / other - 1) < 0.00000001
 
 fun Location.toLatLng() = LatLng(latitude, longitude)
+
+fun Double.roundForDisplay(): String =
+    BigDecimal(this).setScale(4, RoundingMode.HALF_UP)
+        .toString()

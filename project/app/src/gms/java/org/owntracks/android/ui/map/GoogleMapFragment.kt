@@ -207,6 +207,8 @@ class GoogleMapFragment internal constructor(
         markersOnMap[id]?.remove()
     }
 
+    override fun currentMarkersOnMap(): Set<String> = markersOnMap.keys
+
     override fun onResume() {
         super.onResume()
         binding.googleMapView.onResume()

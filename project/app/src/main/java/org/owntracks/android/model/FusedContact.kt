@@ -65,8 +65,13 @@ class FusedContact(id: String?) : BaseObservable() {
                     it
                 }
             }
+
     val latLng: LatLng?
         get() = messageLocation?.run { LatLng(latitude, longitude) }
+
+    @get:Bindable
+    val latLngString: String?
+        get() = this.latLng?.toString()
 
     override fun toString(): String {
         return "FusedContact $id ($fusedName)"

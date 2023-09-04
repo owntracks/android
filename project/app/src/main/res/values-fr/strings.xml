@@ -205,7 +205,6 @@
     <string name="select">"Sélectionner"</string>
 
     <!-- Fuzzy -->
-    <string name="show_options">"Afficher les options"</string>
     <string name="status_background_service_started_hint">"Service d'arrière-plan démarré"</string>
     <string name="status_battery_optimization_whitelisted_hint">"Optimisation de la batterie en liste blanche"</string>
     <string name="status_endpoint_queue_hint">"File d'attente du Endpoint"</string>

@@ -159,7 +159,6 @@
     <string name="reconnect">"Reconectar"</string>
     <string name="save">"Guardar"</string>
     <string name="select">"Seleccione"</string>
-    <string name="show_options">"Mostrar opciones"</string>
     <string name="status_background_service_started_hint">"Servicio en segundo plano activo"</string>
     <string name="status_battery_optimization_whitelisted_hint">"Lista blanca de optimización de batería"</string>
     <string name="status_endpoint_queue_hint">"Cola del punto de conexión"</string>

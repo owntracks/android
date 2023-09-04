@@ -27,6 +27,7 @@ abstract class MapFragment<V : ViewDataBinding> internal constructor(
     abstract fun updateCamera(latLng: LatLng)
     abstract fun updateMarkerOnMap(id: String, latLng: LatLng, image: Bitmap)
     abstract fun removeMarkerFromMap(id: String)
+    abstract fun currentMarkersOnMap(): Set<String>
     abstract fun initMap()
     abstract fun drawRegions(regions: Set<WaypointModel>)
     abstract fun setMapLayerType(mapLayerStyle: MapLayerStyle)
@@ -72,6 +73,7 @@ abstract class MapFragment<V : ViewDataBinding> internal constructor(
     }
 
     internal fun updateAllMarkers(contacts: Set<FusedContact>) {
+        currentMarkersOnMap().subtract(contacts.map { it.id }.toSet()).forEach(::removeMarkerFromMap)
         contacts.forEach {
             updateMarkerForContact(it)
             if (it == viewModel.currentContact.value) {
@@ -85,7 +87,7 @@ abstract class MapFragment<V : ViewDataBinding> internal constructor(
             Timber.w("unable to update marker for $contact. no location")
             return
         }
-        Timber.v("updating marker for contact: %s", contact.id)
+        Timber.v("updating marker for contact: ${contact.id}")
         lifecycleScope.launch {
             contactImageBindingAdapter.run {
                 updateMarkerOnMap(contact.id, contact.latLng!!, getBitmapFromCache(contact))

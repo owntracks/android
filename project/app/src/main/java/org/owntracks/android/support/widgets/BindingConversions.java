@@ -10,6 +10,7 @@ import androidx.databinding.BindingConversion;
 import androidx.databinding.InverseMethod;
 
 import org.owntracks.android.R;
+import org.owntracks.android.location.LatLng;
 import org.owntracks.android.location.geofencing.Geofence;
 import org.owntracks.android.preferences.types.ConnectionMode;
 
@@ -29,6 +30,15 @@ public class BindingConversions {
     @BindingConversion
     public static String convertToString(String s) {
         return s != null ? s : EMPTY_STRING;
+    }
+
+    @BindingConversion
+    public static String convertLatLngToString(LatLng latLng) {
+        if (latLng == null) {
+            return "";
+        } else {
+            return latLng.toDisplayString();
+        }
     }
 
     @BindingAdapter("android:visibility")

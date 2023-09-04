@@ -191,7 +191,6 @@
     <string name="reconnect">"再接続"</string>
     <string name="save">"保存"</string>
     <string name="select">"選択"</string>
-    <string name="show_options">"オプションを見る"</string>
     <string name="status_background_service_started_hint">"バックグラウンドサービスの開始時刻"</string>
     <string name="status_battery_optimization_whitelisted_hint">"バッテリー最適化のホワイトリストに登録されている"</string>
     <string name="status_endpoint_queue_hint">"エンドポイントキュー"</string>

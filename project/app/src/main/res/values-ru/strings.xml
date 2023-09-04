@@ -235,7 +235,6 @@
     <string name="reconnect">"Переподключение"</string>
     <string name="save">"Сохранить"</string>
     <string name="select">"Выбрать"</string>
-    <string name="show_options">"Показать настройки"</string>
     <string name="status_background_service_started_hint">"Дата и время запуска фонового процесса"</string>
     <string name="status_battery_optimization_whitelisted_hint">"Приложение в исключениях сервиса оптимизации энергопотребления"</string>
     <string name="status_endpoint_queue_hint">"Очередь сообщений серверу"</string>

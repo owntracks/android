@@ -33,6 +33,7 @@
     <string name="contactDetailsBatteryValue">"%d %%"</string>
     <string name="contactDetailsBearing">"Bearing"</string>
     <string name="contactDetailsBearingValue">"%,.0f°"</string>
+    <string name="contactDetailsCoordinates">"Coordinates"</string>
     <string name="contactDetailsDistance">"Distance"</string>
     <string name="contactDetailsDistanceUnitKilometres">"km"</string>
     <string name="contactDetailsDistanceUnitMeters">"m"</string>
@@ -243,7 +244,6 @@ To allow this, please enable Location in the device settings."</string>
     <string name="reconnect">"Reconnect"</string>
     <string name="save">"Save"</string>
     <string name="select">"Select"</string>
-    <string name="show_options">"Show options"</string>
     <string name="status_background_service_started_hint">"Background service started"</string>
     <string name="status_battery_optimization_whitelisted_hint">"Battery optimization whitelisted"</string>
     <string name="status_endpoint_queue_hint">"Endpoint queue"</string>

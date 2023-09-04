@@ -213,7 +213,6 @@
     <string name="reconnect">"재연결"</string>
     <string name="save">"저장"</string>
     <string name="select">"선택"</string>
-    <string name="show_options">"옵션 보기"</string>
     <string name="status_background_service_started_hint">"백그라운드 서비스 시작 시간"</string>
     <string name="status_battery_optimization_whitelisted_hint">"배터리 최적화 화이트리스트에 등록됨"</string>
     <string name="status_endpoint_queue_hint">"엔드포인트 대기열"</string>

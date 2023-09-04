@@ -225,7 +225,6 @@ Aby to umożliwić, włącz lokalizację w ustawieniach urządzenia."</string>
     <string name="reconnect">"Połącz ponownie"</string>
     <string name="save">"Zapisz"</string>
     <string name="select">"Wybierz"</string>
-    <string name="show_options">"Pokaż opcje"</string>
     <string name="status_background_service_started_hint">"Usługa w tle została uruchomiona"</string>
     <string name="status_battery_optimization_whitelisted_hint">"Optymalizacja baterii na białej liście"</string>
     <string name="status_endpoint_queue_hint">"Kolejka endpointa"</string>

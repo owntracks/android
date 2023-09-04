@@ -223,7 +223,6 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="reconnect">"Reconnectar"</string>
     <string name="save">"Desa"</string>
     <string name="select">"Seleccionar"</string>
-    <string name="show_options">"Veure opcions"</string>
     <string name="status_background_service_started_hint">"Iniciat el servei en segon pla"</string>
     <string name="status_battery_optimization_whitelisted_hint">"Optimització de la bateria a la llista blanca"</string>
     <string name="status_endpoint_queue_hint">"Cua de punt final"</string>

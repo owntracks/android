@@ -193,7 +193,6 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="reconnect">"Neu verbinden"</string>
     <string name="save">"Speichern"</string>
     <string name="select">"Auswählen"</string>
-    <string name="show_options">"Optionen anzeigen"</string>
     <string name="status_background_service_started_hint">"Standortservice gestartet"</string>
     <string name="status_battery_optimization_whitelisted_hint">"Batterieoptimierung ermöglicht"</string>
     <string name="status_endpoint_queue_hint">"Endpunktschlange"</string>

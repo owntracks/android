@@ -227,7 +227,6 @@ To allow this, please enable Location in the device settings."</string>
     <string name="reconnect">"Reconnect"</string>
     <string name="save">"Kaydet"</string>
     <string name="select">"Seç"</string>
-    <string name="show_options">"Seçenekleri göster"</string>
     <string name="status_background_service_started_hint">"Background service started"</string>
     <string name="status_battery_optimization_whitelisted_hint">"Battery optimization whitelisted"</string>
     <string name="status_endpoint_queue_hint">"Endpoint queue"</string>
