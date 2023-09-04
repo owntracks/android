@@ -312,6 +312,12 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
                     return
                 }
 
+                // Called when the events are cancelled
+                INTENT_ACTION_CLEAR_NOTIFICATIONS -> {
+                    clearEventStackNotification()
+                    return
+                }
+
                 INTENT_ACTION_CHANGE_MONITORING -> {
                     if (intent.hasExtra("monitoring")) {
                         val newMode = getByValue(
@@ -495,6 +501,14 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
                     this,
                     System.currentTimeMillis().toInt() / 1000,
                     Intent(this, MapActivity::class.java),
+                    updateCurrentIntentFlags
+                )
+            )
+            .setDeleteIntent(
+                PendingIntent.getService(
+                    this,
+                    1,
+                    Intent(this, BackgroundService::class.java).setAction(INTENT_ACTION_CLEAR_NOTIFICATIONS),
                     updateCurrentIntentFlags
                 )
             )
@@ -730,6 +744,7 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
         // NEW ACTIONS ALSO HAVE TO BE ADDED TO THE SERVICE INTENT FILTER
         private const val INTENT_ACTION_SEND_LOCATION_USER = "org.owntracks.android.SEND_LOCATION_USER"
         const val INTENT_ACTION_SEND_EVENT_CIRCULAR = "org.owntracks.android.SEND_EVENT_CIRCULAR"
+        private const val INTENT_ACTION_CLEAR_NOTIFICATIONS = "org.owntracks.android.CLEAR_EVENT_NOTIFICATIONS"
         private const val INTENT_ACTION_CHANGE_MONITORING = "org.owntracks.android.CHANGE_MONITORING"
         private const val INTENT_ACTION_EXIT = "org.owntracks.android.EXIT"
         private const val INTENT_ACTION_BOOT_COMPLETED = "android.intent.action.BOOT_COMPLETED"

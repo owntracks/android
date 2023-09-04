@@ -21,7 +21,7 @@
 - Prompt for location permissions in the welcome screen
 - An exported log file also contains the threadname for each logentry
 - Certificates are stored in-line in the config, rather than just the names. This should help import/export
-- Removed the undocumented `CLEAR_NOTIFICATIONS` and `REREQUEST_LOCATION_UPDATES` intents
+- Removed the undocumented `REREQUEST_LOCATION_UPDATES` intent
 - Added `clearWaypoints` remote command (#1022)
 - Contact direction arrow now moves with device to point in the actual direction of the contact
 
