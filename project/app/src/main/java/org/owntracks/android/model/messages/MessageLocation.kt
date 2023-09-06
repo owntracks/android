@@ -4,13 +4,11 @@ import android.annotation.SuppressLint
 import android.location.Location
 import android.os.Build
 import com.fasterxml.jackson.annotation.*
-import java.lang.ref.WeakReference
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 import org.jetbrains.annotations.NotNull
 import org.owntracks.android.location.roundForDisplay
 import org.owntracks.android.model.BatteryStatus
-import org.owntracks.android.model.FusedContact
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.services.WifiInfoProvider
@@ -61,7 +59,6 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
     @JsonProperty("m")
     var monitoringMode: MonitoringMode? = null
 
-    private var _contact: WeakReference<FusedContact?>? = null
     var conn: String? = null
 
     @JsonProperty("inregions")
@@ -82,7 +79,6 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
         set(value) {
             field = value
             hasGeocode = true
-            notifyContactPropertyChanged()
         }
 
     @get:JsonIgnore
@@ -93,22 +89,9 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
     var hasGeocode: Boolean = false
         private set
 
-    fun setContact(contact: FusedContact?) {
-        _contact = WeakReference(contact)
-    }
-
-    private fun notifyContactPropertyChanged() {
-        _contact?.get()
-            ?.notifyMessageLocationPropertyChanged()
-    }
-
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty("tid")
     override var trackerId: String? = null
-        set(value) {
-            field = value
-            notifyContactPropertyChanged()
-        }
 
     override fun isValidMessage(): Boolean {
         return timestamp > 0

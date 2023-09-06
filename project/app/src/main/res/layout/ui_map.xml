@@ -26,12 +26,11 @@
             android:id="@+id/fabMapLayers"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="top|end"
+            android:layout_gravity="bottom|end"
             android:contentDescription="@string/mapLayerDialogTitle"
             android:src="@drawable/ic_baseline_layers_24"
-            android:tooltipText="@string/mapLayerDialogTitle"
             app:fabSize="normal"
-            app:layout_anchor="@+id/fabMyLocation"
+            app:layout_anchor="@+id/mapFragment"
             app:layout_anchorGravity="top|end"
             app:useCompatPadding="true"
             tools:targetApi="o" />
@@ -42,15 +41,12 @@
             android:layout_height="wrap_content"
             android:layout_gravity="top"
             android:contentDescription="@string/currentLocationButtonLabel"
-            android:tooltipText="@string/currentLocationButtonLabel"
             app:backgroundTint="@color/fabMyLocationBackground"
+            app:borderWidth="1dp"
             app:layout_anchor="@+id/bottomSheetLayout"
             app:layout_anchorGravity="end|bottom"
             app:locationIcon="@{vm.myLocationStatus}"
-            app:strokeColor="@color/md_pink_400"
-            app:strokeWidth="3dp"
-            app:useCompatPadding="true"
-            tools:targetApi="o" />
+            app:useCompatPadding="true" />
 
 
         <androidx.fragment.app.FragmentContainerView
@@ -124,7 +120,7 @@
                         android:id="@+id/contactDetailsBattery"
                         layout="@layout/ui_contactsheet_parameter"
                         app:icon="@{@drawable/ic_baseline_battery_std_24}"
-                        app:textValue="@{String.format(@string/contactDetailsBatteryValue,vm.currentContact.messageLocation.battery)}"
+                        app:textValue="@{vm.currentContact.messageLocation.battery != null ? String.format(@string/contactDetailsBatteryValue,  vm.currentContact.messageLocation.battery) : @string/na }"
                         app:title="@{@string/contactDetailsBattery}" />
 
                     <include

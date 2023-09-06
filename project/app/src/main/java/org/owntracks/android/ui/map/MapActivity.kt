@@ -23,6 +23,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.LinearLayoutCompat
+import androidx.appcompat.widget.TooltipCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.setPadding
 import androidx.core.widget.ImageViewCompat
@@ -44,7 +45,7 @@ import kotlinx.coroutines.launch
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiMapBinding
 import org.owntracks.android.location.roundForDisplay
-import org.owntracks.android.model.FusedContact
+import org.owntracks.android.model.Contact
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.services.BackgroundService
@@ -175,20 +176,26 @@ class MapActivity :
                         }
                     })
 
-                fabMyLocation.setOnClickListener {
-                    if (checkAndRequestLocationPermissions(true)) {
-                        checkAndRequestLocationServicesEnabled(true)
-                    }
-                    if (viewModel.myLocationStatus.value != MyLocationStatus.DISABLED) {
-                        viewModel.onMyLocationClicked()
+                fabMyLocation.apply {
+                    TooltipCompat.setTooltipText(this, getString(R.string.currentLocationButtonLabel))
+                    setOnClickListener {
+                        if (checkAndRequestLocationPermissions(true)) {
+                            checkAndRequestLocationServicesEnabled(true)
+                        }
+                        if (viewModel.myLocationStatus.value != MyLocationStatus.DISABLED) {
+                            viewModel.onMyLocationClicked()
+                        }
                     }
                 }
 
-                fabMapLayers.setOnClickListener {
-                    MapLayerBottomSheetDialog().show(
-                        supportFragmentManager,
-                        "layerBottomSheetDialog"
-                    )
+                fabMapLayers.apply {
+                    TooltipCompat.setTooltipText(this, getString(R.string.mapLayerDialogTitle))
+                    setOnClickListener {
+                        MapLayerBottomSheetDialog().show(
+                            supportFragmentManager,
+                            "layerBottomSheetDialog"
+                        )
+                    }
                 }
 
                 val labels = listOf(
@@ -219,7 +226,7 @@ class MapActivity :
 
         setBottomSheetHidden()
 
-        viewModel.currentContact.observe(this) { contact: FusedContact? ->
+        viewModel.currentContact.observe(this) { contact: Contact? ->
             contact?.let {
                 binding.contactPeek.run {
                     image.setImageResource(0) // Remove old image before async loading the new one

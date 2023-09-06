@@ -68,6 +68,7 @@ class GeocoderProvider @Inject constructor(
         Timber.d("Resolving geocode for $messageLocation")
         val result = geocoderResolve(messageLocation)
         messageLocation.geocode = geocodeResultToText(result)
+        Timber.v("Geocoded $messageLocation")
         maybeCreateErrorNotification(result)
     }
 

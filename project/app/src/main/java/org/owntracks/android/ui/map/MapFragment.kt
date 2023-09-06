@@ -13,9 +13,10 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import org.owntracks.android.R
+import org.owntracks.android.data.repos.ContactsRepoChange
 import org.owntracks.android.data.waypoints.WaypointModel
 import org.owntracks.android.location.LatLng
-import org.owntracks.android.model.FusedContact
+import org.owntracks.android.model.Contact
 import org.owntracks.android.support.ContactImageBindingAdapter
 import timber.log.Timber
 
@@ -51,15 +52,25 @@ abstract class MapFragment<V : ViewDataBinding> internal constructor(
 
         viewModel.apply {
             mapCenter.observe(viewLifecycleOwner, this@MapFragment::updateCamera)
-            allContacts.observe(viewLifecycleOwner) { contacts ->
-                updateAllMarkers(contacts.values.toSet())
-
-                /*
-            allContacts gets fired whenever any marker location changes, so we can update the camera
-            if we're following one.
-             */
-                if (viewMode == MapViewModel.ViewMode.Contact(true)) {
-                    currentContact.value?.latLng?.run(this@MapFragment::updateCamera)
+            updateAllMarkers(allContacts.values.toSet())
+            contactUpdatedEvent.observe(viewLifecycleOwner) {
+                when (it) {
+                    ContactsRepoChange.AllCleared -> { updateAllMarkers(emptySet()) }
+                    is ContactsRepoChange.ContactAdded -> {
+                        updateMarkerForContact(it.contact)
+                    }
+                    is ContactsRepoChange.ContactLocationUpdated -> {
+                        updateMarkerForContact(it.contact)
+                        if (viewMode == MapViewModel.ViewMode.Contact(true) && currentContact.value == it.contact) {
+                            it.contact.latLng?.run(this@MapFragment::updateCamera)
+                        }
+                    }
+                    is ContactsRepoChange.ContactCardUpdated -> {
+                        updateMarkerForContact(it.contact)
+                    }
+                    is ContactsRepoChange.ContactRemoved -> {
+                        removeMarkerFromMap(it.contact.id)
+                    }
                 }
             }
 
@@ -72,17 +83,12 @@ abstract class MapFragment<V : ViewDataBinding> internal constructor(
         return binding.root
     }
 
-    internal fun updateAllMarkers(contacts: Set<FusedContact>) {
+    internal fun updateAllMarkers(contacts: Set<Contact>) {
         currentMarkersOnMap().subtract(contacts.map { it.id }.toSet()).forEach(::removeMarkerFromMap)
-        contacts.forEach {
-            updateMarkerForContact(it)
-            if (it == viewModel.currentContact.value) {
-                viewModel.refreshGeocodeForContact(it)
-            }
-        }
+        contacts.forEach(::updateMarkerForContact)
     }
 
-    private fun updateMarkerForContact(contact: FusedContact) {
+    private fun updateMarkerForContact(contact: Contact) {
         if (contact.latLng == null) {
             Timber.w("unable to update marker for $contact. no location")
             return
@@ -91,6 +97,9 @@ abstract class MapFragment<V : ViewDataBinding> internal constructor(
         lifecycleScope.launch {
             contactImageBindingAdapter.run {
                 updateMarkerOnMap(contact.id, contact.latLng!!, getBitmapFromCache(contact))
+            }
+            if (contact == viewModel.currentContact.value) {
+                viewModel.refreshGeocodeForContact(contact)
             }
         }
     }

@@ -6,6 +6,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.location.Location
 import androidx.annotation.MainThread
+import androidx.databinding.Observable
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -15,13 +16,15 @@ import javax.inject.Inject
 import kotlin.math.asin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import org.owntracks.android.BR
 import org.owntracks.android.data.repos.ContactsRepo
+import org.owntracks.android.data.repos.ContactsRepoChange
 import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.data.waypoints.WaypointsRepo
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.location.LatLng
 import org.owntracks.android.location.toLatLng
-import org.owntracks.android.model.FusedContact
+import org.owntracks.android.model.Contact
 import org.owntracks.android.model.messages.MessageClear
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.preferences.Preferences
@@ -45,8 +48,8 @@ class MapViewModel @Inject constructor(
     private val requirementsChecker: RequirementsChecker
 ) : AndroidViewModel(application) {
     // controls who the currently selected contact is
-    private val mutableCurrentContact = MutableLiveData<FusedContact?>()
-    val currentContact: LiveData<FusedContact?>
+    private val mutableCurrentContact = MutableLiveData<Contact?>()
+    val currentContact: LiveData<Contact?>
         get() = mutableCurrentContact
 
     // controls the state of the bottom sheet on the map
@@ -87,6 +90,7 @@ class MapViewModel @Inject constructor(
     val currentLocation = LocationLiveData(application, viewModelScope)
     val waypoints = waypointsRepo.allLive
     val allContacts = contactsRepo.all
+    val contactUpdatedEvent: LiveData<ContactsRepoChange> = contactsRepo.repoChangedEvent
 
     val scope: CoroutineScope
         get() = viewModelScope
@@ -157,9 +161,12 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    fun refreshGeocodeForContact(contact: FusedContact) {
+    fun refreshGeocodeForContact(contact: Contact) {
         viewModelScope.launch {
-            contact.messageLocation?.run { geocoderProvider.resolve(this) }
+            contact.messageLocation?.run {
+                geocoderProvider.resolve(this)
+                contact.notifyPropertyChanged(BR.geocodedLocation)
+            }
         }
     }
 
@@ -192,10 +199,35 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    private fun setViewModeContact(contact: FusedContact, center: Boolean) {
+    /**
+     * We need a way of updating other bits in the viewmodel when the current contact's properties change.
+     *
+     * @constructor Create empty Fused contact property changed callback
+     */
+    inner class ContactPropertyChangedCallback : Observable.OnPropertyChangedCallback() {
+        override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
+            sender?.run {
+                if (this is Contact) {
+                    when (propertyId) {
+                        BR.messageLocation -> {
+                            updateActiveContactDistanceAndBearing(this)
+                        }
+                        BR.trackerId -> {
+                            mutableCurrentContact.postValue(this)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private val contactPropertyChangedCallback = ContactPropertyChangedCallback()
+
+    private fun setViewModeContact(contact: Contact, center: Boolean) {
         Timber.d("setting view mode: VIEW_CONTACT for $contact, center=$center")
         locationRepo.viewMode = ViewMode.Contact(center)
         mutableCurrentContact.value = contact
+        contact.addOnPropertyChangedCallback(contactPropertyChangedCallback)
         mutableBottomSheetHidden.value = false
         refreshGeocodeForContact(contact)
         updateActiveContactDistanceAndBearing(contact)
@@ -232,6 +264,7 @@ class MapViewModel @Inject constructor(
     }
 
     private fun clearActiveContact() {
+        mutableCurrentContact.value?.removeOnPropertyChangedCallback(contactPropertyChangedCallback)
         mutableCurrentContact.postValue(null)
         mutableBottomSheetHidden.postValue(true)
     }
@@ -244,7 +277,7 @@ class MapViewModel @Inject constructor(
         clearActiveContact()
     }
 
-    private fun updateActiveContactDistanceAndBearing(contact: FusedContact) {
+    private fun updateActiveContactDistanceAndBearing(contact: Contact) {
         currentLocation.value?.run {
             updateActiveContactDistanceAndBearing(this, contact)
         }
@@ -258,7 +291,7 @@ class MapViewModel @Inject constructor(
 
     private fun updateActiveContactDistanceAndBearing(
         currentLocation: Location,
-        contact: FusedContact
+        contact: Contact
     ) {
         contact.messageLocation?.run {
             val distanceBetween = FloatArray(2)

@@ -26,7 +26,7 @@
     <string name="CONNECTING">"Connecting"</string>
     <string name="contact_image">"Contact Image"</string>
     <string name="contactDetailsAccuracy">"Accuracy"</string>
-    <string name="contactDetailsAccuracyValue">"%d m"</string>
+    <string name="contactDetailsAccuracyValue">"%,d m"</string>
     <string name="contactDetailsAltitude">"Altitude"</string>
     <string name="contactDetailsAltitudeValue">"%,d m"</string>
     <string name="contactDetailsBattery">"Battery"</string>

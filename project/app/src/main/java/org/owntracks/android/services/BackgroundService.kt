@@ -454,7 +454,7 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
         val contact = contactsRepo.getById(message.contactKey)
         val timestampInMs = TimeUnit.SECONDS.toMillis(message.timestamp)
         val location = message.description ?: getString(R.string.aLocation)
-        val title = contact?.fusedName ?: message.trackerId ?: message.contactKey
+        val title = contact?.name ?: message.trackerId ?: message.contactKey
         val transitionText = getString(
             if (message.getTransition() == Geofence.GEOFENCE_TRANSITION_ENTER) {
                 R.string.transitionEntering

@@ -8,7 +8,7 @@
 
         <variable
             name="contact"
-            type="org.owntracks.android.model.FusedContact" />
+            type="org.owntracks.android.model.Contact" />
 
         <variable
             name="coroutineScope"
@@ -47,7 +47,7 @@
             android:layout_marginEnd="16dp"
             android:ellipsize="end"
             android:singleLine="true"
-            android:text="@{contact.fusedName}"
+            android:text="@{contact.name}"
             app:layout_constraintEnd_toStartOf="@+id/locationDate"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

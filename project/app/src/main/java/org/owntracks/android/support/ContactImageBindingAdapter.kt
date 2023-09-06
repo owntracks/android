@@ -8,21 +8,21 @@ import android.util.Base64
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.owntracks.android.model.FusedContact
+import org.owntracks.android.model.Contact
 import org.owntracks.android.support.widgets.TextDrawable
 import timber.log.Timber
-import javax.inject.Inject
 
 class ContactImageBindingAdapter @Inject constructor(
     @ApplicationContext context: Context,
     private val memoryCache: ContactBitmapAndNameMemoryCache
 ) {
     @BindingAdapter(value = ["contact", "coroutineScope"])
-    fun ImageView.displayFaceInViewAsync(contact: FusedContact?, scope: CoroutineScope) {
+    fun ImageView.displayFaceInViewAsync(contact: Contact?, scope: CoroutineScope) {
         contact?.also {
             scope.launch(Dispatchers.Main) {
                 setImageBitmap(getBitmapFromCache(it))
@@ -32,75 +32,64 @@ class ContactImageBindingAdapter @Inject constructor(
 
     private val faceDimensions = (48 * (context.resources.displayMetrics.densityDpi / 160f)).toInt()
 
-    suspend fun getBitmapFromCache(contact: FusedContact): Bitmap {
+    suspend fun getBitmapFromCache(contact: Contact): Bitmap {
+        Timber.v("Getting face bitmap for ${contact.id}")
         return withContext(Dispatchers.IO) {
             val contactBitMapAndName = memoryCache[contact.id]
 
             if (contactBitMapAndName != null && contactBitMapAndName is ContactBitmapAndName.CardBitmap && contactBitMapAndName.bitmap != null) {
                 return@withContext contactBitMapAndName.bitmap
             }
-            contact.messageCard?.run {
-                face?.also { face ->
-                    val imageAsBytes =
-                        Base64.decode(face.toByteArray(), Base64.DEFAULT)
-                    val b = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.size)
-                    val bitmap: Bitmap
-                    if (b == null) {
-                        Timber.e("Decoding card bitmap failed")
-                        val fallbackBitmap = Bitmap.createBitmap(
+
+            return@withContext contact.messageCard?.run {
+                face?.run {
+                    Base64.decode(toByteArray(), Base64.DEFAULT)
+                }?.run {
+                    BitmapFactory.decodeByteArray(this, 0, size)
+                }?.run {
+                    getRoundedShape(
+                        Bitmap.createScaledBitmap(
+                            this,
                             faceDimensions,
                             faceDimensions,
-                            Bitmap.Config.ARGB_8888
+                            true
                         )
-                        val canvas = Canvas(fallbackBitmap)
-                        val paint = Paint()
-                        paint.color = -0x1
-                        canvas.drawRect(
-                            0f,
-                            0f,
-                            faceDimensions.toFloat(),
-                            faceDimensions.toFloat(),
-                            paint
-                        )
-                        bitmap = getRoundedShape(fallbackBitmap)
+                    )
+                }?.also { bitmap ->
+                    memoryCache.put(
+                        contact.id,
+                        ContactBitmapAndName.CardBitmap(name, bitmap)
+                    )
+                }
+            } ?: run {
+                memoryCache[contact.id]?.run {
+                    if (this is ContactBitmapAndName.TrackerIdBitmap && this.trackerId == contact.trackerId) {
+                        this.bitmap
                     } else {
-                        bitmap = getRoundedShape(
-                            Bitmap.createScaledBitmap(
-                                b,
-                                faceDimensions,
-                                faceDimensions,
-                                true
-                            )
-                        )
+                        null
+                    }
+                } ?: run {
+                    getFallbackBitmap(contact.trackerId, contact.id).also { bitmap ->
                         memoryCache.put(
                             contact.id,
-                            ContactBitmapAndName.CardBitmap(name, bitmap)
+                            ContactBitmapAndName.TrackerIdBitmap(contact.trackerId, bitmap)
                         )
                     }
-                    return@withContext bitmap
                 }
-            }
-            if (contactBitMapAndName !is ContactBitmapAndName.TrackerIdBitmap || contactBitMapAndName.trackerId != contact.trackerId) {
-                val bitmap = drawableToBitmap(
-                    TextDrawable
-                        .Builder()
-                        .buildRoundRect(
-                            contact.trackerId,
-                            TextDrawable.ColorGenerator.MATERIAL.getColor(contact.id),
-                            faceDimensions
-                        )
-                )
-                memoryCache.put(
-                    contact.id,
-                    ContactBitmapAndName.TrackerIdBitmap(contact.trackerId, bitmap)
-                )
-
-                return@withContext bitmap
-            } else {
-                return@withContext contactBitMapAndName.bitmap
             }
         }
     }
+
+    private fun getFallbackBitmap(text: String, colorKey: String): Bitmap =
+        drawableToBitmap(
+            TextDrawable
+                .Builder()
+                .buildRoundRect(
+                    text,
+                    TextDrawable.ColorGenerator.MATERIAL.getColor(colorKey),
+                    faceDimensions
+                )
+        )
 
     private fun getRoundedShape(bitmap: Bitmap): Bitmap {
         val output = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)

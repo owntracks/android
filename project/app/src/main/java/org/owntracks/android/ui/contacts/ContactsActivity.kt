@@ -10,15 +10,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import org.owntracks.android.R
+import org.owntracks.android.data.repos.ContactsRepoChange
 import org.owntracks.android.databinding.UiContactsBinding
-import org.owntracks.android.model.FusedContact
+import org.owntracks.android.model.Contact
 import org.owntracks.android.support.DrawerProvider
 import org.owntracks.android.ui.map.MapActivity
 
 @AndroidEntryPoint
 class ContactsActivity :
     AppCompatActivity(),
-    AdapterClickListener<FusedContact> {
+    AdapterClickListener<Contact> {
     @Inject
     lateinit var drawerProvider: DrawerProvider
 
@@ -39,13 +40,25 @@ class ContactsActivity :
                     adapter = contactsAdapter
                 }
             }
-        vm.contacts.observe(this) { contacts: Map<String, FusedContact> ->
-            contactsAdapter.setContactList(contacts.values)
-            vm.refreshGeocodes()
+
+        contactsAdapter.setContactList(vm.contacts.values)
+        vm.contactUpdatedEvent.observe(this) {
+            when (it) {
+                is ContactsRepoChange.ContactAdded -> {
+                    contactsAdapter.addContact(it.contact)
+                    vm.refreshGeocode(it.contact)
+                }
+                is ContactsRepoChange.ContactRemoved -> contactsAdapter.removeContact(it.contact)
+                is ContactsRepoChange.ContactLocationUpdated -> {
+                    contactsAdapter.updateContact(it.contact)
+                    vm.refreshGeocode(it.contact) }
+                is ContactsRepoChange.ContactCardUpdated -> contactsAdapter.updateContact(it.contact)
+                is ContactsRepoChange.AllCleared -> contactsAdapter.clearAll()
+            }
         }
     }
 
-    override fun onClick(item: FusedContact, view: View, longClick: Boolean) {
+    override fun onClick(item: Contact, view: View, longClick: Boolean) {
         startActivity(
             Intent(this, MapActivity::class.java).putExtra(
                 "_args",
