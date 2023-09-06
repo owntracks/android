@@ -59,6 +59,7 @@ import org.owntracks.android.ui.mixins.NotificationsPermissionRequested
 import org.owntracks.android.ui.mixins.ServiceStarter
 import org.owntracks.android.ui.mixins.WorkManagerInitExceptionNotifier
 import org.owntracks.android.ui.welcome.WelcomeActivity
+import org.threeten.bp.ZoneId
 import timber.log.Timber
 
 @AndroidEntryPoint
@@ -160,7 +161,19 @@ class MapActivity :
                                 type = "text/plain"
                                 putExtra(
                                     Intent.EXTRA_TEXT,
-                                    viewModel.currentContact.value?.latLng?.toDisplayString() ?: R.string.na
+                                    viewModel.currentContact.value?.run {
+                                        getString(
+                                            R.string.shareContactBody,
+                                            this.name,
+                                            this.geocodedLocation,
+                                            this.latLng?.toDisplayString() ?: "",
+                                            org.threeten.bp.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+                                                .withZone(ZoneId.systemDefault()).format(
+                                                    org.threeten.bp.Instant.ofEpochSecond(this.tst)
+                                                )
+
+                                        )
+                                    } ?: R.string.na
                                 )
                             },
                             "Share Location"

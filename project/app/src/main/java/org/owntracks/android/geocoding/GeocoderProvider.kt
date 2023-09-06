@@ -20,7 +20,7 @@ import org.owntracks.android.preferences.types.ReverseGeocodeProvider
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.ui.map.MapActivity
 import org.threeten.bp.Instant
-import org.threeten.bp.ZoneOffset.UTC
+import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 import timber.log.Timber
 
@@ -91,7 +91,7 @@ class GeocoderProvider @Inject constructor(
             is GeocodeResult.Fault.RateLimited -> context.getString(
                 R.string.geocoderRateLimited,
                 DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-                    .withZone(UTC)
+                    .withZone(ZoneId.systemDefault())
                     .format(result.until)
             )
             is GeocodeResult.Fault.Unavailable -> context.getString(R.string.geocoderUnavailable)

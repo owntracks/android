@@ -244,6 +244,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="reconnect">"Reconnect"</string>
     <string name="save">"Save"</string>
     <string name="select">"Select"</string>
+    <string name="shareContactBody">"%s last location: %s (%s) at %s"</string>
     <string name="status_background_service_started_hint">"Background service started"</string>
     <string name="status_battery_optimization_whitelisted_hint">"Battery optimization whitelisted"</string>
     <string name="status_endpoint_queue_hint">"Endpoint queue"</string>
