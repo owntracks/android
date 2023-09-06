@@ -20,11 +20,13 @@ import kotlin.time.TimeSource
 import org.owntracks.android.R
 import org.owntracks.android.data.waypoints.WaypointModel
 import org.owntracks.android.databinding.UiWaypointsBinding
+import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.DrawerProvider
 import org.owntracks.android.support.SimpleIdlingResource
 import org.owntracks.android.ui.base.BaseRecyclerViewAdapterWithClickHandler
 import org.owntracks.android.ui.base.ClickHasBeenHandled
 import org.owntracks.android.ui.base.RecyclerViewLayoutCompleteListener
+import org.owntracks.android.ui.mixins.NotificationsPermissionRequested
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import org.owntracks.android.ui.waypoint.WaypointActivity
 import timber.log.Timber
@@ -34,12 +36,16 @@ import timber.log.Timber
 class WaypointsActivity :
     AppCompatActivity(),
     BaseRecyclerViewAdapterWithClickHandler.ClickListener<WaypointModel>,
-    RecyclerViewLayoutCompleteListener.RecyclerViewIdlingCallback {
+    RecyclerViewLayoutCompleteListener.RecyclerViewIdlingCallback,
+    NotificationsPermissionRequested by NotificationsPermissionRequested.Impl() {
     private var recyclerViewStartLayoutInstant: ComparableTimeMark? = null
     private var layoutCompleteListener: RecyclerViewLayoutCompleteListener? = null
 
     @Inject
     lateinit var drawerProvider: DrawerProvider
+
+    @Inject
+    lateinit var preferences: Preferences
 
     @Inject
     @Named("outgoingQueueIdlingResource")
@@ -57,7 +63,7 @@ class WaypointsActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         recyclerViewAdapter = WaypointsAdapter(this)
-
+        postNotificationsPermissionInit(this, preferences)
         DataBindingUtil.setContentView<UiWaypointsBinding>(this, R.layout.ui_waypoints)
             .apply {
                 vm = viewModel
@@ -86,6 +92,11 @@ class WaypointsActivity :
             recyclerViewStartLayoutInstant = TimeSource.Monotonic.markNow()
             recyclerViewAdapter.setData(it)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        requestNotificationsPermission()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -136,5 +147,7 @@ class WaypointsActivity :
 
     override var isRecyclerViewLayoutCompleted: Boolean
         get() = (recyclerViewStartLayoutInstant == null).also { Timber.v("Being asked if I'm idle, saying $it") }
-        set(value) { recyclerViewStartLayoutInstant = if (!value) TimeSource.Monotonic.markNow() else null }
+        set(value) {
+            recyclerViewStartLayoutInstant = if (!value) TimeSource.Monotonic.markNow() else null
+        }
 }

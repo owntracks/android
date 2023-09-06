@@ -7,7 +7,6 @@ import android.content.res.ColorStateList
 import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.provider.Settings
@@ -56,6 +55,7 @@ import org.owntracks.android.support.RequirementsChecker
 import org.owntracks.android.support.SimpleIdlingResource
 import org.owntracks.android.ui.mixins.ActivityResultCallerWithLocationPermissionCallback
 import org.owntracks.android.ui.mixins.LocationPermissionRequester
+import org.owntracks.android.ui.mixins.NotificationsPermissionRequested
 import org.owntracks.android.ui.mixins.ServiceStarter
 import org.owntracks.android.ui.mixins.WorkManagerInitExceptionNotifier
 import org.owntracks.android.ui.welcome.WelcomeActivity
@@ -68,7 +68,8 @@ class MapActivity :
     View.OnLongClickListener,
     ActivityResultCallerWithLocationPermissionCallback,
     WorkManagerInitExceptionNotifier by WorkManagerInitExceptionNotifier.Impl(),
-    ServiceStarter by ServiceStarter.Impl() {
+    ServiceStarter by ServiceStarter.Impl(),
+    NotificationsPermissionRequested by NotificationsPermissionRequested.Impl() {
     private val viewModel: MapViewModel by viewModels()
     private val locationPermissionRequester = LocationPermissionRequester(this)
     private var previouslyHadLocationPermissions: Boolean = false
@@ -136,6 +137,7 @@ class MapActivity :
             finish()
             return
         }
+        postNotificationsPermissionInit(this, preferences)
 
         binding = DataBindingUtil.setContentView<UiMapBinding>(this, R.layout.ui_map)
             .apply {
@@ -461,27 +463,17 @@ class MapActivity :
         updateMonitoringModeMenu()
         viewModel.updateMyLocationStatus()
 
-        if (!requirementsChecker.isNotificationsEnabled() &&
-            !preferences.userDeclinedEnableNotificationPermissions &&
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-        ) {
-            notificationPermissionRequest.launch(POST_NOTIFICATIONS)
-        } else {
-            if (checkAndRequestLocationPermissions(false)) {
-                checkAndRequestLocationServicesEnabled(false)
-            }
-            if (!previouslyHadLocationPermissions && requirementsChecker.hasLocationPermissions()) {
-                previouslyHadLocationPermissions = true
-                viewModel.requestLocationUpdatesForBlueDot()
-                service?.reInitializeLocationRequests()
-            }
+        requestNotificationsPermission()
+
+        if (checkAndRequestLocationPermissions(false)) {
+            checkAndRequestLocationServicesEnabled(false)
+        }
+        if (!previouslyHadLocationPermissions && requirementsChecker.hasLocationPermissions()) {
+            previouslyHadLocationPermissions = true
+            viewModel.requestLocationUpdatesForBlueDot()
+            service?.reInitializeLocationRequests()
         }
     }
-
-    private val notificationPermissionRequest =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-            preferences.userDeclinedEnableNotificationPermissions = !it
-        }
 
     private fun handleIntentExtras(intent: Intent) {
         Timber.v("handleIntentExtras")

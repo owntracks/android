@@ -4,12 +4,10 @@ import android.view.View
 import androidx.annotation.IdRes
 import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso
-import androidx.test.espresso.Espresso.onData
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
 import androidx.test.espresso.UiController
 import androidx.test.espresso.ViewAction
-import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -27,7 +25,6 @@ import mqtt.packets.Qos
 import mqtt.packets.mqtt.MQTTPublish
 import mqtt.packets.mqttv5.MQTT5Properties
 import org.hamcrest.CoreMatchers
-import org.hamcrest.CoreMatchers.anything
 import org.hamcrest.Matcher
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -205,13 +202,8 @@ class MQTTMessagePublishTests :
         clickOnAndWait("TestName")
         sleep(1000) // Apparently espresso won't wait for the MapActivity to finish rendering
         clickOnAndWait(R.id.contactPeek)
-        assertDisplayed(R.id.moreButton)
-        clickOnRegardlessOfVisibility(R.id.moreButton)
-
-        // Hacky way to click on the first thing in a popup menu
-        // https://stackoverflow.com/questions/28061300/espresso-click-a-single-list-view-item
-        onData(anything()).atPosition(0)
-            .perform(click())
+        assertDisplayed(R.id.contactClearButton)
+        clickOnRegardlessOfVisibility(R.id.contactClearButton)
 
         openDrawer()
         clickOnAndWait(R.string.title_activity_contacts)

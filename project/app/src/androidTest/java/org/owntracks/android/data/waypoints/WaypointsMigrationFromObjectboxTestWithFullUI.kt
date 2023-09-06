@@ -1,5 +1,6 @@
 package org.owntracks.android.data.waypoints
 
+import android.Manifest.permission.POST_NOTIFICATIONS
 import android.app.Notification
 import android.app.NotificationManager
 import android.content.Context
@@ -10,6 +11,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.assertion.BaristaRecyclerViewAssertions.assertRecyclerViewItemCount
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
+import com.adevinta.android.barista.interaction.PermissionGranter.allowPermissionsIfNeeded
 import kotlin.random.Random
 import org.junit.Assert
 import org.junit.Test
@@ -30,10 +32,7 @@ class WaypointsMigrationFromObjectboxTestWithFullUI : TestWithAnActivity<Waypoin
     false
 ) {
 
-    @Test
-    fun migratingAnEmptyObjectboxProducesZeroWaypoints() {
-        setNotFirstStartPreferences()
-        val dataBytes = this.javaClass.getResource("/objectbox-lmdbs/empty/data.mdb")!!.readBytes()
+    private fun setupActivity(dataBytes: ByteArray) {
         InstrumentationRegistry.getInstrumentation().targetContext.filesDir.resolve("objectbox/objectbox/").run {
             mkdirs()
             resolve("data.mdb").run {
@@ -44,7 +43,14 @@ class WaypointsMigrationFromObjectboxTestWithFullUI : TestWithAnActivity<Waypoin
         }
         setNotFirstStartPreferences()
         launchActivity()
+        allowPermissionsIfNeeded(POST_NOTIFICATIONS)
         waitUntilActivityVisible<WaypointsActivity>()
+    }
+
+    @Test
+    fun migratingAnEmptyObjectboxProducesZeroWaypoints() {
+        val dataBytes = this.javaClass.getResource("/objectbox-lmdbs/empty/data.mdb")!!.readBytes()
+        setupActivity(dataBytes)
         app.migrateWaypoints()
         app.migrationIdlingResource.use {
             Espresso.onIdle()
@@ -55,20 +61,10 @@ class WaypointsMigrationFromObjectboxTestWithFullUI : TestWithAnActivity<Waypoin
     @Test
     fun migratingAnObjectboxWithSinglePointProducesOneWaypoint() {
         val dataBytes = this.javaClass.getResource("/objectbox-lmdbs/single-waypoint/data.mdb")!!.readBytes()
-        InstrumentationRegistry.getInstrumentation().targetContext.filesDir.resolve("objectbox/objectbox/").run {
-            mkdirs()
-            resolve("data.mdb").run {
-                outputStream().use {
-                    it.write(dataBytes)
-                }
-            }
-        }
-        setNotFirstStartPreferences()
-        launchActivity()
+        setupActivity(dataBytes)
         val waypointsActivityIdlingResource = RecyclerViewLayoutCompleteIdlingResource(
             baristaRule.activityTestRule.activity
         )
-        waitUntilActivityVisible<WaypointsActivity>()
         waypointsActivityIdlingResource.setUnidle()
         app.migrateWaypoints()
         app.migrationIdlingResource.use {
@@ -83,21 +79,10 @@ class WaypointsMigrationFromObjectboxTestWithFullUI : TestWithAnActivity<Waypoin
     @Test
     fun migratingAnObjectboxWith10PointsProduces10Waypoints() {
         val dataBytes = this.javaClass.getResource("/objectbox-lmdbs/10-waypoints/data.mdb")!!.readBytes()
-        InstrumentationRegistry.getInstrumentation().targetContext.filesDir.resolve("objectbox/objectbox/").run {
-            mkdirs()
-            resolve("data.mdb").run {
-                outputStream().use {
-                    it.write(dataBytes)
-                }
-            }
-        }
-
-        setNotFirstStartPreferences()
-        launchActivity()
+        setupActivity(dataBytes)
         val waypointsActivityIdlingResource = RecyclerViewLayoutCompleteIdlingResource(
             baristaRule.activityTestRule.activity
         )
-        waitUntilActivityVisible<WaypointsActivity>()
         waypointsActivityIdlingResource.setUnidle()
         app.migrateWaypoints()
         app.migrationIdlingResource.use {
@@ -112,20 +97,10 @@ class WaypointsMigrationFromObjectboxTestWithFullUI : TestWithAnActivity<Waypoin
     @Test
     fun migratingAnObjectboxWith5000PointsProduces5000Waypoints() {
         val dataBytes = this.javaClass.getResource("/objectbox-lmdbs/5000-waypoints/data.mdb")!!.readBytes()
-        InstrumentationRegistry.getInstrumentation().targetContext.filesDir.resolve("objectbox/objectbox/").run {
-            mkdirs()
-            resolve("data.mdb").run {
-                outputStream().use {
-                    it.write(dataBytes)
-                }
-            }
-        }
-        setNotFirstStartPreferences()
-        launchActivity()
+        setupActivity(dataBytes)
         val waypointsActivityIdlingResource = RecyclerViewLayoutCompleteIdlingResource(
             baristaRule.activityTestRule.activity
         )
-        waitUntilActivityVisible<WaypointsActivity>()
         waypointsActivityIdlingResource.setUnidle()
         app.migrateWaypoints()
         app.migrationIdlingResource.use {
@@ -140,17 +115,7 @@ class WaypointsMigrationFromObjectboxTestWithFullUI : TestWithAnActivity<Waypoin
     @Test
     fun migratingACorruptObjectboxDatabaseGivesNoWaypointsAndANotification() {
         val random = Random(1)
-        InstrumentationRegistry.getInstrumentation().targetContext.filesDir.resolve("objectbox/objectbox/").run {
-            mkdirs()
-            resolve("data.mdb").run {
-                outputStream().use {
-                    it.write(random.nextBytes(4096))
-                }
-            }
-        }
-        setNotFirstStartPreferences()
-        launchActivity()
-        waitUntilActivityVisible<WaypointsActivity>()
+        setupActivity(random.nextBytes(4096))
         app.migrateWaypoints()
         app.migrationIdlingResource.use {
             Espresso.onIdle()
