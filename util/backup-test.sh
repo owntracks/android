@@ -33,4 +33,3 @@ adb shell bmgr transport com.google.android.gms/.backup.BackupTransportService
 rm $apks
 
 echo "Done"
-

@@ -1,4 +1,4 @@
-:8889 { 
+:8889 {
     reverse_proxy  mosquitto:8080
     tls /tls/cert.pem /tls/key.pem
 }

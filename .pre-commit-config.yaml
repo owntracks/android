@@ -2,7 +2,7 @@
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.2.0
+    rev: v4.4.0
     hooks:
       - id: trailing-whitespace
         exclude: >
@@ -21,4 +21,13 @@ repos:
       - id: check-toml
       - id: check-added-large-files
       - id: mixed-line-ending
+        exclude: project/gradlew.bat
         args: ["--fix=lf"]
+  - repo: local
+    hooks:
+      - id: unit-test
+        name: ktlint
+        description: Runs unit-tests
+        entry: ./project/gradlew -p project testGmsDebugUnitTest
+        pass_filenames: false
+        language: system
