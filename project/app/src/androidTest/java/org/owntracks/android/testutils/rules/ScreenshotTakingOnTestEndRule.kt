@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.test.core.app.takeScreenshotNoSync
 import androidx.test.services.storage.TestStorage
 import java.io.IOException
-import java.util.*
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 

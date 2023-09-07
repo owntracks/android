@@ -1,11 +1,17 @@
 package org.owntracks.android.support.widgets
 
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.ColorFilter
+import android.graphics.Paint
+import android.graphics.PixelFormat
+import android.graphics.RectF
+import android.graphics.Typeface
 import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.OvalShape
 import android.graphics.drawable.shapes.RectShape
 import android.graphics.drawable.shapes.RoundRectShape
-import java.util.*
+import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.min
 
@@ -77,7 +83,12 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
         val height = if (height < 0) r.height() else height
         val fontSize = if (fontSize < 0) min(width, height) / 2 else fontSize
         textPaint.textSize = fontSize.toFloat()
-        canvas.drawText(text, (width / 2).toFloat(), height.toFloat() / 2 - (textPaint.descent() + textPaint.ascent()) / 2, textPaint)
+        canvas.drawText(
+            text,
+            (width / 2).toFloat(),
+            height.toFloat() / 2 - (textPaint.descent() + textPaint.ascent()) / 2,
+            textPaint
+        )
         canvas.restoreToCount(count)
     }
 
@@ -105,6 +116,7 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
         textPaint.colorFilter = cf
     }
 
+    @Deprecated("Deprecated in Java", ReplaceWith("PixelFormat.TRANSLUCENT", "android.graphics.PixelFormat"))
     override fun getOpacity(): Int {
         return PixelFormat.TRANSLUCENT
     }
@@ -144,7 +156,16 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
 
         override fun roundRect(radius: Int): IBuilder {
             this.radius = radius.toFloat()
-            val radii = floatArrayOf(radius.toFloat(), radius.toFloat(), radius.toFloat(), radius.toFloat(), radius.toFloat(), radius.toFloat(), radius.toFloat(), radius.toFloat())
+            val radii = floatArrayOf(
+                radius.toFloat(),
+                radius.toFloat(),
+                radius.toFloat(),
+                radius.toFloat(),
+                radius.toFloat(),
+                radius.toFloat(),
+                radius.toFloat(),
+                radius.toFloat()
+            )
             shape = RoundRectShape(radii, null, null)
             return this
         }

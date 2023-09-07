@@ -20,7 +20,16 @@ import java.net.UnknownHostException
 import javax.inject.Inject
 import javax.net.ssl.SSLException
 import org.eclipse.paho.client.mqttv3.MqttException
-import org.eclipse.paho.client.mqttv3.MqttException.*
+import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CLIENT_TIMEOUT
+import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CONNECTION_LOST
+import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_FAILED_AUTHENTICATION
+import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_INVALID_CLIENT_ID
+import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_INVALID_PROTOCOL_VERSION
+import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_NOT_AUTHORIZED
+import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_SERVER_CONNECT_ERROR
+import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_SSL_CONFIG_ERROR
+import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_SUBSCRIBE_FAILED
+import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_WRITE_TIMEOUT
 import org.owntracks.android.R
 import org.owntracks.android.data.EndpointState
 import org.owntracks.android.databinding.UiStatusBinding

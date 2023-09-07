@@ -3,7 +3,7 @@ package org.owntracks.android.geocoding
 import android.content.Context
 import android.location.Address
 import java.math.BigDecimal
-import java.util.*
+import java.util.Locale
 import org.threeten.bp.Instant
 import org.threeten.bp.temporal.ChronoUnit
 import timber.log.Timber

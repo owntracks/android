@@ -40,7 +40,7 @@ class LocationProcessor @Inject constructor(
     private val wifiInfoProvider: WifiInfoProvider,
     @ApplicationScope private val scope: CoroutineScope,
     @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    @Named("publishResponseMessageIdlingResource") private val publishResponseMessageIdlingResource: SimpleIdlingResource,
+    @Named("publishResponseMessageIdlingResource") private val publishResponseMessageIdlingResource: SimpleIdlingResource, // ktlint-disable max-line-length
     @Named("mockLocationIdlingResource") private val mockLocationIdlingResource: SimpleIdlingResource
 ) {
     private fun ignoreLowAccuracy(l: Location): Boolean {

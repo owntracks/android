@@ -1,7 +1,14 @@
 package org.owntracks.android.services.worker
 
 import android.content.Context
-import androidx.work.*
+import androidx.work.BackoffPolicy
+import androidx.work.Constraints
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequest
+import androidx.work.PeriodicWorkRequest
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -37,7 +44,8 @@ class Scheduler @Inject constructor(
             .setConstraints(anyNetworkConstraint)
             .build()
         Timber.d(
-            "WorkManager queue task $PERIODIC_TASK_SEND_LOCATION_PING as ${pingWorkRequest.id} with interval ${preferences.ping} minutes"
+            "WorkManager queue task $PERIODIC_TASK_SEND_LOCATION_PING as ${pingWorkRequest.id} " +
+                "with interval ${preferences.ping} minutes"
         )
         workManager.cancelAllWorkByTag(PERIODIC_TASK_SEND_LOCATION_PING)
         workManager.enqueue(pingWorkRequest)

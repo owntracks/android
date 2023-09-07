@@ -1,6 +1,8 @@
 package org.owntracks.android.ui.status
 
-import android.Manifest.permission.*
+import android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
+import android.Manifest.permission.ACCESS_COARSE_LOCATION
+import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.app.Application
 import android.content.Context
 import android.location.Location
@@ -13,7 +15,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.util.*
+import java.util.Date
 import javax.inject.Inject
 import org.owntracks.android.R
 import org.owntracks.android.data.EndpointState

@@ -2,7 +2,8 @@ package org.owntracks.android.logging
 
 import android.util.Log
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 data class LogEntry(
     val priority: Int,

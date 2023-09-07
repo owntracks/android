@@ -1,9 +1,14 @@
 package org.owntracks.android.model.messages
 
 import androidx.databinding.BaseObservable
-import com.fasterxml.jackson.annotation.*
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.JsonPropertyOrder
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import java.io.IOException
-import java.util.*
+import kotlin.random.Random
 import okhttp3.internal.toHexString
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ConnectionMode
@@ -33,10 +38,7 @@ abstract class MessageBase : BaseObservable() {
 
     @get:JsonIgnore
     @JsonIgnore
-    val messageId = "${System.currentTimeMillis()}-${
-        Random().nextInt(0X1000000)
-            .toHexString()
-    }"
+    val messageId = "${System.currentTimeMillis()}-${Random.nextInt(0X1000000).toHexString()}"
 
     @JsonIgnore
     open var topic: String = ""

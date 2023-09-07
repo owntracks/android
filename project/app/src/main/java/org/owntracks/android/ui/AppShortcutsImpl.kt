@@ -6,12 +6,12 @@ import androidx.annotation.StringRes
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
+import javax.inject.Inject
+import javax.inject.Singleton
 import org.owntracks.android.R
 import org.owntracks.android.ui.preferences.PreferencesActivity
 import org.owntracks.android.ui.status.logs.LogViewerActivity
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 class AppShortcutsImpl @Inject constructor() : AppShortcuts {

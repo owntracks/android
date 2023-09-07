@@ -26,8 +26,14 @@ repos:
   - repo: local
     hooks:
       - id: unit-test
-        name: ktlint
+        name: Run unit tests
         description: Runs unit-tests
         entry: ./project/gradlew -p project testGmsDebugUnitTest
+        pass_filenames: false
+        language: system
+      - id: ktlint
+        name: ktlint
+        description: Ktlints
+        entry: ./project/gradlew -p project ktlintCheck
         pass_filenames: false
         language: system

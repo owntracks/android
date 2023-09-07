@@ -1,8 +1,11 @@
 package org.owntracks.android.ui.map
 
-import android.Manifest.permission.*
 import android.annotation.SuppressLint
-import android.content.*
+import android.content.ActivityNotFoundException
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.content.res.ColorStateList
 import android.hardware.Sensor
 import android.hardware.SensorManager

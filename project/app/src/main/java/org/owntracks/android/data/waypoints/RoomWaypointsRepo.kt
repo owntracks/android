@@ -2,7 +2,17 @@ package org.owntracks.android.data.waypoints
 
 import android.content.Context
 import androidx.lifecycle.LiveData
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Database
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverter
+import androidx.room.TypeConverters
+import androidx.room.Upsert
 import com.google.flatbuffers.Constants
 import com.google.flatbuffers.FlatBufferBuilder
 import com.google.flatbuffers.Table

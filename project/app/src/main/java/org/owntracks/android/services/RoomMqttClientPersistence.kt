@@ -1,9 +1,19 @@
 package org.owntracks.android.services
 
 import android.content.Context
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Dao
+import androidx.room.Database
+import androidx.room.Delete
+import androidx.room.Entity
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.PrimaryKey
+import androidx.room.Query
+import androidx.room.Room
+import androidx.room.RoomDatabase
 import java.nio.ByteBuffer
-import java.util.*
+import java.util.Enumeration
 import org.eclipse.paho.client.mqttv3.MqttClientPersistence
 import org.eclipse.paho.client.mqttv3.MqttPersistable
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException

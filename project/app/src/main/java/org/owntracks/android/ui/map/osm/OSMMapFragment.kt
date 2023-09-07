@@ -7,8 +7,12 @@ import android.hardware.display.DisplayManager
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
-import android.view.*
+import android.view.Display
+import android.view.LayoutInflater
 import android.view.MotionEvent.ACTION_BUTTON_RELEASE
+import android.view.Surface
+import android.view.View
+import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.Observer
@@ -22,7 +26,11 @@ import org.osmdroid.events.ZoomEvent
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
-import org.osmdroid.views.overlay.*
+import org.osmdroid.views.overlay.CopyrightOverlay
+import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.Polygon
+import org.osmdroid.views.overlay.ScaleBarOverlay
+import org.osmdroid.views.overlay.TilesOverlay
 import org.osmdroid.views.overlay.compass.CompassOverlay
 import org.osmdroid.views.overlay.compass.IOrientationConsumer
 import org.osmdroid.views.overlay.compass.IOrientationProvider
@@ -39,7 +47,10 @@ import org.owntracks.android.location.toGeoPoint
 import org.owntracks.android.location.toLatLng
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.ContactImageBindingAdapter
-import org.owntracks.android.ui.map.*
+import org.owntracks.android.ui.map.MapFragment
+import org.owntracks.android.ui.map.MapLayerStyle
+import org.owntracks.android.ui.map.MapLocationZoomLevelAndRotation
+import org.owntracks.android.ui.map.MapViewModel
 import timber.log.Timber
 
 class OSMMapFragment internal constructor(

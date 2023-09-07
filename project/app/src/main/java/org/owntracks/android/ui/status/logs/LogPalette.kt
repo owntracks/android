@@ -8,5 +8,5 @@ data class LogPalette(
     val debug: Int,
     val info: Int,
     val warning: Int,
-    val error: Int,
+    val error: Int
 )

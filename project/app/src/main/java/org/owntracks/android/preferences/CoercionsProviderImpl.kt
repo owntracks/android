@@ -1,7 +1,7 @@
 package org.owntracks.android.preferences
 
-import org.owntracks.android.services.worker.Scheduler
 import kotlin.reflect.KProperty
+import org.owntracks.android.services.worker.Scheduler
 
 class CoercionsProviderImpl : CoercionsProvider {
     /**
@@ -28,7 +28,9 @@ class CoercionsProviderImpl : CoercionsProvider {
                             )
                         ) {
                             1
-                        } else Scheduler.MIN_PERIODIC_INTERVAL.inWholeSeconds.toInt()
+                        } else {
+                            Scheduler.MIN_PERIODIC_INTERVAL.inWholeSeconds.toInt()
+                        }
                     )
             }
             Preferences::port -> {

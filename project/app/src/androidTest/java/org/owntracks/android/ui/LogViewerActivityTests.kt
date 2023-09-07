@@ -1,9 +1,16 @@
 package org.owntracks.android.ui
 
-import android.content.Intent.*
+import android.content.Intent.ACTION_CHOOSER
+import android.content.Intent.ACTION_SEND
+import android.content.Intent.EXTRA_INTENT
+import android.content.Intent.EXTRA_TITLE
+import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.BundleMatchers.hasEntry
-import androidx.test.espresso.intent.matcher.IntentMatchers.*
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtras
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasFlag
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasType
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed

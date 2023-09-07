@@ -17,8 +17,8 @@ package org.owntracks.android.support
 
 import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.IdlingResource.ResourceCallback
-import org.jetbrains.annotations.NotNull
 import java.util.concurrent.atomic.AtomicBoolean
+import org.jetbrains.annotations.NotNull
 
 /**
  * A very simple implementation of [IdlingResource].

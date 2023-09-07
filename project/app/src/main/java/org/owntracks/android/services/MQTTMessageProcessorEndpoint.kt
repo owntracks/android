@@ -13,10 +13,25 @@ import java.util.stream.Collectors
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
-import org.eclipse.paho.client.mqttv3.*
+import kotlinx.coroutines.withContext
+import org.eclipse.paho.client.mqttv3.IMqttActionListener
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken
+import org.eclipse.paho.client.mqttv3.IMqttToken
+import org.eclipse.paho.client.mqttv3.MqttAsyncClient
+import org.eclipse.paho.client.mqttv3.MqttCallback
+import org.eclipse.paho.client.mqttv3.MqttException
+import org.eclipse.paho.client.mqttv3.MqttMessage
+import org.eclipse.paho.client.mqttv3.MqttSecurityException
+import org.eclipse.paho.client.mqttv3.ScheduledExecutorPingSender
 import org.owntracks.android.data.EndpointState
 import org.owntracks.android.data.repos.EndpointStateRepo
 import org.owntracks.android.di.ApplicationScope
@@ -217,9 +232,9 @@ class MQTTMessageProcessorEndpoint(
             Preferences::ws.name
         )
         if (propertiesWeWantToReconnectOn.stream()
-                .filter(properties::contains)
-                .collect(Collectors.toSet())
-                .isNotEmpty()
+            .filter(properties::contains)
+            .collect(Collectors.toSet())
+            .isNotEmpty()
         ) {
             Timber.d("MQTT preferences changed. Reconnecting to broker")
             scope.launch {

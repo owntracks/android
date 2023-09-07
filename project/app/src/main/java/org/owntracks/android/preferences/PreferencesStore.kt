@@ -4,7 +4,13 @@ import android.content.SharedPreferences
 import java.io.Closeable
 import kotlin.reflect.KProperty
 import kotlin.reflect.typeOf
-import org.owntracks.android.preferences.types.*
+import org.owntracks.android.preferences.types.AppTheme
+import org.owntracks.android.preferences.types.ConnectionMode
+import org.owntracks.android.preferences.types.MonitoringMode
+import org.owntracks.android.preferences.types.MqttProtocolLevel
+import org.owntracks.android.preferences.types.MqttQos
+import org.owntracks.android.preferences.types.ReverseGeocodeProvider
+import org.owntracks.android.preferences.types.StringMaxTwoAlphaNumericChars
 import org.owntracks.android.ui.map.MapLayerStyle
 import timber.log.Timber
 

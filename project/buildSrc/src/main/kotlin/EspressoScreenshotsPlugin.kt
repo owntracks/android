@@ -1,7 +1,7 @@
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.variant.AndroidComponentsExtension
 import java.io.File
-import java.util.*
+import java.util.Locale
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Exec

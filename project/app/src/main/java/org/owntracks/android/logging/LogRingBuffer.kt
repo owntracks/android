@@ -1,6 +1,6 @@
 package org.owntracks.android.logging
 
-import java.util.*
+import java.util.Collections
 
 class LogRingBuffer(capacity: Int) {
     private val actualCapacity = if (capacity > 0) capacity else DEFAULT_CAPACITY

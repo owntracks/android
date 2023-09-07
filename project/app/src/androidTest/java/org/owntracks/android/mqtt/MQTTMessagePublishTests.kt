@@ -9,7 +9,9 @@ import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
 import androidx.test.espresso.UiController
 import androidx.test.espresso.ViewAction
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.espresso.matcher.ViewMatchers.isClickable
+import androidx.test.espresso.matcher.ViewMatchers.isEnabled
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.adevinta.android.barista.assertion.BaristaListAssertions.assertDisplayedAtPosition
@@ -36,7 +38,17 @@ import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.model.messages.MessageWaypoints
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.Parser
-import org.owntracks.android.testutils.*
+import org.owntracks.android.testutils.GPSMockDeviceLocation
+import org.owntracks.android.testutils.MockDeviceLocation
+import org.owntracks.android.testutils.OWNTRACKS_ICON_BASE64
+import org.owntracks.android.testutils.TestWithAnActivity
+import org.owntracks.android.testutils.TestWithAnMQTTBroker
+import org.owntracks.android.testutils.TestWithAnMQTTBrokerImpl
+import org.owntracks.android.testutils.grantMapActivityPermissions
+import org.owntracks.android.testutils.reportLocationFromMap
+import org.owntracks.android.testutils.setNotFirstStartPreferences
+import org.owntracks.android.testutils.use
+import org.owntracks.android.testutils.waitUntilActivityVisible
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.map.MapActivity
 

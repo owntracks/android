@@ -5,7 +5,7 @@ import androidx.test.filters.SmallTest
 import com.google.android.gms.location.Priority
 import java.time.Duration
 import java.util.concurrent.TimeUnit
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.location.LocationRequest

@@ -13,11 +13,14 @@ import java.io.InputStreamReader
 import java.net.URI
 import java.net.URL
 import java.nio.charset.StandardCharsets
-import java.util.*
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
-import okhttp3.*
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
 import org.apache.commons.codec.binary.Base64
 import org.apache.hc.core5.net.URIBuilder
 import org.owntracks.android.data.waypoints.WaypointsRepo
@@ -119,9 +122,7 @@ class LoadViewModel @Inject constructor(
                 val r = BufferedReader(InputStreamReader(FileInputStream(uri.path)))
                 val total = StringBuilder()
                 var content: String?
-                while (r.readLine()
-                        .also { content = it } != null
-                ) {
+                while (r.readLine().also { content = it } != null) {
                     total.append(content)
                 }
                 setConfiguration(total.toString())
@@ -141,9 +142,7 @@ class LoadViewModel @Inject constructor(
                 }
                 when {
                     configQueryParam.size == 1 -> {
-                        val config: ByteArray = Base64.decodeBase64(
-                            configQueryParam[0].toByteArray()
-                        )
+                        val config: ByteArray = Base64.decodeBase64(configQueryParam[0].toByteArray())
                         setConfiguration(String(config, StandardCharsets.UTF_8))
                     }
                     urlQueryParam.size == 1 -> {

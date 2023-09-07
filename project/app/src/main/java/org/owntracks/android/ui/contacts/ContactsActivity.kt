@@ -51,7 +51,8 @@ class ContactsActivity :
                 is ContactsRepoChange.ContactRemoved -> contactsAdapter.removeContact(it.contact)
                 is ContactsRepoChange.ContactLocationUpdated -> {
                     contactsAdapter.updateContact(it.contact)
-                    vm.refreshGeocode(it.contact) }
+                    vm.refreshGeocode(it.contact)
+                }
                 is ContactsRepoChange.ContactCardUpdated -> contactsAdapter.updateContact(it.contact)
                 is ContactsRepoChange.AllCleared -> contactsAdapter.clearAll()
             }

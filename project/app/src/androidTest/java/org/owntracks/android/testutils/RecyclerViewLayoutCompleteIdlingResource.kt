@@ -15,7 +15,8 @@ class RecyclerViewLayoutCompleteIdlingResource(
     override fun getName(): String = "RecyclerViewLayoutCompleteIdlingResource"
 
     override fun registerIdleTransitionCallback(callback: IdlingResource.ResourceCallback?) {
-        this.resourceCallback = callback }
+        this.resourceCallback = callback
+    }
 
     override fun isIdleNow(): Boolean = idlingCallback.isRecyclerViewLayoutCompleted
     override fun onLayoutCompleted() {

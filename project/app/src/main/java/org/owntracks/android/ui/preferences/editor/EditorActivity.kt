@@ -2,7 +2,8 @@ package org.owntracks.android.ui.preferences.editor
 
 import android.content.DialogInterface
 import android.content.Intent
-import android.content.Intent.*
+import android.content.Intent.ACTION_CREATE_DOCUMENT
+import android.content.Intent.EXTRA_TITLE
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem

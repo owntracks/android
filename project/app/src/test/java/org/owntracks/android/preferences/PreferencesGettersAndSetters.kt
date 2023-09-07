@@ -11,7 +11,12 @@ import org.junit.runners.Parameterized
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.owntracks.android.model.messages.MessageConfiguration
-import org.owntracks.android.preferences.types.*
+import org.owntracks.android.preferences.types.ConnectionMode
+import org.owntracks.android.preferences.types.MonitoringMode
+import org.owntracks.android.preferences.types.MqttProtocolLevel
+import org.owntracks.android.preferences.types.MqttQos
+import org.owntracks.android.preferences.types.ReverseGeocodeProvider
+import org.owntracks.android.preferences.types.StringMaxTwoAlphaNumericChars
 import org.owntracks.android.support.SimpleIdlingResource
 
 @RunWith(Parameterized::class)

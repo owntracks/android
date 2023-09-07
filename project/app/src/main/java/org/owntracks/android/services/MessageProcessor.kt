@@ -12,7 +12,12 @@ import javax.inject.Singleton
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.owntracks.android.data.EndpointState
 import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.data.repos.EndpointStateRepo
@@ -20,7 +25,12 @@ import org.owntracks.android.data.waypoints.WaypointsRepo
 import org.owntracks.android.di.ApplicationScope
 import org.owntracks.android.di.CoroutineScopes.IoDispatcher
 import org.owntracks.android.model.CommandAction
-import org.owntracks.android.model.messages.*
+import org.owntracks.android.model.messages.MessageBase
+import org.owntracks.android.model.messages.MessageCard
+import org.owntracks.android.model.messages.MessageClear
+import org.owntracks.android.model.messages.MessageCmd
+import org.owntracks.android.model.messages.MessageLocation
+import org.owntracks.android.model.messages.MessageTransition
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.services.worker.Scheduler

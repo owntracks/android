@@ -8,7 +8,11 @@ import java.security.KeyStore
 import java.security.Security
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
-import javax.net.ssl.*
+import javax.net.ssl.KeyManagerFactory
+import javax.net.ssl.SSLContext
+import javax.net.ssl.SSLSocket
+import javax.net.ssl.SSLSocketFactory
+import javax.net.ssl.TrustManagerFactory
 import timber.log.Timber
 
 class SocketFactory(options: SocketFactoryOptions) : SSLSocketFactory() {
@@ -78,9 +82,9 @@ class SocketFactory(options: SocketFactoryOptions) : SSLSocketFactory() {
             while (aliasesCA.hasMoreElements()) {
                 val o = aliasesCA.nextElement()
                 Timber.v(
-                    "Alias: $o isKeyEntry:${caKeyStore.isKeyEntry(o)} isCertificateEntry:${
-                        caKeyStore.isCertificateEntry(o)
-                    }"
+                    "Alias: $o " +
+                        "isKeyEntry:${caKeyStore.isKeyEntry(o)} " +
+                        "isCertificateEntry:${caKeyStore.isCertificateEntry(o)}"
                 )
             }
         } else {

@@ -1,13 +1,13 @@
 package org.owntracks.android.services
 
+import java.io.File
+import java.nio.file.Files
+import kotlin.random.Random
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.support.Parser
-import java.io.File
-import java.nio.file.Files
-import kotlin.random.Random
 
 class BlockingDequeueThatAlsoSometimesPersistsThingsToDiskMaybeTest {
     private val parser = Parser(null)

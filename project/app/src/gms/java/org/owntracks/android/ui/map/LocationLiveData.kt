@@ -1,5 +1,6 @@
 package org.owntracks.android.ui.map
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Location
 import android.os.Looper
@@ -30,13 +31,16 @@ class LocationLiveData(
     private val locationCallback = Callback()
 
     private val lock = Semaphore(1)
+
+    @SuppressLint("MissingPermission")
     suspend fun requestLocationUpdates() {
         // We don't want to kick off another request while we're doing this one
         lock.acquire()
         locationProviderClient.removeLocationUpdates(locationCallback)
             .continueWith { task ->
                 Timber.d(
-                    "Removing previous locationupdate task complete.  Success=${task.isSuccessful} Cancelled=${task.isCanceled}"
+                    "Removing previous locationupdate task complete. " +
+                        "Success=${task.isSuccessful} Cancelled=${task.isCanceled}"
                 )
                 locationProviderClient.requestLocationUpdates(
                     LocationRequest(
@@ -50,7 +54,8 @@ class LocationLiveData(
                 )
                     .addOnCompleteListener {
                         Timber.d(
-                            "LocationLiveData location update request completed: Success=${it.isSuccessful} Cancelled=${it.isCanceled}"
+                            "LocationLiveData location update request completed: " +
+                                "Success=${it.isSuccessful} Cancelled=${it.isCanceled}"
                         )
                         lock.release()
                     }
@@ -62,7 +67,8 @@ class LocationLiveData(
         locationProviderClient.removeLocationUpdates(locationCallback)
             .addOnCompleteListener {
                 Timber.d(
-                    "LocationLiveData removing location updates completed: Success=${it.isSuccessful} Cancelled=${it.isCanceled}"
+                    "LocationLiveData removing location updates completed: " +
+                        "Success=${it.isSuccessful} Cancelled=${it.isCanceled}"
                 )
                 lock.release()
             }

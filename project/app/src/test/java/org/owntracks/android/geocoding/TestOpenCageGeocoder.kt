@@ -1,10 +1,16 @@
 package org.owntracks.android.geocoding
 
 import kotlinx.coroutines.test.runTest
-import okhttp3.*
+import okhttp3.Call
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.OkHttpClient
+import okhttp3.Protocol
+import okhttp3.Request
+import okhttp3.Response
 import okhttp3.ResponseBody.Companion.toResponseBody
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn

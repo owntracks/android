@@ -3,12 +3,12 @@ package org.owntracks.android.ui.map
 import android.content.Context
 import android.location.Location
 import androidx.lifecycle.LiveData
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
-import java.util.concurrent.TimeUnit
 
 class LocationLiveData(
     private val locationProviderClient: GpsMyLocationProvider,
@@ -22,7 +22,7 @@ class LocationLiveData(
 
     private val locationCallback = ThisLocationCallback()
 
-    suspend fun requestLocationUpdates() {
+    fun requestLocationUpdates() {
         locationProviderClient.apply {
             clearLocationSources()
             addLocationSource("gps")
@@ -34,7 +34,7 @@ class LocationLiveData(
         }
     }
 
-    private suspend fun removeLocationUpdates() {
+    private fun removeLocationUpdates() {
         locationProviderClient.stopLocationProvider()
     }
 

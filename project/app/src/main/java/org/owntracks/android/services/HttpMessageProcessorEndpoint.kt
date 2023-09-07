@@ -3,7 +3,7 @@ package org.owntracks.android.services
 import android.content.Context
 import com.fasterxml.jackson.core.JsonProcessingException
 import java.io.IOException
-import java.util.*
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 import javax.net.ssl.HostnameVerifier
 import kotlinx.coroutines.CoroutineDispatcher
@@ -202,7 +202,7 @@ class HttpMessageProcessorEndpoint(
         )
 
         if (propertiesWeCareAbout.intersect(properties)
-                .isNotEmpty()
+            .isNotEmpty()
         ) {
             scope.launch(ioDispatcher) {
                 try {

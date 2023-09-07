@@ -8,13 +8,22 @@ import com.adevinta.android.barista.interaction.BaristaSleepInteractions
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 import mqtt.packets.mqtt.MQTTPublish
-import org.junit.Assert.*
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.Parser
-import org.owntracks.android.testutils.*
+import org.owntracks.android.testutils.GPSMockDeviceLocation
+import org.owntracks.android.testutils.MockDeviceLocation
+import org.owntracks.android.testutils.TestWithAnActivity
+import org.owntracks.android.testutils.TestWithAnMQTTBroker
+import org.owntracks.android.testutils.TestWithAnMQTTBrokerImpl
+import org.owntracks.android.testutils.grantMapActivityPermissions
+import org.owntracks.android.testutils.reportLocationFromMap
+import org.owntracks.android.testutils.setNotFirstStartPreferences
+import org.owntracks.android.testutils.waitUntilActivityVisible
 import org.owntracks.android.ui.map.MapActivity
 
 @OptIn(ExperimentalUnsignedTypes::class)
@@ -26,7 +35,7 @@ class LocationAccuracyTest :
     MockDeviceLocation by GPSMockDeviceLocation() {
 
     @Test
-    fun given_an_inaccurate_and_accurate_location_when_publishing_then_only_the_location_only_the_accurate_location_is_published() {
+    fun given_an_inaccurate_and_accurate_location_when_publishing_then_only_the_location_only_the_accurate_location_is_published() { // ktlint-disable max-line-length
         val inaccurateMockLatitude = Random.nextDouble(-30.0, 30.0)
         val inaccurateMockLongitude = 4.0
         val accurateMockLatitude = Random.nextDouble(-30.0, 30.0)
@@ -56,7 +65,9 @@ class LocationAccuracyTest :
                 "received packets contains accurate location",
                 any {
                     it.second.run {
-                        this is MessageLocation && latitude == accurateMockLatitude && longitude == accurateMockLongitude
+                        this is MessageLocation &&
+                            latitude == accurateMockLatitude &&
+                            longitude == accurateMockLongitude
                     }
                 }
             )
@@ -64,7 +75,9 @@ class LocationAccuracyTest :
                 "received packets doesn't contain inaccurate location",
                 any {
                     it.second.run {
-                        this is MessageLocation && latitude == inaccurateMockLatitude && longitude == inaccurateMockLongitude
+                        this is MessageLocation &&
+                            latitude == inaccurateMockLatitude &&
+                            longitude == inaccurateMockLongitude
                     }
                 }
             )

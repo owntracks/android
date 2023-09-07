@@ -3,12 +3,12 @@ package org.owntracks.android.support
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
-import org.owntracks.android.model.messages.MessageBase
-import org.owntracks.android.model.messages.MessageEncrypted
 import java.io.IOException
 import java.io.InputStream
 import javax.inject.Inject
 import javax.inject.Singleton
+import org.owntracks.android.model.messages.MessageBase
+import org.owntracks.android.model.messages.MessageEncrypted
 
 @Singleton
 class Parser @Inject constructor(private val encryptionProvider: EncryptionProvider?) {
@@ -71,9 +71,11 @@ class Parser @Inject constructor(private val encryptionProvider: EncryptionProvi
         // Recorder compatibility, encrypted messages with data array
         if (a == null) throw IOException("null array")
         return if (a.size == 1 && a[0] is MessageEncrypted) {
-            if (encryptionProvider == null || !encryptionProvider.isPayloadEncryptionEnabled) throw EncryptionException(
-                "received encrypted message but payload encryption is not enabled"
-            )
+            if (encryptionProvider == null || !encryptionProvider.isPayloadEncryptionEnabled) {
+                throw EncryptionException(
+                    "received encrypted message but payload encryption is not enabled"
+                )
+            }
             defaultMapper.readValue(
                 encryptionProvider.decrypt((a[0] as MessageEncrypted).data),
                 Array<MessageBase>::class.java
@@ -86,11 +88,14 @@ class Parser @Inject constructor(private val encryptionProvider: EncryptionProvi
     @Throws(IOException::class, EncryptionException::class)
     private fun decrypt(m: MessageBase): MessageBase {
         if (m is MessageEncrypted) {
-            if (encryptionProvider == null || !encryptionProvider.isPayloadEncryptionEnabled) throw EncryptionException(
-                "received encrypted message but payload encryption is not enabled"
-            )
+            if (encryptionProvider == null || !encryptionProvider.isPayloadEncryptionEnabled) {
+                throw EncryptionException(
+                    "received encrypted message but payload encryption is not enabled"
+                )
+            }
             return defaultMapper.readValue(
-                encryptionProvider.decrypt(m.data), MessageBase::class.java
+                encryptionProvider.decrypt(m.data),
+                MessageBase::class.java
             )
         }
         return m

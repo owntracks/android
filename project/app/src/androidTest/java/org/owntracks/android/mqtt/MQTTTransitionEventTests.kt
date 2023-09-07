@@ -21,7 +21,17 @@ import org.owntracks.android.R
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.model.messages.MessageTransition
 import org.owntracks.android.support.Parser
-import org.owntracks.android.testutils.*
+import org.owntracks.android.testutils.GPSMockDeviceLocation
+import org.owntracks.android.testutils.MockDeviceLocation
+import org.owntracks.android.testutils.TestWithAnActivity
+import org.owntracks.android.testutils.TestWithAnMQTTBroker
+import org.owntracks.android.testutils.TestWithAnMQTTBrokerImpl
+import org.owntracks.android.testutils.disableHeadsupNotifications
+import org.owntracks.android.testutils.grantMapActivityPermissions
+import org.owntracks.android.testutils.reportLocationFromMap
+import org.owntracks.android.testutils.setNotFirstStartPreferences
+import org.owntracks.android.testutils.stopAndroidSetupProcess
+import org.owntracks.android.testutils.waitUntilActivityVisible
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.map.MapActivity
 

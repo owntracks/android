@@ -17,7 +17,11 @@ import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 import org.owntracks.android.R
 import org.owntracks.android.preferences.Preferences
-import org.owntracks.android.testutils.*
+import org.owntracks.android.testutils.TestWithAnActivity
+import org.owntracks.android.testutils.disableDeviceLocation
+import org.owntracks.android.testutils.enableDeviceLocation
+import org.owntracks.android.testutils.grantMapActivityPermissions
+import org.owntracks.android.testutils.setNotFirstStartPreferences
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)

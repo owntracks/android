@@ -5,7 +5,9 @@ import android.content.Intent
 import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.Intents.intending
-import androidx.test.espresso.intent.matcher.IntentMatchers.*
+import androidx.test.espresso.intent.matcher.IntentMatchers.anyIntent
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtra
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains

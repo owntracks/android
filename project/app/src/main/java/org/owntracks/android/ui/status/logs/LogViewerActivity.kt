@@ -14,7 +14,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.*
+import kotlin.random.Random
 import org.owntracks.android.BuildConfig
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiPreferencesLogsBinding
@@ -135,8 +135,7 @@ class LogViewerActivity : AppCompatActivity() {
     }
 
     private fun getRandomHexString(): String {
-        return Random().nextInt(0X1000000)
-            .toString(16)
+        return Random.nextInt(0X1000000).toString(16)
     }
 
     private fun revokeExportUriPermissions() {

@@ -31,35 +31,29 @@ class AdvancedFragment @Inject constructor() : AbstractPreferenceFragment(), Pre
         setPreferencesFromResource(R.xml.preferences_advanced, rootKey)
         val remoteConfigurationPreference =
             findPreference<SwitchPreferenceCompat>(Preferences::remoteConfiguration.name)
-        val remoteCommandPreference =
-            findPreference<SwitchPreferenceCompat>(Preferences::cmd.name)
+        val remoteCommandPreference = findPreference<SwitchPreferenceCompat>(Preferences::cmd.name)
         val remoteCommandAndConfigurationChangeListener =
             Preference.OnPreferenceChangeListener { preference, newValue ->
                 if (newValue is Boolean) {
                     when (preference.key) {
                         Preferences::cmd.name -> if (!newValue) {
-                            remoteConfigurationPreference?.isChecked =
-                                false
+                            remoteConfigurationPreference?.isChecked = false
                         }
                         Preferences::remoteConfiguration.name -> if (newValue) {
-                            remoteCommandPreference?.isChecked =
-                                true
+                            remoteCommandPreference?.isChecked = true
                         }
                     }
                 }
                 true
             }
-        remoteConfigurationPreference?.onPreferenceChangeListener =
-            remoteCommandAndConfigurationChangeListener
-        remoteCommandPreference?.onPreferenceChangeListener =
-            remoteCommandAndConfigurationChangeListener
+        remoteConfigurationPreference?.onPreferenceChangeListener = remoteCommandAndConfigurationChangeListener
+        remoteCommandPreference?.onPreferenceChangeListener = remoteCommandAndConfigurationChangeListener
 
         findPreference<Preference>("autostartWarning")?.isVisible =
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && PermissionChecker.checkSelfPermission(
-                requireActivity(),
-                ACCESS_BACKGROUND_LOCATION
-            ) == PermissionChecker.PERMISSION_DENIED
-
+            requireActivity(),
+            ACCESS_BACKGROUND_LOCATION
+        ) == PermissionChecker.PERMISSION_DENIED
         setOpenCageAPIKeyPreferenceVisibility()
     }
 

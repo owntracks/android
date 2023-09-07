@@ -1,7 +1,7 @@
 package org.owntracks.android.preferences
 
 import android.os.Build
-import java.util.*
+import java.util.Locale
 import kotlin.reflect.KProperty
 import org.owntracks.android.preferences.types.AppTheme
 import org.owntracks.android.preferences.types.ConnectionMode

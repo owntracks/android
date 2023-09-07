@@ -3,7 +3,12 @@ package org.owntracks.android.model.messages
 import android.annotation.SuppressLint
 import android.location.Location
 import android.os.Build
-import com.fasterxml.jackson.annotation.*
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.fasterxml.jackson.annotation.JsonValue
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 import org.jetbrains.annotations.NotNull

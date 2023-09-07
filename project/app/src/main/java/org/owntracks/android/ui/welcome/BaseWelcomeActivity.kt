@@ -16,7 +16,13 @@ import org.owntracks.android.databinding.UiWelcomeBinding
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.RequirementsChecker
 import org.owntracks.android.ui.map.MapActivity
-import org.owntracks.android.ui.welcome.fragments.*
+import org.owntracks.android.ui.welcome.fragments.ConnectionSetupFragment
+import org.owntracks.android.ui.welcome.fragments.FinishFragment
+import org.owntracks.android.ui.welcome.fragments.IntroFragment
+import org.owntracks.android.ui.welcome.fragments.LocationPermissionFragment
+import org.owntracks.android.ui.welcome.fragments.NotificationPermissionFragment
+import org.owntracks.android.ui.welcome.fragments.OSRestrictionsFragment
+import org.owntracks.android.ui.welcome.fragments.WelcomeFragment
 
 abstract class BaseWelcomeActivity : AppCompatActivity() {
     private val viewModel: WelcomeViewModel by viewModels()
@@ -67,8 +73,7 @@ abstract class BaseWelcomeActivity : AppCompatActivity() {
                     viewPager.adapter = WelcomeAdapter(this@BaseWelcomeActivity).apply {
                         addFragmentsToAdapter(this)
                     }
-                    viewPager.registerOnPageChangeCallback(object :
-                        ViewPager2.OnPageChangeCallback() {
+                    viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                         override fun onPageSelected(position: Int) {
                             viewModel.moveToPage(position)
                             super.onPageSelected(position)

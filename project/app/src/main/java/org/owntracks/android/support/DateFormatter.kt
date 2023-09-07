@@ -2,7 +2,8 @@ package org.owntracks.android.support
 
 import android.text.format.DateUtils
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 object DateFormatter {
     @JvmStatic

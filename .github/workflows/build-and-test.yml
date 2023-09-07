@@ -13,6 +13,30 @@ name: Build and Test
       - master
 
 jobs:
+  ktlint:
+    name: ktlint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4
+      - uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: "17"
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            src:
+              - "**/*.kt"
+      - name: Gradle build
+        id: build
+        uses: gradle/gradle-build-action@v2
+        if: steps.changes.outputs.src == 'true'
+        with:
+          build-root-directory: project
+          arguments: |
+            ktlintCheck
+
   build-test-lint:
     name: Build, test & lint
     runs-on: self-hosted

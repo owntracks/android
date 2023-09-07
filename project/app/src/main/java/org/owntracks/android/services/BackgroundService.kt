@@ -241,8 +241,7 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 waypointsRepo.migrationCompleteFlow.collect {
                     if (it) {
-                        waypointsRepo.operations.observe(this@BackgroundService) {
-                                waypointOperation ->
+                        waypointsRepo.operations.observe(this@BackgroundService) { waypointOperation ->
                             when (waypointOperation) {
                                 is WaypointsRepo.WaypointOperation.Insert ->
                                     locationProcessor.publishWaypointMessage(waypointOperation.waypoint)
@@ -337,13 +336,19 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
                 }
 
                 INTENT_ACTION_BOOT_COMPLETED, INTENT_ACTION_PACKAGE_REPLACED -> {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !hasBeenStartedExplicitly && ActivityCompat.checkSelfPermission(
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        val backgroundLocationPermissionDenied = ActivityCompat.checkSelfPermission(
                             this,
                             Manifest.permission.ACCESS_BACKGROUND_LOCATION
                         ) == PackageManager.PERMISSION_DENIED
-                    ) {
-                        notifyUserOfBackgroundLocationRestriction()
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+                            !hasBeenStartedExplicitly &&
+                            backgroundLocationPermissionDenied
+                        ) {
+                            notifyUserOfBackgroundLocationRestriction()
+                        }
                     }
+
                     return
                 }
 
@@ -370,7 +375,9 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
                 this,
                 Manifest.permission.POST_NOTIFICATIONS
             ) != PackageManager.PERMISSION_GRANTED
-        ) { return }
+        ) {
+            return
+        }
         val activityLaunchIntent =
             Intent(applicationContext, MapActivity::class.java).setAction("android.intent.action.MAIN")
                 .addCategory("android.intent.category.LAUNCHER")
@@ -450,7 +457,9 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
                 this,
                 Manifest.permission.POST_NOTIFICATIONS
             ) != PackageManager.PERMISSION_GRANTED
-        ) { return }
+        ) {
+            return
+        }
         val contact = contactsRepo.getById(message.contactKey)
         val timestampInMs = TimeUnit.SECONDS.toMillis(message.timestamp)
         val location = message.description ?: getString(R.string.aLocation)

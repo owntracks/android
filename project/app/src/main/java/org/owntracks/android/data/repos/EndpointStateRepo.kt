@@ -1,7 +1,7 @@
 package org.owntracks.android.data.repos
 
 import androidx.lifecycle.MutableLiveData
-import java.util.*
+import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
 import org.owntracks.android.data.EndpointState

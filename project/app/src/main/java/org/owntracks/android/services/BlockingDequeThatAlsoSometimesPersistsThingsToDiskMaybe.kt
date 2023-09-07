@@ -2,15 +2,15 @@ package org.owntracks.android.services
 
 import com.squareup.tape2.ObjectQueue
 import com.squareup.tape2.QueueFile
+import java.io.File
+import java.io.IOException
+import java.io.OutputStream
+import java.util.concurrent.LinkedBlockingDeque
 import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.model.messages.MessageEncrypted
 import org.owntracks.android.model.messages.MessageUnknown
 import org.owntracks.android.support.Parser
 import timber.log.Timber
-import java.io.File
-import java.io.IOException
-import java.io.OutputStream
-import java.util.concurrent.LinkedBlockingDeque
 
 class BlockingDequeThatAlsoSometimesPersistsThingsToDiskMaybe(
     capacity: Int,

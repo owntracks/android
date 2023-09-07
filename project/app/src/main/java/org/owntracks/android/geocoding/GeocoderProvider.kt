@@ -1,5 +1,6 @@
 package org.owntracks.android.geocoding
 
+import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -9,7 +10,11 @@ import androidx.core.app.NotificationManagerCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import org.owntracks.android.R
 import org.owntracks.android.di.ApplicationScope
@@ -72,6 +77,7 @@ class GeocoderProvider @Inject constructor(
         maybeCreateErrorNotification(result)
     }
 
+    @SuppressLint("MissingPermission")
     private fun maybeCreateErrorNotification(result: GeocodeResult) {
         if (result is GeocodeResult.Formatted ||
             result is GeocodeResult.Empty ||
@@ -157,8 +163,7 @@ class GeocoderProvider @Inject constructor(
 
     private val preferenceChangeListener = object : Preferences.OnPreferenceChangeListener {
         override fun onPreferenceChanged(properties: Set<String>) {
-            if (properties.intersect(setOf("reverseGeocodeProvider", "opencageApiKey"))
-                    .isNotEmpty()
+            if (properties.intersect(setOf("reverseGeocodeProvider", "opencageApiKey")).isNotEmpty()
             ) {
                 setGeocoderProvider(context, preferences)
             }

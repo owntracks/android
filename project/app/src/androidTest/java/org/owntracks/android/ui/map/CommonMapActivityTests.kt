@@ -14,8 +14,13 @@ import com.adevinta.android.barista.interaction.BaristaEditTextInteractions
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
-import org.owntracks.android.testutils.*
+import org.owntracks.android.testutils.GPSMockDeviceLocation
+import org.owntracks.android.testutils.MockDeviceLocation
+import org.owntracks.android.testutils.TestWithAnActivity
+import org.owntracks.android.testutils.grantMapActivityPermissions
 import org.owntracks.android.testutils.matchers.withActionIconDrawable
+import org.owntracks.android.testutils.reportLocationFromMap
+import org.owntracks.android.testutils.setNotFirstStartPreferences
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.clickOnDrawerAndWait
 

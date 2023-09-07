@@ -8,7 +8,10 @@ import android.text.Spanned
 import android.util.AttributeSet
 import android.util.SparseArray
 import android.util.TypedValue
-import android.util.TypedValue.*
+import android.util.TypedValue.TYPE_INT_DEC
+import android.util.TypedValue.TYPE_INT_HEX
+import android.util.TypedValue.TYPE_REFERENCE
+import android.util.TypedValue.TYPE_STRING
 import androidx.annotation.StringRes
 import androidx.core.util.forEach
 

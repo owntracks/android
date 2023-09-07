@@ -6,11 +6,14 @@ plugins {
     id("com.github.triplet.play")
     kotlin("android")
     kotlin("kapt")
+    id("org.jlleitschuh.gradle.ktlint")
 }
 
 apply<EspressoScreenshotsPlugin>()
 
-val googleMapsAPIKey = System.getenv("GOOGLE_MAPS_API_KEY")?.toString() ?: extra.get("google_maps_api_key")?.toString() ?: "PLACEHOLDER_API_KEY"
+val googleMapsAPIKey = System.getenv("GOOGLE_MAPS_API_KEY")?.toString()
+    ?: extra.get("google_maps_api_key")?.toString()
+    ?: "PLACEHOLDER_API_KEY"
 
 val gmsImplementation: Configuration by configurations.creating
 val numShards = System.getenv("CIRCLE_NODE_TOTAL") ?: "0"
@@ -271,4 +274,8 @@ dependencies {
 // Handled now in the android / playConfigs block
 play {
     enabled.set(false)
+}
+
+ktlint {
+    android.set(true)
 }

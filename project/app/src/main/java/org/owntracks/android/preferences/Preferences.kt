@@ -4,7 +4,7 @@ import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-import java.util.*
+import java.util.WeakHashMap
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -18,7 +18,14 @@ import kotlin.reflect.jvm.jvmErasure
 import kotlin.reflect.typeOf
 import org.owntracks.android.BuildConfig
 import org.owntracks.android.model.messages.MessageConfiguration
-import org.owntracks.android.preferences.types.*
+import org.owntracks.android.preferences.types.AppTheme
+import org.owntracks.android.preferences.types.ConnectionMode
+import org.owntracks.android.preferences.types.FromConfiguration
+import org.owntracks.android.preferences.types.MonitoringMode
+import org.owntracks.android.preferences.types.MqttProtocolLevel
+import org.owntracks.android.preferences.types.MqttQos
+import org.owntracks.android.preferences.types.ReverseGeocodeProvider
+import org.owntracks.android.preferences.types.StringMaxTwoAlphaNumericChars
 import org.owntracks.android.services.worker.Scheduler.Companion.MIN_PERIODIC_INTERVAL
 import org.owntracks.android.support.SimpleIdlingResource
 import org.owntracks.android.ui.map.MapLayerStyle

@@ -1,7 +1,12 @@
 package org.owntracks.android.model.messages
 
-import com.fasterxml.jackson.annotation.*
-import java.util.*
+import com.fasterxml.jackson.annotation.JsonAnyGetter
+import com.fasterxml.jackson.annotation.JsonAnySetter
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonPropertyOrder
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+import java.util.TreeMap
 import org.owntracks.android.support.MessageWaypointCollection
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")

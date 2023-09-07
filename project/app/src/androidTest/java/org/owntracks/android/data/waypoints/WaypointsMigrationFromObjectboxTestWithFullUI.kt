@@ -135,7 +135,7 @@ class WaypointsMigrationFromObjectboxTestWithFullUI : TestWithAnActivity<Waypoin
                 }
                 .any { notification ->
                     notification.extras.getString(Notification.EXTRA_TITLE) == "Error migrating waypoints" &&
-                        notification.extras.getString(Notification.EXTRA_TEXT) == "An error occurred whilst migrating waypoints. Some may not have been migrated, so check the logs and re-add."
+                        notification.extras.getString(Notification.EXTRA_TEXT) == "An error occurred whilst migrating waypoints. Some may not have been migrated, so check the logs and re-add." // ktlint-disable max-line-length
                 }
         )
     }

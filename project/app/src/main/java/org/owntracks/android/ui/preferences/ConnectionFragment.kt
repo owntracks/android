@@ -205,9 +205,7 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
         lifecycleScope.launch(mainDispatcher) {
             findPreference<Preference>(preference.name)?.summary =
                 requireContext().getString(
-                    if (preference.getter.call(preferences)
-                            .isBlank()
-                    ) {
+                    if (preference.getter.call(preferences).isBlank()) {
                         R.string.preferencesNotSet
                     } else {
                         R.string.preferencesSet
