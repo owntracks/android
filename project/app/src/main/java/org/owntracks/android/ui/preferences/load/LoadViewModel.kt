@@ -11,6 +11,7 @@ import java.io.FileInputStream
 import java.io.IOException
 import java.io.InputStreamReader
 import java.net.URI
+import java.net.URISyntaxException
 import java.net.URL
 import java.nio.charset.StandardCharsets
 import javax.inject.Inject
@@ -112,7 +113,18 @@ class LoadViewModel @Inject constructor(
         }
     }
 
-    fun extractPreferences(uri: URI) {
+    /**
+     * Extract preferences from uri. We've not parsed the uri for validity yet, hence accepting a string
+     *
+     * @param uriString a string containing maybe a URI
+     */
+    fun extractPreferencesFromUri(uriString: String) {
+        val uri = try {
+            URI(uriString)
+        } catch (e: URISyntaxException) {
+            configurationImportFailed(e)
+            return
+        }
         loadIdlingResource.setIdleState(false)
         try {
             if (ContentResolver.SCHEME_FILE == uri.scheme) {

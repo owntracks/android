@@ -17,7 +17,6 @@ import androidx.test.espresso.IdlingResource
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.IOException
-import java.net.URI
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiPreferencesLoadBinding
 import timber.log.Timber
@@ -99,7 +98,7 @@ class LoadActivity : AppCompatActivity() {
                 if (ContentResolver.SCHEME_CONTENT == uri.scheme) {
                     viewModel.extractPreferences(getContentFromURI(uri))
                 } else {
-                    viewModel.extractPreferences(URI(uri.toString()))
+                    viewModel.extractPreferencesFromUri(uri.toString())
                 }
             } else {
                 viewModel.configurationImportFailed(Exception(getString(R.string.preferencesImportNoURIGiven)))

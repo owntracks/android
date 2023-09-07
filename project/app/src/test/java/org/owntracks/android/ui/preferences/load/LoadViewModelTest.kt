@@ -2,7 +2,6 @@ package org.owntracks.android.ui.preferences.load
 
 import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import java.net.URI
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -38,12 +37,22 @@ class LoadViewModelTest {
     }
 
     @Test
+    fun `Given an invalid RUL, when loading it into the LoadViewModel, then the error is correctly set`() = runTest {
+        val parser = Parser(null)
+        val preferences = Preferences(preferencesStore, mockIdlingResource)
+        val vm = LoadViewModel(preferences, parser, InMemoryWaypointsRepo(), UnconfinedTestDispatcher())
+        vm.extractPreferencesFromUri("owntracks:///config?{}")
+        assertEquals(ImportStatus.FAILED, vm.configurationImportStatus.value)
+        assertEquals("Illegal character in query at index 20: owntracks:///config?{}", vm.importError.value)
+    }
+
+    @Test
     fun `Given an inline OwnTracks config URL with invalid JSON, when loading it into the LoadViewModel, then the error is correctly set`() =
         runTest {
             val parser = Parser(null)
             val preferences = Preferences(preferencesStore, mockIdlingResource)
             val vm = LoadViewModel(preferences, parser, InMemoryWaypointsRepo(), UnconfinedTestDispatcher())
-            vm.extractPreferences(URI("owntracks:///config?inline=e30="))
+            vm.extractPreferencesFromUri("owntracks:///config?inline=e30=")
             assertEquals(ImportStatus.FAILED, vm.configurationImportStatus.value)
             assertEquals("Message is not a valid configuration message", vm.importError.value)
         }
@@ -54,7 +63,7 @@ class LoadViewModelTest {
             val parser = Parser(null)
             val preferences = Preferences(preferencesStore, mockIdlingResource)
             val vm = LoadViewModel(preferences, parser, InMemoryWaypointsRepo(), UnconfinedTestDispatcher())
-            vm.extractPreferences(URI("owntracks:///config?inline=eyJfdHlwZSI6ImNvbmZpZ3VyYXRpb24ifQ"))
+            vm.extractPreferencesFromUri("owntracks:///config?inline=eyJfdHlwZSI6ImNvbmZpZ3VyYXRpb24ifQ")
             val expectedConfig = """
             {
               "_type" : "configuration",
@@ -71,10 +80,9 @@ class LoadViewModelTest {
             val parser = Parser(null)
             val preferences = Preferences(preferencesStore, mockIdlingResource)
             val vm = LoadViewModel(preferences, parser, InMemoryWaypointsRepo(), UnconfinedTestDispatcher())
-            vm.extractPreferences(
-                URI(
-                    "owntracks:///config?inline=eyJfdHlwZSI6IndheXBvaW50cyIsIndheXBvaW50cyI6W3siX3R5cGUiOiJ3YXlwb2ludCIsImRlc2MiOiJUZXN0IFdheXBvaW50IiwibGF0Ijo1MSwibG9uIjowLCJyYWQiOjQ1MCwidHN0IjoxNTk4NDUxMzcyfV19" // ktlint-disable max-line-length
-                )
+            vm.extractPreferencesFromUri(
+                "owntracks:///config?inline=eyJfdHlwZSI6IndheXBvaW50cyIsIndheXBvaW50cyI6W3siX3R5cGUiOiJ3YXlwb2ludCIsImRlc2MiOiJUZXN0IFdheXBvaW50IiwibGF0Ijo1MSwibG9uIjowLCJyYWQiOjQ1MCwidHN0IjoxNTk4NDUxMzcyfV19" // ktlint-disable max-line-length
+
             )
             val expectedConfig = """
             {
