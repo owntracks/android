@@ -8,6 +8,9 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_LOW
 import androidx.core.app.NotificationManagerCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
@@ -24,9 +27,6 @@ import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ReverseGeocodeProvider
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.ui.map.MapActivity
-import org.threeten.bp.Instant
-import org.threeten.bp.ZoneId
-import org.threeten.bp.format.DateTimeFormatter
 import timber.log.Timber
 
 @Singleton

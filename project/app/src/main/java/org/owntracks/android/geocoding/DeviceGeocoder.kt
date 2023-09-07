@@ -3,9 +3,9 @@ package org.owntracks.android.geocoding
 import android.content.Context
 import android.location.Address
 import java.math.BigDecimal
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import java.util.Locale
-import org.threeten.bp.Instant
-import org.threeten.bp.temporal.ChronoUnit
 import timber.log.Timber
 
 class DeviceGeocoder internal constructor(context: Context) : CachingGeocoder() {

@@ -83,14 +83,6 @@
             android:data="https://hc.apache.org/httpcomponents-core-5.1.x/" />
     </Preference>
     <Preference
-        android:summary="joschi"
-        android:title="Jackson ThreeTen Backport Datatype"
-        app:iconSpaceReserved="false">
-        <intent
-            android:action="android.intent.action.VIEW"
-            android:data="https://joschi.github.io/jackson-datatype-threetenbp/" />
-    </Preference>
-    <Preference
         android:summary="Mikepenz"
         android:title="MaterialDrawer"
         app:iconSpaceReserved="false">

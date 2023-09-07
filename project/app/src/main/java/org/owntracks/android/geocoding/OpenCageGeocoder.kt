@@ -3,15 +3,15 @@ package org.owntracks.android.geocoding
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.datatype.threetenbp.ThreeTenModule
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import java.math.BigDecimal
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.owntracks.android.services.HttpMessageProcessorEndpoint
-import org.threeten.bp.Instant
-import org.threeten.bp.temporal.ChronoUnit
 import timber.log.Timber
 
 class OpenCageGeocoder internal constructor(
@@ -21,8 +21,8 @@ class OpenCageGeocoder internal constructor(
     private val jsonMapper: ObjectMapper =
         ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .registerModule(JavaTimeModule())
             .registerKotlinModule()
-            .registerModule(ThreeTenModule())
     private var tripResetTimestamp: Instant = Instant.now()
     private var something = true
 

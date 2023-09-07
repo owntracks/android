@@ -1,6 +1,6 @@
 package org.owntracks.android.geocoding
 
-import org.threeten.bp.Instant
+import java.time.Instant
 
 sealed class GeocodeResult {
     data class Formatted(val text: String) : GeocodeResult()

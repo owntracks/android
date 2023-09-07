@@ -41,6 +41,9 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Named
 import kotlinx.coroutines.launch
@@ -62,7 +65,6 @@ import org.owntracks.android.ui.mixins.NotificationsPermissionRequested
 import org.owntracks.android.ui.mixins.ServiceStarter
 import org.owntracks.android.ui.mixins.WorkManagerInitExceptionNotifier
 import org.owntracks.android.ui.welcome.WelcomeActivity
-import org.threeten.bp.ZoneId
 import timber.log.Timber
 
 @AndroidEntryPoint
@@ -170,9 +172,9 @@ class MapActivity :
                                             this.name,
                                             this.geocodedLocation,
                                             this.latLng?.toDisplayString() ?: "",
-                                            org.threeten.bp.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+                                            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
                                                 .withZone(ZoneId.systemDefault()).format(
-                                                    org.threeten.bp.Instant.ofEpochSecond(this.tst)
+                                                    Instant.ofEpochSecond(this.tst)
                                                 )
 
                                         )

@@ -25,8 +25,7 @@ google-play-services-maps = "18.1.0"
 guava = "32.1.2-jre"
 hilt = "2.48"
 hilt-work = "1.0.0"
-jackson = "2.13.4"
-jackson-threetenbp = "2.15.2"
+jackson = "2.13.5"
 jaxb = "4.0.3"
 jaxb-api = "2.3.1"
 kmqtt = "0.3.2"
@@ -46,7 +45,6 @@ slf4j-simple = "2.0.9"
 slf4j-timber = "1.0.1"
 square-leakcanary = "2.12"
 square-tape2 = "2.0.0-beta1"
-threetenbp = "1.6.8"
 timber = "5.0.1"
 triplet = "3.8.4"
 
@@ -79,8 +77,6 @@ jackson-core = { module = "com.fasterxml.jackson.core:jackson-core", version.ref
 jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
 jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
 jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson" }
-jackson-threetenbp = { module = "com.github.joschi.jackson:jackson-datatype-threetenbp", version.ref = "jackson-threetenbp" }
-threetenbp = { module = "org.threeten:threetenbp", version.ref = "threetenbp" }
 
 # AndroidX
 androidx-preference = { module = "androidx.preference:preference", version.ref = "androidx-preference" }
@@ -140,7 +136,7 @@ desugar = { module = "com.android.tools:desugar_jdk_libs_nio", version.ref = "de
 
 
 [bundles]
-jackson = ["jackson-core", "jackson-databind", "jackson-module-kotlin", "jackson-datatype-jsr310", "jackson-threetenbp", "threetenbp"]
+jackson = ["jackson-core", "jackson-databind", "jackson-module-kotlin", "jackson-datatype-jsr310"]
 kotlin = ["kotlin-coroutines-android", "kotlin-coroutines-jdk8", "kotlin-reflect"]
 jaxb-annotation-processors = ["jaxb-api", "jaxb-core", "jaxb-impl"]
 kapt-hilt = ["hilt-compiler", "hilt-androidx"]

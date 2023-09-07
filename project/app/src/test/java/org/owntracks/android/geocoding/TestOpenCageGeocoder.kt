@@ -1,5 +1,7 @@
 package org.owntracks.android.geocoding
 
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import kotlinx.coroutines.test.runTest
 import okhttp3.Call
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -15,8 +17,6 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.threeten.bp.Instant
-import org.threeten.bp.temporal.ChronoUnit
 
 class TestOpenCageGeocoder {
 
