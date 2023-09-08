@@ -132,7 +132,6 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesAutostart">"Autostart"</string>
     <string name="preferencesAutostartSummary">"Automatically start on device boot"</string>
     <string name="preferencesBrokerPassword">"Password"</string>
-    <string name="preferencesCaCrtPath">"CA certificate"</string>
     <string name="preferencesCategoryAdvancedEncryption">"Encryption"</string>
     <string name="preferencesCategoryAdvancedLocator">"Locator"</string>
     <string name="preferencesCategoryAdvancedMisc">"Misc"</string>

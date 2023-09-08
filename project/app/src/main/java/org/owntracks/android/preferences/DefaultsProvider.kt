@@ -70,7 +70,6 @@ interface DefaultsProvider {
             Preferences::subTopic -> DEFAULT_SUB_TOPIC
             Preferences::theme -> AppTheme.AUTO
             Preferences::tls -> true
-            Preferences::tlsCaCrt -> ""
             Preferences::tlsClientCrt -> ""
             Preferences::tlsClientCrtPassword -> ""
             Preferences::tid -> StringMaxTwoAlphaNumericChars(

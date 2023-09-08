@@ -125,7 +125,6 @@
     <string name="preferencesAutostart">"자동 시작"</string>
     <string name="preferencesAutostartSummary">"기기 시작 시 자동으로 시작"</string>
     <string name="preferencesBrokerPassword">"비밀번호"</string>
-    <string name="preferencesCaCrtPath">"CA 인증서"</string>
     <string name="preferencesCategoryAdvancedEncryption">"암호화"</string>
     <string name="preferencesCategoryAdvancedLocator">"위치 정보 가져오기"</string>
     <string name="preferencesCategoryAdvancedMisc">"기타"</string>

@@ -76,7 +76,6 @@
     <string name="preferencesAutostart">"自动启动"</string>
     <string name="preferencesAutostartSummary">"自动随设备启动"</string>
     <string name="preferencesBrokerPassword">"密码"</string>
-    <string name="preferencesCaCrtPath">"CA证书"</string>
     <string name="preferencesCategoryAdvancedEncryption">"加密"</string>
     <string name="preferencesCategoryAdvancedMisc">"其他"</string>
     <string name="preferencesCategoryAdvancedServices">"服务"</string>

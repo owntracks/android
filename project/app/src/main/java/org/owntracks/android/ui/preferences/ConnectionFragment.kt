@@ -49,7 +49,6 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
     private val booleanSummaryProperties = setOf(
         Preferences::password,
         Preferences::tlsClientCrtPassword,
-        Preferences::tlsCaCrt,
         Preferences::tlsClientCrt
     )
 
@@ -97,7 +96,6 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
             }
 
         mapOf(
-            Preferences::tlsCaCrt to caCrtLauncher,
             Preferences::tlsClientCrt to clientCertLauncher
         )
             .forEach { (property, launcher) ->
@@ -163,7 +161,6 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
         }
     }
 
-    private val caCrtLauncher = createFilePickerLauncher(Preferences::tlsCaCrt)
     private val clientCertLauncher = createFilePickerLauncher(Preferences::tlsClientCrt)
 
     /**

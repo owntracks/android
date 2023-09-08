@@ -48,7 +48,6 @@
     <string name="preferencesAutostart">"Início automático"</string>
     <string name="preferencesAutostartSummary">"Iniciar automaticamente quando inicia"</string>
     <string name="preferencesBrokerPassword">"Palavra-passe"</string>
-    <string name="preferencesCaCrtPath">"Certificado CA"</string>
     <string name="preferencesCategoryAdvancedEncryption">"Encriptação"</string>
     <string name="preferencesCategoryAdvancedLocator">"Localizador"</string>
     <string name="preferencesCategoryAdvancedMisc">"Diversos"</string>

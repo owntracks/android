@@ -131,7 +131,6 @@ Chcete-li to umožnit, zapněte polohu v nastavení zařízení."</string>
     <string name="preferencesAutostart">"Autostart"</string>
     <string name="preferencesAutostartSummary">"Automaticky spustit po spuštění zařízení"</string>
     <string name="preferencesBrokerPassword">"Heslo"</string>
-    <string name="preferencesCaCrtPath">"CA certifikát"</string>
     <string name="preferencesCategoryAdvancedEncryption">"Šifrování"</string>
     <string name="preferencesCategoryAdvancedLocator">"Lokátor"</string>
     <string name="preferencesCategoryAdvancedMisc">"Různé"</string>

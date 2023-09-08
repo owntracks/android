@@ -225,7 +225,6 @@ class ImportExportTest {
               "theme" : 2,
               "tid" : "wn",
               "tls" : false,
-              "tlsCaCrt" : "",
               "tlsClientCrt" : "",
               "tlsClientCrtPassword" : "",
               "username" : "testusername",

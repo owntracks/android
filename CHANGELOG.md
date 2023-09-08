@@ -2,6 +2,10 @@
 
 ## Version 2.5.0
 
+### Breaking changes
+
+- OwnTracks will no longer manage your TLS CAs if you're using a CA that's not in your device's CA store. You will need to add your CA to your device's CA store, and OwnTracks will use that store as a trusted reference for verifying TLS endpoints.
+
 ### New features
 
 - Minimum device version is now SDK v24 (Android 7.0 Nougat)

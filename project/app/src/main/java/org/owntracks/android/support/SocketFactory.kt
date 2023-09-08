@@ -6,8 +6,6 @@ import java.net.InetAddress
 import java.net.Socket
 import java.security.KeyStore
 import java.security.Security
-import java.security.cert.CertificateFactory
-import java.security.cert.X509Certificate
 import javax.net.ssl.KeyManagerFactory
 import javax.net.ssl.SSLContext
 import javax.net.ssl.SSLSocket
@@ -22,7 +20,6 @@ class SocketFactory(options: SocketFactoryOptions) : SSLSocketFactory() {
     private val socketTimeout: Int
 
     data class SocketFactoryOptions(
-        var caCrt: ByteArray? = null,
         var clientP12Certificate: ByteArray? = null,
 
         var caClientP12Password: String? = null,
@@ -34,10 +31,6 @@ class SocketFactory(options: SocketFactoryOptions) : SSLSocketFactory() {
 
             other as SocketFactoryOptions
 
-            if (caCrt != null) {
-                if (other.caCrt == null) return false
-                if (!caCrt.contentEquals(other.caCrt)) return false
-            } else if (other.caCrt != null) return false
             if (clientP12Certificate != null) {
                 if (other.clientP12Certificate == null) return false
                 if (!clientP12Certificate.contentEquals(other.clientP12Certificate)) return false
@@ -49,8 +42,7 @@ class SocketFactory(options: SocketFactoryOptions) : SSLSocketFactory() {
         }
 
         override fun hashCode(): Int {
-            var result = caCrt?.contentHashCode() ?: 0
-            result = 31 * result + (clientP12Certificate?.contentHashCode() ?: 0)
+            var result = (clientP12Certificate?.contentHashCode() ?: 0)
             result = 31 * result + (caClientP12Password?.hashCode() ?: 0)
             result = 31 * result + socketTimeout
             return result
@@ -62,37 +54,11 @@ class SocketFactory(options: SocketFactoryOptions) : SSLSocketFactory() {
         val tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
         val kmf = KeyManagerFactory.getInstance("X509")
         socketTimeout = options.socketTimeout
-        if (options.caCrt != null) {
-            Timber.v("options.hasCaCrt(): true")
-            val caKeyStore = KeyStore.getInstance(KeyStore.getDefaultType())
-            caKeyStore.load(null, null)
-            val caCF = CertificateFactory.getInstance("X.509", "BC")
-            val ca = caCF.generateCertificate(ByteArrayInputStream(options.caCrt)) as X509Certificate
-            val alias = ca.subjectX500Principal.name
-            // Set proper alias name
-            caKeyStore.setCertificateEntry(alias, ca)
-            tmf.init(caKeyStore)
-            Timber.v("Certificate Owner: ${ca.subjectDN}")
-            Timber.v("Certificate Issuer: ${ca.issuerDN}")
-            Timber.v("Certificate Serial Number: ${ca.serialNumber}")
-            Timber.v("Certificate Algorithm: ${ca.sigAlgName}")
-            Timber.v("Certificate Version: ${ca.version}")
-            Timber.v("Certificate OID: ${ca.sigAlgOID}")
-            val aliasesCA = caKeyStore.aliases()
-            while (aliasesCA.hasMoreElements()) {
-                val o = aliasesCA.nextElement()
-                Timber.v(
-                    "Alias: $o " +
-                        "isKeyEntry:${caKeyStore.isKeyEntry(o)} " +
-                        "isCertificateEntry:${caKeyStore.isCertificateEntry(o)}"
-                )
-            }
-        } else {
-            Timber.v("CA sideload: false, using system keystore")
-            val keyStore = KeyStore.getInstance("AndroidCAStore")
-            keyStore.load(null)
-            tmf.init(keyStore)
-        }
+
+        val keyStore = KeyStore.getInstance("AndroidCAStore")
+        keyStore.load(null)
+        tmf.init(keyStore)
+
         if (options.clientP12Certificate != null) {
             Timber.v("options.hasClientP12Crt(): true")
             val clientKeyStore = KeyStore.getInstance("PKCS12", Security.getProvider("BC"))

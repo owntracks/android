@@ -117,7 +117,6 @@ class PreferenceTest {
         "port",
         "pubTopicBase",
         "tls",
-        "tlsCaCrt",
         "tlsClientCrt",
         "tlsClientCrtPassword"
     )

@@ -107,7 +107,6 @@
     <string name="preferencesAutostart">"Démarrage auto"</string>
     <string name="preferencesAutostartSummary">"Démarrer automatiquement au démarrage de l'appareil"</string>
     <string name="preferencesBrokerPassword">"Mot de passe"</string>
-    <string name="preferencesCaCrtPath">"Certificat CA"</string>
     <string name="preferencesCategoryAdvancedEncryption">"Chiffrement"</string>
     <string name="preferencesCategoryAdvancedLocator">"Localisateur"</string>
     <string name="preferencesCategoryAdvancedMisc">"Autres"</string>

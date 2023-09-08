@@ -116,7 +116,6 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="preferencesAutostart">"Autostart"</string>
     <string name="preferencesAutostartSummary">"Automatisch mit Gerät starten"</string>
     <string name="preferencesBrokerPassword">"Passwort"</string>
-    <string name="preferencesCaCrtPath">"CA-Zertifikat"</string>
     <string name="preferencesCategoryAdvancedEncryption">"Verschlüsselung"</string>
     <string name="preferencesCategoryAdvancedLocator">"Ortung"</string>
     <string name="preferencesCategoryAdvancedMisc">"Weiteres"</string>

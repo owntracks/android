@@ -319,9 +319,6 @@ class Preferences @Inject constructor(
     var tls: Boolean by preferencesStore
 
     @Preference(exportModeHttp = false)
-    var tlsCaCrt: String by preferencesStore
-
-    @Preference(exportModeHttp = false)
     var tlsClientCrt: String by preferencesStore
 
     @Preference(exportModeHttp = false)

@@ -535,13 +535,6 @@ class PreferencesGettersAndSetters(private val parameter: Parameter) {
                     false
                 ),
                 Parameter(
-                    "TlsCaCrt",
-                    "tlsCaCrt",
-                    "caCertName",
-                    String::class,
-                    false
-                ),
-                Parameter(
                     "TlsClientCrt",
                     "tlsClientCrt",
                     "clientCertName",

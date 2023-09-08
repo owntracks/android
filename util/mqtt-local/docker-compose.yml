@@ -7,6 +7,7 @@ services:
       - 1883:1883
       - 8883:8883
       - 8884:8884
+      - 8885:8885
       - 8080:8080
       - 8081:8081
     volumes:
@@ -15,6 +16,8 @@ services:
       - ${PWD}/rootCA.pem:/mosquitto/config/rootCA.pem:ro
       - ${PWD}/_wildcard.docker.local-key.pem:/mosquitto/config/key.pem:ro
       - ${PWD}/_wildcard.docker.local.pem:/mosquitto/config/cert.pem:ro
+      - ${PWD}/self-signed.crt:/mosquitto/config/self-signed.crt:ro
+      - ${PWD}/self-signed.key:/mosquitto/config/self-signed.key:ro
   nginx:
     depends_on:
       mosquitto:

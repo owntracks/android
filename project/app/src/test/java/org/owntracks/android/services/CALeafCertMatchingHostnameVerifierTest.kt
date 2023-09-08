@@ -1,6 +1,7 @@
 package org.owntracks.android.services
 
 import java.io.ByteArrayInputStream
+import java.security.KeyStore
 import java.security.Principal
 import java.security.cert.Certificate
 import java.security.cert.CertificateFactory
@@ -9,6 +10,7 @@ import javax.net.ssl.SSLSessionContext
 import javax.security.cert.X509Certificate
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 
 class CALeafCertMatchingHostnameVerifierTest {
@@ -17,8 +19,14 @@ class CALeafCertMatchingHostnameVerifierTest {
         this.javaClass.getResource("/letsEncryptSignedLeafX509Certificate.pem")!!.readBytes()
     private val selfSignedCert = this.javaClass.getResource("/selfSignedX509Certificate.pem")!!.readBytes()
 
+    @Before
+    fun `Init Fake KeyStoreProvider`() {
+        FakeAndroidKeyStoreProvider.setup()
+    }
+
     @Test
     fun `Given a standard signed certificate, MqttHostnameVerifier should delegate to HTTPS implementation and succeed if hostnames are the same`() { // ktlint-disable max-line-length
+
         val testCA = CertificateFactory.getInstance("X.509").generateCertificate(
             ByteArrayInputStream(letsEncryptRootCert)
         )
@@ -26,7 +34,7 @@ class CALeafCertMatchingHostnameVerifierTest {
             ByteArrayInputStream(letsEncryptSignedLeaf)
         )
         val sslSession = TestSSLSession(listOf(testLeaf, testCA))
-        assertTrue(CALeafCertMatchingHostnameVerifier(testCA).verify("valid-isrgrootx1.letsencrypt.org", sslSession))
+        assertTrue(CALeafCertMatchingHostnameVerifier().verify("valid-isrgrootx1.letsencrypt.org", sslSession))
     }
 
     @Test
@@ -38,7 +46,7 @@ class CALeafCertMatchingHostnameVerifierTest {
             ByteArrayInputStream(letsEncryptSignedLeaf)
         )
         val sslSession = TestSSLSession(listOf(testLeaf, testCA))
-        assertFalse(CALeafCertMatchingHostnameVerifier(testCA).verify("host.evil.org", sslSession))
+        assertFalse(CALeafCertMatchingHostnameVerifier().verify("host.evil.org", sslSession))
     }
 
     @Test
@@ -47,7 +55,11 @@ class CALeafCertMatchingHostnameVerifierTest {
             ByteArrayInputStream(selfSignedCert)
         )
         val sslSession = TestSSLSession(listOf(selfSigned))
-        assertTrue(CALeafCertMatchingHostnameVerifier(selfSigned).verify("host.evil.org", sslSession))
+        val keystore = KeyStore.getInstance("AndroidCAStore").apply {
+            load(null)
+            setCertificateEntry("selfsigned", selfSigned)
+        }
+        assertTrue(CALeafCertMatchingHostnameVerifier(keystore).verify("host.evil.org", sslSession))
     }
 
     @Test
@@ -56,7 +68,7 @@ class CALeafCertMatchingHostnameVerifierTest {
             ByteArrayInputStream(selfSignedCert)
         )
         val sslSession = TestSSLSession(listOf(selfSigned))
-        assertTrue(CALeafCertMatchingHostnameVerifier(selfSigned).verify("test.example.com", sslSession))
+        assertTrue(CALeafCertMatchingHostnameVerifier().verify("test.example.com", sslSession))
     }
 
     private class TestSSLSession(private val testPeerCertificates: List<Certificate>) : SSLSession {

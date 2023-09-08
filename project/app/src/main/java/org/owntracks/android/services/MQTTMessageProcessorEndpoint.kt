@@ -225,7 +225,6 @@ class MQTTMessageProcessorEndpoint(
             Preferences::password.name,
             Preferences::port.name,
             Preferences::tls.name,
-            Preferences::tlsCaCrt.name,
             Preferences::tlsClientCrt.name,
             Preferences::tlsClientCrtPassword.name,
             Preferences::username.name,

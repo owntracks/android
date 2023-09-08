@@ -24,7 +24,7 @@ class SharedPreferencesStore @Inject constructor(@ApplicationContext private val
     }
 
     private fun migrateCertificatesToInline() {
-        listOf(Preferences::tlsCaCrt.name, Preferences::tlsClientCrt.name).forEach { preferenceName ->
+        listOf(Preferences::tlsClientCrt.name).forEach { preferenceName ->
             sharedPreferences.getString(preferenceName, null)
                 ?.run {
                     val crtFileExists = try {

@@ -88,7 +88,6 @@
     <string name="preferencesAutostart">"Autoarranque"</string>
     <string name="preferencesAutostartSummary">"Arrancar cuando se enciende el dispositivo"</string>
     <string name="preferencesBrokerPassword">"Contraseña"</string>
-    <string name="preferencesCaCrtPath">"Certificado CA"</string>
     <string name="preferencesCategoryAdvancedEncryption">"Encriptación"</string>
     <string name="preferencesCategoryAdvancedLocator">"Locator"</string>
     <string name="preferencesCategoryAdvancedMisc">"Miscelánea"</string>

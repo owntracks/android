@@ -97,11 +97,6 @@
             android:title="@string/tls"
             app:iconSpaceReserved="false" />
         <org.owntracks.android.ui.preferences.FilePickerPreference
-            android:key="tlsCaCrt"
-            android:title="@string/preferencesCaCrtPath"
-            app:dependency="tls"
-            app:iconSpaceReserved="false" />
-        <org.owntracks.android.ui.preferences.FilePickerPreference
             android:key="tlsClientCrt"
             android:title="@string/preferencesClientCrtPath"
             app:dependency="tls"

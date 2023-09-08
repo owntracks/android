@@ -135,7 +135,6 @@ Aby to umożliwić, włącz lokalizację w ustawieniach urządzenia."</string>
     <string name="preferencesAutostart">"Autostart"</string>
     <string name="preferencesAutostartSummary">"Uruchamiaj razem z urządzeniem"</string>
     <string name="preferencesBrokerPassword">"Hasło"</string>
-    <string name="preferencesCaCrtPath">"Certyfikat CA"</string>
     <string name="preferencesCategoryAdvancedEncryption">"Szyfrowanie"</string>
     <string name="preferencesCategoryAdvancedLocator">"Lokalizator"</string>
     <string name="preferencesCategoryAdvancedMisc">"Różne"</string>

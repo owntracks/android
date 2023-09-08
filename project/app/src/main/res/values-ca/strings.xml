@@ -131,7 +131,6 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="preferencesAutostart">"Autoengegada"</string>
     <string name="preferencesAutostartSummary">"Engega automàticament en arrencar el dispositiu "</string>
     <string name="preferencesBrokerPassword">"Contrasenya"</string>
-    <string name="preferencesCaCrtPath">"Certificat CA"</string>
     <string name="preferencesCategoryAdvancedEncryption">"Encriptació"</string>
     <string name="preferencesCategoryAdvancedLocator">"Localitzador"</string>
     <string name="preferencesCategoryAdvancedMisc">"Misc"</string>

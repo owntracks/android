@@ -145,7 +145,6 @@
     <string name="preferencesAutostart">"Автозапуск"</string>
     <string name="preferencesAutostartSummary">"Автоматический запуск приложения при включении устройства"</string>
     <string name="preferencesBrokerPassword">"Пароль"</string>
-    <string name="preferencesCaCrtPath">"CA сертификат"</string>
     <string name="preferencesCategoryAdvancedEncryption">"Шифрование"</string>
     <string name="preferencesCategoryAdvancedLocator">"Локатор"</string>
     <string name="preferencesCategoryAdvancedMisc">"Прочее"</string>

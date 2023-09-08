@@ -129,7 +129,6 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="preferencesAutostart">"Autostart"</string>
     <string name="preferencesAutostartSummary">"Start automatisk når enhed tænder"</string>
     <string name="preferencesBrokerPassword">"Adgangskode"</string>
-    <string name="preferencesCaCrtPath">"CA-certifikat"</string>
     <string name="preferencesCategoryAdvancedEncryption">"Kryptering"</string>
     <string name="preferencesCategoryAdvancedLocator">"Lokaliseringsløsning"</string>
     <string name="preferencesCategoryAdvancedMisc">"Andet"</string>

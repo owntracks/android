@@ -113,7 +113,6 @@
     <string name="preferencesAutostart">"自動開始"</string>
     <string name="preferencesAutostartSummary">"デバイス起動時に自動的に開始する"</string>
     <string name="preferencesBrokerPassword">"パスワード"</string>
-    <string name="preferencesCaCrtPath">"CA証明書"</string>
     <string name="preferencesCategoryAdvancedEncryption">"暗号化"</string>
     <string name="preferencesCategoryAdvancedLocator">"位置情報取得"</string>
     <string name="preferencesCategoryAdvancedMisc">"その他"</string>

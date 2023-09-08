@@ -47,8 +47,6 @@ class HttpMessageProcessorEndpointTest {
     fun setupPreferences() {
         testPreferences = mock {
             on { encryptionKey } doReturn "testEncryptionKey"
-            on { tlsCaCrt } doReturn ""
-            on { tlsCaCrt } doReturn ""
             on { tlsClientCrt } doReturn ""
             on { username } doReturn ""
             on { deviceId } doReturn ""
