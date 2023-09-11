@@ -50,7 +50,7 @@ triplet = "3.8.4"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-hilt-android = { id = "dagger.hilt.android.plugin", version.ref = "hilt" }
+hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 triplet = { id = "com.github.triplet.play", version.ref = "triplet" }
 

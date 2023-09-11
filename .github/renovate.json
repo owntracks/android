@@ -14,5 +14,6 @@
       "matchFileNames": [".github/google-play-api/requirements.txt"],
       "automerge": true
     }
-  ]
+  ],
+  "platformAutomerge": true
 }

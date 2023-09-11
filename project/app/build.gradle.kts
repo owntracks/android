@@ -2,7 +2,7 @@ import kotlin.io.path.isRegularFile
 
 plugins {
     id("com.android.application")
-    id("dagger.hilt.android.plugin")
+    id("com.google.dagger.hilt.android")
     id("com.github.triplet.play")
     kotlin("android")
     kotlin("kapt")
