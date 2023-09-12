@@ -4,7 +4,7 @@ charset-normalizer==3.2.0
 google-api-core==2.11.1
 google-api-python-client==2.97.0
 google-auth==2.22.0
-google-auth-httplib2==0.1.0
+google-auth-httplib2==0.1.1
 googleapis-common-protos==1.60.0
 httplib2==0.22.0
 idna==3.4
