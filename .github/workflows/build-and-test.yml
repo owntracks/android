@@ -97,7 +97,7 @@ jobs:
 
       - name: Upload coverage
         if: ${{ steps.changes.outputs.src == 'true' && (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'integration-test-required')) || (github.event_name == 'push' && github.ref == 'refs/heads/master') }}
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           files: ./project/app/build/reports/coverage/test/gms/debug/report.xml
           flags: unittests
@@ -261,7 +261,7 @@ jobs:
         if: always() && steps.changes.outputs.src == 'true'
       - name: Upload coverage
         if: ${{ (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'integration-test-required')) || (github.event_name == 'push' && github.ref == 'refs/heads/master') }}
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           files: ./project/app/build/reports/coverage/androidTest/${{ matrix.flavour == 'Gms' && 'gms' || 'oss' }}/debug/connected/report.xml
           flags: uitests
