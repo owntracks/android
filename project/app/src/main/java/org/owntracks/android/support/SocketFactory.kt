@@ -15,7 +15,7 @@ import timber.log.Timber
 
 class SocketFactory(options: SocketFactoryOptions) : SSLSocketFactory() {
     private val factory: SSLSocketFactory
-    private val protocols = arrayOf("TLSv1", "TLSv1.1", "TLSv1.2", "TLSv1.3")
+    private val protocols = arrayOf("TLSv1.2", "TLSv1.3")
 
     private val socketTimeout: Int
 
