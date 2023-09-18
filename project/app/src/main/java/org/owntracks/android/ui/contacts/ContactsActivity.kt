@@ -42,6 +42,7 @@ class ContactsActivity :
             }
 
         contactsAdapter.setContactList(vm.contacts.values)
+        vm.contacts.values.forEach(vm::refreshGeocode)
         vm.contactUpdatedEvent.observe(this) {
             when (it) {
                 is ContactsRepoChange.ContactAdded -> {

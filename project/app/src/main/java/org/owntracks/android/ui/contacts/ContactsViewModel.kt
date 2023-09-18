@@ -16,7 +16,6 @@ class ContactsViewModel @Inject constructor(
     private val contactsRepo: ContactsRepo,
     private val geocoderProvider: GeocoderProvider
 ) : ViewModel() {
-
     fun refreshGeocode(contact: Contact) {
         contact.geocodeLocation(geocoderProvider, viewModelScope)
     }
