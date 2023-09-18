@@ -13,7 +13,7 @@ import javax.net.ssl.SSLSocketFactory
 import javax.net.ssl.TrustManagerFactory
 import timber.log.Timber
 
-class SocketFactory(options: SocketFactoryOptions) : SSLSocketFactory() {
+class SocketFactory(options: SocketFactoryOptions, caKeyStore: KeyStore) : SSLSocketFactory() {
     private val factory: SSLSocketFactory
     private val protocols = arrayOf("TLSv1.2", "TLSv1.3")
 
@@ -55,9 +55,7 @@ class SocketFactory(options: SocketFactoryOptions) : SSLSocketFactory() {
         val kmf = KeyManagerFactory.getInstance("X509")
         socketTimeout = options.socketTimeout
 
-        val keyStore = KeyStore.getInstance("AndroidCAStore")
-        keyStore.load(null)
-        tmf.init(keyStore)
+        tmf.init(caKeyStore)
 
         if (options.clientP12Certificate != null) {
             Timber.v("options.hasClientP12Crt(): true")

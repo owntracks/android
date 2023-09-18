@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import java.security.KeyStore
 import javax.inject.Named
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
@@ -76,4 +77,11 @@ class SingletonModule {
 
     @Provides
     fun provideOkHttpClient(): OkHttpClient = OkHttpClient()
+
+    @Provides
+    @Named("CAKeyStore")
+    @Singleton
+    fun privateAndroidCaKeyStore(): KeyStore {
+        return KeyStore.getInstance("AndroidCAStore").apply { load(null) }
+    }
 }

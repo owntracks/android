@@ -3,6 +3,7 @@ package org.owntracks.android.services
 import android.content.Context
 import com.fasterxml.jackson.core.JsonProcessingException
 import java.io.IOException
+import java.security.KeyStore
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 import javax.net.ssl.HostnameVerifier
@@ -36,6 +37,7 @@ class HttpMessageProcessorEndpoint(
     private val preferences: Preferences,
     private val applicationContext: Context,
     private val endpointStateRepo: EndpointStateRepo,
+    private val caKeyStore: KeyStore,
     @ApplicationScope private val scope: CoroutineScope,
     @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : MessageProcessorEndpoint(messageProcessor),
@@ -227,7 +229,8 @@ class HttpMessageProcessorEndpoint(
             preferences.tls,
             tlsClientCrtBytes,
             preferences.tlsClientCrtPassword,
-            context
+            context,
+            caKeyStore
         )
 
         return HttpClientAndConfiguration(

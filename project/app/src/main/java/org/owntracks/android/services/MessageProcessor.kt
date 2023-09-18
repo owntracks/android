@@ -5,6 +5,7 @@ import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.idling.CountingIdlingResource
 import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.security.KeyStore
 import java.util.concurrent.BlockingDeque
 import javax.inject.Inject
 import javax.inject.Named
@@ -52,6 +53,7 @@ class MessageProcessor @Inject constructor(
     private val serviceBridge: ServiceBridge,
     @Named("outgoingQueueIdlingResource") private val outgoingQueueIdlingResource: CountingIdlingResource,
     @Named("importConfigurationIdlingResource") private val importConfigurationIdlingResource: SimpleIdlingResource,
+    @Named("CAKeyStore") private val caKeyStore: KeyStore,
     private val locationProcessorLazy: Lazy<LocationProcessor>,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val scope: CoroutineScope
@@ -85,6 +87,7 @@ class MessageProcessor @Inject constructor(
             preferences,
             applicationContext,
             endpointStateRepo,
+            caKeyStore,
             scope,
             ioDispatcher
         )
@@ -94,6 +97,7 @@ class MessageProcessor @Inject constructor(
             scheduler,
             preferences,
             parser,
+            caKeyStore,
             scope,
             ioDispatcher,
             applicationContext

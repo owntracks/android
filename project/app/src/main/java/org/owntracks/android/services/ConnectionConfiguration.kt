@@ -3,6 +3,7 @@ package org.owntracks.android.services
 import android.content.Context
 import android.util.Base64
 import android.util.Base64.NO_WRAP
+import java.security.KeyStore
 import org.owntracks.android.support.SocketFactory
 
 interface ConnectionConfiguration {
@@ -25,7 +26,8 @@ interface ConnectionConfiguration {
         tls: Boolean,
         tlsClientCrt: ByteArray?,
         tlsClientCrtPassword: String,
-        context: Context
+        context: Context,
+        caKeyStore: KeyStore
     ): SocketFactory =
         SocketFactory(
             SocketFactory.SocketFactoryOptions()
@@ -37,6 +39,7 @@ interface ConnectionConfiguration {
                             caClientP12Password = tlsClientCrtPassword
                         }
                     }
-                }
+                },
+            caKeyStore
         )
 }

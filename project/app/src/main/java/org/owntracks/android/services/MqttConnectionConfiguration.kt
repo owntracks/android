@@ -3,6 +3,7 @@ package org.owntracks.android.services
 import android.content.Context
 import java.net.URI
 import java.net.URISyntaxException
+import java.security.KeyStore
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions
 import org.json.JSONObject
 import org.owntracks.android.preferences.DefaultsProvider
@@ -57,7 +58,7 @@ data class MqttConnectionConfiguration constructor(
             return URI(scheme, null, host, port, "", "", "").toString()
         }
 
-    fun getConnectOptions(context: Context): MqttConnectOptions =
+    fun getConnectOptions(context: Context, caKeyStore: KeyStore): MqttConnectOptions =
         MqttConnectOptions().apply {
             userName = username
             password = this@MqttConnectionConfiguration.password.toCharArray()
@@ -77,7 +78,14 @@ data class MqttConnectionConfiguration constructor(
             maxInflight = maxInFlight
             if (tls) {
                 val tlsClientCrtBytes = getClientCert(tlsClientCrtBase64)
-                socketFactory = getSocketFactory(timeout, true, tlsClientCrtBytes, tlsClientCrtPassword, context)
+                socketFactory = getSocketFactory(
+                    timeout,
+                    true,
+                    tlsClientCrtBytes,
+                    tlsClientCrtPassword,
+                    context,
+                    caKeyStore
+                )
 
                 /* The default for paho is to validate hostnames as per the HTTPS spec. However, this causes
                 a bit of a breakage for some users using self-signed certificates, where the verification of

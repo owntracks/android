@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.IOException
+import java.security.KeyStore
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.stream.Collectors
 import kotlin.time.Duration.Companion.milliseconds
@@ -56,6 +57,7 @@ class MQTTMessageProcessorEndpoint(
     private val scheduler: Scheduler,
     private val preferences: Preferences,
     private val parser: Parser,
+    private val caKeyStore: KeyStore,
     @ApplicationScope private val scope: CoroutineScope,
     @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationContext private val applicationContext: Context
@@ -319,7 +321,7 @@ class MQTTMessageProcessorEndpoint(
                         }
                         .apply {
                             Timber.i("Connecting to ${mqttConnectionConfiguration.connectionString}")
-                            connect(mqttConnectionConfiguration.getConnectOptions(applicationContext))
+                            connect(mqttConnectionConfiguration.getConnectOptions(applicationContext, caKeyStore))
                                 .waitForCompletion()
                             Timber.i("Connected. Subscribing to ${mqttConnectionConfiguration.topicsToSubscribeTo}")
                             endpointStateRepo.setState(EndpointState.CONNECTED)

@@ -79,6 +79,7 @@ class HttpMessageProcessorEndpointTest {
                     testPreferences,
                     application,
                     endpointStateRepo,
+                    mock {},
                     this,
                     StandardTestDispatcher()
                 )
@@ -104,6 +105,7 @@ class HttpMessageProcessorEndpointTest {
                 testPreferences,
                 application,
                 endpointStateRepo,
+                mock {},
                 this,
                 StandardTestDispatcher()
             )
@@ -126,6 +128,7 @@ class HttpMessageProcessorEndpointTest {
                 testPreferences,
                 application,
                 endpointStateRepo,
+                mock {},
                 this,
                 StandardTestDispatcher()
             )
@@ -154,6 +157,7 @@ class HttpMessageProcessorEndpointTest {
                 testPreferences,
                 application,
                 endpointStateRepo,
+                mock {},
                 this,
                 StandardTestDispatcher()
             )
@@ -185,6 +189,7 @@ class HttpMessageProcessorEndpointTest {
                 testPreferences,
                 application,
                 endpointStateRepo,
+                mock {},
                 this,
                 StandardTestDispatcher()
             )
@@ -207,6 +212,7 @@ class HttpMessageProcessorEndpointTest {
                     testPreferences,
                     application,
                     endpointStateRepo,
+                    mock {},
                     this,
                     StandardTestDispatcher()
                 )
