@@ -11,6 +11,7 @@ import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.owntracks.android.R
 import org.owntracks.android.data.repos.ContactsRepoChange
@@ -53,23 +54,25 @@ abstract class MapFragment<V : ViewDataBinding> internal constructor(
         viewModel.apply {
             mapCenter.observe(viewLifecycleOwner, this@MapFragment::updateCamera)
             updateAllMarkers(allContacts.values.toSet())
-            contactUpdatedEvent.observe(viewLifecycleOwner) {
-                when (it) {
-                    ContactsRepoChange.AllCleared -> { updateAllMarkers(emptySet()) }
-                    is ContactsRepoChange.ContactAdded -> {
-                        updateMarkerForContact(it.contact)
-                    }
-                    is ContactsRepoChange.ContactLocationUpdated -> {
-                        updateMarkerForContact(it.contact)
-                        if (viewMode == MapViewModel.ViewMode.Contact(true) && currentContact.value == it.contact) {
-                            it.contact.latLng?.run(this@MapFragment::updateCamera)
+            lifecycleScope.launch {
+                contactUpdatedEvent.collect {
+                    when (it) {
+                        ContactsRepoChange.AllCleared -> { updateAllMarkers(emptySet()) }
+                        is ContactsRepoChange.ContactAdded -> {
+                            updateMarkerForContact(it.contact)
                         }
-                    }
-                    is ContactsRepoChange.ContactCardUpdated -> {
-                        updateMarkerForContact(it.contact)
-                    }
-                    is ContactsRepoChange.ContactRemoved -> {
-                        removeMarkerFromMap(it.contact.id)
+                        is ContactsRepoChange.ContactLocationUpdated -> {
+                            updateMarkerForContact(it.contact)
+                            if (viewMode == MapViewModel.ViewMode.Contact(true) && currentContact.value == it.contact) {
+                                it.contact.latLng?.run(this@MapFragment::updateCamera)
+                            }
+                        }
+                        is ContactsRepoChange.ContactCardUpdated -> {
+                            updateMarkerForContact(it.contact)
+                        }
+                        is ContactsRepoChange.ContactRemoved -> {
+                            removeMarkerFromMap(it.contact.id)
+                        }
                     }
                 }
             }

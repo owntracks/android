@@ -11,9 +11,9 @@
             type="org.owntracks.android.ui.waypoints.WaypointsViewModel" />
     </data>
 
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical">
 
         <include
@@ -34,5 +34,5 @@
             android:gravity="center"
             android:text="@string/waypointListPlaceholder"
             android:visibility="@{vm.waypointsList.empty ? View.VISIBLE : View.GONE}" />
-    </androidx.appcompat.widget.LinearLayoutCompat>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

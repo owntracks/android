@@ -323,7 +323,9 @@ class MQTTMessageProcessorEndpoint(
                             Timber.i("Connecting to ${mqttConnectionConfiguration.connectionString}")
                             connect(mqttConnectionConfiguration.getConnectOptions(applicationContext, caKeyStore))
                                 .waitForCompletion()
-                            Timber.i("Connected. Subscribing to ${mqttConnectionConfiguration.topicsToSubscribeTo}")
+                            Timber.i(
+                                "MQTT Connected. Subscribing to ${mqttConnectionConfiguration.topicsToSubscribeTo}"
+                            )
                             endpointStateRepo.setState(EndpointState.CONNECTED)
                             setCallback(mqttCallback)
                             subscribe(
@@ -332,7 +334,7 @@ class MQTTMessageProcessorEndpoint(
                                     mqttConnectionConfiguration.subQos.value
                                 }
                             ).waitForCompletion()
-                            Timber.i("Subscribed")
+                            Timber.i("MQTT Subscribed")
 
                             messageProcessor.notifyOutgoingMessageQueue()
                             if (preferences.publishLocationOnConnect) {

@@ -312,7 +312,7 @@ class MessageProcessor @Inject constructor(
     }
 
     private fun processIncomingMessage(message: MessageClear) {
-        contactsRepo.remove(message.contactKey)
+        scope.launch { contactsRepo.remove(message.contactKey) }
     }
 
     private fun processIncomingMessage(message: MessageLocation) {
@@ -323,12 +323,12 @@ class MessageProcessor @Inject constructor(
         ) {
             Timber.e("discarding stale location")
         } else {
-            contactsRepo.update(message.contactKey, message)
+            scope.launch { contactsRepo.update(message.contactKey, message) }
         }
     }
 
     private fun processIncomingMessage(message: MessageCard) {
-        contactsRepo.update(message.contactKey, message)
+        scope.launch { contactsRepo.update(message.contactKey, message) }
     }
 
     private suspend fun processIncomingMessage(message: MessageCmd) {

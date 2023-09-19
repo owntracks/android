@@ -48,10 +48,12 @@ class ContactImageBindingAdapter @Inject constructor(
                 contactBitMapAndName is ContactBitmapAndName.CardBitmap &&
                 contactBitMapAndName.bitmap != null
             ) {
+                Timber.v("Retruning face bitmap for ${contact.id} from cache")
                 return@withContext contactBitMapAndName.bitmap
             }
 
             return@withContext contact.messageCard?.run {
+                Timber.v("Working out the face for ${contact.id}")
                 face?.run {
                     Base64.decode(toByteArray(), Base64.DEFAULT)
                 }?.run {

@@ -1,10 +1,10 @@
 package org.owntracks.android.data.repos
 
-import androidx.annotation.MainThread
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.internal.synchronized
 import org.owntracks.android.model.Contact
 import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageLocation
@@ -21,56 +21,51 @@ class MemoryContactsRepo @Inject constructor(
 
     private val contacts = mutableMapOf<String, Contact>()
 
-    private val mutableRepoChangedEvent = MutableLiveData<ContactsRepoChange>()
+    private val mutableRepoChangedEvent = MutableSharedFlow<ContactsRepoChange>()
 
-    override val repoChangedEvent: LiveData<ContactsRepoChange> = mutableRepoChangedEvent
+    override val repoChangedEvent: SharedFlow<ContactsRepoChange> = mutableRepoChangedEvent
     override val all: Map<String, Contact>
         get() = contacts
     override fun getById(id: String): Contact? {
         return contacts[id]
     }
 
-    @Synchronized
-    private fun put(id: String, contact: Contact) {
-        Timber.v("new contact allocated id=$id, tid=${contact.trackerId}")
-        contacts[id] = contact
-        mutableRepoChangedEvent.postValue(ContactsRepoChange.ContactAdded(contact))
+    private suspend fun put(id: String, contact: Contact) {
+        kotlin.synchronized(contacts) {
+            Timber.v("new contact allocated id=$id, tid=${contact.trackerId}")
+            contacts[id] = contact
+        }
+        mutableRepoChangedEvent.emit(ContactsRepoChange.ContactAdded(contact))
     }
 
-    @MainThread
-    @Synchronized
     override fun clearAll() {
         contacts.clear()
         contactsBitmapAndNameMemoryCache.evictAll()
-        mutableRepoChangedEvent.postValue(ContactsRepoChange.AllCleared)
+        mutableRepoChangedEvent.tryEmit(ContactsRepoChange.AllCleared)
     }
 
-    @Synchronized
-    override fun remove(id: String) {
+    override suspend fun remove(id: String) {
         Timber.v("removing contact: $id")
         contacts.remove(id)?.run {
-            mutableRepoChangedEvent.postValue(ContactsRepoChange.ContactRemoved(this))
+            mutableRepoChangedEvent.emit(ContactsRepoChange.ContactRemoved(this))
         }
     }
 
-    @Synchronized
-    override fun update(id: String, messageCard: MessageCard) {
-        Timber.v("Updating card for contact $id")
+    override suspend fun update(id: String, messageCard: MessageCard) {
         getById(id)?.apply {
             this.messageCard = messageCard
-            mutableRepoChangedEvent.postValue(ContactsRepoChange.ContactCardUpdated(this))
+            mutableRepoChangedEvent.emit(ContactsRepoChange.ContactCardUpdated(this))
         } ?: run {
             Contact(id).apply { this.messageCard = messageCard }.also { put(id, it) }
         }
     }
 
-    @Synchronized
-    override fun update(id: String, messageLocation: MessageLocation) {
+    override suspend fun update(id: String, messageLocation: MessageLocation) {
         Timber.v("Updating location for contact $id")
         getById(id)?.apply {
             // If timestamp of last location message is <= the new location message, skip update. We either received an old or already known message.
             if (setMessageLocation(messageLocation)) {
-                mutableRepoChangedEvent.postValue(ContactsRepoChange.ContactLocationUpdated(this))
+                mutableRepoChangedEvent.emit(ContactsRepoChange.ContactLocationUpdated(this))
             }
         } ?: run {
             Contact(id).apply {

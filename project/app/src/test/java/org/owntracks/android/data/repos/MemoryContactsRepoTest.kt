@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.Resources
 import android.util.DisplayMetrics
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -63,7 +64,7 @@ class MemoryContactsRepoTest {
     }
 
     @Test
-    fun `given an empty repo, when updating a contact with a location, then the contact is created with the location`() {
+    fun `given an empty repo, when updating a contact with a location, then the contact is created with the location`() = runTest {
         contactsRepo!!.update(CONTACT_ID, messageLocation)
         val c = contactsRepo!!.getById(CONTACT_ID)
         assertEquals(messageLocation, c!!.messageLocation)
@@ -72,21 +73,21 @@ class MemoryContactsRepoTest {
     }
 
     @Test
-    fun `given a non-empty repo, when removing a contact, then that contact is no longer in the repo`() {
+    fun `given a non-empty repo, when removing a contact, then that contact is no longer in the repo`() = runTest {
         contactsRepo!!.update(CONTACT_ID, messageLocation)
         contactsRepo!!.remove(CONTACT_ID)
         assertNull(contactsRepo!!.getById(CONTACT_ID))
     }
 
     @Test
-    fun `given a non-empty repo, when the mode change event is called, the repo is emptied`() {
+    fun `given a non-empty repo, when the mode change event is called, the repo is emptied`() = runTest {
         contactsRepo!!.update(CONTACT_ID, messageLocation)
         preferences.mode = ConnectionMode.HTTP
         assertTrue(contactsRepo!!.all.isEmpty())
     }
 
     @Test
-    fun `given a non-empty repo, when the endpoint change event is called, the repo is emptied`() {
+    fun `given a non-empty repo, when the endpoint change event is called, the repo is emptied`() = runTest {
         contactsRepo!!.update(CONTACT_ID, messageLocation)
         preferences.mode = ConnectionMode.HTTP
         assertTrue(contactsRepo!!.all.isEmpty())

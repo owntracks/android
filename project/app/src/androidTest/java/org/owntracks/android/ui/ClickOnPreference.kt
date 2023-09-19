@@ -9,7 +9,7 @@ import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import org.hamcrest.Matchers.allOf
 
-private const val sleepMillis = 100L
+private const val SLEEP_MILLIS = 100L
 
 fun clickOnDrawerAndWait(text: Int) {
     Espresso.onView(
@@ -19,20 +19,20 @@ fun clickOnDrawerAndWait(text: Int) {
         )
     )
         .perform(click())
-    sleep(sleepMillis)
+    sleep(SLEEP_MILLIS)
 }
 
 fun clickOnAndWait(int: Int) {
     clickOn(int)
-    sleep(sleepMillis)
+    sleep(SLEEP_MILLIS)
 }
 
 fun clickOnAndWait(str: String) {
     clickOn(str)
-    sleep(sleepMillis)
+    sleep(SLEEP_MILLIS)
 }
 
 fun clickBackAndWait() {
     clickBack()
-    sleep(sleepMillis)
+    sleep(SLEEP_MILLIS)
 }

@@ -15,6 +15,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.math.asin
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import org.owntracks.android.BR
 import org.owntracks.android.data.repos.ContactsRepo
@@ -90,7 +91,7 @@ class MapViewModel @Inject constructor(
     val currentLocation = LocationLiveData(application, viewModelScope)
     val waypoints = waypointsRepo.allLive
     val allContacts = contactsRepo.all
-    val contactUpdatedEvent: LiveData<ContactsRepoChange> = contactsRepo.repoChangedEvent
+    val contactUpdatedEvent: Flow<ContactsRepoChange> = contactsRepo.repoChangedEvent
 
     val scope: CoroutineScope
         get() = viewModelScope
@@ -272,7 +273,9 @@ class MapViewModel @Inject constructor(
     fun onClearContactClicked() {
         mutableCurrentContact.value?.also {
             messageProcessor.queueMessageForSending(MessageClear().apply { topic = it.id })
-            contactsRepo.remove(it.id)
+            viewModelScope.launch {
+                contactsRepo.remove(it.id)
+            }
         }
         clearActiveContact()
     }

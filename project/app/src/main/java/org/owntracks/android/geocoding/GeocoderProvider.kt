@@ -13,9 +13,11 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -71,6 +73,7 @@ class GeocoderProvider @Inject constructor(
             return
         }
         Timber.d("Resolving geocode for $messageLocation")
+        delay(5.seconds)
         val result = geocoderResolve(messageLocation)
         messageLocation.geocode = geocodeResultToText(result)
         Timber.v("Geocoded $messageLocation")

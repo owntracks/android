@@ -34,16 +34,22 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
     override lateinit var broker: Broker
     override val packetReceivedIdlingResource = LatchingIdlingResourceWithData("mqttPacketReceivedIdlingResource")
 
-    override fun <E : MessageBase> Collection<E>.sendFromBroker(broker: Broker) {
-        map(Parser(null)::toJsonBytes).forEach {
-            broker.publish(
-                false,
-                "owntracks/someuser/somedevice",
-                Qos.AT_LEAST_ONCE,
-                MQTT5Properties(),
-                it.toUByteArray()
-            )
-        }
+    override fun MessageBase.sendFromBroker(
+        broker: Broker,
+        topicName: String,
+        retain: Boolean
+    ) {
+        Timber.i("Publishing ${this::class.java.simpleName} message to $topicName with retain=$retain")
+        this.toJsonBytes(Parser(null))
+            .run {
+                broker.publish(
+                    retain,
+                    topicName,
+                    Qos.AT_LEAST_ONCE,
+                    MQTT5Properties(),
+                    toUByteArray()
+                )
+            }
     }
 
     private lateinit var brokerThread: Thread
@@ -110,8 +116,6 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
                             Timber.v("packet contains magic string $magic. Unlatching")
                             packetReceivedIdlingResource.unlatch()
                         }
-
-                        Timber.d("Total MQTT Packets received is ${mqttPacketsReceived.size}")
                     }
                 }
             }

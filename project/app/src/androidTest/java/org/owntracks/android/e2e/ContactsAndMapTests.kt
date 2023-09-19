@@ -26,7 +26,7 @@ import org.owntracks.android.ui.map.MapActivity
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class ContactActivityTests :
+class ContactsAndMapTests :
     TestWithAnActivity<MapActivity>(MapActivity::class.java, false),
     TestWithAnHTTPServer by TestWithAnHTTPServerImpl(),
     MockDeviceLocation by GPSMockDeviceLocation() {

@@ -4,13 +4,14 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
             name="vm"
             type="org.owntracks.android.ui.contacts.ContactsViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:id="@+id/mapCoordinatorLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -19,11 +20,20 @@
             android:id="@+id/appbar"
             layout="@layout/appbar" />
 
-        <androidx.recyclerview.widget.RecyclerView
+        <org.owntracks.android.support.widgets.RecyclerViewWithEmptyPlaceholder
             android:id="@+id/contactsRecyclerView"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:visibility="@{vm.contacts.isEmpty ? View.GONE : View.VISIBLE}"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+        <TextView
+            android:id="@+id/placeholder"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+            android:gravity="center"
+            android:text="@string/contactsListPlaceholder"
+            android:visibility="@{vm.contacts.isEmpty ? View.VISIBLE : View.GONE}" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

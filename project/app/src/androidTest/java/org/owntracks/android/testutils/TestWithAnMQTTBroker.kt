@@ -17,7 +17,17 @@ interface TestWithAnMQTTBroker {
     val mqttClientId: String
     val deviceId: String
     val packetReceivedIdlingResource: LatchingIdlingResourceWithData
-    fun <E : MessageBase> Collection<E>.sendFromBroker(broker: Broker)
+    fun MessageBase.sendFromBroker(
+        broker: Broker,
+        topicName: String = "owntracks/someuser/somedevice",
+        retain: Boolean = false
+    )
+
+    fun <E : MessageBase> Collection<E>.sendFromBroker(
+        broker: Broker,
+        topicName: String = "owntracks/someuser/somedevice",
+        retain: Boolean = false
+    ) = forEach { it.sendFromBroker(broker, topicName, retain) }
 
     @DelicateCoroutinesApi
     fun startBroker()

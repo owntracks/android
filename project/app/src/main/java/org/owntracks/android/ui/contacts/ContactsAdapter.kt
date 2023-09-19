@@ -10,7 +10,6 @@ import kotlinx.coroutines.CoroutineScope
 import org.owntracks.android.BR
 import org.owntracks.android.R
 import org.owntracks.android.model.Contact
-import timber.log.Timber
 
 internal class ContactsAdapter(
     private val clickListener: AdapterClickListener<Contact>,
@@ -26,7 +25,6 @@ internal class ContactsAdapter(
         }
 
         override fun onRemoved(position: Int, count: Int) {
-            Timber.v("Removing $count contacts from position $position")
             notifyItemRangeRemoved(position, count)
         }
 

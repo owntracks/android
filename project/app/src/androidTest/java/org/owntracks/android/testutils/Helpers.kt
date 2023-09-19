@@ -32,6 +32,7 @@ import java.io.FileInputStream
 import java.io.FileWriter
 import java.io.InputStream
 import java.util.concurrent.TimeUnit
+import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import org.owntracks.android.R
@@ -259,3 +260,8 @@ private fun InputStream.readAllAsString(): String {
     }
     return contents
 }
+
+fun Random.string(length: Int) =
+    IntRange(1, length).map {
+        this.nextInt(65, 90).toChar()
+    }.joinToString("")

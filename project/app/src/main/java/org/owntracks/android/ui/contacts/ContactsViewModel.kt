@@ -1,11 +1,11 @@
 package org.owntracks.android.ui.contacts
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.data.repos.ContactsRepoChange
 import org.owntracks.android.geocoding.GeocoderProvider
@@ -21,7 +21,7 @@ class ContactsViewModel @Inject constructor(
     }
 
     val contacts = contactsRepo.all
-    val contactUpdatedEvent: LiveData<ContactsRepoChange>
+    val contactUpdatedEvent: Flow<ContactsRepoChange>
         get() = contactsRepo.repoChangedEvent
     val coroutineScope: CoroutineScope
         get() = viewModelScope
