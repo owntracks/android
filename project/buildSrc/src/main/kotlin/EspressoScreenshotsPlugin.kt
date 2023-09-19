@@ -21,7 +21,7 @@ class EspressoScreenshotsPlugin : Plugin<Project> {
         val androidComponents = project.extensions.getByType(AndroidComponentsExtension::class.java)
 
         // This is where AGP writes out connected test reports
-        val reportsDirectoryPath = "${project.buildDir}/reports/androidTests/connected/flavors/%s"
+        val reportsDirectoryPath = "${project.layout.buildDirectory.get().asFile.path}/reports/androidTests/connected/debug/flavors/%s"
         android.run {
             productFlavors.all {
                 val flavorName = this.name

@@ -1,7 +1,7 @@
+import java.io.File
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
-import java.io.File
 
 abstract class EmbedScreenshotsInTestReport : DefaultTask() {
     @Input
@@ -22,8 +22,7 @@ abstract class EmbedScreenshotsInTestReport : DefaultTask() {
                 testClassDirectory.listFiles()?.forEach failedFile@{
                     val testName = it.name
                     val testNameWithoutExtension = it.nameWithoutExtension
-                    val testClassJunitReportFile =
-                        File(reportsPath, "$testClassName.html")
+                    val testClassJunitReportFile = File(reportsPath, "$testClassName.html")
                     if (!testClassJunitReportFile.exists()) {
                         println("Could not find JUnit report file for test class '$testClassJunitReportFile'")
                         return@failedFile
