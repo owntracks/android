@@ -17,7 +17,7 @@ plugins {
     alias(libs.plugins.kotlin.android).apply(false)
     alias(libs.plugins.hilt.android).apply(false)
     alias(libs.plugins.triplet).apply(false)
-    id("org.jlleitschuh.gradle.ktlint") version "11.5.1"
+    alias(libs.plugins.ktlint).apply(false)
 }
 
 extensions.findByName("buildScan")
