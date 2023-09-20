@@ -28,7 +28,7 @@ hilt-work = "1.0.0"
 jackson = "2.13.5"
 jaxb = "4.0.3"
 jaxb-api = "2.3.1"
-kmqtt = "0.3.2"
+kmqtt = "0.4.1"
 kotlin = "1.8.10"
 kotlin-coroutines = "1.7.3"
 ktlint = "11.5.1"
@@ -119,7 +119,8 @@ widgets-materialize = { module = "com.mikepenz:materialize", version.ref = "mate
 
 # Testing
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito-kotlin" }
-kmqtt = { module = "com.github.davidepianca98.KMQTT:kmqtt", version.ref = "kmqtt" }
+kmqtt-broker = { module = "com.github.davidepianca98.KMQTT:kmqtt-broker-jvm", version.ref = "kmqtt" }
+kmqtt-common = { module = "com.github.davidepianca98.KMQTT:kmqtt-common-jvm", version.ref = "kmqtt" }
 barista = { module = "com.adevinta.android:barista", version.ref = "barista" }
 square-leakcanary = { module = "com.squareup.leakcanary:leakcanary-android-instrumentation", version.ref = "square-leakcanary" }
 
@@ -148,3 +149,4 @@ androidx-test = ["androidx-test-junit", "androidx-test-core-ktx", "androidx-test
 androidx-test-util = ["androidx-test-services", "androidx-test-orchestrator"]
 buildscript = ["r8", "guava"]
 objectbox-migration = ["lmdb-kt", "slf4j-simple", "slf4j-timber", "flatbuffers"]
+kmqtt = ["kmqtt-broker", "kmqtt-common"]

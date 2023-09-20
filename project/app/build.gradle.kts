@@ -262,7 +262,7 @@ dependencies {
         exclude("org.jetbrains.kotlin")
     }
     androidTestImplementation(libs.okhttp.mockwebserver)
-    androidTestImplementation(libs.kmqtt)
+    androidTestImplementation(libs.bundles.kmqtt)
     androidTestImplementation(libs.square.leakcanary)
 
     androidTestUtil(libs.bundles.androidx.test.util)
