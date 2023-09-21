@@ -116,7 +116,7 @@ class LocationProcessor @Inject constructor(
             fromLocation(location, Build.VERSION.SDK_INT)
         }.apply {
             this.trigger = trigger
-            trackerId = preferences.tid.value
+            trackerId = preferences.tid.toString()
             inregions = calculateInRegions(loadedWaypoints)
         }
         Timber.v(
@@ -197,7 +197,7 @@ class LocationProcessor @Inject constructor(
             MessageTransition().apply {
                 setTransition(transition)
                 this.trigger = trigger
-                trackerId = preferences.tid.value
+                trackerId = preferences.tid.toString()
                 latitude = triggeringLocation.latitude
                 longitude = triggeringLocation.longitude
                 accuracy = triggeringLocation.accuracy

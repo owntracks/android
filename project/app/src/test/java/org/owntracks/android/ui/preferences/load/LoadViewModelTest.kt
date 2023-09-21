@@ -168,6 +168,6 @@ class LoadViewModelTest {
             vm.saveConfiguration()
             advanceUntilIdle()
             assertEquals(ImportStatus.SAVED, vm.configurationImportStatus.value)
-            assertEquals("te", preferences.tid.value)
+            assertEquals("te", preferences.tid.toString())
         }
 }

@@ -180,7 +180,7 @@ abstract class PreferencesStore :
             is MqttProtocolLevel -> putInt(property.name, coercedValue.value)
             is MqttQos -> putInt(property.name, coercedValue.value)
             is AppTheme -> putInt(property.name, coercedValue.value)
-            is StringMaxTwoAlphaNumericChars -> putString(property.name, coercedValue.value)
+            is StringMaxTwoAlphaNumericChars -> putString(property.name, coercedValue.toString())
             else -> throw UnsupportedPreferenceTypeException(
                 "Trying to set property ${property.name} has type ${property.returnType}"
             )

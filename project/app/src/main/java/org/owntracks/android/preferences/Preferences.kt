@@ -38,17 +38,17 @@ class Preferences @Inject constructor(
     private val importConfigurationIdlingResource: SimpleIdlingResource
 ) {
     val allConfigKeys =
-        Preferences::class.declaredMemberProperties.filter {
-            it.annotations.any { annotation -> annotation is Preference }
+        Preferences::class.declaredMemberProperties.filter { property ->
+            property.annotations.any { annotation -> annotation is Preference }
         }
 
     private val mqttExportedConfigKeys =
-        allConfigKeys.filter {
-            it.annotations.any { annotation -> annotation is Preference && annotation.exportModeMqtt }
+        allConfigKeys.filter { property ->
+            property.annotations.any { annotation -> annotation is Preference && annotation.exportModeMqtt }
         }
     private val httpExportedConfigKeys =
-        allConfigKeys.filter {
-            it.annotations.any { annotation -> annotation is Preference && annotation.exportModeHttp }
+        allConfigKeys.filter { property ->
+            property.annotations.any { annotation -> annotation is Preference && annotation.exportModeHttp }
         }
 
     private val placeholder = Any()
@@ -429,7 +429,7 @@ class Preferences @Inject constructor(
                 when (mode) {
                     ConnectionMode.MQTT -> mqttExportedConfigKeys
                     ConnectionMode.HTTP -> httpExportedConfigKeys
-                }.forEach { set(it.name, it.get(this@Preferences)) }
+                }.forEach { property -> set(property.name, property.get(this@Preferences)) }
             }
     }
 

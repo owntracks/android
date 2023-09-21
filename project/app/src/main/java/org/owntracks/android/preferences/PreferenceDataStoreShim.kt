@@ -40,7 +40,7 @@ class PreferenceDataStoreShim @Inject constructor(private val preferences: Prefe
         val stringPreferenceValue =
             when (val preferenceValue = key?.run(preferences::getPreferenceByName) ?: defValue) {
                 is ReverseGeocodeProvider -> preferenceValue.value
-                is StringMaxTwoAlphaNumericChars -> preferenceValue.value
+                is StringMaxTwoAlphaNumericChars -> preferenceValue.toString()
                 else -> preferenceValue
             }
         return stringPreferenceValue as String
