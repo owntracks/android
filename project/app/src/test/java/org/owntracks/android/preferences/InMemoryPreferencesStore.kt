@@ -54,6 +54,9 @@ class InMemoryPreferencesStore : PreferencesStore() {
         valueMap.remove(key)
     }
 
+    override fun migrate() {
+    }
+
     override fun registerOnSharedPreferenceChangeListener(
         listener: SharedPreferences.OnSharedPreferenceChangeListener
     ) {

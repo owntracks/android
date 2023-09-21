@@ -1,5 +1,6 @@
 package org.owntracks.android.ui
 
+import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -177,7 +178,7 @@ class PreferencesActivityTests : TestWithAnActivity<PreferencesActivity>(Prefere
         val defaultGeocoder = baristaRule.activityTestRule.activity.applicationContext.let {
             DefaultsProviderImpl().getDefaultValue<ReverseGeocodeProvider>(
                 Preferences(
-                    SharedPreferencesStore(it),
+                    SharedPreferencesStore(it, NotificationManagerCompat.from(app), NotificationsStash()),
                     SimpleIdlingResource("unused", true)
                 ),
                 Preferences::reverseGeocodeProvider

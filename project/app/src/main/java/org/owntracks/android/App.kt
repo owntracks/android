@@ -34,6 +34,7 @@ import org.owntracks.android.di.CustomBindingEntryPoint
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.logging.TimberInMemoryLogTree
 import org.owntracks.android.preferences.Preferences
+import org.owntracks.android.preferences.PreferencesStore
 import org.owntracks.android.preferences.types.AppTheme
 import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.services.worker.Scheduler
@@ -63,6 +64,9 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
 
     @Inject
     lateinit var notificationManager: NotificationManagerCompat
+
+    @Inject
+    lateinit var preferencesStore: PreferencesStore
 
     @Inject
     @get:VisibleForTesting
@@ -227,6 +231,15 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
     @get:VisibleForTesting
     val mqttConnectionIdlingResource: IdlingResource
         get() = messageProcessor.mqttConnectionIdlingResource
+
+    /**
+     * Migrate preferences. Available to be called from espresso tests.
+     *
+     */
+    @VisibleForTesting
+    fun migratePreferences() {
+        preferencesStore.migrate()
+    }
 
     /**
      * Migrate waypoints. We need a way to call this from an espresso test after it's written the test files

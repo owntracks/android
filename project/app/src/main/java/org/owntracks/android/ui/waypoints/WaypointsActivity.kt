@@ -23,6 +23,7 @@ import org.owntracks.android.databinding.UiWaypointsBinding
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.DrawerProvider
 import org.owntracks.android.support.SimpleIdlingResource
+import org.owntracks.android.ui.NotificationsStash
 import org.owntracks.android.ui.base.BaseRecyclerViewAdapterWithClickHandler
 import org.owntracks.android.ui.base.ClickHasBeenHandled
 import org.owntracks.android.ui.base.RecyclerViewLayoutCompleteListener
@@ -40,6 +41,9 @@ class WaypointsActivity :
     NotificationsPermissionRequested by NotificationsPermissionRequested.Impl() {
     private var recyclerViewStartLayoutInstant: ComparableTimeMark? = null
     private var layoutCompleteListener: RecyclerViewLayoutCompleteListener? = null
+
+    @Inject
+    lateinit var notificationsStash: NotificationsStash
 
     @Inject
     lateinit var drawerProvider: DrawerProvider
@@ -63,7 +67,7 @@ class WaypointsActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         recyclerViewAdapter = WaypointsAdapter(this)
-        postNotificationsPermissionInit(this, preferences)
+        postNotificationsPermissionInit(this, preferences, notificationsStash)
         DataBindingUtil.setContentView<UiWaypointsBinding>(this, R.layout.ui_waypoints)
             .apply {
                 vm = viewModel

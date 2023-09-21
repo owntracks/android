@@ -20,6 +20,9 @@
     <string name="batteryOptimizationWhitelistDialogMessage">"Whitelisting OwnTracks from battery optimization may help it more reliably track locations and maintain contact with the server."</string>
     <string name="batteryOptimizationWhitelistDialogTitle">"Battery Optimization"</string>
     <string name="cancel">"Cancel"</string>
+    <string name="certificateMigrationRequiredOpenSettingsAction">"Open Settings"</string>
+    <string name="certificateMigrationRequiredNotificationText">"OwnTracks now uses TLS certificates from the device certificate store. If you were using either a custom CA or TLS client certificates, please add these to the device certificate store."</string>
+    <string name="certificateMigrationRequiredNotificationTitle">"Certificate Migration required"</string>
     <string name="clear_log">"Clear"</string>
     <string name="configurationManagement">"Configuration management"</string>
     <string name="CONNECTED">"Connected"</string>

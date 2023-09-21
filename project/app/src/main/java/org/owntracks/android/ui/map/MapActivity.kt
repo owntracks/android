@@ -59,6 +59,7 @@ import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.support.DrawerProvider
 import org.owntracks.android.support.RequirementsChecker
 import org.owntracks.android.support.SimpleIdlingResource
+import org.owntracks.android.ui.NotificationsStash
 import org.owntracks.android.ui.mixins.ActivityResultCallerWithLocationPermissionCallback
 import org.owntracks.android.ui.mixins.LocationPermissionRequester
 import org.owntracks.android.ui.mixins.NotificationsPermissionRequested
@@ -87,6 +88,9 @@ class MapActivity :
     private lateinit var binding: UiMapBinding
 
     private lateinit var locationServicesAlertDialog: AlertDialog
+
+    @Inject
+    lateinit var notificationsStash: NotificationsStash
 
     @Inject
     lateinit var contactImageBindingAdapter: ContactImageBindingAdapter
@@ -143,7 +147,7 @@ class MapActivity :
             finish()
             return
         }
-        postNotificationsPermissionInit(this, preferences)
+        postNotificationsPermissionInit(this, preferences, notificationsStash)
 
         binding = DataBindingUtil.setContentView<UiMapBinding>(this, R.layout.ui_map)
             .apply {

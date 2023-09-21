@@ -1,52 +1,86 @@
 package org.owntracks.android.preferences
 
+import android.Manifest
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.content.SharedPreferences
-import android.util.Base64
+import android.content.pm.PackageManager
+import android.provider.Settings.ACTION_SECURITY_SETTINGS
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
+import org.owntracks.android.R
+import org.owntracks.android.geocoding.GeocoderProvider
+import org.owntracks.android.ui.NotificationsStash
 import timber.log.Timber
 
 /***
  * Implements a PreferencesStore that uses a SharedPreferecnces as a backend.
  */
 @Singleton
-class SharedPreferencesStore @Inject constructor(@ApplicationContext private val context: Context) :
+class SharedPreferencesStore @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val notificationManager: NotificationManagerCompat,
+    private val notificationStash: NotificationsStash
+) :
     PreferencesStore() {
 
     private val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
     init {
-        migrateToSingleSharedPreferences()
-        migrateCertificatesToInline()
+        migrate()
     }
 
-    private fun migrateCertificatesToInline() {
-        listOf(Preferences::tlsClientCrt.name).forEach { preferenceName ->
-            sharedPreferences.getString(preferenceName, null)
-                ?.run {
-                    val crtFileExists = try {
-                        context.getFileStreamPath(this)
-                            .exists()
-                    } catch (e: IllegalArgumentException) {
-                        false
-                    }
-                    if (crtFileExists && this.isNotBlank()) {
-                        context.openFileInput(this)
-                            .use { fileInputStream ->
-                                Timber.i("Migrating $preferenceName to inline base64")
-                                sharedPreferences.edit()
-                                    .putString(
-                                        preferenceName,
-                                        Base64.encodeToString(fileInputStream.readBytes(), Base64.NO_WRAP)
-                                    )
-                                    .commit()
+    override fun migrate() {
+        migrateToSingleSharedPreferences()
+        detectIfCertsInConfig()
+    }
+
+    private fun detectIfCertsInConfig() {
+        with(sharedPreferences.edit()) {
+            if (sharedPreferences.contains("tlsCaCrt")) {
+                if (!sharedPreferences.getString("tlsCaCrt", "").isNullOrEmpty()) {
+                    NotificationCompat.Builder(
+                        context,
+                        GeocoderProvider.ERROR_NOTIFICATION_CHANNEL_ID
+                    )
+                        .setContentTitle(context.getString(R.string.certificateMigrationRequiredNotificationTitle))
+                        .setContentText(context.getString(R.string.certificateMigrationRequiredNotificationText))
+                        .setAutoCancel(true)
+                        .setSmallIcon(R.drawable.ic_owntracks_80)
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .addAction(
+                            R.drawable.ic_owntracks_80,
+                            context.getString(R.string.certificateMigrationRequiredOpenSettingsAction),
+                            PendingIntent.getActivity(
+                                context,
+                                0,
+                                Intent(ACTION_SECURITY_SETTINGS).addFlags(FLAG_ACTIVITY_NEW_TASK),
+                                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                            )
+                        )
+                        .setSilent(true)
+                        .build()
+                        .run {
+                            if (ActivityCompat.checkSelfPermission(
+                                    context,
+                                    Manifest.permission.POST_NOTIFICATIONS
+                                ) == PackageManager.PERMISSION_GRANTED
+                            ) {
+                                notificationManager.notify("CertificateManagementNotification", 0, this)
+                            } else {
+                                notificationStash.add(this)
                             }
-                        context.deleteFile(this)
-                    }
+                        }
                 }
+            }
+            this.remove("tlsCaCrt")
         }
     }
 

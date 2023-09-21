@@ -20,6 +20,7 @@ import timber.log.Timber
 abstract class PreferencesStore :
     DefaultsProvider by DefaultsProviderImpl(),
     CoercionsProvider by CoercionsProviderImpl() {
+
     abstract fun getSharedPreferencesName(): String
 
     abstract fun putBoolean(key: String, value: Boolean)
@@ -40,6 +41,8 @@ abstract class PreferencesStore :
     abstract fun hasKey(key: String): Boolean
 
     abstract fun remove(key: String)
+
+    abstract fun migrate()
 
     abstract fun registerOnSharedPreferenceChangeListener(
         listener: SharedPreferences.OnSharedPreferenceChangeListener
