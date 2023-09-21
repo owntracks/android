@@ -10,7 +10,7 @@
 ### New features
 
 - Minimum device version is now SDK v24 (Android 7.0 Nougat)
-- When displayed, LanLngs now are limited to 4 decimal places, because more precision than that is a bit silly (#1278, #1279)
+- When displayed, LatLngs now are limited to 4 decimal places, because more precision than that is a bit silly (#1278, #1279)
 - The config editor text is now selectable
 - No need to restart the app once loading in a config any more!
 - Add an option for a location message to be republished on reconnection to MQTT (#1273, #1178)
