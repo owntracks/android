@@ -9,6 +9,7 @@ import android.content.ServiceConnection
 import android.content.res.ColorStateList
 import android.hardware.Sensor
 import android.hardware.SensorManager
+import android.hardware.SensorManager.SENSOR_DELAY_UI
 import android.net.Uri
 import android.os.Bundle
 import android.os.IBinder
@@ -595,7 +596,7 @@ class MapActivity :
             sensorManager?.registerListener(
                 viewModel.orientationSensorEventListener,
                 it,
-                500_000
+                SENSOR_DELAY_UI
             )
         }
     }
