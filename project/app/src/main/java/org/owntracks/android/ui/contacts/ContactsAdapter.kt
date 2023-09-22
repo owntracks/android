@@ -20,24 +20,15 @@ internal class ContactsAdapter(
     private val sortedListCallback = object : SortedList.Callback<Contact>() {
         override fun compare(o1: Contact, o2: Contact): Int = o2.tst.compareTo(o1.tst)
 
-        override fun onInserted(position: Int, count: Int) {
-            notifyItemRangeInserted(position, count)
-        }
+        override fun onInserted(position: Int, count: Int) { }
 
-        override fun onRemoved(position: Int, count: Int) {
-            notifyItemRangeRemoved(position, count)
-        }
+        override fun onRemoved(position: Int, count: Int) { }
 
-        override fun onMoved(fromPosition: Int, toPosition: Int) {
-            notifyItemMoved(fromPosition, toPosition)
-        }
+        override fun onMoved(fromPosition: Int, toPosition: Int) { }
 
-        override fun onChanged(position: Int, count: Int) {
-            notifyItemRangeChanged(position, count)
-        }
+        override fun onChanged(position: Int, count: Int) { }
 
-        override fun areItemsTheSame(item1: Contact, item2: Contact): Boolean =
-            (item1.id == item2.id)
+        override fun areItemsTheSame(item1: Contact, item2: Contact): Boolean = (item1.id == item2.id)
 
         override fun areContentsTheSame(oldItem: Contact, newItem: Contact): Boolean = (oldItem == newItem)
     }
