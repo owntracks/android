@@ -591,7 +591,7 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
             Duration.ofMinutes(1),
             LocationRequest.PRIORITY_HIGH_ACCURACY,
             Duration.ofMinutes(1),
-            null
+            true
         )
         Timber.d("On demand location request")
         locationProviderClient.requestLocationUpdates(
