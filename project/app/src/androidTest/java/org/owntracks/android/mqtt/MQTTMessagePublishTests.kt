@@ -1,5 +1,6 @@
 package org.owntracks.android.mqtt
 
+import android.Manifest
 import android.view.View
 import androidx.annotation.IdRes
 import androidx.preference.PreferenceManager
@@ -21,6 +22,7 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
+import com.adevinta.android.barista.interaction.PermissionGranter
 import java.time.Instant
 import kotlin.time.Duration.Companion.seconds
 import mqtt.packets.Qos
@@ -309,6 +311,8 @@ class MQTTMessagePublishTests :
         initializeMockLocationProvider(app)
         configureMQTTConnectionToLocalWithGeneratedPassword()
         waitUntilActivityVisible<MapActivity>()
+        clickOnAndWait(R.id.fabMyLocation)
+        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
     }
 
     private fun clickOnRegardlessOfVisibility(@IdRes id: Int) {

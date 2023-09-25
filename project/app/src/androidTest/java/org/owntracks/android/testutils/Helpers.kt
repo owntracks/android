@@ -186,8 +186,8 @@ fun enableDeviceLocation() {
 }
 
 fun grantMapActivityPermissions() {
-    PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.POST_NOTIFICATIONS)
     PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+    PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.POST_NOTIFICATIONS)
 }
 
 /**

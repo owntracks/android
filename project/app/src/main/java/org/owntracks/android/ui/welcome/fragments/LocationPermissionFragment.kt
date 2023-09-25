@@ -12,14 +12,12 @@ import javax.inject.Inject
 import org.owntracks.android.databinding.UiWelcomeLocationPermissionBinding
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.RequirementsChecker
-import org.owntracks.android.ui.mixins.ActivityResultCallerWithLocationPermissionCallback
 import org.owntracks.android.ui.mixins.LocationPermissionRequester
 import org.owntracks.android.ui.welcome.WelcomeViewModel
 
 @AndroidEntryPoint
 class LocationPermissionFragment @Inject constructor() :
-    WelcomeFragment(),
-    ActivityResultCallerWithLocationPermissionCallback {
+    WelcomeFragment() {
     private lateinit var binding: UiWelcomeLocationPermissionBinding
 
     @Inject
@@ -28,7 +26,7 @@ class LocationPermissionFragment @Inject constructor() :
     @Inject
     lateinit var preferences: Preferences
 
-    private val locationPermissionRequester = LocationPermissionRequester(this)
+    private val locationPermissionRequester = LocationPermissionRequester(this, ::permissionGranted, ::permissionDenied)
 
     override fun shouldBeDisplayed(context: Context): Boolean = !requirementsChecker.hasLocationPermissions()
 
@@ -65,14 +63,14 @@ class LocationPermissionFragment @Inject constructor() :
         )
     }
 
-    override fun locationPermissionGranted(code: Int) {
+    private fun permissionGranted(code: Int) {
         preferences.userDeclinedEnableLocationPermissions = false
         binding.uiFragmentWelcomeLocationPermissionsRequest.visibility = View.INVISIBLE
         binding.uiFragmentWelcomeLocationPermissionsMessage.visibility = View.VISIBLE
         viewModel.setWelcomeState(WelcomeViewModel.ProgressState.PERMITTED)
     }
 
-    override fun locationPermissionDenied(code: Int) {
+    private fun permissionDenied(code: Int) {
         preferences.userDeclinedEnableLocationPermissions = true
         viewModel.setWelcomeState(WelcomeViewModel.ProgressState.PERMITTED)
     }

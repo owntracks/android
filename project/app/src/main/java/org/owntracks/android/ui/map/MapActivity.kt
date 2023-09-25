@@ -61,9 +61,8 @@ import org.owntracks.android.support.DrawerProvider
 import org.owntracks.android.support.RequirementsChecker
 import org.owntracks.android.support.SimpleIdlingResource
 import org.owntracks.android.ui.NotificationsStash
-import org.owntracks.android.ui.mixins.ActivityResultCallerWithLocationPermissionCallback
 import org.owntracks.android.ui.mixins.LocationPermissionRequester
-import org.owntracks.android.ui.mixins.NotificationsPermissionRequested
+import org.owntracks.android.ui.mixins.NotificationPermissionRequester
 import org.owntracks.android.ui.mixins.ServiceStarter
 import org.owntracks.android.ui.mixins.WorkManagerInitExceptionNotifier
 import org.owntracks.android.ui.welcome.WelcomeActivity
@@ -74,12 +73,19 @@ class MapActivity :
     AppCompatActivity(),
     View.OnClickListener,
     View.OnLongClickListener,
-    ActivityResultCallerWithLocationPermissionCallback,
     WorkManagerInitExceptionNotifier by WorkManagerInitExceptionNotifier.Impl(),
-    ServiceStarter by ServiceStarter.Impl(),
-    NotificationsPermissionRequested by NotificationsPermissionRequested.Impl() {
+    ServiceStarter by ServiceStarter.Impl() {
     private val viewModel: MapViewModel by viewModels()
-    private val locationPermissionRequester = LocationPermissionRequester(this)
+    private val notificationPermissionRequester = NotificationPermissionRequester(
+        this,
+        ::notificationPermissionGranted,
+        ::notificationPermissionDenied
+    )
+    private val locationPermissionRequester = LocationPermissionRequester(
+        this,
+        ::locationPermissionGranted,
+        ::locationPermissionDenied
+    )
     private var previouslyHadLocationPermissions: Boolean = false
     private var service: BackgroundService? = null
     private var bottomSheetBehavior: BottomSheetBehavior<LinearLayoutCompat>? = null
@@ -148,7 +154,6 @@ class MapActivity :
             finish()
             return
         }
-        postNotificationsPermissionInit(this, preferences, notificationsStash)
 
         binding = DataBindingUtil.setContentView<UiMapBinding>(this, R.layout.ui_map)
             .apply {
@@ -204,7 +209,7 @@ class MapActivity :
                 fabMyLocation.apply {
                     TooltipCompat.setTooltipText(this, getString(R.string.currentLocationButtonLabel))
                     setOnClickListener {
-                        if (checkAndRequestLocationPermissions(true)) {
+                        if (checkAndRequestLocationPermissions(true) == CheckPermissionsResult.HAS_PERMISSIONS) {
                             checkAndRequestLocationServicesEnabled(true)
                         }
                         if (viewModel.myLocationStatus.value != MyLocationStatus.DISABLED) {
@@ -350,7 +355,8 @@ class MapActivity :
     private val locationServicesLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         // We have to check permissions again here, because it may have been revoked in the
         // period between asking for location services and returning here.
-        if (checkAndRequestLocationPermissions(false)) {
+        Timber.d("Location services callback, result=$it")
+        if (checkAndRequestLocationPermissions(false) == CheckPermissionsResult.HAS_PERMISSIONS) {
             viewModel.requestLocationUpdatesForBlueDot()
         }
     }
@@ -369,9 +375,11 @@ class MapActivity :
      * prompt to enable to raised, even if the user says "yes" to the prompt.
      */
     private fun checkAndRequestLocationServicesEnabled(explicitUserAction: Boolean): Boolean {
+        Timber.d("Check and request location services")
         return if (!requirementsChecker.isLocationServiceEnabled()) {
             Timber.d("Location Services disabled")
             if ((explicitUserAction || !preferences.userDeclinedEnableLocationServices)) {
+                Timber.d("Showing location services dialog")
                 if (!this::locationServicesAlertDialog.isInitialized) {
                     locationServicesAlertDialog = MaterialAlertDialogBuilder(this).setCancelable(true)
                         .setIcon(R.drawable.ic_baseline_location_disabled_24)
@@ -392,6 +400,11 @@ class MapActivity :
                 if (!locationServicesAlertDialog.isShowing) {
                     locationServicesAlertDialog.show()
                 }
+            } else {
+                Timber.d(
+                    "Not requesting location services. " +
+                        "Explicit=false, previously declined=${preferences.userDeclinedEnableLocationServices}"
+                )
             }
             false
         } else {
@@ -400,12 +413,32 @@ class MapActivity :
     }
 
     /**
-     * User has granted location permission. Ask the viewmodel to start requesting locations, set the [MapViewModel.ViewMode] to
+     * User has granted notification permission. Notify everything that's in the NotificationStash
+     *
+     */
+    private fun notificationPermissionGranted() {
+        Timber.d("Notification permission granted. Showing all notifications in stash")
+        notificationsStash.showAll(NotificationManagerCompat.from(this))
+    }
+
+    /**
+     * User has declined notification permissions. Log this in the preferences so we don't keep askin them
+     *
+     */
+    private fun notificationPermissionDenied() {
+        Timber.d("Notification permission denied")
+        preferences.userDeclinedEnableNotificationPermissions = true
+    }
+
+    /**
+     * User has granted permission. If It's location, ask the viewmodel to start requesting locations, set the [MapViewModel.ViewMode] to
      * [MapViewModel.ViewMode.Device] and tell the service to reinitialize locations.
      *
      */
-    override fun locationPermissionGranted(code: Int) {
+    private fun locationPermissionGranted(code: Int) {
+        Timber.d("Location Permission granted")
         if (code == EXPLICIT_LOCATION_PERMISSION_REQUEST) {
+            Timber.d("Location Permission was explicitly asked for, check location services")
             checkAndRequestLocationServicesEnabled(true)
         }
         viewModel.requestLocationUpdatesForBlueDot()
@@ -419,7 +452,8 @@ class MapActivity :
      * didn't mean to).
      *
      */
-    override fun locationPermissionDenied(code: Int) {
+    private fun locationPermissionDenied(code: Int) {
+        Timber.d("Location Permission denied. Showing snackbar")
         preferences.userDeclinedEnableLocationPermissions = true
         Snackbar.make(
             binding.mapCoordinatorLayout,
@@ -436,6 +470,32 @@ class MapActivity :
             .show()
     }
 
+    enum class CheckPermissionsResult {
+        HAS_PERMISSIONS,
+        NO_PERMISSIONS_LAUNCHED_REQUEST,
+        NO_PERMISSIONS_NOT_LAUNCHED_REQUEST
+    }
+
+    private fun checkAndRequestNotificationPermissions(): CheckPermissionsResult {
+        Timber.d("Checking and requesting notification permissions")
+        return if (!notificationPermissionRequester.hasPermission()) {
+            Timber.d("No notification permission")
+            if (!preferences.userDeclinedEnableNotificationPermissions) {
+                Timber.d("Requesting notification permissions")
+                notificationPermissionRequester.requestNotificationPermission()
+                CheckPermissionsResult.NO_PERMISSIONS_LAUNCHED_REQUEST
+            } else {
+                Timber.d(
+                    "Not request location permissions. " +
+                        "previouslyDeclined=${preferences.userDeclinedEnableNotificationPermissions}"
+                )
+                CheckPermissionsResult.NO_PERMISSIONS_NOT_LAUNCHED_REQUEST
+            }
+        } else {
+            CheckPermissionsResult.HAS_PERMISSIONS
+        }
+    }
+
     /**
      * Performs a check that the user has granted location permissions. This can be called either because the user has
      * explicitly done something that requires location permissions (clicked on the MyLocation FAB), or because some other
@@ -449,11 +509,13 @@ class MapActivity :
      * @return indication as to whether location permissions have been granted. This will return false immediately if a
      * prompt to enable to raised, even if the user says "yes" to the prompt.
      */
-    private fun checkAndRequestLocationPermissions(explicitUserAction: Boolean): Boolean {
+    private fun checkAndRequestLocationPermissions(explicitUserAction: Boolean): CheckPermissionsResult {
+        Timber.d("Checking and requesting location permissions")
         return if (!requirementsChecker.hasLocationPermissions()) {
             Timber.d("No location permission")
             // We don't have location permission
             if ((explicitUserAction || !preferences.userDeclinedEnableLocationPermissions)) {
+                Timber.d("Requesting location permissions, explicit=$explicitUserAction")
                 locationPermissionRequester.requestLocationPermissions(
                     if (explicitUserAction) {
                         EXPLICIT_LOCATION_PERMISSION_REQUEST
@@ -462,10 +524,16 @@ class MapActivity :
                     },
                     this
                 ) { shouldShowRequestPermissionRationale(it) }
+                CheckPermissionsResult.NO_PERMISSIONS_LAUNCHED_REQUEST
+            } else {
+                Timber.d(
+                    "Not request location permissions. " +
+                        "Explicit action=false, previouslyDeclined=${preferences.userDeclinedEnableLocationPermissions}"
+                )
+                CheckPermissionsResult.NO_PERMISSIONS_NOT_LAUNCHED_REQUEST
             }
-            false
         } else {
-            true
+            CheckPermissionsResult.HAS_PERMISSIONS
         }
     }
 
@@ -486,15 +554,27 @@ class MapActivity :
         updateMonitoringModeMenu()
         viewModel.updateMyLocationStatus()
 
-        requestNotificationsPermission()
-
-        if (checkAndRequestLocationPermissions(false)) {
-            checkAndRequestLocationServicesEnabled(false)
-        }
-        if (!previouslyHadLocationPermissions && requirementsChecker.hasLocationPermissions()) {
-            previouslyHadLocationPermissions = true
-            viewModel.requestLocationUpdatesForBlueDot()
-            service?.reInitializeLocationRequests()
+        when (checkAndRequestNotificationPermissions()) {
+            CheckPermissionsResult.HAS_PERMISSIONS, CheckPermissionsResult.NO_PERMISSIONS_NOT_LAUNCHED_REQUEST ->
+                {
+                    when (checkAndRequestLocationPermissions(false)) {
+                        CheckPermissionsResult.NO_PERMISSIONS_LAUNCHED_REQUEST -> {
+                            Timber.d("Launched notification permission request")
+                        }
+                        CheckPermissionsResult.NO_PERMISSIONS_NOT_LAUNCHED_REQUEST -> {
+                            Timber.d("No location permissions, not launched request")
+                        }
+                        CheckPermissionsResult.HAS_PERMISSIONS -> {
+                            if (checkAndRequestLocationServicesEnabled(false)) {
+                                viewModel.requestLocationUpdatesForBlueDot()
+                                service?.reInitializeLocationRequests()
+                            }
+                        }
+                    }
+                }
+            CheckPermissionsResult.NO_PERMISSIONS_LAUNCHED_REQUEST -> Timber.d(
+                "Launched notification permission request, not asking for location permissions"
+            )
         }
     }
 
