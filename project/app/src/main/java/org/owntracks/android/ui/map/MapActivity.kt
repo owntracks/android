@@ -637,22 +637,23 @@ class MapActivity :
         const val BUNDLE_KEY_CONTACT_ID = "BUNDLE_KEY_CONTACT_ID"
         const val IMPLICIT_LOCATION_PERMISSION_REQUEST = 1
         const val EXPLICIT_LOCATION_PERMISSION_REQUEST = 2
-    }
-}
 
-@BindingAdapter("locationIcon")
-fun FloatingActionButton.setIcon(status: MyLocationStatus) {
-    val tint = when (status) {
-        MyLocationStatus.FOLLOWING -> resources.getColor(R.color.fabMyLocationForegroundActiveTint, null)
-        else -> resources.getColor(R.color.fabMyLocationForegroundInActiveTint, null)
+        @JvmStatic
+        @BindingAdapter("locationIcon")
+        fun FloatingActionButton.setIcon(status: MyLocationStatus) {
+            val tint = when (status) {
+                MyLocationStatus.FOLLOWING -> resources.getColor(R.color.fabMyLocationForegroundActiveTint, null)
+                else -> resources.getColor(R.color.fabMyLocationForegroundInActiveTint, null)
+            }
+            when (status) {
+                MyLocationStatus.DISABLED -> setImageResource(R.drawable.ic_baseline_location_disabled_24)
+                MyLocationStatus.AVAILABLE -> setImageResource(R.drawable.ic_baseline_location_searching_24)
+                MyLocationStatus.FOLLOWING -> setImageResource(R.drawable.ic_baseline_my_location_24)
+            }
+            ImageViewCompat.setImageTintList(
+                this,
+                ColorStateList.valueOf(tint)
+            )
+        }
     }
-    when (status) {
-        MyLocationStatus.DISABLED -> setImageResource(R.drawable.ic_baseline_location_disabled_24)
-        MyLocationStatus.AVAILABLE -> setImageResource(R.drawable.ic_baseline_location_searching_24)
-        MyLocationStatus.FOLLOWING -> setImageResource(R.drawable.ic_baseline_my_location_24)
-    }
-    ImageViewCompat.setImageTintList(
-        this,
-        ColorStateList.valueOf(tint)
-    )
 }
