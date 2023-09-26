@@ -1,6 +1,5 @@
 package org.owntracks.android.mqtt
 
-import android.Manifest
 import android.view.View
 import androidx.annotation.IdRes
 import androidx.preference.PreferenceManager
@@ -22,12 +21,8 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
-import com.adevinta.android.barista.interaction.PermissionGranter
 import java.time.Instant
-import kotlin.time.Duration.Companion.seconds
-import mqtt.packets.Qos
 import mqtt.packets.mqtt.MQTTPublish
-import mqtt.packets.mqttv5.MQTT5Properties
 import org.hamcrest.CoreMatchers
 import org.hamcrest.Matcher
 import org.junit.Assert.assertTrue
@@ -39,6 +34,7 @@ import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.model.messages.MessageWaypoints
 import org.owntracks.android.preferences.Preferences
+import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.support.Parser
 import org.owntracks.android.testutils.GPSMockDeviceLocation
 import org.owntracks.android.testutils.MockDeviceLocation
@@ -46,12 +42,14 @@ import org.owntracks.android.testutils.OWNTRACKS_ICON_BASE64
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.TestWithAnMQTTBroker
 import org.owntracks.android.testutils.TestWithAnMQTTBrokerImpl
+import org.owntracks.android.testutils.getCurrentActivity
 import org.owntracks.android.testutils.grantMapActivityPermissions
 import org.owntracks.android.testutils.reportLocationFromMap
 import org.owntracks.android.testutils.setNotFirstStartPreferences
 import org.owntracks.android.testutils.use
 import org.owntracks.android.testutils.waitUntilActivityVisible
 import org.owntracks.android.ui.clickOnAndWait
+import org.owntracks.android.ui.contacts.ContactsActivity
 import org.owntracks.android.ui.map.MapActivity
 
 @ExperimentalUnsignedTypes
@@ -90,110 +88,12 @@ class MQTTMessagePublishTests :
     }
 
     @Test
-    fun given_an_MQTT_configured_client_when_the_broker_sends_a_message_card_without_a_location_then_a_new_contact_appears() { // ktlint-disable max-line-length
-        setup()
-
-        reportLocationFromMap(app.mockLocationIdlingResource) {
-            setMockLocation(51.0, 0.0)
-        }
-
-        baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.use {
-            openDrawer()
-            clickOnAndWait(R.string.title_activity_contacts)
-        }
-
-        val messageCard = MessageCard().apply {
-            name = "TestName"
-            face = OWNTRACKS_ICON_BASE64
-        }
-        val bytes = Parser(null).toJsonBytes(messageCard)
-
-        broker.publish(
-            false,
-            "owntracks/someuser/somedevice/info",
-            Qos.AT_LEAST_ONCE,
-            MQTT5Properties(),
-            bytes.toUByteArray()
-        )
-        sleep(1000) // Need to wait for the message to percolate through the app.
-        assertRecyclerViewItemCount(R.id.contactsRecyclerView, 2)
-        assertDisplayedAtPosition(R.id.contactsRecyclerView, 1, R.id.name, "TestName")
-        assertDisplayedAtPosition(R.id.contactsRecyclerView, 1, R.id.location, R.string.na)
-    }
-
-    @Test
-    fun given_an_MQTT_configured_client_when_the_broker_sends_a_message_card_with_a_location_then_a_new_contact_appears() { // ktlint-disable max-line-length
-        PreferenceManager.getDefaultSharedPreferences(app)
-            .edit()
-            .putString(Preferences::reverseGeocodeProvider.name, "None")
-            .apply()
-        setup()
-
-        reportLocationFromMap(app.mockLocationIdlingResource) {
-            setMockLocation(51.0, 0.0)
-        }
-
-        app.mqttConnectionIdlingResource.use {
-            openDrawer()
-            clickOnAndWait(R.string.title_activity_contacts)
-        }
-
-        listOf(
-            MessageLocation().apply {
-                latitude = 52.123
-                longitude = 0.56789
-                timestamp = Instant.parse("2006-01-02T15:04:05Z").epochSecond
-            },
-            MessageCard().apply {
-                name = "TestName"
-                face = OWNTRACKS_ICON_BASE64
-            }
-        ).map {
-            Pair(
-                Parser(null).toJsonBytes(it),
-                when (it) {
-                    is MessageCard -> "owntracks/someuser/somedevice/info"
-                    else -> "owntracks/someuser/somedevice"
-                }
-            )
-        }
-            .forEach {
-                broker.publish(
-                    false,
-                    it.second,
-                    Qos.AT_LEAST_ONCE,
-                    MQTT5Properties(),
-                    it.first.toUByteArray()
-                )
-            }
-        sleep(1000) // Need to wait for the message to percolate through the app.
-        assertRecyclerViewItemCount(R.id.contactsRecyclerView, 2)
-        assertDisplayedAtPosition(R.id.contactsRecyclerView, 1, R.id.name, "TestName")
-        assertDisplayedAtPosition(R.id.contactsRecyclerView, 1, R.id.location, "52.1230, 0.5679")
-        assertDisplayedAtPosition(
-            R.id.contactsRecyclerView,
-            1,
-            R.id.locationDate,
-            "1/2/06" // Default locale for emulator is en_US
-        )
-    }
-
-    @Test
     fun given_an_MQTT_configured_client_when_the_broker_sends_a_location_for_a_cleared_contact_then_a_the_contact_returns_with_the_correct_details() { // ktlint-disable max-line-length
-        PreferenceManager.getDefaultSharedPreferences(app)
-            .edit()
-            .putString(Preferences::reverseGeocodeProvider.name, "None")
-            .apply()
-
         setup()
-        reportLocationFromMap(app.mockLocationIdlingResource) {
-            setMockLocation(51.0, 0.0)
-        }
 
-        baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.use {
-            openDrawer()
-            clickOnAndWait(R.string.title_activity_contacts)
-        }
+        openDrawer()
+        clickOnAndWait(R.string.title_activity_contacts)
+        val contactsCountingIdlingResource = (getCurrentActivity() as ContactsActivity).contactsCountingIdlingResource
 
         listOf(
             MessageLocation().apply {
@@ -210,39 +110,42 @@ class MQTTMessagePublishTests :
                 name = "TestName"
                 face = OWNTRACKS_ICON_BASE64
             }
-        ).sendFromBroker(broker)
+        ).also {
+            repeat(it.size) { contactsCountingIdlingResource.increment() }
+        }.sendFromBroker(broker)
 
-        sleep(1000) // Need to wait for the message to percolate through the app.
-        clickOnAndWait("TestName")
+        contactsCountingIdlingResource.use {
+            clickOnAndWait("TestName")
+        }
         sleep(1000) // Apparently espresso won't wait for the MapActivity to finish rendering
         clickOnAndWait(R.id.contactPeek)
         assertDisplayed(R.id.contactClearButton)
-        clickOnRegardlessOfVisibility(R.id.contactClearButton)
+        clickOnAndWait(R.id.contactClearButton)
 
         openDrawer()
         clickOnAndWait(R.string.title_activity_contacts)
-        assertRecyclerViewItemCount(R.id.contactsRecyclerView, 1)
-        assertDisplayedAtPosition(R.id.contactsRecyclerView, 0, R.id.name, deviceId)
+        assertDisplayed(R.id.placeholder)
 
+        contactsCountingIdlingResource.increment()
         listOf(
             MessageLocation().apply {
-                latitude = 52.123
-                longitude = 0.56789
+                latitude = 50.123
+                longitude = 3.56789
                 timestamp = Instant.parse("2006-01-02T15:04:05Z").epochSecond
             }
         ).sendFromBroker(broker)
 
-        sleep(1.seconds.inWholeMilliseconds)
-
-        assertRecyclerViewItemCount(R.id.contactsRecyclerView, 2)
-        assertDisplayedAtPosition(R.id.contactsRecyclerView, 1, R.id.name, "TestName")
-        assertDisplayedAtPosition(R.id.contactsRecyclerView, 1, R.id.location, "52.1230, 0.5679")
-        assertDisplayedAtPosition(
-            R.id.contactsRecyclerView,
-            1,
-            R.id.locationDate,
-            "1/2/06" // Default locale for emulator is en_US
-        )
+        contactsCountingIdlingResource.use {
+            assertRecyclerViewItemCount(R.id.contactsRecyclerView, 1)
+            assertDisplayedAtPosition(R.id.contactsRecyclerView, 0, R.id.name, "TestName")
+            assertDisplayedAtPosition(R.id.contactsRecyclerView, 0, R.id.location, "50.1230, 3.5679")
+            assertDisplayedAtPosition(
+                R.id.contactsRecyclerView,
+                0,
+                R.id.locationDate,
+                "1/2/06" // Default locale for emulator is en_US
+            )
+        }
     }
 
     @Test
@@ -305,14 +208,19 @@ class MQTTMessagePublishTests :
     }
 
     private fun setup() {
+        PreferenceManager.getDefaultSharedPreferences(app)
+            .edit()
+            .putInt(Preferences::monitoring.name, MonitoringMode.QUIET.value)
+            .putString(Preferences::reverseGeocodeProvider.name, "None")
+            .apply()
         setNotFirstStartPreferences()
         launchActivity()
         grantMapActivityPermissions()
+
         initializeMockLocationProvider(app)
         configureMQTTConnectionToLocalWithGeneratedPassword()
         waitUntilActivityVisible<MapActivity>()
         clickOnAndWait(R.id.fabMyLocation)
-        PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
     }
 
     private fun clickOnRegardlessOfVisibility(@IdRes id: Int) {

@@ -96,7 +96,7 @@ abstract class MessageBase : BaseObservable() {
     }
 
     @get:JsonIgnore
-    protected open val baseTopicSuffix: String?
+    open val baseTopicSuffix: String
         get() = BASETOPIC_SUFFIX
 
     // Called after deserialization to check if all required attributes are set or not.
@@ -137,6 +137,6 @@ abstract class MessageBase : BaseObservable() {
 
     companion object {
         const val TYPE = "base"
-        val BASETOPIC_SUFFIX = null
+        const val BASETOPIC_SUFFIX = ""
     }
 }

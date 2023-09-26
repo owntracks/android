@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.test.espresso.idling.CountingIdlingResource
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import javax.inject.Named
 import kotlinx.coroutines.launch
 import org.owntracks.android.R
 import org.owntracks.android.data.repos.ContactsRepoChange
@@ -30,8 +31,10 @@ class ContactsActivity :
     @Inject
     lateinit var drawerProvider: DrawerProvider
 
+    @Inject
+    @Named("contactsActivityIdlingResource")
     @VisibleForTesting
-    val contactsCountingIdlingResource = CountingIdlingResource("contactsActivityIdlingResource", true)
+    lateinit var contactsCountingIdlingResource: CountingIdlingResource
 
     private val viewModel: ContactsViewModel by viewModels()
     private lateinit var contactsAdapter: ContactsAdapter
@@ -80,6 +83,7 @@ class ContactsActivity :
                 }
 
                 contactsCountingIdlingResource.run {
+                    dumpStateToLogs()
                     if (!isIdleNow) decrement()
                 }
             }

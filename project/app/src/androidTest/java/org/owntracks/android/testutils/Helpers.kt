@@ -185,9 +185,15 @@ fun enableDeviceLocation() {
     }
 }
 
+/**
+ * Who knows what order these will appear in.
+ *
+ */
 fun grantMapActivityPermissions() {
+    PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.POST_NOTIFICATIONS)
     PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
     PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.POST_NOTIFICATIONS)
+    PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
 }
 
 /**

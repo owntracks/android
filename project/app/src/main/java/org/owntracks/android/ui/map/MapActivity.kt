@@ -86,7 +86,6 @@ class MapActivity :
         ::locationPermissionGranted,
         ::locationPermissionDenied
     )
-    private var previouslyHadLocationPermissions: Boolean = false
     private var service: BackgroundService? = null
     private var bottomSheetBehavior: BottomSheetBehavior<LinearLayoutCompat>? = null
     private var menu: Menu? = null

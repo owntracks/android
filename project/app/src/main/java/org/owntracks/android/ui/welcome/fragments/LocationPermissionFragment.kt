@@ -21,10 +21,10 @@ class LocationPermissionFragment @Inject constructor() :
     private lateinit var binding: UiWelcomeLocationPermissionBinding
 
     @Inject
-    lateinit var requirementsChecker: RequirementsChecker
+    lateinit var preferences: Preferences
 
     @Inject
-    lateinit var preferences: Preferences
+    lateinit var requirementsChecker: RequirementsChecker
 
     private val locationPermissionRequester = LocationPermissionRequester(this, ::permissionGranted, ::permissionDenied)
 

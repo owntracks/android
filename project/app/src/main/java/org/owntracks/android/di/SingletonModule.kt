@@ -62,6 +62,14 @@ class SingletonModule {
 
     @Provides
     @Singleton
+    @Named("contactsActivityIdlingResource")
+    fun provideContactsActivityIdlingResource(): CountingIdlingResource = CountingIdlingResource(
+        "contactsActivityIdlingResource",
+        true
+    )
+
+    @Provides
+    @Singleton
     fun provideAppShortcuts(): AppShortcuts = AppShortcutsImpl()
 
     @ApplicationScope

@@ -68,7 +68,7 @@ class ContactsActivityTests :
         MessageCard().apply {
             name = "TestName"
             face = OWNTRACKS_ICON_BASE64
-        }.sendFromBroker(broker, topicName = "owntracks/someuser/somedevice/info")
+        }.sendFromBroker(broker)
 
         (baristaRule.activityTestRule.activity as ContactsActivity).contactsCountingIdlingResource.use {
             assertNotDisplayed(R.id.placeholder)
@@ -76,6 +76,31 @@ class ContactsActivityTests :
         assertRecyclerViewItemCount(R.id.contactsRecyclerView, 1)
         assertDisplayedAtPosition(R.id.contactsRecyclerView, 0, R.id.name, "TestName")
         assertDisplayedAtPosition(R.id.contactsRecyclerView, 0, R.id.location, R.string.na)
+    }
+
+    @Test
+    fun contactAppearsWhenBrokerAddsACardMessageAndALocationMessage() {
+        setupTestActivity()
+
+        (baristaRule.activityTestRule.activity as ContactsActivity).contactsCountingIdlingResource.increment()
+        listOf(
+            MessageCard().apply {
+                name = "TestName"
+                face = OWNTRACKS_ICON_BASE64
+            },
+            MessageLocation().apply {
+                latitude = 52.123
+                longitude = 0.56789
+                timestamp = Instant.parse("2006-01-02T15:04:05Z").epochSecond
+            }
+        ).sendFromBroker(broker)
+
+        (baristaRule.activityTestRule.activity as ContactsActivity).contactsCountingIdlingResource.use {
+            assertNotDisplayed(R.id.placeholder)
+            assertRecyclerViewItemCount(R.id.contactsRecyclerView, 1)
+            assertDisplayedAtPosition(R.id.contactsRecyclerView, 0, R.id.name, "TestName")
+            assertDisplayedAtPosition(R.id.contactsRecyclerView, 0, R.id.location, "52.1230, 0.5679")
+        }
     }
 
     @Test

@@ -39,12 +39,13 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
         topicName: String,
         retain: Boolean
     ) {
-        Timber.i("Publishing ${this::class.java.simpleName} message to $topicName with retain=$retain")
+        val actualTopic = topicName + this@sendFromBroker.baseTopicSuffix
+        Timber.i("Publishing ${this::class.java.simpleName} message to $actualTopic with retain=$retain")
         this.toJsonBytes(Parser(null))
             .run {
                 broker.publish(
                     retain,
-                    topicName,
+                    actualTopic,
                     Qos.AT_LEAST_ONCE,
                     MQTT5Properties(),
                     toUByteArray()
