@@ -3,7 +3,6 @@ name: Build and Test
 
 "on":
   merge_group:
-    types: [checks_requested]
   pull_request:
     types:
       - labeled
