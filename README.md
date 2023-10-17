@@ -2,6 +2,8 @@
 
 This is the OwnTracks Android app. See our [booklet](http://owntracks.org/booklet/features/android/) for details on how to get started with OwnTracks, as well some details about behaviour specific to the Android app.
 
+OwnTracks Android app is currently broken on devices with "GPS only" location enabled, see [#1410](https://github.com/owntracks/android/issues/1410)
+
 ## Build flavours
 
 There are two build flavours for OwnTracks:
