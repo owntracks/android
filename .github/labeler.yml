@@ -1,4 +1,0 @@
----
-smoke-test-required:
-  - "project/gradle/libs.versions.toml"
-  - "project/**/*.gradle.kts"

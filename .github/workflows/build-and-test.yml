@@ -178,7 +178,7 @@ jobs:
           files: "/android-sdk/user_home/avd/owntracks-test-${{ matrix.android-api }}-${{ matrix.flavour }}.avd/snapshots/default_boot/screenshot.png"
 
       - name: Create AVD and generate snapshot for caching
-        if: steps.changes.outputs.src == 'true' && steps.check_snapshot_exists.outputs.files_exists == 'false'
+        if: steps.changes.outputs.src == 'true' && steps.check_snapshot_exists.outputs.files_exists == 'false' && github.event_name != 'pull_request'
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.android-api }}
@@ -197,11 +197,10 @@ jobs:
 
       - name: Espresso Test
         uses: reactivecircus/android-emulator-runner@v2
-        if: steps.changes.outputs.src == 'true'
+        if: steps.changes.outputs.src == 'true' && github.event_name != 'pull_request'
         timeout-minutes: 60
         env:
           # Only run the smoke tests on merge group events
-          TEST_OPTIONS: ${{ (github.event_name == 'merge_group' || (contains(github.event.pull_request.labels.*.name, 'smoke-test-required') && !contains(github.event.pull_request.labels.*.name, 'integration-test-required'))) && '-Pandroid.testInstrumentationRunnerArguments.annotation=org.owntracks.android.testutils.SmokeTest' || '' }}
           FLAVOUR: ${{ matrix.flavour }}
         with:
           api-level: ${{ matrix.android-api }}
@@ -225,7 +224,7 @@ jobs:
             adb logcat > emulator.log & echo $! > logcat_file.pid
             adb logcat "*:S MonitoringInstr:V AndroidJUnitRunner:V TestRequestBuilder:V TestExecutor:V TestRunner:V" --format=color & echo $! > logcat_console.pid
             echo 0 > gradle.exit # Set a default exit code.
-            ./project/gradlew -p project create${FLAVOUR}DebugCoverageReport $TEST_OPTIONS --max-workers=1 --stacktrace --scan --no-daemon || echo $? > gradle.exit
+            ./project/gradlew -p project create${FLAVOUR}DebugCoverageReport --max-workers=1 --stacktrace --scan --no-daemon || echo $? > gradle.exit
             # Stop capturing logcat output.
             kill $(cat logcat_file.pid)    || echo "::warning file=.github/workflows/ci.yml::Logcat process $(cat logcat_file.pid) didn't exist."
             kill $(cat logcat_console.pid) || echo "::warning file=.github/workflows/ci.yml::Logcat process $(cat logcat_console.pid) didn't exist."
