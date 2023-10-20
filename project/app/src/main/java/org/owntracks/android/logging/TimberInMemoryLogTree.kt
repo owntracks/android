@@ -12,7 +12,7 @@ class TimberInMemoryLogTree(private val debugBuild: Boolean) : DebugTree() {
         const val LOG_PREFIX = "FARTSHOES"
     }
 
-    private val buffer = LogRingBuffer(1_000)
+    private val buffer = LogRingBuffer(10_000)
     private val mutableLiveLogs = MutableLiveData(buffer.all())
     val liveLogs: LiveData<List<LogEntry>> = mutableLiveLogs
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
