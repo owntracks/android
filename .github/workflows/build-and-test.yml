@@ -107,6 +107,7 @@ jobs:
         if: steps.changes.outputs.src == 'true'
         with:
           report_paths: "**/build/test-results/test*UnitTest/TEST-*.xml"
+          detailed_summary: true
 
       - name: Upload lint report
         uses: actions/upload-artifact@v3
@@ -258,15 +259,16 @@ jobs:
         uses: mikepenz/action-junit-report@v3
         if: always() && steps.run-espresso-guard.outputs.run-espresso == 'true'
         with:
-          report_paths: app/build/outputs/androidTest-results/connected/*.xml
+          report_paths: "**/TEST-*.xml"
+          detailed_summary: true
       - name: Upload connected test coverage artifact
         uses: ./.github/actions/upload-artifact
         with:
           name: espresso-test-coverage-${{ matrix.android-api }}-${{ matrix.flavour }}
           path: ./project/app/build/reports/coverage/androidTest/
-        if: always() && steps.run-espresso-guard.outputs.run-espresso == 'true'
+        if: steps.run-espresso-guard.outputs.run-espresso == 'true'
       - name: Upload coverage
-        if: ${{ (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'integration-test-required')) || (github.event_name == 'push' && github.ref == 'refs/heads/master') }}
+        if: steps.run-espresso-guard.outputs.run-espresso == 'true'
         uses: codecov/codecov-action@v3
         with:
           files: ./project/app/build/reports/coverage/androidTest/${{ matrix.flavour == 'Gms' && 'gms' || 'oss' }}/debug/connected/report.xml
