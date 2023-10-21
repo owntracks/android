@@ -100,18 +100,10 @@ class MQTTMessageProcessorEndpoint(
         scope.launch {
             try {
                 val configuration = getEndpointConfiguration()
-                connectingLock.withPermit {
-                    mqttConnectionIdlingResource.setIdleState(false)
-                    connectToBroker(configuration)
-                }
+                reconnect(configuration)
             } catch (e: ConfigurationIncompleteException) {
                 Timber.w(e, "MQTT Configuration not complete, cannot activate")
                 endpointStateRepo.setState(EndpointState.ERROR_CONFIGURATION.withError(e))
-            } catch (e: Exception) {
-                Timber.w(e, "Unable to connect to MQTT. Cannot activate")
-                scheduler.scheduleMqttReconnect()
-            } finally {
-                mqttConnectionIdlingResource.setIdleState(true)
             }
         }
     }
@@ -352,6 +344,7 @@ class MQTTMessageProcessorEndpoint(
                         }
                     }
                     endpointStateRepo.setState(EndpointState.ERROR.withError(e))
+                    scheduler.scheduleMqttReconnect()
                     throw e
                 }
             }.apply { Timber.d("MQTT connection attempt completed in $this") }
@@ -377,9 +370,9 @@ class MQTTMessageProcessorEndpoint(
     private suspend fun reconnect(mqttConnectionConfiguration: MqttConnectionConfiguration) {
         Timber.v("MQTT reconnect with configuration $mqttConnectionConfiguration")
         connectingLock.withPermit {
-            mqttConnectionIdlingResource.setIdleState(false)
             disconnect()
             try {
+                mqttConnectionIdlingResource.setIdleState(false)
                 connectToBroker(mqttConnectionConfiguration)
             } finally {
                 mqttConnectionIdlingResource.setIdleState(true)

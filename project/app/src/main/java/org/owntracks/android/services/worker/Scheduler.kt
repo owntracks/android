@@ -83,7 +83,7 @@ class Scheduler @Inject constructor(
                 .setConstraints(anyNetworkConstraint)
                 .build()
         )
-            .apply { Timber.d("WorkManager queue task $ONETIME_TASK_MQTT_RECONNECT") }
+            .apply { Timber.d("$ONETIME_TASK_MQTT_RECONNECT scheduled") }
     }
 
     companion object {
