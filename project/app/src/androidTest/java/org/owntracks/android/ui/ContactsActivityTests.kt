@@ -159,6 +159,8 @@ class ContactsActivityTests :
                     MQTT5Properties(),
                     it.second.toUByteArray()
                 )
+                // There's a bug in KMQTT which means that if you try and slam it with publish calls, it breaks. So, we wait.
+                sleep(100)
             }
 
         (baristaRule.activityTestRule.activity as ContactsActivity).contactsCountingIdlingResource.use {
