@@ -28,7 +28,7 @@ hilt-work = "1.0.0"
 jackson = "2.13.5"
 jaxb = "4.0.3"
 jaxb-api = "2.3.1"
-kmqtt = "0.4.1"
+kmqtt = "0.4.3"
 kotlin = "1.8.21"
 kotlin-coroutines = "1.7.3"
 ktlint = "11.6.0"
@@ -119,8 +119,8 @@ widgets-materialize = { module = "com.mikepenz:materialize", version.ref = "mate
 
 # Testing
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito-kotlin" }
-kmqtt-broker = { module = "com.github.davidepianca98.KMQTT:kmqtt-broker-jvm", version.ref = "kmqtt" }
-kmqtt-common = { module = "com.github.davidepianca98.KMQTT:kmqtt-common-jvm", version.ref = "kmqtt" }
+kmqtt-broker = { module = "io.github.davidepianca98:kmqtt-broker-jvm", version.ref = "kmqtt" }
+kmqtt-common = { module = "io.github.davidepianca98:kmqtt-common-jvm", version.ref = "kmqtt" }
 barista = { module = "com.adevinta.android:barista", version.ref = "barista" }
 square-leakcanary = { module = "com.squareup.leakcanary:leakcanary-android-instrumentation", version.ref = "square-leakcanary" }
 
