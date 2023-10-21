@@ -14,5 +14,6 @@ jobs:
           stale-issue-label: stale
           only-labels: needs-more-info
           debug-only: true
+          days-before-close: 30
           days-before-pr-close: -1
           days-before-pr-stale: -1
