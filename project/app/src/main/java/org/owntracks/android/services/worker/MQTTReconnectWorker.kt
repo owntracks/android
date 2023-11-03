@@ -19,8 +19,12 @@ class MQTTReconnectWorker @AssistedInject constructor(
 ) : CoroutineWorker(context, workerParams) {
     override suspend fun doWork(): Result {
         Timber.i("MQTT reconnect worker job started")
-        if (!messageProcessor.isEndpointReady) return Result.failure()
-        return if (messageProcessor.reconnect() == true) {
+        if (!messageProcessor.isEndpointReady) {
+            return Result.failure().also {
+                Timber.w("Unable to reconnect as endpoint is not ready")
+            }
+        }
+        return if (messageProcessor.reconnect().isSuccess) {
             Result.success()
         } else {
             Result.retry()

@@ -119,18 +119,22 @@ class MessageProcessor @Inject constructor(
     /**
      * Called either by the connection activity user button, or by receiving a RECONNECT message
      */
-    suspend fun reconnect(): Boolean? {
-        return when (endpoint) {
-            null -> {
-                loadOutgoingMessageProcessor() // The processor should take care of the reconnect on init
-                null
+    suspend fun reconnect(): Result<Unit> {
+        return try {
+            when (endpoint) {
+                null -> {
+                    loadOutgoingMessageProcessor() // The processor should take care of the reconnect on init
+                    Result.success(Unit)
+                }
+                is MQTTMessageProcessorEndpoint -> {
+                    (endpoint as MQTTMessageProcessorEndpoint).reconnect()
+                }
+                else -> {
+                    Result.success(Unit)
+                }
             }
-            is MQTTMessageProcessorEndpoint -> {
-                (endpoint as MQTTMessageProcessorEndpoint).reconnect()
-            }
-            else -> {
-                null
-            }
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 

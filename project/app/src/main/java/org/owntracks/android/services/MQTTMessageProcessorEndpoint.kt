@@ -30,8 +30,10 @@ import org.eclipse.paho.client.mqttv3.IMqttToken
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient
 import org.eclipse.paho.client.mqttv3.MqttCallback
 import org.eclipse.paho.client.mqttv3.MqttException
+import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CLIENT_ALREADY_DISCONNECTED
+import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CLIENT_DISCONNECTING
+import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CONNECTION_LOST
 import org.eclipse.paho.client.mqttv3.MqttMessage
-import org.eclipse.paho.client.mqttv3.MqttSecurityException
 import org.eclipse.paho.client.mqttv3.ScheduledExecutorPingSender
 import org.owntracks.android.data.EndpointState
 import org.owntracks.android.data.repos.EndpointStateRepo
@@ -102,7 +104,13 @@ class MQTTMessageProcessorEndpoint(
                 val configuration = getEndpointConfiguration()
                 reconnect(configuration)
             } catch (e: ConfigurationIncompleteException) {
-                Timber.w(e, "MQTT Configuration not complete, cannot activate")
+                when (e.cause) {
+                    is MqttConnectionConfiguration.MissingHostException -> Timber.w(
+                        "MQTT Configuration not complete because host is missing, cannot activate"
+                    )
+                    else -> Timber.w(e, "MQTT Configuration not complete, cannot activate")
+                }
+
                 endpointStateRepo.setState(EndpointState.ERROR_CONFIGURATION.withError(e))
             }
         }
@@ -128,7 +136,15 @@ class MQTTMessageProcessorEndpoint(
                     try {
                         mqttClient.disconnect()
                     } catch (e: MqttException) {
-                        Timber.d(e, "Could not disconnect from client. Closing")
+                        when (e.reasonCode.toShort()) {
+                            REASON_CODE_CLIENT_ALREADY_DISCONNECTED -> Timber.d(
+                                "Could not disconnect from client because already disconnected"
+                            )
+                            REASON_CODE_CLIENT_DISCONNECTING -> Timber.d(
+                                "Could not disconnect from client because already disconnecting"
+                            )
+                            else -> Timber.d(e, "Could not disconnect from client. Closing")
+                        }
                     }
                     endpointStateRepo.setState(EndpointState.DISCONNECTED)
                     mqttClient.close(true)
@@ -336,8 +352,14 @@ class MQTTMessageProcessorEndpoint(
                         }
                 } catch (e: Exception) {
                     when (e) {
-                        is MqttSecurityException -> {
-                            Timber.e("MQTT client unable to connect to endpoint: ${e.message}")
+                        is MqttException -> {
+                            when (e.reasonCode) {
+                                REASON_CODE_CONNECTION_LOST.toInt() -> Timber.e(
+                                    e.cause,
+                                    "MQTT client unable to connect to endpoint because the connection was lost"
+                                )
+                                else -> Timber.e(e, "MQTT client unable to connect to endpoint")
+                            }
                         }
                         else -> {
                             Timber.e(e, "MQTT client unable to connect to endpoint")
@@ -351,19 +373,18 @@ class MQTTMessageProcessorEndpoint(
         }
     }
 
-    override suspend fun reconnect(): Boolean {
+    override suspend fun reconnect(): Result<Unit> {
         return try {
             mqttClientAndConfiguration?.mqttConnectionConfiguration?.run {
                 reconnect(this)
-                true
+                Result.success(Unit)
             } ?: run {
                 reconnect(getEndpointConfiguration())
-                true
+                Result.success(Unit)
             }
         } catch (e: Exception) {
-            Timber.w(e, "Failed to reconnect")
-            endpointStateRepo.setState(EndpointState.ERROR.withError(e))
-            false
+            // We should set the endpoint state and log in the reconnect method, so no need to do here
+            Result.failure(e)
         }
     }
 

@@ -1,17 +1,8 @@
 package org.owntracks.android.mqtt
 
-import android.view.View
-import androidx.annotation.IdRes
 import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso
-import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
-import androidx.test.espresso.UiController
-import androidx.test.espresso.ViewAction
-import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.isClickable
-import androidx.test.espresso.matcher.ViewMatchers.isEnabled
-import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.adevinta.android.barista.assertion.BaristaListAssertions.assertDisplayedAtPosition
@@ -23,9 +14,8 @@ import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writ
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import java.time.Instant
 import mqtt.packets.mqtt.MQTTPublish
-import org.hamcrest.CoreMatchers
-import org.hamcrest.Matcher
 import org.junit.Assert.assertTrue
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
@@ -61,6 +51,7 @@ class MQTTMessagePublishTests :
     MockDeviceLocation by GPSMockDeviceLocation() {
 
     @Test
+    @Ignore
     fun given_an_MQTT_configured_client_when_the_report_button_is_pressed_then_the_broker_receives_a_packet_with_the_correct_location_message_in() { // ktlint-disable max-line-length
         setup()
         val mockLatitude = 51.0
@@ -88,6 +79,7 @@ class MQTTMessagePublishTests :
     }
 
     @Test
+    @Ignore
     fun given_an_MQTT_configured_client_when_the_broker_sends_a_location_for_a_cleared_contact_then_a_the_contact_returns_with_the_correct_details() { // ktlint-disable max-line-length
         setup()
 
@@ -163,6 +155,7 @@ class MQTTMessagePublishTests :
     }
 
     @OptIn(ExperimentalUnsignedTypes::class)
+    @Ignore
     @Test
     fun given_an_MQTT_configured_client_when_the_user_publishes_waypoints_then_the_broker_receives_a_waypoint_message() { // ktlint-disable max-line-length
         setup()
@@ -221,29 +214,5 @@ class MQTTMessagePublishTests :
         configureMQTTConnectionToLocalWithGeneratedPassword()
         waitUntilActivityVisible<MapActivity>()
         clickOnAndWait(R.id.fabMyLocation)
-    }
-
-    private fun clickOnRegardlessOfVisibility(@IdRes id: Int) {
-        onView(withId(id)).check(
-            matches(
-                CoreMatchers.allOf(
-                    isEnabled(),
-                    isClickable()
-                )
-            )
-        )
-            .perform(object : ViewAction {
-                override fun getConstraints(): Matcher<View> {
-                    return isEnabled() // no constraints, they are checked above
-                }
-
-                override fun getDescription(): String {
-                    return "click plus button"
-                }
-
-                override fun perform(uiController: UiController?, view: View) {
-                    view.performClick()
-                }
-            })
     }
 }

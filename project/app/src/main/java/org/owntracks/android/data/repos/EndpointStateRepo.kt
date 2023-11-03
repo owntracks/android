@@ -16,7 +16,11 @@ class EndpointStateRepo @Inject constructor() {
         }
 
     fun setState(newEndpointState: EndpointState) {
-        Timber.v("Setting endpoint state $newEndpointState")
+        Timber.v(
+            "Setting endpoint state $newEndpointState called from: ${Thread.currentThread().stackTrace[3].run {
+                "$className: $methodName"
+            }}"
+        )
         endpointState = newEndpointState
     }
 
