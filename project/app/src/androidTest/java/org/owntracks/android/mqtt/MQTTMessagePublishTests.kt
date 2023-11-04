@@ -15,7 +15,6 @@ import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import java.time.Instant
 import mqtt.packets.mqtt.MQTTPublish
 import org.junit.Assert.assertTrue
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
@@ -51,7 +50,6 @@ class MQTTMessagePublishTests :
     MockDeviceLocation by GPSMockDeviceLocation() {
 
     @Test
-    @Ignore
     fun given_an_MQTT_configured_client_when_the_report_button_is_pressed_then_the_broker_receives_a_packet_with_the_correct_location_message_in() { // ktlint-disable max-line-length
         setup()
         val mockLatitude = 51.0
@@ -79,7 +77,6 @@ class MQTTMessagePublishTests :
     }
 
     @Test
-    @Ignore
     fun given_an_MQTT_configured_client_when_the_broker_sends_a_location_for_a_cleared_contact_then_a_the_contact_returns_with_the_correct_details() { // ktlint-disable max-line-length
         setup()
 
@@ -141,6 +138,7 @@ class MQTTMessagePublishTests :
     }
 
     @Test
+    @org.owntracks.android.testutils.JustThisTestPlease
     fun given_an_MQTT_configured_client_when_the_wrong_credentials_are_used_then_the_status_screen_shows_that_the_broker_is_not_connected() { // ktlint-disable max-line-length
         setNotFirstStartPreferences()
         launchActivity()
@@ -155,7 +153,6 @@ class MQTTMessagePublishTests :
     }
 
     @OptIn(ExperimentalUnsignedTypes::class)
-    @Ignore
     @Test
     fun given_an_MQTT_configured_client_when_the_user_publishes_waypoints_then_the_broker_receives_a_waypoint_message() { // ktlint-disable max-line-length
         setup()
