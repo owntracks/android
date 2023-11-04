@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import java.math.BigDecimal
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import okhttp3.HttpUrl
@@ -127,7 +129,11 @@ class OpenCageGeocoder internal constructor(
         } catch (e: Exception) {
             tripResetTimestamp = Instant.now()
                 .plus(1, ChronoUnit.MINUTES)
-            Timber.e(e, "Error reverse geocoding from opencage")
+            when (e) {
+                is SocketTimeoutException -> Timber.e("Error reverse geocoding from opencage. Timeout")
+                is UnknownHostException -> Timber.e("Error reverse geocoding from opencage. ${e.message}")
+                else -> Timber.e(e, "Error reverse geocoding from opencage")
+            }
             GeocodeResult.Fault.ExceptionError(e, tripResetTimestamp)
         }
     }

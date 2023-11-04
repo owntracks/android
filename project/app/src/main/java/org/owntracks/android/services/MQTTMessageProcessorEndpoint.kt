@@ -28,7 +28,7 @@ import org.eclipse.paho.client.mqttv3.IMqttActionListener
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken
 import org.eclipse.paho.client.mqttv3.IMqttToken
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient
-import org.eclipse.paho.client.mqttv3.MqttCallback
+import org.eclipse.paho.client.mqttv3.MqttCallbackExtended
 import org.eclipse.paho.client.mqttv3.MqttException
 import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CLIENT_ALREADY_DISCONNECTED
 import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CLIENT_DISCONNECTING
@@ -76,7 +76,9 @@ class MQTTMessageProcessorEndpoint(
     private val networkChangeCallback = object : ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) {
             super.onAvailable(network)
+            Timber.v("Network becomes available")
             if (endpointStateRepo.endpointState == EndpointState.DISCONNECTED) {
+                Timber.v("Currently disconnected, so attempting reconnect")
                 scope.launch {
                     reconnect()
                 }
@@ -261,9 +263,12 @@ class MQTTMessageProcessorEndpoint(
         }
     }
 
-    private val mqttCallback = object : MqttCallback {
+    private val mqttCallback = object : MqttCallbackExtended {
         override fun connectionLost(cause: Throwable) {
-            Timber.e(cause, "Connection Lost")
+            when (cause) {
+                is IOException -> Timber.e("Connection Lost: ${cause.message}")
+                else -> Timber.e(cause, "Connection Lost")
+            }
             endpointStateRepo.setState(EndpointState.DISCONNECTED)
             scheduler.scheduleMqttReconnect()
         }
@@ -302,6 +307,10 @@ class MQTTMessageProcessorEndpoint(
 
         override fun deliveryComplete(token: IMqttDeliveryToken?) {
             Timber.v("Delivery complete messageId = ${token?.messageId}")
+        }
+
+        override fun connectComplete(reconnect: Boolean, serverURI: String?) {
+            Timber.v("MQTT Connection complete to $serverURI. Reconnect=$reconnect")
         }
     }
 
