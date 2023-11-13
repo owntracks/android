@@ -1,8 +1,8 @@
 package org.owntracks.android.data.waypoints
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import java.time.Instant
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -13,13 +13,15 @@ class InMemoryWaypointsRepo : WaypointsRepo() {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getByTst(instant: Instant): WaypointModel? = waypoints.firstOrNull { it.tst == instant }
+    override suspend fun getByTst(instant: Instant): WaypointModel? =
+        waypoints.firstOrNull { it.tst == instant }
 
     override val all: List<WaypointModel>
         get() = waypoints
 
-    override val allLive: LiveData<List<WaypointModel>>
-        get() = MutableLiveData(waypoints)
+    private val mutableWaypoints = MutableSharedFlow<List<WaypointModel>>()
+    override val allLive: Flow<List<WaypointModel>>
+        get() = mutableWaypoints
 
     override suspend fun clearImpl() {
         waypoints.clear()

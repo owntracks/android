@@ -1,10 +1,11 @@
 package org.owntracks.android.data.waypoints
 
-import androidx.lifecycle.LiveData
 import java.time.Instant
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import org.owntracks.android.model.messages.MessageWaypoint
 import org.owntracks.android.support.MessageWaypointCollection
 
@@ -19,7 +20,7 @@ abstract class WaypointsRepo protected constructor() {
     abstract suspend fun get(id: Long): WaypointModel?
     abstract suspend fun getByTst(instant: Instant): WaypointModel?
     abstract val all: List<WaypointModel>
-    abstract val allLive: LiveData<List<WaypointModel>>
+    abstract val allLive: Flow<List<WaypointModel>>
 
     private val mutableOperations = MutableSharedFlow<WaypointOperation>()
     val operations: SharedFlow<WaypointOperation> = mutableOperations
@@ -68,9 +69,6 @@ abstract class WaypointsRepo protected constructor() {
             }
     }
 
-    fun exportToMessage(): MessageWaypointCollection =
-        MessageWaypointCollection().apply { addAll(all.map(::fromDaoObject)) }
-
     private fun toDaoObject(messageWaypoint: MessageWaypoint): WaypointModel {
         return WaypointModel(
             0,
@@ -85,13 +83,13 @@ abstract class WaypointsRepo protected constructor() {
     }
 
     fun fromDaoObject(w: WaypointModel): MessageWaypoint {
-        val message = MessageWaypoint()
-        message.description = w.description
-        message.latitude = w.geofenceLatitude
-        message.longitude = w.geofenceLongitude
-        message.radius = w.geofenceRadius
-        message.timestamp = w.tst.epochSecond
-        return message
+        return MessageWaypoint().apply {
+            description = w.description
+            latitude = w.geofenceLatitude
+            longitude = w.geofenceLongitude
+            radius = w.geofenceRadius
+            timestamp = w.tst.epochSecond
+        }
     }
 
     protected abstract suspend fun clearImpl()

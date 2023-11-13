@@ -87,6 +87,7 @@ androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
 androidx-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "androidx-core-testing" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidx-room" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidx-room" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidx-room" }
 
 # Cryptography
@@ -137,7 +138,6 @@ r8 = { module = "com.android.tools:r8", version.ref = "r8" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 desugar = { module = "com.android.tools:desugar_jdk_libs_nio", version.ref = "desguar-jdk" }
 
-
 [bundles]
 jackson = ["jackson-core", "jackson-databind", "jackson-module-kotlin", "jackson-datatype-jsr310"]
 kotlin = ["kotlin-coroutines-android", "kotlin-coroutines-jdk8", "kotlin-reflect"]
@@ -145,6 +145,7 @@ jaxb-annotation-processors = ["jaxb-api", "jaxb-core", "jaxb-impl"]
 kapt-hilt = ["hilt-compiler", "hilt-androidx"]
 hilt = ["hilt-android", "hilt-work"]
 androidx = ["androidx-core-ktx", "androidx-preference", "androidx-work-runtime", "androidx-fragment-ktx"]
+androidx-room = ["androidx-room-runtime", "androidx-room-ktx"]
 androidx-test = ["androidx-test-junit", "androidx-test-core-ktx", "androidx-test-rules", "androidx-test-runner"]
 androidx-test-util = ["androidx-test-services", "androidx-test-orchestrator"]
 buildscript = ["r8", "guava"]

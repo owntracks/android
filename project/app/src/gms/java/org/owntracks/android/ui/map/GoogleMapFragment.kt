@@ -185,7 +185,7 @@ class GoogleMapFragment internal constructor(
 
             // We need to specifically re-draw any contact markers and regions now that we've re-init the map
             viewModel.allContacts.values.toSet().run(::updateAllMarkers)
-            viewModel.waypoints.value?.toSet() ?.run(::drawRegions)
+//            viewModel.waypoints.value?.toSet() ?.run(::drawRegions)
         }
     }
 

@@ -233,7 +233,7 @@ dependencies {
     implementation(libs.libsodium)
     implementation(libs.apache.httpcore)
     implementation(libs.commons.codec)
-    implementation(libs.androidx.room.runtime)
+    implementation(libs.bundles.androidx.room)
     implementation(libs.bundles.objectbox.migration)
 
     // The BC version shipped under com.android is half-broken. Weird certificate issues etc.

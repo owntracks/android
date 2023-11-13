@@ -8,7 +8,11 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat.startActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.test.espresso.idling.CountingIdlingResource
 import dagger.hilt.android.AndroidEntryPoint
@@ -17,6 +21,8 @@ import javax.inject.Named
 import kotlin.time.ComparableTimeMark
 import kotlin.time.ExperimentalTime
 import kotlin.time.TimeSource
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import org.owntracks.android.R
 import org.owntracks.android.data.waypoints.WaypointModel
 import org.owntracks.android.databinding.UiWaypointsBinding
@@ -42,14 +48,11 @@ class WaypointsActivity :
     private var recyclerViewStartLayoutInstant: ComparableTimeMark? = null
     private var layoutCompleteListener: RecyclerViewLayoutCompleteListener? = null
 
-    @Inject
-    lateinit var notificationsStash: NotificationsStash
+    @Inject lateinit var notificationsStash: NotificationsStash
 
-    @Inject
-    lateinit var drawerProvider: DrawerProvider
+    @Inject lateinit var drawerProvider: DrawerProvider
 
-    @Inject
-    lateinit var preferences: Preferences
+    @Inject lateinit var preferences: Preferences
 
     @Inject
     @Named("outgoingQueueIdlingResource")
@@ -68,33 +71,32 @@ class WaypointsActivity :
         super.onCreate(savedInstanceState)
         recyclerViewAdapter = WaypointsAdapter(this)
         postNotificationsPermissionInit(this, preferences, notificationsStash)
-        DataBindingUtil.setContentView<UiWaypointsBinding>(this, R.layout.ui_waypoints)
-            .apply {
-                vm = viewModel
-                lifecycleOwner = this@WaypointsActivity
-                setSupportActionBar(appbar.toolbar)
-                drawerProvider.attach(appbar.toolbar)
-                waypointsRecyclerView.apply {
-                    layoutManager = LinearLayoutManager(this@WaypointsActivity)
-                    adapter = recyclerViewAdapter
-                    emptyView = placeholder
-                    viewTreeObserver.addOnGlobalLayoutListener {
-                        Timber.v("global layout changed")
-                        if (recyclerViewStartLayoutInstant != null) {
-                            this@WaypointsActivity.recyclerViewStartLayoutInstant?.run {
-                                Timber.d("Completed waypoints layout in ${this.elapsedNow()}")
-                            }
-                            this@WaypointsActivity.recyclerViewStartLayoutInstant = null
+        DataBindingUtil.setContentView<UiWaypointsBinding>(this, R.layout.ui_waypoints).apply {
+            vm = viewModel
+            lifecycleOwner = this@WaypointsActivity
+            setSupportActionBar(appbar.toolbar)
+            drawerProvider.attach(appbar.toolbar)
+            waypointsRecyclerView.apply {
+                layoutManager = LinearLayoutManager(this@WaypointsActivity)
+                adapter = recyclerViewAdapter
+                emptyView = placeholder
+                viewTreeObserver.addOnGlobalLayoutListener {
+                    Timber.v("global layout changed")
+                    if (recyclerViewStartLayoutInstant != null) {
+                        this@WaypointsActivity.recyclerViewStartLayoutInstant?.run {
+                            Timber.d("Completed waypoints layout in ${this.elapsedNow()}")
                         }
-                        layoutCompleteListener?.run {
-                            onLayoutCompleted()
-                        }
+                        this@WaypointsActivity.recyclerViewStartLayoutInstant = null
                     }
+                    layoutCompleteListener?.run { onLayoutCompleted() }
                 }
             }
-        viewModel.waypointsList.observe(this) {
-            recyclerViewStartLayoutInstant = TimeSource.Monotonic.markNow()
-            recyclerViewAdapter.setData(it)
+        }
+        lifecycleScope.launch {
+            viewModel.waypointsList.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect {
+                recyclerViewStartLayoutInstant = TimeSource.Monotonic.markNow()
+                recyclerViewAdapter.setData(it)
+            }
         }
     }
 
@@ -126,18 +128,12 @@ class WaypointsActivity :
         }
     }
 
-    override fun onClick(
-        thing: WaypointModel,
-        view: View,
-        longClick: Boolean
-    ): ClickHasBeenHandled {
+    override fun onClick(thing: WaypointModel, view: View, longClick: Boolean): ClickHasBeenHandled {
         startActivity(Intent(this, WaypointActivity::class.java).putExtra("waypointId", thing.id))
         return true
     }
 
-    override fun setRecyclerViewLayoutCompleteListener(
-        listener: RecyclerViewLayoutCompleteListener
-    ) {
+    override fun setRecyclerViewLayoutCompleteListener(listener: RecyclerViewLayoutCompleteListener) {
         this.layoutCompleteListener = listener
     }
 
@@ -150,7 +146,10 @@ class WaypointsActivity :
     }
 
     override var isRecyclerViewLayoutCompleted: Boolean
-        get() = (recyclerViewStartLayoutInstant == null).also { Timber.v("Being asked if I'm idle, saying $it") }
+        get() =
+            (recyclerViewStartLayoutInstant == null).also {
+                Timber.v("Being asked if I'm idle, saying $it")
+            }
         set(value) {
             recyclerViewStartLayoutInstant = if (!value) TimeSource.Monotonic.markNow() else null
         }

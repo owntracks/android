@@ -73,9 +73,4 @@ class WaypointsActivityTests :
 
         assertNotDisplayed(waypointName)
     }
-
-//    @After
-//    fun mqttAfter() {
-//        stopBroker()
-//    }
 }

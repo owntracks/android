@@ -1,7 +1,6 @@
 package org.owntracks.android.data.waypoints
 
 import android.content.Context
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Database
 import androidx.room.Delete
@@ -29,6 +28,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -52,7 +52,7 @@ class RoomWaypointsRepo @Inject constructor(
         fun getByTst(tst: Instant): WaypointModel?
 
         @Query("SELECT * FROM WaypointModel")
-        fun allLive(): LiveData<List<WaypointModel>>
+        fun allLive(): Flow<List<WaypointModel>>
 
         @Query("SELECT * FROM WaypointModel")
         fun all(): List<WaypointModel>
@@ -94,7 +94,7 @@ class RoomWaypointsRepo @Inject constructor(
     override val all: List<WaypointModel>
         get() = db.waypointDao().all()
 
-    override val allLive: LiveData<List<WaypointModel>>
+    override val allLive: Flow<List<WaypointModel>>
         get() = db.waypointDao().allLive()
 
     override suspend fun clearImpl() {
