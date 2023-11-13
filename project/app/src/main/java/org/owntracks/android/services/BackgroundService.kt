@@ -34,6 +34,7 @@ import java.util.stream.Collectors
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.forEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.owntracks.android.App
@@ -238,10 +239,10 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
         lifecycleScope.launch {
             // Every time a waypoint is inserted, updated or deleted, we need to update the geofences, and maybe publish that
             // waypoint
-            repeatOnLifecycle(Lifecycle.State.CREATED) {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
                 waypointsRepo.migrationCompleteFlow.collect {
                     if (it) {
-                        waypointsRepo.operations.observe(this@BackgroundService) { waypointOperation ->
+                        waypointsRepo.operations.collect { waypointOperation ->
                             when (waypointOperation) {
                                 is WaypointsRepo.WaypointOperation.Insert ->
                                     locationProcessor.publishWaypointMessage(waypointOperation.waypoint)
@@ -256,7 +257,6 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
                     }
                 }
             }
-
             setupGeofences()
         }
 

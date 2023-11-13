@@ -1,8 +1,9 @@
 package org.owntracks.android.data.waypoints
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import java.time.Instant
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.owntracks.android.model.messages.MessageWaypoint
 import org.owntracks.android.support.MessageWaypointCollection
@@ -20,13 +21,13 @@ abstract class WaypointsRepo protected constructor() {
     abstract val all: List<WaypointModel>
     abstract val allLive: LiveData<List<WaypointModel>>
 
-    private val mutableOperations = MutableLiveData<WaypointOperation>()
-    val operations: LiveData<WaypointOperation> = mutableOperations
+    private val mutableOperations = MutableSharedFlow<WaypointOperation>()
+    val operations: SharedFlow<WaypointOperation> = mutableOperations
 
     suspend fun insert(waypointModel: WaypointModel) {
         waypointModel.run {
             insertImpl(this@run)
-            mutableOperations.postValue(WaypointOperation.Insert(this@run))
+            mutableOperations.emit(WaypointOperation.Insert(this@run))
         }
     }
 
@@ -34,7 +35,7 @@ abstract class WaypointsRepo protected constructor() {
         waypointModel.run {
             updateImpl(this@run)
             if (notify) {
-                mutableOperations.postValue(WaypointOperation.Update(this@run))
+                mutableOperations.emit(WaypointOperation.Update(this@run))
             }
         }
     }
@@ -42,13 +43,13 @@ abstract class WaypointsRepo protected constructor() {
     suspend fun delete(waypointModel: WaypointModel) {
         waypointModel.run {
             deleteImpl(this@run)
-            mutableOperations.postValue(WaypointOperation.Delete(this@run))
+            mutableOperations.emit(WaypointOperation.Delete(this@run))
         }
     }
 
     suspend fun clearAll() {
         clearImpl()
-        mutableOperations.postValue(WaypointOperation.Clear)
+        mutableOperations.emit(WaypointOperation.Clear)
     }
 
     /**
@@ -68,7 +69,7 @@ abstract class WaypointsRepo protected constructor() {
     }
 
     fun exportToMessage(): MessageWaypointCollection =
-        MessageWaypointCollection().apply { addAll(allLive.value?.map(::fromDaoObject) ?: emptyList()) }
+        MessageWaypointCollection().apply { addAll(all.map(::fromDaoObject)) }
 
     private fun toDaoObject(messageWaypoint: MessageWaypoint): WaypointModel {
         return WaypointModel(
