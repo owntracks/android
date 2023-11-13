@@ -111,8 +111,8 @@ abstract class MessageBase : BaseObservable() {
 
     @JsonIgnore
     private fun getBaseTopic(topic: String): String {
-        return if (baseTopicSuffix != null && topic.endsWith(baseTopicSuffix!!)) {
-            topic.substring(0, topic.length - baseTopicSuffix!!.length)
+        return if (topic.endsWith(baseTopicSuffix)) {
+            topic.substring(0, topic.length - baseTopicSuffix.length)
         } else {
             topic
         }
