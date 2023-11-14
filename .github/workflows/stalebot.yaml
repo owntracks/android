@@ -3,9 +3,12 @@ name: "Close stale issues and PRs"
 on:
   schedule:
     - cron: "30 1 * * *"
+  workflow_dispatch:
 
 jobs:
   stale:
+    permissions:
+      issues: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/stale@v8
