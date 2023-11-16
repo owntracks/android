@@ -34,14 +34,15 @@
     <Preference
         android:key="advancedScreen"
         android:title="@string/preferencesAdvanced"
-        app:icon="@drawable/ic_baseline_settings_suggest_24"
-        app:fragment="org.owntracks.android.ui.preferences.AdvancedFragment" />
+        app:fragment="org.owntracks.android.ui.preferences.AdvancedFragment"
+        app:icon="@drawable/ic_baseline_settings_suggest_24" />
     <Preference
         android:key="experimentalScreen"
         android:title="@string/preferencesExperimental"
-        app:fragment="org.owntracks.android.ui.preferences.ExperimentalFragment" />
+        app:fragment="org.owntracks.android.ui.preferences.ExperimentalFragment"
+        app:icon="@drawable/science_24" />
     <Preference
         android:key="configuration"
-        app:icon="@drawable/ic_baseline_import_export_24"
-        android:title="@string/configurationManagement" />
+        android:title="@string/configurationManagement"
+        app:icon="@drawable/ic_baseline_import_export_24" />
 </PreferenceScreen>
