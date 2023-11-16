@@ -16,7 +16,6 @@ class ExperimentalFragment @Inject constructor() : AbstractPreferenceFragment() 
         EXPERIMENTAL_FEATURES.forEach { feature ->
             SwitchPreferenceCompat(requireContext()).apply {
                 title = feature
-                isChecked = preferences.experimentalFeatures.contains(feature)
                 isIconSpaceReserved = false
                 setOnPreferenceClickListener {
                     val newFeatures = preferences.experimentalFeatures.toMutableSet()
@@ -29,6 +28,8 @@ class ExperimentalFragment @Inject constructor() : AbstractPreferenceFragment() 
                     true
                 }
                 preferenceScreen.addPreference(this)
+            }.apply {
+                isChecked = preferences.experimentalFeatures.contains(feature)
             }
         }
     }
