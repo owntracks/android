@@ -13,6 +13,8 @@ abstract class LocationProviderClient {
         actuallyRequestLocationUpdates(locationRequest, clientCallBack, looper)
     }
 
+    abstract fun singleHighAccuracyLocation(clientCallBack: LocationCallback, looper: Looper)
+
     protected abstract fun actuallyRequestLocationUpdates(
         locationRequest: LocationRequest,
         clientCallBack: LocationCallback,

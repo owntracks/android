@@ -17,6 +17,7 @@ import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.Date
 import javax.inject.Inject
+import kotlinx.coroutines.flow.StateFlow
 import org.owntracks.android.R
 import org.owntracks.android.data.EndpointState
 import org.owntracks.android.data.repos.EndpointStateRepo
@@ -32,7 +33,7 @@ class StatusViewModel @Inject constructor(
     val endpointState: LiveData<EndpointState> = endpointStateRepo.endpointStateLiveData
     val endpointQueueLength: LiveData<Int> = endpointStateRepo.endpointQueueLength
     val serviceStarted: LiveData<Date> = endpointStateRepo.serviceStartedDate
-    val currentLocation: LiveData<Location> = locationRepo.currentPublishedLocation
+    val currentLocation: StateFlow<Location?> = locationRepo.currentPublishedLocation
     private val powerManager =
         (getApplication<Application>().applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager)
     internal val dozeWhitelisted = MutableLiveData<Boolean>()

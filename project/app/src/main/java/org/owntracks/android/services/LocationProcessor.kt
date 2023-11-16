@@ -146,8 +146,15 @@ class LocationProcessor @Inject constructor(
      * @param reportType type of report that
      */
     suspend fun onLocationChanged(location: Location, reportType: MessageLocation.ReportType) {
-        locationRepo.setCurrentPublishedLocation(location)
-        publishLocationMessage(reportType, location)
+        Timber.v("OnLocationChanged $location $reportType")
+        if (location.time > locationRepo.currentLocationTime ||
+            reportType != MessageLocation.ReportType.DEFAULT
+        ) {
+            locationRepo.setCurrentPublishedLocation(location)
+            publishLocationMessage(reportType, location)
+        } else {
+            Timber.v("Not re-sending message with same timestamp as last")
+        }
     }
 
     fun onWaypointTransition(

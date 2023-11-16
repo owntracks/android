@@ -127,7 +127,7 @@ class MapActivity :
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            Timber.d("Service connected to MapActivity")
+            Timber.d("MapActivity connected to service")
             this@MapActivity.service = (service as BackgroundService.LocalBinder).service
         }
 

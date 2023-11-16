@@ -4,13 +4,18 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Location
 import android.os.Looper
+import com.google.android.gms.location.CurrentLocationRequest
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.Granularity.GRANULARITY_PERMISSION_LEVEL
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.Tasks
 import java.util.concurrent.ExecutionException
+import kotlin.time.Duration.Companion.seconds
 import org.owntracks.android.location.LocationCallback
 import org.owntracks.android.location.LocationProviderClient
 import org.owntracks.android.location.LocationRequest
+import org.owntracks.android.location.LocationResult
 import timber.log.Timber
 
 /**
@@ -25,6 +30,17 @@ class GMSLocationProviderClient(
 
     private val callbackMap =
         mutableMapOf<Int, com.google.android.gms.location.LocationCallback>()
+
+    @SuppressLint("MissingPermission")
+    override fun singleHighAccuracyLocation(clientCallBack: LocationCallback, looper: Looper) {
+        fusedLocationProviderClient.getCurrentLocation(
+            CurrentLocationRequest.Builder()
+                .setMaxUpdateAgeMillis(5.seconds.inWholeMilliseconds)
+                .setGranularity(GRANULARITY_PERMISSION_LEVEL)
+                .setPriority(Priority.PRIORITY_HIGH_ACCURACY).build(),
+            null
+        ).addOnSuccessListener { clientCallBack.onLocationResult(LocationResult(it)) }
+    }
 
     /**
      * Converts the generic callback into a GMS-specific callback before invoking the location client

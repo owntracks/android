@@ -54,7 +54,7 @@ interface DefaultsProvider {
             Preferences::osmTileScaleFactor -> 1.0f
             Preferences::password -> ""
             Preferences::pegLocatorFastestIntervalToInterval -> false
-            Preferences::ping -> 30
+            Preferences::ping -> 15
             Preferences::port -> 8883
             Preferences::pubExtendedData -> true
             Preferences::pubQos -> MqttQos.ONE

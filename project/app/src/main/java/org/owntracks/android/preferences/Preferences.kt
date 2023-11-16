@@ -447,10 +447,13 @@ class Preferences @Inject constructor(
     companion object {
         const val EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI = "showExperimentalPreferenceUI"
         const val EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE = "allowSmallKeepalive"
+        const val EXPERIMENTAL_FEATURE_LOCATION_PING_USES_HIGH_ACCURACY_LOCATION_REQUEST =
+            "locationPingUsesHighAccuracyLocationRequest"
 
         internal val EXPERIMENTAL_FEATURES = setOf(
             EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI,
-            EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE
+            EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE,
+            EXPERIMENTAL_FEATURE_LOCATION_PING_USES_HIGH_ACCURACY_LOCATION_REQUEST
         )
 
         val SYSTEM_NIGHT_AUTO_MODE by lazy {

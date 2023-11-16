@@ -19,6 +19,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -34,7 +35,6 @@ import java.util.stream.Collectors
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.forEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.owntracks.android.App
@@ -73,9 +73,8 @@ import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber
 
 @AndroidEntryPoint
-class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preferences.OnPreferenceChangeListener {
-    private lateinit var locationCallback: LocationCallback
-    private lateinit var locationCallbackOnDemand: LocationCallback
+class BackgroundService :
+    LifecycleService(), ServiceBridgeInterface, Preferences.OnPreferenceChangeListener {
     private var lastLocationMessage: MessageLocation? = null
 
     private lateinit var notificationManagerCompat: NotificationManagerCompat
@@ -126,19 +125,24 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
     @CoroutineScopes.IoDispatcher
     lateinit var ioDispatcher: CoroutineDispatcher
 
+    private val callbackForReportType =
+        mutableMapOf<MessageLocation.ReportType, Lazy<LocationCallbackWithReportType>>().apply {
+            MessageLocation.ReportType.values().forEach {
+                this[it] = lazy {
+                    LocationCallbackWithReportType(it, locationProcessor, lifecycleScope)
+                }
+            }
+        }
+
     // Active notification intents and builder
     private val resultIntent by lazy {
-        Intent(this, MapActivity::class.java).setAction("android.intent.action.MAIN")
+        Intent(this, MapActivity::class.java)
+            .setAction("android.intent.action.MAIN")
             .addCategory("android.intent.category.LAUNCHER")
             .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
     }
     private val resultPendingIntent by lazy {
-        PendingIntent.getActivity(
-            this,
-            0,
-            resultIntent,
-            updateCurrentIntentFlags
-        )
+        PendingIntent.getActivity(this, 0, resultIntent, updateCurrentIntentFlags)
     }
     private val publishPendingIntent by lazy {
         PendingIntent.getService(
@@ -152,9 +156,7 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
         PendingIntent.getService(
             this,
             0,
-            Intent().setAction(
-                INTENT_ACTION_CHANGE_MONITORING
-            ),
+            Intent().setAction(INTENT_ACTION_CHANGE_MONITORING),
             updateCurrentIntentFlags
         )
     }
@@ -191,15 +193,13 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
     @InstallIn(SingletonComponent::class)
     internal interface ServiceEntrypoint {
         fun preferences(): Preferences
+
         fun endpointStateRepo(): EndpointStateRepo
     }
 
     override fun onCreate() {
         Timber.d("Backgroundservice onCreate")
-        val entrypoint = EntryPoints.get(
-            applicationContext,
-            ServiceEntrypoint::class.java
-        )
+        val entrypoint = EntryPoints.get(applicationContext, ServiceEntrypoint::class.java)
         preferences = entrypoint.preferences()
         endpointStateRepo = entrypoint.endpointStateRepo()
         Timber.d("BackgroundService has injected. calling startForeground")
@@ -208,23 +208,7 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
         super.onCreate()
         serviceBridge.bind(this)
         notificationManagerCompat = NotificationManagerCompat.from(this)
-        locationCallback = object : LocationCallback {
-            override fun onLocationAvailability(locationAvailability: LocationAvailability) {
-                Timber.d("location availability $locationAvailability")
-            }
 
-            override fun onLocationResult(locationResult: LocationResult) {
-                Timber.d("location result received: $locationResult")
-                onLocationChanged(locationResult.lastLocation, MessageLocation.ReportType.DEFAULT)
-            }
-        }
-        locationCallbackOnDemand = object : LocationCallback {
-            override fun onLocationAvailability(locationAvailability: LocationAvailability) {}
-            override fun onLocationResult(locationResult: LocationResult) {
-                Timber.d("BackgroundService On-demand location result received: locationResult")
-                onLocationChanged(locationResult.lastLocation, MessageLocation.ReportType.RESPONSE)
-            }
-        }
         setupLocationRequest()
         scheduler.scheduleLocationPing()
         messageProcessor.initialize()
@@ -237,38 +221,41 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
         endpointStateRepo.setServiceStartedNow()
 
         lifecycleScope.launch {
-            // Every time a waypoint is inserted, updated or deleted, we need to update the geofences, and maybe publish that
+            // Every time a waypoint is inserted, updated or deleted, we need to update the geofences, and
+            // maybe publish that
             // waypoint
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                waypointsRepo.migrationCompleteFlow.collect {
-                    if (it) {
-                        waypointsRepo.operations.collect { waypointOperation ->
-                            when (waypointOperation) {
-                                is WaypointsRepo.WaypointOperation.Insert ->
-                                    locationProcessor.publishWaypointMessage(waypointOperation.waypoint)
-                                is WaypointsRepo.WaypointOperation.Update ->
-                                    locationProcessor.publishWaypointMessage(waypointOperation.waypoint)
-                                else -> {}
+                launch {
+                    waypointsRepo.migrationCompleteFlow.collect {
+                        if (it) {
+                            waypointsRepo.operations.collect { waypointOperation ->
+                                when (waypointOperation) {
+                                    is WaypointsRepo.WaypointOperation.Insert ->
+                                        locationProcessor.publishWaypointMessage(waypointOperation.waypoint)
+                                    is WaypointsRepo.WaypointOperation.Update ->
+                                        locationProcessor.publishWaypointMessage(waypointOperation.waypoint)
+                                    else -> {}
+                                }
+                                lifecycleScope.launch { setupGeofences() }
                             }
-                            lifecycleScope.launch {
-                                setupGeofences()
+                        }
+                    }
+                }
+                launch {
+                    locationRepo.currentPublishedLocation.collect { location ->
+                        location?.run {
+                            val messageLocation = fromLocation(location, Build.VERSION.SDK_INT)
+                            if (lastLocationMessage == null ||
+                                lastLocationMessage!!.timestamp < messageLocation.timestamp
+                            ) {
+                                lastLocationMessage = messageLocation
+                                geocoderProvider.resolve(messageLocation, this@BackgroundService)
                             }
                         }
                     }
                 }
             }
             setupGeofences()
-        }
-
-        locationRepo.currentPublishedLocation.observe(this) { location: Location ->
-            val messageLocation = fromLocation(
-                location,
-                Build.VERSION.SDK_INT
-            )
-            if (lastLocationMessage == null || lastLocationMessage!!.timestamp < messageLocation.timestamp) {
-                lastLocationMessage = messageLocation
-                geocoderProvider.resolve(messageLocation, this)
-            }
         }
     }
 
@@ -286,7 +273,8 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
     }
 
     /**
-     * We've been sent a start command with an intent, which usually means we've got to do something depending on the action
+     * We've been sent a start command with an intent, which usually means we've got to do something
+     * depending on the action
      *
      * @param intent that was passed to the service start command
      */
@@ -305,9 +293,7 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
                 }
                 // This comes from the [GeofencingBroadcastReceiver]
                 INTENT_ACTION_SEND_EVENT_CIRCULAR -> {
-                    lifecycleScope.launch {
-                        onGeofencingEvent(fromIntent(intent))
-                    }
+                    lifecycleScope.launch { onGeofencingEvent(fromIntent(intent)) }
                     return
                 }
 
@@ -316,15 +302,9 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
                     clearEventStackNotification()
                     return
                 }
-
                 INTENT_ACTION_CHANGE_MONITORING -> {
                     if (intent.hasExtra("monitoring")) {
-                        val newMode = getByValue(
-                            intent.getIntExtra(
-                                "monitoring",
-                                preferences.monitoring.value
-                            )
-                        )
+                        val newMode = getByValue(intent.getIntExtra("monitoring", preferences.monitoring.value))
                         preferences.monitoring = newMode
                     } else {
                         // Step monitoring mode if no mode is specified
@@ -334,13 +314,15 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
                     notificationManagerCompat.cancel(BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG, 0)
                     return
                 }
-
-                INTENT_ACTION_BOOT_COMPLETED, INTENT_ACTION_PACKAGE_REPLACED -> {
+                INTENT_ACTION_BOOT_COMPLETED,
+                INTENT_ACTION_PACKAGE_REPLACED -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                        val backgroundLocationPermissionDenied = ActivityCompat.checkSelfPermission(
-                            this,
-                            Manifest.permission.ACCESS_BACKGROUND_LOCATION
-                        ) == PackageManager.PERMISSION_DENIED
+                        val backgroundLocationPermissionDenied =
+                            ActivityCompat.checkSelfPermission(
+                                this,
+                                Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                            ) ==
+                                PackageManager.PERMISSION_DENIED
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
                             !hasBeenStartedExplicitly &&
                             backgroundLocationPermissionDenied
@@ -351,12 +333,10 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
 
                     return
                 }
-
                 INTENT_ACTION_EXIT -> {
                     exit()
                     return
                 }
-
                 else -> {}
             }
         } else {
@@ -371,49 +351,49 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
     }
 
     private fun notifyUserOfBackgroundLocationRestriction() {
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) != PackageManager.PERMISSION_GRANTED
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) !=
+            PackageManager.PERMISSION_GRANTED
         ) {
             return
         }
         val activityLaunchIntent =
-            Intent(applicationContext, MapActivity::class.java).setAction("android.intent.action.MAIN")
+            Intent(applicationContext, MapActivity::class.java)
+                .setAction("android.intent.action.MAIN")
                 .addCategory("android.intent.category.LAUNCHER")
                 .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
         val notificationText = getString(R.string.backgroundLocationRestrictionNotificationText)
         val notificationTitle = getString(R.string.backgroundLocationRestrictionNotificationTitle)
-        val notification = NotificationCompat.Builder(
-            applicationContext,
-            GeocoderProvider.ERROR_NOTIFICATION_CHANNEL_ID
-        )
-            .setContentTitle(notificationTitle)
-            .setContentText(notificationText)
-            .setAutoCancel(true)
-            .setSmallIcon(R.drawable.ic_owntracks_80)
-            .setStyle(
-                NotificationCompat.BigTextStyle().bigText(notificationText)
+        val notification =
+            NotificationCompat.Builder(
+                applicationContext,
+                GeocoderProvider.ERROR_NOTIFICATION_CHANNEL_ID
             )
-            .setContentIntent(
-                PendingIntent.getActivity(
-                    applicationContext,
-                    0,
-                    activityLaunchIntent,
-                    updateCurrentIntentFlags
+                .setContentTitle(notificationTitle)
+                .setContentText(notificationText)
+                .setAutoCancel(true)
+                .setSmallIcon(R.drawable.ic_owntracks_80)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(notificationText))
+                .setContentIntent(
+                    PendingIntent.getActivity(
+                        applicationContext,
+                        0,
+                        activityLaunchIntent,
+                        updateCurrentIntentFlags
+                    )
                 )
-            )
-            .setPriority(NotificationCompat.PRIORITY_LOW)
-            .setSilent(true)
-            .build()
-        notificationManagerCompat.notify(BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG, 0, notification)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setSilent(true)
+                .build()
+        notificationManagerCompat.notify(
+            BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG,
+            0,
+            notification
+        )
     }
 
     private fun updateOngoingNotification() {
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) == PackageManager.PERMISSION_GRANTED
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
+            PackageManager.PERMISSION_GRANTED
         ) {
             notificationManagerCompat.notify(NOTIFICATION_ID_ONGOING, ongoingNotification)
         }
@@ -421,26 +401,35 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
 
     // Show monitoring mode if endpoint state is not interesting
     private val ongoingNotification: Notification
-        get() = activeNotificationCompatBuilder.apply {
-            if (lastLocationMessage != null && preferences.notificationLocation) {
-                setContentTitle(lastLocationMessage!!.geocode)
-                setWhen(TimeUnit.SECONDS.toMillis(lastLocationMessage!!.timestamp))
-                setNumber(lastQueueLength)
-            } else {
-                setContentTitle(getString(R.string.app_name))
-            }
-            // Show monitoring mode if endpoint state is not interesting
-            val lastEndpointState = endpointStateRepo.endpointStateLiveData.value
-            if (lastEndpointState === EndpointState.CONNECTED || lastEndpointState === EndpointState.IDLE) {
-                setContentText(getMonitoringLabel(preferences.monitoring))
-            } else if (lastEndpointState === EndpointState.ERROR && lastEndpointState.message != null) {
-                setContentText(
-                    lastEndpointState.getLabel(this@BackgroundService) + ": " + lastEndpointState.message
-                )
-            } else {
-                setContentText(lastEndpointState!!.getLabel(this@BackgroundService))
-            }
-        }.build()
+        get() =
+            activeNotificationCompatBuilder
+                .apply {
+                    if (lastLocationMessage != null && preferences.notificationLocation) {
+                        setContentTitle(lastLocationMessage!!.geocode)
+                        setWhen(TimeUnit.SECONDS.toMillis(lastLocationMessage!!.timestamp))
+                        setNumber(lastQueueLength)
+                    } else {
+                        setContentTitle(getString(R.string.app_name))
+                    }
+                    // Show monitoring mode if endpoint state is not interesting
+                    val lastEndpointState = endpointStateRepo.endpointStateLiveData.value
+                    if (lastEndpointState === EndpointState.CONNECTED ||
+                        lastEndpointState === EndpointState.IDLE
+                    ) {
+                        setContentText(getMonitoringLabel(preferences.monitoring))
+                    } else if (lastEndpointState === EndpointState.ERROR &&
+                        lastEndpointState.message != null
+                    ) {
+                        setContentText(
+                            lastEndpointState.getLabel(this@BackgroundService) +
+                                ": " +
+                                lastEndpointState.message
+                        )
+                    } else {
+                        setContentText(lastEndpointState!!.getLabel(this@BackgroundService))
+                    }
+                }
+                .build()
 
     private fun getMonitoringLabel(mode: MonitoringMode): String {
         return when (mode) {
@@ -453,10 +442,9 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
 
     override fun sendEventNotification(message: MessageTransition) {
         Timber.d("Sending event notification for $message")
-        if (!preferences.notificationEvents || ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) != PackageManager.PERMISSION_GRANTED
+        if (!preferences.notificationEvents ||
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) !=
+            PackageManager.PERMISSION_GRANTED
         ) {
             return
         }
@@ -464,13 +452,14 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
         val timestampInMs = TimeUnit.SECONDS.toMillis(message.timestamp)
         val location = message.description ?: getString(R.string.aLocation)
         val title = contact?.name ?: message.trackerId ?: message.contactKey
-        val transitionText = getString(
-            if (message.getTransition() == Geofence.GEOFENCE_TRANSITION_ENTER) {
-                R.string.transitionEntering
-            } else {
-                R.string.transitionLeaving
-            }
-        )
+        val transitionText =
+            getString(
+                if (message.getTransition() == Geofence.GEOFENCE_TRANSITION_ENTER) {
+                    R.string.transitionEntering
+                } else {
+                    R.string.transitionLeaving
+                }
+            )
         val eventText = "$transitionText $location"
         val whenStr = formatDate(timestampInMs)
         activeNotifications.push(
@@ -484,11 +473,12 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
             }
         )
         Timber.v("groupedNotifications: ${activeNotifications.size}")
-        val summary = resources.getQuantityString(
-            R.plurals.notificationEventsTitle,
-            activeNotifications.size,
-            activeNotifications.size
-        )
+        val summary =
+            resources.getQuantityString(
+                R.plurals.notificationEventsTitle,
+                activeNotifications.size,
+                activeNotifications.size
+            )
         val inbox = NotificationCompat.InboxStyle().setSummaryText(summary)
         activeNotifications.forEach { inbox.addLine(it) }
 
@@ -517,7 +507,8 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
                 PendingIntent.getService(
                     this,
                     1,
-                    Intent(this, BackgroundService::class.java).setAction(INTENT_ACTION_CLEAR_NOTIFICATIONS),
+                    Intent(this, BackgroundService::class.java)
+                        .setAction(INTENT_ACTION_CLEAR_NOTIFICATIONS),
                     updateCurrentIntentFlags
                 )
             )
@@ -541,7 +532,10 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
             Timber.e("geofencingEvent hasError: ${event.errorCode}")
             return
         }
-        if (event.geofenceTransition == null || event.triggeringGeofences == null || event.triggeringLocation == null) {
+        if (event.geofenceTransition == null ||
+            event.triggeringGeofences == null ||
+            event.triggeringLocation == null
+        ) {
             Timber.e("geofencingEvent has no transition or trigger")
             return
         }
@@ -558,9 +552,7 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
                             transition,
                             MessageTransition.TRIGGER_CIRCULAR
                         )
-                    } ?: run {
-                        Timber.e("waypoint id $requestId not found for geofence event")
-                    }
+                    } ?: run { Timber.e("waypoint id $requestId not found for geofence event") }
                 } catch (e: NumberFormatException) {
                     Timber.e("$requestId from Geofencing event is not a valid request id")
                 }
@@ -568,35 +560,14 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
         }
     }
 
-    fun onLocationChanged(location: Location, reportType: MessageLocation.ReportType) {
-        Timber.v("location update received: $location, report type $reportType")
-        if (location.time > locationRepo.currentLocationTime || reportType != MessageLocation.ReportType.DEFAULT) {
-            lifecycleScope.launch {
-                locationProcessor.onLocationChanged(location, reportType)
-            }
-        } else {
-            Timber.v("Not re-sending message with same timestamp as last")
-        }
-    }
-
-    override fun requestOnDemandLocationUpdate() {
+    override fun requestOnDemandLocationUpdate(reportType: MessageLocation.ReportType) {
         if (locationPermissionIsMissing()) {
             Timber.e("missing location permission")
             return
         }
-        val request = LocationRequest(
-            null,
-            null,
-            1,
-            Duration.ofMinutes(1),
-            LocationRequest.PRIORITY_HIGH_ACCURACY,
-            Duration.ofMinutes(1),
-            true
-        )
         Timber.d("On demand location request")
-        locationProviderClient.requestLocationUpdates(
-            request,
-            locationCallbackOnDemand,
+        locationProviderClient.singleHighAccuracyLocation(
+            callbackForReportType[reportType]!!.value,
             runThingsOnOtherThreads.getBackgroundLooper()
         )
     }
@@ -614,18 +585,17 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
         var smallestDisplacement: Float? = null
         var priority: Int? = null
         when (monitoring) {
-            MonitoringMode.QUIET, MonitoringMode.MANUAL -> {
+            MonitoringMode.QUIET,
+            MonitoringMode.MANUAL -> {
                 interval = Duration.ofSeconds(preferences.locatorInterval.toLong())
                 smallestDisplacement = preferences.locatorDisplacement.toFloat()
                 priority = LocationRequest.PRIORITY_LOW_POWER
             }
-
             MonitoringMode.SIGNIFICANT -> {
                 interval = Duration.ofSeconds(preferences.locatorInterval.toLong())
                 smallestDisplacement = preferences.locatorDisplacement.toFloat()
                 priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
             }
-
             MonitoringMode.MOVE -> {
                 interval = Duration.ofSeconds(preferences.moveModeLocatorInterval.toLong())
                 priority = LocationRequest.PRIORITY_HIGH_ACCURACY
@@ -634,20 +604,13 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
         if (preferences.pegLocatorFastestIntervalToInterval) {
             fastestInterval = interval
         }
-        val request = LocationRequest(
-            fastestInterval,
-            smallestDisplacement,
-            null,
-            null,
-            priority,
-            interval,
-            null
-        )
+        val request =
+            LocationRequest(fastestInterval, smallestDisplacement, null, null, priority, interval, null)
         Timber.d("location update request params: $request")
         locationProviderClient.flushLocations()
         locationProviderClient.requestLocationUpdates(
             request,
-            locationCallback,
+            callbackForReportType[MessageLocation.ReportType.DEFAULT]!!.value,
             runThingsOnOtherThreads.getBackgroundLooper()
         )
         return true
@@ -661,18 +624,21 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
         withContext(ioDispatcher) {
             val waypoints = waypointsRepo.all
             Timber.i("Setting up geofences for ${waypoints.size} waypoints")
-            val geofences = waypoints.map {
-                Geofence(
-                    it.id.toString(),
-                    Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT,
-                    2.minutes.inWholeMilliseconds.toInt(),
-                    Latitude(it.geofenceLatitude),
-                    Longitude(it.geofenceLongitude),
-                    it.geofenceRadius.toFloat(),
-                    Geofence.NEVER_EXPIRE,
-                    null
-                )
-            }.toList()
+            val geofences =
+                waypoints
+                    .map {
+                        Geofence(
+                            it.id.toString(),
+                            Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT,
+                            2.minutes.inWholeMilliseconds.toInt(),
+                            Latitude(it.geofenceLatitude),
+                            Longitude(it.geofenceLongitude),
+                            it.geofenceRadius.toFloat(),
+                            Geofence.NEVER_EXPIRE,
+                            null
+                        )
+                    }
+                    .toList()
             geofencingClient.removeGeofences(this@BackgroundService)
             if (geofences.isNotEmpty()) {
                 val request = GeofencingRequest(Geofence.GEOFENCE_TRANSITION_ENTER, geofences)
@@ -683,13 +649,10 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
 
     private fun locationPermissionIsMissing(): Boolean {
         return (
-            ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_DENIED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) == PackageManager.PERMISSION_DENIED
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_DENIED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) ==
+                PackageManager.PERMISSION_DENIED
             )
     }
 
@@ -700,15 +663,18 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
     }
 
     override fun onPreferenceChanged(properties: Set<String>) {
-        val propertiesWeCareAbout = listOf(
-            "locatorInterval",
-            "locatorDisplacement",
-            "moveModeLocatorInterval",
-            "pegLocatorFastestIntervalToInterval"
-        )
-        if (propertiesWeCareAbout.stream().filter { o: String -> properties.contains(o) }.collect(
-                Collectors.toSet()
-            ).isNotEmpty()
+        val propertiesWeCareAbout =
+            listOf(
+                "locatorInterval",
+                "locatorDisplacement",
+                "moveModeLocatorInterval",
+                "pegLocatorFastestIntervalToInterval"
+            )
+        if (propertiesWeCareAbout
+            .stream()
+            .filter { o: String -> properties.contains(o) }
+            .collect(Collectors.toSet())
+            .isNotEmpty()
         ) {
             Timber.d("locator preferences changed. Resetting location request.")
             setupLocationRequest()
@@ -720,14 +686,22 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
     }
 
     fun reInitializeLocationRequests() {
-        runThingsOnOtherThreads.postOnServiceHandlerDelayed({
-            if (setupLocationRequest()) {
-                Timber.d("Getting last location")
-                locationProviderClient.getLastLocation()?.run {
-                    onLocationChanged(this, MessageLocation.ReportType.DEFAULT)
+        runThingsOnOtherThreads.postOnServiceHandlerDelayed(
+            {
+                if (setupLocationRequest()) {
+                    Timber.d("Getting last location")
+                    locationProviderClient.getLastLocation()?.run {
+                        lifecycleScope.launch {
+                            locationProcessor.onLocationChanged(
+                                this@run,
+                                MessageLocation.ReportType.DEFAULT
+                            )
+                        }
+                    }
                 }
-            }
-        }, 0)
+            },
+            0
+        )
     }
 
     private val localServiceBinder: IBinder = LocalBinder()
@@ -753,11 +727,42 @@ class BackgroundService : LifecycleService(), ServiceBridgeInterface, Preference
         // NEW ACTIONS ALSO HAVE TO BE ADDED TO THE SERVICE INTENT FILTER
         private const val INTENT_ACTION_SEND_LOCATION_USER = "org.owntracks.android.SEND_LOCATION_USER"
         const val INTENT_ACTION_SEND_EVENT_CIRCULAR = "org.owntracks.android.SEND_EVENT_CIRCULAR"
-        private const val INTENT_ACTION_CLEAR_NOTIFICATIONS = "org.owntracks.android.CLEAR_EVENT_NOTIFICATIONS"
+        private const val INTENT_ACTION_CLEAR_NOTIFICATIONS =
+            "org.owntracks.android.CLEAR_EVENT_NOTIFICATIONS"
         private const val INTENT_ACTION_CHANGE_MONITORING = "org.owntracks.android.CHANGE_MONITORING"
         private const val INTENT_ACTION_EXIT = "org.owntracks.android.EXIT"
         private const val INTENT_ACTION_BOOT_COMPLETED = "android.intent.action.BOOT_COMPLETED"
         private const val INTENT_ACTION_PACKAGE_REPLACED = "android.intent.action.MY_PACKAGE_REPLACED"
-        private const val updateCurrentIntentFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        private const val updateCurrentIntentFlags =
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+    }
+
+    class LocationCallbackWithReportType(
+        private val reportType: MessageLocation.ReportType,
+        private val locationProcessor: LocationProcessor,
+        private val lifecycleCoroutineScope: LifecycleCoroutineScope
+    ) : LocationCallback {
+
+        override fun onLocationAvailability(locationAvailability: LocationAvailability) {
+            Timber.v("Location availability $locationAvailability")
+        }
+
+        override fun onLocationResult(locationResult: LocationResult) {
+            Timber.d("Location result received: $locationResult")
+            onLocationChanged(locationResult.lastLocation, reportType)
+        }
+
+        override fun onLocationError() {
+            Timber.v("Callback fired with no location received")
+        }
+
+        private fun onLocationChanged(location: Location, reportType: MessageLocation.ReportType) {
+            Timber.v("backgroundservice location update received: $location, report type $reportType")
+            lifecycleCoroutineScope.launch { locationProcessor.onLocationChanged(location, reportType) }
+        }
+
+        override fun toString(): String {
+            return "Backgroundservice callback[$reportType] "
+        }
     }
 }

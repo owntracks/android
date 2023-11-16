@@ -277,7 +277,7 @@ class MQTTMessageProcessorEndpoint(
 
         override fun messageArrived(topic: String, message: MqttMessage) {
             scope.launch {
-                Timber.d("Received MQTT message on $topic: ${message.id}")
+                Timber.d("Received MQTT message on $topic: id=${message.id}")
                 if (message.payload.isEmpty()) {
                     onMessageReceived(
                         MessageClear().apply {

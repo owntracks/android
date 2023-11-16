@@ -15,12 +15,14 @@ class GMSLocationCallback(private val clientCallBack: LocationCallback) :
     com.google.android.gms.location.LocationCallback() {
     override fun onLocationResult(locationResult: LocationResult) {
         super.onLocationResult(locationResult)
-        locationResult.lastLocation?.run {
+        locationResult.lastLocation?.apply {
             clientCallBack.onLocationResult(
                 org.owntracks.android.location.LocationResult(
                     this
                 )
             )
+        } ?: run {
+            clientCallBack.onLocationError()
         }
     }
 
