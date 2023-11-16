@@ -79,7 +79,6 @@ class Scheduler @Inject constructor(
 
     fun scheduleMqttReconnect() {
         workManager.getWorkInfosForUniqueWork(ONETIME_TASK_MQTT_RECONNECT).run {
-            Timber.w("$this ${this.isDone} ${this.isCancelled}")
             if (isDone) {
                 Timber.d("Scheduling ONETIME_TASK_MQTT_RECONNECT job")
                 mqttReconnectJob = workManager.enqueueUniqueWork(

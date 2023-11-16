@@ -11,6 +11,7 @@ import java.io.IOException
 import java.security.KeyStore
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.stream.Collectors
+import javax.net.ssl.SSLHandshakeException
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
@@ -32,6 +33,7 @@ import org.eclipse.paho.client.mqttv3.MqttCallbackExtended
 import org.eclipse.paho.client.mqttv3.MqttException
 import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CLIENT_ALREADY_DISCONNECTED
 import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CLIENT_DISCONNECTING
+import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CLIENT_EXCEPTION
 import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CONNECTION_LOST
 import org.eclipse.paho.client.mqttv3.MqttMessage
 import org.eclipse.paho.client.mqttv3.ScheduledExecutorPingSender
@@ -367,6 +369,15 @@ class MQTTMessageProcessorEndpoint(
                                     e.cause,
                                     "MQTT client unable to connect to endpoint because the connection was lost"
                                 )
+                                REASON_CODE_CLIENT_EXCEPTION.toInt() ->
+                                    when (e.cause) {
+                                        is SSLHandshakeException ->
+                                            Timber.e(
+                                                "MQTT client unable to connect to endpoint: " +
+                                                    "${(e.cause as SSLHandshakeException).message}"
+                                            )
+                                        else -> Timber.e(e, "MQTT client unable to connect to endpoint")
+                                    }
                                 else -> Timber.e(e, "MQTT client unable to connect to endpoint")
                             }
                         }
@@ -376,7 +387,6 @@ class MQTTMessageProcessorEndpoint(
                     }
                     endpointStateRepo.setState(EndpointState.ERROR.withError(e))
                     scheduler.scheduleMqttReconnect()
-                    throw e
                 }
             }.apply { Timber.d("MQTT connection attempt completed in $this") }
         }
