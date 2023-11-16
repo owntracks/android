@@ -131,7 +131,7 @@ class OpenCageGeocoder internal constructor(
                 .plus(1, ChronoUnit.MINUTES)
             when (e) {
                 is SocketTimeoutException -> Timber.e("Error reverse geocoding from opencage. Timeout")
-                is UnknownHostException -> Timber.e("Error reverse geocoding from opencage. ${e.message}")
+                is UnknownHostException -> Timber.e("Error reverse geocoding from opencage. Unable to resolve host")
                 else -> Timber.e(e, "Error reverse geocoding from opencage")
             }
             GeocodeResult.Fault.ExceptionError(e, tripResetTimestamp)
