@@ -11,10 +11,16 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ShareCompat
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.random.Random
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import org.owntracks.android.BuildConfig
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiPreferencesLogsBinding
@@ -34,17 +40,17 @@ class LogViewerActivity : AppCompatActivity() {
     private var recyclerView: RecyclerView? = null
     private var clearButton: MenuItem? = null
     private lateinit var binding: UiPreferencesLogsBinding
+    private var collectorJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView<UiPreferencesLogsBinding?>(
             this,
             R.layout.ui_preferences_logs
-        )
-            .apply {
-                lifecycleOwner = this@LogViewerActivity
-                setSupportActionBar(appbar.toolbar)
-            }
+        ).apply {
+            lifecycleOwner = this@LogViewerActivity
+            setSupportActionBar(appbar.toolbar)
+        }
 
         supportActionBar?.apply {
             setDisplayShowHomeEnabled(true)
@@ -61,8 +67,7 @@ class LogViewerActivity : AppCompatActivity() {
                 resources.getColor(R.color.log_error_tag_color)
             )
         )
-        viewModel.logLines()
-            .observe(this, ::updateAdapterWithLogLines)
+        restartLogCollector()
 
         binding.logsRecyclerView.apply {
             recyclerView = this
@@ -71,8 +76,7 @@ class LogViewerActivity : AppCompatActivity() {
         }
         binding.shareFab.setOnClickListener {
             revokeExportUriPermissions()
-            val key =
-                "${getRandomHexString()}/debug=${viewModel.isDebugEnabled()}/owntracks-debug.txt"
+            val key = "${getRandomHexString()}/debug=${viewModel.isDebugEnabled()}/owntracks-debug.txt"
             logExportUri = Uri.parse("content://${BuildConfig.APPLICATION_ID}.log/$key")
             val shareIntent = ShareCompat.IntentBuilder(this)
                 .setType("text/plain")
@@ -86,13 +90,21 @@ class LogViewerActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateAdapterWithLogLines(logEntries: List<LogEntry>) {
-        val atTheBottom = !binding.logsRecyclerView.canScrollVertically(1)
-        logAdapter.setLogLines(
-            logEntries.filter {
-                (it.priority >= Log.DEBUG && viewModel.isDebugEnabled()) || it.priority >= Log.INFO
+    private fun restartLogCollector() {
+        collectorJob?.cancel("Restarting")
+        logAdapter.clearLogs()
+        collectorJob = lifecycleScope.launch {
+            viewModel.logLines().flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect {
+                if (viewModel.isDebugEnabled() || it.priority >= Log.INFO) {
+                    updateAdapterWithLogLines(it)
+                }
             }
-        )
+        }
+    }
+
+    private fun updateAdapterWithLogLines(logEntry: LogEntry) {
+        val atTheBottom = !binding.logsRecyclerView.canScrollVertically(1)
+        logAdapter.addLogLine(logEntry)
         if (atTheBottom) {
             binding.logsRecyclerView.scrollToPosition(logAdapter.itemCount - 1)
         }
@@ -122,12 +134,13 @@ class LogViewerActivity : AppCompatActivity() {
             }
             R.id.clear_log -> {
                 viewModel.clearLog()
+                restartLogCollector()
                 true
             }
             R.id.show_debug_logs -> {
                 item.isChecked = !item.isChecked
                 viewModel.enableDebugLogs(item.isChecked)
-                viewModel.logLines().value?.run(::updateAdapterWithLogLines)
+                restartLogCollector()
                 true
             }
             else -> super.onOptionsItemSelected(item)
