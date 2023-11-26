@@ -284,9 +284,9 @@ class BackgroundService :
             when (intent.action) {
                 INTENT_ACTION_SEND_LOCATION_USER -> {
                     lifecycleScope.launch {
-                        locationProcessor.publishLocationMessage(
-                            MessageLocation.ReportType.USER,
-                            locationRepo.currentPublishedLocation.value
+                        locationProviderClient.singleHighAccuracyLocation(
+                            callbackForReportType[MessageLocation.ReportType.USER]!!.value,
+                            runThingsOnOtherThreads.getBackgroundLooper()
                         )
                     }
                     return
