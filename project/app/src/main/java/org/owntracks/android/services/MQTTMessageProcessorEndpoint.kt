@@ -94,7 +94,7 @@ class MQTTMessageProcessorEndpoint(
                 connectingLock.withPermit {
                     disconnect()
                 }
-                scheduler.cancelMqttTasks()
+                scheduler.cancelAllTasks()
             }
         }
     }
@@ -128,7 +128,7 @@ class MQTTMessageProcessorEndpoint(
             connectingLock.withPermit {
                 disconnect()
             }
-            scheduler.cancelMqttTasks()
+            scheduler.cancelAllTasks()
         }
     }
 

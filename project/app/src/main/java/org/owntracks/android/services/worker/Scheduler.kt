@@ -59,22 +59,9 @@ class Scheduler @Inject constructor(
      * Cancels all WorkManager tasks. Called on app exit
      */
     fun cancelAllTasks() {
-        cancelMqttTasks()
+        Timber.d("Cancelling task tag (all mqtt tasks) $ONETIME_TASK_MQTT_RECONNECT")
+        workManager.cancelUniqueWork(ONETIME_TASK_MQTT_RECONNECT)
         workManager.cancelAllWorkByTag(PERIODIC_TASK_SEND_LOCATION_PING)
-    }
-
-    /**
-     * Called when the MQTT endpoint deactivates
-     */
-    fun cancelMqttTasks() {
-        workManager.apply {
-            Timber.d("Cancelling task tag (all mqtt tasks) $ONEOFF_TASK_SEND_MESSAGE_MQTT")
-            cancelAllWorkByTag(ONEOFF_TASK_SEND_MESSAGE_MQTT)
-            Timber.d("Cancelling task tag (all mqtt tasks) $PERIODIC_TASK_MQTT_KEEPALIVE")
-            cancelAllWorkByTag(PERIODIC_TASK_MQTT_KEEPALIVE)
-            Timber.d("Cancelling task tag (all mqtt tasks) $ONETIME_TASK_MQTT_RECONNECT")
-            cancelUniqueWork(ONETIME_TASK_MQTT_RECONNECT)
-        }
     }
 
     fun scheduleMqttReconnect() {
@@ -100,9 +87,7 @@ class Scheduler @Inject constructor(
 
     companion object {
         val MIN_PERIODIC_INTERVAL = PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS.milliseconds
-        private const val ONEOFF_TASK_SEND_MESSAGE_MQTT = "SEND_MESSAGE_MQTT"
         private const val PERIODIC_TASK_SEND_LOCATION_PING = "PERIODIC_TASK_SEND_LOCATION_PING"
-        private const val PERIODIC_TASK_MQTT_KEEPALIVE = "PERIODIC_TASK_MQTT_KEEPALIVE"
         private const val ONETIME_TASK_MQTT_RECONNECT = "ONETIME_TASK_MQTT_RECONNECT"
     }
 
