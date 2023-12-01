@@ -213,12 +213,6 @@ class BackgroundService :
         scheduler.scheduleLocationPing()
         messageProcessor.initialize()
         preferences.registerOnPreferenceChangedListener(this)
-        endpointStateRepo.endpointQueueLength.observe(this) { queueLength: Int ->
-            lastQueueLength = queueLength
-            updateOngoingNotification()
-        }
-        endpointStateRepo.endpointStateLiveData.observe(this) { updateOngoingNotification() }
-        endpointStateRepo.setServiceStartedNow()
 
         lifecycleScope.launch {
             // Every time a waypoint is inserted, updated or deleted, we need to update the geofences, and
@@ -254,6 +248,16 @@ class BackgroundService :
                         }
                     }
                 }
+                launch {
+                    endpointStateRepo.endpointQueueLength.collect { queueLength: Int ->
+                        lastQueueLength = queueLength
+                        updateOngoingNotification()
+                    }
+                }
+                launch {
+                    endpointStateRepo.endpointState.collect { updateOngoingNotification() }
+                }
+                endpointStateRepo.setServiceStartedNow()
             }
             setupGeofences()
         }
@@ -412,7 +416,7 @@ class BackgroundService :
                         setContentTitle(getString(R.string.app_name))
                     }
                     // Show monitoring mode if endpoint state is not interesting
-                    val lastEndpointState = endpointStateRepo.endpointStateLiveData.value
+                    val lastEndpointState = endpointStateRepo.endpointState.value
                     if (lastEndpointState === EndpointState.CONNECTED ||
                         lastEndpointState === EndpointState.IDLE
                     ) {
@@ -426,7 +430,7 @@ class BackgroundService :
                                 lastEndpointState.message
                         )
                     } else {
-                        setContentText(lastEndpointState!!.getLabel(this@BackgroundService))
+                        setContentText(lastEndpointState.getLabel(this@BackgroundService))
                     }
                 }
                 .build()

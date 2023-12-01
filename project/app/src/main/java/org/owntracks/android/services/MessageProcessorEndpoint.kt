@@ -22,7 +22,7 @@ abstract class MessageProcessorEndpoint internal constructor(val messageProcesso
         OutgoingMessageSendingException::class,
         IOException::class
     )
-    abstract fun sendMessage(message: MessageBase)
+    abstract suspend fun sendMessage(message: MessageBase)
 }
 
 class OutgoingMessageSendingException internal constructor(e: Exception?) : Exception(e)

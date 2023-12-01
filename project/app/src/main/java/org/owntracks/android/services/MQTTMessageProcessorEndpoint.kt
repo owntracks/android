@@ -79,7 +79,7 @@ class MQTTMessageProcessorEndpoint(
         override fun onAvailable(network: Network) {
             super.onAvailable(network)
             Timber.v("Network becomes available")
-            if (endpointStateRepo.endpointState == EndpointState.DISCONNECTED) {
+            if (endpointStateRepo.endpointState.value == EndpointState.DISCONNECTED) {
                 Timber.v("Currently disconnected, so attempting reconnect")
                 scope.launch {
                     reconnect()
@@ -165,9 +165,9 @@ class MQTTMessageProcessorEndpoint(
 
     override fun onFinalizeMessage(message: MessageBase): MessageBase = message
 
-    override fun sendMessage(message: MessageBase) {
+    override suspend fun sendMessage(message: MessageBase) {
         Timber.i("Sending message $message")
-        if (endpointStateRepo.endpointState != EndpointState.CONNECTED || mqttClientAndConfiguration == null) {
+        if (endpointStateRepo.endpointState.value != EndpointState.CONNECTED || mqttClientAndConfiguration == null) {
             throw OutgoingMessageSendingException(NotConnectedException())
         }
         message.addMqttPreferences(preferences)
@@ -179,7 +179,7 @@ class MQTTMessageProcessorEndpoint(
                 val handler = CoroutineExceptionHandler { _, throwable ->
                     sendMessageThrowable = throwable
                 }
-                val job = scope.launch(ioDispatcher + CoroutineName("MQTT SendMessage") + handler) {
+                val job = launch(ioDispatcher + CoroutineName("MQTT SendMessage") + handler) {
                     try {
                         Timber.d("Publishing message id=${message.messageId}")
                         measureTime {
@@ -271,7 +271,9 @@ class MQTTMessageProcessorEndpoint(
                 is IOException -> Timber.e("Connection Lost: ${cause.message}")
                 else -> Timber.e(cause, "Connection Lost")
             }
-            endpointStateRepo.setState(EndpointState.DISCONNECTED)
+            scope.launch {
+                endpointStateRepo.setState(EndpointState.DISCONNECTED)
+            }
             scheduler.scheduleMqttReconnect()
         }
 

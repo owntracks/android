@@ -108,8 +108,8 @@ class MessageProcessor @Inject constructor(
     fun initialize() {
         if (!initialized) {
             Timber.d("Initializing MessageProcessor")
-            endpointStateRepo.setState(EndpointState.INITIAL)
             scope.launch {
+                endpointStateRepo.setState(EndpointState.INITIAL)
                 reconnect()
                 initialized = true
             }
@@ -157,7 +157,9 @@ class MessageProcessor @Inject constructor(
             .also {
                 Timber.d("Destroying previous endpoint")
             }
-        endpointStateRepo.setQueueLength(outgoingQueue.size)
+        scope.launch {
+            endpointStateRepo.setQueueLength(outgoingQueue.size)
+        }
         endpoint = when (preferences.mode) {
             ConnectionMode.HTTP -> httpEndpoint
             ConnectionMode.MQTT -> mqttEndpoint
@@ -181,7 +183,9 @@ class MessageProcessor @Inject constructor(
                     Timber.e("Still can't put message onto the queue. Dropping: ${message.messageId}")
                 }
             }
-            endpointStateRepo.setQueueLength(outgoingQueue.size)
+            scope.launch {
+                endpointStateRepo.setQueueLength(outgoingQueue.size)
+            }
         }
     }
 
@@ -281,17 +285,23 @@ class MessageProcessor @Inject constructor(
     }
 
     fun onMessageDelivered() {
-        endpointStateRepo.setQueueLength(outgoingQueue.size)
+        scope.launch {
+            endpointStateRepo.setQueueLength(outgoingQueue.size)
+        }
     }
 
     fun onMessageDeliveryFailedFinal(messageId: String?) {
-        Timber.e("Message delivery failed, not retryable. $messageId")
-        endpointStateRepo.setQueueLength(outgoingQueue.size)
+        scope.launch {
+            Timber.e("Message delivery failed, not retryable. $messageId")
+            endpointStateRepo.setQueueLength(outgoingQueue.size)
+        }
     }
 
     fun onMessageDeliveryFailed(messageId: String?) {
-        Timber.e("Message delivery failed. queueLength: ${outgoingQueue.size + 1}, messageId: $messageId")
-        endpointStateRepo.setQueueLength(outgoingQueue.size)
+        scope.launch {
+            Timber.e("Message delivery failed. queueLength: ${outgoingQueue.size + 1}, messageId: $messageId")
+            endpointStateRepo.setQueueLength(outgoingQueue.size)
+        }
     }
 
     suspend fun processIncomingMessage(message: MessageBase) {

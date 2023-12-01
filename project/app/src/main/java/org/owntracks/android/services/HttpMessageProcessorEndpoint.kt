@@ -98,7 +98,7 @@ class HttpMessageProcessorEndpoint(
         }
         .build()
 
-    override fun sendMessage(message: MessageBase) {
+    override suspend fun sendMessage(message: MessageBase) {
         message.addMqttPreferences(preferences)
         // HTTP messages carry the topic field in the body of the message, rather than MQTT which
         // simply publishes the message to that topic.
@@ -106,6 +106,7 @@ class HttpMessageProcessorEndpoint(
         if (httpClientAndConfiguration == null) {
             throw OutgoingMessageSendingException(Exception("Http client not yet initialized"))
         }
+
         httpClientAndConfiguration?.run {
             endpointStateRepo.setState(EndpointState.CONNECTING)
             Timber.d("Publishing message id=${message.messageId}")
@@ -134,17 +135,19 @@ class HttpMessageProcessorEndpoint(
                                 try {
                                     val result = parser.fromJson(response.body!!.byteStream())
                                     // TODO apply i18n here
-                                    endpointStateRepo.setState(
-                                        EndpointState.IDLE.withMessage(
-                                            String.format(
-                                                Locale.ROOT,
-                                                "Response %d, (%d msgs received)",
-                                                response.code,
-                                                result.size
+                                    scope.launch {
+                                        endpointStateRepo.setState(
+                                            EndpointState.IDLE.withMessage(
+                                                String.format(
+                                                    Locale.ROOT,
+                                                    "Response %d, (%d msgs received)",
+                                                    response.code,
+                                                    result.size
+                                                )
                                             )
                                         )
-                                    )
-                                    scope.launch { result.forEach { onMessageReceived(it) } }
+                                        result.forEach { onMessageReceived(it) }
+                                    }
                                 } catch (e: JsonProcessingException) {
                                     Timber.e("JsonParseException HTTP status: %s", response.code)
                                     endpointStateRepo.setState(

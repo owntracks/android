@@ -15,7 +15,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.util.Date
+import java.time.Instant
 import javax.inject.Inject
 import kotlinx.coroutines.flow.StateFlow
 import org.owntracks.android.R
@@ -30,9 +30,9 @@ class StatusViewModel @Inject constructor(
     locationRepo: LocationRepo
 ) :
     AndroidViewModel(application) {
-    val endpointState: LiveData<EndpointState> = endpointStateRepo.endpointStateLiveData
-    val endpointQueueLength: LiveData<Int> = endpointStateRepo.endpointQueueLength
-    val serviceStarted: LiveData<Date> = endpointStateRepo.serviceStartedDate
+    val endpointState: StateFlow<EndpointState> = endpointStateRepo.endpointState
+    val endpointQueueLength: StateFlow<Int> = endpointStateRepo.endpointQueueLength
+    val serviceStarted: StateFlow<Instant> = endpointStateRepo.serviceStartedDate
     val currentLocation: StateFlow<Location?> = locationRepo.currentPublishedLocation
     private val powerManager =
         (getApplication<Application>().applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager)

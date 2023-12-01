@@ -1,22 +1,20 @@
 package org.owntracks.android.support
 
 import android.text.format.DateUtils
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 object DateFormatter {
     @JvmStatic
     fun formatDate(tstMilliSeconds: Long): String {
-        return formatDate(Date(tstMilliSeconds))
+        return formatDate(Instant.ofEpochMilli(tstMilliSeconds))
     }
 
     @JvmStatic
-    fun formatDate(d: Date): String {
-        return if (DateUtils.isToday(d.time)) {
-            SimpleDateFormat("HH:mm", Locale.getDefault()).format(d)
-        } else {
-            SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(d)
-        }
+    fun formatDate(instant: Instant): String = if (DateUtils.isToday(instant.toEpochMilli())) {
+        DateTimeFormatter.ofPattern("HH:mm").withZone(ZoneId.systemDefault()).format(instant)
+    } else {
+        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(ZoneId.systemDefault()).format(instant)
     }
 }

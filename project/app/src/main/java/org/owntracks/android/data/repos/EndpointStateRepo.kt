@@ -1,43 +1,38 @@
 package org.owntracks.android.data.repos
 
-import androidx.lifecycle.MutableLiveData
-import java.util.Date
+import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.owntracks.android.data.EndpointState
 import timber.log.Timber
 
 @Singleton
 class EndpointStateRepo @Inject constructor() {
-    var endpointState: EndpointState = EndpointState.INITIAL
-        set(value) {
-            field = value
-            endpointStateLiveData.postValue(value)
-        }
 
-    fun setState(newEndpointState: EndpointState) {
+    val endpointState: MutableStateFlow<EndpointState> = MutableStateFlow(EndpointState.IDLE)
+
+    val endpointQueueLength: MutableStateFlow<Int> = MutableStateFlow(0)
+
+    val serviceStartedDate: MutableStateFlow<Instant> = MutableStateFlow(Instant.now())
+
+    suspend fun setState(newEndpointState: EndpointState) {
         Timber.v(
-            "Setting endpoint state $newEndpointState called from: ${Thread.currentThread().stackTrace[3].run {
+            "Setting endpoint state $newEndpointState called from: ${
+            Thread.currentThread().stackTrace[3].run {
                 "$className: $methodName"
-            }}"
+            }
+            }"
         )
-        endpointState = newEndpointState
+        endpointState.emit(newEndpointState)
     }
 
-    fun setQueueLength(queueLength: Int) {
+    suspend fun setQueueLength(queueLength: Int) {
         Timber.v("Setting queuelength=$queueLength")
-        endpointQueueLength.postValue(queueLength)
+        endpointQueueLength.emit(queueLength)
     }
 
-    fun setServiceStartedNow() {
-        serviceStartedDate.postValue(Date())
+    suspend fun setServiceStartedNow() {
+        serviceStartedDate.emit(Instant.now())
     }
-
-    val endpointStateLiveData: MutableLiveData<EndpointState> =
-        // TODO migrate this to Kotlin flow once we get AGP 7
-        MutableLiveData(EndpointState.IDLE)
-
-    val endpointQueueLength: MutableLiveData<Int> = MutableLiveData(0)
-
-    val serviceStartedDate: MutableLiveData<Date> = MutableLiveData()
 }
