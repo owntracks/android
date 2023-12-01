@@ -7,7 +7,11 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.Exec
 import org.gradle.kotlin.dsl.register
 
-class EspressoScreenshotsPlugin : Plugin<Project> {
+/**
+ * A little gradle plugin that grabs screenshots and logcats of failed tests, and embeds them in the test report
+ *
+ */
+class EspressoMetadataEmbeddingPlugin : Plugin<Project> {
     // This is where the androidx test files service puts saved bitmaps
     @Suppress("SdCardPath")
     private val screenshotsDeviceFolder = "/sdcard/googletest/test_outputfiles"
@@ -22,10 +26,12 @@ class EspressoScreenshotsPlugin : Plugin<Project> {
 
         // This is where AGP writes out connected test reports
         val reportsDirectoryPath = "${project.layout.buildDirectory.get().asFile.path}/reports/androidTests/connected/debug/flavors/%s"
+        val logcatDirectoryPath = "${project.layout.buildDirectory.get().asFile.path}/outputs/androidTest-results/connected/debug/flavors/%s"
         android.run {
             productFlavors.all {
                 val flavorName = this.name
                 val flavorTestReportPath = reportsDirectoryPath.format(flavorName)
+                val flavouredLogcatDirectoryPath = logcatDirectoryPath.format(flavorName)
                 project.run {
                     val adbExecutable = androidComponents.sdkComponents.adb.get().asFile.invariantSeparatorsPath
 
@@ -61,6 +67,7 @@ class EspressoScreenshotsPlugin : Plugin<Project> {
                         dependsOn("fetch${flavorName.titleCase()}Screenshots")
                         finalizedBy("clear${flavorName.titleCase()}Screenshots")
                         reportsPath = flavorTestReportPath
+                        logcatPath = flavouredLogcatDirectoryPath
                     }
                 }
             }

@@ -221,30 +221,11 @@ jobs:
           cores: 2
           sdcard-path-or-size: 1000M
           script: |
-            adb logcat -d > emulator-startup.log
             adb shell settings put global bluetooth_on 0
             adb shell rm -rf /sdcard/googletest || echo "Couldn't delete googletest folder"
             adb uninstall org.owntracks.android.debug || echo "org.owntracks.android not installed"
             adb uninstall org.owntracks.android.debug.test || echo "org.owntracks.android.test not installed"
-            adb logcat -c
-            adb logcat > emulator.log & echo $! > logcat_file.pid
-            adb logcat "*:S MonitoringInstr:V AndroidJUnitRunner:V TestRequestBuilder:V TestExecutor:V TestRunner:V" --format=color & echo $! > logcat_console.pid
-            echo 0 > gradle.exit # Set a default exit code.
-            ./project/gradlew -p project create${FLAVOUR}DebugCoverageReport --max-workers=1 --stacktrace --scan --no-daemon || echo $? > gradle.exit
-            # Stop capturing logcat output.
-            kill $(cat logcat_file.pid)    || echo "::warning file=.github/workflows/ci.yml::Logcat process $(cat logcat_file.pid) didn't exist."
-            kill $(cat logcat_console.pid) || echo "::warning file=.github/workflows/ci.yml::Logcat process $(cat logcat_console.pid) didn't exist."
-            adb logcat -d --buffer=crash --format=color
-            exit $(cat gradle.exit)
-
-      - name: Upload logcat
-        if: always() && steps.run-espresso-guard.outputs.run-espresso == 'true'
-        uses: actions/upload-artifact@v3
-        with:
-          name: logcat-${{ matrix.android-api }}-${{ matrix.flavour }}
-          path: |
-            ${{ github.workspace }}/emulator.log
-            ${{ github.workspace }}/emulator-startup.log
+            ./project/gradlew -p project create${FLAVOUR}DebugCoverageReport --max-workers=1 --stacktrace --scan --no-daemon
 
       - name: Upload connected test result artifact
         uses: actions/upload-artifact@v3

@@ -9,7 +9,7 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint")
 }
 
-apply<EspressoScreenshotsPlugin>()
+apply<EspressoMetadataEmbeddingPlugin>()
 
 val googleMapsAPIKey = System.getenv("GOOGLE_MAPS_API_KEY")?.toString()
     ?: extra.get("google_maps_api_key")?.toString()
