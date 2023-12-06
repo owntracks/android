@@ -36,6 +36,7 @@ jobs:
   build-test-lint:
     name: Build, test & lint
     runs-on: self-hosted
+    if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/master') || (github.event_name == 'pull_request' && !github.event.pull_request.draft) || github.event_name == 'merge_group' }}
     outputs:
       apk-generated: ${{ steps.output.outputs.apk_generated}}
     permissions:
@@ -133,7 +134,7 @@ jobs:
   espresso-test:
     name: "Espresso test"
     runs-on: self-hosted
-    if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/master') || github.event_name == 'pull_request' || github.event_name == 'merge_group' }}
+    if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/master') || (github.event_name == 'pull_request' && !github.event.pull_request.draft) || github.event_name == 'merge_group' }}
     permissions:
       contents: read
       checks: write
