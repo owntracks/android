@@ -75,14 +75,5 @@
                 android:action="android.intent.action.VIEW"
                 android:data="@string/mastodonUrl" />
         </Preference>
-        <Preference
-            android:icon="@drawable/twitter_24"
-            android:key="twitter"
-            android:summary="@string/twitterUrl"
-            android:title="@string/preferencesTwitter">
-            <intent
-                android:action="android.intent.action.VIEW"
-                android:data="@string/twitterUrl" />
-        </Preference>
     </androidx.preference.PreferenceCategory>
 </PreferenceScreen>

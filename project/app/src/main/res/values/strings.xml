@@ -236,7 +236,6 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesTheme">"Theme"</string>
     <string name="preferencesTrackerId">"Tracker ID"</string>
     <string name="preferencesTrackerIdValidationError">"Must be one or two characters"</string>
-    <string name="preferencesTwitter" translatable="false">"Twitter"</string>
     <string name="preferencesMastodon" translatable="false">"Mastodon"</string>
     <string name="preferencesUrl" translatable="false">"URL"</string>
     <string name="preferencesUrlValidationError">"Invalid HTTP URL"</string>

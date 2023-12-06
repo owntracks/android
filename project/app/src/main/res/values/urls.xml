@@ -2,7 +2,6 @@
 <resources>
     <string name="repoUrl" translatable="false">https://github.com/owntracks/android</string>
     <string name="issueUrl" translatable="false">https://github.com/owntracks/android/issues</string>
-    <string name="twitterUrl" translatable="false">https://twitter.com/owntracks</string>
     <string name="mastodonUrl" translatable="false">https://fosstodon.org/@owntracks</string>
     <string name="documentationUrl" translatable="false">https://owntracks.org/booklet</string>
     <string name="documentationUrlAndroid" translatable="false">https://owntracks.org/booklet/features/android/</string>

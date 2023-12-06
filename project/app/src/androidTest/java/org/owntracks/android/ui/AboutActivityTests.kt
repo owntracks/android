@@ -32,18 +32,6 @@ class AboutActivityTests : TestWithAnActivity<AboutActivity>(AboutActivity::clas
     }
 
     @Test
-    fun twitterLinkOpensSite() {
-        scrollToPreferenceWithText(R.string.preferencesTwitter)
-        clickOn(R.string.preferencesTwitter)
-        intended(
-            allOf(
-                hasAction(Intent.ACTION_VIEW),
-                hasData(baristaRule.activityTestRule.activity.getString(R.string.twitterUrl))
-            )
-        )
-    }
-
-    @Test
     fun sourceLinkOpensSite() {
         scrollToPreferenceWithText(R.string.preferencesRepository)
         clickOn(R.string.preferencesRepository)
