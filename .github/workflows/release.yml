@@ -40,7 +40,7 @@ jobs:
           distribution: "temurin"
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
 
       - name: Install python dependencies
         run: |
