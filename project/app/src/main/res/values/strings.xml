@@ -279,6 +279,10 @@ To allow this, please enable Location in the device settings."</string>
     <string name="statusLocationPermissionsCoarseBackground">"Approximate (available in background)"</string>
     <string name="statusLocationPermissionsFineBackground">"Precise (available in background)"</string>
     <string name="statusLocationPermissionsUnknown">"Unknown"</string>
+    <string name="statusLocationPermissionsPromptTitle">"Background location"</string>
+    <string name="statusLocationPermissionsPromptText">"If you want to automatically track locations on device restart, you can enable background location permissions by granting OwnTracks access to your location \"all the time\"".</string>
+    <string name="statusLocationPermissionsPromptPositiveButton">"Application Settings"</string>
+    <string name="statusLocationPermissionsPromptNegativeButton">"Cancel"</string>
     <string name="title_activity_about">"About"</string>
     <string name="title_activity_contacts">"Friends"</string>
     <string name="title_activity_map">"Map"</string>
@@ -314,7 +318,9 @@ For more details, take a look at the OwnTracks Booklet."</string>
     <string name="welcome_location_permission_title">"Location permissions"</string>
     <string name="welcome_location_permission_description">"In order to receive your current location to send to your OwnTracks endpoint, OwnTracks needs your permission in order to access your device's location.
 
-You can review this permission and request additional (background) location permissions if necessary from the Status page."</string>
+You can review this permission and request additional (background) location permissions from the Status page.
+
+Background location permission may improve the frequency and reliability of location data, depending on your device and configuration."</string>
     <string name="welcome_location_permission_granted">"Location permissions granted"</string>
     <string name="welcome_notification_permission_title">"Notification permissions"</string>
     <string name="welcome_notification_permission_description">"To function fully, OwnTracks needs your permission in order to display some notifications.

@@ -84,11 +84,29 @@ class StatusActivity : AppCompatActivity() {
                     )
                 }
                 locationPermissions.setOnClickListener {
-                    startActivity(
-                        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                            data = Uri.parse("package:$packageName")
-                        }
-                    )
+                    val showLocationPermissionsStarter = {
+                        startActivity(
+                            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                data = Uri.parse("package:$packageName")
+                            }
+                        )
+                    }
+                    if (viewModel.locationPermissions.value != R.string.statusLocationPermissionsFineBackground) {
+                        MaterialAlertDialogBuilder(this@StatusActivity).setTitle(
+                            R.string.statusLocationPermissionsPromptTitle
+                        )
+                            .setMessage(R.string.statusLocationPermissionsPromptText)
+                            .setIcon(R.drawable.ic_baseline_my_location_24)
+                            .setPositiveButton(
+                                R.string.statusLocationPermissionsPromptPositiveButton
+                            ) { _, _ -> showLocationPermissionsStarter() }
+                            .setNegativeButton(
+                                R.string.statusLocationPermissionsPromptNegativeButton
+                            ) { dialog, _ -> dialog.cancel() }
+                            .show()
+                    } else {
+                        showLocationPermissionsStarter()
+                    }
                 }
             }
     }
