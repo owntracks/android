@@ -11,7 +11,7 @@ jobs:
       issues: write
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/stale@v8
+      - uses: actions/stale@v9
         with:
           stale-issue-message: "Marking issue with request for more data as stale, due to no updates."
           stale-issue-label: stale
