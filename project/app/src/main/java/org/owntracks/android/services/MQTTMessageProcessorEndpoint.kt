@@ -196,6 +196,7 @@ class MQTTMessageProcessorEndpoint(
                                 message.retained
                             )
                                 .also {
+                                    it.waitForCompletion()
                                     Timber.v("MQTT message sent with messageId=${it.messageId}. ")
                                 }
                         }.apply { Timber.i("Message id=${message.messageId} sent in $this") }
