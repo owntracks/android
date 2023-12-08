@@ -6,7 +6,6 @@ import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
-import androidx.work.Operation
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
@@ -32,8 +31,6 @@ class Scheduler @Inject constructor(
         .setRequiredNetworkType(NetworkType.CONNECTED)
         .build()
     private val workManager = WorkManager.getInstance(context)
-
-    private var mqttReconnectJob: Operation? = null
 
     /**
      * Used by the background service to peridically ping a location
@@ -64,26 +61,16 @@ class Scheduler @Inject constructor(
         workManager.cancelAllWorkByTag(PERIODIC_TASK_SEND_LOCATION_PING)
     }
 
-    fun scheduleMqttReconnect() {
-        workManager.getWorkInfosForUniqueWork(ONETIME_TASK_MQTT_RECONNECT).run {
-            if (isDone) {
-                Timber.d("Scheduling ONETIME_TASK_MQTT_RECONNECT job")
-                mqttReconnectJob = workManager.enqueueUniqueWork(
-                    ONETIME_TASK_MQTT_RECONNECT,
-                    ExistingWorkPolicy.REPLACE,
-                    OneTimeWorkRequest.Builder(MQTTReconnectWorker::class.java)
-                        .addTag(ONETIME_TASK_MQTT_RECONNECT)
-                        .setBackoffCriteria(BackoffPolicy.LINEAR, MIN_BACKOFF_MILLIS, TimeUnit.MILLISECONDS)
-                        .setConstraints(anyNetworkConstraint)
-                        .build()
-                )
-            } else {
-                Timber.d(
-                    "Not attempting to schedule reconnect, as existing reconnect job is in progress."
-                )
-            }
-        }
-    }
+    fun scheduleMqttReconnect() =
+        workManager.enqueueUniqueWork(
+            ONETIME_TASK_MQTT_RECONNECT,
+            ExistingWorkPolicy.KEEP,
+            OneTimeWorkRequest.Builder(MQTTReconnectWorker::class.java)
+                .addTag(ONETIME_TASK_MQTT_RECONNECT)
+                .setBackoffCriteria(BackoffPolicy.LINEAR, MIN_BACKOFF_MILLIS, TimeUnit.MILLISECONDS)
+                .setConstraints(anyNetworkConstraint)
+                .build()
+        ).also { Timber.d("Scheduled ONETIME_TASK_MQTT_RECONNECT job: $it") }
 
     companion object {
         val MIN_PERIODIC_INTERVAL = PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS.milliseconds

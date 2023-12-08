@@ -12,8 +12,10 @@ import java.security.KeyStore
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.stream.Collectors
 import javax.net.ssl.SSLHandshakeException
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.ExperimentalTime
+import kotlin.time.TimeSource
 import kotlin.time.measureTime
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -322,10 +324,10 @@ class MQTTMessageProcessorEndpoint(
      * Creates an MQTT client and connects to the broker, then subscribes to the configured topics.
      */
     @kotlin.jvm.Throws(MqttException::class)
-    private suspend fun connectToBroker(mqttConnectionConfiguration: MqttConnectionConfiguration) {
+    private suspend fun connectToBroker(mqttConnectionConfiguration: MqttConnectionConfiguration): Result<Unit> =
         withContext(ioDispatcher) {
             Timber.v("MQTT connect to Broker")
-            measureTime {
+            measureTimedValue {
                 endpointStateRepo.setState(EndpointState.CONNECTING)
                 try {
                     val executorService = ScheduledThreadPoolExecutor(8)
@@ -363,6 +365,7 @@ class MQTTMessageProcessorEndpoint(
                                 messageProcessor.publishLocationMessage(MessageLocation.ReportType.DEFAULT)
                             }
                         }
+                    Result.success(Unit)
                 } catch (e: Exception) {
                     when (e) {
                         is MqttException -> {
@@ -389,29 +392,22 @@ class MQTTMessageProcessorEndpoint(
                     }
                     endpointStateRepo.setState(EndpointState.ERROR.withError(e))
                     scheduler.scheduleMqttReconnect()
+                    Result.failure(e)
                 }
-            }.apply { Timber.d("MQTT connection attempt completed in $this") }
+            }.apply { Timber.d("MQTT connection attempt completed in ${this.duration}") }
+                .value
         }
-    }
 
-    override suspend fun reconnect(): Result<Unit> {
-        return try {
-            mqttClientAndConfiguration?.mqttConnectionConfiguration?.run {
-                reconnect(this)
-                Result.success(Unit)
-            } ?: run {
-                reconnect(getEndpointConfiguration())
-                Result.success(Unit)
-            }
-        } catch (e: Exception) {
-            // We should set the endpoint state and log in the reconnect method, so no need to do here
-            Result.failure(e)
+    override suspend fun reconnect(): Result<Unit> =
+        mqttClientAndConfiguration?.mqttConnectionConfiguration?.run {
+            reconnect(this)
+        } ?: run {
+            reconnect(getEndpointConfiguration())
         }
-    }
 
-    private suspend fun reconnect(mqttConnectionConfiguration: MqttConnectionConfiguration) {
-        Timber.v("MQTT reconnect with configuration $mqttConnectionConfiguration")
+    private suspend fun reconnect(mqttConnectionConfiguration: MqttConnectionConfiguration): Result<Unit> =
         connectingLock.withPermit {
+            Timber.v("MQTT reconnect with configuration $mqttConnectionConfiguration")
             disconnect()
             try {
                 mqttConnectionIdlingResource.setIdleState(false)
@@ -420,7 +416,6 @@ class MQTTMessageProcessorEndpoint(
                 mqttConnectionIdlingResource.setIdleState(true)
             }
         }
-    }
 
     override fun checkConnection(): Boolean {
         return mqttClientAndConfiguration?.mqttClient?.run {
@@ -451,4 +446,21 @@ class MQTTMessageProcessorEndpoint(
         val mqttClient: MqttAsyncClient,
         val mqttConnectionConfiguration: MqttConnectionConfiguration
     )
+
+    data class TimedValue<T>(val duration: Duration, val value: T)
+
+    /**
+     * Measure timed value. A `measureTime` but also returns the return value of the block.
+     * Backported from kotlin 1.9
+     *
+     * @param T generic type of return value
+     * @param block function to execute
+     * @receiver
+     * @return a [TimedValue] containing the result of the block and the duration it took
+     */
+    private inline fun <T> measureTimedValue(block: () -> T): TimedValue<T> {
+        val mark = TimeSource.Monotonic.markNow()
+        val result = block()
+        return TimedValue(mark.elapsedNow(), result)
+    }
 }

@@ -25,6 +25,7 @@ class MQTTReconnectWorker @AssistedInject constructor(
             }
         }
         return if (messageProcessor.reconnect().isSuccess) {
+            Timber.i("MQTT reconnect worker job completed successfully")
             Result.success()
         } else {
             Result.retry()
