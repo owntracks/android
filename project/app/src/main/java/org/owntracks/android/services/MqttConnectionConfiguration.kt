@@ -13,7 +13,7 @@ import org.owntracks.android.preferences.types.MqttQos
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
 import timber.log.Timber
 
-data class MqttConnectionConfiguration constructor(
+data class MqttConnectionConfiguration(
     val tls: Boolean,
     val ws: Boolean,
     val host: String,
@@ -30,7 +30,7 @@ data class MqttConnectionConfiguration constructor(
     val willTopic: String,
     val topicsToSubscribeTo: Set<String>,
     val subQos: MqttQos,
-    val maxInFlight: Int = 10
+    val maxInFlight: Int = 500
 ) : ConnectionConfiguration {
     private val scheme = if (ws) {
         if (tls) "wss" else "ws"
