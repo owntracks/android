@@ -154,8 +154,7 @@
     <string name="preferencesCategoryNotificationOngoing">"Постоянное уведомление"</string>
     <string name="preferencesChangelog">"Список изменений"</string>
     <string name="preferencesCleanSessionEnabled">"Чистая сессия"</string>
-    <string name="preferencesClientCrtPassword">"Пароль"</string>
-    <string name="preferencesClientCrtPath">"Сертификат пользователя"</string>
+    <string name="preferencesClientCrt">"Сертификат пользователя"</string>
     <string name="preferencesClientId">"ID клиента"</string>
     <string name="preferencesDebugLog">"Журнал отладки"</string>
     <string name="preferencesDeviceName">"ID устройства"</string>

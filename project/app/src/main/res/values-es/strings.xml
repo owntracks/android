@@ -96,8 +96,7 @@
     <string name="preferencesCategoryNotificationOngoing">"Notificación en progreso"</string>
     <string name="preferencesChangelog">"Registro de cambios"</string>
     <string name="preferencesCleanSessionEnabled">"Limpiar sesión"</string>
-    <string name="preferencesClientCrtPassword">"Contraseña del certificado cliente"</string>
-    <string name="preferencesClientCrtPath">"Certificado cliente"</string>
+    <string name="preferencesClientCrt">"Certificado cliente"</string>
     <string name="preferencesClientId">"ID de cliente"</string>
     <string name="preferencesDebugLog">"Registro de depuración"</string>
     <string name="preferencesDeviceName">"ID de Dispositivo"</string>

@@ -73,7 +73,6 @@ class PreferencesActivityTests : TestWithAnActivity<PreferencesActivity>(Prefere
         assertContains(R.id.effectiveConfiguration, "\"subQos\" : 2")
         assertContains(R.id.effectiveConfiguration, "\"info\" : true")
         assertContains(R.id.effectiveConfiguration, "\"tlsClientCrt\" : \"\"")
-        assertContains(R.id.effectiveConfiguration, "\"tlsClientCrtPassword\" : \"\"")
         assertContains(R.id.effectiveConfiguration, "\"tls\" : true")
         assertContains(R.id.effectiveConfiguration, "\"mqttProtocolLevel\" : 3")
         assertContains(R.id.effectiveConfiguration, "\"subTopic\" : \"owntracks/+/+\"")

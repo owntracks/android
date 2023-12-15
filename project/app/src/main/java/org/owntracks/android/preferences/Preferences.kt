@@ -321,9 +321,6 @@ class Preferences @Inject constructor(
     @Preference(exportModeHttp = false)
     var tlsClientCrt: String by preferencesStore
 
-    @Preference(exportModeHttp = false)
-    var tlsClientCrtPassword: String by preferencesStore
-
     @Preference
     var tid: StringMaxTwoAlphaNumericChars by preferencesStore
 

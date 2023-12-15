@@ -118,8 +118,7 @@
     <!-- This can be "Notes de version" -->
     <string name="preferencesChangelog">"Version"</string>
     <string name="preferencesCleanSessionEnabled">"Vider la session"</string>
-    <string name="preferencesClientCrtPassword">"Mot de passe du certificat client"</string>
-    <string name="preferencesClientCrtPath">"Certificat client"</string>
+    <string name="preferencesClientCrt">"Certificat client"</string>
     <string name="preferencesClientId">"ID Client"</string>
     <string name="preferencesDebugLog">"Débogage du journal"</string>
     <string name="preferencesDeviceName">"Device ID"</string>

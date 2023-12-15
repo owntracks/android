@@ -32,6 +32,7 @@ jaxb-api = "2.3.1"
 kmqtt = "0.4.3"
 kotlin = "1.8.21"
 kotlin-coroutines = "1.7.3"
+kotlin-datetime = "0.5.0"
 ktlint = "11.6.0"
 libsodium = "2.0.2"
 lmdb-kt = "0.1.1-SNAPSHOT"
@@ -65,6 +66,7 @@ kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref =
 kotlin-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlin-coroutines" }
 kotlin-coroutines-jdk8 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8", version.ref = "kotlin-coroutines" }
 kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlin-coroutines" }
+kotlin-datetime = { module="org.jetbrains.kotlinx:kotlinx-datetime", version.ref="kotlin-datetime"}
 
 # Hilt
 hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }

@@ -138,8 +138,7 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="preferencesCategoryNotificationOngoing">"Vedvarende notifikation"</string>
     <string name="preferencesChangelog">"Ændringsoversigt"</string>
     <string name="preferencesCleanSessionEnabled">"Ren Session"</string>
-    <string name="preferencesClientCrtPassword">"Klient-certifikat adgangskode"</string>
-    <string name="preferencesClientCrtPath">"Klient-certifikat"</string>
+    <string name="preferencesClientCrt">"Klient-certifikat"</string>
     <string name="preferencesClientId">"Klient-ID"</string>
     <string name="preferencesDebugLog">"Fejlsøgningslog"</string>
     <string name="preferencesDeviceName">"Enheds-ID"</string>

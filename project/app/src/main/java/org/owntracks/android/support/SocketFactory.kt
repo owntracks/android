@@ -1,11 +1,12 @@
 package org.owntracks.android.support
 
-import java.io.ByteArrayInputStream
+import android.content.Context
+import android.security.KeyChain
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.IOException
 import java.net.InetAddress
 import java.net.Socket
 import java.security.KeyStore
-import java.security.Security
 import javax.net.ssl.KeyManagerFactory
 import javax.net.ssl.SSLContext
 import javax.net.ssl.SSLSocket
@@ -13,74 +14,47 @@ import javax.net.ssl.SSLSocketFactory
 import javax.net.ssl.TrustManagerFactory
 import timber.log.Timber
 
-class SocketFactory(options: SocketFactoryOptions, caKeyStore: KeyStore) : SSLSocketFactory() {
+class SocketFactory(options: SocketFactoryOptions, caKeyStore: KeyStore, @ApplicationContext context: Context) :
+    SSLSocketFactory() {
     private val factory: SSLSocketFactory
     private val protocols = arrayOf("TLSv1.2", "TLSv1.3")
 
     private val socketTimeout: Int
 
     data class SocketFactoryOptions(
-        var clientP12Certificate: ByteArray? = null,
-
-        var caClientP12Password: String? = null,
+        var clientCertificateAlias: String = "",
         var socketTimeout: Int = 0
-    ) {
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (javaClass != other?.javaClass) return false
-
-            other as SocketFactoryOptions
-
-            if (clientP12Certificate != null) {
-                if (other.clientP12Certificate == null) return false
-                if (!clientP12Certificate.contentEquals(other.clientP12Certificate)) return false
-            } else if (other.clientP12Certificate != null) return false
-            if (caClientP12Password != other.caClientP12Password) return false
-            if (socketTimeout != other.socketTimeout) return false
-
-            return true
-        }
-
-        override fun hashCode(): Int {
-            var result = (clientP12Certificate?.contentHashCode() ?: 0)
-            result = 31 * result + (caClientP12Password?.hashCode() ?: 0)
-            result = 31 * result + socketTimeout
-            return result
-        }
-    }
+    )
 
     init {
         Timber.v("initializing CustomSocketFactory")
-        val tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
-        val kmf = KeyManagerFactory.getInstance("X509")
+        val trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
+        val keyManagerFactory = KeyManagerFactory.getInstance("X509")
         socketTimeout = options.socketTimeout
 
-        tmf.init(caKeyStore)
+        trustManagerFactory.init(caKeyStore)
 
-        if (options.clientP12Certificate != null) {
-            Timber.v("options.hasClientP12Crt(): true")
-            val clientKeyStore = KeyStore.getInstance("PKCS12", Security.getProvider("BC"))
-            val password = if (options.caClientP12Password != null) {
-                options.caClientP12Password!!.toCharArray()
-            } else {
-                CharArray(0)
+        keyManagerFactory.init(null, null)
+        if (options.clientCertificateAlias.isNotEmpty()) {
+            val clientCertPrivateKey = KeyChain.getPrivateKey(context, options.clientCertificateAlias)
+            if (clientCertPrivateKey != null) {
+                val clientCert = KeyChain.getCertificateChain(context, options.clientCertificateAlias)
+                KeyStore.getInstance("PKCS12", "BC").apply {
+                    load(null, null)
+                    setKeyEntry(
+                        options.clientCertificateAlias,
+                        clientCertPrivateKey,
+                        "".toCharArray(),
+                        clientCert
+                    )
+                }.let { keyManagerFactory.init(it, null) }
             }
-            clientKeyStore.load(ByteArrayInputStream(options.clientP12Certificate), password)
-            kmf.init(clientKeyStore, password)
-            Timber.v("Client .p12 Keystore content: ")
-            val aliasesClientCert = clientKeyStore.aliases()
-            while (aliasesClientCert.hasMoreElements()) {
-                val o = aliasesClientCert.nextElement()
-                Timber.v("Alias: $o")
-            }
-        } else {
-            kmf.init(null, null)
         }
 
         // Create an SSLContext that uses our TrustManager
-        val context = SSLContext.getInstance("TLS")
-        context.init(kmf.keyManagers, tmf.trustManagers, null)
-        factory = context.socketFactory
+        factory = SSLContext.getInstance("TLS").apply {
+            init(keyManagerFactory.keyManagers, trustManagerFactory.trustManagers, null)
+        }.socketFactory
     }
 
     override fun getDefaultCipherSuites(): Array<String> = factory.defaultCipherSuites

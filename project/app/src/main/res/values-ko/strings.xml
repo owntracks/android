@@ -134,8 +134,7 @@
     <string name="preferencesCategoryNotificationOngoing">"시작 중 항상 알림"</string>
     <string name="preferencesChangelog">"변경 내역"</string>
     <string name="preferencesCleanSessionEnabled">"클린 세션"</string>
-    <string name="preferencesClientCrtPassword">"클라이언트 인증서 비밀번호"</string>
-    <string name="preferencesClientCrtPath">"클라이언트 인증서"</string>
+    <string name="preferencesClientCrt">"클라이언트 인증서"</string>
     <string name="preferencesClientId">"클라이언트 ID"</string>
     <string name="preferencesDebugLog">"디버그 로그"</string>
     <string name="preferencesDeviceName">"기기 ID"</string>

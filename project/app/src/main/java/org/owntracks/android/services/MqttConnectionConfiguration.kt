@@ -25,8 +25,7 @@ data class MqttConnectionConfiguration(
     val timeout: Int,
     val cleanSession: Boolean,
     val mqttProtocolLevel: MqttProtocolLevel,
-    val tlsClientCrtBase64: String,
-    val tlsClientCrtPassword: String,
+    val tlsClentCertAlias: String,
     val willTopic: String,
     val topicsToSubscribeTo: Set<String>,
     val subQos: MqttQos,
@@ -77,12 +76,10 @@ data class MqttConnectionConfiguration(
             )
             maxInflight = maxInFlight
             if (tls) {
-                val tlsClientCrtBytes = getClientCert(tlsClientCrtBase64)
                 socketFactory = getSocketFactory(
                     timeout,
                     true,
-                    tlsClientCrtBytes,
-                    tlsClientCrtPassword,
+                    tlsClentCertAlias,
                     context,
                     caKeyStore
                 )
@@ -118,7 +115,6 @@ fun Preferences.toMqttConnectionConfiguration(): MqttConnectionConfiguration =
         cleanSession,
         mqttProtocolLevel,
         tlsClientCrt,
-        tlsClientCrtPassword,
         pubTopicBaseWithUserDetails,
         if (subTopic.contains(" ")) {
             subTopic.split(" ")

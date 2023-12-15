@@ -125,8 +125,7 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="preferencesCategoryNotificationOngoing">"Dauerhafte Benachrichtigung"</string>
     <string name="preferencesChangelog">"Änderungshistorie"</string>
     <string name="preferencesCleanSessionEnabled">"Sitzung säubern"</string>
-    <string name="preferencesClientCrtPassword">"Passwort für Client-Zertifikat"</string>
-    <string name="preferencesClientCrtPath">"Client-Zertifikat"</string>
+    <string name="preferencesClientCrt">"Client-Zertifikat"</string>
     <string name="preferencesClientId">"Client ID"</string>
     <string name="preferencesDebugLog">"Debug Log"</string>
     <string name="preferencesDeviceName">"Geräte ID"</string>

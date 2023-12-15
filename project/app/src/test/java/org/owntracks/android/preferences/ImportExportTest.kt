@@ -226,7 +226,6 @@ class ImportExportTest {
               "tid" : "wn",
               "tls" : false,
               "tlsClientCrt" : "",
-              "tlsClientCrtPassword" : "",
               "username" : "testusername",
               "ws" : false
             }

@@ -479,12 +479,6 @@ class PreferencesGettersAndSetters(private val parameter: Parameter) {
                     false
                 ),
                 Parameter(
-                    "tlsClientCrtPassword",
-                    "clientCrtPassword",
-                    String::class,
-                    false
-                ),
-                Parameter(
                     "tid",
                     StringMaxTwoAlphaNumericChars("t1"),
                     String::class,

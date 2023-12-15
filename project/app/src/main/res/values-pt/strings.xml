@@ -55,8 +55,7 @@
     <string name="preferencesCategoryNotificationOngoing">"Notificação atual"</string>
     <string name="preferencesChangelog">"Registo de alterações"</string>
     <string name="preferencesCleanSessionEnabled">"Limpar sessão"</string>
-    <string name="preferencesClientCrtPassword">"Password certificado cliente"</string>
-    <string name="preferencesClientCrtPath">"Certificado Cliente"</string>
+    <string name="preferencesClientCrt">"Certificado Cliente"</string>
     <string name="preferencesDeviceName">"ID Dispositivo"</string>
     <string name="preferencesDocumentation">"Documentação"</string>
     <string name="preferencesEditor">"Editor"</string>

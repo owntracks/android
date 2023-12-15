@@ -136,6 +136,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesAutostart">"Autostart"</string>
     <string name="preferencesAutostartSummary">"Automatically start on device boot"</string>
     <string name="preferencesBrokerPassword">"Password"</string>
+    <string name="preferencesCaCrtInstall">"Install CA certificate"</string>
     <string name="preferencesCategoryAdvancedEncryption">"Encryption"</string>
     <string name="preferencesCategoryAdvancedLocator">"Locator"</string>
     <string name="preferencesCategoryAdvancedMisc">"Misc"</string>
@@ -148,8 +149,8 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesCategoryNotificationOngoing">"Ongoing notification"</string>
     <string name="preferencesChangelog">"Changelog"</string>
     <string name="preferencesCleanSessionEnabled">"Clean Session"</string>
-    <string name="preferencesClientCrtPassword">"Client certificate password"</string>
-    <string name="preferencesClientCrtPath">"Client certificate"</string>
+    <string name="preferencesClientCrtInstall">"Install client certificate"</string>
+    <string name="preferencesClientCrt">"Client certificate"</string>
     <string name="preferencesClientId">"Client ID"</string>
     <string name="preferencesClientIdValidationError">"Cannot be empty"</string>
     <string name="preferencesDebugLog">"Debug log"</string>
@@ -241,7 +242,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesUrlValidationError">"Invalid HTTP URL"</string>
     <string name="preferencesUsername">"Username"</string>
     <string name="preferencesWebsocket">"Use WebSockets"</string>
-    <string name="publish">"Report"</string>
+    <string name="publish">"Report Location"</string>
     <string name="radius">"Radius (m)"</string>
     <string name="reconnect">"Reconnect"</string>
     <string name="save">"Save"</string>

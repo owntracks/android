@@ -117,8 +117,7 @@ class PreferenceTest {
         "port",
         "pubTopicBase",
         "tls",
-        "tlsClientCrt",
-        "tlsClientCrtPassword"
+        "tlsClientCrt"
     )
 
     @Test

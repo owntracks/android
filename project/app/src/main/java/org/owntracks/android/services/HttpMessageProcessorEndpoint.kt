@@ -201,8 +201,7 @@ class HttpMessageProcessorEndpoint(
             Preferences::username.name,
             Preferences::password.name,
             Preferences::deviceId.name,
-            Preferences::tlsClientCrt.name,
-            Preferences::tlsClientCrtPassword.name
+            Preferences::tlsClientCrt.name
         )
 
         if (propertiesWeCareAbout.intersect(properties)
@@ -225,13 +224,11 @@ class HttpMessageProcessorEndpoint(
     ): HttpClientAndConfiguration {
         val httpConfiguration = getEndpointConfiguration()
 
-        val tlsClientCrtBytes = httpConfiguration.getClientCert(preferences.tlsClientCrt)
         val hostnameVerifier = CALeafCertMatchingHostnameVerifier()
         val socketFactory = httpConfiguration.getSocketFactory(
             preferences.connectionTimeoutSeconds,
             preferences.tls,
-            tlsClientCrtBytes,
-            preferences.tlsClientCrtPassword,
+            preferences.tlsClientCrt,
             context,
             caKeyStore
         )

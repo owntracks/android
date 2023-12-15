@@ -71,7 +71,6 @@ interface DefaultsProvider {
             Preferences::theme -> AppTheme.AUTO
             Preferences::tls -> true
             Preferences::tlsClientCrt -> ""
-            Preferences::tlsClientCrtPassword -> ""
             Preferences::tid -> StringMaxTwoAlphaNumericChars(
                 preferences.deviceId.takeLast(2)
                     .ifEmpty { "na" }

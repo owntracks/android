@@ -138,8 +138,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesCategoryNotificationOngoing">"Ongoing notification"</string>
     <string name="preferencesChangelog">"Değişiklik günlüğü"</string>
     <string name="preferencesCleanSessionEnabled">"Temiz Oturum"</string>
-    <string name="preferencesClientCrtPassword">"Client certificate password"</string>
-    <string name="preferencesClientCrtPath">"Client certificate"</string>
+    <string name="preferencesClientCrt">"Client certificate"</string>
     <string name="preferencesClientId">"Client ID"</string>
     <string name="preferencesDebugLog">"Debug log"</string>
     <string name="preferencesDeviceName">"Device ID"</string>

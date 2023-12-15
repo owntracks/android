@@ -81,8 +81,7 @@
     <string name="preferencesCategoryAdvancedServices">"服务"</string>
     <string name="preferencesCategoryNotificationBackground">"后台通知"</string>
     <string name="preferencesChangelog">"更新日志"</string>
-    <string name="preferencesClientCrtPassword">"客户端证书密码"</string>
-    <string name="preferencesClientCrtPath">"客户端证书"</string>
+    <string name="preferencesClientCrt">"客户端证书"</string>
     <string name="preferencesDeviceName">"设备 ID"</string>
     <string name="preferencesDocumentation">"文档"</string>
     <string name="preferencesEncryptionKey">"密钥"</string>

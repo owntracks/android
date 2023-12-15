@@ -140,8 +140,7 @@ Chcete-li to umožnit, zapněte polohu v nastavení zařízení."</string>
     <string name="preferencesCategoryNotificationOngoing">"Příchozí oznámení"</string>
     <string name="preferencesChangelog">"Seznam změn"</string>
     <string name="preferencesCleanSessionEnabled">"Vyčistit sezení"</string>
-    <string name="preferencesClientCrtPassword">"Heslo certifikátu klienta"</string>
-    <string name="preferencesClientCrtPath">"Certifikát klienta"</string>
+    <string name="preferencesClientCrt">"Certifikát klienta"</string>
     <string name="preferencesClientId">"Client ID"</string>
     <string name="preferencesDebugLog">"Protokol ladění"</string>
     <string name="preferencesDeviceName">"Device ID"</string>

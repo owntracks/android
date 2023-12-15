@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonValue
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
+import kotlinx.datetime.Instant
 import org.jetbrains.annotations.NotNull
 import org.owntracks.android.location.roundForDisplay
 import org.owntracks.android.model.BatteryStatus
@@ -103,7 +104,11 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
     }
 
     @JsonIgnore
-    override fun toString(): String = "Location id=$messageId: ($latitude,$longitude) trigger=$trigger"
+    override fun toString(): String = "Location id=$messageId: ($latitude,$longitude) timestamp=${
+    Instant.fromEpochSeconds(
+        timestamp
+    )
+    } trigger=$trigger"
 
     override fun addMqttPreferences(preferences: Preferences) {
         topic = preferences.pubTopicLocations

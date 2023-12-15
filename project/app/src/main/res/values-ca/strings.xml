@@ -140,8 +140,7 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="preferencesCategoryNotificationOngoing">"Notificació en curs"</string>
     <string name="preferencesChangelog">"Informe de canvis"</string>
     <string name="preferencesCleanSessionEnabled">"Netejar sessió"</string>
-    <string name="preferencesClientCrtPassword">"Contrasenya del certifica client"</string>
-    <string name="preferencesClientCrtPath">"Certificat client"</string>
+    <string name="preferencesClientCrt">"Certificat client"</string>
     <string name="preferencesClientId">"ID Client"</string>
     <string name="preferencesDebugLog">"Registre de depuració"</string>
     <string name="preferencesDeviceName">"Id de dispositiu"</string>

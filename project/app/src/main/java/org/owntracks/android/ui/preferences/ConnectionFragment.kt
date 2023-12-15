@@ -2,21 +2,20 @@ package org.owntracks.android.ui.preferences
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
-import android.util.Base64
-import android.util.Base64.NO_WRAP
-import android.view.MenuItem
+import android.provider.Settings.ACTION_SECURITY_SETTINGS
+import android.security.KeyChain
+import android.security.KeyChain.EXTRA_NAME
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
 import androidx.preference.ValidatingEditTextPreference
-import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KProperty
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.owntracks.android.R
@@ -24,6 +23,7 @@ import org.owntracks.android.di.CoroutineScopes
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.services.MessageProcessor
+import org.owntracks.android.support.RunThingsOnOtherThreads
 import timber.log.Timber
 
 @AndroidEntryPoint
@@ -39,6 +39,9 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
     @CoroutineScopes.MainDispatcher
     lateinit var mainDispatcher: CoroutineDispatcher
 
+    @Inject
+    lateinit var runThingsOnOtherThreads: RunThingsOnOtherThreads
+
     private lateinit var menuProvider: PreferencesMenuProvider
 
     override fun onAttach(context: Context) {
@@ -47,10 +50,11 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
     }
 
     private val booleanSummaryProperties = setOf(
-        Preferences::password,
-        Preferences::tlsClientCrtPassword,
-        Preferences::tlsClientCrt
+        Preferences::password
     )
+
+    private val certificateInstallerLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         super.onCreatePreferences(savedInstanceState, rootKey)
@@ -95,52 +99,62 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
                 preferences.minimumKeepaliveSeconds
             }
 
-        mapOf(
-            Preferences::tlsClientCrt to clientCertLauncher
-        )
-            .forEach { (property, launcher) ->
-                findPreference<FilePickerPreference>(property.name)?.apply {
-                    setOnPreferenceClickListener {
-                        PopupMenu(it.context, view)
-                            .apply {
-                                menuInflater.inflate(R.menu.picker, menu)
-                                setOnMenuItemClickListener { item: MenuItem ->
-                                    when (item.itemId) {
-                                        R.id.clear -> {
-                                            lifecycleScope.launch(ioDispatcher) {
-                                                val filename = property.getter.call(preferences)
-                                                try {
-                                                    Timber.v("Deleting certificate: $filename")
-                                                    val result =
-                                                        requireContext().applicationContext.deleteFile(filename)
-                                                    Timber.v("Certificate deletion success: $result")
-                                                } catch (e: Exception) {
-                                                    Timber.w(e, "Unable to remove certificate file $filename")
-                                                }
-                                                property.setter.call(preferences, "")
-                                                setBooleanIndicatorSummary(property)
-                                            }
-                                        }
-                                        R.id.select -> {
-                                            launcher.launch(
-                                                Intent.createChooser(
-                                                    Intent(Intent.ACTION_GET_CONTENT).apply {
-                                                        addCategory(Intent.CATEGORY_OPENABLE)
-                                                        type = "*/*"
-                                                    },
-                                                    requireContext().getString(R.string.loadActivitySelectAFile)
-                                                )
-                                            )
-                                        }
-                                    }
-                                    true
-                                }
-                            }
-                            .show()
-                        true
-                    }
+        /* We need to work out if the given cert still exists. We also need to do this off-main thread */
+        lifecycleScope.launch(Dispatchers.IO) {
+            if (preferences.tlsClientCrt.isNotBlank()) {
+                val certChain = KeyChain.getCertificateChain(requireActivity(), preferences.tlsClientCrt)
+                if (certChain.isNullOrEmpty()) {
+                    Timber.w("Client cert for ${preferences.tlsClientCrt} no longer exists in device store.")
+                    findPreference<PopupMenuPreference>(Preferences::tlsClientCrt.name)?.setValue("")
                 }
             }
+            launch(Dispatchers.Main) {
+                findPreference<Preference>(Preferences::tlsClientCrt.name)?.isEnabled = true
+            }
+        }
+        findPreference<Preference>("tlsClientCertInstall")?.apply {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                isVisible = true
+            }
+            setOnPreferenceClickListener {
+                certificateInstallerLauncher.launch(
+                    KeyChain.createInstallIntent()
+                        .apply { putExtra(EXTRA_NAME, "owntracks-client-cert") }
+                )
+                true
+            }
+        }
+
+        findPreference<Preference>("tlsCAInstall")?.apply {
+            setOnPreferenceClickListener {
+                startActivity(Intent(ACTION_SECURITY_SETTINGS))
+                true
+            }
+        }
+        findPreference<PopupMenuPreference>(Preferences::tlsClientCrt.name)?.apply {
+            setOnPreferenceClickListener {
+                val choosePrivateKeyLaunch = {
+                    KeyChain.choosePrivateKeyAlias(
+                        requireActivity(),
+                        { alias ->
+                            if (alias != null) {
+                                runThingsOnOtherThreads.postOnMainHandlerDelayed({ setValue(alias) }, 0)
+                            }
+                        },
+                        null,
+                        null,
+                        null,
+                        null
+                    )
+                }
+                if (preferences.tlsClientCrt.isBlank()) {
+                    choosePrivateKeyLaunch()
+                } else {
+                    showMenu({ preferences.tlsClientCrt = "" }, { choosePrivateKeyLaunch() })
+                }
+                true
+            }
+        }
     }
 
     /**
@@ -160,38 +174,6 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
             else -> super.onDisplayPreferenceDialog(preference)
         }
     }
-
-    private val clientCertLauncher = createFilePickerLauncher(Preferences::tlsClientCrt)
-
-    /**
-     * Creates a filepicker activity launcher for selecting a file from the local device and adding the content
-     * to the given preference property
-     *
-     * @param property preference to be set with the base64 contents of the file
-     */
-    private fun createFilePickerLauncher(property: KMutableProperty<String>) =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            val maybeContentUri = it.data?.data
-            maybeContentUri?.also { contentUri ->
-                lifecycleScope.launch(ioDispatcher) {
-                    requireContext().applicationContext.run {
-                        contentResolver.openInputStream(contentUri)
-                            .use { inputStream ->
-                                inputStream?.run {
-                                    property.setter.call(preferences, Base64.encodeToString(readBytes(), NO_WRAP))
-                                    setBooleanIndicatorSummary(property)
-                                }
-                            }
-                    }
-                }
-            } ?: run {
-                Snackbar.make(
-                    requireView(),
-                    R.string.unableToCopyCertificate,
-                    Snackbar.LENGTH_LONG
-                )
-            }
-        }
 
     /**
      * Sets the summary for a preference that should either show "Set" or "Not set"

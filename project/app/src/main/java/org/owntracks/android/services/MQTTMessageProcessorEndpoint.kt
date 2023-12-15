@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.IOException
+import java.net.ConnectException
 import java.security.KeyStore
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.stream.Collectors
@@ -37,6 +38,7 @@ import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CLIENT_ALREADY_D
 import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CLIENT_DISCONNECTING
 import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CLIENT_EXCEPTION
 import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CONNECTION_LOST
+import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_SERVER_CONNECT_ERROR
 import org.eclipse.paho.client.mqttv3.MqttMessage
 import org.eclipse.paho.client.mqttv3.ScheduledExecutorPingSender
 import org.owntracks.android.data.EndpointState
@@ -242,7 +244,6 @@ class MQTTMessageProcessorEndpoint(
             Preferences::port.name,
             Preferences::tls.name,
             Preferences::tlsClientCrt.name,
-            Preferences::tlsClientCrtPassword.name,
             Preferences::username.name,
             Preferences::ws.name
         )
@@ -367,6 +368,7 @@ class MQTTMessageProcessorEndpoint(
                         }
                     Result.success(Unit)
                 } catch (e: Exception) {
+                    val errorLog = "MQTT client unable to connect to endpoint"
                     when (e) {
                         is MqttException -> {
                             when (e.reasonCode) {
@@ -378,16 +380,22 @@ class MQTTMessageProcessorEndpoint(
                                     when (e.cause) {
                                         is SSLHandshakeException ->
                                             Timber.e(
-                                                "MQTT client unable to connect to endpoint: " +
-                                                    "${(e.cause as SSLHandshakeException).message}"
+                                                "$errorLog: ${(e.cause as SSLHandshakeException).message}"
                                             )
-                                        else -> Timber.e(e, "MQTT client unable to connect to endpoint")
+                                        else -> Timber.e(e, errorLog)
                                     }
-                                else -> Timber.e(e, "MQTT client unable to connect to endpoint")
+                                REASON_CODE_SERVER_CONNECT_ERROR.toInt() -> {
+                                    when (e.cause) {
+                                        is ConnectException -> {
+                                            Timber.e("$errorLog: ${(e.cause as ConnectException).message}")
+                                        }
+                                    }
+                                }
+                                else -> Timber.e(e, errorLog)
                             }
                         }
                         else -> {
-                            Timber.e(e, "MQTT client unable to connect to endpoint")
+                            Timber.e(e, errorLog)
                         }
                     }
                     endpointStateRepo.setState(EndpointState.ERROR.withError(e))

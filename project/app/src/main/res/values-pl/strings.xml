@@ -144,8 +144,7 @@ Aby to umożliwić, włącz lokalizację w ustawieniach urządzenia."</string>
     <string name="preferencesCategoryNotificationOngoing">"Bieżące powiadomienie"</string>
     <string name="preferencesChangelog">"Historia zmian"</string>
     <string name="preferencesCleanSessionEnabled">"Wyczyść sesję"</string>
-    <string name="preferencesClientCrtPassword">"Hasło certyfikatu klienta"</string>
-    <string name="preferencesClientCrtPath">"Certyfikat klienta"</string>
+    <string name="preferencesClientCrt">"Certyfikat klienta"</string>
     <string name="preferencesClientId">"ID Klienta"</string>
     <string name="preferencesDebugLog">"Informacje debugowania"</string>
     <string name="preferencesDeviceName">"ID Urządzenia"</string>
