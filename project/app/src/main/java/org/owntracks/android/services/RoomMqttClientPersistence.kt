@@ -22,24 +22,10 @@ import org.eclipse.paho.client.mqttv3.internal.MqttPersistentData
 /**
  * Implementation of [MqttClientPersistence] that stores data in a Room database
  */
-class RoomMqttClientPersistence(applicationContext: Context, forTesting: Boolean = false) :
+class RoomMqttClientPersistence(private val applicationContext: Context, private val forTesting: Boolean = false) :
     MqttClientPersistence {
 
-    private val db = if (forTesting) {
-        Room.inMemoryDatabaseBuilder(
-            applicationContext,
-            MqttPersistableDatabase::class.java
-        )
-            .allowMainThreadQueries()
-            .build()
-    } else {
-        Room.databaseBuilder(
-            applicationContext,
-            MqttPersistableDatabase::class.java,
-            "pahoMqttPersistence"
-        )
-            .build()
-    }
+    private var db: MqttPersistableDatabase? = null
 
     @Entity
     data class MqttPersistableForClient(
@@ -53,9 +39,7 @@ class RoomMqttClientPersistence(applicationContext: Context, forTesting: Boolean
             other as MqttPersistableForClient
 
             if (clientId != other.clientId) return false
-            if (!persistable.contentEquals(other.persistable)) return false
-
-            return true
+            return persistable.contentEquals(other.persistable)
         }
 
         override fun hashCode(): Int {
@@ -89,11 +73,25 @@ class RoomMqttClientPersistence(applicationContext: Context, forTesting: Boolean
     }
 
     override fun close() {
-        // NOOP
+        db?.close()
     }
 
     override fun open(clientId: String?, serverURI: String?) {
-        // NOOP
+        db = if (forTesting) {
+            Room.inMemoryDatabaseBuilder(
+                applicationContext,
+                MqttPersistableDatabase::class.java
+            )
+                .allowMainThreadQueries()
+                .build()
+        } else {
+            Room.databaseBuilder(
+                applicationContext,
+                MqttPersistableDatabase::class.java,
+                "pahoMqttPersistence"
+            )
+                .build()
+        }
     }
 
     fun MqttPersistable.toByteArray(): ByteArray {
@@ -121,33 +119,30 @@ class RoomMqttClientPersistence(applicationContext: Context, forTesting: Boolean
             }
 
     override fun put(key: String, persistable: MqttPersistable) {
-        db.mqttPersistableDao()
-            .insert(MqttPersistableForClient(key, persistable.toByteArray()))
+        db?.mqttPersistableDao()?.insert(MqttPersistableForClient(key, persistable.toByteArray()))
     }
 
     override fun get(key: String): MqttPersistable {
-        return db.mqttPersistableDao()
-            .getById(key)?.persistable?.toMqttPersistentData(key) ?: throw MqttPersistenceException()
+        return db?.mqttPersistableDao()?.getById(key)?.persistable?.toMqttPersistentData(key)
+            ?: throw MqttPersistenceException()
     }
 
     override fun remove(key: String) {
-        db.mqttPersistableDao()
-            .delete(MqttPersistableForClient(key, null))
+        db?.mqttPersistableDao()?.delete(MqttPersistableForClient(key, null))
     }
 
-    override fun keys(): Enumeration<*> = db.mqttPersistableDao()
-        .keys()
-        .asSequence()
+    override fun keys(): Enumeration<String> = (
+        db?.mqttPersistableDao()?.keys()
+            ?.asSequence() ?: sequenceOf()
+        )
         .toEnumeration()
 
     override fun clear() {
-        db.mqttPersistableDao()
-            .deleteAll()
+        db?.mqttPersistableDao()?.deleteAll()
     }
 
     override fun containsKey(key: String): Boolean =
-        db.mqttPersistableDao()
-            .getById(key) != null
+        db?.mqttPersistableDao()?.getById(key) != null
 
     private fun <T> Sequence<T>.toEnumeration(): Enumeration<T> {
         val iterator = this.iterator()

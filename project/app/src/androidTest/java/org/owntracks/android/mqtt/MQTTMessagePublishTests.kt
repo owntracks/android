@@ -43,6 +43,7 @@ import org.owntracks.android.ui.map.MapActivity
 
 @ExperimentalUnsignedTypes
 @LargeTest
+@org.owntracks.android.testutils.JustThisTestPlease
 @RunWith(AndroidJUnit4::class)
 class MQTTMessagePublishTests :
     TestWithAnActivity<MapActivity>(MapActivity::class.java, false),
@@ -138,7 +139,6 @@ class MQTTMessagePublishTests :
     }
 
     @Test
-    @org.owntracks.android.testutils.JustThisTestPlease
     fun given_an_MQTT_configured_client_when_the_wrong_credentials_are_used_then_the_status_screen_shows_that_the_broker_is_not_connected() { // ktlint-disable max-line-length
         setNotFirstStartPreferences()
         launchActivity()
