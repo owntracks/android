@@ -223,6 +223,7 @@ jobs:
           sdcard-path-or-size: 1000M
           script: |
             adb shell settings put global bluetooth_on 0
+            adb shell settings put secure long_press_timeout 1000
             adb shell rm -rf /sdcard/googletest || echo "Couldn't delete googletest folder"
             adb uninstall org.owntracks.android.debug || echo "org.owntracks.android not installed"
             adb uninstall org.owntracks.android.debug.test || echo "org.owntracks.android.test not installed"
