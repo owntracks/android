@@ -40,6 +40,9 @@ class IntentTests :
     fun given_an_application_instance_when_sending_a_send_location_intent_then_a_location_message_is_published_with_the_user_trigger() { // ktlint-disable max-line-length
         setupTestActivity()
 
+        initializeMockLocationProvider(app)
+        setMockLocation(51.0, 0.0)
+
         packetReceivedIdlingResource.latch("\"t\":\"u\"")
         ContextCompat.startForegroundService(
             app,
