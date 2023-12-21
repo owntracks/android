@@ -6,7 +6,7 @@ import android.app.NotificationManager
 import android.content.Context
 import androidx.test.espresso.Espresso
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.LargeTest
+import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.assertion.BaristaRecyclerViewAssertions.assertRecyclerViewItemCount
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
@@ -25,7 +25,7 @@ import org.owntracks.android.testutils.waitUntilActivityVisible
 import org.owntracks.android.ui.waypoints.WaypointsActivity
 import timber.log.Timber
 
-@LargeTest
+@MediumTest
 @RunWith(AndroidJUnit4::class)
 class WaypointsMigrationFromObjectboxTestWithFullUI : TestWithAnActivity<WaypointsActivity>(
     WaypointsActivity::class.java,

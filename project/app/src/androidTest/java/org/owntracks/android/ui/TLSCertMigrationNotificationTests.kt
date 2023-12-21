@@ -3,9 +3,12 @@ package org.owntracks.android.ui
 import android.app.Notification
 import android.app.NotificationManager
 import android.content.Context
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assert
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.getPreferences
@@ -14,6 +17,8 @@ import org.owntracks.android.testutils.setNotFirstStartPreferences
 import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber
 
+@MediumTest
+@RunWith(AndroidJUnit4::class)
 class TLSCertMigrationNotificationTests : TestWithAnActivity<MapActivity>(MapActivity::class.java, false) {
 
     @Test

@@ -3,7 +3,7 @@ package org.owntracks.android.ui
 import android.content.Intent
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.LargeTest
+import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
@@ -22,7 +22,7 @@ import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.writeFileToDevice
 import org.owntracks.android.ui.preferences.load.LoadActivity
 
-@LargeTest
+@MediumTest
 @RunWith(AndroidJUnit4::class)
 class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.java, false) {
     private var mockWebServer = MockWebServer()

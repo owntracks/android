@@ -4,7 +4,7 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.LargeTest
+import androidx.test.filters.MediumTest
 import com.adevinta.android.barista.assertion.BaristaDrawerAssertions.assertDrawerIsClosed
 import com.adevinta.android.barista.assertion.BaristaEnabledAssertions
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
@@ -24,7 +24,7 @@ import org.owntracks.android.testutils.setNotFirstStartPreferences
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.clickOnDrawerAndWait
 
-@LargeTest
+@MediumTest
 @RunWith(AndroidJUnit4::class)
 class CommonMapActivityTests :
     TestWithAnActivity<MapActivity>(MapActivity::class.java, false),

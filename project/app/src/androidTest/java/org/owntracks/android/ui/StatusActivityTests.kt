@@ -1,7 +1,7 @@
 package org.owntracks.android.ui
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.LargeTest
+import androidx.test.filters.MediumTest
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -9,7 +9,7 @@ import org.owntracks.android.R
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.ui.status.StatusActivity
 
-@LargeTest
+@MediumTest
 @RunWith(AndroidJUnit4::class)
 class StatusActivityTests : TestWithAnActivity<StatusActivity>(StatusActivity::class.java) {
     @Test

@@ -5,7 +5,7 @@ import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasData
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.LargeTest
+import androidx.test.filters.MediumTest
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import org.hamcrest.CoreMatchers.allOf
@@ -16,7 +16,7 @@ import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.scrollToPreferenceWithText
 import org.owntracks.android.ui.preferences.about.AboutActivity
 
-@LargeTest
+@MediumTest
 @RunWith(AndroidJUnit4::class)
 class AboutActivityTests : TestWithAnActivity<AboutActivity>(AboutActivity::class.java) {
     @Test

@@ -10,7 +10,7 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.anyIntent
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtra
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.LargeTest
+import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
@@ -27,7 +27,7 @@ import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.setNotFirstStartPreferences
 import org.owntracks.android.ui.preferences.editor.EditorActivity
 
-@LargeTest
+@MediumTest
 @RunWith(AndroidJUnit4::class)
 class ConfigEditorActivityTests :
     TestWithAnActivity<EditorActivity>(EditorActivity::class.java, startActivity = false) {

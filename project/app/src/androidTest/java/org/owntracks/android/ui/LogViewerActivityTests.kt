@@ -12,7 +12,7 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtras
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasFlag
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasType
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.LargeTest
+import androidx.test.filters.MediumTest
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
@@ -25,7 +25,7 @@ import org.owntracks.android.R
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.ui.status.logs.LogViewerActivity
 
-@LargeTest
+@MediumTest
 @RunWith(AndroidJUnit4::class)
 class LogViewerActivityTests :
     TestWithAnActivity<LogViewerActivity>(LogViewerActivity::class.java) {

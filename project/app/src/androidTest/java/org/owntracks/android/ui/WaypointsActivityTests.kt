@@ -1,7 +1,7 @@
 package org.owntracks.android.ui
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.LargeTest
+import androidx.test.filters.MediumTest
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
@@ -15,7 +15,7 @@ import org.owntracks.android.testutils.TestWithAnMQTTBrokerImpl
 import org.owntracks.android.ui.waypoints.WaypointsActivity
 
 @OptIn(ExperimentalUnsignedTypes::class)
-@LargeTest
+@MediumTest
 @RunWith(AndroidJUnit4::class)
 class WaypointsActivityTests :
     TestWithAnActivity<WaypointsActivity>(WaypointsActivity::class.java),

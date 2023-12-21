@@ -3,6 +3,7 @@ package org.owntracks.android.data.waypoints
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso
+import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
 import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.CoroutineScope
@@ -16,6 +17,7 @@ import org.junit.runners.Parameterized
 import org.owntracks.android.testutils.idlingresources.EspressoTrackedDispatcher
 import org.owntracks.android.testutils.use
 
+@SmallTest
 @RunWith(Parameterized::class)
 class WaypointsMigrationFromObjectboxTest(private val parameter: Parameter) {
     @Before
