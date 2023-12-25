@@ -26,6 +26,7 @@ import org.owntracks.android.testutils.matchers.withActionIconDrawable
 import org.owntracks.android.testutils.setNotFirstStartPreferences
 import org.owntracks.android.testutils.use
 import org.owntracks.android.testutils.waitUntilActivityVisible
+import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber
 
@@ -41,7 +42,16 @@ class IntentTests :
         setupTestActivity()
 
         initializeMockLocationProvider(app)
+        app.mockLocationIdlingResource.setIdleState(false)
+
+        waitUntilActivityVisible<MapActivity>()
+        clickOnAndWait(R.id.menu_monitoring)
+        clickOnAndWait(R.id.fabMonitoringModeMove)
         setMockLocation(51.0, 0.0)
+
+        app.mockLocationIdlingResource.use(15.seconds) {
+            clickOnAndWait(R.id.fabMyLocation)
+        }
 
         packetReceivedIdlingResource.latch("\"t\":\"u\"")
         ContextCompat.startForegroundService(
@@ -62,7 +72,7 @@ class IntentTests :
             }.also {
                 Timber.w("packets: $it")
             }.any {
-                it is MessageLocation && it.trigger == MessageLocation.ReportType.USER
+                it is MessageLocation && it.trigger == MessageLocation.ReportType.USER && it.latitude == 51.0
             }
         )
     }
