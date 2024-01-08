@@ -190,14 +190,14 @@ jobs:
         with:
           api-level: ${{ matrix.android-api }}
           force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
+          emulator-options: -no-window -gpu auto -noaudio -no-boot-anim -camera-back none -camera-front none
           profile: pixel_3a
           target: ${{ matrix.flavour == 'Gms' && 'google_apis' || 'default' }}
-          ram-size: 6000M
+          ram-size: 4000M
           avd-name: owntracks-test-${{ matrix.android-api }}-${{ matrix.flavour }}
           disable-animations: true
           arch: x86_64
-          cores: 2
+          cores: 1
           sdcard-path-or-size: 1000M
           script: |
             echo "Created AVD snapshot"
@@ -212,14 +212,14 @@ jobs:
         with:
           api-level: ${{ matrix.android-api }}
           force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
+          emulator-options: -no-snapshot-save -no-window -gpu auto -noaudio -no-boot-anim -camera-back none -camera-front none
           profile: pixel_3a
           target: ${{ matrix.flavour == 'Gms' && 'google_apis' || 'default' }}
-          ram-size: 6000M
+          ram-size: 4000M
           disable-animations: true
           avd-name: owntracks-test-${{ matrix.android-api }}-${{ matrix.flavour }}
           arch: x86_64
-          cores: 2
+          cores: 1
           sdcard-path-or-size: 1000M
           script: |
             adb shell settings put global bluetooth_on 0
