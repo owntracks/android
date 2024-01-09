@@ -101,14 +101,20 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
 
         /* We need to work out if the given cert still exists. We also need to do this off-main thread */
         lifecycleScope.launch(Dispatchers.IO) {
-            if (preferences.tlsClientCrt.isNotBlank()) {
+            val shouldClearPreference = if (preferences.tlsClientCrt.isNotBlank()) {
                 val certChain = KeyChain.getCertificateChain(requireActivity(), preferences.tlsClientCrt)
                 if (certChain.isNullOrEmpty()) {
                     Timber.w("Client cert for ${preferences.tlsClientCrt} no longer exists in device store.")
+                }
+                true
+            } else {
+                false
+            }
+            // However, we need to update the UI on the main thread
+            launch(Dispatchers.Main) {
+                if (shouldClearPreference) {
                     findPreference<PopupMenuPreference>(Preferences::tlsClientCrt.name)?.setValue("")
                 }
-            }
-            launch(Dispatchers.Main) {
                 findPreference<Preference>(Preferences::tlsClientCrt.name)?.isEnabled = true
             }
         }

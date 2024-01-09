@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.replace
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import dagger.hilt.android.AndroidEntryPoint
@@ -13,6 +14,7 @@ import org.owntracks.android.databinding.UiPreferencesBinding
 import org.owntracks.android.support.DrawerProvider
 import org.owntracks.android.ui.mixins.ServiceStarter
 import org.owntracks.android.ui.mixins.WorkManagerInitExceptionNotifier
+import timber.log.Timber
 
 @AndroidEntryPoint
 open class PreferencesActivity :
@@ -25,7 +27,7 @@ open class PreferencesActivity :
     @Inject
     lateinit var drawerProvider: DrawerProvider
 
-    protected open val startFragment: Fragment?
+    protected open val startFragment: Fragment
         get() = PreferencesFragment()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,19 +42,24 @@ open class PreferencesActivity :
                     }
                 }
 
-        supportFragmentManager.addOnBackStackChangedListener {
-            if (supportFragmentManager.fragments.isEmpty()) {
-                setToolbarTitle(title)
-            } else {
-                setToolbarTitle(
-                    (supportFragmentManager.fragments[0] as PreferenceFragmentCompat).preferenceScreen.title
-                )
+        supportFragmentManager.run {
+            addOnBackStackChangedListener {
+                if (supportFragmentManager.fragments.isEmpty()) {
+                    setToolbarTitle(title)
+                } else {
+                    setToolbarTitle(
+                        (supportFragmentManager.fragments[0] as PreferenceFragmentCompat).preferenceScreen.title
+                    )
+                }
             }
+            beginTransaction().replace(R.id.content_frame, startFragment, null).commit()
+            when(intent.getStringExtra(START_FRAGMENT_KEY))   {
+                ConnectionFragment::class.java.name ->
+                    beginTransaction().replace(R.id.content_frame, ConnectionFragment()).commit()
+            }
+            executePendingTransactions()
         }
-        val fragmentTransaction = supportFragmentManager.beginTransaction()
-            .replace(R.id.content_frame, startFragment!!, null)
-        fragmentTransaction.commit()
-        supportFragmentManager.executePendingTransactions()
+
         // We may have come here straight from the WelcomeActivity, so start the service.
         startService(this)
 
@@ -80,5 +87,8 @@ open class PreferencesActivity :
             .commit()
 
         return true
+    }
+    companion object {
+        const val START_FRAGMENT_KEY = "startFragment"
     }
 }

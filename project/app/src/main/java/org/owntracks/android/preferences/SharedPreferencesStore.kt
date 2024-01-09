@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.provider.Settings.ACTION_SECURITY_SETTINGS
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -19,7 +18,9 @@ import javax.inject.Singleton
 import org.owntracks.android.R
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.ui.NotificationsStash
+import org.owntracks.android.ui.preferences.ConnectionFragment
 import org.owntracks.android.ui.preferences.PreferencesActivity
+import org.owntracks.android.ui.preferences.PreferencesActivity.Companion.START_FRAGMENT_KEY
 import timber.log.Timber
 
 /***
@@ -45,20 +46,24 @@ class SharedPreferencesStore @Inject constructor(
     }
 
     private fun detectIfCertsInConfig() {
-        val tlsCrtKeys = setOf("tlsCaCrt", "tlsClientCrtPassword")
-        val shouldNotify =
-            tlsCrtKeys.filter { sharedPreferences.contains(it) && !sharedPreferences.getString(it, "").isNullOrEmpty() }
-        sharedPreferences.edit {
-            tlsCrtKeys.forEach(this::remove)
+        val legacyTlsCrtKeys = setOf("tlsCaCrt", "tlsClientCrtPassword")
+        val shouldNotify = legacyTlsCrtKeys.filter {
+            sharedPreferences.contains(it) && !sharedPreferences.getString(it, "").isNullOrEmpty()
         }
 
         if (shouldNotify.isNotEmpty()) {
+            // Delete local files
+            setOf("tlsClientCrt", "tlsCaCrt").forEach {
+                sharedPreferences.getString(it, "")
+                    .also{Timber.i("Deleting legacy cert from app storage: $it")}
+                    .run (context::deleteFile)
+            }
+            // Notify user
             NotificationCompat.Builder(
                 context,
                 GeocoderProvider.ERROR_NOTIFICATION_CHANNEL_ID
             )
                 .setContentTitle(context.getString(R.string.certificateMigrationRequiredNotificationTitle))
-                .setContentText(context.getString(R.string.certificateMigrationRequiredNotificationText))
                 .setAutoCancel(true)
                 .setSmallIcon(R.drawable.ic_owntracks_80)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -68,9 +73,16 @@ class SharedPreferencesStore @Inject constructor(
                     PendingIntent.getActivity(
                         context,
                         0,
-                        Intent(context, PreferencesActivity::class.java).addFlags(FLAG_ACTIVITY_NEW_TASK),
+                        Intent(context,PreferencesActivity::class.java)
+                            .addFlags(FLAG_ACTIVITY_NEW_TASK)
+                            .putExtra(START_FRAGMENT_KEY, ConnectionFragment::class.java.name),
+
                         PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
                     )
+                )
+                .setStyle(
+                    NotificationCompat.BigTextStyle()
+                        .bigText(context.getString(R.string.certificateMigrationRequiredNotificationText))
                 )
                 .setSilent(true)
                 .build()
@@ -86,11 +98,9 @@ class SharedPreferencesStore @Inject constructor(
                     }
                 }
         }
-        with(sharedPreferences.edit()) {
-            if (sharedPreferences.contains("tlsCaCrt")) {
-                if (!sharedPreferences.getString("tlsCaCrt", "").isNullOrEmpty()) {
-                }
-            }
+        // Remove old preferences from sharedPreferences
+        sharedPreferences.edit {
+            legacyTlsCrtKeys.forEach(this::remove)
         }
     }
 
