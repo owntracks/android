@@ -55,7 +55,7 @@ class TLSCertMigrationNotificationTests : TestWithAnActivity<MapActivity>(MapAct
     }
 
     @Test
-    fun whenMigrationACurrentTLSCAPreferenceThenTheNotificationIsShown() {
+    fun whenMigratingACurrentTLSCAPreferenceThenTheNotificationIsShown() {
         getPreferences().edit().putString("tlsCaCrt", "TestValue").apply()
         setNotFirstStartPreferences()
         app.migratePreferences()
