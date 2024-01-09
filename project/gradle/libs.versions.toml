@@ -33,7 +33,7 @@ kmqtt = "0.4.3"
 kotlin = "1.8.21"
 kotlin-coroutines = "1.7.3"
 kotlin-datetime = "0.5.0"
-ktlint = "11.6.0"
+ktfmt = "0.16.0"
 libsodium = "2.0.2"
 lmdb-kt = "0.1.1-SNAPSHOT"
 materialdrawer = "6.1.2"
@@ -56,7 +56,7 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 triplet = { id = "com.github.triplet.play", version.ref = "triplet" }
-ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref= "ktlint"}
+ktfmt = { id = "com.ncorti.ktfmt.gradle", version.ref = "ktfmt" }
 
 [libraries]
 android-gradle-api = { module = "com.android.tools.build:gradle-api", version.ref = "agp" }

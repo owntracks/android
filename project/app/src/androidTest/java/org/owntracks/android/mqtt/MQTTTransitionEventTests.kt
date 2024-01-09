@@ -56,7 +56,7 @@ class MQTTTransitionEventTests :
     }
 
     @Test
-    fun given_an_MQTT_configured_client_when_the_broker_sends_a_transition_message_then_a_notification_appears() { // ktlint-disable max-line-length
+    fun given_an_MQTT_configured_client_when_the_broker_sends_a_transition_message_then_a_notification_appears() {
         setNotFirstStartPreferences()
         launchActivity()
         grantMapActivityPermissions()
@@ -105,7 +105,7 @@ class MQTTTransitionEventTests :
     }
 
     @Test
-    fun given_an_MQTT_configured_client_when_the_location_enters_a_geofence_a_transition_message_is_sent() { // ktlint-disable max-line-length
+    fun given_an_MQTT_configured_client_when_the_location_enters_a_geofence_a_transition_message_is_sent() {
         val waypointLatitude = 48.0
         val waypointLongitude = -1.0
         val waypointDescription = "Test Region"

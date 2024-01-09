@@ -81,7 +81,7 @@ class LoadViewModelTest {
             val preferences = Preferences(preferencesStore, mockIdlingResource)
             val vm = LoadViewModel(preferences, parser, InMemoryWaypointsRepo(), UnconfinedTestDispatcher())
             vm.extractPreferencesFromUri(
-                "owntracks:///config?inline=eyJfdHlwZSI6IndheXBvaW50cyIsIndheXBvaW50cyI6W3siX3R5cGUiOiJ3YXlwb2ludCIsImRlc2MiOiJUZXN0IFdheXBvaW50IiwibGF0Ijo1MSwibG9uIjowLCJyYWQiOjQ1MCwidHN0IjoxNTk4NDUxMzcyfV19" // ktlint-disable max-line-length
+                "owntracks:///config?inline=eyJfdHlwZSI6IndheXBvaW50cyIsIndheXBvaW50cyI6W3siX3R5cGUiOiJ3YXlwb2ludCIsImRlc2MiOiJUZXN0IFdheXBvaW50IiwibGF0Ijo1MSwibG9uIjowLCJyYWQiOjQ1MCwidHN0IjoxNTk4NDUxMzcyfV19"
 
             )
             val expectedConfig = """

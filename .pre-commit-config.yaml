@@ -31,9 +31,3 @@ repos:
         entry: ./project/gradlew -p project testGmsDebugUnitTest
         pass_filenames: false
         language: system
-      - id: ktlint
-        name: ktlint
-        description: Ktlints
-        entry: ./project/gradlew -p project ktlintCheck
-        pass_filenames: false
-        language: system

@@ -37,7 +37,7 @@ class IntentTests :
     MockDeviceLocation by GPSMockDeviceLocation() {
 
     @Test
-    fun given_an_application_instance_when_sending_a_send_location_intent_then_a_location_message_is_published_with_the_user_trigger() { // ktlint-disable max-line-length
+    fun given_an_application_instance_when_sending_a_send_location_intent_then_a_location_message_is_published_with_the_user_trigger() {
         setupTestActivity()
 
         initializeMockLocationProvider(app)
@@ -68,7 +68,7 @@ class IntentTests :
     }
 
     @Test
-    fun given_an_application_instance_when_sending_a_change_monitoring_intent_with_no_specific_mode_then_the_app_changes_monitoring_mode_to_the_next() { // ktlint-disable max-line-length
+    fun given_an_application_instance_when_sending_a_change_monitoring_intent_with_no_specific_mode_then_the_app_changes_monitoring_mode_to_the_next() {
         setupTestActivity()
 
         app.preferenceSetIdlingResource.setIdleState(false)
@@ -85,7 +85,7 @@ class IntentTests :
     }
 
     @Test
-    fun given_an_application_instance_when_sending_a_change_monitoring_intent_with_quiet_mode_specified_then_the_app_changes_monitoring_mode_to_quiet() { // ktlint-disable max-line-length
+    fun given_an_application_instance_when_sending_a_change_monitoring_intent_with_quiet_mode_specified_then_the_app_changes_monitoring_mode_to_quiet() {
         setupTestActivity()
         app.preferenceSetIdlingResource.setIdleState(false)
         ContextCompat.startForegroundService(

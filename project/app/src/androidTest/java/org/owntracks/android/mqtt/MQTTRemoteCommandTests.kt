@@ -69,7 +69,7 @@ class MQTTRemoteCommandTests :
     }
 
     @Test
-    fun given_an_MQTT_configured_client_when_the_broker_sends_a_reportLocation_command_message_then_a_response_location_is_sent_back_to_the_broker() { // ktlint-disable max-line-length
+    fun given_an_MQTT_configured_client_when_the_broker_sends_a_reportLocation_command_message_then_a_response_location_is_sent_back_to_the_broker() {
         setupTestActivity()
 
         clickOnAndWait(R.id.menu_monitoring)
@@ -109,7 +109,7 @@ class MQTTRemoteCommandTests :
     }
 
     @Test
-    fun given_an_MQTT_configured_client_when_the_broker_sends_a_waypoints_response_message_then_a_waypoints_message_is_sent_back_to_the_broker() { // ktlint-disable max-line-length
+    fun given_an_MQTT_configured_client_when_the_broker_sends_a_waypoints_response_message_then_a_waypoints_message_is_sent_back_to_the_broker() {
         setupTestActivity()
 
         clickOnAndWait(R.id.menu_monitoring)
@@ -169,7 +169,7 @@ class MQTTRemoteCommandTests :
     }
 
     @Test
-    fun given_an_MQTT_configured_client_when_the_broker_sends_a_set_waypoints_command_message_then_the_waypoints_are_merged_with_the_existing_waypoints() { // ktlint-disable max-line-length
+    fun given_an_MQTT_configured_client_when_the_broker_sends_a_set_waypoints_command_message_then_the_waypoints_are_merged_with_the_existing_waypoints() {
         setupTestActivity()
 
         clickOnAndWait(R.id.menu_monitoring)
@@ -239,7 +239,7 @@ class MQTTRemoteCommandTests :
     }
 
     @Test
-    fun given_an_MQTT_configured_client_when_the_broker_sends_a_clear_waypoints_command_message_then_the_waypoints_are_cleared() { // ktlint-disable max-line-length
+    fun given_an_MQTT_configured_client_when_the_broker_sends_a_clear_waypoints_command_message_then_the_waypoints_are_cleared() {
         setupTestActivity()
 
         clickOnAndWait(R.id.menu_monitoring)
@@ -288,7 +288,7 @@ class MQTTRemoteCommandTests :
     }
 
     @Test
-    fun given_an_MQTT_configured_client_when_the_broker_sends_a_setConfiguration_response_message_then_the_configuration_is_set_in_the_preferences() { // ktlint-disable max-line-length
+    fun given_an_MQTT_configured_client_when_the_broker_sends_a_setConfiguration_response_message_then_the_configuration_is_set_in_the_preferences() {
         setupTestActivity()
         PreferenceManager.getDefaultSharedPreferences(baristaRule.activityTestRule.activity).edit {
             putBoolean("remoteConfiguration", true)
@@ -328,7 +328,7 @@ class MQTTRemoteCommandTests :
     }
 
     @Test
-    fun given_an_MQTT_configured_client_to_not_accept_remote_configs_when_the_broker_sends_a_setConfiguration_response_message_then_the_configuration_is_not_set_in_the_preferences() { // ktlint-disable max-line-length
+    fun given_an_MQTT_configured_client_to_not_accept_remote_configs_when_the_broker_sends_a_setConfiguration_response_message_then_the_configuration_is_not_set_in_the_preferences() {
         setupTestActivity()
         PreferenceManager.getDefaultSharedPreferences(baristaRule.activityTestRule.activity).edit {
             putBoolean("remoteConfiguration", false)

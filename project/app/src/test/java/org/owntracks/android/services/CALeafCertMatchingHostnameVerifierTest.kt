@@ -25,7 +25,7 @@ class CALeafCertMatchingHostnameVerifierTest {
     }
 
     @Test
-    fun `Given a standard signed certificate, MqttHostnameVerifier should delegate to HTTPS implementation and succeed if hostnames are the same`() { // ktlint-disable max-line-length
+    fun `Given a standard signed certificate, MqttHostnameVerifier should delegate to HTTPS implementation and succeed if hostnames are the same`() {
 
         val testCA = CertificateFactory.getInstance("X.509").generateCertificate(
             ByteArrayInputStream(letsEncryptRootCert)
@@ -38,7 +38,7 @@ class CALeafCertMatchingHostnameVerifierTest {
     }
 
     @Test
-    fun `Given a standard signed certificate, MqttHostnameVerifier should delegate to HTTPS implementation and fail if hostnames are the different`() { // ktlint-disable max-line-length
+    fun `Given a standard signed certificate, MqttHostnameVerifier should delegate to HTTPS implementation and fail if hostnames are the different`() {
         val testCA = CertificateFactory.getInstance("X.509").generateCertificate(
             ByteArrayInputStream(letsEncryptRootCert)
         )
@@ -50,7 +50,7 @@ class CALeafCertMatchingHostnameVerifierTest {
     }
 
     @Test
-    fun `Given a self-signed certificate, MqttHostnameVerifier should skip validation and succeed even if hostnames are different`() { // ktlint-disable max-line-length
+    fun `Given a self-signed certificate, MqttHostnameVerifier should skip validation and succeed even if hostnames are different`() {
         val selfSigned = CertificateFactory.getInstance("X.509").generateCertificate(
             ByteArrayInputStream(selfSignedCert)
         )
@@ -63,7 +63,7 @@ class CALeafCertMatchingHostnameVerifierTest {
     }
 
     @Test
-    fun `Given a self-signed certificate, MqttHostnameVerifier should skip validation and succeed even if hostnames are the same`() { // ktlint-disable max-line-length
+    fun `Given a self-signed certificate, MqttHostnameVerifier should skip validation and succeed even if hostnames are the same`() {
         val selfSigned = CertificateFactory.getInstance("X.509").generateCertificate(
             ByteArrayInputStream(selfSignedCert)
         )

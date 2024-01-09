@@ -6,7 +6,7 @@ plugins {
     id("com.github.triplet.play")
     kotlin("android")
     kotlin("kapt")
-    id("org.jlleitschuh.gradle.ktlint")
+    alias(libs.plugins.ktfmt)
 }
 
 apply<EspressoMetadataEmbeddingPlugin>()
@@ -275,8 +275,4 @@ dependencies {
 // Handled now in the android / playConfigs block
 play {
     enabled.set(false)
-}
-
-ktlint {
-    android.set(true)
 }

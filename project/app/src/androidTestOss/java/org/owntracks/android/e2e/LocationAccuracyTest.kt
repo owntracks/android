@@ -35,7 +35,7 @@ class LocationAccuracyTest :
     MockDeviceLocation by GPSMockDeviceLocation() {
 
     @Test
-    fun given_an_inaccurate_and_accurate_location_when_publishing_then_only_the_location_only_the_accurate_location_is_published() { // ktlint-disable max-line-length
+    fun given_an_inaccurate_and_accurate_location_when_publishing_then_only_the_location_only_the_accurate_location_is_published() {
         val inaccurateMockLatitude = Random.nextDouble(-30.0, 30.0)
         val inaccurateMockLongitude = 4.0
         val accurateMockLatitude = Random.nextDouble(-30.0, 30.0)

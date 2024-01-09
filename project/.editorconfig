@@ -10,5 +10,3 @@ ij_kotlin_method_call_chain_wrap = on_every_item
 ij_kotlin_wrap_first_method_in_call_chain = false
 ij_kotlin_line_break_after_multiline_when_entry = false
 ij_kotlin_method_parameters_wrap = on_every_item
-ktlint_ignore_back_ticked_identifier = true
-ktlint_code_style = android

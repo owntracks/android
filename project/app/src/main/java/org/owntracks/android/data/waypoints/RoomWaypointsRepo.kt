@@ -148,7 +148,7 @@ class RoomWaypointsRepo @Inject constructor(
                     }
                     db.waypointDao().getRowCount().let { rowCount ->
                         Timber.i(
-                            "Waypoints Migration complete in ${migrationDuration.duration}. Tried to insert ${migrationDuration.value}, ended up with $rowCount waypoints in the repo" // ktlint-disable max-line-length
+                            "Waypoints Migration complete in ${migrationDuration.duration}. Tried to insert ${migrationDuration.value}, ended up with $rowCount waypoints in the repo"
                         )
                     }
                 }
@@ -245,7 +245,7 @@ class RoomWaypointsRepo @Inject constructor(
             }
 
         override fun toString(): String {
-            return "FbWaypointModel(id=$id,description=$description,latitude=$geofenceLatitude,longitude=$geofenceLongitude,radius=$geofenceRadius,lastTransition=$lastTransition,lastTriggered=$lastTriggered,tst=$tst)" // ktlint-disable max-line-length
+            return "FbWaypointModel(id=$id,description=$description,latitude=$geofenceLatitude,longitude=$geofenceLongitude,radius=$geofenceRadius,lastTransition=$lastTransition,lastTriggered=$lastTriggered,tst=$tst)"
         }
 
         companion object {

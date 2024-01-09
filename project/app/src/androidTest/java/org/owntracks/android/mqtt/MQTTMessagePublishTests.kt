@@ -51,7 +51,7 @@ class MQTTMessagePublishTests :
     MockDeviceLocation by GPSMockDeviceLocation() {
 
     @Test
-    fun given_an_MQTT_configured_client_when_the_report_button_is_pressed_then_the_broker_receives_a_packet_with_the_correct_location_message_in() { // ktlint-disable max-line-length
+    fun given_an_MQTT_configured_client_when_the_report_button_is_pressed_then_the_broker_receives_a_packet_with_the_correct_location_message_in() {
         setup()
         val mockLatitude = 51.0
         val mockLongitude = 0.0
@@ -78,7 +78,7 @@ class MQTTMessagePublishTests :
     }
 
     @Test
-    fun given_an_MQTT_configured_client_when_the_broker_sends_a_location_for_a_cleared_contact_then_a_the_contact_returns_with_the_correct_details() { // ktlint-disable max-line-length
+    fun given_an_MQTT_configured_client_when_the_broker_sends_a_location_for_a_cleared_contact_then_a_the_contact_returns_with_the_correct_details() {
         setup()
 
         openDrawer()
@@ -139,7 +139,7 @@ class MQTTMessagePublishTests :
     }
 
     @Test
-    fun given_an_MQTT_configured_client_when_the_wrong_credentials_are_used_then_the_status_screen_shows_that_the_broker_is_not_connected() { // ktlint-disable max-line-length
+    fun given_an_MQTT_configured_client_when_the_wrong_credentials_are_used_then_the_status_screen_shows_that_the_broker_is_not_connected() {
         setNotFirstStartPreferences()
         launchActivity()
         grantMapActivityPermissions()
@@ -154,7 +154,7 @@ class MQTTMessagePublishTests :
 
     @OptIn(ExperimentalUnsignedTypes::class)
     @Test
-    fun given_an_MQTT_configured_client_when_the_user_publishes_waypoints_then_the_broker_receives_a_waypoint_message() { // ktlint-disable max-line-length
+    fun given_an_MQTT_configured_client_when_the_user_publishes_waypoints_then_the_broker_receives_a_waypoint_message() {
         setup()
 
         openDrawer()
