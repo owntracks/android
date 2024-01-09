@@ -19,6 +19,7 @@ import javax.inject.Singleton
 import org.owntracks.android.R
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.ui.NotificationsStash
+import org.owntracks.android.ui.preferences.PreferencesActivity
 import timber.log.Timber
 
 /***
@@ -67,7 +68,7 @@ class SharedPreferencesStore @Inject constructor(
                     PendingIntent.getActivity(
                         context,
                         0,
-                        Intent(ACTION_SECURITY_SETTINGS).addFlags(FLAG_ACTIVITY_NEW_TASK),
+                        Intent(context, PreferencesActivity::class.java).addFlags(FLAG_ACTIVITY_NEW_TASK),
                         PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
                     )
                 )
