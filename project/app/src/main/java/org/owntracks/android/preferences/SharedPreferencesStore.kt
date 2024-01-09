@@ -11,6 +11,7 @@ import android.provider.Settings.ACTION_SECURITY_SETTINGS
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -43,44 +44,52 @@ class SharedPreferencesStore @Inject constructor(
     }
 
     private fun detectIfCertsInConfig() {
+        val tlsCrtKeys = setOf("tlsCaCrt", "tlsClientCrtPassword")
+        val shouldNotify =
+            tlsCrtKeys.filter { sharedPreferences.contains(it) && !sharedPreferences.getString(it, "").isNullOrEmpty() }
+        sharedPreferences.edit {
+            tlsCrtKeys.forEach(this::remove)
+        }
+
+        if (shouldNotify.isNotEmpty()) {
+            NotificationCompat.Builder(
+                context,
+                GeocoderProvider.ERROR_NOTIFICATION_CHANNEL_ID
+            )
+                .setContentTitle(context.getString(R.string.certificateMigrationRequiredNotificationTitle))
+                .setContentText(context.getString(R.string.certificateMigrationRequiredNotificationText))
+                .setAutoCancel(true)
+                .setSmallIcon(R.drawable.ic_owntracks_80)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .addAction(
+                    R.drawable.ic_owntracks_80,
+                    context.getString(R.string.certificateMigrationRequiredOpenSettingsAction),
+                    PendingIntent.getActivity(
+                        context,
+                        0,
+                        Intent(ACTION_SECURITY_SETTINGS).addFlags(FLAG_ACTIVITY_NEW_TASK),
+                        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                    )
+                )
+                .setSilent(true)
+                .build()
+                .run {
+                    if (ActivityCompat.checkSelfPermission(
+                            context,
+                            Manifest.permission.POST_NOTIFICATIONS
+                        ) == PackageManager.PERMISSION_GRANTED
+                    ) {
+                        notificationManager.notify("CertificateManagementNotification", 0, this)
+                    } else {
+                        notificationStash.add(this)
+                    }
+                }
+        }
         with(sharedPreferences.edit()) {
             if (sharedPreferences.contains("tlsCaCrt")) {
                 if (!sharedPreferences.getString("tlsCaCrt", "").isNullOrEmpty()) {
-                    NotificationCompat.Builder(
-                        context,
-                        GeocoderProvider.ERROR_NOTIFICATION_CHANNEL_ID
-                    )
-                        .setContentTitle(context.getString(R.string.certificateMigrationRequiredNotificationTitle))
-                        .setContentText(context.getString(R.string.certificateMigrationRequiredNotificationText))
-                        .setAutoCancel(true)
-                        .setSmallIcon(R.drawable.ic_owntracks_80)
-                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                        .addAction(
-                            R.drawable.ic_owntracks_80,
-                            context.getString(R.string.certificateMigrationRequiredOpenSettingsAction),
-                            PendingIntent.getActivity(
-                                context,
-                                0,
-                                Intent(ACTION_SECURITY_SETTINGS).addFlags(FLAG_ACTIVITY_NEW_TASK),
-                                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-                            )
-                        )
-                        .setSilent(true)
-                        .build()
-                        .run {
-                            if (ActivityCompat.checkSelfPermission(
-                                    context,
-                                    Manifest.permission.POST_NOTIFICATIONS
-                                ) == PackageManager.PERMISSION_GRANTED
-                            ) {
-                                notificationManager.notify("CertificateManagementNotification", 0, this)
-                            } else {
-                                notificationStash.add(this)
-                            }
-                        }
                 }
             }
-            this.remove("tlsCaCrt")
         }
     }
 
