@@ -61,6 +61,8 @@ class ContactsActivity :
         // Trigger a geocode refresh on startup, because future refreshes will only be triggered on update events
         viewModel.contacts.values.forEach(viewModel::refreshGeocode)
 
+        // Observe changes to the contacts repo in our lifecycle and forward it onto the [ContactsAdapter], optionally
+        // updating the geocode for the contact.
         lifecycleScope.launch {
             viewModel.contactUpdatedEvent.collect {
                 Timber.v("Received contactUpdatedEvent $it")
@@ -83,7 +85,6 @@ class ContactsActivity :
                 }
 
                 contactsCountingIdlingResource.run {
-                    dumpStateToLogs()
                     if (!isIdleNow) decrement()
                 }
             }
