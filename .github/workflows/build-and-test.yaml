@@ -12,7 +12,7 @@ jobs:
   build-test-lint:
     name: Build, test & lint
     runs-on: self-hosted
-    if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/master') || (github.event_name == 'pull_request' && !github.event.pull_request.draft) || github.event_name == 'merge_group' }}
+    if: ${{ (github.event_name == 'push' && format('refs/heads/{0}', github.event.repository.default_branch)) || (github.event_name == 'pull_request' && !github.event.pull_request.draft) || github.event_name == 'merge_group' }}
     outputs:
       apk-generated: ${{ steps.output.outputs.apk_generated}}
     permissions:
@@ -69,7 +69,7 @@ jobs:
         run: echo "apk_generated=true" >> "$GITHUB_OUTPUT"
 
       - name: Upload coverage
-        if: ${{ steps.changes.outputs.src == 'true' && (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'integration-test-required')) || (github.event_name == 'push' && github.ref == 'refs/heads/master') }}
+        if: ${{ steps.changes.outputs.src == 'true' && (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'integration-test-required')) || (github.event_name == 'push' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)) }}
         uses: codecov/codecov-action@v3
         with:
           files: ./project/app/build/reports/coverage/test/gms/debug/report.xml
@@ -110,7 +110,7 @@ jobs:
   espresso-test:
     name: "Espresso test"
     runs-on: self-hosted
-    if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/master') || (github.event_name == 'pull_request' && !github.event.pull_request.draft) || github.event_name == 'merge_group' }}
+    if: ${{ (github.event_name == 'push' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)) || (github.event_name == 'pull_request' && !github.event.pull_request.draft) || github.event_name == 'merge_group' }}
     permissions:
       contents: read
       checks: write
@@ -240,7 +240,7 @@ jobs:
       contents: read
       checks: write
     needs: espresso-test
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+    if: ${{ github.event_name == 'push' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
     steps:
       - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4
       - uses: actions/setup-java@v3
