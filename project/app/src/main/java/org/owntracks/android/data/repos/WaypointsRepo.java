@@ -13,6 +13,7 @@ import java.util.List;
 
 import io.objectbox.android.ObjectBoxLiveData;
 import io.objectbox.query.Query;
+import timber.log.Timber;
 
 public abstract class WaypointsRepo {
     private final EventBus eventBus;
@@ -56,6 +57,9 @@ public abstract class WaypointsRepo {
             // check if the latitude and longitude are valid, otherwise do not replace the waypoint
             if ((m.getLatitude() >= -90.0) && (m.getLatitude() <= 90.0) && (m.getLongitude() >= -180.0) && (m.getLongitude() <= 180.0)) {
                 insert(toDaoObject(m));
+            } else {
+                // log a warning for the waypoint that isn't being imported
+                Timber.w("Ignoring waypoint with invalid coordinates: %s", m.getDescription());
             }
         }
     }
