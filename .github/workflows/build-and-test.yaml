@@ -143,7 +143,9 @@ jobs:
         # Build the espresso tests before start emulator
       - name: Gradle build
         uses: gradle/gradle-build-action@982da8e78c05368c70dac0351bb82647a9e9a5d2 # v2
+        if: steps.run-espresso-guard.outputs.run-espresso == 'true'
         with:
+          build-root-directory: project
           arguments: |
             :app:package${FLAVOUR}DebugAndroidTest :app:package${FLAVOUR}Debug :app:compile${FLAVOUR}DebugAndroidTestKotlin :app:compile${FLAVOUR}DebugAndroidTestJavaWithJavac --daemon --scan
           dependency-graph: generate
