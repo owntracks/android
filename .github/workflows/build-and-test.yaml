@@ -2,6 +2,7 @@
 name: Build and Test
 
 "on":
+  workflow_dispatch:
   merge_group:
   pull_request:
   push:
@@ -12,7 +13,7 @@ jobs:
   build-test-lint:
     name: Build, test & lint
     runs-on: self-hosted
-    if: ${{ (github.event_name == 'push' && format('refs/heads/{0}', github.event.repository.default_branch)) || (github.event_name == 'pull_request' && !github.event.pull_request.draft) || github.event_name == 'merge_group' }}
+    if: ${{ (github.event_name == 'push' && format('refs/heads/{0}', github.event.repository.default_branch)) || (github.event_name == 'pull_request' && !github.event.pull_request.draft) || github.event_name == 'merge_group' || github.event_name == 'workflow_dispatch' }}
     outputs:
       apk-generated: ${{ steps.output.outputs.apk_generated}}
     permissions:
@@ -102,7 +103,7 @@ jobs:
   espresso-test:
     name: "Espresso test"
     runs-on: self-hosted
-    if: ${{ (github.event_name == 'push' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)) || (github.event_name == 'pull_request' && !github.event.pull_request.draft) || github.event_name == 'merge_group' }}
+    if: ${{ (github.event_name == 'push' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)) || (github.event_name == 'pull_request' && !github.event.pull_request.draft) || github.event_name == 'merge_group' || github.event_name == 'workflow_dispatch'}}
     permissions:
       contents: read
       checks: write
