@@ -197,13 +197,15 @@ jobs:
           arch: x86_64
           cores: 1
           sdcard-path-or-size: 1000M
+          pre-emulator-launch-script: |
+            ./project/gradlew -p project compile${FLAVOUR}DebugAndroidTestSources --max-workers=1 --stacktrace --scan --no-daemon --console=plain
           script: |
             adb shell settings put global bluetooth_on 0
             adb shell settings put secure long_press_timeout 1000
             adb shell rm -rf /sdcard/googletest || echo "Couldn't delete googletest folder"
             adb uninstall org.owntracks.android.debug || echo "org.owntracks.android not installed"
             adb uninstall org.owntracks.android.debug.test || echo "org.owntracks.android.test not installed"
-            ./project/gradlew -p project create${FLAVOUR}DebugCoverageReport --max-workers=1 --stacktrace --scan --no-daemon
+            ./project/gradlew -p project create${FLAVOUR}DebugCoverageReport --max-workers=1 --stacktrace --scan --no-daemon --console=plain
 
       - name: Upload connected test result artifact
         uses: actions/upload-artifact@v3

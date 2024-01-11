@@ -236,6 +236,7 @@ dependencies {
     implementation(libs.bundles.androidx.room)
     implementation(libs.bundles.objectbox.migration)
     implementation(libs.kotlin.datetime)
+    implementation(libs.kotlin.serialization)
 
     // The BC version shipped under com.android is half-broken. Weird certificate issues etc.
     // To solve, we bring in our own version of BC

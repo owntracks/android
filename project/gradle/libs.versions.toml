@@ -66,7 +66,8 @@ kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref =
 kotlin-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlin-coroutines" }
 kotlin-coroutines-jdk8 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8", version.ref = "kotlin-coroutines" }
 kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlin-coroutines" }
-kotlin-datetime = { module="org.jetbrains.kotlinx:kotlinx-datetime", version.ref="kotlin-datetime"}
+kotlin-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlin-datetime" }
+kotlin-serialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 
 # Hilt
 hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
@@ -92,7 +93,7 @@ androidx-core-testing = { module = "androidx.arch.core:core-testing", version.re
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidx-room" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidx-room" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidx-room" }
-androidx-concurrent-futures = { module = "androidx.concurrent:concurrent-futures", version.ref="androidx.concurrent"}
+androidx-concurrent-futures = { module = "androidx.concurrent:concurrent-futures", version.ref = "androidx-concurrent" }
 
 # Cryptography
 conscrypt = { module = "org.conscrypt:conscrypt-android", version.ref = "conscrypt" }
