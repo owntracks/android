@@ -49,11 +49,14 @@ public abstract class WaypointsRepo {
 
         for (MessageWaypoint m: waypoints) {
             // Delete existing waypoint if one with the same tst already exists
-            WaypointModel exisiting = get(m.getTimestamp());
-            if(exisiting != null) {
-                delete(exisiting);
+            WaypointModel existing = get(m.getTimestamp());
+            if(existing != null) {
+                delete(existing);
             }
-            insert(toDaoObject(m));
+            // check if the latitude and longitude are valid, otherwise do not replace the waypoint
+            if ((m.getLatitude() >= -90.0) && (m.getLatitude() <= 90.0) && (m.getLongitude() >= -180.0) && (m.getLongitude() <= 180.0)) {
+                insert(toDaoObject(m));
+            }
         }
     }
 
