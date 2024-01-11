@@ -45,7 +45,6 @@ jobs:
           build-root-directory: project
           arguments: |
             assembleDebug
-            assembleRelease
             lint
             app:createGmsDebugUnitTestCoverageReport --scan --stacktrace
 
