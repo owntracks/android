@@ -132,6 +132,7 @@ jobs:
               - "project/gradle/wrapper/gradle-wrapper.properties"
               - "project/gradle/libs.versions.toml"
       - id: run-espresso-guard
+        name: Decide whether or not we want to run the espresso tests
         run: |
           if ${{ (steps.changes.outputs.src == 'true' && github.event_name != 'pull_request') || github.event_name == 'workflow_dispatch' }}
           then
@@ -144,6 +145,8 @@ jobs:
       - name: Gradle build
         uses: gradle/gradle-build-action@982da8e78c05368c70dac0351bb82647a9e9a5d2 # v2
         if: steps.run-espresso-guard.outputs.run-espresso == 'true'
+        env:
+          FLAVOUR: ${{ matrix.flavour }}
         with:
           build-root-directory: project
           arguments: |
