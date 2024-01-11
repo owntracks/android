@@ -27,7 +27,7 @@ jobs:
         with:
           filters: |
             src:
-              - ".github/workflows/build-and-test.yml"
+              - ".github/workflows/build-and-test.yaml"
               - "project/app/src/**"
               - "project/app/*.pro"
               - "project/buildSrc/src/**"
@@ -40,7 +40,7 @@ jobs:
       - name: Gradle build
         id: build
         uses: gradle/gradle-build-action@v2
-        if: steps.changes.outputs.src == 'true'
+        if: steps.changes.outputs.src == 'true' || github.event_name == 'workflow_dispatch'
         with:
           build-root-directory: project
           arguments: |
@@ -50,19 +50,19 @@ jobs:
             app:createGmsDebugUnitTestCoverageReport --scan --stacktrace
 
       - name: Upload apk artifact
-        if: steps.changes.outputs.src == 'true'
+        if: steps.changes.outputs.src == 'true' || github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v3
         with:
           name: apks
           path: |
             ./project/app/build/outputs/apk/oss/debug/app-oss-debug.apk
       - name: Generate output flag for other jobs
-        if: steps.changes.outputs.src == 'true'
+        if: steps.changes.outputs.src == 'true' || github.event_name == 'workflow_dispatch'
         id: output
         run: echo "apk_generated=true" >> "$GITHUB_OUTPUT"
 
       - name: Upload coverage
-        if: ${{ steps.changes.outputs.src == 'true' && (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'integration-test-required')) || (github.event_name == 'push' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)) }}
+        if: ${{ steps.changes.outputs.src == 'true' && github.event_name == 'push' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) || github.event_name == 'workflow_dispatch' }}
         uses: codecov/codecov-action@v3
         with:
           files: ./project/app/build/reports/coverage/test/gms/debug/report.xml
@@ -71,7 +71,7 @@ jobs:
 
       - name: JUnit Report Action
         uses: mikepenz/action-junit-report@v3
-        if: steps.changes.outputs.src == 'true'
+        if: steps.changes.outputs.src == 'true' || github.event_name == 'workflow_dispatch'
         with:
           report_paths: "**/build/test-results/test*UnitTest/TEST-*.xml"
           detailed_summary: true
@@ -82,7 +82,7 @@ jobs:
         with:
           name: lint-report
           path: project/app/build/reports/lint-results-gmsDebug.html
-        if: steps.changes.outputs.src == 'true'
+        if: steps.changes.outputs.src == 'true' || github.event_name == 'workflow_dispatch'
 
   fdroid-scanner:
     name: F-Droid scanner
@@ -123,7 +123,7 @@ jobs:
         with:
           filters: |
             src:
-              - ".github/workflows/build-and-test.yml"
+              - ".github/workflows/build-and-test.yaml"
               - "project/app/src/**"
               - "project/app/*.pro"
               - "project/buildSrc/src/**"
@@ -134,7 +134,7 @@ jobs:
               - "project/gradle/libs.versions.toml"
       - id: run-espresso-guard
         run: |
-          if ${{ steps.changes.outputs.src == 'true' && github.event_name != 'pull_request' }}
+          if ${{ (steps.changes.outputs.src == 'true' && github.event_name != 'pull_request') || github.event_name == 'workflow_dispatch' }}
           then
             echo "run-espresso=true" >> $GITHUB_OUTPUT
           else
@@ -249,7 +249,7 @@ jobs:
         with:
           filters: |
             src:
-              - ".github/workflows/build-and-test.yml"
+              - ".github/workflows/build-and-test.yaml"
               - "project/app/src/**"
               - "project/app/*.pro"
               - "project/buildSrc/src/**"
@@ -259,13 +259,13 @@ jobs:
               - "project/gradle/wrapper/gradle-wrapper.properties"
               - "project/gradle/libs.versions.toml"
       - name: Create keystore
-        if: steps.changes.outputs.src == 'true'
+        if: steps.changes.outputs.src == 'true' || github.event_name == 'workflow_dispatch'
         run: |
           echo -n $KEYSTORE_BASE64 | base64 -d > project/owntracks.release.keystore.jks
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
       - name: Gradle build
-        if: steps.changes.outputs.src == 'true'
+        if: steps.changes.outputs.src == 'true' || github.event_name == 'workflow_dispatch'
         uses: gradle/gradle-build-action@v2
         env:
           KEYSTORE_PASSPHRASE: ${{ secrets.KEYSTORE_PASSPHRASE }}
