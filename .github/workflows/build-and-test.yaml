@@ -19,11 +19,8 @@ jobs:
       contents: read
       checks: write
     steps:
+      - run: echo "/opt/java/openjdk/bin" >> $GITHUB_PATH
       - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4
-      - uses: actions/setup-java@v3
-        with:
-          distribution: "temurin"
-          java-version: "17"
       - uses: dorny/paths-filter@v2
         id: changes
         with:
@@ -47,12 +44,7 @@ jobs:
           build-root-directory: project
           arguments: |
             assembleDebug
-            assembleAndroidTest
-            :app:compileOssReleaseSources
-            :app:assembleGmsDebugAndroidTest
-            :app:assembleOssDebugAndroidTest
-            :app:packageGmsDebugAndroidTest
-            :app:packageOssDebugAndroidTest
+            assembleRelease
             lint
             app:createGmsDebugUnitTestCoverageReport --scan --stacktrace
 
@@ -121,12 +113,9 @@ jobs:
         android-api: [31]
         flavour: [Oss, Gms]
     steps:
+      - run: echo "/opt/java/openjdk/bin" >> $GITHUB_PATH
+      - run: echo "/android-sdk/platform-tools/" >> $GITHUB_PATH
       - uses: nschloe/action-cached-lfs-checkout@v1
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          distribution: "temurin"
-          java-version: 17
       - uses: dorny/paths-filter@v2
         id: changes
         with:
@@ -149,10 +138,15 @@ jobs:
           else
             echo "run-espresso=false" >> $GITHUB_OUTPUT
           fi
-      - run: echo "/android-sdk/platform-tools/" >> $GITHUB_PATH
-      - run: /android-sdk/cmdline-tools/latest/bin/sdkmanager "platforms;android-$API"
-        env:
-          API: ${{ matrix.android-api }}
+
+        # Build the espresso tests before start emulator
+      - name: Gradle build
+        uses: gradle/gradle-build-action@982da8e78c05368c70dac0351bb82647a9e9a5d2 # v2
+        with:
+          arguments: |
+            :app:package${FLAVOUR}DebugAndroidTest :app:package${FLAVOUR}Debug :app:compile${FLAVOUR}DebugAndroidTestKotlin :app:compile${FLAVOUR}DebugAndroidTestJavaWithJavac --daemon --scan
+          dependency-graph: generate
+        timeout-minutes: 10
 
       - name: "Check snapshot exists"
         id: check_snapshot_exists
@@ -183,7 +177,6 @@ jobs:
         if: steps.run-espresso-guard.outputs.run-espresso == 'true'
         timeout-minutes: 60
         env:
-          # Only run the smoke tests on merge group events
           FLAVOUR: ${{ matrix.flavour }}
         with:
           api-level: ${{ matrix.android-api }}
@@ -197,15 +190,13 @@ jobs:
           arch: x86_64
           cores: 1
           sdcard-path-or-size: 1000M
-          pre-emulator-launch-script: |
-            ./project/gradlew -p project compile${FLAVOUR}DebugAndroidTestSources --max-workers=1 --stacktrace --scan --no-daemon --console=plain
           script: |
             adb shell settings put global bluetooth_on 0
             adb shell settings put secure long_press_timeout 1000
             adb shell rm -rf /sdcard/googletest || echo "Couldn't delete googletest folder"
             adb uninstall org.owntracks.android.debug || echo "org.owntracks.android not installed"
             adb uninstall org.owntracks.android.debug.test || echo "org.owntracks.android.test not installed"
-            ./project/gradlew -p project create${FLAVOUR}DebugCoverageReport --max-workers=1 --stacktrace --scan --no-daemon --console=plain
+            ./project/gradlew -p project create${FLAVOUR}DebugCoverageReport --max-workers=1 --stacktrace --scan --daemon --info
 
       - name: Upload connected test result artifact
         uses: actions/upload-artifact@v3
