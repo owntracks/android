@@ -7,6 +7,7 @@ plugins {
     kotlin("android")
     kotlin("kapt")
     alias(libs.plugins.ktfmt)
+    alias(libs.plugins.ksp)
 }
 
 apply<EspressoMetadataEmbeddingPlugin>()
@@ -251,7 +252,7 @@ dependencies {
 
     // Preprocessors
     kapt(libs.bundles.kapt.hilt)
-    kapt(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)
 
     kaptTest(libs.bundles.kapt.hilt)
 
