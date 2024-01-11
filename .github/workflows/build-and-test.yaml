@@ -74,7 +74,7 @@ jobs:
         with:
           report_paths: "**/build/test-results/test*UnitTest/TEST-*.xml"
           detailed_summary: true
-          include_passed: true
+          include_passed: false # Lots of test, much output.
 
       - name: Upload lint report
         uses: actions/upload-artifact@v3
