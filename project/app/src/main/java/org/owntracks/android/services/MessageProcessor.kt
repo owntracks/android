@@ -191,85 +191,89 @@ class MessageProcessor @Inject constructor(
 
     // Should be on the background thread here, because we block
     private suspend fun sendAvailableMessages() {
-        Timber.d("Starting outbound message loop.")
-        var messageFailedLastTime = false
-        var retriesToGo = 0
-        while (true) {
-            try {
-                @Suppress("BlockingMethodInNonBlockingContext") // We're in ioDispatcher here
-                val message: MessageBase = outgoingQueue.take() // <--- blocks
-                Timber.d("Taken message off queue: ${message.messageId}")
-                endpointStateRepo.setQueueLength(outgoingQueue.size + 1)
-                // reset the retry logic if the last message succeeded
-                if (!messageFailedLastTime) {
-                    retriesToGo = message.numberOfRetries
-                    retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT
-                }
-                messageFailedLastTime = false
+        try {
+            Timber.d("Starting outbound message loop.")
+            var messageFailedLastTime = false
+            var retriesToGo = 0
+            while (true) {
                 try {
-                    endpoint!!.sendMessage(message)
-                } catch (e: Exception) {
-                    when (e) {
-                        is OutgoingMessageSendingException,
-                        is ConfigurationIncompleteException -> {
-                            Timber.w("Error sending message ${message.messageId}. Re-queueing")
-                            synchronized(outgoingQueue) {
-                                if (!outgoingQueue.offerFirst(message)) {
-                                    val tailMessage = outgoingQueue.removeLast()
-                                    Timber.w(
-                                        "Queue full when trying to re-queue failed message. " +
-                                            "Dropping last message: ${tailMessage.messageId}"
-                                    )
+                    @Suppress("BlockingMethodInNonBlockingContext") // We're in ioDispatcher here
+                    val message: MessageBase = outgoingQueue.take() // <--- blocks
+                    Timber.d("Taken message off queue: ${message.messageId}")
+                    endpointStateRepo.setQueueLength(outgoingQueue.size + 1)
+                    // reset the retry logic if the last message succeeded
+                    if (!messageFailedLastTime) {
+                        retriesToGo = message.numberOfRetries
+                        retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT
+                    }
+                    messageFailedLastTime = false
+                    try {
+                        endpoint!!.sendMessage(message)
+                    } catch (e: Exception) {
+                        when (e) {
+                            is OutgoingMessageSendingException,
+                            is ConfigurationIncompleteException -> {
+                                Timber.w("Error sending message ${message.messageId}. Re-queueing")
+                                synchronized(outgoingQueue) {
                                     if (!outgoingQueue.offerFirst(message)) {
-                                        Timber.e(
-                                            "Couldn't restore failed message ${message.messageId} back onto the " +
-                                                "queue, dropping: "
+                                        val tailMessage = outgoingQueue.removeLast()
+                                        Timber.w(
+                                            "Queue full when trying to re-queue failed message. " +
+                                                "Dropping last message: ${tailMessage.messageId}"
                                         )
+                                        if (!outgoingQueue.offerFirst(message)) {
+                                            Timber.e(
+                                                "Couldn't restore failed message ${message.messageId} back onto the " +
+                                                    "queue, dropping: "
+                                            )
+                                        }
                                     }
                                 }
-                            }
-                            messageFailedLastTime = true
-                            Timber.i("Waiting for $retryWait before retrying ${message.messageId}")
-
-                            scope.launch {
-                                delay(retryWait)
-                            }
-                                .run {
-                                    retryDelayJob = this
-                                    join()
+                                messageFailedLastTime = true
+                                scope.launch {
+                                    Timber.i("Waiting for $retryWait before retrying ${message.messageId}")
+                                    delay(retryWait)
                                 }
-                            retryWait = (retryWait * 2).coerceAtMost(SEND_FAILURE_BACKOFF_MAX_WAIT)
-                            retriesToGo -= 1
-                        }
-                        else -> {
-                            Timber.e(e, "Couldn't send message ${message.messageId}. Dropping")
-                            retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT
-                            messageFailedLastTime = false
+                                    .run {
+                                        Timber.d("Pause for ${message.messageId}")
+                                        retryDelayJob = this
+                                        join()
+                                        Timber.d("Retry wait finished for ${message.messageId}. Cancelled=${isCancelled}}")
+                                    }
+                                retryWait = (retryWait * 2).coerceAtMost(SEND_FAILURE_BACKOFF_MAX_WAIT)
+                                retriesToGo -= 1
+                            }
+                            else -> {
+                                Timber.e(e, "Couldn't send message ${message.messageId}. Dropping")
+                                retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT
+                                messageFailedLastTime = false
+                            }
                         }
                     }
-                }
 
-                if (retriesToGo <= 0) {
-                    messageFailedLastTime = false
-                    Timber.w("Ran out of retries for sending ${message.messageId}. Dropping")
-                }
-
-                if (!messageFailedLastTime) {
-                    try {
-                        if (!outgoingQueueIdlingResource.isIdleNow) {
-                            Timber.v("Decrementing outgoingQueueIdlingResource")
-                            outgoingQueueIdlingResource.decrement()
-                        }
-                    } catch (e: IllegalStateException) {
-                        Timber.w(e, "outgoingQueueIdlingResource is invalid")
+                    if (retriesToGo <= 0) {
+                        messageFailedLastTime = false
+                        Timber.w("Ran out of retries for sending ${message.messageId}. Dropping")
                     }
+
+                    if (!messageFailedLastTime) {
+                        try {
+                            if (!outgoingQueueIdlingResource.isIdleNow) {
+                                Timber.v("Decrementing outgoingQueueIdlingResource")
+                                outgoingQueueIdlingResource.decrement()
+                            }
+                        } catch (e: IllegalStateException) {
+                            Timber.w(e, "outgoingQueueIdlingResource is invalid")
+                        }
+                    }
+                } catch (e: InterruptedException) {
+                    Timber.w(e, "Outgoing message loop interrupted")
+                    break
                 }
-            } catch (e: InterruptedException) {
-                Timber.w(e, "Outgoing message loop interrupted")
-                break
             }
+        } catch (e: Exception) {
+            Timber.e(e, "Outgoing message loop failed")
         }
-        Timber.w("Exiting outgoing message loop")
     }
 
     /**

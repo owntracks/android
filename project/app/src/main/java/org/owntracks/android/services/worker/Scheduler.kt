@@ -70,7 +70,7 @@ class Scheduler @Inject constructor(
                 .setBackoffCriteria(BackoffPolicy.LINEAR, MIN_BACKOFF_MILLIS, TimeUnit.MILLISECONDS)
                 .setConstraints(anyNetworkConstraint)
                 .build()
-        ).also { Timber.d("Scheduled ONETIME_TASK_MQTT_RECONNECT job: $it") }
+        ).also { Timber.d("Scheduled ONETIME_TASK_MQTT_RECONNECT job") }
 
     companion object {
         val MIN_PERIODIC_INTERVAL = PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS.milliseconds
