@@ -161,7 +161,7 @@ jobs:
         with:
           api-level: ${{ matrix.android-api }}
           force-avd-creation: false
-          emulator-options: -no-window -gpu auto -noaudio -no-boot-anim -camera-back none -camera-front none
+          emulator-options: -no-window -gpu auto -noaudio -no-boot-anim -camera-back none -camera-front none -memory 4000
           profile: pixel_3a
           target: ${{ matrix.flavour == 'Gms' && 'google_apis' || 'default' }}
           ram-size: 4000M
@@ -182,7 +182,7 @@ jobs:
         with:
           api-level: ${{ matrix.android-api }}
           force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu auto -noaudio -no-boot-anim -camera-back none -camera-front none
+          emulator-options: -no-snapshot-save -no-window -gpu auto -noaudio -no-boot-anim -camera-back none -camera-front none -memory 4000
           profile: pixel_3a
           target: ${{ matrix.flavour == 'Gms' && 'google_apis' || 'default' }}
           ram-size: 4000M
