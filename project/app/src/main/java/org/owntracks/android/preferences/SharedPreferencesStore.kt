@@ -47,11 +47,11 @@ class SharedPreferencesStore @Inject constructor(
 
     private fun detectIfCertsInConfig() {
         val legacyTlsCrtKeys = setOf("tlsCaCrt", "tlsClientCrtPassword")
-        val shouldNotify = legacyTlsCrtKeys.filter {
+        val shouldNotify = legacyTlsCrtKeys.any {
             sharedPreferences.contains(it) && !sharedPreferences.getString(it, "").isNullOrEmpty()
         }
 
-        if (shouldNotify.isNotEmpty()) {
+        if (shouldNotify) {
             // Delete local files
             setOf("tlsClientCrt", "tlsCaCrt").forEach {
                 sharedPreferences.getString(it, "")
