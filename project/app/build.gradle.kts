@@ -1,3 +1,4 @@
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 import kotlin.io.path.isRegularFile
 
 plugins {
@@ -149,8 +150,13 @@ android {
 
     tasks.withType<Test> {
         testLogging {
-            events("passed", "skipped", "failed")
+            events(TestLogEvent.STARTED,TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED, TestLogEvent.STANDARD_OUT, TestLogEvent.STANDARD_ERROR)
             setExceptionFormat("full")
+            showStandardStreams = true
+
+            showCauses = true
+            showExceptions = true
+            showStackTraces = true
         }
         reports.junitXml.required.set(true)
         reports.html.required.set(true)
