@@ -212,7 +212,7 @@ jobs:
         with:
           report_paths: "**/TEST-*.xml"
           detailed_summary: true
-          include_passed: true
+          include_passed: false
 
       - name: Upload connected test coverage artifact
         uses: ./.github/actions/upload-artifact
