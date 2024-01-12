@@ -49,7 +49,7 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
                     Qos.AT_LEAST_ONCE,
                     MQTT5Properties(),
                     toUByteArray()
-                )
+                ).run {Timber.d("MQTT Publish result to $actualTopic is $this")}
             }
     }
 

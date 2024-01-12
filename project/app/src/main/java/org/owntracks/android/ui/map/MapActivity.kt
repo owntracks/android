@@ -558,7 +558,7 @@ class MapActivity :
                 {
                     when (checkAndRequestLocationPermissions(false)) {
                         CheckPermissionsResult.NO_PERMISSIONS_LAUNCHED_REQUEST -> {
-                            Timber.d("Launched notification permission request")
+                            Timber.d("Launched location permission request")
                         }
                         CheckPermissionsResult.NO_PERMISSIONS_NOT_LAUNCHED_REQUEST -> {
                             Timber.d("No location permissions, not launched request")

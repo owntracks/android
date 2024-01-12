@@ -1,6 +1,7 @@
 package org.owntracks.android.testutils
 
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.delay
 import mqtt.broker.Broker
 import mqtt.packets.MQTTPacket
 import org.junit.After
@@ -27,7 +28,9 @@ interface TestWithAnMQTTBroker {
         broker: Broker,
         topicName: String = "owntracks/someuser/somedevice",
         retain: Boolean = false
-    ) = forEach { it.sendFromBroker(broker, topicName, retain) }
+    ) = forEach {
+        it.sendFromBroker(broker, topicName, retain)
+    }
 
     @DelicateCoroutinesApi
     fun startBroker()
