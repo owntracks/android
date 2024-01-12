@@ -198,6 +198,10 @@ kapt {
     correctErrorTypes = true
 }
 
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
+
 tasks.withType<Test> {
     systemProperties["junit.jupiter.execution.parallel.enabled"] = false
     systemProperties["junit.jupiter.execution.parallel.mode.default"] = "same_thread"
