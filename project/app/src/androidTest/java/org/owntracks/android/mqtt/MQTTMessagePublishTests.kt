@@ -40,10 +40,10 @@ import org.owntracks.android.testutils.waitUntilActivityVisible
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.contacts.ContactsActivity
 import org.owntracks.android.ui.map.MapActivity
+import timber.log.Timber
 
 @ExperimentalUnsignedTypes
 @LargeTest
-@org.owntracks.android.testutils.JustThisTestPlease
 @RunWith(AndroidJUnit4::class)
 class MQTTMessagePublishTests :
     TestWithAnActivity<MapActivity>(MapActivity::class.java, false),
@@ -78,6 +78,7 @@ class MQTTMessagePublishTests :
     }
 
     @Test
+    @org.owntracks.android.testutils.JustThisTestPlease
     fun given_an_MQTT_configured_client_when_the_broker_sends_a_location_for_a_cleared_contact_then_a_the_contact_returns_with_the_correct_details() {
         setup()
 
