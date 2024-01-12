@@ -32,12 +32,12 @@ constructor(
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
-            Timber.d("$name has connected to BackgroundService")
+            Timber.d("${this@SendLocationPingWorker::class.simpleName} has connected to $name")
             this@SendLocationPingWorker.service = (service as BackgroundService.LocalBinder).service
         }
 
         override fun onServiceDisconnected(name: ComponentName) {
-            Timber.w("$name has disconnected from BackgroundService")
+            Timber.w("${this@SendLocationPingWorker::class.simpleName} has disconnected from $name")
             service = null
         }
     }

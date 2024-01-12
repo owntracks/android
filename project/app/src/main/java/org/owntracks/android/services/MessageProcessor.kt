@@ -1,6 +1,10 @@
 package org.owntracks.android.services
 
+import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
+import android.os.IBinder
 import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.idling.CountingIdlingResource
 import dagger.Lazy
@@ -36,7 +40,6 @@ import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.Parser
-import org.owntracks.android.support.ServiceBridge
 import org.owntracks.android.support.SimpleIdlingResource
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
 import timber.log.Timber
@@ -50,7 +53,6 @@ class MessageProcessor @Inject constructor(
     parser: Parser,
     scheduler: Scheduler,
     private val endpointStateRepo: EndpointStateRepo,
-    private val serviceBridge: ServiceBridge,
     @Named("outgoingQueueIdlingResource") private val outgoingQueueIdlingResource: CountingIdlingResource,
     @Named("importConfigurationIdlingResource") private val importConfigurationIdlingResource: SimpleIdlingResource,
     @Named("CAKeyStore") private val caKeyStore: KeyStore,
@@ -67,6 +69,19 @@ class MessageProcessor @Inject constructor(
     private var retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT
     private val httpEndpoint: MessageProcessorEndpoint
     private val mqttEndpoint: MessageProcessorEndpoint
+    private var service: BackgroundService? = null
+
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName, service: IBinder) {
+            Timber.d("${this@MessageProcessor::class.simpleName} has connected to $name")
+            this@MessageProcessor.service = (service as BackgroundService.LocalBinder).service
+        }
+
+        override fun onServiceDisconnected(name: ComponentName) {
+            Timber.w("${this@MessageProcessor::class.simpleName} has disconnected from $name")
+            service = null
+        }
+    }
 
     init {
         outgoingQueue = BlockingDequeThatAlsoSometimesPersistsThingsToDiskMaybe(
@@ -101,6 +116,11 @@ class MessageProcessor @Inject constructor(
             scope,
             ioDispatcher,
             applicationContext
+        )
+        applicationContext.bindService(
+            Intent(applicationContext, BackgroundService::class.java),
+            serviceConnection,
+            Context.BIND_AUTO_CREATE
         )
     }
 
@@ -369,7 +389,7 @@ class MessageProcessor @Inject constructor(
                 if (message.modeId !== ConnectionMode.MQTT) {
                     Timber.e("command not supported in HTTP mode: ${message.action})")
                 } else {
-                    serviceBridge.requestOnDemandLocationFix()
+                    service?.requestOnDemandLocationUpdate(MessageLocation.ReportType.RESPONSE)
                 }
             }
             CommandAction.WAYPOINTS -> locationProcessorLazy.get()
@@ -406,7 +426,7 @@ class MessageProcessor @Inject constructor(
     }
 
     private fun processIncomingMessage(message: MessageTransition) {
-        serviceBridge.sendEventNotification(message)
+        service?.sendEventNotification(message)
     }
 
     fun stopSendingMessages() {

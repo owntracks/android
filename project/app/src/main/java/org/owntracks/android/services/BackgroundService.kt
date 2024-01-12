@@ -67,14 +67,12 @@ import org.owntracks.android.preferences.types.MonitoringMode.Companion.getByVal
 import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.DateFormatter.formatDate
 import org.owntracks.android.support.RunThingsOnOtherThreads
-import org.owntracks.android.support.ServiceBridge
-import org.owntracks.android.support.ServiceBridge.ServiceBridgeInterface
 import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber
 
 @AndroidEntryPoint
 class BackgroundService :
-    LifecycleService(), ServiceBridgeInterface, Preferences.OnPreferenceChangeListener {
+    LifecycleService(), Preferences.OnPreferenceChangeListener {
     private var lastLocationMessage: MessageLocation? = null
 
     private lateinit var notificationManagerCompat: NotificationManagerCompat
@@ -105,9 +103,6 @@ class BackgroundService :
 
     @Inject
     lateinit var waypointsRepo: WaypointsRepo
-
-    @Inject
-    lateinit var serviceBridge: ServiceBridge
 
     @Inject
     lateinit var messageProcessor: MessageProcessor
@@ -206,7 +201,6 @@ class BackgroundService :
         startForeground(NOTIFICATION_ID_ONGOING, ongoingNotification)
         Timber.d("BackgroundService super.OnCreate")
         super.onCreate()
-        serviceBridge.bind(this)
         notificationManagerCompat = NotificationManagerCompat.from(this)
 
         setupLocationRequest()
@@ -444,7 +438,7 @@ class BackgroundService :
         }
     }
 
-    override fun sendEventNotification(message: MessageTransition) {
+    fun sendEventNotification(message: MessageTransition) {
         Timber.d("Sending event notification for $message")
         if (!preferences.notificationEvents ||
             ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) !=
@@ -564,7 +558,7 @@ class BackgroundService :
         }
     }
 
-    override fun requestOnDemandLocationUpdate(reportType: MessageLocation.ReportType) {
+    fun requestOnDemandLocationUpdate(reportType: MessageLocation.ReportType) {
         if (locationPermissionIsMissing()) {
             Timber.e("missing location permission")
             return
