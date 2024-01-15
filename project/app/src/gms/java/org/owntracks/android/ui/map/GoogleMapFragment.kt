@@ -60,6 +60,12 @@ class GoogleMapFragment internal constructor(
                 onLocationChangedListener: LocationSource.OnLocationChangedListener
             ) {
                 locationObserver = Observer { location ->
+                    preferences.ignoreInaccurateLocations.run {
+                        if (location.accuracy>=this) {
+                            Timber.d("Ignoring location with accuracy ${location.accuracy} >= $this")
+                            return@Observer
+                        }
+                    }
                     onLocationChangedListener.onLocationChanged(location)
                     viewModel.setCurrentBlueDotLocation(location.toLatLng())
                     if (viewModel.viewMode == MapViewModel.ViewMode.Device) {
