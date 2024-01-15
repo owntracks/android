@@ -66,6 +66,12 @@ class OSMMapFragment internal constructor(
         override fun startLocationProvider(myLocationConsumer: IMyLocationConsumer?): Boolean {
             val locationProvider: IMyLocationProvider = this
             locationObserver = Observer { location ->
+                preferences.ignoreInaccurateLocations.run {
+                    if (location.accuracy>=this) {
+                        Timber.d("Ignoring location with accuracy ${location.accuracy} >= $this")
+                        return@Observer
+                    }
+                }
                 myLocationConsumer?.onLocationChanged(location, locationProvider)
                 viewModel.setCurrentBlueDotLocation(location.toLatLng())
                 if (viewModel.viewMode == MapViewModel.ViewMode.Device) {
