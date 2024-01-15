@@ -43,36 +43,26 @@ class LocationProcessor @Inject constructor(
     @Named("publishResponseMessageIdlingResource") private val publishResponseMessageIdlingResource: SimpleIdlingResource,
     @Named("mockLocationIdlingResource") private val mockLocationIdlingResource: SimpleIdlingResource
 ) {
-    private fun ignoreLowAccuracy(l: Location): Boolean {
-        val threshold = preferences.ignoreInaccurateLocations
-        val ignore = threshold > 0 && l.accuracy > threshold
-        if (ignore) {
-            Timber.i(
-                "Ignoring location (acc=${l.accuracy}) because it's below accuracy threshold of $threshold"
-            )
-        } else {
-            Timber.v("Location accuracy ${l.accuracy} is within accuracy $threshold")
+    private fun locationIsWithAccuracyThreshold(l: Location): Boolean =
+         preferences.ignoreInaccurateLocations.run {
+             preferences.ignoreInaccurateLocations == 0 || l.accuracy < this
+        }.also {
+            if (!it) {
+                Timber.v("Location accuracy ${l.accuracy} is not within accuracy threshold ${preferences.ignoreInaccurateLocations}")
+            }
         }
-        return ignore
-    }
 
-    @JvmOverloads
-    suspend fun publishLocationMessage(
+    suspend fun publishLocationMessage(trigger: MessageLocation.ReportType) =
+        locationRepo.currentPublishedLocation.value?.run {  publishLocationMessage(trigger,this) }
+
+
+    private suspend fun publishLocationMessage(
         trigger: MessageLocation.ReportType,
-        location: Location? = locationRepo.currentPublishedLocation.value
-    ) {
-        if (location == null) return
+        location: Location
+    ) : Result<Unit> {
         Timber.v("Maybe publishing $location with trigger $trigger")
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || location.isMock) {
-            Timber.v("Idling location")
-            mockLocationIdlingResource.setIdleState(true)
-        }
-        if (locationRepo.currentPublishedLocation.value == null) {
-            Timber.e("no location available, can't publish location")
-            return
-        }
+        if (!locationIsWithAccuracyThreshold(location)) return Result.failure(Exception("location accuracy too low"))
         val loadedWaypoints = withContext(ioDispatcher) { waypointsRepo.all }
-        if (ignoreLowAccuracy(location)) return
         Timber.d("publishLocationMessage for $location triggered by $trigger")
 
         // Check if publish would trigger a region if fusedRegionDetection is enabled
@@ -95,14 +85,14 @@ class LocationProcessor @Inject constructor(
         }
         if (preferences.monitoring === MonitoringMode.QUIET && MessageLocation.ReportType.USER != trigger) {
             Timber.v("message suppressed by monitoring settings: quiet")
-            return
+            return Result.failure(Exception("message suppressed by monitoring settings: quiet"))
         }
         if (preferences.monitoring === MonitoringMode.MANUAL &&
             MessageLocation.ReportType.USER != trigger &&
             MessageLocation.ReportType.CIRCULAR != trigger
         ) {
             Timber.v("message suppressed by monitoring settings: manual")
-            return
+            return Result.failure(Exception("message suppressed by monitoring settings: manual"))
         }
 
         val message = if (preferences.pubExtendedData) {
@@ -126,6 +116,7 @@ class LocationProcessor @Inject constructor(
         if (responseMessageTypes.contains(trigger)) {
             publishResponseMessageIdlingResource.setIdleState(true)
         }
+        return Result.success(Unit)
     }
 
     private val responseMessageTypes = listOf(
@@ -147,11 +138,20 @@ class LocationProcessor @Inject constructor(
      */
     suspend fun onLocationChanged(location: Location, reportType: MessageLocation.ReportType) {
         Timber.v("OnLocationChanged $location $reportType")
-        if (!ignoreLowAccuracy(location) && location.time > locationRepo.currentLocationTime ||
+        if (location.time > locationRepo.currentLocationTime ||
             reportType != MessageLocation.ReportType.DEFAULT
         ) {
-            locationRepo.setCurrentPublishedLocation(location)
-            publishLocationMessage(reportType, location)
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || location.isMock) {
+                Timber.v("Idling location")
+                mockLocationIdlingResource.setIdleState(true)
+            }
+            publishLocationMessage(reportType, location).run {
+                if (isSuccess) {
+                    locationRepo.setCurrentPublishedLocation(location)
+                } else {
+                    Timber.d("Not publishing location: ${exceptionOrNull()?.message}")
+                }
+            }
         } else {
             Timber.v("Not re-sending message with same timestamp as last")
         }
@@ -163,7 +163,7 @@ class LocationProcessor @Inject constructor(
         transition: Int,
         trigger: String
     ) {
-        if (ignoreLowAccuracy(location)) {
+        if (!locationIsWithAccuracyThreshold(location)) {
             Timber.d("ignoring transition: low accuracy ")
             return
         }
@@ -183,7 +183,7 @@ class LocationProcessor @Inject constructor(
                 } else {
                     publishTransitionMessage(waypointModel, location, transition, trigger)
                     if (trigger == MessageTransition.TRIGGER_CIRCULAR) {
-                        publishLocationMessage(MessageLocation.ReportType.CIRCULAR)
+                        publishLocationMessage(MessageLocation.ReportType.CIRCULAR, location)
                     }
                 }
             }
