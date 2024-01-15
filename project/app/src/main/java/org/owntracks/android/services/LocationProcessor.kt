@@ -48,7 +48,7 @@ class LocationProcessor @Inject constructor(
              preferences.ignoreInaccurateLocations == 0 || l.accuracy < this
         }.also {
             if (!it) {
-                Timber.v("Location accuracy ${l.accuracy} is not within accuracy threshold ${preferences.ignoreInaccurateLocations}")
+                Timber.v("Location accuracy ${l.accuracy} is outside accuracy threshold of ${preferences.ignoreInaccurateLocations}")
             }
         }
 
