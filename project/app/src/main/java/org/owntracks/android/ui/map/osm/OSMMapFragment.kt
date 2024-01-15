@@ -300,7 +300,7 @@ class OSMMapFragment internal constructor(
 
     override fun updateCamera(latLng: LatLng) {
         mapView?.controller?.run {
-            setCenter(latLng.toGeoPoint())
+            animateTo(latLng.toGeoPoint())
         }
     }
 

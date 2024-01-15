@@ -147,7 +147,7 @@ class LocationProcessor @Inject constructor(
      */
     suspend fun onLocationChanged(location: Location, reportType: MessageLocation.ReportType) {
         Timber.v("OnLocationChanged $location $reportType")
-        if (location.time > locationRepo.currentLocationTime ||
+        if (!ignoreLowAccuracy(location) && location.time > locationRepo.currentLocationTime ||
             reportType != MessageLocation.ReportType.DEFAULT
         ) {
             locationRepo.setCurrentPublishedLocation(location)
