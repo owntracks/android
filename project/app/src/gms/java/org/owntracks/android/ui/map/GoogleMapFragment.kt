@@ -44,7 +44,7 @@ import timber.log.Timber
 class GoogleMapFragment internal constructor(
     private val preferences: Preferences,
     contactImageBindingAdapter: ContactImageBindingAdapter
-) : MapFragment<GoogleMapFragmentBinding>(contactImageBindingAdapter),
+) : MapFragment<GoogleMapFragmentBinding>(contactImageBindingAdapter, preferences),
     OnMapReadyCallback,
     OnMapsSdkInitializedCallback {
 
@@ -53,32 +53,21 @@ class GoogleMapFragment internal constructor(
     override val layout: Int
         get() = R.layout.google_map_fragment
 
-    private var locationObserver: Observer<Location>? = null
     private val googleMapLocationSource: LocationSource by lazy {
         object : LocationSource {
+            private lateinit var locationObserver: Observer<Location>
             override fun activate(
                 onLocationChangedListener: LocationSource.OnLocationChangedListener
             ) {
-                locationObserver = Observer { location ->
-                    preferences.ignoreInaccurateLocations.run {
-                        if (location.accuracy>=this) {
-                            Timber.d("Ignoring location with accuracy ${location.accuracy} >= $this")
-                            return@Observer
-                        }
-                    }
-                    onLocationChangedListener.onLocationChanged(location)
-                    viewModel.setCurrentBlueDotLocation(location.toLatLng())
-                    if (viewModel.viewMode == MapViewModel.ViewMode.Device) {
-                        updateCamera(location.toLatLng())
-                    }
-                }
-                locationObserver?.run {
+                locationObserver = Observer { location:Location ->
+                    onLocationObserved(location) {onLocationChangedListener.onLocationChanged(location)}
+                }.apply {
                     viewModel.currentLocation.observe(viewLifecycleOwner, this)
                 }
             }
 
             override fun deactivate() {
-                locationObserver?.run(viewModel.currentLocation::removeObserver)
+                viewModel.currentLocation.removeObserver(locationObserver)
             }
         }
     }

@@ -57,28 +57,18 @@ class OSMMapFragment internal constructor(
     private val preferences: Preferences,
     contactImageBindingAdapter: ContactImageBindingAdapter
 ) :
-    MapFragment<OsmMapFragmentBinding>(contactImageBindingAdapter) {
+    MapFragment<OsmMapFragmentBinding>(contactImageBindingAdapter,preferences) {
     override val layout: Int
         get() = R.layout.osm_map_fragment
 
-    private var locationObserver: Observer<Location>? = null
     private val osmMapLocationSource: IMyLocationProvider = object : IMyLocationProvider {
+        private lateinit var locationObserver: Observer<Location>
         override fun startLocationProvider(myLocationConsumer: IMyLocationConsumer?): Boolean {
             val locationProvider: IMyLocationProvider = this
-            locationObserver = Observer { location ->
-                preferences.ignoreInaccurateLocations.run {
-                    if (location.accuracy>=this) {
-                        Timber.d("Ignoring location with accuracy ${location.accuracy} >= $this")
-                        return@Observer
-                    }
-                }
-                myLocationConsumer?.onLocationChanged(location, locationProvider)
-                viewModel.setCurrentBlueDotLocation(location.toLatLng())
-                if (viewModel.viewMode == MapViewModel.ViewMode.Device) {
-                    updateCamera(location.toLatLng())
-                }
-            }
-            locationObserver?.run {
+            locationObserver = Observer { location:Location ->
+                onLocationObserved(location) {myLocationConsumer?.onLocationChanged(location, locationProvider)}
+
+            }.apply {
                 viewModel.currentLocation.observe(viewLifecycleOwner, this)
             }
             return true

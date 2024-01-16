@@ -1,6 +1,7 @@
 package org.owntracks.android.ui.map
 
 import android.graphics.Bitmap
+import android.location.Location
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -14,18 +15,19 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.owntracks.android.R
 import org.owntracks.android.data.repos.ContactsRepoChange
 import org.owntracks.android.data.waypoints.WaypointModel
 import org.owntracks.android.location.LatLng
+import org.owntracks.android.location.toLatLng
 import org.owntracks.android.model.Contact
+import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.ContactImageBindingAdapter
 import timber.log.Timber
 
 abstract class MapFragment<V : ViewDataBinding>
-internal constructor(private val contactImageBindingAdapter: ContactImageBindingAdapter) :
+internal constructor(private val contactImageBindingAdapter: ContactImageBindingAdapter, preferences: Preferences) :
     Fragment() {
     protected abstract val layout: Int
     protected lateinit var binding: V
@@ -45,6 +47,21 @@ internal constructor(private val contactImageBindingAdapter: ContactImageBinding
     abstract fun setMapLayerType(mapLayerStyle: MapLayerStyle)
 
     protected val viewModel: MapViewModel by activityViewModels()
+
+    /* Callback that's fired when a new location is observed */
+    protected val onLocationObserved: (Location, ()->Unit)->Unit = { location, additionalCallback ->
+        preferences.ignoreInaccurateLocations.run {
+            if (this > 0 && location.accuracy>=this) {
+                Timber.d("Ignoring location with accuracy ${location.accuracy} >= $this")
+                return@run
+            }
+        }
+        viewModel.setCurrentBlueDotLocation(location.toLatLng())
+        if (viewModel.viewMode == MapViewModel.ViewMode.Device) {
+            updateCamera(location.toLatLng())
+        }
+        additionalCallback()
+    }
 
     protected fun getRegionColor(): Int {
         val typedValue = TypedValue()
