@@ -23,12 +23,14 @@ import org.owntracks.android.model.messages.MessageWaypoints
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.Parser
 import org.owntracks.android.testutils.GPSMockDeviceLocation
+import org.owntracks.android.testutils.JustThisTestPlease
 import org.owntracks.android.testutils.MockDeviceLocation
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.TestWithAnMQTTBroker
 import org.owntracks.android.testutils.TestWithAnMQTTBrokerImpl
 import org.owntracks.android.testutils.getPreferences
 import org.owntracks.android.testutils.grantMapActivityPermissions
+import org.owntracks.android.testutils.reportLocationFromMap
 import org.owntracks.android.testutils.setNotFirstStartPreferences
 import org.owntracks.android.testutils.use
 import org.owntracks.android.testutils.waitUntilActivityVisible
@@ -69,9 +71,13 @@ class MQTTRemoteCommandTests :
     }
 
     @Test
+    @JustThisTestPlease
     fun given_an_MQTT_configured_client_when_the_broker_sends_a_reportLocation_command_message_then_a_response_location_is_sent_back_to_the_broker() {
         setupTestActivity()
-
+        initializeMockLocationProvider(app)
+        reportLocationFromMap(app.mockLocationIdlingResource) {
+            setMockLocation(52.0, 0.0)
+        }
         clickOnAndWait(R.id.menu_monitoring)
         clickOnAndWait(R.id.fabMonitoringModeSignificantChanges)
 

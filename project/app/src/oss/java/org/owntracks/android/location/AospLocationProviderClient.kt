@@ -6,15 +6,20 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
+import android.os.Bundle
+import android.os.Handler
 import android.os.Looper
 import androidx.core.location.LocationListenerCompat
 import androidx.core.location.LocationManagerCompat
 import androidx.core.location.LocationRequestCompat
+import androidx.core.os.CancellationSignal
+import androidx.core.os.ExecutorCompat
+import org.owntracks.android.location.LocationRequest.Companion.PRIORITY_HIGH_ACCURACY
+import timber.log.Timber
+import java.util.Locale.filter
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
-import org.owntracks.android.location.LocationRequest.Companion.PRIORITY_HIGH_ACCURACY
-import timber.log.Timber
 
 class AospLocationProviderClient(val context: Context) : LocationProviderClient() {
     enum class LocationSources {
@@ -46,49 +51,18 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient(
             )
         }
 
-    /**
-     * A location listener that discards locations that are older than [maxUpdateAge], posting the first location
-     * to the given [clientCallBack] and then stopping updates.
-     *
-     *
-     * @property maxUpdateAge
-     * @property clientCallBack
-     * @property locationManager
-     * @constructor Create empty Location listener with max update age
-     */
-    @Suppress("MissingPermission")
-    class LocationListenerWithMaxUpdateAge(
-        private val maxUpdateAge: Duration,
-        private val clientCallBack: LocationCallback,
-        private val locationManager: LocationManager
-    ) : LocationListenerCompat {
-        override fun onLocationChanged(location: Location) {
-            val age = (System.currentTimeMillis() - location.time).milliseconds
-            if (age <= maxUpdateAge) {
-                clientCallBack.onLocationResult(LocationResult(location))
-                LocationManagerCompat.removeUpdates(locationManager, this@LocationListenerWithMaxUpdateAge)
-            } else {
-                Timber.v("Received location that's too old: $age. Discarding")
-            }
-        }
-    }
-
     @SuppressLint("MissingPermission")
     override fun singleHighAccuracyLocation(clientCallBack: LocationCallback, looper: Looper) {
         Timber.d("Getting single high-accuracy location, posting to $clientCallBack")
-
         locationManager?.run {
-            val listener = LocationListenerWithMaxUpdateAge(5.seconds, clientCallBack, this)
-            LocationManagerCompat.requestLocationUpdates(
+            LocationManagerCompat.getCurrentLocation(
                 this,
                 LocationSources.GPS.name.lowercase(),
-                LocationRequestCompat.Builder(1.seconds.inWholeMilliseconds).setQuality(
-                    LocationRequestCompat.QUALITY_HIGH_ACCURACY
-                ).build(),
-
-                listener,
-                looper
-            )
+                null,
+                ExecutorCompat.create(Handler(looper))
+            ) { location ->
+                clientCallBack.onLocationResult(LocationResult(location))
+            }
         }
     }
 
@@ -132,7 +106,7 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient(
                     try {
                         locationManager?.requestFlush(it.second.name.lowercase(), it.first, 0)
                     } catch (e: IllegalArgumentException) {
-                        Timber.d("Unable to flush locations for ${it.second} callback")
+                        Timber.d(e,"Unable to flush locations for ${it.second} callback")
                     }
                 }
         } else {
