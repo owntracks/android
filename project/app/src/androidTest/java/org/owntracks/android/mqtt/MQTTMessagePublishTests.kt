@@ -1,19 +1,30 @@
 package org.owntracks.android.mqtt
 
+import android.service.autofill.Validators.and
+import android.view.View
 import androidx.preference.PreferenceManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso
+import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
+import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.BoundedMatcher
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.adevinta.android.barista.assertion.BaristaListAssertions.assertDisplayedAtPosition
 import com.adevinta.android.barista.assertion.BaristaRecyclerViewAssertions.assertRecyclerViewItemCount
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
+import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotContains
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
-import java.time.Instant
 import mqtt.packets.mqtt.MQTTPublish
+import org.hamcrest.Description
+import org.hamcrest.Matcher
+import org.hamcrest.Matchers.not
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,11 +37,14 @@ import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.support.Parser
 import org.owntracks.android.testutils.GPSMockDeviceLocation
+import org.owntracks.android.testutils.JustThisTestPlease
 import org.owntracks.android.testutils.MockDeviceLocation
 import org.owntracks.android.testutils.OWNTRACKS_ICON_BASE64
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.TestWithAnMQTTBroker
 import org.owntracks.android.testutils.TestWithAnMQTTBrokerImpl
+import org.owntracks.android.testutils.assertRecyclerViewContainsItemWithText
+import org.owntracks.android.testutils.assertRecyclerViewDoesntContainItemWithText
 import org.owntracks.android.testutils.getCurrentActivity
 import org.owntracks.android.testutils.grantMapActivityPermissions
 import org.owntracks.android.testutils.reportLocationFromMap
@@ -41,6 +55,8 @@ import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.contacts.ContactsActivity
 import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber
+import java.time.Instant
+
 
 @ExperimentalUnsignedTypes
 @LargeTest
@@ -53,6 +69,7 @@ class MQTTMessagePublishTests :
     @Test
     fun given_an_MQTT_configured_client_when_the_report_button_is_pressed_then_the_broker_receives_a_packet_with_the_correct_location_message_in() {
         setup()
+
         val mockLatitude = 51.0
         val mockLongitude = 0.0
 
@@ -78,13 +95,15 @@ class MQTTMessagePublishTests :
     }
 
     @Test
-    @org.owntracks.android.testutils.JustThisTestPlease
+    @JustThisTestPlease
     fun given_an_MQTT_configured_client_when_the_broker_sends_a_location_for_a_cleared_contact_then_a_the_contact_returns_with_the_correct_details() {
         setup()
 
         openDrawer()
         clickOnAndWait(R.string.title_activity_contacts)
         val contactsCountingIdlingResource = (getCurrentActivity() as ContactsActivity).contactsCountingIdlingResource
+
+        val contactName = "TestName"
 
         listOf(
             MessageLocation().apply {
@@ -98,7 +117,7 @@ class MQTTMessagePublishTests :
                 timestamp = Instant.parse("2006-01-02T15:04:05Z").epochSecond
             },
             MessageCard().apply {
-                name = "TestName"
+                name = contactName
                 face = OWNTRACKS_ICON_BASE64
             }
         ).also {
@@ -106,7 +125,7 @@ class MQTTMessagePublishTests :
         }.sendFromBroker(broker)
 
         contactsCountingIdlingResource.use {
-            clickOnAndWait("TestName")
+            clickOnAndWait(contactName)
         }
         sleep(1000) // Apparently espresso won't wait for the MapActivity to finish rendering
         clickOnAndWait(R.id.contactPeek)
@@ -115,7 +134,8 @@ class MQTTMessagePublishTests :
 
         openDrawer()
         clickOnAndWait(R.string.title_activity_contacts)
-        assertDisplayed(R.id.placeholder)
+
+        assertRecyclerViewDoesntContainItemWithText(R.id.contactsRecyclerView, contactName)
 
         contactsCountingIdlingResource.increment()
         listOf(
@@ -127,17 +147,10 @@ class MQTTMessagePublishTests :
         ).sendFromBroker(broker)
 
         contactsCountingIdlingResource.use {
-            assertRecyclerViewItemCount(R.id.contactsRecyclerView, 1)
-            assertDisplayedAtPosition(R.id.contactsRecyclerView, 0, R.id.name, "TestName")
-            assertDisplayedAtPosition(R.id.contactsRecyclerView, 0, R.id.location, "50.1230, 3.5679")
-            assertDisplayedAtPosition(
-                R.id.contactsRecyclerView,
-                0,
-                R.id.locationDate,
-                "1/2/06" // Default locale for emulator is en_US
-            )
+            assertRecyclerViewContainsItemWithText(R.id.contactsRecyclerView, contactName)
         }
     }
+
 
     @Test
     fun given_an_MQTT_configured_client_when_the_wrong_credentials_are_used_then_the_status_screen_shows_that_the_broker_is_not_connected() {

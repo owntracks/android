@@ -9,6 +9,8 @@ import android.os.Build
 import android.os.Environment
 import android.os.ParcelFileDescriptor
 import android.provider.MediaStore
+import android.view.View
+import androidx.annotation.IdRes
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
@@ -16,7 +18,9 @@ import androidx.test.espresso.IdlingPolicies
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.action.ViewActions
+import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
+import androidx.test.espresso.matcher.BoundedMatcher
 import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
@@ -27,6 +31,10 @@ import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickD
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions
 import com.adevinta.android.barista.interaction.PermissionGranter
+import org.hamcrest.Description
+import org.hamcrest.Matcher
+import org.hamcrest.Matchers.not
+import org.hamcrest.TypeSafeMatcher
 import java.io.BufferedInputStream
 import java.io.FileInputStream
 import java.io.FileWriter
@@ -271,3 +279,12 @@ fun Random.string(length: Int) =
     IntRange(1, length).map {
         this.nextInt(65, 90).toChar()
     }.joinToString("")
+
+// matchers
+fun assertRecyclerViewContainsItemWithText(@IdRes id: Int, text: String) {
+    onView(withId(id)).check(matches(hasDescendant(withText(text))))
+}
+
+fun assertRecyclerViewDoesntContainItemWithText(@IdRes id: Int, text: String) {
+    onView(withId(id)).check(matches(not(hasDescendant(withText(text)))))
+}

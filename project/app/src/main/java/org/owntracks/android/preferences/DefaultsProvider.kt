@@ -9,6 +9,7 @@ import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.preferences.types.MqttProtocolLevel
 import org.owntracks.android.preferences.types.MqttQos
 import org.owntracks.android.preferences.types.StringMaxTwoAlphaNumericChars
+import timber.log.Timber
 
 interface DefaultsProvider {
     @Suppress("IMPLICIT_CAST_TO_ANY", "UNCHECKED_CAST")
