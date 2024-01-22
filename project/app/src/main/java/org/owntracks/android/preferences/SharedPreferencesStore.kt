@@ -92,9 +92,13 @@ class SharedPreferencesStore @Inject constructor(
                             Manifest.permission.POST_NOTIFICATIONS
                         ) == PackageManager.PERMISSION_GRANTED
                     ) {
-                        notificationManager.notify("CertificateManagementNotification", 0, this)
+                        notificationManager
+                            .notify("CertificateManagementNotification", 0, this)
+                            .also{ Timber.d("Notifying user of certificate migration") }
                     } else {
-                        notificationStash.add(this)
+                        notificationStash
+                            .add(this)
+                            .also{ Timber.d("Notifying user of certificate migration: delaying until user grants notification permissions") }
                     }
                 }
         }

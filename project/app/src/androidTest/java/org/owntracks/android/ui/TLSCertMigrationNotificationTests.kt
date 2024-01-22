@@ -77,7 +77,7 @@ class TLSCertMigrationNotificationTests : TestWithAnActivity<MapActivity>(MapAct
                     notification.extras.getString(Notification.EXTRA_TITLE) == app.getString(
                         R.string.certificateMigrationRequiredNotificationTitle
                     ) &&
-                        notification.extras.getString(Notification.EXTRA_TEXT) == app.getString(
+                        notification.extras.getString(Notification.EXTRA_BIG_TEXT) == app.getString(
                         R.string.certificateMigrationRequiredNotificationText
                     )
                 }
