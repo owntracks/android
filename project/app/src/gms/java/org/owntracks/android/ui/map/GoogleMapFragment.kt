@@ -55,7 +55,7 @@ class GoogleMapFragment internal constructor(
 
     private val googleMapLocationSource: LocationSource by lazy {
         object : LocationSource {
-            private lateinit var locationObserver: Observer<Location>
+            private var locationObserver: Observer<Location>? = null
             override fun activate(
                 onLocationChangedListener: LocationSource.OnLocationChangedListener
             ) {
@@ -67,7 +67,7 @@ class GoogleMapFragment internal constructor(
             }
 
             override fun deactivate() {
-                viewModel.currentLocation.removeObserver(locationObserver)
+                locationObserver?.run(viewModel.currentLocation::removeObserver)
             }
         }
     }

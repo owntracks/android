@@ -62,7 +62,7 @@ class OSMMapFragment internal constructor(
         get() = R.layout.osm_map_fragment
 
     private val osmMapLocationSource: IMyLocationProvider = object : IMyLocationProvider {
-        private lateinit var locationObserver: Observer<Location>
+        private var locationObserver: Observer<Location>? = null
         override fun startLocationProvider(myLocationConsumer: IMyLocationConsumer?): Boolean {
             val locationProvider: IMyLocationProvider = this
             locationObserver = Observer { location:Location ->
