@@ -3,7 +3,7 @@ certifi==2023.11.17
 charset-normalizer==3.3.2
 google-api-core==2.15.0
 google-api-python-client==2.115.0
-google-auth==2.26.2
+google-auth==2.27.0
 google-auth-httplib2==0.2.0
 googleapis-common-protos==1.62.0
 httplib2==0.22.0
