@@ -262,11 +262,6 @@ HTTPS 또는 MQTT 및 로그인 자격 증명을 통해 액세스할 수 있는�
     <!-- Fuzzy -->
     <string name="welcome_play_description">"OwnTracks은 Google Play 서비스가 필요합니다."</string>
     <string name="welcome_play_heading">"Google Play 개발자 서비스"</string>
-    <string name="welcome_version_description">"OS 제한으로 인해 일부 기능은 제한된 방식으로 작동 할 수 있습니다.
-
-앱이 백그라운드에서 항상 실행되도록 하려면 항상 알림이 표시됩니다. 이 알림은 시스템 알림 기본 설정에서 비활성화할 수 있습니다."</string>
-    <string name="welcome_version_learn_more">"자세히"</string>
-    <string name="welcome_version_title">"제한"</string>
     <string name="welcomeFixIssue">"권한 설정"</string>
     <string name="workmanagerInitializationErrorDialogMessage">"일부 구성 요소가 제대로 초기화되지 않아 Owntracks가 제대로 작동하지 않을 수 있습니다. 앱을 다시 설치하거나 사용자 데이터를 삭제해야 할 수 있습니다.
 

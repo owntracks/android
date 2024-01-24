@@ -18,38 +18,31 @@ import org.owntracks.android.ui.welcome.WelcomeViewModel
 
 @AndroidEntryPoint
 class ConnectionSetupFragment @Inject constructor() : WelcomeFragment() {
-    override fun shouldBeDisplayed(context: Context): Boolean = true
+  override fun shouldBeDisplayed(context: Context): Boolean = true
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        return UiWelcomeConnectionSetupBinding.inflate(inflater, container, false)
-            .apply {
-                welcomeConnectionSetupLearnMoreButton.setOnClickListener {
-                    try {
-                        startActivity(
-                            Intent(
-                                Intent.ACTION_VIEW,
-                                Uri.parse(getString(R.string.documentationUrl))
-                            )
-                        )
-                    } catch (e: ActivityNotFoundException) {
-                        Snackbar.make(
-                            root,
-                            getString(R.string.noBrowserInstalled),
-                            Snackbar.LENGTH_SHORT
-                        )
-                            .show()
-                    }
-                }
-                screenDesc.movementMethod = ScrollingMovementMethod()
-            }.root
-    }
+  override fun onCreateView(
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?
+  ): View {
+    return UiWelcomeConnectionSetupBinding.inflate(inflater, container, false)
+        .apply {
+          welcomeConnectionSetupLearnMoreButton.setOnClickListener {
+            try {
+              startActivity(
+                  Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.documentationUrl))))
+            } catch (e: ActivityNotFoundException) {
+              Snackbar.make(root, getString(R.string.noBrowserInstalled), Snackbar.LENGTH_SHORT)
+                  .show()
+            }
+          }
+          screenDesc.movementMethod = ScrollingMovementMethod()
+        }
+        .root
+  }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.setWelcomeState(WelcomeViewModel.ProgressState.PERMITTED)
-    }
+  override fun onResume() {
+    super.onResume()
+    viewModel.setWelcomeState(WelcomeViewModel.ProgressState.PERMITTED)
+  }
 }

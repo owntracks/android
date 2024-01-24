@@ -162,9 +162,4 @@
     <!-- Fuzzy -->
     <string name="welcome_play_description">"Owntracks 依赖 Google Play 服务"</string>
     <string name="welcome_play_heading">"Google Play 服务"</string>
-    <string name="welcome_version_description">"由于操作系统限制，某些功能可能会运作在受限的行为模式下。
-
-为使本程序能够在后台正常运行，通知栏中会一直显示一个通知。您可以在系统设置的通知相关设置中屏蔽掉这条通知。"</string>
-    <string name="welcome_version_learn_more">"了解更多信息"</string>
-    <string name="welcome_version_title">"限制"</string>
 </resources>

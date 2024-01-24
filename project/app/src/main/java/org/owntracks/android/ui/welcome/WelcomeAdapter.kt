@@ -5,19 +5,19 @@ import dagger.hilt.android.scopes.ActivityScoped
 import org.owntracks.android.ui.welcome.fragments.WelcomeFragment
 
 @ActivityScoped
-class WelcomeAdapter constructor(private val welcomeActivity: BaseWelcomeActivity) :
+class WelcomeAdapter(private val welcomeActivity: BaseWelcomeActivity) :
     FragmentStateAdapter(welcomeActivity) {
-    private val fragments = ArrayList<WelcomeFragment>()
-    fun setupFragments(welcomeFragments: List<WelcomeFragment>) {
-        welcomeFragments.filter { it.shouldBeDisplayed(welcomeActivity) }
-            .forEach(fragments::add)
-    }
+  private val fragments = ArrayList<WelcomeFragment>()
 
-    override fun getItemCount(): Int {
-        return fragments.size
-    }
+  fun setupFragments(welcomeFragments: List<WelcomeFragment>) {
+    welcomeFragments.filter { it.shouldBeDisplayed(welcomeActivity) }.forEach(fragments::add)
+  }
 
-    override fun createFragment(position: Int): WelcomeFragment {
-        return fragments[position]
-    }
+  override fun getItemCount(): Int {
+    return fragments.size
+  }
+
+  override fun createFragment(position: Int): WelcomeFragment {
+    return fragments[position]
+  }
 }

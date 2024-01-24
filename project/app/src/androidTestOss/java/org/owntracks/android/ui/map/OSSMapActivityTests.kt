@@ -26,7 +26,7 @@ class OSSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
     fun welcomeActivityShouldNotRunWhenFirstStartPreferencesSet() {
         setNotFirstStartPreferences()
         launchActivity()
-        PermissionGranter.allowPermissionsIfNeeded(ACCESS_FINE_LOCATION)
+        grantMapActivityPermissions()
         assertDisplayed(R.id.osm_map_view)
     }
 

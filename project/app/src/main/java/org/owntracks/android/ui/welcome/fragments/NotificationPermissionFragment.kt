@@ -10,11 +10,11 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 import org.owntracks.android.databinding.UiWelcomeNotificationPermissionBinding
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.RequirementsChecker
 import org.owntracks.android.ui.welcome.WelcomeViewModel
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class NotificationPermissionFragment @Inject constructor() : WelcomeFragment() {

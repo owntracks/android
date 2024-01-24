@@ -14,28 +14,28 @@ import org.owntracks.android.ui.welcome.WelcomeViewModel
 
 @AndroidEntryPoint
 class FinishFragment @Inject constructor() : WelcomeFragment() {
-    override fun shouldBeDisplayed(context: Context) = true
+  override fun shouldBeDisplayed(context: Context) = true
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        return UiWelcomeFinishBinding.inflate(inflater, container, false)
-            .apply {
-                uiFragmentWelcomeFinishOpenPreferences.setOnClickListener {
-                    viewModel.setWelcomeState(WelcomeViewModel.ProgressState.FINISHED)
-                    startActivity(
-                        Intent(requireContext(), PreferencesActivity::class.java).apply {
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        }
-                    )
-                }
-            }.root
-    }
+  override fun onCreateView(
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?
+  ): View {
+    return UiWelcomeFinishBinding.inflate(inflater, container, false)
+        .apply {
+          uiFragmentWelcomeFinishOpenPreferences.setOnClickListener {
+            viewModel.setWelcomeState(WelcomeViewModel.ProgressState.FINISHED)
+            startActivity(
+                Intent(requireContext(), PreferencesActivity::class.java).apply {
+                  flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                })
+          }
+        }
+        .root
+  }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.setWelcomeState(WelcomeViewModel.ProgressState.FINISHED)
-    }
+  override fun onResume() {
+    super.onResume()
+    viewModel.setWelcomeState(WelcomeViewModel.ProgressState.FINISHED)
+  }
 }

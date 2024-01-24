@@ -194,10 +194,5 @@
     <string name="welcome_heading">"Bienvenido"</string>
     <string name="welcome_play_description">"OwnTracks necesita Google Play Services"</string>
     <string name="welcome_play_heading">"Google Play Services"</string>
-    <string name="welcome_version_description">"Debido a limitaciones del sistema algunas características pueden no funcionar.
-
-Una notificación permanente se mostrará para mantener la aplicación funcionando en segundo plano. Se puede deshabilitar en ajustes del sistema."</string>
-    <string name="welcome_version_learn_more">"Aprender más"</string>
-    <string name="welcome_version_title">"Restricciones"</string>
     <string name="welcomeFixIssue">"Fix"</string>
 </resources>

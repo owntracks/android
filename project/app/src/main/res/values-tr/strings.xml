@@ -274,11 +274,6 @@ For more details, take a look at the OwnTracks Booklet."</string>
     <string name="welcome_heading">"Welcome"</string>
     <string name="welcome_play_description">"OwnTracks requires Google Play Services"</string>
     <string name="welcome_play_heading">"Google Play Services"</string>
-    <string name="welcome_version_description">"Due to OS limitations, some features might work in a restricted manner.
-
-A permanent notification will be shown to keep running in the background. It can be disabled in the systems notification preferences."</string>
-    <string name="welcome_version_learn_more">"Learn more"</string>
-    <string name="welcome_version_title">"Restrictions"</string>
     <string name="welcomeFixIssue">"Fix"</string>
     <string name="workmanagerInitializationErrorDialogMessage">"Some components failed to initialize properly, so OwnTracks may not work properly. It may be necessary to re-install the application or clear the user data.
 

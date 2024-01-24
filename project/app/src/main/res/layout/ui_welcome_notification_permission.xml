@@ -22,15 +22,13 @@
 
         <TextView
             android:id="@+id/screen_heading"
+            style="@style/Theme.Owntracks.Welcome.TextView.Heading"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/img"
             android:layout_marginBottom="12dp"
             android:gravity="bottom|center_horizontal"
-            android:paddingLeft="24dp"
-            android:paddingRight="24dp"
-            android:text="@string/welcome_notification_permission_title"
-            android:textSize="24sp" />
+            android:text="@string/welcome_notification_permission_title" />
 
         <TextView
             android:id="@+id/screen_desc"
@@ -41,13 +39,8 @@
             android:layout_alignStart="@+id/screen_heading"
             android:layout_marginBottom="8dp"
             android:gravity="top|center_horizontal"
-            android:lineSpacingMultiplier="1.2"
-            android:minHeight="@dimen/welcome_content_min_height"
-            android:paddingLeft="24dp"
-            android:paddingRight="24dp"
             android:scrollbars="vertical"
-            android:text="@string/welcome_notification_permission_description"
-            android:textSize="16sp" />
+            android:text="@string/welcome_notification_permission_description" />
 
         <TextView
             android:id="@+id/ui_fragment_welcome_notification_permissions_message"
@@ -56,15 +49,12 @@
             android:layout_below="@+id/screen_desc"
             android:layout_alignStart="@+id/screen_desc"
             android:gravity="center_horizontal"
-            android:lineSpacingMultiplier="1.2"
-            android:paddingLeft="24dp"
-            android:paddingRight="24dp"
             android:text="@string/welcome_notification_permission_granted"
-            android:textSize="16sp"
             android:visibility="invisible" />
 
         <Button
             android:id="@+id/ui_fragment_welcome_notification_permissions_request"
+            style="?attr/materialButtonOutlinedStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"

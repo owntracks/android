@@ -272,11 +272,6 @@ Aby dowiedzieć się więcej, zapoznaj się z Broszurą OwnTracks."</string>
     <string name="welcome_heading">"Witaj"</string>
     <string name="welcome_play_description">"OwnTracks wymaga Usługi Google Play"</string>
     <string name="welcome_play_heading">"Usługi Google Play"</string>
-    <string name="welcome_version_description">"Przez ograniczenia systemu, niektóre funkcje mogą zostać zredukowane.
-
-Aby utrzymać działanie aplikacji w tle, będzie wyświetlana permanentna notyfikacja. Można ją wyłączyć w systemowych ustawieniach powiadomień."</string>
-    <string name="welcome_version_learn_more">"Dowiedz się więcej"</string>
-    <string name="welcome_version_title">"Ograniczenia"</string>
     <string name="welcomeFixIssue">"Napraw"</string>
     <string name="workmanagerInitializationErrorDialogMessage">"Niektóre komponenty nie uruchomiły się prawidłowo, więc OwnTracks może nie działać poprawnie. Może zajść potrzeba reinstalacji aplikacji lub usunięcia danych użytkownika.
 

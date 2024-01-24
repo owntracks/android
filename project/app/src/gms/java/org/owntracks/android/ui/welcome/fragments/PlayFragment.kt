@@ -17,84 +17,73 @@ import org.owntracks.android.ui.welcome.WelcomeViewModel
 
 @AndroidEntryPoint
 class PlayFragment @Inject constructor() : WelcomeFragment() {
-    private val playFragmentViewModel: PlayFragmentViewModel by viewModels()
-    private lateinit var binding: UiWelcomePlayBinding
-    private val googleAPI = GoogleApiAvailability.getInstance()
-    override fun shouldBeDisplayed(context: Context): Boolean =
-        googleAPI.isGooglePlayServicesAvailable(context) != ConnectionResult.SUCCESS
+  private val playFragmentViewModel: PlayFragmentViewModel by viewModels()
+  private lateinit var binding: UiWelcomePlayBinding
+  private val googleAPI = GoogleApiAvailability.getInstance()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding = UiWelcomePlayBinding.inflate(inflater, container, false)
-            .apply {
-                vm = playFragmentViewModel
-                lifecycleOwner = this@PlayFragment.viewLifecycleOwner
-                recover.setOnClickListener {
-                    requestFix()
-                }
-            }
-        return binding.root
-    }
+  override fun shouldBeDisplayed(context: Context): Boolean =
+      googleAPI.isGooglePlayServicesAvailable(context) != ConnectionResult.SUCCESS
 
-    fun onPlayServicesResolutionResult() {
-        checkGooglePlayservicesIsAvailable()
-    }
-
-    private fun requestFix() {
-        val result = googleAPI.isGooglePlayServicesAvailable(requireContext())
-
-        if (!googleAPI.showErrorDialogFragment(
-                requireActivity(),
-                result,
-                PLAY_SERVICES_RESOLUTION_REQUEST
-            )
-        ) {
-            Snackbar.make(
-                binding.root,
-                getString(R.string.play_services_not_available),
-                Snackbar.LENGTH_SHORT
-            )
-                .show()
+  override fun onCreateView(
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?
+  ): View {
+    binding =
+        UiWelcomePlayBinding.inflate(inflater, container, false).apply {
+          vm = playFragmentViewModel
+          lifecycleOwner = this@PlayFragment.viewLifecycleOwner
+          recover.setOnClickListener { requestFix() }
         }
-        checkGooglePlayservicesIsAvailable()
-    }
+    return binding.root
+  }
 
-    private fun checkGooglePlayservicesIsAvailable() {
-        val nextEnabled =
-            when (val result = googleAPI.isGooglePlayServicesAvailable(requireContext())) {
-                ConnectionResult.SUCCESS -> {
-                    playFragmentViewModel.setPlayServicesAvailable(getString(R.string.play_services_now_available))
-                    WelcomeViewModel.ProgressState.PERMITTED
-                }
-                ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED, ConnectionResult.SERVICE_UPDATING -> {
-                    playFragmentViewModel.setPlayServicesNotAvailable(
-                        true,
-                        getString(R.string.play_services_update_required)
-                    )
-                    WelcomeViewModel.ProgressState.NOT_PERMITTED
-                }
-                else -> {
-                    playFragmentViewModel.setPlayServicesNotAvailable(
-                        googleAPI.isUserResolvableError(
-                            result
-                        ),
-                        getString(R.string.play_services_not_available)
-                    )
-                    WelcomeViewModel.ProgressState.NOT_PERMITTED
-                }
-            }
-        viewModel.setWelcomeState(nextEnabled)
-    }
+  fun onPlayServicesResolutionResult() {
+    checkGooglePlayservicesIsAvailable()
+  }
 
-    override fun onResume() {
-        super.onResume()
-        checkGooglePlayservicesIsAvailable()
-    }
+  private fun requestFix() {
+    val result = googleAPI.isGooglePlayServicesAvailable(requireContext())
 
-    companion object {
-        const val PLAY_SERVICES_RESOLUTION_REQUEST = 1
+    if (!googleAPI.showErrorDialogFragment(
+        requireActivity(), result, PLAY_SERVICES_RESOLUTION_REQUEST)) {
+      Snackbar.make(
+              binding.root, getString(R.string.play_services_not_available), Snackbar.LENGTH_SHORT)
+          .show()
     }
+    checkGooglePlayservicesIsAvailable()
+  }
+
+  private fun checkGooglePlayservicesIsAvailable() {
+    val nextEnabled =
+        when (val result = googleAPI.isGooglePlayServicesAvailable(requireContext())) {
+          ConnectionResult.SUCCESS -> {
+            playFragmentViewModel.setPlayServicesAvailable(
+                getString(R.string.play_services_now_available))
+            WelcomeViewModel.ProgressState.PERMITTED
+          }
+          ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED,
+          ConnectionResult.SERVICE_UPDATING -> {
+            playFragmentViewModel.setPlayServicesNotAvailable(
+                true, getString(R.string.play_services_update_required))
+            WelcomeViewModel.ProgressState.NOT_PERMITTED
+          }
+          else -> {
+            playFragmentViewModel.setPlayServicesNotAvailable(
+                googleAPI.isUserResolvableError(result),
+                getString(R.string.play_services_not_available))
+            WelcomeViewModel.ProgressState.NOT_PERMITTED
+          }
+        }
+    viewModel.setWelcomeState(nextEnabled)
+  }
+
+  override fun onResume() {
+    super.onResume()
+    checkGooglePlayservicesIsAvailable()
+  }
+
+  companion object {
+    const val PLAY_SERVICES_RESOLUTION_REQUEST = 1
+  }
 }

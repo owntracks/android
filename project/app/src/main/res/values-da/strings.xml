@@ -266,11 +266,6 @@ For flere detaljer, læs OwnTracks Booklet."</string>
     <string name="welcome_heading">"Velkommen"</string>
     <string name="welcome_play_description">"OwnTracks kræver Google Play Tjenester"</string>
     <string name="welcome_play_heading">"Google Play Tjenester"</string>
-    <string name="welcome_version_description">"Grundet begrænsninger i operativsystemet kører nogle funktioner muligvis i en begrænset tilstand.
-
-En permanent notifikation vil blive vist for at holde app'en kørende i baggrunden. Den kan slås fra i systemets indstillinger for notifikationer."</string>
-    <string name="welcome_version_learn_more">"Lær mere"</string>
-    <string name="welcome_version_title">"Begrænsninger"</string>
     <string name="welcomeFixIssue">"Fiks"</string>
     <string name="workmanagerInitializationErrorDialogMessage">"Nogle komponenter kunne ikke starte rigtigt, så Owntracks virker måske ikke som det skal. Det kan være nødvendigt at geninstallere app'en eller rydde den eksisterende brugerdata.
 

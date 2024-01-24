@@ -270,11 +270,6 @@ Per obtenir més detalls, feu una ullada al llibret d'OwnTracks."</string>
     <string name="welcome_heading">"Benvinguda"</string>
     <string name="welcome_play_description">"OwnTracks necessita Serveis Google Play"</string>
     <string name="welcome_play_heading">"Serveis Google Play"</string>
-    <string name="welcome_version_description">"A causa de les limitacions del sistema operatiu, algunes característiques poden funcionar de manera restringida.
-
-Es mostrarà una notificació permanent per continuar executant-se en segon pla. Es pot desactivar a les preferències de notificació del sistema."</string>
-    <string name="welcome_version_learn_more">"Saber-ne més"</string>
-    <string name="welcome_version_title">"Restriccions"</string>
     <string name="welcomeFixIssue">"Fix"</string>
     <string name="workmanagerInitializationErrorDialogMessage">"Alguns components no s'han pogut inicialitzar correctament, de manera que és possible que OwnTracks no funcioni bé. Pot ser que calgui tornar a instal·lar l'aplicació o esborrar les dades de l'usuari.
 

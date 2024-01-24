@@ -282,11 +282,6 @@
     <string name="welcome_heading">"Добро пожаловать!"</string>
     <string name="welcome_play_description">"Для работы OwnTracks необходимы сервисы Google Play"</string>
     <string name="welcome_play_heading">"Сервисы Google Play"</string>
-    <string name="welcome_version_description">"Из-за ограничений Android некоторые функции могут работать не в полной мере.
-
-Постоянное уведомление будет отображаться в шторке для того, чтобы дать возможность приложению работать в фоне. Его можно отключить в системных настройках уведомлений."</string>
-    <string name="welcome_version_learn_more">"Подробности"</string>
-    <string name="welcome_version_title">"Ограничения"</string>
     <string name="welcomeFixIssue">"Исправить"</string>
     <string name="workmanagerInitializationErrorDialogMessage">"Некоторые компоненты не были корректно инициализированы, поэтому OwnTracks может работать не в полной мере. Может потребоваться переустановка приложения или очистка данных приложения.
 

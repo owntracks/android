@@ -330,11 +330,6 @@ A permanent notification will be displayed in order to keep the location trackin
     <string name="welcome_permission_request">"Request"</string>
     <string name="welcome_play_description">"OwnTracks requires Google Play Services"</string>
     <string name="welcome_play_heading">"Google Play Services"</string>
-    <string name="welcome_version_description">"Due to OS limitations, some features might work in a restricted manner.
-
-A permanent notification will be shown to keep running in the background. It can be disabled in the systems notification preferences."</string>
-    <string name="welcome_version_learn_more">"Learn more"</string>
-    <string name="welcome_version_title">"Restrictions"</string>
     <string name="waypointMigrationErrorNotificationTitle">"Error migrating waypoints"</string>
     <string name="waypointMigrationErrorNotificationText">"An error occurred whilst migrating waypoints. Some may not have been migrated, so check the logs and re-add."</string>
     <string name="welcomeFixIssue">"Fix"</string>

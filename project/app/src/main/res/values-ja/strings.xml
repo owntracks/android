@@ -230,11 +230,6 @@
     <!-- Fuzzy -->
     <string name="welcome_play_description">"Owntrack"</string>
     <string name="welcome_play_heading">"Google Play開発者サービス"</string>
-    <string name="welcome_version_description">"OSの制限により、一部の機能の動作が制限される場合があります。
-
-アプリをバックグラウンドで常に起動させるために、常時、通知が表示されます。この通知は、システムの通知設定で無効化することができます。"</string>
-    <string name="welcome_version_learn_more">"詳しく"</string>
-    <string name="welcome_version_title">"制限"</string>
     <string name="welcomeFixIssue">"権限を設定"</string>
     <string name="workmanagerInitializationErrorDialogMessage">"一部のコンポーネントが正しく初期化できなかったため、Owntracksが正常に動作しない可能性があります。アプリを再インストールするか、ユーザデータの消去が必要となる場合があります。
 

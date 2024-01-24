@@ -23,7 +23,6 @@ import org.owntracks.android.model.messages.MessageWaypoints
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.Parser
 import org.owntracks.android.testutils.GPSMockDeviceLocation
-import org.owntracks.android.testutils.JustThisTestPlease
 import org.owntracks.android.testutils.MockDeviceLocation
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.TestWithAnMQTTBroker
@@ -71,7 +70,6 @@ class MQTTRemoteCommandTests :
     }
 
     @Test
-    @JustThisTestPlease
     fun given_an_MQTT_configured_client_when_the_broker_sends_a_reportLocation_command_message_then_a_response_location_is_sent_back_to_the_broker() {
         setupTestActivity()
         initializeMockLocationProvider(app)

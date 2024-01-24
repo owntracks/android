@@ -8,19 +8,19 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PlayFragmentViewModel @Inject constructor() : ViewModel() {
-    fun setPlayServicesAvailable(message: String) {
-        mutableMessage.postValue(message)
-        mutablePlayServicesFixAvailable.postValue(false)
-    }
+  fun setPlayServicesAvailable(message: String) {
+    mutableMessage.postValue(message)
+    mutablePlayServicesFixAvailable.postValue(false)
+  }
 
-    fun setPlayServicesNotAvailable(fixAvailable: Boolean, message: String) {
-        mutableMessage.postValue(message)
-        mutablePlayServicesFixAvailable.postValue(fixAvailable)
-    }
+  fun setPlayServicesNotAvailable(fixAvailable: Boolean, message: String) {
+    mutableMessage.postValue(message)
+    mutablePlayServicesFixAvailable.postValue(fixAvailable)
+  }
 
-    private val mutableMessage = MutableLiveData<String>()
-    val message: LiveData<String> = mutableMessage
+  private val mutableMessage = MutableLiveData<String>()
+  val message: LiveData<String> = mutableMessage
 
-    private val mutablePlayServicesFixAvailable = MutableLiveData(false)
-    val playServicesFixAvailable: LiveData<Boolean> = mutablePlayServicesFixAvailable
+  private val mutablePlayServicesFixAvailable = MutableLiveData(false)
+  val playServicesFixAvailable: LiveData<Boolean> = mutablePlayServicesFixAvailable
 }

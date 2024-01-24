@@ -28,15 +28,13 @@
 
         <TextView
             android:id="@+id/screen_heading"
+            style="@style/Theme.Owntracks.Welcome.TextView.Heading"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/img"
             android:layout_marginBottom="?attr/welcomeHeadingMargin"
             android:gravity="bottom|center_horizontal"
-            android:paddingLeft="24dp"
-            android:paddingRight="24dp"
-            android:text="@string/done_heading"
-            android:textSize="24sp" />
+            android:text="@string/done_heading" />
 
         <TextView
             android:id="@+id/screen_desc"
@@ -45,15 +43,11 @@
             android:layout_below="@+id/screen_heading"
             android:layout_alignStart="@+id/screen_heading"
             android:gravity="top|center_horizontal"
-            android:lineSpacingMultiplier="1.2"
-            android:minHeight="@dimen/welcome_content_min_height"
-            android:paddingLeft="24dp"
-            android:paddingRight="24dp"
-            android:text="@string/enjoy_description"
-            android:textSize="16sp" />
+            android:text="@string/enjoy_description" />
 
         <Button
             android:id="@+id/ui_fragment_welcome_finish_open_preferences"
+            style="?attr/materialButtonOutlinedStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"

@@ -230,9 +230,6 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="welcome_heading">"Willkommen"</string>
     <string name="welcome_play_description">"OwnTracks benötigt die Google Play-Dienste"</string>
     <string name="welcome_play_heading">"Google Play-Dienste"</string>
-    <string name="welcome_version_description">"Einige Funktionen sind aufgrund der Android version nur eingeschränkt verfügbar"</string>
-    <string name="welcome_version_learn_more">"Mehr erfahren"</string>
-    <string name="welcome_version_title">"Einschränkungen"</string>
     <string name="welcomeFixIssue">"Korrigieren"</string>
     <string name="workmanagerInitializationErrorDialogMessage">"Einige Komponenten konnten nicht initialisiert werden; OwnTracks könnte fehlerhaft arbeiten. Es kann notwendig sein die App neu zu installieren oder die Daten zu löschen.
 

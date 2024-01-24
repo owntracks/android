@@ -110,6 +110,4 @@
     <string name="welcome_heading">"Bem vindo"</string>
     <string name="welcome_play_description">"OwnTracks precisa de Google Play Services"</string>
     <string name="welcome_play_heading">"Google Play Services"</string>
-    <string name="welcome_version_learn_more">"Saber mais"</string>
-    <string name="welcome_version_title">"Restrições"</string>
 </resources>
