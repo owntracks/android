@@ -451,7 +451,7 @@ class MapActivity :
      * didn't mean to).
      *
      */
-    private fun locationPermissionDenied(code: Int) {
+    private fun locationPermissionDenied(@Suppress("UNUSED_PARAMETER") code: Int) {
         Timber.d("Location Permission denied. Showing snackbar")
         preferences.userDeclinedEnableLocationPermissions = true
         Snackbar.make(

@@ -7,8 +7,7 @@ enum class MapLayerStyle {
     OpenStreetMapNormal,
     OpenStreetMapWikimedia;
 
-    @Suppress("UNUSED_PARAMETER")
-    fun isSameProviderAs(_mapLayerStyle: MapLayerStyle): Boolean = true
+    fun isSameProviderAs(@Suppress("UNUSED_PARAMETER") mapLayerStyle: MapLayerStyle): Boolean = true
 
     companion object {
         @JvmStatic
