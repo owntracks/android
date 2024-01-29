@@ -151,7 +151,7 @@ jobs:
 
       - name: "Check snapshot exists"
         id: check_snapshot_exists
-        uses: andstor/file-existence-action@v2
+        uses: andstor/file-existence-action@v3
         with:
           files: "/android-sdk/user_home/avd/owntracks-test-${{ matrix.android-api }}-${{ matrix.flavour }}.avd/snapshots/default_boot/screenshot.png"
 
