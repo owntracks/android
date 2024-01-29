@@ -170,7 +170,7 @@ class MQTTMessageProcessorEndpoint(
     override fun onFinalizeMessage(message: MessageBase): MessageBase = message
 
     override suspend fun sendMessage(message: MessageBase) {
-        Timber.i("Sending message $message")
+        Timber.i("Sending message [$message]")
         if (endpointStateRepo.endpointState.value != EndpointState.CONNECTED || mqttClientAndConfiguration == null) {
             throw OutgoingMessageSendingException(NotConnectedException())
         }
@@ -185,7 +185,7 @@ class MQTTMessageProcessorEndpoint(
                 }
                 val job = launch(ioDispatcher + CoroutineName("MQTT SendMessage") + handler) {
                     try {
-                        Timber.d("Publishing message id=${message.messageId}")
+                        Timber.d("Publishing message [$message]")
                         measureTime {
                             while (mqttClient.inFlightMessageCount >= mqttConnectionConfiguration.maxInFlight) {
                                 Timber.v("Pausing to wait for inflight to drop below max")
@@ -200,10 +200,10 @@ class MQTTMessageProcessorEndpoint(
                                 .also {
                                     Timber.v("MQTT message sent with messageId=${it.messageId}. ")
                                 }
-                        }.apply { Timber.i("Message id=${message.messageId} dispatched in $this") }
+                        }.apply { Timber.i("Message [$message] dispatched in $this") }
                         messageProcessor.onMessageDelivered()
                     } catch (e: Exception) {
-                        Timber.e(e, "Error publishing message id=${message.messageId}")
+                        Timber.e(e, "Error publishing message [$message]")
                         when (e) {
                             is IOException -> messageProcessor.onMessageDeliveryFailedFinal(message.messageId)
                             is MqttException -> {
@@ -269,6 +269,7 @@ class MQTTMessageProcessorEndpoint(
     }
 
     private val mqttCallback = object : MqttCallbackExtended {
+
         override fun connectionLost(cause: Throwable) {
             when (cause) {
                 is IOException -> Timber.e("Connection Lost: ${cause.message}")
@@ -313,7 +314,9 @@ class MQTTMessageProcessorEndpoint(
         }
 
         override fun deliveryComplete(token: IMqttDeliveryToken?) {
-            Timber.v("Delivery complete messageId = ${token?.messageId}")
+            token?.run {
+                Timber.v("Delivery complete messageId=$messageId topics=${this.topics.joinToString(",")}}")
+            }
         }
 
         override fun connectComplete(reconnect: Boolean, serverURI: String?) {

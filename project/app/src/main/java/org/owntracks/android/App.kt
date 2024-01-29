@@ -17,6 +17,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.MutableLiveData
 import androidx.test.espresso.IdlingResource
+import androidx.test.espresso.idling.CountingIdlingResource
 import androidx.work.Configuration
 import androidx.work.InitializationExceptionHandler
 import androidx.work.WorkerFactory
@@ -33,11 +34,14 @@ import org.owntracks.android.di.CustomBindingComponentBuilder
 import org.owntracks.android.di.CustomBindingEntryPoint
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.logging.TimberInMemoryLogTree
+import org.owntracks.android.model.messages.MessageBase
+import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.PreferencesStore
 import org.owntracks.android.preferences.types.AppTheme
 import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.services.worker.Scheduler
+import org.owntracks.android.support.IdlingResourceWithData
 import org.owntracks.android.support.SimpleIdlingResource
 import org.owntracks.android.ui.AppShortcuts
 import timber.log.Timber
@@ -75,6 +79,21 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
 
     @get:VisibleForTesting
     val preferenceSetIdlingResource: SimpleIdlingResource = SimpleIdlingResource("preferenceSetIdlingResource", true)
+
+    @Inject
+    @Named("outgoingQueueIdlingResource")
+    @get:VisibleForTesting
+    lateinit var outgoingQueueIdlingResource: CountingIdlingResource
+
+    @Inject
+    @Named("contactsClearedIdlingResource")
+    @get:VisibleForTesting
+    lateinit var contactsClearedIdlingResource: SimpleIdlingResource
+
+    @Inject
+    @Named("selfMessageReceivedIdlingResource")
+    @get:VisibleForTesting
+    lateinit var selfMQTTMessageReceivedIdlingResource: IdlingResourceWithData<MessageLocation>
 
     @Inject
     lateinit var waypointsRepo: RoomWaypointsRepo

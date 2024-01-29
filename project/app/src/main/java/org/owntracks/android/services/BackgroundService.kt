@@ -28,12 +28,6 @@ import dagger.hilt.EntryPoints
 import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.components.SingletonComponent
-import java.time.Duration
-import java.util.LinkedList
-import java.util.concurrent.TimeUnit
-import java.util.stream.Collectors
-import javax.inject.Inject
-import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -67,8 +61,16 @@ import org.owntracks.android.preferences.types.MonitoringMode.Companion.getByVal
 import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.DateFormatter.formatDate
 import org.owntracks.android.support.RunThingsOnOtherThreads
+import org.owntracks.android.support.SimpleIdlingResource
 import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber
+import java.time.Duration
+import java.util.LinkedList
+import java.util.concurrent.TimeUnit
+import java.util.stream.Collectors
+import javax.inject.Inject
+import javax.inject.Named
+import kotlin.time.Duration.Companion.minutes
 
 @AndroidEntryPoint
 class BackgroundService :
@@ -115,6 +117,10 @@ class BackgroundService :
 
     @Inject
     lateinit var locationProviderClient: LocationProviderClient
+
+    @Inject
+    @Named("contactsClearedIdlingResource")
+    lateinit var contactsClearedIdlingResource: SimpleIdlingResource
 
     @Inject
     @CoroutineScopes.IoDispatcher
@@ -298,6 +304,14 @@ class BackgroundService :
                 // Called when the events are cancelled
                 INTENT_ACTION_CLEAR_NOTIFICATIONS -> {
                     clearEventStackNotification()
+                    return
+                }
+                // Clears all contacts from the repo
+                INTENT_ACTION_CLEAR_CONTACTS -> {
+                    lifecycleScope.launch {
+                        contactsRepo.clearAll()
+                        contactsClearedIdlingResource.setIdleState(true)
+                    }
                     return
                 }
                 INTENT_ACTION_CHANGE_MONITORING -> {
@@ -681,6 +695,9 @@ class BackgroundService :
             setupLocationRequest()
             updateOngoingNotification()
         }
+        if (properties.contains("mode")) {
+            lifecycleScope.launch { contactsRepo.clearAll() }
+        }
     }
 
     fun reInitializeLocationRequests() {
@@ -727,6 +744,7 @@ class BackgroundService :
         const val INTENT_ACTION_SEND_EVENT_CIRCULAR = "org.owntracks.android.SEND_EVENT_CIRCULAR"
         private const val INTENT_ACTION_CLEAR_NOTIFICATIONS =
             "org.owntracks.android.CLEAR_EVENT_NOTIFICATIONS"
+        private const val INTENT_ACTION_CLEAR_CONTACTS = "org.owntracks.android.CLEAR_CONTACTS"
         private const val INTENT_ACTION_CHANGE_MONITORING = "org.owntracks.android.CHANGE_MONITORING"
         private const val INTENT_ACTION_EXIT = "org.owntracks.android.EXIT"
         private const val INTENT_ACTION_BOOT_COMPLETED = "android.intent.action.BOOT_COMPLETED"

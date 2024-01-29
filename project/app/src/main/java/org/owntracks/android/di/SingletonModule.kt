@@ -15,6 +15,9 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import okhttp3.OkHttpClient
+import org.owntracks.android.model.messages.MessageBase
+import org.owntracks.android.model.messages.MessageLocation
+import org.owntracks.android.support.IdlingResourceWithData
 import org.owntracks.android.support.SimpleIdlingResource
 import org.owntracks.android.ui.AppShortcuts
 import org.owntracks.android.ui.AppShortcutsImpl
@@ -46,12 +49,22 @@ class SingletonModule {
     fun provideResponseMessageIdlingResource(): SimpleIdlingResource =
         SimpleIdlingResource("publishResponseMessageIdlingResource", false)
 
+    /**
+     * Idles once a configuration import has been completed
+     *
+     * @return a [SimpleIdlingResource]
+     */
     @Provides
     @Named("importConfigurationIdlingResource")
     @Singleton
     fun provideImportConfigurationIdlingResource(): SimpleIdlingResource =
         SimpleIdlingResource("importConfigurationIdlingResource", false)
 
+    /**
+     * Used to help determine that a mock location set by a test has been received by the device.
+     *
+     * @return a [SimpleIdlingResource]
+     */
     @Provides
     @Singleton
     @Named("mockLocationIdlingResource")
@@ -60,12 +73,38 @@ class SingletonModule {
         false
     )
 
+    /**
+     * Idles once the ContactsActivity has finished loading
+     *
+     * @return a [CountingIdlingResource
+     */
     @Provides
     @Singleton
     @Named("contactsActivityIdlingResource")
     fun provideContactsActivityIdlingResource(): CountingIdlingResource = CountingIdlingResource(
         "contactsActivityIdlingResource",
         true
+    )
+
+    /**
+     * This idling resource is used to detect that a clear message has propagated and updated through to the ContactsAdapter
+     *
+     * @return a [SimpleIdlingResource]
+     */
+    @Provides
+    @Singleton
+    @Named("contactsClearedIdlingResource")
+    fun provideContactsClearedIdlingResource(): SimpleIdlingResource = SimpleIdlingResource(
+        "contactsClearedIdlingResource",
+        true
+    )
+
+    @Provides
+    @Singleton
+    @Named("selfMessageReceivedIdlingResource")
+    fun provideLocationMessageIdlingResource(): IdlingResourceWithData<MessageLocation> = IdlingResourceWithData(
+        "selfMessageReceivedIdlingResource",
+        compareBy ( {it.timestamp }, { it.accuracy }, {it.battery }, { it.altitude }, { it.longitude }, { it.latitude }, {it.trigger} )
     )
 
     @Provides

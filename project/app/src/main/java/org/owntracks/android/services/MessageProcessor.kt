@@ -39,6 +39,7 @@ import org.owntracks.android.model.messages.MessageTransition
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.services.worker.Scheduler
+import org.owntracks.android.support.IdlingResourceWithData
 import org.owntracks.android.support.Parser
 import org.owntracks.android.support.SimpleIdlingResource
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
@@ -55,6 +56,7 @@ class MessageProcessor @Inject constructor(
     private val endpointStateRepo: EndpointStateRepo,
     @Named("outgoingQueueIdlingResource") private val outgoingQueueIdlingResource: CountingIdlingResource,
     @Named("importConfigurationIdlingResource") private val importConfigurationIdlingResource: SimpleIdlingResource,
+    @Named("selfMessageReceivedIdlingResource") private val selfMessageReceivedIdlingResource: IdlingResourceWithData<MessageLocation>,
     @Named("CAKeyStore") private val caKeyStore: KeyStore,
     private val locationProcessorLazy: Lazy<LocationProcessor>,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -229,6 +231,9 @@ class MessageProcessor @Inject constructor(
                     messageFailedLastTime = false
                     try {
                         endpoint!!.sendMessage(message)
+                        if (message is MessageLocation) {
+                            selfMessageReceivedIdlingResource.add(message)
+                        }
                     } catch (e: Exception) {
                         when (e) {
                             is OutgoingMessageSendingException,
@@ -360,8 +365,18 @@ class MessageProcessor @Inject constructor(
             preferences.ignoreStaleLocations.toDouble().days.inWholeMilliseconds
         ) {
             Timber.e("discarding stale location")
+            selfMessageReceivedIdlingResource.remove(message)
         } else {
-            scope.launch { contactsRepo.update(message.contactKey, message) }
+            scope.launch {
+                contactsRepo.update(message.contactKey, message)
+                /*
+                We need to idle the selfMessageReceivedIdlingResource synchronously after we call update, because
+                the update method will trigger a change event, which will cause the UI to update, which needs to happen
+                before we trigger any clear all contacts events. Otherwise, we have a race, and the clear all may happen
+                before the contactsRepo gets updated with this location.
+                 */
+                selfMessageReceivedIdlingResource.remove(message)
+            }
         }
     }
 

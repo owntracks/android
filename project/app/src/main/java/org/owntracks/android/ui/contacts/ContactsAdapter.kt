@@ -7,9 +7,11 @@ import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SortedList
 import kotlinx.coroutines.CoroutineScope
+import org.bouncycastle.asn1.x500.style.RFC4519Style.l
 import org.owntracks.android.BR
 import org.owntracks.android.R
 import org.owntracks.android.model.Contact
+import timber.log.Timber
 
 internal class ContactsAdapter(
     private val clickListener: AdapterClickListener<Contact>,
@@ -60,27 +62,32 @@ internal class ContactsAdapter(
         contactList.run {
             beginBatchedUpdates()
             clear()
-            addAll(contacts)
+            addAll(contacts).also { Timber.v("Added ${contacts.count()} contacts") }
             endBatchedUpdates()
         }
     }
 
     fun addContact(contact: Contact) {
-        contactList.add(contact)
+        contactList.add(contact).also { Timber.v("Added contact: ${contact.id}") }
     }
 
     fun removeContact(contact: Contact) {
-        contactList.remove(contact)
+        contactList.remove(contact).also { Timber.v("Removing contact: ${contact.id}") }
     }
 
     fun updateContact(contact: Contact) {
         contactList.indexOf(contact).run {
-            contactList.updateItemAt(this, contact)
+            if (this == SortedList.INVALID_POSITION) {
+                Timber.v("Attempted to update contact ${contact.id} but it was not found in the adapter")
+                return
+            }
+            contactList.updateItemAt(this, contact).also { Timber.v("Updated contact: $it at index $this") }
         }
     }
 
     fun clearAll() {
         contactList.size().run {
+            Timber.d("Clearing $this contacts from adapter")
             contactList.clear()
         }
     }

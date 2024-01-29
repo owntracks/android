@@ -1,10 +1,14 @@
 package org.owntracks.android.mqtt
 
+import android.content.Intent
+import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import com.adevinta.android.barista.assertion.BaristaListAssertions.assertDisplayedAtPosition
+import com.adevinta.android.barista.assertion.BaristaRecyclerViewAssertions.assertRecyclerViewItemCount
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
@@ -21,6 +25,7 @@ import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.model.messages.MessageWaypoints
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.MonitoringMode
+import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.support.Parser
 import org.owntracks.android.testutils.GPSMockDeviceLocation
 import org.owntracks.android.testutils.MockDeviceLocation
@@ -28,8 +33,6 @@ import org.owntracks.android.testutils.OWNTRACKS_ICON_BASE64
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.TestWithAnMQTTBroker
 import org.owntracks.android.testutils.TestWithAnMQTTBrokerImpl
-import org.owntracks.android.testutils.assertRecyclerViewContainsItemWithText
-import org.owntracks.android.testutils.assertRecyclerViewDoesntContainItemWithText
 import org.owntracks.android.testutils.getCurrentActivity
 import org.owntracks.android.testutils.grantMapActivityPermissions
 import org.owntracks.android.testutils.reportLocationFromMap
@@ -52,7 +55,7 @@ class MQTTMessagePublishTests :
 
     @Test
     fun given_an_MQTT_configured_client_when_the_report_button_is_pressed_then_the_broker_receives_a_packet_with_the_correct_location_message_in() {
-        setup()
+        setupTestActivity()
 
         val mockLatitude = 51.0
         val mockLongitude = 0.0
@@ -80,7 +83,7 @@ class MQTTMessagePublishTests :
 
     @Test
     fun given_an_MQTT_configured_client_when_the_broker_sends_a_location_for_a_cleared_contact_then_a_the_contact_returns_with_the_correct_details() {
-        setup()
+        setupTestActivity()
 
         openDrawer()
         clickOnAndWait(R.string.title_activity_contacts)
@@ -118,7 +121,7 @@ class MQTTMessagePublishTests :
         openDrawer()
         clickOnAndWait(R.string.title_activity_contacts)
 
-        assertRecyclerViewDoesntContainItemWithText(R.id.contactsRecyclerView, contactName)
+        assertDisplayed(R.id.placeholder)
 
         contactsCountingIdlingResource.increment()
         listOf(
@@ -130,7 +133,15 @@ class MQTTMessagePublishTests :
         ).sendFromBroker(broker)
 
         contactsCountingIdlingResource.use {
-            assertRecyclerViewContainsItemWithText(R.id.contactsRecyclerView, contactName)
+            assertRecyclerViewItemCount(R.id.contactsRecyclerView, 1)
+            assertDisplayedAtPosition(R.id.contactsRecyclerView, 0, R.id.name, "TestName")
+            assertDisplayedAtPosition(R.id.contactsRecyclerView, 0, R.id.location, "50.1230, 3.5679")
+            assertDisplayedAtPosition(
+                R.id.contactsRecyclerView,
+                0,
+                R.id.locationDate,
+                "1/2/06" // Default locale for emulator is en_US
+            )
         }
     }
 
@@ -152,7 +163,7 @@ class MQTTMessagePublishTests :
     @OptIn(ExperimentalUnsignedTypes::class)
     @Test
     fun given_an_MQTT_configured_client_when_the_user_publishes_waypoints_then_the_broker_receives_a_waypoint_message() {
-        setup()
+        setupTestActivity()
 
         openDrawer()
         clickOnAndWait(R.string.title_activity_waypoints)
@@ -194,7 +205,7 @@ class MQTTMessagePublishTests :
         }
     }
 
-    private fun setup() {
+    private fun setupTestActivity() {
         PreferenceManager.getDefaultSharedPreferences(app)
             .edit()
             .putInt(Preferences::monitoring.name, MonitoringMode.QUIET.value)
@@ -208,5 +219,6 @@ class MQTTMessagePublishTests :
         configureMQTTConnectionToLocalWithGeneratedPassword()
         waitUntilActivityVisible<MapActivity>()
         clickOnAndWait(R.id.fabMyLocation)
+        waitForMQTTToCompleteAndContactsToBeCleared()
     }
 }

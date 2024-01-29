@@ -22,7 +22,7 @@ class Contact(id: String?) : BaseObservable() {
             val prevLocation = messageLocation?.toLatLng()
             field = value
             if (prevLocation != value?.toLatLng()) {
-                Timber.v("contact has moved to ${value?.toLatLng()}")
+                Timber.v("contact ${this.id} has moved to ${value?.toLatLng()}")
                 notifyPropertyChanged(BR.geocodedLocation)
             }
             notifyPropertyChanged(BR.messageLocation)

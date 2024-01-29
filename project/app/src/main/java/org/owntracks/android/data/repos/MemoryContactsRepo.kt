@@ -4,11 +4,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.internal.synchronized
 import org.owntracks.android.model.Contact
 import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageLocation
-import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.ContactBitmapAndName
 import org.owntracks.android.support.ContactBitmapAndNameMemoryCache
 import timber.log.Timber
@@ -16,8 +14,7 @@ import timber.log.Timber
 @Singleton
 class MemoryContactsRepo @Inject constructor(
     private val contactsBitmapAndNameMemoryCache: ContactBitmapAndNameMemoryCache,
-    preferences: Preferences
-) : ContactsRepo, Preferences.OnPreferenceChangeListener {
+) : ContactsRepo {
 
     private val contacts = mutableMapOf<String, Contact>()
 
@@ -31,17 +28,18 @@ class MemoryContactsRepo @Inject constructor(
     }
 
     private suspend fun put(id: String, contact: Contact) {
-        kotlin.synchronized(contacts) {
+        synchronized(contacts) {
             Timber.v("new contact allocated id=$id, tid=${contact.trackerId}")
             contacts[id] = contact
         }
         mutableRepoChangedEvent.emit(ContactsRepoChange.ContactAdded(contact))
     }
 
-    override fun clearAll() {
+    override suspend fun clearAll() {
+        Timber.i("Clearing all contacts")
         contacts.clear()
         contactsBitmapAndNameMemoryCache.evictAll()
-        mutableRepoChangedEvent.tryEmit(ContactsRepoChange.AllCleared)
+        mutableRepoChangedEvent.emit(ContactsRepoChange.AllCleared)
     }
 
     override suspend fun remove(id: String) {
@@ -78,16 +76,6 @@ class MemoryContactsRepo @Inject constructor(
                     }
                 }
             }.also { put(id, it) }
-        }
-    }
-
-    init {
-        preferences.registerOnPreferenceChangedListener(this)
-    }
-
-    override fun onPreferenceChanged(properties: Set<String>) {
-        if (properties.contains("mode")) {
-            clearAll()
         }
     }
 }

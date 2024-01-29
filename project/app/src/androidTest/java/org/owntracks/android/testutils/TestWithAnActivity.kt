@@ -2,6 +2,8 @@ package org.owntracks.android.testutils
 
 import android.app.Activity
 import android.content.Intent
+import androidx.core.content.ContextCompat
+import androidx.test.espresso.Espresso
 import androidx.test.espresso.intent.Intents
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.rule.BaristaRule
@@ -16,8 +18,10 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.RuleChain
 import org.owntracks.android.App
+import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.testutils.rules.ScreenshotTakingOnTestEndRule
 import shark.AndroidReferenceMatchers
+import timber.log.Timber
 
 abstract class TestWithAnActivity<T : Activity>(
     activityClass: Class<T>,
@@ -109,4 +113,22 @@ abstract class TestWithAnActivity<T : Activity>(
             .getInstrumentation()
             .targetContext
             .applicationContext as App
+
+    fun waitForMQTTToCompleteAndContactsToBeCleared() {
+        Timber.v("Waiting for MQTT connection to be established")
+        app.mqttConnectionIdlingResource.use { Espresso.onIdle() }
+        Timber.v("Waiting for MQTT outgoing queue to be empty")
+        app.outgoingQueueIdlingResource.use { Espresso.onIdle() }
+        Timber.v("Waiting for MQTT messages that were sent to all be received")
+        app.selfMQTTMessageReceivedIdlingResource.use { Espresso.onIdle() }
+        app.contactsClearedIdlingResource.setIdleState(false)
+        ContextCompat.startForegroundService(
+            app,
+            Intent(app, BackgroundService::class.java).apply {
+                action = "org.owntracks.android.CLEAR_CONTACTS"
+            })
+        Timber.v("Waiting for contacts to be cleared")
+        app.contactsClearedIdlingResource.use { Espresso.onIdle() }
+        Timber.v("Test setup complete")
+    }
 }
