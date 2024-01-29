@@ -26,8 +26,7 @@ class LocationPermissionFragment @Inject constructor() : WelcomeFragment() {
   private val locationPermissionRequester =
       LocationPermissionRequester(this, ::permissionGranted, ::permissionDenied)
 
-  override fun shouldBeDisplayed(context: Context): Boolean =
-      !requirementsChecker.hasLocationPermissions()
+  override fun shouldBeDisplayed(context: Context): Boolean = true
 
   @RequiresApi(Build.VERSION_CODES.TIRAMISU)
   override fun onCreateView(
@@ -53,8 +52,11 @@ class LocationPermissionFragment @Inject constructor() : WelcomeFragment() {
   override fun onResume() {
     super.onResume()
     viewModel.setWelcomeState(
-        if (requirementsChecker.hasLocationPermissions() ||
-            preferences.userDeclinedEnableLocationPermissions) {
+        if (requirementsChecker.hasLocationPermissions()) {
+          binding.uiFragmentWelcomeLocationPermissionsRequest.visibility = View.INVISIBLE
+          binding.uiFragmentWelcomeLocationPermissionsMessage.visibility = View.VISIBLE
+          WelcomeViewModel.ProgressState.PERMITTED
+        } else if (preferences.userDeclinedEnableLocationPermissions) {
           WelcomeViewModel.ProgressState.PERMITTED
         } else {
           WelcomeViewModel.ProgressState.NOT_PERMITTED

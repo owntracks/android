@@ -21,6 +21,7 @@ import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.BoundedMatcher
+import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
@@ -31,6 +32,7 @@ import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickD
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions
 import com.adevinta.android.barista.interaction.PermissionGranter
+import junit.framework.AssertionFailedError
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers.not
@@ -287,4 +289,12 @@ fun assertRecyclerViewContainsItemWithText(@IdRes id: Int, text: String) {
 
 fun assertRecyclerViewDoesntContainItemWithText(@IdRes id: Int, text: String) {
     onView(withId(id)).check(matches(not(hasDescendant(withText(text)))))
+}
+
+fun doIfViewNotVisible(@IdRes id: Int, doThat: () -> Unit) {
+    try {
+        onView(withId(id)).check(matches(ViewMatchers.isDisplayed()))
+    } catch (e: AssertionFailedError) {
+        doThat()
+    }
 }
