@@ -5,7 +5,6 @@ import androidx.test.espresso.Espresso.pressBack
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SdkSuppress
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
-import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.PermissionGranter.allowPermissionsIfNeeded
 import org.junit.Test
@@ -37,7 +36,7 @@ class WelcomeActivityTests : TestWithAnActivity<WelcomeActivity>(WelcomeActivity
     }
 
     // Location permissions fragment
-    assertDisplayed(R.id.ui_fragment_welcome_location_permissions_request)
+    assertDisplayed(R.id.ui_fragment_welcome_location_permissions_message)
     doIfViewNotVisible(R.id.btn_next) {
       R.id.ui_fragment_welcome_location_permissions_request.run {
         assertDisplayed(this)
@@ -51,7 +50,7 @@ class WelcomeActivityTests : TestWithAnActivity<WelcomeActivity>(WelcomeActivity
     }
 
     // Notification permissions fragment
-    assertDisplayed(R.id.ui_fragment_welcome_notification_permissions_request)
+    assertDisplayed(R.id.ui_fragment_welcome_notification_permissions_message)
     doIfViewNotVisible(R.id.btn_next) {
       R.id.ui_fragment_welcome_notification_permissions_request.run {
         assertDisplayed(this)
@@ -83,6 +82,7 @@ class WelcomeActivityTests : TestWithAnActivity<WelcomeActivity>(WelcomeActivity
 
     // Connection setup fragment
     assertDisplayed(R.string.welcome_connection_setup_title)
+
     assertDisplayed(R.string.welcome_connection_setup_description)
     R.id.btn_next.run {
       assertDisplayed(this)
@@ -90,15 +90,14 @@ class WelcomeActivityTests : TestWithAnActivity<WelcomeActivity>(WelcomeActivity
     }
 
     // Location permissions fragment
-
-    assertDisplayed(R.id.ui_fragment_welcome_location_permissions_request)
-    assertNotDisplayed(R.id.btn_next)
-    R.id.ui_fragment_welcome_location_permissions_request.run {
-      assertDisplayed(this)
-      clickOn(this)
+    assertDisplayed(R.id.ui_fragment_welcome_location_permissions_message)
+    doIfViewNotVisible(R.id.btn_next) {
+      R.id.ui_fragment_welcome_location_permissions_request.run {
+        assertDisplayed(this)
+        clickOn(this)
+      }
+      allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
     }
-    allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
-
     R.id.btn_next.run {
       assertDisplayed(this)
       clickOn(this)

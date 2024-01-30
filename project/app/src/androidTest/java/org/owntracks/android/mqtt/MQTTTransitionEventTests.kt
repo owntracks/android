@@ -34,6 +34,7 @@ import org.owntracks.android.testutils.stopAndroidSetupProcess
 import org.owntracks.android.testutils.waitUntilActivityVisible
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.map.MapActivity
+import timber.log.Timber
 
 @ExperimentalUnsignedTypes
 @LargeTest
@@ -93,6 +94,13 @@ class MQTTTransitionEventTests :
         val notificationManager = app.getSystemService(
             NOTIFICATION_SERVICE
         ) as NotificationManager
+
+        notificationManager
+            .activeNotifications
+            .forEach{
+                Timber.d("Notification Title: ${it.notification.extras.getString(Notification.EXTRA_TITLE)} Lines: ${it.notification.extras.getCharSequenceArray(Notification.EXTRA_TEXT_LINES)?.joinToString(separator = "|")}")
+            }
+
         assertTrue(
             "Event notification is displayed",
             notificationManager.activeNotifications.any {

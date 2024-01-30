@@ -124,7 +124,7 @@ jobs:
       fail-fast: false
       matrix:
         android-api: [31]
-        flavour: [Oss]
+        flavour: [Gms, Oss]
     steps:
       - name: Enable KVM group perms
         run: |
