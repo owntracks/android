@@ -77,6 +77,7 @@ class MQTTTransitionEventTests :
                 latitude = 52.12
                 longitude = 0.56
                 trigger = "l"
+                trackerId = "tt"
                 timestamp = Instant.parse("2006-01-02T15:04:05Z").epochSecond
             }
         ).map(Parser(null)::toJsonBytes)
@@ -106,7 +107,7 @@ class MQTTTransitionEventTests :
             notificationManager.activeNotifications.any {
                 it.notification.extras.getString(Notification.EXTRA_TITLE) == "Events" &&
                     it.notification.extras.getCharSequenceArray(Notification.EXTRA_TEXT_LINES)?.any { line ->
-                        line.toString() == "2006-01-02 15:04 ce enters Transition!"
+                        line.toString() == "2006-01-02 15:04 tt enters Transition!"
                     } ?: false
             }
         )
