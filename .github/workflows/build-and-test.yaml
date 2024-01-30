@@ -9,21 +9,30 @@ name: Build and Test
     branches:
       - master
 
+env:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=true -Dorg.gradle.configuration-cache=false -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.jvmargs='-Xmx3096M -Dkotlin.daemon.jvm.options=-Xmx2048M -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8 -XX:+UseParallelGC'"
+
 jobs:
   build-test-lint:
     name: Build, test & lint
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     if: ${{ (github.event_name == 'push' && format('refs/heads/{0}', github.event.repository.default_branch)) || (github.event_name == 'pull_request' && !github.event.pull_request.draft) || github.event_name == 'merge_group' || github.event_name == 'workflow_dispatch' }}
     outputs:
-      apk-generated: ${{ steps.output.outputs.apk_generated}}
+      apk-generated: ${{ steps.guard.outputs.run_build }}
     permissions:
-      contents: read
+      contents: write
       checks: write
     steps:
-      - run: echo "/opt/java/openjdk/bin" >> $GITHUB_PATH
-      - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4
+      - uses: actions/setup-java@387ac29b308b003ca37ba93a6cab5eb57c8f5f93 # v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+
       - uses: dorny/paths-filter@v2
-        id: changes
+        name: Check if we should trigger a build
+        id: file-changes-should-build
         with:
           filters: |
             src:
@@ -37,85 +46,92 @@ jobs:
               - "project/gradle/wrapper/gradle-wrapper.properties"
               - "project/gradle/libs.versions.toml"
 
-      - name: Gradle build
-        id: build
-        uses: gradle/gradle-build-action@v2
-        if: steps.changes.outputs.src == 'true' || github.event_name == 'workflow_dispatch'
-        with:
-          build-root-directory: project
-          arguments: |
-            assembleDebug
-            lint
-            app:createGmsDebugUnitTestCoverageReport --scan --stacktrace
+      - name: Guard on running the build based on files changed and event
+        if: steps.file-changes-should-build.outputs.src == 'true' || github.event_name == 'workflow_dispatch'
+        id: guard
+        run: echo "run_build=true" >> "$GITHUB_OUTPUT"
 
-      - name: Upload apk artifact
-        if: steps.changes.outputs.src == 'true' || github.event_name == 'workflow_dispatch'
-        uses: actions/upload-artifact@v3
+      - name: Gradle setup
+        if: steps.guard.outputs.run_build == 'true'
+        uses: gradle/gradle-build-action@a8f75513eafdebd8141bd1cd4e30fcd194af8dfa # v2
         with:
-          name: apks
-          path: |
-            ./project/app/build/outputs/apk/oss/debug/app-oss-debug.apk
-      - name: Generate output flag for other jobs
-        if: steps.changes.outputs.src == 'true' || github.event_name == 'workflow_dispatch'
-        id: output
-        run: echo "apk_generated=true" >> "$GITHUB_OUTPUT"
+          dependency-graph: generate-and-submit
+          cache-read-only: ${{ github.ref != format('refs/heads/{0}', github.event.repository.default_branch) }}
+
+      - name: Build
+        if: steps.guard.outputs.run_build == 'true'
+        run: |
+          ./project/gradlew -p project assembleDebug lint app:createGmsDebugUnitTestCoverageReport --scan
+
+      - name: JUnit Report Action
+        uses: mikepenz/action-junit-report@v3
+        if: steps.guard.outputs.run_build == 'true'
+        with:
+          report_paths: "**/TEST-*.xml"
+          detailed_summary: true
+          include_passed: false # Lots of test, much output.
 
       - name: Upload coverage
-        if: ${{ steps.changes.outputs.src == 'true' && github.event_name == 'push' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) || github.event_name == 'workflow_dispatch' }}
+        if: steps.guard.outputs.run_build == 'true'
         uses: codecov/codecov-action@v3
         with:
           files: ./project/app/build/reports/coverage/test/gms/debug/report.xml
           flags: unittests
           token: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: JUnit Report Action
-        uses: mikepenz/action-junit-report@v3
-        if: steps.changes.outputs.src == 'true' || github.event_name == 'workflow_dispatch'
+      - name: Upload apk artifact for F-droid scanning
+        if: steps.guard.outputs.run_build == 'true'
+        uses: actions/upload-artifact@v3
         with:
-          report_paths: "**/build/test-results/test*UnitTest/TEST-*.xml"
-          detailed_summary: true
-          include_passed: false # Lots of test, much output.
+          name: oss-apk
+          path: |
+            ./project/app/build/outputs/apk/oss/debug/app-oss-debug.apk
 
       - name: Upload lint report
+        if: steps.guard.outputs.run_build == 'true'
         uses: actions/upload-artifact@v3
         with:
           name: lint-report
           path: project/app/build/reports/lint-results-gmsDebug.html
-        if: steps.changes.outputs.src == 'true' || github.event_name == 'workflow_dispatch'
 
   fdroid-scanner:
     name: F-Droid scanner
     runs-on: ubuntu-latest
     needs: build-test-lint
+    if: ${{ needs.build-test-lint.outputs.apk-generated }}
     container:
       image: registry.gitlab.com/fdroid/docker-executable-fdroidserver:master
     steps:
       - name: Download APK
         uses: actions/download-artifact@v3
-        if: ${{ needs.build-test-lint.outputs.apk-generated }}
         with:
-          name: apks
+          name: oss-apk
       - name: Scan OSS APK
-        if: ${{ needs.build-test-lint.outputs.apk-generated }}
         run: |
           . /etc/profile.d/bsenv.sh && GRADLE_USER_HOME=${home_vagrant}/.gradle ${fdroidserver}/fdroid scanner app-oss-debug.apk
 
   espresso-test:
     name: "Espresso test"
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     if: ${{ (github.event_name == 'push' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)) || (github.event_name == 'pull_request' && !github.event.pull_request.draft) || github.event_name == 'merge_group' || github.event_name == 'workflow_dispatch'}}
+    outputs:
+      espresso-tests-run: ${{ steps.run-espresso-guard.outputs.run-espresso }}
     permissions:
-      contents: read
+      contents: write
       checks: write
     needs: build-test-lint
     strategy:
       fail-fast: false
       matrix:
         android-api: [31]
-        flavour: [Oss, Gms]
+        flavour: [Oss]
     steps:
-      - run: echo "/opt/java/openjdk/bin" >> $GITHUB_PATH
-      - run: echo "/android-sdk/platform-tools/" >> $GITHUB_PATH
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
       - uses: nschloe/action-cached-lfs-checkout@v1
       - uses: dorny/paths-filter@v2
         id: changes
@@ -131,44 +147,50 @@ jobs:
               - "project/gradle.properties"
               - "project/gradle/wrapper/gradle-wrapper.properties"
               - "project/gradle/libs.versions.toml"
+
       - id: run-espresso-guard
-        name: Decide whether or not we want to run the espresso tests
+        name: Guard on running the espresso tests based on files changed and event
+        if: (steps.changes.outputs.src == 'true' && github.event_name != 'pull_request') || github.event_name == 'workflow_dispatch'
         run: |
-          if ${{ (steps.changes.outputs.src == 'true' && github.event_name != 'pull_request') || github.event_name == 'workflow_dispatch' }}
-          then
-            echo "run-espresso=true" >> $GITHUB_OUTPUT
-          else
-            echo "run-espresso=false" >> $GITHUB_OUTPUT
-          fi
+          echo "run-espresso=true" >> $GITHUB_OUTPUT
 
-        # Build the espresso tests before start emulator
-      - name: Gradle build
+      - uses: actions/setup-java@387ac29b308b003ca37ba93a6cab5eb57c8f5f93 # v4
         if: steps.run-espresso-guard.outputs.run-espresso == 'true'
-        run: ./project/gradlew -p project :app:package${FLAVOUR}DebugAndroidTest :app:package${FLAVOUR}Debug :app:compile${FLAVOUR}DebugAndroidTestKotlin :app:compile${FLAVOUR}DebugAndroidTestJavaWithJavac --daemon --scan
-        env:
-          FLAVOUR: ${{ matrix.flavour }}
-        timeout-minutes: 10
-
-      - name: "Check snapshot exists"
-        id: check_snapshot_exists
-        uses: andstor/file-existence-action@v2
         with:
-          files: "/android-sdk/user_home/avd/owntracks-test-${{ matrix.android-api }}-${{ matrix.flavour }}.avd/snapshots/default_boot/screenshot.png"
+          distribution: "temurin" # See 'Supported distributions' for available options
+          java-version: "17"
+
+      - name: Gradle setup
+        uses: gradle/gradle-build-action@a8f75513eafdebd8141bd1cd4e30fcd194af8dfa # v2
+        if: steps.run-espresso-guard.outputs.run-espresso == 'true'
+        with:
+          dependency-graph: generate
+
+      - name: AVD cache
+        uses: actions/cache@13aacd865c20de90d75de3b17ebe84f7a17d57d2 # v4
+        if: steps.run-espresso-guard.outputs.run-espresso == 'true'
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: owntracks-test-${{ matrix.android-api }}-${{ matrix.flavour }}
 
       - name: Create AVD and generate snapshot for caching
-        if: steps.run-espresso-guard.outputs.run-espresso == 'true' && steps.check_snapshot_exists.outputs.files_exists == 'false'
+        if: steps.avd-cache.outputs.cache-hit != 'true' && steps.run-espresso-guard.outputs.run-espresso == 'true'
+        timeout-minutes: 10
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.android-api }}
           force-avd-creation: false
-          emulator-options: -no-window -gpu auto -noaudio -no-boot-anim -camera-back none -camera-front none -memory 4000
+          emulator-options: -no-window -gpu auto -noaudio -no-boot-anim -camera-back none -camera-front none -memory 6000
           profile: pixel_3a
           target: ${{ matrix.flavour == 'Gms' && 'google_apis' || 'default' }}
-          ram-size: 4000M
+          ram-size: 6000M
           avd-name: owntracks-test-${{ matrix.android-api }}-${{ matrix.flavour }}
           disable-animations: true
           arch: x86_64
-          cores: 1
+          cores: 2
           sdcard-path-or-size: 1000M
           script: |
             echo "Created AVD snapshot"
@@ -176,20 +198,20 @@ jobs:
       - name: Espresso Test
         uses: reactivecircus/android-emulator-runner@v2
         if: steps.run-espresso-guard.outputs.run-espresso == 'true'
-        timeout-minutes: 60
+        timeout-minutes: 30
         env:
           FLAVOUR: ${{ matrix.flavour }}
         with:
           api-level: ${{ matrix.android-api }}
           force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu auto -noaudio -no-boot-anim -camera-back none -camera-front none -memory 4000
+          emulator-options: -no-snapshot-save -no-window -gpu auto -noaudio -no-boot-anim -camera-back none -camera-front none -memory 6000
           profile: pixel_3a
           target: ${{ matrix.flavour == 'Gms' && 'google_apis' || 'default' }}
-          ram-size: 4000M
+          ram-size: 6000M
           disable-animations: true
           avd-name: owntracks-test-${{ matrix.android-api }}-${{ matrix.flavour }}
           arch: x86_64
-          cores: 1
+          cores: 2
           sdcard-path-or-size: 1000M
           script: |
             adb shell settings put global bluetooth_on 0
@@ -197,14 +219,14 @@ jobs:
             adb shell rm -rf /sdcard/googletest || echo "Couldn't delete googletest folder"
             adb uninstall org.owntracks.android.debug || echo "org.owntracks.android not installed"
             adb uninstall org.owntracks.android.debug.test || echo "org.owntracks.android.test not installed"
-            ./project/gradlew -p project create${FLAVOUR}DebugCoverageReport --max-workers=1 --stacktrace --scan --daemon --info
+            ./project/gradlew -p project create${FLAVOUR}DebugCoverageReport --max-workers=1 --stacktrace --scan
 
       - name: Upload connected test result artifact
         uses: actions/upload-artifact@v3
+        if: always() && steps.run-espresso-guard.outputs.run-espresso == 'true'
         with:
           name: espresso-test-reports-${{ matrix.android-api }}-${{ matrix.flavour }}
           path: ./project/app/build/reports/androidTests/connected/
-        if: always() && steps.run-espresso-guard.outputs.run-espresso == 'true'
 
       - name: Espresso JUnit Report
         uses: mikepenz/action-junit-report@v3
@@ -216,10 +238,10 @@ jobs:
 
       - name: Upload connected test coverage artifact
         uses: ./.github/actions/upload-artifact
+        if: steps.run-espresso-guard.outputs.run-espresso == 'true'
         with:
           name: espresso-test-coverage-${{ matrix.android-api }}-${{ matrix.flavour }}
           path: ./project/app/build/reports/coverage/androidTest/
-        if: steps.run-espresso-guard.outputs.run-espresso == 'true'
 
       - name: Upload coverage
         if: steps.run-espresso-guard.outputs.run-espresso == 'true'
@@ -231,12 +253,12 @@ jobs:
 
   publish-to-play-store:
     name: "Publish to Play Store"
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       checks: write
     needs: espresso-test
-    if: ${{ github.event_name == 'push' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
+    if: ${{ github.event_name == 'push' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && needs.espresso-test.outputs.espresso-tests-run == 'true'  }}
     steps:
       - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4
       - uses: actions/setup-java@v3
