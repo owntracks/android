@@ -68,6 +68,7 @@ class MQTTTransitionEventTests :
             MessageLocation().apply {
                 latitude = 52.123
                 longitude = 0.56789
+                trackerId = "tt"
                 timestamp = Instant.parse("2006-01-02T15:04:05Z").epochSecond
             },
             MessageTransition().apply {
@@ -77,7 +78,7 @@ class MQTTTransitionEventTests :
                 latitude = 52.12
                 longitude = 0.56
                 trigger = "l"
-                trackerId = "tt"
+                trackerId = "aa" // This is the trackerId of the *waypoint*
                 timestamp = Instant.parse("2006-01-02T15:04:05Z").epochSecond
             }
         ).map(Parser(null)::toJsonBytes)
