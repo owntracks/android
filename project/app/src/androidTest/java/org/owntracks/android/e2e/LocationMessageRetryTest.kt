@@ -14,7 +14,6 @@ import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.testutils.GPSMockDeviceLocation
 import org.owntracks.android.testutils.MockDeviceLocation
-import org.owntracks.android.testutils.SmokeTest
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.TestWithAnHTTPServer
 import org.owntracks.android.testutils.TestWithAnHTTPServerImpl
@@ -26,7 +25,6 @@ import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.map.MapActivity
 
 @LargeTest
-@SmokeTest
 @RunWith(AndroidJUnit4::class)
 class LocationMessageRetryTest :
     TestWithAnActivity<MapActivity>(MapActivity::class.java, false),
