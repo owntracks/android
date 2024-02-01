@@ -115,11 +115,11 @@ jobs:
         if: ${{ contains(github.ref, 'beta') }}
 
       - name: Promote play store production from beta
-        run: ./gradlew promoteArtifact --from-track beta --promote-track production --release-status completed
+        run: ./gradlew promoteArtifact --from-track beta --promote-track production --release-status inProgress -user-fraction .1
         working-directory: project
         if: ${{ !contains(github.ref, 'beta') && steps.tagCount.outputs.beta_tag_count > 0 }}
 
       - name: Promote play store production from internal
-        run: ./gradlew promoteArtifact --from-track internal --promote-track production --release-status completed
+        run: ./gradlew promoteArtifact --from-track internal --promote-track production --release-status inProgress -user-fraction .1
         working-directory: project
         if: ${{ !contains(github.ref, 'beta') && steps.tagCount.outputs.beta_tag_count == 0 }}
