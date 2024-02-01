@@ -18,6 +18,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
+import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.model.messages.MessageTransition
 import org.owntracks.android.support.Parser
@@ -110,6 +111,65 @@ class MQTTTransitionEventTests :
                     it.notification.extras.getCharSequenceArray(Notification.EXTRA_TEXT_LINES)?.any { line ->
                         line.toString() == "2006-01-02 15:04 tt enters Transition!"
                     } ?: false
+            }
+        )
+    }
+
+    @Test
+    fun given_an_MQTT_configured_client_when_the_broker_sends_a_transition_message_for_a_contact_with_a_card_then_a_notification_appears() {
+        setNotFirstStartPreferences()
+        launchActivity()
+        grantMapActivityPermissions()
+        configureMQTTConnectionToLocalWithGeneratedPassword()
+        waitUntilActivityVisible<MapActivity>()
+
+        listOf(
+            MessageCard().apply {name="Test Contact"},
+            MessageLocation().apply {
+                latitude = 52.123
+                longitude = 0.56789
+                trackerId = "tt"
+                timestamp = Instant.parse("2006-01-02T15:04:05Z").epochSecond
+            },
+            MessageTransition().apply {
+                accuracy = 48f
+                description = "Transition!"
+                event = "enter"
+                latitude = 52.12
+                longitude = 0.56
+                trigger = "l"
+                trackerId = "aa"
+                timestamp = Instant.parse("2006-01-02T15:04:05Z").epochSecond
+            }
+        ).map(Parser(null)::toJsonBytes)
+            .forEach {
+                broker.publish(
+                    false,
+                    "owntracks/someuser/somedevice",
+                    Qos.AT_LEAST_ONCE,
+                    MQTT5Properties(),
+                    it.toUByteArray()
+                )
+            }
+        BaristaSleepInteractions.sleep(10, TimeUnit.SECONDS)
+
+        val notificationManager = app.getSystemService(
+            NOTIFICATION_SERVICE
+        ) as NotificationManager
+
+        notificationManager
+            .activeNotifications
+            .forEach{
+                Timber.d("Notification Title: ${it.notification.extras.getString(Notification.EXTRA_TITLE)} Lines: ${it.notification.extras.getCharSequenceArray(Notification.EXTRA_TEXT_LINES)?.joinToString(separator = "|")}")
+            }
+
+        assertTrue(
+            "Event notification is displayed",
+            notificationManager.activeNotifications.any {
+                it.notification.extras.getString(Notification.EXTRA_TITLE) == "Events" &&
+                it.notification.extras.getCharSequenceArray(Notification.EXTRA_TEXT_LINES)?.any { line ->
+                    line.toString() == "2006-01-02 15:04 Test Contact enters Transition!"
+                } ?: false
             }
         )
     }
