@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import org.owntracks.android.model.messages.MessageWaypoint
 import org.owntracks.android.support.MessageWaypointCollection
+import timber.log.Timber
 
 abstract class WaypointsRepo protected constructor() {
     sealed class WaypointOperation {
@@ -65,7 +66,13 @@ abstract class WaypointsRepo protected constructor() {
                 getByTst(it.first)?.run {
                     delete(this)
                 }
-                insert(toDaoObject(it.second))
+                // check if the latitude and longitude are valid, otherwise do not replace the waypoint
+                if ((it.second.latitude >= -90.0) && (it.second.latitude <= 90.0) && (it.second.longitude >= -180.0) && (it.second.longitude <= 180.0)) {
+                    insert(toDaoObject(it.second))
+                } else {
+                    // log a warning for the waypoint that isn't being imported
+                    Timber.w("Ignoring waypoint with invalid coordinates: %s", it.second.description);
+                }
             }
     }
 
