@@ -4,7 +4,7 @@
 
 ### Breaking changes
 
-- OwnTracks will no longer manage your TLS CAs if you're using a CA that's not in your device's CA store. You will need to add your CA to your device's CA store, and OwnTracks will use that store as a trusted reference for verifying TLS endpoints. There should be a notification when OwnTracks starts after upgrade.
+- OwnTracks will no longer manage your TLS CAs or client certs. For custom CA certs, you will need to add your CA to your device's CA store, and OwnTracks will use that store as a trusted reference for verifying TLS endpoints. Similarly, for client certificates, you'll need to add that certificate to the device's certificate store There should be a notification when OwnTracks starts after upgrade.
 - TLSv1 and TLSv1.1 are deprecated. Supported TLS versions are 1.2 and 1.3.
 
 ### New features
