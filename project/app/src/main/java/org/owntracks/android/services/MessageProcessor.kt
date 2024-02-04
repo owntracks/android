@@ -37,6 +37,7 @@ import org.owntracks.android.model.messages.MessageCmd
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.model.messages.MessageTransition
 import org.owntracks.android.preferences.Preferences
+import org.owntracks.android.preferences.Preferences.Companion.PREFERENCES_THAT_WIPE_QUEUE_AND_CONTACTS
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.IdlingResourceWithData
@@ -450,8 +451,9 @@ class MessageProcessor @Inject constructor(
     }
 
     override fun onPreferenceChanged(properties: Set<String>) {
-        if (properties.contains("mode")) {
+        if (properties.intersect(PREFERENCES_THAT_WIPE_QUEUE_AND_CONTACTS).isNotEmpty()) {
             acceptMessages = false
+            outgoingQueue.clear()
             loadOutgoingMessageProcessor()
         }
     }

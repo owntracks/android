@@ -57,6 +57,7 @@ import org.owntracks.android.location.toLatLng
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.model.messages.MessageTransition
 import org.owntracks.android.preferences.Preferences
+import org.owntracks.android.preferences.Preferences.Companion.PREFERENCES_THAT_WIPE_QUEUE_AND_CONTACTS
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.preferences.types.MonitoringMode.Companion.getByValue
 import org.owntracks.android.services.worker.Scheduler
@@ -706,7 +707,7 @@ class BackgroundService :
             setupLocationRequest()
             updateOngoingNotificationContentText()
         }
-        if (properties.contains("mode")) {
+        if (properties.intersect(PREFERENCES_THAT_WIPE_QUEUE_AND_CONTACTS).isNotEmpty()) {
             lifecycleScope.launch { contactsRepo.clearAll() }
         }
     }

@@ -455,6 +455,16 @@ class Preferences @Inject constructor(
                 MODE_NIGHT_AUTO_BATTERY
             }
         }
+        // These preferences changing should trigger wiping the contacts and messagequeue
+        val PREFERENCES_THAT_WIPE_QUEUE_AND_CONTACTS = setOf(
+            Preferences::mode.name,
+            Preferences::url.name,
+            Preferences::port.name,
+            Preferences::host.name,
+            Preferences::username.name,
+            Preferences::clientId.name,
+            Preferences::tlsClientCrt.name
+        )
     }
 
     @Target(AnnotationTarget.PROPERTY)
