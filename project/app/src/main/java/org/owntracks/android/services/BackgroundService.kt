@@ -129,7 +129,7 @@ class BackgroundService :
 
     private val callbackForReportType =
         mutableMapOf<MessageLocation.ReportType, Lazy<LocationCallbackWithReportType>>().apply {
-            MessageLocation.ReportType.values().forEach {
+            MessageLocation.ReportType.entries.forEach {
                 this[it] = lazy {
                     LocationCallbackWithReportType(it, locationProcessor, lifecycleScope)
                 }

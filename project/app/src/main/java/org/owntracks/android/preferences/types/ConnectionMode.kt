@@ -10,7 +10,7 @@ enum class ConnectionMode(@JsonValue val value: Int) {
         @JvmStatic
         @FromConfiguration
         fun getByValue(value: Int): ConnectionMode =
-            ConnectionMode.values()
+            entries
                 .firstOrNull { it.value == value } ?: MQTT
     }
 }

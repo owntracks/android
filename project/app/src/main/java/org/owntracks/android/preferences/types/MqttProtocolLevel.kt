@@ -9,8 +9,6 @@ enum class MqttProtocolLevel(@JsonValue val value: Int) {
     companion object {
         @JvmStatic
         @FromConfiguration
-        fun getByValue(value: Int): MqttProtocolLevel =
-            MqttProtocolLevel.values()
-                .firstOrNull { it.value == value } ?: MQTT_3_1
+        fun getByValue(value: Int): MqttProtocolLevel = entries.firstOrNull { it.value == value } ?: MQTT_3_1
     }
 }

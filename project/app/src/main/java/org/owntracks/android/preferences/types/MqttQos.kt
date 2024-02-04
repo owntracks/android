@@ -10,8 +10,6 @@ enum class MqttQos(@JsonValue val value: Int) {
     companion object {
         @JvmStatic
         @FromConfiguration
-        fun getByValue(value: Int): MqttQos =
-            MqttQos.values()
-                .firstOrNull { it.value == value } ?: ONE
+        fun getByValue(value: Int): MqttQos = entries.firstOrNull { it.value == value } ?: ONE
     }
 }

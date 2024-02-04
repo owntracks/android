@@ -10,7 +10,6 @@ enum class ReverseGeocodeProvider(@JsonValue val value: String) {
     companion object {
         @JvmStatic
         @FromConfiguration
-        fun getByValue(value: String): ReverseGeocodeProvider =
-            ReverseGeocodeProvider.values().firstOrNull { it.value == value } ?: NONE
+        fun getByValue(value: String): ReverseGeocodeProvider = entries.firstOrNull { it.value == value } ?: NONE
     }
 }

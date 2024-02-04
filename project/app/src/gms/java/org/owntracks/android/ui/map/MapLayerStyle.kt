@@ -30,9 +30,7 @@ enum class MapLayerStyle {
     companion object {
         @JvmStatic
         @FromConfiguration
-        fun getByValue(value: String): MapLayerStyle =
-            MapLayerStyle.values()
-                .firstOrNull { it.name == value } ?: GoogleMapDefault
+        fun getByValue(value: String): MapLayerStyle = entries.firstOrNull { it.name == value } ?: GoogleMapDefault
     }
 }
 

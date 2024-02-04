@@ -11,7 +11,6 @@ enum class AppTheme(@JsonValue val value: Int) {
         @JvmStatic
         @FromConfiguration
         fun getByValue(value: Int): AppTheme =
-            AppTheme.values()
-                .firstOrNull { it.value == value } ?: LIGHT
+            entries.firstOrNull { it.value == value } ?: LIGHT
     }
 }
