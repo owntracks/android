@@ -12,8 +12,8 @@ import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageLocation
 import timber.log.Timber
 
-class Contact(id: String?) : BaseObservable() {
-  @get:Bindable val id: String = if (!id.isNullOrEmpty()) id else "NOID"
+class Contact(id: String) : BaseObservable() {
+  @get:Bindable val id: String = id.ifEmpty { "NOID" }
 
   @get:Bindable
   val displayName: String
@@ -104,7 +104,7 @@ class Contact(id: String?) : BaseObservable() {
     }
 
   @get:Bindable
-  var trackerId: String = ""
+  var trackerId: String = id.takeLast(2)
     private set(value) {
       field = value
       notifyPropertyChanged(BR.trackerId)
