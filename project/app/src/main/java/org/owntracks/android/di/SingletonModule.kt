@@ -8,19 +8,16 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import java.security.KeyStore
-import javax.inject.Named
-import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import okhttp3.OkHttpClient
-import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.support.IdlingResourceWithData
 import org.owntracks.android.support.SimpleIdlingResource
-import org.owntracks.android.ui.AppShortcuts
-import org.owntracks.android.ui.AppShortcutsImpl
+import java.security.KeyStore
+import javax.inject.Named
+import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
 @Module
@@ -106,10 +103,6 @@ class SingletonModule {
         "selfMessageReceivedIdlingResource",
         compareBy ( {it.timestamp }, { it.accuracy }, {it.battery }, { it.altitude }, { it.longitude }, { it.latitude }, {it.trigger} )
     )
-
-    @Provides
-    @Singleton
-    fun provideAppShortcuts(): AppShortcuts = AppShortcutsImpl()
 
     @ApplicationScope
     @Provides

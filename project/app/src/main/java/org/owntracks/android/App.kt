@@ -23,10 +23,6 @@ import androidx.work.InitializationExceptionHandler
 import androidx.work.WorkerFactory
 import dagger.hilt.EntryPoints
 import dagger.hilt.android.HiltAndroidApp
-import java.security.Security
-import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Provider
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.conscrypt.Conscrypt
 import org.owntracks.android.data.waypoints.RoomWaypointsRepo
@@ -34,7 +30,6 @@ import org.owntracks.android.di.CustomBindingComponentBuilder
 import org.owntracks.android.di.CustomBindingEntryPoint
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.logging.TimberInMemoryLogTree
-import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.PreferencesStore
@@ -43,8 +38,11 @@ import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.IdlingResourceWithData
 import org.owntracks.android.support.SimpleIdlingResource
-import org.owntracks.android.ui.AppShortcuts
 import timber.log.Timber
+import java.security.Security
+import javax.inject.Inject
+import javax.inject.Named
+import javax.inject.Provider
 
 @HiltAndroidApp
 class App : Application(), Configuration.Provider, Preferences.OnPreferenceChangeListener {
@@ -59,9 +57,6 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
 
     @Inject
     lateinit var bindingComponentProvider: Provider<CustomBindingComponentBuilder>
-
-    @Inject
-    lateinit var appShortcuts: AppShortcuts
 
     @Inject
     lateinit var messageProcessor: MessageProcessor
@@ -147,7 +142,6 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
         preferences.registerOnPreferenceChangedListener(this)
 
         setThemeFromPreferences()
-        appShortcuts.enableShortcuts(this)
 
         migrateWaypoints()
 
