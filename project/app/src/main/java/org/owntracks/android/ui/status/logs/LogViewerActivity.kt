@@ -25,15 +25,14 @@ import org.owntracks.android.BuildConfig
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiPreferencesLogsBinding
 import org.owntracks.android.logging.LogEntry
+import timber.log.Timber
 
 @AndroidEntryPoint
 class LogViewerActivity : AppCompatActivity() {
     val viewModel: LogViewerViewModel by viewModels()
 
     private val shareIntentActivityLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            revokeExportUriPermissions()
-        }
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { }
 
     private lateinit var logAdapter: LogEntryAdapter
     private var logExportUri: Uri? = null
@@ -75,7 +74,6 @@ class LogViewerActivity : AppCompatActivity() {
             adapter = logAdapter
         }
         binding.shareFab.setOnClickListener {
-            revokeExportUriPermissions()
             val key = "${getRandomHexString()}/debug=${viewModel.isDebugEnabled()}/owntracks-debug.txt"
             logExportUri = Uri.parse("content://${BuildConfig.APPLICATION_ID}.log/$key")
             val shareIntent = ShareCompat.IntentBuilder(this)
@@ -84,8 +82,9 @@ class LogViewerActivity : AppCompatActivity() {
                 .setChooserTitle(R.string.exportLogFilePrompt)
                 .setStream(logExportUri)
                 .createChooserIntent()
-                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            grantUriPermission("android", logExportUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION) // Temporary. No need to revoke.
+                .also { Timber.v("Created share intent of r$logExportUri") }
+            grantUriPermission("android", logExportUri, Intent.FLAG_GRANT_READ_URI_PERMISSION).also { Timber.v("Granted READ_URI_PERMISSION permission to $logExportUri") }
             shareIntentActivityLauncher.launch(shareIntent)
         }
     }
@@ -149,12 +148,5 @@ class LogViewerActivity : AppCompatActivity() {
 
     private fun getRandomHexString(): String {
         return Random.nextInt(0X1000000).toString(16)
-    }
-
-    private fun revokeExportUriPermissions() {
-        logExportUri?.let {
-            revokeUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            logExportUri = null
-        }
     }
 }
