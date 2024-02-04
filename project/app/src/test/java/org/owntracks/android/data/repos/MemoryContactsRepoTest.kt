@@ -18,6 +18,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.owntracks.android.location.toLatLng
 import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.preferences.InMemoryPreferencesStore
@@ -63,6 +64,8 @@ class MemoryContactsRepoTest {
           latitude = 50.1
           longitude = 60.2
           timestamp = 123456789
+          trackerId = "aa"
+          topic = "owntracks/test/name"
         }
 
     messageCard = MessageCard().apply { name = "TESTNAME" }
@@ -78,8 +81,27 @@ class MemoryContactsRepoTest {
         contactsRepo!!.run {
           update(CONTACT_ID, messageLocation)
           getById(CONTACT_ID)!!.let { c ->
-            assertEquals(messageLocation, c.messageLocation)
-            assertEquals(messageLocation.timestamp, c.tst)
+            assertEquals(messageLocation.battery, c.battery)
+            assertEquals(messageLocation.toLatLng(), c.latLng)
+            assertEquals(messageLocation.altitude, c.altitude)
+            assertEquals(messageLocation.timestamp, c.locationTimestamp)
+            assertEquals("aa", c.trackerId)
+            assertEquals(CONTACT_ID, c.id)
+          }
+        }
+      }
+
+  @Test
+  fun `given an empty repo, when updating a contact with a location without a tid, then the contact is created with the fallback displayName`() =
+      runTest {
+        contactsRepo!!.run {
+          update(CONTACT_ID, messageLocation.apply { trackerId = null })
+          getById(CONTACT_ID)!!.let { c ->
+            assertEquals(messageLocation.battery, c.battery)
+            assertEquals(messageLocation.toLatLng(), c.latLng)
+            assertEquals(messageLocation.altitude, c.altitude)
+            assertEquals(messageLocation.timestamp, c.locationTimestamp)
+            assertEquals("me", c.trackerId)
             assertEquals(CONTACT_ID, c.id)
           }
         }
@@ -91,7 +113,8 @@ class MemoryContactsRepoTest {
         contactsRepo!!.run {
           update(CONTACT_ID, messageCard)
           getById(CONTACT_ID)!!.let { c ->
-            assertEquals(messageCard, c.messageCard)
+            assertEquals(messageCard.name, c.displayName)
+            assertEquals(messageCard.face, c.face)
             assertEquals(CONTACT_ID, c.id)
           }
         }
@@ -201,7 +224,7 @@ class MemoryContactsRepoTest {
           contactBitmapAndNameMemoryCache.put(
               CONTACT_ID, ContactBitmapAndName.CardBitmap("TESTNAME", null))
           update(CONTACT_ID, messageLocation)
-          assertEquals("TESTNAME", getById(CONTACT_ID)!!.messageCard!!.name)
+          assertEquals("TESTNAME", getById(CONTACT_ID)!!.displayName)
         }
       }
 

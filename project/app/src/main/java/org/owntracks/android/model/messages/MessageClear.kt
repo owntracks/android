@@ -4,6 +4,8 @@ import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.Parser
 
 class MessageClear : MessageBase() {
+    override fun toString(): String = "[MessageClear]"
+
     override fun addMqttPreferences(preferences: Preferences) {
         retained = true
     }

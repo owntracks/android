@@ -35,7 +35,6 @@ class DeviceGeocoder internal constructor(context: Context) : CachingGeocoder() 
                 val g = StringBuilder()
                 val a = addresses[0]
                 if (a.getAddressLine(0) != null) g.append(a.getAddressLine(0))
-                Timber.d("Resolved $latitude,$longitude to $g")
                 GeocodeResult.Formatted(g.toString())
             } else {
                 GeocodeResult.Empty

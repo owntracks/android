@@ -18,6 +18,8 @@ class MessageCmd : MessageBase() {
         return super.isValidMessage() && action != null
     }
 
+    override fun toString(): String = "[MessageCmd action=$action]"
+
     override fun addMqttPreferences(preferences: Preferences) {
         topic = preferences.receivedCommandsTopic
     }

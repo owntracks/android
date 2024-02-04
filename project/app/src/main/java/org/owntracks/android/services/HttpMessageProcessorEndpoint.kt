@@ -24,6 +24,8 @@ import org.owntracks.android.data.repos.EndpointStateRepo
 import org.owntracks.android.di.ApplicationScope
 import org.owntracks.android.di.CoroutineScopes
 import org.owntracks.android.model.messages.MessageBase
+import org.owntracks.android.model.messages.MessageLocation
+import org.owntracks.android.model.messages.MessageTransition
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.support.Parser
@@ -109,7 +111,7 @@ class HttpMessageProcessorEndpoint(
 
         httpClientAndConfiguration?.run {
             endpointStateRepo.setState(EndpointState.CONNECTING)
-            Timber.d("Publishing message id=${message.messageId}")
+            Timber.d("Publishing message $message")
             try {
                 client.newCall(getRequest(configuration, message))
                     .execute()
@@ -128,7 +130,7 @@ class HttpMessageProcessorEndpoint(
                                     )
                                 )
                             )
-                            messageProcessor.onMessageDeliveryFailed(message.messageId)
+                            messageProcessor.onMessageDeliveryFailed(message)
                             throw OutgoingMessageSendingException(httpException)
                         } else {
                             if (response.body != null) {
@@ -173,7 +175,7 @@ class HttpMessageProcessorEndpoint(
                                 } catch (e: IOException) {
                                     Timber.e(e, "HTTP Delivery failed")
                                     endpointStateRepo.setState(EndpointState.ERROR.withError(e))
-                                    messageProcessor.onMessageDeliveryFailed(message.messageId)
+                                    messageProcessor.onMessageDeliveryFailed(message)
                                     throw OutgoingMessageSendingException(e)
                                 }
                             }
@@ -251,7 +253,7 @@ class HttpMessageProcessorEndpoint(
 
     override fun onFinalizeMessage(message: MessageBase): MessageBase {
         // Build pseudo topic based on tid
-        if (message.hasTrackerId()) {
+        if (message is MessageLocation) { // STOPSHIP messages don't have topics.
             message.topic = HTTPTOPIC + message.trackerId
         }
         return message

@@ -541,7 +541,7 @@ class ParserTest {
         val messageCmd = messageBase as MessageCmd
         assertTrue(messageCmd.isValidMessage())
         assertEquals(CommandAction.REPORT_LOCATION, messageCmd.action)
-        assertEquals("owntracks/username/device", messageCmd.contactKey)
+        assertEquals("owntracks/username/device", messageCmd.getContactId())
     }
 
     @Test
@@ -642,7 +642,7 @@ class ParserTest {
         assertEquals(1558351273, message.waypointTimestamp)
         assertEquals("ce", message.trackerId)
         assertEquals("l", message.trigger)
-        assertEquals("owntracks/username/device", message.contactKey)
+        assertEquals("owntracks/username/device", message.getContactId())
     }
 
     @Test
@@ -791,7 +791,6 @@ class ParserTest {
         assertTrue(message.isValidMessage())
         assertFalse(message.waypoints.isEmpty())
         assertEquals(2, message.waypoints.size)
-        assertFalse(message.hasTrackerId())
         assertEquals(true, message["autostartOnBoot"])
         assertEquals(5, message["locatorDisplacement"])
     }
@@ -1014,7 +1013,7 @@ class ParserTest {
         val messageCard = messageBase as MessageCard
         assertTrue(messageCard.isValidMessage())
         assertEquals("MyName!", messageCard.name)
-        assertEquals("owntracks/user/device", messageCard.contactKey)
+        assertEquals("owntracks/user/device", messageCard.getContactId())
     }
     //endregion
 

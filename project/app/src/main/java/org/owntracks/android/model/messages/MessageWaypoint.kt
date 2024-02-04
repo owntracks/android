@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import kotlinx.datetime.Instant
 import org.owntracks.android.preferences.Preferences
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
@@ -29,6 +30,8 @@ class MessageWaypoint : MessageBase() {
     override fun isValidMessage(): Boolean {
         return super.isValidMessage() && description != null
     }
+
+    override fun toString(): String = "[MessageWaypoint ts=${Instant.fromEpochSeconds(timestamp)},description=$description,lat=$latitude,lon=$longitude,rad=$radius]"
 
     override fun addMqttPreferences(preferences: Preferences) {
         topic = preferences.pubTopicWaypoints

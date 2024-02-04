@@ -8,8 +8,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import java.io.IOException
-import kotlin.random.Random
-import okhttp3.internal.toHexString
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.support.Parser
@@ -36,16 +34,13 @@ abstract class MessageBase : BaseObservable() {
     @JsonIgnore
     open val numberOfRetries: Int = 10
 
-    @get:JsonIgnore
-    @JsonIgnore
-    val messageId = "${System.currentTimeMillis()}-${Random.nextInt(0X1000000).toHexString()}"
-
     @JsonIgnore
     open var topic: String = ""
         set(value) {
             field = value
             topicBase = getBaseTopic(value) // Normalized topic for all message types
         }
+
 
     @JsonProperty("topic")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -55,19 +50,26 @@ abstract class MessageBase : BaseObservable() {
     @JsonIgnore
     private var topicBase: String? = null
 
+    /**
+     * We only add the `topic` attribute if we're publishing over HTTP, so rely on an HTTP transport explicitly setting
+     * it by calling this.
+     */
     fun setTopicVisible() {
         visibleTopic = topic
     }
+
+    /**
+     * Gets the contact identifier for this message, based on the message topic
+     *
+     * @return
+     */
+    @JsonIgnore
+    fun getContactId(): String = getBaseTopic(topic)
 
     @get:JsonIgnore
     @set:JsonIgnore
     @JsonIgnore
     var modeId = ConnectionMode.MQTT
-
-    @get:JsonIgnore
-    @JsonIgnore
-    var isIncoming = false
-        private set
 
     @get:JsonIgnore
     @set:JsonIgnore
@@ -79,22 +81,6 @@ abstract class MessageBase : BaseObservable() {
     @JsonIgnore
     var retained = false
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    @JsonProperty("tid")
-    open var trackerId: String? = null
-
-    @get:JsonIgnore
-    val contactKey: String
-        get() {
-            if (topicBase != null) return topicBase!!
-            return if (trackerId != null) trackerId!! else "NOKEY"
-        }
-
-    @JsonIgnore
-    fun setIncoming() {
-        isIncoming = true
-    }
-
     @get:JsonIgnore
     open val baseTopicSuffix: String
         get() = BASETOPIC_SUFFIX
@@ -103,11 +89,6 @@ abstract class MessageBase : BaseObservable() {
     // The message is discarded if false is returned.
     @JsonIgnore
     open fun isValidMessage(): Boolean = true
-
-    @JsonIgnore
-    fun hasTrackerId(): Boolean {
-        return trackerId != null
-    }
 
     @JsonIgnore
     private fun getBaseTopic(topic: String): String {
@@ -119,9 +100,7 @@ abstract class MessageBase : BaseObservable() {
     }
 
     @JsonIgnore
-    override fun toString(): String {
-        return String.format("${this.javaClass.name} id=$messageId")
-    }
+    abstract override fun toString(): String
 
     open fun addMqttPreferences(preferences: Preferences) {}
 

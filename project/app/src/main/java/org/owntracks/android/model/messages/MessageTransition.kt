@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import kotlinx.datetime.Instant
 import org.owntracks.android.location.geofencing.Geofence
 import org.owntracks.android.preferences.Preferences
 
@@ -35,7 +36,7 @@ class MessageTransition : MessageBase() {
     var description: String? = null
 
     @JsonProperty("tid")
-    override var trackerId: String? = null
+    var trackerId: String? = null
 
     @JsonProperty("t")
     var trigger: String? = null
@@ -63,6 +64,8 @@ class MessageTransition : MessageBase() {
 
     override val baseTopicSuffix: String
         get() = BASETOPIC_SUFFIX
+
+    override fun toString(): String = "[MessageTransition ts=${Instant.fromEpochSeconds(timestamp)},event=$event,desc=$description,lon=$longitude,lat=$latitude,acc=$accuracy,trigger=$trigger,trackerId=$trackerId]"
 
     companion object {
         const val TYPE = "transition"

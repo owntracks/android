@@ -167,12 +167,7 @@ class MapViewModel @Inject constructor(
     }
 
     fun refreshGeocodeForContact(contact: Contact) {
-        viewModelScope.launch {
-            contact.messageLocation?.run {
-                geocoderProvider.resolve(this)
-                contact.notifyPropertyChanged(BR.geocodedLocation)
-            }
-        }
+        contact.geocodeLocation(geocoderProvider, viewModelScope)
     }
 
     fun sendLocation() {
@@ -214,7 +209,7 @@ class MapViewModel @Inject constructor(
             sender?.run {
                 if (this is Contact) {
                     when (propertyId) {
-                        BR.messageLocation -> {
+                        BR.latLng -> {
                             updateActiveContactDistanceAndBearing(this)
                         }
                         BR.trackerId -> {
@@ -300,7 +295,7 @@ class MapViewModel @Inject constructor(
         currentLocation: Location,
         contact: Contact
     ) {
-        contact.messageLocation?.run {
+        contact.latLng?.run {
             val distanceBetween = FloatArray(2)
             Location.distanceBetween(
                 currentLocation.latitude,
@@ -390,7 +385,7 @@ class MapViewModel @Inject constructor(
     val orientationSensorEventListener = object : SensorEventListener {
         override fun onSensorChanged(maybeEvent: SensorEvent?) {
             maybeEvent?.let { event ->
-                currentContact.value?.messageLocation?.let { contactLatLng ->
+                currentContact.value?.latLng?.let { contactLatLng ->
                     currentLocation.value?.let { currentLocation ->
                         // Orientation is angle around the Z axis
                         val azimuth = (180 / Math.PI) * 2 * asin(event.values[2])

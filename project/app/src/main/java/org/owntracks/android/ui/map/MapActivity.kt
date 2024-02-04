@@ -178,12 +178,12 @@ class MapActivity :
                                     viewModel.currentContact.value?.run {
                                         getString(
                                             R.string.shareContactBody,
-                                            this.name,
+                                            this.displayName,
                                             this.geocodedLocation,
                                             this.latLng?.toDisplayString() ?: "",
                                             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
                                                 .withZone(ZoneId.systemDefault()).format(
-                                                    Instant.ofEpochSecond(this.tst)
+                                                    Instant.ofEpochSecond(this.locationTimestamp)
                                                 )
 
                                         )

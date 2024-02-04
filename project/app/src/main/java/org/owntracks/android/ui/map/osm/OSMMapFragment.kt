@@ -17,7 +17,6 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
-import kotlin.math.roundToInt
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.DelayedMapListener
 import org.osmdroid.events.MapListener
@@ -50,8 +49,8 @@ import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.ui.map.MapFragment
 import org.owntracks.android.ui.map.MapLayerStyle
 import org.owntracks.android.ui.map.MapLocationZoomLevelAndRotation
-import org.owntracks.android.ui.map.MapViewModel
 import timber.log.Timber
+import kotlin.math.roundToInt
 
 class OSMMapFragment internal constructor(
     private val preferences: Preferences,
@@ -416,6 +415,7 @@ class OSMMapFragment internal constructor(
     }
 
     override fun setMapLayerType(mapLayerStyle: MapLayerStyle) {
+        @Suppress("REDUNDANT_ELSE_IN_WHEN")
         when (mapLayerStyle) {
             MapLayerStyle.OpenStreetMapNormal -> binding.osmMapView.setTileSource(TileSourceFactory.MAPNIK)
             MapLayerStyle.OpenStreetMapWikimedia -> binding.osmMapView.setTileSource(

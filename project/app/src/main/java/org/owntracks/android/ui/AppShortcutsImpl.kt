@@ -45,7 +45,7 @@ class AppShortcutsImpl @Inject constructor() : AppShortcuts {
                 .setIcon(
                     IconCompat.createWithResource(
                         applicationContext,
-                        R.drawable.ic_outline_info_24
+                        R.drawable.ic_owntracks_80
                     )
                 )
                 .setIntent(

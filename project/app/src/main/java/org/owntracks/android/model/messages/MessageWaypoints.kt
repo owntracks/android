@@ -11,6 +11,8 @@ import org.owntracks.android.support.MessageWaypointCollection
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 class MessageWaypoints : MessageBase() {
     var waypoints: MessageWaypointCollection? = null
+    override fun toString(): String = "[MessageWaypoints waypoints=${waypoints?.size}]"
+
     override fun addMqttPreferences(preferences: Preferences) {
         topic = preferences.pubTopicWaypoints
         qos = preferences.pubQosWaypoints.value

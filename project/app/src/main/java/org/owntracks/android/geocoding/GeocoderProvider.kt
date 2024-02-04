@@ -13,18 +13,16 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import org.owntracks.android.R
 import org.owntracks.android.di.ApplicationScope
 import org.owntracks.android.di.CoroutineScopes
-import org.owntracks.android.model.messages.MessageLocation
+import org.owntracks.android.location.LatLng
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ReverseGeocodeProvider
 import org.owntracks.android.services.BackgroundService
@@ -61,24 +59,32 @@ class GeocoderProvider @Inject constructor(
         }
     }
 
-    private suspend fun geocoderResolve(messageLocation: MessageLocation): GeocodeResult {
+    private suspend fun geocoderResolve(latLng: LatLng): GeocodeResult {
         return withContext(ioDispatcher) {
             job?.run { join() }
-            return@withContext geocoder.reverse(messageLocation.latitude, messageLocation.longitude)
+            return@withContext geocoder.reverse(latLng.latitude,latLng.longitude)
         }
     }
 
-    suspend fun resolve(messageLocation: MessageLocation) {
-        if (messageLocation.hasGeocode) {
-            return
-        }
-        Timber.d("Resolving geocode for $messageLocation")
-        delay(5.seconds)
-        val result = geocoderResolve(messageLocation)
-        messageLocation.geocode = geocodeResultToText(result)
-        Timber.v("Geocoded $messageLocation")
+    suspend fun resolve(latLng: LatLng): String {
+        Timber.d("Resolving geocode for $latLng")
+        val result = geocoderResolve(latLng)
+        maybeCreateErrorNotification(result)
+        Timber.d("Resolved $latLng to $result with ${geocoder.javaClass.name}")
+        return geocodeResultToText(result) ?: latLng.toDisplayString()
+    }
+
+    suspend fun resolve(latLng: LatLng, backgroundService: BackgroundService) {
+        val result = geocoderResolve(latLng)
+        backgroundService.onGeocodingProviderResult(latLng,geocodeResultToText(result)?: latLng.toDisplayString())
         maybeCreateErrorNotification(result)
     }
+
+    private fun geocodeResultToText(result: GeocodeResult) =
+        when (result) {
+            is GeocodeResult.Formatted -> result.text
+            else -> null
+        }
 
     @SuppressLint("MissingPermission")
     private fun maybeCreateErrorNotification(result: GeocodeResult) {
@@ -143,25 +149,6 @@ class GeocoderProvider @Inject constructor(
             .build()
 
         notificationManager.notify(GEOCODE_ERROR_NOTIFICATION_TAG, 0, notification)
-    }
-
-    private fun geocodeResultToText(result: GeocodeResult) =
-        when (result) {
-            is GeocodeResult.Formatted -> result.text
-            else -> null
-        }
-
-    fun resolve(messageLocation: MessageLocation, backgroundService: BackgroundService) {
-        if (messageLocation.hasGeocode) {
-            backgroundService.onGeocodingProviderResult(messageLocation)
-            return
-        }
-        scope.launch {
-            val result = geocoderResolve(messageLocation)
-            messageLocation.geocode = geocodeResultToText(result)
-            backgroundService.onGeocodingProviderResult(messageLocation)
-            maybeCreateErrorNotification(result)
-        }
     }
 
     private val preferenceChangeListener = object : Preferences.OnPreferenceChangeListener {

@@ -40,6 +40,7 @@ import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.data.waypoints.WaypointsRepo
 import org.owntracks.android.di.CoroutineScopes
 import org.owntracks.android.geocoding.GeocoderProvider
+import org.owntracks.android.location.LatLng
 import org.owntracks.android.location.LocationAvailability
 import org.owntracks.android.location.LocationCallback
 import org.owntracks.android.location.LocationProviderClient
@@ -52,8 +53,8 @@ import org.owntracks.android.location.geofencing.GeofencingEvent.Companion.fromI
 import org.owntracks.android.location.geofencing.GeofencingRequest
 import org.owntracks.android.location.geofencing.Latitude
 import org.owntracks.android.location.geofencing.Longitude
+import org.owntracks.android.location.toLatLng
 import org.owntracks.android.model.messages.MessageLocation
-import org.owntracks.android.model.messages.MessageLocation.Companion.fromLocation
 import org.owntracks.android.model.messages.MessageTransition
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.MonitoringMode
@@ -75,7 +76,7 @@ import kotlin.time.Duration.Companion.minutes
 @AndroidEntryPoint
 class BackgroundService :
     LifecycleService(), Preferences.OnPreferenceChangeListener {
-    private var lastLocationMessage: MessageLocation? = null
+    private var lastLocation: Location? = null
 
     private lateinit var notificationManagerCompat: NotificationManagerCompat
     private val activeNotifications = LinkedList<Spannable>()
@@ -204,8 +205,7 @@ class BackgroundService :
         preferences = entrypoint.preferences()
         endpointStateRepo = entrypoint.endpointStateRepo()
         Timber.d("BackgroundService has injected. calling startForeground")
-        startForeground(NOTIFICATION_ID_ONGOING, ongoingNotification)
-        Timber.d("BackgroundService super.OnCreate")
+        startForeground(NOTIFICATION_ID_ONGOING, getOngoingNotification())
         super.onCreate()
         notificationManagerCompat = NotificationManagerCompat.from(this)
 
@@ -238,24 +238,20 @@ class BackgroundService :
                 launch {
                     locationRepo.currentPublishedLocation.collect { location ->
                         location?.run {
-                            val messageLocation = fromLocation(location, Build.VERSION.SDK_INT)
-                            if (lastLocationMessage == null ||
-                                lastLocationMessage!!.timestamp < messageLocation.timestamp
+                            if (lastLocation == null ||
+                                lastLocation!!.time < location.time
                             ) {
-                                lastLocationMessage = messageLocation
-                                geocoderProvider.resolve(messageLocation, this@BackgroundService)
+                                lastLocation = location
+                                Timber.v("New published location: $location. Doing a geocode reverse")
+                                geocoderProvider.resolve(location.toLatLng(), this@BackgroundService)
                             }
                         }
                     }
                 }
                 launch {
-                    endpointStateRepo.endpointQueueLength.collect { queueLength: Int ->
-                        lastQueueLength = queueLength
-                        updateOngoingNotification()
+                    endpointStateRepo.endpointState.collect {
+                        updateOngoingNotificationContentText()
                     }
-                }
-                launch {
-                    endpointStateRepo.endpointState.collect { updateOngoingNotification() }
                 }
                 endpointStateRepo.setServiceStartedNow()
             }
@@ -403,43 +399,55 @@ class BackgroundService :
         )
     }
 
-    private fun updateOngoingNotification() {
+    private fun updateOngoingNotificationContentText() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
             PackageManager.PERMISSION_GRANTED
         ) {
-            notificationManagerCompat.notify(NOTIFICATION_ID_ONGOING, ongoingNotification)
+            notificationManagerCompat.notify(NOTIFICATION_ID_ONGOING, activeNotificationCompatBuilder.apply{
+                val lastEndpointState = endpointStateRepo.endpointState.value
+                if (lastEndpointState === EndpointState.CONNECTED ||
+                    lastEndpointState === EndpointState.IDLE
+                ) {
+                    setContentText(getMonitoringLabel(preferences.monitoring))
+                } else if (lastEndpointState === EndpointState.ERROR &&
+                           lastEndpointState.message != null
+                ) {
+                    setContentText(
+                        lastEndpointState.getLabel(this@BackgroundService) +
+                        ": " +
+                        lastEndpointState.message
+                    )
+                } else {
+                    setContentText(lastEndpointState.getLabel(this@BackgroundService))
+                }
+            }.build())
+        }
+    }
+
+    private fun updateOngoingNotificationTitle(reverseGeocodedText: String) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
+            PackageManager.PERMISSION_GRANTED
+        ) {
+            notificationManagerCompat.notify(NOTIFICATION_ID_ONGOING, activeNotificationCompatBuilder.apply{
+                if (lastLocation != null && preferences.notificationLocation) {
+                    val title = reverseGeocodedText.ifBlank { lastLocation!!.toLatLng().toDisplayString() }
+                    Timber.v("Updating notification with title $title")
+                    setContentTitle(title)
+                    setWhen(lastLocation!!.time)
+                } else {
+                    setContentTitle(getString(R.string.app_name))
+                }
+            }.build())
         }
     }
 
     // Show monitoring mode if endpoint state is not interesting
-    private val ongoingNotification: Notification
-        get() =
+    private fun getOngoingNotification(): Notification     =
             activeNotificationCompatBuilder
                 .apply {
-                    if (lastLocationMessage != null && preferences.notificationLocation) {
-                        setContentTitle(lastLocationMessage!!.geocode)
-                        setWhen(TimeUnit.SECONDS.toMillis(lastLocationMessage!!.timestamp))
-                        setNumber(lastQueueLength)
-                    } else {
-                        setContentTitle(getString(R.string.app_name))
-                    }
-                    // Show monitoring mode if endpoint state is not interesting
-                    val lastEndpointState = endpointStateRepo.endpointState.value
-                    if (lastEndpointState === EndpointState.CONNECTED ||
-                        lastEndpointState === EndpointState.IDLE
-                    ) {
-                        setContentText(getMonitoringLabel(preferences.monitoring))
-                    } else if (lastEndpointState === EndpointState.ERROR &&
-                        lastEndpointState.message != null
-                    ) {
-                        setContentText(
-                            lastEndpointState.getLabel(this@BackgroundService) +
-                                ": " +
-                                lastEndpointState.message
-                        )
-                    } else {
-                        setContentText(lastEndpointState.getLabel(this@BackgroundService))
-                    }
+                    setContentTitle(getString(R.string.app_name))
+                    setContentText(getMonitoringLabel(preferences.monitoring))
+                    setWhen(System.currentTimeMillis())
                 }
                 .build()
 
@@ -460,10 +468,10 @@ class BackgroundService :
         ) {
             return
         }
-        val contact = contactsRepo.getById(message.contactKey)
+        val contact = contactsRepo.getById(message.getContactId())
         val timestampInMs = TimeUnit.SECONDS.toMillis(message.timestamp)
         val location = message.description ?: getString(R.string.aLocation)
-        val title = contact?.name ?: message.trackerId ?: message.contactKey
+        val title = contact?.displayName ?: message.topic
         val transitionText =
             getString(
                 if (message.getTransition() == Geofence.GEOFENCE_TRANSITION_ENTER) {
@@ -668,9 +676,12 @@ class BackgroundService :
             )
     }
 
-    fun onGeocodingProviderResult(m: MessageLocation) {
-        if (m === lastLocationMessage) {
-            updateOngoingNotification()
+    fun onGeocodingProviderResult(latLng: LatLng, reverseGeocodedText: String) {
+        if (latLng == lastLocation?.toLatLng()) {
+            Timber.v("New reverse geocode for $latLng: $reverseGeocodedText")
+            updateOngoingNotificationTitle(reverseGeocodedText)
+        } else {
+            Timber.v("Ignoring reverse geocode for $latLng: $reverseGeocodedText, because my lastPublished location is ${lastLocation?.toLatLng()}")
         }
     }
 
@@ -693,7 +704,7 @@ class BackgroundService :
         }
         if (properties.contains("monitoring")) {
             setupLocationRequest()
-            updateOngoingNotification()
+            updateOngoingNotificationContentText()
         }
         if (properties.contains("mode")) {
             lifecycleScope.launch { contactsRepo.clearAll() }

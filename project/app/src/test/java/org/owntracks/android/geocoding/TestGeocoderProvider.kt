@@ -23,6 +23,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.spy
+import org.owntracks.android.location.LatLng
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.preferences.InMemoryPreferencesStore
 import org.owntracks.android.preferences.Preferences
@@ -49,14 +50,9 @@ class TestGeocoderProvider {
                 UnconfinedTestDispatcher(),
                 OkHttpClient()
             )
-            val messageLocation = MessageLocation().apply {
-                latitude = 50.0
-                longitude = 0.0
-            }
-            provider.resolve(messageLocation)
+            val result = provider.resolve(LatLng(50.0,0.0))
             advanceUntilIdle()
-            assertTrue(messageLocation.hasGeocode)
-            assertEquals("50.0000, 0.0000", messageLocation.geocode)
+            assertEquals("50.0000, 0.0000", result)
         }
 
     @Test
@@ -74,14 +70,11 @@ class TestGeocoderProvider {
                 UnconfinedTestDispatcher(),
                 OkHttpClient()
             )
-            val messageLocation = MessageLocation().apply {
-                latitude = 50.0
-                longitude = 0.0
-            }
             val backgroundService: BackgroundService = spy {}
-            provider.resolve(messageLocation, backgroundService)
+            val latLng = LatLng(50.0,0.0)
+            provider.resolve(latLng, backgroundService)
             advanceUntilIdle()
-            verify(backgroundService, times(1)).onGeocodingProviderResult(messageLocation)
+            verify(backgroundService, times(1)).onGeocodingProviderResult(latLng, "50.0000, 0.0000")
         }
 
     @Test
@@ -116,13 +109,8 @@ class TestGeocoderProvider {
                 UnconfinedTestDispatcher(),
                 mockHttpClient
             )
-            val messageLocation = MessageLocation().apply {
-                latitude = 50.0
-                longitude = 0.0
-            }
-            provider.resolve(messageLocation)
+            val result = provider.resolve(LatLng(50.0,0.0))
             advanceUntilIdle()
-            assertTrue(messageLocation.hasGeocode)
-            assertEquals("Friedrich-Ebert-Straße 7, 48153 Münster, Germany", messageLocation.geocode)
+            assertEquals("Friedrich-Ebert-Straße 7, 48153 Münster, Germany", result)
         }
 }

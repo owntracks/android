@@ -51,10 +51,10 @@ class MemoryContactsRepo @Inject constructor(
 
     override suspend fun update(id: String, messageCard: MessageCard) {
         getById(id)?.apply {
-            this.messageCard = messageCard
+            this.setMessageCard(messageCard)
             mutableRepoChangedEvent.emit(ContactsRepoChange.ContactCardUpdated(this))
         } ?: run {
-            Contact(id).apply { this.messageCard = messageCard }.also { put(id, it) }
+            Contact(id).apply { setMessageCard(messageCard) }.also { put(id, it) }
         }
     }
 
@@ -72,7 +72,7 @@ class MemoryContactsRepo @Inject constructor(
                 // Check the cache to see if we have a name
                 contactsBitmapAndNameMemoryCache[id]?.also {
                     if (it is ContactBitmapAndName.CardBitmap && it.name != null) {
-                        this.messageCard = MessageCard().apply { name = it.name }
+                        setMessageCard(MessageCard().apply { name = it.name })
                     }
                 }
             }.also { put(id, it) }

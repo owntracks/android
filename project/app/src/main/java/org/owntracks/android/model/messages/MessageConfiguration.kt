@@ -44,4 +44,6 @@ class MessageConfiguration : MessageBase() {
     companion object {
         const val TYPE = "configuration"
     }
+
+    override fun toString(): String = "[MessageConfiguration keys=${keys.joinToString(",")}]"
 }

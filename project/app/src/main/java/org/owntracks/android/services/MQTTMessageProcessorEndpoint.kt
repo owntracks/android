@@ -205,22 +205,22 @@ class MQTTMessageProcessorEndpoint(
                     } catch (e: Exception) {
                         Timber.e(e, "Error publishing message [$message]")
                         when (e) {
-                            is IOException -> messageProcessor.onMessageDeliveryFailedFinal(message.messageId)
+                            is IOException -> messageProcessor.onMessageDeliveryFailedFinal(message)
                             is MqttException -> {
                                 if (e.reasonCode.toShort() != MqttException.REASON_CODE_MAX_INFLIGHT) {
-                                    messageProcessor.onMessageDeliveryFailed(message.messageId)
+                                    messageProcessor.onMessageDeliveryFailed(message)
                                     reconnect(mqttConnectionConfiguration)
                                 }
                                 throw OutgoingMessageSendingException(e)
                             }
                             else -> {
-                                messageProcessor.onMessageDeliveryFailed(message.messageId)
+                                messageProcessor.onMessageDeliveryFailed(message)
                                 throw OutgoingMessageSendingException(e)
                             }
                         }
                     }
                 }
-                Timber.d("Waiting for sendmessage job for message id ${message.messageId} to finish")
+                Timber.d("Waiting for sendmessage job for message $message to finish")
                 job.join()
                 sendMessageThrowable?.run {
                     throw this

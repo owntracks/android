@@ -7,7 +7,6 @@ import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SortedList
 import kotlinx.coroutines.CoroutineScope
-import org.bouncycastle.asn1.x500.style.RFC4519Style.l
 import org.owntracks.android.BR
 import org.owntracks.android.R
 import org.owntracks.android.model.Contact
@@ -20,7 +19,7 @@ internal class ContactsAdapter(
     RecyclerView.Adapter<ContactsAdapter.ContactViewHolder>() {
 
     private val sortedListCallback = object : SortedList.Callback<Contact>() {
-        override fun compare(o1: Contact, o2: Contact): Int = o2.tst.compareTo(o1.tst)
+        override fun compare(o1: Contact, o2: Contact): Int = o2.locationTimestamp.compareTo(o1.locationTimestamp)
 
         override fun onInserted(position: Int, count: Int) { notifyItemRangeInserted(position, count) }
 

@@ -52,13 +52,13 @@ class ContactImageBindingAdapter @Inject constructor(
                 return@withContext contactBitMapAndName.bitmap
             }
 
-            return@withContext contact.messageCard?.run {
-                Timber.v("Working out the face for ${contact.id}")
-                face?.run {
-                    Base64.decode(toByteArray(), Base64.DEFAULT)
-                }?.run {
+            return@withContext contact.face?.run {
+                // There's a base64 face pic. Decode and cache it.
+                toByteArray().run {
+                    Base64.decode(this, Base64.DEFAULT)
+                }.run {
                     BitmapFactory.decodeByteArray(this, 0, size)
-                }?.run {
+                }.run {
                     getRoundedShape(
                         Bitmap.createScaledBitmap(
                             this,
@@ -67,13 +67,14 @@ class ContactImageBindingAdapter @Inject constructor(
                             true
                         )
                     )
-                }?.also { bitmap ->
+                }.also { bitmap ->
                     memoryCache.put(
                         contact.id,
-                        ContactBitmapAndName.CardBitmap(name, bitmap)
+                        ContactBitmapAndName.CardBitmap(contact.displayName, bitmap)
                     )
                 }
             } ?: run {
+                // No face pic. Generate a fallback bitmap and cache it.
                 memoryCache[contact.id]?.run {
                     if (this is ContactBitmapAndName.TrackerIdBitmap && this.trackerId == contact.trackerId) {
                         this.bitmap

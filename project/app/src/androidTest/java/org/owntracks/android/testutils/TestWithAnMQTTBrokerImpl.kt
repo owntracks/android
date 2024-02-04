@@ -151,7 +151,8 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
                 "username": "$mqttUsername",
                 "tls": false,
                 "keepalive": 5,
-                "connectionTimeoutSeconds": 2
+                "connectionTimeoutSeconds": 2,
+                "reverseGeocodeProvider": "None"
             }
             """.trimIndent()
         )

@@ -15,7 +15,7 @@ abstract class CachingGeocoder : Geocoder {
             ),
             ::doLookup
         )
-        Timber.d("Geocode cache: hits=${cache.hitCount()}, misses=${cache.missCount()}")
+        Timber.v("Geocode cache: hits=${cache.hitCount()}, misses=${cache.missCount()}")
         return result
     }
 

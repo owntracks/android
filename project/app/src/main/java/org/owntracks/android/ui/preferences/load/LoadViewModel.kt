@@ -58,9 +58,6 @@ class LoadViewModel @Inject constructor(
     private fun setConfiguration(json: String) {
         when (val message = parser.fromJson(json.toByteArray())) {
             is MessageConfiguration -> {
-                if (message.hasTrackerId()) {
-                    message[preferences::tid.name] = message.trackerId
-                }
                 configuration = message
                 try {
                     mutableConfig.postValue(parser.toUnencryptedJsonPretty(message))

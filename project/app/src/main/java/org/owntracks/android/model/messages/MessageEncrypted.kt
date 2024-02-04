@@ -13,4 +13,6 @@ class MessageEncrypted : MessageBase() {
     companion object {
         const val TYPE = "encrypted"
     }
+
+    override fun toString(): String = "[MessageEncrypted]"
 }

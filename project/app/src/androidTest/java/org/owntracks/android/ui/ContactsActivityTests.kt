@@ -206,7 +206,7 @@ class ContactsActivityTests :
     (baristaRule.activityTestRule.activity as ContactsActivity)
         .contactsCountingIdlingResource
         .increment()
-    MessageClear().apply { trackerId = "aa" }.sendFromBroker(broker)
+    MessageClear().sendFromBroker(broker)
     (baristaRule.activityTestRule.activity as ContactsActivity).contactsCountingIdlingResource.use {
       assertDisplayed(R.id.placeholder)
     }

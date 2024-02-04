@@ -196,13 +196,13 @@ class MessageProcessor @Inject constructor(
     fun queueMessageForSending(message: MessageBase) {
         if (!acceptMessages) return
         outgoingQueueIdlingResource.increment()
-        Timber.d("Queueing messageId:${message.messageId}, current queueLength:${outgoingQueue.size}")
+        Timber.d("Queueing message=$message, current queueLength:${outgoingQueue.size}")
         synchronized(outgoingQueue) {
             if (!outgoingQueue.offer(message)) {
                 val droppedMessage = outgoingQueue.poll()
                 Timber.e("Outgoing queue full. Dropping oldest message: $droppedMessage")
                 if (!outgoingQueue.offer(message)) {
-                    Timber.e("Still can't put message onto the queue. Dropping: ${message.messageId}")
+                    Timber.e("Still can't put message onto the queue. Dropping: $message}")
                 }
             }
             scope.launch {
@@ -221,7 +221,7 @@ class MessageProcessor @Inject constructor(
                 try {
                     @Suppress("BlockingMethodInNonBlockingContext") // We're in ioDispatcher here
                     val message: MessageBase = outgoingQueue.take() // <--- blocks
-                    Timber.d("Taken message off queue: ${message.messageId}")
+                    Timber.d("Taken message off queue: $message")
                     endpointStateRepo.setQueueLength(outgoingQueue.size + 1)
                     // reset the retry logic if the last message succeeded
                     if (!messageFailedLastTime) {
@@ -238,17 +238,17 @@ class MessageProcessor @Inject constructor(
                         when (e) {
                             is OutgoingMessageSendingException,
                             is ConfigurationIncompleteException -> {
-                                Timber.w("Error sending message ${message.messageId}. Re-queueing")
+                                Timber.w("Error sending message $message. Re-queueing")
                                 synchronized(outgoingQueue) {
                                     if (!outgoingQueue.offerFirst(message)) {
                                         val tailMessage = outgoingQueue.removeLast()
                                         Timber.w(
                                             "Queue full when trying to re-queue failed message. " +
-                                                "Dropping last message: ${tailMessage.messageId}"
+                                                "Dropping last message: $tailMessage"
                                         )
                                         if (!outgoingQueue.offerFirst(message)) {
                                             Timber.e(
-                                                "Couldn't restore failed message ${message.messageId} back onto the " +
+                                                "Couldn't restore failed message $message back onto the " +
                                                     "queue, dropping: "
                                             )
                                         }
@@ -256,20 +256,20 @@ class MessageProcessor @Inject constructor(
                                 }
                                 messageFailedLastTime = true
                                 scope.launch {
-                                    Timber.i("Waiting for $retryWait before retrying ${message.messageId}")
+                                    Timber.i("Waiting for $retryWait before retrying $message")
                                     delay(retryWait)
                                 }
                                     .run {
-                                        Timber.d("Pause for ${message.messageId}")
+                                        Timber.d("Pause for $message")
                                         retryDelayJob = this
                                         join()
-                                        Timber.d("Retry wait finished for ${message.messageId}. Cancelled=${isCancelled}}")
+                                        Timber.d("Retry wait finished for $message. Cancelled=${isCancelled}}")
                                     }
                                 retryWait = (retryWait * 2).coerceAtMost(SEND_FAILURE_BACKOFF_MAX_WAIT)
                                 retriesToGo -= 1
                             }
                             else -> {
-                                Timber.e(e, "Couldn't send message ${message.messageId}. Dropping")
+                                Timber.e(e, "Couldn't send message $message. Dropping")
                                 retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT
                                 messageFailedLastTime = false
                             }
@@ -278,7 +278,7 @@ class MessageProcessor @Inject constructor(
 
                     if (retriesToGo <= 0) {
                         messageFailedLastTime = false
-                        Timber.w("Ran out of retries for sending ${message.messageId}. Dropping")
+                        Timber.w("Ran out of retries for sending $message. Dropping")
                     }
 
                     if (!messageFailedLastTime) {
@@ -319,22 +319,22 @@ class MessageProcessor @Inject constructor(
         }
     }
 
-    fun onMessageDeliveryFailedFinal(messageId: String?) {
+    fun onMessageDeliveryFailedFinal(message: MessageBase) {
         scope.launch {
-            Timber.e("Message delivery failed, not retryable. $messageId")
+            Timber.e("Message delivery failed, not retryable. $message")
             endpointStateRepo.setQueueLength(outgoingQueue.size)
         }
     }
 
-    fun onMessageDeliveryFailed(messageId: String?) {
+    fun onMessageDeliveryFailed(message:MessageBase) {
         scope.launch {
-            Timber.e("Message delivery failed. queueLength: ${outgoingQueue.size + 1}, messageId: $messageId")
+            Timber.e("Message delivery failed. queueLength: ${outgoingQueue.size + 1}, message=$message")
             endpointStateRepo.setQueueLength(outgoingQueue.size)
         }
     }
 
     suspend fun processIncomingMessage(message: MessageBase) {
-        Timber.i("Received incoming message: ${message.javaClass.simpleName} on ${message.contactKey}")
+        Timber.i("Received incoming message: ${message.javaClass.simpleName} on ${message.topic}")
         when (message) {
             is MessageClear -> {
                 processIncomingMessage(message)
@@ -355,7 +355,7 @@ class MessageProcessor @Inject constructor(
     }
 
     private fun processIncomingMessage(message: MessageClear) {
-        scope.launch { contactsRepo.remove(message.contactKey) }
+        scope.launch { contactsRepo.remove(message.getContactId()) }
     }
 
     private fun processIncomingMessage(message: MessageLocation) {
@@ -368,7 +368,7 @@ class MessageProcessor @Inject constructor(
             selfMessageReceivedIdlingResource.remove(message)
         } else {
             scope.launch {
-                contactsRepo.update(message.contactKey, message)
+                contactsRepo.update(message.getContactId(), message)
                 /*
                 We need to idle the selfMessageReceivedIdlingResource synchronously after we call update, because
                 the update method will trigger a change event, which will cause the UI to update, which needs to happen
@@ -381,7 +381,7 @@ class MessageProcessor @Inject constructor(
     }
 
     private fun processIncomingMessage(message: MessageCard) {
-        scope.launch { contactsRepo.update(message.contactKey, message) }
+        scope.launch { contactsRepo.update(message.getContactId(), message) }
     }
 
     private suspend fun processIncomingMessage(message: MessageCmd) {

@@ -9,15 +9,14 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonValue
-import java.util.concurrent.TimeUnit
-import kotlin.math.roundToInt
 import kotlinx.datetime.Instant
 import org.jetbrains.annotations.NotNull
-import org.owntracks.android.location.roundForDisplay
 import org.owntracks.android.model.BatteryStatus
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.services.WifiInfoProvider
+import java.util.concurrent.TimeUnit
+import kotlin.math.roundToInt
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
@@ -76,39 +75,16 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
     @JsonProperty("SSID")
     var ssid: String? = null
 
-    @set:JsonIgnore
-    @get:JsonIgnore
-    var geocode: String? = null
-        get() {
-            return field ?: fallbackGeocode
-        }
-        set(value) {
-            field = value
-            hasGeocode = true
-        }
-
-    @get:JsonIgnore
-    internal val fallbackGeocode: String
-        get() = "${latitude.roundForDisplay()}, ${longitude.roundForDisplay()}"
-
-    @get:JsonIgnore
-    var hasGeocode: Boolean = false
-        private set
-
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty("tid")
-    override var trackerId: String? = null
+    var trackerId: String? = null
 
     override fun isValidMessage(): Boolean {
         return timestamp > 0
     }
 
     @JsonIgnore
-    override fun toString(): String = "Location id=$messageId: ($latitude,$longitude) timestamp=${
-    Instant.fromEpochSeconds(
-        timestamp
-    )
-    } trigger=$trigger"
+    override fun toString(): String = "[MessageLocation ts=${Instant.fromEpochSeconds(timestamp)},lat=$latitude,long=$longitude,created_at=${Instant.fromEpochSeconds(timestamp)},trigger=$trigger]"
 
     override fun addMqttPreferences(preferences: Preferences) {
         topic = preferences.pubTopicLocations
