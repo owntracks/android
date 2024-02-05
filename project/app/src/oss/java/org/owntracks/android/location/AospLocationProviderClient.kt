@@ -6,20 +6,14 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
-import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import androidx.core.location.LocationListenerCompat
 import androidx.core.location.LocationManagerCompat
-import androidx.core.location.LocationRequestCompat
-import androidx.core.os.CancellationSignal
 import androidx.core.os.ExecutorCompat
 import org.owntracks.android.location.LocationRequest.Companion.PRIORITY_HIGH_ACCURACY
 import timber.log.Timber
-import java.util.Locale.filter
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
+import java.lang.ref.WeakReference
+import java.util.WeakHashMap
 
 class AospLocationProviderClient(val context: Context) : LocationProviderClient() {
     enum class LocationSources {
@@ -34,14 +28,14 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient(
     private val availableLocationProviders =
         (
             locationManager?.allProviders?.run {
-                LocationSources.values()
+                LocationSources.entries
                     .filter { contains(it.name.lowercase()) }
                     .toSet()
             }
                 ?: emptySet()
             )
 
-    private val callbacks = mutableMapOf<LocationCallback, LocationListener>()
+    private val callbacks = WeakHashMap<LocationCallback, LocationListener>()
 
     private fun locationSourcesForPriority(priority: Int): Set<LocationSources> =
         when (priority) {
@@ -100,13 +94,17 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient(
 
     override fun flushLocations() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            Timber.v("Flushing locations")
             callbacks.values.zip(availableLocationProviders)
                 .forEach {
                     try {
+                        Timber.v("Flushing locations for ${it.first} callback on ${it.second} provider")
                         locationManager?.requestFlush(it.second.name.lowercase(), it.first, 0)
                     } catch (e: IllegalArgumentException) {
-                        Timber.d(e,"Unable to flush locations for ${it.second} callback")
+                        if (e.message=="unregistered listener cannot be flushed") {
+                            Timber.d("Unable to flush locations for ${it.second} callback, as provider {it.second} is not registered")
+                        } else {
+                            Timber.e(e, "Unable to flush locations for ${it.second} callback")
+                        }
                     }
                 }
         } else {
@@ -117,7 +115,7 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient(
     @Suppress("MissingPermission")
     override fun getLastLocation(): Location? =
         locationManager?.run {
-            LocationSources.values().map { getLastKnownLocation(it.name.lowercase()) }
+            LocationSources.entries.map { getLastKnownLocation(it.name.lowercase()) }
                 .maxByOrNull { it?.time ?: 0 }
         }
 
