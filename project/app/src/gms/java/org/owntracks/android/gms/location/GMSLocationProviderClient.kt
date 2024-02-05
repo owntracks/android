@@ -17,6 +17,7 @@ import org.owntracks.android.location.LocationProviderClient
 import org.owntracks.android.location.LocationRequest
 import org.owntracks.android.location.LocationResult
 import timber.log.Timber
+import java.util.WeakHashMap
 
 /**
  * An implementation of [LocationProviderClient] that uses a [FusedLocationProviderClient] to request
@@ -29,7 +30,7 @@ class GMSLocationProviderClient(
 ) : LocationProviderClient() {
 
     private val callbackMap =
-        mutableMapOf<Int, com.google.android.gms.location.LocationCallback>()
+        WeakHashMap<LocationCallback, com.google.android.gms.location.LocationCallback>()
 
     @SuppressLint("MissingPermission")
     override fun singleHighAccuracyLocation(clientCallBack: LocationCallback, looper: Looper) {
@@ -62,7 +63,7 @@ class GMSLocationProviderClient(
                 "interval=${locationRequest.interval} clientCallback=${clientCallBack.hashCode()}"
         )
         val gmsCallBack = GMSLocationCallback(clientCallBack)
-        callbackMap[clientCallBack.hashCode()] = gmsCallBack
+        callbackMap[clientCallBack] = gmsCallBack
         val gmsLocationRequest = locationRequest.toGMSLocationRequest()
         Timber.d("transformed location request is $gmsLocationRequest")
         fusedLocationProviderClient.requestLocationUpdates(
@@ -79,10 +80,10 @@ class GMSLocationProviderClient(
     }
 
     override fun removeLocationUpdates(clientCallBack: LocationCallback) {
-        callbackMap[clientCallBack.hashCode()]?.run {
+        callbackMap[clientCallBack]?.run {
             Timber.d("Removing location updates clientcallback=${clientCallBack.hashCode()}")
             fusedLocationProviderClient.removeLocationUpdates(this)
-            callbackMap.remove(clientCallBack.hashCode())
+            callbackMap.remove(clientCallBack)
         }
     }
 
