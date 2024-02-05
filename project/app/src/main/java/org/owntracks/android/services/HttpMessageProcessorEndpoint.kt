@@ -2,11 +2,6 @@ package org.owntracks.android.services
 
 import android.content.Context
 import com.fasterxml.jackson.core.JsonProcessingException
-import java.io.IOException
-import java.security.KeyStore
-import java.util.Locale
-import java.util.concurrent.TimeUnit
-import javax.net.ssl.HostnameVerifier
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -25,13 +20,17 @@ import org.owntracks.android.di.ApplicationScope
 import org.owntracks.android.di.CoroutineScopes
 import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.model.messages.MessageLocation
-import org.owntracks.android.model.messages.MessageTransition
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.support.Parser
 import org.owntracks.android.support.SocketFactory
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
 import timber.log.Timber
+import java.io.IOException
+import java.security.KeyStore
+import java.util.Locale
+import java.util.concurrent.TimeUnit
+import javax.net.ssl.HostnameVerifier
 
 class HttpMessageProcessorEndpoint(
     messageProcessor: MessageProcessor,
@@ -118,9 +117,8 @@ class HttpMessageProcessorEndpoint(
                     .use { response ->
                         Timber.d("HTTP response received: $response")
                         if (!response.isSuccessful) {
-                            val httpException =
-                                Exception("HTTP request failed. Status: ${response.code}")
-                            Timber.e(httpException)
+                            val httpException = Exception("HTTP request failed. Status: ${response.code}")
+                            Timber.e("HTTP request failed. Status: ${response.code}")
                             endpointStateRepo.setState(
                                 EndpointState.ERROR.withMessage(
                                     String.format(
