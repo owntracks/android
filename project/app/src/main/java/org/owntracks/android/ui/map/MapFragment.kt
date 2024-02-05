@@ -76,7 +76,7 @@ internal constructor(private val contactImageBindingAdapter: ContactImageBinding
     ): View {
         binding =
             DataBindingUtil.inflate<V>(inflater, layout, container, false).apply {
-                lifecycleOwner = this@MapFragment
+                lifecycleOwner = this@MapFragment.viewLifecycleOwner
             }
 
         viewModel.apply {
