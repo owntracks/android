@@ -453,14 +453,11 @@ class MessageProcessor @Inject constructor(
     override fun onPreferenceChanged(properties: Set<String>) {
         if (properties.intersect(PREFERENCES_THAT_WIPE_QUEUE_AND_CONTACTS).isNotEmpty()) {
             acceptMessages = false
-            Timber.i("Clearing outgoing message queue")
-            outgoingQueue.clear()
-            while(true) {
-                try {
-                    outgoingQueueIdlingResource.decrement()
-                } catch (e: IllegalStateException) {
-                    break
-                }
+
+            outgoingQueue.also{Timber.i("Clearing outgoing message queue length=${it.size}")}.clear()
+            while(!outgoingQueueIdlingResource.isIdleNow) {
+                Timber.v("Decrementing outgoingQueueIdlingResource")
+                outgoingQueueIdlingResource.decrement()
             }
             loadOutgoingMessageProcessor()
         }
