@@ -176,6 +176,15 @@ jobs:
             ~/.android/adb*
           key: owntracks-test-${{ matrix.android-api }}-${{ matrix.flavour }}
 
+      - name: Remove unneeded things
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf "/usr/local/share/boost"
+
+      - name: Check disk space
+        run: |
+          df -h && du -h -d 1
+
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true' && steps.run-espresso-guard.outputs.run-espresso == 'true'
         timeout-minutes: 10
