@@ -57,13 +57,18 @@ class MQTTTransitionEventTests :
         disableHeadsupNotifications()
     }
 
-    @Test
-    fun given_an_MQTT_configured_client_when_the_broker_sends_a_transition_message_then_a_notification_appears() {
+    private fun setupTestActivity() {
         setNotFirstStartPreferences()
         launchActivity()
         grantMapActivityPermissions()
         configureMQTTConnectionToLocalWithGeneratedPassword()
         waitUntilActivityVisible<MapActivity>()
+        waitForMQTTToCompleteAndContactsToBeCleared()
+    }
+
+    @Test
+    fun given_an_MQTT_configured_client_when_the_broker_sends_a_transition_message_then_a_notification_appears() {
+        setupTestActivity()
 
         listOf(
             MessageLocation().apply {
@@ -117,11 +122,7 @@ class MQTTTransitionEventTests :
 
     @Test
     fun given_an_MQTT_configured_client_when_the_broker_sends_a_transition_message_for_a_contact_with_a_card_then_a_notification_appears() {
-        setNotFirstStartPreferences()
-        launchActivity()
-        grantMapActivityPermissions()
-        configureMQTTConnectionToLocalWithGeneratedPassword()
-        waitUntilActivityVisible<MapActivity>()
+        setupTestActivity()
 
         listOf(
             MessageCard().apply {name="Test Contact"},
@@ -180,13 +181,8 @@ class MQTTTransitionEventTests :
         val waypointLongitude = -1.0
         val waypointDescription = "Test Region"
 
-        setNotFirstStartPreferences()
-        launchActivity()
-        grantMapActivityPermissions()
+        setupTestActivity()
         initializeMockLocationProvider(app)
-        configureMQTTConnectionToLocalWithGeneratedPassword()
-        waitUntilActivityVisible<MapActivity>()
-
         reportLocationFromMap(app.mockLocationIdlingResource) {
             setMockLocation(51.0, 0.0)
         }

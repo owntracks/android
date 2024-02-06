@@ -378,5 +378,6 @@ class MQTTRemoteCommandTests :
         grantMapActivityPermissions()
         configureMQTTConnectionToLocalWithGeneratedPassword()
         waitUntilActivityVisible<MapActivity>()
+        waitForMQTTToCompleteAndContactsToBeCleared()
     }
 }
