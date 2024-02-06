@@ -72,7 +72,7 @@ class MQTTMessageProcessorEndpoint(
 ) : MessageProcessorEndpoint(messageProcessor),
     StatefulServiceMessageProcessor,
     Preferences.OnPreferenceChangeListener {
-    val mqttConnectionIdlingResource: SimpleIdlingResource = SimpleIdlingResource("mqttConnection", true)
+    val mqttConnectionIdlingResource: SimpleIdlingResource = SimpleIdlingResource("mqttConnection", false)
     override val modeId: ConnectionMode = ConnectionMode.MQTT
     private val connectingLock = Semaphore(1)
     private val connectivityManager =
@@ -80,21 +80,24 @@ class MQTTMessageProcessorEndpoint(
     private var mqttClientAndConfiguration: MqttClientAndConfiguration? = null
 
     private val networkChangeCallback = object : ConnectivityManager.NetworkCallback() {
+        var justRegistered = true
         override fun onAvailable(network: Network) {
             super.onAvailable(network)
             Timber.v("Network becomes available")
-            if (endpointStateRepo.endpointState.value == EndpointState.DISCONNECTED) {
+            if (!justRegistered && endpointStateRepo.endpointState.value == EndpointState.DISCONNECTED) {
                 Timber.v("Currently disconnected, so attempting reconnect")
                 scope.launch {
                     reconnect()
                 }
             }
+            justRegistered = false
         }
 
         override fun onLost(network: Network) {
             super.onLost(network)
-            Timber.w("Default network is lost, disconnecting")
+
             scope.launch {
+                Timber.w("Default network is lost, disconnecting. Waiting for lock")
                 connectingLock.withPermit {
                     disconnect()
                 }
@@ -106,6 +109,7 @@ class MQTTMessageProcessorEndpoint(
     override fun activate() {
         Timber.v("MQTT Activate")
         preferences.registerOnPreferenceChangedListener(this)
+        networkChangeCallback.justRegistered = true
         connectivityManager.registerDefaultNetworkCallback(networkChangeCallback)
         scope.launch {
             try {
@@ -125,24 +129,26 @@ class MQTTMessageProcessorEndpoint(
     }
 
     override fun deactivate() {
-        Timber.v("MQTT Deactivate")
+        Timber.v("MQTT Deactivate. waiting for lock")
         preferences.unregisterOnPreferenceChangedListener(this)
         connectivityManager.unregisterNetworkCallback(networkChangeCallback)
         scope.launch {
             connectingLock.withPermit {
                 disconnect()
-            }
+            }.apply { Timber.v("MQTT Deactivate lock released") }
             scheduler.cancelAllTasks()
         }
     }
 
     private suspend fun disconnect() {
         withContext(ioDispatcher) {
-            Timber.v("MQTT Disconnect")
+            Timber.v("MQTT attempting Disconnect, waiting for lock")
             measureTime {
                 mqttClientAndConfiguration?.run {
                     try {
-                        mqttClient.disconnect()
+                        if (mqttClient.isConnected) mqttClient.disconnect() else Timber.d(
+                            "MQTT client already not connected"
+                        )
                     } catch (e: MqttException) {
                         when (e.reasonCode.toShort()) {
                             REASON_CODE_CLIENT_ALREADY_DISCONNECTED -> Timber.d(
@@ -230,7 +236,8 @@ class MQTTMessageProcessorEndpoint(
     }
 
     override fun onPreferenceChanged(properties: Set<String>) {
-        if (preferences.mode != ConnectionMode.MQTT) {
+        if (preferences.mode != ConnectionMode.MQTT || mqttClientAndConfiguration == null) {
+            Timber.d("Preference changed but MQTT not activated. Ignoring.")
             return
         }
         Timber.v("MQTT preferences changed: [${properties.joinToString(",")}]")
@@ -252,7 +259,7 @@ class MQTTMessageProcessorEndpoint(
             .collect(Collectors.toSet())
             .isNotEmpty()
         ) {
-            Timber.d("MQTT preferences changed. Reconnecting to broker")
+            Timber.d("Reconnecting to broker because of preference change")
             scope.launch {
                 try {
                     reconnect(getEndpointConfiguration())
@@ -417,7 +424,7 @@ class MQTTMessageProcessorEndpoint(
         }
 
     private suspend fun reconnect(mqttConnectionConfiguration: MqttConnectionConfiguration): Result<Unit> =
-        connectingLock.withPermit {
+        connectingLock.also{ Timber.v(Exception(),"MQTT reconnect request, waiting for lock") }.withPermit {
             Timber.v("MQTT reconnect with configuration $mqttConnectionConfiguration")
             disconnect()
             try {
