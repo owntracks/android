@@ -69,7 +69,7 @@ class WaypointsActivityTests :
         clickOnAndWait(waypointName)
 
         clickOnAndWait(R.id.delete)
-        clickOnAndWait(R.string.deleteWaypointTitle)
+        clickOnAndWait(R.string.deleteWaypointConfirmationButtonLabel)
 
         assertNotDisplayed(waypointName)
     }
