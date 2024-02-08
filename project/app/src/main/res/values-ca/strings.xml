@@ -22,12 +22,17 @@
     <string name="batteryOptimizationWhitelistDialogMessage">"Posar OwnTracks a la llista de l'optimització de la bateria pot ajudar-lo a fer un seguiment més fiable de les ubicacions i del contacte principal amb el servidor."</string>
     <string name="batteryOptimizationWhitelistDialogTitle">"Optimització de la bateria"</string>
     <string name="cancel">"Cancel·la"</string>
+    <string name="certificateMigrationRequiredNotificationText">"OwnTracks ara fa servir certificats TLS del magatzem de certificats del dispositiu.\n\nSi feieu servir un CA personalitzat o certificats TLS de client, afegiu-los al magatzem de certificats del dispositiu."</string>
+    <string name="certificateMigrationRequiredNotificationTitle">"Migració de certificats necessària"</string>
+    <string name="certificateMigrationRequiredOpenSettingsAction">"Obrir configuració"</string>
     <string name="clear_log">"Esborrar"</string>
     <string name="configurationManagement">"Gestió de configuració"</string>
     <string name="CONNECTED">"Connectat"</string>
     <string name="CONNECTING">"Connectant"</string>
     <string name="contact_image">"Imatge de contacte"</string>
     <string name="contactDetailsAccuracy">"Precisió"</string>
+
+    <!-- Fuzzy -->
     <string name="contactDetailsAccuracyValue">"%d m"</string>
     <string name="contactDetailsAltitude">"Alçada"</string>
     <string name="contactDetailsAltitudeValue">"%,d m"</string>
@@ -35,6 +40,7 @@
     <string name="contactDetailsBatteryValue">"%d %%"</string>
     <string name="contactDetailsBearing">"Orientació"</string>
     <string name="contactDetailsBearingValue">"%,.0f°"</string>
+    <string name="contactDetailsCoordinates">"Coordenades"</string>
     <string name="contactDetailsDistance">"Distància"</string>
     <string name="contactDetailsDistanceUnitKilometres">"km"</string>
     <string name="contactDetailsDistanceUnitMeters">"m"</string>
@@ -44,7 +50,17 @@
     <string name="contactDetailsTopic">"Identificador"</string>
     <string name="contactDetailsTrackerId">"Tracker ID"</string>
     <string name="contactLocationUnknown">"Ubicació no disponible"</string>
+    <string name="contactsListPlaceholder">"No s'ha trobat cap contacte"</string>
     <string name="currentLocationButtonLabel">"Posició actual"</string>
+
+    <!-- Label for the confirmation button on the Delete Waypoint dialog box. -->
+    <string name="deleteWaypointConfirmationButtonLabel">"Esborrar"</string>
+
+    <!-- Content text of the dialog shown to confirm deletion of a waypoint -->
+    <string name="deleteWaypointConfirmationText">"Voleu suprimir aquest waypoint?"</string>
+
+    <!-- Title of the dialog shown to confirm deletion of a waypoint -->
+    <string name="deleteWaypointTitle">"Esborrar"</string>
     <string name="description">"Descripció"</string>
     <string name="deviceLocationDisabledDialogMessage">"Actualment els serveis d'ubicació d'aquest dispositiu estan desactivats, de manera que OwnTracks no pot fer un seguiment de la vostra ubicació actual.
 
@@ -60,6 +76,8 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="ERROR">"Error"</string>
     <string name="ERROR_CONFIGURATION">"Configuració incompleta"</string>
     <string name="ERROR_DATADISABLED">"Connexió de dades no disponible"</string>
+
+    <!-- Fuzzy -->
     <string name="errorPreferencesImportFailed">"Error importació"</string>
     <string name="events">"Esdeveniments"</string>
     <string name="exportConfiguration">"Exportar"</string>
@@ -81,6 +99,8 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="importConfig">"Importar"</string>
     <string name="INITIAL">"Inicialitzant"</string>
     <string name="latitude">"Latitud"</string>
+    <string name="loadActivityNoFileExplorerFound">"No s'ha trobat cap aplicació d'explorador de fitxers"</string>
+    <string name="loadActivitySelectAFile">"Seleccioneu un fitxer"</string>
     <string name="locationPermissionNotGrantedNotification">"No s'ha concedit el permís d'ubicació"</string>
     <string name="locationPermissionRequestDialogMessage">"Per fer el seguiment de la teva ubicació actual concediu permisos d'ubicació a OwnTracks."</string>
     <string name="locationPermissionRequestDialogTitle">"Sol·licitud de permís d'ubicació"</string>
@@ -101,6 +121,8 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="monitoring_move">"Mode de control de moviment"</string>
     <string name="monitoring_quiet">"Mode de control silenciós"</string>
     <string name="monitoring_significant">"Mode de control de canvis significatius"</string>
+
+    <!-- Fuzzy -->
     <string name="monitoringModeDialogManualDescription">"Només les transicions de regió es publiquen automàticament, no les ubicacions"</string>
     <string name="monitoringModeDialogManualTitle">"Manual"</string>
     <string name="monitoringModeDialogMoveDescription">"Alta freqüència i precisió, però ús elevat d'energia"</string>
@@ -116,6 +138,8 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="noNavigationApp">"cap app adequada instal·lada"</string>
     <string name="notificationChangeMonitoring">"Canvia el mode control"</string>
     <string name="notificationChannelErrors">"Errors"</string>
+
+    <!-- Fuzzy -->
     <string name="notificationChannelEventsDescription">"Transmissions regionals "</string>
     <string name="notificationChannelOngoing">"En marxa"</string>
     <string name="notificationChannelOngoingDescription">"Obligatori per rebre actualitzacions d’ubicació en segon pla"</string>
@@ -131,19 +155,26 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="preferencesAutostart">"Autoengegada"</string>
     <string name="preferencesAutostartSummary">"Engega automàticament en arrencar el dispositiu "</string>
     <string name="preferencesBrokerPassword">"Contrasenya"</string>
+    <string name="preferencesCaCrtInstall">"Instal·lar certificat CA"</string>
     <string name="preferencesCategoryAdvancedEncryption">"Encriptació"</string>
     <string name="preferencesCategoryAdvancedLocator">"Localitzador"</string>
     <string name="preferencesCategoryAdvancedMisc">"Misc"</string>
     <string name="preferencesCategoryAdvancedServices">"Serveis"</string>
+    <string name="preferencesCategoryConnectionCredentials">"Credencials"</string>
+    <string name="preferencesCategoryConnectionEndpoint">"Punt final"</string>
+    <string name="preferencesCategoryConnectionIdentification">"Identificació"</string>
     <string name="preferencesCategoryNotificationBackground">"Notificacions de fons"</string>
     <string name="preferencesCategoryNotificationErrors">"Errors i Problemes"</string>
     <string name="preferencesCategoryNotificationOngoing">"Notificació en curs"</string>
     <string name="preferencesChangelog">"Informe de canvis"</string>
     <string name="preferencesCleanSessionEnabled">"Netejar sessió"</string>
     <string name="preferencesClientCrt">"Certificat client"</string>
+    <string name="preferencesClientCrtInstall">"Instal·lar certificat client"</string>
     <string name="preferencesClientId">"ID Client"</string>
+    <string name="preferencesClientIdValidationError">"n"</string>
     <string name="preferencesDebugLog">"Registre de depuració"</string>
     <string name="preferencesDeviceName">"Id de dispositiu"</string>
+    <string name="preferencesDeviceNameValidationError">"No pot estar buit"</string>
     <string name="preferencesDocumentation">"Documentació"</string>
     <string name="preferencesEditor">"Editor"</string>
     <string name="preferencesEditorDescription">"Definiu un valor únic per a la clau especificada. És possible que alguns canvis necessitin reiniciar l'aplicació."</string>
@@ -157,11 +188,14 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="preferencesEncryptionKeyDialogMessage">"La clau d'encriptació es talla als 32 caracters"</string>
     <string name="preferencesEncryptionKeySummary">"Clau simètrica d'encriptació de càrrega"</string>
     <string name="preferencesExperimental">"Experimental"</string>
+    <string name="preferencesExportError">"Error en exportar la configuració"</string>
     <string name="preferencesExportSuccess">"Exportació reeixida"</string>
     <string name="preferencesHost">"Amfitrió"</string>
+    <string name="preferencesHostValidationError">"No pot estar buit"</string>
     <string name="preferencesIgnoreInaccurateLocations">"Ubicacions incorrectes "</string>
     <string name="preferencesIgnoreInaccurateLocationsDialog">"Ignora ubicació si la precisió és superior als metre determinats"</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">"Ignorar ubicacions incorrectes "</string>
+    <string name="preferencesImportNoURIGiven">"No s'ha indicat cap URI per importar la configuració"</string>
     <string name="preferencesKeepalive">"Keepalive"</string>
     <string name="preferencesKeepaliveValidationError">"Keepalive hauria de ser mínim %d"</string>
     <string name="preferencesLicenses">"Llibreries"</string>
@@ -184,6 +218,9 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="preferencesNotificationGeocoderErrorsSummary">"Mostra els errors de geocodificació, els límits de consum i els excessos de quota"</string>
     <string name="preferencesNotificationLocation">"Darrera posició informada"</string>
     <string name="preferencesNotificationLocationSummary">"Mostra la darrera posició i la hora"</string>
+    <string name="preferencesNotificationPermissionRequest">"Permís de notificació desactivat"</string>
+    <string name="preferencesNotificationPermissionRequestSummary">"Toqueu aquí per sol·licitar permís de notificació"</string>
+    <string name="preferencesNotSet">"No configurat"</string>
     <string name="preferencesOpencageGeocoderApiKey">"OpenCage API Key"</string>
     <string name="preferencesOpencageGeocoderApiKeyDialog">"Si es defineix, s'utilitza OpenCage per resoldre les adreces d'ubicació en lloc de Google. Requereix reiniciar."</string>
     <string name="preferencesOpencageGeocoderApiKeySummary">"API key per OpenCage Reverse Geocoder"</string>
@@ -191,6 +228,7 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="preferencesPegLocatorFastestIntervalToInterval">"Limita la freqüència màxima del localitzador"</string>
     <string name="preferencesPegLocatorFastestIntervalToIntervalSummary">"Sol·liciteu que el proveïdor d'ubicació proporcioni actualitzacions no més ràpidament que l'interval de localització sol·licitat"</string>
     <string name="preferencesPort">"Port"</string>
+    <string name="preferencesPortValidationError">"El port ha de ser un número entre 1 i 65535"</string>
     <string name="preferencesProfileId">"Mode"</string>
     <string name="preferencesPubExtendedData">"Dades ampliades"</string>
     <string name="preferencesPubExtendedDataSummary">"Inclou dades ampliades als informació de posició"</string>
@@ -204,6 +242,7 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="preferencesRepublishOnReconnectSummary">"Publiqueu la darrera ubicació coneguda i les dades actuals ampliades immediatament en connectar-vos a MQTT"</string>
     <string name="preferencesReverseGeocodeProvider">"Proveïdor de geocodificació inversa"</string>
     <string name="preferencesServer">"Connexió"</string>
+    <string name="preferencesSet">"Configurat"</string>
 
     <!-- Fuzzy -->
     <string name="preferencesShowWaypointsOnMap">"Mostra regions"</string>
@@ -212,15 +251,24 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="preferencesShowWaypointsOnMapSummary">" preferencesShowRegionsOnMapSummary "</string>
     <string name="preferencesTheme">"Tema"</string>
     <string name="preferencesTrackerId">"Tracker ID"</string>
+    <string name="preferencesTrackerIdValidationError">"Ha de tenir un o dos caràcters"</string>
+    <string name="preferencesUrlValidationError">"URL HTTP no vàlid"</string>
 
     <!-- Fuzzy -->
     <string name="preferencesUsername">"Nom d'usuari"</string>
     <string name="preferencesWebsocket">"Utilitza WebSockets"</string>
+
+    <!-- Fuzzy -->
     <string name="publish">"Informe"</string>
+
+    <!-- Fuzzy -->
     <string name="radius">"Radi"</string>
     <string name="reconnect">"Reconnectar"</string>
     <string name="save">"Desa"</string>
     <string name="select">"Seleccionar"</string>
+    <string name="shareContactBody">"
+%1$s darrera ubicació: %2$s (%3$s) a %4$s
+"</string>
     <string name="status_background_service_started_hint">"Iniciat el servei en segon pla"</string>
     <string name="status_battery_optimization_whitelisted_hint">"Optimització de la bateria a la llista blanca"</string>
     <string name="status_endpoint_queue_hint">"Cua de punt final"</string>
@@ -229,6 +277,33 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="status_last_background_update_hint">"Última actualització en segon pla del servei d'ubicació"</string>
     <string name="statusBatteryDozeWhiteListDisabled">"No"</string>
     <string name="statusBatteryDozeWhiteListEnabled">"Si"</string>
+    <string name="statusEndpointStateMessageAuthenticationFailed">"L'autenticació ha fallat"</string>
+    <string name="statusEndpointStateMessageClientTimeout">"Temps d'espera del client"</string>
+    <string name="statusEndpointStateMessageConnectionLost">"Connexió perduda: %s"</string>
+    <string name="statusEndpointStateMessageInvalidClientId">"Invàlid ID de client"</string>
+    <string name="statusEndpointStateMessageInvalidProtocolVersion">"Versió del protocol MQTT no vàlida"</string>
+    <string name="statusEndpointStateMessageMalformedHostPort">"Hostname i port no vàlids"</string>
+    <string name="statusEndpointStateMessageMissingHost">"Cap host definit"</string>
+    <string name="statusEndpointStateMessageNotAuthorized">"No autoritzat"</string>
+    <string name="statusEndpointStateMessageServerTimeout">"Temps d'espera d'escriptura del servidor"</string>
+    <string name="statusEndpointStateMessageSocketTimeout">"Temps de connexió esgotat"</string>
+    <string name="statusEndpointStateMessageSubscribeFailed">"La subscripció ha fallat"</string>
+    <string name="statusEndpointStateMessageTLSBadClientCertPassword">"Error TLS: contrasenya de certificat de client incorrecta"</string>
+    <string name="statusEndpointStateMessageTLSConfigError">"Error de configuració de TLS"</string>
+    <string name="statusEndpointStateMessageTLSError">"Error TLS: %s"</string>
+    <string name="statusEndpointStateMessageUnableToConnect">"Impossible connectar"</string>
+    <string name="statusEndpointStateMessageUnknownHost">"Host desconegut"</string>
+    <string name="statusLocationPermissions">"Permisos d'ubicació concedits"</string>
+    <string name="statusLocationPermissionsCoarseBackground">"Aproximat (disponible en segon pla)"</string>
+    <string name="statusLocationPermissionsCoarseForeground">"Aproximat"</string>
+    <string name="statusLocationPermissionsFineBackground">"Precís (disponible en segon pla)"</string>
+    <string name="statusLocationPermissionsFineForeground">"Precís"</string>
+    <string name="statusLocationPermissionsNone">"Cap"</string>
+    <string name="statusLocationPermissionsPromptNegativeButton">"Cancel·lar"</string>
+    <string name="statusLocationPermissionsPromptPositiveButton">"Configuració de l'aplicació"</string>
+    <string name="statusLocationPermissionsPromptText">"Si voleu fer un seguiment automàtic de les ubicacions en reiniciar el dispositiu podeu habilitar els permisos d'ubicació en segon pla concedint a OwnTracks accés a la vostra ubicació \"tot el temps\"."</string>
+    <string name="statusLocationPermissionsPromptTitle">"Ubicació de fons"</string>
+    <string name="statusLocationPermissionsUnknown">"Desconegut"</string>
     <string name="title_activity_about">"Sobre"</string>
     <string name="title_activity_contacts">"Amics"</string>
     <string name="title_activity_map">"Mapa"</string>
@@ -255,7 +330,12 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
 
     <!-- Fuzzy -->
     <string name="waypoint_region_unknown">"Estat desconegut"</string>
+
+    <!-- Fuzzy -->
     <string name="waypointListPlaceholder">"Cap regió definida"</string>
+    <string name="waypointMigrationErrorNotificationText">"S'ha produït un error en migrar els waypoints. És possible que alguns no s'hagin migrat, així que comproveu els registres i torneu-los a afegir."</string>
+    <string name="waypointMigrationErrorNotificationTitle">"S'ha produït un error en migrar els waypoints"</string>
+    <string name="waypointsImport">"Importa punts de ruta"</string>
     <string name="welcome_connection_setup_description">"OwnTracks funciona enviant les vostres dades d'ubicació a un servidor vostre (o d'algú de la vostra confiança), per estar segurs que manteniu el control de les vostres dades.
 
 Assegureu-vos de conèixer els detalls de connexió del vostre servidor, ja sigui accessible mitjançant HTTPS o MQTT i qualssevol credencials d'inici de sessió.
@@ -268,6 +348,19 @@ Per obtenir més detalls, feu una ullada al llibret d'OwnTracks."</string>
     <string name="welcome_description">"Els següents passos t'ajudaran a començar amb Owntracks"</string>
     <string name="welcome_finish_open_preferences_button_label">"Obrir Preferències"</string>
     <string name="welcome_heading">"Benvinguda"</string>
+
+    <!-- Fuzzy -->
+    <string name="welcome_location_permission_description">"Per rebre la vostra ubicació actual per enviar-la al vostre punt final d'OwnTracks, OwnTracks necessita el vostre permís per accedir a la ubicació del vostre dispositiu.
+
+Podeu revisar aquest permís i sol·licitar permisos d'ubicació (de fons) addicionals si cal des de la pàgina Estat."</string>
+    <string name="welcome_location_permission_granted">"Permisos d'ubicació concedits"</string>
+    <string name="welcome_location_permission_title">"Permisos d'ubicació"</string>
+    <string name="welcome_notification_permission_description">"Per funcionar completament, OwnTracks necessita el vostre permís per mostrar algunes notificacions.
+
+Es mostrarà una notificació permanent per mantenir el seguiment de la ubicació i la connexió activa, i també podeu optar per activar les notificacions per als contactes que fan la transició entre punts d'interès."</string>
+    <string name="welcome_notification_permission_granted">"Permisos de notificació concedits"</string>
+    <string name="welcome_notification_permission_title">"Permisos de notificació"</string>
+    <string name="welcome_permission_request">"Petició"</string>
     <string name="welcome_play_description">"OwnTracks necessita Serveis Google Play"</string>
     <string name="welcome_play_heading">"Serveis Google Play"</string>
     <string name="welcomeFixIssue">"Fix"</string>
