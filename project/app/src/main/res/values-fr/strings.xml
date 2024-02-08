@@ -27,6 +27,8 @@
     <string name="CONNECTING">"Connexion"</string>
     <string name="contact_image">"Image de contact"</string>
     <string name="contactDetailsAccuracy">"Précision"</string>
+
+    <!-- Fuzzy -->
     <string name="contactDetailsAccuracyValue">"%d m"</string>
     <string name="contactDetailsAltitude">"Altitude"</string>
     <string name="contactDetailsAltitudeValue">"%,d m"</string>
@@ -54,6 +56,8 @@
     <string name="ERROR">"Erreur"</string>
     <string name="ERROR_CONFIGURATION">"Configuration incomplète"</string>
     <string name="ERROR_DATADISABLED">"Données de connexion non disponible"</string>
+
+    <!-- Fuzzy -->
     <string name="errorPreferencesImportFailed">"L'importation a échoué"</string>
     <string name="events">"Événements"</string>
     <string name="exportConfiguration">"Exporter"</string>
@@ -92,6 +96,8 @@
     <string name="noNavigationApp">"Aucune application appropriée installée"</string>
     <string name="notificationChangeMonitoring">"Changer le mode de surveillance"</string>
     <string name="notificationChannelErrors">"Erreurs"</string>
+
+    <!-- Fuzzy -->
     <string name="notificationChannelEventsDescription">"Transmissions par région"</string>
     <string name="notificationChannelOngoing">"En cours"</string>
     <string name="notificationChannelOngoingDescription">"Requis pour recevoir des mises à jour de localisation en arrière-plan"</string>
@@ -118,7 +124,6 @@
     <!-- This can be "Notes de version" -->
     <string name="preferencesChangelog">"Version"</string>
     <string name="preferencesCleanSessionEnabled">"Vider la session"</string>
-    <string name="preferencesClientCrt">"Certificat client"</string>
     <string name="preferencesClientId">"ID Client"</string>
     <string name="preferencesDebugLog">"Débogage du journal"</string>
     <string name="preferencesDeviceName">"Device ID"</string>
@@ -196,13 +201,15 @@
     <!-- Fuzzy -->
     <string name="preferencesUsername">"Nom d'utilisateur"</string>
     <string name="preferencesWebsocket">"WebSockets"</string>
+
+    <!-- Fuzzy -->
     <string name="publish">"Envoyer"</string>
+
+    <!-- Fuzzy -->
     <string name="radius">"Rayon"</string>
     <string name="reconnect">"Reconnecter"</string>
     <string name="save">"Sauvegarder"</string>
     <string name="select">"Sélectionner"</string>
-
-    <!-- Fuzzy -->
     <string name="status_background_service_started_hint">"Service d'arrière-plan démarré"</string>
     <string name="status_battery_optimization_whitelisted_hint">"Optimisation de la batterie en liste blanche"</string>
     <string name="status_endpoint_queue_hint">"File d'attente du Endpoint"</string>
@@ -239,6 +246,8 @@
 
     <!-- Fuzzy -->
     <string name="waypoint_region_unknown">"Statut inconnu"</string>
+
+    <!-- Fuzzy -->
     <string name="waypointListPlaceholder">"Aucune région définie"</string>
     <string name="welcome_connection_setup_title">"Configurer une connexion"</string>
     <string name="welcome_description">"Les étapes suivantes vous aideront à démarrer avec OwnTracks"</string>

@@ -11,6 +11,8 @@
     <string name="cancel">"Cancelar"</string>
     <string name="CONNECTED">"Conectado"</string>
     <string name="CONNECTING">"Conectando"</string>
+
+    <!-- Fuzzy -->
     <string name="contactDetailsAccuracyValue">"%d m"</string>
     <string name="contactDetailsAltitudeValue">"%,d m"</string>
     <string name="contactDetailsBatteryValue">"%d %%"</string>
@@ -25,6 +27,8 @@
     <string name="DISCONNECTED">"Desconectado"</string>
     <string name="done_heading">"Feito"</string>
     <string name="ERROR">"Erro"</string>
+
+    <!-- Fuzzy -->
     <string name="errorPreferencesImportFailed">"Importação falhada"</string>
     <string name="events">"Eventos"</string>
     <string name="exportConfiguration">"Exportar"</string>
@@ -55,7 +59,6 @@
     <string name="preferencesCategoryNotificationOngoing">"Notificação atual"</string>
     <string name="preferencesChangelog">"Registo de alterações"</string>
     <string name="preferencesCleanSessionEnabled">"Limpar sessão"</string>
-    <string name="preferencesClientCrt">"Certificado Cliente"</string>
     <string name="preferencesDeviceName">"ID Dispositivo"</string>
     <string name="preferencesDocumentation">"Documentação"</string>
     <string name="preferencesEditor">"Editor"</string>
@@ -87,7 +90,11 @@
     <!-- Fuzzy -->
     <string name="preferencesUsername">"Utilizador"</string>
     <string name="preferencesWebsocket">"Usa Websockets"</string>
+
+    <!-- Fuzzy -->
     <string name="publish">"Reportar"</string>
+
+    <!-- Fuzzy -->
     <string name="radius">"Raio"</string>
     <string name="save">"Salvar"</string>
     <string name="title_activity_about">"Acerca de"</string>
@@ -106,6 +113,8 @@
     <string name="transitionLeaving">"Saidas"</string>
     <string name="unableToCopyCertificate">"Impossível copiar certificado para o armazenamento interno"</string>
     <string name="version">"Versão"</string>
+
+    <!-- Fuzzy -->
     <string name="waypointListPlaceholder">"Nenhuma região definida"</string>
     <string name="welcome_heading">"Bem vindo"</string>
     <string name="welcome_play_description">"OwnTracks precisa de Google Play Services"</string>

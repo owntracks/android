@@ -30,6 +30,8 @@
     <string name="CONNECTING">"Łączenie"</string>
     <string name="contact_image">"Obraz kontaktu"</string>
     <string name="contactDetailsAccuracy">"Precyzja"</string>
+
+    <!-- Fuzzy -->
     <string name="contactDetailsAccuracyValue">"%d m"</string>
     <string name="contactDetailsAltitude">"Wysokość"</string>
     <string name="contactDetailsAltitudeValue">"%,d m"</string>
@@ -62,6 +64,8 @@ Aby to umożliwić, włącz lokalizację w ustawieniach urządzenia."</string>
     <string name="ERROR">"Błąd"</string>
     <string name="ERROR_CONFIGURATION">"Niepełna konfiguracja"</string>
     <string name="ERROR_DATADISABLED">"Połączenie danych niedostępne"</string>
+
+    <!-- Fuzzy -->
     <string name="errorPreferencesImportFailed">"Import nieudany"</string>
     <string name="events">"Zdarzenia"</string>
     <string name="exportConfiguration">"Eksport"</string>
@@ -103,6 +107,8 @@ Aby to umożliwić, włącz lokalizację w ustawieniach urządzenia."</string>
     <string name="monitoring_move">"Tryb monitorowania ruchu"</string>
     <string name="monitoring_quiet">"Tryb cichego monitorowania"</string>
     <string name="monitoring_significant">"Tryb monitorowania znaczących zmian"</string>
+
+    <!-- Fuzzy -->
     <string name="monitoringModeDialogManualDescription">"Automatycznie publikowane są tylko przejścia między regionami, a nie lokalizacje"</string>
     <string name="monitoringModeDialogManualTitle">"Ręczny"</string>
     <string name="monitoringModeDialogMoveDescription">"Wysoka częstotliwość i dokładność, wysokie zużycie energii"</string>
@@ -118,6 +124,8 @@ Aby to umożliwić, włącz lokalizację w ustawieniach urządzenia."</string>
     <string name="noNavigationApp">"odpowiednia aplikacja nie jest zainstalowana"</string>
     <string name="notificationChangeMonitoring">"Zmień monitorowanie"</string>
     <string name="notificationChannelErrors">"Błędy"</string>
+
+    <!-- Fuzzy -->
     <string name="notificationChannelEventsDescription">"Transmisje regionu"</string>
     <string name="notificationChannelOngoing">"W trakcie"</string>
     <string name="notificationChannelOngoingDescription">"Wymagane do otrzymywania lokalizacji w tle"</string>
@@ -144,7 +152,6 @@ Aby to umożliwić, włącz lokalizację w ustawieniach urządzenia."</string>
     <string name="preferencesCategoryNotificationOngoing">"Bieżące powiadomienie"</string>
     <string name="preferencesChangelog">"Historia zmian"</string>
     <string name="preferencesCleanSessionEnabled">"Wyczyść sesję"</string>
-    <string name="preferencesClientCrt">"Certyfikat klienta"</string>
     <string name="preferencesClientId">"ID Klienta"</string>
     <string name="preferencesDebugLog">"Informacje debugowania"</string>
     <string name="preferencesDeviceName">"ID Urządzenia"</string>
@@ -218,7 +225,11 @@ Aby to umożliwić, włącz lokalizację w ustawieniach urządzenia."</string>
     <!-- Fuzzy -->
     <string name="preferencesUsername">"Nazwa użytkownika"</string>
     <string name="preferencesWebsocket">"Używaj WebSockets"</string>
+
+    <!-- Fuzzy -->
     <string name="publish">"Zgłoś"</string>
+
+    <!-- Fuzzy -->
     <string name="radius">"Zasięg"</string>
     <string name="reconnect">"Połącz ponownie"</string>
     <string name="save">"Zapisz"</string>
@@ -257,6 +268,8 @@ Aby to umożliwić, włącz lokalizację w ustawieniach urządzenia."</string>
 
     <!-- Fuzzy -->
     <string name="waypoint_region_unknown">"Status nieznany"</string>
+
+    <!-- Fuzzy -->
     <string name="waypointListPlaceholder">"Nie zdefiniowano obszarów"</string>
     <string name="welcome_connection_setup_description">"OwnTracks działa poprzez wysyłanie danych o Twojej lokalizacji do serwera, którego właścicielem jesteś Ty (lub ktoś, komu ufasz), co daje Ci pewność, że zachowujesz kontrolę nad swoimi danymi.
 

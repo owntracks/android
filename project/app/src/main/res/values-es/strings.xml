@@ -21,6 +21,8 @@
     <string name="CONNECTING">"Conectando"</string>
     <string name="contact_image">"Imagen de contacto"</string>
     <string name="contactDetailsAccuracy">"Precisión"</string>
+
+    <!-- Fuzzy -->
     <string name="contactDetailsAccuracyValue">"%d m"</string>
     <string name="contactDetailsAltitudeValue">"%,d m"</string>
     <string name="contactDetailsBatteryValue">"%d %%"</string>
@@ -41,6 +43,8 @@
     <string name="ERROR">"Error"</string>
     <string name="ERROR_CONFIGURATION">"Configuracion incompleta"</string>
     <string name="ERROR_DATADISABLED">"Conexión no disponible"</string>
+
+    <!-- Fuzzy -->
     <string name="errorPreferencesImportFailed">"No se pudo importar"</string>
     <string name="events">"Eventos"</string>
     <string name="exportConfiguration">"Exportar"</string>
@@ -74,6 +78,8 @@
     <string name="noNavigationApp">"No hay aplicaciones compatibles"</string>
     <string name="notificationChangeMonitoring">"Cambio modo"</string>
     <string name="notificationChannelErrors">"Errores"</string>
+
+    <!-- Fuzzy -->
     <string name="notificationChannelEventsDescription">"Transmisiones regionales"</string>
     <string name="notificationChannelOngoing">"Ongoing"</string>
     <string name="notificationChannelOngoingDescription">"Se requiere para recibir actualizaciones de ubicación en segundo plano"</string>
@@ -96,7 +102,6 @@
     <string name="preferencesCategoryNotificationOngoing">"Notificación en progreso"</string>
     <string name="preferencesChangelog">"Registro de cambios"</string>
     <string name="preferencesCleanSessionEnabled">"Limpiar sesión"</string>
-    <string name="preferencesClientCrt">"Certificado cliente"</string>
     <string name="preferencesClientId">"ID de cliente"</string>
     <string name="preferencesDebugLog">"Registro de depuración"</string>
     <string name="preferencesDeviceName">"ID de Dispositivo"</string>
@@ -152,7 +157,11 @@
     <!-- Fuzzy -->
     <string name="preferencesUsername">"Nombre de Usuario"</string>
     <string name="preferencesWebsocket">"Usar WebSockets"</string>
+
+    <!-- Fuzzy -->
     <string name="publish">"Reportar"</string>
+
+    <!-- Fuzzy -->
     <string name="radius">"Radio"</string>
     <string name="reconnect">"Reconectar"</string>
     <string name="save">"Guardar"</string>
@@ -189,6 +198,8 @@
 
     <!-- Fuzzy -->
     <string name="waypoint_region_unknown">"Estado desconocido"</string>
+
+    <!-- Fuzzy -->
     <string name="waypointListPlaceholder">"No hay regiones definidas"</string>
     <string name="welcome_description">"Los siguientes pasos te ayudarán a comenzar con OwnTracks"</string>
     <string name="welcome_heading">"Bienvenido"</string>

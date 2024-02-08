@@ -17,6 +17,8 @@
     <string name="CONNECTED">"已连接"</string>
     <string name="CONNECTING">"正在连接"</string>
     <string name="contactDetailsAccuracy">"精度"</string>
+
+    <!-- Fuzzy -->
     <string name="contactDetailsAccuracyValue">"%d m"</string>
     <string name="contactDetailsAltitudeValue">"%,d m"</string>
     <string name="contactDetailsBattery">"电池"</string>
@@ -39,6 +41,8 @@
     <string name="ERROR">"错误"</string>
     <string name="ERROR_CONFIGURATION">"配置未完成"</string>
     <string name="ERROR_DATADISABLED">"没有可用的数据连接"</string>
+
+    <!-- Fuzzy -->
     <string name="errorPreferencesImportFailed">"导入失败"</string>
     <string name="events">"事件"</string>
     <string name="exportConfiguration">"导出"</string>
@@ -81,7 +85,6 @@
     <string name="preferencesCategoryAdvancedServices">"服务"</string>
     <string name="preferencesCategoryNotificationBackground">"后台通知"</string>
     <string name="preferencesChangelog">"更新日志"</string>
-    <string name="preferencesClientCrt">"客户端证书"</string>
     <string name="preferencesDeviceName">"设备 ID"</string>
     <string name="preferencesDocumentation">"文档"</string>
     <string name="preferencesEncryptionKey">"密钥"</string>
@@ -121,6 +124,8 @@
     <!-- Fuzzy -->
     <string name="preferencesUsername">"用户名"</string>
     <string name="preferencesWebsocket">"使用 WebSockets"</string>
+
+    <!-- Fuzzy -->
     <string name="radius">"半径"</string>
     <string name="reconnect">"重新连接"</string>
     <string name="save">"保存"</string>
@@ -153,6 +158,8 @@
 
     <!-- Fuzzy -->
     <string name="waypoint_region_unknown">"未知状态"</string>
+
+    <!-- Fuzzy -->
     <string name="waypointListPlaceholder">"还未定义区域"</string>
 
     <!-- Fuzzy -->

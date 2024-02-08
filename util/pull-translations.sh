@@ -12,12 +12,17 @@ for lang in $(curl -s -X POST https://api.poeditor.com/v2/languages/list \
     -d id=${APP_ID} | jq -r .result.languages[].code); do
     if [[ $lang == "zh-CN" ]]; then
         locale="zh"
+    elif [[ $lang == "en-gb" ]]; then
+        locale="en-rGB"
+    elif [[ $lang == "id" ]]; then
+        locale="in"
     else
         locale=$lang
     fi
 
+
     if [[ $lang == "en" || ! -f project/app/src/main/res/values-"${locale}"/strings.xml ]]; then
-        echo "Skipping $lang"
+        echo "Skipping $lang because $locale doesn't exist"
         continue
     fi
     echo "Fetching $lang into $locale"

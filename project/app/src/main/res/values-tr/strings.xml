@@ -28,6 +28,8 @@
     <string name="CONNECTING">"Bağlanıyor"</string>
     <string name="contact_image">"Contact Image"</string>
     <string name="contactDetailsAccuracy">"Accuracy"</string>
+
+    <!-- Fuzzy -->
     <string name="contactDetailsAccuracyValue">"%d m"</string>
     <string name="contactDetailsAltitude">"Altitude"</string>
     <string name="contactDetailsAltitudeValue">"%,d m"</string>
@@ -58,6 +60,8 @@ To allow this, please enable Location in the device settings."</string>
     <string name="ERROR">"Error"</string>
     <string name="ERROR_CONFIGURATION">"Configuration incomplete"</string>
     <string name="ERROR_DATADISABLED">"Data connection not available"</string>
+
+    <!-- Fuzzy -->
     <string name="errorPreferencesImportFailed">"Import failed"</string>
     <string name="events">"Etkinlikler"</string>
     <string name="exportConfiguration">"Dışa aktar"</string>
@@ -99,6 +103,8 @@ To allow this, please enable Location in the device settings."</string>
     <string name="monitoring_move">"Move monitoring mode"</string>
     <string name="monitoring_quiet">"Quiet monitoring mode"</string>
     <string name="monitoring_significant">"Significant changes monitoring mode"</string>
+
+    <!-- Fuzzy -->
     <string name="monitoringModeDialogManualDescription">"Only region transitions published automatically, not locations"</string>
     <string name="monitoringModeDialogManualTitle">"Manual"</string>
     <string name="monitoringModeDialogMoveDescription">"High frequency and accuracy, but high power usage"</string>
@@ -114,6 +120,8 @@ To allow this, please enable Location in the device settings."</string>
     <string name="noNavigationApp">"no suitable app installed"</string>
     <string name="notificationChangeMonitoring">"Change Monitoring"</string>
     <string name="notificationChannelErrors">"Hatalar"</string>
+
+    <!-- Fuzzy -->
     <string name="notificationChannelEventsDescription">"Region transmissions"</string>
     <string name="notificationChannelOngoing">"Ongoing"</string>
     <string name="notificationChannelOngoingDescription">"Required to receive location updates in the background"</string>
@@ -138,7 +146,6 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesCategoryNotificationOngoing">"Ongoing notification"</string>
     <string name="preferencesChangelog">"Değişiklik günlüğü"</string>
     <string name="preferencesCleanSessionEnabled">"Temiz Oturum"</string>
-    <string name="preferencesClientCrt">"Client certificate"</string>
     <string name="preferencesClientId">"Client ID"</string>
     <string name="preferencesDebugLog">"Debug log"</string>
     <string name="preferencesDeviceName">"Device ID"</string>
@@ -220,7 +227,11 @@ To allow this, please enable Location in the device settings."</string>
     <!-- Fuzzy -->
     <string name="preferencesUsername">"Username"</string>
     <string name="preferencesWebsocket">"Use WebSockets"</string>
+
+    <!-- Fuzzy -->
     <string name="publish">"Report"</string>
+
+    <!-- Fuzzy -->
     <string name="radius">"Radius"</string>
     <string name="reconnect">"Reconnect"</string>
     <string name="save">"Kaydet"</string>
@@ -259,6 +270,8 @@ To allow this, please enable Location in the device settings."</string>
 
     <!-- Fuzzy -->
     <string name="waypoint_region_unknown">"Status unknown"</string>
+
+    <!-- Fuzzy -->
     <string name="waypointListPlaceholder">"No regions defined yet"</string>
     <string name="welcome_connection_setup_description">"OwnTracks works by sending your location data to a server that you (or someone you trust) owns, making sure you remain in control of your data.
 
