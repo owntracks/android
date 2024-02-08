@@ -88,8 +88,8 @@ class WaypointActivity : AppCompatActivity() {
             R.id.delete -> {
                 MaterialAlertDialogBuilder(this) // set message, title, and icon
                     .setTitle(R.string.deleteWaypointTitle)
-                    .setMessage(R.string.deleteWaypointConfirmation)
-                    .setPositiveButton(R.string.deleteWaypointTitle) { dialog: DialogInterface, _: Int ->
+                    .setMessage(R.string.deleteWaypointConfirmationText)
+                    .setPositiveButton(R.string.deleteWaypointConfirmationButtonLabel) { dialog: DialogInterface, _: Int ->
                         viewModel.delete()
                         dialog.dismiss()
                         finish()
