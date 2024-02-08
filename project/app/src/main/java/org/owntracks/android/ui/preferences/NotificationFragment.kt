@@ -31,10 +31,10 @@ class NotificationFragment @Inject constructor() : AbstractPreferenceFragment() 
             Preferences::notificationGeocoderErrors.name
         ).forEach { preferenceKey ->
             findPreference<SwitchPreferenceCompat>(preferenceKey)?.isEnabled =
-                requirementsChecker.isNotificationsEnabled()
+                requirementsChecker.hasNotificationPermissions()
         }
         findPreference<Preference>("notificationPermission")?.apply {
-            isVisible = !requirementsChecker.isNotificationsEnabled()
+            isVisible = !requirementsChecker.hasNotificationPermissions()
             setOnPreferenceClickListener {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     startActivity(

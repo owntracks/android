@@ -60,7 +60,7 @@ class NotificationPermissionFragment @Inject constructor() : WelcomeFragment() {
   override fun onResume() {
     super.onResume()
     viewModel.setWelcomeState(
-        if (requirementsChecker.isNotificationsEnabled()) {
+        if (requirementsChecker.hasNotificationPermissions()) {
           binding.uiFragmentWelcomeNotificationPermissionsRequest.visibility = View.INVISIBLE
           binding.uiFragmentWelcomeNotificationPermissionsMessage.visibility = View.VISIBLE
           WelcomeViewModel.ProgressState.PERMITTED

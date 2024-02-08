@@ -4,5 +4,5 @@ interface RequirementsChecker {
     fun hasLocationPermissions(): Boolean
     fun isLocationServiceEnabled(): Boolean
     fun isPlayServicesCheckPassed(): Boolean
-    fun isNotificationsEnabled(): Boolean
+    fun hasNotificationPermissions(): Boolean
 }
