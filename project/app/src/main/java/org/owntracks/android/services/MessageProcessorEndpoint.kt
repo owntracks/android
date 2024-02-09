@@ -8,7 +8,7 @@ import org.owntracks.android.support.interfaces.OutgoingMessageProcessor
 
 abstract class MessageProcessorEndpoint internal constructor(val messageProcessor: MessageProcessor) :
     OutgoingMessageProcessor {
-    suspend fun onMessageReceived(message: MessageBase) {
+    fun onMessageReceived(message: MessageBase) {
         message.modeId = modeId!!
         messageProcessor.processIncomingMessage(onFinalizeMessage(message))
     }

@@ -289,33 +289,31 @@ class MQTTMessageProcessorEndpoint(
         }
 
         override fun messageArrived(topic: String, message: MqttMessage) {
-            scope.launch {
-                Timber.d("Received MQTT message on $topic: message=$message")
-                if (message.payload.isEmpty()) {
-                    onMessageReceived(
-                        MessageClear().apply {
-                            this.topic = topic.replace(MessageCard.BASETOPIC_SUFFIX, "")
-                        }
-                    )
-                } else {
-                    try {
-                        onMessageReceived(
-                            parser.fromJson(message.payload)
-                                .apply {
-                                    this.topic = topic
-                                    this.retained = message.isRetained
-                                    this.qos = message.qos
-                                }
-                        )
-                    } catch (e: Parser.EncryptionException) {
-                        Timber.w("Enable to decrypt received message ${message.id} on $topic")
-                    } catch (e: JsonMappingException) {
-                        Timber.w(e, "Malformed JSON message received ${message.id} on $topic")
-                    } catch (e: JsonParseException) {
-                        Timber.w(e, "Malformed JSON message received ${message.id} on $topic")
-                    } catch (e: InvalidFormatException) {
-                        Timber.w("Malformed JSON message received ${message.id} on $topic")
+            Timber.d("Received MQTT message on $topic: message=$message")
+            if (message.payload.isEmpty()) {
+                onMessageReceived(
+                    MessageClear().apply {
+                        this.topic = topic.replace(MessageCard.BASETOPIC_SUFFIX, "")
                     }
+                )
+            } else {
+                try {
+                    onMessageReceived(
+                        parser.fromJson(message.payload)
+                            .apply {
+                                this.topic = topic
+                                this.retained = message.isRetained
+                                this.qos = message.qos
+                            }
+                    )
+                } catch (e: Parser.EncryptionException) {
+                    Timber.w("Enable to decrypt received message ${message.id} on $topic")
+                } catch (e: JsonMappingException) {
+                    Timber.w(e, "Malformed JSON message received ${message.id} on $topic")
+                } catch (e: JsonParseException) {
+                    Timber.w(e, "Malformed JSON message received ${message.id} on $topic")
+                } catch (e: InvalidFormatException) {
+                    Timber.w("Malformed JSON message received ${message.id} on $topic")
                 }
             }
         }

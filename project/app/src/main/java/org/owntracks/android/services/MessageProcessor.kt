@@ -334,7 +334,7 @@ class MessageProcessor @Inject constructor(
         }
     }
 
-    suspend fun processIncomingMessage(message: MessageBase) {
+    fun processIncomingMessage(message: MessageBase) {
         Timber.i("Received incoming message: ${message.javaClass.simpleName} on ${message.topic}")
         when (message) {
             is MessageClear -> {
@@ -385,7 +385,7 @@ class MessageProcessor @Inject constructor(
         scope.launch { contactsRepo.update(message.getContactId(), message) }
     }
 
-    private suspend fun processIncomingMessage(message: MessageCmd) {
+    private fun processIncomingMessage(message: MessageCmd) {
         if (!preferences.cmd) {
             Timber.w("remote commands are disabled")
             return
@@ -400,40 +400,41 @@ class MessageProcessor @Inject constructor(
             Timber.e("Invalid action message received")
             return
         }
-        when (message.action) {
-            CommandAction.REPORT_LOCATION -> {
-                if (message.modeId !== ConnectionMode.MQTT) {
-                    Timber.e("command not supported in HTTP mode: ${message.action})")
-                } else {
-                    service?.requestOnDemandLocationUpdate(MessageLocation.ReportType.RESPONSE)
-                }
-            }
-            CommandAction.WAYPOINTS -> locationProcessorLazy.get()
-                .publishWaypointsMessage()
-            CommandAction.SET_WAYPOINTS -> message.waypoints?.run {
-                waypointsRepo.importFromMessage(waypoints)
-            }
-            CommandAction.SET_CONFIGURATION -> {
-                if (!preferences.remoteConfiguration) {
-                    Timber.w("Received a remote configuration command but remote config setting is disabled")
-                } else {
-                    if (message.configuration != null) {
-                        preferences.importConfiguration(message.configuration!!)
+        scope.launch {
+            when (message.action) {
+                CommandAction.REPORT_LOCATION -> {
+                    if (message.modeId !== ConnectionMode.MQTT) {
+                        Timber.e("command not supported in HTTP mode: ${message.action})")
                     } else {
-                        Timber.i("No remote configuration provided")
-                    }
-                    if (message.waypoints != null) {
-                        waypointsRepo.importFromMessage(message.waypoints!!.waypoints)
-                    } else {
-                        Timber.d("No remote waypoints provided")
+                        service?.requestOnDemandLocationUpdate(MessageLocation.ReportType.RESPONSE)
                     }
                 }
-                importConfigurationIdlingResource.setIdleState(true)
+                CommandAction.WAYPOINTS -> locationProcessorLazy.get().publishWaypointsMessage()
+                CommandAction.SET_WAYPOINTS -> message.waypoints?.run {
+                    waypointsRepo.importFromMessage(waypoints)
+                }
+                CommandAction.SET_CONFIGURATION -> {
+                    if (!preferences.remoteConfiguration) {
+                        Timber.w("Received a remote configuration command but remote config setting is disabled")
+                    } else {
+                        if (message.configuration != null) {
+                            preferences.importConfiguration(message.configuration!!)
+                        } else {
+                            Timber.i("No remote configuration provided")
+                        }
+                        if (message.waypoints != null) {
+                            waypointsRepo.importFromMessage(message.waypoints!!.waypoints)
+                        } else {
+                            Timber.d("No remote waypoints provided")
+                        }
+                    }
+                    importConfigurationIdlingResource.setIdleState(true)
+                }
+                CommandAction.CLEAR_WAYPOINTS -> {
+                    waypointsRepo.clearAll()
+                }
+                null -> {}
             }
-            CommandAction.CLEAR_WAYPOINTS -> {
-                waypointsRepo.clearAll()
-            }
-            null -> {}
         }
     }
 
