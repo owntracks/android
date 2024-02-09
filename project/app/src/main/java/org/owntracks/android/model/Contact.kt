@@ -10,6 +10,7 @@ import org.owntracks.android.location.LatLng
 import org.owntracks.android.location.toLatLng
 import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageLocation
+import org.owntracks.android.model.messages.MessageTransition
 import timber.log.Timber
 
 class Contact(id: String) : BaseObservable() {
@@ -52,7 +53,7 @@ class Contact(id: String) : BaseObservable() {
     face = messageCard.face
   }
 
-  fun setMessageLocation(messageLocation: MessageLocation): Boolean {
+  fun setLocationFromMessageLocation(messageLocation: MessageLocation): Boolean {
     if (locationTimestamp > messageLocation.timestamp) return false
     Timber.v("update contact:$id, tst:${messageLocation.timestamp}", id, messageLocation.timestamp)
     locationTimestamp = messageLocation.timestamp
@@ -66,6 +67,17 @@ class Contact(id: String) : BaseObservable() {
     velocity = messageLocation.velocity
     battery = messageLocation.battery
     return true
+  }
+
+  fun setLocationFromMessageTransition(messageLocation: MessageTransition): Boolean {
+      if (locationAccuracy > messageLocation.timestamp) return false
+      locationTimestamp = messageLocation.timestamp
+      if (latLng != messageLocation.toLatLng()) {
+          Timber.v("Contact ${this.id} has moved to $latLng")
+          latLng = messageLocation.toLatLng()
+      }
+      locationAccuracy = messageLocation.accuracy
+      return true
   }
 
   @get:Bindable

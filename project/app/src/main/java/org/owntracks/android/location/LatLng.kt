@@ -8,6 +8,7 @@ import org.osmdroid.util.GeoPoint
 import org.owntracks.android.location.geofencing.Latitude
 import org.owntracks.android.location.geofencing.Longitude
 import org.owntracks.android.model.messages.MessageLocation
+import org.owntracks.android.model.messages.MessageTransition
 
 class LatLng(private val _latitude: Latitude, private val _longitude: Longitude) {
     constructor(latitude: Double, longitude: Double) : this(Latitude(latitude), Longitude(longitude))
@@ -44,6 +45,8 @@ fun Double.equalsDelta(other: Double) = abs(this / other - 1) < 0.000001
 fun Location.toLatLng() = LatLng(latitude, longitude)
 
 fun MessageLocation.toLatLng() = LatLng(latitude, longitude)
+
+fun MessageTransition.toLatLng() = LatLng(latitude, longitude)
 
 fun Double.roundForDisplay(): String =
     BigDecimal(this).setScale(4, RoundingMode.HALF_UP)

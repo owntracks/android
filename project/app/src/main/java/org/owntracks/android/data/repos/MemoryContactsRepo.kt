@@ -10,6 +10,7 @@ import kotlinx.coroutines.sync.withLock
 import org.owntracks.android.model.Contact
 import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageLocation
+import org.owntracks.android.model.messages.MessageTransition
 import org.owntracks.android.support.ContactBitmapAndName
 import org.owntracks.android.support.ContactBitmapAndNameMemoryCache
 import timber.log.Timber
@@ -38,7 +39,7 @@ constructor(
     Timber.i("Clearing all contacts. Waiting for lock")
     measureTime {
           repoLock.withLock {
-              Timber.v("Lock acquired")
+            Timber.v("Lock acquired")
             contacts.clear()
             contactsBitmapAndNameMemoryCache.evictAll()
             mutableRepoChangedEvent.emit(ContactsRepoChange.AllCleared)
@@ -51,7 +52,7 @@ constructor(
     Timber.v("removing contact: $id. waiting for lock")
     measureTime {
           repoLock.withLock {
-              Timber.v("Lock acquired")
+            Timber.v("Lock acquired")
             contacts.remove(id)?.run {
               mutableRepoChangedEvent.emit(ContactsRepoChange.ContactRemoved(this))
             }
@@ -76,20 +77,34 @@ constructor(
   }
 
   override suspend fun update(id: String, messageLocation: MessageLocation) {
-    Timber.v("Updating location for contact $id. waiting for repoLock")
+    Timber.v("Updating location for contact $id from $messageLocation. waiting for repoLock")
+    updateContactLocation(id) { contact: Contact ->
+      contact.setLocationFromMessageLocation(messageLocation)
+    }
+  }
+
+  override suspend fun update(id: String, messageTransition: MessageTransition) {
+    Timber.v("Updating location for contact $id from $messageTransition. waiting for repoLock")
+    updateContactLocation(id) { contact: Contact ->
+      contact.setLocationFromMessageTransition(messageTransition)
+    }
+  }
+
+  private suspend fun updateContactLocation(id: String, updateLocation: (Contact) -> Boolean) {
+
     measureTime {
           repoLock.withLock {
             getById(id)?.apply {
               // If timestamp of last location message is <= the new location message, skip update.
               // We either received an old or already known message.
-              if (setMessageLocation(messageLocation)) {
+              if (updateLocation(this)) {
                 mutableRepoChangedEvent.emit(ContactsRepoChange.ContactLocationUpdated(this))
               }
             }
-                ?: run { // If getByid is null, we have not seen this contact id before
+                ?: run { // If getById is null, we have not seen this contact id before
                   Contact(id)
                       .apply {
-                        setMessageLocation(messageLocation)
+                        updateLocation(this)
                         // We may have seen this contact id before, and it may have been removed
                         // from the repo Check the cache to see if we have a name
                         contactsBitmapAndNameMemoryCache[id]?.also {

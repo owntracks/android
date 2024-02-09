@@ -381,6 +381,20 @@ class MessageProcessor @Inject constructor(
         }
     }
 
+    private fun processIncomingMessage(message: MessageTransition) {
+        if (preferences.ignoreStaleLocations > 0 &&
+            System.currentTimeMillis() - message.timestamp * 1000 >
+            preferences.ignoreStaleLocations.toDouble().days.inWholeMilliseconds
+        ) {
+            Timber.e("discarding stale transition")
+        } else {
+            scope.launch {
+                contactsRepo.update(message.getContactId(), message)
+                service?.sendEventNotification(message)
+            }
+        }
+    }
+
     private fun processIncomingMessage(message: MessageCard) {
         scope.launch { contactsRepo.update(message.getContactId(), message) }
     }
@@ -440,10 +454,6 @@ class MessageProcessor @Inject constructor(
 
     suspend fun publishLocationMessage(trigger: MessageLocation.ReportType) {
         locationProcessorLazy.get().publishLocationMessage(trigger)
-    }
-
-    private fun processIncomingMessage(message: MessageTransition) {
-        service?.sendEventNotification(message)
     }
 
     fun stopSendingMessages() {
