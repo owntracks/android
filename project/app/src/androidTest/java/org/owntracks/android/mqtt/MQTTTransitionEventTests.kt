@@ -78,7 +78,7 @@ class MQTTTransitionEventTests :
                 timestamp = Instant.parse("2006-01-02T15:04:05Z").epochSecond
             },
             MessageTransition().apply {
-                accuracy = 48f
+                accuracy = 48
                 description = "Transition!"
                 event = "enter"
                 latitude = 52.12
@@ -133,7 +133,7 @@ class MQTTTransitionEventTests :
                 timestamp = Instant.parse("2006-01-02T15:04:05Z").epochSecond
             },
             MessageTransition().apply {
-                accuracy = 48f
+                accuracy = 48
                 description = "Transition!"
                 event = "enter"
                 latitude = 52.12

@@ -617,7 +617,7 @@ class ParserTest {
         val input = """
             {
               "_type": "transition",
-              "acc": 3.075,
+              "acc": 3,
               "desc": "myregion",
               "event": "leave",
               "lat": 52.71234,
@@ -634,7 +634,7 @@ class ParserTest {
         val message = messageBase as MessageTransition
         assertTrue(message.isValidMessage())
         assertEquals(2, message.getTransition())
-        assertEquals(3.075f, message.accuracy, 0f)
+        assertEquals(3, message.accuracy)
         assertEquals("myregion", message.description)
         assertEquals(52.71234, message.latitude, 0.0)
         assertEquals(-1.61234123, message.longitude, 0.0)
@@ -654,7 +654,7 @@ class ParserTest {
             longitude = -1.61234123
             description = "myregion"
             setTransition(Geofence.GEOFENCE_TRANSITION_EXIT)
-            accuracy = 3.075f
+            accuracy = 4
             timestamp = 1603209966
             waypointTimestamp = 1558351273
             trackerId = "ce"
@@ -669,10 +669,8 @@ class ParserTest {
                 .asText()
         )
         assertEquals(
-            message.accuracy.toDouble(),
-            jsonNode.get("acc")
-                .asDouble(),
-            0.001
+            message.accuracy,
+            jsonNode.get("acc").asInt()
         )
         assertEquals(
             message.description,

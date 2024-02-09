@@ -48,7 +48,7 @@ class MessageTransition : MessageBase() {
     var waypointTimestamp: Long = 0
 
     @JsonProperty("acc")
-    var accuracy = 0f
+    var accuracy = 0
 
     @JsonProperty("lon")
     var longitude = 0.0

@@ -29,6 +29,7 @@ import org.owntracks.android.support.DeviceMetricsProvider
 import org.owntracks.android.support.MessageWaypointCollection
 import org.owntracks.android.support.SimpleIdlingResource
 import timber.log.Timber
+import kotlin.math.roundToInt
 
 @Singleton
 class LocationProcessor @Inject constructor(
@@ -207,7 +208,7 @@ class LocationProcessor @Inject constructor(
                 trackerId = preferences.tid.toString()
                 latitude = triggeringLocation.latitude
                 longitude = triggeringLocation.longitude
-                accuracy = triggeringLocation.accuracy
+                accuracy = triggeringLocation.accuracy.roundToInt()
                 timestamp = TimeUnit.MILLISECONDS.toSeconds(triggeringLocation.time)
                 waypointTimestamp = waypointModel.tst.epochSecond
                 description = waypointModel.description
