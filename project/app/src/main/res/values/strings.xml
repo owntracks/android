@@ -179,6 +179,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">"Ignore inaccurate locations"</string>
     <string name="preferencesImportNoURIGiven">"No URI given for importing configuration"</string>
     <string name="preferencesKeepalive">"Keepalive"</string>
+    <string name="preferencesKeepaliveDialogMessage">"How often should the client send a keepalive message to the broker (seconds)"</string>
     <string name="preferencesKeepaliveValidationError">"Keepalive should be a minimum of %d"</string>
     <string name="preferencesLicenses">"Libraries"</string>
     <string name="preferencesLicensesSummary">"Thanks to the authors of included libraries"</string>

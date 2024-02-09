@@ -120,7 +120,7 @@
         app:title="@string/preferencesParameters">
         <org.owntracks.android.support.widgets.EditIntegerPreference
             android:inputType="number"
-            app:dialogMessage="@string/preferencesMoveModeLocatorIntervalDialog"
+            app:dialogMessage="@string/preferencesKeepaliveDialogMessage"
             app:iconSpaceReserved="false"
             app:key="keepalive"
             app:title="@string/preferencesKeepalive"
