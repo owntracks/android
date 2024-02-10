@@ -1,7 +1,5 @@
 package org.owntracks.android.mqtt
 
-import android.content.Intent
-import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
@@ -25,7 +23,6 @@ import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.model.messages.MessageWaypoints
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.MonitoringMode
-import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.support.Parser
 import org.owntracks.android.testutils.GPSMockDeviceLocation
 import org.owntracks.android.testutils.MockDeviceLocation
