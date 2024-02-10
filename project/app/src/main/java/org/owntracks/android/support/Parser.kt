@@ -1,6 +1,8 @@
 package org.owntracks.android.support
 
+import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import java.io.IOException
@@ -9,6 +11,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.model.messages.MessageEncrypted
+import org.owntracks.android.model.messages.MessageUnknown
 
 @Singleton
 class Parser @Inject constructor(private val encryptionProvider: EncryptionProvider?) {
@@ -56,9 +59,15 @@ class Parser @Inject constructor(private val encryptionProvider: EncryptionProvi
 
     // Accepts {plain} as byte array
     @Throws(IOException::class, EncryptionException::class)
-    fun fromJson(input: ByteArray): MessageBase {
-        return decrypt(fromUnencryptedJson(input))
-    }
+    fun fromJson(input: ByteArray): MessageBase =
+        try {
+            decrypt(fromUnencryptedJson(input))
+        } catch (e: JsonMappingException) {
+            MessageUnknown
+        } catch (e: JsonParseException) {
+            MessageUnknown
+        }
+
 
     // Accepts 1) [{plain},{plain},...], 2) {plain}, 3) {encrypted, data:[{plain}, {plain}, ...]} as input stream
     @Throws(IOException::class, EncryptionException::class)

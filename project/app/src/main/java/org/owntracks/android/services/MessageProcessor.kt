@@ -36,6 +36,7 @@ import org.owntracks.android.model.messages.MessageClear
 import org.owntracks.android.model.messages.MessageCmd
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.model.messages.MessageTransition
+import org.owntracks.android.model.messages.MessageUnknown
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.Preferences.Companion.PREFERENCES_THAT_WIPE_QUEUE_AND_CONTACTS
 import org.owntracks.android.preferences.types.ConnectionMode
@@ -57,7 +58,7 @@ class MessageProcessor @Inject constructor(
     private val endpointStateRepo: EndpointStateRepo,
     @Named("outgoingQueueIdlingResource") private val outgoingQueueIdlingResource: CountingIdlingResource,
     @Named("importConfigurationIdlingResource") private val importConfigurationIdlingResource: SimpleIdlingResource,
-    @Named("selfMessageReceivedIdlingResource") private val selfMessageReceivedIdlingResource: IdlingResourceWithData<MessageLocation>,
+    @Named("messageReceivedIdlingResource") private val messageReceivedIdlingResource: IdlingResourceWithData<MessageBase>,
     @Named("CAKeyStore") private val caKeyStore: KeyStore,
     private val locationProcessorLazy: Lazy<LocationProcessor>,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -232,9 +233,7 @@ class MessageProcessor @Inject constructor(
                     messageFailedLastTime = false
                     try {
                         endpoint!!.sendMessage(message)
-                        if (message is MessageLocation) {
-                            selfMessageReceivedIdlingResource.add(message)
-                        }
+                        messageReceivedIdlingResource.add(message)
                     } catch (e: Exception) {
                         when (e) {
                             is OutgoingMessageSendingException,
@@ -352,11 +351,18 @@ class MessageProcessor @Inject constructor(
             is MessageTransition -> {
                 processIncomingMessage(message)
             }
+            is MessageUnknown -> {
+                Timber.w("Unknown message type received")
+                messageReceivedIdlingResource.remove(message)
+            }
         }
     }
 
     private fun processIncomingMessage(message: MessageClear) {
-        scope.launch { contactsRepo.remove(message.getContactId()) }
+        scope.launch {
+            contactsRepo.remove(message.getContactId())
+            messageReceivedIdlingResource.remove(message)
+        }
     }
 
     private fun processIncomingMessage(message: MessageLocation) {
@@ -366,7 +372,7 @@ class MessageProcessor @Inject constructor(
             preferences.ignoreStaleLocations.toDouble().days.inWholeMilliseconds
         ) {
             Timber.e("discarding stale location")
-            selfMessageReceivedIdlingResource.remove(message)
+            messageReceivedIdlingResource.remove(message)
         } else {
             scope.launch {
                 contactsRepo.update(message.getContactId(), message)
@@ -376,7 +382,7 @@ class MessageProcessor @Inject constructor(
                 before we trigger any clear all contacts events. Otherwise, we have a race, and the clear all may happen
                 before the contactsRepo gets updated with this location.
                  */
-                selfMessageReceivedIdlingResource.remove(message)
+                messageReceivedIdlingResource.remove(message)
             }
         }
     }
@@ -387,67 +393,74 @@ class MessageProcessor @Inject constructor(
             preferences.ignoreStaleLocations.toDouble().days.inWholeMilliseconds
         ) {
             Timber.e("discarding stale transition")
+            messageReceivedIdlingResource.remove(message)
         } else {
             scope.launch {
                 contactsRepo.update(message.getContactId(), message)
                 service?.sendEventNotification(message)
+                messageReceivedIdlingResource.remove(message)
             }
         }
     }
 
     private fun processIncomingMessage(message: MessageCard) {
-        scope.launch { contactsRepo.update(message.getContactId(), message) }
+        scope.launch {
+            contactsRepo.update(message.getContactId(), message)
+            messageReceivedIdlingResource.remove(message)
+        }
     }
 
     private fun processIncomingMessage(message: MessageCmd) {
         if (!preferences.cmd) {
             Timber.w("remote commands are disabled")
-            return
+            messageReceivedIdlingResource.remove(message)
         }
-        if (message.modeId !== ConnectionMode.HTTP &&
+        else if (message.modeId !== ConnectionMode.HTTP &&
             preferences.receivedCommandsTopic != message.topic
         ) {
             Timber.e("cmd message received on wrong topic")
-            return
+            messageReceivedIdlingResource.remove(message)
         }
         if (!message.isValidMessage()) {
             Timber.e("Invalid action message received")
-            return
-        }
-        scope.launch {
-            when (message.action) {
-                CommandAction.REPORT_LOCATION -> {
-                    if (message.modeId !== ConnectionMode.MQTT) {
-                        Timber.e("command not supported in HTTP mode: ${message.action})")
-                    } else {
-                        service?.requestOnDemandLocationUpdate(MessageLocation.ReportType.RESPONSE)
-                    }
-                }
-                CommandAction.WAYPOINTS -> locationProcessorLazy.get().publishWaypointsMessage()
-                CommandAction.SET_WAYPOINTS -> message.waypoints?.run {
-                    waypointsRepo.importFromMessage(waypoints)
-                }
-                CommandAction.SET_CONFIGURATION -> {
-                    if (!preferences.remoteConfiguration) {
-                        Timber.w("Received a remote configuration command but remote config setting is disabled")
-                    } else {
-                        if (message.configuration != null) {
-                            preferences.importConfiguration(message.configuration!!)
+            messageReceivedIdlingResource.remove(message)
+        } else {
+            scope.launch {
+                when (message.action) {
+                    CommandAction.REPORT_LOCATION -> {
+                        if (message.modeId !== ConnectionMode.MQTT) {
+                            Timber.e("command not supported in HTTP mode: ${message.action})")
                         } else {
-                            Timber.i("No remote configuration provided")
-                        }
-                        if (message.waypoints != null) {
-                            waypointsRepo.importFromMessage(message.waypoints!!.waypoints)
-                        } else {
-                            Timber.d("No remote waypoints provided")
+                            service?.requestOnDemandLocationUpdate(MessageLocation.ReportType.RESPONSE)
                         }
                     }
-                    importConfigurationIdlingResource.setIdleState(true)
+                    CommandAction.WAYPOINTS -> locationProcessorLazy.get().publishWaypointsMessage()
+                    CommandAction.SET_WAYPOINTS -> message.waypoints?.run {
+                        waypointsRepo.importFromMessage(waypoints)
+                    }
+                    CommandAction.SET_CONFIGURATION -> {
+                        if (!preferences.remoteConfiguration) {
+                            Timber.w("Received a remote configuration command but remote config setting is disabled")
+                        } else {
+                            if (message.configuration != null) {
+                                preferences.importConfiguration(message.configuration!!)
+                            } else {
+                                Timber.i("No remote configuration provided")
+                            }
+                            if (message.waypoints != null) {
+                                waypointsRepo.importFromMessage(message.waypoints!!.waypoints)
+                            } else {
+                                Timber.d("No remote waypoints provided")
+                            }
+                        }
+                        importConfigurationIdlingResource.setIdleState(true)
+                    }
+                    CommandAction.CLEAR_WAYPOINTS -> {
+                        waypointsRepo.clearAll()
+                    }
+                    null -> {}
                 }
-                CommandAction.CLEAR_WAYPOINTS -> {
-                    waypointsRepo.clearAll()
-                }
-                null -> {}
+                messageReceivedIdlingResource.remove(message)
             }
         }
     }

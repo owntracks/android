@@ -30,6 +30,7 @@ import org.owntracks.android.di.CustomBindingComponentBuilder
 import org.owntracks.android.di.CustomBindingEntryPoint
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.logging.TimberInMemoryLogTree
+import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.PreferencesStore
@@ -86,9 +87,9 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
     lateinit var contactsClearedIdlingResource: SimpleIdlingResource
 
     @Inject
-    @Named("selfMessageReceivedIdlingResource")
+    @Named("messageReceivedIdlingResource")
     @get:VisibleForTesting
-    lateinit var selfMQTTMessageReceivedIdlingResource: IdlingResourceWithData<MessageLocation>
+    lateinit var messageReceivedIdlingResource: IdlingResourceWithData<MessageBase>
 
     @Inject
     lateinit var waypointsRepo: RoomWaypointsRepo

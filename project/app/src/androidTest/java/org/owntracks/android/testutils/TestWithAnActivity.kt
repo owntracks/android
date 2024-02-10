@@ -120,7 +120,7 @@ abstract class TestWithAnActivity<T : Activity>(
         Timber.v("Waiting for MQTT outgoing queue to be empty")
         app.outgoingQueueIdlingResource.use { Espresso.onIdle() }
         Timber.v("Waiting for MQTT messages that were sent to all be received")
-        app.selfMQTTMessageReceivedIdlingResource.use { Espresso.onIdle() }
+        app.messageReceivedIdlingResource.use { Espresso.onIdle() }
         app.contactsClearedIdlingResource.setIdleState(false)
         ContextCompat.startForegroundService(
             app,
