@@ -15,7 +15,7 @@ abstract class WaypointsRepo protected constructor() {
         data class Insert(val waypoint: WaypointModel) : WaypointOperation()
         data class Update(val waypoint: WaypointModel) : WaypointOperation()
         data class Delete(val waypoint: WaypointModel) : WaypointOperation()
-        object Clear : WaypointOperation()
+        data object Clear : WaypointOperation()
     }
 
     abstract suspend fun get(id: Long): WaypointModel?
