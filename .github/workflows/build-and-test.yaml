@@ -131,7 +131,13 @@ jobs:
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
-
+      - name: Remove unused things
+        run: |
+          sudo rm -rf /opt/ghc # Haskell
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo rm -rf /usr/share/dotnet
+          sudo docker image prune --all --force
+          sudo df -h
       - uses: nschloe/action-cached-lfs-checkout@v1
       - uses: dorny/paths-filter@v2
         id: changes
@@ -175,15 +181,6 @@ jobs:
             ~/.android/avd/*
             ~/.android/adb*
           key: owntracks-test-${{ matrix.android-api }}-${{ matrix.flavour }}
-
-      - name: Remove unneeded things
-        run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf "/usr/local/share/boost"
-
-      - name: Check disk space
-        run: |
-          df -h && du -h -d 1
 
       - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true' && steps.run-espresso-guard.outputs.run-espresso == 'true'
