@@ -372,7 +372,8 @@ class Preferences @Inject constructor(
     val eventTopicSuffix = "/event"
     val commandTopicSuffix = "/cmd"
     val infoTopicSuffix = "/info"
-    val waypointsTopicSuffix = "/waypoints"
+    private val waypointsTopicSuffix = "/waypoints"
+    private val waypointTopicSuffix = "/waypoint"
 
     val receivedCommandsTopic: String
         get() {
@@ -387,9 +388,15 @@ class Preferences @Inject constructor(
         get() {
             return pubTopicBaseWithUserDetails
         }
+    // When publishing all waypoints
     val pubTopicWaypoints: String
         get() {
             return pubTopicBaseWithUserDetails + waypointsTopicSuffix
+        }
+    // For single waypoints on create / update
+    val pubTopicWaypoint: String
+        get() {
+            return pubTopicBaseWithUserDetails + waypointTopicSuffix
         }
 
     val minimumKeepaliveSeconds = MIN_PERIODIC_INTERVAL.inWholeSeconds

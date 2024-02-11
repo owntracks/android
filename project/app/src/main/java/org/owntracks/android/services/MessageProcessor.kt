@@ -38,6 +38,7 @@ import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.model.messages.MessageTransition
 import org.owntracks.android.model.messages.MessageUnknown
 import org.owntracks.android.model.messages.MessageWaypoint
+import org.owntracks.android.preferences.DefaultsProvider.Companion.DEFAULT_SUB_TOPIC
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.Preferences.Companion.PREFERENCES_THAT_WIPE_QUEUE_AND_CONTACTS
 import org.owntracks.android.preferences.types.ConnectionMode
@@ -419,12 +420,13 @@ class MessageProcessor @Inject constructor(
             messageReceivedIdlingResource.remove(message)
         }
         else if (message.modeId !== ConnectionMode.HTTP &&
-            preferences.receivedCommandsTopic != message.topic
+             preferences.receivedCommandsTopic != message.topic &&
+             preferences.subTopic == DEFAULT_SUB_TOPIC // If we're not using the default subtopic, we receive commands from anywhere
         ) {
             Timber.e("cmd message received on wrong topic")
             messageReceivedIdlingResource.remove(message)
         }
-        if (!message.isValidMessage()) {
+        else if (!message.isValidMessage()) {
             Timber.e("Invalid action message received")
             messageReceivedIdlingResource.remove(message)
         } else {

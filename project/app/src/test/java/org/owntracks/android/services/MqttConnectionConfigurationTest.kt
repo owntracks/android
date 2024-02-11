@@ -20,7 +20,7 @@ class MqttConnectionConfigurationTest {
                 "owntracks/+/+",
                 "owntracks/+/+/event",
                 "owntracks/+/+/info",
-                "owntracks/+/+/cmd"
+                "owntracks/user/unknown/cmd"
             ),
             topics
         )

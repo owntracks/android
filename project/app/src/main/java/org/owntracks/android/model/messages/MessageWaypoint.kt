@@ -34,7 +34,7 @@ class MessageWaypoint : MessageBase() {
     override fun toString(): String = "[MessageWaypoint ts=${Instant.fromEpochSeconds(timestamp)},description=$description,lat=$latitude,lon=$longitude,rad=$radius]"
 
     override fun addMqttPreferences(preferences: Preferences) {
-        topic = preferences.pubTopicWaypoints
+        topic = preferences.pubTopicWaypoint
         qos = preferences.pubQosWaypoints.value
         retained = preferences.pubRetainWaypoints
     }
