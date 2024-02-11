@@ -125,14 +125,12 @@ fun Preferences.toMqttConnectionConfiguration(): MqttConnectionConfiguration =
                     subTopic,
                     subTopic + infoTopicSuffix,
                     subTopic + eventTopicSuffix,
-                    subTopic + waypointsTopicSuffix,
                     subTopic + commandTopicSuffix
                 )
             } else {
                 sortedSetOf(
                     subTopic,
                     subTopic + eventTopicSuffix,
-                    subTopic + waypointsTopicSuffix,
                     subTopic + commandTopicSuffix
                 )
             }

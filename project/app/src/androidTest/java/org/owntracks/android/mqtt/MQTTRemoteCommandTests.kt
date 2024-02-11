@@ -5,11 +5,12 @@ import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import com.adevinta.android.barista.assertion.BaristaListAssertions.assertDisplayedAtPosition
 import com.adevinta.android.barista.assertion.BaristaRecyclerViewAssertions.assertRecyclerViewItemCount
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
-import com.adevinta.android.barista.interaction.BaristaEditTextInteractions
+import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
 import mqtt.packets.Qos
 import mqtt.packets.mqtt.MQTTPublish
 import mqtt.packets.mqttv5.MQTT5Properties
@@ -18,10 +19,15 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
+import org.owntracks.android.model.CommandAction
+import org.owntracks.android.model.messages.MessageCmd
+import org.owntracks.android.model.messages.MessageConfiguration
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.model.messages.MessageUnknown
+import org.owntracks.android.model.messages.MessageWaypoint
 import org.owntracks.android.model.messages.MessageWaypoints
 import org.owntracks.android.preferences.Preferences
+import org.owntracks.android.support.MessageWaypointCollection
 import org.owntracks.android.support.Parser
 import org.owntracks.android.testutils.GPSMockDeviceLocation
 import org.owntracks.android.testutils.MockDeviceLocation
@@ -81,22 +87,19 @@ class MQTTRemoteCommandTests :
     clickOnAndWait(R.id.fabMonitoringModeSignificantChanges)
 
     baristaRule.activityTestRule.activity.publishResponseMessageIdlingResource.setIdleState(false)
-    listOf(
-            // language=JSON
-            """
-            {
-              "_type": "cmd",
-              "action": "reportLocation"
-            }
-            """
-                .trimIndent())
+    listOf(MessageCmd().apply { action = CommandAction.REPORT_LOCATION })
+        .map {
+          app.messageReceivedIdlingResource.add(it)
+          it
+        }
+        .map(Parser(null)::toJsonBytes)
         .forEach {
           broker.publish(
               false,
               "owntracks/$mqttUsername/$deviceId/cmd",
               Qos.AT_LEAST_ONCE,
               MQTT5Properties(),
-              it.toByteArray().toUByteArray())
+              it.toUByteArray())
         }
 
     baristaRule.activityTestRule.activity.publishResponseMessageIdlingResource.use {
@@ -122,39 +125,36 @@ class MQTTRemoteCommandTests :
     clickOnAndWait(R.string.title_activity_waypoints)
 
     clickOnAndWait(R.id.add)
-    BaristaEditTextInteractions.writeTo(R.id.description, "test waypoint")
-    BaristaEditTextInteractions.writeTo(R.id.latitude, "51.123")
-    BaristaEditTextInteractions.writeTo(R.id.longitude, "0.456")
-    BaristaEditTextInteractions.writeTo(R.id.radius, "20")
+    writeTo(R.id.description, "test waypoint")
+    writeTo(R.id.latitude, "51.123")
+    writeTo(R.id.longitude, "0.456")
+    writeTo(R.id.radius, "20")
     clickOnAndWait(R.id.save)
 
     clickOnAndWait(R.id.add)
-    BaristaEditTextInteractions.writeTo(R.id.description, "test waypoint 2")
-    BaristaEditTextInteractions.writeTo(R.id.latitude, "51.00")
-    BaristaEditTextInteractions.writeTo(R.id.longitude, "0.4")
-    BaristaEditTextInteractions.writeTo(R.id.radius, "25")
+    writeTo(R.id.description, "test waypoint 2")
+    writeTo(R.id.latitude, "51.00")
+    writeTo(R.id.longitude, "0.4")
+    writeTo(R.id.radius, "25")
     clickOnAndWait(R.id.save)
 
     openDrawer()
     clickOnAndWait(R.string.title_activity_map)
 
     baristaRule.activityTestRule.activity.publishResponseMessageIdlingResource.setIdleState(false)
-    listOf(
-            // language=JSON
-            """
-            {
-              "_type": "cmd",
-              "action": "waypoints"
-            }
-            """
-                .trimIndent())
+    listOf(MessageCmd().apply { action = CommandAction.WAYPOINTS })
+        .map {
+          app.messageReceivedIdlingResource.add(it)
+          it
+        }
+        .map(Parser(null)::toJsonBytes)
         .forEach {
           broker.publish(
               false,
               "owntracks/$mqttUsername/$deviceId/cmd",
               Qos.AT_LEAST_ONCE,
               MQTT5Properties(),
-              it.toByteArray().toUByteArray())
+              it.toUByteArray())
         }
 
     baristaRule.activityTestRule.activity.publishResponseMessageIdlingResource.use {
@@ -180,63 +180,68 @@ class MQTTRemoteCommandTests :
     clickOnAndWait(R.string.title_activity_waypoints)
 
     clickOnAndWait(R.id.add)
-    BaristaEditTextInteractions.writeTo(R.id.description, "test waypoint")
-    BaristaEditTextInteractions.writeTo(R.id.latitude, "51.123")
-    BaristaEditTextInteractions.writeTo(R.id.longitude, "0.456")
-    BaristaEditTextInteractions.writeTo(R.id.radius, "20")
+    writeTo(R.id.description, "test waypoint")
+    writeTo(R.id.latitude, "51.123")
+    writeTo(R.id.longitude, "0.456")
+    writeTo(R.id.radius, "20")
     clickOnAndWait(R.id.save)
 
     clickOnAndWait(R.id.add)
-    BaristaEditTextInteractions.writeTo(R.id.description, "test waypoint 2")
-    BaristaEditTextInteractions.writeTo(R.id.latitude, "51.00")
-    BaristaEditTextInteractions.writeTo(R.id.longitude, "0.4")
-    BaristaEditTextInteractions.writeTo(R.id.radius, "25")
+    writeTo(R.id.description, "test waypoint 2")
+    writeTo(R.id.latitude, "51.00")
+    writeTo(R.id.longitude, "0.4")
+    writeTo(R.id.radius, "25")
     clickOnAndWait(R.id.save)
 
     openDrawer()
     clickOnAndWait(R.string.title_activity_map)
 
     listOf(
-            // language=JSON
-            """
-  {
-    "_type": "cmd",
-    "action": "setWaypoints",
-    "waypoints": {
-      "_type": "waypoints",
-      "waypoints": [
-        {
-          "_type": "waypoint",
-          "desc": "work",
-          "lat": 51.5,
-          "lon": -0.02,
-          "rad": 150,
-          "tst": 1505910709000
-        },
-        {
-          "_type": "waypoint",
-          "desc": "home",
-          "lat": 53.6,
-          "lon": -1.5,
-          "rad": 100,
-          "tst": 1558351273
+            MessageCmd().apply {
+              action = CommandAction.SET_WAYPOINTS
+              waypoints =
+                  MessageWaypoints().apply {
+                    waypoints =
+                        MessageWaypointCollection().apply {
+                          addAll(
+                              listOf(
+                                  MessageWaypoint().apply {
+                                    description = "location2"
+                                    latitude = 51.5
+                                    longitude = -0.02
+                                    radius = 150
+                                    timestamp = 1505910709
+                                  },
+                                  MessageWaypoint().apply {
+                                    description = "home"
+                                    latitude = 51.0
+                                    longitude = 0.1
+                                    radius = 100
+                                    timestamp = 15059107010
+                                  }))
+                        }
+                  }
+            })
+        .map {
+          app.messageReceivedIdlingResource.add(it)
+          it
         }
-      ]
-    }
-  }
-            """
-                .trimIndent())
+        .map(Parser(null)::toJsonBytes)
         .forEach {
           broker.publish(
               false,
               "owntracks/$mqttUsername/$deviceId/cmd",
               Qos.AT_LEAST_ONCE,
               MQTT5Properties(),
-              it.toByteArray().toUByteArray())
+              it.toUByteArray())
         }
     openDrawer()
     clickOnAndWait(R.string.title_activity_waypoints)
     assertRecyclerViewItemCount(R.id.waypointsRecyclerView, 4)
+    assertDisplayedAtPosition(R.id.waypointsRecyclerView, 0, R.id.title, "test waypoint")
+    assertDisplayedAtPosition(R.id.waypointsRecyclerView, 1, R.id.title, "test waypoint 2")
+    assertDisplayedAtPosition(R.id.waypointsRecyclerView, 2, R.id.title, "location2")
+    assertDisplayedAtPosition(R.id.waypointsRecyclerView, 3, R.id.title, "home")
   }
 
   @Test
@@ -250,40 +255,39 @@ class MQTTRemoteCommandTests :
     clickOnAndWait(R.string.title_activity_waypoints)
 
     clickOnAndWait(R.id.add)
-    BaristaEditTextInteractions.writeTo(R.id.description, "test waypoint")
-    BaristaEditTextInteractions.writeTo(R.id.latitude, "51.123")
-    BaristaEditTextInteractions.writeTo(R.id.longitude, "0.456")
-    BaristaEditTextInteractions.writeTo(R.id.radius, "20")
+    writeTo(R.id.description, "test waypoint")
+    writeTo(R.id.latitude, "51.123")
+    writeTo(R.id.longitude, "0.456")
+    writeTo(R.id.radius, "20")
     clickOnAndWait(R.id.save)
 
     clickOnAndWait(R.id.add)
-    BaristaEditTextInteractions.writeTo(R.id.description, "test waypoint 2")
-    BaristaEditTextInteractions.writeTo(R.id.latitude, "51.00")
-    BaristaEditTextInteractions.writeTo(R.id.longitude, "0.4")
-    BaristaEditTextInteractions.writeTo(R.id.radius, "25")
+    writeTo(R.id.description, "test waypoint 2")
+    writeTo(R.id.latitude, "51.00")
+    writeTo(R.id.longitude, "0.4")
+    writeTo(R.id.radius, "25")
     clickOnAndWait(R.id.save)
 
     openDrawer()
     clickOnAndWait(R.string.title_activity_map)
 
-    listOf(
-            // language=JSON
-            """
-  {
-    "_type": "cmd",
-    "action": "clearWaypoints"
-  }
-            """
-                .trimIndent())
+    listOf(MessageCmd().apply { action = CommandAction.CLEAR_WAYPOINTS })
+        .map {
+          app.messageReceivedIdlingResource.add(it)
+          it
+        }
+        .map(Parser(null)::toJsonBytes)
         .forEach {
           broker.publish(
               false,
               "owntracks/$mqttUsername/$deviceId/cmd",
               Qos.AT_LEAST_ONCE,
               MQTT5Properties(),
-              it.toByteArray().toUByteArray())
+              it.toUByteArray())
         }
-    openDrawer()
+
+    app.messageReceivedIdlingResource.use { openDrawer() }
+
     clickOnAndWait(R.string.title_activity_waypoints)
     assertNotDisplayed(R.id.waypointsRecyclerView)
   }
@@ -298,25 +302,25 @@ class MQTTRemoteCommandTests :
     val testPreference = "TEST_PREFERENCE_VALUE"
 
     listOf(
-            // language=JSON
-            """
-            {
-              "_type": "cmd",
-              "action": "setConfiguration",
-              "configuration": {
-                "_type": "configuration",
-                "opencageApiKey": "$testPreference"
-              }
-            }
-            """
-                .trimIndent())
+            MessageCmd().apply {
+              action = CommandAction.SET_CONFIGURATION
+              configuration =
+                  MessageConfiguration().apply {
+                    set(Preferences::opencageApiKey.name, testPreference)
+                  }
+            })
+        .map {
+          app.messageReceivedIdlingResource.add(it)
+          it
+        }
+        .map(Parser(null)::toJsonBytes)
         .forEach {
           broker.publish(
               false,
               "owntracks/$mqttUsername/$deviceId/cmd",
               Qos.AT_LEAST_ONCE,
               MQTT5Properties(),
-              it.toByteArray().toUByteArray())
+              it.toUByteArray())
         }
     baristaRule.activityTestRule.activity.importConfigurationIdlingResource.use {
       clickOnAndWait(R.id.fabMyLocation)
@@ -335,25 +339,25 @@ class MQTTRemoteCommandTests :
     val testPreference = "TEST_PREFERENCE_VALUE"
 
     listOf(
-            // language=JSON
-            """
-            {
-              "_type": "cmd",
-              "action": "setConfiguration",
-              "configuration": {
-                "_type": "configuration",
-                "opencageApiKey": "$testPreference"
-              }
-            }
-            """
-                .trimIndent())
+            MessageCmd().apply {
+              action = CommandAction.SET_CONFIGURATION
+              configuration =
+                  MessageConfiguration().apply {
+                    set(Preferences::opencageApiKey.name, testPreference)
+                  }
+            })
+        .map {
+          app.messageReceivedIdlingResource.add(it)
+          it
+        }
+        .map(Parser(null)::toJsonBytes)
         .forEach {
           broker.publish(
               false,
               "owntracks/$mqttUsername/$deviceId/cmd",
               Qos.AT_LEAST_ONCE,
               MQTT5Properties(),
-              it.toByteArray().toUByteArray())
+              it.toUByteArray())
         }
     baristaRule.activityTestRule.activity.importConfigurationIdlingResource.use {
       clickOnAndWait(R.id.fabMyLocation)

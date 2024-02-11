@@ -1,6 +1,7 @@
 package org.owntracks.android.support
 
 import androidx.test.espresso.IdlingResource
+import java.util.function.Predicate
 import timber.log.Timber
 
 /**
@@ -12,7 +13,7 @@ import timber.log.Timber
  */
 class IdlingResourceWithData<T>(
     private val resourceName: String,
-    private val comparator: Comparator<T>? = null
+    private val comparator: Comparator<in T>
 ) : IdlingResource {
   private var callback: IdlingResource.ResourceCallback? = null
   private val data = mutableListOf<T>()
@@ -26,17 +27,38 @@ class IdlingResourceWithData<T>(
   override fun isIdleNow(): Boolean = data.isEmpty()
 
   fun add(thing: T) {
-    data.add(thing)
-    Timber.v("Waiting for return for $thing")
+    synchronized(data) {
+      data.add(thing)
+      Timber.v("Waiting for return for $thing")
+    }
   }
 
   fun remove(thing: T) {
-    data.removeIf { comparator?.compare(it, thing) == 0 }
-    val removed = data.remove(thing)
-    Timber.v("$name Got return for $thing. Removed=$removed")
-    if (data.isEmpty()) {
-      Timber.v("$name Empty. Idling.")
-      callback?.onTransitionToIdle()
+    synchronized(data) {
+      val removed = data.removeFirst { comparator.compare(it, thing) == 0 }
+      Timber.v("$name Got return for $thing. Removed=$removed. Remaining=${data.joinToString(",")}")
+      if (data.isEmpty()) {
+        Timber.v("$name Empty. Idling.")
+        callback?.onTransitionToIdle()
+      }
     }
+  }
+
+  /**
+   * Removes first item in collection that matches the predicate
+   *
+   * @param filter predicate
+   * @return whether or not an item was removed
+   */
+  private fun <E> MutableCollection<E>.removeFirst(filter: Predicate<in E>): Boolean {
+    val iterator = this.iterator()
+    while (iterator.hasNext()) {
+      val element = iterator.next()
+      if (filter.test(element)) {
+        iterator.remove()
+        return true
+      }
+    }
+    return false
   }
 }

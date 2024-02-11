@@ -37,6 +37,7 @@ import org.owntracks.android.model.messages.MessageCmd
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.model.messages.MessageTransition
 import org.owntracks.android.model.messages.MessageUnknown
+import org.owntracks.android.model.messages.MessageWaypoint
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.Preferences.Companion.PREFERENCES_THAT_WIPE_QUEUE_AND_CONTACTS
 import org.owntracks.android.preferences.types.ConnectionMode
@@ -233,7 +234,9 @@ class MessageProcessor @Inject constructor(
                     messageFailedLastTime = false
                     try {
                         endpoint!!.sendMessage(message)
-                        messageReceivedIdlingResource.add(message)
+                        if (message !is MessageWaypoint) {
+                            messageReceivedIdlingResource.add(message)
+                        }
                     } catch (e: Exception) {
                         when (e) {
                             is OutgoingMessageSendingException,
