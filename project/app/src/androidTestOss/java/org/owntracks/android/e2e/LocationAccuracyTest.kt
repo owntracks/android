@@ -51,7 +51,6 @@ class LocationAccuracyTest :
         reportLocationFromMap(app.mockLocationIdlingResource) {
             setMockLocation(inaccurateMockLatitude, inaccurateMockLongitude, 3000f)
         }
-        BaristaSleepInteractions.sleep(10, TimeUnit.SECONDS)
 
         app.mockLocationIdlingResource.setIdleState(false)
         reportLocationFromMap(app.mockLocationIdlingResource) {
