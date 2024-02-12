@@ -81,7 +81,7 @@ jobs:
 
       - name: Upload apk artifact for F-droid scanning
         if: steps.guard.outputs.run_build == 'true'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: oss-apk
           path: |
@@ -89,7 +89,7 @@ jobs:
 
       - name: Upload lint report
         if: steps.guard.outputs.run_build == 'true'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: lint-report
           path: project/app/build/reports/lint-results-gmsDebug.html
@@ -228,7 +228,7 @@ jobs:
             ./project/gradlew -p project create${FLAVOUR}DebugCoverageReport --max-workers=1 --stacktrace --scan
 
       - name: Upload connected test result artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always() && steps.run-espresso-guard.outputs.run-espresso == 'true'
         with:
           name: espresso-test-reports-${{ matrix.android-api }}-${{ matrix.flavour }}
