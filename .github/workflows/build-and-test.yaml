@@ -64,7 +64,7 @@ jobs:
           ./project/gradlew -p project assembleDebug lint app:createGmsDebugUnitTestCoverageReport --scan
 
       - name: JUnit Report Action
-        uses: mikepenz/action-junit-report@v3
+        uses: mikepenz/action-junit-report@v4
         if: steps.guard.outputs.run_build == 'true'
         with:
           report_paths: "**/TEST-*.xml"
@@ -235,7 +235,7 @@ jobs:
           path: ./project/app/build/reports/androidTests/connected/
 
       - name: Espresso JUnit Report
-        uses: mikepenz/action-junit-report@v3
+        uses: mikepenz/action-junit-report@v4
         if: always() && steps.run-espresso-guard.outputs.run-espresso == 'true'
         with:
           report_paths: "**/TEST-*.xml"
