@@ -103,7 +103,7 @@ jobs:
       image: registry.gitlab.com/fdroid/docker-executable-fdroidserver:master
     steps:
       - name: Download APK
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: oss-apk
       - name: Scan OSS APK
