@@ -197,6 +197,9 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="preferencesIgnoreInaccurateLocationsSummary">"Ignorar ubicacions incorrectes "</string>
     <string name="preferencesImportNoURIGiven">"No s'ha indicat cap URI per importar la configuració"</string>
     <string name="preferencesKeepalive">"Keepalive"</string>
+
+    <!-- Text of the dialog shown to the user when editing the MQTT connection keepalive preference -->
+    <string name="preferencesKeepaliveDialogMessage">"Amb quina freqüència hauria d'enviar el client un missatge de manteniment al servidor (segons)"</string>
     <string name="preferencesKeepaliveValidationError">"Keepalive hauria de ser mínim %d"</string>
     <string name="preferencesLicenses">"Llibreries"</string>
     <string name="preferencesLicensesSummary">"Gràcies als autors de les llibreries incloses"</string>

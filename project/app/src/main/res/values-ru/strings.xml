@@ -73,7 +73,7 @@
     <string name="deleteWaypointConfirmationText">"Вы действительно хотите удалить это место?"</string>
 
     <!-- Title of the dialog shown to confirm deletion of a waypoint -->
-    <string name="deleteWaypointTitle">"Удалить"</string>
+    <string name="deleteWaypointTitle">"Удаление"</string>
     <string name="description">"Описание"</string>
     <string name="deviceLocationDisabledDialogMessage">"Сервисы определения местоположения на этом устройстве отключены, поэтому OwnTracks не может отслеживать ваше местоположение.
 
@@ -208,6 +208,9 @@
     <string name="preferencesIgnoreInaccurateLocationsSummary">"Игнорировать неточные местоположения"</string>
     <string name="preferencesImportNoURIGiven">"Не указан URI для импорта настроек"</string>
     <string name="preferencesKeepalive">"Постоянное соединение"</string>
+
+    <!-- Text of the dialog shown to the user when editing the MQTT connection keepalive preference -->
+    <string name="preferencesKeepaliveDialogMessage">"Как часто клиент должен отправлять сообщение брокеру для поддержания постоянного соединения (в секундах)"</string>
     <string name="preferencesKeepaliveValidationError">"Должно быть более %d секунд"</string>
     <string name="preferencesLicenses">"Библиотеки"</string>
     <string name="preferencesLicensesSummary">"Благодарим авторов использованных библиотек"</string>
