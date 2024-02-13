@@ -13,9 +13,8 @@ plugins {
 
 apply<EspressoMetadataEmbeddingPlugin>()
 
-val googleMapsAPIKey = System.getenv("GOOGLE_MAPS_API_KEY")?.toString()
-    ?: extra.get("google_maps_api_key")?.toString()
-    ?: "PLACEHOLDER_API_KEY"
+val googleMapsAPIKey = System.getenv("GOOGLE_MAPS_API_KEY")?.toString() ?: extra.get("google_maps_api_key")?.toString()
+?: "PLACEHOLDER_API_KEY"
 
 val gmsImplementation: Configuration by configurations.creating
 val numShards = System.getenv("CIRCLE_NODE_TOTAL") ?: "0"
@@ -36,14 +35,11 @@ android {
         versionCode = packageVersionCode
         versionName = "2.5.0"
 
-        val localeCount = fileTree("src/main/res/")
-            .map {
-                it.toPath()
-            }.count { it.isRegularFile() && it.fileName.toString() == "strings.xml" }
+        val localeCount = fileTree("src/main/res/").map {
+            it.toPath()
+        }.count { it.isRegularFile() && it.fileName.toString() == "strings.xml" }
         buildConfigField(
-            "int",
-            "TRANSLATION_COUNT",
-            localeCount.toString()
+            "int", "TRANSLATION_COUNT", localeCount.toString()
         )
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -87,8 +83,7 @@ android {
             isShrinkResources = true
             proguardFiles.addAll(
                 listOf(
-                    getDefaultProguardFile("proguard-android-optimize.txt"),
-                    file("proguard-rules.pro")
+                    getDefaultProguardFile("proguard-android-optimize.txt"), file("proguard-rules.pro")
                 )
             )
             resValue("string", "GOOGLE_MAPS_API_KEY", googleMapsAPIKey)
@@ -100,8 +95,7 @@ android {
             isShrinkResources = false
             proguardFiles.addAll(
                 listOf(
-                    getDefaultProguardFile("proguard-android-optimize.txt"),
-                    file("proguard-rules.pro")
+                    getDefaultProguardFile("proguard-android-optimize.txt"), file("proguard-rules.pro")
                 )
             )
             resValue("string", "GOOGLE_MAPS_API_KEY", googleMapsAPIKey)
@@ -134,9 +128,7 @@ android {
         abortOnError = false
         disable.addAll(
             setOf(
-                "TypographyFractions",
-                "TypographyQuotes",
-                "Typos"
+                "TypographyFractions", "TypographyQuotes", "Typos"
             )
         )
     }
@@ -146,11 +138,27 @@ android {
         unitTests {
             isIncludeAndroidResources = true
         }
+        managedDevices {
+            localDevices {
+                create("pixel2api30aosp") {
+                    device = "Pixel 2"
+                    apiLevel = 30
+                    systemImageSource = "aosp-atd"
+                }
+            }
+        }
     }
 
     tasks.withType<Test> {
         testLogging {
-            events(TestLogEvent.STARTED,TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED, TestLogEvent.STANDARD_OUT, TestLogEvent.STANDARD_ERROR)
+            events(
+                TestLogEvent.STARTED,
+                TestLogEvent.PASSED,
+                TestLogEvent.SKIPPED,
+                TestLogEvent.FAILED,
+                TestLogEvent.STANDARD_OUT,
+                TestLogEvent.STANDARD_ERROR
+            )
             setExceptionFormat("full")
             showStandardStreams = true
 
