@@ -7,6 +7,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.owntracks.android.net.WifiInfoProvider
+import org.owntracks.android.net.getUnquotedSSID
 
 class WifiInfoProviderTest {
 

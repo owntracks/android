@@ -1,4 +1,4 @@
-package org.owntracks.android.services
+package org.owntracks.android.net
 
 import android.content.Context
 import java.security.KeyStore

@@ -1,8 +1,9 @@
-package org.owntracks.android.services
+package org.owntracks.android.net
 
 import java.io.IOException
 import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.preferences.types.ConnectionMode
+import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
 import org.owntracks.android.support.interfaces.OutgoingMessageProcessor
 

@@ -1,4 +1,4 @@
-package org.owntracks.android.services
+package org.owntracks.android.net.mqtt
 
 import android.content.Context
 import androidx.room.ColumnInfo

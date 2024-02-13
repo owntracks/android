@@ -29,7 +29,11 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.time.delay
 import kotlinx.coroutines.withContext
 import org.owntracks.android.App
 import org.owntracks.android.R
@@ -73,6 +77,8 @@ import java.util.stream.Collectors
 import javax.inject.Inject
 import javax.inject.Named
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.toJavaDuration
 
 @AndroidEntryPoint
 class BackgroundService :
@@ -81,7 +87,6 @@ class BackgroundService :
 
     private lateinit var notificationManagerCompat: NotificationManagerCompat
     private val activeNotifications = LinkedList<Spannable>()
-    private var lastQueueLength = 0
     private var hasBeenStartedExplicitly = false
 
     @Inject
@@ -217,8 +222,7 @@ class BackgroundService :
 
         lifecycleScope.launch {
             // Every time a waypoint is inserted, updated or deleted, we need to update the geofences, and
-            // maybe publish that
-            // waypoint
+            // maybe publish that waypoint
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     waypointsRepo.migrationCompleteFlow.collect {

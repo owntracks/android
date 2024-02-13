@@ -11,7 +11,7 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.owntracks.android.services.WifiInfoProvider
+import org.owntracks.android.net.WifiInfoProvider
 
 class MessageLocationTest {
 

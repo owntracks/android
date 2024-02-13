@@ -38,6 +38,10 @@ import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.model.messages.MessageTransition
 import org.owntracks.android.model.messages.MessageUnknown
 import org.owntracks.android.model.messages.MessageWaypoint
+import org.owntracks.android.net.MessageProcessorEndpoint
+import org.owntracks.android.net.OutgoingMessageSendingException
+import org.owntracks.android.net.http.HttpMessageProcessorEndpoint
+import org.owntracks.android.net.mqtt.MQTTMessageProcessorEndpoint
 import org.owntracks.android.preferences.DefaultsProvider.Companion.DEFAULT_SUB_TOPIC
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.Preferences.Companion.PREFERENCES_THAT_WIPE_QUEUE_AND_CONTACTS

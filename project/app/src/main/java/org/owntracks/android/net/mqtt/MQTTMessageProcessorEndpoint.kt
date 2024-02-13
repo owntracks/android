@@ -1,23 +1,13 @@
-package org.owntracks.android.services
+package org.owntracks.android.net.mqtt
 
+import android.app.AlarmManager
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
-import com.fasterxml.jackson.core.JsonParseException
-import com.fasterxml.jackson.databind.JsonMappingException
+import android.os.Build
+import androidx.core.content.getSystemService
 import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.io.IOException
-import java.net.ConnectException
-import java.security.KeyStore
-import java.util.concurrent.ScheduledThreadPoolExecutor
-import java.util.stream.Collectors
-import javax.net.ssl.SSLHandshakeException
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.ExperimentalTime
-import kotlin.time.TimeSource
-import kotlin.time.measureTime
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
@@ -40,7 +30,6 @@ import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CLIENT_EXCEPTION
 import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CONNECTION_LOST
 import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_SERVER_CONNECT_ERROR
 import org.eclipse.paho.client.mqttv3.MqttMessage
-import org.eclipse.paho.client.mqttv3.ScheduledExecutorPingSender
 import org.owntracks.android.data.EndpointState
 import org.owntracks.android.data.repos.EndpointStateRepo
 import org.owntracks.android.di.ApplicationScope
@@ -51,14 +40,27 @@ import org.owntracks.android.model.messages.MessageClear
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ConnectionMode
+import org.owntracks.android.services.MessageProcessor
+import org.owntracks.android.net.MessageProcessorEndpoint
+import org.owntracks.android.net.OutgoingMessageSendingException
 import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.Parser
 import org.owntracks.android.support.SimpleIdlingResource
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor
 import timber.log.Timber
+import java.io.IOException
+import java.net.ConnectException
+import java.security.KeyStore
+import java.util.concurrent.ScheduledThreadPoolExecutor
+import java.util.stream.Collectors
+import javax.net.ssl.SSLHandshakeException
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.TimeSource
+import kotlin.time.measureTime
 
-@OptIn(ExperimentalTime::class)
 class MQTTMessageProcessorEndpoint(
     messageProcessor: MessageProcessor,
     private val endpointStateRepo: EndpointStateRepo,
@@ -75,8 +77,8 @@ class MQTTMessageProcessorEndpoint(
     val mqttConnectionIdlingResource: SimpleIdlingResource = SimpleIdlingResource("mqttConnection", false)
     override val modeId: ConnectionMode = ConnectionMode.MQTT
     private val connectingLock = Semaphore(1)
-    private val connectivityManager =
-        applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    private val connectivityManager:ConnectivityManager = applicationContext.getSystemService()!!
+    private val alarmManager: AlarmManager = applicationContext.getSystemService()!!
     private var mqttClientAndConfiguration: MqttClientAndConfiguration? = null
 
     private val networkChangeCallback = object : ConnectivityManager.NetworkCallback() {
@@ -336,11 +338,16 @@ class MQTTMessageProcessorEndpoint(
                 endpointStateRepo.setState(EndpointState.CONNECTING)
                 try {
                     val executorService = ScheduledThreadPoolExecutor(8)
+                    val pingSender = if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && alarmManager.canScheduleExactAlarms()) {
+                        AlarmPingSender(applicationContext)
+                    } else {
+                        AsyncPingSender(scope)
+                    }
                     MqttAsyncClient(
                         mqttConnectionConfiguration.connectionString,
                         mqttConnectionConfiguration.clientId,
                         RoomMqttClientPersistence(applicationContext),
-                        ScheduledExecutorPingSender(executorService),
+                        pingSender,
                         executorService,
                         AndroidHighResolutionTimer()
                     )

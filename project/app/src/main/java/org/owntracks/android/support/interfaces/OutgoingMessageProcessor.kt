@@ -1,6 +1,6 @@
 package org.owntracks.android.support.interfaces
 
-import org.owntracks.android.services.ConnectionConfiguration
+import org.owntracks.android.net.ConnectionConfiguration
 
 interface OutgoingMessageProcessor {
     fun activate()

@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull
 import org.owntracks.android.model.BatteryStatus
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.MonitoringMode
-import org.owntracks.android.services.WifiInfoProvider
+import org.owntracks.android.net.WifiInfoProvider
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 

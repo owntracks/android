@@ -23,6 +23,7 @@ import org.owntracks.android.model.messages.MessageLocation.Companion.fromLocati
 import org.owntracks.android.model.messages.MessageTransition
 import org.owntracks.android.model.messages.MessageWaypoint
 import org.owntracks.android.model.messages.MessageWaypoints
+import org.owntracks.android.net.WifiInfoProvider
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.support.DeviceMetricsProvider

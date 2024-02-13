@@ -1,4 +1,4 @@
-package org.owntracks.android.services
+package org.owntracks.android.net.mqtt
 
 import android.os.SystemClock
 import org.eclipse.paho.client.mqttv3.internal.HighResolutionTimer

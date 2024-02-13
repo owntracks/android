@@ -9,6 +9,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.owntracks.android.net.mqtt.RoomMqttClientPersistence
 
 @SmallTest
 @RunWith(AndroidJUnit4::class)

@@ -16,6 +16,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.owntracks.android.data.repos.EndpointStateRepo
 import org.owntracks.android.model.messages.MessageLocation
+import org.owntracks.android.net.http.HttpMessageProcessorEndpoint
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.EncryptionProvider
 import org.owntracks.android.support.Parser

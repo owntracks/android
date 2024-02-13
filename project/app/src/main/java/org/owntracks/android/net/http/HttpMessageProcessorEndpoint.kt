@@ -1,4 +1,4 @@
-package org.owntracks.android.services
+package org.owntracks.android.net.http
 
 import android.content.Context
 import com.fasterxml.jackson.core.JsonProcessingException
@@ -22,6 +22,10 @@ import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ConnectionMode
+import org.owntracks.android.net.CALeafCertMatchingHostnameVerifier
+import org.owntracks.android.services.MessageProcessor
+import org.owntracks.android.net.MessageProcessorEndpoint
+import org.owntracks.android.net.OutgoingMessageSendingException
 import org.owntracks.android.support.Parser
 import org.owntracks.android.support.SocketFactory
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException

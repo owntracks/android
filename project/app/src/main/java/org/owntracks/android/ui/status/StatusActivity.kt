@@ -34,7 +34,7 @@ import org.owntracks.android.R
 import org.owntracks.android.data.EndpointState
 import org.owntracks.android.databinding.UiStatusBinding
 import org.owntracks.android.preferences.Preferences
-import org.owntracks.android.services.MqttConnectionConfiguration
+import org.owntracks.android.net.mqtt.MqttConnectionConfiguration
 import org.owntracks.android.support.DrawerProvider
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
 import org.owntracks.android.ui.status.logs.LogViewerActivity

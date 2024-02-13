@@ -1,4 +1,4 @@
-package org.owntracks.android.services
+package org.owntracks.android.net.mqtt
 
 import android.content.Context
 import java.net.URI
@@ -10,8 +10,12 @@ import org.owntracks.android.preferences.DefaultsProvider
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.MqttProtocolLevel
 import org.owntracks.android.preferences.types.MqttQos
+import org.owntracks.android.net.CALeafCertMatchingHostnameVerifier
+import org.owntracks.android.net.ConnectionConfiguration
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
 import timber.log.Timber
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 data class MqttConnectionConfiguration(
     val tls: Boolean,
@@ -21,11 +25,11 @@ data class MqttConnectionConfiguration(
     val clientId: String,
     val username: String,
     val password: String,
-    val keepAlive: Int,
-    val timeout: Int,
+    val keepAlive: Duration,
+    val timeout: Duration,
     val cleanSession: Boolean,
     val mqttProtocolLevel: MqttProtocolLevel,
-    val tlsClentCertAlias: String,
+    val tlsClientCertAlias: String,
     val willTopic: String,
     val topicsToSubscribeTo: Set<String>,
     val subQos: MqttQos,
@@ -63,8 +67,8 @@ data class MqttConnectionConfiguration(
             password = this@MqttConnectionConfiguration.password.toCharArray()
             mqttVersion = mqttProtocolLevel.value
             isAutomaticReconnect = false
-            keepAliveInterval = keepAlive.coerceAtLeast(0)
-            connectionTimeout = timeout.coerceAtLeast(1)
+            keepAliveInterval = keepAlive.inWholeSeconds.coerceAtLeast(0).toInt()
+            connectionTimeout = timeout.inWholeSeconds.coerceAtLeast(1).toInt()
             isCleanSession = cleanSession
             setWill(
                 willTopic,
@@ -77,9 +81,9 @@ data class MqttConnectionConfiguration(
             maxInflight = maxInFlight
             if (tls) {
                 socketFactory = getSocketFactory(
-                    timeout,
+                    timeout.inWholeSeconds.toInt(),
                     true,
-                    tlsClentCertAlias,
+                    tlsClientCertAlias,
                     context,
                     caKeyStore
                 )
@@ -110,8 +114,8 @@ fun Preferences.toMqttConnectionConfiguration(): MqttConnectionConfiguration =
         clientId,
         username,
         password,
-        keepalive,
-        connectionTimeoutSeconds,
+        keepalive.seconds,
+        connectionTimeoutSeconds.seconds,
         cleanSession,
         mqttProtocolLevel,
         tlsClientCrt,

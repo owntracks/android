@@ -1,4 +1,4 @@
-package org.owntracks.android.services
+package org.owntracks.android.net
 
 import android.annotation.SuppressLint
 import android.content.Context
