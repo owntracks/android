@@ -10,7 +10,7 @@ name: Build and Test
       - master
 
 env:
-  GRADLE_OPTS: "-Dorg.gradle.daemon=true -Dorg.gradle.configuration-cache=false -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.jvmargs='-Xmx3096M -Dkotlin.daemon.jvm.options=-Xmx2048M -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8 -XX:+UseParallelGC'"
+  GRADLE_OPTS: "-Dorg.gradle.daemon=true -Dorg.gradle.configuration-cache=true -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.jvmargs='-Xmx3096M -Dkotlin.daemon.jvm.options=-Xmx2048M -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8 -XX:+UseParallelGC'"
 
 jobs:
   build-test-lint:
@@ -57,6 +57,7 @@ jobs:
         with:
           dependency-graph: generate-and-submit
           cache-read-only: ${{ github.ref != format('refs/heads/{0}', github.event.repository.default_branch) }}
+          cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
 
       - name: Build
         if: steps.guard.outputs.run_build == 'true'
@@ -171,6 +172,7 @@ jobs:
         if: steps.run-espresso-guard.outputs.run-espresso == 'true'
         with:
           dependency-graph: generate
+          cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
 
       - name: AVD cache
         uses: actions/cache@13aacd865c20de90d75de3b17ebe84f7a17d57d2 # v4
@@ -300,5 +302,6 @@ jobs:
           GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
         with:
           build-root-directory: project
+          cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
           arguments: |
             publishGmsReleaseBundle --stacktrace --scan

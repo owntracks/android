@@ -9,6 +9,9 @@ on:
       - v[0-9]+.[0-9]+.[0-9]+-beta[0-9]+
       - release-test-tag
 
+env:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=true -Dorg.gradle.configuration-cache=true -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.jvmargs='-Xmx3096M -Dkotlin.daemon.jvm.options=-Xmx2048M -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8 -XX:+UseParallelGC'"
+
 jobs:
   release:
     name: Create GH release and promote Play store beta to release
@@ -75,6 +78,7 @@ jobs:
           version_code: ${{ setps.version-code-generator.versionCode}}
         with:
           build-root-directory: project
+          cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
           arguments: |
             assembleRelease --stacktrace --scan
 
