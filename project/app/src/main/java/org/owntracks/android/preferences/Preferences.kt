@@ -4,6 +4,19 @@ import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+import org.owntracks.android.BuildConfig
+import org.owntracks.android.model.messages.MessageConfiguration
+import org.owntracks.android.preferences.types.AppTheme
+import org.owntracks.android.preferences.types.ConnectionMode
+import org.owntracks.android.preferences.types.FromConfiguration
+import org.owntracks.android.preferences.types.MonitoringMode
+import org.owntracks.android.preferences.types.MqttProtocolLevel
+import org.owntracks.android.preferences.types.MqttQos
+import org.owntracks.android.preferences.types.ReverseGeocodeProvider
+import org.owntracks.android.preferences.types.StringMaxTwoAlphaNumericChars
+import org.owntracks.android.support.SimpleIdlingResource
+import org.owntracks.android.ui.map.MapLayerStyle
+import timber.log.Timber
 import java.util.WeakHashMap
 import javax.inject.Inject
 import javax.inject.Named
@@ -16,20 +29,6 @@ import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.jvm.jvmErasure
 import kotlin.reflect.typeOf
-import org.owntracks.android.BuildConfig
-import org.owntracks.android.model.messages.MessageConfiguration
-import org.owntracks.android.preferences.types.AppTheme
-import org.owntracks.android.preferences.types.ConnectionMode
-import org.owntracks.android.preferences.types.FromConfiguration
-import org.owntracks.android.preferences.types.MonitoringMode
-import org.owntracks.android.preferences.types.MqttProtocolLevel
-import org.owntracks.android.preferences.types.MqttQos
-import org.owntracks.android.preferences.types.ReverseGeocodeProvider
-import org.owntracks.android.preferences.types.StringMaxTwoAlphaNumericChars
-import org.owntracks.android.services.worker.Scheduler.Companion.MIN_PERIODIC_INTERVAL
-import org.owntracks.android.support.SimpleIdlingResource
-import org.owntracks.android.ui.map.MapLayerStyle
-import timber.log.Timber
 
 @Singleton
 class Preferences @Inject constructor(
@@ -399,10 +398,6 @@ class Preferences @Inject constructor(
             return pubTopicBaseWithUserDetails + waypointTopicSuffix
         }
 
-    val minimumKeepaliveSeconds = MIN_PERIODIC_INTERVAL.inWholeSeconds
-    fun keepAliveInRange(i: Int): Boolean =
-        i >= if (EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE in experimentalFeatures) 1 else minimumKeepaliveSeconds
-
     fun setMonitoringNext() {
         monitoring = monitoring.next()
     }
@@ -445,13 +440,11 @@ class Preferences @Inject constructor(
 
     companion object {
         const val EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI = "showExperimentalPreferenceUI"
-        const val EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE = "allowSmallKeepalive"
         const val EXPERIMENTAL_FEATURE_LOCATION_PING_USES_HIGH_ACCURACY_LOCATION_REQUEST =
             "locationPingUsesHighAccuracyLocationRequest"
 
         internal val EXPERIMENTAL_FEATURES = setOf(
             EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI,
-            EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE,
             EXPERIMENTAL_FEATURE_LOCATION_PING_USES_HIGH_ACCURACY_LOCATION_REQUEST
         )
 

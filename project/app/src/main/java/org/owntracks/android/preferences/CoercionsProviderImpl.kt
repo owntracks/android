@@ -21,22 +21,10 @@ class CoercionsProviderImpl : CoercionsProvider {
                 (value as Int).coerceAtLeast(1)
             }
             Preferences::keepalive -> {
-                (value as Int)
-                    .coerceAtLeast(
-                        if (preferences.experimentalFeatures.contains(
-                                Preferences.EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE
-                            )
-                        ) {
-                            1
-                        } else {
-                            Scheduler.MIN_PERIODIC_INTERVAL.inWholeSeconds.toInt()
-                        }
-                    )
+                (value as Int).coerceAtLeast(0)
             }
             Preferences::port -> {
-                (value as Int)
-                    .coerceAtLeast(1)
-                    .coerceAtMost(65535)
+                (value as Int).coerceAtLeast(1).coerceAtMost(65535)
             }
             else -> value
         } as T

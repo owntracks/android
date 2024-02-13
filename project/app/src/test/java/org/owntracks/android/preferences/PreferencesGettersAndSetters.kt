@@ -211,21 +211,21 @@ class PreferencesGettersAndSetters(private val parameter: Parameter) {
                     899,
                     Int::class,
                     false,
-                    preferenceValueExpected = 900
+                    preferenceValueExpected = 899
                 ),
                 Parameter(
                     "keepalive",
                     0,
                     Int::class,
                     false,
-                    preferenceValueExpected = 900
+                    preferenceValueExpected = 0
                 ),
                 Parameter(
                     "keepalive",
                     -1,
                     Int::class,
                     false,
-                    preferenceValueExpected = 900
+                    preferenceValueExpected = 0
                 ),
                 Parameter(
                     "locatorDisplacement",

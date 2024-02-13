@@ -63,8 +63,8 @@ data class MqttConnectionConfiguration(
             password = this@MqttConnectionConfiguration.password.toCharArray()
             mqttVersion = mqttProtocolLevel.value
             isAutomaticReconnect = false
-            keepAliveInterval = keepAlive
-            connectionTimeout = timeout
+            keepAliveInterval = keepAlive.coerceAtLeast(0)
+            connectionTimeout = timeout.coerceAtLeast(1)
             isCleanSession = cleanSession
             setWill(
                 willTopic,

@@ -79,9 +79,7 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
             Preferences::tid.name to { input: String -> input.isNotBlank() && input.length <= 2 },
             Preferences::clientId.name to { input: String -> input.isNotBlank() },
             Preferences::keepalive.name to { input: String ->
-                input.toIntOrNull() != null && preferences.keepAliveInRange(
-                    input.toInt()
-                )
+                input.toIntOrNull() != null && input.toInt() >= 0
             }
         ).forEach { (preferenceName, validator) ->
             findPreference<ValidatingEditTextPreference>(preferenceName)?.apply {
@@ -89,15 +87,7 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
             }
         }
 
-        findPreference<ValidatingEditTextPreference>(Preferences::keepalive.name)?.validationErrorArgs =
-            if (preferences.experimentalFeatures.contains(
-                    Preferences.EXPERIMENTAL_FEATURE_ALLOW_SMALL_KEEPALIVE
-                )
-            ) {
-                1
-            } else {
-                preferences.minimumKeepaliveSeconds
-            }
+        findPreference<ValidatingEditTextPreference>(Preferences::keepalive.name)?.validationErrorArgs = 0
 
         /* We need to work out if the given cert still exists. We also need to do this off-main thread */
         lifecycleScope.launch(Dispatchers.IO) {
