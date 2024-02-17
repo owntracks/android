@@ -255,7 +255,7 @@ class HttpMessageProcessorEndpoint(
 
     override fun onFinalizeMessage(message: MessageBase): MessageBase {
         // Build pseudo topic based on tid
-        if (message is MessageLocation) { // STOPSHIP messages don't have topics.
+        if (message is MessageLocation) {
             message.topic = HTTPTOPIC + message.trackerId
         }
         return message

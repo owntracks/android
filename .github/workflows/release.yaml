@@ -64,18 +64,18 @@ jobs:
         run: |
           echo VERSION_CODE=$(python .github/google-play-api/google-play-api.py beta) >> $GITHUB_ENV"
 
-          - name: Create keystore
-          run: |
-            echo -n $KEYSTORE_BASE64 | base64 -d > project/owntracks.release.keystore.jks
-          env:
-            KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+      - name: Create keystore
+        run: |
+          echo -n $KEYSTORE_BASE64 | base64 -d > project/owntracks.release.keystore.jks
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
 
       - name: Build release APKs
         uses: gradle/actions/setup-gradle@v3
         env:
           KEYSTORE_PASSPHRASE: ${{ secrets.KEYSTORE_PASSPHRASE }}
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
-          version_code: ${{ setps.version-code-generator.versionCode}}
+          version_code: ${{ steps.version-code-generator.versionCode}}
         with:
           build-root-directory: project
           cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
