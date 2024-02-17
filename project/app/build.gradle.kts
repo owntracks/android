@@ -17,8 +17,6 @@ val googleMapsAPIKey = System.getenv("GOOGLE_MAPS_API_KEY")?.toString() ?: extra
 ?: "PLACEHOLDER_API_KEY"
 
 val gmsImplementation: Configuration by configurations.creating
-val numShards = System.getenv("CIRCLE_NODE_TOTAL") ?: "0"
-val shardIndex = System.getenv("CIRCLE_NODE_INDEX") ?: "0"
 
 val packageVersionCode: Int = System.getenv("VERSION_CODE")?.toInt() ?: 420412000
 val manuallySetVersion: Boolean = System.getenv("VERSION_CODE") != null
@@ -48,9 +46,7 @@ android {
                 "clearPackageData" to "false",
                 "coverage" to "true",
                 "disableAnalytics" to "true",
-                "useTestStorageService" to "false",
-                "numShards" to numShards,
-                "shardIndex" to shardIndex
+                "useTestStorageService" to "false"
             )
         )
         javaCompileOptions {
