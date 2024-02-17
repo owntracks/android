@@ -293,15 +293,24 @@ jobs:
           echo -n $KEYSTORE_BASE64 | base64 -d > project/owntracks.release.keystore.jks
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
-      - name: Gradle build
+      - name: Setup gradle
         if: steps.changes.outputs.src == 'true' || github.event_name == 'workflow_dispatch'
         uses: gradle/actions/setup-gradle@v3
+        with:
+          build-root-directory: project
+          cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
+      - name: Process version codes from play store
+        if: steps.changes.outputs.src == 'true' || github.event_name == 'workflow_dispatch'
+        run: |
+          ./project/gradlew -p project clean processGmsVersionCodes
+          cat ./project/app/build/intermediates/gpp/gmsRelease/available-version-codes.txt
+        env:
+          ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
+      - name: Publish Release
+        if: steps.changes.outputs.src == 'true' || github.event_name == 'workflow_dispatch'
+        run: |
+          ./project/gradlew -p project publishGmsReleaseBundle --stacktrace --scan
         env:
           KEYSTORE_PASSPHRASE: ${{ secrets.KEYSTORE_PASSPHRASE }}
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
           GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
-        with:
-          build-root-directory: project
-          cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
-          arguments: |
-            publishGmsReleaseBundle --stacktrace --scan
