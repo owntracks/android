@@ -227,7 +227,7 @@ jobs:
             adb shell rm -rf /sdcard/googletest || echo "Couldn't delete googletest folder"
             adb uninstall org.owntracks.android.debug || echo "org.owntracks.android not installed"
             adb uninstall org.owntracks.android.debug.test || echo "org.owntracks.android.test not installed"
-            ./project/gradlew -p project create${FLAVOUR}DebugCoverageReport --max-workers=1 --stacktrace --scan
+            ./project/gradlew -p project :app:create${FLAVOUR}DebugAndroidTestCoverageReport --max-workers=1 --stacktrace --scan
 
       - name: Upload connected test result artifact
         uses: actions/upload-artifact@v4
