@@ -262,6 +262,14 @@ jobs:
           flags: uitests
           token: ${{ secrets.CODECOV_TOKEN }}
 
+  pr-checkpoint-status:
+    name: "PR Checkpoint Status"
+    runs-on: ubuntu-latest
+    needs: espresso-test
+    if: ${{ github.event_name == 'pull_request' }}
+    steps:
+      - run: |
+          echo "PR Checkpoint Status. Noop"
   publish-to-play-store:
     name: "Publish to Play Store"
     runs-on: ubuntu-latest
