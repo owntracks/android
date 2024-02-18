@@ -126,6 +126,7 @@ jobs:
       matrix:
         android-api: [31]
         flavour: [Gms, Oss]
+        shard: [1, 2]
     steps:
       - name: Enable KVM group perms
         run: |
@@ -209,6 +210,8 @@ jobs:
         timeout-minutes: 30
         env:
           FLAVOUR: ${{ matrix.flavour }}
+          SHARD_COUNT: 2
+          SHARD_INDEX: ${{ matrix.shard }}
         with:
           api-level: ${{ matrix.android-api }}
           force-avd-creation: false
@@ -227,13 +230,13 @@ jobs:
             adb shell rm -rf /sdcard/googletest || echo "Couldn't delete googletest folder"
             adb uninstall org.owntracks.android.debug || echo "org.owntracks.android not installed"
             adb uninstall org.owntracks.android.debug.test || echo "org.owntracks.android.test not installed"
-            ./project/gradlew -p project :app:create${FLAVOUR}DebugAndroidTestCoverageReport --max-workers=1 --stacktrace --scan
+            ./project/gradlew -p project :app:create${FLAVOUR}DebugAndroidTestCoverageReport -Pandroid.testInstrumentationRunnerArguments.numShards=${SHARD_COUNT} -Pandroid.testInstrumentationRunnerArguments.shardIndex=${SHARD_INDEX} --max-workers=1 --scan
 
       - name: Upload connected test result artifact
         uses: actions/upload-artifact@v4
         if: always() && steps.run-espresso-guard.outputs.run-espresso == 'true'
         with:
-          name: espresso-test-reports-${{ matrix.android-api }}-${{ matrix.flavour }}
+          name: espresso-test-reports-${{ matrix.android-api }}-${{ matrix.flavour }}-${{ matrix.shard }}
           path: ./project/app/build/reports/androidTests/connected/
 
       - name: Espresso JUnit Report
@@ -248,7 +251,7 @@ jobs:
         uses: ./.github/actions/upload-artifact
         if: steps.run-espresso-guard.outputs.run-espresso == 'true'
         with:
-          name: espresso-test-coverage-${{ matrix.android-api }}-${{ matrix.flavour }}
+          name: espresso-test-coverage-${{ matrix.android-api }}-${{ matrix.flavour }}-${{ matrix.shard }}
           path: ./project/app/build/reports/coverage/androidTest/
 
       - name: Upload coverage
