@@ -30,7 +30,7 @@ jobs:
 
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
 
-      - uses: dorny/paths-filter@v2
+      - uses: dorny/paths-filter@v3
         name: Check if we should trigger a build
         id: file-changes-should-build
         with:
@@ -141,7 +141,7 @@ jobs:
           sudo docker image prune --all --force
           sudo df -h
       - uses: nschloe/action-cached-lfs-checkout@v1
-      - uses: dorny/paths-filter@v2
+      - uses: dorny/paths-filter@v3
         id: changes
         with:
           filters: |
@@ -284,7 +284,7 @@ jobs:
         with:
           distribution: "temurin"
           java-version: "17"
-      - uses: dorny/paths-filter@v2
+      - uses: dorny/paths-filter@v3
         id: changes
         with:
           filters: |
