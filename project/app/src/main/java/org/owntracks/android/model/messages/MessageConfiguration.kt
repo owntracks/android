@@ -10,7 +10,7 @@ import java.util.TreeMap
 import org.owntracks.android.support.MessageWaypointCollection
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
-class MessageConfiguration : MessageBase() {
+class MessageConfiguration(private val messageWithId: MessageWithId = MessageWithRandomId()) : MessageBase(), MessageWithId by messageWithId {
     private val map: MutableMap<String, Any?> = TreeMap()
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

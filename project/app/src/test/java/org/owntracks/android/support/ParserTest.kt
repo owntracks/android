@@ -3,6 +3,7 @@ package org.owntracks.android.support
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.exc.InvalidFormatException
+import java.time.Instant
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import org.junit.Assert.assertEquals
@@ -34,6 +35,7 @@ import org.owntracks.android.preferences.types.MqttQos
 import org.owntracks.android.support.Parser.EncryptionException
 
 class ParserTest {
+    private val testId = "dummyTestId"
     private val extendedMessageLocation = MessageLocation(MessageCreatedAtNow(FakeFixedClock())).apply {
         accuracy = 10
         altitude = 20
@@ -42,6 +44,7 @@ class ParserTest {
         timestamp = 123456789
         velocity = 5.6.toInt()
         verticalAccuracy = 1.7.toInt()
+        id = testId
         inregions = listOf("Testregion1", "Testregion2")
         battery = 30
         batteryStatus = BatteryStatus.CHARGING
@@ -54,6 +57,7 @@ class ParserTest {
         accuracy = 10
         altitude = 20
         latitude = 50.1
+        id = testId
         longitude = 60.2
         timestamp = 123456789
         velocity = 5.6.toInt()
@@ -97,6 +101,7 @@ class ParserTest {
               "bs" : 2,
               "conn" : "TestConn",
               "created_at" : 25,
+              "id" : "dummyTestId",
               "inregions" : [ "Testregion1", "Testregion2" ],
               "lat" : 50.1,
               "lon" : 60.2,
@@ -120,6 +125,7 @@ class ParserTest {
               "acc" : 10,
               "alt" : 20,
               "created_at" : 25,
+              "id" : "dummyTestId",
               "inregions" : [ "Testregion1", "Testregion2" ],
               "lat" : 50.1,
               "lon" : 60.2,
@@ -146,6 +152,7 @@ class ParserTest {
                 "batt": 99,
                 "bs": 3,
                 "conn": "w",
+                "id" : "inputTestId",
                 "lat": 52.3153748,
                 "lon": 5.0408462,
                 "t": "p",
@@ -173,6 +180,7 @@ class ParserTest {
         assertEquals(MessageLocation.ReportType.PING, message.trigger)
         assertEquals(0f, message.verticalAccuracy.toFloat(), 0f)
         assertEquals(2, message.inregions?.size)
+        assertEquals("inputTestId", message.id)
     }
 
     @Test
@@ -1045,7 +1053,15 @@ class ParserTest {
     }
     //endregion
 
+    @Test
+    fun `Given a serialized MessageLocation, when deserializing then the created_at field is correctly parsed`() {
+        val msg = """{"_type":"location","BSSID":"00:13:10:85:fe:01","SSID":"AndroidWifi","acc":5,"alt":50,"batt":100,"bs":0,"conn":"w","created_at":1709037052,"lat":51.0,"lon":0.0,"m":1,"randomId":9302,"tid":"aa","tst":1709037003,"vac":0,"vel":0}"""
+        val parser = Parser(encryptionProvider)
+        val parsed = parser.fromJson(msg) as MessageLocation
+        assertEquals(Instant.parse("2024-02-27T12:30:52Z"),parsed.createdAt)
+    }
+
     inner class FakeFixedClock : Clock {
-        override val time: Long = 25
+        override val time: Instant = Instant.ofEpochMilli(25123)
     }
 }

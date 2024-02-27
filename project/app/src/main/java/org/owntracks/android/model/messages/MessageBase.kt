@@ -30,7 +30,7 @@ import org.owntracks.android.support.Parser
     JsonSubTypes.Type(value = MessageLwt::class, name = MessageLwt.TYPE)
 )
 @JsonPropertyOrder(alphabetic = true)
-abstract class MessageBase : BaseObservable() {
+abstract class MessageBase : BaseObservable(), MessageWithId {
     @JsonIgnore
     open val numberOfRetries: Int = 10
 

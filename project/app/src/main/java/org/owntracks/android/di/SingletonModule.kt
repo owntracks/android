@@ -102,7 +102,7 @@ class SingletonModule {
     @Named("messageReceivedIdlingResource")
     fun provideLocationMessageIdlingResource(): IdlingResourceWithData<MessageBase> = IdlingResourceWithData(
         "messageReceivedIdlingResource",
-        compareBy { it.toString() }
+        compareBy { it.id }
     )
 
     @ApplicationScope

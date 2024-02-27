@@ -77,7 +77,7 @@ class MQTTMessageProcessorEndpoint(
     val mqttConnectionIdlingResource: SimpleIdlingResource = SimpleIdlingResource("mqttConnection", false)
     override val modeId: ConnectionMode = ConnectionMode.MQTT
     private val connectingLock = Semaphore(1)
-    private val connectivityManager:ConnectivityManager = applicationContext.getSystemService()!!
+    private val connectivityManager: ConnectivityManager = applicationContext.getSystemService()!!
     private val alarmManager: AlarmManager = applicationContext.getSystemService()!!
     private var mqttClientAndConfiguration: MqttClientAndConfiguration? = null
 
@@ -178,7 +178,7 @@ class MQTTMessageProcessorEndpoint(
     override fun onFinalizeMessage(message: MessageBase): MessageBase = message
 
     override suspend fun sendMessage(message: MessageBase) {
-        Timber.i("Sending message [$message]")
+        Timber.i("Sending message $message")
         if (endpointStateRepo.endpointState.value != EndpointState.CONNECTED || mqttClientAndConfiguration == null) {
             throw OutgoingMessageSendingException(NotConnectedException())
         }
@@ -300,13 +300,14 @@ class MQTTMessageProcessorEndpoint(
                 )
             } else {
                 try {
+                    Timber.tag("ARSEFACE").d("Received message: ${String(message.payload)}")
                     onMessageReceived(
                         parser.fromJson(message.payload)
                             .apply {
                                 this.topic = topic
                                 this.retained = message.isRetained
                                 this.qos = message.qos
-                            }
+                            }.also { Timber.tag("ARSEFACE").d("Parsed message: $it")}
                     )
                 } catch (e: Parser.EncryptionException) {
                     Timber.w("Enable to decrypt received message ${message.id} on $topic")

@@ -263,12 +263,13 @@ class MessageProcessor @Inject constructor(
                                     }
                                 }
                                 messageFailedLastTime = true
+                                // We need to launch this delay in a new job, so that we can cancel it if we need to
                                 scope.launch {
                                     Timber.i("Waiting for $retryWait before retrying $message")
                                     delay(retryWait)
                                 }
                                     .run {
-                                        Timber.d("Pause for $message")
+                                        Timber.v("Joining on backoff delay job for $message")
                                         retryDelayJob = this
                                         join()
                                         Timber.d("Retry wait finished for $message. Cancelled=${isCancelled}}")

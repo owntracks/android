@@ -10,7 +10,7 @@ import org.owntracks.android.preferences.Preferences
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-class MessageWaypoint : MessageBase() {
+class MessageWaypoint(private val messageWithId: MessageWithId = MessageWithRandomId()) : MessageBase(), MessageWithId by messageWithId {
     @JsonProperty("desc")
     var description: String? = null
 

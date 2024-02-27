@@ -9,7 +9,7 @@ import org.owntracks.android.support.MessageWaypointCollection
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-class MessageWaypoints : MessageBase() {
+class MessageWaypoints(private val messageWithId: MessageWithId = MessageWithRandomId()) : MessageBase(), MessageWithId by messageWithId {
     var waypoints: MessageWaypointCollection? = null
     override fun toString(): String = "[MessageWaypoints waypoints=${waypoints?.size}]"
 

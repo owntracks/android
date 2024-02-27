@@ -1,21 +1,20 @@
 package org.owntracks.android.model.messages
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import kotlin.time.Duration.Companion.milliseconds
+import java.time.Instant
 
 interface MessageWithCreatedAt {
-    @get:JsonProperty("created_at")
-    val createdAt: Long
+  @get:JsonProperty("created_at") var createdAt: Instant
 }
 
 class MessageCreatedAtNow(clock: Clock) : MessageWithCreatedAt {
-    override val createdAt: Long = clock.time
+  override var createdAt: Instant = clock.time
 }
 
 interface Clock {
-    val time: Long
+  val time: Instant
 }
 
 class RealClock : Clock {
-    override val time: Long = System.currentTimeMillis().milliseconds.inWholeSeconds
+  override val time: Instant = Instant.now()
 }

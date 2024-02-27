@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-class MessageCard : MessageBase() {
+class MessageCard(private val messageWithId: MessageWithId = MessageWithRandomId()) : MessageBase(), MessageWithId by messageWithId {
     @get:Bindable
     var name: String? = null
 

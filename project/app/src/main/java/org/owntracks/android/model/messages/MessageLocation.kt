@@ -25,8 +25,8 @@ import kotlin.math.roundToInt
 )
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreatedAtNow(RealClock())) :
-    MessageBase(), MessageWithCreatedAt by dep {
+open class MessageLocation(private val messageWithCreatedAtImpl: MessageWithCreatedAt = MessageCreatedAtNow(RealClock()), private val messageWithId: MessageWithId = MessageWithRandomId()) :
+    MessageBase(), MessageWithCreatedAt by messageWithCreatedAtImpl, MessageWithId by messageWithId {
 
     @JsonIgnore
     override val numberOfRetries: Int = 100_000 // This should last a few weeks at 1 attempt per minute
@@ -84,7 +84,7 @@ open class MessageLocation(private val dep: MessageWithCreatedAt = MessageCreate
     }
 
     @JsonIgnore
-    override fun toString(): String = "[MessageLocation ts=${Instant.fromEpochSeconds(timestamp)},lat=$latitude,long=$longitude,created_at=${Instant.fromEpochSeconds(timestamp)},trigger=$trigger]"
+    override fun toString(): String = "[MessageLocation id=$id ts=${Instant.fromEpochSeconds(timestamp)},lat=$latitude,long=$longitude,created_at=${createdAt},trigger=$trigger]"
 
     override fun addMqttPreferences(preferences: Preferences) {
         topic = preferences.pubTopicLocations

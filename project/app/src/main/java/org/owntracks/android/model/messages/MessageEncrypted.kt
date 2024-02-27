@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-class MessageEncrypted : MessageBase() {
+class MessageEncrypted(private val messageWithId: MessageWithId = MessageWithRandomId()) : MessageBase(), MessageWithId by messageWithId {
     var data: String? = null
 
     companion object {

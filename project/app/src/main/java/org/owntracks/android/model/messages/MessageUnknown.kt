@@ -1,6 +1,7 @@
 package org.owntracks.android.model.messages
 
-object MessageUnknown : MessageBase() {
+object MessageUnknown : MessageBase(), MessageWithId {
+    override var id: MessageId = ZeroMessageId
     const val TYPE = "unknown"
     override fun toString(): String = "[MessageUnknown]"
 }

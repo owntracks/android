@@ -1,7 +1,10 @@
 package org.owntracks.android.preferences
 
 import android.content.Context
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -172,64 +175,59 @@ class ImportExportTest {
         val parser = Parser(null)
         val json = parser.toUnencryptedJsonPretty(message)
 
-        //language=JSON
-        val expected = """
-            {
-              "_type" : "configuration",
-              "waypoints" : [ ],
-              "_build" : ${BuildConfig.VERSION_CODE},
-              "autostartOnBoot" : true,
-              "cleanSession" : false,
-              "clientId" : "emulator",
-              "cmd" : true,
-              "connectionTimeoutSeconds" : 30,
-              "debugLog" : true,
-              "deviceId" : "testdevice",
-              "enableMapRotation" : true,
-              "encryptionKey" : "",
-              "experimentalFeatures" : [ ],
-              "fusedRegionDetection" : true,
-              "host" : "127.0.0.1",
-              "ignoreInaccurateLocations" : 150,
-              "ignoreStaleLocations" : 0.0,
-              "info" : true,
-              "keepalive" : 900,
-              "locatorDisplacement" : 5,
-              "locatorInterval" : 60,
-              "mapLayerStyle" : "${defaultMapLayerStyle.name}",
-              "mode" : 0,
-              "monitoring" : 1,
-              "moveModeLocatorInterval" : 10,
-              "mqttProtocolLevel" : 3,
-              "notificationEvents" : true,
-              "notificationGeocoderErrors" : true,
-              "notificationHigherPriority" : false,
-              "notificationLocation" : true,
-              "opencageApiKey" : "testkey",
-              "osmTileScaleFactor" : 1.0,
-              "password" : "testpassword",
-              "pegLocatorFastestIntervalToInterval" : false,
-              "ping" : 30,
-              "port" : 1883,
-              "pubExtendedData" : true,
-              "pubQos" : 1,
-              "pubRetain" : true,
-              "pubTopicBase" : "owntracks/%u/%d",
-              "publishLocationOnConnect" : false,
-              "remoteConfiguration" : true,
-              "reverseGeocodeProvider" : "${defaultReverseGeocodeProvider.value}",
-              "showRegionsOnMap" : false,
-              "sub" : true,
-              "subQos" : 2,
-              "subTopic" : "owntracks/+/+",
-              "theme" : 2,
-              "tid" : "wn",
-              "tls" : false,
-              "tlsClientCrt" : "",
-              "username" : "testusername",
-              "ws" : false
-            }
-        """.trimIndent()
-        assertEquals(expected, json)
+        val jsonNode = ObjectMapper().readTree(json)
+        assertEquals("configuration", jsonNode.get("_type").asText())
+        assertTrue(jsonNode.has("id"))
+        assertEquals(0, jsonNode.get("waypoints").size())
+        assertTrue(jsonNode.get("autostartOnBoot").asBoolean())
+        assertFalse(jsonNode.get("cleanSession").asBoolean())
+        assertEquals("emulator", jsonNode.get("clientId").asText())
+        assertTrue(jsonNode.get("cmd").asBoolean())
+        assertEquals(30,jsonNode.get("connectionTimeoutSeconds").asInt())
+        assertTrue(jsonNode.get("debugLog").asBoolean())
+        assertEquals("testdevice", jsonNode.get("deviceId").asText())
+        assertTrue(jsonNode.get("enableMapRotation").asBoolean())
+        assertEquals("", jsonNode.get("encryptionKey").asText())
+        assertEquals(0, jsonNode.get("experimentalFeatures").size())
+        assertTrue(jsonNode.get("fusedRegionDetection").asBoolean())
+        assertEquals("127.0.0.1", jsonNode.get("host").asText())
+        assertEquals(150, jsonNode.get("ignoreInaccurateLocations").asInt())
+        assertEquals(0.0, jsonNode.get("ignoreStaleLocations").asDouble(), 0.000001)
+        assertTrue(jsonNode.get("info").asBoolean())
+        assertEquals(900, jsonNode.get("keepalive").asInt())
+        assertEquals(5, jsonNode.get("locatorDisplacement").asInt())
+        assertEquals(60, jsonNode.get("locatorInterval").asInt())
+        assertEquals(defaultMapLayerStyle.name, jsonNode.get("mapLayerStyle").asText())
+        assertEquals(0, jsonNode.get("mode").asInt())
+        assertEquals(1, jsonNode.get("monitoring").asInt())
+        assertEquals(10, jsonNode.get("moveModeLocatorInterval").asInt())
+        assertEquals(3, jsonNode.get("mqttProtocolLevel").asInt())
+        assertTrue(jsonNode.get("notificationEvents").asBoolean())
+        assertTrue(jsonNode.get("notificationGeocoderErrors").asBoolean())
+        assertFalse(jsonNode.get("notificationHigherPriority").asBoolean())
+        assertTrue(jsonNode.get("notificationLocation").asBoolean())
+        assertEquals("testkey", jsonNode.get("opencageApiKey").asText())
+        assertEquals(1.0, jsonNode.get("osmTileScaleFactor").asDouble(), 0.000001)
+        assertEquals("testpassword", jsonNode.get("password").asText())
+        assertFalse(jsonNode.get("pegLocatorFastestIntervalToInterval").asBoolean())
+        assertEquals(30, jsonNode.get("ping").asInt())
+        assertEquals(1883, jsonNode.get("port").asInt())
+        assertTrue(jsonNode.get("pubExtendedData").asBoolean())
+        assertEquals(1, jsonNode.get("pubQos").asInt())
+        assertTrue(jsonNode.get("pubRetain").asBoolean())
+        assertEquals("owntracks/%u/%d", jsonNode.get("pubTopicBase").asText())
+        assertFalse(jsonNode.get("publishLocationOnConnect").asBoolean())
+        assertTrue(jsonNode.get("remoteConfiguration").asBoolean())
+        assertEquals(defaultReverseGeocodeProvider.value, jsonNode.get("reverseGeocodeProvider").asText())
+        assertFalse(jsonNode.get("showRegionsOnMap").asBoolean())
+        assertTrue(jsonNode.get("sub").asBoolean())
+        assertEquals(2, jsonNode.get("subQos").asInt())
+        assertEquals("owntracks/+/+", jsonNode.get("subTopic").asText())
+        assertEquals(2, jsonNode.get("theme").asInt())
+        assertEquals("wn", jsonNode.get("tid").asText())
+        assertFalse(jsonNode.get("tls").asBoolean())
+        assertEquals("", jsonNode.get("tlsClientCrt").asText())
+        assertEquals("testusername", jsonNode.get("username").asText())
+        assertFalse(jsonNode.get("ws").asBoolean())
     }
 }
