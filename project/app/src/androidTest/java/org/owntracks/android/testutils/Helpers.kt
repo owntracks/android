@@ -9,6 +9,8 @@ import android.os.Build
 import android.os.Environment
 import android.os.ParcelFileDescriptor
 import android.provider.MediaStore
+import android.view.View
+import android.widget.TextView
 import androidx.annotation.IdRes
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
@@ -16,6 +18,9 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingPolicies
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.IdlingResource
+import androidx.test.espresso.UiController
+import androidx.test.espresso.ViewAction
+import androidx.test.espresso.ViewInteraction
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
@@ -36,6 +41,7 @@ import java.io.FileWriter
 import java.io.InputStream
 import java.util.concurrent.TimeUnit
 import junit.framework.AssertionFailedError
+import org.hamcrest.Matcher
 import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -277,4 +283,30 @@ fun doIfViewNotVisible(@IdRes id: Int, doThat: () -> Unit) {
   } catch (e: AssertionFailedError) {
     doThat()
   }
+}
+
+/**
+ * Gets the text of a view
+ *
+ * @param matcher
+ * @return
+ */
+fun getText(matcher: ViewInteraction): String {
+    var text = String()
+    matcher.perform(object : ViewAction {
+        override fun getConstraints(): Matcher<View> {
+            return ViewMatchers.isAssignableFrom(TextView::class.java)
+        }
+
+        override fun getDescription(): String {
+            return "Text of the view"
+        }
+
+        override fun perform(uiController: UiController, view: View) {
+            val tv = view as TextView
+            text = tv.text.toString()
+        }
+    })
+
+    return text
 }

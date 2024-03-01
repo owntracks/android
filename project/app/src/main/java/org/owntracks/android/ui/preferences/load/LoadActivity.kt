@@ -35,7 +35,9 @@ class LoadActivity : AppCompatActivity() {
                 lifecycleOwner = this@LoadActivity
                 setSupportActionBar(appbar.toolbar)
             }
-        viewModel.displayedConfiguration.observe(this) { invalidateOptionsMenu() }
+        viewModel.displayedConfiguration.observe(this) {
+            invalidateOptionsMenu()
+        }
         viewModel.configurationImportStatus.observe(this) {
             invalidateOptionsMenu()
             Timber.d("ImportStatus is $it")
@@ -151,8 +153,8 @@ class LoadActivity : AppCompatActivity() {
     }
 
     @get:VisibleForTesting
-    val importStatusIdlingResource: IdlingResource
-        get() = viewModel.importStatusIdlingResource
+    val saveConfigurationIdlingResource: IdlingResource
+        get() = viewModel.saveConfigurationIdlingResource
 
     companion object {
         const val FLAG_IN_APP = "INAPP"

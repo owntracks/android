@@ -2,25 +2,35 @@ package org.owntracks.android.ui
 
 import android.content.Intent
 import android.net.Uri
+import androidx.test.espresso.Espresso
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotExist
-import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
-import java.io.File
+import com.fasterxml.jackson.databind.ObjectMapper
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.testutils.TestWithAnActivity
+import org.owntracks.android.testutils.getCurrentActivity
+import org.owntracks.android.testutils.getText
+import org.owntracks.android.testutils.use
 import org.owntracks.android.testutils.writeFileToDevice
 import org.owntracks.android.ui.preferences.load.LoadActivity
+import java.io.File
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -31,68 +41,6 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
     fun teardown() {
         mockWebServer.shutdown()
     }
-
-    //language=JSON
-    private val expectedConfig = """
-{
-  "_type" : "configuration",
-  "waypoints" : [ {
-    "_type" : "waypoint",
-    "desc" : "work",
-    "lat" : 51.5,
-    "lon" : -0.02,
-    "rad" : 150,
-    "tst" : 1505910709000
-  }, {
-    "_type" : "waypoint",
-    "desc" : "home",
-    "lat" : 53.6,
-    "lon" : -1.5,
-    "rad" : 100,
-    "tst" : 1558351273
-  } ],
-  "auth" : true,
-  "autostartOnBoot" : true,
-  "cleanSession" : false,
-  "clientId" : "emulator",
-  "cmd" : true,
-  "connectionTimeoutSeconds" : 34,
-  "debugLog" : true,
-  "deviceId" : "testdevice",
-  "enableMapRotation" : false,
-  "fusedRegionDetection" : true,
-  "geocodeEnabled" : true,
-  "host" : "testhost.example.com",
-  "ignoreInaccurateLocations" : 150,
-  "ignoreStaleLocations" : 0,
-  "keepalive" : 900,
-  "locatorDisplacement" : 5,
-  "locatorInterval" : 60,
-  "mode" : 0,
-  "monitoring" : 1,
-  "moveModeLocatorInterval" : 10,
-  "mqttProtocolLevel" : 3,
-  "notificationHigherPriority" : false,
-  "notificationLocation" : true,
-  "opencageApiKey" : "",
-  "osmTileScaleFactor" : 3.352,
-  "password" : "password",
-  "ping" : 30,
-  "port" : 1883,
-  "pubExtendedData" : true,
-  "pubQos" : 1,
-  "pubRetain" : true,
-  "pubTopicBase" : "owntracks/%u/%d",
-  "remoteConfiguration" : true,
-  "sub" : true,
-  "subQos" : 2,
-  "subTopic" : "owntracks/+/+",
-  "tls" : false,
-  "usePassword" : true,
-  "username" : "username",
-  "ws" : false
-}
-    """.trimIndent()
 
     //language=JSON
     private val servedConfig =
@@ -158,6 +106,63 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
   "ws": false
 }"""
 
+    private fun assertExpectedConfig(input:String) {
+        val json = ObjectMapper().readTree(input)
+        assertTrue(json.isObject)
+        assertEquals("configuration", json["_type"].asText())
+        assertEquals(2, json["waypoints"].size())
+        assertEquals("work", json["waypoints"][0]["desc"].asText())
+        assertEquals(51.5, json["waypoints"][0]["lat"].asDouble(), 0.0001)
+        assertEquals(-0.02, json["waypoints"][0]["lon"].asDouble(), 0.0001)
+        assertEquals(150, json["waypoints"][0]["rad"].asInt())
+        assertEquals(1505910709000, json["waypoints"][0]["tst"].asLong())
+        assertEquals("home", json["waypoints"][1]["desc"].asText())
+        assertEquals(53.6, json["waypoints"][1]["lat"].asDouble(), 0.0001)
+        assertEquals(-1.5, json["waypoints"][1]["lon"].asDouble(), 0.0001)
+        assertEquals(100, json["waypoints"][1]["rad"].asInt())
+        assertEquals(1558351273, json["waypoints"][1]["tst"].asLong())
+        assertTrue(json["auth"].asBoolean())
+        assertTrue(json["autostartOnBoot"].asBoolean())
+        assertFalse(json["cleanSession"].asBoolean())
+        assertEquals("emulator", json["clientId"].asText())
+        assertTrue(json["cmd"].asBoolean())
+        assertEquals(34, json["connectionTimeoutSeconds"].asInt())
+        assertTrue(json["debugLog"].asBoolean())
+        assertEquals("testdevice", json["deviceId"].asText())
+        assertFalse(json["enableMapRotation"].asBoolean())
+        assertTrue(json["fusedRegionDetection"].asBoolean())
+        assertTrue(json["geocodeEnabled"].asBoolean())
+        assertEquals("testhost.example.com", json["host"].asText())
+        assertEquals(150, json["ignoreInaccurateLocations"].asInt())
+        assertEquals(0, json["ignoreStaleLocations"].asInt())
+        assertEquals(900, json["keepalive"].asInt())
+        assertEquals(5, json["locatorDisplacement"].asInt())
+        assertEquals(60, json["locatorInterval"].asInt())
+        assertEquals(0, json["mode"].asInt())
+        assertEquals(1, json["monitoring"].asInt())
+        assertEquals(10, json["moveModeLocatorInterval"].asInt())
+        assertEquals(3, json["mqttProtocolLevel"].asInt())
+        assertFalse(json["notificationHigherPriority"].asBoolean())
+        assertTrue(json["notificationLocation"].asBoolean())
+        assertEquals("", json["opencageApiKey"].asText())
+        assertEquals(3.352, json["osmTileScaleFactor"].asDouble(), 0.0001)
+        assertEquals("password", json["password"].asText())
+        assertEquals(30, json["ping"].asInt())
+        assertEquals(1883, json["port"].asInt())
+        assertTrue(json["pubExtendedData"].asBoolean())
+        assertEquals(1 , json["pubQos"].asInt())
+        assertTrue(json["pubRetain"].asBoolean())
+        assertEquals("owntracks/%u/%d", json["pubTopicBase"].asText())
+        assertTrue(json["remoteConfiguration"].asBoolean())
+        assertTrue(json["sub"].asBoolean())
+        assertEquals(2, json["subQos"].asInt())
+        assertEquals("owntracks/+/+", json["subTopic"].asText())
+        assertFalse(json["tls"].asBoolean())
+        assertTrue(json["usePassword"].asBoolean())
+        assertEquals("username", json["username"].asText())
+        assertFalse(json["ws"].asBoolean())
+    }
+
     @Test
     fun loadActivityCanLoadConfigFromOwntracksInlineConfigURL() {
         launchActivity(
@@ -168,7 +173,7 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
                 )
             )
         )
-        assertContains(R.id.effectiveConfiguration, expectedConfig)
+        assertExpectedConfig(getText(onView(withId(R.id.effectiveConfiguration))))
         assertDisplayed(R.id.save)
         assertDisplayed(R.id.close)
     }
@@ -216,8 +221,9 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
                 Uri.parse("owntracks:///config?url=http%3A%2F%2Flocalhost%3A8080%2Fmyconfig.otrc")
             )
         )
-        sleep(1000)
-        assertContains(R.id.effectiveConfiguration, expectedConfig)
+        ViewIdlingResource(withId(R.id.effectiveConfiguration), isDisplayed()).use {
+            assertExpectedConfig(getText(onView(withId(R.id.effectiveConfiguration))))
+        }
         assertDisplayed(R.id.save)
         assertDisplayed(R.id.close)
     }
@@ -233,7 +239,6 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
                 Uri.parse("owntracks:///config?url=http%3A%2F%2Flocalhost%3A8080%2Fnotfound")
             )
         )
-        sleep(1000)
         assertContains(R.id.importError, "Unexpected status code")
         assertNotExist(R.id.save)
         assertDisplayed(R.id.close)
@@ -250,7 +255,10 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
                 Uri.parse("file://${localConfig.absoluteFile}")
             )
         )
-        assertContains(R.id.effectiveConfiguration, expectedConfig)
+        ViewIdlingResource(withId(R.id.effectiveConfiguration), isDisplayed()).use {
+            assertExpectedConfig(getText(onView(withId(R.id.effectiveConfiguration))))
+        }
+        assertExpectedConfig(getText(onView(withId(R.id.effectiveConfiguration))))
         assertDisplayed(R.id.save)
         assertDisplayed(R.id.close)
     }
@@ -263,7 +271,10 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
                 writeFileToDevice("espresso-testconfig.otrc", servedConfig.toByteArray())
             )
         )
-        assertContains(R.id.effectiveConfiguration, expectedConfig)
+        ViewIdlingResource(withId(R.id.effectiveConfiguration), isDisplayed()).use {
+            assertExpectedConfig(getText(onView(withId(R.id.effectiveConfiguration))))
+        }
+        assertExpectedConfig(getText(onView(withId(R.id.effectiveConfiguration))))
         assertDisplayed(R.id.save)
         assertDisplayed(R.id.close)
     }

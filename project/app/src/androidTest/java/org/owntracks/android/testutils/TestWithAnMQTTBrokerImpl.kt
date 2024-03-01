@@ -164,7 +164,7 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
         )
         waitUntilActivityVisible<LoadActivity>()
         val activity = getCurrentActivity() as LoadActivity
-        activity.importStatusIdlingResource.use {
+        activity.saveConfigurationIdlingResource.use {
             clickOnAndWait(R.id.save)
         }
     }

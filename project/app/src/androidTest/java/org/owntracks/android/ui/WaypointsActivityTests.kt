@@ -1,5 +1,7 @@
 package org.owntracks.android.ui
 
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
@@ -8,6 +10,9 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
+import com.fasterxml.jackson.databind.ObjectMapper
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -15,6 +20,7 @@ import org.owntracks.android.R
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.TestWithAnMQTTBroker
 import org.owntracks.android.testutils.TestWithAnMQTTBrokerImpl
+import org.owntracks.android.testutils.getText
 import org.owntracks.android.testutils.grantMapActivityPermissions
 import org.owntracks.android.ui.waypoints.WaypointsActivity
 
@@ -99,7 +105,14 @@ class WaypointsActivityTests :
     openDrawer()
     clickOn(R.string.title_activity_preferences)
     clickOn(R.string.configurationManagement)
-    assertContains(
-        R.id.effectiveConfiguration, "\"waypoints\" : [ {\n    \"_type\" : \"waypoint\",\n    \"desc\" : \"$waypointName\",\n    \"lat\" : $latitude,\n    \"lon\" : $longitude,\n    \"rad\" : $radius,\n    \"tst\" : ")
+    val effectiveConfiguration = getText(onView(withId(R.id.effectiveConfiguration)))
+    val json = ObjectMapper().readTree(effectiveConfiguration)
+    assertTrue(json.isObject)
+    assertTrue(json.has("waypoints"))
+    assertEquals(1, json["waypoints"].size())
+    assertEquals(waypointName, json["waypoints"][0]["desc"].asText())
+    assertEquals(latitude, json["waypoints"][0]["lat"].asDouble(), 0.0001)
+    assertEquals(longitude, json["waypoints"][0]["lon"].asDouble(), 0.0001)
+    assertEquals(radius, json["waypoints"][0]["rad"].asInt())
   }
 }

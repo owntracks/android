@@ -41,9 +41,7 @@ class LoadViewModel @Inject constructor(
     private val waypointsRepo: WaypointsRepo,
     @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
-    val importStatusIdlingResource = SimpleIdlingResource("importStatus", true)
-
-    private val loadIdlingResource = SimpleIdlingResource("loadIdlingResource", true)
+    val saveConfigurationIdlingResource = SimpleIdlingResource("importStatus", true)
     private var configuration: MessageConfiguration? = null
 
     private val mutableConfig = MutableLiveData("")
@@ -85,7 +83,7 @@ class LoadViewModel @Inject constructor(
 
     fun saveConfiguration() {
         viewModelScope.launch(ioDispatcher) {
-            importStatusIdlingResource.setIdleState(false)
+            saveConfigurationIdlingResource.setIdleState(false)
             mutableImportStatus.postValue(ImportStatus.LOADING)
             Timber.d("Saving configuration $configuration")
             configuration?.run {
@@ -96,7 +94,7 @@ class LoadViewModel @Inject constructor(
             }
             Timber.d("Setting ImportStatus to saved")
             mutableImportStatus.postValue(ImportStatus.SAVED)
-            importStatusIdlingResource.setIdleState(true)
+            saveConfigurationIdlingResource.setIdleState(true)
         }
     }
 
@@ -122,7 +120,6 @@ class LoadViewModel @Inject constructor(
             configurationImportFailed(e)
             return
         }
-        loadIdlingResource.setIdleState(false)
         try {
             if (ContentResolver.SCHEME_FILE == uri.scheme) {
                 // Note: left here to avoid breaking compatibility.  May be removed
