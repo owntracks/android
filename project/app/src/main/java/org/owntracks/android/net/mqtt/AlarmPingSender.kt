@@ -12,7 +12,6 @@ import kotlin.time.Duration.Companion.milliseconds
 import org.eclipse.paho.client.mqttv3.MqttPingSender
 import org.eclipse.paho.client.mqttv3.internal.ClientComms
 import timber.log.Timber
-import kotlin.time.Duration.Companion.seconds
 
 class AlarmPingSender(private val applicationContext: Context) : MqttPingSender {
   private lateinit var alarmReceiver: AlarmReceiver
@@ -24,16 +23,20 @@ class AlarmPingSender(private val applicationContext: Context) : MqttPingSender 
     Timber.d("Initializing MQTT keepalive AlarmPingSender")
     this.comms = comms
     this.alarmReceiver = AlarmReceiver(comms)
+    Timber.d("AlarmPingSender initialized. alarmReceiver=$alarmReceiver")
   }
 
   override fun start() {
     Timber.v("MQTT keepalive start")
     val action = this.javaClass.simpleName + comms!!.client.clientId
     comms?.run {
-        applicationContext.registerReceiver(alarmReceiver, IntentFilter(action))
-        pendingIntent =
+      applicationContext.registerReceiver(alarmReceiver, IntentFilter(action))
+      pendingIntent =
           PendingIntent.getBroadcast(
-              applicationContext, 0, Intent(action), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+              applicationContext,
+              0,
+              Intent(action),
+              PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
       schedule(keepAlive)
     }
   }
@@ -43,7 +46,8 @@ class AlarmPingSender(private val applicationContext: Context) : MqttPingSender 
     applicationContext.unregisterReceiver(alarmReceiver)
   }
 
-  // We're not going to be even instantiated unless we can schedule exact alarms, ie the user has explicitly white-listed us.
+  // We're not going to be even instantiated unless we can schedule exact alarms, ie the user has
+  // explicitly white-listed us.
   @SuppressLint("MissingPermission")
   override fun schedule(delayInMilliseconds: Long) {
     Timber.v("MQTT keepalive scheduled in ${delayInMilliseconds.milliseconds}")

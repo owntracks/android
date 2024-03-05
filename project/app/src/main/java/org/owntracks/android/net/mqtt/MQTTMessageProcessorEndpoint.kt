@@ -193,7 +193,7 @@ class MQTTMessageProcessorEndpoint(
                 }
                 val job = launch(ioDispatcher + CoroutineName("MQTT SendMessage") + handler) {
                     try {
-                        Timber.d("Publishing message [$message]")
+                        Timber.d("Publishing message $message")
                         measureTime {
                             while (mqttClient.inFlightMessageCount >= mqttConnectionConfiguration.maxInFlight) {
                                 Timber.v("Pausing to wait for inflight to drop below max")
@@ -208,10 +208,10 @@ class MQTTMessageProcessorEndpoint(
                                 .also {
                                     Timber.v("MQTT message sent with messageId=${it.messageId}. ")
                                 }
-                        }.apply { Timber.i("Message [$message] dispatched in $this") }
+                        }.apply { Timber.i("Message $message dispatched in $this") }
                         messageProcessor.onMessageDelivered()
                     } catch (e: Exception) {
-                        Timber.e(e, "Error publishing message [$message]")
+                        Timber.e(e, "Error publishing message $message")
                         when (e) {
                             is IOException -> messageProcessor.onMessageDeliveryFailedFinal(message)
                             is MqttException -> {
@@ -300,14 +300,14 @@ class MQTTMessageProcessorEndpoint(
                 )
             } else {
                 try {
-                    Timber.tag("ARSEFACE").d("Received message: ${String(message.payload)}")
+                    Timber.d("Received message: ${String(message.payload)}")
                     onMessageReceived(
                         parser.fromJson(message.payload)
                             .apply {
                                 this.topic = topic
                                 this.retained = message.isRetained
                                 this.qos = message.qos
-                            }.also { Timber.tag("ARSEFACE").d("Parsed message: $it")}
+                            }.also { Timber.d("Parsed message: $it")}
                     )
                 } catch (e: Parser.EncryptionException) {
                     Timber.w("Enable to decrypt received message ${message.id} on $topic")
