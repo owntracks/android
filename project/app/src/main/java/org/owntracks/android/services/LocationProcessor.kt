@@ -68,6 +68,7 @@ class LocationProcessor @Inject constructor(
         Timber.d("publishLocationMessage for $location triggered by $trigger")
 
         // Check if publish would trigger a region if fusedRegionDetection is enabled
+        Timber.v("Checking if location triggers waypoint transitions. waypoints: $loadedWaypoints, fusedRegionDetection: ${preferences.fusedRegionDetection}")
         if (loadedWaypoints.isNotEmpty() &&
             preferences.fusedRegionDetection &&
             trigger != MessageLocation.ReportType.CIRCULAR
@@ -165,6 +166,7 @@ class LocationProcessor @Inject constructor(
         transition: Int,
         trigger: String
     ) {
+        Timber.v("OnWaypointTransition $waypointModel $location $transition $trigger")
         if (!locationIsWithAccuracyThreshold(location)) {
             Timber.d("ignoring transition: low accuracy ")
             return
