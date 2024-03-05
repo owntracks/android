@@ -18,6 +18,7 @@ import android.text.style.StyleSpan
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.PermissionChecker.PERMISSION_GRANTED
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LifecycleService
@@ -211,6 +212,15 @@ class BackgroundService :
         preferences = entrypoint.preferences()
         endpointStateRepo = entrypoint.endpointStateRepo()
         Timber.d("BackgroundService has injected. calling startForeground")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            Timber.v("Permissions. ACCESS_BACKGROUND_LOCATION: ${ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION)==PERMISSION_GRANTED}")
+        }
+        Timber.v("Permissions. ACCESS_COARSE_LOCATION: ${ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)==PERMISSION_GRANTED}")
+        Timber.v("Permissions. ACCESS_FINE_LOCATION: ${ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)==PERMISSION_GRANTED}")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Timber.v("Permissions. POST_NOTIFICATIONS: ${ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)==PERMISSION_GRANTED}")
+        }
+
         startForeground(NOTIFICATION_ID_ONGOING, getOngoingNotification())
         super.onCreate()
         notificationManagerCompat = NotificationManagerCompat.from(this)
