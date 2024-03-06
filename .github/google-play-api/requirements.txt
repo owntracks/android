@@ -12,7 +12,7 @@ jmespath==1.0.1
 protobuf==4.25.3
 pyasn1==0.5.1
 pyasn1-modules==0.3.0
-pyparsing==3.1.1
+pyparsing==3.1.2
 requests==2.31.0
 rsa==4.9
 six==1.16.0
