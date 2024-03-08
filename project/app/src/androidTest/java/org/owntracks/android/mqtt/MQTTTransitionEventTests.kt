@@ -8,6 +8,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
+import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import java.time.Instant
 import mqtt.packets.Qos
 import mqtt.packets.mqtt.MQTTPublish
@@ -162,7 +163,6 @@ class MQTTTransitionEventTests :
       Timber.d(
           "Notification Title: ${it.notification.extras.getString(Notification.EXTRA_TITLE)} Lines: ${it.notification.extras.getCharSequenceArray(Notification.EXTRA_TEXT_LINES)?.joinToString(separator = "|")}")
     }
-
     assertTrue(
         "Event notification is displayed",
         notificationManager.activeNotifications.any {

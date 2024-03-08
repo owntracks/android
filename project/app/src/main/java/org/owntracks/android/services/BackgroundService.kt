@@ -5,6 +5,8 @@ import android.app.Notification
 import android.app.PendingIntent
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
 import android.graphics.Typeface
 import android.location.Location
 import android.media.AudioManager
@@ -207,11 +209,10 @@ class BackgroundService :
     }
 
     override fun onCreate() {
-        Timber.d("Backgroundservice onCreate")
+        Timber.v("Backgroundservice onCreate")
         val entrypoint = EntryPoints.get(applicationContext, ServiceEntrypoint::class.java)
         preferences = entrypoint.preferences()
         endpointStateRepo = entrypoint.endpointStateRepo()
-        Timber.d("BackgroundService has injected. calling startForeground")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             Timber.v("Permissions. ACCESS_BACKGROUND_LOCATION: ${ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION)==PERMISSION_GRANTED}")
         }
@@ -221,13 +222,9 @@ class BackgroundService :
             Timber.v("Permissions. POST_NOTIFICATIONS: ${ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)==PERMISSION_GRANTED}")
         }
 
-        startForeground(NOTIFICATION_ID_ONGOING, getOngoingNotification())
         super.onCreate()
         notificationManagerCompat = NotificationManagerCompat.from(this)
 
-        setupLocationRequest()
-        scheduler.scheduleLocationPing()
-        messageProcessor.initialize()
         preferences.registerOnPreferenceChangedListener(this)
 
         lifecycleScope.launch {
@@ -275,6 +272,7 @@ class BackgroundService :
     }
 
     override fun onDestroy() {
+        Timber.v("Backgroundservice onDestroy")
         stopForeground(STOP_FOREGROUND_REMOVE)
         preferences.unregisterOnPreferenceChangedListener(this)
         messageProcessor.stopSendingMessages()
@@ -282,8 +280,9 @@ class BackgroundService :
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        Timber.v("Backgroundservice onStartCommand intent=$intent")
         super.onStartCommand(intent, flags, startId)
-        intent?.let { handleIntent(it) }
+        handleIntent(intent)
         return START_STICKY
     }
 
@@ -293,8 +292,8 @@ class BackgroundService :
      *
      * @param intent that was passed to the service start command
      */
-    private fun handleIntent(intent: Intent) {
-        if (intent.action != null) {
+    private fun handleIntent(intent: Intent?) {
+        if (intent?.action != null) {
             Timber.v("intent received with action:${intent.action}")
             when (intent.action) {
                 INTENT_ACTION_SEND_LOCATION_USER -> {
@@ -353,7 +352,7 @@ class BackgroundService :
                             notifyUserOfBackgroundLocationRestriction()
                         }
                     }
-
+                    setupAndStartService()
                     return
                 }
                 INTENT_ACTION_EXIT -> {
@@ -363,11 +362,26 @@ class BackgroundService :
                 else -> {}
             }
         } else {
+            Timber.d("no intent or action provided, setting up location request and scheduling location ping.")
             hasBeenStartedExplicitly = true
+            setupAndStartService()
         }
     }
 
+    private fun setupAndStartService() {
+        Timber.v("setupAndStartService")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(NOTIFICATION_ID_ONGOING, getOngoingNotification(), FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE)
+        } else {
+            startForeground(NOTIFICATION_ID_ONGOING, getOngoingNotification())
+        }
+        setupLocationRequest()
+        scheduler.scheduleLocationPing()
+        messageProcessor.initialize()
+    }
+
     private fun exit() {
+        Timber.v("exit() called. Stopping service and process.")
         stopSelf()
         scheduler.cancelAllTasks()
         Process.killProcess(Process.myPid())
@@ -553,7 +567,9 @@ class BackgroundService :
                     NOTIFICATION_GROUP_EVENTS,
                     NOTIFICATION_ID_EVENT_GROUP,
                     this
-                )
+                ).also {
+                    Timber.v("Event notification sent: $it")
+                }
             }
     }
 
@@ -727,6 +743,7 @@ class BackgroundService :
     }
 
     fun reInitializeLocationRequests() {
+        Timber.v("Reinitializing location requests")
         runThingsOnOtherThreads.postOnServiceHandlerDelayed(
             {
                 if (setupLocationRequest()) {
@@ -754,7 +771,7 @@ class BackgroundService :
 
     override fun onBind(intent: Intent): IBinder {
         super.onBind(intent)
-        Timber.d("Background service bound")
+        Timber.d("Background service bound intent=$intent")
         return localServiceBinder
     }
 

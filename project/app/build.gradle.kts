@@ -22,13 +22,13 @@ val packageVersionCode: Int = System.getenv("VERSION_CODE")?.toInt() ?: 42041200
 val manuallySetVersion: Boolean = System.getenv("VERSION_CODE") != null
 
 android {
-    compileSdk = 33
+    compileSdk = 34
     namespace = "org.owntracks.android"
 
     defaultConfig {
         applicationId = "org.owntracks.android"
         minSdk = 24
-        targetSdk = 33
+        targetSdk = 34
 
         versionCode = packageVersionCode
         versionName = "2.5.0"

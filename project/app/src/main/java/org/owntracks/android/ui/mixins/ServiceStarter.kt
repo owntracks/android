@@ -13,7 +13,7 @@ interface ServiceStarter {
     fun startService(context: Context, action: String? = null, intent: Intent? = null)
     class Impl : ServiceStarter {
         override fun startService(context: Context, action: String?, intent: Intent?) {
-            Timber.d("starting service")
+            Timber.d("requesting service start with action $action")
             ContextCompat.startForegroundService(
                 context,
                 (intent ?: Intent()).setClass(context, BackgroundService::class.java)

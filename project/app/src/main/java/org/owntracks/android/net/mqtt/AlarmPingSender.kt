@@ -28,17 +28,22 @@ class AlarmPingSender(private val applicationContext: Context) : MqttPingSender 
 
   override fun start() {
     Timber.v("MQTT keepalive start")
+    val action =
+        comms?.run {
+          applicationContext.registerReceiver(alarmReceiver, IntentFilter(getPendingIntentAction()))
+          schedule(keepAlive)
+        }
+  }
+
+  private fun getPendingIntentAction(): String = this.javaClass.simpleName + comms!!.client.clientId
+
+  private fun getPendingIntent(): PendingIntent {
     val action = this.javaClass.simpleName + comms!!.client.clientId
-    comms?.run {
-      applicationContext.registerReceiver(alarmReceiver, IntentFilter(action))
-      pendingIntent =
-          PendingIntent.getBroadcast(
-              applicationContext,
-              0,
-              Intent(action),
-              PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-      schedule(keepAlive)
-    }
+    return PendingIntent.getBroadcast(
+        applicationContext,
+        0,
+        Intent(action),
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
   }
 
   override fun stop() {
@@ -52,7 +57,9 @@ class AlarmPingSender(private val applicationContext: Context) : MqttPingSender 
   override fun schedule(delayInMilliseconds: Long) {
     Timber.v("MQTT keepalive scheduled in ${delayInMilliseconds.milliseconds}")
     alarmManager.setExactAndAllowWhileIdle(
-        AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayInMilliseconds, pendingIntent)
+        AlarmManager.RTC_WAKEUP,
+        System.currentTimeMillis() + delayInMilliseconds,
+        getPendingIntent())
   }
 
   class AlarmReceiver(private val clientComms: ClientComms) : BroadcastReceiver() {

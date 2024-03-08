@@ -22,9 +22,9 @@ class StartBackgroundServiceReceiver : BroadcastReceiver() {
             preferences.autostartOnBoot
         ) {
             Timber.v("android.intent.action.BOOT_COMPLETED received")
+            val startIntent = Intent(context, BackgroundService::class.java)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 Timber.v("running startForegroundService")
-                val startIntent = Intent(context, BackgroundService::class.java)
                 startIntent.action = intent.action
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     try {
@@ -41,7 +41,7 @@ class StartBackgroundServiceReceiver : BroadcastReceiver() {
                 }
             } else {
                 Timber.v("running legacy startService")
-                context.startService(Intent(context, BackgroundService::class.java))
+                context.startService(startIntent)
             }
         }
     }

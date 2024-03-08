@@ -564,9 +564,9 @@ class MapActivity :
                             Timber.d("No location permissions, not launched request")
                         }
                         CheckPermissionsResult.HAS_PERMISSIONS -> {
+                            Timber.d("Has location permissions")
                             if (checkAndRequestLocationServicesEnabled(false)) {
                                 viewModel.requestLocationUpdatesForBlueDot()
-                                service?.reInitializeLocationRequests()
                             }
                         }
                     }

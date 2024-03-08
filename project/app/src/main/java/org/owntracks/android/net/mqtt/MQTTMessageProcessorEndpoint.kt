@@ -217,6 +217,7 @@ class MQTTMessageProcessorEndpoint(
                             is MqttException -> {
                                 if (e.reasonCode.toShort() != MqttException.REASON_CODE_MAX_INFLIGHT) {
                                     messageProcessor.onMessageDeliveryFailed(message)
+                                    Timber.w(e, "Error publishing message. Doing a reconnect")
                                     reconnect(mqttConnectionConfiguration)
                                 }
                                 throw OutgoingMessageSendingException(e)
@@ -426,7 +427,7 @@ class MQTTMessageProcessorEndpoint(
         }
 
     private suspend fun reconnect(mqttConnectionConfiguration: MqttConnectionConfiguration): Result<Unit> =
-        connectingLock.also{ Timber.v(Exception(),"MQTT reconnect request, waiting for lock") }.withPermit {
+        connectingLock.also{ Timber.v("MQTT reconnect request, waiting for lock") }.withPermit {
             Timber.v("MQTT reconnect with configuration $mqttConnectionConfiguration")
             disconnect()
             try {

@@ -35,7 +35,7 @@ class AutoResizingTextViewWithListener : AppCompatTextView {
 
     var configurationChangedFlag = false
 
-    override fun onDraw(canvas: Canvas?) {
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         if (previousTextSize != this.textSize && listener != null) {
             previousTextSize = this.textSize

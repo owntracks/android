@@ -10,16 +10,16 @@ import org.eclipse.paho.client.mqttv3.internal.ClientComms
 import timber.log.Timber
 
 class AsyncPingSender(private val scope: CoroutineScope) : MqttPingSender {
-  override fun init(comms: ClientComms?) {
-    Timber.d("Initializing MQTT keepalive AsyncPingSender")
+  private lateinit var comms: ClientComms
+
+  override fun init(comms: ClientComms) {
+    Timber.d("Initializing MQTT keepalive AsyncPingSender with comms $comms")
     this.comms = comms
   }
 
-  private var comms: ClientComms? = null
-
   override fun start() {
     Timber.v("MQTT keepalive start")
-    comms?.run { schedule(keepAlive) }
+    comms.run { schedule(keepAlive) }
   }
 
   override fun stop() {
@@ -35,8 +35,7 @@ class AsyncPingSender(private val scope: CoroutineScope) : MqttPingSender {
         scope.launch {
           delay(delayInMilliseconds)
           Timber.v("Sending keepalive")
-          comms?.checkForActivity()?.waitForCompletion()
-              ?: Timber.w("MQTT keepalive token was null")
+          comms.checkForActivity()?.waitForCompletion() ?: Timber.w("MQTT keepalive token was null")
         }
   }
 }

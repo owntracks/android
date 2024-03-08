@@ -55,12 +55,12 @@ import timber.log.Timber
 
 @Singleton
 class MessageProcessor @Inject constructor(
-    @ApplicationContext applicationContext: Context,
+    @ApplicationContext private val applicationContext: Context,
     private val contactsRepo: ContactsRepo,
     private val preferences: Preferences,
     private val waypointsRepo: WaypointsRepo,
-    parser: Parser,
-    scheduler: Scheduler,
+    private val parser: Parser,
+    private val scheduler: Scheduler,
     private val endpointStateRepo: EndpointStateRepo,
     @Named("outgoingQueueIdlingResource") private val outgoingQueueIdlingResource: CountingIdlingResource,
     @Named("importConfigurationIdlingResource") private val importConfigurationIdlingResource: SimpleIdlingResource,
@@ -77,8 +77,6 @@ class MessageProcessor @Inject constructor(
     private var retryDelayJob: Job? = null
     private var initialized = false
     private var retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT
-    private val httpEndpoint: MessageProcessorEndpoint
-    private val mqttEndpoint: MessageProcessorEndpoint
     private var service: BackgroundService? = null
 
     private val serviceConnection = object : ServiceConnection {
@@ -106,39 +104,22 @@ class MessageProcessor @Inject constructor(
             Timber.d("Initializing the outgoingQueueIdlingResource at ${outgoingQueue.size})")
         }
         preferences.registerOnPreferenceChangedListener(this)
-        httpEndpoint = HttpMessageProcessorEndpoint(
-            this,
-            parser,
-            preferences,
-            applicationContext,
-            endpointStateRepo,
-            caKeyStore,
-            scope,
-            ioDispatcher
-        )
-        mqttEndpoint = MQTTMessageProcessorEndpoint(
-            this,
-            endpointStateRepo,
-            scheduler,
-            preferences,
-            parser,
-            caKeyStore,
-            scope,
-            ioDispatcher,
-            applicationContext
-        )
-        applicationContext.bindService(
-            Intent(applicationContext, BackgroundService::class.java),
-            serviceConnection,
-            Context.BIND_AUTO_CREATE
-        )
     }
 
-    @Synchronized
+    /**
+     * Initialize is called by the background service when its started. This should bind back to the service, and then
+     * try and connect to the endpoint.
+     *
+     */
     fun initialize() {
         if (!initialized) {
             Timber.d("Initializing MessageProcessor")
             scope.launch {
+                applicationContext.bindService(
+                    Intent(applicationContext, BackgroundService::class.java),
+                    serviceConnection,
+                    Context.BIND_AUTO_CREATE
+                )
                 endpointStateRepo.setState(EndpointState.INITIAL)
                 reconnect()
                 initialized = true
@@ -150,6 +131,7 @@ class MessageProcessor @Inject constructor(
      * Called either by the connection activity user button, or by receiving a RECONNECT message
      */
     suspend fun reconnect(): Result<Unit> {
+        Timber.v("reconnect")
         return try {
             when (endpoint) {
                 null -> {
@@ -190,15 +172,39 @@ class MessageProcessor @Inject constructor(
         scope.launch {
             endpointStateRepo.setQueueLength(outgoingQueue.size)
         }
-        endpoint = when (preferences.mode) {
-            ConnectionMode.HTTP -> httpEndpoint
-            ConnectionMode.MQTT -> mqttEndpoint
-        }
+        endpoint = getEndpoint(preferences.mode)
 
         dequeueAndSenderJob =
             scope.launch(ioDispatcher) { sendAvailableMessages() }
         endpoint?.activate()
             ?.run { acceptMessages = true }
+    }
+
+    private fun getEndpoint(mode: ConnectionMode): MessageProcessorEndpoint {
+        Timber.v("Creating endpoint for mode: $mode")
+        return when (mode) {
+            ConnectionMode.MQTT -> MQTTMessageProcessorEndpoint(
+                    this,
+                    endpointStateRepo,
+                    scheduler,
+                    preferences,
+                    parser,
+                    caKeyStore,
+                    scope,
+                    ioDispatcher,
+                    applicationContext
+                )
+            ConnectionMode.HTTP -> HttpMessageProcessorEndpoint(
+                    this,
+                    parser,
+                    preferences,
+                    applicationContext,
+                    endpointStateRepo,
+                    caKeyStore,
+                    scope,
+                    ioDispatcher
+                )
+        }
     }
 
     fun queueMessageForSending(message: MessageBase) {

@@ -4,6 +4,8 @@ import android.content.Context
 import android.location.Criteria
 import android.location.Location
 import android.location.LocationManager
+import android.location.provider.ProviderProperties.ACCURACY_FINE
+import android.location.provider.ProviderProperties.POWER_USAGE_HIGH
 import android.os.SystemClock
 import androidx.core.location.LocationCompat
 import java.util.concurrent.TimeUnit
@@ -30,8 +32,8 @@ open class GPSMockDeviceLocation : MockDeviceLocation {
                     true,
                     true,
                     true,
-                    Criteria.POWER_HIGH,
-                    Criteria.ACCURACY_FINE
+                    POWER_USAGE_HIGH,
+                    ACCURACY_FINE
                 )
                 Timber.d("Enabling location Test Provider called $provider")
                 setTestProviderEnabled(provider, true)

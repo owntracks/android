@@ -31,7 +31,6 @@ import org.owntracks.android.di.CustomBindingEntryPoint
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.logging.TimberInMemoryLogTree
 import org.owntracks.android.model.messages.MessageBase
-import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.PreferencesStore
 import org.owntracks.android.preferences.types.AppTheme
@@ -290,8 +289,8 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
                             notificationManager.notify("WaypointsMigrationNotification", 0, this)
                         }
                 }
-            } else {
-                Timber.w("notification permissions not granted, can't display waypoints migration error notification")
+            } else if (throwable != null ) {
+                Timber.w(throwable,"notification permissions not granted, can't display waypoints migration error notification")
             }
             Timber.v("Idling migrationIdlingResource")
             migrationIdlingResource.setIdleState(true)

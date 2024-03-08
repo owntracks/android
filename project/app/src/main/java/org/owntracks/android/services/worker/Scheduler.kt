@@ -33,7 +33,7 @@ class Scheduler @Inject constructor(
     private val workManager = WorkManager.getInstance(context)
 
     /**
-     * Used by the background service to peridically ping a location
+     * Used by the background service to periodically ping a location
      */
     fun scheduleLocationPing() {
         val pingWorkRequest: WorkRequest = PeriodicWorkRequest.Builder(
@@ -73,7 +73,6 @@ class Scheduler @Inject constructor(
         ).also { Timber.d("Scheduled ONETIME_TASK_MQTT_RECONNECT job") }
 
     companion object {
-        val MIN_PERIODIC_INTERVAL = PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS.milliseconds
         private const val PERIODIC_TASK_SEND_LOCATION_PING = "PERIODIC_TASK_SEND_LOCATION_PING"
         private const val ONETIME_TASK_MQTT_RECONNECT = "ONETIME_TASK_MQTT_RECONNECT"
     }

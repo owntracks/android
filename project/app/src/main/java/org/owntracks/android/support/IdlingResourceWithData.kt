@@ -18,7 +18,6 @@ class IdlingResourceWithData<T : MessageBase>(
   private var callback: IdlingResource.ResourceCallback? = null
   private val sent = mutableListOf<T>()
   private val received = mutableListOf<T>()
-  private val seen = mutableSetOf<String>()
 
   override fun getName(): String = this.resourceName
 
@@ -31,15 +30,9 @@ class IdlingResourceWithData<T : MessageBase>(
   fun add(thing: T) {
     synchronized(sent) {
       synchronized(received) {
-        synchronized(seen) {
-          if (seen.contains(thing.id)) {
-            Timber.v("Already seen $thing. Not adding")
-            return
-          }
-          Timber.v("Waiting for return for $thing")
-          sent.add(thing)
-          reconcile()
-        }
+        Timber.v("Waiting for return for $thing")
+        sent.add(thing)
+        reconcile()
       }
     }
   }
@@ -47,15 +40,9 @@ class IdlingResourceWithData<T : MessageBase>(
   fun remove(thing: T) {
     synchronized(sent) {
       synchronized(received) {
-        synchronized(seen) {
-          if (seen.contains(thing.id)) {
-            Timber.v("Already seen $thing. Not removing")
-            return
-          }
-          Timber.v("Received return for $thing")
-          received.add(thing)
-          reconcile()
-        }
+        Timber.v("Received return for $thing")
+        received.add(thing)
+        reconcile()
       }
     }
   }
@@ -70,9 +57,6 @@ class IdlingResourceWithData<T : MessageBase>(
         received.removeAll(receivedToRemove).also {
           Timber.v("Removed $receivedToRemove from received. Success = $it")
         }
-        sentToRemove.forEach { seen.add(it.id) }
-        receivedToRemove.forEach { seen.add(it.id) }
-        Timber.v("Have now seen ids: $seen")
       }
     }
     if (sent.isEmpty() && received.isEmpty()) {
