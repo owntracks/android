@@ -63,7 +63,6 @@ To allow this, please enable Location in the device settings."</string>
     <string name="enjoy_description">"Select preferences from the menu (or use the link below) and configure OwnTracks for your server before using it"</string>
     <string name="ERROR">"Error"</string>
     <string name="ERROR_CONFIGURATION">"Configuration incomplete"</string>
-    <string name="ERROR_DATADISABLED">"Data connection not available"</string>
     <string name="errorPreferencesImportFailed">"Import failed: %s"</string>
     <string name="events">"Events"</string>
     <string name="exportConfiguration">"Export"</string>
@@ -258,6 +257,9 @@ To allow this, please enable Location in the device settings."</string>
     <string name="statusEndpointStateMessageAuthenticationFailed">"Authentication failed"</string>
     <string name="statusEndpointStateMessageClientTimeout">"Client timeout"</string>
     <string name="statusEndpointStateMessageConnectionLost">"Connection lost: %s"</string>
+    <string name="statusEndpointStateMessageConnectionRefused">"Connection refused"</string>
+    <string name="statusEndpointStateMessageEOFError">"EOFException from endpoint - is endpoint expecting TLS?"</string>
+    <string name="statusEndpointStateMessageEndpointDoesNotSupportWebsockets">"Endpoint does not support WebSockets"</string>
     <string name="statusEndpointStateMessageInvalidClientId">"Invalid client Id"</string>
     <string name="statusEndpointStateMessageInvalidProtocolVersion">"Invalid MQTT protocol version"</string>
     <string name="statusEndpointStateMessageMalformedHostPort">"Invalid hostname &amp; port"</string>
@@ -267,8 +269,10 @@ To allow this, please enable Location in the device settings."</string>
     <string name="statusEndpointStateMessageSocketTimeout">"Connection timed out"</string>
     <string name="statusEndpointStateMessageSubscribeFailed">"Subscribe failed"</string>
     <string name="statusEndpointStateMessageTLSConfigError">"TLS config error"</string>
+    <string name="statusEndpointStateMessageTLSConnectionClosed">"TLS connection closed"</string>
     <string name="statusEndpointStateMessageTLSError">"TLS Error: %s"</string>
-    <string name="statusEndpointStateMessageTLSBadClientCertPassword">"TLS Error: Bad client certificate password"</string>
+    <string name="statusEndpointStateMessageTLSEndpointCANotTrustedError">"Endpoint TLS CA not trusted"</string>
+    <string name="statusEndpointStateMessageTLSEndpointClientCertsRequired">"Endpoint requires TLS client certificates"</string>
     <string name="statusEndpointStateMessageUnableToConnect">"Unable to connect"</string>
     <string name="statusEndpointStateMessageUnknownHost">"Unknown host"</string>
     <string name="status_last_background_update_hint">"Location service last background update"</string>

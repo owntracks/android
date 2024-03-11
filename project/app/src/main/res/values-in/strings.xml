@@ -69,7 +69,6 @@ Untuk memperbolehkannya, silakan aktifkan Lokasi dalam pengaturan perangkat."</s
     <string name="enjoy_description">"Pilih preferensi dari menu (atau gunakan tautan di bawah) dan atur OwnTracks untuk server Anda sebelum menggunakannya"</string>
     <string name="ERROR">"Eror"</string>
     <string name="ERROR_CONFIGURATION">"Konfigurasi tidak lengkap"</string>
-    <string name="ERROR_DATADISABLED">"Koneksi data tidak tersedia"</string>
     <string name="errorPreferencesImportFailed">"Pengimporan gagal: %s"</string>
     <string name="events">"Peristiwa"</string>
     <string name="exportConfiguration">"Ekspor"</string>
@@ -265,7 +264,6 @@ Untuk memperbolehkannya, silakan aktifkan Lokasi dalam pengaturan perangkat."</s
     <string name="statusEndpointStateMessageServerTimeout">"Waktu penulisan server habis"</string>
     <string name="statusEndpointStateMessageSocketTimeout">"Waktu koneksi habis"</string>
     <string name="statusEndpointStateMessageSubscribeFailed">"Pelangganan gagal"</string>
-    <string name="statusEndpointStateMessageTLSBadClientCertPassword">"Eror TLS: Kata sandi sertifikat klien tidak valid"</string>
     <string name="statusEndpointStateMessageTLSConfigError">"Eror pengaturan TLS"</string>
     <string name="statusEndpointStateMessageTLSError">"Eror TLS: %s"</string>
     <string name="statusEndpointStateMessageUnableToConnect">"Tidak dapat menghubungkan"</string>

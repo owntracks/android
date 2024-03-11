@@ -121,15 +121,19 @@ class Preferences @Inject constructor(
         if (it.returnType.isSubtypeOf(typeOf<Enum<*>>())) {
             // Find the companion object method annotated with FromConfiguration with a single parameter
             // that's the same type as the configuration value
-            val conversionMethod = it.returnType.jvmErasure.companionObject?.members?.first { method ->
+            val conversionMethod = it.returnType.jvmErasure.companionObject?.members?.firstOrNull { method ->
                 method.annotations.any {
                     it is FromConfiguration
                 } && method.parameters.size == 2 && method.parameters.any {
                     it.type.jvmErasure == value.javaClass.kotlin
                 }
             }
-            val enumValue = conversionMethod?.call(it.returnType.jvmErasure.companionObjectInstance, value)
-            it.setter.call(this, enumValue)
+            if (conversionMethod!=null) {
+                val enumValue = conversionMethod.call(it.returnType.jvmErasure.companionObjectInstance, value)
+                it.setter.call(this, enumValue)
+            } else {
+                Timber.i("Unknown preference key ${it.name}")
+            }
         } else if (it.returnType.isSubtypeOf(typeOf<StringMaxTwoAlphaNumericChars>()) && value is String) {
             it.setter.call(this, StringMaxTwoAlphaNumericChars(value))
         } else if (value is String) {

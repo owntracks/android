@@ -6,7 +6,6 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
-import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
 import android.graphics.Typeface
 import android.location.Location
 import android.media.AudioManager
@@ -32,11 +31,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.time.delay
 import kotlinx.coroutines.withContext
 import org.owntracks.android.App
 import org.owntracks.android.R
@@ -80,8 +75,6 @@ import java.util.stream.Collectors
 import javax.inject.Inject
 import javax.inject.Named
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
-import kotlin.time.toJavaDuration
 
 @AndroidEntryPoint
 class BackgroundService :
@@ -153,14 +146,14 @@ class BackgroundService :
             .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
     }
     private val resultPendingIntent by lazy {
-        PendingIntent.getActivity(this, 0, resultIntent, updateCurrentIntentFlags)
+        PendingIntent.getActivity(this, 0, resultIntent, UPDATE_CURRENT_INTENT_FLAGS)
     }
     private val publishPendingIntent by lazy {
         PendingIntent.getService(
             this,
             0,
             Intent().setAction(INTENT_ACTION_SEND_LOCATION_USER),
-            updateCurrentIntentFlags
+            UPDATE_CURRENT_INTENT_FLAGS
         )
     }
     private val changeMonitoringPendingIntent by lazy {
@@ -168,13 +161,13 @@ class BackgroundService :
             this,
             0,
             Intent().setAction(INTENT_ACTION_CHANGE_MONITORING),
-            updateCurrentIntentFlags
+            UPDATE_CURRENT_INTENT_FLAGS
         )
     }
     private val activeNotificationCompatBuilder: NotificationCompat.Builder by lazy {
         NotificationCompat.Builder(this, App.NOTIFICATION_CHANNEL_ONGOING)
             .setContentIntent(resultPendingIntent)
-            .setSortKey("a")
+            .setStyle(NotificationCompat.BigTextStyle())
             .addAction(
                 R.drawable.ic_baseline_publish_24,
                 getString(R.string.publish),
@@ -415,7 +408,7 @@ class BackgroundService :
                         applicationContext,
                         0,
                         activityLaunchIntent,
-                        updateCurrentIntentFlags
+                        UPDATE_CURRENT_INTENT_FLAGS
                     )
                 )
                 .setPriority(NotificationCompat.PRIORITY_LOW)
@@ -428,54 +421,66 @@ class BackgroundService :
         )
     }
 
+    // Triggered on endpoint state changes, and preferences changes (monitoring mode)
     private fun updateOngoingNotificationContentText() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
             PackageManager.PERMISSION_GRANTED
         ) {
             notificationManagerCompat.notify(NOTIFICATION_ID_ONGOING, activeNotificationCompatBuilder.apply{
-                val lastEndpointState = endpointStateRepo.endpointState.value
-                if (lastEndpointState === EndpointState.CONNECTED ||
-                    lastEndpointState === EndpointState.IDLE
-                ) {
-                    setContentText(getMonitoringLabel(preferences.monitoring))
-                } else if (lastEndpointState === EndpointState.ERROR &&
-                           lastEndpointState.message != null
-                ) {
-                    setContentText(
-                        lastEndpointState.getLabel(this@BackgroundService) +
-                        ": " +
-                        lastEndpointState.message
-                    )
-                } else {
-                    setContentText(lastEndpointState.getLabel(this@BackgroundService))
-                }
+                setContentText(ongoingNotificationContentText())
             }.build())
         }
     }
 
-    private fun updateOngoingNotificationTitle(reverseGeocodedText: String) {
+    // The current ongoing notification title
+    private fun ongoingNotificationTitle(reverseGeocodedText: String): String {
+        return if (lastLocation != null && preferences.notificationLocation) {
+            reverseGeocodedText.ifBlank { lastLocation!!.toLatLng().toDisplayString() }
+        } else {
+            getString(R.string.app_name)
+        }
+    }
+
+    // The current ongoing notification content text
+    private fun ongoingNotificationContentText(): String {
+        return """
+            ${connectionStatusText(endpointStateRepo.endpointState.value)}
+            """.trimIndent()
+    }
+
+    private fun connectionStatusText(state: EndpointState): String {
+        return when (state) {
+            EndpointState.CONNECTED -> "${state.getLabel(this@BackgroundService)} to ${preferences.host}"
+            EndpointState.IDLE ->
+                if (state.message != null) "${state.getLabel(this@BackgroundService)}: ${state.message}"
+                else state.getLabel(this@BackgroundService)
+            EndpointState.ERROR ->
+                if (state.error != null)
+                    "${state.getLabel(this@BackgroundService)}: ${state.getErrorLabel(this@BackgroundService)}"
+                else state.getLabel(this@BackgroundService)
+            else -> state.getLabel(this@BackgroundService)
+        }
+    }
+
+    private fun updateOngoingNotificationTitleWithLocationGeocode(reverseGeocodedText: String) {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
             PackageManager.PERMISSION_GRANTED
         ) {
             notificationManagerCompat.notify(NOTIFICATION_ID_ONGOING, activeNotificationCompatBuilder.apply{
-                if (lastLocation != null && preferences.notificationLocation) {
-                    val title = reverseGeocodedText.ifBlank { lastLocation!!.toLatLng().toDisplayString() }
-                    Timber.v("Updating notification with title $title")
-                    setContentTitle(title)
-                    setWhen(lastLocation!!.time)
-                } else {
-                    setContentTitle(getString(R.string.app_name))
-                }
+                setContentTitle(ongoingNotificationTitle(reverseGeocodedText))
+                setContentText(ongoingNotificationContentText())
+                setWhen(lastLocation!!.time)
             }.build())
         }
     }
 
+
     // Show monitoring mode if endpoint state is not interesting
-    private fun getOngoingNotification(): Notification     =
+    private fun getOngoingNotification(): Notification =
             activeNotificationCompatBuilder
                 .apply {
-                    setContentTitle(getString(R.string.app_name))
-                    setContentText(getMonitoringLabel(preferences.monitoring))
+                    setContentTitle(ongoingNotificationTitle(""))
+                    setContentText(ongoingNotificationContentText())
                     setWhen(System.currentTimeMillis())
                 }
                 .build()
@@ -549,7 +554,7 @@ class BackgroundService :
                     this,
                     System.currentTimeMillis().toInt() / 1000,
                     Intent(this, MapActivity::class.java),
-                    updateCurrentIntentFlags
+                    UPDATE_CURRENT_INTENT_FLAGS
                 )
             )
             .setDeleteIntent(
@@ -558,7 +563,7 @@ class BackgroundService :
                     1,
                     Intent(this, BackgroundService::class.java)
                         .setAction(INTENT_ACTION_CLEAR_NOTIFICATIONS),
-                    updateCurrentIntentFlags
+                    UPDATE_CURRENT_INTENT_FLAGS
                 )
             )
             .build()
@@ -710,7 +715,7 @@ class BackgroundService :
     fun onGeocodingProviderResult(latLng: LatLng, reverseGeocodedText: String) {
         if (latLng == lastLocation?.toLatLng()) {
             Timber.v("New reverse geocode for $latLng: $reverseGeocodedText")
-            updateOngoingNotificationTitle(reverseGeocodedText)
+            updateOngoingNotificationTitleWithLocationGeocode(reverseGeocodedText)
         } else {
             Timber.v("Ignoring reverse geocode for $latLng: $reverseGeocodedText, because my lastPublished location is ${lastLocation?.toLatLng()}")
         }
@@ -792,7 +797,7 @@ class BackgroundService :
         private const val INTENT_ACTION_EXIT = "org.owntracks.android.EXIT"
         private const val INTENT_ACTION_BOOT_COMPLETED = "android.intent.action.BOOT_COMPLETED"
         private const val INTENT_ACTION_PACKAGE_REPLACED = "android.intent.action.MY_PACKAGE_REPLACED"
-        private const val updateCurrentIntentFlags =
+        private const val UPDATE_CURRENT_INTENT_FLAGS =
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
     }
 

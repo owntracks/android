@@ -63,7 +63,6 @@ Aby to umożliwić, włącz lokalizację w ustawieniach urządzenia."</string>
     <string name="enjoy_description">"Wybierz ustawienia z menu i skonfiguruj OwnTracks dla swojego serwera przed użyciem go"</string>
     <string name="ERROR">"Błąd"</string>
     <string name="ERROR_CONFIGURATION">"Niepełna konfiguracja"</string>
-    <string name="ERROR_DATADISABLED">"Połączenie danych niedostępne"</string>
 
     <!-- Fuzzy -->
     <string name="errorPreferencesImportFailed">"Import nieudany"</string>

@@ -64,7 +64,6 @@ Chcete-li to umožnit, zapněte polohu v nastavení zařízení."</string>
     <string name="enjoy_description">"Zvolte nabídku Nastavení a nakonfigurujte Owntracks před tím, než jej začnete používat"</string>
     <string name="ERROR">"Chyba"</string>
     <string name="ERROR_CONFIGURATION">"Neúplná konfigurace"</string>
-    <string name="ERROR_DATADISABLED">"Datové připojení není dostupné"</string>
 
     <!-- Fuzzy -->
     <string name="errorPreferencesImportFailed">"Import selhal"</string>

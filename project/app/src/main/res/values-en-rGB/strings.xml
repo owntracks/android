@@ -66,7 +66,6 @@ To allow this, please enable Location in the device settings."</string>
     <string name="enjoy_description">"Select preferences from the menu (or use the link below) and configure OwnTracks for your server before using it"</string>
     <string name="ERROR">"Error"</string>
     <string name="ERROR_CONFIGURATION">"Configuration incomplete"</string>
-    <string name="ERROR_DATADISABLED">"Data connection not available"</string>
     <string name="errorPreferencesImportFailed">"Import failed: %s"</string>
     <string name="events">"Events"</string>
     <string name="exportConfiguration">"Export"</string>
@@ -259,7 +258,6 @@ To allow this, please enable Location in the device settings."</string>
     <string name="statusEndpointStateMessageServerTimeout">"Server write timeout"</string>
     <string name="statusEndpointStateMessageSocketTimeout">"Connection timed out"</string>
     <string name="statusEndpointStateMessageSubscribeFailed">"Subscribe failed"</string>
-    <string name="statusEndpointStateMessageTLSBadClientCertPassword">"TLS Error: Bad client certificate password"</string>
     <string name="statusEndpointStateMessageTLSConfigError">"TLS config error"</string>
     <string name="statusEndpointStateMessageTLSError">"TLS Error: %s"</string>
     <string name="statusEndpointStateMessageUnableToConnect">"Unable to connect"</string>

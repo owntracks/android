@@ -59,7 +59,6 @@
     <string name="enjoy_description">"메뉴에서 기본 설정을 선택하고(또는 아래 링크 사용) 사용하기 전에 서버에 대해 OwnTracks를 구성하십시오"</string>
     <string name="ERROR">"오류"</string>
     <string name="ERROR_CONFIGURATION">"구성 설정이 완전하지 않습니다"</string>
-    <string name="ERROR_DATADISABLED">"데이터 통신이 불가능합니다"</string>
 
     <!-- Fuzzy -->
     <string name="errorPreferencesImportFailed">"가져오기에 실패했습니다"</string>

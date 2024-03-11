@@ -59,7 +59,6 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="enjoy_description">"Vælg præferencer fra menuen (eller brug linket herunder) og forbind OwnTracks til din server før du bruger det"</string>
     <string name="ERROR">"Fejl"</string>
     <string name="ERROR_CONFIGURATION">"Konfiguration er ufuldstændig"</string>
-    <string name="ERROR_DATADISABLED">"Dataforbindelse er ikke tilgængelig"</string>
 
     <!-- Fuzzy -->
     <string name="errorPreferencesImportFailed">"Import fejlet"</string>

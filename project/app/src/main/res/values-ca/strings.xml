@@ -75,7 +75,6 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="enjoy_description">"Escull preferències des del menú i configura Owntracks per al teu servidor abans d'utilitzar-lo"</string>
     <string name="ERROR">"Error"</string>
     <string name="ERROR_CONFIGURATION">"Configuració incompleta"</string>
-    <string name="ERROR_DATADISABLED">"Connexió de dades no disponible"</string>
 
     <!-- Fuzzy -->
     <string name="errorPreferencesImportFailed">"Error importació"</string>
@@ -291,7 +290,6 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="statusEndpointStateMessageServerTimeout">"Temps d'espera d'escriptura del servidor"</string>
     <string name="statusEndpointStateMessageSocketTimeout">"Temps de connexió esgotat"</string>
     <string name="statusEndpointStateMessageSubscribeFailed">"La subscripció ha fallat"</string>
-    <string name="statusEndpointStateMessageTLSBadClientCertPassword">"Error TLS: contrasenya de certificat de client incorrecta"</string>
     <string name="statusEndpointStateMessageTLSConfigError">"Error de configuració de TLS"</string>
     <string name="statusEndpointStateMessageTLSError">"Error TLS: %s"</string>
     <string name="statusEndpointStateMessageUnableToConnect">"Impossible connectar"</string>

@@ -59,7 +59,6 @@
     <string name="enjoy_description">"Owntracksの利用を開始する前に、メニューから環境設定を選択し、サーバの設定を行ってください"</string>
     <string name="ERROR">"エラー"</string>
     <string name="ERROR_CONFIGURATION">"構成設定が完全ではありません"</string>
-    <string name="ERROR_DATADISABLED">"データ通信ができません"</string>
 
     <!-- Fuzzy -->
     <string name="errorPreferencesImportFailed">"インポートに失敗しました"</string>

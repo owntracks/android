@@ -69,7 +69,6 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="enjoy_description">"Gehe im Menü in die Einstellungen (oder nutze den Link unten) und richte OwnTracks für deinen Server ein"</string>
     <string name="ERROR">"Fehler"</string>
     <string name="ERROR_CONFIGURATION">"Konfiguration unvollständig"</string>
-    <string name="ERROR_DATADISABLED">"Datenverbindung nicht verfügbar"</string>
     <string name="errorPreferencesImportFailed">"Import fehlgeschlagen: %s"</string>
     <string name="events">"Ereignisse"</string>
     <string name="exportConfiguration">"Exportieren"</string>
@@ -264,7 +263,6 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="statusEndpointStateMessageServerTimeout">"Zeitüberschreitung beim Warten auf Server-Antwort"</string>
     <string name="statusEndpointStateMessageSocketTimeout">"Zeitüberschreitung bei der Verbindung"</string>
     <string name="statusEndpointStateMessageSubscribeFailed">"Abonnieren fehlgeschlagen"</string>
-    <string name="statusEndpointStateMessageTLSBadClientCertPassword">"TLS Fehler: Passwort für Client-Zertifikat ungültig"</string>
     <string name="statusEndpointStateMessageTLSConfigError">"Fehler in der TLS Konfiguration"</string>
     <string name="statusEndpointStateMessageTLSError">"TLS Fehler: %s"</string>
     <string name="statusEndpointStateMessageUnableToConnect">"Konnte keine Verbindung herstellen"</string>

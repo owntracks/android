@@ -55,7 +55,6 @@
     <string name="enjoy_description">"Sélectionnez les préférences dans le menu et configurez OwnTracks pour votre serveur avant de l'utiliser"</string>
     <string name="ERROR">"Erreur"</string>
     <string name="ERROR_CONFIGURATION">"Configuration incomplète"</string>
-    <string name="ERROR_DATADISABLED">"Données de connexion non disponible"</string>
 
     <!-- Fuzzy -->
     <string name="errorPreferencesImportFailed">"L'importation a échoué"</string>

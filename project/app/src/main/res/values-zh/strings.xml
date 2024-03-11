@@ -40,7 +40,6 @@
     <string name="enjoy_description">"在使用 OwnTracks 之前，请从菜单中选择首选项，并配置您的服务器"</string>
     <string name="ERROR">"错误"</string>
     <string name="ERROR_CONFIGURATION">"配置未完成"</string>
-    <string name="ERROR_DATADISABLED">"没有可用的数据连接"</string>
 
     <!-- Fuzzy -->
     <string name="errorPreferencesImportFailed">"导入失败"</string>

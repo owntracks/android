@@ -88,7 +88,6 @@
     <string name="enjoy_description">"Воспользуйтесь меню настроек и настройте OwnTracks для работы с вашим сервером"</string>
     <string name="ERROR">"Ошибка"</string>
     <string name="ERROR_CONFIGURATION">"Не настроено"</string>
-    <string name="ERROR_DATADISABLED">"Подключение для передачи данных недоступно"</string>
     <string name="errorPreferencesImportFailed">"Не удалось импортировать настройки"</string>
     <string name="events">"События"</string>
     <string name="exportConfiguration">"Экспорт"</string>
@@ -300,7 +299,6 @@
     <string name="statusEndpointStateMessageServerTimeout">"Таймаут сервера"</string>
     <string name="statusEndpointStateMessageSocketTimeout">"Таймаут подключения"</string>
     <string name="statusEndpointStateMessageSubscribeFailed">"Ошибка при подписке на сообщения MQTT"</string>
-    <string name="statusEndpointStateMessageTLSBadClientCertPassword">"Ошибка TLS: некорректный пароль клиентского сертификата"</string>
     <string name="statusEndpointStateMessageTLSConfigError">"Ошибка конфигурации TLS"</string>
     <string name="statusEndpointStateMessageTLSError">"Ошибка TLS: %s"</string>
     <string name="statusEndpointStateMessageUnableToConnect">"Не удалось подключиться"</string>
