@@ -474,6 +474,15 @@ class BackgroundService :
         }
     }
 
+    private fun updateOngoingNotificationMonitoringMode(mode: MonitoringMode) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
+            PackageManager.PERMISSION_GRANTED
+        ) {
+            notificationManagerCompat.notify(NOTIFICATION_ID_ONGOING, activeNotificationCompatBuilder.apply{
+                setSubText(getMonitoringLabel(mode))
+            }.build())
+        }
+    }
 
     // Show monitoring mode if endpoint state is not interesting
     private fun getOngoingNotification(): Notification =
@@ -740,7 +749,7 @@ class BackgroundService :
         }
         if (properties.contains("monitoring")) {
             setupLocationRequest()
-            updateOngoingNotificationContentText()
+            updateOngoingNotificationMonitoringMode(preferences.monitoring)
         }
         if (properties.intersect(PREFERENCES_THAT_WIPE_QUEUE_AND_CONTACTS).isNotEmpty()) {
             lifecycleScope.launch { contactsRepo.clearAll() }
