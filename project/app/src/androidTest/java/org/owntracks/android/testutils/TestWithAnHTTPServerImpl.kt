@@ -54,6 +54,7 @@ class TestWithAnHTTPServerImpl : TestWithAnHTTPServer {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
             }
         )
+        waitUntilActivityVisible<LoadActivity>()
         val activity = getCurrentActivity() as LoadActivity
         activity.saveConfigurationIdlingResource.use {
             clickOnAndWait(R.id.save)
