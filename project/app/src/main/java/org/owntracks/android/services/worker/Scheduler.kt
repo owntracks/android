@@ -59,7 +59,8 @@ constructor(
   fun scheduleMqttReconnect() =
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             OneTimeWorkRequest.Builder(MQTTReconnectWorker::class.java)
-                .setInitialDelay(Duration.ofSeconds(2)) // Pause in case there's network turmoil
+                // Pause in case there's network turmoil
+                .setInitialDelay(Duration.ofSeconds(RECONNECT_DELAY_SECONDS))
                 .addTag(ONETIME_TASK_MQTT_RECONNECT)
                 .setBackoffCriteria(BackoffPolicy.LINEAR, MIN_BACKOFF_MILLIS, TimeUnit.MILLISECONDS)
                 .setConstraints(anyNetworkConstraint)
@@ -80,6 +81,7 @@ constructor(
   companion object {
     private const val PERIODIC_TASK_SEND_LOCATION_PING = "PERIODIC_TASK_SEND_LOCATION_PING"
     private const val ONETIME_TASK_MQTT_RECONNECT = "ONETIME_TASK_MQTT_RECONNECT"
+    private const val RECONNECT_DELAY_SECONDS = 10L
   }
 
   override fun onPreferenceChanged(properties: Set<String>) {
