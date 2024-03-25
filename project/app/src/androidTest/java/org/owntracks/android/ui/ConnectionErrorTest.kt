@@ -12,6 +12,7 @@ import java.net.ConnectException
 import java.net.InetSocketAddress
 import java.net.Socket
 import kotlin.concurrent.thread
+import kotlin.random.Random
 import mqtt.broker.Broker
 import mqtt.broker.interfaces.Authentication
 import org.eclipse.paho.client.mqttv3.internal.websocket.Base64
@@ -20,7 +21,6 @@ import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ConnectionMode
-import org.owntracks.android.testutils.JustThisTestPlease
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.getCurrentActivity
 import org.owntracks.android.testutils.use
@@ -39,7 +39,7 @@ class ConnectionErrorTest :
   fun given_a_config_with_http_mode_and_invalid_url_when_viewing_the_connecting_status_then_a_config_incomplete_message_is_shown() {
     val username = "user"
     val password = "password"
-    val port = 18883
+    val port = Random.nextInt(10000, 20000)
 
     val config =
         encodeConfig(
@@ -56,7 +56,7 @@ class ConnectionErrorTest :
   fun given_a_config_with_no_host_when_viewing_the_connecting_status_then_a_config_incomplete_message_is_shown() {
     val username = "user"
     val password = "password"
-    val port = 18883
+    val port = Random.nextInt(10000, 20000)
     getBroker(port, username, password).use {
       val config =
           encodeConfig(
@@ -70,10 +70,13 @@ class ConnectionErrorTest :
   fun given_a_config_with_the_wrong_host_when_viewing_the_connecting_status_then_a_DNS_fail_message_is_shown() {
     val username = "user"
     val password = "password"
-    val port = 18883
+    val port = Random.nextInt(10000, 20000)
     getBroker(port, username, password).use {
       val config =
-          encodeConfig(getConfig(port, username, password).apply { this[Preferences::host.name] = "unknown" })
+          encodeConfig(
+              getConfig(port, username, password).apply {
+                this[Preferences::host.name] = "unknown"
+              })
       setupActivity(config)
       assertContains(R.id.connectedStatusMessage, R.string.statusEndpointStateMessageUnknownHost)
     }
@@ -83,9 +86,11 @@ class ConnectionErrorTest :
   fun given_a_config_with_the_wrong_port_when_viewing_the_connecting_status_then_a_refused_message_is_shown() {
     val username = "user"
     val password = "password"
-    val port = 18883
+    val port = Random.nextInt(10000, 20000)
     getBroker(port, username, password).use {
-      val config = encodeConfig(getConfig(port, username, password).apply { this[Preferences::port.name] = 1234 })
+      val config =
+          encodeConfig(
+              getConfig(port, username, password).apply { this[Preferences::port.name] = 1234 })
       setupActivity(config)
       app.mqttConnectionIdlingResource.use { Espresso.onIdle() }
       assertContains(
@@ -97,7 +102,7 @@ class ConnectionErrorTest :
   fun given_a_config_with_tls_disabled_against_a_tls_endpoint_when_viewing_the_connecting_status_then_an_eoferror_is_shown() {
     val username = "user"
     val password = "password"
-    val port = 18883
+    val port = Random.nextInt(10000, 20000)
     val tlsSettings = getTLSSettings(this)
     getBroker(port, username, password, tlsSettings).use {
       val config = encodeConfig(getConfig(port, username, password))
@@ -111,10 +116,12 @@ class ConnectionErrorTest :
   fun given_a_config_against_a_tls_endpoint_with_self_signed_certs_when_viewing_the_connecting_status_then_a_ca_not_trusted_error_is_shown() {
     val username = "user"
     val password = "password"
-    val port = 18883
+    val port = Random.nextInt(10000, 20000)
     val tlsSettings = getTLSSettings(this)
     getBroker(port, username, password, tlsSettings).use {
-      val config = encodeConfig(getConfig(port, username, password).apply { this[Preferences::tls.name] = true })
+      val config =
+          encodeConfig(
+              getConfig(port, username, password).apply { this[Preferences::tls.name] = true })
       setupActivity(config)
       app.mqttConnectionIdlingResource.use { Espresso.onIdle() }
       assertContains(
@@ -123,20 +130,22 @@ class ConnectionErrorTest :
     }
   }
 
-    @Test
-    fun given_a_config_with_websockets_enabled_against_a_tls_endpoint_when_viewing_the_connecting_status_then_an_eoferror_is_showna() {
-        val username = "user"
-        val password = "password"
-        val port = 18883
-        getBroker(port, username, password).use {
-            val config = encodeConfig(getConfig(port, username, password).apply { this[Preferences::ws.name] = true })
-            setupActivity(config)
-            app.mqttConnectionIdlingResource.use { Espresso.onIdle() }
-            assertContains(
-                R.id.connectedStatusMessage,
-                R.string.statusEndpointStateMessageEndpointDoesNotSupportWebsockets)
-        }
+  @Test
+  fun given_a_config_with_websockets_enabled_against_a_tls_endpoint_when_viewing_the_connecting_status_then_an_eoferror_is_showna() {
+    val username = "user"
+    val password = "password"
+    val port = Random.nextInt(10000, 20000)
+    getBroker(port, username, password).use {
+      val config =
+          encodeConfig(
+              getConfig(port, username, password).apply { this[Preferences::ws.name] = true })
+      setupActivity(config)
+      app.mqttConnectionIdlingResource.use { Espresso.onIdle() }
+      assertContains(
+          R.id.connectedStatusMessage,
+          R.string.statusEndpointStateMessageEndpointDoesNotSupportWebsockets)
     }
+  }
 
   private fun setupActivity(config: String) {
     InstrumentationRegistry.getInstrumentation()
