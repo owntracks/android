@@ -49,10 +49,10 @@ abstract class EmbedScreenshotsInTestReport : DefaultTask() {
                         "<h3 class=\"failures\">$testNameWithoutExtension</h3>"
 
                     val failedPatternToReplace =
-                        """$failedHeaderPatternToFind <img src=\"$screenShotSrcRelativeDir/$testClassName/${testName}\" width =\"360\" />
+                        """$failedHeaderPatternToFind <img src="$screenShotSrcRelativeDir/$testClassName/${testName}" width ="360" />
                             <details>
                             <summary>Logcat</summary>
-                            <span class=\"code\">
+                            <span class="code">
                             <pre>$logcat</pre>
                             </span>
                             </details>""".trimMargin()
