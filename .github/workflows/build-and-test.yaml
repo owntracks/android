@@ -140,7 +140,9 @@ jobs:
           sudo rm -rf /usr/share/dotnet
           sudo docker image prune --all --force
           sudo df -h
-      - uses: nschloe/action-cached-lfs-checkout@v1
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+        with:
+          lfs: true
       - uses: dorny/paths-filter@v3
         id: changes
         with:
