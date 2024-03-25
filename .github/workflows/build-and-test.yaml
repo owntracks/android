@@ -126,7 +126,7 @@ jobs:
       matrix:
         android-api: [31]
         flavour: [Gms, Oss]
-        shard: [1, 2, 3, 4]
+        shard: [1, 2, 3, 4, 5, 6]
     steps:
       - name: Enable KVM group perms
         run: |
@@ -212,7 +212,7 @@ jobs:
         timeout-minutes: 30
         env:
           FLAVOUR: ${{ matrix.flavour }}
-          SHARD_COUNT: 4
+          SHARD_COUNT: 6
           SHARD_INDEX: ${{ matrix.shard }}
         with:
           api-level: ${{ matrix.android-api }}
