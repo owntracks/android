@@ -146,7 +146,7 @@ class PreferencesActivityTests : TestWithAnActivity<PreferencesActivity>(Prefere
         assertContains(R.id.effectiveConfiguration, "\"deviceId\" : \"testDeviceId\"")
         assertContains(R.id.effectiveConfiguration, "\"tid\" : \"t1\"")
         assertContains(R.id.effectiveConfiguration, "\"notificationEvents\" : true")
-        assertContains(R.id.effectiveConfiguration, "\"pubExtendedData\" : false")
+        assertContains(R.id.effectiveConfiguration, "\"extendedData\" : false")
         assertContains(R.id.effectiveConfiguration, "\"ignoreInaccurateLocations\" : 950")
         assertContains(R.id.effectiveConfiguration, "\"locatorInterval\" : 123")
         assertContains(R.id.effectiveConfiguration, "\"locatorDisplacement\" : 567")

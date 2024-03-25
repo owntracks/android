@@ -93,7 +93,7 @@ class PreferenceTest {
         "opencageApiKey",
         "password",
         "ping",
-        "pubExtendedData",
+        "extendedData",
         "cmd",
         "remoteConfiguration",
         "tid",
@@ -119,6 +119,18 @@ class PreferenceTest {
         "tls",
         "tlsClientCrt"
     )
+
+    @Test
+    fun `given an MQTT configuration message containing remapped values, when imported and exported the remapped values are present`() {
+        val preferences = Preferences(preferencesStore, mockIdlingresource)
+        val messageConfiguration = MessageConfiguration()
+        messageConfiguration["pubExtendedData"] = true
+
+        preferences.importConfiguration(messageConfiguration)
+
+        val exportedMessageConfiguration = preferences.exportToMessage()
+        assertTrue(exportedMessageConfiguration[Preferences::extendedData.name] as Boolean)
+    }
 
     @Test
     fun `given an MQTT configuration message, when imported and then exported, the config is merged and all the preference keys are present`() {

@@ -8,7 +8,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
-import org.owntracks.android.BuildConfig
 import org.owntracks.android.model.messages.MessageConfiguration
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.preferences.types.MonitoringMode
@@ -77,7 +76,7 @@ class ImportExportTest {
               "password": "testpassword",
               "ping": 30,
               "port": 1883,
-              "pubExtendedData": true,
+              "extendedData": true,
               "pubQos": 1,
               "pubRetain": true,
               "pubTopicBase": "owntracks/%u/%d",
@@ -118,7 +117,7 @@ class ImportExportTest {
             assertEquals("testpassword", password)
             assertEquals(30, ping)
             assertEquals(1883, port)
-            assert(pubExtendedData)
+            assert(extendedData)
             assertEquals(MqttQos.ONE, pubQos)
             assert(pubRetain)
             assertEquals("owntracks/%u/%d", pubTopicBase)
@@ -159,7 +158,7 @@ class ImportExportTest {
             password = "testpassword"
             ping = 30
             port = 1883
-            pubExtendedData = true
+            extendedData = true
             pubQos = MqttQos.ONE
             pubRetain = true
             pubTopicBase = "owntracks/%u/%d"
@@ -212,7 +211,7 @@ class ImportExportTest {
         assertFalse(jsonNode.get("pegLocatorFastestIntervalToInterval").asBoolean())
         assertEquals(30, jsonNode.get("ping").asInt())
         assertEquals(1883, jsonNode.get("port").asInt())
-        assertTrue(jsonNode.get("pubExtendedData").asBoolean())
+        assertTrue(jsonNode.get("extendedData").asBoolean())
         assertEquals(1, jsonNode.get("pubQos").asInt())
         assertTrue(jsonNode.get("pubRetain").asBoolean())
         assertEquals("owntracks/%u/%d", jsonNode.get("pubTopicBase").asText())

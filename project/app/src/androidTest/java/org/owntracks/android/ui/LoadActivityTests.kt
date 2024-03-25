@@ -92,7 +92,7 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
   "password": "password",
   "ping": 30,
   "port": 1883,
-  "pubExtendedData": true,
+  "extendedData": true,
   "pubQos": 1,
   "pubRetain": true,
   "pubTopicBase": "owntracks/%u/%d",
@@ -149,7 +149,7 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
         assertEquals("password", json["password"].asText())
         assertEquals(30, json["ping"].asInt())
         assertEquals(1883, json["port"].asInt())
-        assertTrue(json["pubExtendedData"].asBoolean())
+        assertTrue(json["extendedData"].asBoolean())
         assertEquals(1 , json["pubQos"].asInt())
         assertTrue(json["pubRetain"].asBoolean())
         assertEquals("owntracks/%u/%d", json["pubTopicBase"].asText())

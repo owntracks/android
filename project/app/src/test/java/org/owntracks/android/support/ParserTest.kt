@@ -777,7 +777,7 @@ class ParserTest {
               "password": "testpassword",
               "ping": 30,
               "port": 1883,
-              "pubExtendedData": true,
+              "extendedData": true,
               "pubQos": 1,
               "pubRetain": true,
               "pubTopicBase": "owntracks/%u/%d",

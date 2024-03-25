@@ -384,7 +384,7 @@ class PreferencesGettersAndSetters(private val parameter: Parameter) {
                     false
                 ),
                 Parameter(
-                    "pubExtendedData",
+                    "extendedData",
                     true,
                     Boolean::class,
                     false

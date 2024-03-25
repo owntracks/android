@@ -53,6 +53,8 @@ class Preferences @Inject constructor(
     private val placeholder = Any()
     private val listeners = WeakHashMap<OnPreferenceChangeListener, Any>()
 
+    private val remappedPreferenceKeys = mapOf("pubExtendedData" to Preferences::extendedData)
+
     /*
     To initialize the defaults for each property, we can simply get the property. This should set
     the value in the underlying backing store to be the default, as only the backing store knows
@@ -103,6 +105,25 @@ class Preferences @Inject constructor(
                                 Timber.w(
                                     "Trying to import wrong type of preference for ${it.name}. " +
                                         "Expected ${it.getter.returnType} but given ${configValue.javaClass}. Ignoring."
+                                )
+                            }
+                        }
+                    }
+
+                remappedPreferenceKeys
+                    .filter { configuration.containsKey(it.key) && !configuration.containsKey(it.value.name) }
+                    .forEach { (key, property) ->
+                        val configValue = configuration[key]
+                        if (configValue == null) {
+                            resetPreference(key)
+                        } else {
+                            Timber.d("Importing configuration key $key -> $configValue")
+                            try {
+                                importPreference(property, configValue)
+                            } catch (e: java.lang.IllegalArgumentException) {
+                                Timber.w(
+                                    "Trying to import wrong type of preference for $key. " +
+                                        "Expected ${property.getter.returnType} but given ${configValue.javaClass}. Ignoring."
                                 )
                             }
                         }
@@ -275,7 +296,7 @@ class Preferences @Inject constructor(
     var port: Int by preferencesStore
 
     @Preference
-    var pubExtendedData: Boolean by preferencesStore
+    var extendedData: Boolean by preferencesStore
 
     @Preference(exportModeHttp = false)
     var pubQos: MqttQos by preferencesStore

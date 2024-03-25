@@ -9,7 +9,6 @@ import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.preferences.types.MqttProtocolLevel
 import org.owntracks.android.preferences.types.MqttQos
 import org.owntracks.android.preferences.types.StringMaxTwoAlphaNumericChars
-import timber.log.Timber
 
 interface DefaultsProvider {
     @Suppress("IMPLICIT_CAST_TO_ANY", "UNCHECKED_CAST")
@@ -57,7 +56,7 @@ interface DefaultsProvider {
             Preferences::pegLocatorFastestIntervalToInterval -> false
             Preferences::ping -> 15
             Preferences::port -> 8883
-            Preferences::pubExtendedData -> true
+            Preferences::extendedData -> true
             Preferences::pubQos -> MqttQos.ONE
             Preferences::pubRetain -> true
             Preferences::pubTopicBase -> "owntracks/%u/%d"

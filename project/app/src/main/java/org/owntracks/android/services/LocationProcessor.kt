@@ -98,7 +98,7 @@ class LocationProcessor @Inject constructor(
             return Result.failure(Exception("message suppressed by monitoring settings: manual"))
         }
 
-        val message = if (preferences.pubExtendedData) {
+        val message = if (preferences.extendedData) {
             fromLocationAndWifiInfo(location, wifiInfoProvider).apply {
                 battery = deviceMetricsProvider.batteryLevel
                 batteryStatus = deviceMetricsProvider.batteryStatus

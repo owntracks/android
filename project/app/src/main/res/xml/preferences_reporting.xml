@@ -3,7 +3,7 @@
     app:title="@string/preferencesReporting">
     <androidx.preference.SwitchPreferenceCompat
         app:iconSpaceReserved="false"
-        app:key="pubExtendedData"
+        app:key="extendedData"
         app:summary="@string/preferencesPubExtendedDataSummary"
         app:title="@string/preferencesPubExtendedData" />
     <androidx.preference.SwitchPreferenceCompat
