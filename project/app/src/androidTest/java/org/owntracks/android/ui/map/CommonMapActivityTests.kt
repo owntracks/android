@@ -11,10 +11,12 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions
+import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.testutils.GPSMockDeviceLocation
+import org.owntracks.android.testutils.JustThisTestPlease
 import org.owntracks.android.testutils.MockDeviceLocation
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.grantMapActivityPermissions
@@ -120,6 +122,7 @@ class CommonMapActivityTests :
     }
 
     @Test
+    @JustThisTestPlease
     fun regionsCanBeDrawnOnMap() {
         setNotFirstStartPreferences()
         launchActivity()
@@ -133,10 +136,10 @@ class CommonMapActivityTests :
         clickOnDrawerAndWait(R.string.title_activity_waypoints)
 
         clickOnAndWait(R.id.add)
-        BaristaEditTextInteractions.writeTo(R.id.description, "testwaypoint")
-        BaristaEditTextInteractions.writeTo(R.id.latitude, "51.0")
-        BaristaEditTextInteractions.writeTo(R.id.longitude, "0")
-        BaristaEditTextInteractions.writeTo(R.id.radius, "250")
+        writeTo(R.id.description, "testwaypoint")
+        writeTo(R.id.latitude, "51.0")
+        writeTo(R.id.longitude, "0")
+        writeTo(R.id.radius, "250")
 
         clickOnAndWait(R.id.save)
 

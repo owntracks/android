@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit
 import timber.log.Timber
 
 open class GPSMockDeviceLocation : MockDeviceLocation {
-  private var locationManager: LocationManager? = null
+  private lateinit var locationManager: LocationManager
 
   private val locationProvidersToMock =
       listOf(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER)
@@ -20,7 +20,7 @@ open class GPSMockDeviceLocation : MockDeviceLocation {
     Timber.d("Initialize mock location Provider")
     this.locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     setPackageAsMockLocationProvider(context)
-    locationManager?.run {
+    locationManager.run {
       locationProvidersToMock.forEach { provider ->
         addTestProvider(
             provider, false, false, false, false, true, true, true, POWER_USAGE_HIGH, ACCURACY_FINE)
@@ -46,7 +46,7 @@ open class GPSMockDeviceLocation : MockDeviceLocation {
             LocationCompat.setSpeedAccuracyMetersPerSecond(this, 1f)
           }
       Timber.i("Setting mock GPS location for $provider to $location")
-      locationManager!!.setTestProviderLocation(provider, location)
+      locationManager.setTestProviderLocation(provider, location)
     }
   }
 }
