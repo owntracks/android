@@ -300,5 +300,8 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
     companion object {
         const val NOTIFICATION_CHANNEL_ONGOING = "O"
         const val NOTIFICATION_CHANNEL_EVENTS = "E"
+        const val NOTIFICATION_ID_ONGOING = 1
+        const val NOTIFICATION_ID_EVENT_GROUP = 2
+        const val NOTIFICATION_GROUP_EVENTS = "events"
     }
 }
