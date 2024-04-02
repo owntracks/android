@@ -128,6 +128,7 @@ To allow this, please enable Location in the device settings."</string>
         <item quantity="one">"%1$d new event"</item>
         <item quantity="other">"%1$d new events"</item>
     </plurals>
+    <string name="notificationEndpointStateConnected">"%1$s to %2$s"</string>
     <string name="play_services_not_available">"Google Play Services are not available"</string>
     <string name="play_services_now_available">"Google Play Services are now available"</string>
     <string name="play_services_update_required">"Google Play Services update is required"</string>

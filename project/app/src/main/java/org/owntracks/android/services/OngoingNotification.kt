@@ -55,7 +55,11 @@ class OngoingNotification(private val context: Context, private val initialMode:
   }
   private var serviceNotificationState =
       ServiceNotificationState(
-          context.getString(R.string.app_name), "", Clock.System.now(), getMonitoringLabel(initialMode), false)
+          context.getString(R.string.app_name),
+          "",
+          Clock.System.now(),
+          getMonitoringLabel(initialMode),
+          false)
 
   private val notificationBuilder =
       NotificationCompat.Builder(context, App.NOTIFICATION_CHANNEL_ONGOING)
@@ -103,11 +107,11 @@ class OngoingNotification(private val context: Context, private val initialMode:
   fun setEndpointState(endpointState: EndpointState, host: String) {
     val notificationContent =
         when (endpointState) {
-          EndpointState.CONNECTED -> "${endpointState.getLabel(context)} to $host"
-          EndpointState.IDLE ->
-              if (endpointState.message != null)
-                  "${endpointState.getLabel(context)}: ${endpointState.message}"
-              else endpointState.getLabel(context)
+          EndpointState.CONNECTED, EndpointState.IDLE ->
+              context.getString(
+                  R.string.notificationEndpointStateConnected,
+                  context.resources.getString(R.string.CONNECTED),
+                  host)
           EndpointState.ERROR ->
               if (endpointState.error != null)
                   "${endpointState.getLabel(context)}: ${endpointState.getErrorLabel(context)}"

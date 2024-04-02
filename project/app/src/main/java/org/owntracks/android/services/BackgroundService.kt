@@ -32,6 +32,7 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.owntracks.android.App
 import org.owntracks.android.App.Companion.NOTIFICATION_GROUP_EVENTS
 import org.owntracks.android.App.Companion.NOTIFICATION_ID_EVENT_GROUP
@@ -61,6 +62,7 @@ import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.model.messages.MessageTransition
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.Preferences.Companion.PREFERENCES_THAT_WIPE_QUEUE_AND_CONTACTS
+import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.preferences.types.MonitoringMode.Companion.getByValue
 import org.owntracks.android.services.worker.Scheduler
@@ -202,7 +204,7 @@ class BackgroundService :
                 }
                 launch {
                     endpointStateRepo.endpointState.collect {
-                        ongoingNotification.setEndpointState(it, preferences.host)
+                        ongoingNotification.setEndpointState(it, if (preferences.mode == ConnectionMode.MQTT) preferences.host else preferences.url.toHttpUrl().host)
                     }
                 }
                 endpointStateRepo.setServiceStartedNow()
