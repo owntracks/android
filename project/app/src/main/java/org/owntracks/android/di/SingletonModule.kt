@@ -13,7 +13,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import okhttp3.OkHttpClient
 import org.owntracks.android.model.messages.MessageBase
-import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.support.IdlingResourceWithData
 import org.owntracks.android.support.SimpleIdlingResource
 import java.security.KeyStore
@@ -102,7 +101,7 @@ class SingletonModule {
     @Named("messageReceivedIdlingResource")
     fun provideLocationMessageIdlingResource(): IdlingResourceWithData<MessageBase> = IdlingResourceWithData(
         "messageReceivedIdlingResource",
-        compareBy { it.id }
+        compareBy { it.messageId }
     )
 
     @ApplicationScope

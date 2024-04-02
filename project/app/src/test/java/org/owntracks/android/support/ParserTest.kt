@@ -44,7 +44,7 @@ class ParserTest {
         timestamp = 123456789
         velocity = 5.6.toInt()
         verticalAccuracy = 1.7.toInt()
-        id = testId
+        messageId = testId
         inregions = listOf("Testregion1", "Testregion2")
         battery = 30
         batteryStatus = BatteryStatus.CHARGING
@@ -57,7 +57,7 @@ class ParserTest {
         accuracy = 10
         altitude = 20
         latitude = 50.1
-        id = testId
+        messageId = testId
         longitude = 60.2
         timestamp = 123456789
         velocity = 5.6.toInt()
@@ -95,13 +95,13 @@ class ParserTest {
               "_type" : "location",
               "BSSID" : "12:34:56:78",
               "SSID" : "Wifi SSID",
+              "_id" : "dummyTestId",
               "acc" : 10,
               "alt" : 20,
               "batt" : 30,
               "bs" : 2,
               "conn" : "TestConn",
               "created_at" : 25,
-              "id" : "dummyTestId",
               "inregions" : [ "Testregion1", "Testregion2" ],
               "lat" : 50.1,
               "lon" : 60.2,
@@ -118,14 +118,13 @@ class ParserTest {
     fun `Parser can serialize non-extended location message to a pretty JSON message`() {
         val parser = Parser(null)
 
-        //language=JSON
         val expected = """
             {
               "_type" : "location",
+              "_id" : "dummyTestId",
               "acc" : 10,
               "alt" : 20,
               "created_at" : 25,
-              "id" : "dummyTestId",
               "inregions" : [ "Testregion1", "Testregion2" ],
               "lat" : 50.1,
               "lon" : 60.2,
@@ -134,6 +133,7 @@ class ParserTest {
               "vel" : 5
             }
         """.trimIndent()
+        //language=JSON
         assertEquals(expected, parser.toUnencryptedJsonPretty(messageLocation))
     }
 
@@ -152,7 +152,7 @@ class ParserTest {
                 "batt": 99,
                 "bs": 3,
                 "conn": "w",
-                "id" : "inputTestId",
+                "_id" : "inputTestId",
                 "lat": 52.3153748,
                 "lon": 5.0408462,
                 "t": "p",
@@ -180,7 +180,7 @@ class ParserTest {
         assertEquals(MessageLocation.ReportType.PING, message.trigger)
         assertEquals(0f, message.verticalAccuracy.toFloat(), 0f)
         assertEquals(2, message.inregions?.size)
-        assertEquals("inputTestId", message.id)
+        assertEquals("inputTestId", message.messageId)
     }
 
     @Test

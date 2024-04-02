@@ -176,7 +176,7 @@ class ImportExportTest {
 
         val jsonNode = ObjectMapper().readTree(json)
         assertEquals("configuration", jsonNode.get("_type").asText())
-        assertTrue(jsonNode.has("id"))
+        assertTrue(jsonNode.has("_id"))
         assertEquals(0, jsonNode.get("waypoints").size())
         assertTrue(jsonNode.get("autostartOnBoot").asBoolean())
         assertFalse(jsonNode.get("cleanSession").asBoolean())

@@ -5,7 +5,7 @@ import org.owntracks.android.support.Parser
 import java.util.UUID
 
 class MessageClear : MessageBase(), MessageWithId {
-    override var id: MessageId = ZeroMessageId
+    override var messageId: MessageId = ZeroMessageId
 
     override fun toString(): String = "[MessageClear]"
 

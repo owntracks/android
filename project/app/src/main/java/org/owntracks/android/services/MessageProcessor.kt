@@ -349,7 +349,7 @@ class MessageProcessor @Inject constructor(
     }
 
     fun processIncomingMessage(message: MessageBase) {
-        Timber.i("Received incoming message: ${message.javaClass.simpleName} on ${message.topic} with id=${message.id}")
+        Timber.i("Received incoming message: ${message.javaClass.simpleName} on ${message.topic} with id=${message.messageId}")
         when (message) {
             is MessageClear -> {
                 processIncomingMessage(message)

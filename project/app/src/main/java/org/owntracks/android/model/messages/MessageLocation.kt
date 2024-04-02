@@ -84,7 +84,7 @@ open class MessageLocation(private val messageWithCreatedAtImpl: MessageWithCrea
     }
 
     @JsonIgnore
-    override fun toString(): String = "[MessageLocation id=$id ts=${Instant.fromEpochSeconds(timestamp)},lat=$latitude,long=$longitude,created_at=${createdAt},trigger=$trigger]"
+    override fun toString(): String = "[MessageLocation id=$messageId ts=${Instant.fromEpochSeconds(timestamp)},lat=$latitude,long=$longitude,created_at=${createdAt},trigger=$trigger]"
 
     override fun addMqttPreferences(preferences: Preferences) {
         topic = preferences.pubTopicLocations
