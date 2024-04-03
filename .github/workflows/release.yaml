@@ -31,10 +31,10 @@ jobs:
         env:
           labels: ${{ steps.get_beta_tags.outputs.data }}
         run: |
-          echo $labels
-          export LENGTH=$(echo $labels | jq '. | length')
-          echo $LENGTH
-          echo "::set-output name=beta_tag_count::$LENGTH"
+          echo "${labels}"
+          LENGTH=$(echo "${labels}" | jq '. | length')
+          echo "${LENGTH}"
+          echo "name=beta_tag_count::$LENGTH" >> "${GITHUB_OUTPUT}"
 
       - name: set up JDK 17
         uses: actions/setup-java@v4
@@ -55,18 +55,18 @@ jobs:
         env:
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
         run: |
-          echo VERSION_CODE=$(python .github/google-play-api/google-play-api.py internal) >> $GITHUB_ENV"
+          echo VERSION_CODE="$(python .github/google-play-api/google-play-api.py internal)" >> "${GITHUB_ENV}"
 
       - name: Get current version code from beta track
         if: ${{ !contains(github.ref, 'beta') && steps.tagCount.outputs.beta_tag_count >= 0 }}
         env:
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
         run: |
-          echo VERSION_CODE=$(python .github/google-play-api/google-play-api.py beta) >> $GITHUB_ENV"
+          echo VERSION_CODE="$(python .github/google-play-api/google-play-api.py beta)" >> "${GITHUB_ENV}"
 
       - name: Create keystore
         run: |
-          echo -n $KEYSTORE_BASE64 | base64 -d > project/owntracks.release.keystore.jks
+          echo -n "${KEYSTORE_BASE64}" | base64 -d > project/owntracks.release.keystore.jks
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
 
@@ -75,7 +75,6 @@ jobs:
         env:
           KEYSTORE_PASSPHRASE: ${{ secrets.KEYSTORE_PASSPHRASE }}
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
-          version_code: ${{ steps.version-code-generator.versionCode}}
         with:
           build-root-directory: project
           cache-encryption-key: ${{ secrets.GradleEncryptionKey }}

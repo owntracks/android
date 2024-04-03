@@ -420,7 +420,7 @@ constructor(
         preferences.receivedCommandsTopic != message.topic &&
         preferences.subTopic ==
             DEFAULT_SUB_TOPIC // If we're not using the default subtopic, we receive commands from
-                              // anywhere
+    // anywhere
     ) {
       Timber.e("cmd message received on wrong topic")
       messageReceivedIdlingResource.remove(message)

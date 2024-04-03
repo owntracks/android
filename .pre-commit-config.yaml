@@ -23,11 +23,23 @@ repos:
       - id: mixed-line-ending
         exclude: project/gradlew.bat
         args: ["--fix=lf"]
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.6.27
+    hooks:
+      - id: actionlint-docker
+        name: Actionlint
+        description: Lint GitHub Actions workflow files
   - repo: local
     hooks:
       - id: unit-test
         name: Run unit tests
         description: Runs unit-tests
         entry: ./project/gradlew -p project testGmsDebugUnitTest
+        pass_filenames: false
+        language: system
+      - id: ktfmt
+        name: Ktfmt
+        description: Formats kotlin files
+        entry: ./project/gradlew -p project ktfmtFormat
         pass_filenames: false
         language: system
