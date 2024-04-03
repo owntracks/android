@@ -12,8 +12,7 @@ import org.owntracks.android.location.geofencing.GeofencingClient
 @InstallIn(ServiceComponent::class)
 @Module
 class ServiceModule {
-    @Provides
-    @ServiceScoped
-    fun getGeofencingClient(service: Service): GeofencingClient =
-        GMSGeofencingClient.create(service)
+  @Provides
+  @ServiceScoped
+  fun getGeofencingClient(service: Service): GeofencingClient = GMSGeofencingClient.create(service)
 }

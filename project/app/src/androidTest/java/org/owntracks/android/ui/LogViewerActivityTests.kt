@@ -29,36 +29,30 @@ import org.owntracks.android.ui.status.logs.LogViewerActivity
 @RunWith(AndroidJUnit4::class)
 class LogViewerActivityTests :
     TestWithAnActivity<LogViewerActivity>(LogViewerActivity::class.java) {
-    @Test
-    fun logViewerActivityShowsTitle() {
-        // Wait for the logviewer coroutine to start
-        sleep(5, TimeUnit.SECONDS)
-        assertDisplayed(R.string.logViewerActivityTitle)
-    }
+  @Test
+  fun logViewerActivityShowsTitle() {
+    // Wait for the logviewer coroutine to start
+    sleep(5, TimeUnit.SECONDS)
+    assertDisplayed(R.string.logViewerActivityTitle)
+  }
 
-    @Test
-    fun logViewerActivityExportFiresIntent() {
-        clickOn(R.id.share_fab)
-        intended(
-            allOf(
-                hasAction(ACTION_CHOOSER),
-                hasExtras(
-                    allOf(
-                        hasEntry(
-                            EXTRA_TITLE,
-                            baristaRule.activityTestRule.activity.getString(R.string.exportLogFilePrompt)
-                        ),
-                        hasEntry(
-                            `is`(EXTRA_INTENT),
-                            allOf(
-                                hasAction(ACTION_SEND),
-                                hasFlag(FLAG_GRANT_READ_URI_PERMISSION),
-                                hasType("text/plain")
-                            )
-                        )
-                    )
-                )
-            )
-        )
-    }
+  @Test
+  fun logViewerActivityExportFiresIntent() {
+    clickOn(R.id.share_fab)
+    intended(
+        allOf(
+            hasAction(ACTION_CHOOSER),
+            hasExtras(
+                allOf(
+                    hasEntry(
+                        EXTRA_TITLE,
+                        baristaRule.activityTestRule.activity.getString(
+                            R.string.exportLogFilePrompt)),
+                    hasEntry(
+                        `is`(EXTRA_INTENT),
+                        allOf(
+                            hasAction(ACTION_SEND),
+                            hasFlag(FLAG_GRANT_READ_URI_PERMISSION),
+                            hasType("text/plain")))))))
+  }
 }

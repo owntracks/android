@@ -27,117 +27,116 @@ import org.owntracks.android.testutils.setNotFirstStartPreferences
 @RunWith(AndroidJUnit4::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class GMSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.java, false) {
-    @Test
-    fun statusActivityCanBeLaunchedFromMapActivityDrawer() {
-        setNotFirstStartPreferences()
-        launchActivity()
-        grantMapActivityPermissions()
-        assertDrawerIsClosed()
-        openDrawer()
+  @Test
+  fun statusActivityCanBeLaunchedFromMapActivityDrawer() {
+    setNotFirstStartPreferences()
+    launchActivity()
+    grantMapActivityPermissions()
+    assertDrawerIsClosed()
+    openDrawer()
 
-        assertDisplayed(R.string.title_activity_status)
-        assertEnabled(R.string.title_activity_status)
+    assertDisplayed(R.string.title_activity_status)
+    assertEnabled(R.string.title_activity_status)
 
-        clickOn(R.string.title_activity_status)
+    clickOn(R.string.title_activity_status)
 
-        arrayOf(
+    arrayOf(
             R.string.status_battery_optimization_whitelisted_hint,
             R.string.status_endpoint_queue_hint,
             R.string.status_background_service_started_hint,
-            R.string.status_endpoint_state_hint
-        ).forEach { assertDisplayed(it) }
-    }
+            R.string.status_endpoint_state_hint)
+        .forEach { assertDisplayed(it) }
+  }
 
-    @Test
-    fun preferencesActivityCanBeLaunchedFromMapActivityDrawer() {
-        setNotFirstStartPreferences()
-        launchActivity()
-        grantMapActivityPermissions()
-        assertDrawerIsClosed()
+  @Test
+  fun preferencesActivityCanBeLaunchedFromMapActivityDrawer() {
+    setNotFirstStartPreferences()
+    launchActivity()
+    grantMapActivityPermissions()
+    assertDrawerIsClosed()
 
-        openDrawer()
+    openDrawer()
 
-        assertDisplayed(R.string.title_activity_preferences)
-        assertEnabled(R.string.title_activity_preferences)
+    assertDisplayed(R.string.title_activity_preferences)
+    assertEnabled(R.string.title_activity_preferences)
 
-        clickOn(R.string.title_activity_preferences)
+    clickOn(R.string.title_activity_preferences)
 
-        arrayOf(
+    arrayOf(
             R.string.preferencesServer,
             R.string.preferencesReporting,
             R.string.preferencesNotification,
             R.string.preferencesAdvanced,
-            R.string.configurationManagement
-        ).forEach {
-            assertDisplayed(it)
-        }
-    }
+            R.string.configurationManagement)
+        .forEach { assertDisplayed(it) }
+  }
 
-    @Test
-    fun welcomeActivityShouldNotRunWhenFirstStartPreferencesSet() {
-        setNotFirstStartPreferences()
-        launchActivity()
-        grantMapActivityPermissions()
-        assertDisplayed(R.id.google_map_view)
-    }
+  @Test
+  fun welcomeActivityShouldNotRunWhenFirstStartPreferencesSet() {
+    setNotFirstStartPreferences()
+    launchActivity()
+    grantMapActivityPermissions()
+    assertDisplayed(R.id.google_map_view)
+  }
 
-    @Test
-    fun mapActivityShouldPromptForLocationServicesOnFirstTime() {
-        try {
-            disableDeviceLocation()
-            setNotFirstStartPreferences()
-            launchActivity()
-            grantMapActivityPermissions()
-            assertDisplayed(R.string.deviceLocationDisabledDialogTitle)
-            clickDialogNegativeButton()
-            assertDisplayed(R.id.google_map_view)
-        } finally {
-            enableDeviceLocation()
-        }
+  @Test
+  fun mapActivityShouldPromptForLocationServicesOnFirstTime() {
+    try {
+      disableDeviceLocation()
+      setNotFirstStartPreferences()
+      launchActivity()
+      grantMapActivityPermissions()
+      assertDisplayed(R.string.deviceLocationDisabledDialogTitle)
+      clickDialogNegativeButton()
+      assertDisplayed(R.id.google_map_view)
+    } finally {
+      enableDeviceLocation()
     }
+  }
 
-    @Test
-    fun mapActivityShouldNotPromptForLocationServicesIfPreviouslyDeclined() {
-        try {
-            disableDeviceLocation()
-            setNotFirstStartPreferences()
-            PreferenceManager.getDefaultSharedPreferences(InstrumentationRegistry.getInstrumentation().targetContext)
-                .edit()
-                .putBoolean(Preferences::userDeclinedEnableLocationServices.name, true)
-                .apply()
-            launchActivity()
-            grantMapActivityPermissions()
-            assertNotExist(R.string.deviceLocationDisabledDialogTitle)
-            assertDisplayed(R.id.google_map_view)
-        } finally {
-            enableDeviceLocation()
-        }
+  @Test
+  fun mapActivityShouldNotPromptForLocationServicesIfPreviouslyDeclined() {
+    try {
+      disableDeviceLocation()
+      setNotFirstStartPreferences()
+      PreferenceManager.getDefaultSharedPreferences(
+              InstrumentationRegistry.getInstrumentation().targetContext)
+          .edit()
+          .putBoolean(Preferences::userDeclinedEnableLocationServices.name, true)
+          .apply()
+      launchActivity()
+      grantMapActivityPermissions()
+      assertNotExist(R.string.deviceLocationDisabledDialogTitle)
+      assertDisplayed(R.id.google_map_view)
+    } finally {
+      enableDeviceLocation()
     }
+  }
 
-    @Test
-    fun mapCanSwitchLayerStyleToOsmAndBackAgain() {
-        setNotFirstStartPreferences()
-        launchActivity()
-        grantMapActivityPermissions()
-        assertDisplayed(R.id.google_map_view)
-        clickOn(R.id.fabMapLayers)
-        clickOn(R.id.fabMapLayerOpenStreetMap)
-        assertDisplayed(R.id.osm_map_view)
-        clickOn(R.id.fabMapLayers)
-        clickOn(R.id.fabMapLayerGoogleHybrid)
-        assertDisplayed(R.id.google_map_view)
-    }
+  @Test
+  fun mapCanSwitchLayerStyleToOsmAndBackAgain() {
+    setNotFirstStartPreferences()
+    launchActivity()
+    grantMapActivityPermissions()
+    assertDisplayed(R.id.google_map_view)
+    clickOn(R.id.fabMapLayers)
+    clickOn(R.id.fabMapLayerOpenStreetMap)
+    assertDisplayed(R.id.osm_map_view)
+    clickOn(R.id.fabMapLayers)
+    clickOn(R.id.fabMapLayerGoogleHybrid)
+    assertDisplayed(R.id.google_map_view)
+  }
 
-    @Test
-    fun mapStartsOnOSMMapIfPreferenceIsSelected() {
-        setNotFirstStartPreferences()
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
-        PreferenceManager.getDefaultSharedPreferences(context)
-            .edit()
-            .putString(Preferences::mapLayerStyle.name, MapLayerStyle.OpenStreetMapNormal.name)
-            .apply()
-        launchActivity()
-        grantMapActivityPermissions()
-        assertDisplayed(R.id.osm_map_view)
-    }
+  @Test
+  fun mapStartsOnOSMMapIfPreferenceIsSelected() {
+    setNotFirstStartPreferences()
+    val context = InstrumentationRegistry.getInstrumentation().targetContext
+    PreferenceManager.getDefaultSharedPreferences(context)
+        .edit()
+        .putString(Preferences::mapLayerStyle.name, MapLayerStyle.OpenStreetMapNormal.name)
+        .apply()
+    launchActivity()
+    grantMapActivityPermissions()
+    assertDisplayed(R.id.osm_map_view)
+  }
 }

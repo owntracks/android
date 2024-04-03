@@ -107,7 +107,8 @@ class OngoingNotification(private val context: Context, private val initialMode:
   fun setEndpointState(endpointState: EndpointState, host: String) {
     val notificationContent =
         when (endpointState) {
-          EndpointState.CONNECTED, EndpointState.IDLE ->
+          EndpointState.CONNECTED,
+          EndpointState.IDLE ->
               context.getString(
                   R.string.notificationEndpointStateConnected,
                   context.resources.getString(R.string.CONNECTED),

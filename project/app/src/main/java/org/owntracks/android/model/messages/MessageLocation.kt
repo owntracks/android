@@ -9,134 +9,122 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.annotation.JsonValue
+import java.util.concurrent.TimeUnit
+import kotlin.math.roundToInt
 import kotlinx.datetime.Instant
 import org.jetbrains.annotations.NotNull
 import org.owntracks.android.model.BatteryStatus
+import org.owntracks.android.net.WifiInfoProvider
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.MonitoringMode
-import org.owntracks.android.net.WifiInfoProvider
-import java.util.concurrent.TimeUnit
-import kotlin.math.roundToInt
 
 @JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME,
-    include = JsonTypeInfo.As.EXTERNAL_PROPERTY,
-    property = "_type"
-)
+    use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-open class MessageLocation(private val messageWithCreatedAtImpl: MessageWithCreatedAt = MessageCreatedAtNow(RealClock()), private val messageWithId: MessageWithId = MessageWithRandomId()) :
-    MessageBase(), MessageWithCreatedAt by messageWithCreatedAtImpl, MessageWithId by messageWithId {
+open class MessageLocation(
+    private val messageWithCreatedAtImpl: MessageWithCreatedAt = MessageCreatedAtNow(RealClock()),
+    private val messageWithId: MessageWithId = MessageWithRandomId()
+) :
+    MessageBase(),
+    MessageWithCreatedAt by messageWithCreatedAtImpl,
+    MessageWithId by messageWithId {
 
-    @JsonIgnore
-    override val numberOfRetries: Int = 100_000 // This should last a few weeks at 1 attempt per minute
+  @JsonIgnore
+  override val numberOfRetries: Int =
+      100_000 // This should last a few weeks at 1 attempt per minute
 
-    @JsonProperty("t")
-    var trigger: ReportType = ReportType.DEFAULT
+  @JsonProperty("t") var trigger: ReportType = ReportType.DEFAULT
 
-    @JsonProperty("batt")
-    var battery: Int? = null
+  @JsonProperty("batt") var battery: Int? = null
 
-    @JsonProperty("bs")
-    var batteryStatus: BatteryStatus? = null
+  @JsonProperty("bs") var batteryStatus: BatteryStatus? = null
 
-    @JsonProperty("acc")
-    var accuracy = 0
+  @JsonProperty("acc") var accuracy = 0
 
-    @JsonProperty("vac")
-    var verticalAccuracy = 0
+  @JsonProperty("vac") var verticalAccuracy = 0
 
-    @JsonProperty("lat")
-    var latitude = 0.0
+  @JsonProperty("lat") var latitude = 0.0
 
-    @JsonProperty("lon")
-    var longitude = 0.0
+  @JsonProperty("lon") var longitude = 0.0
 
-    @JsonProperty("alt")
-    var altitude = 0
+  @JsonProperty("alt") var altitude = 0
 
-    @JsonProperty("vel")
-    var velocity = 0
+  @JsonProperty("vel") var velocity = 0
 
-    @JsonProperty("tst")
-    var timestamp: Long = 0
+  @JsonProperty("tst") var timestamp: Long = 0
 
-    @JsonProperty("m")
-    var monitoringMode: MonitoringMode? = null
+  @JsonProperty("m") var monitoringMode: MonitoringMode? = null
 
-    var conn: String? = null
+  var conn: String? = null
 
-    @JsonProperty("inregions")
-    var inregions: List<String>? = null
+  @JsonProperty("inregions") var inregions: List<String>? = null
 
-    @JsonProperty("BSSID")
-    var bssid: String? = null
+  @JsonProperty("BSSID") var bssid: String? = null
 
-    @JsonProperty("SSID")
-    var ssid: String? = null
+  @JsonProperty("SSID") var ssid: String? = null
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    @JsonProperty("tid")
-    var trackerId: String? = null
+  @JsonInclude(JsonInclude.Include.NON_NULL) @JsonProperty("tid") var trackerId: String? = null
 
-    override fun isValidMessage(): Boolean {
-        return timestamp > 0
-    }
+  override fun isValidMessage(): Boolean {
+    return timestamp > 0
+  }
 
-    @JsonIgnore
-    override fun toString(): String = "[MessageLocation id=$messageId ts=${Instant.fromEpochSeconds(timestamp)},lat=$latitude,long=$longitude,created_at=${createdAt},trigger=$trigger]"
+  @JsonIgnore
+  override fun toString(): String =
+      "[MessageLocation id=$messageId ts=${Instant.fromEpochSeconds(timestamp)},lat=$latitude,long=$longitude,created_at=${createdAt},trigger=$trigger]"
 
-    override fun addMqttPreferences(preferences: Preferences) {
-        topic = preferences.pubTopicLocations
-        qos = preferences.pubQosLocations.value
-        retained = preferences.pubRetainLocations
-    }
+  override fun addMqttPreferences(preferences: Preferences) {
+    topic = preferences.pubTopicLocations
+    qos = preferences.pubQosLocations.value
+    retained = preferences.pubRetainLocations
+  }
 
-    companion object {
-        @SuppressLint("NewApi")
-        @JvmStatic
-        fun fromLocation(location: Location, sdk: Int = Build.VERSION.SDK_INT): MessageLocation =
-            MessageLocation().apply {
-                latitude = location.latitude
-                longitude = location.longitude
-                altitude = location.altitude.roundToInt()
-                accuracy = location.accuracy.roundToInt()
-                timestamp = TimeUnit.MILLISECONDS.toSeconds(location.time)
-                // Convert m/s to km/h
-                velocity = if (location.hasSpeed()) ((location.speed * 3.6).toInt()) else 0
-                verticalAccuracy =
-                    if (sdk >= Build.VERSION_CODES.O && location.hasVerticalAccuracy()) {
-                        location.verticalAccuracyMeters.toInt()
-                    } else {
-                        0
-                    }
-            }
+  companion object {
+    @SuppressLint("NewApi")
+    @JvmStatic
+    fun fromLocation(location: Location, sdk: Int = Build.VERSION.SDK_INT): MessageLocation =
+        MessageLocation().apply {
+          latitude = location.latitude
+          longitude = location.longitude
+          altitude = location.altitude.roundToInt()
+          accuracy = location.accuracy.roundToInt()
+          timestamp = TimeUnit.MILLISECONDS.toSeconds(location.time)
+          // Convert m/s to km/h
+          velocity = if (location.hasSpeed()) ((location.speed * 3.6).toInt()) else 0
+          verticalAccuracy =
+              if (sdk >= Build.VERSION_CODES.O && location.hasVerticalAccuracy()) {
+                location.verticalAccuracyMeters.toInt()
+              } else {
+                0
+              }
+        }
 
-        @JvmStatic
-        fun fromLocationAndWifiInfo(
-            location: @NotNull Location,
-            wifiInfoProvider: WifiInfoProvider
-        ): @NotNull MessageLocation =
-            if (wifiInfoProvider.isConnected()) {
-                fromLocation(location).apply {
-                    ssid = wifiInfoProvider.getSSID()
-                    bssid = wifiInfoProvider.getBSSID()
-                }
-            } else {
-                fromLocation(location)
-            }
+    @JvmStatic
+    fun fromLocationAndWifiInfo(
+        location: @NotNull Location,
+        wifiInfoProvider: WifiInfoProvider
+    ): @NotNull MessageLocation =
+        if (wifiInfoProvider.isConnected()) {
+          fromLocation(location).apply {
+            ssid = wifiInfoProvider.getSSID()
+            bssid = wifiInfoProvider.getBSSID()
+          }
+        } else {
+          fromLocation(location)
+        }
 
-        const val TYPE = "location"
-        const val CONN_TYPE_OFFLINE = "o"
-        const val CONN_TYPE_WIFI = "w"
-        const val CONN_TYPE_MOBILE = "m"
-    }
+    const val TYPE = "location"
+    const val CONN_TYPE_OFFLINE = "o"
+    const val CONN_TYPE_WIFI = "w"
+    const val CONN_TYPE_MOBILE = "m"
+  }
 
-    enum class ReportType(@JsonValue val serialized: String) {
-        USER("u"), // Explicitly sent by the user
-        RESPONSE("r"), // Triggered by a remote reportLocation command
-        CIRCULAR("c"), // Region enter / leave event
-        PING("p"), // Issued by the periodic ping worker
-        DEFAULT("")
-    }
+  enum class ReportType(@JsonValue val serialized: String) {
+    USER("u"), // Explicitly sent by the user
+    RESPONSE("r"), // Triggered by a remote reportLocation command
+    CIRCULAR("c"), // Region enter / leave event
+    PING("p"), // Issued by the periodic ping worker
+    DEFAULT("")
+  }
 }

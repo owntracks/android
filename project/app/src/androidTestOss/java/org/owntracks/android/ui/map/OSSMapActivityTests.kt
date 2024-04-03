@@ -20,44 +20,45 @@ import org.owntracks.android.testutils.setNotFirstStartPreferences
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class OSSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.java, false) {
-    @Test
-    fun welcomeActivityShouldNotRunWhenFirstStartPreferencesSet() {
-        setNotFirstStartPreferences()
-        launchActivity()
-        grantMapActivityPermissions()
-        assertDisplayed(R.id.osm_map_view)
-    }
+  @Test
+  fun welcomeActivityShouldNotRunWhenFirstStartPreferencesSet() {
+    setNotFirstStartPreferences()
+    launchActivity()
+    grantMapActivityPermissions()
+    assertDisplayed(R.id.osm_map_view)
+  }
 
-    @Test
-    fun mapActivityShouldPromptForLocationServicesOnFirstTime() {
-        try {
-            disableDeviceLocation()
-            setNotFirstStartPreferences()
-            launchActivity()
-            grantMapActivityPermissions()
-            assertDisplayed(R.string.deviceLocationDisabledDialogTitle)
-            clickDialogNegativeButton()
-            assertDisplayed(R.id.osm_map_view)
-        } finally {
-            disableDeviceLocation()
-        }
+  @Test
+  fun mapActivityShouldPromptForLocationServicesOnFirstTime() {
+    try {
+      disableDeviceLocation()
+      setNotFirstStartPreferences()
+      launchActivity()
+      grantMapActivityPermissions()
+      assertDisplayed(R.string.deviceLocationDisabledDialogTitle)
+      clickDialogNegativeButton()
+      assertDisplayed(R.id.osm_map_view)
+    } finally {
+      disableDeviceLocation()
     }
+  }
 
-    @Test
-    fun mapActivityShouldNotPromptForLocationServicesIfPreviouslyDeclined() {
-        try {
-            disableDeviceLocation()
-            setNotFirstStartPreferences()
-            PreferenceManager.getDefaultSharedPreferences(InstrumentationRegistry.getInstrumentation().targetContext)
-                .edit()
-                .putBoolean(Preferences::userDeclinedEnableLocationServices.name, true)
-                .apply()
-            launchActivity()
-            grantMapActivityPermissions()
-            assertNotExist(R.string.deviceLocationDisabledDialogTitle)
-            assertDisplayed(R.id.osm_map_view)
-        } finally {
-            enableDeviceLocation()
-        }
+  @Test
+  fun mapActivityShouldNotPromptForLocationServicesIfPreviouslyDeclined() {
+    try {
+      disableDeviceLocation()
+      setNotFirstStartPreferences()
+      PreferenceManager.getDefaultSharedPreferences(
+              InstrumentationRegistry.getInstrumentation().targetContext)
+          .edit()
+          .putBoolean(Preferences::userDeclinedEnableLocationServices.name, true)
+          .apply()
+      launchActivity()
+      grantMapActivityPermissions()
+      assertNotExist(R.string.deviceLocationDisabledDialogTitle)
+      assertDisplayed(R.id.osm_map_view)
+    } finally {
+      enableDeviceLocation()
     }
+  }
 }

@@ -12,17 +12,20 @@ import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.model.Contact
 
 @HiltViewModel
-class ContactsViewModel @Inject constructor(
+class ContactsViewModel
+@Inject
+constructor(
     private val contactsRepo: ContactsRepo,
     private val geocoderProvider: GeocoderProvider
 ) : ViewModel() {
-    fun refreshGeocode(contact: Contact) {
-        contact.geocodeLocation(geocoderProvider, viewModelScope)
-    }
+  fun refreshGeocode(contact: Contact) {
+    contact.geocodeLocation(geocoderProvider, viewModelScope)
+  }
 
-    val contacts = contactsRepo.all
-    val contactUpdatedEvent: Flow<ContactsRepoChange>
-        get() = contactsRepo.repoChangedEvent
-    val coroutineScope: CoroutineScope
-        get() = viewModelScope
+  val contacts = contactsRepo.all
+  val contactUpdatedEvent: Flow<ContactsRepoChange>
+    get() = contactsRepo.repoChangedEvent
+
+  val coroutineScope: CoroutineScope
+    get() = viewModelScope
 }

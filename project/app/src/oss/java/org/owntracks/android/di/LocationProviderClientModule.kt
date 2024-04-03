@@ -13,8 +13,9 @@ import org.owntracks.android.location.LocationProviderClient
 @InstallIn(SingletonComponent::class)
 @Module
 class LocationProviderClientModule {
-    @Provides
-    @Singleton
-    fun getLocationProviderClient(@ApplicationContext applicationContext: Context): LocationProviderClient =
-        AospLocationProviderClient(applicationContext)
+  @Provides
+  @Singleton
+  fun getLocationProviderClient(
+      @ApplicationContext applicationContext: Context
+  ): LocationProviderClient = AospLocationProviderClient(applicationContext)
 }

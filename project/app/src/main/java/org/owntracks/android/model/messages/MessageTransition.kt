@@ -9,70 +9,67 @@ import kotlinx.datetime.Instant
 import org.owntracks.android.location.geofencing.Geofence
 import org.owntracks.android.preferences.Preferences
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-class MessageTransition(private val messageWithId: MessageWithId = MessageWithRandomId()) : MessageBase(), MessageWithId by messageWithId {
+class MessageTransition(private val messageWithId: MessageWithId = MessageWithRandomId()) :
+    MessageBase(), MessageWithId by messageWithId {
 
-    @JsonIgnore
-    fun getTransition(): Int = when (event) {
+  @JsonIgnore
+  fun getTransition(): Int =
+      when (event) {
         EVENT_ENTER -> Geofence.GEOFENCE_TRANSITION_ENTER
         EVENT_LEAVE -> Geofence.GEOFENCE_TRANSITION_EXIT
         else -> 0
-    }
+      }
 
-    fun setTransition(value: Int) {
-        this.event = when (value) {
-            Geofence.GEOFENCE_TRANSITION_ENTER, Geofence.GEOFENCE_TRANSITION_DWELL -> EVENT_ENTER
-            Geofence.GEOFENCE_TRANSITION_EXIT -> EVENT_LEAVE
-            else -> null
+  fun setTransition(value: Int) {
+    this.event =
+        when (value) {
+          Geofence.GEOFENCE_TRANSITION_ENTER,
+          Geofence.GEOFENCE_TRANSITION_DWELL -> EVENT_ENTER
+          Geofence.GEOFENCE_TRANSITION_EXIT -> EVENT_LEAVE
+          else -> null
         }
-    }
+  }
 
-    @JsonProperty("event")
-    var event: String? = null
+  @JsonProperty("event") var event: String? = null
 
-    @JsonProperty("desc")
-    var description: String? = null
+  @JsonProperty("desc") var description: String? = null
 
-    @JsonProperty("tid")
-    var trackerId: String? = null
+  @JsonProperty("tid") var trackerId: String? = null
 
-    @JsonProperty("t")
-    var trigger: String? = null
+  @JsonProperty("t") var trigger: String? = null
 
-    @JsonProperty("tst")
-    var timestamp: Long = 0
+  @JsonProperty("tst") var timestamp: Long = 0
 
-    @JsonProperty("wtst")
-    var waypointTimestamp: Long = 0
+  @JsonProperty("wtst") var waypointTimestamp: Long = 0
 
-    @JsonProperty("acc")
-    var accuracy = 0
+  @JsonProperty("acc") var accuracy = 0
 
-    @JsonProperty("lon")
-    var longitude = 0.0
+  @JsonProperty("lon") var longitude = 0.0
 
-    @JsonProperty("lat")
-    var latitude = 0.0
+  @JsonProperty("lat") var latitude = 0.0
 
-    override fun addMqttPreferences(preferences: Preferences) {
-        topic = preferences.pubTopicEvents
-        qos = preferences.pubQosEvents.value
-        retained = preferences.pubRetainEvents
-    }
+  override fun addMqttPreferences(preferences: Preferences) {
+    topic = preferences.pubTopicEvents
+    qos = preferences.pubQosEvents.value
+    retained = preferences.pubRetainEvents
+  }
 
-    override val baseTopicSuffix: String
-        get() = BASETOPIC_SUFFIX
+  override val baseTopicSuffix: String
+    get() = BASETOPIC_SUFFIX
 
-    override fun toString(): String = "[MessageTransition ts=${Instant.fromEpochSeconds(timestamp)},event=$event,desc=$description,lon=$longitude,lat=$latitude,acc=$accuracy,trigger=$trigger,trackerId=$trackerId]"
+  override fun toString(): String =
+      "[MessageTransition ts=${Instant.fromEpochSeconds(timestamp)},event=$event,desc=$description,lon=$longitude,lat=$latitude,acc=$accuracy,trigger=$trigger,trackerId=$trackerId]"
 
-    companion object {
-        const val TYPE = "transition"
-        const val TRIGGER_CIRCULAR = "c"
-        const val TRIGGER_LOCATION = "l"
-        private const val BASETOPIC_SUFFIX = "/event"
-        private const val EVENT_ENTER = "enter"
-        private const val EVENT_LEAVE = "leave"
-    }
+  companion object {
+    const val TYPE = "transition"
+    const val TRIGGER_CIRCULAR = "c"
+    const val TRIGGER_LOCATION = "l"
+    private const val BASETOPIC_SUFFIX = "/event"
+    private const val EVENT_ENTER = "enter"
+    private const val EVENT_LEAVE = "leave"
+  }
 }

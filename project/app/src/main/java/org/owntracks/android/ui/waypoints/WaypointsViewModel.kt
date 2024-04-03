@@ -18,10 +18,10 @@ class WaypointsViewModel
 constructor(waypointsRepo: WaypointsRepo, private val locationProcessor: LocationProcessor) :
     ViewModel() {
 
-    val waypointsList: StateFlow<List<WaypointModel>> =
-        waypointsRepo.allLive.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+  val waypointsList: StateFlow<List<WaypointModel>> =
+      waypointsRepo.allLive.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-    fun exportWaypoints() {
-        viewModelScope.launch { locationProcessor.publishWaypointsMessage() }
-    }
+  fun exportWaypoints() {
+    viewModelScope.launch { locationProcessor.publishWaypointsMessage() }
+  }
 }

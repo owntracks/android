@@ -19,16 +19,15 @@ annotation class WorkerKey(val value: KClass<out ListenableWorker>)
 @Module
 interface WorkerModule {
 
-    @Binds
-    @IntoMap
-    @WorkerKey(MQTTReconnectWorker::class)
-    fun bindMQTTReconnectWorkerFactory(factory: MQTTReconnectWorker.Factory): ChildWorkerFactory
+  @Binds
+  @IntoMap
+  @WorkerKey(MQTTReconnectWorker::class)
+  fun bindMQTTReconnectWorkerFactory(factory: MQTTReconnectWorker.Factory): ChildWorkerFactory
 
-    @Binds
-    @IntoMap
-    @WorkerKey(SendLocationPingWorker::class)
-    fun bindSendLocationPingWorkerFactory(factory: SendLocationPingWorker.Factory): ChildWorkerFactory
+  @Binds
+  @IntoMap
+  @WorkerKey(SendLocationPingWorker::class)
+  fun bindSendLocationPingWorkerFactory(factory: SendLocationPingWorker.Factory): ChildWorkerFactory
 
-    @Binds
-    fun bindWorkerFactory(factory: BackgroundWorkerFactory): WorkerFactory
+  @Binds fun bindWorkerFactory(factory: BackgroundWorkerFactory): WorkerFactory
 }

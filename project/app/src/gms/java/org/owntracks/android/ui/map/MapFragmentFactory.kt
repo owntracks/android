@@ -14,19 +14,21 @@ import timber.log.Timber
  * @property preferences can be used to decide what implementation of [MapFragment] should be used.
  * @property contactImageBindingAdapter A binding adapter that can render contact images in views
  */
-
-class MapFragmentFactory @Inject constructor(
+class MapFragmentFactory
+@Inject
+constructor(
     private val preferences: Preferences,
     private val contactImageBindingAdapter: ContactImageBindingAdapter
 ) : FragmentFactory() {
-    override fun instantiate(classLoader: ClassLoader, className: String): Fragment {
-        Timber.d("Instantiating Fragment for $className")
-        return if (MapFragment::class.java.isAssignableFrom(classLoader.loadClass(className))) {
-            preferences.mapLayerStyle.getFragmentClass()
-                .getConstructor(Preferences::class.java, ContactImageBindingAdapter::class.java)
-                .newInstance(preferences, contactImageBindingAdapter)
-        } else {
-            super.instantiate(classLoader, className)
-        }
+  override fun instantiate(classLoader: ClassLoader, className: String): Fragment {
+    Timber.d("Instantiating Fragment for $className")
+    return if (MapFragment::class.java.isAssignableFrom(classLoader.loadClass(className))) {
+      preferences.mapLayerStyle
+          .getFragmentClass()
+          .getConstructor(Preferences::class.java, ContactImageBindingAdapter::class.java)
+          .newInstance(preferences, contactImageBindingAdapter)
+    } else {
+      super.instantiate(classLoader, className)
     }
+  }
 }

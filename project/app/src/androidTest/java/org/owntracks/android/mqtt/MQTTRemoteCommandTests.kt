@@ -292,53 +292,53 @@ class MQTTRemoteCommandTests :
     assertNotDisplayed(R.id.waypointsRecyclerView)
   }
 
-    @Test
-    fun given_an_MQTT_configured_client_when_the_broker_sends_a_clear_waypoints_command_message_to_the_wrong_topic_then_the_waypoints_are_not_cleared() {
-        setupTestActivity()
+  @Test
+  fun given_an_MQTT_configured_client_when_the_broker_sends_a_clear_waypoints_command_message_to_the_wrong_topic_then_the_waypoints_are_not_cleared() {
+    setupTestActivity()
 
-        clickOnAndWait(R.id.menu_monitoring)
-        clickOnAndWait(R.id.fabMonitoringModeSignificantChanges)
+    clickOnAndWait(R.id.menu_monitoring)
+    clickOnAndWait(R.id.fabMonitoringModeSignificantChanges)
 
-        openDrawer()
-        clickOnAndWait(R.string.title_activity_waypoints)
+    openDrawer()
+    clickOnAndWait(R.string.title_activity_waypoints)
 
-        clickOnAndWait(R.id.add)
-        writeTo(R.id.description, "test waypoint")
-        writeTo(R.id.latitude, "51.123")
-        writeTo(R.id.longitude, "0.456")
-        writeTo(R.id.radius, "20")
-        clickOnAndWait(R.id.save)
+    clickOnAndWait(R.id.add)
+    writeTo(R.id.description, "test waypoint")
+    writeTo(R.id.latitude, "51.123")
+    writeTo(R.id.longitude, "0.456")
+    writeTo(R.id.radius, "20")
+    clickOnAndWait(R.id.save)
 
-        clickOnAndWait(R.id.add)
-        writeTo(R.id.description, "test waypoint 2")
-        writeTo(R.id.latitude, "51.00")
-        writeTo(R.id.longitude, "0.4")
-        writeTo(R.id.radius, "25")
-        clickOnAndWait(R.id.save)
+    clickOnAndWait(R.id.add)
+    writeTo(R.id.description, "test waypoint 2")
+    writeTo(R.id.latitude, "51.00")
+    writeTo(R.id.longitude, "0.4")
+    writeTo(R.id.radius, "25")
+    clickOnAndWait(R.id.save)
 
-        openDrawer()
-        clickOnAndWait(R.string.title_activity_map)
+    openDrawer()
+    clickOnAndWait(R.string.title_activity_map)
 
-        listOf(MessageCmd().apply { action = CommandAction.CLEAR_WAYPOINTS })
-            .map {
-                app.messageReceivedIdlingResource.add(it)
-                it
-            }
-            .map(Parser(null)::toJsonBytes)
-            .forEach {
-                broker.publish(
-                    false,
-                    "owntracks/$mqttUsername/$deviceId",
-                    Qos.AT_LEAST_ONCE,
-                    MQTT5Properties(),
-                    it.toUByteArray())
-            }
+    listOf(MessageCmd().apply { action = CommandAction.CLEAR_WAYPOINTS })
+        .map {
+          app.messageReceivedIdlingResource.add(it)
+          it
+        }
+        .map(Parser(null)::toJsonBytes)
+        .forEach {
+          broker.publish(
+              false,
+              "owntracks/$mqttUsername/$deviceId",
+              Qos.AT_LEAST_ONCE,
+              MQTT5Properties(),
+              it.toUByteArray())
+        }
 
-        app.messageReceivedIdlingResource.use { openDrawer() }
+    app.messageReceivedIdlingResource.use { openDrawer() }
 
-        clickOnAndWait(R.string.title_activity_waypoints)
-        assertDisplayed(R.id.waypointsRecyclerView)
-    }
+    clickOnAndWait(R.string.title_activity_waypoints)
+    assertDisplayed(R.id.waypointsRecyclerView)
+  }
 
   @Test
   fun given_an_MQTT_configured_client_when_the_broker_sends_a_setConfiguration_response_message_then_the_configuration_is_set_in_the_preferences() {

@@ -16,8 +16,7 @@ import org.owntracks.android.support.Parser
     use = JsonTypeInfo.Id.NAME,
     include = JsonTypeInfo.As.EXTERNAL_PROPERTY,
     property = "_type",
-    defaultImpl = MessageUnknown::class
-)
+    defaultImpl = MessageUnknown::class)
 @JsonSubTypes(
     JsonSubTypes.Type(value = MessageLocation::class, name = MessageLocation.TYPE),
     JsonSubTypes.Type(value = MessageTransition::class, name = MessageTransition.TYPE),
@@ -27,95 +26,79 @@ import org.owntracks.android.support.Parser
     JsonSubTypes.Type(value = MessageEncrypted::class, name = MessageEncrypted.TYPE),
     JsonSubTypes.Type(value = MessageWaypoint::class, name = MessageWaypoint.TYPE),
     JsonSubTypes.Type(value = MessageWaypoints::class, name = MessageWaypoints.TYPE),
-    JsonSubTypes.Type(value = MessageLwt::class, name = MessageLwt.TYPE)
-)
+    JsonSubTypes.Type(value = MessageLwt::class, name = MessageLwt.TYPE))
 @JsonPropertyOrder(alphabetic = true)
 abstract class MessageBase : BaseObservable(), MessageWithId {
-    @JsonIgnore
-    open val numberOfRetries: Int = 10
+  @JsonIgnore open val numberOfRetries: Int = 10
 
-    @JsonIgnore
-    open var topic: String = ""
-        set(value) {
-            field = value
-            topicBase = getBaseTopic(value) // Normalized topic for all message types
-        }
-
-
-    @JsonProperty("topic")
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    @set:JsonIgnore
-    var visibleTopic: String = ""
-
-    @JsonIgnore
-    private var topicBase: String? = null
-
-    /**
-     * We only add the `topic` attribute if we're publishing over HTTP, so rely on an HTTP transport explicitly setting
-     * it by calling this.
-     */
-    fun setTopicVisible() {
-        visibleTopic = topic
+  @JsonIgnore
+  open var topic: String = ""
+    set(value) {
+      field = value
+      topicBase = getBaseTopic(value) // Normalized topic for all message types
     }
 
-    /**
-     * Gets the contact identifier for this message, based on the message topic
-     *
-     * @return
-     */
-    @JsonIgnore
-    fun getContactId(): String = getBaseTopic(topic)
+  @JsonProperty("topic")
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  @set:JsonIgnore
+  var visibleTopic: String = ""
 
-    @get:JsonIgnore
-    @set:JsonIgnore
-    @JsonIgnore
-    var modeId = ConnectionMode.MQTT
+  @JsonIgnore private var topicBase: String? = null
 
-    @get:JsonIgnore
-    @set:JsonIgnore
-    @JsonIgnore
-    var qos = 0
+  /**
+   * We only add the `topic` attribute if we're publishing over HTTP, so rely on an HTTP transport
+   * explicitly setting it by calling this.
+   */
+  fun setTopicVisible() {
+    visibleTopic = topic
+  }
 
-    @get:JsonIgnore
-    @set:JsonIgnore
-    @JsonIgnore
-    var retained = false
+  /**
+   * Gets the contact identifier for this message, based on the message topic
+   *
+   * @return
+   */
+  @JsonIgnore fun getContactId(): String = getBaseTopic(topic)
 
-    @get:JsonIgnore
-    open val baseTopicSuffix: String
-        get() = BASETOPIC_SUFFIX
+  @get:JsonIgnore @set:JsonIgnore @JsonIgnore var modeId = ConnectionMode.MQTT
 
-    // Called after deserialization to check if all required attributes are set or not.
-    // The message is discarded if false is returned.
-    @JsonIgnore
-    open fun isValidMessage(): Boolean = true
+  @get:JsonIgnore @set:JsonIgnore @JsonIgnore var qos = 0
 
-    @JsonIgnore
-    private fun getBaseTopic(topic: String): String {
-        return if (topic.endsWith(baseTopicSuffix)) {
-            topic.substring(0, topic.length - baseTopicSuffix.length)
-        } else {
-            topic
-        }
+  @get:JsonIgnore @set:JsonIgnore @JsonIgnore var retained = false
+
+  @get:JsonIgnore
+  open val baseTopicSuffix: String
+    get() = BASETOPIC_SUFFIX
+
+  // Called after deserialization to check if all required attributes are set or not.
+  // The message is discarded if false is returned.
+  @JsonIgnore open fun isValidMessage(): Boolean = true
+
+  @JsonIgnore
+  private fun getBaseTopic(topic: String): String {
+    return if (topic.endsWith(baseTopicSuffix)) {
+      topic.substring(0, topic.length - baseTopicSuffix.length)
+    } else {
+      topic
     }
+  }
 
-    @JsonIgnore
-    abstract override fun toString(): String
+  @JsonIgnore abstract override fun toString(): String
 
-    open fun addMqttPreferences(preferences: Preferences) {}
+  open fun addMqttPreferences(preferences: Preferences) {}
 
-    @Throws(IOException::class)
-    open fun toJsonBytes(parser: Parser): ByteArray {
-        return parser.toJsonBytes(this)
-    }
+  @Throws(IOException::class)
+  open fun toJsonBytes(parser: Parser): ByteArray {
+    return parser.toJsonBytes(this)
+  }
 
-    @Throws(IOException::class)
-    open fun toJson(parser: Parser): String? {
-        return parser.toJson(this)
-    }
+  @Throws(IOException::class)
+  open fun toJson(parser: Parser): String? {
+    return parser.toJson(this)
+  }
 
-    companion object {
-        const val TYPE = "base"
-        const val BASETOPIC_SUFFIX = ""
-    }
+  companion object {
+    const val TYPE = "base"
+    const val BASETOPIC_SUFFIX = ""
+  }
 }

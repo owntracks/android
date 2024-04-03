@@ -12,29 +12,29 @@ import org.owntracks.android.R
 import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.ui.status.StatusActivity
 
-class PreferencesMenuProvider(private val context: Fragment, private val messageProcessor: MessageProcessor) :
-    MenuProvider {
-    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-        menuInflater.inflate(R.menu.preferences_connection, menu)
-    }
+class PreferencesMenuProvider(
+    private val context: Fragment,
+    private val messageProcessor: MessageProcessor
+) : MenuProvider {
+  override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+    menuInflater.inflate(R.menu.preferences_connection, menu)
+  }
 
-    override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-        return when (menuItem.itemId) {
-            R.id.connect -> {
-                if (messageProcessor.isEndpointReady) {
-                    context.lifecycleScope.launch {
-                        messageProcessor.reconnect()
-                    }
-                }
-                true
-            }
-            R.id.status -> {
-                context.startActivity(Intent(this.context.requireActivity(), StatusActivity::class.java))
-                false
-            }
-            else -> {
-                false
-            }
+  override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+    return when (menuItem.itemId) {
+      R.id.connect -> {
+        if (messageProcessor.isEndpointReady) {
+          context.lifecycleScope.launch { messageProcessor.reconnect() }
         }
+        true
+      }
+      R.id.status -> {
+        context.startActivity(Intent(this.context.requireActivity(), StatusActivity::class.java))
+        false
+      }
+      else -> {
+        false
+      }
     }
+  }
 }

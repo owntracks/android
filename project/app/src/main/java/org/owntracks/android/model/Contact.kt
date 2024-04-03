@@ -70,14 +70,14 @@ class Contact(id: String) : BaseObservable() {
   }
 
   fun setLocationFromMessageTransition(messageLocation: MessageTransition): Boolean {
-      if (locationAccuracy > messageLocation.timestamp) return false
-      locationTimestamp = messageLocation.timestamp
-      if (latLng != messageLocation.toLatLng()) {
-          Timber.v("Contact ${this.id} has moved to $latLng")
-          latLng = messageLocation.toLatLng()
-      }
-      locationAccuracy = messageLocation.accuracy
-      return true
+    if (locationAccuracy > messageLocation.timestamp) return false
+    locationTimestamp = messageLocation.timestamp
+    if (latLng != messageLocation.toLatLng()) {
+      Timber.v("Contact ${this.id} has moved to $latLng")
+      latLng = messageLocation.toLatLng()
+    }
+    locationAccuracy = messageLocation.accuracy
+    return true
   }
 
   @get:Bindable

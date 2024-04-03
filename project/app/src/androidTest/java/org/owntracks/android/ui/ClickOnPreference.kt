@@ -12,27 +12,23 @@ import org.hamcrest.Matchers.allOf
 private const val SLEEP_MILLIS = 100L
 
 fun clickOnDrawerAndWait(text: Int) {
-    Espresso.onView(
-        allOf(
-            withId(com.mikepenz.materialdrawer.R.id.material_drawer_name),
-            withText(text)
-        )
-    )
-        .perform(click())
-    sleep(SLEEP_MILLIS)
+  Espresso.onView(
+          allOf(withId(com.mikepenz.materialdrawer.R.id.material_drawer_name), withText(text)))
+      .perform(click())
+  sleep(SLEEP_MILLIS)
 }
 
 fun clickOnAndWait(int: Int) {
-    clickOn(int)
-    sleep(SLEEP_MILLIS)
+  clickOn(int)
+  sleep(SLEEP_MILLIS)
 }
 
 fun clickOnAndWait(str: String) {
-    clickOn(str)
-    sleep(SLEEP_MILLIS)
+  clickOn(str)
+  sleep(SLEEP_MILLIS)
 }
 
 fun clickBackAndWait() {
-    clickBack()
-    sleep(SLEEP_MILLIS)
+  clickBack()
+  sleep(SLEEP_MILLIS)
 }

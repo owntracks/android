@@ -15,30 +15,26 @@ abstract class BaseRecyclerViewAdapterWithClickHandler<T, VH : BaseRecyclerViewH
     private val viewHolderConstructor: (ViewDataBinding) -> VH,
     @LayoutRes private val viewHolderLayout: Int
 ) : RecyclerView.Adapter<VH>() {
-    private val itemList: MutableList<T> = mutableListOf()
+  private val itemList: MutableList<T> = mutableListOf()
 
-    fun setData(items: Collection<T>) {
-        itemList.clear()
-        itemList.addAll(items)
-        notifyDataSetChanged()
-    }
+  fun setData(items: Collection<T>) {
+    itemList.clear()
+    itemList.addAll(items)
+    notifyDataSetChanged()
+  }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH = viewHolderConstructor(
-        DataBindingUtil.inflate(
-            LayoutInflater.from(parent.context),
-            viewHolderLayout,
-            parent,
-            false
-        )
-    )
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH =
+      viewHolderConstructor(
+          DataBindingUtil.inflate(
+              LayoutInflater.from(parent.context), viewHolderLayout, parent, false))
 
-    override fun onBindViewHolder(holder: VH, position: Int) {
-        holder.bind(itemList[position], clickListener)
-    }
+  override fun onBindViewHolder(holder: VH, position: Int) {
+    holder.bind(itemList[position], clickListener)
+  }
 
-    override fun getItemCount(): Int = itemList.size
+  override fun getItemCount(): Int = itemList.size
 
-    interface ClickListener<T> {
-        fun onClick(thing: T, view: View, longClick: Boolean): ClickHasBeenHandled
-    }
+  interface ClickListener<T> {
+    fun onClick(thing: T, view: View, longClick: Boolean): ClickHasBeenHandled
+  }
 }

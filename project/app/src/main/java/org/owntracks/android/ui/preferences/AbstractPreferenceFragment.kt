@@ -9,19 +9,18 @@ import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ConnectionMode
 
 abstract class AbstractPreferenceFragment : PreferenceFragmentCompat() {
-    @Inject
-    lateinit var preferences: Preferences
+  @Inject lateinit var preferences: Preferences
 
-    @Inject
-    lateinit var preferenceDataStore: PreferenceDataStoreShim
+  @Inject lateinit var preferenceDataStore: PreferenceDataStoreShim
 
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        preferenceManager.preferenceDataStore = preferenceDataStore
-    }
+  override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+    preferenceManager.preferenceDataStore = preferenceDataStore
+  }
 
-    protected val connectionMode: String
-        get() = when (preferences.mode) {
-            ConnectionMode.HTTP -> getString(R.string.mode_http_private_label)
-            ConnectionMode.MQTT -> getString(R.string.mode_mqtt_private_label)
+  protected val connectionMode: String
+    get() =
+        when (preferences.mode) {
+          ConnectionMode.HTTP -> getString(R.string.mode_http_private_label)
+          ConnectionMode.MQTT -> getString(R.string.mode_mqtt_private_label)
         }
 }

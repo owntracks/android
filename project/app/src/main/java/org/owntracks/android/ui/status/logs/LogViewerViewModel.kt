@@ -9,18 +9,18 @@ import timber.log.Timber
 
 @HiltViewModel
 class LogViewerViewModel @Inject constructor(private val preferences: Preferences) : ViewModel() {
-    private val timberInMemoryLogTree =
-        Timber.forest().filterIsInstance(TimberInMemoryLogTree::class.java).first()
+  private val timberInMemoryLogTree =
+      Timber.forest().filterIsInstance(TimberInMemoryLogTree::class.java).first()
 
-    fun logLines() = timberInMemoryLogTree.liveLogs
+  fun logLines() = timberInMemoryLogTree.liveLogs
 
-    fun clearLog() {
-        timberInMemoryLogTree.clear()
-    }
+  fun clearLog() {
+    timberInMemoryLogTree.clear()
+  }
 
-    fun isDebugEnabled(): Boolean = preferences.debugLog
+  fun isDebugEnabled(): Boolean = preferences.debugLog
 
-    fun enableDebugLogs(enabled: Boolean) {
-        preferences.debugLog = enabled
-    }
+  fun enableDebugLogs(enabled: Boolean) {
+    preferences.debugLog = enabled
+  }
 }

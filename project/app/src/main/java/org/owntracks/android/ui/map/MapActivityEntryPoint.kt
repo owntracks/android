@@ -7,5 +7,5 @@ import dagger.hilt.android.components.ActivityComponent
 @EntryPoint
 @InstallIn(ActivityComponent::class)
 interface MapActivityEntryPoint {
-    val fragmentFactory: MapFragmentFactory
+  val fragmentFactory: MapFragmentFactory
 }

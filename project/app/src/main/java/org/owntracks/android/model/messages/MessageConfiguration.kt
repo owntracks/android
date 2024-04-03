@@ -9,41 +9,43 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import java.util.TreeMap
 import org.owntracks.android.support.MessageWaypointCollection
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
-class MessageConfiguration(private val messageWithId: MessageWithId = MessageWithRandomId()) : MessageBase(), MessageWithId by messageWithId {
-    private val map: MutableMap<String, Any?> = TreeMap()
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
+class MessageConfiguration(private val messageWithId: MessageWithId = MessageWithRandomId()) :
+    MessageBase(), MessageWithId by messageWithId {
+  private val map: MutableMap<String, Any?> = TreeMap()
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    var waypoints: MessageWaypointCollection = MessageWaypointCollection()
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  var waypoints: MessageWaypointCollection = MessageWaypointCollection()
 
-    @JsonAnyGetter
-    @JsonPropertyOrder(alphabetic = true)
-    fun any(): Map<String, Any?> {
-        return map
-    }
+  @JsonAnyGetter
+  @JsonPropertyOrder(alphabetic = true)
+  fun any(): Map<String, Any?> {
+    return map
+  }
 
-    @JsonAnySetter
-    operator fun set(key: String, value: Any?) {
-        map[key] = value
-    }
+  @JsonAnySetter
+  operator fun set(key: String, value: Any?) {
+    map[key] = value
+  }
 
-    @JsonIgnore
-    operator fun get(key: String?): Any? {
-        return map[key]
-    }
+  @JsonIgnore
+  operator fun get(key: String?): Any? {
+    return map[key]
+  }
 
-    @JsonIgnore
-    fun containsKey(key: String?): Boolean {
-        return map.containsKey(key)
-    }
+  @JsonIgnore
+  fun containsKey(key: String?): Boolean {
+    return map.containsKey(key)
+  }
 
-    @get:JsonIgnore
-    val keys: Set<String>
-        get() = map.keys
+  @get:JsonIgnore
+  val keys: Set<String>
+    get() = map.keys
 
-    companion object {
-        const val TYPE = "configuration"
-    }
+  companion object {
+    const val TYPE = "configuration"
+  }
 
-    override fun toString(): String = "[MessageConfiguration keys=${keys.joinToString(",")}]"
+  override fun toString(): String = "[MessageConfiguration keys=${keys.joinToString(",")}]"
 }

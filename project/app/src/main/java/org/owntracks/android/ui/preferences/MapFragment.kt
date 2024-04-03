@@ -7,7 +7,7 @@ import org.owntracks.android.R
 
 @AndroidEntryPoint
 class MapFragment @Inject constructor() : AbstractPreferenceFragment() {
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        setPreferencesFromResource(R.xml.preferences_map, rootKey)
-    }
+  override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+    setPreferencesFromResource(R.xml.preferences_map, rootKey)
+  }
 }

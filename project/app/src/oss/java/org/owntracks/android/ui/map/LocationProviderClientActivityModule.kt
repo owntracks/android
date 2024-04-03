@@ -12,8 +12,8 @@ import org.owntracks.android.location.LocationProviderClient
 @InstallIn(ActivityComponent::class)
 @Module
 class LocationProviderClientActivityModule {
-    @Provides
-    @ActivityScoped
-    fun getLocationProviderClient(activity: Activity): LocationProviderClient =
-        AospLocationProviderClient(activity)
+  @Provides
+  @ActivityScoped
+  fun getLocationProviderClient(activity: Activity): LocationProviderClient =
+      AospLocationProviderClient(activity)
 }

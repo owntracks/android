@@ -41,10 +41,10 @@ import java.io.FileWriter
 import java.io.InputStream
 import java.util.concurrent.TimeUnit
 import junit.framework.AssertionFailedError
-import org.hamcrest.Matcher
 import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import org.hamcrest.Matcher
 import org.owntracks.android.R
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.ui.clickOnAndWait
@@ -292,21 +292,22 @@ fun doIfViewNotVisible(@IdRes id: Int, doThat: () -> Unit) {
  * @return
  */
 fun getText(matcher: ViewInteraction): String {
-    var text = String()
-    matcher.perform(object : ViewAction {
+  var text = String()
+  matcher.perform(
+      object : ViewAction {
         override fun getConstraints(): Matcher<View> {
-            return ViewMatchers.isAssignableFrom(TextView::class.java)
+          return ViewMatchers.isAssignableFrom(TextView::class.java)
         }
 
         override fun getDescription(): String {
-            return "Text of the view"
+          return "Text of the view"
         }
 
         override fun perform(uiController: UiController, view: View) {
-            val tv = view as TextView
-            text = tv.text.toString()
+          val tv = view as TextView
+          text = tv.text.toString()
         }
-    })
+      })
 
-    return text
+  return text
 }

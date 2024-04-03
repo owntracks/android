@@ -4,25 +4,26 @@ import androidx.test.espresso.IdlingResource
 import timber.log.Timber
 
 class LatchingIdlingResourceWithData(private val name: String) : IdlingResource {
-    private var callback: IdlingResource.ResourceCallback? = null
-    private var latched = false
-    var data: String? = null
-    fun latch(data: String) {
-        Timber.d("Latching with $data")
-        latched = true
-        this.data = data
-    }
+  private var callback: IdlingResource.ResourceCallback? = null
+  private var latched = false
+  var data: String? = null
 
-    fun unlatch() {
-        latched = false
-        callback?.onTransitionToIdle()
-    }
+  fun latch(data: String) {
+    Timber.d("Latching with $data")
+    latched = true
+    this.data = data
+  }
 
-    override fun getName(): String = name
+  fun unlatch() {
+    latched = false
+    callback?.onTransitionToIdle()
+  }
 
-    override fun registerIdleTransitionCallback(callback: IdlingResource.ResourceCallback?) {
-        this.callback = callback
-    }
+  override fun getName(): String = name
 
-    override fun isIdleNow(): Boolean = !latched.also { Timber.v("Is latched? $latched") }
+  override fun registerIdleTransitionCallback(callback: IdlingResource.ResourceCallback?) {
+    this.callback = callback
+  }
+
+  override fun isIdleNow(): Boolean = !latched.also { Timber.v("Is latched? $latched") }
 }

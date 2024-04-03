@@ -1,7 +1,6 @@
 package org.owntracks.android.testutils
 
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.delay
 import mqtt.broker.Broker
 import mqtt.packets.MQTTPacket
 import org.junit.After
@@ -10,40 +9,41 @@ import org.owntracks.android.model.messages.MessageBase
 
 @ExperimentalUnsignedTypes
 interface TestWithAnMQTTBroker {
-    fun configureMQTTConnectionToLocal(password: String)
-    fun configureMQTTConnectionToLocalWithGeneratedPassword()
-    val mqttPacketsReceived: MutableList<MQTTPacket>
-    val broker: Broker
-    val mqttUsername: String
-    val mqttClientId: String
-    val deviceId: String
-    val packetReceivedIdlingResource: LatchingIdlingResourceWithData
-    fun MessageBase.sendFromBroker(
-        broker: Broker,
-        topicName: String = "owntracks/someuser/somedevice",
-        retain: Boolean = false
-    )
+  fun configureMQTTConnectionToLocal(password: String)
 
-    fun <E : MessageBase> Collection<E>.sendFromBroker(
-        broker: Broker,
-        topicName: String = "owntracks/someuser/somedevice",
-        retain: Boolean = false
-    ) = forEach {
-        it.sendFromBroker(broker, topicName, retain)
-    }
+  fun configureMQTTConnectionToLocalWithGeneratedPassword()
 
-    @DelicateCoroutinesApi
-    fun startBroker()
-    fun stopBroker()
+  val mqttPacketsReceived: MutableList<MQTTPacket>
+  val broker: Broker
+  val mqttUsername: String
+  val mqttClientId: String
+  val deviceId: String
+  val packetReceivedIdlingResource: LatchingIdlingResourceWithData
 
-    @After
-    fun mqttAfter() {
-        stopBroker()
-    }
+  fun MessageBase.sendFromBroker(
+      broker: Broker,
+      topicName: String = "owntracks/someuser/somedevice",
+      retain: Boolean = false
+  )
 
-    @DelicateCoroutinesApi
-    @Before
-    fun mqttBefore() {
-        startBroker()
-    }
+  fun <E : MessageBase> Collection<E>.sendFromBroker(
+      broker: Broker,
+      topicName: String = "owntracks/someuser/somedevice",
+      retain: Boolean = false
+  ) = forEach { it.sendFromBroker(broker, topicName, retain) }
+
+  @DelicateCoroutinesApi fun startBroker()
+
+  fun stopBroker()
+
+  @After
+  fun mqttAfter() {
+    stopBroker()
+  }
+
+  @DelicateCoroutinesApi
+  @Before
+  fun mqttBefore() {
+    startBroker()
+  }
 }

@@ -143,10 +143,11 @@ class Parser @Inject constructor(private val encryptionProvider: EncryptionProvi
   class EncryptionException internal constructor(s: String?) : Exception(s)
 }
 
-val thisModule = SimpleModule().apply {
-    addSerializer(Instant::class.java, InstantSerializer())
-    addDeserializer(Instant::class.java, InstantDeserializer())
-}
+val thisModule =
+    SimpleModule().apply {
+      addSerializer(Instant::class.java, InstantSerializer())
+      addDeserializer(Instant::class.java, InstantDeserializer())
+    }
 
 class InstantDeserializer : StdDeserializer<Instant>(Instant::class.java) {
   override fun deserialize(jp: JsonParser, ctxt: DeserializationContext): Instant {

@@ -31,41 +31,41 @@ class ContactsAndMapTests :
     TestWithAnHTTPServer by TestWithAnHTTPServerImpl(),
     MockDeviceLocation by GPSMockDeviceLocation() {
 
-    private val locationResponse = """
+  private val locationResponse =
+      """
         {"_type":"location","acc":20,"al":0,"batt":100,"bs":0,"conn":"w","created_at":1610748273,"lat":51.2,"lon":-4,"tid":"aa","tst":1610799026,"vac":40,"vel":7}
-    """.trimIndent()
+    """
+          .trimIndent()
 
-    @Test
-    fun testClickingOnContactLoadsContactOnMap() {
-        startServer(mapOf("/" to locationResponse))
-        setNotFirstStartPreferences()
-        launchActivity()
+  @Test
+  fun testClickingOnContactLoadsContactOnMap() {
+    startServer(mapOf("/" to locationResponse))
+    setNotFirstStartPreferences()
+    launchActivity()
 
-        grantMapActivityPermissions()
-        initializeMockLocationProvider(app)
-        configureHTTPConnectionToLocal()
-        waitUntilActivityVisible<MapActivity>()
-        app.mockLocationIdlingResource.setIdleState(false)
+    grantMapActivityPermissions()
+    initializeMockLocationProvider(app)
+    configureHTTPConnectionToLocal()
+    waitUntilActivityVisible<MapActivity>()
+    app.mockLocationIdlingResource.setIdleState(false)
 
-        reportLocationFromMap(app.mockLocationIdlingResource) {
-            setMockLocation(51.0, 0.0)
-        }
+    reportLocationFromMap(app.mockLocationIdlingResource) { setMockLocation(51.0, 0.0) }
 
-        baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.use {
-            openDrawer()
-            clickOnAndWait(R.string.title_activity_contacts)
-        }
-
-        assertRecyclerViewItemCount(R.id.contactsRecyclerView, 1)
-
-        clickOnAndWait("aa")
-        assertDisplayed(R.id.bottomSheetLayout)
-        assertDisplayed(R.id.contactPeek)
-        assertContains(R.id.name, "aa")
-
-        clickBackAndWait()
-
-        assertNotDisplayed(R.id.bottomSheetLayout)
-        assertNotDisplayed(R.id.contactPeek)
+    baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.use {
+      openDrawer()
+      clickOnAndWait(R.string.title_activity_contacts)
     }
+
+    assertRecyclerViewItemCount(R.id.contactsRecyclerView, 1)
+
+    clickOnAndWait("aa")
+    assertDisplayed(R.id.bottomSheetLayout)
+    assertDisplayed(R.id.contactPeek)
+    assertContains(R.id.name, "aa")
+
+    clickBackAndWait()
+
+    assertNotDisplayed(R.id.bottomSheetLayout)
+    assertNotDisplayed(R.id.contactPeek)
+  }
 }

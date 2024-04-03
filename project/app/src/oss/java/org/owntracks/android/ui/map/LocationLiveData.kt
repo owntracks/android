@@ -13,44 +13,43 @@ import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 class LocationLiveData(
     private val locationProviderClient: GpsMyLocationProvider,
     private val coroutineScope: CoroutineScope
-) :
-    LiveData<Location>() {
-    constructor(
-        context: Context,
-        coroutineScope: CoroutineScope
-    ) : this(GpsMyLocationProvider(context), coroutineScope)
+) : LiveData<Location>() {
+  constructor(
+      context: Context,
+      coroutineScope: CoroutineScope
+  ) : this(GpsMyLocationProvider(context), coroutineScope)
 
-    private val locationCallback = ThisLocationCallback()
+  private val locationCallback = ThisLocationCallback()
 
-    fun requestLocationUpdates() {
-        locationProviderClient.apply {
-            clearLocationSources()
-            addLocationSource("gps")
-            addLocationSource("network")
-            addLocationSource("passive")
-            locationUpdateMinTime = TimeUnit.SECONDS.toMillis(2)
-            locationUpdateMinDistance = 1f
-            startLocationProvider(locationCallback)
-        }
+  fun requestLocationUpdates() {
+    locationProviderClient.apply {
+      clearLocationSources()
+      addLocationSource("gps")
+      addLocationSource("network")
+      addLocationSource("passive")
+      locationUpdateMinTime = TimeUnit.SECONDS.toMillis(2)
+      locationUpdateMinDistance = 1f
+      startLocationProvider(locationCallback)
     }
+  }
 
-    private fun removeLocationUpdates() {
-        locationProviderClient.stopLocationProvider()
-    }
+  private fun removeLocationUpdates() {
+    locationProviderClient.stopLocationProvider()
+  }
 
-    override fun onActive() {
-        super.onActive()
-        coroutineScope.launch { requestLocationUpdates() }
-    }
+  override fun onActive() {
+    super.onActive()
+    coroutineScope.launch { requestLocationUpdates() }
+  }
 
-    override fun onInactive() {
-        coroutineScope.launch { removeLocationUpdates() }
-        super.onInactive()
-    }
+  override fun onInactive() {
+    coroutineScope.launch { removeLocationUpdates() }
+    super.onInactive()
+  }
 
-    inner class ThisLocationCallback : IMyLocationConsumer {
-        override fun onLocationChanged(location: Location?, source: IMyLocationProvider?) {
-            location?.run { value = this }
-        }
+  inner class ThisLocationCallback : IMyLocationConsumer {
+    override fun onLocationChanged(location: Location?, source: IMyLocationProvider?) {
+      location?.run { value = this }
     }
+  }
 }
