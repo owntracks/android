@@ -10,7 +10,8 @@ on:
       - release-test-tag
 
 env:
-  GRADLE_OPTS: "-Dorg.gradle.daemon=true -Dorg.gradle.configuration-cache=true -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.jvmargs='-Xmx3096M -Dkotlin.daemon.jvm.options=-Xmx2048M -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8 -XX:+UseParallelGC'"
+  # Config cache is false for releases, because tripleT doesn't work with it.
+  GRADLE_OPTS: "-Dorg.gradle.daemon=true -Dorg.gradle.configuration-cache=false -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.jvmargs='-Xmx3096M -Dkotlin.daemon.jvm.options=-Xmx2048M -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8 -XX:+UseParallelGC'"
 
 jobs:
   release:
