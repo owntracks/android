@@ -14,6 +14,8 @@ class AsyncPingSender(private val scope: CoroutineScope) : MqttPingSender {
 
   override fun init(comms: ClientComms) {
     Timber.d("Initializing MQTT keepalive AsyncPingSender with comms $comms")
+    // Stop is not reliably called. We need to cancel the job here to avoid multiple jobs running
+    keepaliveJob?.cancel()
     this.comms = comms
   }
 
