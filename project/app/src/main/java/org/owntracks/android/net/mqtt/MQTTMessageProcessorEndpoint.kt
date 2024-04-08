@@ -1,10 +1,13 @@
 package org.owntracks.android.net.mqtt
 
 import android.app.AlarmManager
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.net.Network
 import android.os.Build
+import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -16,8 +19,10 @@ import java.util.stream.Collectors
 import javax.net.ssl.SSLHandshakeException
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.DurationUnit
 import kotlin.time.TimeSource
 import kotlin.time.measureTime
+import kotlin.time.toDuration
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
@@ -82,6 +87,8 @@ class MQTTMessageProcessorEndpoint(
   private val alarmManager: AlarmManager = applicationContext.getSystemService()!!
   private var mqttClientAndConfiguration: MqttClientAndConfiguration? = null
 
+  private var pingAlarmReceiver: BroadcastReceiver? = null
+
   private val networkChangeCallback =
       object : ConnectivityManager.NetworkCallback() {
         var justRegistered = true
@@ -101,8 +108,7 @@ class MQTTMessageProcessorEndpoint(
           super.onLost(network)
 
           scope.launch {
-            Timber.w("Default network is lost, disconnecting. Waiting for lock")
-            connectingLock.withPermit { disconnect() }
+            connectingLock.withPermitLogged("network lost") { disconnect() }
             scheduler.cancelAllTasks()
           }
         }
@@ -130,18 +136,17 @@ class MQTTMessageProcessorEndpoint(
   }
 
   override fun deactivate() {
-    Timber.v("MQTT Deactivate. waiting for lock")
     preferences.unregisterOnPreferenceChangedListener(this)
     connectivityManager.unregisterNetworkCallback(networkChangeCallback)
     scope.launch {
-      connectingLock.withPermit { disconnect() }.apply { Timber.v("MQTT Deactivate lock released") }
+      connectingLock.withPermitLogged("mqtt deactivate") { disconnect() }
       scheduler.cancelAllTasks()
     }
   }
 
   private suspend fun disconnect() {
     withContext(ioDispatcher) {
-      Timber.v("MQTT attempting Disconnect, waiting for lock")
+      Timber.v("MQTT attempting Disconnect")
       measureTime {
             mqttClientAndConfiguration?.run {
               try {
@@ -158,6 +163,12 @@ class MQTTMessageProcessorEndpoint(
               }
               endpointStateRepo.setState(EndpointState.DISCONNECTED)
               mqttClient.close(true)
+              try {
+                pingAlarmReceiver?.run(applicationContext::unregisterReceiver)
+                Timber.d("Unregistered ping alarm receiver")
+              } catch (e: IllegalArgumentException) {
+                Timber.d("Ping alarm receiver already unregistered")
+              }
             }
           }
           .apply { Timber.d("MQTT disconnected in $this") }
@@ -342,6 +353,7 @@ class MQTTMessageProcessorEndpoint(
                     } else {
                       AsyncPingSender(scope)
                     }
+
                 MqttAsyncClient(
                         mqttConnectionConfiguration.connectionString,
                         mqttConnectionConfiguration.clientId,
@@ -354,11 +366,20 @@ class MQTTMessageProcessorEndpoint(
                           MqttClientAndConfiguration(it, mqttConnectionConfiguration)
                     }
                     .apply {
-                      Timber.i("Connecting to ${mqttConnectionConfiguration.connectionString}")
-                      connect(
-                              mqttConnectionConfiguration.getConnectOptions(
-                                  applicationContext, caKeyStore))
-                          .waitForCompletion()
+                      mqttConnectionConfiguration
+                          .getConnectOptions(applicationContext, caKeyStore)
+                          .also {
+                            Timber.i(
+                                "Connecting to ${mqttConnectionConfiguration.connectionString} timeout = ${ it.connectionTimeout.toDuration(DurationUnit.SECONDS)}")
+                          }
+                          .run { connect(this).waitForCompletion() }
+                      pingAlarmReceiver = MQTTPingAlarmReceiver(this)
+                      ContextCompat.registerReceiver(
+                              applicationContext,
+                              pingAlarmReceiver,
+                              IntentFilter(AlarmPingSender.PING_INTENT_ACTION),
+                              ContextCompat.RECEIVER_EXPORTED)
+                          .also { Timber.d("Registered ping alarm receiver") }
                       Timber.i(
                           "MQTT Connected. Subscribing to ${mqttConnectionConfiguration.topicsToSubscribeTo}")
                       endpointStateRepo.setState(EndpointState.CONNECTED)
@@ -423,18 +444,15 @@ class MQTTMessageProcessorEndpoint(
   private suspend fun reconnect(
       mqttConnectionConfiguration: MqttConnectionConfiguration
   ): Result<Unit> =
-      connectingLock
-          .also { Timber.v("MQTT reconnect request, waiting for lock") }
-          .withPermit {
-            Timber.v("MQTT reconnect with configuration $mqttConnectionConfiguration")
-            disconnect()
-            try {
-              mqttConnectionIdlingResource.setIdleState(false)
-              connectToBroker(mqttConnectionConfiguration)
-            } finally {
-              mqttConnectionIdlingResource.setIdleState(true)
-            }
-          }
+      connectingLock.withPermitLogged("MQTT reconnect") {
+        disconnect()
+        try {
+          mqttConnectionIdlingResource.setIdleState(false)
+          connectToBroker(mqttConnectionConfiguration)
+        } finally {
+          mqttConnectionIdlingResource.setIdleState(true)
+        }
+      }
 
   override fun checkConnection(): Boolean {
     return mqttClientAndConfiguration?.mqttClient?.run {
@@ -483,4 +501,29 @@ class MQTTMessageProcessorEndpoint(
     val result = block()
     return TimedValue(mark.elapsedNow(), result)
   }
+}
+
+/**
+ * Wrapper around [Semaphore.withPermit] that logs when the lock is acquired and released
+ *
+ * @param label
+ * @param function
+ * @return
+ * @receiver
+ */
+private suspend fun <T> Semaphore.withPermitLogged(label: String, function: suspend () -> T): T {
+  return also {
+        Timber.v("Waiting for lock. label=$label available permits = ${it.availablePermits}")
+      }
+      .withPermit {
+        Timber.v("lock acquired label=$label")
+        try {
+          function()
+        } catch (e: Exception) {
+          Timber.e(e, "BOO")
+          throw e
+        } finally {
+          Timber.v("lock released label=$label")
+        }
+      }
 }

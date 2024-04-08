@@ -3,52 +3,34 @@ package org.owntracks.android.net.mqtt
 import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.PendingIntent
-import android.content.BroadcastReceiver
+import android.app.PendingIntent.FLAG_IMMUTABLE
+import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import androidx.core.content.getSystemService
+import kotlin.random.Random
 import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.datetime.Instant
 import org.eclipse.paho.client.mqttv3.MqttPingSender
 import org.eclipse.paho.client.mqttv3.internal.ClientComms
 import timber.log.Timber
 
 class AlarmPingSender(private val applicationContext: Context) : MqttPingSender {
-  private lateinit var alarmReceiver: AlarmReceiver
-  private var comms: ClientComms? = null
   private val alarmManager: AlarmManager = applicationContext.getSystemService()!!
-  private var pendingIntent: PendingIntent? = null
+  private lateinit var comms: ClientComms
 
   override fun init(comms: ClientComms) {
     Timber.d("Initializing MQTT keepalive AlarmPingSender")
     this.comms = comms
-    this.alarmReceiver = AlarmReceiver(comms)
-    Timber.d("AlarmPingSender initialized. alarmReceiver=$alarmReceiver")
   }
 
   override fun start() {
-    Timber.v("MQTT keepalive start")
-    val action =
-        comms?.run {
-          applicationContext.registerReceiver(alarmReceiver, IntentFilter(getPendingIntentAction()))
-          schedule(keepAlive)
-        }
-  }
-
-  private fun getPendingIntentAction(): String = this.javaClass.simpleName + comms!!.client.clientId
-
-  private fun getPendingIntent(): PendingIntent {
-    val action = this.javaClass.simpleName + comms!!.client.clientId
-    return PendingIntent.getBroadcast(
-        applicationContext,
-        0,
-        Intent(action),
-        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+    Timber.v("MQTT keepalive start. Keepalive is ${comms.keepAlive}")
+    schedule(comms.keepAlive)
   }
 
   override fun stop() {
-    Timber.v("MQTT keepalive stop")
-    applicationContext.unregisterReceiver(alarmReceiver)
+    Timber.v("MQTT keepalive stop.")
   }
 
   // We're not going to be even instantiated unless we can schedule exact alarms, ie the user has
@@ -56,16 +38,23 @@ class AlarmPingSender(private val applicationContext: Context) : MqttPingSender 
   @SuppressLint("MissingPermission")
   override fun schedule(delayInMilliseconds: Long) {
     Timber.v("MQTT keepalive scheduled in ${delayInMilliseconds.milliseconds}")
-    alarmManager.setExactAndAllowWhileIdle(
-        AlarmManager.RTC_WAKEUP,
-        System.currentTimeMillis() + delayInMilliseconds,
-        getPendingIntent())
+    Random.nextInt(0, Int.MAX_VALUE).run {
+      alarmManager.setExactAndAllowWhileIdle(
+          AlarmManager.RTC_WAKEUP,
+          (System.currentTimeMillis() + delayInMilliseconds).also {
+            Timber.v("Alarm time is ${Instant.fromEpochMilliseconds(it)}")
+          },
+          PendingIntent.getBroadcast(
+              applicationContext,
+              this,
+              Intent().setAction(PING_INTENT_ACTION).putExtra("requestCode", this),
+              FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE,
+          ))
+      Timber.v("MQTT ping alarm intent requestcode=$this")
+    }
   }
 
-  class AlarmReceiver(private val clientComms: ClientComms) : BroadcastReceiver() {
-    override fun onReceive(context: Context?, intent: Intent?) {
-      clientComms.checkForActivity()?.waitForCompletion()
-          ?: Timber.w("MQTT keepalive token was null")
-    }
+  companion object {
+    const val PING_INTENT_ACTION = "org.owntracks.android.debug.MQTT_PING"
   }
 }
