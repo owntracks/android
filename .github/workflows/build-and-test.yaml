@@ -157,9 +157,22 @@ jobs:
           sudo rm -rf /usr/share/dotnet
           sudo docker image prune --all --force
           sudo df -h
+
+      # Github charges us for LFS bandwidth, so let's use the cache
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
         with:
-          lfs: true
+          lfs: false
+      - name: Create LFS file list
+        run: git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
+      - name: Restore LFS cache
+        uses: actions/cache@v2
+        id: lfs-cache
+        with:
+          path: .git/lfs
+          key: ${{ runner.os }}-lfs-${{ hashFiles('.lfs-assets-id') }}-v1
+      - name: Git LFS Pull
+        run: git lfs pull
+
       - uses: dorny/paths-filter@v3
         id: changes
         with:
