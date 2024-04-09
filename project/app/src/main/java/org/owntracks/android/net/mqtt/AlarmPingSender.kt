@@ -38,19 +38,24 @@ class AlarmPingSender(private val applicationContext: Context) : MqttPingSender 
   @SuppressLint("MissingPermission")
   override fun schedule(delayInMilliseconds: Long) {
     Timber.v("MQTT keepalive scheduled in ${delayInMilliseconds.milliseconds}")
-    Random.nextInt(0, Int.MAX_VALUE).run {
-      alarmManager.setExactAndAllowWhileIdle(
-          AlarmManager.RTC_WAKEUP,
-          (System.currentTimeMillis() + delayInMilliseconds).also {
-            Timber.v("Alarm time is ${Instant.fromEpochMilliseconds(it)}")
-          },
-          PendingIntent.getBroadcast(
-              applicationContext,
-              this,
-              Intent().setAction(PING_INTENT_ACTION).putExtra("requestCode", this),
-              FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE,
-          ))
-      Timber.v("MQTT ping alarm intent requestcode=$this")
+    try {
+      Random.nextInt(0, Int.MAX_VALUE).run {
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            (System.currentTimeMillis() + delayInMilliseconds).also {
+              Timber.v("Alarm time is ${Instant.fromEpochMilliseconds(it)}")
+            },
+            PendingIntent.getBroadcast(
+                applicationContext,
+                this,
+                Intent().setAction(PING_INTENT_ACTION).putExtra("requestCode", this),
+                FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE,
+            ))
+        Timber.v("MQTT ping alarm intent requestcode=$this")
+      }
+    } catch (_: SecurityException) {
+      Timber.w(
+          "Unable to schedule MQTT ping alarm, looks like we don't have the necessary permissions")
     }
   }
 
