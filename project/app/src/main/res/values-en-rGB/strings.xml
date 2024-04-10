@@ -45,15 +45,6 @@
     <string name="contactDetailsTrackerId">"Tracker ID"</string>
     <string name="contactLocationUnknown">"No location is available"</string>
     <string name="currentLocationButtonLabel">"Current location"</string>
-
-    <!-- Label for the confirmation button on the Delete Waypoint dialog box. -->
-    <string name="deleteWaypointConfirmationButtonLabel">"Delete"</string>
-
-    <!-- Content text of the dialog shown to confirm deletion of a waypoint -->
-    <string name="deleteWaypointConfirmationText">"Do you want to delete this waypoint?"</string>
-
-    <!-- Title of the dialog shown to confirm deletion of a waypoint -->
-    <string name="deleteWaypointTitle">"Delete Waypoint"</string>
     <string name="description">"Description"</string>
     <string name="deviceLocationDisabledDialogMessage">"Location services on this device are currently disabled, so OwnTracks is unable to track your current location.
 
