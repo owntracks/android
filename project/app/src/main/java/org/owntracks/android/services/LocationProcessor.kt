@@ -110,6 +110,11 @@ constructor(
                 batteryStatus = deviceMetricsProvider.batteryStatus
                 conn = deviceMetricsProvider.connectionType
                 monitoringMode = preferences.monitoring
+                wifistate  = wifiInfoProvider.isWiFiEnabled();
+                powerSave = deviceMetricsProvider.powerSave;
+                batteryOptimizations = deviceMetricsProvider.batteryOptimizations;
+                appHibernation = deviceMetricsProvider.appHibernation;
+                locationPermission = deviceMetricsProvider.locationPermission;
               }
             } else {
               fromLocation(location, Build.VERSION.SDK_INT)
@@ -120,13 +125,6 @@ constructor(
               inregions = calculateInRegions(loadedWaypoints)
             }
     Timber.v("Actually publishing location $location triggered by $trigger as message=$message")
-
-    // always output the system status
-    message.wifistate  = wifiInfoProvider.isWiFiEnabled();
-    message.powerSave = deviceMetricsProvider.powerSave;
-    message.batteryOptimizations = deviceMetricsProvider.batteryOptimizations;
-    message.appHibernation = deviceMetricsProvider.appHibernation;
-    message.locationPermission = deviceMetricsProvider.locationPermission;
 
     messageProcessor.queueMessageForSending(message)
     if (responseMessageTypes.contains(trigger)) {
