@@ -49,9 +49,6 @@
     <string name="contactDetailsTrackerId">"Tracker ID"</string>
     <string name="contactLocationUnknown">"Poloha není dostupná"</string>
     <string name="currentLocationButtonLabel">"Aktuální poloha"</string>
-
-    <!-- Title of the dialog shown to confirm deletion of a waypoint -->
-    <string name="deleteWaypointTitle">"Smazat"</string>
     <string name="description">"Popis"</string>
     <string name="deviceLocationDisabledDialogMessage">"Služby určování polohy na tomto zařízení jsou momentálně vypnuté, takže OwnTracks nemůže sledovat vaši aktuální polohu.
 

@@ -48,15 +48,6 @@
     <string name="contactLocationUnknown">"Tidak ada lokasi yang tersedia"</string>
     <string name="contactsListPlaceholder">"Tidak ada kontak yang ditemukan"</string>
     <string name="currentLocationButtonLabel">"Lokasi saat ini"</string>
-
-    <!-- Label for the confirmation button on the Delete Waypoint dialog box. -->
-    <string name="deleteWaypointConfirmationButtonLabel">"Hapus"</string>
-
-    <!-- Content text of the dialog shown to confirm deletion of a waypoint -->
-    <string name="deleteWaypointConfirmationText">"Apakah Anda ingin menghapus titik jalan ini?"</string>
-
-    <!-- Title of the dialog shown to confirm deletion of a waypoint -->
-    <string name="deleteWaypointTitle">"Hapus"</string>
     <string name="description">"Deskripsi"</string>
     <string name="deviceLocationDisabledDialogMessage">"Layanan lokasi di perangkat ini saat ini dinonaktifkan, sehingga OwnTracks tidak dapat melacak lokasi Anda saat ini.
 

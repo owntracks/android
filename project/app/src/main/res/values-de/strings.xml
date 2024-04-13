@@ -48,15 +48,6 @@
     <string name="contactLocationUnknown">"Kein Standort verfügbar"</string>
     <string name="contactsListPlaceholder">"Keine Kontakte gefunden"</string>
     <string name="currentLocationButtonLabel">"Aktuelle Standort"</string>
-
-    <!-- Label for the confirmation button on the Delete Waypoint dialog box. -->
-    <string name="deleteWaypointConfirmationButtonLabel">"Löschen"</string>
-
-    <!-- Content text of the dialog shown to confirm deletion of a waypoint -->
-    <string name="deleteWaypointConfirmationText">"Möchtest du diesen Marker löschen?"</string>
-
-    <!-- Title of the dialog shown to confirm deletion of a waypoint -->
-    <string name="deleteWaypointTitle">"Löschen"</string>
     <string name="description">"Beschreibung"</string>
     <string name="deviceLocationDisabledDialogMessage">"Die Ortungsdienste auf diesem Gerät sind derzeit deaktiviert, sodass OwnTracks Ihren aktuellen Standort nicht verfolgen kann.
 

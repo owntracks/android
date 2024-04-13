@@ -52,15 +52,9 @@
     <string name="contactLocationUnknown">"Ubicació no disponible"</string>
     <string name="contactsListPlaceholder">"No s'ha trobat cap contacte"</string>
     <string name="currentLocationButtonLabel">"Posició actual"</string>
-
-    <!-- Label for the confirmation button on the Delete Waypoint dialog box. -->
     <string name="deleteWaypointConfirmationButtonLabel">"Esborrar"</string>
-
-    <!-- Content text of the dialog shown to confirm deletion of a waypoint -->
-    <string name="deleteWaypointConfirmationText">"Voleu suprimir aquest waypoint?"</string>
-
-    <!-- Title of the dialog shown to confirm deletion of a waypoint -->
-    <string name="deleteWaypointTitle">"Esborrar"</string>
+    <string name="deleteWaypointConfirmationText">"Voleu esborrar aquest punt de pas?"</string>
+    <string name="deleteWaypointTitle">"Esborrar punt de pas"</string>
     <string name="description">"Descripció"</string>
     <string name="deviceLocationDisabledDialogMessage">"Actualment els serveis d'ubicació d'aquest dispositiu estan desactivats, de manera que OwnTracks no pot fer un seguiment de la vostra ubicació actual.
 
@@ -196,9 +190,7 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="preferencesIgnoreInaccurateLocationsSummary">"Ignorar ubicacions incorrectes "</string>
     <string name="preferencesImportNoURIGiven">"No s'ha indicat cap URI per importar la configuració"</string>
     <string name="preferencesKeepalive">"Keepalive"</string>
-
-    <!-- Text of the dialog shown to the user when editing the MQTT connection keepalive preference -->
-    <string name="preferencesKeepaliveDialogMessage">"Amb quina freqüència hauria d'enviar el client un missatge de manteniment al servidor (segons)"</string>
+    <string name="preferencesKeepaliveDialogMessage">"Amb quina freqüència hauria d'enviar el client un missatge de manteniment al broker (segons)"</string>
     <string name="preferencesKeepaliveValidationError">"Keepalive hauria de ser mínim %d"</string>
     <string name="preferencesLicenses">"Llibreries"</string>
     <string name="preferencesLicensesSummary">"Gràcies als autors de les llibreries incloses"</string>
@@ -255,8 +247,6 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="preferencesTrackerId">"Tracker ID"</string>
     <string name="preferencesTrackerIdValidationError">"Ha de tenir un o dos caràcters"</string>
     <string name="preferencesUrlValidationError">"URL HTTP no vàlid"</string>
-
-    <!-- Fuzzy -->
     <string name="preferencesUsername">"Nom d'usuari"</string>
     <string name="preferencesWebsocket">"Utilitza WebSockets"</string>
 
@@ -282,6 +272,9 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="statusEndpointStateMessageAuthenticationFailed">"L'autenticació ha fallat"</string>
     <string name="statusEndpointStateMessageClientTimeout">"Temps d'espera del client"</string>
     <string name="statusEndpointStateMessageConnectionLost">"Connexió perduda: %s"</string>
+    <string name="statusEndpointStateMessageConnectionRefused">"Connexió rebutjada"</string>
+    <string name="statusEndpointStateMessageEndpointDoesNotSupportWebsockets">"El punt final no admet WebSockets"</string>
+    <string name="statusEndpointStateMessageEOFError">"EOFException del punt final - el punt final espera TLS?"</string>
     <string name="statusEndpointStateMessageInvalidClientId">"Invàlid ID de client"</string>
     <string name="statusEndpointStateMessageInvalidProtocolVersion">"Versió del protocol MQTT no vàlida"</string>
     <string name="statusEndpointStateMessageMalformedHostPort">"Hostname i port no vàlids"</string>
@@ -291,6 +284,9 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="statusEndpointStateMessageSocketTimeout">"Temps de connexió esgotat"</string>
     <string name="statusEndpointStateMessageSubscribeFailed">"La subscripció ha fallat"</string>
     <string name="statusEndpointStateMessageTLSConfigError">"Error de configuració de TLS"</string>
+    <string name="statusEndpointStateMessageTLSConnectionClosed">"Connexió TLS tancada"</string>
+    <string name="statusEndpointStateMessageTLSEndpointCANotTrustedError">"La CA TLS del punt final no és de confiança"</string>
+    <string name="statusEndpointStateMessageTLSEndpointClientCertsRequired">"El punt final requereix certificats de client TLS"</string>
     <string name="statusEndpointStateMessageTLSError">"Error TLS: %s"</string>
     <string name="statusEndpointStateMessageUnableToConnect">"Impossible connectar"</string>
     <string name="statusEndpointStateMessageUnknownHost">"Host desconegut"</string>

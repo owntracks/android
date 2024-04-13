@@ -39,7 +39,6 @@
     <string name="contactDetailsAccuracy">"Точность"</string>
 
     <!-- meters in Russian is "метров", i.e. "%dм" instead if "%d m" -->
-    <!-- Fuzzy -->
     <string name="contactDetailsAccuracyValue">"%dм"</string>
     <string name="contactDetailsAltitude">"Высота"</string>
 
@@ -65,15 +64,6 @@
     <string name="contactLocationUnknown">"Местоположение недоступно"</string>
     <string name="contactsListPlaceholder">"Друзья не найдены"</string>
     <string name="currentLocationButtonLabel">"Текущее местоположение"</string>
-
-    <!-- Label for the confirmation button on the Delete Waypoint dialog box. -->
-    <string name="deleteWaypointConfirmationButtonLabel">"Удалить"</string>
-
-    <!-- Content text of the dialog shown to confirm deletion of a waypoint -->
-    <string name="deleteWaypointConfirmationText">"Вы действительно хотите удалить это место?"</string>
-
-    <!-- Title of the dialog shown to confirm deletion of a waypoint -->
-    <string name="deleteWaypointTitle">"Удаление"</string>
     <string name="description">"Описание"</string>
     <string name="deviceLocationDisabledDialogMessage">"Сервисы определения местоположения на этом устройстве отключены, поэтому OwnTracks не может отслеживать ваше местоположение.
 
@@ -83,8 +73,6 @@
     <string name="DISCONNECTED">"Отключен"</string>
     <string name="divider">"Разделитель"</string>
     <string name="done_heading">"Готово"</string>
-
-    <!-- Fuzzy -->
     <string name="enjoy_description">"Воспользуйтесь меню настроек и настройте OwnTracks для работы с вашим сервером"</string>
     <string name="ERROR">"Ошибка"</string>
     <string name="ERROR_CONFIGURATION">"Не настроено"</string>
@@ -146,8 +134,6 @@
     <string name="noNavigationApp">"Подходящее приложение не установлено"</string>
     <string name="notificationChangeMonitoring">"Изменить режим"</string>
     <string name="notificationChannelErrors">"Ошибки"</string>
-
-    <!-- Fuzzy -->
     <string name="notificationChannelEventsDescription">"Передача места"</string>
     <string name="notificationChannelOngoing">"Постоянное"</string>
     <string name="notificationChannelOngoingDescription">"Необходимо для обновления местоположения в фоновом режиме"</string>
@@ -207,9 +193,6 @@
     <string name="preferencesIgnoreInaccurateLocationsSummary">"Игнорировать неточные местоположения"</string>
     <string name="preferencesImportNoURIGiven">"Не указан URI для импорта настроек"</string>
     <string name="preferencesKeepalive">"Постоянное соединение"</string>
-
-    <!-- Text of the dialog shown to the user when editing the MQTT connection keepalive preference -->
-    <string name="preferencesKeepaliveDialogMessage">"Как часто клиент должен отправлять сообщение брокеру для поддержания постоянного соединения (в секундах)"</string>
     <string name="preferencesKeepaliveValidationError">"Должно быть более %d секунд"</string>
     <string name="preferencesLicenses">"Библиотеки"</string>
     <string name="preferencesLicensesSummary">"Благодарим авторов использованных библиотек"</string>
@@ -256,11 +239,7 @@
     <string name="preferencesReverseGeocodeProvider">"Геокодирование"</string>
     <string name="preferencesServer">"Подключение к серверу"</string>
     <string name="preferencesSet">"Есть"</string>
-
-    <!-- Fuzzy -->
     <string name="preferencesShowWaypointsOnMap">"Показывать места"</string>
-
-    <!-- Fuzzy -->
     <string name="preferencesShowWaypointsOnMapSummary">"Отображать окружность для известных мест на карте"</string>
     <string name="preferencesTheme">"Тема"</string>
 
@@ -268,13 +247,9 @@
     <string name="preferencesTrackerId">"Метка на карте"</string>
     <string name="preferencesTrackerIdValidationError">"Должен состоять из одного или двух символов"</string>
     <string name="preferencesUrlValidationError">"Некорректный HTTP URL"</string>
-
-    <!-- Fuzzy -->
     <string name="preferencesUsername">"Пользователь"</string>
     <string name="preferencesWebsocket">"Использовать WebSockets"</string>
     <string name="publish">"Сообщить местоположение"</string>
-
-    <!-- Fuzzy -->
     <string name="radius">"Радиус"</string>
     <string name="reconnect">"Переподключение"</string>
     <string name="save">"Сохранить"</string>
@@ -319,11 +294,7 @@
     <string name="title_activity_map">"Карта"</string>
     <string name="title_activity_preferences">"Настройки"</string>
     <string name="title_activity_status">"Статус"</string>
-
-    <!-- Fuzzy -->
     <string name="title_activity_waypoint">"Место"</string>
-
-    <!-- Fuzzy -->
     <string name="title_activity_waypoints">"Места"</string>
     <string name="title_exit">"Выход"</string>
     <string name="transitionEntering">"прибыл(а) в"</string>
@@ -331,17 +302,9 @@
     <string name="unableToCopyCertificate">"Невозможно скопировать сертификат во внутреннее хранилище"</string>
     <string name="version">"Версия"</string>
     <string name="viewLogs">"Просмотр журнала"</string>
-
-    <!-- Fuzzy -->
     <string name="waypoint_region_inside">"Сейчас в этом месте"</string>
-
-    <!-- Fuzzy -->
     <string name="waypoint_region_outside">"Сейчас вне этого места"</string>
-
-    <!-- Fuzzy -->
     <string name="waypoint_region_unknown">"Статус неизвестен"</string>
-
-    <!-- Fuzzy -->
     <string name="waypointListPlaceholder">"Места еще не обозначены"</string>
     <string name="waypointMigrationErrorNotificationText">"Произошла ошибка при переносе списка мест. Некоторые из них, возможно, не были перенесены, поэтому проверьте журнал и добавьте пропущенные места заново."</string>
     <string name="waypointMigrationErrorNotificationTitle">"Ошибка переноса списка мест"</string>
