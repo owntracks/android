@@ -120,6 +120,14 @@ constructor(
               inregions = calculateInRegions(loadedWaypoints)
             }
     Timber.v("Actually publishing location $location triggered by $trigger as message=$message")
+
+    // always output the system status
+    message.wifistate  = wifiInfoProvider.isWiFiEnabled();
+    message.powerSave = deviceMetricsProvider.powerSave;
+    message.batteryOptimizations = deviceMetricsProvider.batteryOptimizations;
+    message.appHibernation = deviceMetricsProvider.appHibernation;
+    message.locationPermission = deviceMetricsProvider.locationPermission;
+
     messageProcessor.queueMessageForSending(message)
     if (responseMessageTypes.contains(trigger)) {
       publishResponseMessageIdlingResource.setIdleState(true)

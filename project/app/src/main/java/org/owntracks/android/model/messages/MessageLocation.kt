@@ -66,6 +66,16 @@ open class MessageLocation(
 
   @JsonProperty("SSID") var ssid: String? = null
 
+  @JsonProperty("wifi") var wifistate = 0
+
+  @JsonProperty("ps") var powerSave = 0
+
+  @JsonProperty("bo") var batteryOptimizations = 0
+
+  @JsonProperty("hib") var appHibernation = 0
+
+  @JsonProperty("loc") var locationPermission = 0
+
   @JsonInclude(JsonInclude.Include.NON_NULL) @JsonProperty("tid") var trackerId: String? = null
 
   override fun isValidMessage(): Boolean {
