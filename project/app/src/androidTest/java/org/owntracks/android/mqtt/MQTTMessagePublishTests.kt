@@ -94,6 +94,11 @@ class MQTTMessagePublishTests :
               accuracy = 456
               battery = 78
               batteryStatus = BatteryStatus.CHARGING
+              wifistate = 1
+              powerSave = 1
+              batteryOptimizations = 1
+              appHibernation = 1
+              locationPermission = 3
               velocity = 99
               timestamp = Instant.parse("2006-01-02T15:04:05Z").epochSecond
             },
