@@ -17,9 +17,10 @@ jobs:
   release:
     name: Create GH release and promote Play store beta to release
     runs-on: ubuntu-22.04
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
-
       - uses: octokit/request-action@v2.x
         name: Find beta tags
         id: get_beta_tags
@@ -84,13 +85,13 @@ jobs:
 
       - name: Create release
         id: create_release
-        uses: actions/create-release@v1
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
           body_path: ./CHANGELOG.md
-          release_name: ${{ github.ref }}
+          name: ${{ github.ref }}
           draft: true
           prerelease: ${{ contains(github.ref, 'beta') }}
 
