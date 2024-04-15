@@ -103,7 +103,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
           asset_path: ./project/app/build/outputs/apk/gms/release/app-gms-release.apk
-          asset_name: owntracks-release-gms-${VERSION_CODE}.apk
+          asset_name: owntracks-release-gms-${{ env.VERSION_CODE }}.apk
           asset_content_type: application/vnd.android.package-archive
       - name: Upload OSS Release Asset
         uses: actions/upload-release-asset@v1
@@ -112,7 +112,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
           asset_path: ./project/app/build/outputs/apk/oss/release/app-oss-release.apk
-          asset_name: owntracks-release-oss-${VERSION_CODE}.apk
+          asset_name: owntracks-release-oss-${{ env.VERSION_CODE }}.apk
           asset_content_type: application/vnd.android.package-archive
 
       - name: Promote play store beta from internal
