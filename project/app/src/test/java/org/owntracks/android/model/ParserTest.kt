@@ -24,9 +24,11 @@ import org.owntracks.android.model.messages.MessageCmd
 import org.owntracks.android.model.messages.MessageConfiguration
 import org.owntracks.android.model.messages.MessageCreatedAtNow
 import org.owntracks.android.model.messages.MessageLocation
+import org.owntracks.android.model.messages.MessageStatus
 import org.owntracks.android.model.messages.MessageTransition
 import org.owntracks.android.model.messages.MessageUnknown
 import org.owntracks.android.model.messages.MessageWaypoint
+import org.owntracks.android.model.messages.addMessageStatus
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.preferences.types.MqttQos
@@ -527,6 +529,28 @@ class ParserTest {
     assertEquals("newHost", messageCmd.configuration!!["host"])
   }
 
+  @Test
+  fun `Parser can deserialize a status cmd message`() {
+    val parser = Parser(encryptionProvider)
+
+    // language=JSON
+    val input =
+        """
+            {
+              "_type": "cmd",
+              "action": "status"
+            }
+        """
+            .trimIndent()
+    val messageBase = parser.fromJson(input)
+    messageBase.topic = "owntracks/username/device/cmd"
+    assertEquals(MessageCmd::class.java, messageBase.javaClass)
+    val messageCmd = messageBase as MessageCmd
+    assertTrue(messageCmd.isValidMessage())
+    assertEquals(CommandAction.STATUS, messageCmd.action)
+    assertEquals("owntracks/username/device", messageCmd.getContactId())
+  }
+
   @Test(expected = InvalidFormatException::class)
   fun `Parser throws exception when given cmd with invalid action`() {
     val parser = Parser(encryptionProvider)
@@ -543,7 +567,6 @@ class ParserTest {
             .trimIndent()
     parser.fromJson(input)
   }
-
   // endregion
 
   // region Transition Messages
@@ -784,6 +807,33 @@ class ParserTest {
     assertEquals(message.longitude, jsonNode.get("lon").asDouble(), 0.00001)
     assertEquals(message.radius, jsonNode.get("rad").asInt())
     assertEquals(message.timestamp, jsonNode.get("tst").asLong())
+  }
+  // endregion
+
+  // region Status Messages
+  @Test
+  fun `Parser can serialize a status message`() {
+    `when`(encryptionProvider.isPayloadEncryptionEnabled).thenReturn(false)
+    val parser = Parser(encryptionProvider)
+    val message =
+        MessageStatus().apply {
+          android = addMessageStatus().apply {
+            wifistate = 1
+            powerSave = 1
+            batteryOptimizations = 1
+            appHibernation = 1
+            locationPermission = -3
+          }
+        }
+    val serialized = message.toJson(parser)
+    val jsonNode = objectMapper.readTree(serialized)
+    assertTrue(jsonNode.isObject)
+    assertEquals("status", jsonNode.get("_type").asText())
+    assertEquals(message.android.wifistate, jsonNode.get("wifi").asInt())
+    assertEquals(message.android.powerSave, jsonNode.get("ps").asInt())
+    assertEquals(message.android.batteryOptimizations, jsonNode.get("bo").asInt()))
+    assertEquals(message.android.appHibernation, jsonNode.get("hib").asInt())
+    assertEquals(message.android.locationPermission, jsonNode.get("loc").asInt())
   }
   // endregion
 
