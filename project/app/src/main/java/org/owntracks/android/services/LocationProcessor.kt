@@ -21,6 +21,7 @@ import org.owntracks.android.location.geofencing.Geofence
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.model.messages.MessageLocation.Companion.fromLocation
 import org.owntracks.android.model.messages.MessageLocation.Companion.fromLocationAndWifiInfo
+import org.owntracks.android.model.messages.MessageStatus
 import org.owntracks.android.model.messages.MessageTransition
 import org.owntracks.android.model.messages.MessageWaypoint
 import org.owntracks.android.model.messages.MessageWaypoints
@@ -110,11 +111,6 @@ constructor(
                 batteryStatus = deviceMetricsProvider.batteryStatus
                 conn = deviceMetricsProvider.connectionType
                 monitoringMode = preferences.monitoring
-                wifistate  = wifiInfoProvider.isWiFiEnabled();
-                powerSave = deviceMetricsProvider.powerSave;
-                batteryOptimizations = deviceMetricsProvider.batteryOptimizations;
-                appHibernation = deviceMetricsProvider.appHibernation;
-                locationPermission = deviceMetricsProvider.locationPermission;
               }
             } else {
               fromLocation(location, Build.VERSION.SDK_INT)
@@ -246,6 +242,18 @@ constructor(
                       })
                 }
               }
+        })
+    publishResponseMessageIdlingResource.setIdleState(true)
+  }
+
+  suspend fun publishStatusMessage() {
+    messageProcessor.queueMessageForSending(
+        MessageStatus().apply {
+            wifistate = wifiInfoProvider.isWiFiEnabled();
+            powerSave = deviceMetricsProvider.powerSave;
+            batteryOptimizations = deviceMetricsProvider.batteryOptimizations;
+            appHibernation = deviceMetricsProvider.appHibernation;
+            locationPermission = deviceMetricsProvider.locationPermission;
         })
     publishResponseMessageIdlingResource.setIdleState(true)
   }
