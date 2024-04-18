@@ -18,7 +18,7 @@ val googleMapsAPIKey = System.getenv("GOOGLE_MAPS_API_KEY")?.toString() ?: extra
 
 val gmsImplementation: Configuration by configurations.creating
 
-val packageVersionCode: Int = System.getenv("VERSION_CODE")?.toInt() ?: 420412000
+val packageVersionCode: Int = System.getenv("VERSION_CODE")?.toInt() ?: 420500000
 val manuallySetVersion: Boolean = System.getenv("VERSION_CODE") != null
 
 android {
