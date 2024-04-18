@@ -112,10 +112,10 @@ internal constructor(@ApplicationContext private val context: Context) {
                 )
                 /* create a response of:
                 0 = Background location, fine precision
-                1 = Background location, coarse precision
-                2 = Foreground location, fine precision
-                3 = Foreground location, coarse precision
-                4 = Disabled
+                -1 = Background location, coarse precision
+                -2 = Foreground location, fine precision
+                -3 = Foreground location, coarse precision
+                -4 = Disabled
                 */
                 return (2*resultBack + resultFine + resultCoarse)
             } else {
