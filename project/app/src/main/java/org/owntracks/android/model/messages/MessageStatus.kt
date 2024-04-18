@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import org.owntracks.android.preferences.Preferences
+import org.owntracks.android.support.MessageWaypointCollection
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
@@ -13,19 +14,10 @@ import org.owntracks.android.preferences.Preferences
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 class MessageStatus(private val messageWithId: MessageWithId = MessageWithRandomId()) :
   MessageBase(), MessageWithId by messageWithId {
+  var android: addMessageStatus? = null
   @JsonIgnore
   override fun toString(): String =
-      "[MessageStatus wifi=$wifistate,ps=$powerSave,bo=$batteryOptimizations,hib=$appHibernation,loc=$locationPermission]"
-
-  @JsonProperty("wifi") var wifistate = 0
-
-  @JsonProperty("ps") var powerSave = 0
-
-  @JsonProperty("bo") var batteryOptimizations = 0
-
-  @JsonProperty("hib") var appHibernation = 0
-
-  @JsonProperty("loc") var locationPermission = 0
+      "[MessageStatus android=${android}]"
 
   override fun addMqttPreferences(preferences: Preferences) {
     topic = preferences.pubTopicStatus
@@ -40,4 +32,21 @@ class MessageStatus(private val messageWithId: MessageWithId = MessageWithRandom
     const val TYPE = "status"
     private const val BASETOPIC_SUFFIX = "/status"
   }
+}
+
+class addMessageStatus() {
+  @JsonProperty("wifi")
+  var wifistate = 0
+
+  @JsonProperty("ps")
+  var powerSave = 0
+
+  @JsonProperty("bo")
+  var batteryOptimizations = 0
+
+  @JsonProperty("hib")
+  var appHibernation = 0
+
+  @JsonProperty("loc")
+  var locationPermission = 0
 }
