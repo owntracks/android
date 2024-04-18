@@ -461,6 +461,7 @@ constructor(
           CommandAction.CLEAR_WAYPOINTS -> {
             waypointsRepo.clearAll()
           }
+          CommandAction.STATUS  -> locationProcessorLazy.get().publishStatusMessage()
           null -> {}
         }
         messageReceivedIdlingResource.remove(message)

@@ -8,5 +8,6 @@ enum class CommandAction(@JsonValue val value: String) {
   SET_WAYPOINTS("setWaypoints"),
   CLEAR_WAYPOINTS("clearWaypoints"),
   SET_CONFIGURATION("setConfiguration"),
-  WAYPOINTS("waypoints")
+  WAYPOINTS("waypoints"),
+  STATUS("status")
 }
