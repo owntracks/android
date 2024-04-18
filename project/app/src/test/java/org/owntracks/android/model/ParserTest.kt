@@ -47,11 +47,6 @@ class ParserTest {
         inregions = listOf("Testregion1", "Testregion2")
         battery = 30
         batteryStatus = BatteryStatus.CHARGING
-        wifistate = 1
-        powerSave = 1
-        batteryOptimizations = 1
-        appHibernation = 1
-        locationPermission = 3
         bssid = "12:34:56:78"
         conn = "TestConn"
         monitoringMode = MonitoringMode.SIGNIFICANT

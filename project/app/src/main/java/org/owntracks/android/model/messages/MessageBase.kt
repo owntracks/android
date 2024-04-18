@@ -26,7 +26,8 @@ import org.owntracks.android.preferences.types.ConnectionMode
     JsonSubTypes.Type(value = MessageEncrypted::class, name = MessageEncrypted.TYPE),
     JsonSubTypes.Type(value = MessageWaypoint::class, name = MessageWaypoint.TYPE),
     JsonSubTypes.Type(value = MessageWaypoints::class, name = MessageWaypoints.TYPE),
-    JsonSubTypes.Type(value = MessageLwt::class, name = MessageLwt.TYPE))
+    JsonSubTypes.Type(value = MessageLwt::class, name = MessageLwt.TYPE),
+    JsonSubTypes.Type(value = MessageStatus::class, name = MessageStatus.TYPE))
 @JsonPropertyOrder(alphabetic = true)
 abstract class MessageBase : BaseObservable(), MessageWithId {
   @JsonIgnore open val numberOfRetries: Int = 10
