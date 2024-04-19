@@ -829,11 +829,11 @@ class ParserTest {
     val jsonNode = objectMapper.readTree(serialized)
     assertTrue(jsonNode.isObject)
     assertEquals("status", jsonNode.get("_type").asText())
-    assertEquals(message.android.wifistate, jsonNode.get("android").get("wifi").asInt())
-    assertEquals(message.android.powerSave, jsonNode.get("android").get("ps").asInt())
-    assertEquals(message.android.batteryOptimizations, jsonNode.get("android").get("bo").asInt())
-    assertEquals(message.android.appHibernation, jsonNode.get("android").get("hib").asInt())
-    assertEquals(message.android.locationPermission, jsonNode.get("android").get("loc").asInt())
+    assertEquals(message.android?.wifistate, jsonNode.get("android").get("wifi").asInt())
+    assertEquals(message.android?.powerSave, jsonNode.get("android").get("ps").asInt())
+    assertEquals(message.android?.batteryOptimizations, jsonNode.get("android").get("bo").asInt())
+    assertEquals(message.android?.appHibernation, jsonNode.get("android").get("hib").asInt())
+    assertEquals(message.android?.locationPermission, jsonNode.get("android").get("loc").asInt())
   }
   // endregion
 
