@@ -350,9 +350,10 @@ constructor(
   val eventTopicSuffix = "/event"
   val commandTopicSuffix = "/cmd"
   val infoTopicSuffix = "/info"
+  val statusTopicSuffix = "/status"
   private val waypointsTopicSuffix = "/waypoints"
   private val waypointTopicSuffix = "/waypoint"
-  private val statusTopicSuffix = "/status"
+
 
   val receivedCommandsTopic: String
     get() {
