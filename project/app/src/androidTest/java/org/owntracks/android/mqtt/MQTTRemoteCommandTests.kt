@@ -24,6 +24,7 @@ import org.owntracks.android.model.Parser
 import org.owntracks.android.model.messages.MessageCmd
 import org.owntracks.android.model.messages.MessageConfiguration
 import org.owntracks.android.model.messages.MessageLocation
+import org.owntracks.android.model.messages.MessageStatus
 import org.owntracks.android.model.messages.MessageUnknown
 import org.owntracks.android.model.messages.MessageWaypoint
 import org.owntracks.android.model.messages.MessageWaypoints
@@ -415,7 +416,43 @@ class MQTTRemoteCommandTests :
     assertEquals("", configuredPreference)
   }
 
-  private fun setupTestActivity() {
+  @Test
+  fun given_an_MQTT_configured_client_when_the_broker_sends_a_status_response_message_then_a_status_message_is_sent_back_to_the_broker() {
+    setupTestActivity()
+    initializeMockLocationProvider(app)
+    reportLocationFromMap(app.mockLocationIdlingResource) { setMockLocation(52.0, 0.0) }
+    clickOnAndWait(R.id.menu_monitoring)
+    clickOnAndWait(R.id.fabMonitoringModeSignificantChanges)
+
+    baristaRule.activityTestRule.activity.publishResponseMessageIdlingResource.setIdleState(false)
+    listOf(MessageCmd().apply { action = CommandAction.STATUS })
+    .map {
+      app.messageReceivedIdlingResource.add(it)
+      it
+    }
+    .map(Parser(null)::toJsonBytes)
+    .forEach {
+      broker.publish(
+          false,
+          "owntracks/$mqttUsername/$deviceId/cmd",
+          Qos.AT_LEAST_ONCE,
+          MQTT5Properties(),
+          it.toUByteArray())
+    }
+
+    baristaRule.activityTestRule.activity.publishResponseMessageIdlingResource.use {
+      clickOnAndWait(R.id.fabMyLocation)
+    }
+    baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.use {
+      assertTrue(
+          mqttPacketsReceived
+              .filterIsInstance<MQTTPublish>()
+              .map { Parser(null).fromJson((it.payload)!!.toByteArray()) }
+              .any { it is MessageStatus })
+    }
+  }
+
+private fun setupTestActivity() {
     setNotFirstStartPreferences()
     launchActivity()
     grantMapActivityPermissions()
