@@ -5,6 +5,7 @@
 ### New features
 
 - Added `cog` field to location messages showing current bearing (#1777)
+- Added `status` remote command to retrieve system configuration status (#1618)
 
 ### Bug fixes
 
