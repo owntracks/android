@@ -324,7 +324,7 @@ class MQTTMessageProcessorEndpoint(
         override fun deliveryComplete(token: IMqttDeliveryToken?) {
           token?.run {
             Timber.v(
-                "Delivery complete messageId=$messageId topics=${this.topics.joinToString(",")}}")
+                "Delivery complete messageId=$messageId topics=${(topics?: emptyArray()).joinToString(",")}}")
           }
         }
 
