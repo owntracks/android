@@ -1,7 +1,6 @@
 package org.owntracks.android.services.worker
 
 import androidx.work.ListenableWorker
-import androidx.work.WorkerFactory
 import dagger.Binds
 import dagger.MapKey
 import dagger.Module
@@ -28,6 +27,4 @@ interface WorkerModule {
   @IntoMap
   @WorkerKey(SendLocationPingWorker::class)
   fun bindSendLocationPingWorkerFactory(factory: SendLocationPingWorker.Factory): ChildWorkerFactory
-
-  @Binds fun bindWorkerFactory(factory: BackgroundWorkerFactory): WorkerFactory
 }

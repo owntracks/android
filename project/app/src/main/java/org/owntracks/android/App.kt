@@ -15,12 +15,12 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.databinding.DataBindingUtil
+import androidx.hilt.work.HiltWorkerFactory
 import androidx.lifecycle.MutableLiveData
 import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.idling.CountingIdlingResource
 import androidx.work.Configuration
 import androidx.work.InitializationExceptionHandler
-import androidx.work.WorkerFactory
 import dagger.hilt.EntryPoints
 import dagger.hilt.android.HiltAndroidApp
 import java.security.Security
@@ -48,7 +48,7 @@ import timber.log.Timber
 class App : Application(), Configuration.Provider, Preferences.OnPreferenceChangeListener {
   @Inject lateinit var preferences: Preferences
 
-  @Inject lateinit var workerFactory: WorkerFactory
+  @Inject lateinit var workerFactory: HiltWorkerFactory
 
   @Inject lateinit var scheduler: Scheduler
 
@@ -218,6 +218,7 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
                 Timber.e(throwable, "Exception thrown when initializing WorkManager")
                 workManagerFailedToInitialize.postValue(true)
               })
+          .setMinimumLoggingLevel(android.util.Log.INFO)
           .build()
 
   override fun onPreferenceChanged(properties: Set<String>) {
