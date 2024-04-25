@@ -2,8 +2,8 @@ package org.owntracks.android.net
 
 import android.content.Context
 import java.security.KeyStore
-import org.owntracks.android.support.SocketFactory
 import java.util.concurrent.TimeUnit
+import org.owntracks.android.support.SocketFactory
 
 interface ConnectionConfiguration {
   fun validate()
