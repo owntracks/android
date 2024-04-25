@@ -167,6 +167,7 @@ class HttpMessageProcessorEndpoint(
           messageProcessor.onMessageDelivered()
         }
       } catch (e: Exception) {
+        Timber.d(e, "Execute call failed")
         // Sometimes we get an exception just on the execute() call
         throw OutgoingMessageSendingException(e)
       }
