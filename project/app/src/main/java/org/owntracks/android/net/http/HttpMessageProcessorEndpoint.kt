@@ -24,6 +24,7 @@ import org.owntracks.android.data.repos.EndpointStateRepo
 import org.owntracks.android.di.ApplicationScope
 import org.owntracks.android.di.CoroutineScopes
 import org.owntracks.android.model.messages.MessageBase
+import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.net.CALeafCertMatchingHostnameVerifier
 import org.owntracks.android.net.MessageProcessorEndpoint
@@ -235,6 +236,10 @@ class HttpMessageProcessorEndpoint(
     // Build pseudo topic based on tid
     if (message is MessageLocation) {
       message.topic = HTTPTOPIC + message.trackerId
+    } else if (message is MessageCard) {
+      message.topic = HTTPTOPIC + message.trackerId
+    } else {
+      message.topic = "NOKEY"
     }
     return message
   }

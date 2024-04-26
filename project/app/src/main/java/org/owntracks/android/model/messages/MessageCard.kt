@@ -3,6 +3,7 @@ package org.owntracks.android.model.messages
 import androidx.databinding.Bindable
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSetter
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 
@@ -15,6 +16,8 @@ class MessageCard(private val messageWithId: MessageWithId = MessageWithRandomId
   @get:Bindable var name: String? = null
 
   @set:JsonSetter var face: String? = null
+
+  @JsonInclude(JsonInclude.Include.NON_NULL) @JsonProperty("tid") var trackerId: String? = null
 
   override val baseTopicSuffix: String
     get() = BASETOPIC_SUFFIX
