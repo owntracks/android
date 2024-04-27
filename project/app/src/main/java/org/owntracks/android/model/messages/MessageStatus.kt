@@ -14,7 +14,7 @@ import org.owntracks.android.preferences.Preferences
 class MessageStatus(private val messageWithId: MessageWithId = MessageWithRandomId()) :
   MessageBase(), MessageWithId by messageWithId {
 
-  var android: addMessageStatus? = null
+  var android: AddMessageStatus? = null
 
   @JsonIgnore
   override fun toString(): String = "[MessageStatus android=${android}]"
@@ -26,15 +26,19 @@ class MessageStatus(private val messageWithId: MessageWithId = MessageWithRandom
   }
 
   override val baseTopicSuffix: String
-    get() = MessageStatus.BASETOPIC_SUFFIX
+    get() = BASETOPIC_SUFFIX
 
   companion object {
     const val TYPE = "status"
     private const val BASETOPIC_SUFFIX = "/status"
+    const val STATUS_PASS = 0
+    const val STATUS_FAIL = 1
+    const val STATUS_WIFI_ENABLED = 1
+    const val STATUS_WIFI_DISABLED = 0
   }
 }
 
-class addMessageStatus() {
+class AddMessageStatus() {
   @JsonProperty("wifi")
   var wifistate = 0
 

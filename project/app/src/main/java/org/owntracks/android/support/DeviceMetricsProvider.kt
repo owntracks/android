@@ -17,6 +17,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import org.owntracks.android.model.BatteryStatus
 import org.owntracks.android.model.messages.MessageLocation
+import org.owntracks.android.model.messages.MessageStatus
 import timber.log.Timber
 
 @Singleton
@@ -73,17 +74,25 @@ internal constructor(@ApplicationContext private val context: Context) {
       get() {
         val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
         // return 0 if no power save
-        return (if (powerManager.isPowerSaveMode) 1 else 0)
+        return if (powerManager.isPowerSaveMode) {
+          MessageStatus.STATUS_FAIL
+        } else {
+          MessageStatus.STATUS_PASS
+        }
       }
 
     val batteryOptimizations: Int
       get() {
-        // return 0 if no battery optimizations
+        // return 0 (STATUS_PASS) if no battery optimizations
         return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
           val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-          if (powerManager.isIgnoringBatteryOptimizations(context.getPackageName())) 0 else 1
+          if (powerManager.isIgnoringBatteryOptimizations(context.getPackageName())) {
+            MessageStatus.STATUS_PASS
+          } else {
+            MessageStatus.STATUS_FAIL
+          }
         } else {
-          0
+          MessageStatus.STATUS_PASS
         }
       }
 
@@ -92,7 +101,11 @@ internal constructor(@ApplicationContext private val context: Context) {
         val future: ListenableFuture<Int> =
           PackageManagerCompat.getUnusedAppRestrictionsStatus(context)
         // return 0 if no app hibernation
-        return (if (future.get() == DISABLED) 0 else 1)
+        return if (future.get() == DISABLED) {
+          MessageStatus.STATUS_PASS
+        } else {
+          MessageStatus.STATUS_FAIL
+        }
       }
 
     val locationPermission: Int
@@ -119,7 +132,7 @@ internal constructor(@ApplicationContext private val context: Context) {
           */
           return (2*resultBack + resultFine + resultCoarse)
         } else {
-          return 0
+          return MessageStatus.STATUS_PASS
         }
       }
 }
