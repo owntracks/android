@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import org.owntracks.android.preferences.Preferences
-import org.owntracks.android.support.MessageWaypointCollection
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
@@ -18,8 +17,7 @@ class MessageStatus(private val messageWithId: MessageWithId = MessageWithRandom
   var android: addMessageStatus? = null
 
   @JsonIgnore
-  override fun toString(): String =
-      "[MessageStatus android=${android}]"
+  override fun toString(): String = "[MessageStatus android=${android}]"
 
   override fun addMqttPreferences(preferences: Preferences) {
     topic = preferences.pubTopicStatus

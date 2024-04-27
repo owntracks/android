@@ -81,11 +81,7 @@ internal constructor(@ApplicationContext private val context: Context) {
         // return 0 if no battery optimizations
         return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
           val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-          if (powerManager.isIgnoringBatteryOptimizations(context.getPackageName())) {
-            0
-          } else {
-            1
-          }
+          if (powerManager.isIgnoringBatteryOptimizations(context.getPackageName())) 0 else 1
         } else {
           0
         }
@@ -96,11 +92,7 @@ internal constructor(@ApplicationContext private val context: Context) {
         val future: ListenableFuture<Int> =
           PackageManagerCompat.getUnusedAppRestrictionsStatus(context)
         // return 0 if no app hibernation
-        return if (future.get() == DISABLED) {
-          0
-        } else {
-          1
-        }
+        return (if (future.get() == DISABLED) 0 else 1)
       }
 
     val locationPermission: Int
@@ -127,7 +119,7 @@ internal constructor(@ApplicationContext private val context: Context) {
           */
           return (2*resultBack + resultFine + resultCoarse)
         } else {
-          return (0)
+          return 0
         }
       }
 }
