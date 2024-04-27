@@ -249,13 +249,14 @@ constructor(
   fun publishStatusMessage() {
     messageProcessor.queueMessageForSending(
         MessageStatus().apply {
-          android = addMessageStatus().apply {
-            wifistate = wifiInfoProvider.isWiFiEnabled()
-            powerSave = deviceMetricsProvider.powerSave
-            batteryOptimizations = deviceMetricsProvider.batteryOptimizations
-            appHibernation = deviceMetricsProvider.appHibernation
-            locationPermission = deviceMetricsProvider.locationPermission
-          }
+          android =
+              addMessageStatus().apply {
+                wifistate = wifiInfoProvider.isWiFiEnabled()
+                powerSave = deviceMetricsProvider.powerSave
+                batteryOptimizations = deviceMetricsProvider.batteryOptimizations
+                appHibernation = deviceMetricsProvider.appHibernation
+                locationPermission = deviceMetricsProvider.locationPermission
+              }
         })
     publishResponseMessageIdlingResource.setIdleState(true)
   }
