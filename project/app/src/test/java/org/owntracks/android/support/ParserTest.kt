@@ -30,7 +30,7 @@ import org.owntracks.android.model.messages.MessageStatus
 import org.owntracks.android.model.messages.MessageTransition
 import org.owntracks.android.model.messages.MessageUnknown
 import org.owntracks.android.model.messages.MessageWaypoint
-import org.owntracks.android.model.messages.addMessageStatus
+import org.owntracks.android.model.messages.AddMessageStatus
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.preferences.types.MqttQos
@@ -744,7 +744,7 @@ class ParserTest {
     val parser = Parser(encryptionProvider)
     val message =
         MessageStatus().apply {
-          android = addMessageStatus().apply {
+          android = AddMessageStatus().apply {
             wifistate = 1
             powerSave = 1
             batteryOptimizations = 1

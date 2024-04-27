@@ -9,6 +9,7 @@ import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
 import android.os.Build
 import dagger.hilt.android.qualifiers.ApplicationContext
+import org.owntracks.android.model.messages.MessageStatus
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -63,9 +64,9 @@ class WifiInfoProvider @Inject constructor(@ApplicationContext context: Context)
 
   fun isWiFiEnabled(): Int =
       if (wifiManager.isWifiEnabled) {
-        1
+        MessageStatus.STATUS_WIFI_ENABLED
       } else {
-        0
+        MessageStatus.STATUS_WIFI_DISABLED
       }
 }
 
