@@ -9,9 +9,9 @@ import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
 import android.os.Build
 import dagger.hilt.android.qualifiers.ApplicationContext
-import org.owntracks.android.model.messages.MessageStatus
 import javax.inject.Inject
 import javax.inject.Singleton
+import org.owntracks.android.model.messages.MessageStatus
 
 @Singleton
 class WifiInfoProvider @Inject constructor(@ApplicationContext context: Context) {

@@ -18,6 +18,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.owntracks.android.location.geofencing.Geofence
 import org.owntracks.android.model.Parser.EncryptionException
+import org.owntracks.android.model.messages.AddMessageStatus
 import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageClear
 import org.owntracks.android.model.messages.MessageCmd
@@ -28,7 +29,6 @@ import org.owntracks.android.model.messages.MessageStatus
 import org.owntracks.android.model.messages.MessageTransition
 import org.owntracks.android.model.messages.MessageUnknown
 import org.owntracks.android.model.messages.MessageWaypoint
-import org.owntracks.android.model.messages.AddMessageStatus
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.preferences.types.MqttQos
@@ -817,13 +817,14 @@ class ParserTest {
     val parser = Parser(encryptionProvider)
     val message =
         MessageStatus().apply {
-          android = AddMessageStatus().apply {
-            wifistate = 1
-            powerSave = 1
-            batteryOptimizations = 1
-            appHibernation = 1
-            locationPermission = -3
-          }
+          android =
+              AddMessageStatus().apply {
+                wifistate = 1
+                powerSave = 1
+                batteryOptimizations = 1
+                appHibernation = 1
+                locationPermission = -3
+              }
         }
     val serialized = message.toJson(parser)
     val jsonNode = objectMapper.readTree(serialized)
