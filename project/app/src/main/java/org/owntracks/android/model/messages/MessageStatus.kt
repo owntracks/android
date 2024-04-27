@@ -12,12 +12,11 @@ import org.owntracks.android.preferences.Preferences
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 class MessageStatus(private val messageWithId: MessageWithId = MessageWithRandomId()) :
-  MessageBase(), MessageWithId by messageWithId {
+    MessageBase(), MessageWithId by messageWithId {
 
   var android: AddMessageStatus? = null
 
-  @JsonIgnore
-  override fun toString(): String = "[MessageStatus android=${android}]"
+  @JsonIgnore override fun toString(): String = "[MessageStatus android=${android}]"
 
   override fun addMqttPreferences(preferences: Preferences) {
     topic = preferences.pubTopicStatus
@@ -39,18 +38,13 @@ class MessageStatus(private val messageWithId: MessageWithId = MessageWithRandom
 }
 
 class AddMessageStatus() {
-  @JsonProperty("wifi")
-  var wifistate = 0
+  @JsonProperty("wifi") var wifistate = 0
 
-  @JsonProperty("ps")
-  var powerSave = 0
+  @JsonProperty("ps") var powerSave = 0
 
-  @JsonProperty("bo")
-  var batteryOptimizations = 0
+  @JsonProperty("bo") var batteryOptimizations = 0
 
-  @JsonProperty("hib")
-  var appHibernation = 0
+  @JsonProperty("hib") var appHibernation = 0
 
-  @JsonProperty("loc")
-  var locationPermission = 0
+  @JsonProperty("loc") var locationPermission = 0
 }
