@@ -347,7 +347,6 @@ constructor(
   private val waypointsTopicSuffix = "/waypoints"
   private val waypointTopicSuffix = "/waypoint"
 
-
   val receivedCommandsTopic: String
     get() {
       return pubTopicBaseWithUserDetails + commandTopicSuffix
@@ -372,6 +371,7 @@ constructor(
     get() {
       return pubTopicBaseWithUserDetails + waypointTopicSuffix
     }
+  // For status command
   val pubTopicStatus: String
     get() {
       return pubTopicBaseWithUserDetails + statusTopicSuffix

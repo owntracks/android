@@ -62,7 +62,11 @@ class WifiInfoProvider @Inject constructor(@ApplicationContext context: Context)
   fun isConnected(): Boolean = getBSSID() != null
 
   fun isWiFiEnabled(): Int =
-      if (wifiManager.isWifiEnabled) { 1 } else { 0 }
+      if (wifiManager.isWifiEnabled) {
+        1
+      } else {
+        0
+      }
 }
 
 fun WifiInfo.getUnquotedSSID(): String = this.ssid.replace(Regex("^\"(.*)\"$"), "$1")
