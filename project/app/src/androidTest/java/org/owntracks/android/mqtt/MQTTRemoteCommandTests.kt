@@ -426,19 +426,19 @@ class MQTTRemoteCommandTests :
 
     baristaRule.activityTestRule.activity.publishResponseMessageIdlingResource.setIdleState(false)
     listOf(MessageCmd().apply { action = CommandAction.STATUS })
-    .map {
-      app.messageReceivedIdlingResource.add(it)
-      it
-    }
-    .map(Parser(null)::toJsonBytes)
-    .forEach {
-      broker.publish(
-          false,
-          "owntracks/$mqttUsername/$deviceId/cmd",
-          Qos.AT_LEAST_ONCE,
-          MQTT5Properties(),
-          it.toUByteArray())
-    }
+        .map {
+          app.messageReceivedIdlingResource.add(it)
+          it
+        }
+        .map(Parser(null)::toJsonBytes)
+        .forEach {
+          broker.publish(
+              false,
+              "owntracks/$mqttUsername/$deviceId/cmd",
+              Qos.AT_LEAST_ONCE,
+              MQTT5Properties(),
+              it.toUByteArray())
+        }
 
     baristaRule.activityTestRule.activity.publishResponseMessageIdlingResource.use {
       clickOnAndWait(R.id.fabMyLocation)
@@ -452,7 +452,7 @@ class MQTTRemoteCommandTests :
     }
   }
 
-private fun setupTestActivity() {
+  private fun setupTestActivity() {
     setNotFirstStartPreferences()
     launchActivity()
     grantMapActivityPermissions()
