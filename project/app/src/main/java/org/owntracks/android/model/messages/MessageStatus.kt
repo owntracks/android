@@ -14,7 +14,9 @@ import org.owntracks.android.support.MessageWaypointCollection
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 class MessageStatus(private val messageWithId: MessageWithId = MessageWithRandomId()) :
   MessageBase(), MessageWithId by messageWithId {
+
   var android: addMessageStatus? = null
+
   @JsonIgnore
   override fun toString(): String =
       "[MessageStatus android=${android}]"
