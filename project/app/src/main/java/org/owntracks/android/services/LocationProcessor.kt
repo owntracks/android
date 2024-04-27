@@ -122,7 +122,6 @@ constructor(
               inregions = calculateInRegions(loadedWaypoints)
             }
     Timber.v("Actually publishing location $location triggered by $trigger as message=$message")
-
     messageProcessor.queueMessageForSending(message)
     if (responseMessageTypes.contains(trigger)) {
       publishResponseMessageIdlingResource.setIdleState(true)
