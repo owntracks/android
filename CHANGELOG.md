@@ -9,7 +9,7 @@
 
 ### New features
 
-- Now translated into Indonesian, and British English(!)
+- Now translated into Indonesian, Italian, and British English(!)
 - Minimum device version is now SDK v24 (Android 7.0 Nougat)
 - When displayed, LatLngs now are limited to 4 decimal places, because more precision than that is a bit silly (#1278, #1279)
 - The config editor text is now selectable
