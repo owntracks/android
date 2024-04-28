@@ -22,12 +22,15 @@
     <string name="batteryOptimizationWhitelistDialogMessage">"Fritagelse fra batterioptimering kan hjælpe OwnTracks med at spore position mere pålideligt og holde kontakt med serveren."</string>
     <string name="batteryOptimizationWhitelistDialogTitle">"Batterioptimering"</string>
     <string name="cancel">"Anullér"</string>
+    <string name="certificateMigrationRequiredOpenSettingsAction">"Åbn Indstillinger"</string>
     <string name="clear_log">"Ryd"</string>
     <string name="configurationManagement">"Konfigurationshåndtering"</string>
     <string name="CONNECTED">"Forbundet"</string>
     <string name="CONNECTING">"Forbinder"</string>
     <string name="contact_image">"Kontaktbillede"</string>
     <string name="contactDetailsAccuracy">"Præcision"</string>
+
+    <!-- Fuzzy -->
     <string name="contactDetailsAccuracyValue">"%d m"</string>
     <string name="contactDetailsAltitude">"Højde"</string>
     <string name="contactDetailsAltitudeValue">"%,d m"</string>
@@ -35,16 +38,19 @@
     <string name="contactDetailsBatteryValue">"%d %%"</string>
     <string name="contactDetailsBearing">"Pejling"</string>
     <string name="contactDetailsBearingValue">"%,.0f°"</string>
+    <string name="contactDetailsCoordinates">"Koordinater"</string>
     <string name="contactDetailsDistance">"Distance"</string>
     <string name="contactDetailsDistanceUnitKilometres">"km"</string>
     <string name="contactDetailsDistanceUnitMeters">"m"</string>
     <string name="contactDetailsDistanceValue">"%1$,.2f %2$s"</string>
     <string name="contactDetailsSpeed">"Hastighed"</string>
-    <string name="contactDetailsSpeedValue">"%d km/h"</string>
+    <string name="contactDetailsSpeedValue">"%d km/t"</string>
     <string name="contactDetailsTopic">"Identifikator"</string>
     <string name="contactDetailsTrackerId">"Sporings-ID"</string>
     <string name="contactLocationUnknown">"Ingen position tilgængelig"</string>
+    <string name="contactsListPlaceholder">"Ingen kontakter fundet"</string>
     <string name="currentLocationButtonLabel">"Nuværende position"</string>
+    <string name="deleteWaypointConfirmationButtonLabel">"Slet"</string>
     <string name="description">"Beskrivelse"</string>
     <string name="deviceLocationDisabledDialogMessage">"Positionstjenesterne på denne enhed er i øjeblikket slået fra, så OwnTracks kan ikke spore dine nuværende position.
 
@@ -57,7 +63,8 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="enjoy_description">"Vælg præferencer fra menuen (eller brug linket herunder) og forbind OwnTracks til din server før du bruger det"</string>
     <string name="ERROR">"Fejl"</string>
     <string name="ERROR_CONFIGURATION">"Konfiguration er ufuldstændig"</string>
-    <string name="ERROR_DATADISABLED">"Dataforbindelse er ikke tilgængelig"</string>
+
+    <!-- Fuzzy -->
     <string name="errorPreferencesImportFailed">"Import fejlet"</string>
     <string name="events">"Begivenheder"</string>
     <string name="exportConfiguration">"Eksportér"</string>
@@ -79,6 +86,7 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="importConfig">"Importér"</string>
     <string name="INITIAL">"Starter"</string>
     <string name="latitude">"Breddegrad"</string>
+    <string name="loadActivitySelectAFile">"Vælg en fil"</string>
     <string name="locationPermissionNotGrantedNotification">"Positionstilladelse er ikke givet"</string>
     <string name="locationPermissionRequestDialogMessage">"For at spore din nuværende position, giv venligst OwnTracks positionstilladelser."</string>
     <string name="locationPermissionRequestDialogTitle">"Anmodning om adgang til position"</string>
@@ -99,6 +107,8 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="monitoring_move">"Bevægelse overvågningstilstand"</string>
     <string name="monitoring_quiet">"Stille overvågningstilstand"</string>
     <string name="monitoring_significant">"Betydelig ændring overvågningstilstand"</string>
+
+    <!-- Fuzzy -->
     <string name="monitoringModeDialogManualDescription">"Kun overgange mellem regioner offentliggøres automatisk, ikke positioner"</string>
     <string name="monitoringModeDialogManualTitle">"Manuel"</string>
     <string name="monitoringModeDialogMoveDescription">"Høj frekvens og præcision, men højt strømforbrug"</string>
@@ -114,6 +124,8 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="noNavigationApp">"ingen passende app installeret"</string>
     <string name="notificationChangeMonitoring">"Ændring overvågningstilstand"</string>
     <string name="notificationChannelErrors">"Fejl"</string>
+
+    <!-- Fuzzy -->
     <string name="notificationChannelEventsDescription">"Region-notifikationer"</string>
     <string name="notificationChannelOngoing">"Vedvarende"</string>
     <string name="notificationChannelOngoingDescription">"Nødvendig for at modtage positionsopdateringer i baggrunden"</string>
@@ -129,6 +141,7 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="preferencesAutostart">"Autostart"</string>
     <string name="preferencesAutostartSummary">"Start automatisk når enhed tænder"</string>
     <string name="preferencesBrokerPassword">"Adgangskode"</string>
+    <string name="preferencesCaCrtInstall">"Installér CA-certifikat"</string>
     <string name="preferencesCategoryAdvancedEncryption">"Kryptering"</string>
     <string name="preferencesCategoryAdvancedLocator">"Lokaliseringsløsning"</string>
     <string name="preferencesCategoryAdvancedMisc">"Andet"</string>
@@ -138,11 +151,13 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="preferencesCategoryNotificationOngoing">"Vedvarende notifikation"</string>
     <string name="preferencesChangelog">"Ændringsoversigt"</string>
     <string name="preferencesCleanSessionEnabled">"Ren Session"</string>
-    <string name="preferencesClientCrtPassword">"Klient-certifikat adgangskode"</string>
-    <string name="preferencesClientCrtPath">"Klient-certifikat"</string>
+    <string name="preferencesClientCrt">"Klient certifikat"</string>
+    <string name="preferencesClientCrtInstall">"Installér klient-certifikat"</string>
     <string name="preferencesClientId">"Klient-ID"</string>
+    <string name="preferencesClientIdValidationError">"Kan ikke være tom"</string>
     <string name="preferencesDebugLog">"Fejlsøgningslog"</string>
     <string name="preferencesDeviceName">"Enheds-ID"</string>
+    <string name="preferencesDeviceNameValidationError">"Kan ikke være tom"</string>
     <string name="preferencesDocumentation">"Dokumentation"</string>
     <string name="preferencesEditor">"Editor"</string>
     <string name="preferencesEditorDescription">"Angiv en enkelt værdi for den specificerede nøgle. Nogle ændringer kræver måske en genstart af app'en."</string>
@@ -158,6 +173,7 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="preferencesExperimental">"Eksperimentel"</string>
     <string name="preferencesExportSuccess">"Eksport lykkedes"</string>
     <string name="preferencesHost">"Vært"</string>
+    <string name="preferencesHostValidationError">"Kan ikke være tom"</string>
     <string name="preferencesIgnoreInaccurateLocations">"Upræcise positioner"</string>
     <string name="preferencesIgnoreInaccurateLocationsDialog">"Ignorér position hvis præcisionen er større end de angivne meter"</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">"Ignorér upræcise positioner"</string>
@@ -183,6 +199,7 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="preferencesNotificationGeocoderErrorsSummary">"Vis begivenheder for geokoders fejl &amp; hastighedsbegrænsninger"</string>
     <string name="preferencesNotificationLocation">"Sidst rapporterede position"</string>
     <string name="preferencesNotificationLocationSummary">"Vis sidst rapporterede position og tid"</string>
+    <string name="preferencesNotSet">"Ikke indstillet"</string>
     <string name="preferencesOpencageGeocoderApiKey">"OpenCage API-nøgle"</string>
     <string name="preferencesOpencageGeocoderApiKeyDialog">"Hvis udfyldt, bliver OpenCage brugt til at bestemme adresser i stedet for Google. Kræver genstart."</string>
     <string name="preferencesOpencageGeocoderApiKeySummary">"API-nøgle til OpenCage omvendt geokoder"</string>
@@ -201,6 +218,7 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="preferencesRepository">"Klidekode"</string>
     <string name="preferencesReverseGeocodeProvider">"Udbyder af baglæns geokodning"</string>
     <string name="preferencesServer">"Forbindelse"</string>
+    <string name="preferencesSet">"Indstil"</string>
 
     <!-- Fuzzy -->
     <string name="preferencesShowWaypointsOnMap">"Vis Regioner"</string>
@@ -209,11 +227,13 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="preferencesShowWaypointsOnMapSummary">"Vis regionscirkler på kortet"</string>
     <string name="preferencesTheme">"Tema"</string>
     <string name="preferencesTrackerId">"Tracker ID"</string>
-
-    <!-- Fuzzy -->
     <string name="preferencesUsername">"Brugernavn"</string>
     <string name="preferencesWebsocket">"Brug WebSockets"</string>
+
+    <!-- Fuzzy -->
     <string name="publish">"Rapport"</string>
+
+    <!-- Fuzzy -->
     <string name="radius">"Radius"</string>
     <string name="reconnect">"Genforbind"</string>
     <string name="save">"Gem"</string>
@@ -226,6 +246,13 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="status_last_background_update_hint">"Sidste baggrundsopdatering fra positionsservice"</string>
     <string name="statusBatteryDozeWhiteListDisabled">"Nej"</string>
     <string name="statusBatteryDozeWhiteListEnabled">"Ja"</string>
+    <string name="statusEndpointStateMessageTLSError">"TLS fejl: %s"</string>
+    <string name="statusEndpointStateMessageUnableToConnect">"Kunne ikke forbinde"</string>
+    <string name="statusLocationPermissionsFineForeground">"Præcis"</string>
+    <string name="statusLocationPermissionsNone">"Ingen"</string>
+    <string name="statusLocationPermissionsPromptNegativeButton">"Annullér"</string>
+    <string name="statusLocationPermissionsPromptTitle">"Baggrundslokation"</string>
+    <string name="statusLocationPermissionsUnknown">"Ukendt"</string>
     <string name="title_activity_about">"Om"</string>
     <string name="title_activity_contacts">"Venner"</string>
     <string name="title_activity_map">"Kort"</string>
@@ -252,6 +279,8 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
 
     <!-- Fuzzy -->
     <string name="waypoint_region_unknown">"Ukendt status"</string>
+
+    <!-- Fuzzy -->
     <string name="waypointListPlaceholder">"Ingen regioner defineret endnu"</string>
     <string name="welcome_connection_setup_description">"OwnTracks fungerer ved at sende din position til en server som du (eller en du stoler på) ejer, hvilket sikrer at du kontrollerer din data.
 
@@ -267,11 +296,6 @@ For flere detaljer, læs OwnTracks Booklet."</string>
     <string name="welcome_heading">"Velkommen"</string>
     <string name="welcome_play_description">"OwnTracks kræver Google Play Tjenester"</string>
     <string name="welcome_play_heading">"Google Play Tjenester"</string>
-    <string name="welcome_version_description">"Grundet begrænsninger i operativsystemet kører nogle funktioner muligvis i en begrænset tilstand.
-
-En permanent notifikation vil blive vist for at holde app'en kørende i baggrunden. Den kan slås fra i systemets indstillinger for notifikationer."</string>
-    <string name="welcome_version_learn_more">"Lær mere"</string>
-    <string name="welcome_version_title">"Begrænsninger"</string>
     <string name="welcomeFixIssue">"Fiks"</string>
     <string name="workmanagerInitializationErrorDialogMessage">"Nogle komponenter kunne ikke starte rigtigt, så Owntracks virker måske ikke som det skal. Det kan være nødvendigt at geninstallere app'en eller rydde den eksisterende brugerdata.
 

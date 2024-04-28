@@ -11,13 +11,13 @@ import org.owntracks.android.location.LatLng
 @SmallTest
 class LatLngGMSConversion {
 
-    @Test
-    fun canConvertLatLngToGMS() {
-        val lat = 51.5732
-        val long = 0.5763
-        val latLng = LatLng(lat, long)
-        val gmsLatLng = latLng.toGMSLatLng()
-        assertEquals(lat, gmsLatLng.latitude, 0.0001)
-        assertEquals(long, gmsLatLng.longitude, 0.0001)
-    }
+  @Test
+  fun canConvertLatLngToGMS() {
+    val lat = 51.5732
+    val long = 0.5763
+    val latLng = LatLng(lat, long)
+    val gmsLatLng = latLng.toGMSLatLng()
+    assertEquals(lat, gmsLatLng.latitude, 0.0001)
+    assertEquals(long, gmsLatLng.longitude, 0.0001)
+  }
 }

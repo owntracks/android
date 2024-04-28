@@ -10,25 +10,26 @@ import org.owntracks.android.databinding.ModeBottomSheetDialogBinding
 import org.owntracks.android.preferences.types.MonitoringMode
 
 class MonitoringModeBottomSheetDialog : BottomSheetDialogFragment() {
-    private val viewModel: MapViewModel by activityViewModels()
-    private lateinit var binding: ModeBottomSheetDialogBinding
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding = ModeBottomSheetDialogBinding.inflate(inflater, container, false)
-        mapOf(
+  private val viewModel: MapViewModel by activityViewModels()
+  private lateinit var binding: ModeBottomSheetDialogBinding
+
+  override fun onCreateView(
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?
+  ): View {
+    binding = ModeBottomSheetDialogBinding.inflate(inflater, container, false)
+    mapOf(
             binding.fabMonitoringModeQuiet to MonitoringMode.QUIET,
             binding.fabMonitoringModeManual to MonitoringMode.MANUAL,
             binding.fabMonitoringModeSignificantChanges to MonitoringMode.SIGNIFICANT,
-            binding.fabMonitoringModeMove to MonitoringMode.MOVE
-        ).forEach {
-            it.key.setOnClickListener { _ ->
-                viewModel.setMonitoringMode(it.value)
-                dismiss()
-            }
+            binding.fabMonitoringModeMove to MonitoringMode.MOVE)
+        .forEach {
+          it.key.setOnClickListener { _ ->
+            viewModel.setMonitoringMode(it.value)
+            dismiss()
+          }
         }
-        return binding.root
-    }
+    return binding.root
+  }
 }

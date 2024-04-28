@@ -4,11 +4,12 @@
 
 ### Breaking changes
 
-- OwnTracks will no longer manage your TLS CAs if you're using a CA that's not in your device's CA store. You will need to add your CA to your device's CA store, and OwnTracks will use that store as a trusted reference for verifying TLS endpoints. There should be a notification when OwnTracks starts after upgrade.
+- OwnTracks will no longer manage your TLS CAs or client certs. For custom CA certs, you will need to add your CA to your device's CA store, and OwnTracks will use that store as a trusted reference for verifying TLS endpoints. Similarly, for client certificates, you'll need to add that certificate to the device's certificate store There should be a notification when OwnTracks starts after upgrade. (#736, #1061)
 - TLSv1 and TLSv1.1 are deprecated. Supported TLS versions are 1.2 and 1.3.
 
 ### New features
 
+- Now translated into Indonesian, and British English(!)
 - Minimum device version is now SDK v24 (Android 7.0 Nougat)
 - When displayed, LatLngs now are limited to 4 decimal places, because more precision than that is a bit silly (#1278, #1279)
 - The config editor text is now selectable
@@ -18,18 +19,20 @@
 - Added korean translation
 - Shortcuts to preferences and logs on the launcher icon
 - Waypoints can be imported on the config import screen (#1284)
-- MQTT connection now reacts to changes in the device's default network, explicitly doing a reconnect
+- MQTT connection now reacts to changes in the device's default network, explicitly doing a reconnect (#642)
 - Waypoint delete UX made a little easier. Explicit button in the waypoint activity, rather than a long-press
 - Notification permissions are requested sensibly on Android 13+
 - Google Play Store build numbers will now just increment from 40800000, rather than reflect the version string
 - Background location permission! (Hurray!)
-- Prompt for location permissions in the welcome screen
+- Prompt for location & notification permissions in the welcome screen
 - An exported log file also contains the threadname for each logentry
-- Certificates are stored in-line in the config, rather than just the names. This should help import/export
 - Removed the undocumented `REREQUEST_LOCATION_UPDATES` intent
 - Added `clearWaypoints` remote command (#1022)
 - Contact direction arrow now moves with device to point in the actual direction of the contact
 - Share button added to contact sheet (#1465)
+- Changing the connection details will now clear the contacts and the location message backlog (#1598)
+- Messages now include a random `_id` (String) field which can be used by any consumer to correlate and distinguish send/return messages
+- `pubExtendedData` preference renamed to `extendedData` (#1654)
 
 ### Bug fixes
 
@@ -40,6 +43,14 @@
 - Config export actually exports to a local file now, rather than just a somewhat useless "share"
 - `conn` value correctly filled out as `o` (offline) when there's no network connection (#1442)
 - `batt` is ommitted from locations if extended data is disabled (#741)
+- Don't import waypoints from config if they're not valid (#1597)
+- Fix the list of MQTT topics that we listen to, so that we only listen to the cmd topic for our device
+- Publish new waypoints on the correct `/waypoint` topic
+- Fix issue where notificiation permission banner was shown on devices where the notifications were actually just disabled
+- Incoming messages that can't be parsed are now correctly handled as MessageUnknown
+- Map blue dot should show the location accuracy circle properly
+- Fix crash on importing config URIs that weren't valid
+- Fix bug when sharing logs via GMail (#1600)
 
 ## Version 2.4.12
 

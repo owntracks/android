@@ -14,12 +14,12 @@ import org.owntracks.android.preferences.SharedPreferencesStore
 @InstallIn(SingletonComponent::class)
 @Module
 abstract class ReposAndContextModule {
-    @Binds
-    abstract fun bindSharedPreferencesStoreModule(sharedPreferencesStore: SharedPreferencesStore): PreferencesStore
+  @Binds
+  abstract fun bindSharedPreferencesStoreModule(
+      sharedPreferencesStore: SharedPreferencesStore
+  ): PreferencesStore
 
-    @Binds
-    abstract fun bindWaypointsRepo(waypointsRepo: RoomWaypointsRepo): WaypointsRepo
+  @Binds abstract fun bindWaypointsRepo(waypointsRepo: RoomWaypointsRepo): WaypointsRepo
 
-    @Binds
-    abstract fun bindMemoryContactsRepo(memoryContactsRepo: MemoryContactsRepo): ContactsRepo
+  @Binds abstract fun bindMemoryContactsRepo(memoryContactsRepo: MemoryContactsRepo): ContactsRepo
 }

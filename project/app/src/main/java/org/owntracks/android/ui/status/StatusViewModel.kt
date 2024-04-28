@@ -24,80 +24,70 @@ import org.owntracks.android.data.repos.EndpointStateRepo
 import org.owntracks.android.data.repos.LocationRepo
 
 @HiltViewModel
-class StatusViewModel @Inject constructor(
+class StatusViewModel
+@Inject
+constructor(
     application: Application,
     endpointStateRepo: EndpointStateRepo,
     locationRepo: LocationRepo
-) :
-    AndroidViewModel(application) {
-    val endpointState: StateFlow<EndpointState> = endpointStateRepo.endpointState
-    val endpointQueueLength: StateFlow<Int> = endpointStateRepo.endpointQueueLength
-    val serviceStarted: StateFlow<Instant> = endpointStateRepo.serviceStartedDate
-    val currentLocation: StateFlow<Location?> = locationRepo.currentPublishedLocation
-    private val powerManager =
-        (getApplication<Application>().applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager)
-    internal val dozeWhitelisted = MutableLiveData<Boolean>()
+) : AndroidViewModel(application) {
+  val endpointState: StateFlow<EndpointState> = endpointStateRepo.endpointState
+  val endpointQueueLength: StateFlow<Int> = endpointStateRepo.endpointQueueLength
+  val serviceStarted: StateFlow<Instant> = endpointStateRepo.serviceStartedDate
+  val currentLocation: StateFlow<Location?> = locationRepo.currentPublishedLocation
+  private val powerManager =
+      (getApplication<Application>().applicationContext.getSystemService(Context.POWER_SERVICE)
+          as PowerManager)
+  internal val dozeWhitelisted = MutableLiveData<Boolean>()
 
-    private val mutableLocationPermissions = MutableLiveData(R.string.statusLocationPermissionsUnknown)
-    val locationPermissions: LiveData<Int> = mutableLocationPermissions
+  private val mutableLocationPermissions =
+      MutableLiveData(R.string.statusLocationPermissionsUnknown)
+  val locationPermissions: LiveData<Int> = mutableLocationPermissions
 
-    fun refreshLocationPermissions() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val permissions = listOf(
-                ACCESS_COARSE_LOCATION,
-                ACCESS_FINE_LOCATION,
-                ACCESS_BACKGROUND_LOCATION
-            ).map { PermissionChecker.checkSelfPermission(getApplication(), it) }
-            when (permissions) {
-                listOf(
-                    PERMISSION_DENIED,
-                    PERMISSION_DENIED,
-                    PERMISSION_DENIED
-                ) -> R.string.statusLocationPermissionsNone
-                listOf(
-                    PERMISSION_GRANTED,
-                    PERMISSION_DENIED,
-                    PERMISSION_DENIED
-                ) -> R.string.statusLocationPermissionsCoarseForeground
-                listOf(
-                    PERMISSION_GRANTED,
-                    PERMISSION_GRANTED,
-                    PERMISSION_DENIED
-                ) -> R.string.statusLocationPermissionsFineForeground
-                listOf(
-                    PERMISSION_GRANTED,
-                    PERMISSION_DENIED,
-                    PERMISSION_GRANTED
-                ) -> R.string.statusLocationPermissionsCoarseBackground
-                listOf(
-                    PERMISSION_GRANTED,
-                    PERMISSION_GRANTED,
-                    PERMISSION_GRANTED
-                ) -> R.string.statusLocationPermissionsFineBackground
-                else -> R.string.statusLocationPermissionsUnknown
-            }
+  fun refreshLocationPermissions() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+          val permissions =
+              listOf(ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION, ACCESS_BACKGROUND_LOCATION).map {
+                PermissionChecker.checkSelfPermission(getApplication(), it)
+              }
+          when (permissions) {
+            listOf(PERMISSION_DENIED, PERMISSION_DENIED, PERMISSION_DENIED) ->
+                R.string.statusLocationPermissionsNone
+            listOf(PERMISSION_GRANTED, PERMISSION_DENIED, PERMISSION_DENIED) ->
+                R.string.statusLocationPermissionsCoarseForeground
+            listOf(PERMISSION_GRANTED, PERMISSION_GRANTED, PERMISSION_DENIED) ->
+                R.string.statusLocationPermissionsFineForeground
+            listOf(PERMISSION_GRANTED, PERMISSION_DENIED, PERMISSION_GRANTED) ->
+                R.string.statusLocationPermissionsCoarseBackground
+            listOf(PERMISSION_GRANTED, PERMISSION_GRANTED, PERMISSION_GRANTED) ->
+                R.string.statusLocationPermissionsFineBackground
+            else -> R.string.statusLocationPermissionsUnknown
+          }
         } else {
-            val permissions = listOf(
-                ACCESS_COARSE_LOCATION,
-                ACCESS_FINE_LOCATION
-            ).map { PermissionChecker.checkSelfPermission(getApplication(), it) }
-            when (permissions) {
-                listOf(PERMISSION_DENIED, PERMISSION_DENIED) -> R.string.statusLocationPermissionsNone
-                listOf(PERMISSION_GRANTED, PERMISSION_DENIED) -> R.string.statusLocationPermissionsCoarseForeground
-                listOf(PERMISSION_GRANTED, PERMISSION_GRANTED) -> R.string.statusLocationPermissionsFineForeground
-                else -> R.string.statusLocationPermissionsUnknown
-            }
-        }.run { mutableLocationPermissions.postValue(this) }
-    }
+          val permissions =
+              listOf(ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION).map {
+                PermissionChecker.checkSelfPermission(getApplication(), it)
+              }
+          when (permissions) {
+            listOf(PERMISSION_DENIED, PERMISSION_DENIED) -> R.string.statusLocationPermissionsNone
+            listOf(PERMISSION_GRANTED, PERMISSION_DENIED) ->
+                R.string.statusLocationPermissionsCoarseForeground
+            listOf(PERMISSION_GRANTED, PERMISSION_GRANTED) ->
+                R.string.statusLocationPermissionsFineForeground
+            else -> R.string.statusLocationPermissionsUnknown
+          }
+        }
+        .run { mutableLocationPermissions.postValue(this) }
+  }
 
-    fun getDozeWhitelisted(): LiveData<Boolean> = dozeWhitelisted
-    fun refreshDozeModeWhitelisted() {
-        dozeWhitelisted.postValue(isIgnoringBatteryOptimizations())
-    }
+  fun getDozeWhitelisted(): LiveData<Boolean> = dozeWhitelisted
 
-    private fun isIgnoringBatteryOptimizations(): Boolean {
-        return powerManager.isIgnoringBatteryOptimizations(
-            getApplication<Application>().applicationContext.packageName
-        )
-    }
+  fun refreshDozeModeWhitelisted() {
+    dozeWhitelisted.postValue(isIgnoringBatteryOptimizations())
+  }
+
+  private fun isIgnoringBatteryOptimizations(): Boolean {
+    return powerManager.isIgnoringBatteryOptimizations(
+        getApplication<Application>().applicationContext.packageName)
+  }
 }

@@ -9,5 +9,5 @@ import org.owntracks.android.support.ContactImageBindingAdapter
 @BindingScoped
 @InstallIn(CustomBindingComponent::class)
 interface CustomBindingEntryPoint : DataBindingComponent {
-    override fun getContactImageBindingAdapter(): ContactImageBindingAdapter
+  override fun getContactImageBindingAdapter(): ContactImageBindingAdapter
 }

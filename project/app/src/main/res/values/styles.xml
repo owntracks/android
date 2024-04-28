@@ -49,10 +49,31 @@
     <style name="Theme.Owntracks.Welcome">
         <item name="android:windowBackground">@color/OTPrimaryBlue</item>
         <item name="android:textColor">@color/md_white_1000</item>
-        <item name="colorPrimary">@color/OTAccent</item>
+        <item name="android:textViewStyle">@style/Theme.Owntracks.Welcome.TextView</item>
+        <item name="materialButtonStyle">@style/Theme.Owntracks.Welcome.Button</item>
+        <item name="materialButtonOutlinedStyle">@style/Theme.Owntracks.Welcome.Button.Outlined</item>
+        <item name="colorPrimary">@color/md_white_1000</item>
         <item name="colorOnPrimary">@color/md_white_1000</item>
         <item name="welcomeIconMargin">16dp</item>
         <item name="welcomeHeadingMargin">12dp</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="Theme.Owntracks.Welcome.Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:backgroundTint">@color/OTAccent</item>
+    </style>
+
+    <style name="Theme.Owntracks.Welcome.Button.Outlined" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:backgroundTint">@android:color/transparent</item>
+        <item name="strokeColor">?attr/colorPrimary</item>
+    </style>
+
+    <style name="Theme.Owntracks.Welcome.TextView">
+        <item name="android:textSize">16sp</item>
+        <item name="android:lineSpacingMultiplier">1.2</item>
+    </style>
+    <style name="Theme.Owntracks.Welcome.TextView.Heading">
+        <item name="android:textSize">24sp</item>
     </style>
 
     <style name="Theme.Owntracks.Preferences" parent="@style/PreferenceThemeOverlay">

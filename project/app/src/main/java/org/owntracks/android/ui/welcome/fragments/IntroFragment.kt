@@ -12,18 +12,18 @@ import org.owntracks.android.ui.welcome.WelcomeViewModel
 
 @AndroidEntryPoint
 class IntroFragment @Inject constructor() : WelcomeFragment() {
-    override fun shouldBeDisplayed(context: Context) = true
+  override fun shouldBeDisplayed(context: Context) = true
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        return UiWelcomeIntroBinding.inflate(inflater, container, false).root
-    }
+  override fun onCreateView(
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?
+  ): View {
+    return UiWelcomeIntroBinding.inflate(inflater, container, false).root
+  }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.setWelcomeState(WelcomeViewModel.ProgressState.PERMITTED)
-    }
+  override fun onResume() {
+    super.onResume()
+    viewModel.setWelcomeState(WelcomeViewModel.ProgressState.PERMITTED)
+  }
 }

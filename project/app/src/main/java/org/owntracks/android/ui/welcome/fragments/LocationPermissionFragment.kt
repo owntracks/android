@@ -16,62 +16,62 @@ import org.owntracks.android.ui.mixins.LocationPermissionRequester
 import org.owntracks.android.ui.welcome.WelcomeViewModel
 
 @AndroidEntryPoint
-class LocationPermissionFragment @Inject constructor() :
-    WelcomeFragment() {
-    private lateinit var binding: UiWelcomeLocationPermissionBinding
+class LocationPermissionFragment @Inject constructor() : WelcomeFragment() {
+  private lateinit var binding: UiWelcomeLocationPermissionBinding
 
-    @Inject
-    lateinit var preferences: Preferences
+  @Inject lateinit var preferences: Preferences
 
-    @Inject
-    lateinit var requirementsChecker: RequirementsChecker
+  @Inject lateinit var requirementsChecker: RequirementsChecker
 
-    private val locationPermissionRequester = LocationPermissionRequester(this, ::permissionGranted, ::permissionDenied)
+  private val locationPermissionRequester =
+      LocationPermissionRequester(this, ::permissionGranted, ::permissionDenied)
 
-    override fun shouldBeDisplayed(context: Context): Boolean = !requirementsChecker.hasLocationPermissions()
+  override fun shouldBeDisplayed(context: Context): Boolean = true
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding = UiWelcomeLocationPermissionBinding.inflate(inflater, container, false)
-            .apply {
-                uiFragmentWelcomeLocationPermissionsRequest.setOnClickListener {
-                    requestLocationPermissions()
-                }
-            }
-        return binding.root
+  @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+  override fun onCreateView(
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?
+  ): View {
+    binding =
+        UiWelcomeLocationPermissionBinding.inflate(inflater, container, false).apply {
+          uiFragmentWelcomeLocationPermissionsRequest.setOnClickListener {
+            requestLocationPermissions()
+          }
+        }
+    return binding.root
+  }
+
+  private fun requestLocationPermissions() {
+    locationPermissionRequester.requestLocationPermissions(0, requireContext()) {
+      shouldShowRequestPermissionRationale(it)
     }
+  }
 
-    private fun requestLocationPermissions() {
-        locationPermissionRequester.requestLocationPermissions(
-            0,
-            requireContext()
-        ) { shouldShowRequestPermissionRationale(it) }
-    }
+  override fun onResume() {
+    super.onResume()
+    viewModel.setWelcomeState(
+        if (requirementsChecker.hasLocationPermissions()) {
+          binding.uiFragmentWelcomeLocationPermissionsRequest.visibility = View.INVISIBLE
+          binding.uiFragmentWelcomeLocationPermissionsMessage.visibility = View.VISIBLE
+          WelcomeViewModel.ProgressState.PERMITTED
+        } else if (preferences.userDeclinedEnableLocationPermissions) {
+          WelcomeViewModel.ProgressState.PERMITTED
+        } else {
+          WelcomeViewModel.ProgressState.NOT_PERMITTED
+        })
+  }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.setWelcomeState(
-            if (requirementsChecker.hasLocationPermissions() || preferences.userDeclinedEnableLocationPermissions) {
-                WelcomeViewModel.ProgressState.PERMITTED
-            } else {
-                WelcomeViewModel.ProgressState.NOT_PERMITTED
-            }
-        )
-    }
+  private fun permissionGranted(@Suppress("UNUSED_PARAMETER") code: Int) {
+    preferences.userDeclinedEnableLocationPermissions = false
+    binding.uiFragmentWelcomeLocationPermissionsRequest.visibility = View.INVISIBLE
+    binding.uiFragmentWelcomeLocationPermissionsMessage.visibility = View.VISIBLE
+    viewModel.setWelcomeState(WelcomeViewModel.ProgressState.PERMITTED)
+  }
 
-    private fun permissionGranted(code: Int) {
-        preferences.userDeclinedEnableLocationPermissions = false
-        binding.uiFragmentWelcomeLocationPermissionsRequest.visibility = View.INVISIBLE
-        binding.uiFragmentWelcomeLocationPermissionsMessage.visibility = View.VISIBLE
-        viewModel.setWelcomeState(WelcomeViewModel.ProgressState.PERMITTED)
-    }
-
-    private fun permissionDenied(code: Int) {
-        preferences.userDeclinedEnableLocationPermissions = true
-        viewModel.setWelcomeState(WelcomeViewModel.ProgressState.PERMITTED)
-    }
+  private fun permissionDenied(@Suppress("UNUSED_PARAMETER") code: Int) {
+    preferences.userDeclinedEnableLocationPermissions = true
+    viewModel.setWelcomeState(WelcomeViewModel.ProgressState.PERMITTED)
+  }
 }

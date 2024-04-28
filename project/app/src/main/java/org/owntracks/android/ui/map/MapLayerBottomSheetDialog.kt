@@ -12,34 +12,31 @@ import org.owntracks.android.R
 import org.owntracks.android.databinding.MapLayerBottomSheetDialogBinding
 
 class MapLayerBottomSheetDialog : BottomSheetDialogFragment() {
-    private val viewModel: MapViewModel by activityViewModels()
-    private lateinit var binding: MapLayerBottomSheetDialogBinding
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding = MapLayerBottomSheetDialogBinding.inflate(inflater, container, false)
-        mapLayerSelectorButtonsToStyles.forEach {
-            binding.root.findViewById<AppCompatImageButton>(it.key)
-                .setOnClickListener { _ ->
-                    val currentMapLayerStyle = viewModel.mapLayerStyle.value
-                    val newMapLayerStyle = it.value
-                    viewModel.setMapLayerStyle(it.value)
-                    if (currentMapLayerStyle?.isSameProviderAs(newMapLayerStyle) != true) {
-                        // Replace the map fragment
-                        val mapFragment = parentFragmentManager.fragmentFactory.instantiate(
-                            requireActivity().classLoader,
-                            MapFragment::class.java.name
-                        )
-                        parentFragmentManager.commit(true) {
-                            replace(R.id.mapFragment, mapFragment, "map")
-                        }
-                    }
+  private val viewModel: MapViewModel by activityViewModels()
+  private lateinit var binding: MapLayerBottomSheetDialogBinding
 
-                    dismiss()
-                }
+  override fun onCreateView(
+      inflater: LayoutInflater,
+      container: ViewGroup?,
+      savedInstanceState: Bundle?
+  ): View {
+    binding = MapLayerBottomSheetDialogBinding.inflate(inflater, container, false)
+    mapLayerSelectorButtonsToStyles.forEach {
+      binding.root.findViewById<AppCompatImageButton>(it.key).setOnClickListener { _ ->
+        val currentMapLayerStyle = viewModel.mapLayerStyle.value
+        val newMapLayerStyle = it.value
+        viewModel.setMapLayerStyle(it.value)
+        if (currentMapLayerStyle?.isSameProviderAs(newMapLayerStyle) != true) {
+          // Replace the map fragment
+          val mapFragment =
+              parentFragmentManager.fragmentFactory.instantiate(
+                  requireActivity().classLoader, MapFragment::class.java.name)
+          parentFragmentManager.commit(true) { replace(R.id.mapFragment, mapFragment, "map") }
         }
-        return binding.root
+
+        dismiss()
+      }
     }
+    return binding.root
+  }
 }

@@ -1,8 +1,6 @@
 package org.owntracks.android.ui.status.logs
 
-/**
- * Colour palette for log lines
- */
+/** Colour palette for log lines */
 data class LogPalette(
     val default: Int,
     val debug: Int,

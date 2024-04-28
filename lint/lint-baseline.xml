@@ -5297,17 +5297,6 @@
     <issue
         id="UnknownNullness"
         message="Unknown nullability; explicitly declare as `@Nullable` or `@NonNull` to improve Kotlin interoperability; see https://android.github.io/kotlin-guides/interop.html#nullability-annotations"
-        errorLine1="            ServiceBridge serviceBridge,"
-        errorLine2="            ~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/org/owntracks/android/services/MessageProcessor.java"
-            line="87"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="UnknownNullness"
-        message="Unknown nullability; explicitly declare as `@Nullable` or `@NonNull` to improve Kotlin interoperability; see https://android.github.io/kotlin-guides/interop.html#nullability-annotations"
         errorLine1="            RunThingsOnOtherThreads runThingsOnOtherThreads,"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~">
         <location

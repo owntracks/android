@@ -29,6 +29,8 @@
     <string name="CONNECTING">"연결 중"</string>
     <string name="contact_image">"연락처 이미지"</string>
     <string name="contactDetailsAccuracy">"정확도"</string>
+
+    <!-- Fuzzy -->
     <string name="contactDetailsAccuracyValue">"%d m"</string>
     <string name="contactDetailsAltitude">"고급"</string>
     <string name="contactDetailsAltitudeValue">"%,d m"</string>
@@ -57,7 +59,8 @@
     <string name="enjoy_description">"메뉴에서 기본 설정을 선택하고(또는 아래 링크 사용) 사용하기 전에 서버에 대해 OwnTracks를 구성하십시오"</string>
     <string name="ERROR">"오류"</string>
     <string name="ERROR_CONFIGURATION">"구성 설정이 완전하지 않습니다"</string>
-    <string name="ERROR_DATADISABLED">"데이터 통신이 불가능합니다"</string>
+
+    <!-- Fuzzy -->
     <string name="errorPreferencesImportFailed">"가져오기에 실패했습니다"</string>
     <string name="events">"이벤트"</string>
     <string name="exportConfiguration">"내보내기"</string>
@@ -96,6 +99,8 @@
     <string name="monitoring_move">"이동 모니터링 모드"</string>
     <string name="monitoring_quiet">"정적 모니터링 모드"</string>
     <string name="monitoring_significant">"Significant changes 모니터링 모드"</string>
+
+    <!-- Fuzzy -->
     <string name="monitoringModeDialogManualDescription">"위치가 아닌 지역 전환만 자동으로 게시됨"</string>
     <string name="monitoringModeDialogManualTitle">"수동"</string>
     <string name="monitoringModeDialogMoveDescription">"주파수와 정확도가 높지만, 높은 전력 사용"</string>
@@ -111,6 +116,8 @@
     <string name="noNavigationApp">"적절한 앱이 설치되지 않았습니다"</string>
     <string name="notificationChangeMonitoring">"모니터링 모드 변경"</string>
     <string name="notificationChannelErrors">"오류"</string>
+
+    <!-- Fuzzy -->
     <string name="notificationChannelEventsDescription">"지역 전송"</string>
     <string name="notificationChannelOngoing">"시작 중"</string>
     <string name="notificationChannelOngoingDescription">"백그라운드에서 위치 정보를 업데이트하는 데 필요"</string>
@@ -134,8 +141,6 @@
     <string name="preferencesCategoryNotificationOngoing">"시작 중 항상 알림"</string>
     <string name="preferencesChangelog">"변경 내역"</string>
     <string name="preferencesCleanSessionEnabled">"클린 세션"</string>
-    <string name="preferencesClientCrtPassword">"클라이언트 인증서 비밀번호"</string>
-    <string name="preferencesClientCrtPath">"클라이언트 인증서"</string>
     <string name="preferencesClientId">"클라이언트 ID"</string>
     <string name="preferencesDebugLog">"디버그 로그"</string>
     <string name="preferencesDeviceName">"기기 ID"</string>
@@ -207,7 +212,11 @@
     <!-- Fuzzy -->
     <string name="preferencesUsername">"사용자 이름"</string>
     <string name="preferencesWebsocket">"WebSockets 사용"</string>
+
+    <!-- Fuzzy -->
     <string name="publish">"보고서"</string>
+
+    <!-- Fuzzy -->
     <string name="radius">"반경"</string>
     <string name="reconnect">"재연결"</string>
     <string name="save">"저장"</string>
@@ -244,6 +253,8 @@
 
     <!-- Fuzzy -->
     <string name="waypoint_region_unknown">"상태 알 수 없음"</string>
+
+    <!-- Fuzzy -->
     <string name="waypointListPlaceholder">"지역이 하나도 없습니다"</string>
     <string name="welcome_connection_setup_description">"OwnTracks는 귀하(또는 귀하가 신뢰하는 사람)가 소유한 서버에 위치 데이터를 전송하여 작동하므로 귀하가 데이터를 계속 제어할 수 있습니다.
 
@@ -263,11 +274,6 @@ HTTPS 또는 MQTT 및 로그인 자격 증명을 통해 액세스할 수 있는�
     <!-- Fuzzy -->
     <string name="welcome_play_description">"OwnTracks은 Google Play 서비스가 필요합니다."</string>
     <string name="welcome_play_heading">"Google Play 개발자 서비스"</string>
-    <string name="welcome_version_description">"OS 제한으로 인해 일부 기능은 제한된 방식으로 작동 할 수 있습니다.
-
-앱이 백그라운드에서 항상 실행되도록 하려면 항상 알림이 표시됩니다. 이 알림은 시스템 알림 기본 설정에서 비활성화할 수 있습니다."</string>
-    <string name="welcome_version_learn_more">"자세히"</string>
-    <string name="welcome_version_title">"제한"</string>
     <string name="welcomeFixIssue">"권한 설정"</string>
     <string name="workmanagerInitializationErrorDialogMessage">"일부 구성 요소가 제대로 초기화되지 않아 Owntracks가 제대로 작동하지 않을 수 있습니다. 앱을 다시 설치하거나 사용자 데이터를 삭제해야 할 수 있습니다.
 

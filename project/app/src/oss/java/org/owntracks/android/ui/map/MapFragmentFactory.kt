@@ -12,15 +12,17 @@ import org.owntracks.android.ui.map.osm.OSMMapFragment
  *
  * @property contactImageBindingAdapter A binding adapter that can render contact images in views
  */
-class MapFragmentFactory @Inject constructor(
+class MapFragmentFactory
+@Inject
+constructor(
     private val preferences: Preferences,
     private val contactImageBindingAdapter: ContactImageBindingAdapter
 ) : FragmentFactory() {
-    override fun instantiate(classLoader: ClassLoader, className: String): Fragment {
-        return if (MapFragment::class.java.isAssignableFrom(classLoader.loadClass(className))) {
-            OSMMapFragment(preferences, contactImageBindingAdapter)
-        } else {
-            super.instantiate(classLoader, className)
-        }
+  override fun instantiate(classLoader: ClassLoader, className: String): Fragment {
+    return if (MapFragment::class.java.isAssignableFrom(classLoader.loadClass(className))) {
+      OSMMapFragment(preferences, contactImageBindingAdapter)
+    } else {
+      super.instantiate(classLoader, className)
     }
+  }
 }

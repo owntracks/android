@@ -96,18 +96,23 @@
             android:key="tls"
             android:title="@string/tls"
             app:iconSpaceReserved="false" />
-        <org.owntracks.android.ui.preferences.FilePickerPreference
+        <org.owntracks.android.ui.preferences.PopupMenuPreference
+            android:enabled="false"
             android:key="tlsClientCrt"
-            android:title="@string/preferencesClientCrtPath"
+            android:title="@string/preferencesClientCrt"
             app:dependency="tls"
             app:iconSpaceReserved="false" />
-        <ValidatingEditTextPreference
-            android:inputType="textPassword"
-            android:key="tlsClientCrtPassword"
-            android:title="@string/preferencesClientCrtPassword"
+        <Preference
+            android:key="tlsClientCertInstall"
+            android:title="@string/preferencesClientCrtInstall"
             app:dependency="tls"
             app:iconSpaceReserved="false"
-            app:useSimpleSummaryProvider="false" />
+            app:isPreferenceVisible="false" />
+        <Preference
+            android:key="tlsCAInstall"
+            android:title="@string/preferencesCaCrtInstall"
+            app:dependency="tls"
+            app:iconSpaceReserved="false" />
     </PreferenceCategory>
     <PreferenceCategory
         android:key="preferenceGroupParameters"
@@ -115,7 +120,7 @@
         app:title="@string/preferencesParameters">
         <org.owntracks.android.support.widgets.EditIntegerPreference
             android:inputType="number"
-            app:dialogMessage="@string/preferencesMoveModeLocatorIntervalDialog"
+            app:dialogMessage="@string/preferencesKeepaliveDialogMessage"
             app:iconSpaceReserved="false"
             app:key="keepalive"
             app:title="@string/preferencesKeepalive"

@@ -14,7 +14,7 @@ Runs the [F-Droid server scanner](https://gitlab.com/fdroid/fdroidserver) agains
 
 ### UI tests
 
-Runs the espresso tests. Can be parameterized over which flavour to run (OSS/GMS), parallelism, the Android API version of the emulator to use, and a flag to indicate that only tests annotated `@SmokeTest` should be run. Coverage report uploaded to codecov.io if the smoketest flag is not set
+Runs the espresso tests. Can be parameterized over which flavour to run (OSS/GMS), parallelism, the Android API version of the emulator to use. Uploads coverage to [CodeCov](https://app.codecov.io/gh/owntracks/android)
 
 ### Publish to Play Store
 
@@ -24,9 +24,9 @@ Uploads the release bundle of the GMS flavour to the Google Play Store internal 
 
 Three main workflows:
 
-1. `build-integration-test-publish` runs the `build-release`, `fdoird-scanner`, `unit-test`, `lint`, `ui-tests` (matrixed across oss/gms flavours) and `publish-to-play-store` jobs. Triggered on every commit to `master` that changes the source.
-2. `smoke-test` runs the `unit-test` and `ui-tests` jobs just on the `gms` flavour an flagging that only `@SmokeTest` tests should be run. Triggered when the `smoke-test-required` label is added to a PR.
-3. `integration-test` runs the `unit-test` and `ui-tests` jobs on both `gms` and `oss` flavours across all test cases.
+1. `Build and Test` runs the `build-test-lint`, `fdroid-scanner`, `espresso-test` (matrixed across oss/gms flavours) and `publish-to-play-store` jobs. Triggered on every commit to `master` that changes the source.
+2. `Android Release` pulls the appropriate secrets and then assembles a `release` variant of the `gms` flavour, before uploading to the right Google Play Store track.
+3. `Close stale issues and PRs` closes open issues that are waiting a response and haven't received one in a while.
 
 ## Github Actions jobs
 
@@ -35,11 +35,3 @@ There's 3 GHA workflows that help manage PRs and releases.
 ### Android Release
 
 Triggered by a version tag, this workflow creates a Github Release, fetches the APKs from the corresponding CircleCI workflow and attaches them to the release, and finally promotes the Play Store build between either internal and beta, beta and production or internal and production (depending on whether it's a beta tag or not).
-
-### Auto-Label PRs
-
-Labels new PRs with the approprate test required label depending on what's changed.
-
-## Forked PRs
-
-Forked PRs can't trigger workflows on CircleCI because that requires an API key stored in a Github secret. Github secrets aren't exposed to `pull_request` flows running on forked branches, so the workaround is to review the forked PR and then push those to a separate branch on the main repo using the `git-push-fork-to-upstream-branch` script. This can then trigger a CI test run on CircleCI depending on the branch pushed to. Commits pushed to `trigger-smoke-test` will trigger a smoketest run, and `trigger-integration-test` will trigger a full integration test. On completion, Circle should post the result status to GH for that commit, which should update the status on the forked PR.

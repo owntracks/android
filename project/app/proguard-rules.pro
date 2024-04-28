@@ -91,3 +91,11 @@
 
 # Statically guarded by try-catch block and not used on Android, see CacheByClass
 -dontwarn java.lang.ClassValue
+
+# Required by kotlinx./serialization
+-dontwarn kotlinx.serialization.KSerializer
+-dontwarn kotlinx.serialization.Serializable
+-dontwarn org.gradle.api.Plugin
+-dontwarn org.jetbrains.kotlin.compiler.plugin.CliOption
+-dontwarn org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
+-dontwarn org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar

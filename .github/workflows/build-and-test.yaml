@@ -2,58 +2,58 @@
 name: Build and Test
 
 "on":
+  workflow_dispatch:
   merge_group:
   pull_request:
   push:
     branches:
       - master
 
+env:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=true -Dorg.gradle.configuration-cache=true -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.jvmargs='-Xmx3096M -Dkotlin.daemon.jvm.options=-Xmx2048M -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8 -XX:+UseParallelGC'"
+
 jobs:
-  ktlint:
-    name: ktlint
+  ktfmt:
+    name: ktfmt
     runs-on: ubuntu-latest
+    if: ${{ (github.event_name == 'push' && format('refs/heads/{0}', github.event.repository.default_branch)) || github.event_name == 'pull_request' || github.event_name == 'merge_group' || github.event_name == 'workflow_dispatch' }}
     steps:
-      - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4
-      - uses: actions/setup-java@v3
+      - uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9 # v4
         with:
           distribution: "temurin"
           java-version: "17"
-      - uses: dorny/paths-filter@v2
-        id: changes
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+      - name: Gradle setup
+        uses: gradle/actions/setup-gradle@v3
         with:
-          filters: |
-            src:
-              - "**/*.kt"
-      - name: Gradle build
-        id: build
-        uses: gradle/gradle-build-action@v2
-        if: steps.changes.outputs.src == 'true'
-        with:
-          build-root-directory: project
-          arguments: |
-            ktlintCheck
-
+          cache-read-only: ${{ github.ref != format('refs/heads/{0}', github.event.repository.default_branch) }}
+          cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
+      - name: Ktfmt
+        run: ./project/gradlew -p project ktfmtCheck
   build-test-lint:
     name: Build, test & lint
-    runs-on: self-hosted
-    if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/master') || (github.event_name == 'pull_request' && !github.event.pull_request.draft) || github.event_name == 'merge_group' }}
+    runs-on: ubuntu-latest
+    if: ${{ (github.event_name == 'push' && format('refs/heads/{0}', github.event.repository.default_branch)) || github.event_name == 'pull_request' || github.event_name == 'merge_group' || github.event_name == 'workflow_dispatch' }}
     outputs:
-      apk-generated: ${{ steps.output.outputs.apk_generated}}
+      apk-generated: ${{ steps.guard.outputs.run_build }}
     permissions:
-      contents: read
+      contents: write
       checks: write
     steps:
-      - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4
-      - uses: actions/setup-java@v3
+      - uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9 # v4
         with:
           distribution: "temurin"
           java-version: "17"
-      - uses: dorny/paths-filter@v2
-        id: changes
+
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+
+      - uses: dorny/paths-filter@v3
+        name: Check if we should trigger a build
+        id: file-changes-should-build
         with:
           filters: |
             src:
-              - ".github/workflows/build-and-test.yml"
+              - ".github/workflows/build-and-test.yaml"
               - "project/app/src/**"
               - "project/app/*.pro"
               - "project/buildSrc/src/**"
@@ -63,100 +63,122 @@ jobs:
               - "project/gradle/wrapper/gradle-wrapper.properties"
               - "project/gradle/libs.versions.toml"
 
-      - name: Gradle build
-        id: build
-        uses: gradle/gradle-build-action@v2
-        if: steps.changes.outputs.src == 'true'
-        with:
-          build-root-directory: project
-          arguments: |
-            assembleDebug
-            assembleAndroidTest
-            :app:compileOssReleaseSources
-            :app:assembleGmsDebugAndroidTest
-            :app:assembleOssDebugAndroidTest
-            :app:packageGmsDebugAndroidTest
-            :app:packageOssDebugAndroidTest
-            lint
-            app:createGmsDebugUnitTestCoverageReport --scan --stacktrace
+      - name: Guard on running the build based on files changed and event
+        if: steps.file-changes-should-build.outputs.src == 'true' || github.event_name == 'workflow_dispatch'
+        id: guard
+        run: echo "run_build=true" >> "$GITHUB_OUTPUT"
 
-      - name: Upload apk artifact
-        if: steps.changes.outputs.src == 'true'
-        uses: actions/upload-artifact@v3
+      - name: Gradle setup
+        if: steps.guard.outputs.run_build == 'true'
+        uses: gradle/actions/setup-gradle@v3
         with:
-          name: apks
-          path: |
-            ./project/app/build/outputs/apk/oss/debug/app-oss-debug.apk
-      - name: Generate output flag for other jobs
-        if: steps.changes.outputs.src == 'true'
-        id: output
-        run: echo "apk_generated=true" >> "$GITHUB_OUTPUT"
+          dependency-graph: generate-and-submit
+          cache-read-only: ${{ github.ref != format('refs/heads/{0}', github.event.repository.default_branch) }}
+          cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
+
+      - name: Build
+        if: steps.guard.outputs.run_build == 'true'
+        run: |
+          ./project/gradlew -p project assembleDebug lint app:createGmsDebugUnitTestCoverageReport --scan
+
+      - name: JUnit Report Action
+        uses: mikepenz/action-junit-report@v4
+        if: steps.guard.outputs.run_build == 'true'
+        with:
+          report_paths: "**/TEST-*.xml"
+          detailed_summary: true
+          include_passed: false # Lots of test, much output.
 
       - name: Upload coverage
-        if: ${{ steps.changes.outputs.src == 'true' && (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'integration-test-required')) || (github.event_name == 'push' && github.ref == 'refs/heads/master') }}
-        uses: codecov/codecov-action@v3
+        if: steps.guard.outputs.run_build == 'true'
+        uses: codecov/codecov-action@v4
         with:
           files: ./project/app/build/reports/coverage/test/gms/debug/report.xml
           flags: unittests
           token: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: JUnit Report Action
-        uses: mikepenz/action-junit-report@v3
-        if: steps.changes.outputs.src == 'true'
+      - name: Upload apk artifact for F-droid scanning
+        if: steps.guard.outputs.run_build == 'true'
+        uses: actions/upload-artifact@v4
         with:
-          report_paths: "**/build/test-results/test*UnitTest/TEST-*.xml"
-          detailed_summary: true
+          name: oss-apk
+          path: |
+            ./project/app/build/outputs/apk/oss/debug/app-oss-debug.apk
 
       - name: Upload lint report
-        uses: actions/upload-artifact@v3
+        if: steps.guard.outputs.run_build == 'true'
+        uses: actions/upload-artifact@v4
         with:
           name: lint-report
           path: project/app/build/reports/lint-results-gmsDebug.html
-        if: steps.changes.outputs.src == 'true'
 
   fdroid-scanner:
     name: F-Droid scanner
     runs-on: ubuntu-latest
     needs: build-test-lint
+    if: ${{ needs.build-test-lint.outputs.apk-generated }}
     container:
       image: registry.gitlab.com/fdroid/docker-executable-fdroidserver:master
     steps:
       - name: Download APK
-        uses: actions/download-artifact@v3
-        if: ${{ needs.build-test-lint.outputs.apk-generated }}
+        uses: actions/download-artifact@v4
         with:
-          name: apks
+          name: oss-apk
       - name: Scan OSS APK
-        if: ${{ needs.build-test-lint.outputs.apk-generated }}
         run: |
-          . /etc/profile.d/bsenv.sh && GRADLE_USER_HOME=${home_vagrant}/.gradle ${fdroidserver}/fdroid scanner app-oss-debug.apk
+          . /etc/profile.d/bsenv.sh && GRADLE_USER_HOME="${home_vagrant}"/.gradle "${fdroidserver}"/fdroid scanner app-oss-debug.apk
 
   espresso-test:
     name: "Espresso test"
-    runs-on: self-hosted
-    if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/master') || (github.event_name == 'pull_request' && !github.event.pull_request.draft) || github.event_name == 'merge_group' }}
+    runs-on: ubuntu-latest
+    if: ${{ (github.event_name == 'push' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)) || github.event_name == 'pull_request' || github.event_name == 'merge_group' || github.event_name == 'workflow_dispatch'}}
+    outputs:
+      espresso-tests-run: ${{ steps.run-espresso-guard.outputs.run-espresso }}
     permissions:
-      contents: read
+      contents: write
       checks: write
     needs: build-test-lint
     strategy:
       fail-fast: false
       matrix:
         android-api: [31]
-        flavour: [Oss, Gms]
+        flavour: [Gms, Oss]
+        shard: [1, 2, 3, 4, 5, 6]
     steps:
-      - uses: nschloe/action-cached-lfs-checkout@v1
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Remove unused things
+        run: |
+          sudo rm -rf /opt/ghc # Haskell
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo rm -rf /usr/share/dotnet
+          sudo docker image prune --all --force
+          sudo df -h
+
+      # Github charges us for LFS bandwidth, so let's use the cache
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
         with:
-          distribution: "temurin"
-          java-version: 17
-      - uses: dorny/paths-filter@v2
+          lfs: false
+      - name: Create LFS file list
+        run: git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
+      - name: Restore LFS cache
+        uses: actions/cache@v2
+        id: lfs-cache
+        with:
+          path: .git/lfs
+          key: ${{ runner.os }}-lfs-${{ hashFiles('.lfs-assets-id') }}-v1
+      - name: Git LFS Pull
+        run: git lfs pull
+
+      - uses: dorny/paths-filter@v3
         id: changes
         with:
           filters: |
             src:
-              - ".github/workflows/build-and-test.yml"
+              - ".github/workflows/build-and-test.yaml"
               - "project/app/src/**"
               - "project/app/*.pro"
               - "project/buildSrc/src/**"
@@ -165,32 +187,44 @@ jobs:
               - "project/gradle.properties"
               - "project/gradle/wrapper/gradle-wrapper.properties"
               - "project/gradle/libs.versions.toml"
-      - id: run-espresso-guard
-        run: |
-          if ${{ steps.changes.outputs.src == 'true' && github.event_name != 'pull_request' }}
-          then
-            echo "run-espresso=true" >> $GITHUB_OUTPUT
-          else
-            echo "run-espresso=false" >> $GITHUB_OUTPUT
-          fi
-      - run: echo "/android-sdk/platform-tools/" >> $GITHUB_PATH
-      - run: /android-sdk/cmdline-tools/latest/bin/sdkmanager "platforms;android-$API"
-        env:
-          API: ${{ matrix.android-api }}
 
-      - name: "Check snapshot exists"
-        id: check_snapshot_exists
-        uses: andstor/file-existence-action@v2
+      - id: run-espresso-guard
+        name: Guard on running the espresso tests based on files changed and event
+        if: (steps.changes.outputs.src == 'true' && github.event_name != 'pull_request') || github.event_name == 'workflow_dispatch'
+        run: |
+          echo "run-espresso=true" >> "${GITHUB_OUTPUT}"
+
+      - uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9 # v4
+        if: steps.run-espresso-guard.outputs.run-espresso == 'true'
         with:
-          files: "/android-sdk/user_home/avd/owntracks-test-${{ matrix.android-api }}-${{ matrix.flavour }}.avd/snapshots/default_boot/screenshot.png"
+          distribution: "temurin" # See 'Supported distributions' for available options
+          java-version: "17"
+
+      - name: Gradle setup
+        uses: gradle/actions/setup-gradle@v3
+        if: steps.run-espresso-guard.outputs.run-espresso == 'true'
+        with:
+          dependency-graph: generate
+          cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
+
+      - name: AVD cache
+        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4
+        if: steps.run-espresso-guard.outputs.run-espresso == 'true'
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: owntracks-test-${{ matrix.android-api }}-${{ matrix.flavour }}
 
       - name: Create AVD and generate snapshot for caching
-        if: steps.run-espresso-guard.outputs.run-espresso == 'true' && steps.check_snapshot_exists.outputs.files_exists == 'false'
+        if: steps.avd-cache.outputs.cache-hit != 'true' && steps.run-espresso-guard.outputs.run-espresso == 'true'
+        timeout-minutes: 10
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.android-api }}
           force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
+          emulator-options: -no-window -gpu auto -noaudio -no-boot-anim -camera-back none -camera-front none -memory 6000
           profile: pixel_3a
           target: ${{ matrix.flavour == 'Gms' && 'google_apis' || 'default' }}
           ram-size: 6000M
@@ -205,14 +239,15 @@ jobs:
       - name: Espresso Test
         uses: reactivecircus/android-emulator-runner@v2
         if: steps.run-espresso-guard.outputs.run-espresso == 'true'
-        timeout-minutes: 60
+        timeout-minutes: 30
         env:
-          # Only run the smoke tests on merge group events
           FLAVOUR: ${{ matrix.flavour }}
+          SHARD_COUNT: 6
+          SHARD_INDEX: ${{ matrix.shard }}
         with:
           api-level: ${{ matrix.android-api }}
           force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
+          emulator-options: -no-snapshot-save -no-window -gpu auto -noaudio -no-boot-anim -camera-back none -camera-front none -memory 6000
           profile: pixel_3a
           target: ${{ matrix.flavour == 'Gms' && 'google_apis' || 'default' }}
           ram-size: 6000M
@@ -223,57 +258,72 @@ jobs:
           sdcard-path-or-size: 1000M
           script: |
             adb shell settings put global bluetooth_on 0
+            adb shell settings put secure long_press_timeout 1000
             adb shell rm -rf /sdcard/googletest || echo "Couldn't delete googletest folder"
             adb uninstall org.owntracks.android.debug || echo "org.owntracks.android not installed"
             adb uninstall org.owntracks.android.debug.test || echo "org.owntracks.android.test not installed"
-            ./project/gradlew -p project create${FLAVOUR}DebugCoverageReport --max-workers=1 --stacktrace --scan --no-daemon
+            ./project/gradlew -p project :app:create${FLAVOUR}DebugAndroidTestCoverageReport -Pandroid.testInstrumentationRunnerArguments.numShards=${SHARD_COUNT} -Pandroid.testInstrumentationRunnerArguments.shardIndex=${SHARD_INDEX} --max-workers=1 --scan
 
       - name: Upload connected test result artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: espresso-test-reports-${{ matrix.android-api }}-${{ matrix.flavour }}
-          path: ./project/app/build/reports/androidTests/connected/
+        uses: actions/upload-artifact@v4
         if: always() && steps.run-espresso-guard.outputs.run-espresso == 'true'
+        with:
+          name: espresso-test-reports-${{ matrix.android-api }}-${{ matrix.flavour }}-${{ matrix.shard }}
+          path: ./project/app/build/reports/androidTests/connected/
+
       - name: Espresso JUnit Report
-        uses: mikepenz/action-junit-report@v3
+        uses: mikepenz/action-junit-report@v4
         if: always() && steps.run-espresso-guard.outputs.run-espresso == 'true'
         with:
           report_paths: "**/TEST-*.xml"
           detailed_summary: true
+          include_passed: false
+
       - name: Upload connected test coverage artifact
         uses: ./.github/actions/upload-artifact
-        with:
-          name: espresso-test-coverage-${{ matrix.android-api }}-${{ matrix.flavour }}
-          path: ./project/app/build/reports/coverage/androidTest/
         if: steps.run-espresso-guard.outputs.run-espresso == 'true'
+        with:
+          name: espresso-test-coverage-${{ matrix.android-api }}-${{ matrix.flavour }}-${{ matrix.shard }}
+          path: ./project/app/build/reports/coverage/androidTest/
+
       - name: Upload coverage
         if: steps.run-espresso-guard.outputs.run-espresso == 'true'
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           files: ./project/app/build/reports/coverage/androidTest/${{ matrix.flavour == 'Gms' && 'gms' || 'oss' }}/debug/connected/report.xml
           flags: uitests
           token: ${{ secrets.CODECOV_TOKEN }}
 
+  pr-checkpoint-status:
+    name: "PR Checkpoint Status"
+    runs-on: ubuntu-latest
+    needs:
+      - espresso-test
+      - ktfmt
+    if: ${{ github.event_name == 'pull_request' }}
+    steps:
+      - run: |
+          echo "PR Checkpoint Status. Noop"
   publish-to-play-store:
     name: "Publish to Play Store"
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       checks: write
     needs: espresso-test
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+    if: ${{ github.event_name == 'push' && github.event.pull_request.head.repo.full_name == 'owntracks/android'  && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && needs.espresso-test.outputs.espresso-tests-run == 'true' }}
     steps:
-      - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4
-      - uses: actions/setup-java@v3
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+      - uses: actions/setup-java@v4
         with:
           distribution: "temurin"
           java-version: "17"
-      - uses: dorny/paths-filter@v2
+      - uses: dorny/paths-filter@v3
         id: changes
         with:
           filters: |
             src:
-              - ".github/workflows/build-and-test.yml"
+              - ".github/workflows/build-and-test.yaml"
               - "project/app/src/**"
               - "project/app/*.pro"
               - "project/buildSrc/src/**"
@@ -283,19 +333,29 @@ jobs:
               - "project/gradle/wrapper/gradle-wrapper.properties"
               - "project/gradle/libs.versions.toml"
       - name: Create keystore
-        if: steps.changes.outputs.src == 'true'
+        if: steps.changes.outputs.src == 'true' || github.event_name == 'workflow_dispatch'
         run: |
-          echo -n $KEYSTORE_BASE64 | base64 -d > project/owntracks.release.keystore.jks
+          echo -n "${KEYSTORE_BASE64}" | base64 -d > project/owntracks.release.keystore.jks
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
-      - name: Gradle build
-        if: steps.changes.outputs.src == 'true'
-        uses: gradle/gradle-build-action@v2
+      - name: Setup gradle
+        if: steps.changes.outputs.src == 'true' || github.event_name == 'workflow_dispatch'
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          build-root-directory: project
+          cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
+      - name: Process version codes from play store
+        if: steps.changes.outputs.src == 'true' || github.event_name == 'workflow_dispatch'
+        run: |
+          ./project/gradlew -p project clean processGmsVersionCodes
+          cat ./project/app/build/intermediates/gpp/gmsRelease/available-version-codes.txt
+        env:
+          ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
+      - name: Publish Release
+        if: steps.changes.outputs.src == 'true' || github.event_name == 'workflow_dispatch'
+        run: |
+          ./project/gradlew -p project publishGmsReleaseBundle --stacktrace --scan
         env:
           KEYSTORE_PASSPHRASE: ${{ secrets.KEYSTORE_PASSPHRASE }}
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
           GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
-        with:
-          build-root-directory: project
-          arguments: |
-            publishGmsReleaseBundle --stacktrace --scan

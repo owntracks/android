@@ -12,8 +12,7 @@ import org.owntracks.android.support.RequirementsChecker
 @InstallIn(SingletonComponent::class)
 @Module
 class RequirementsCheckerModule {
-    @Provides
-    fun provideRequirementsChecker(
-        @ApplicationContext context: Context
-    ): RequirementsChecker = OSSRequirementsChecker(context)
+  @Provides
+  fun provideRequirementsChecker(@ApplicationContext context: Context): RequirementsChecker =
+      OSSRequirementsChecker(context)
 }

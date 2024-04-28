@@ -4,5 +4,5 @@ import dagger.hilt.DefineComponent
 
 @DefineComponent.Builder
 interface CustomBindingComponentBuilder {
-    fun build(): CustomBindingComponent
+  fun build(): CustomBindingComponent
 }

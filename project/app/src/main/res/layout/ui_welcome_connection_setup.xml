@@ -46,16 +46,13 @@
             android:layout_alignStart="@+id/screen_heading"
             android:layout_marginBottom="8dp"
             android:gravity="top|center_horizontal"
-            android:lineSpacingMultiplier="1.2"
-            android:minHeight="@dimen/welcome_content_min_height"
-            android:paddingLeft="24dp"
-            android:paddingRight="24dp"
             android:scrollbars="vertical"
             android:text="@string/welcome_connection_setup_description"
             android:textSize="16sp" />
 
         <Button
             android:id="@+id/welcome_connection_setup_learn_more_button"
+            style="?attr/materialButtonOutlinedStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"

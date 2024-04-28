@@ -17,13 +17,13 @@ data class WaypointModel(
     var lastTriggered: Instant? = null,
     var lastTransition: Int = 0,
     val tst: Instant = Instant.now()
-
 ) {
-    fun getLocation(): Location = Location("waypoint").apply {
+  fun getLocation(): Location =
+      Location("waypoint").apply {
         latitude = geofenceLatitude
         longitude = geofenceLongitude
         accuracy = geofenceRadius.toFloat()
-    }
+      }
 
-    fun isUnknown(): Boolean = lastTransition == Geofence.GEOFENCE_TRANSITION_UNKNOWN
+  fun isUnknown(): Boolean = lastTransition == Geofence.GEOFENCE_TRANSITION_UNKNOWN
 }

@@ -23,12 +23,15 @@
     <string name="batteryOptimizationWhitelistDialogMessage">"Vyjmutí OwnTracks z optimalizace baterie může pomoci spolehlivěji sledovat polohu a udržet spojení se serverem."</string>
     <string name="batteryOptimizationWhitelistDialogTitle">"Optimalizace baterie"</string>
     <string name="cancel">"Zrušit"</string>
+    <string name="certificateMigrationRequiredOpenSettingsAction">"Otevřít nastavení"</string>
     <string name="clear_log">"Vyčistit"</string>
     <string name="configurationManagement">"Správa konfigurace"</string>
     <string name="CONNECTED">"Připojeno"</string>
     <string name="CONNECTING">"Připojování"</string>
     <string name="contact_image">"Obrázek kontaktu"</string>
     <string name="contactDetailsAccuracy">"Přesnost"</string>
+
+    <!-- Fuzzy -->
     <string name="contactDetailsAccuracyValue">"%d m"</string>
     <string name="contactDetailsAltitude">"Výška"</string>
     <string name="contactDetailsAltitudeValue">"%,d m"</string>
@@ -58,7 +61,8 @@ Chcete-li to umožnit, zapněte polohu v nastavení zařízení."</string>
     <string name="enjoy_description">"Zvolte nabídku Nastavení a nakonfigurujte Owntracks před tím, než jej začnete používat"</string>
     <string name="ERROR">"Chyba"</string>
     <string name="ERROR_CONFIGURATION">"Neúplná konfigurace"</string>
-    <string name="ERROR_DATADISABLED">"Datové připojení není dostupné"</string>
+
+    <!-- Fuzzy -->
     <string name="errorPreferencesImportFailed">"Import selhal"</string>
     <string name="events">"Události"</string>
     <string name="exportConfiguration">"Export"</string>
@@ -80,6 +84,7 @@ Chcete-li to umožnit, zapněte polohu v nastavení zařízení."</string>
     <string name="importConfig">"Import"</string>
     <string name="INITIAL">"Inicializace"</string>
     <string name="latitude">"Zeměpisná šířka"</string>
+    <string name="loadActivitySelectAFile">"Vyberte soubor"</string>
     <string name="locationPermissionNotGrantedNotification">"Nebylo uděleno oprávnění k poloze"</string>
     <string name="locationPermissionRequestDialogMessage">"Chcete-li sledovat svou aktuální polohu, udělte Owntracks oprávnění k poloze."</string>
     <string name="locationPermissionRequestDialogTitle">"Požadavek na povolení polohy"</string>
@@ -100,6 +105,8 @@ Chcete-li to umožnit, zapněte polohu v nastavení zařízení."</string>
     <string name="monitoring_move">"Mód pohybu"</string>
     <string name="monitoring_quiet">"Tichý mód"</string>
     <string name="monitoring_significant">"Mód změn"</string>
+
+    <!-- Fuzzy -->
     <string name="monitoringModeDialogManualDescription">"Automaticky se zveřejňují pouze změny oblasti, nikoliv polohy"</string>
     <string name="monitoringModeDialogManualTitle">"Ruční"</string>
     <string name="monitoringModeDialogMoveDescription">"Vysoká frekvence a přesnost, ale vysoká spotřeba energie"</string>
@@ -115,6 +122,8 @@ Chcete-li to umožnit, zapněte polohu v nastavení zařízení."</string>
     <string name="noNavigationApp">"není nainstalována vhodná aplikace"</string>
     <string name="notificationChangeMonitoring">"Změna módu"</string>
     <string name="notificationChannelErrors">"Chyby"</string>
+
+    <!-- Fuzzy -->
     <string name="notificationChannelEventsDescription">"Přenosy oblastí"</string>
     <string name="notificationChannelOngoing">"Pokračující"</string>
     <string name="notificationChannelOngoingDescription">"Vyžadováno pro přijem aktualizací polohy na pozadí"</string>
@@ -135,16 +144,17 @@ Chcete-li to umožnit, zapněte polohu v nastavení zařízení."</string>
     <string name="preferencesCategoryAdvancedLocator">"Lokátor"</string>
     <string name="preferencesCategoryAdvancedMisc">"Různé"</string>
     <string name="preferencesCategoryAdvancedServices">"Služby"</string>
+    <string name="preferencesCategoryConnectionCredentials">"Pověření"</string>
     <string name="preferencesCategoryNotificationBackground">"Oznámení na pozadí"</string>
     <string name="preferencesCategoryNotificationErrors">"Chyby a prohlémy"</string>
     <string name="preferencesCategoryNotificationOngoing">"Příchozí oznámení"</string>
     <string name="preferencesChangelog">"Seznam změn"</string>
     <string name="preferencesCleanSessionEnabled">"Vyčistit sezení"</string>
-    <string name="preferencesClientCrtPassword">"Heslo certifikátu klienta"</string>
-    <string name="preferencesClientCrtPath">"Certifikát klienta"</string>
     <string name="preferencesClientId">"Client ID"</string>
+    <string name="preferencesClientIdValidationError">"Nemůže být prázdný"</string>
     <string name="preferencesDebugLog">"Protokol ladění"</string>
     <string name="preferencesDeviceName">"Device ID"</string>
+    <string name="preferencesDeviceNameValidationError">"Nemůže být prázdný"</string>
     <string name="preferencesDocumentation">"Dokumentace"</string>
     <string name="preferencesEditor">"Editor"</string>
     <string name="preferencesEditorDescription">"Nastavte hodnotu pro zadaný klíč. Některé změny mohou vyžadovat restart aplikace."</string>
@@ -160,6 +170,7 @@ Chcete-li to umožnit, zapněte polohu v nastavení zařízení."</string>
     <string name="preferencesExperimental">"Experimentální"</string>
     <string name="preferencesExportSuccess">"Export byl úspěšný"</string>
     <string name="preferencesHost">"Server"</string>
+    <string name="preferencesHostValidationError">"Nemůže být prázdný"</string>
     <string name="preferencesIgnoreInaccurateLocations">"Nepřesné polohy"</string>
     <string name="preferencesIgnoreInaccurateLocationsDialog">"Ignorovat polohu, pokud je přesnost horší než zadaný počet metrů"</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">"Ignorovat nepřesné polohy"</string>
@@ -185,6 +196,7 @@ Chcete-li to umožnit, zapněte polohu v nastavení zařízení."</string>
     <string name="preferencesNotificationGeocoderErrorsSummary">"Zobrazit chyby geokodéru, limity četností a překročení kvóty"</string>
     <string name="preferencesNotificationLocation">"Poslední hlášená poloha"</string>
     <string name="preferencesNotificationLocationSummary">"Zobrazit poslední hlášenou polohu a čas"</string>
+    <string name="preferencesNotSet">"Nenastaveno"</string>
     <string name="preferencesOpencageGeocoderApiKey">"Klíč OpenCage API"</string>
     <string name="preferencesOpencageGeocoderApiKeyDialog">"Pokud je nastaveno, použije se ke zjištění adres polohy OpenCage místo Google. Vyžaduje restart."</string>
     <string name="preferencesOpencageGeocoderApiKeySummary">"API klíč pro zpětný geokodér OpenCage"</string>
@@ -192,6 +204,7 @@ Chcete-li to umožnit, zapněte polohu v nastavení zařízení."</string>
     <string name="preferencesPegLocatorFastestIntervalToInterval">"Omezit max frekvenci lokátoru"</string>
     <string name="preferencesPegLocatorFastestIntervalToIntervalSummary">"Požaduj, aby poskytovatel lokalizace neaktualizoval polohu rychleji, než je požadovaný interval"</string>
     <string name="preferencesPort">"Port"</string>
+    <string name="preferencesPortValidationError">"Port musí být číslo mezi 1 a 65535"</string>
     <string name="preferencesProfileId">"Mód"</string>
     <string name="preferencesPubExtendedData">"Rozšířená data"</string>
     <string name="preferencesPubExtendedDataSummary">"K hlášení polohy přidat i rozšířená data"</string>
@@ -205,6 +218,7 @@ Chcete-li to umožnit, zapněte polohu v nastavení zařízení."</string>
     <string name="preferencesRepublishOnReconnectSummary">"Ihned po připojení k MQTT zveřejni poslední známou polohu a rozšířená data"</string>
     <string name="preferencesReverseGeocodeProvider">"Poskytovatel reverzního geokódu"</string>
     <string name="preferencesServer">"Připojení"</string>
+    <string name="preferencesSet">"Nastavit"</string>
 
     <!-- Fuzzy -->
     <string name="preferencesShowWaypointsOnMap">"Ukázat oblasti"</string>
@@ -213,11 +227,17 @@ Chcete-li to umožnit, zapněte polohu v nastavení zařízení."</string>
     <string name="preferencesShowWaypointsOnMapSummary">"Vykreslit kruhy oblasti na mapě"</string>
     <string name="preferencesTheme">"Vzhled aplikace"</string>
     <string name="preferencesTrackerId">"Tracker ID"</string>
+    <string name="preferencesTrackerIdValidationError">"Musí být jeden nebo dva znaky"</string>
+    <string name="preferencesUrlValidationError">"Neplatné HTTP URL"</string>
 
     <!-- Fuzzy -->
     <string name="preferencesUsername">"Uživatelské jméno"</string>
     <string name="preferencesWebsocket">"Použít WebSockets"</string>
+
+    <!-- Fuzzy -->
     <string name="publish">"Ohlásit"</string>
+
+    <!-- Fuzzy -->
     <string name="radius">"Poloměr"</string>
     <string name="reconnect">"Znovu připojit"</string>
     <string name="save">"Uložit"</string>
@@ -230,6 +250,13 @@ Chcete-li to umožnit, zapněte polohu v nastavení zařízení."</string>
     <string name="status_last_background_update_hint">"Poslední aktualizace služby určování polohy na pozadí"</string>
     <string name="statusBatteryDozeWhiteListDisabled">"Ne"</string>
     <string name="statusBatteryDozeWhiteListEnabled">"Ano"</string>
+    <string name="statusEndpointStateMessageAuthenticationFailed">"Ověření se nezdařilo"</string>
+    <string name="statusEndpointStateMessageConnectionLost">"Ztráta spojení: %s"</string>
+    <string name="statusEndpointStateMessageMalformedHostPort">"Nesprávný název hostitele a port"</string>
+    <string name="statusLocationPermissionsCoarseForeground">"Přibližně"</string>
+    <string name="statusLocationPermissionsFineForeground">"Přesně"</string>
+    <string name="statusLocationPermissionsNone">"Žádné"</string>
+    <string name="statusLocationPermissionsPromptNegativeButton">"Zrušit"</string>
     <string name="title_activity_about">"O aplikaci"</string>
     <string name="title_activity_contacts">"Přátelé"</string>
     <string name="title_activity_map">"Mapa"</string>
@@ -256,6 +283,8 @@ Chcete-li to umožnit, zapněte polohu v nastavení zařízení."</string>
 
     <!-- Fuzzy -->
     <string name="waypoint_region_unknown">"Stav neznámý"</string>
+
+    <!-- Fuzzy -->
     <string name="waypointListPlaceholder">"Oblasti nejsou definovány"</string>
     <string name="welcome_connection_setup_description">"Služba OwnTracks funguje tak, že odesílá data o vaší poloze na server, který vlastníte vy (nebo někdo, komu důvěřujete), takže máte svá data i nadále pod kontrolou.
 
@@ -271,11 +300,6 @@ Další podrobnosti najdete v brožuře OwnTracks."</string>
     <string name="welcome_heading">"Vítejte"</string>
     <string name="welcome_play_description">"OwnTracks vyžaduje služby Google Play"</string>
     <string name="welcome_play_heading">"Služby Google Play"</string>
-    <string name="welcome_version_description">"Kvůli omezením OS mohou některé funkce fungovat omezeně.
-
-Aby aplikace mohla běžet na pozadí, bude zobrazeno trvalé oznámení. To lze deaktivovat v předvolbách Oznámení v systému."</string>
-    <string name="welcome_version_learn_more">"Zjistit víc"</string>
-    <string name="welcome_version_title">"Omezení"</string>
     <string name="welcomeFixIssue">"Fix"</string>
     <string name="workmanagerInitializationErrorDialogMessage">"Některé součásti se nepodařilo správně inicializovat, takže OwnTracks nemusí fungovat správně. Může být nutné znovu nainstalovat aplikaci nebo vymazat uživatelská data.
 

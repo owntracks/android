@@ -8,12 +8,10 @@ import org.owntracks.android.ui.base.BaseRecyclerViewAdapterWithClickHandler
 import org.owntracks.android.ui.base.BaseRecyclerViewHolder
 
 class WaypointsAdapter(clickListener: ClickListener<WaypointModel>) :
-    BaseRecyclerViewAdapterWithClickHandler<WaypointModel, WaypointsAdapter.WaypointModelViewHolder>(
-        clickListener,
-        ::WaypointModelViewHolder,
-        R.layout.ui_row_waypoint
-    ) {
+    BaseRecyclerViewAdapterWithClickHandler<
+        WaypointModel, WaypointsAdapter.WaypointModelViewHolder>(
+        clickListener, ::WaypointModelViewHolder, R.layout.ui_row_waypoint) {
 
-    class WaypointModelViewHolder(binding: ViewDataBinding) :
-        BaseRecyclerViewHolder<WaypointModel>(binding, BR.waypoint)
+  class WaypointModelViewHolder(binding: ViewDataBinding) :
+      BaseRecyclerViewHolder<WaypointModel>(binding, BR.waypoint)
 }

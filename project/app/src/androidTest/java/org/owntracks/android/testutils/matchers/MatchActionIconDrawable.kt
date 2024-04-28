@@ -20,63 +20,47 @@ import org.hamcrest.Matcher
  */
 // https://stackoverflow.com/a/34063950/352740
 fun withActionIconDrawable(@DrawableRes resourceId: Int): Matcher<View?> {
-    return object : BoundedMatcher<View?, ActionMenuItemView>(ActionMenuItemView::class.java) {
-        override fun describeTo(description: Description) {
-            description.appendText("has image drawable resource $resourceId")
-        }
-
-        override fun matchesSafely(actionMenuItemView: ActionMenuItemView): Boolean {
-            return sameBitmap(
-                actionMenuItemView.context,
-                actionMenuItemView.itemData.icon!!,
-                resourceId,
-                actionMenuItemView
-            )
-        }
+  return object : BoundedMatcher<View?, ActionMenuItemView>(ActionMenuItemView::class.java) {
+    override fun describeTo(description: Description) {
+      description.appendText("has image drawable resource $resourceId")
     }
+
+    override fun matchesSafely(actionMenuItemView: ActionMenuItemView): Boolean {
+      return sameBitmap(
+          actionMenuItemView.context,
+          actionMenuItemView.itemData.icon!!,
+          resourceId,
+          actionMenuItemView)
+    }
+  }
 }
 
-private fun sameBitmap(
-    context: Context,
-    drawable: Drawable,
-    resourceId: Int,
-    view: View
-): Boolean {
-    val otherDrawable: Drawable = context.resources.getDrawable(resourceId, null) ?: return false
+private fun sameBitmap(context: Context, drawable: Drawable, resourceId: Int, view: View): Boolean {
+  val otherDrawable: Drawable = context.resources.getDrawable(resourceId, null) ?: return false
 
-    val actualDrawable = when (drawable) {
+  val actualDrawable =
+      when (drawable) {
         is StateListDrawable -> {
-            val getStateDrawableIndex =
-                StateListDrawable::class.java.getMethod(
-                    "getStateDrawableIndex",
-                    IntArray::class.java
-                )
-            val getStateDrawable =
-                StateListDrawable::class.java.getMethod(
-                    "getStateDrawable",
-                    Int::class.javaPrimitiveType
-                )
-            getStateDrawable.invoke(
-                drawable,
-                getStateDrawableIndex.invoke(drawable, view.drawableState)
-            ) as Drawable
+          val getStateDrawableIndex =
+              StateListDrawable::class.java.getMethod("getStateDrawableIndex", IntArray::class.java)
+          val getStateDrawable =
+              StateListDrawable::class
+                  .java
+                  .getMethod("getStateDrawable", Int::class.javaPrimitiveType)
+          getStateDrawable.invoke(
+              drawable, getStateDrawableIndex.invoke(drawable, view.drawableState)) as Drawable
         }
-
         else -> drawable
-    }
-    val bitmap = getBitmapFromDrawable(actualDrawable)
-    val otherBitmap = getBitmapFromDrawable(otherDrawable)
-    return bitmap.sameAs(otherBitmap)
+      }
+  val bitmap = getBitmapFromDrawable(actualDrawable)
+  val otherBitmap = getBitmapFromDrawable(otherDrawable)
+  return bitmap.sameAs(otherBitmap)
 }
 
 private fun getBitmapFromDrawable(drawable: Drawable): Bitmap =
-    Bitmap.createBitmap(
-        drawable.intrinsicWidth,
-        drawable.intrinsicHeight,
-        Bitmap.Config.ARGB_8888
-    )
+    Bitmap.createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
         .apply {
-            val canvas = Canvas(this)
-            drawable.setBounds(0, 0, canvas.width, canvas.height)
-            drawable.draw(canvas)
+          val canvas = Canvas(this)
+          drawable.setBounds(0, 0, canvas.width, canvas.height)
+          drawable.draw(canvas)
         }

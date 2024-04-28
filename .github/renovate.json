@@ -13,7 +13,11 @@
       "matchDatasources": ["pypi"],
       "matchFileNames": [".github/google-play-api/requirements.txt"],
       "automerge": true
-    }
+    },
+    {
+      "matchPackagePatterns": ["^com.fasterxml.jackson"],
+      "enabled": false
+    },
   ],
   "platformAutomerge": true,
   "automergeStrategy": "rebase"

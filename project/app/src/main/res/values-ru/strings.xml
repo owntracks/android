@@ -20,17 +20,22 @@
     <string name="app_name">"OwnTracks"</string>
     <string name="backgroundLocationRestrictionNotificationText">"Ваша версия Android ограничивает возможность определения местоположения при автоматическом запуске приложения до его открытия. Нажмите на это уведомление, чтобы открыть OwnTracks и начать отслеживание местоположения."</string>
     <string name="backgroundLocationRestrictionNotificationTitle">"Отслеживание местоположения приостановлено"</string>
-    <string name="batteryOptimizationWhitelistDialogButtonLabel">"Настройки оптимизации энергопотребления"</string>
 
-    <!-- Fuzzy -->
+    <!-- Comment for translators:
+
+"Настройки оптимизации энергопотребления" звучит красиво, но на кнопку не влазит. -->
+    <string name="batteryOptimizationWhitelistDialogButtonLabel">"Настройки"</string>
     <string name="batteryOptimizationWhitelistDialogMessage">"Добавление OwnTracks в исключения сервиса оптимизации энергопотребления может помочь надежно отслеживать ваши местоположения и обеспечит бесперебойную связь с сервером."</string>
     <string name="batteryOptimizationWhitelistDialogTitle">"Оптимизация энергопотребления"</string>
     <string name="cancel">"Отмена"</string>
+    <string name="certificateMigrationRequiredNotificationText">"OwnTracks теперь использует сертификаты TLS из хранилища сертификатов устройства.\n\nЕсли ранее вы использовали клиентские или корневые сертификаты, добавьте их в хранилище сертификатов устройства."</string>
+    <string name="certificateMigrationRequiredNotificationTitle">"Требуется перенос сертификата"</string>
+    <string name="certificateMigrationRequiredOpenSettingsAction">"Настройки"</string>
     <string name="clear_log">"Очистить"</string>
-    <string name="configurationManagement">"Управление конфигурацией"</string>
+    <string name="configurationManagement">"Управление настройками"</string>
     <string name="CONNECTED">"Подключен"</string>
     <string name="CONNECTING">"Подключение"</string>
-    <string name="contact_image">"Изображение контакта"</string>
+    <string name="contact_image">"Изображение друга"</string>
     <string name="contactDetailsAccuracy">"Точность"</string>
 
     <!-- meters in Russian is "метров", i.e. "%dм" instead if "%d m" -->
@@ -43,6 +48,7 @@
     <string name="contactDetailsBatteryValue">"%d%%"</string>
     <string name="contactDetailsBearing">"Азимут"</string>
     <string name="contactDetailsBearingValue">"%,.0f°"</string>
+    <string name="contactDetailsCoordinates">"Координаты"</string>
     <string name="contactDetailsDistance">"Расстояние"</string>
     <string name="contactDetailsDistanceUnitKilometres">"км"</string>
     <string name="contactDetailsDistanceUnitMeters">"м"</string>
@@ -56,28 +62,26 @@
     <!-- Non-translatable? Why? -->
     <string name="contactDetailsTrackerId">"Метка на карте"</string>
     <string name="contactLocationUnknown">"Местоположение недоступно"</string>
+    <string name="contactsListPlaceholder">"Друзья не найдены"</string>
     <string name="currentLocationButtonLabel">"Текущее местоположение"</string>
     <string name="description">"Описание"</string>
-    <string name="deviceLocationDisabledDialogMessage">"Службы определения местоположения на этом устройстве отключены, поэтому OwnTracks не может отслеживать ваше текущее местоположение.
+    <string name="deviceLocationDisabledDialogMessage">"Сервисы определения местоположения на этом устройстве отключены, поэтому OwnTracks не может отслеживать ваше местоположение.
 
-Пожалуйста, включите \"Местоположение\" в настройках устройства."</string>
+Пожалуйста, включите «Местоположение» в настройках устройства."</string>
     <string name="deviceLocationDisabledDialogPositiveButtonLabel">"Настройки"</string>
     <string name="deviceLocationDisabledDialogTitle">"Определение местоположения отключено"</string>
     <string name="DISCONNECTED">"Отключен"</string>
     <string name="divider">"Разделитель"</string>
     <string name="done_heading">"Готово"</string>
-
-    <!-- Fuzzy -->
     <string name="enjoy_description">"Воспользуйтесь меню настроек и настройте OwnTracks для работы с вашим сервером"</string>
     <string name="ERROR">"Ошибка"</string>
     <string name="ERROR_CONFIGURATION">"Не настроено"</string>
-    <string name="ERROR_DATADISABLED">"Подключение для передачи данных недоступно"</string>
     <string name="errorPreferencesImportFailed">"Не удалось импортировать настройки"</string>
     <string name="events">"События"</string>
     <string name="exportConfiguration">"Экспорт"</string>
     <string name="exportLogFilePrompt">"Экспорт файла журнала"</string>
     <string name="exportLogFileSubject">"Файл журнала OwnTracks"</string>
-    <string name="exportWaypointsToEndpoint">"Опубликовать места"</string>
+    <string name="exportWaypointsToEndpoint">"Опубликовать"</string>
     <string name="fixProblemLabel">"Исправить"</string>
     <string name="geocoderDisabled">"Сервис геокодирования отключен"</string>
     <string name="geocoderError">"Ошибка сервиса геокодирования: %s"</string>
@@ -93,8 +97,10 @@
     <string name="importConfig">"Импорт"</string>
     <string name="INITIAL">"Инициализация"</string>
     <string name="latitude">"Широта"</string>
+    <string name="loadActivityNoFileExplorerFound">"Менеджер файлов не обнаружен"</string>
+    <string name="loadActivitySelectAFile">"Выберите файл"</string>
     <string name="locationPermissionNotGrantedNotification">"Нет доступа к местоположению"</string>
-    <string name="locationPermissionRequestDialogMessage">"Для отслеживания вашего текущего местоположения, пожалуйста, предоставьте OwnTracks соответствующие разрешения."</string>
+    <string name="locationPermissionRequestDialogMessage">"Для отслеживания вашего местоположения, пожалуйста, предоставьте OwnTracks соответствующие разрешения."</string>
     <string name="locationPermissionRequestDialogTitle">"Запрос доступа к местоположению"</string>
     <string name="logViewerActivityTitle">"Журнал"</string>
     <string name="longitude">"Долгота"</string>
@@ -130,7 +136,7 @@
     <string name="notificationChannelErrors">"Ошибки"</string>
     <string name="notificationChannelEventsDescription">"Передача места"</string>
     <string name="notificationChannelOngoing">"Постоянное"</string>
-    <string name="notificationChannelOngoingDescription">"Необходимо для обновления текущего местоположения в фоновом режиме"</string>
+    <string name="notificationChannelOngoingDescription">"Необходимо для обновления местоположения в фоновом режиме"</string>
     <plurals name="notificationEventsTitle">
         <item quantity="one">"%1$d новое событие"</item>
         <item quantity="few">"%1$d новых события"</item>
@@ -145,20 +151,26 @@
     <string name="preferencesAutostart">"Автозапуск"</string>
     <string name="preferencesAutostartSummary">"Автоматический запуск приложения при включении устройства"</string>
     <string name="preferencesBrokerPassword">"Пароль"</string>
+    <string name="preferencesCaCrtInstall">"Установить корневой сертификат"</string>
     <string name="preferencesCategoryAdvancedEncryption">"Шифрование"</string>
     <string name="preferencesCategoryAdvancedLocator">"Локатор"</string>
     <string name="preferencesCategoryAdvancedMisc">"Прочее"</string>
     <string name="preferencesCategoryAdvancedServices">"Сервисы"</string>
+    <string name="preferencesCategoryConnectionCredentials">"Учетная запись"</string>
+    <string name="preferencesCategoryConnectionEndpoint">"Сервер"</string>
+    <string name="preferencesCategoryConnectionIdentification">"Идентификация"</string>
     <string name="preferencesCategoryNotificationBackground">"Фоновые уведомления"</string>
     <string name="preferencesCategoryNotificationErrors">"Ошибки и проблемы"</string>
     <string name="preferencesCategoryNotificationOngoing">"Постоянное уведомление"</string>
     <string name="preferencesChangelog">"Список изменений"</string>
     <string name="preferencesCleanSessionEnabled">"Чистая сессия"</string>
-    <string name="preferencesClientCrtPassword">"Пароль"</string>
-    <string name="preferencesClientCrtPath">"Сертификат пользователя"</string>
+    <string name="preferencesClientCrt">"Клиентский сертификат"</string>
+    <string name="preferencesClientCrtInstall">"Установить клиентский сертификат"</string>
     <string name="preferencesClientId">"ID клиента"</string>
+    <string name="preferencesClientIdValidationError">"Не может быть пустым"</string>
     <string name="preferencesDebugLog">"Журнал отладки"</string>
     <string name="preferencesDeviceName">"ID устройства"</string>
+    <string name="preferencesDeviceNameValidationError">"Не может быть пустым"</string>
     <string name="preferencesDocumentation">"Документация"</string>
     <string name="preferencesEditor">"Редактор"</string>
     <string name="preferencesEditorDescription">"Укажите ключ и его значение. Некоторые изменения могут потребовать перезапуск приложения."</string>
@@ -166,29 +178,34 @@
     <string name="preferencesEditorKeyError">"Указан неверный ключ"</string>
     <string name="preferencesEditorValue">"Значение"</string>
     <string name="preferencesEditorValueError">"Указано неверное значение"</string>
+    <string name="preferencesEnableMapRotation">"Вращающаяся карта"</string>
+    <string name="preferencesEnableMapRotationSummary">"Разрешить поворачивание карты"</string>
     <string name="preferencesEncryptionKey">"Ключ шифрования"</string>
     <string name="preferencesEncryptionKeyDialogMessage">"Ключ шифрования обрезается после 32 символов."</string>
     <string name="preferencesEncryptionKeySummary">"Ключ симметрического шифрования данных"</string>
     <string name="preferencesExperimental">"Экспериментальные"</string>
+    <string name="preferencesExportError">"Не удалось экспортировать настройки"</string>
     <string name="preferencesExportSuccess">"Настройки экспортированы"</string>
     <string name="preferencesHost">"Адрес"</string>
+    <string name="preferencesHostValidationError">"Не может быть пустым"</string>
     <string name="preferencesIgnoreInaccurateLocations">"Неточные местоположения"</string>
-    <string name="preferencesIgnoreInaccurateLocationsDialog">"Игнорировать местоположение, если неточность его определения превышает указанное количество метров"</string>
+    <string name="preferencesIgnoreInaccurateLocationsDialog">"Игнорировать местоположение, если точность его определения менее указанного количества метров"</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">"Игнорировать неточные местоположения"</string>
+    <string name="preferencesImportNoURIGiven">"Не указан URI для импорта настроек"</string>
     <string name="preferencesKeepalive">"Постоянное соединение"</string>
     <string name="preferencesKeepaliveValidationError">"Должно быть более %d секунд"</string>
     <string name="preferencesLicenses">"Библиотеки"</string>
     <string name="preferencesLicensesSummary">"Благодарим авторов использованных библиотек"</string>
-    <string name="preferencesLoadFailed">"Не удалось загрузить эффективную конфигурацию"</string>
+    <string name="preferencesLoadFailed">"Не удалось загрузить настройки"</string>
     <string name="preferencesLocatorDisplacement">"Минимальное перемещение"</string>
     <string name="preferencesLocatorDisplacementDialog">"На какое расстояние (в метрах) должно переместиться устройство для обновления местоположения"</string>
     <string name="preferencesLocatorDisplacementSummary">"Минимальное расстояние между обновлениями местоположения"</string>
     <string name="preferencesLocatorInterval">"Интервал определения местоположения"</string>
-    <string name="preferencesLocatorIntervalDialog">"Как часто должно запрашиваться текущее местоположение у устройства (в секундах)"</string>
+    <string name="preferencesLocatorIntervalDialog">"Как часто должно запрашиваться местоположение у устройства (в секундах)"</string>
     <string name="preferencesLocatorIntervalSummary">"Интервал между обновлениями местоположения"</string>
     <string name="preferencesMap">"Карта"</string>
     <string name="preferencesMoveModeLocatorInterval">"Интервал определения местоположения (Режим отслеживания перемещений)"</string>
-    <string name="preferencesMoveModeLocatorIntervalDialog">"Как часто должно запрашиваться текущее местоположение у устройства в режиме отслеживания перемещений (в секундах)"</string>
+    <string name="preferencesMoveModeLocatorIntervalDialog">"Как часто должно запрашиваться местоположение у устройства в режиме отслеживания перемещений (в секундах)"</string>
     <string name="preferencesMoveModeLocatorIntervalSummary">"Интервал между обновлениями местоположения в режиме отслеживания перемещений"</string>
     <string name="preferencesNotification">"Уведомления"</string>
     <string name="preferencesNotificationEvents">"События"</string>
@@ -197,36 +214,39 @@
     <string name="preferencesNotificationGeocoderErrorsSummary">"Показывать ошибки геокодирования, превышения лимитов частоты и количества запросов к геокодеру"</string>
     <string name="preferencesNotificationLocation">"Последнее известное местоположение"</string>
     <string name="preferencesNotificationLocationSummary">"Показывать последнее известное местоположение и время"</string>
+    <string name="preferencesNotificationPermissionRequest">"Нет доступа к уведомлениям"</string>
+    <string name="preferencesNotificationPermissionRequestSummary">"Нажмите чтобы разрешить доступ к уведомлениям"</string>
+    <string name="preferencesNotSet">"Не указан"</string>
     <string name="preferencesOpencageGeocoderApiKey">"Ключ OpenCage Geocoder API"</string>
     <string name="preferencesOpencageGeocoderApiKeyDialog">"Если установлено, OpenCage используется для разрешения адресов местоположения вместо Google. Требуется перезапуск."</string>
     <string name="preferencesOpencageGeocoderApiKeySummary">"Ключ OpenCage Geocoder API использования в качестве альтернативного геокодирования"</string>
     <string name="preferencesParameters">"Параметры"</string>
     <string name="preferencesPegLocatorFastestIntervalToInterval">"Ограничить максимальную частоту определения местоположения"</string>
-    <string name="preferencesPegLocatorFastestIntervalToIntervalSummary">"Требовать от службы определения местоположения вашего устройства предоставлять данные не чаще, чем это требуется для выбранного режима работы приложения"</string>
+    <string name="preferencesPegLocatorFastestIntervalToIntervalSummary">"Требовать от сервиса определения местоположения вашего устройства предоставлять данные не чаще, чем это требуется для выбранного режима работы приложения"</string>
     <string name="preferencesPort">"Порт"</string>
+    <string name="preferencesPortValidationError">"Должен быть числом в диапазоне от 1 до 65535"</string>
     <string name="preferencesProfileId">"Протокол"</string>
     <string name="preferencesPubExtendedData">"Расширенные сведения"</string>
     <string name="preferencesPubExtendedDataSummary">"Отправлять расширенные сведения"</string>
     <string name="preferencesRemoteCommand">"Внешние команды"</string>
     <string name="preferencesRemoteCommandSummary">"Разрешить получение команд и настроек от сервера"</string>
     <string name="preferencesRemoteConfiguration">"Удаленное изменение параметров"</string>
-    <string name="preferencesRemoteConfigurationSummary">"Разрешить удаленное изменение параметров конфигурации"</string>
+    <string name="preferencesRemoteConfigurationSummary">"Разрешить удаленное изменение настроек"</string>
     <string name="preferencesReporting">"Отчеты"</string>
     <string name="preferencesRepository">"Исходный код"</string>
+    <string name="preferencesRepublishOnReconnect">"Отправлять местоположение при подключении"</string>
+    <string name="preferencesRepublishOnReconnectSummary">"Отправлять последнее известное местоположение сразу после подключения к MQTT серверу"</string>
     <string name="preferencesReverseGeocodeProvider">"Геокодирование"</string>
     <string name="preferencesServer">"Подключение к серверу"</string>
-
-    <!-- Fuzzy -->
+    <string name="preferencesSet">"Есть"</string>
     <string name="preferencesShowWaypointsOnMap">"Показывать места"</string>
-
-    <!-- Fuzzy -->
     <string name="preferencesShowWaypointsOnMapSummary">"Отображать окружность для известных мест на карте"</string>
     <string name="preferencesTheme">"Тема"</string>
 
     <!-- but contactDetailsTrackerId is untranslated? -->
     <string name="preferencesTrackerId">"Метка на карте"</string>
-
-    <!-- Fuzzy -->
+    <string name="preferencesTrackerIdValidationError">"Должен состоять из одного или двух символов"</string>
+    <string name="preferencesUrlValidationError">"Некорректный HTTP URL"</string>
     <string name="preferencesUsername">"Пользователь"</string>
     <string name="preferencesWebsocket">"Использовать WebSockets"</string>
     <string name="publish">"Сообщить местоположение"</string>
@@ -234,6 +254,7 @@
     <string name="reconnect">"Переподключение"</string>
     <string name="save">"Сохранить"</string>
     <string name="select">"Выбрать"</string>
+    <string name="shareContactBody">"%1$s, последнее местоположение: %2$s (%3$s) в %4$s"</string>
     <string name="status_background_service_started_hint">"Дата и время запуска фонового процесса"</string>
     <string name="status_battery_optimization_whitelisted_hint">"Приложение в исключениях сервиса оптимизации энергопотребления"</string>
     <string name="status_endpoint_queue_hint">"Очередь сообщений серверу"</string>
@@ -242,16 +263,38 @@
     <string name="status_last_background_update_hint">"Последнее фоновое обновление местоположения"</string>
     <string name="statusBatteryDozeWhiteListDisabled">"Нет"</string>
     <string name="statusBatteryDozeWhiteListEnabled">"Да"</string>
+    <string name="statusEndpointStateMessageAuthenticationFailed">"Ошибка авторизации"</string>
+    <string name="statusEndpointStateMessageClientTimeout">"Таймаут клиента"</string>
+    <string name="statusEndpointStateMessageConnectionLost">"Подключение потеряно: %s"</string>
+    <string name="statusEndpointStateMessageInvalidClientId">"Некорректный ID клиента"</string>
+    <string name="statusEndpointStateMessageInvalidProtocolVersion">"Некорректная версия протокола MQTT"</string>
+    <string name="statusEndpointStateMessageMalformedHostPort">"Некорректный адрес и порт"</string>
+    <string name="statusEndpointStateMessageMissingHost">"Не указан адрес"</string>
+    <string name="statusEndpointStateMessageNotAuthorized">"Не авторизован"</string>
+    <string name="statusEndpointStateMessageServerTimeout">"Таймаут сервера"</string>
+    <string name="statusEndpointStateMessageSocketTimeout">"Таймаут подключения"</string>
+    <string name="statusEndpointStateMessageSubscribeFailed">"Ошибка при подписке на сообщения MQTT"</string>
+    <string name="statusEndpointStateMessageTLSConfigError">"Ошибка конфигурации TLS"</string>
+    <string name="statusEndpointStateMessageTLSError">"Ошибка TLS: %s"</string>
+    <string name="statusEndpointStateMessageUnableToConnect">"Не удалось подключиться"</string>
+    <string name="statusEndpointStateMessageUnknownHost">"Неизвестный адрес"</string>
+    <string name="statusLocationPermissions">"Предоставленный доступ к сервисам определения местоположения"</string>
+    <string name="statusLocationPermissionsCoarseBackground">"Приблизительное местоположение (доступно в фоне)"</string>
+    <string name="statusLocationPermissionsCoarseForeground">"Приблизительное местоположение"</string>
+    <string name="statusLocationPermissionsFineBackground">"Точное местоположение (доступно в фоне)"</string>
+    <string name="statusLocationPermissionsFineForeground">"Точное местоположение"</string>
+    <string name="statusLocationPermissionsNone">"Нет"</string>
+    <string name="statusLocationPermissionsPromptNegativeButton">"Отмена"</string>
+    <string name="statusLocationPermissionsPromptPositiveButton">"Настройки"</string>
+    <string name="statusLocationPermissionsPromptText">"Если вы хотите, чтобы ваше местоположение отслеживалось сразу после перезапуска устройства, дайте разрешение на определение местоположения в варианте «Разрешить в любом режиме»."</string>
+    <string name="statusLocationPermissionsPromptTitle">"Фоновое определение местоположения"</string>
+    <string name="statusLocationPermissionsUnknown">"Неизвестно"</string>
     <string name="title_activity_about">"Информация"</string>
     <string name="title_activity_contacts">"Друзья"</string>
     <string name="title_activity_map">"Карта"</string>
     <string name="title_activity_preferences">"Настройки"</string>
     <string name="title_activity_status">"Статус"</string>
-
-    <!-- Fuzzy -->
     <string name="title_activity_waypoint">"Место"</string>
-
-    <!-- Fuzzy -->
     <string name="title_activity_waypoints">"Места"</string>
     <string name="title_exit">"Выход"</string>
     <string name="transitionEntering">"прибыл(а) в"</string>
@@ -259,16 +302,13 @@
     <string name="unableToCopyCertificate">"Невозможно скопировать сертификат во внутреннее хранилище"</string>
     <string name="version">"Версия"</string>
     <string name="viewLogs">"Просмотр журнала"</string>
-
-    <!-- Fuzzy -->
     <string name="waypoint_region_inside">"Сейчас в этом месте"</string>
-
-    <!-- Fuzzy -->
     <string name="waypoint_region_outside">"Сейчас вне этого места"</string>
-
-    <!-- Fuzzy -->
     <string name="waypoint_region_unknown">"Статус неизвестен"</string>
     <string name="waypointListPlaceholder">"Места еще не обозначены"</string>
+    <string name="waypointMigrationErrorNotificationText">"Произошла ошибка при переносе списка мест. Некоторые из них, возможно, не были перенесены, поэтому проверьте журнал и добавьте пропущенные места заново."</string>
+    <string name="waypointMigrationErrorNotificationTitle">"Ошибка переноса списка мест"</string>
+    <string name="waypointsImport">"Импортировать"</string>
     <string name="welcome_connection_setup_description">"OwnTracks в процессе работы отправляет данные о вашем местоположении на сервер, которым владеете вы или кто-то, кому вы доверяете, тем самым гарантируя, что ваши данные контролируются только вами.
 
 Убедитесь, что вам известны данные подключения к вашему серверу - его протокол (HTTPS или MQTT), а также все необходимые учетные данные.
@@ -281,13 +321,21 @@
     <string name="welcome_description">"Следующие шаги помогут вам начать работу с OwnTracks"</string>
     <string name="welcome_finish_open_preferences_button_label">"Настройки"</string>
     <string name="welcome_heading">"Добро пожаловать!"</string>
+    <string name="welcome_location_permission_description">"Для отслеживания вашего местоположения и последующей отправки его на сервер, OwnTracks необходимо разрешение на доступ к сервисам определения местоположения вашего устройства.
+
+Вы можете проверить это разрешение и предоставить дополнительное разрешение на доступ к фоновому определению местоположения позднее в разделе «Статус».
+
+Разрешение на фоновое определение местоположения может повысить частоту и точность данных о местоположении в зависимости от вашего устройства и настроек."</string>
+    <string name="welcome_location_permission_granted">"Доступ предоставлен"</string>
+    <string name="welcome_location_permission_title">"Доступ к местоположению"</string>
+    <string name="welcome_notification_permission_description">"Для полноценной работы OwnTracks необходимо разрешение на отображение уведомлений.
+
+Будет отображаться постоянное уведомление для поддержания  соединения с сервером и отслеживания вашего местоположения, а также вы можете включить уведомления о перемещениях друзей между между местами."</string>
+    <string name="welcome_notification_permission_granted">"Доступ предоставлен"</string>
+    <string name="welcome_notification_permission_title">"Доступ к уведомлениям"</string>
+    <string name="welcome_permission_request">"Разрешить доступ"</string>
     <string name="welcome_play_description">"Для работы OwnTracks необходимы сервисы Google Play"</string>
     <string name="welcome_play_heading">"Сервисы Google Play"</string>
-    <string name="welcome_version_description">"Из-за ограничений Android некоторые функции могут работать не в полной мере.
-
-Постоянное уведомление будет отображаться в шторке для того, чтобы дать возможность приложению работать в фоне. Его можно отключить в системных настройках уведомлений."</string>
-    <string name="welcome_version_learn_more">"Подробности"</string>
-    <string name="welcome_version_title">"Ограничения"</string>
     <string name="welcomeFixIssue">"Исправить"</string>
     <string name="workmanagerInitializationErrorDialogMessage">"Некоторые компоненты не были корректно инициализированы, поэтому OwnTracks может работать не в полной мере. Может потребоваться переустановка приложения или очистка данных приложения.
 

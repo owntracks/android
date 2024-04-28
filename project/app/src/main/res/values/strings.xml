@@ -21,8 +21,8 @@
     <string name="batteryOptimizationWhitelistDialogTitle">"Battery Optimization"</string>
     <string name="cancel">"Cancel"</string>
     <string name="certificateMigrationRequiredOpenSettingsAction">"Open Settings"</string>
-    <string name="certificateMigrationRequiredNotificationText">"OwnTracks now uses TLS certificates from the device certificate store. If you were using either a custom CA or TLS client certificates, please add these to the device certificate store."</string>
-    <string name="certificateMigrationRequiredNotificationTitle">"Certificate Migration required"</string>
+    <string name="certificateMigrationRequiredNotificationText">"OwnTracks now uses TLS certificates from the device certificate store.\n\nIf you were using either a custom CA or TLS client certificates, please add these to the device certificate store."</string>
+    <string name="certificateMigrationRequiredNotificationTitle">"Certificate Migration Required"</string>
     <string name="clear_log">"Clear"</string>
     <string name="configurationManagement">"Configuration management"</string>
     <string name="CONNECTED">"Connected"</string>
@@ -48,8 +48,9 @@
     <string name="contactLocationUnknown">"No location is available"</string>
     <string name="contactsListPlaceholder">"No contacts found"</string>
     <string name="currentLocationButtonLabel">"Current location"</string>
-    <string name="deleteWaypointConfirmation">"Do you want to delete this waypoint?"</string>
-    <string name="deleteWaypointTitle">"Delete"</string>
+    <string name="deleteWaypointConfirmationText">"Do you want to delete this waypoint?"</string>
+    <string name="deleteWaypointConfirmationButtonLabel">"Delete"</string>
+    <string name="deleteWaypointTitle">"Delete Waypoint"</string>
     <string name="description">"Description"</string>
     <string name="deviceLocationDisabledDialogMessage">"Location services on this device are currently disabled, so OwnTracks is unable to track your current location.
 
@@ -62,7 +63,6 @@ To allow this, please enable Location in the device settings."</string>
     <string name="enjoy_description">"Select preferences from the menu (or use the link below) and configure OwnTracks for your server before using it"</string>
     <string name="ERROR">"Error"</string>
     <string name="ERROR_CONFIGURATION">"Configuration incomplete"</string>
-    <string name="ERROR_DATADISABLED">"Data connection not available"</string>
     <string name="errorPreferencesImportFailed">"Import failed: %s"</string>
     <string name="events">"Events"</string>
     <string name="exportConfiguration">"Export"</string>
@@ -128,6 +128,7 @@ To allow this, please enable Location in the device settings."</string>
         <item quantity="one">"%1$d new event"</item>
         <item quantity="other">"%1$d new events"</item>
     </plurals>
+    <string name="notificationEndpointStateConnected">"%1$s to %2$s"</string>
     <string name="play_services_not_available">"Google Play Services are not available"</string>
     <string name="play_services_now_available">"Google Play Services are now available"</string>
     <string name="play_services_update_required">"Google Play Services update is required"</string>
@@ -136,6 +137,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesAutostart">"Autostart"</string>
     <string name="preferencesAutostartSummary">"Automatically start on device boot"</string>
     <string name="preferencesBrokerPassword">"Password"</string>
+    <string name="preferencesCaCrtInstall">"Install CA certificate"</string>
     <string name="preferencesCategoryAdvancedEncryption">"Encryption"</string>
     <string name="preferencesCategoryAdvancedLocator">"Locator"</string>
     <string name="preferencesCategoryAdvancedMisc">"Misc"</string>
@@ -148,8 +150,8 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesCategoryNotificationOngoing">"Ongoing notification"</string>
     <string name="preferencesChangelog">"Changelog"</string>
     <string name="preferencesCleanSessionEnabled">"Clean Session"</string>
-    <string name="preferencesClientCrtPassword">"Client certificate password"</string>
-    <string name="preferencesClientCrtPath">"Client certificate"</string>
+    <string name="preferencesClientCrtInstall">"Install client certificate"</string>
+    <string name="preferencesClientCrt">"Client certificate"</string>
     <string name="preferencesClientId">"Client ID"</string>
     <string name="preferencesClientIdValidationError">"Cannot be empty"</string>
     <string name="preferencesDebugLog">"Debug log"</string>
@@ -177,6 +179,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">"Ignore inaccurate locations"</string>
     <string name="preferencesImportNoURIGiven">"No URI given for importing configuration"</string>
     <string name="preferencesKeepalive">"Keepalive"</string>
+    <string name="preferencesKeepaliveDialogMessage">"How often should the client send a keepalive message to the broker (seconds)"</string>
     <string name="preferencesKeepaliveValidationError">"Keepalive should be a minimum of %d"</string>
     <string name="preferencesLicenses">"Libraries"</string>
     <string name="preferencesLicensesSummary">"Thanks to the authors of included libraries"</string>
@@ -241,7 +244,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesUrlValidationError">"Invalid HTTP URL"</string>
     <string name="preferencesUsername">"Username"</string>
     <string name="preferencesWebsocket">"Use WebSockets"</string>
-    <string name="publish">"Report"</string>
+    <string name="publish">"Report Location"</string>
     <string name="radius">"Radius (m)"</string>
     <string name="reconnect">"Reconnect"</string>
     <string name="save">"Save"</string>
@@ -255,6 +258,9 @@ To allow this, please enable Location in the device settings."</string>
     <string name="statusEndpointStateMessageAuthenticationFailed">"Authentication failed"</string>
     <string name="statusEndpointStateMessageClientTimeout">"Client timeout"</string>
     <string name="statusEndpointStateMessageConnectionLost">"Connection lost: %s"</string>
+    <string name="statusEndpointStateMessageConnectionRefused">"Connection refused"</string>
+    <string name="statusEndpointStateMessageEOFError">"EOFException from endpoint - is endpoint expecting TLS?"</string>
+    <string name="statusEndpointStateMessageEndpointDoesNotSupportWebsockets">"Endpoint does not support WebSockets"</string>
     <string name="statusEndpointStateMessageInvalidClientId">"Invalid client Id"</string>
     <string name="statusEndpointStateMessageInvalidProtocolVersion">"Invalid MQTT protocol version"</string>
     <string name="statusEndpointStateMessageMalformedHostPort">"Invalid hostname &amp; port"</string>
@@ -264,8 +270,10 @@ To allow this, please enable Location in the device settings."</string>
     <string name="statusEndpointStateMessageSocketTimeout">"Connection timed out"</string>
     <string name="statusEndpointStateMessageSubscribeFailed">"Subscribe failed"</string>
     <string name="statusEndpointStateMessageTLSConfigError">"TLS config error"</string>
+    <string name="statusEndpointStateMessageTLSConnectionClosed">"TLS connection closed"</string>
     <string name="statusEndpointStateMessageTLSError">"TLS Error: %s"</string>
-    <string name="statusEndpointStateMessageTLSBadClientCertPassword">"TLS Error: Bad client certificate password"</string>
+    <string name="statusEndpointStateMessageTLSEndpointCANotTrustedError">"Endpoint TLS CA not trusted"</string>
+    <string name="statusEndpointStateMessageTLSEndpointClientCertsRequired">"Endpoint requires TLS client certificates"</string>
     <string name="statusEndpointStateMessageUnableToConnect">"Unable to connect"</string>
     <string name="statusEndpointStateMessageUnknownHost">"Unknown host"</string>
     <string name="status_last_background_update_hint">"Location service last background update"</string>
@@ -329,11 +337,6 @@ A permanent notification will be displayed in order to keep the location trackin
     <string name="welcome_permission_request">"Request"</string>
     <string name="welcome_play_description">"OwnTracks requires Google Play Services"</string>
     <string name="welcome_play_heading">"Google Play Services"</string>
-    <string name="welcome_version_description">"Due to OS limitations, some features might work in a restricted manner.
-
-A permanent notification will be shown to keep running in the background. It can be disabled in the systems notification preferences."</string>
-    <string name="welcome_version_learn_more">"Learn more"</string>
-    <string name="welcome_version_title">"Restrictions"</string>
     <string name="waypointMigrationErrorNotificationTitle">"Error migrating waypoints"</string>
     <string name="waypointMigrationErrorNotificationText">"An error occurred whilst migrating waypoints. Some may not have been migrated, so check the logs and re-add."</string>
     <string name="welcomeFixIssue">"Fix"</string>

@@ -1,0 +1,1 @@
+adb shell am start -a android.intent.action.VIEW -d owntracks:///config?inline=eyJfdHlwZSI6ImNvbmZpZ3VyYXRpb24iLCJkZXZpY2VJZCI6ImVtdTY0eGEiLCJkb250UmV1c2VIdHRwQ2xpZW50IjpmYWxzZSwibW9kZSI6MywidGlkIjoieGEiLCJ1cmwiOiJodHRwOi8vbXF0dC5kb2NrZXIubG9jYWw6ODA4My9wdWIiLCJwYXNzd29yZCI6InBhc3N3b3JkIiwgICJ1c2VybmFtZSI6InRlc3QifQ==

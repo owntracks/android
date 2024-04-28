@@ -12,79 +12,55 @@
             type="org.owntracks.android.ui.welcome.WelcomeViewModel" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="0dp">
 
-        <ImageButton
-            android:id="@+id/btn_next"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:layout_margin="0dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="0dp"
-            android:background="?selectableItemBackgroundBorderless"
-            android:contentDescription="@string/next"
-            android:gravity="center"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_baseline_keyboard_arrow_right_24"
-            android:visibility="@{vm.nextEnabled ? View.VISIBLE : View.INVISIBLE}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toRightOf="parent" />
-
-        <ImageButton
-            android:id="@+id/btn_done"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:layout_margin="0dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="0dp"
-            android:background="?selectableItemBackgroundBorderless"
-            android:contentDescription="@string/done_heading"
-            android:gravity="center"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:src="@drawable/ic_baseline_done_24"
-            android:textSize="18sp"
-            android:visibility="@{vm.doneEnabled ? View.VISIBLE : View.INVISIBLE}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toRightOf="@+id/btn_next" />
-
-
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/viewPager"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginRight="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/btn_next"
             android:layout_marginBottom="8dp"
-            app:layout_constraintBottom_toTopOf="@+id/circles"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0"
-            app:userInputEnabled="@{vm.nextEnabled || vm.doneEnabled}" />
+            app:userInputEnabled="@{false}" />
+
+        <Button
+            android:id="@+id/btn_next"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/circles"
+            android:layout_centerHorizontal="true"
+            android:contentDescription="@string/next"
+            android:text="@string/next"
+            android:visibility="@{vm.nextEnabled ? View.VISIBLE : View.INVISIBLE}" />
+
+        <Button
+            android:id="@+id/btn_done"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/circles"
+            android:layout_centerHorizontal="true"
+            android:contentDescription="@string/done_heading"
+            android:text="@string/done_heading"
+            android:visibility="@{vm.doneEnabled ? View.VISIBLE : View.INVISIBLE}" />
 
         <LinearLayout
             android:id="@+id/circles"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="48dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginBottom="0dp"
-            android:gravity="center_vertical"
+            android:gravity="center"
             android:orientation="horizontal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            />
+
+    </RelativeLayout>
 </layout>

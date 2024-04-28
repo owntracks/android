@@ -14,42 +14,40 @@ import org.owntracks.android.location.LocationRequest
 @SmallTest
 class LocationRequestGMSConversion {
 
-    @Test
-    fun canConvertLocationRequestToGMS() =
-        LocationRequest(
-            fastestInterval = Duration.ofSeconds(1),
-            smallestDisplacement = 50f,
-            numUpdates = 50,
-            expirationDuration = Duration.ofMinutes(2),
-            priority = LocationRequest.PRIORITY_HIGH_ACCURACY,
-            interval = Duration.ofSeconds(30)
-        )
-            .toGMSLocationRequest()
-            .run {
-                assertEquals(1_000, minUpdateIntervalMillis)
-                assertEquals(30_000, intervalMillis)
-                assertEquals(50, maxUpdates)
-                assertEquals(TimeUnit.MINUTES.toMillis(2), durationMillis)
-                assertEquals(Priority.PRIORITY_HIGH_ACCURACY, priority)
-                assertEquals(50f, minUpdateDistanceMeters)
-            }
+  @Test
+  fun canConvertLocationRequestToGMS() =
+      LocationRequest(
+              fastestInterval = Duration.ofSeconds(1),
+              smallestDisplacement = 50f,
+              numUpdates = 50,
+              expirationDuration = Duration.ofMinutes(2),
+              priority = LocationRequest.PRIORITY_HIGH_ACCURACY,
+              interval = Duration.ofSeconds(30))
+          .toGMSLocationRequest()
+          .run {
+            assertEquals(1_000, minUpdateIntervalMillis)
+            assertEquals(30_000, intervalMillis)
+            assertEquals(50, maxUpdates)
+            assertEquals(TimeUnit.MINUTES.toMillis(2), durationMillis)
+            assertEquals(Priority.PRIORITY_HIGH_ACCURACY, priority)
+            assertEquals(50f, minUpdateDistanceMeters)
+          }
 
-    @Test
-    fun canConvertLocationRequestToGMSWithoutFastestIntervalSet() {
-        LocationRequest(
+  @Test
+  fun canConvertLocationRequestToGMSWithoutFastestIntervalSet() {
+    LocationRequest(
             smallestDisplacement = 50f,
             numUpdates = 50,
             expirationDuration = Duration.ofMinutes(2),
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY,
-            interval = Duration.ofSeconds(30)
-        )
-            .toGMSLocationRequest()
-            .run {
-                assertEquals(30_000, minUpdateIntervalMillis)
-                assertEquals(50, maxUpdates)
-                assertEquals(Priority.PRIORITY_HIGH_ACCURACY, priority)
-                assertEquals(TimeUnit.MINUTES.toMillis(2), durationMillis)
-                assertEquals(50f, minUpdateDistanceMeters)
-            }
-    }
+            interval = Duration.ofSeconds(30))
+        .toGMSLocationRequest()
+        .run {
+          assertEquals(30_000, minUpdateIntervalMillis)
+          assertEquals(50, maxUpdates)
+          assertEquals(Priority.PRIORITY_HIGH_ACCURACY, priority)
+          assertEquals(TimeUnit.MINUTES.toMillis(2), durationMillis)
+          assertEquals(50f, minUpdateDistanceMeters)
+        }
+  }
 }

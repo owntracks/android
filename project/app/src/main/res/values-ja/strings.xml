@@ -27,6 +27,8 @@
     <string name="CONNECTING">"接続中"</string>
     <string name="contact_image">"連絡先画像"</string>
     <string name="contactDetailsAccuracy">"精度"</string>
+
+    <!-- Fuzzy -->
     <string name="contactDetailsAccuracyValue">"%d m"</string>
     <string name="contactDetailsAltitude">"高度"</string>
     <string name="contactDetailsAltitudeValue">"%,d m"</string>
@@ -57,7 +59,8 @@
     <string name="enjoy_description">"Owntracksの利用を開始する前に、メニューから環境設定を選択し、サーバの設定を行ってください"</string>
     <string name="ERROR">"エラー"</string>
     <string name="ERROR_CONFIGURATION">"構成設定が完全ではありません"</string>
-    <string name="ERROR_DATADISABLED">"データ通信ができません"</string>
+
+    <!-- Fuzzy -->
     <string name="errorPreferencesImportFailed">"インポートに失敗しました"</string>
     <string name="events">"イベント"</string>
     <string name="exportConfiguration">"エクスポート"</string>
@@ -122,8 +125,6 @@
     <string name="preferencesCategoryNotificationOngoing">"起動中の常時通知"</string>
     <string name="preferencesChangelog">"変更履歴"</string>
     <string name="preferencesCleanSessionEnabled">"クリーンセッション"</string>
-    <string name="preferencesClientCrtPassword">"クライアント証明書パスワード"</string>
-    <string name="preferencesClientCrtPath">"クライアント証明書"</string>
     <string name="preferencesClientId">"クライアントID"</string>
     <string name="preferencesDebugLog">"デバッグログ"</string>
     <string name="preferencesDeviceName">"デバイスID"</string>
@@ -185,7 +186,11 @@
     <!-- Fuzzy -->
     <string name="preferencesUsername">"ユーザ名"</string>
     <string name="preferencesWebsocket">"WebSocketを使用"</string>
+
+    <!-- Fuzzy -->
     <string name="publish">"レポート"</string>
+
+    <!-- Fuzzy -->
     <string name="radius">"半径"</string>
     <string name="reconnect">"再接続"</string>
     <string name="save">"保存"</string>
@@ -222,6 +227,8 @@
 
     <!-- Fuzzy -->
     <string name="waypoint_region_unknown">"ステータス不明"</string>
+
+    <!-- Fuzzy -->
     <string name="waypointListPlaceholder">"リージョンが1つもありません"</string>
 
     <!-- Fuzzy -->
@@ -231,11 +238,6 @@
     <!-- Fuzzy -->
     <string name="welcome_play_description">"Owntrack"</string>
     <string name="welcome_play_heading">"Google Play開発者サービス"</string>
-    <string name="welcome_version_description">"OSの制限により、一部の機能の動作が制限される場合があります。
-
-アプリをバックグラウンドで常に起動させるために、常時、通知が表示されます。この通知は、システムの通知設定で無効化することができます。"</string>
-    <string name="welcome_version_learn_more">"詳しく"</string>
-    <string name="welcome_version_title">"制限"</string>
     <string name="welcomeFixIssue">"権限を設定"</string>
     <string name="workmanagerInitializationErrorDialogMessage">"一部のコンポーネントが正しく初期化できなかったため、Owntracksが正常に動作しない可能性があります。アプリを再インストールするか、ユーザデータの消去が必要となる場合があります。
 

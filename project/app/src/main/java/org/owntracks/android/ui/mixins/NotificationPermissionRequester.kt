@@ -13,20 +13,22 @@ class NotificationPermissionRequester(
     private val permissionGrantedCallback: () -> Unit,
     private val permissionDeniedCallback: () -> Unit
 ) {
-    fun hasPermission(): Boolean = NotificationManagerCompat.from(caller as Context).areNotificationsEnabled()
+  fun hasPermission(): Boolean =
+      NotificationManagerCompat.from(caller as Context).areNotificationsEnabled()
 
-    private val permissionRequest = caller.registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+  private val permissionRequest =
+      caller.registerForActivityResult(ActivityResultContracts.RequestPermission()) {
         Timber.d("Notification notification callback, result=$it ")
         if (it) {
-            permissionGrantedCallback()
+          permissionGrantedCallback()
         } else {
-            permissionDeniedCallback()
+          permissionDeniedCallback()
         }
-    }
+      }
 
-    fun requestNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            permissionRequest.launch(Manifest.permission.POST_NOTIFICATIONS)
-        }
+  fun requestNotificationPermission() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      permissionRequest.launch(Manifest.permission.POST_NOTIFICATIONS)
     }
+  }
 }

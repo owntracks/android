@@ -18,3 +18,4 @@ dependencyResolutionManagement {
 
 include(":app")
 rootProject.name = "owntracks-android"
+include(":location-kalman")

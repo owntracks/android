@@ -1,9 +1,9 @@
 [versions]
-agp = "8.1.2"
+agp = "8.3.1"
 androidx-concurrent = "1.1.0"
 androidx-core = "1.10.1"
 androidx-core-testing = "2.2.0"
-androidx-fragment = "1.6.1"
+androidx-fragment = "1.6.2"
 androidx-preference = "1.2.1"
 androidx-room = "2.5.2"
 androidx-test-core-ktx = "1.5.0"
@@ -14,48 +14,52 @@ androidx-test-rules = "1.5.0"
 androidx-test-runner = "1.5.2"
 androidx-test-services = "1.4.2"
 androidx-work = "2.8.1"
-apache-httpcore = "5.2.3"
+apache-httpcore = "5.2.4"
 barista = "4.3.0"
-bouncycastle = "1.76"
-commons-codec = "1.16.0"
+bouncycastle = "1.77"
+commons-codec = "1.16.1"
 conscrypt = "2.5.2"
-desguar-jdk = "2.0.3"
+desguar-jdk = "2.0.4"
 flatbuffers = "23.5.26"
 google-material = "1.9.0"
-google-play-services-maps = "18.1.0"
-guava = "32.1.3-jre"
-hilt = "2.48.1"
+google-play-services-maps = "18.2.0"
+guava = "33.1.0-jre"
+hilt = "2.51"
 hilt-work = "1.0.0"
 jackson = "2.13.5"
-jaxb = "4.0.3"
+jaxb = "4.0.5"
 jaxb-api = "2.3.1"
-kmqtt = "0.4.3"
-kotlin = "1.8.21"
-kotlin-coroutines = "1.7.3"
-ktlint = "11.6.0"
+kmqtt = "0.4.6"
+kotlin = "1.9.23"
+kotlin-coroutines = "1.8.0"
+kotlin-datetime = "0.5.0"
+ksp = "1.9.23-1.0.19"
+ktfmt = "0.17.0"
 libsodium = "2.0.2"
 lmdb-kt = "0.1.1-SNAPSHOT"
 materialdrawer = "6.1.2"
 materialize = "1.2.1"
-mockito-kotlin = "5.1.0"
-okhttp = "4.11.0"
-osmdroid = "6.1.17"
+mockito-kotlin = "5.2.1"
+okhttp = "4.12.0"
+osmdroid = "6.1.18"
 paho-mqtt = "1.2.5"
-play-services-location = "21.0.1"
-r8 = "8.1.56"
-slf4j-simple = "2.0.9"
+play-services-location = "21.2.0"
+r8 = "8.3.37"
+slf4j-simple = "2.0.12"
 slf4j-timber = "1.0.1"
-square-leakcanary = "2.12"
+square-leakcanary = "2.13"
 square-tape2 = "2.0.0-beta1"
 timber = "5.0.1"
-triplet = "3.8.4"
+triplet = "3.9.1"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-jvm= { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 triplet = { id = "com.github.triplet.play", version.ref = "triplet" }
-ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref= "ktlint"}
+ktfmt = { id = "com.ncorti.ktfmt.gradle", version.ref = "ktfmt" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 
 [libraries]
 android-gradle-api = { module = "com.android.tools.build:gradle-api", version.ref = "agp" }
@@ -65,6 +69,8 @@ kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref =
 kotlin-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlin-coroutines" }
 kotlin-coroutines-jdk8 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8", version.ref = "kotlin-coroutines" }
 kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlin-coroutines" }
+kotlin-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlin-datetime" }
+kotlin-serialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 
 # Hilt
 hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
@@ -90,7 +96,7 @@ androidx-core-testing = { module = "androidx.arch.core:core-testing", version.re
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidx-room" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidx-room" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidx-room" }
-androidx-concurrent-futures = { module = "androidx.concurrent:concurrent-futures", version.ref="androidx.concurrent"}
+androidx-concurrent-futures = { module = "androidx.concurrent:concurrent-futures", version.ref = "androidx-concurrent" }
 
 # Cryptography
 conscrypt = { module = "org.conscrypt:conscrypt-android", version.ref = "conscrypt" }

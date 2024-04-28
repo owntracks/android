@@ -1,11 +1,12 @@
 package org.owntracks.android.support.interfaces
 
-import org.owntracks.android.services.ConnectionConfiguration
+import org.owntracks.android.net.ConnectionConfiguration
 
 interface OutgoingMessageProcessor {
-    fun activate()
-    fun deactivate()
+  fun activate()
 
-    @Throws(ConfigurationIncompleteException::class)
-    fun getEndpointConfiguration(): ConnectionConfiguration
+  fun deactivate()
+
+  @Throws(ConfigurationIncompleteException::class)
+  fun getEndpointConfiguration(): ConnectionConfiguration
 }

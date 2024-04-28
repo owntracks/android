@@ -81,7 +81,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:visibility="@{vm.currentContact.messageLocation!=null ? View.VISIBLE : View.GONE}">
+                android:visibility="@{vm.currentContact.latLng!=null ? View.VISIBLE : View.GONE}">
 
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:layout_width="0dp"
@@ -96,14 +96,14 @@
                         android:id="@+id/contactDetailsAccuracy"
                         layout="@layout/ui_contactsheet_parameter"
                         app:icon="@{@drawable/ic_baseline_my_location_24}"
-                        app:textValue="@{String.format(@string/contactDetailsAccuracyValue,vm.currentContact.messageLocation.accuracy)}"
+                        app:textValue="@{String.format(@string/contactDetailsAccuracyValue,vm.currentContact.locationAccuracy)}"
                         app:title="@{@string/contactDetailsAccuracy}" />
 
                     <include
                         android:id="@+id/contactDetailsAltitude"
                         layout="@layout/ui_contactsheet_parameter"
                         app:icon="@{@drawable/ic_baseline_airplanemode_active_24}"
-                        app:textValue="@{String.format(@string/contactDetailsAltitudeValue, vm.currentContact.messageLocation.altitude)}"
+                        app:textValue="@{String.format(@string/contactDetailsAltitudeValue, vm.currentContact.altitude)}"
                         app:title="@{@string/contactDetailsAltitude}" />
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -120,14 +120,14 @@
                         android:id="@+id/contactDetailsBattery"
                         layout="@layout/ui_contactsheet_parameter"
                         app:icon="@{@drawable/ic_baseline_battery_std_24}"
-                        app:textValue="@{vm.currentContact.messageLocation.battery != null ? String.format(@string/contactDetailsBatteryValue,  vm.currentContact.messageLocation.battery) : @string/na }"
+                        app:textValue="@{vm.currentContact.battery != null ? String.format(@string/contactDetailsBatteryValue,  vm.currentContact.battery) : @string/na }"
                         app:title="@{@string/contactDetailsBattery}" />
 
                     <include
                         android:id="@+id/contactDetailsSpeed"
                         layout="@layout/ui_contactsheet_parameter"
                         app:icon="@{@drawable/ic_baseline_speed_24}"
-                        app:textValue="@{String.format(@string/contactDetailsSpeedValue,vm.currentContact.messageLocation.velocity)}"
+                        app:textValue="@{String.format(@string/contactDetailsSpeedValue,vm.currentContact.velocity)}"
                         app:title="@{@string/contactDetailsSpeed}" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>

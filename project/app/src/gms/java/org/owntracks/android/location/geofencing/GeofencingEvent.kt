@@ -9,29 +9,27 @@ data class GeofencingEvent(
     val triggeringGeofences: List<Geofence>?,
     val triggeringLocation: Location?
 ) {
-    fun hasError(): Boolean = errorCode != null && errorCode >= 0
+  fun hasError(): Boolean = errorCode != null && errorCode >= 0
 
-    companion object {
-        @JvmStatic
-        fun fromIntent(intent: Intent): GeofencingEvent {
-            val gmsGeofencingEvent = com.google.android.gms.location.GeofencingEvent.fromIntent(intent)
-            return GeofencingEvent(
-                gmsGeofencingEvent?.errorCode,
-                gmsGeofencingEvent?.geofenceTransition,
-                gmsGeofencingEvent?.triggeringGeofences?.map {
-                    Geofence(
-                        it.requestId,
-                        it.transitionTypes,
-                        it.notificationResponsiveness,
-                        Latitude(it.latitude),
-                        Longitude(it.longitude),
-                        it.radius,
-                        it.expirationTime,
-                        it.loiteringDelay
-                    )
-                },
-                gmsGeofencingEvent?.triggeringLocation
-            )
-        }
+  companion object {
+    @JvmStatic
+    fun fromIntent(intent: Intent): GeofencingEvent {
+      val gmsGeofencingEvent = com.google.android.gms.location.GeofencingEvent.fromIntent(intent)
+      return GeofencingEvent(
+          gmsGeofencingEvent?.errorCode,
+          gmsGeofencingEvent?.geofenceTransition,
+          gmsGeofencingEvent?.triggeringGeofences?.map {
+            Geofence(
+                it.requestId,
+                it.transitionTypes,
+                it.notificationResponsiveness,
+                Latitude(it.latitude),
+                Longitude(it.longitude),
+                it.radius,
+                it.expirationTime,
+                it.loiteringDelay)
+          },
+          gmsGeofencingEvent?.triggeringLocation)
     }
+  }
 }

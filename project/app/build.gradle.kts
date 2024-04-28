@@ -1,3 +1,4 @@
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 import kotlin.io.path.isRegularFile
 
 plugins {
@@ -6,42 +7,37 @@ plugins {
     id("com.github.triplet.play")
     kotlin("android")
     kotlin("kapt")
-    id("org.jlleitschuh.gradle.ktlint")
+    alias(libs.plugins.ktfmt)
+    alias(libs.plugins.ksp)
 }
 
 apply<EspressoMetadataEmbeddingPlugin>()
 
-val googleMapsAPIKey = System.getenv("GOOGLE_MAPS_API_KEY")?.toString()
-    ?: extra.get("google_maps_api_key")?.toString()
-    ?: "PLACEHOLDER_API_KEY"
+val googleMapsAPIKey = System.getenv("GOOGLE_MAPS_API_KEY")?.toString() ?: extra.get("google_maps_api_key")?.toString()
+?: "PLACEHOLDER_API_KEY"
 
 val gmsImplementation: Configuration by configurations.creating
-val numShards = System.getenv("CIRCLE_NODE_TOTAL") ?: "0"
-val shardIndex = System.getenv("CIRCLE_NODE_INDEX") ?: "0"
 
-val packageVersionCode: Int = System.getenv("VERSION_CODE")?.toInt() ?: 420412000
+val packageVersionCode: Int = System.getenv("VERSION_CODE")?.toInt() ?: 420500000
 val manuallySetVersion: Boolean = System.getenv("VERSION_CODE") != null
 
 android {
-    compileSdk = 33
+    compileSdk = 34
     namespace = "org.owntracks.android"
 
     defaultConfig {
         applicationId = "org.owntracks.android"
         minSdk = 24
-        targetSdk = 33
+        targetSdk = 34
 
         versionCode = packageVersionCode
         versionName = "2.5.0"
 
-        val localeCount = fileTree("src/main/res/")
-            .map {
-                it.toPath()
-            }.count { it.isRegularFile() && it.fileName.toString() == "strings.xml" }
+        val localeCount = fileTree("src/main/res/").map {
+            it.toPath()
+        }.count { it.isRegularFile() && it.fileName.toString() == "strings.xml" }
         buildConfigField(
-            "int",
-            "TRANSLATION_COUNT",
-            localeCount.toString()
+            "int", "TRANSLATION_COUNT", localeCount.toString()
         )
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -50,9 +46,7 @@ android {
                 "clearPackageData" to "false",
                 "coverage" to "true",
                 "disableAnalytics" to "true",
-                "useTestStorageService" to "false",
-                "numShards" to numShards,
-                "shardIndex" to shardIndex
+                "useTestStorageService" to "false"
             )
         )
         javaCompileOptions {
@@ -85,8 +79,7 @@ android {
             isShrinkResources = true
             proguardFiles.addAll(
                 listOf(
-                    getDefaultProguardFile("proguard-android-optimize.txt"),
-                    file("proguard-rules.pro")
+                    getDefaultProguardFile("proguard-android-optimize.txt"), file("proguard-rules.pro")
                 )
             )
             resValue("string", "GOOGLE_MAPS_API_KEY", googleMapsAPIKey)
@@ -98,8 +91,7 @@ android {
             isShrinkResources = false
             proguardFiles.addAll(
                 listOf(
-                    getDefaultProguardFile("proguard-android-optimize.txt"),
-                    file("proguard-rules.pro")
+                    getDefaultProguardFile("proguard-android-optimize.txt"), file("proguard-rules.pro")
                 )
             )
             resValue("string", "GOOGLE_MAPS_API_KEY", googleMapsAPIKey)
@@ -132,9 +124,7 @@ android {
         abortOnError = false
         disable.addAll(
             setOf(
-                "TypographyFractions",
-                "TypographyQuotes",
-                "Typos"
+                "TypographyFractions", "TypographyQuotes", "Typos"
             )
         )
     }
@@ -144,12 +134,33 @@ android {
         unitTests {
             isIncludeAndroidResources = true
         }
+        managedDevices {
+            localDevices {
+                create("pixel2api30aosp") {
+                    device = "Pixel 2"
+                    apiLevel = 30
+                    systemImageSource = "aosp-atd"
+                }
+            }
+        }
     }
 
     tasks.withType<Test> {
         testLogging {
-            events("passed", "skipped", "failed")
+            events(
+                TestLogEvent.STARTED,
+                TestLogEvent.PASSED,
+                TestLogEvent.SKIPPED,
+                TestLogEvent.FAILED,
+                TestLogEvent.STANDARD_OUT,
+                TestLogEvent.STANDARD_ERROR
+            )
             setExceptionFormat("full")
+            showStandardStreams = true
+
+            showCauses = true
+            showExceptions = true
+            showStackTraces = true
         }
         reports.junitXml.required.set(true)
         reports.html.required.set(true)
@@ -197,6 +208,10 @@ kapt {
     correctErrorTypes = true
 }
 
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
+
 tasks.withType<Test> {
     systemProperties["junit.jupiter.execution.parallel.enabled"] = false
     systemProperties["junit.jupiter.execution.parallel.mode.default"] = "same_thread"
@@ -235,6 +250,8 @@ dependencies {
     implementation(libs.commons.codec)
     implementation(libs.bundles.androidx.room)
     implementation(libs.bundles.objectbox.migration)
+    implementation(libs.kotlin.datetime)
+    implementation(libs.kotlin.serialization)
 
     // The BC version shipped under com.android is half-broken. Weird certificate issues etc.
     // To solve, we bring in our own version of BC
@@ -249,7 +266,7 @@ dependencies {
 
     // Preprocessors
     kapt(libs.bundles.kapt.hilt)
-    kapt(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)
 
     kaptTest(libs.bundles.kapt.hilt)
 
@@ -274,8 +291,4 @@ dependencies {
 // Handled now in the android / playConfigs block
 play {
     enabled.set(false)
-}
-
-ktlint {
-    android.set(true)
 }
