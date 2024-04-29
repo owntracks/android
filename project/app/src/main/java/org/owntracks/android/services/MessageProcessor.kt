@@ -431,11 +431,7 @@ constructor(
       scope.launch {
         when (message.action) {
           CommandAction.REPORT_LOCATION -> {
-            if (message.modeId !== ConnectionMode.MQTT) {
-              Timber.e("command not supported in HTTP mode: ${message.action})")
-            } else {
-              service?.requestOnDemandLocationUpdate(MessageLocation.ReportType.RESPONSE)
-            }
+            service?.requestOnDemandLocationUpdate(MessageLocation.ReportType.RESPONSE)
           }
           CommandAction.WAYPOINTS -> locationProcessorLazy.get().publishWaypointsMessage()
           CommandAction.SET_WAYPOINTS ->
