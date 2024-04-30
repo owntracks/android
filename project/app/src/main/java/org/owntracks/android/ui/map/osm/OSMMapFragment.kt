@@ -270,6 +270,7 @@ internal constructor(
           }
         }
     setMapStyle()
+    drawAllContactsAndRegions()
   }
 
   override fun updateCamera(latLng: LatLng) {
@@ -345,7 +346,7 @@ internal constructor(
   override fun drawRegions(regions: Set<WaypointModel>) {
     if (preferences.showRegionsOnMap) {
       mapView?.run {
-        Timber.d("Drawing regions on map")
+        Timber.d("Drawing ${regions.size} regions on map")
         overlays
             .filterIsInstance<Marker>()
             .filter { it.id.startsWith("regionmarker-") }
@@ -387,7 +388,6 @@ internal constructor(
   }
 
   override fun setMapLayerType(mapLayerStyle: MapLayerStyle) {
-    @Suppress("REDUNDANT_ELSE_IN_WHEN")
     when (mapLayerStyle) {
       MapLayerStyle.OpenStreetMapNormal ->
           binding.osmMapView.setTileSource(TileSourceFactory.MAPNIK)

@@ -15,7 +15,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.owntracks.android.R
 import org.owntracks.android.data.repos.ContactsRepoChange
 import org.owntracks.android.data.waypoints.WaypointModel
@@ -42,11 +45,24 @@ internal constructor(
 
   abstract fun currentMarkersOnMap(): Set<String>
 
+  /**
+   * Init map is called to initialize the given fragments implementation of the map. This needs to
+   * take care of initializing the specific map implementation, setting the theme, drawing the
+   * waypoints and the contacts on the map.
+   */
   abstract fun initMap()
 
   abstract fun drawRegions(regions: Set<WaypointModel>)
 
   abstract fun setMapLayerType(mapLayerStyle: MapLayerStyle)
+
+  protected fun drawAllContactsAndRegions() {
+    viewModel.allContacts.values.toSet().run(::updateAllMarkers)
+    lifecycleScope.launch {
+      val regions = withContext(Dispatchers.IO) { viewModel.waypoints.first().toSet() }
+      withContext(Dispatchers.Main) { drawRegions(regions) }
+    }
+  }
 
   protected val viewModel: MapViewModel by activityViewModels()
 
@@ -82,37 +98,46 @@ internal constructor(
           lifecycleOwner = this@MapFragment.viewLifecycleOwner
         }
 
+    // Here we set up all the flow collectors to react to the universe changing. Usually contacts
+    // and waypoints coming and going.
     viewModel.apply {
       mapCenter.observe(viewLifecycleOwner, this@MapFragment::updateCamera)
       updateAllMarkers(allContacts.values.toSet())
       lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-          contactUpdatedEvent.collect {
-            when (it) {
-              ContactsRepoChange.AllCleared -> {
-                updateAllMarkers(emptySet())
-              }
-              is ContactsRepoChange.ContactAdded -> {
-                updateMarkerForContact(it.contact)
-              }
-              is ContactsRepoChange.ContactLocationUpdated -> {
-                updateMarkerForContact(it.contact)
-                if (viewMode == MapViewModel.ViewMode.Contact(true) &&
-                    currentContact.value == it.contact) {
-                  it.contact.latLng?.run(this@MapFragment::updateCamera)
+          launch {
+            contactUpdatedEvent.collect {
+              when (it) {
+                ContactsRepoChange.AllCleared -> {
+                  updateAllMarkers(emptySet())
                 }
-              }
-              is ContactsRepoChange.ContactCardUpdated -> {
-                updateMarkerForContact(it.contact)
-              }
-              is ContactsRepoChange.ContactRemoved -> {
-                removeMarkerFromMap(it.contact.id)
+                is ContactsRepoChange.ContactAdded -> {
+                  updateMarkerForContact(it.contact)
+                }
+                is ContactsRepoChange.ContactLocationUpdated -> {
+                  updateMarkerForContact(it.contact)
+                  if (viewMode == MapViewModel.ViewMode.Contact(true) &&
+                      currentContact.value == it.contact) {
+                    it.contact.latLng?.run(this@MapFragment::updateCamera)
+                  }
+                }
+                is ContactsRepoChange.ContactCardUpdated -> {
+                  updateMarkerForContact(it.contact)
+                }
+                is ContactsRepoChange.ContactRemoved -> {
+                  removeMarkerFromMap(it.contact.id)
+                }
               }
             }
           }
-          waypoints
-              .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-              .collect { regions -> drawRegions(regions.toSet()) }
+          launch {
+            waypoints
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED)
+                .collect { regions ->
+                  Timber.tag("FLIBBLE").v("Waypoints changed. Redrawing regions")
+                  drawRegions(regions.toSet())
+                }
+          }
         }
       }
       mapLayerStyle.observe(viewLifecycleOwner, this@MapFragment::setMapLayerType)
@@ -121,7 +146,7 @@ internal constructor(
     return binding.root
   }
 
-  internal fun updateAllMarkers(contacts: Set<Contact>) {
+  private fun updateAllMarkers(contacts: Set<Contact>) {
     currentMarkersOnMap().subtract(contacts.map { it.id }.toSet()).forEach(::removeMarkerFromMap)
     contacts.forEach(::updateMarkerForContact)
   }
