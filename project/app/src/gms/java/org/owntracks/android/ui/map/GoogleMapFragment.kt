@@ -261,7 +261,7 @@ internal constructor(
                         center(region.getLocation().toLatLng().toGMSLatLng())
                         radius(region.geofenceRadius.toDouble())
                         fillColor(getRegionColor())
-                        strokeWidth(0.0f)
+                        strokeWidth(1.0f)
                       }
                       .let { addCircle(it) })
               .run(regionsOnMap::add)

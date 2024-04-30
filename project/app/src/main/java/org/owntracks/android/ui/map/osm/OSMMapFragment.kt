@@ -366,7 +366,7 @@ internal constructor(
                             region.getLocation().toLatLng().toGeoPoint(),
                             region.geofenceRadius.toDouble())
                     fillPaint.color = getRegionColor()
-                    outlinePaint.strokeWidth = 0f
+                    outlinePaint.strokeWidth = 1f
                     setOnClickListener { _, mapView, _ ->
                       mapView.overlays
                           .filterIsInstance<Marker>()
