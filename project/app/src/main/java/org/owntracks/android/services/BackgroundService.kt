@@ -486,6 +486,8 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
     }
     if (preferences.pegLocatorFastestIntervalToInterval) {
       fastestInterval = interval
+    } else {
+      fastestInterval = Duration.ofSeconds(1)
     }
     val request =
         LocationRequest(fastestInterval, smallestDisplacement, null, null, priority, interval, null)
