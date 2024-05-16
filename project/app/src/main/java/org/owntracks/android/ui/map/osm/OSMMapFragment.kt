@@ -24,6 +24,7 @@ import org.osmdroid.events.MapListener
 import org.osmdroid.events.ScrollEvent
 import org.osmdroid.events.ZoomEvent
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.TileSystemWebMercator
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.CopyrightOverlay
@@ -363,8 +364,16 @@ internal constructor(
                     id = "regionpolygon-${region.id}"
                     points =
                         Polygon.pointsAsCircle(
-                            region.getLocation().toLatLng().toGeoPoint(),
-                            region.geofenceRadius.toDouble())
+                                region.getLocation().toLatLng().toGeoPoint(),
+                                region.geofenceRadius.toDouble())
+                            .filter {
+                              (TileSystemWebMercator.MinLatitude..TileSystemWebMercator.MaxLatitude)
+                                  .contains(it.latitude) &&
+                                  (TileSystemWebMercator.MinLongitude..TileSystemWebMercator
+                                              .MaxLongitude)
+                                      .contains(it.longitude)
+                            }
+
                     fillPaint.color = getRegionColor()
                     outlinePaint.strokeWidth = 1f
                     setOnClickListener { _, mapView, _ ->
