@@ -33,6 +33,7 @@
 - Changing the connection details will now clear the contacts and the location message backlog (#1598)
 - Messages now include a random `_id` (String) field which can be used by any consumer to correlate and distinguish send/return messages
 - `pubExtendedData` preference renamed to `extendedData` (#1654)
+- `reportLocation` command is now supported in HTTP mode
 
 ### Bug fixes
 
