@@ -39,7 +39,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.owntracks.android.App
 import org.owntracks.android.App.Companion.NOTIFICATION_GROUP_EVENTS
 import org.owntracks.android.App.Companion.NOTIFICATION_ID_EVENT_GROUP
@@ -191,7 +191,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
             ongoingNotification.setEndpointState(
                 it,
                 if (preferences.mode == ConnectionMode.MQTT) preferences.host
-                else preferences.url.toHttpUrl().host)
+                else preferences.url.toHttpUrlOrNull()?.host ?: "")
           }
         }
         endpointStateRepo.setServiceStartedNow()
