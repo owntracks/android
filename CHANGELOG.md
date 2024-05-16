@@ -51,6 +51,7 @@
 - Map blue dot should show the location accuracy circle properly
 - Fix crash on importing config URIs that weren't valid
 - Fix bug when sharing logs via GMail (#1600)
+- Default the locater fastest interval to 1-second to address changes in Android 14 that was fixing fastest interval to `interval` seconds.
 
 ## Version 2.4.12
 
