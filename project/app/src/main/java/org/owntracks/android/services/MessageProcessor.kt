@@ -77,7 +77,9 @@ constructor(
 ) : Preferences.OnPreferenceChangeListener {
   private var endpoint: MessageProcessorEndpoint? = null
   private var acceptMessages = false
-  private val outgoingQueue: BlockingDeque<MessageBase>
+  private val outgoingQueue: BlockingDeque<MessageBase> =
+      BlockingDequeThatAlsoSometimesPersistsThingsToDiskMaybe(
+          100_000, applicationContext.filesDir, parser)
   private var dequeueAndSenderJob: Job? = null
   private var retryDelayJob: Job? = null
   private var initialized = false
@@ -98,9 +100,6 @@ constructor(
       }
 
   init {
-    outgoingQueue =
-        BlockingDequeThatAlsoSometimesPersistsThingsToDiskMaybe(
-            100_000, applicationContext.filesDir, parser)
     synchronized(outgoingQueue) {
       for (i in outgoingQueue.indices) {
         outgoingQueueIdlingResource.increment()
@@ -270,7 +269,10 @@ constructor(
                       join()
                       Timber.d("Retry wait finished for $message. Cancelled=${isCancelled}}")
                     }
-                retryWait = (retryWait * 2).coerceAtMost(SEND_FAILURE_BACKOFF_MAX_WAIT)
+                retryWait =
+                    (retryWait * 2).coerceAtMost(SEND_FAILURE_BACKOFF_MAX_WAIT).also {
+                      Timber.v("Increasing failure retry wait to $it")
+                    }
                 retriesToGo -= 1
               }
               else -> {
@@ -480,7 +482,7 @@ constructor(
   override fun onPreferenceChanged(properties: Set<String>) {
     if (properties.intersect(PREFERENCES_THAT_WIPE_QUEUE_AND_CONTACTS).isNotEmpty()) {
       acceptMessages = false
-
+      Timber.v("Preferences changed: [${properties.joinToString(",")}] riggering queue wipe")
       outgoingQueue.also { Timber.i("Clearing outgoing message queue length=${it.size}") }.clear()
       while (!outgoingQueueIdlingResource.isIdleNow) {
         Timber.v("Decrementing outgoingQueueIdlingResource")
