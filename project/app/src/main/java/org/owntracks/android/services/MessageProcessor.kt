@@ -242,7 +242,7 @@ constructor(
             when (e) {
               is OutgoingMessageSendingException,
               is ConfigurationIncompleteException -> {
-                Timber.w("Error sending message $message. Re-queueing")
+                Timber.w(e, "Error sending message $message. Re-queueing")
                 synchronized(outgoingQueue) {
                   if (!outgoingQueue.offerFirst(message)) {
                     val tailMessage = outgoingQueue.removeLast()
