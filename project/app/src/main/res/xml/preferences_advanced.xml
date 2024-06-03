@@ -88,6 +88,11 @@
             app:key="reverseGeocodeProvider"
             app:title="@string/preferencesReverseGeocodeProvider"
             app:useSimpleSummaryProvider="true" />
+        <Preference
+            android:icon="@drawable/baseline_privacy_tip_24"
+            app:iconSpaceReserved="true"
+            app:key="opencagePrivacy"
+            app:summary="@string/preferencesAdvancedOpencagePrivacy" />
         <androidx.preference.EditTextPreference
             app:dialogMessage="@string/preferencesOpencageGeocoderApiKeyDialog"
             app:iconSpaceReserved="false"

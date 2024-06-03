@@ -5,9 +5,10 @@ import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import androidx.core.content.PermissionChecker
-import androidx.preference.EditTextPreference
+import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import org.owntracks.android.R
@@ -58,12 +59,33 @@ class AdvancedFragment @Inject constructor() :
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
             PermissionChecker.checkSelfPermission(requireActivity(), ACCESS_BACKGROUND_LOCATION) ==
                 PermissionChecker.PERMISSION_DENIED
+
+    findPreference<ListPreference>(Preferences::reverseGeocodeProvider.name)
+        ?.onPreferenceChangeListener =
+        Preference.OnPreferenceChangeListener { preference, newValue ->
+          if (newValue == ReverseGeocodeProvider.OPENCAGE.value) {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.preferencesAdvancedOpencagePrivacyDialogTitle)
+                .setMessage(R.string.preferencesAdvancedOpencagePrivacyDialogMessage)
+                .setPositiveButton(R.string.preferencesAdvancedOpencagePrivacyDialogAccept) { _, _
+                  ->
+                  (preference as ListPreference).value = newValue.toString()
+                }
+                .setNegativeButton(R.string.preferencesAdvancedOpencagePrivacyDialogCancel, null)
+                .show()
+            false
+          } else {
+            true
+          }
+        }
     setOpenCageAPIKeyPreferenceVisibility()
   }
 
   private fun setOpenCageAPIKeyPreferenceVisibility() {
-    findPreference<EditTextPreference>(Preferences::opencageApiKey.name)?.isVisible =
-        preferences.reverseGeocodeProvider == ReverseGeocodeProvider.OPENCAGE
+    setOf(Preferences::opencageApiKey.name, "opencagePrivacy").forEach {
+      findPreference<Preference>(it)?.isVisible =
+          preferences.reverseGeocodeProvider == ReverseGeocodeProvider.OPENCAGE
+    }
   }
 
   override fun onPreferenceChanged(properties: Set<String>) {
