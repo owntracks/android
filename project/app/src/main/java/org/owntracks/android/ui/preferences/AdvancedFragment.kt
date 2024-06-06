@@ -1,9 +1,11 @@
 package org.owntracks.android.ui.preferences
 
 import android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
+import android.app.ProgressDialog.show
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.widget.TextView
 import androidx.core.content.PermissionChecker
 import androidx.preference.ListPreference
 import androidx.preference.Preference
@@ -72,7 +74,10 @@ class AdvancedFragment @Inject constructor() :
                   (preference as ListPreference).value = newValue.toString()
                 }
                 .setNegativeButton(R.string.preferencesAdvancedOpencagePrivacyDialogCancel, null)
-                .show()
+                .create()
+                .apply { show() }
+                .findViewById<TextView>(android.R.id.message)
+                ?.movementMethod = android.text.method.LinkMovementMethod.getInstance()
             false
           } else {
             true

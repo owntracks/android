@@ -132,6 +132,7 @@ class PreferencesActivityTests :
     clickOnAndWait(R.string.preferencesReverseGeocodeProvider)
 
     clickOnAndWait("OpenCage")
+    clickOnAndWait(android.R.id.button1)
 
     writeToPreference(R.string.preferencesOpencageGeocoderApiKey, "geocodeAPIKey")
 

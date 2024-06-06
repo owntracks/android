@@ -92,7 +92,11 @@
             android:icon="@drawable/baseline_privacy_tip_24"
             app:iconSpaceReserved="true"
             app:key="opencagePrivacy"
-            app:summary="@string/preferencesAdvancedOpencagePrivacy" />
+            app:summary="@string/preferencesAdvancedOpencagePrivacy">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/opencagePrivacyPolicyUrl" />
+        </Preference>
         <androidx.preference.EditTextPreference
             app:dialogMessage="@string/preferencesOpencageGeocoderApiKeyDialog"
             app:iconSpaceReserved="false"
