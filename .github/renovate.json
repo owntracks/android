@@ -6,18 +6,55 @@
     ":rebaseStalePrs",
     ":disableDependencyDashboard"
   ],
-  "assignees": ["growse"],
-  "ignoreDeps": ["android"],
+  "assignees": [
+    "growse"
+  ],
+  "ignoreDeps": [
+    "android"
+  ],
   "packageRules": [
     {
-      "matchDatasources": ["pypi"],
-      "matchFileNames": [".github/google-play-api/requirements.txt"],
+      "matchDatasources": [
+        "pypi"
+      ],
+      "matchFileNames": [
+        ".github/google-play-api/requirements.txt"
+      ],
       "automerge": true
     },
     {
-      "matchPackagePatterns": ["^com.fasterxml.jackson"],
+      "matchPackagePatterns": [
+        "^com.fasterxml.jackson"
+      ],
       "enabled": false
     },
+    {
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "label": "major"
+    },
+    {
+      "matchUpdateTypes": [
+        "minor"
+      ],
+      "label": "minor"
+    },
+    {
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "label": "patch"
+    },
+    {
+      "matchUpdateTypes": [
+        "pin"
+      ],
+      "label": "pin"
+    }
+  ],
+  "labels": [
+    "dependencies"
   ],
   "platformAutomerge": true,
   "automergeStrategy": "rebase"
