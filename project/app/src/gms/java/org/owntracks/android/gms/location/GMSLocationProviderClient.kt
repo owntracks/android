@@ -43,7 +43,16 @@ class GMSLocationProviderClient(
                 .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
                 .build(),
             null)
-        .addOnSuccessListener { clientCallBack.onLocationResult(LocationResult(it)) }
+        .addOnSuccessListener { location: Location? ->
+          // Turns out location can be null! Especially if there's no location available or if
+          // locations are turned off on the device.
+          if (location != null) {
+            clientCallBack.onLocationResult(LocationResult(location))
+          } else {
+            Timber.w(
+                "No location available for single high accuracy request. Device location disabled?")
+          }
+        }
   }
 
   /**
