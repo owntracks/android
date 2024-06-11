@@ -1,8 +1,11 @@
 package org.owntracks.android.services
 
 import android.Manifest
+import android.app.ActivityManager
+import android.app.ForegroundServiceStartNotAllowedException
 import android.app.Notification
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
@@ -39,7 +42,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.owntracks.android.App
 import org.owntracks.android.App.Companion.NOTIFICATION_GROUP_EVENTS
 import org.owntracks.android.App.Companion.NOTIFICATION_ID_EVENT_GROUP
@@ -124,6 +127,9 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
 
   private val ongoingNotification by lazy { OngoingNotification(this, preferences.monitoring) }
   private val notificationManagerCompat by lazy { NotificationManagerCompat.from(this) }
+  private val activityManager by lazy {
+    this.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+  }
 
   @EntryPoint
   @InstallIn(SingletonComponent::class)
@@ -191,7 +197,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
             ongoingNotification.setEndpointState(
                 it,
                 if (preferences.mode == ConnectionMode.MQTT) preferences.host
-                else preferences.url.toHttpUrl().host)
+                else preferences.url.toHttpUrlOrNull()?.host ?: "")
           }
         }
         endpointStateRepo.setServiceStartedNow()
@@ -296,7 +302,19 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
 
   private fun setupAndStartService() {
     Timber.v("setupAndStartService")
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+      try {
+        startForeground(
+            NOTIFICATION_ID_ONGOING,
+            ongoingNotification.getNotification(),
+            FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE)
+      } catch (e: ForegroundServiceStartNotAllowedException) {
+        Timber.e(
+            e,
+            "Foreground service start not allowed. backgroundRestricted=${activityManager.isBackgroundRestricted}")
+        return
+      }
+    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
       startForeground(
           NOTIFICATION_ID_ONGOING,
           ongoingNotification.getNotification(),
@@ -486,6 +504,8 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
     }
     if (preferences.pegLocatorFastestIntervalToInterval) {
       fastestInterval = interval
+    } else {
+      fastestInterval = Duration.ofSeconds(1)
     }
     val request =
         LocationRequest(fastestInterval, smallestDisplacement, null, null, priority, interval, null)

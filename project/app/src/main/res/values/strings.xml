@@ -134,6 +134,11 @@ To allow this, please enable Location in the device settings."</string>
     <string name="play_services_update_required">"Google Play Services update is required"</string>
     <string name="preferencesAdvanced">"Advanced"</string>
     <string name="preferencesAdvancedAutostartWarning">"This version of Android restricts OwnTracks from receiving locations when automatically started on device boot until the app is opened."</string>
+    <string name="preferencesAdvancedOpencagePrivacy"><a href="%s">OpenCage Privacy Policy</a></string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogMessage">To use the OpenCage geocoder, OwnTracks will send every location it processes to OpenCage over a TLS-encrypted connection.\n\nThe OpenCage privacy policy can be found <a href="https://opencagedata.com/api#privacy">on their website</a>.</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogTitle">OpenCage Privacy Policy</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogAccept">Accept</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogCancel">Cancel</string>
     <string name="preferencesAutostart">"Autostart"</string>
     <string name="preferencesAutostartSummary">"Automatically start on device boot"</string>
     <string name="preferencesBrokerPassword">"Password"</string>

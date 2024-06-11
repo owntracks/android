@@ -24,6 +24,7 @@ import org.osmdroid.events.MapListener
 import org.osmdroid.events.ScrollEvent
 import org.osmdroid.events.ZoomEvent
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.TileSystemWebMercator
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.CopyrightOverlay
@@ -270,6 +271,7 @@ internal constructor(
           }
         }
     setMapStyle()
+    drawAllContactsAndRegions()
   }
 
   override fun updateCamera(latLng: LatLng) {
@@ -345,7 +347,7 @@ internal constructor(
   override fun drawRegions(regions: Set<WaypointModel>) {
     if (preferences.showRegionsOnMap) {
       mapView?.run {
-        Timber.d("Drawing regions on map")
+        Timber.d("Drawing ${regions.size} regions on map")
         overlays
             .filterIsInstance<Marker>()
             .filter { it.id.startsWith("regionmarker-") }
@@ -362,10 +364,18 @@ internal constructor(
                     id = "regionpolygon-${region.id}"
                     points =
                         Polygon.pointsAsCircle(
-                            region.getLocation().toLatLng().toGeoPoint(),
-                            region.geofenceRadius.toDouble())
+                                region.getLocation().toLatLng().toGeoPoint(),
+                                region.geofenceRadius.toDouble())
+                            .filter {
+                              (TileSystemWebMercator.MinLatitude..TileSystemWebMercator.MaxLatitude)
+                                  .contains(it.latitude) &&
+                                  (TileSystemWebMercator.MinLongitude..TileSystemWebMercator
+                                              .MaxLongitude)
+                                      .contains(it.longitude)
+                            }
+
                     fillPaint.color = getRegionColor()
-                    outlinePaint.strokeWidth = 0f
+                    outlinePaint.strokeWidth = 1f
                     setOnClickListener { _, mapView, _ ->
                       mapView.overlays
                           .filterIsInstance<Marker>()
@@ -387,7 +397,6 @@ internal constructor(
   }
 
   override fun setMapLayerType(mapLayerStyle: MapLayerStyle) {
-    @Suppress("REDUNDANT_ELSE_IN_WHEN")
     when (mapLayerStyle) {
       MapLayerStyle.OpenStreetMapNormal ->
           binding.osmMapView.setTileSource(TileSourceFactory.MAPNIK)

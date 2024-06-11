@@ -184,13 +184,12 @@ class HttpMessageProcessorEndpoint(
       return
     }
     Timber.v("HTTP preferences changed: [${properties.joinToString(",")}]")
-    val propertiesWeCareAbout =
-        setOf(
-            Preferences::url.name,
-            Preferences::username.name,
-            Preferences::password.name,
-            Preferences::deviceId.name,
-            Preferences::tlsClientCrt.name)
+    /* In HTTP mode, the *only* preference we care about wanting to trigger an immediate reprocessing
+     * of the outgoing message queue is the password. The other properties that might change the
+     * liklihood of message sends succeeding (e.g. URL, username etc.) will actually trigger a
+     * queue wipe and full reset, and that's handled in the [MessageProcessor].
+     */
+    val propertiesWeCareAbout = setOf(Preferences::password.name)
 
     if (propertiesWeCareAbout.intersect(properties).isNotEmpty()) {
       scope.launch(ioDispatcher) {
@@ -209,6 +208,7 @@ class HttpMessageProcessorEndpoint(
       context: Context,
       preferences: Preferences
   ): HttpClientAndConfiguration {
+    Timber.v("Creating new HTTP client and configuration")
     val httpConfiguration = getEndpointConfiguration()
 
     val hostnameVerifier = CALeafCertMatchingHostnameVerifier()
