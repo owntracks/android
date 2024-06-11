@@ -20,9 +20,9 @@
     <string name="batteryOptimizationWhitelistDialogMessage">"Disabilitando l\'ottimizzazione batteria per Owntracks potrebbe favorire l'affidabilità del tracciamento ed il mantenimento del contatto con il server."</string>
     <string name="batteryOptimizationWhitelistDialogTitle">"Ottimizzazione batteria"</string>
     <string name="cancel">"Cancella"</string>
-    <string name="certificateMigrationRequiredOpenSettingsAction">"Apri le impostazioni"</string>
     <string name="certificateMigrationRequiredNotificationText">"OwnTracks ora utilizza certificati TLS dall'archivio del dispositivo. Se utilizzavi un certificato CA personalizzato o uno TLS client, aggiungili all'\archivio del dispositivo."</string>
     <string name="certificateMigrationRequiredNotificationTitle">"Migrazione certificati richiesta"</string>
+    <string name="certificateMigrationRequiredOpenSettingsAction">"Apri le impostazioni"</string>
     <string name="clear_log">"Pulisci"</string>
     <string name="configurationManagement">"Gestione configurazione"</string>
     <string name="CONNECTED">"Connesso"</string>
@@ -48,8 +48,8 @@
     <string name="contactLocationUnknown">"Nessuna posizione disponibile"</string>
     <string name="contactsListPlaceholder">"Nessun contatto trovato"</string>
     <string name="currentLocationButtonLabel">"Posizione attuale"</string>
-    <string name="deleteWaypointConfirmationText">"Vuoi cancellare questa regione?"</string>
     <string name="deleteWaypointConfirmationButtonLabel">"Cancella"</string>
+    <string name="deleteWaypointConfirmationText">"Vuoi cancellare questa regione?"</string>
     <string name="deleteWaypointTitle">"Cancella"</string>
     <string name="description">"Descrizione"</string>
     <string name="deviceLocationDisabledDialogMessage">"I servizi di posizionamento sul tuo dispositivo sono al momento disabilitati, quindi OwnTracks non è in grado di tracciare la tua attuale posizione.
@@ -84,8 +84,8 @@ Per permetterlo, abilita la geocolizzazione nelle impostazioni del dispositivo."
     <string name="importConfig">"Importa"</string>
     <string name="INITIAL">"Inizializzazione"</string>
     <string name="latitude">"Latitudine"</string>
-    <string name="loadActivityNoFileExplorerFound">Nessusa app di esplorazione file trovata</string>
-    <string name="loadActivitySelectAFile">Seleziona un file</string>
+    <string name="loadActivityNoFileExplorerFound">"Nessusa app di esplorazione file trovata"</string>
+    <string name="loadActivitySelectAFile">"Seleziona un file"</string>
     <string name="locationPermissionNotGrantedNotification">"Permessi di posizione non concessi"</string>
     <string name="locationPermissionRequestDialogMessage">"Per tracciare la tua posizione, concedi a OwnTracks i permessi di posizionamento."</string>
     <string name="locationPermissionRequestDialogTitle">"Richiesta permessi di posizionamento"</string>
@@ -124,11 +124,11 @@ Per permetterlo, abilita la geocolizzazione nelle impostazioni del dispositivo."
     <string name="notificationChannelEventsDescription">"Trasmissioni delle regioni"</string>
     <string name="notificationChannelOngoing">"In corso"</string>
     <string name="notificationChannelOngoingDescription">"Necessaria per ricevere gli aggiornamenti delle posizioni in background"</string>
+    <string name="notificationEndpointStateConnected">"tra %1$s e %2$s"</string>
     <plurals name="notificationEventsTitle">
         <item quantity="one">"%1$d nuovo eventi"</item>
         <item quantity="other">"%1$d nuovi eventi"</item>
     </plurals>
-    <string name="notificationEndpointStateConnected">"tra %1$s e %2$s"</string>
     <string name="play_services_not_available">"Google Play Services non disponibili"</string>
     <string name="play_services_now_available">"Google Play Services ora disponibili"</string>
     <string name="play_services_update_required">"Necessario aggiornamento di Google Play Services"</string>
@@ -142,16 +142,16 @@ Per permetterlo, abilita la geocolizzazione nelle impostazioni del dispositivo."
     <string name="preferencesCategoryAdvancedLocator">"Localizzatore"</string>
     <string name="preferencesCategoryAdvancedMisc">"Miscellanee"</string>
     <string name="preferencesCategoryAdvancedServices">"Servizi"</string>
+    <string name="preferencesCategoryConnectionCredentials">"Credenziali"</string>
     <string name="preferencesCategoryConnectionEndpoint">"Endpoint"</string>
     <string name="preferencesCategoryConnectionIdentification">"Identificazione"</string>
-    <string name="preferencesCategoryConnectionCredentials">"Credenziali"</string>
     <string name="preferencesCategoryNotificationBackground">"Notifiche in background"</string>
     <string name="preferencesCategoryNotificationErrors">"Errori e problemi"</string>
     <string name="preferencesCategoryNotificationOngoing">"Notifiche dinamiche"</string>
     <string name="preferencesChangelog">"Cronologia delle modifiche"</string>
     <string name="preferencesCleanSessionEnabled">"Pulisci"</string>
-    <string name="preferencesClientCrtInstall">"Installa certificato client"</string>
     <string name="preferencesClientCrt">"Certificato client"</string>
+    <string name="preferencesClientCrtInstall">"Installa certificato client"</string>
     <string name="preferencesClientId">"ID client"</string>
     <string name="preferencesClientIdValidationError">"Non può esser vuoto"</string>
     <string name="preferencesDebugLog">"Log di debug"</string>
@@ -170,8 +170,8 @@ Per permetterlo, abilita la geocolizzazione nelle impostazioni del dispositivo."
     <string name="preferencesEncryptionKeyDialogMessage">"La chiave di cifratura è troncata a 32 caratteri."</string>
     <string name="preferencesEncryptionKeySummary">"Chiave simmetrica per la crittografia"</string>
     <string name="preferencesExperimental">"Sperimentale"</string>
-    <string name="preferencesExportSuccess">"Esportazione avvenuta con successo"</string>
     <string name="preferencesExportError">"Errore nell\'esportazione della configurazione"</string>
+    <string name="preferencesExportSuccess">"Esportazione avvenuta con successo"</string>
     <string name="preferencesHost">"Host"</string>
     <string name="preferencesHostValidationError">"Non può esser vuoto"</string>
     <string name="preferencesIgnoreInaccurateLocations">"Posizioni inaccurate"</string>
@@ -201,8 +201,8 @@ Per permetterlo, abilita la geocolizzazione nelle impostazioni del dispositivo."
     <string name="preferencesNotificationGeocoderErrorsSummary">"Mostra gli errori del geocoder, i limiti di frequenza e gli eventi di superamento quote"</string>
     <string name="preferencesNotificationLocation">"Ultima posizione tracciata"</string>
     <string name="preferencesNotificationLocationSummary">"Mostra posizione e ora dell\'ultimo tracciamento"</string>
-    <string name="preferencesNotificationPermissionRequestSummary">"Tocca qui per richiedere i permessi per le notifiche"</string>
     <string name="preferencesNotificationPermissionRequest">"Permessi per le notifiche disabilitati"</string>
+    <string name="preferencesNotificationPermissionRequestSummary">"Tocca qui per richiedere i permessi per le notifiche"</string>
     <string name="preferencesNotSet">"Non impostato"</string>
     <string name="preferencesOpencageGeocoderApiKey">"Chiave API OpenCage"</string>
     <string name="preferencesOpencageGeocoderApiKeyDialog">"Se impostato, OpenCage viene utilizzato per risolvere gli indirizzi delle posizioni al posto di Google. Richiede riavvio."</string>
@@ -245,10 +245,15 @@ Per permetterlo, abilita la geocolizzazione nelle impostazioni del dispositivo."
     <string name="status_endpoint_queue_hint">"Coda ultima posizione"</string>
     <string name="status_endpoint_state_hint">"Stato ultima posizione"</string>
     <string name="status_endpoint_state_message_hint">"Messaggio di stato ultima posizione"</string>
+    <string name="status_last_background_update_hint">"Ultimo aggiornamento in background del servizio di posizionamento"</string>
+    <string name="statusBatteryDozeWhiteListDisabled">"No"</string>
+    <string name="statusBatteryDozeWhiteListEnabled">"Sì"</string>
     <string name="statusEndpointStateMessageAuthenticationFailed">"Autenticazione fallita"</string>
     <string name="statusEndpointStateMessageClientTimeout">"Timeout del client"</string>
     <string name="statusEndpointStateMessageConnectionLost">"Connessione persa: %s"</string>
     <string name="statusEndpointStateMessageConnectionRefused">"Connessione rifiutata"</string>
+    <string name="statusEndpointStateMessageEndpointDoesNotSupportWebsockets">"L\'endpoint non supporta i WebSockets"</string>
+    <string name="statusEndpointStateMessageEOFError">"Eccezione EOFException dall\'endpoint - l\'endpoint si aspetta il TLS?"</string>
     <string name="statusEndpointStateMessageInvalidClientId">"ID client invalido"</string>
     <string name="statusEndpointStateMessageInvalidProtocolVersion">"Versione protocollo MQTT invalida"</string>
     <string name="statusEndpointStateMessageMalformedHostPort">"Nome host invalido &amp; porta"</string>
@@ -258,46 +263,43 @@ Per permetterlo, abilita la geocolizzazione nelle impostazioni del dispositivo."
     <string name="statusEndpointStateMessageSocketTimeout">"Connessione scaduta"</string>
     <string name="statusEndpointStateMessageSubscribeFailed">"Sottoscrizione fallita"</string>
     <string name="statusEndpointStateMessageTLSConfigError">"Errore di configurazione TLS"</string>
-    <string name="statusEndpointStateMessageTLSError">"Errore TLS: %s"</string>
-    <string name="statusEndpointStateMessageUnableToConnect">"Impossibile connettersi"</string>
-    <string name="statusEndpointStateMessageUnknownHost">"Host sconosciuto"</string>
-    <string name="statusEndpointStateMessageEndpointDoesNotSupportWebsockets">"L\'endpoint non supporta i WebSockets"</string>
-    <string name="statusEndpointStateMessageEOFError">"Eccezione EOFException dall\'endpoint - l\'endpoint si aspetta il TLS?"</string>
     <string name="statusEndpointStateMessageTLSConnectionClosed">"Connessione TLS chiusa"</string>
     <string name="statusEndpointStateMessageTLSEndpointCANotTrustedError">"Certificato TLS CA dell\'endpoint non fidato"</string>
     <string name="statusEndpointStateMessageTLSEndpointClientCertsRequired">"L'\endpoint richiede un certificato client TLS"</string>
-    <string name="status_last_background_update_hint">"Ultimo aggiornamento in background del servizio di posizionamento"</string>
-    <string name="statusBatteryDozeWhiteListDisabled">"No"</string>
-    <string name="statusBatteryDozeWhiteListEnabled">"Sì"</string>
+    <string name="statusEndpointStateMessageTLSError">"Errore TLS: %s"</string>
+    <string name="statusEndpointStateMessageUnableToConnect">"Impossibile connettersi"</string>
+    <string name="statusEndpointStateMessageUnknownHost">"Host sconosciuto"</string>
     <string name="statusLocationPermissions">"Permessi di posizionamento concessi"</string>
-    <string name="statusLocationPermissionsNone">"Nessuno"</string>
-    <string name="statusLocationPermissionsCoarseForeground">"Approssimata"</string>
-    <string name="statusLocationPermissionsFineForeground">"Precisa"</string>
     <string name="statusLocationPermissionsCoarseBackground">"Approssimata (disponibile in background)"</string>
+    <string name="statusLocationPermissionsCoarseForeground">"Approssimata"</string>
     <string name="statusLocationPermissionsFineBackground">"Precisa (disponibile in background)"</string>
-    <string name="statusLocationPermissionsUnknown">"Sconosciuto"</string>
-    <string name="statusLocationPermissionsPromptTitle">"Posizione in background"</string>
-    <string name="statusLocationPermissionsPromptText">"Se vuoi tracciare automaticamente le posizioni al riavvio del dispositivo, puoi abilitare i permessi di posizionamento in background concedendo a OwnTracks di accedere \"sempre\" alla tua posizione.</string>
-    <string name="statusLocationPermissionsPromptPositiveButton">"Impostazioni dell\'applicazione"</string>
+    <string name="statusLocationPermissionsFineForeground">"Precisa"</string>
+    <string name="statusLocationPermissionsNone">"Nessuno"</string>
     <string name="statusLocationPermissionsPromptNegativeButton">"Cancella"</string>
+    <string name="statusLocationPermissionsPromptPositiveButton">"Impostazioni dell\'applicazione"</string>
+    <string name="statusLocationPermissionsPromptText">"Se vuoi tracciare automaticamente le posizioni al riavvio del dispositivo, puoi abilitare i permessi di posizionamento in background concedendo a OwnTracks di accedere \"sempre\" alla tua posizione."</string>
+    <string name="statusLocationPermissionsPromptTitle">"Posizione in background"</string>
+    <string name="statusLocationPermissionsUnknown">"Sconosciuto"</string>
     <string name="title_activity_about">"Informazioni"</string>
     <string name="title_activity_contacts">"Amici"</string>
     <string name="title_activity_map">"Mappa"</string>
     <string name="title_activity_preferences">"Preferenze"</string>
+    <string name="title_activity_status">"Stato"</string>
     <string name="title_activity_waypoint">"Regione"</string>
     <string name="title_activity_waypoints">"Regioni"</string>
-    <string name="title_activity_status">"Stato"</string>
     <string name="title_exit">"Esci"</string>
     <string name="transitionEntering">"entra a"</string>
     <string name="transitionLeaving">"abbandona"</string>
     <string name="unableToCopyCertificate">"Impossibile copiare il certificato nell\'archivio interno"</string>
     <string name="version">"Versione"</string>
     <string name="viewLogs">"Mostra log"</string>
-    <string name="waypointListPlaceholder">"Ancora nessun punto di passaggio defiinito"</string>
-    <string name="waypointsImport">"Importa regioni"</string>
     <string name="waypoint_region_inside">"Al momentro all\'interno di"</string>
     <string name="waypoint_region_outside">"Al momento all\'esterno di"</string>
     <string name="waypoint_region_unknown">"Stato sconosciuto"</string>
+    <string name="waypointListPlaceholder">"Ancora nessun punto di passaggio defiinito"</string>
+    <string name="waypointMigrationErrorNotificationText">"Errore durante la migrazione delle regioni. Alcune potrebbero non esser migrate, verifica i log ed aggiungile nuovamente."</string>
+    <string name="waypointMigrationErrorNotificationTitle">"Errore nella migrazione delle regioni"</string>
+    <string name="waypointsImport">"Importa regioni"</string>
     <string name="welcome_connection_setup_description">"OwnTracks funziona inviando i tuo dati di posizione ad un server di tua proprietà (o di qualcuno di cui ti fidi), assicuranza che ti rimanga il controllo dei tuoi dati.
 
 Assicurati di conoscere i dettagli di connessione del tuo server, se accessibile tramite HTTPS o MQTT e le credenziali di accesso.
@@ -309,35 +311,26 @@ Per maggiori dettagli, consulta il Manuale OwnTracks."</string>
     <string name="welcome_connection_setup_title">"Imposta una connessione"</string>
     <string name="welcome_description">"I prossimi passi ti aiuteranno ad impostare OwnTracks"</string>
     <string name="welcome_finish_open_preferences_button_label">"Apri le Impostazioni"</string>
-
     <string name="welcome_heading">"Benvenuto"</string>
-    <string name="welcome_location_permission_title">"Permessi di localizzazione"</string>
     <string name="welcome_location_permission_description">"Affinché il tuo endpoint OwnTracks riceva la tua posizione corrente, OwnTracks ha bisogno dei tuoi permessi ad acceddere alla posizione del tuo dispositivo.
 
 Puoi controllare questo permesso e chiedere permessi per la posizione aggiutnivi (in background) dalla pagina di Stato.
 
 Il permesso di posizionamento in background potrebbe migliorare la frequenza e l'affidabilità dei dati di posizionamento, in funzione del tuo disposiziovo e della sua configurazione."</string>
     <string name="welcome_location_permission_granted">"Permessi di localizzazione concessi"</string>
-    <string name="welcome_notification_permission_title">"Permessi per le notifiche"</string>
+    <string name="welcome_location_permission_title">"Permessi di localizzazione"</string>
     <string name="welcome_notification_permission_description">"Per funzionare completamente, OwnTracks ha bisogno dei tuoi permessi a visualizzare alcune notifiche.
 
 Una notifica permanente verrà visualizzata in modo da mantenere attivi il tracciamento e la connessione, e puoi anche scegliere di attivare le notifiche per i contatti al passaggio attraverso i luoghi prestabiliti."</string>
     <string name="welcome_notification_permission_granted">"Permessi per le notifiche concessi"</string>
+    <string name="welcome_notification_permission_title">"Permessi per le notifiche"</string>
     <string name="welcome_permission_request">"Richiedi"</string>
     <string name="welcome_play_description">"OwnTracks richiede i Google Play Services"</string>
     <string name="welcome_play_heading">"Google Play Services"</string>
-    <string name="waypointMigrationErrorNotificationTitle">"Errore nella migrazione delle regioni"</string>
-    <string name="waypointMigrationErrorNotificationText">"Errore durante la migrazione delle regioni. Alcune potrebbero non esser migrate, verifica i log ed aggiungile nuovamente."</string>
     <string name="welcomeFixIssue">"Correggi"</string>
     <string name="workmanagerInitializationErrorDialogMessage">"Alcuni componenti non si sono inizializzati correttamente, quindi OwnTracks potrebbe non funzionare correttamente. Potrebbe essere necessario reinstallare l\'app o cancellarne i dati.
 
 Verifica i log per maggiori dettagli."</string>
     <string name="workmanagerInitializationErrorDialogOpenSettingsLabel">"Apri le impostazioni dell\'applicazione"</string>
     <string name="workmanagerInitializationErrorDialogTitle">"Errore di inizializzazione"</string>
-    <string-array name="themeLabels">
-        <item>Chiaro</item>
-        <item>Scuro</item>
-        <item>Tema del dispositivo</item>
-    </string-array>
-
 </resources>

@@ -136,6 +136,7 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="notificationChannelEventsDescription">"Transmissions regionals "</string>
     <string name="notificationChannelOngoing">"En marxa"</string>
     <string name="notificationChannelOngoingDescription">"Obligatori per rebre actualitzacions d’ubicació en segon pla"</string>
+    <string name="notificationEndpointStateConnected">"%1$s a %2$s"</string>
     <plurals name="notificationEventsTitle">
         <item quantity="one">"%1$d nou esdeveniment"</item>
         <item quantity="other">"%1$d nous esdeveniments"</item>
