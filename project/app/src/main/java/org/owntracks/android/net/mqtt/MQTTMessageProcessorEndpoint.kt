@@ -249,18 +249,18 @@ class MQTTMessageProcessorEndpoint(
       return
     }
     Timber.v("MQTT preferences changed: [${properties.joinToString(",")}]")
+    /*
+     * Similar to the HTTP endpoint, there are other preferences that trigger a complete reset, and
+     * these are handled in the [MessageProcessor]. These properties below will trigger an MQTT reset
+     * and attempt to redeliver the message queue head, but will not clear the queue.
+     */
     val propertiesWeWantToReconnectOn =
-        listOf(
-            Preferences::clientId.name,
+        setOf(
             Preferences::deviceId.name,
-            Preferences::host.name,
             Preferences::keepalive.name,
             Preferences::mqttProtocolLevel.name,
             Preferences::password.name,
-            Preferences::port.name,
             Preferences::tls.name,
-            Preferences::tlsClientCrt.name,
-            Preferences::username.name,
             Preferences::ws.name)
     if (propertiesWeWantToReconnectOn
         .stream()

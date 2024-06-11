@@ -20,6 +20,12 @@ plugins {
     alias(libs.plugins.triplet).apply(false)
     alias(libs.plugins.ktfmt).apply(false)
     alias(libs.plugins.ksp).apply(false)
+  id( "com.xcporter.metaview").version( "0.0.5")
+}
+generateUml {
+  classTree {
+    target = file("app/src/main")
+  }
 }
 
 extensions.findByName("buildScan")

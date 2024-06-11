@@ -164,11 +164,7 @@ internal constructor(
       }
 
       viewModel.mapLayerStyle.value?.run { setMapLayerType(this) }
-
-      // We need to specifically re-draw any contact markers and regions now that we've re-init the
-      // map
-      viewModel.allContacts.values.toSet().run(::updateAllMarkers)
-      //            viewModel.waypoints.value?.toSet() ?.run(::drawRegions)
+      drawAllContactsAndRegions()
     }
   }
 
@@ -265,7 +261,7 @@ internal constructor(
                         center(region.getLocation().toLatLng().toGMSLatLng())
                         radius(region.geofenceRadius.toDouble())
                         fillColor(getRegionColor())
-                        strokeWidth(0.0f)
+                        strokeWidth(1.0f)
                       }
                       .let { addCircle(it) })
               .run(regionsOnMap::add)

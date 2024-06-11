@@ -38,7 +38,7 @@ internal constructor(private val apiKey: String, private val httpClient: OkHttpC
     }
     val url =
         HttpUrl.Builder()
-            .scheme("http")
+            .scheme("https")
             .host(OPENCAGE_HOST)
             .addPathSegment("geocode")
             .addPathSegment("v1")

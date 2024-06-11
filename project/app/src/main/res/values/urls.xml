@@ -7,4 +7,5 @@
     <string name="translationContributionUrl" translatable="false">https://poeditor.com/join/project?hash=xe6LPP0Jnx</string>
     <string name="licenseUrl" translatable="false">https://opensource.org/licenses/EPL-1.0</string>
     <string name="changelogUrl" translatable="false">https://raw.githubusercontent.com/owntracks/android/master/CHANGELOG.md</string>
+    <string name="opencagePrivacyPolicyUrl" translatable="false">https://opencagedata.com/api#privacy</string>
 </resources>
