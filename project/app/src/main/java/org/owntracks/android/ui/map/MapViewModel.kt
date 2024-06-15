@@ -177,6 +177,7 @@ constructor(
       currentLocation.value?.run {
         Timber.d("Sending current location from user request: $this")
         locationProcessor.onLocationChanged(this, MessageLocation.ReportType.USER)
+        locationProcessor.publishStatusMessage()
       }
     }
   }

@@ -325,12 +325,15 @@ constructor(
 
   val pubQosWaypoints = MqttQos.ZERO
 
+  val pubQosStatus = MqttQos.ZERO
+
   val pubRetainLocations: Boolean
     get() {
       return pubRetain
     }
 
   val pubRetainWaypoints: Boolean = false
+  val pubRetainStatus: Boolean = false
   val pubRetainEvents: Boolean = false
   val pubTopicBaseWithUserDetails: String
     get() {
@@ -340,6 +343,7 @@ constructor(
   val eventTopicSuffix = "/event"
   val commandTopicSuffix = "/cmd"
   val infoTopicSuffix = "/info"
+  val statusTopicSuffix = "/status"
   private val waypointsTopicSuffix = "/waypoints"
   private val waypointTopicSuffix = "/waypoint"
 
@@ -366,6 +370,11 @@ constructor(
   val pubTopicWaypoint: String
     get() {
       return pubTopicBaseWithUserDetails + waypointTopicSuffix
+    }
+  // For status command
+  val pubTopicStatus: String
+    get() {
+      return pubTopicBaseWithUserDetails + statusTopicSuffix
     }
 
   fun setMonitoringNext() {
