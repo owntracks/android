@@ -757,6 +757,27 @@ class ParserTest {
     assertEquals("MyName!", messageCard.name)
     assertEquals("owntracks/user/device", messageCard.getContactId())
   }
+
+  @Test
+  fun `Parser can deserialize a MessageCard with a trackerId field`() {
+    val parser = Parser(encryptionProvider)
+    // language=JSON
+    val input =
+        """
+          {
+          "_type": "card",
+          "tid": "overridden-topic",
+          "name": "MyName!"
+          }
+        """
+            .trimIndent()
+    val messageBase = parser.fromJson(input)
+    assertEquals(MessageCard::class.java, messageBase.javaClass)
+    val messageCard = messageBase as MessageCard
+    assertTrue(messageCard.isValidMessage())
+    assertEquals("MyName!", messageCard.name)
+    assertEquals("overridden-topic", messageCard.trackerId)
+  }
   // endregion
 
   // region  Invalid messages

@@ -234,12 +234,16 @@ class HttpMessageProcessorEndpoint(
 
   override fun onFinalizeMessage(message: MessageBase): MessageBase {
     // Build pseudo topic based on tid
-    if (message is MessageLocation) {
-      message.topic = HTTPTOPIC + message.trackerId
-    } else if (message is MessageCard) {
-      message.topic = HTTPTOPIC + message.trackerId
-    } else {
-      message.topic = "NOKEY"
+    when (message) {
+      is MessageLocation -> {
+        message.topic = HTTPTOPIC + message.trackerId
+      }
+      is MessageCard -> {
+        message.topic = HTTPTOPIC + message.trackerId
+      }
+      else -> {
+        message.topic = "NOKEY"
+      }
     }
     return message
   }

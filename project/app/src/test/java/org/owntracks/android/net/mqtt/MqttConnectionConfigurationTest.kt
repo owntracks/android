@@ -1,8 +1,7 @@
-package org.owntracks.android.services
+package org.owntracks.android.net.mqtt
 
 import org.junit.Assert
 import org.junit.Test
-import org.owntracks.android.net.mqtt.toMqttConnectionConfiguration
 import org.owntracks.android.preferences.InMemoryPreferencesStore
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.SimpleIdlingResource

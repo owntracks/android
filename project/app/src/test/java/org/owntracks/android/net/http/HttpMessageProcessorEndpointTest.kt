@@ -1,4 +1,4 @@
-package org.owntracks.android.services
+package org.owntracks.android.net.http
 
 import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
@@ -15,9 +15,11 @@ import org.mockito.Mockito.`when`
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.owntracks.android.data.repos.EndpointStateRepo
+import org.owntracks.android.model.messages.MessageCard
+import org.owntracks.android.model.messages.MessageCmd
 import org.owntracks.android.model.messages.MessageLocation
-import org.owntracks.android.net.http.HttpMessageProcessorEndpoint
 import org.owntracks.android.preferences.Preferences
+import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.support.EncryptionProvider
 import org.owntracks.android.support.Parser
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
@@ -201,4 +203,58 @@ class HttpMessageProcessorEndpointTest {
       httpMessageProcessorEndpoint.getEndpointConfiguration()
     }
   }
+
+  @Test
+  fun `Given a received MessageCard, when processing the message, then it is parsed with the correct topic`() =
+      runTest {
+        val httpMessageProcessorEndpoint =
+            HttpMessageProcessorEndpoint(
+                messageProcessor,
+                parser,
+                testPreferences,
+                application,
+                endpointStateRepo,
+                mock {},
+                this,
+                StandardTestDispatcher())
+        val messageCard = MessageCard().apply { trackerId = "testTrackerId" }
+        httpMessageProcessorEndpoint.onMessageReceived(messageCard)
+        assertEquals("owntracks/http/testTrackerId", messageCard.getContactId())
+      }
+
+  @Test
+  fun `Given a received MessageLocation, when processing the message, then it is parsed with the correct topic`() =
+      runTest {
+        val httpMessageProcessorEndpoint =
+            HttpMessageProcessorEndpoint(
+                messageProcessor,
+                parser,
+                testPreferences,
+                application,
+                endpointStateRepo,
+                mock {},
+                this,
+                StandardTestDispatcher())
+        val messageLocation = MessageLocation().apply { trackerId = "testTrackerId" }
+        httpMessageProcessorEndpoint.onMessageReceived(messageLocation)
+        assertEquals("owntracks/http/testTrackerId", messageLocation.getContactId())
+      }
+
+  @Test
+  fun `Given a received MessageCmd, when processing the message, then it is parsed with the correct topic`() =
+      runTest {
+        val httpMessageProcessorEndpoint =
+            HttpMessageProcessorEndpoint(
+                messageProcessor,
+                parser,
+                testPreferences,
+                application,
+                endpointStateRepo,
+                mock {},
+                this,
+                StandardTestDispatcher())
+        val messageCmd = MessageCmd()
+        httpMessageProcessorEndpoint.onMessageReceived(messageCmd)
+        assertEquals("NOKEY", messageCmd.getContactId())
+      }
 }
