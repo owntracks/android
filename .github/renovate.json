@@ -32,25 +32,25 @@
       "matchUpdateTypes": [
         "major"
       ],
-      "label": "major"
+      "addLabels": ["major"]
     },
     {
       "matchUpdateTypes": [
         "minor"
       ],
-      "label": "minor"
+      "addLabels": ["minor"]
     },
     {
       "matchUpdateTypes": [
         "patch"
       ],
-      "label": "patch"
+      "addLabels": ["patch"]
     },
     {
       "matchUpdateTypes": [
         "pin"
       ],
-      "label": "pin"
+      "addLabels": ["pin"]
     }
   ],
   "labels": [
