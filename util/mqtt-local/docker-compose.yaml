@@ -1,5 +1,8 @@
 ---
 version: "3.0"
+volumes:
+  recorder-data:
+  mosquitto:
 services:
   mosquitto:
     image: eclipse-mosquitto:2.0.18-openssl
@@ -18,6 +21,7 @@ services:
       - ${PWD}/_wildcard.docker.local.pem:/mosquitto/config/cert.pem:ro
       - ${PWD}/self-signed.crt:/mosquitto/config/self-signed.crt:ro
       - ${PWD}/self-signed.key:/mosquitto/config/self-signed.key:ro
+      - mosquitto:/mosquitto/data
   nginx:
     depends_on:
       mosquitto:
@@ -48,11 +52,15 @@ services:
     image: owntracks/recorder
     ports:
       - 8083:8083
+    entrypoint: /bin/sh -c "tail -f /dev/null"
+    volumes:
+      - recorder-data:/store
     environment:
       - OTR_HOST=mosquitto
       - OTR_PORT=1883
       - OTR_USER=test
       - OTR_PASS=test
+      - LOG_DEBUG=true
   owntracks-frontend:
     depends_on:
       owntracks-recorder:

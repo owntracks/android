@@ -482,7 +482,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
 
     val monitoring = preferences.monitoring
     var interval: Duration? = null
-    var fastestInterval: Duration? = null
+    var fastestInterval: Duration?
     var smallestDisplacement: Float? = null
     var priority: Int? = null
     when (monitoring) {

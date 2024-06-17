@@ -2,6 +2,7 @@ package org.owntracks.android.net.http
 
 import android.content.Context
 import com.fasterxml.jackson.core.JsonProcessingException
+import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.security.KeyStore
 import java.util.Locale
@@ -90,6 +91,7 @@ class HttpMessageProcessorEndpoint(
               "POST",
               message
                   .toJson(parser)
+                  .also { Timber.d("Publishing Message JSON $it") }
                   ?.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull()))
           .apply {
             val url = configuration.url.toHttpUrl()
@@ -118,7 +120,6 @@ class HttpMessageProcessorEndpoint(
 
     httpClientAndConfiguration?.run {
       endpointStateRepo.setState(EndpointState.CONNECTING)
-      Timber.d("Publishing message $message")
       try {
         client.newCall(getRequest(configuration, message)).execute().use { response ->
           Timber.d("HTTP response received: $response")
@@ -133,7 +134,10 @@ class HttpMessageProcessorEndpoint(
           } else {
             if (response.body != null) {
               try {
-                val result = parser.fromJson(response.body!!.byteStream())
+                val responseString = response.body!!.string()
+                Timber.d("HTTP response body: ${responseString.take(1000)}")
+                val responseStream = ByteArrayInputStream(responseString.toByteArray())
+                val result = parser.fromJson(responseStream)
                 // TODO apply i18n here
                 scope.launch {
                   endpointStateRepo.setState(
