@@ -12,6 +12,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.owntracks.android.location.LocatorPriority
 import org.owntracks.android.model.messages.MessageConfiguration
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.preferences.types.MonitoringMode
@@ -128,6 +129,12 @@ class PreferencesGettersAndSetters(private val parameter: Parameter) {
               Parameter("keepalive", -1, Int::class, false, preferenceValueExpected = 0),
               Parameter("locatorDisplacement", 1690, Int::class, false),
               Parameter("locatorInterval", 1000, Int::class, false),
+              Parameter(
+                  "locatorPriority",
+                  LocatorPriority.HighAccuracy,
+                  LocatorPriority::class,
+                  false,
+                  preferenceValueInConfiguration = "HighAccuracy"),
               Parameter(
                   "mode",
                   ConnectionMode.HTTP,

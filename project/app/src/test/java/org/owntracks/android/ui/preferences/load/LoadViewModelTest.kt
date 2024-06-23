@@ -36,7 +36,7 @@ class LoadViewModelTest {
   }
 
   @Test
-  fun `Given an invalid RUL, when loading it into the LoadViewModel, then the error is correctly set`() =
+  fun `Given an invalid URL, when loading it into the LoadViewModel, then the error is correctly set`() =
       runTest {
         val parser = Parser(null)
         val preferences = Preferences(preferencesStore, mockIdlingResource)

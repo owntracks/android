@@ -9,6 +9,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.location.LocationRequest
+import org.owntracks.android.location.LocatorPriority
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
@@ -21,7 +22,7 @@ class LocationRequestGMSConversion {
               smallestDisplacement = 50f,
               numUpdates = 50,
               expirationDuration = Duration.ofMinutes(2),
-              priority = LocationRequest.PRIORITY_HIGH_ACCURACY,
+              priority = LocatorPriority.HighAccuracy,
               interval = Duration.ofSeconds(30))
           .toGMSLocationRequest()
           .run {
@@ -39,7 +40,7 @@ class LocationRequestGMSConversion {
             smallestDisplacement = 50f,
             numUpdates = 50,
             expirationDuration = Duration.ofMinutes(2),
-            priority = LocationRequest.PRIORITY_HIGH_ACCURACY,
+            priority = LocatorPriority.HighAccuracy,
             interval = Duration.ofSeconds(30))
         .toGMSLocationRequest()
         .run {

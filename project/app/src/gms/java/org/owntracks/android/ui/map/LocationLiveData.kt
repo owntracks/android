@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
 import org.owntracks.android.gms.location.toGMSLocationRequest
 import org.owntracks.android.location.LocationRequest
+import org.owntracks.android.location.LocatorPriority
 import timber.log.Timber
 
 class LocationLiveData(
@@ -43,7 +44,7 @@ class LocationLiveData(
           .requestLocationUpdates(
               LocationRequest(
                       smallestDisplacement = 1f,
-                      priority = LocationRequest.PRIORITY_HIGH_ACCURACY,
+                      priority = LocatorPriority.HighAccuracy,
                       interval = Duration.ofSeconds(2),
                       waitForAccurateLocation = false)
                   .toGMSLocationRequest(),

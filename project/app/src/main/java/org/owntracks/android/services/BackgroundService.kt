@@ -60,6 +60,7 @@ import org.owntracks.android.location.LocationCallback
 import org.owntracks.android.location.LocationProviderClient
 import org.owntracks.android.location.LocationRequest
 import org.owntracks.android.location.LocationResult
+import org.owntracks.android.location.LocatorPriority
 import org.owntracks.android.location.geofencing.Geofence
 import org.owntracks.android.location.geofencing.GeofencingClient
 import org.owntracks.android.location.geofencing.GeofencingEvent
@@ -482,31 +483,31 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
 
     val monitoring = preferences.monitoring
     var interval: Duration? = null
-    var fastestInterval: Duration?
     var smallestDisplacement: Float? = null
-    var priority: Int? = null
+    val priority: LocatorPriority
     when (monitoring) {
       MonitoringMode.QUIET,
       MonitoringMode.MANUAL -> {
         interval = Duration.ofSeconds(preferences.locatorInterval.toLong())
         smallestDisplacement = preferences.locatorDisplacement.toFloat()
-        priority = LocationRequest.PRIORITY_LOW_POWER
+        priority = preferences.locatorPriority ?: LocatorPriority.LowPower
       }
       MonitoringMode.SIGNIFICANT -> {
         interval = Duration.ofSeconds(preferences.locatorInterval.toLong())
         smallestDisplacement = preferences.locatorDisplacement.toFloat()
-        priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
+        priority = preferences.locatorPriority ?: LocatorPriority.BalancedPowerAccuracy
       }
       MonitoringMode.MOVE -> {
         interval = Duration.ofSeconds(preferences.moveModeLocatorInterval.toLong())
-        priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        priority = preferences.locatorPriority ?: LocatorPriority.HighAccuracy
       }
     }
-    if (preferences.pegLocatorFastestIntervalToInterval) {
-      fastestInterval = interval
-    } else {
-      fastestInterval = Duration.ofSeconds(1)
-    }
+    val fastestInterval =
+        if (preferences.pegLocatorFastestIntervalToInterval) {
+          interval
+        } else {
+          Duration.ofSeconds(1)
+        }
     val request =
         LocationRequest(fastestInterval, smallestDisplacement, null, null, priority, interval, null)
     Timber.d("location update request params: $request")
@@ -578,7 +579,8 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
             Preferences::locatorDisplacement.name,
             Preferences::moveModeLocatorInterval.name,
             Preferences::pegLocatorFastestIntervalToInterval.name,
-            Preferences::notificationHigherPriority.name)
+            Preferences::notificationHigherPriority.name,
+            Preferences::locatorPriority.name)
     if (propertiesWeCareAbout
         .stream()
         .filter { o: String -> properties.contains(o) }

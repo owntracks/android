@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import java.io.Closeable
 import kotlin.reflect.KProperty
 import kotlin.reflect.typeOf
+import org.owntracks.android.location.LocatorPriority
 import org.owntracks.android.preferences.types.AppTheme
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.preferences.types.MonitoringMode
@@ -85,6 +86,7 @@ abstract class PreferencesStore :
             typeOf<AppTheme>() -> AppTheme.getByValue(getInt(property.name, 0))
             typeOf<StringMaxTwoAlphaNumericChars>() ->
                 StringMaxTwoAlphaNumericChars(getString(property.name, "") ?: "")
+            typeOf<LocatorPriority?>() -> LocatorPriority.getByValue(getString(property.name, ""))
             else ->
                 throw UnsupportedPreferenceTypeException(
                     "Trying to get property ${property.name} has type ${property.returnType}")
@@ -181,6 +183,8 @@ abstract class PreferencesStore :
       is MqttQos -> putInt(property.name, coercedValue.value)
       is AppTheme -> putInt(property.name, coercedValue.value)
       is StringMaxTwoAlphaNumericChars -> putString(property.name, coercedValue.toString())
+      is LocatorPriority? ->
+          coercedValue?.run { putString(property.name, this.name) } ?: remove(property.name)
       else ->
           throw UnsupportedPreferenceTypeException(
               "Trying to set property ${property.name} has type ${property.returnType}")

@@ -17,6 +17,7 @@ import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.jvm.jvmErasure
 import kotlin.reflect.typeOf
 import org.owntracks.android.BuildConfig
+import org.owntracks.android.location.LocatorPriority
 import org.owntracks.android.model.messages.MessageConfiguration
 import org.owntracks.android.preferences.types.AppTheme
 import org.owntracks.android.preferences.types.ConnectionMode
@@ -142,7 +143,8 @@ constructor(
    * @param value untyped value to try and set
    */
   private fun importPreference(it: KMutableProperty<*>, value: Any) {
-    if (it.returnType.isSubtypeOf(typeOf<Enum<*>>())) {
+    if (it.returnType.isSubtypeOf(typeOf<Enum<*>>()) ||
+        it.returnType.isSubtypeOf(typeOf<Enum<*>?>())) {
       // Find the companion object method annotated with FromConfiguration with a single parameter
       // that's the same type as the configuration value
       val conversionMethod =
@@ -225,6 +227,8 @@ constructor(
   @Preference var locatorDisplacement: Int by preferencesStore
 
   @Preference var locatorInterval: Int by preferencesStore
+
+  @Preference var locatorPriority: LocatorPriority? by preferencesStore
 
   @Preference var mapLayerStyle: MapLayerStyle by preferencesStore
 
@@ -357,11 +361,13 @@ constructor(
     get() {
       return pubTopicBaseWithUserDetails
     }
+
   // When publishing all waypoints
   val pubTopicWaypoints: String
     get() {
       return pubTopicBaseWithUserDetails + waypointsTopicSuffix
     }
+
   // For single waypoints on create / update
   val pubTopicWaypoint: String
     get() {
@@ -390,7 +396,7 @@ constructor(
           when (mode) {
             ConnectionMode.MQTT -> mqttExportedConfigKeys
             ConnectionMode.HTTP -> httpExportedConfigKeys
-          }.forEach { property -> set(property.name, property.get(this@Preferences)) }
+          }.forEach { property -> property.get(this@Preferences)?.run { set(property.name, this) } }
         }
   }
 

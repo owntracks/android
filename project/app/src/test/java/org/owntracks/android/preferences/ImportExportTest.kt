@@ -8,6 +8,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.owntracks.android.location.LocatorPriority
 import org.owntracks.android.model.messages.MessageConfiguration
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.preferences.types.MonitoringMode
@@ -67,6 +68,7 @@ class ImportExportTest {
               "keepalive": 900,
               "locatorDisplacement": 5,
               "locatorInterval": 60,
+              "locatorPriority": "LowPower",
               "mode": 0,
               "monitoring": 1,
               "moveModeLocatorInterval": 10,
@@ -109,6 +111,7 @@ class ImportExportTest {
       assertEquals(900, keepalive)
       assertEquals(5, locatorDisplacement)
       assertEquals(60, locatorInterval)
+      assertEquals(LocatorPriority.LowPower, locatorPriority)
       assertEquals(ConnectionMode.MQTT, mode)
       assertEquals(MonitoringMode.SIGNIFICANT, monitoring)
       assertEquals(10, moveModeLocatorInterval)
@@ -150,6 +153,7 @@ class ImportExportTest {
       keepalive = 900
       locatorDisplacement = 5
       locatorInterval = 60
+      locatorPriority = null
       mode = ConnectionMode.MQTT
       monitoring = MonitoringMode.SIGNIFICANT
       moveModeLocatorInterval = 10
@@ -198,6 +202,7 @@ class ImportExportTest {
     assertEquals(900, jsonNode.get("keepalive").asInt())
     assertEquals(5, jsonNode.get("locatorDisplacement").asInt())
     assertEquals(60, jsonNode.get("locatorInterval").asInt())
+    assertFalse(jsonNode.has("locatorPriority"))
     assertEquals(defaultMapLayerStyle.name, jsonNode.get("mapLayerStyle").asText())
     assertEquals(0, jsonNode.get("mode").asInt())
     assertEquals(1, jsonNode.get("monitoring").asInt())
@@ -231,5 +236,18 @@ class ImportExportTest {
     assertEquals("", jsonNode.get("tlsClientCrt").asText())
     assertEquals("testusername", jsonNode.get("username").asText())
     assertFalse(jsonNode.get("ws").asBoolean())
+  }
+
+  @Test
+  fun `given a preferences instance with locatorPriority set, when exporting it, then the exported JSON message has a value for locatorPriority`() {
+    val preferences = Preferences(preferencesStore, mockIdlingResource)
+    preferences.run { locatorPriority = LocatorPriority.HighAccuracy }
+    val message = preferences.exportToMessage()
+    val parser = Parser(null)
+    val json = parser.toUnencryptedJsonPretty(message)
+
+    val jsonNode = ObjectMapper().readTree(json)
+    assertTrue(jsonNode.has("locatorPriority"))
+    assertEquals(0, jsonNode.get("locatorPriority").asInt())
   }
 }
