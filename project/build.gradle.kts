@@ -20,7 +20,7 @@ plugins {
     alias(libs.plugins.triplet).apply(false)
     alias(libs.plugins.ktfmt).apply(false)
     alias(libs.plugins.ksp).apply(false)
-  id( "com.xcporter.metaview").version( "0.0.5")
+  id( "com.xcporter.metaview").version( "0.0.6")
 }
 generateUml {
   classTree {
