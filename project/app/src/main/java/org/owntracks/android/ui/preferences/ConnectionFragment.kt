@@ -91,8 +91,10 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
             if (certChain.isNullOrEmpty()) {
               Timber.w(
                   "Client cert for ${preferences.tlsClientCrt} no longer exists in device store.")
+              true
+            } else {
+              false
             }
-            true
           } else {
             false
           }
