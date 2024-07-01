@@ -11,7 +11,6 @@ import android.os.Looper
 import androidx.core.location.LocationManagerCompat
 import androidx.core.os.ExecutorCompat
 import java.util.WeakHashMap
-import org.owntracks.android.location.LocationRequest.Companion.PRIORITY_HIGH_ACCURACY
 import timber.log.Timber
 
 class AospLocationProviderClient(val context: Context) : LocationProviderClient() {
@@ -32,9 +31,9 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient(
 
   private val callbacks = WeakHashMap<LocationCallback, LocationListener>()
 
-  private fun locationSourcesForPriority(priority: Int): Set<LocationSources> =
+  private fun locationSourcesForPriority(priority: LocatorPriority): Set<LocationSources> =
       when (priority) {
-        PRIORITY_HIGH_ACCURACY -> setOf(LocationSources.GPS)
+        LocatorPriority.HighAccuracy -> setOf(LocationSources.GPS)
         else ->
             setOf(LocationSources.FUSED, LocationSources.NETWORK, LocationSources.PASSIVE)
                 .intersect(availableLocationProviders)
