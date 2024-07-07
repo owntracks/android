@@ -190,7 +190,7 @@ class HttpMessageProcessorEndpoint(
     Timber.v("HTTP preferences changed: [${properties.joinToString(",")}]")
     /* In HTTP mode, the *only* preference we care about wanting to trigger an immediate reprocessing
      * of the outgoing message queue is the password. The other properties that might change the
-     * liklihood of message sends succeeding (e.g. URL, username etc.) will actually trigger a
+     * likelihood of message sends succeeding (e.g. URL, username etc.) will actually trigger a
      * queue wipe and full reset, and that's handled in the [MessageProcessor].
      */
     val propertiesWeCareAbout = setOf(Preferences::password.name)
