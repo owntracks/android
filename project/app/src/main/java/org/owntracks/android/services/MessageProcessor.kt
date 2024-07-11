@@ -482,7 +482,11 @@ constructor(
       outgoingQueue.also { Timber.i("Clearing outgoing message queue length=${it.size}") }.clear()
       while (!outgoingQueueIdlingResource.isIdleNow) {
         Timber.v("Decrementing outgoingQueueIdlingResource")
-        outgoingQueueIdlingResource.decrement()
+        try {
+          outgoingQueueIdlingResource.decrement()
+        } catch (e: IllegalStateException) {
+          Timber.w(e, "outgoingQueueIdlingResource is invalid")
+        }
       }
       loadOutgoingMessageProcessor()
     }
