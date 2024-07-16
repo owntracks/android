@@ -26,9 +26,10 @@ jobs:
         name: Find beta tags if this is a prod release
         id: get_beta_tags
         with:
-          route: GET /repos/owntracks/android/git/matching-refs/tags/${{ github.ref }}-beta
+          route: GET /repos/owntracks/android/git/matching-refs/tags/${{ github.ref_name }}-beta
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: "echo beta tags: '${{ steps.get_beta_tags.outputs.data }}'"
       - name: Get number of matching tags
         id: tagCount
         env:
@@ -123,14 +124,14 @@ jobs:
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
 
       - name: Promote play store production from beta
-        run: ./gradlew promoteArtifact --from-track beta --promote-track production --release-status inProgress -user-fraction .1
+        run: ./gradlew promoteArtifact --from-track beta --promote-track production --release-status inProgress --user-fraction .1
         working-directory: project
         if: ${{ !contains(github.ref, 'beta') && steps.tagCount.outputs.beta_tag_count > 0 }}
         env:
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
 
       - name: Promote play store production from internal
-        run: ./gradlew promoteArtifact --from-track internal --promote-track production --release-status inProgress -user-fraction .1
+        run: ./gradlew promoteArtifact --from-track internal --promote-track production --release-status inProgress --user-fraction .1
         working-directory: project
         if: ${{ !contains(github.ref, 'beta') && steps.tagCount.outputs.beta_tag_count == 0 }}
         env:
