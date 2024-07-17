@@ -4,8 +4,8 @@ import org.junit.Assert
 import org.junit.Test
 import org.owntracks.android.preferences.InMemoryPreferencesStore
 import org.owntracks.android.preferences.Preferences
-import org.owntracks.android.support.SimpleIdlingResource
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
+import org.owntracks.android.test.SimpleIdlingResource
 
 class MqttConnectionConfigurationTest {
   private val mockIdlingResource = SimpleIdlingResource("mock", true)

@@ -2,6 +2,7 @@ package org.owntracks.android.support
 
 import org.junit.Test
 import org.owntracks.android.model.messages.MessageLocation
+import org.owntracks.android.test.IdlingResourceWithData
 
 class IdlingResourceWithDataTest {
   @Test

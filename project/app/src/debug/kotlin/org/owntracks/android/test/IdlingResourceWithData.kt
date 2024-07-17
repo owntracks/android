@@ -1,4 +1,4 @@
-package org.owntracks.android.support
+package org.owntracks.android.test
 
 import androidx.test.espresso.IdlingResource
 import org.owntracks.android.model.messages.MessageBase

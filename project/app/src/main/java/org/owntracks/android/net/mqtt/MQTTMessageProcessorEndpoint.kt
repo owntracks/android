@@ -60,9 +60,9 @@ import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.Parser
-import org.owntracks.android.support.SimpleIdlingResource
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor
+import org.owntracks.android.test.SimpleIdlingResource
 import timber.log.Timber
 
 class MQTTMessageProcessorEndpoint(

@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
 import androidx.test.espresso.IdlingResource
-import androidx.test.espresso.idling.CountingIdlingResource
 import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.security.KeyStore
@@ -47,10 +46,11 @@ import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.Preferences.Companion.PREFERENCES_THAT_WIPE_QUEUE_AND_CONTACTS
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.services.worker.Scheduler
-import org.owntracks.android.support.IdlingResourceWithData
 import org.owntracks.android.support.Parser
-import org.owntracks.android.support.SimpleIdlingResource
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
+import org.owntracks.android.test.CountingIdlingResourceShim
+import org.owntracks.android.test.IdlingResourceWithData
+import org.owntracks.android.test.SimpleIdlingResource
 import timber.log.Timber
 
 @Singleton
@@ -65,7 +65,7 @@ constructor(
     private val scheduler: Scheduler,
     private val endpointStateRepo: EndpointStateRepo,
     @Named("outgoingQueueIdlingResource")
-    private val outgoingQueueIdlingResource: CountingIdlingResource,
+    private val outgoingQueueIdlingResource: CountingIdlingResourceShim,
     @Named("importConfigurationIdlingResource")
     private val importConfigurationIdlingResource: SimpleIdlingResource,
     @Named("messageReceivedIdlingResource")

@@ -79,7 +79,7 @@ import org.owntracks.android.preferences.types.MonitoringMode.Companion.getByVal
 import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.DateFormatter.formatDate
 import org.owntracks.android.support.RunThingsOnOtherThreads
-import org.owntracks.android.support.SimpleIdlingResource
+import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber
 

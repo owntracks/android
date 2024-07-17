@@ -31,7 +31,7 @@ import org.owntracks.android.model.messages.MessageWaypoints
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.Parser
 import org.owntracks.android.support.Parser.EncryptionException
-import org.owntracks.android.support.SimpleIdlingResource
+import org.owntracks.android.test.SimpleIdlingResource
 import timber.log.Timber
 
 @HiltViewModel

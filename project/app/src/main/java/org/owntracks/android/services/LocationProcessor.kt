@@ -29,7 +29,7 @@ import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.support.DeviceMetricsProvider
 import org.owntracks.android.support.MessageWaypointCollection
-import org.owntracks.android.support.SimpleIdlingResource
+import org.owntracks.android.test.SimpleIdlingResource
 import timber.log.Timber
 
 @Singleton
