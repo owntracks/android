@@ -5,8 +5,10 @@ import android.app.ActivityManager
 import android.app.ForegroundServiceStartNotAllowedException
 import android.app.Notification
 import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
 import android.graphics.Typeface
@@ -14,6 +16,7 @@ import android.location.Location
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
+import android.os.PowerManager
 import android.os.Process
 import android.text.Spannable
 import android.text.SpannableString
@@ -131,6 +134,13 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
   private val activityManager by lazy {
     this.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
   }
+  private val powerStateLogger by lazy { PowerStateLogger(this.applicationContext) }
+  private val powerBroadcastReceiver =
+      object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+          intent.action?.run(powerStateLogger::logPowerState)
+        }
+      }
 
   @EntryPoint
   @InstallIn(SingletonComponent::class)
@@ -161,6 +171,19 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
     super.onCreate()
 
     preferences.registerOnPreferenceChangedListener(this)
+
+    registerReceiver(
+        powerBroadcastReceiver,
+        IntentFilter().apply {
+          addAction(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED)
+          addAction(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED)
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            addAction(PowerManager.ACTION_DEVICE_LIGHT_IDLE_MODE_CHANGED)
+          }
+          addAction(Intent.ACTION_SCREEN_ON)
+          addAction(Intent.ACTION_SCREEN_OFF)
+        })
+    powerStateLogger.logPowerState("serviceOnCreate")
 
     lifecycleScope.launch {
       // Every time a waypoint is inserted, updated or deleted, we need to update the geofences, and
@@ -210,6 +233,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
   override fun onDestroy() {
     Timber.v("Backgroundservice onDestroy")
     stopForeground(STOP_FOREGROUND_REMOVE)
+    unregisterReceiver(powerBroadcastReceiver)
     preferences.unregisterOnPreferenceChangedListener(this)
     messageProcessor.stopSendingMessages()
     super.onDestroy()
@@ -670,6 +694,28 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
 
     override fun toString(): String {
       return "Backgroundservice callback[$reportType] "
+    }
+  }
+
+  class PowerStateLogger(private val applicationContext: Context) {
+    private val powerManager =
+        applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
+
+    fun logPowerState(action: String) {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        Timber.d(
+            "triggeringAction=$action " +
+                "isPowerSaveMode=${powerManager.isPowerSaveMode} " +
+                "locationPowerSaveMode=${powerManager.locationPowerSaveMode} " +
+                "isDeviceIdleMode=${powerManager.isDeviceIdleMode} " +
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                  "isDeviceLightIdleMode=${powerManager.isDeviceLightIdleMode} "
+                } else {
+                  ""
+                } +
+                "isInteractive=${powerManager.isInteractive} " +
+                "isIgnoringBatteryOptimizations=${powerManager.isIgnoringBatteryOptimizations(applicationContext.packageName)}")
+      }
     }
   }
 }
