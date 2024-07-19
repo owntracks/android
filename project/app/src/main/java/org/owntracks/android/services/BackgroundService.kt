@@ -696,7 +696,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
     }
   }
 
-  class PowerStateLogger(applicationContext: Context) {
+  class PowerStateLogger(private val applicationContext: Context) {
     private val powerManager =
         applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
 
@@ -704,12 +704,16 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
         Timber.d(
             "triggeringAction=$action " +
-                "PowerSaveMode=${powerManager.isPowerSaveMode} " +
-                "LocationPowerSaveMode=${powerManager.locationPowerSaveMode} " +
+                "isPowerSaveMode=${powerManager.isPowerSaveMode} " +
+                "locationPowerSaveMode=${powerManager.locationPowerSaveMode} " +
                 "isDeviceIdleMode=${powerManager.isDeviceIdleMode} " +
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                   "isDeviceLightIdleMode=${powerManager.isDeviceLightIdleMode} "
-                } else "" + "isInteractive=${powerManager.isInteractive}")
+                } else {
+                  ""
+                } +
+                "isInteractive=${powerManager.isInteractive} " +
+                "isIgnoringBatteryOptimizations=${powerManager.isIgnoringBatteryOptimizations(applicationContext.packageName)}")
       }
     }
   }
