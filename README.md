@@ -2,7 +2,7 @@
 
 This is the OwnTracks Android app. See our [booklet](http://owntracks.org/booklet/features/android/) for details on how to get started with OwnTracks, as well some details about behaviour specific to the Android app.
 
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/owntracks/android/build-and-test.yaml) [![Get it on Google Play](https://img.shields.io/endpoint?color=green&logo=google-play&logoColor=green&url=https%3A%2F%2Fplay.cuzi.workers.dev%2Fplay%3Fi%3Dorg.owntracks.android%26gl%3DUS%26hl%3Den%26l%3D%24name%26m%3D%24version)](https://play.google.com/store/apps/details?id=org.owntracks.android&hl=en_GB) [![F-Droid Version](https://img.shields.io/f-droid/v/org.owntracks.android)](https://f-droid.org/en/packages/org.owntracks.android/) ![GitHub License](https://img.shields.io/github/license/owntracks/android)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/owntracks/android/build-and-test.yaml?branch=master) [![Get it on Google Play](https://img.shields.io/endpoint?color=green&logo=google-play&logoColor=green&url=https%3A%2F%2Fplay.cuzi.workers.dev%2Fplay%3Fi%3Dorg.owntracks.android%26gl%3DUS%26hl%3Den%26l%3D%24name%26m%3D%24version)](https://play.google.com/store/apps/details?id=org.owntracks.android&hl=en_GB) [![F-Droid Version](https://img.shields.io/f-droid/v/org.owntracks.android)](https://f-droid.org/en/packages/org.owntracks.android/) ![GitHub License](https://img.shields.io/github/license/owntracks/android)
 
 
 
