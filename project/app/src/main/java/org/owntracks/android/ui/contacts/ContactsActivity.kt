@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.test.espresso.idling.CountingIdlingResource
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import javax.inject.Named
@@ -19,6 +18,7 @@ import org.owntracks.android.data.repos.ContactsRepoChange
 import org.owntracks.android.databinding.UiContactsBinding
 import org.owntracks.android.model.Contact
 import org.owntracks.android.support.DrawerProvider
+import org.owntracks.android.test.CountingIdlingResourceShim
 import org.owntracks.android.ui.map.MapActivity
 import org.owntracks.android.ui.mixins.ServiceStarter
 import timber.log.Timber
@@ -31,7 +31,7 @@ class ContactsActivity :
   @Inject
   @Named("contactsActivityIdlingResource")
   @VisibleForTesting
-  lateinit var contactsCountingIdlingResource: CountingIdlingResource
+  lateinit var contactsCountingIdlingResource: CountingIdlingResourceShim
 
   private val viewModel: ContactsViewModel by viewModels()
   private lateinit var contactsAdapter: ContactsAdapter

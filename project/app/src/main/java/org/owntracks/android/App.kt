@@ -1,7 +1,6 @@
 package org.owntracks.android
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.ActivityManager
 import android.app.Application
 import android.app.Notification
@@ -20,9 +19,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.lifecycle.MutableLiveData
 import androidx.test.espresso.IdlingResource
-import androidx.test.espresso.idling.CountingIdlingResource
 import androidx.work.Configuration
-import androidx.work.InitializationExceptionHandler
 import dagger.hilt.EntryPoints
 import dagger.hilt.android.HiltAndroidApp
 import java.security.Security
@@ -42,8 +39,9 @@ import org.owntracks.android.preferences.PreferencesStore
 import org.owntracks.android.preferences.types.AppTheme
 import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.services.worker.Scheduler
-import org.owntracks.android.support.IdlingResourceWithData
-import org.owntracks.android.support.SimpleIdlingResource
+import org.owntracks.android.test.CountingIdlingResourceShim
+import org.owntracks.android.test.IdlingResourceWithData
+import org.owntracks.android.test.SimpleIdlingResource
 import timber.log.Timber
 
 @HiltAndroidApp
@@ -74,7 +72,7 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
   @Inject
   @Named("outgoingQueueIdlingResource")
   @get:VisibleForTesting
-  lateinit var outgoingQueueIdlingResource: CountingIdlingResource
+  lateinit var outgoingQueueIdlingResource: CountingIdlingResourceShim
 
   @Inject
   @Named("contactsClearedIdlingResource")
@@ -220,18 +218,6 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
     }
   }
 
-  @SuppressLint("RestrictedApi")
-  override fun getWorkManagerConfiguration(): Configuration =
-      Configuration.Builder()
-          .setWorkerFactory(workerFactory)
-          .setInitializationExceptionHandler(
-              InitializationExceptionHandler { throwable ->
-                Timber.e(throwable, "Exception thrown when initializing WorkManager")
-                workManagerFailedToInitialize.postValue(true)
-              })
-          .setMinimumLoggingLevel(android.util.Log.INFO)
-          .build()
-
   override fun onPreferenceChanged(properties: Set<String>) {
     if (properties.contains(Preferences::theme.name)) {
       Timber.d("Theme changed. Setting theme to ${preferences.theme}")
@@ -295,4 +281,15 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
     const val NOTIFICATION_ID_EVENT_GROUP = 2
     const val NOTIFICATION_GROUP_EVENTS = "events"
   }
+
+  override val workManagerConfiguration: Configuration
+    get() =
+        Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .setInitializationExceptionHandler { throwable ->
+              Timber.e(throwable, "Exception thrown when initializing WorkManager")
+              workManagerFailedToInitialize.postValue(true)
+            }
+            .setMinimumLoggingLevel(android.util.Log.INFO)
+            .build()
 }

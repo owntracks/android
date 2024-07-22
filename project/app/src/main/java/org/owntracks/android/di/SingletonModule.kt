@@ -2,7 +2,6 @@ package org.owntracks.android.di
 
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
-import androidx.test.espresso.idling.CountingIdlingResource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,8 +15,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import okhttp3.OkHttpClient
 import org.owntracks.android.model.messages.MessageBase
-import org.owntracks.android.support.IdlingResourceWithData
-import org.owntracks.android.support.SimpleIdlingResource
+import org.owntracks.android.test.CountingIdlingResourceShim
+import org.owntracks.android.test.IdlingResourceWithData
+import org.owntracks.android.test.SimpleIdlingResource
 
 @InstallIn(SingletonComponent::class)
 @Module
@@ -26,13 +26,13 @@ class SingletonModule {
   /**
    * This idling resource is idled when the outgoing message queue becomes empty
    *
-   * @return a [CountingIdlingResource] representing the size of the outgoing message queue
+   * @return a [CountingIdlingResourceShimShim] representing the size of the outgoing message queue
    */
   @Provides
   @Named("outgoingQueueIdlingResource")
   @Singleton
-  fun provideOutgoingQueueIdlingResource(): CountingIdlingResource =
-      CountingIdlingResource("outgoingQueueIdlingResource", true)
+  fun provideOutgoingQueueIdlingResource(): CountingIdlingResourceShim =
+      CountingIdlingResourceShim("outgoingQueueIdlingResource", true)
 
   /**
    * This idling resource is idled when a message with is published in response to a remote command.
@@ -72,13 +72,13 @@ class SingletonModule {
   /**
    * Idles once the ContactsActivity has finished loading
    *
-   * @return a [CountingIdlingResource
+   * @return a [CountingIdlingResourceShim
    */
   @Provides
   @Singleton
   @Named("contactsActivityIdlingResource")
-  fun provideContactsActivityIdlingResource(): CountingIdlingResource =
-      CountingIdlingResource("contactsActivityIdlingResource", true)
+  fun provideContactsActivityIdlingResource(): CountingIdlingResourceShim =
+      CountingIdlingResourceShim("contactsActivityIdlingResource", true)
 
   /**
    * This idling resource is used to detect that a clear message has propagated and updated through

@@ -20,7 +20,7 @@ import org.owntracks.android.preferences.types.MqttProtocolLevel
 import org.owntracks.android.preferences.types.MqttQos
 import org.owntracks.android.preferences.types.ReverseGeocodeProvider
 import org.owntracks.android.preferences.types.StringMaxTwoAlphaNumericChars
-import org.owntracks.android.support.SimpleIdlingResource
+import org.owntracks.android.test.SimpleIdlingResource
 
 @RunWith(Parameterized::class)
 class PreferencesGettersAndSetters(private val parameter: Parameter) {

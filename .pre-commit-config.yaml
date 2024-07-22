@@ -36,10 +36,15 @@ repos:
         description: Runs unit-tests
         entry: ./project/gradlew -p project testGmsDebugUnitTest
         pass_filenames: false
+        types_or:
+          - kotlin
+          - java
         language: system
       - id: ktfmt
         name: Ktfmt
         description: Formats kotlin files
         entry: ./project/gradlew -p project ktfmtFormat
         pass_filenames: false
+        types_or:
+          - kotlin
         language: system

@@ -27,7 +27,7 @@ import org.owntracks.android.preferences.InMemoryPreferencesStore
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ReverseGeocodeProvider
 import org.owntracks.android.services.BackgroundService
-import org.owntracks.android.support.SimpleIdlingResource
+import org.owntracks.android.test.SimpleIdlingResource
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TestGeocoderProvider {

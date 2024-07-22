@@ -1,4 +1,4 @@
-package org.owntracks.android.support
+package org.owntracks.android.test
 
 import androidx.test.espresso.IdlingResource
 import org.owntracks.android.model.messages.MessageBase
@@ -10,10 +10,9 @@ import org.owntracks.android.model.messages.MessageBase
  * @constructor Create empty Idling resource with data
  * @property resourceName
  */
-@Suppress("unused", "EmptyMethod")
 class IdlingResourceWithData<T : MessageBase>(
     private val resourceName: String,
-    private val comparator: Comparator<in T>
+    @Suppress("unused_parameter") comparator: Comparator<in T>
 ) : IdlingResource {
   private var callback: IdlingResource.ResourceCallback? = null
   private val sent = mutableListOf<T>()
@@ -27,11 +26,11 @@ class IdlingResourceWithData<T : MessageBase>(
 
   override fun isIdleNow(): Boolean = sent.isEmpty() && received.isEmpty()
 
-  fun add(thing: T) {
+  fun add(@Suppress("unused_parameter") thing: T) {
     // No-op
   }
 
-  fun remove(thing: T) {
+  fun remove(@Suppress("unused_parameter") thing: T) {
     // No-op
   }
 }

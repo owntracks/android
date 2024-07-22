@@ -26,9 +26,10 @@ jobs:
         name: Find beta tags if this is a prod release
         id: get_beta_tags
         with:
-          route: GET /repos/owntracks/android/git/matching-refs/tags/${{ github.ref }}-beta
+          route: GET /repos/owntracks/android/git/matching-refs/tags/${{ github.ref_name }}-beta
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: "echo beta tags: '${{ steps.get_beta_tags.outputs.data }}'"
       - name: Get number of matching tags
         id: tagCount
         env:
@@ -36,8 +37,8 @@ jobs:
         run: |
           echo "${labels}"
           LENGTH=$(echo "${labels}" | jq '. | length')
-          echo "${LENGTH}"
-          echo "name=beta_tag_count::$LENGTH" >> "${GITHUB_OUTPUT}"
+          echo "beta_tag_count=${LENGTH}"
+          echo "beta_tag_count=$LENGTH" >> "${GITHUB_OUTPUT}"
 
       - name: set up JDK 17
         uses: actions/setup-java@v4
@@ -54,18 +55,20 @@ jobs:
           pip install -r .github/google-play-api/requirements.txt
 
       - name: Get current version code from internal track
-        if: ${{ contains(github.ref, 'beta') || steps.tagCount.outputs.beta_tag_count == 0 }}
+        if: ${{ contains(github.ref_name, 'beta') || steps.tagCount.outputs.beta_tag_count == 0 }}
         env:
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
         run: |
-          echo VERSION_CODE="$(python .github/google-play-api/google-play-api.py internal)" >> "${GITHUB_ENV}"
+          VERSION_CODE="$(python .github/google-play-api/google-play-api.py internal)"
+          echo VERSION_CODE="${VERSION_CODE}" >> "${GITHUB_ENV}"
 
       - name: Get current version code from beta track
-        if: ${{ !contains(github.ref, 'beta') && steps.tagCount.outputs.beta_tag_count >= 0 }}
+        if: ${{ !contains(github.ref_name, 'beta') && steps.tagCount.outputs.beta_tag_count >= 0 }}
         env:
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
         run: |
-          echo VERSION_CODE="$(python .github/google-play-api/google-play-api.py beta)" >> "${GITHUB_ENV}"
+          VERSION_CODE="$(python .github/google-play-api/google-play-api.py beta)"
+          echo VERSION_CODE="${VERSION_CODE}" >> "${GITHUB_ENV}"
 
       - name: Create keystore
         run: |
@@ -90,11 +93,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
+          tag_name: ${{ github.ref_name }}
           body_path: ./CHANGELOG.md
-          name: ${{ github.ref }}
+          name: ${{ github.ref_name }}
           draft: true
-          prerelease: ${{ contains(github.ref, 'beta') }}
+          prerelease: ${{ contains(github.ref_name, 'beta') }}
 
       - name: Upload GMS Release Asset
         uses: actions/upload-release-asset@v1
@@ -118,20 +121,20 @@ jobs:
       - name: Promote play store beta from internal
         run: ./gradlew promoteGmsReleaseArtifact --from-track internal --promote-track beta --release-status completed
         working-directory: project
-        if: ${{ contains(github.ref, 'beta') }}
+        if: ${{ contains(github.ref_name, 'beta') }}
         env:
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
 
       - name: Promote play store production from beta
-        run: ./gradlew promoteArtifact --from-track beta --promote-track production --release-status inProgress -user-fraction .1
+        run: ./gradlew promoteArtifact --from-track beta --promote-track production --release-status inProgress --user-fraction .1
         working-directory: project
-        if: ${{ !contains(github.ref, 'beta') && steps.tagCount.outputs.beta_tag_count > 0 }}
+        if: ${{ !contains(github.ref_name, 'beta') && steps.tagCount.outputs.beta_tag_count > 0 }}
         env:
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
 
       - name: Promote play store production from internal
-        run: ./gradlew promoteArtifact --from-track internal --promote-track production --release-status inProgress -user-fraction .1
+        run: ./gradlew promoteArtifact --from-track internal --promote-track production --release-status inProgress --user-fraction .1
         working-directory: project
-        if: ${{ !contains(github.ref, 'beta') && steps.tagCount.outputs.beta_tag_count == 0 }}
+        if: ${{ !contains(github.ref_name, 'beta') && steps.tagCount.outputs.beta_tag_count == 0 }}
         env:
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}

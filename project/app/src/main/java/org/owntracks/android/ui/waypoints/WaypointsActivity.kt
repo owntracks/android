@@ -14,7 +14,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.test.espresso.idling.CountingIdlingResource
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import javax.inject.Named
@@ -28,7 +27,8 @@ import org.owntracks.android.data.waypoints.WaypointModel
 import org.owntracks.android.databinding.UiWaypointsBinding
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.DrawerProvider
-import org.owntracks.android.support.SimpleIdlingResource
+import org.owntracks.android.test.CountingIdlingResourceShim
+import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.ui.NotificationsStash
 import org.owntracks.android.ui.base.BaseRecyclerViewAdapterWithClickHandler
 import org.owntracks.android.ui.base.ClickHasBeenHandled
@@ -57,7 +57,7 @@ class WaypointsActivity :
   @Inject
   @Named("outgoingQueueIdlingResource")
   @get:VisibleForTesting
-  lateinit var outgoingQueueIdlingResource: CountingIdlingResource
+  lateinit var outgoingQueueIdlingResource: CountingIdlingResourceShim
 
   @Inject
   @Named("publishResponseMessageIdlingResource")
