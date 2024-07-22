@@ -2,12 +2,16 @@
 
 This is the OwnTracks Android app. See our [booklet](http://owntracks.org/booklet/features/android/) for details on how to get started with OwnTracks, as well some details about behaviour specific to the Android app.
 
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/owntracks/android/build-and-test.yaml) [![Get it on Google Play](https://img.shields.io/endpoint?color=green&logo=google-play&logoColor=green&url=https%3A%2F%2Fplay.cuzi.workers.dev%2Fplay%3Fi%3Dorg.owntracks.android%26gl%3DUS%26hl%3Den%26l%3D%24name%26m%3D%24version)](https://play.google.com/store/apps/details?id=org.owntracks.android&hl=en_GB) [![F-Droid Version](https://img.shields.io/f-droid/v/org.owntracks.android)](https://f-droid.org/en/packages/org.owntracks.android/) ![GitHub License](https://img.shields.io/github/license/owntracks/android)
+
+
+
 ## Build flavours
 
 There are two build flavours for OwnTracks:
 
 * `gms`: This is the build published to the [Google Play Store](https://play.google.com/store/apps/details?id=org.owntracks.android). It links to and requires the Google Play Services libraries for location (using the Google location APIs), as well as the Google Maps SDK for drawing the main map.
-* `oss`: This is an "un-Googled" build, which does not require or depend on Google Play Services. It uses the built-in android location capabilities and defaults to [OpenStreetMap](https://www.openstreetmap.org/) for the main map. Available via [F-Droid](https://f-droid.org/packages/org.owntracks.android/). *N.B. this is currently unavailable until we remove a specific closed-source dependency. See [#1288](https://github.com/owntracks/android/issues/1298)*
+* `oss`: This is an "un-Googled" build, which does not require or depend on Google Play Services. It uses the built-in android location capabilities and defaults to [OpenStreetMap](https://www.openstreetmap.org/) for the main map. Available via [F-Droid](https://f-droid.org/packages/org.owntracks.android/).
 
 Both flavours are published as an APK to Github releases.
 
@@ -22,5 +26,3 @@ Both flavours are published as an APK to Github releases.
 Pull requests welcome! Please see [CONTRIBUTING.md](https://github.com/owntracks/android/blob/master/CONTRIBUTING.md) for details on how to build the project locally.
 
 If you spot a translation issue or want to help contribute translating the app into other languages, you can visit [POEditor](https://poeditor.com/projects/view?id=419041) and help out.
-
-[![CircleCI](https://circleci.com/gh/owntracks/android/tree/master.svg?style=shield)](https://circleci.com/gh/owntracks/android/tree/master)
