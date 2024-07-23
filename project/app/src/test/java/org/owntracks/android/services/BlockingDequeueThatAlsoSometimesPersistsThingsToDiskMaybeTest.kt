@@ -6,8 +6,8 @@ import kotlin.random.Random
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.owntracks.android.model.Parser
 import org.owntracks.android.model.messages.MessageLocation
-import org.owntracks.android.support.Parser
 
 class BlockingDequeueThatAlsoSometimesPersistsThingsToDiskMaybeTest {
   private val parser = Parser(null)

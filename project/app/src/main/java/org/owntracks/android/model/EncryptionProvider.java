@@ -1,4 +1,7 @@
-package org.owntracks.android.support;
+package org.owntracks.android.model;
+
+import static org.libsodium.jni.SodiumConstants.XSALSA20_POLY1305_SECRETBOX_KEYBYTES;
+import static org.libsodium.jni.SodiumConstants.XSALSA20_POLY1305_SECRETBOX_NONCEBYTES;
 
 import android.util.Base64;
 
@@ -6,20 +9,14 @@ import androidx.annotation.NonNull;
 
 import org.libsodium.jni.crypto.Random;
 import org.libsodium.jni.crypto.SecretBox;
-import org.owntracks.android.R;
 import org.owntracks.android.preferences.Preferences;
 
-import javax.inject.Singleton;
+import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import timber.log.Timber;
-
-import static org.libsodium.jni.SodiumConstants.XSALSA20_POLY1305_SECRETBOX_KEYBYTES;
-import static org.libsodium.jni.SodiumConstants.XSALSA20_POLY1305_SECRETBOX_NONCEBYTES;
-
-import java.util.List;
-import java.util.Set;
 
 @Singleton
 public class EncryptionProvider {

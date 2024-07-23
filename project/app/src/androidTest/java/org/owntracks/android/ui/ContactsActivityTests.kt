@@ -13,12 +13,12 @@ import mqtt.packets.mqttv5.MQTT5Properties
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
+import org.owntracks.android.model.Parser
 import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageClear
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.MonitoringMode
-import org.owntracks.android.support.Parser
 import org.owntracks.android.testutils.OWNTRACKS_ICON_BASE64
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.TestWithAnMQTTBroker

@@ -6,10 +6,10 @@ import java.io.File
 import java.io.IOException
 import java.io.OutputStream
 import java.util.concurrent.LinkedBlockingDeque
+import org.owntracks.android.model.Parser
 import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.model.messages.MessageEncrypted
 import org.owntracks.android.model.messages.MessageUnknown
-import org.owntracks.android.support.Parser
 import timber.log.Timber
 
 class BlockingDequeThatAlsoSometimesPersistsThingsToDiskMaybe(

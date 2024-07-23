@@ -1,7 +1,7 @@
 package org.owntracks.android.model.messages
 
+import org.owntracks.android.model.Parser
 import org.owntracks.android.preferences.Preferences
-import org.owntracks.android.support.Parser
 
 class MessageClear : MessageBase(), MessageWithId {
   override var messageId: MessageId = ZeroMessageId

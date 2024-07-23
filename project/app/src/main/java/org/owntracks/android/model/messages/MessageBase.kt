@@ -8,9 +8,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import java.io.IOException
+import org.owntracks.android.model.Parser
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ConnectionMode
-import org.owntracks.android.support.Parser
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,

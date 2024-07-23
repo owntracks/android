@@ -49,6 +49,7 @@ import org.owntracks.android.data.EndpointState
 import org.owntracks.android.data.repos.EndpointStateRepo
 import org.owntracks.android.di.ApplicationScope
 import org.owntracks.android.di.CoroutineScopes
+import org.owntracks.android.model.Parser
 import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageClear
@@ -59,7 +60,6 @@ import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.services.worker.Scheduler
-import org.owntracks.android.support.Parser
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
 import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor
 import org.owntracks.android.test.SimpleIdlingResource

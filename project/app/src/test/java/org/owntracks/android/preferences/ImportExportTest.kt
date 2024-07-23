@@ -9,12 +9,12 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.owntracks.android.location.LocatorPriority
+import org.owntracks.android.model.Parser
 import org.owntracks.android.model.messages.MessageConfiguration
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.preferences.types.MqttProtocolLevel
 import org.owntracks.android.preferences.types.MqttQos
-import org.owntracks.android.support.Parser
 import org.owntracks.android.test.SimpleIdlingResource
 
 class ImportExportTest {

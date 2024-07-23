@@ -29,6 +29,7 @@ import org.owntracks.android.data.waypoints.WaypointsRepo
 import org.owntracks.android.di.ApplicationScope
 import org.owntracks.android.di.CoroutineScopes.IoDispatcher
 import org.owntracks.android.model.CommandAction
+import org.owntracks.android.model.Parser
 import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageClear
@@ -46,7 +47,6 @@ import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.Preferences.Companion.PREFERENCES_THAT_WIPE_QUEUE_AND_CONTACTS
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.services.worker.Scheduler
-import org.owntracks.android.support.Parser
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
 import org.owntracks.android.test.CountingIdlingResourceShim
 import org.owntracks.android.test.IdlingResourceWithData

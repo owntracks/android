@@ -15,10 +15,10 @@ import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.owntracks.android.data.waypoints.InMemoryWaypointsRepo
+import org.owntracks.android.model.Parser
 import org.owntracks.android.preferences.InMemoryPreferencesStore
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.PreferencesStore
-import org.owntracks.android.support.Parser
 import org.owntracks.android.test.SimpleIdlingResource
 
 @OptIn(ExperimentalCoroutinesApi::class)

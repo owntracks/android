@@ -1,4 +1,4 @@
-package org.owntracks.android.support
+package org.owntracks.android.model
 
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.core.JsonParseException
@@ -12,7 +12,6 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
-import com.fasterxml.jackson.datatype.jsr310.ser.InstantSerializer
 import java.io.IOException
 import java.io.InputStream
 import java.time.Instant

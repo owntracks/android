@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 2.5.1
+
+### Bug fixes
+
+- Re-added `tst` from Lwt MQTT message type that was accidentally dropped in 2.5.0 (#1766)
+
 ## Version 2.5.0
 
 ### Breaking changes

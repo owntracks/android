@@ -9,9 +9,9 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.owntracks.android.data.waypoints.WaypointsRepo
+import org.owntracks.android.model.Parser
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.MessageWaypointCollection
-import org.owntracks.android.support.Parser
 import timber.log.Timber
 
 @HiltViewModel

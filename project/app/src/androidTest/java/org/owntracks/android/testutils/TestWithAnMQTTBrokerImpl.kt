@@ -17,8 +17,8 @@ import mqtt.packets.mqtt.MQTTPublish
 import mqtt.packets.mqttv5.MQTT5Properties
 import org.eclipse.paho.client.mqttv3.internal.websocket.Base64
 import org.owntracks.android.R
+import org.owntracks.android.model.Parser
 import org.owntracks.android.model.messages.MessageBase
-import org.owntracks.android.support.Parser
 import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import timber.log.Timber

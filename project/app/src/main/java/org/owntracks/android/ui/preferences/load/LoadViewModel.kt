@@ -26,11 +26,11 @@ import org.apache.commons.codec.binary.Base64
 import org.apache.hc.core5.net.URIBuilder
 import org.owntracks.android.data.waypoints.WaypointsRepo
 import org.owntracks.android.di.CoroutineScopes
+import org.owntracks.android.model.Parser
+import org.owntracks.android.model.Parser.EncryptionException
 import org.owntracks.android.model.messages.MessageConfiguration
 import org.owntracks.android.model.messages.MessageWaypoints
 import org.owntracks.android.preferences.Preferences
-import org.owntracks.android.support.Parser
-import org.owntracks.android.support.Parser.EncryptionException
 import org.owntracks.android.test.SimpleIdlingResource
 import timber.log.Timber
 

@@ -17,10 +17,10 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
+import org.owntracks.android.model.Parser
 import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.model.messages.MessageTransition
-import org.owntracks.android.support.Parser
 import org.owntracks.android.testutils.GPSMockDeviceLocation
 import org.owntracks.android.testutils.MockDeviceLocation
 import org.owntracks.android.testutils.TestWithAnActivity

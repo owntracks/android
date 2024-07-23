@@ -24,6 +24,7 @@ import org.owntracks.android.data.EndpointState
 import org.owntracks.android.data.repos.EndpointStateRepo
 import org.owntracks.android.di.ApplicationScope
 import org.owntracks.android.di.CoroutineScopes
+import org.owntracks.android.model.Parser
 import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageLocation
@@ -33,7 +34,6 @@ import org.owntracks.android.net.OutgoingMessageSendingException
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.services.MessageProcessor
-import org.owntracks.android.support.Parser
 import org.owntracks.android.support.SocketFactory
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
 import timber.log.Timber

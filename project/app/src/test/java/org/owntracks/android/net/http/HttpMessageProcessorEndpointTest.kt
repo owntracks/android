@@ -15,13 +15,13 @@ import org.mockito.Mockito.`when`
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.owntracks.android.data.repos.EndpointStateRepo
+import org.owntracks.android.model.EncryptionProvider
+import org.owntracks.android.model.Parser
 import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageCmd
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.services.MessageProcessor
-import org.owntracks.android.support.EncryptionProvider
-import org.owntracks.android.support.Parser
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
 
 class HttpMessageProcessorEndpointTest {

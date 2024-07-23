@@ -20,6 +20,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.model.CommandAction
+import org.owntracks.android.model.Parser
 import org.owntracks.android.model.messages.MessageCmd
 import org.owntracks.android.model.messages.MessageConfiguration
 import org.owntracks.android.model.messages.MessageLocation
@@ -28,7 +29,6 @@ import org.owntracks.android.model.messages.MessageWaypoint
 import org.owntracks.android.model.messages.MessageWaypoints
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.MessageWaypointCollection
-import org.owntracks.android.support.Parser
 import org.owntracks.android.testutils.GPSMockDeviceLocation
 import org.owntracks.android.testutils.MockDeviceLocation
 import org.owntracks.android.testutils.TestWithAnActivity

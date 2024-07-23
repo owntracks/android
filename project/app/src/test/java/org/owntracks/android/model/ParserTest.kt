@@ -1,4 +1,4 @@
-package org.owntracks.android.support
+package org.owntracks.android.model
 
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -17,9 +17,7 @@ import org.mockito.Mockito.`when`
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.owntracks.android.location.geofencing.Geofence
-import org.owntracks.android.model.BatteryStatus
-import org.owntracks.android.model.CommandAction
-import org.owntracks.android.model.messages.Clock
+import org.owntracks.android.model.Parser.EncryptionException
 import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageClear
 import org.owntracks.android.model.messages.MessageCmd
@@ -32,7 +30,6 @@ import org.owntracks.android.model.messages.MessageWaypoint
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.preferences.types.MqttQos
-import org.owntracks.android.support.Parser.EncryptionException
 
 class ParserTest {
   private val testId = "dummyTestId"
@@ -818,9 +815,5 @@ class ParserTest {
     val parser = Parser(encryptionProvider)
     val parsed = parser.fromJson(msg) as MessageLocation
     assertEquals(Instant.parse("2024-02-27T12:30:52Z"), parsed.createdAt)
-  }
-
-  inner class FakeFixedClock : Clock {
-    override val time: Instant = Instant.ofEpochMilli(25123)
   }
 }
