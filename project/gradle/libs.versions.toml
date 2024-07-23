@@ -1,9 +1,10 @@
 [versions]
+activity-compose = "1.9.2"
 agp = "8.6.1"
 androidx-concurrent = "1.2.0"
 androidx-core = "1.13.1"
 androidx-core-testing = "2.2.0"
-androidx-fragment = "1.8.2"
+androidx-fragment = "1.8.3"
 androidx-preference = "1.2.1"
 androidx-room = "2.6.1"
 androidx-test-core-ktx = "1.6.1"
@@ -18,8 +19,9 @@ apache-httpcore = "5.3"
 barista = "4.3.0"
 bouncycastle = "1.78.1"
 commons-codec = "1.17.1"
+compose-compiler = "1.5.13"
 conscrypt = "2.5.3"
-desguar-jdk = "2.1.1"
+desguar-jdk = "2.1.2"
 flatbuffers = "23.5.26"
 google-material = "1.12.0"
 google-play-services-maps = "19.0.0"
@@ -30,12 +32,13 @@ jackson = "2.13.5"
 jaxb = "4.0.5"
 jaxb-api = "2.3.1"
 kmqtt = "0.4.6"
-kotlin = "1.9.25"
+kotlin = "1.9.23"
 kotlin-coroutines = "1.9.0"
 kotlin-datetime = "0.6.1"
-ksp = "1.9.25-1.0.20"
+ksp = "1.9.23-1.0.20"
 ktfmt = "0.20.1"
 libsodium = "2.0.2"
+lifecycle-viewmodel-compose = "2.8.6"
 lmdb-kt = "0.1.1"
 materialdrawer = "6.1.2"
 materialize = "1.2.1"
@@ -50,7 +53,8 @@ square-leakcanary = "2.14"
 square-tape2 = "2.0.0-beta1"
 timber = "5.0.1"
 triplet = "3.11.0"
-
+material-android = "1.7.2"
+ui-tooling-preview-android = "1.7.2"
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
@@ -64,6 +68,9 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 android-gradle-api = { module = "com.android.tools.build:gradle-api", version.ref = "agp" }
 
 # Kotlin
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
+androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle-viewmodel-compose" }
+androidx-material = { module = "androidx.compose.material:material" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlin-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlin-coroutines" }
 kotlin-coroutines-jdk8 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8", version.ref = "kotlin-coroutines" }
@@ -143,6 +150,8 @@ androidx-test-espresso-idling = { module = "androidx.test.espresso:espresso-idli
 # Build utils
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 desugar = { module = "com.android.tools:desugar_jdk_libs_nio", version.ref = "desguar-jdk" }
+androidx-material3-android = { group = "androidx.compose.material", name = "material-android", version.ref = "material-android" }
+androidx-ui-tooling-preview-android = { group = "androidx.compose.ui", name = "ui-tooling-preview-android", version.ref = "ui-tooling-preview-android" }
 
 [bundles]
 jackson = ["jackson-core", "jackson-databind", "jackson-module-kotlin", "jackson-datatype-jsr310"]

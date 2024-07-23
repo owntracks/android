@@ -1,25 +1,52 @@
 package org.owntracks.android.ui.preferences.load
 
+
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.ContentResolver
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.SystemBarStyle
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material.CircularProgressIndicator
+
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.test.espresso.IdlingResource
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import java.io.IOException
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiPreferencesLoadBinding
+import org.owntracks.android.ui.compose.AppTheme
+
 import timber.log.Timber
+import java.io.IOException
 
 @SuppressLint("GoogleAppIndexingApiWarning")
 @AndroidEntryPoint
@@ -28,25 +55,94 @@ class LoadActivity : AppCompatActivity() {
   private lateinit var binding: UiPreferencesLoadBinding
 
   override fun onCreate(savedInstanceState: Bundle?) {
+    enableEdgeToEdge(statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT))
     super.onCreate(savedInstanceState)
-    binding =
-        DataBindingUtil.setContentView<UiPreferencesLoadBinding?>(
-                this, R.layout.ui_preferences_load)
-            .apply {
-              vm = viewModel
-              lifecycleOwner = this@LoadActivity
-              setSupportActionBar(appbar.toolbar)
+    setContent {
+      LoadView(viewModel)
+    }
+  }
+
+
+  @Composable
+  fun WrapperWithBar(content: @Composable (paddingValues: PaddingValues) -> Unit) {
+    AppTheme {
+      Scaffold(
+          topBar = {
+            TopAppBar(
+                title = {
+                  Text(text = "OOF")
+                },
+            )
+          },
+          content = content,
+      )
+    }
+  }
+
+  @Composable
+  fun LoadView(vm: LoadViewModel) {
+    val importStatus = vm.configurationImportStatus.collectAsState().value
+    val displayedConfiguration = vm.displayedConfiguration.collectAsState().value
+    val importError = vm.importError.collectAsState()
+    WrapperWithBar { paddingValues ->
+      Box(
+          modifier = Modifier
+                  .fillMaxSize()
+                  .padding(paddingValues),
+      ) {
+        when (importStatus) {
+          ImportStatus.LOADING -> {
+            Box(
+                modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                        .visible(importStatus == ImportStatus.LOADING),
+            ) {
+              CircularProgressIndicator(
+                  modifier = Modifier.align(Center),
+              )
             }
-    viewModel.displayedConfiguration.observe(this) { invalidateOptionsMenu() }
-    viewModel.configurationImportStatus.observe(this) {
-      invalidateOptionsMenu()
-      Timber.d("ImportStatus is $it")
-      if (it == ImportStatus.SAVED) {
-        finish()
+          }
+
+          ImportStatus.SUCCESS -> {
+            Column(
+                modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .visible(importStatus == ImportStatus.SUCCESS)
+                        .padding(16.dp),
+            ) {
+              Text(
+                  text = displayedConfiguration,
+                  modifier = Modifier.fillMaxWidth(),
+              )
+            }
+          }
+
+          ImportStatus.FAILED -> {
+            Column(
+                modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                        .visible(importStatus == ImportStatus.FAILED)
+                        .padding(16.dp),
+            ) {
+              Text(
+                  text = stringResource(
+                      id = R.string.errorPreferencesImportFailed,
+                      importError,
+                  ),
+                  modifier = Modifier.fillMaxWidth(),
+
+                  )
+            }
+          }
+          else -> {}
+        }
       }
     }
-    handleIntent(intent)
   }
+
 
   override fun onNewIntent(intent: Intent) {
     super.onNewIntent(intent)
@@ -103,7 +199,8 @@ class LoadActivity : AppCompatActivity() {
         }
       } else {
         viewModel.configurationImportFailed(
-            Exception(getString(R.string.preferencesImportNoURIGiven)))
+            Exception(getString(R.string.preferencesImportNoURIGiven)),
+        )
       }
     } else {
       val pickerIntent = Intent(Intent.ACTION_GET_CONTENT)
@@ -111,7 +208,8 @@ class LoadActivity : AppCompatActivity() {
       pickerIntent.type = "*/*"
       try {
         filePickerResultLauncher.launch(
-            Intent.createChooser(pickerIntent, getString(R.string.loadActivitySelectAFile)))
+            Intent.createChooser(pickerIntent, getString(R.string.loadActivitySelectAFile)),
+        )
       } catch (ex: ActivityNotFoundException) {
         Snackbar.make(binding.root, R.string.loadActivityNoFileExplorerFound, Snackbar.LENGTH_SHORT)
             .show()
@@ -150,5 +248,14 @@ class LoadActivity : AppCompatActivity() {
 
   companion object {
     const val FLAG_IN_APP = "INAPP"
+  }
+}
+
+@Composable
+fun Modifier.visible(isVisible: Boolean): Modifier {
+  return if (isVisible) {
+    this
+  } else {
+    this.then(Modifier.size(0.dp))
   }
 }

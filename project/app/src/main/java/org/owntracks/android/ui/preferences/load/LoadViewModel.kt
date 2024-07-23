@@ -1,8 +1,6 @@
 package org.owntracks.android.ui.preferences.load
 
 import android.content.ContentResolver
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,6 +14,8 @@ import java.net.URL
 import java.nio.charset.StandardCharsets
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import okhttp3.Call
 import okhttp3.Callback
@@ -36,47 +36,51 @@ import timber.log.Timber
 
 @HiltViewModel
 class LoadViewModel
-@Inject
-constructor(
-    private val preferences: Preferences,
-    private val parser: Parser,
-    private val waypointsRepo: WaypointsRepo,
-    @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher
+@Inject constructor(
+  private val preferences: Preferences,
+  private val parser: Parser,
+  private val waypointsRepo: WaypointsRepo,
+  @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : ViewModel() {
   val saveConfigurationIdlingResource = SimpleIdlingResource("importStatus", true)
   private var configuration: MessageConfiguration? = null
 
-  private val mutableConfig = MutableLiveData("")
-  val displayedConfiguration: LiveData<String> = mutableConfig
+  private val mutableConfig = MutableStateFlow("")
+  val displayedConfiguration: StateFlow<String> = mutableConfig
 
-  private val mutableImportStatus = MutableLiveData(ImportStatus.LOADING)
-  val configurationImportStatus: LiveData<ImportStatus> = mutableImportStatus
+  private val mutableImportStatus = MutableStateFlow(ImportStatus.LOADING)
+  val configurationImportStatus: StateFlow<ImportStatus> = mutableImportStatus
 
-  private val mutableImportError = MutableLiveData<String>()
-  val importError: LiveData<String> = mutableImportError
+  private val mutableImportError = MutableStateFlow("")
+  val importError: StateFlow<String> = mutableImportError
 
   private fun setConfiguration(json: String) {
-    when (val message = parser.fromJson(json.toByteArray())) {
-      is MessageConfiguration -> {
-        configuration = message
-        try {
-          mutableConfig.postValue(parser.toUnencryptedJsonPretty(message))
-          mutableImportStatus.postValue(ImportStatus.SUCCESS)
-        } catch (e: IOException) {
-          configurationImportFailed(e)
+    viewModelScope.launch {
+      when (val message = parser.fromJson(json.toByteArray())) {
+        is MessageConfiguration -> {
+          configuration = message
+          try {
+            mutableConfig.emit(parser.toUnencryptedJsonPretty(message))
+            mutableImportStatus.emit(ImportStatus.SUCCESS)
+          } catch (e: IOException) {
+            configurationImportFailed(e)
+          }
         }
-      }
-      is MessageWaypoints -> {
-        configuration = MessageConfiguration().apply { message.waypoints?.run { waypoints = this } }
-        try {
-          mutableConfig.postValue(parser.toUnencryptedJsonPretty(message))
-          mutableImportStatus.postValue(ImportStatus.SUCCESS)
-        } catch (e: IOException) {
-          configurationImportFailed(e)
+
+        is MessageWaypoints -> {
+          configuration =
+              MessageConfiguration().apply { message.waypoints?.run { waypoints = this } }
+          try {
+            mutableConfig.emit(parser.toUnencryptedJsonPretty(message))
+            mutableImportStatus.emit(ImportStatus.SUCCESS)
+          } catch (e: IOException) {
+            configurationImportFailed(e)
+          }
         }
-      }
-      else -> {
-        throw IOException("Message is not a valid configuration message")
+
+        else -> {
+          throw IOException("Message is not a valid configuration message")
+        }
       }
     }
   }
@@ -84,7 +88,7 @@ constructor(
   fun saveConfiguration() {
     viewModelScope.launch(ioDispatcher) {
       saveConfigurationIdlingResource.setIdleState(false)
-      mutableImportStatus.postValue(ImportStatus.LOADING)
+      mutableImportStatus.emit(ImportStatus.LOADING)
       Timber.d("Saving configuration $configuration")
       configuration?.run {
         preferences.importConfiguration(this)
@@ -93,7 +97,7 @@ constructor(
         }
       }
       Timber.d("Setting ImportStatus to saved")
-      mutableImportStatus.postValue(ImportStatus.SAVED)
+      mutableImportStatus.emit(ImportStatus.SAVED)
       saveConfigurationIdlingResource.setIdleState(true)
     }
   }
@@ -115,13 +119,12 @@ constructor(
    * @param uriString a string containing maybe a URI
    */
   fun extractPreferencesFromUri(uriString: String) {
-    val uri =
-        try {
-          URI(uriString)
-        } catch (e: URISyntaxException) {
-          configurationImportFailed(e)
-          return
-        }
+    val uri = try {
+      URI(uriString)
+    } catch (e: URISyntaxException) {
+      configurationImportFailed(e)
+      return
+    }
     try {
       if (ContentResolver.SCHEME_FILE == uri.scheme) {
         // Note: left here to avoid breaking compatibility.  May be removed
@@ -154,38 +157,45 @@ constructor(
             val config: ByteArray = Base64.decodeBase64(configQueryParam[0].toByteArray())
             setConfiguration(String(config, StandardCharsets.UTF_8))
           }
+
           urlQueryParam.size == 1 -> {
             val remoteConfigUrl = URL(urlQueryParam[0])
             val client = OkHttpClient()
             val request: Request = Request.Builder().url(remoteConfigUrl).build()
-            client
-                .newCall(request)
-                .enqueue(
+            client.newCall(request).enqueue(
                     object : Callback {
-                      override fun onFailure(call: Call, e: IOException) {
-                        configurationImportFailed(
-                            Exception("Failure fetching config from remote URL", e))
-                      }
-
-                      @Throws(IOException::class)
-                      override fun onResponse(call: Call, response: Response) {
-                        try {
-                          response.body.use { responseBody ->
-                            if (!response.isSuccessful) {
-                              configurationImportFailed(
-                                  IOException(
-                                      String.format("Unexpected status code: %s", response)))
-                              return
-                            }
-                            setConfiguration(responseBody?.string() ?: "")
-                          }
-                        } catch (e: EncryptionException) {
-                          configurationImportFailed(e)
+                        override fun onFailure(call: Call, e: IOException) {
+                            configurationImportFailed(
+                                    Exception("Failure fetching config from remote URL", e),
+                            )
                         }
-                      }
-                    })
+
+                        @Throws(IOException::class)
+                        override fun onResponse(call: Call, response: Response) {
+                            try {
+                                response.body.use { responseBody ->
+                                    if (!response.isSuccessful) {
+                                        configurationImportFailed(
+                                                IOException(
+                                                        String.format(
+                                                                "Unexpected status code: %s",
+                                                                response
+                                                        ),
+                                                ),
+                                        )
+                                        return
+                                    }
+                                    setConfiguration(responseBody?.string() ?: "")
+                                }
+                            } catch (e: EncryptionException) {
+                                configurationImportFailed(e)
+                            }
+                        }
+                    },
+            )
             // This is async, so result handled on the callback
           }
+
           else -> {
             throw IOException("Invalid config URL")
           }
@@ -206,7 +216,9 @@ constructor(
 
   fun configurationImportFailed(e: Throwable) {
     Timber.e(e)
-    mutableImportError.postValue(e.message)
-    mutableImportStatus.postValue(ImportStatus.FAILED)
+    viewModelScope.launch {
+      mutableImportError.emit(e.message ?: e.toString())
+      mutableImportStatus.emit(ImportStatus.FAILED)
+    }
   }
 }

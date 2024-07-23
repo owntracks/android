@@ -19,7 +19,7 @@ val googleMapsAPIKey =
 
 val gmsImplementation: Configuration by configurations.creating
 
-val packageVersionCode: Int = System.getenv("VERSION_CODE")?.toInt() ?: 420503000
+val packageVersionCode: Int = System.getenv("VERSION_CODE")?.toInt() ?: 420500000
 val manuallySetVersion: Boolean = System.getenv("VERSION_CODE") != null
 
 android {
@@ -32,7 +32,7 @@ android {
     targetSdk = 34
 
     versionCode = packageVersionCode
-    versionName = "2.5.3"
+    versionName = "2.5.0"
 
     val localeCount = fileTree("src/main/res/").map {
       it.toPath()
@@ -108,6 +108,11 @@ android {
     buildConfig = true
     dataBinding = true
     viewBinding = true
+    compose = true
+  }
+
+  composeOptions {
+    kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
   }
 
   dataBinding {
@@ -171,10 +176,11 @@ android {
       }
     }
   }
-
   tasks.withType<Test> {
     testLogging {
       events(
+          TestLogEvent.STARTED,
+          TestLogEvent.PASSED,
           TestLogEvent.SKIPPED,
           TestLogEvent.FAILED,
           TestLogEvent.STANDARD_OUT,
@@ -249,23 +255,35 @@ tasks.withType<JavaCompile>().configureEach {
 }
 
 dependencies {
+  implementation(libs.androidx.ui.tooling.preview.android)
+
+  val composeBom = platform("androidx.compose:compose-bom:2024.09.02")
+  implementation(composeBom)
+  androidTestImplementation(composeBom)
+  implementation(libs.androidx.material3.android)
+  implementation(libs.androidx.activity.compose)
+
+  implementation(libs.androidx.lifecycle.viewmodel.compose)
+
   implementation(libs.bundles.kotlin)
   implementation(libs.bundles.androidx)
   implementation(libs.androidx.test.espresso.idling)
 
+
+
   implementation(libs.google.material)
 
-  // Explicit dependency on conscrypt to give up-to-date TLS support on all devices
+// Explicit dependency on conscrypt to give up-to-date TLS support on all devices
   implementation(libs.conscrypt)
 
-  // Mapping
+// Mapping
   implementation(libs.osmdroid)
 
-  // Connectivity
+// Connectivity
   implementation(libs.paho.mqttclient)
   implementation(libs.okhttp)
 
-  // Utility libraries
+// Utility libraries
   implementation(libs.bundles.hilt)
   implementation(libs.bundles.jackson)
   implementation(libs.square.tape2)
@@ -278,18 +296,18 @@ dependencies {
   implementation(libs.kotlin.datetime)
   implementation(libs.kotlin.serialization)
 
-  // The BC version shipped under com.android is half-broken. Weird certificate issues etc.
-  // To solve, we bring in our own version of BC
+// The BC version shipped under com.android is half-broken. Weird certificate issues etc.
+// To solve, we bring in our own version of BC
   implementation(libs.bouncycastle)
 
-  // Widget libraries
+// Widget libraries
   implementation(libs.widgets.materialdrawer) { artifact { type = "aar" } }
   implementation(libs.widgets.materialize) { artifact { type = "aar" } }
 
-  // These Java EE libs are no longer included in JDKs, so we include explicitly
+// These Java EE libs are no longer included in JDKs, so we include explicitly
   kapt(libs.bundles.jaxb.annotation.processors)
 
-  // Preprocessors
+// Preprocessors
   kapt(libs.bundles.kapt.hilt)
   ksp(libs.androidx.room.compiler)
 
