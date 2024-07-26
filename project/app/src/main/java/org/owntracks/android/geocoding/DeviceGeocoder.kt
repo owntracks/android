@@ -6,6 +6,7 @@ import java.math.BigDecimal
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.Locale
+import org.owntracks.android.location.LatLng
 import timber.log.Timber
 
 class DeviceGeocoder internal constructor(context: Context) : CachingGeocoder() {
@@ -13,9 +14,9 @@ class DeviceGeocoder internal constructor(context: Context) : CachingGeocoder() 
       android.location.Geocoder(context, Locale.getDefault())
   private var tripResetTimestamp: Instant = Instant.MIN
 
-  override suspend fun reverse(latitude: Double, longitude: Double): GeocodeResult {
+  override suspend fun reverse(latLng: LatLng): GeocodeResult {
     return if (geocoderAvailable()) {
-      super.reverse(latitude, longitude)
+      super.reverse(latLng)
     } else {
       tripResetTimestamp = Instant.now().plus(1, ChronoUnit.MINUTES)
       GeocodeResult.Fault.Unavailable(tripResetTimestamp)

@@ -284,7 +284,11 @@ constructor(
     contact.latLng?.run {
       val distanceBetween = FloatArray(2)
       Location.distanceBetween(
-          currentLocation.latitude, currentLocation.longitude, latitude, longitude, distanceBetween)
+          currentLocation.latitude,
+          currentLocation.longitude,
+          latitude.value,
+          longitude.value,
+          distanceBetween)
       mutableContactDistance.postValue(distanceBetween[0])
       mutableContactBearing.postValue(distanceBetween[1])
       mutableRelativeContactBearing.postValue(distanceBetween[1])
@@ -368,8 +372,8 @@ constructor(
                 Location.distanceBetween(
                     currentLocation.latitude,
                     currentLocation.longitude,
-                    contactLatLng.latitude,
-                    contactLatLng.longitude,
+                    contactLatLng.latitude.value,
+                    contactLatLng.longitude.value,
                     distanceBetween)
                 mutableRelativeContactBearing.postValue(distanceBetween[1] + azimuth.toFloat())
               }

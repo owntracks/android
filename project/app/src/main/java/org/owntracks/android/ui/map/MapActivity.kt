@@ -303,7 +303,7 @@ class MapActivity :
             Intent(
                 Intent.ACTION_VIEW,
                 Uri.parse(
-                    "google.navigation:q=${latitude.roundForDisplay()},${longitude.roundForDisplay()}"))
+                    "google.navigation:q=${latitude.value.roundForDisplay()},${longitude.value.roundForDisplay()}"))
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
       } catch (e: ActivityNotFoundException) {

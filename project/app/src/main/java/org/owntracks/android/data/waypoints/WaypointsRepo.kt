@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
+import org.owntracks.android.location.geofencing.Latitude
+import org.owntracks.android.location.geofencing.Longitude
 import org.owntracks.android.model.messages.MessageWaypoint
 import org.owntracks.android.support.MessageWaypointCollection
 import timber.log.Timber
@@ -86,8 +88,8 @@ abstract class WaypointsRepo protected constructor() {
     return WaypointModel(
         0,
         messageWaypoint.description ?: "",
-        messageWaypoint.latitude,
-        messageWaypoint.longitude,
+        Latitude(messageWaypoint.latitude),
+        Longitude(messageWaypoint.longitude),
         messageWaypoint.radius ?: 0,
         Instant.MIN,
         0,
@@ -97,8 +99,8 @@ abstract class WaypointsRepo protected constructor() {
   fun fromDaoObject(w: WaypointModel): MessageWaypoint {
     return MessageWaypoint().apply {
       description = w.description
-      latitude = w.geofenceLatitude
-      longitude = w.geofenceLongitude
+      latitude = w.geofenceLatitude.value
+      longitude = w.geofenceLongitude.value
       radius = w.geofenceRadius
       timestamp = w.tst.epochSecond
     }

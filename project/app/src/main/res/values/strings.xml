@@ -83,6 +83,8 @@ To allow this, please enable Location in the device settings."</string>
     <string name="IDLE">"Idle"</string>
     <string name="importConfig">"Import"</string>
     <string name="INITIAL">"Initializing"</string>
+    <string name="invalidLatitudeError">"Invalid latitude"</string>
+    <string name="invalidLongitudeError">"Invalid longitude"</string>
     <string name="latitude">"Latitude"</string>
     <string name="loadActivityNoFileExplorerFound">No file explorer app found</string>
     <string name="loadActivitySelectAFile">Select a file</string>

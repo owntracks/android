@@ -2,15 +2,15 @@ package org.owntracks.android.ui.waypoint
 
 import android.content.DialogInterface
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.text.format.DateUtils
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.addTextChangedListener
 import androidx.databinding.BindingAdapter
+import androidx.databinding.BindingConversion
 import androidx.databinding.DataBindingUtil
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
@@ -19,6 +19,8 @@ import java.text.DateFormat
 import java.time.Instant
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiWaypointBinding
+import org.owntracks.android.location.geofencing.Latitude
+import org.owntracks.android.location.geofencing.Longitude
 
 @AndroidEntryPoint
 class WaypointActivity : AppCompatActivity() {
@@ -37,22 +39,15 @@ class WaypointActivity : AppCompatActivity() {
           vm = viewModel
           lifecycleOwner = this@WaypointActivity
           setSupportActionBar(appbar.toolbar)
-          val textWatcher =
-              object : TextWatcher {
-                override fun beforeTextChanged(
-                    s: CharSequence,
-                    start: Int,
-                    count: Int,
-                    after: Int
-                ) {}
-
-                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-
-                override fun afterTextChanged(s: Editable) {
-                  setSaveButtonEnabledStatus()
-                }
-              }
-          textFields.forEach { it.addTextChangedListener(textWatcher) }
+          latitude.addTextChangedListener {
+            it.toString().toDoubleOrNull()
+                ?: run { latitude.error = getString(R.string.invalidLatitudeError) }
+          }
+          longitude.addTextChangedListener {
+            it.toString().toDoubleOrNull()
+                ?: run { longitude.error = getString(R.string.invalidLongitudeError) }
+          }
+          textFields.forEach { it.addTextChangedListener { setSaveButtonEnabledStatus() } }
         }
 
     supportActionBar?.run {
@@ -80,8 +75,8 @@ class WaypointActivity : AppCompatActivity() {
       R.id.save -> {
         viewModel.saveWaypoint(
             binding.description.text.toString(),
-            binding.latitude.text.toString().toDouble(),
-            binding.longitude.text.toString().toDouble(),
+            Latitude(binding.latitude.text.toString().toDouble()),
+            Longitude(binding.longitude.text.toString().toDouble()),
             binding.radius.text.toString().toIntOrNull() ?: 1)
         finish()
         true
@@ -114,7 +109,7 @@ class WaypointActivity : AppCompatActivity() {
 
   private fun setSaveButtonEnabledStatus() =
       saveButton?.run {
-        isEnabled = !textFields.map { it.text }.any { it.isNullOrBlank() }
+        isEnabled = !textFields.any { it.text.isNullOrBlank() || it.error != null }
         icon?.alpha = if (isEnabled) 255 else 130
       }
 
@@ -149,3 +144,15 @@ fun TextView.setRelativeTimeSpanString(epochSeconds: Long?) {
         DateFormat.getDateInstance(DateFormat.SHORT).format(instant.toEpochMilli())
       }
 }
+
+@BindingAdapter("android:text")
+fun TextInputEditText.setLatitude(latitude: Latitude) {
+  setText(latitude.value.toString())
+}
+
+@BindingAdapter("android:text")
+fun TextInputEditText.setLongitude(longitude: Longitude) {
+  setText(longitude.value.toString())
+}
+
+@BindingConversion fun fromStringToLatitude(value: String): Latitude = Latitude(value.toDouble())

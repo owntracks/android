@@ -10,25 +10,20 @@ import org.owntracks.android.location.geofencing.Longitude
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.model.messages.MessageTransition
 
-class LatLng(private val _latitude: Latitude, private val _longitude: Longitude) {
+class LatLng(val latitude: Latitude, val longitude: Longitude) {
   constructor(latitude: Double, longitude: Double) : this(Latitude(latitude), Longitude(longitude))
-
-  val latitude: Double
-    get() = _latitude.value
-
-  val longitude
-    get() = _longitude.value
 
   override fun toString(): String {
     return "LatLng $latitude, $longitude"
   }
 
-  fun toDisplayString(): String = "${latitude.roundForDisplay()}, ${longitude.roundForDisplay()}"
+  fun toDisplayString(): String =
+      "${latitude.value.roundForDisplay()}, ${longitude.value.roundForDisplay()}"
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other !is LatLng) return false
-    return this.latitude.equalsDelta(other.latitude) && other.longitude.equalsDelta(this.longitude)
+    return this.latitude == other.latitude && other.longitude == this.longitude
   }
 
   override fun hashCode(): Int {
@@ -39,7 +34,7 @@ class LatLng(private val _latitude: Latitude, private val _longitude: Longitude)
 }
 
 fun LatLng.toGeoPoint(): GeoPoint {
-  return GeoPoint(this.latitude, this.longitude)
+  return GeoPoint(this.latitude.value, this.longitude.value)
 }
 
 fun Double.equalsDelta(other: Double) = abs(this / other - 1) < 0.000001

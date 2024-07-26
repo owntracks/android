@@ -17,6 +17,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.owntracks.android.location.LatLng
 
 class TestOpenCageGeocoder {
 
@@ -59,7 +60,7 @@ class TestOpenCageGeocoder {
 
         val geocoder = OpenCageGeocoder("", httpClient)
 
-        val response = geocoder.reverse(0.0, 0.0)
+        val response = geocoder.reverse(LatLng(0.0, 0.0))
         assert(response is GeocodeResult.Formatted)
         assertEquals(
             "Friedrich-Ebert-Straße 7, 48153 Münster, Germany",
@@ -86,7 +87,7 @@ class TestOpenCageGeocoder {
 
     val geocoder = OpenCageGeocoder("", httpClient)
 
-    val response = geocoder.reverse(0.0, 0.0)
+    val response = geocoder.reverse(LatLng(0.0, 0.0))
     assert(response is GeocodeResult.Fault.Disabled)
   }
 
@@ -113,7 +114,7 @@ class TestOpenCageGeocoder {
 
         val geocoder = OpenCageGeocoder("", httpClient)
 
-        val response = geocoder.reverse(0.0, 0.0)
+        val response = geocoder.reverse(LatLng(0.0, 0.0))
         assert(response is GeocodeResult.Fault.IPAddressRejected)
       }
 
@@ -138,7 +139,7 @@ class TestOpenCageGeocoder {
 
         val geocoder = OpenCageGeocoder("", httpClient)
 
-        val response = geocoder.reverse(0.0, 0.0)
+        val response = geocoder.reverse(LatLng(0.0, 0.0))
         assert(response is GeocodeResult.Fault.RateLimited)
         assert((response as GeocodeResult.Fault.RateLimited).until > Instant.now())
         assert(response.until < Instant.now().plus(5, ChronoUnit.MINUTES))
@@ -165,7 +166,7 @@ class TestOpenCageGeocoder {
 
         val geocoder = OpenCageGeocoder("", httpClient)
 
-        val response = geocoder.reverse(0.0, 0.0)
+        val response = geocoder.reverse(LatLng(0.0, 0.0))
         assert(response is GeocodeResult.Fault.RateLimited)
         assertEquals(
             Instant.parse("2021-03-05T00:00:00Z"),

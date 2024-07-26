@@ -49,7 +49,7 @@ class WaypointsMigrationFromObjectboxTest(private val parameter: Parameter) {
 
   companion object {
     @JvmStatic
-    @Parameterized.Parameters(name = "{index}: {0} (dbname={1}, expected={2})")
+    @Parameterized.Parameters(name = "(dbname={1},expected={2})")
     fun data(): Iterable<Parameter> {
       return arrayListOf(
           Parameter("single-waypoint", 1),

@@ -11,6 +11,8 @@ import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.data.waypoints.WaypointModel
 import org.owntracks.android.data.waypoints.WaypointsRepo
 import org.owntracks.android.location.LatLng
+import org.owntracks.android.location.geofencing.Latitude
+import org.owntracks.android.location.geofencing.Longitude
 import timber.log.Timber
 
 @HiltViewModel
@@ -48,7 +50,7 @@ constructor(private val waypointsRepo: WaypointsRepo, locationRepo: LocationRepo
     return waypoint.value?.id?.run { this != 0L } ?: false
   }
 
-  fun saveWaypoint(description: String, latitude: Double, longitude: Double, radius: Int) {
+  fun saveWaypoint(description: String, latitude: Latitude, longitude: Longitude, radius: Int) {
     viewModelScope.launch {
       waypointsRepo.insert(
           (waypoint.value ?: WaypointModel()).apply {

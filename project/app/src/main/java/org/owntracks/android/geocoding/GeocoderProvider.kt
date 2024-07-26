@@ -64,7 +64,7 @@ constructor(
   private suspend fun geocoderResolve(latLng: LatLng): GeocodeResult {
     return withContext(ioDispatcher) {
       job?.run { join() }
-      return@withContext geocoder.reverse(latLng.latitude, latLng.longitude)
+      return@withContext geocoder.reverse(latLng)
     }
   }
 

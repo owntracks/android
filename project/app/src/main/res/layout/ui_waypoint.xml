@@ -57,7 +57,7 @@
                         android:id="@+id/latitude"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:digits="0123456789."
+                        android:digits="-0123456789."
                         android:inputType="numberDecimal|numberSigned"
                         android:text="@{vm.waypoint.geofenceLatitude}" />
 
@@ -74,7 +74,7 @@
                         android:id="@+id/longitude"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:digits="0123456789."
+                        android:digits="-0123456789."
                         android:enabled="true"
                         android:inputType="numberDecimal|numberSigned"
                         android:text="@{vm.waypoint.geofenceLongitude}" />

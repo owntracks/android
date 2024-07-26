@@ -22,7 +22,6 @@ import java.nio.ByteOrder
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -35,6 +34,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.owntracks.android.di.ApplicationScope
 import org.owntracks.android.di.CoroutineScopes
+import org.owntracks.android.location.geofencing.Latitude
+import org.owntracks.android.location.geofencing.Longitude
 import timber.log.Timber
 
 @Singleton
@@ -68,7 +69,8 @@ constructor(
   }
 
   @Database(entities = [WaypointModel::class], version = 1)
-  @TypeConverters(LocalDateTimeConverter::class)
+  @TypeConverters(
+      LocalDateTimeConverter::class, LatitudeTypeConverter::class, LongitudeTypeConverter::class)
   abstract class WaypointDatabase : RoomDatabase() {
     abstract fun waypointDao(): WaypointDao
   }
@@ -104,7 +106,6 @@ constructor(
   private val _migrationCompleteFlow = MutableStateFlow(false)
   override val migrationCompleteFlow: StateFlow<Boolean> = _migrationCompleteFlow
 
-  @OptIn(ExperimentalTime::class)
   fun migrateFromLegacyStorage(): Job {
     val handler = CoroutineExceptionHandler { _, exception ->
       Timber.e(exception, "Error migrating waypoints")
@@ -158,8 +159,8 @@ constructor(
             WaypointModel(
                 id,
                 description ?: "",
-                geofenceLatitude,
-                geofenceLongitude,
+                Latitude(geofenceLatitude),
+                Longitude(geofenceLongitude),
                 geofenceRadius,
                 if (lastTriggered == 0L) null else Instant.ofEpochSecond(lastTriggered),
                 lastTransition,
@@ -176,6 +177,18 @@ constructor(
     fun toInstant(epochSeconds: Long?): Instant? = epochSeconds?.run(Instant::ofEpochSecond)
 
     @TypeConverter fun toEpochSeconds(instant: Instant?): Long? = instant?.epochSecond
+  }
+
+  class LatitudeTypeConverter {
+    @TypeConverter fun toLatitude(value: Double): Latitude = Latitude(value)
+
+    @TypeConverter fun fromLatitude(latitude: Latitude): Double = latitude.value
+  }
+
+  class LongitudeTypeConverter {
+    @TypeConverter fun toLongitude(value: Double): Longitude = Longitude(value)
+
+    @TypeConverter fun fromLongitude(longitude: Longitude): Double = longitude.value
   }
 
   @Suppress("unused")

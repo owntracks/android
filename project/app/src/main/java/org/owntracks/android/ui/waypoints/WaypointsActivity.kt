@@ -18,7 +18,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import javax.inject.Named
 import kotlin.time.ComparableTimeMark
-import kotlin.time.ExperimentalTime
 import kotlin.time.TimeSource
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -38,7 +37,6 @@ import org.owntracks.android.ui.preferences.load.LoadActivity
 import org.owntracks.android.ui.waypoint.WaypointActivity
 import timber.log.Timber
 
-@OptIn(ExperimentalTime::class)
 @AndroidEntryPoint
 class WaypointsActivity :
     AppCompatActivity(),

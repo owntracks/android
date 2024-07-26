@@ -6,13 +6,15 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.time.Instant
 import org.owntracks.android.location.geofencing.Geofence
+import org.owntracks.android.location.geofencing.Latitude
+import org.owntracks.android.location.geofencing.Longitude
 
 @Entity(indices = [Index(value = ["tst"], unique = true)])
 data class WaypointModel(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     var description: String = "",
-    var geofenceLatitude: Double = 0.0,
-    var geofenceLongitude: Double = 0.0,
+    var geofenceLatitude: Latitude = Latitude(0.0),
+    var geofenceLongitude: Longitude = Longitude(0.0),
     var geofenceRadius: Int = 0,
     var lastTriggered: Instant? = null,
     var lastTransition: Int = 0,
@@ -20,8 +22,8 @@ data class WaypointModel(
 ) {
   fun getLocation(): Location =
       Location("waypoint").apply {
-        latitude = geofenceLatitude
-        longitude = geofenceLongitude
+        latitude = geofenceLatitude.value
+        longitude = geofenceLongitude.value
         accuracy = geofenceRadius.toFloat()
       }
 

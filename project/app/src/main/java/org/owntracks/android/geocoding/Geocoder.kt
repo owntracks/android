@@ -1,5 +1,7 @@
 package org.owntracks.android.geocoding
 
+import org.owntracks.android.location.LatLng
+
 internal interface Geocoder {
-  suspend fun reverse(latitude: Double, longitude: Double): GeocodeResult
+  suspend fun reverse(latLng: LatLng): GeocodeResult
 }

@@ -40,8 +40,8 @@ class TestLatLng {
     val lat = 110.0
     val long = 370.0
     val latLng = LatLng(lat, long)
-    assertEquals(70.0, latLng.latitude, 0.0)
-    assertEquals(10.0, latLng.longitude, 0.0)
+    assertEquals(70.0, latLng.latitude.value, 0.0)
+    assertEquals(10.0, latLng.longitude.value, 0.0)
   }
 
   @Test
@@ -49,8 +49,8 @@ class TestLatLng {
     val lat = 200.0
     val long = 330.0
     val latLng = LatLng(lat, long)
-    assertEquals(-20.0, latLng.latitude, 0.0)
-    assertEquals(-30.0, latLng.longitude, 0.0)
+    assertEquals(-20.0, latLng.latitude.value, 0.0)
+    assertEquals(-30.0, latLng.longitude.value, 0.0)
   }
 
   @Test
@@ -58,8 +58,8 @@ class TestLatLng {
     val lat = 271.0
     val long = 330.0
     val latLng = LatLng(lat, long)
-    assertEquals(-89.0, latLng.latitude, 0.0)
-    assertEquals(-30.0, latLng.longitude, 0.0)
+    assertEquals(-89.0, latLng.latitude.value, 0.0)
+    assertEquals(-30.0, latLng.longitude.value, 0.0)
   }
 
   @Test
@@ -67,7 +67,7 @@ class TestLatLng {
     val lat = 375.0
     val long = 370.0
     val latLng = LatLng(lat, long)
-    assertEquals(15.0, latLng.latitude, 0.0)
-    assertEquals(10.0, latLng.longitude, 0.0)
+    assertEquals(15.0, latLng.latitude.value, 0.0)
+    assertEquals(10.0, latLng.longitude.value, 0.0)
   }
 }

@@ -232,8 +232,8 @@ constructor(
                       waypointsRepo.all.map {
                         MessageWaypoint().apply {
                           description = it.description
-                          latitude = it.geofenceLatitude
-                          longitude = it.geofenceLongitude
+                          latitude = it.geofenceLatitude.value
+                          longitude = it.geofenceLongitude.value
                           radius = it.geofenceRadius
                           timestamp = it.tst.epochSecond
                         }
