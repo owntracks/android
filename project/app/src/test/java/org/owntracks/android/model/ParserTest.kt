@@ -187,6 +187,70 @@ class ParserTest {
   }
 
   @Test
+  fun `a location message with a timer trigger can be parsed`() {
+    `when`(encryptionProvider.isPayloadEncryptionEnabled).thenReturn(false)
+    val parser = Parser(encryptionProvider)
+    val input =
+        """
+      {
+        "_type": "location",
+        "acc": 5,
+        "alt": 84,
+        "batt": 34,
+        "bs": 1,
+        "cog": 277,
+        "conn": "m",
+        "lat": -25.762245,
+        "lon": 126.074502,
+        "m": 2,
+        "p": 100.477,
+        "tid": "AA",
+        "t": "t",
+        "tst": 1721896446,
+        "vac": 3,
+        "vel": 79
+      }
+    """
+            .trimIndent()
+    val messageBase = parser.fromJson(input)
+    assertEquals(MessageLocation::class.java, messageBase.javaClass)
+    val message = messageBase as MessageLocation
+    assertEquals(MessageLocation.ReportType.TIMER, message.trigger)
+  }
+
+  @Test
+  fun `a location message with a beacon trigger can be parsed`() {
+    `when`(encryptionProvider.isPayloadEncryptionEnabled).thenReturn(false)
+    val parser = Parser(encryptionProvider)
+    val input =
+        """
+      {
+        "_type": "location",
+        "acc": 5,
+        "alt": 84,
+        "batt": 34,
+        "bs": 1,
+        "cog": 277,
+        "conn": "m",
+        "lat": -25.762245,
+        "lon": 126.074502,
+        "m": 2,
+        "p": 100.477,
+        "tid": "AA",
+        "t": "b",
+        "tst": 1721896446,
+        "vac": 3,
+        "vel": 79
+      }
+    """
+            .trimIndent()
+    val messageBase = parser.fromJson(input)
+    assertEquals(MessageLocation::class.java, messageBase.javaClass)
+    val message = messageBase as MessageLocation
+    assertEquals(MessageLocation.ReportType.BEACON, message.trigger)
+  }
+
+  @Test
   fun `Parser can serialize a location message`() {
     `when`(encryptionProvider.isPayloadEncryptionEnabled).thenReturn(false)
     val parser = Parser(encryptionProvider)
