@@ -5,6 +5,8 @@
 ### Bug fixes
 
 - Re-added `tst` from Lwt MQTT message type that was accidentally dropped in 2.5.0 (#1766)
+- Fixed bug where locations with either "timer" ("t") or "beacon" ("b") type weren't processed by the app (#1768)
+- Fixed bug where negative latitudes and longitudes couldn't be entered into the waypoints activity (#1765)
 
 ## Version 2.5.0
 
