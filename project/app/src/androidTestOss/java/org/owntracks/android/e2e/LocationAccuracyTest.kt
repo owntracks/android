@@ -10,9 +10,9 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.owntracks.android.model.Parser
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.preferences.Preferences
-import org.owntracks.android.support.Parser
 import org.owntracks.android.testutils.GPSMockDeviceLocation
 import org.owntracks.android.testutils.MockDeviceLocation
 import org.owntracks.android.testutils.TestWithAnActivity
