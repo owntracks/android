@@ -31,6 +31,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
 import androidx.test.runner.lifecycle.Stage
+import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickDialogNegativeButton
 import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickDialogPositiveButton
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions
@@ -198,12 +199,17 @@ fun enableDeviceLocation() {
   }
 }
 
+fun grantNotificationAndForegroundPermissions() {
+  PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.POST_NOTIFICATIONS)
+  PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+  PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.POST_NOTIFICATIONS)
+  PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+}
+
 /** Who knows what order these will appear in. */
 fun grantMapActivityPermissions() {
-  PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.POST_NOTIFICATIONS)
-  PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
-  PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.POST_NOTIFICATIONS)
-  PermissionGranter.allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+  grantNotificationAndForegroundPermissions()
+  clickDialogNegativeButton()
 }
 
 /**

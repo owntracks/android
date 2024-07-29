@@ -14,7 +14,6 @@ import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.hamcrest.Matchers.not
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -25,7 +24,7 @@ import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.TestWithAnMQTTBroker
 import org.owntracks.android.testutils.TestWithAnMQTTBrokerImpl
 import org.owntracks.android.testutils.getText
-import org.owntracks.android.testutils.grantMapActivityPermissions
+import org.owntracks.android.testutils.grantNotificationAndForegroundPermissions
 import org.owntracks.android.ui.waypoints.WaypointsActivity
 
 @OptIn(ExperimentalUnsignedTypes::class)
@@ -36,7 +35,7 @@ class WaypointsActivityTests :
     TestWithAnMQTTBroker by TestWithAnMQTTBrokerImpl() {
   @Before
   fun grantPermissions() {
-    grantMapActivityPermissions()
+    grantNotificationAndForegroundPermissions()
   }
 
   @Test

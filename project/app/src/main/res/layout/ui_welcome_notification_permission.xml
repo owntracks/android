@@ -59,7 +59,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:text="@string/welcome_permission_request" />
+            android:text="@string/welcome_notification_permission_request" />
 
     </RelativeLayout>
 </layout>

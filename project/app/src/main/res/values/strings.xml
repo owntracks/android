@@ -14,6 +14,8 @@
     <string name="addWaypoint">"Add waypoint"</string>
     <string name="aLocation">"a region"</string>
     <string name="app_name">"OwnTracks"</string>
+    <string name="backgroundLocationPermissionRequestDialogText">"If you'd like OwnTracks to collect location data even when it's running in the background, an additional permission is needed to allow OwnTracks to receive locations \"all the time\"."</string>
+    <string name="backgroundLocationPermissionRequestDialogTitle">"Background Location Permission"</string>
     <string name="backgroundLocationRestrictionNotificationText">"This version of Android restricts OwnTracks from receiving locations when started in the background until the app is opened. Click this notification to open the app and start tracking location."</string>
     <string name="backgroundLocationRestrictionNotificationTitle">"Location Tracking Paused"</string>
     <string name="batteryOptimizationWhitelistDialogButtonLabel">"Battery optimization settings"</string>
@@ -294,7 +296,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="statusLocationPermissionsFineBackground">"Precise (available in background)"</string>
     <string name="statusLocationPermissionsUnknown">"Unknown"</string>
     <string name="statusLocationPermissionsPromptTitle">"Background location"</string>
-    <string name="statusLocationPermissionsPromptText">"If you want to automatically track locations on device restart, you can enable background location permissions by granting OwnTracks access to your location \"all the time\"".</string>
+    <string name="statusLocationPermissionsPromptText">"If you want to automatically track locations in the background, you can enable background location permissions by granting OwnTracks access to your location \"all the time\"".</string>
     <string name="statusLocationPermissionsPromptPositiveButton">"Application Settings"</string>
     <string name="statusLocationPermissionsPromptNegativeButton">"Cancel"</string>
     <string name="title_activity_about">"About"</string>
@@ -329,19 +331,21 @@ For more details, take a look at the OwnTracks Booklet."</string>
     <string name="welcome_finish_open_preferences_button_label">"Open Preferences"</string>
 
     <string name="welcome_heading">"Welcome"</string>
+    <string name="welcome_background_location_permission_request">"Request Background Permission"</string>
     <string name="welcome_location_permission_title">"Location permissions"</string>
     <string name="welcome_location_permission_description">"In order to receive your current location to send to your OwnTracks endpoint, OwnTracks needs your permission in order to access your device's location.
 
-You can review this permission and request additional (background) location permissions from the Status page.
+You can review this permission from the Status page.
 
 Background location permission may improve the frequency and reliability of location data, depending on your device and configuration."</string>
     <string name="welcome_location_permission_granted">"Location permissions granted"</string>
+    <string name="welcome_location_permission_request">"Request Permission"</string>
     <string name="welcome_notification_permission_title">"Notification permissions"</string>
     <string name="welcome_notification_permission_description">"To function fully, OwnTracks needs your permission in order to display some notifications.
 
 A permanent notification will be displayed in order to keep the location tracking and connection alive, and you can also choose to enable notifications for contacts transitioning between waypoints."</string>
     <string name="welcome_notification_permission_granted">"Notification permissions granted"</string>
-    <string name="welcome_permission_request">"Request"</string>
+    <string name="welcome_notification_permission_request">"Request Permission"</string>
     <string name="welcome_play_description">"OwnTracks requires Google Play Services"</string>
     <string name="welcome_play_heading">"Google Play Services"</string>
     <string name="waypointMigrationErrorNotificationTitle">"Error migrating waypoints"</string>

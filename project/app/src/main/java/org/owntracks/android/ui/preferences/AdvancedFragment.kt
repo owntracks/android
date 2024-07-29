@@ -1,12 +1,8 @@
 package org.owntracks.android.ui.preferences
 
-import android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
-import android.app.ProgressDialog.show
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.widget.TextView
-import androidx.core.content.PermissionChecker
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
@@ -16,10 +12,13 @@ import javax.inject.Inject
 import org.owntracks.android.R
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ReverseGeocodeProvider
+import org.owntracks.android.support.RequirementsChecker
 
 @AndroidEntryPoint
 class AdvancedFragment @Inject constructor() :
     AbstractPreferenceFragment(), Preferences.OnPreferenceChangeListener {
+  @Inject lateinit var requirementsChecker: RequirementsChecker
+
   override fun onAttach(context: Context) {
     super.onAttach(context)
     preferences.registerOnPreferenceChangedListener(this)
@@ -58,9 +57,7 @@ class AdvancedFragment @Inject constructor() :
         remoteCommandAndConfigurationChangeListener
 
     findPreference<Preference>("autostartWarning")?.isVisible =
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
-            PermissionChecker.checkSelfPermission(requireActivity(), ACCESS_BACKGROUND_LOCATION) ==
-                PermissionChecker.PERMISSION_DENIED
+        !requirementsChecker.hasBackgroundLocationPermission()
 
     findPreference<ListPreference>(Preferences::reverseGeocodeProvider.name)
         ?.onPreferenceChangeListener =

@@ -298,6 +298,9 @@ constructor(
   var userDeclinedEnableLocationPermissions: Boolean by preferencesStore
 
   @Preference(exportModeMqtt = false, exportModeHttp = false)
+  var userDeclinedEnableBackgroundLocationPermissions: Boolean by preferencesStore
+
+  @Preference(exportModeMqtt = false, exportModeHttp = false)
   var userDeclinedEnableLocationServices: Boolean by preferencesStore
 
   @Preference(exportModeMqtt = false, exportModeHttp = false)

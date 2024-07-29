@@ -320,7 +320,7 @@ For more details, take a look at the OwnTracks Booklet."</string>
     <!-- Fuzzy -->
     <string name="welcome_location_permission_description">"In order to receive your current location to send to your OwnTracks endpoint, OwnTracks needs your permission in order to access your device's location.
 
-You can review this permission and request additional (background) location permissions from the Status page.
+You can review this permission and request additional (background) location permissions from the Map or Status page.
 
 Background location permission may improve the frequency and reliability of location data, depending on your device and configuration."</string>
     <string name="welcome_location_permission_granted">"Location permissions granted"</string>

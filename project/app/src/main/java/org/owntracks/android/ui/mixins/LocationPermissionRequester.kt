@@ -19,7 +19,7 @@ class LocationPermissionRequester(
   private val permissionRequest =
       caller.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
           permissions ->
-        Timber.d("Notification permission callback, result=$permissions ")
+        Timber.d("Location permission callback, result=$permissions ")
         when {
           permissions[ACCESS_COARSE_LOCATION] ?: false ||
               permissions[ACCESS_FINE_LOCATION] ?: false -> {

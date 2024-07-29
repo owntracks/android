@@ -73,6 +73,7 @@ interface DefaultsProvider {
           StringMaxTwoAlphaNumericChars(preferences.deviceId.takeLast(2).ifEmpty { "na" })
       Preferences::url -> ""
       Preferences::userDeclinedEnableLocationPermissions -> false
+      Preferences::userDeclinedEnableBackgroundLocationPermissions -> false
       Preferences::userDeclinedEnableLocationServices -> false
       Preferences::userDeclinedEnableNotificationPermissions -> false
       Preferences::username -> ""

@@ -59,7 +59,16 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:text="@string/welcome_permission_request" />
+            android:text="@string/welcome_location_permission_request" />
+        <Button
+            android:id="@+id/ui_fragment_welcome_location_background_permissions_request"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:text="@string/welcome_background_location_permission_request" />
 
     </RelativeLayout>
 </layout>

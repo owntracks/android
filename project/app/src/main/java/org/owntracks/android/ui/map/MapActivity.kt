@@ -11,6 +11,7 @@ import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.hardware.SensorManager.SENSOR_DELAY_UI
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.provider.Settings
@@ -61,6 +62,7 @@ import org.owntracks.android.support.RequirementsChecker
 import org.owntracks.android.test.CountingIdlingResourceShim
 import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.ui.NotificationsStash
+import org.owntracks.android.ui.mixins.BackgroundLocationPermissionRequester
 import org.owntracks.android.ui.mixins.LocationPermissionRequester
 import org.owntracks.android.ui.mixins.NotificationPermissionRequester
 import org.owntracks.android.ui.mixins.ServiceStarter
@@ -81,6 +83,9 @@ class MapActivity :
           this, ::notificationPermissionGranted, ::notificationPermissionDenied)
   private val locationPermissionRequester =
       LocationPermissionRequester(this, ::locationPermissionGranted, ::locationPermissionDenied)
+  private val backgroundLocationPermissionRequester =
+      BackgroundLocationPermissionRequester(
+          this, ::backgroundLocationPermissionGranted, ::backgroundLocationPermissionDenied)
   private var service: BackgroundService? = null
   private var bottomSheetBehavior: BottomSheetBehavior<LinearLayoutCompat>? = null
   private var menu: Menu? = null
@@ -392,7 +397,7 @@ class MapActivity :
   }
 
   /**
-   * User has declined notification permissions. Log this in the preferences so we don't keep askin
+   * User has declined notification permissions. Log this in the preferences so we don't keep asking
    * them
    */
   private fun notificationPermissionDenied() {
@@ -435,6 +440,24 @@ class MapActivity :
               })
         }
         .show()
+  }
+
+  /**
+   * User has declined to enable background location permissions. Log this in the preferences so we
+   * don't keep asking
+   */
+  private fun backgroundLocationPermissionGranted() {
+    Timber.d("Background location permission granted")
+    preferences.userDeclinedEnableBackgroundLocationPermissions = false
+  }
+
+  /**
+   * User has declined to enable background location permissions. Log this in the preferences so we
+   * don't keep asking
+   */
+  private fun backgroundLocationPermissionDenied() {
+    Timber.d("Background location permission denied")
+    preferences.userDeclinedEnableBackgroundLocationPermissions = true
   }
 
   enum class CheckPermissionsResult {
@@ -521,9 +544,11 @@ class MapActivity :
     updateMonitoringModeMenu()
     viewModel.updateMyLocationStatus()
 
+    // Request Notification permissions
     when (checkAndRequestNotificationPermissions()) {
       CheckPermissionsResult.HAS_PERMISSIONS,
       CheckPermissionsResult.NO_PERMISSIONS_NOT_LAUNCHED_REQUEST -> {
+        // Request Location permissions
         when (checkAndRequestLocationPermissions(false)) {
           CheckPermissionsResult.NO_PERMISSIONS_LAUNCHED_REQUEST -> {
             Timber.d("Launched location permission request")
@@ -535,6 +560,12 @@ class MapActivity :
             Timber.d("Has location permissions")
             if (checkAndRequestLocationServicesEnabled(false)) {
               viewModel.requestLocationUpdatesForBlueDot()
+              // Request background location permissions if needed
+              if (!requirementsChecker.hasBackgroundLocationPermission() &&
+                  Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
+                  !preferences.userDeclinedEnableBackgroundLocationPermissions) {
+                backgroundLocationPermissionRequester.requestLocationPermissions(this) { true }
+              }
             }
           }
         }

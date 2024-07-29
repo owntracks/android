@@ -79,6 +79,7 @@ import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.preferences.types.MonitoringMode.Companion.getByValue
 import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.DateFormatter.formatDate
+import org.owntracks.android.support.RequirementsChecker
 import org.owntracks.android.support.RunThingsOnOtherThreads
 import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.ui.map.MapActivity
@@ -113,6 +114,8 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
   @Inject lateinit var geofencingClient: GeofencingClient
 
   @Inject lateinit var locationProviderClient: LocationProviderClient
+
+  @Inject lateinit var requirementsChecker: RequirementsChecker
 
   @Inject
   @Named("contactsClearedIdlingResource")
@@ -296,13 +299,8 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
         INTENT_ACTION_BOOT_COMPLETED,
         INTENT_ACTION_PACKAGE_REPLACED -> {
           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val backgroundLocationPermissionDenied =
-                ActivityCompat.checkSelfPermission(
-                    this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) ==
-                    PackageManager.PERMISSION_DENIED
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
-                !hasBeenStartedExplicitly &&
-                backgroundLocationPermissionDenied) {
+            if (!requirementsChecker.hasBackgroundLocationPermission() &&
+                !hasBeenStartedExplicitly) {
               notifyUserOfBackgroundLocationRestriction()
             }
           }

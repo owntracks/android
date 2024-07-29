@@ -2,6 +2,10 @@
 
 ## Version 2.5.1
 
+### New features
+
+- The background location permission is explicitly asked for in the welcome activity. It's also prompted if missing (but foreground location permissions are present) in the map activity, to catch people upgrading from <2.5.0.
+
 ### Bug fixes
 
 - Re-added `tst` from Lwt MQTT message type that was accidentally dropped in 2.5.0 (#1766)
