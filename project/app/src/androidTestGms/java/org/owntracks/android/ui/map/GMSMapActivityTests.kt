@@ -72,7 +72,7 @@ class GMSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
   }
 
   @Test
-  fun welcomeActivityShouldNotRunWhenFirstStartPreferencesSet() {
+  fun welcomeActivityWhenFirstStartPreferencesSetShouldNotRun() {
     setNotFirstStartPreferences()
     launchActivity()
     grantMapActivityPermissions()
@@ -80,7 +80,7 @@ class GMSMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.j
   }
 
   @Test
-  fun mapActivityShouldPromptForLocationServicesOnFirstTime() {
+  fun mapActivityWhenRunForFirstTimePromptsForLocationServices() {
     try {
       disableDeviceLocation()
       setNotFirstStartPreferences()

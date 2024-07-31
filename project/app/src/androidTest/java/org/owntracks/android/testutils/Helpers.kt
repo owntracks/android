@@ -45,6 +45,7 @@ import junit.framework.AssertionFailedError
 import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.datetime.Clock
 import org.hamcrest.Matcher
 import org.owntracks.android.R
 import org.owntracks.android.preferences.Preferences
@@ -209,7 +210,11 @@ fun grantNotificationAndForegroundPermissions() {
 /** Who knows what order these will appear in. */
 fun grantMapActivityPermissions() {
   grantNotificationAndForegroundPermissions()
-  clickDialogNegativeButton()
+  // Wait for the dialog to appear
+  if (Build.VERSION.SDK_INT >= 29) {
+    waitUntilVisible(onView(withId(android.R.id.button2)))
+    clickDialogNegativeButton()
+  }
 }
 
 /**
@@ -316,4 +321,27 @@ fun getText(matcher: ViewInteraction): String {
       })
 
   return text
+}
+
+fun waitUntilVisible(matcher: ViewInteraction, timeout: Duration = 1.seconds) {
+  matcher.perform(
+      object : ViewAction {
+        override fun getConstraints(): Matcher<View> {
+          return ViewMatchers.isAssignableFrom(TextView::class.java)
+        }
+
+        override fun getDescription(): String {
+          return "Wait until this is visible"
+        }
+
+        override fun perform(uiController: UiController, view: View) {
+          val endTime = Clock.System.now().plus(timeout)
+          do {
+            if (view.visibility == View.VISIBLE) {
+              return
+            }
+            uiController.loopMainThreadUntilIdle()
+          } while (Clock.System.now() < endTime)
+        }
+      })
 }

@@ -37,7 +37,7 @@ class BackgroundLocationPermissionRequester(
       // The user may have denied us once already, so show a rationale
       Timber.d("Showing Background Location permission rationale")
       MaterialAlertDialogBuilder(context)
-          .setCancelable(true)
+          .setCancelable(false)
           .setIcon(R.drawable.baseline_share_location_24)
           .setTitle(R.string.backgroundLocationPermissionRequestDialogTitle)
           .setMessage(R.string.backgroundLocationPermissionRequestDialogText)
