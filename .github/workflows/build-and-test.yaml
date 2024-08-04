@@ -24,7 +24,7 @@ jobs:
           java-version: "17"
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
       - name: Gradle setup
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           cache-read-only: ${{ github.ref != format('refs/heads/{0}', github.event.repository.default_branch) }}
           cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
@@ -70,7 +70,7 @@ jobs:
 
       - name: Gradle setup
         if: steps.guard.outputs.run_build == 'true'
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           dependency-graph: generate-and-submit
           cache-read-only: ${{ github.ref != format('refs/heads/{0}', github.event.repository.default_branch) }}
@@ -201,7 +201,7 @@ jobs:
           java-version: "17"
 
       - name: Gradle setup
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         if: steps.run-espresso-guard.outputs.run-espresso == 'true'
         with:
           dependency-graph: generate
@@ -340,7 +340,7 @@ jobs:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
       - name: Setup gradle
         if: steps.changes.outputs.src == 'true' || github.event_name == 'workflow_dispatch'
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
         with:
           build-root-directory: project
           cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
