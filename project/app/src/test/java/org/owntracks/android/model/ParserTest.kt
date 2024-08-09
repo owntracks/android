@@ -40,6 +40,7 @@ class ParserTest {
         latitude = 50.1
         longitude = 60.2
         timestamp = 123456789
+        bearing = 56
         velocity = 5.6.toInt()
         verticalAccuracy = 1.7.toInt()
         messageId = testId
@@ -59,6 +60,7 @@ class ParserTest {
         messageId = testId
         longitude = 60.2
         timestamp = 123456789
+        bearing = 56
         velocity = 5.6.toInt()
         verticalAccuracy = 1.7.toInt()
         inregions = listOf("Testregion1", "Testregion2")
@@ -98,6 +100,7 @@ class ParserTest {
               "alt" : 20,
               "batt" : 30,
               "bs" : 2,
+              "cog" : 56,
               "conn" : "TestConn",
               "created_at" : 25,
               "inregions" : [ "Testregion1", "Testregion2" ],
@@ -124,6 +127,7 @@ class ParserTest {
               "_id" : "dummyTestId",
               "acc" : 10,
               "alt" : 20,
+              "cog" : 56,
               "created_at" : 25,
               "inregions" : [ "Testregion1", "Testregion2" ],
               "lat" : 50.1,
@@ -153,6 +157,7 @@ class ParserTest {
                 "alt": 0.0,
                 "batt": 99,
                 "bs": 3,
+                "cog" : 56,
                 "conn": "w",
                 "_id" : "inputTestId",
                 "lat": 52.3153748,
@@ -180,6 +185,7 @@ class ParserTest {
     assertEquals("w", message.conn)
     assertEquals(52.3153748, message.latitude, 0.0)
     assertEquals(5.0408462, message.longitude, 0.0)
+    assertEquals(56, message.bearing)
     assertEquals(MessageLocation.ReportType.PING, message.trigger)
     assertEquals(0f, message.verticalAccuracy.toFloat(), 0f)
     assertEquals(2, message.inregions?.size)
@@ -265,6 +271,7 @@ class ParserTest {
     assertEquals(20, jsonNode.get("alt").asInt())
     assertEquals(30, jsonNode.get("batt").asInt())
     assertEquals(2, jsonNode.get("bs").asInt())
+    assertEquals(56, jsonNode.get("cog").asInt())
     assertEquals("TestConn", jsonNode.get("conn").asText())
     assertEquals(25, jsonNode.get("created_at").asInt())
     assertTrue(jsonNode.get("inregions").isArray)
@@ -296,6 +303,7 @@ class ParserTest {
     assertEquals(20, jsonNode.get("alt").asInt())
     assertEquals(30, jsonNode.get("batt").asInt())
     assertEquals(2, jsonNode.get("bs").asInt())
+    assertEquals(56, jsonNode.get("cog").asInt())
     assertEquals("TestConn", jsonNode.get("conn").asText())
     assertEquals(25, jsonNode.get("created_at").asInt())
     assertTrue(jsonNode.get("inregions").isArray)
@@ -324,6 +332,7 @@ class ParserTest {
                   "alt": 0.0,
                   "batt": 99,
                   "bs": 1,
+                  "cog": 56,
                   "conn": "w",
                   "lat": 52.3153748,
                   "lon": 5.0408462,
@@ -354,6 +363,7 @@ class ParserTest {
     assertEquals(1600, messageLocation.accuracy.toLong())
     assertEquals(0.0, messageLocation.altitude.toDouble(), 0.0)
     assertEquals(99, messageLocation.battery)
+    assertEquals(56, messageLocation.bearing)
     assertEquals("w", messageLocation.conn)
     assertEquals(52.3153748, messageLocation.latitude, 0.0)
     assertEquals(5.0408462, messageLocation.longitude, 0.0)
@@ -405,6 +415,7 @@ class ParserTest {
                 "acc": 1600,
                 "alt": 0.0,
                 "batt": 99,
+                "cog" : 45,
                 "conn": "w",
                 "lat": 52.3153748,
                 "lon": 5.0408462,
@@ -418,6 +429,7 @@ class ParserTest {
                 "acc": 95,
                 "alt": 0.0,
                 "batt": 99,
+                "cog" : 56,
                 "conn": "w",
                 "lat": 12.3153748,
                 "lon": 15.0408462,

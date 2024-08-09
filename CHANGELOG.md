@@ -4,6 +4,8 @@
 
 ### New features
 
+- Added `cog` field to location messages showing current bearing (#1777)
+
 ### Bug fixes
 
 ## Version 2.5.1

@@ -52,6 +52,8 @@ open class MessageLocation(
 
   @JsonProperty("vel") var velocity = 0
 
+  @JsonProperty("cog") var bearing = 0
+
   @JsonProperty("tst") var timestamp: Long = 0
 
   @JsonProperty("m") var monitoringMode: MonitoringMode? = null
@@ -89,6 +91,7 @@ open class MessageLocation(
           longitude = location.longitude
           altitude = location.altitude.roundToInt()
           accuracy = location.accuracy.roundToInt()
+          bearing = location.bearing.roundToInt()
           timestamp = TimeUnit.MILLISECONDS.toSeconds(location.time)
           // Convert m/s to km/h
           velocity = if (location.hasSpeed()) ((location.speed * 3.6).toInt()) else 0
