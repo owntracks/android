@@ -18,7 +18,7 @@ val googleMapsAPIKey = System.getenv("GOOGLE_MAPS_API_KEY")?.toString() ?: extra
 
 val gmsImplementation: Configuration by configurations.creating
 
-val packageVersionCode: Int = System.getenv("VERSION_CODE")?.toInt() ?: 420501000
+val packageVersionCode: Int = System.getenv("VERSION_CODE")?.toInt() ?: 420502000
 val manuallySetVersion: Boolean = System.getenv("VERSION_CODE") != null
 
 android {
@@ -31,7 +31,7 @@ android {
         targetSdk = 34
 
         versionCode = packageVersionCode
-        versionName = "2.5.1"
+        versionName = "2.5.2"
 
         val localeCount = fileTree("src/main/res/").map {
             it.toPath()
@@ -148,8 +148,6 @@ android {
     tasks.withType<Test> {
         testLogging {
             events(
-                TestLogEvent.STARTED,
-                TestLogEvent.PASSED,
                 TestLogEvent.SKIPPED,
                 TestLogEvent.FAILED,
                 TestLogEvent.STANDARD_OUT,

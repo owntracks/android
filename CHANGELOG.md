@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 2.5.2
+
+### New features
+
+### Bug fixes
+
 ## Version 2.5.1
 
 ### New features
