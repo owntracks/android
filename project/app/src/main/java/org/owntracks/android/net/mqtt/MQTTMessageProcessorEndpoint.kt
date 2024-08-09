@@ -19,6 +19,7 @@ import java.util.stream.Collectors
 import javax.net.ssl.SSLHandshakeException
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 import kotlin.time.TimeSource
 import kotlin.time.measureTime
@@ -40,7 +41,6 @@ import org.eclipse.paho.client.mqttv3.MqttAsyncClient
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended
 import org.eclipse.paho.client.mqttv3.MqttException
 import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CLIENT_ALREADY_DISCONNECTED
-import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CLIENT_DISCONNECTING
 import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CLIENT_EXCEPTION
 import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CONNECTION_LOST
 import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_SERVER_CONNECT_ERROR
@@ -144,21 +144,27 @@ class MQTTMessageProcessorEndpoint(
     }
   }
 
+  private val disconnectTimeout = 2.seconds
+
   private suspend fun disconnect() {
     withContext(ioDispatcher) {
       Timber.v("MQTT attempting Disconnect")
       measureTime {
             mqttClientAndConfiguration?.run {
               try {
-                if (mqttClient.isConnected) mqttClient.disconnect()
-                else Timber.d("MQTT client already not connected")
+                mqttClient.disconnect()
               } catch (e: MqttException) {
                 when (e.reasonCode.toShort()) {
-                  REASON_CODE_CLIENT_ALREADY_DISCONNECTED ->
-                      Timber.d("Could not disconnect from client because already disconnected")
-                  REASON_CODE_CLIENT_DISCONNECTING ->
-                      Timber.d("Could not disconnect from client because already disconnecting")
-                  else -> Timber.d(e, "Could not disconnect from client. Closing")
+                  REASON_CODE_CLIENT_ALREADY_DISCONNECTED -> Timber.d("Client already disconnected")
+                  else -> {
+                    Timber.d(
+                        e,
+                        "Could not disconnect from client gently. Forcing disconnect with timeout=$disconnectTimeout")
+                    mqttClient.disconnectForcibly(
+                        disconnectTimeout.inWholeMilliseconds,
+                        disconnectTimeout.inWholeMilliseconds,
+                        true)
+                  }
                 }
               }
               endpointStateRepo.setState(EndpointState.DISCONNECTED)
