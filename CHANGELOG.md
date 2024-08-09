@@ -8,6 +8,9 @@
 
 ### Bug fixes
 
+- Fix crash where changing the theme via setting the preferences remotely causes the theme change to not happen on the main thread
+- Fix crash where trying to close the MQTT connection whilst it's connecting thows an unhandled exception
+
 ## Version 2.5.1
 
 ### New features
