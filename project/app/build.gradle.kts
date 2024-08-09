@@ -136,12 +136,36 @@ android {
         }
         managedDevices {
             localDevices {
-                create("pixel2api30aosp") {
-                    device = "Pixel 2"
-                    apiLevel = 30
-                    systemImageSource = "aosp-atd"
+              val hardware = "Small Phone"
+              create("api34aosp") {
+                device = hardware
+                apiLevel = 34
+                systemImageSource = "aosp-atd"
+              }
+                create("api27aosp") {
+                    device = hardware
+                    apiLevel = 27
+                    systemImageSource = "aosp"
                 }
+              create("api34gms") {
+                device = hardware
+                apiLevel = 34
+                systemImageSource = "google-atd"
+              }
+              create("api27gms") {
+                device = hardware
+                apiLevel = 27
+                systemImageSource = "google"
+              }
             }
+          groups {
+            create("allGmsApis") {
+              targetDevices.addAll(listOf(devices["api34gms"], devices["api27gms"]))
+            }
+            create("allAospApis") {
+              targetDevices.addAll(listOf(devices["api34aosp"], devices["api27aosp"]))
+            }
+          }
         }
     }
 

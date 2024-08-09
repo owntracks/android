@@ -1,12 +1,8 @@
-plugins {
-    `kotlin-dsl`
-}
+plugins { `kotlin-dsl` }
 
 repositories {
-    google()
-    mavenCentral()
+  google()
+  mavenCentral()
 }
 
-dependencies {
-    implementation(libs.android.gradle.api)
-}
+dependencies { implementation(libs.android.gradle.api) }
