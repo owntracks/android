@@ -10,6 +10,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.StrictMode
+import androidx.annotation.MainThread
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
@@ -39,6 +40,7 @@ import org.owntracks.android.preferences.PreferencesStore
 import org.owntracks.android.preferences.types.AppTheme
 import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.services.worker.Scheduler
+import org.owntracks.android.support.RunThingsOnOtherThreads
 import org.owntracks.android.test.CountingIdlingResourceShim
 import org.owntracks.android.test.IdlingResourceWithData
 import org.owntracks.android.test.SimpleIdlingResource
@@ -59,6 +61,8 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
   @Inject lateinit var notificationManager: NotificationManagerCompat
 
   @Inject lateinit var preferencesStore: PreferencesStore
+
+  @Inject lateinit var runThingsOnOtherThreads: RunThingsOnOtherThreads
 
   @Inject
   @get:VisibleForTesting
@@ -150,6 +154,7 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
     }
   }
 
+  @MainThread
   private fun setThemeFromPreferences() {
     when (preferences.theme) {
       AppTheme.AUTO -> AppCompatDelegate.setDefaultNightMode(Preferences.SYSTEM_NIGHT_AUTO_MODE)
@@ -221,7 +226,8 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
   override fun onPreferenceChanged(properties: Set<String>) {
     if (properties.contains(Preferences::theme.name)) {
       Timber.d("Theme changed. Setting theme to ${preferences.theme}")
-      setThemeFromPreferences()
+      // Can only call setThemeFromPreferences on the main thread
+      runThingsOnOtherThreads.postOnMainHandlerDelayed(::setThemeFromPreferences, 0)
     }
     Timber.v("Idling preferenceSetIdlingResource because of $properties")
     preferenceSetIdlingResource.setIdleState(true)
