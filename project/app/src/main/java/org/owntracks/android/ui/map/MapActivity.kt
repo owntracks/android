@@ -636,6 +636,7 @@ class MapActivity :
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     return when (item.itemId) {
       R.id.menu_report -> {
+        throw NotImplementedError("Report menu item not implemented")
         viewModel.sendLocation()
         true
       }

@@ -27,6 +27,7 @@ import java.security.Security
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Provider
+import kotlinx.datetime.Instant
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.conscrypt.Conscrypt
 import org.owntracks.android.data.waypoints.RoomWaypointsRepo
@@ -147,9 +148,10 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
       (this.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager)
           .getHistoricalProcessExitReasons(this.packageName, 0, 10)
-          .forEach {
+          .firstOrNull()
+          ?.run {
             Timber.i(
-                "Historical process exit reason: ${it.reason} - Description: ${it.description}")
+                "Historical process exited at ${Instant.fromEpochMilliseconds(timestamp)}. reason: $description")
           }
     }
   }
