@@ -11,5 +11,10 @@ enum class MqttProtocolLevel(@JsonValue val value: Int) {
     @FromConfiguration
     fun getByValue(value: Int): MqttProtocolLevel =
         entries.firstOrNull { it.value == value } ?: MQTT_3_1
+
+    @JvmStatic
+    @FromConfiguration
+    fun getByValue(value: String): MqttProtocolLevel =
+        (value.toIntOrNull() ?: Int.MIN_VALUE).run(::getByValue)
   }
 }

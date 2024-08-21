@@ -39,15 +39,47 @@ class ConfigEditorActivityTests :
   }
 
   @Test
-  fun configurationManagementCanEditAnIntType() {
+  fun configurationManagementCanEditTheMode() {
     launchActivity()
     openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
     clickOn(R.string.preferencesEditor)
     writeTo(R.id.inputKey, Preferences::mode.name)
     writeTo(R.id.inputValue, "0")
     clickDialogPositiveButton()
-
     assertContains(R.id.effectiveConfiguration, "\"mode\" : 0")
+  }
+
+  @Test
+  fun configurationManagementCanEditTheModeToADefault() {
+    launchActivity()
+    openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
+    clickOn(R.string.preferencesEditor)
+    writeTo(R.id.inputKey, Preferences::mode.name)
+    writeTo(R.id.inputValue, "not a number")
+    clickDialogPositiveButton()
+    assertContains(R.id.effectiveConfiguration, "\"mode\" : 0")
+  }
+
+  @Test
+  fun configurationManagementCanEditTheMQTTProtocolLevel() {
+    launchActivity()
+    openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
+    clickOn(R.string.preferencesEditor)
+    writeTo(R.id.inputKey, Preferences::mqttProtocolLevel.name)
+    writeTo(R.id.inputValue, "4")
+    clickDialogPositiveButton()
+    assertContains(R.id.effectiveConfiguration, "\"mqttProtocolLevel\" : 4")
+  }
+
+  @Test
+  fun configurationManagementCanEditTheMQTTProtocolLevelToADefault() {
+    launchActivity()
+    openActionBarOverflowOrOptionsMenu(baristaRule.activityTestRule.activity)
+    clickOn(R.string.preferencesEditor)
+    writeTo(R.id.inputKey, Preferences::mqttProtocolLevel.name)
+    writeTo(R.id.inputValue, "not a number")
+    clickDialogPositiveButton()
+    assertContains(R.id.effectiveConfiguration, "\"mqttProtocolLevel\" : 3")
   }
 
   @Test

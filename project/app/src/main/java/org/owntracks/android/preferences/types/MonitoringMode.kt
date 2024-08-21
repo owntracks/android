@@ -19,6 +19,12 @@ enum class MonitoringMode(@JsonValue val value: Int) {
   companion object {
     @JvmStatic
     @FromConfiguration
-    fun getByValue(value: Int) = entries.firstOrNull { it.value == value } ?: SIGNIFICANT
+    fun getByValue(value: Int): MonitoringMode =
+        entries.firstOrNull { it.value == value } ?: SIGNIFICANT
+
+    @JvmStatic
+    @FromConfiguration
+    fun getByValue(value: String): MonitoringMode =
+        (value.toIntOrNull() ?: Int.MIN_VALUE).run(::getByValue)
   }
 }

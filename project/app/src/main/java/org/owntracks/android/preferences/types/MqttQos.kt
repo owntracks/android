@@ -11,5 +11,10 @@ enum class MqttQos(@JsonValue val value: Int) {
     @JvmStatic
     @FromConfiguration
     fun getByValue(value: Int): MqttQos = entries.firstOrNull { it.value == value } ?: ONE
+
+    @JvmStatic
+    @FromConfiguration
+    fun getByValue(value: String): MqttQos =
+        (value.toIntOrNull() ?: Int.MIN_VALUE).run(::getByValue)
   }
 }
