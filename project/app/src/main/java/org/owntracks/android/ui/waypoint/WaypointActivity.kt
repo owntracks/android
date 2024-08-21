@@ -21,6 +21,7 @@ import org.owntracks.android.R
 import org.owntracks.android.databinding.UiWaypointBinding
 import org.owntracks.android.location.geofencing.Latitude
 import org.owntracks.android.location.geofencing.Longitude
+import org.owntracks.android.location.roundForDisplay
 
 @AndroidEntryPoint
 class WaypointActivity : AppCompatActivity() {
@@ -147,12 +148,12 @@ fun TextView.setRelativeTimeSpanString(epochSeconds: Long?) {
 
 @BindingAdapter("android:text")
 fun TextInputEditText.setLatitude(latitude: Latitude) {
-  setText(latitude.value.toString())
+  setText(latitude.value.roundForDisplay())
 }
 
 @BindingAdapter("android:text")
 fun TextInputEditText.setLongitude(longitude: Longitude) {
-  setText(longitude.value.toString())
+  setText(longitude.value.roundForDisplay())
 }
 
 @BindingConversion fun fromStringToLatitude(value: String): Latitude = Latitude(value.toDouble())

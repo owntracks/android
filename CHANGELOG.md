@@ -12,6 +12,7 @@
 - Fix crash where changing the theme via setting the preferences remotely causes the theme change to not happen on the main thread
 - Fix crash where trying to close the MQTT connection whilst it's connecting thows an unhandled exception
 - Only latest stop reason should be printed to logs on startup
+- Fix bug where geofencing client wasn't initialized properly, leading to very unreliable region transition detection
 
 ## Version 2.5.1
 

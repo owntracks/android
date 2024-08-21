@@ -206,6 +206,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
             }
           }
         }
+        launch { setupGeofences() }
         launch {
           locationRepo.currentPublishedLocation.collect { location ->
             location?.run {
@@ -227,7 +228,6 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
         }
         endpointStateRepo.setServiceStartedNow()
       }
-      setupGeofences()
     }
   }
 

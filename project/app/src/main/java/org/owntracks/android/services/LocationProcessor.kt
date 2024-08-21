@@ -76,7 +76,7 @@ constructor(
 
     // Check if publish would trigger a region if fusedRegionDetection is enabled
     Timber.v(
-        "Checking if location triggers waypoint transitions. waypoints: $loadedWaypoints, fusedRegionDetection: ${preferences.fusedRegionDetection}")
+        "Checking if location triggers waypoint transitions. waypoints: $loadedWaypoints, trigger=$trigger, fusedRegionDetection: ${preferences.fusedRegionDetection}")
     if (loadedWaypoints.isNotEmpty() &&
         preferences.fusedRegionDetection &&
         trigger != MessageLocation.ReportType.CIRCULAR) {
@@ -173,11 +173,12 @@ constructor(
       transition: Int,
       trigger: String
   ) {
-    Timber.v("OnWaypointTransition $waypointModel $location $transition $trigger")
     if (!locationIsWithAccuracyThreshold(location)) {
-      Timber.d("ignoring transition: low accuracy ")
+      Timber.d(
+          "ignoring transition for $location, transition=$transition, trigger=$trigger: low accuracy")
       return
     }
+    Timber.d("OnWaypointTransition $waypointModel $location $transition $trigger")
     scope.launch {
       // If the transition hasn't changed, or has moved from unknown to exit, don't notify.
       if (transition == waypointModel.lastTransition ||
