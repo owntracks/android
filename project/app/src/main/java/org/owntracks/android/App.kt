@@ -107,6 +107,8 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
 
     super.onCreate()
 
+    setGlobalExceptionHandler()
+
     val dataBindingComponent = bindingComponentProvider.get().build()
     val dataBindingEntryPoint =
         EntryPoints.get(dataBindingComponent, CustomBindingEntryPoint::class.java)
@@ -153,6 +155,33 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
             Timber.i(
                 "Historical process exited at ${Instant.fromEpochMilliseconds(timestamp)}. reason: $description")
           }
+    }
+    applicationContext.noBackupFilesDir.resolve("crash.log").run {
+      if (exists()) {
+        readText().let { Timber.e("Previous crash: $it") }
+        delete()
+      }
+    }
+  }
+
+  private fun setGlobalExceptionHandler() {
+    val currentHandler = Thread.getDefaultUncaughtExceptionHandler()
+    Thread.setDefaultUncaughtExceptionHandler { t, e ->
+      try {
+        applicationContext.noBackupFilesDir
+            .resolve("crash.log")
+            .writeText(
+                """
+          |Thread: ${t.name}
+          |Exception: ${e.message}
+          |Stacktrace:
+          |${e.stackTrace.joinToString("\n\t")}
+          """
+                    .trimMargin())
+      } catch (e: Exception) {
+        Timber.e(e, "Error writing crash log")
+      }
+      currentHandler?.uncaughtException(t, e)
     }
   }
 

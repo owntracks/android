@@ -6,6 +6,7 @@
 
 - Added `cog` field to location messages showing current bearing (#1777)
 - Added `status` remote command to retrieve system configuration status (#1618)
+- On crash, details written to file and then printed at the top of the log next time OT starts
 
 ### Bug fixes
 
