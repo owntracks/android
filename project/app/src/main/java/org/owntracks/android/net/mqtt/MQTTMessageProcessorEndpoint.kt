@@ -160,10 +160,15 @@ class MQTTMessageProcessorEndpoint(
                     Timber.d(
                         e,
                         "Could not disconnect from client gently. Forcing disconnect with timeout=$disconnectTimeout")
-                    mqttClient.disconnectForcibly(
-                        disconnectTimeout.inWholeMilliseconds,
-                        disconnectTimeout.inWholeMilliseconds,
-                        true)
+                    try {
+                      mqttClient.disconnectForcibly(
+                          disconnectTimeout.inWholeMilliseconds,
+                          disconnectTimeout.inWholeMilliseconds,
+                          true)
+                    } catch (e: NullPointerException) {
+                      Timber.d(
+                          "Could not forcaibly disconnect client, NPE thown by bug in Paho MQTT. Ignoring.")
+                    }
                   }
                 }
               }
