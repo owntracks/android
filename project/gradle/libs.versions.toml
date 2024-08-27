@@ -50,7 +50,7 @@ slf4j-timber = "1.0.1"
 square-leakcanary = "2.14"
 square-tape2 = "2.0.0-beta1"
 timber = "5.0.1"
-triplet = "3.10.1"
+triplet = "3.11.0"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
