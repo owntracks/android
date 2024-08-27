@@ -8,8 +8,8 @@ import timber.log.Timber
  * Idling resource that tracks data
  *
  * @param T
- * @constructor Create empty Idling resource with data
  * @property resourceName
+ * @constructor Create empty Idling resource with data
  */
 class IdlingResourceWithData<T : MessageBase>(
     private val resourceName: String,

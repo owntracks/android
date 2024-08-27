@@ -105,8 +105,8 @@ open class ValidatingEditTextPreference : EditTextPreference {
   /**
    * An [InputFilter] that only allows characters in the supplied list to be input
    *
-   * @constructor Create empty Specific chars input filter
    * @property chars list of permitted [Char]
+   * @constructor Create empty Specific chars input filter
    */
   class SpecificCharsInputFilter(private val chars: List<Char>) : InputFilter {
     override fun filter(

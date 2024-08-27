@@ -9,8 +9,8 @@ import kotlinx.coroutines.CoroutineDispatcher
  * [CountingIdlingResource] to track completion, and therefore makes it useful in an espresso
  * context. From https://gist.github.com/jonreeve/6c6ea2cc5893c87cd0dabfb5d3d14eb3
  *
- * @constructor Create empty Espresso tracked dispatcher
  * @property delegateDispatcher dispatcher to wrap
+ * @constructor Create empty Espresso tracked dispatcher
  */
 class EspressoTrackedDispatcher(private val delegateDispatcher: CoroutineDispatcher) :
     CoroutineDispatcher(), DispatcherWithIdlingResource {

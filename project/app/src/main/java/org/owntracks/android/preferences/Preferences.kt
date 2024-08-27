@@ -380,6 +380,7 @@ constructor(
     get() {
       return pubTopicBaseWithUserDetails + waypointTopicSuffix
     }
+
   // For status command
   val pubTopicStatus: String
     get() {

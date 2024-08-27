@@ -7,8 +7,8 @@ import androidx.test.espresso.IdlingResource.ResourceCallback
  * Simple idling resource. No-op version for release
  *
  * @param initialIdlingState
- * @constructor
  * @property resourceName
+ * @constructor
  */
 class SimpleIdlingResource(
     private val resourceName: String,
