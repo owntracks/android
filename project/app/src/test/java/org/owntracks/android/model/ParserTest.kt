@@ -454,6 +454,7 @@ class ParserTest {
     val secondMessageLocation = messages[1] as MessageLocation
     assertEquals(1514455579L, secondMessageLocation.timestamp)
   }
+
   // endregion
 
   // region Command Messages
@@ -567,6 +568,7 @@ class ParserTest {
             .trimIndent()
     parser.fromJson(input)
   }
+
   // endregion
 
   // region Transition Messages
@@ -638,6 +640,7 @@ class ParserTest {
     assertEquals(message.timestamp, jsonNode.get("tst").asLong())
     assertEquals(message.waypointTimestamp, jsonNode.get("wtst").asLong())
   }
+
   // endregion
 
   // region Configuration messages
@@ -755,6 +758,7 @@ class ParserTest {
     assertEquals(13487, jsonNode.get("TestIntKey").asInt())
     assertEquals("testString", jsonNode.get("TestStringKey").asText())
   }
+
   // endregion
 
   // region Waypoint Messages
@@ -808,6 +812,7 @@ class ParserTest {
     assertEquals(message.radius, jsonNode.get("rad").asInt())
     assertEquals(message.timestamp, jsonNode.get("tst").asLong())
   }
+
   // endregion
 
   // region Status Messages
@@ -836,6 +841,7 @@ class ParserTest {
     assertEquals(message.android?.appHibernation, jsonNode.get("android").get("hib").asInt())
     assertEquals(message.android?.locationPermission, jsonNode.get("android").get("loc").asInt())
   }
+
   // endregion
 
   // region Clear Messages
@@ -856,6 +862,7 @@ class ParserTest {
     val serialized = message.toJsonBytes(parser)
     assertEquals(0, serialized.size)
   }
+
   // endregion
 
   // Card Messages
@@ -902,6 +909,7 @@ class ParserTest {
     assertEquals("MyName!", messageCard.name)
     assertEquals("overridden-topic", messageCard.trackerId)
   }
+
   // endregion
 
   // region  Invalid messages
@@ -933,6 +941,7 @@ class ParserTest {
     val parser = Parser(encryptionProvider)
     parser.fromJson("not JSON")
   }
+
   // endregion
 
   @Test

@@ -7,8 +7,8 @@ import org.owntracks.android.model.messages.MessageBase
  * Idling resource that tracks data. Noop implementation
  *
  * @param T
- * @constructor Create empty Idling resource with data
  * @property resourceName
+ * @constructor Create empty Idling resource with data
  */
 class IdlingResourceWithData<T : MessageBase>(
     private val resourceName: String,

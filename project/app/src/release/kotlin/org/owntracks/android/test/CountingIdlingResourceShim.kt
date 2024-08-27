@@ -7,8 +7,8 @@ import androidx.test.espresso.IdlingResource
  * no-op version in release mode. This is the no-op implementation.
  *
  * @param debugCounting unused
- * @constructor
  * @property name Name of the idling resource
+ * @constructor
  */
 class CountingIdlingResourceShim(
     private val name: String,
