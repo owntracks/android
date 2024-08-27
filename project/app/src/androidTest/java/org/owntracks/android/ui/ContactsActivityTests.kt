@@ -7,6 +7,8 @@ import com.adevinta.android.barista.assertion.BaristaRecyclerViewAssertions.asse
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
 import java.time.Instant
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.random.Random
 import mqtt.packets.Qos
 import mqtt.packets.mqttv5.MQTT5Properties
@@ -79,6 +81,51 @@ class ContactsActivityTests :
   }
 
   @Test
+  fun contactAppearsWhenBrokerAddsACardMessageWithAnInvalidFaceBase64() {
+    setupTestActivity()
+    val contactName = "TestName"
+    (baristaRule.activityTestRule.activity as ContactsActivity)
+        .contactsCountingIdlingResource
+        .increment()
+    MessageCard()
+        .apply {
+          name = contactName
+          face = "------------------------------"
+        }
+        .sendFromBroker(broker)
+
+    (baristaRule.activityTestRule.activity as ContactsActivity).contactsCountingIdlingResource.use {
+      assertNotDisplayed(R.id.placeholder)
+      assertRecyclerViewItemCount(R.id.contactsRecyclerView, 1)
+      assertDisplayedAtPosition(R.id.contactsRecyclerView, 0, R.id.name, contactName)
+      assertDisplayedAtPosition(R.id.contactsRecyclerView, 0, R.id.location, R.string.na)
+    }
+  }
+
+  @OptIn(ExperimentalEncodingApi::class)
+  @Test
+  fun contactAppearsWhenBrokerAddsACardMessageWithAnInvalidFaceImage() {
+    setupTestActivity()
+    val contactName = "TestName"
+    (baristaRule.activityTestRule.activity as ContactsActivity)
+        .contactsCountingIdlingResource
+        .increment()
+    MessageCard()
+        .apply {
+          name = contactName
+          face = Base64.encode("not an image".toByteArray())
+        }
+        .sendFromBroker(broker)
+
+    (baristaRule.activityTestRule.activity as ContactsActivity).contactsCountingIdlingResource.use {
+      assertNotDisplayed(R.id.placeholder)
+      assertRecyclerViewItemCount(R.id.contactsRecyclerView, 1)
+      assertDisplayedAtPosition(R.id.contactsRecyclerView, 0, R.id.name, contactName)
+      assertDisplayedAtPosition(R.id.contactsRecyclerView, 0, R.id.location, R.string.na)
+    }
+  }
+
+  @Test
   fun contactAppearsWhenBrokerAddsACardMessageAndALocationMessage() {
     setupTestActivity()
 
@@ -95,7 +142,8 @@ class ContactsActivityTests :
               latitude = 52.123
               longitude = 0.56789
               timestamp = Instant.parse("2006-01-02T15:04:05Z").epochSecond
-            })
+            },
+        )
         .sendFromBroker(broker)
 
     (baristaRule.activityTestRule.activity as ContactsActivity).contactsCountingIdlingResource.use {
@@ -134,6 +182,7 @@ class ContactsActivityTests :
     setupTestActivity()
 
     val baseTimeStamp = Instant.ofEpochSecond(1695137000)
+
     data class TimeAndName(val instant: Instant, val trackerId: String, val topic: String)
 
     val random = Random(1)
@@ -143,7 +192,8 @@ class ContactsActivityTests :
               TimeAndName(
                   baseTimeStamp.plusSeconds(random.nextLong(-3600, 3600)),
                   random.string(2),
-                  random.string(5))
+                  random.string(5),
+              )
             }
             .toList()
 
@@ -169,7 +219,8 @@ class ContactsActivityTests :
               "owntracks/${it.first.topic}/somedevice",
               Qos.AT_LEAST_ONCE,
               MQTT5Properties(),
-              it.second.toUByteArray())
+              it.second.toUByteArray(),
+          )
         }
 
     (baristaRule.activityTestRule.activity as ContactsActivity).contactsCountingIdlingResource.use {

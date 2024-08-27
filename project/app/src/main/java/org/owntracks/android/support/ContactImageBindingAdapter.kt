@@ -52,12 +52,19 @@ constructor(
       return@withContext contact.face?.run {
         // There's a base64 face pic. Decode and cache it.
         toByteArray()
-            .run { Base64.decode(this, Base64.DEFAULT) }
-            .run { BitmapFactory.decodeByteArray(this, 0, size) }
             .run {
+              try {
+                Base64.decode(this, Base64.DEFAULT)
+              } catch (e: IllegalArgumentException) {
+                Timber.d("Failed to decode base64 face pic for ${contact.id}")
+                null
+              }
+            }
+            ?.run { BitmapFactory.decodeByteArray(this, 0, size) }
+            ?.run {
               getRoundedShape(Bitmap.createScaledBitmap(this, faceDimensions, faceDimensions, true))
             }
-            .also { bitmap ->
+            ?.also { bitmap ->
               memoryCache.put(
                   contact.id, ContactBitmapAndName.CardBitmap(contact.displayName, bitmap))
             }
