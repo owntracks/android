@@ -4,9 +4,11 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.BatteryManager
+import android.os.Build
 import android.os.PowerManager
 import androidx.core.content.ContextCompat
 import androidx.core.content.PackageManagerCompat
@@ -84,15 +86,11 @@ internal constructor(@ApplicationContext private val context: Context) {
   val batteryOptimizations: Int
     get() {
       // return 0 (STATUS_PASS) if no battery optimizations
-      return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-        val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-        if (powerManager.isIgnoringBatteryOptimizations(context.getPackageName())) {
-          MessageStatus.STATUS_PASS
-        } else {
-          MessageStatus.STATUS_FAIL
-        }
-      } else {
+      val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+      return if (powerManager.isIgnoringBatteryOptimizations(context.packageName)) {
         MessageStatus.STATUS_PASS
+      } else {
+        MessageStatus.STATUS_FAIL
       }
     }
 
@@ -110,24 +108,24 @@ internal constructor(@ApplicationContext private val context: Context) {
 
   val locationPermission: Int
     get() {
-      if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-        var resultBack =
+      val resultBack =
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             ContextCompat.checkSelfPermission(
                 context, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-        var resultFine =
-            ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
-        var resultCoarse =
-            ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
-        /* create a response of:
-        0 = Background location, fine precision
-        -1 = Background location, coarse precision
-        -2 = Foreground location, fine precision
-        -3 = Foreground location, coarse precision
-        -4 = Disabled
-        */
-        return (2 * resultBack + resultFine + resultCoarse)
-      } else {
-        return MessageStatus.STATUS_PASS
-      }
+          } else {
+            PackageManager.PERMISSION_GRANTED
+          }
+      val resultFine =
+          ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+      val resultCoarse =
+          ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
+      /* create a response of:
+      0 = Background location, fine precision
+      -1 = Background location, coarse precision
+      -2 = Foreground location, fine precision
+      -3 = Foreground location, coarse precision
+      -4 = Disabled
+      */
+      return (2 * resultBack + resultFine + resultCoarse)
     }
 }
