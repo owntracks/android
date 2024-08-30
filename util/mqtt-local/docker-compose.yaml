@@ -24,37 +24,44 @@ services:
       - mosquitto:/mosquitto/data
   nginx:
     depends_on:
+      owntracks-recorder:
+        condition: service_started
       mosquitto:
         condition: service_started
     image: nginx
     ports:
-      - 8888:8888
+      - 8900:8900
+      - 8901:8901
     volumes:
       - ${PWD}/nginx.conf:/etc/nginx/nginx.conf:ro
       - ${PWD}/_wildcard.docker.local-key.pem:/tls/key.pem:ro
       - ${PWD}/_wildcard.docker.local.pem:/tls/cert.pem:ro
+      - ${PWD}/rootCA.pem:/tls/ca.crt:ro
   caddy:
     depends_on:
       mosquitto:
         condition: service_started
     image: caddy
     ports:
-      - 8889:8889
+      - 8910:8910
+      - 8911:8911
+      - 8912:8912
     volumes:
       - ${PWD}/Caddyfile:/etc/caddy/Caddyfile:ro
       - ${PWD}/_wildcard.docker.local-key.pem:/tls/key.pem:ro
       - ${PWD}/_wildcard.docker.local.pem:/tls/cert.pem:ro
       - ${PWD}/rootCA.pem:/tls/ca.pem:ro
   owntracks-recorder:
+    entrypoint: /bin/sh -c "/usr/bin/ocat --load=friends < /friends.txt && /usr/sbin/entrypoint.sh"
     depends_on:
       mosquitto:
         condition: service_started
     image: owntracks/recorder
     ports:
       - 8083:8083
-    entrypoint: /bin/sh -c "tail -f /dev/null"
     volumes:
       - recorder-data:/store
+      - ${PWD}/friends.txt:/friends.txt:ro
     environment:
       - OTR_HOST=mosquitto
       - OTR_PORT=1883

@@ -12,9 +12,12 @@ There's a few different configurations here, and running `docker compose up` wil
     - 8080 plain-text MQTT over WS
     - 8081 TLS MQTT over WS
 2. [nginx](https://www.nginx.com/) listening on:
-    - 8888 TLS MQTT over WS forwarding to mosquitto on port 8080
+    - 8900 TLS MQTT over WS forwarding to mosquitto on port 8080
+    - 8901 TLS HTTPS forwarding to recorder with client certs
 3. [caddy](https://caddyserver.com/) listening on:
-    - 8889 TLS MQTT over WS forwarding to mosquitto on port 8080
+    - 8910 TLS MQTT over WS forwarding to mosquitto on port 8080
+    - 8911 TLS HTTP forwarding to recorder
+    - 8912 TLS HTTP with client certs forwarding to recorder
 4. [OwnTracks Recorder](https://github.com/owntracks/recorder) listening on:
     - 8083 HTTP Port of the Web UI
 5. [OwnTracks Frontend](https://github.com/owntracks/frontend) listening on:

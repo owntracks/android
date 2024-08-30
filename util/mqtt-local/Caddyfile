@@ -1,4 +1,25 @@
-:8889 {
+# Websockets
+:8910 {
     reverse_proxy  mosquitto:8080
     tls /tls/cert.pem /tls/key.pem
+}
+
+# TLS HTTP to recorder
+:8911 {
+    log console
+    reverse_proxy  owntracks-recorder:8083
+    tls /tls/cert.pem /tls/key.pem
+}
+
+# Client certs to recorder
+:8912 {
+    log console
+
+    reverse_proxy  owntracks-recorder:8083
+    tls /tls/cert.pem /tls/key.pem {
+        client_auth {
+            mode require
+            trusted_ca_cert_file /tls/ca.pem
+        }
+    }
 }
