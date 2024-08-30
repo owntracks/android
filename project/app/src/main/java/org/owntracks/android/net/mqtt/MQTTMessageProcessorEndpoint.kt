@@ -55,7 +55,6 @@ import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageClear
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.net.MessageProcessorEndpoint
-import org.owntracks.android.net.OutgoingMessageSendingException
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.services.MessageProcessor
@@ -82,6 +81,7 @@ class MQTTMessageProcessorEndpoint(
   val mqttConnectionIdlingResource: SimpleIdlingResource =
       SimpleIdlingResource("mqttConnection", false)
   override val modeId: ConnectionMode = ConnectionMode.MQTT
+
   private val connectingLock = Semaphore(1)
   private val connectivityManager: ConnectivityManager = applicationContext.getSystemService()!!
   private val alarmManager: AlarmManager = applicationContext.getSystemService()!!
@@ -129,7 +129,6 @@ class MQTTMessageProcessorEndpoint(
               Timber.w("MQTT Configuration not complete because host is missing, cannot activate")
           else -> Timber.w(e, "MQTT Configuration not complete, cannot activate")
         }
-
         endpointStateRepo.setState(EndpointState.ERROR_CONFIGURATION.withError(e))
       }
     }
@@ -167,7 +166,7 @@ class MQTTMessageProcessorEndpoint(
                           true)
                     } catch (e: NullPointerException) {
                       Timber.d(
-                          "Could not forcaibly disconnect client, NPE thown by bug in Paho MQTT. Ignoring.")
+                          "Could not forcibly disconnect client, NPE thrown by bug in Paho MQTT. Ignoring.")
                     }
                   }
                 }
@@ -194,18 +193,20 @@ class MQTTMessageProcessorEndpoint(
 
   override fun onFinalizeMessage(message: MessageBase): MessageBase = message
 
-  override suspend fun sendMessage(message: MessageBase) {
+  override suspend fun sendMessage(message: MessageBase): Result<Unit> {
     Timber.i("Sending message $message")
-    if (endpointStateRepo.endpointState.value != EndpointState.CONNECTED ||
-        mqttClientAndConfiguration == null) {
-      throw OutgoingMessageSendingException(NotConnectedException())
+    if (mqttClientAndConfiguration == null) {
+      return Result.failure(NotReadyException())
+    }
+    if (endpointStateRepo.endpointState.value != EndpointState.CONNECTED) {
+      return Result.failure(NotConnectedException())
     }
     // Updates the message data + metadata with things that are in our preferences
     message.annotateFromPreferences(preferences)
 
     // We want to block until this completes off-thread, because we've been called sync by the
     // outgoing message loop
-    mqttClientAndConfiguration?.run {
+    return mqttClientAndConfiguration!!.run {
       runBlocking {
         var sendMessageThrowable: Throwable? = null
         val handler = CoroutineExceptionHandler { _, throwable -> sendMessageThrowable = throwable }
@@ -228,7 +229,6 @@ class MQTTMessageProcessorEndpoint(
                           .also { Timber.v("MQTT message sent with messageId=${it.messageId}. ") }
                     }
                     .apply { Timber.i("Message $message dispatched in $this") }
-                messageProcessor.onMessageDelivered()
               } catch (e: Exception) {
                 Timber.e(e, "Error publishing message $message")
                 when (e) {
@@ -250,7 +250,7 @@ class MQTTMessageProcessorEndpoint(
             }
         Timber.d("Waiting for sendmessage job for message $message to finish")
         job.join()
-        sendMessageThrowable?.run { throw this }
+        sendMessageThrowable?.run { Result.failure(this) } ?: Result.success(Unit)
       }
     }
   }

@@ -1,6 +1,7 @@
 package org.owntracks.android.net.http
 
 import android.content.Context
+import android.net.Uri
 import com.fasterxml.jackson.core.JsonProcessingException
 import java.io.ByteArrayInputStream
 import java.io.IOException
@@ -30,7 +31,6 @@ import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.net.CALeafCertMatchingHostnameVerifier
 import org.owntracks.android.net.MessageProcessorEndpoint
-import org.owntracks.android.net.OutgoingMessageSendingException
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.services.MessageProcessor
@@ -54,13 +54,11 @@ class HttpMessageProcessorEndpoint(
   override fun activate() {
     Timber.v("HTTP Activate")
     preferences.registerOnPreferenceChangedListener(this)
-    scope.launch {
-      try {
-        httpClientAndConfiguration = setClientAndConfiguration(applicationContext, preferences)
-      } catch (e: ConfigurationIncompleteException) {
-        Timber.w(e)
-        endpointStateRepo.setState(EndpointState.ERROR_CONFIGURATION.withError(e))
-      }
+    try {
+      httpClientAndConfiguration = setClientAndConfiguration(applicationContext, preferences)
+    } catch (e: ConfigurationIncompleteException) {
+      Timber.w(e)
+      scope.launch { endpointStateRepo.setState(EndpointState.ERROR_CONFIGURATION.withError(e)) }
     }
   }
 
@@ -109,18 +107,18 @@ class HttpMessageProcessorEndpoint(
           }
           .build()
 
-  override suspend fun sendMessage(message: MessageBase) {
+  override suspend fun sendMessage(message: MessageBase): Result<Unit> {
+    if (httpClientAndConfiguration == null) {
+      return Result.failure(NotReadyException())
+    }
     message.annotateFromPreferences(preferences)
     // HTTP messages carry the topic field in the body of the message, rather than MQTT which
     // simply publishes the message to that topic.
     message.setTopicVisible()
-    if (httpClientAndConfiguration == null) {
-      throw OutgoingMessageSendingException(Exception("Http client not yet initialized"))
-    }
 
-    httpClientAndConfiguration?.run {
+    httpClientAndConfiguration!!.run {
       endpointStateRepo.setState(EndpointState.CONNECTING)
-      try {
+      return try {
         client.newCall(getRequest(configuration, message)).execute().use { response ->
           Timber.d("HTTP response received: $response")
           if (!response.isSuccessful) {
@@ -130,7 +128,7 @@ class HttpMessageProcessorEndpoint(
                 EndpointState.ERROR.withMessage(
                     String.format(Locale.ROOT, "HTTP code %d", response.code)))
             messageProcessor.onMessageDeliveryFailed(message)
-            throw OutgoingMessageSendingException(httpException)
+            Result.failure(OutgoingMessageSendingException(httpException))
           } else {
             if (response.body != null) {
               try {
@@ -146,35 +144,53 @@ class HttpMessageProcessorEndpoint(
                               Locale.ROOT,
                               "Response %d, (%d msgs received)",
                               response.code,
-                              result.size)))
+                              result.size,
+                          ),
+                      ),
+                  )
                   result.forEach { onMessageReceived(it) }
                 }
+                return Result.success(Unit)
               } catch (e: JsonProcessingException) {
                 Timber.e("JsonParseException HTTP status: %s", response.code)
                 endpointStateRepo.setState(
                     EndpointState.IDLE.withMessage(
                         String.format(
-                            Locale.ROOT, "HTTP status %d, JsonParseException", response.code)))
+                            Locale.ROOT,
+                            "HTTP status %d, JsonParseException",
+                            response.code,
+                        ),
+                    ),
+                )
+                return Result.success(Unit)
               } catch (e: Parser.EncryptionException) {
                 Timber.e("JsonParseException HTTP status: %s", response.code)
                 endpointStateRepo.setState(
                     EndpointState.ERROR.withMessage(
                         String.format(
-                            Locale.ROOT, "HTTP status: %d, EncryptionException", response.code)))
+                            Locale.ROOT,
+                            "HTTP status: %d, EncryptionException",
+                            response.code,
+                        ),
+                    ),
+                )
+                return Result.success(Unit)
               } catch (e: IOException) {
                 Timber.e(e, "HTTP Delivery failed")
                 endpointStateRepo.setState(EndpointState.ERROR.withError(e))
                 messageProcessor.onMessageDeliveryFailed(message)
-                throw OutgoingMessageSendingException(e)
+                return Result.failure(OutgoingMessageSendingException(e))
               }
+            } else {
+              Result.failure(OutgoingMessageSendingException(null))
             }
           }
-          messageProcessor.onMessageDelivered()
         }
       } catch (e: Exception) {
+        endpointStateRepo.setState(EndpointState.ERROR.withError(e))
         Timber.d(e, "Execute call failed")
         // Sometimes we get an exception just on the execute() call
-        throw OutgoingMessageSendingException(e)
+        Result.failure(OutgoingMessageSendingException(e))
       }
     }
   }
@@ -219,7 +235,7 @@ class HttpMessageProcessorEndpoint(
     val socketFactory =
         httpConfiguration.getSocketFactory(
             preferences.connectionTimeoutSeconds,
-            preferences.tls,
+            Uri.parse(preferences.url).scheme == "https",
             preferences.tlsClientCrt,
             context,
             caKeyStore)
