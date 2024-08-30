@@ -19,6 +19,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.owntracks.android.model.Contact
 import org.owntracks.android.support.widgets.TextDrawable
@@ -36,56 +38,61 @@ constructor(
   }
 
   private val faceDimensions = (48 * (context.resources.displayMetrics.densityDpi / 160f)).toInt()
+  private val cacheMutex = Mutex()
 
   suspend fun getBitmapFromCache(contact: Contact): Bitmap {
     Timber.v("Getting face bitmap for ${contact.id}")
     return withContext(Dispatchers.IO) {
-      val contactBitMapAndName = memoryCache[contact.id]
+      cacheMutex.withLock {
+        val contactBitMapAndName = memoryCache[contact.id]
 
-      if (contactBitMapAndName != null &&
-          contactBitMapAndName is ContactBitmapAndName.CardBitmap &&
-          contactBitMapAndName.bitmap != null) {
-        Timber.v("Retruning face bitmap for ${contact.id} from cache")
-        return@withContext contactBitMapAndName.bitmap
-      }
+        if (contactBitMapAndName != null &&
+            contactBitMapAndName is ContactBitmapAndName.CardBitmap &&
+            contactBitMapAndName.bitmap != null) {
+          Timber.v("Returning face bitmap for ${contact.id} from cache")
+          return@withContext contactBitMapAndName.bitmap
+        }
 
-      return@withContext contact.face?.run {
-        // There's a base64 face pic. Decode and cache it.
-        toByteArray()
-            .run {
-              try {
-                Base64.decode(this, Base64.DEFAULT)
-              } catch (e: IllegalArgumentException) {
-                Timber.d("Failed to decode base64 face pic for ${contact.id}")
-                null
-              }
-            }
-            ?.run { BitmapFactory.decodeByteArray(this, 0, size) }
-            ?.run {
-              getRoundedShape(Bitmap.createScaledBitmap(this, faceDimensions, faceDimensions, true))
-            }
-            ?.also { bitmap ->
-              memoryCache.put(
-                  contact.id, ContactBitmapAndName.CardBitmap(contact.displayName, bitmap))
-            }
-      }
-          ?: run {
-            // No face pic. Generate a fallback bitmap and cache it.
-            memoryCache[contact.id]?.run {
-              if (this is ContactBitmapAndName.TrackerIdBitmap &&
-                  this.trackerId == contact.trackerId) {
-                this.bitmap
-              } else {
-                null
-              }
-            }
-                ?: run {
-                  getFallbackBitmap(contact.trackerId, contact.id).also { bitmap ->
-                    memoryCache.put(
-                        contact.id, ContactBitmapAndName.TrackerIdBitmap(contact.trackerId, bitmap))
-                  }
+        return@withContext contact.face?.run {
+          // There's a base64 face pic. Decode and cache it.
+          toByteArray()
+              .run {
+                try {
+                  Base64.decode(this, Base64.DEFAULT)
+                } catch (e: IllegalArgumentException) {
+                  Timber.d("Failed to decode base64 face pic for ${contact.id}")
+                  null
                 }
-          }
+              }
+              ?.run { BitmapFactory.decodeByteArray(this, 0, size) }
+              ?.run {
+                getRoundedShape(
+                    Bitmap.createScaledBitmap(this, faceDimensions, faceDimensions, true))
+              }
+              ?.also { bitmap ->
+                memoryCache.put(
+                    contact.id, ContactBitmapAndName.CardBitmap(contact.displayName, bitmap))
+              }
+        }
+            ?: run {
+              // No face pic. Generate a fallback bitmap and cache it.
+              memoryCache[contact.id]?.run {
+                if (this is ContactBitmapAndName.TrackerIdBitmap &&
+                    this.trackerId == contact.trackerId) {
+                  this.bitmap
+                } else {
+                  null
+                }
+              }
+                  ?: run {
+                    getFallbackBitmap(contact.trackerId, contact.id).also { bitmap ->
+                      memoryCache.put(
+                          contact.id,
+                          ContactBitmapAndName.TrackerIdBitmap(contact.trackerId, bitmap))
+                    }
+                  }
+            }
+      }
     }
   }
 
