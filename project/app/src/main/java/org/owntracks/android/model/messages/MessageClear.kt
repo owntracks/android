@@ -8,7 +8,7 @@ class MessageClear : MessageBase(), MessageWithId {
 
   override fun toString(): String = "[MessageClear]"
 
-  override fun addMqttPreferences(preferences: Preferences) {
+  override fun annotateFromPreferences(preferences: Preferences) {
     retained = true
   }
 

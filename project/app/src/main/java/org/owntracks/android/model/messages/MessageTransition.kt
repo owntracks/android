@@ -52,7 +52,7 @@ class MessageTransition(private val messageWithId: MessageWithId = MessageWithRa
 
   @JsonProperty("lat") var latitude = 0.0
 
-  override fun addMqttPreferences(preferences: Preferences) {
+  override fun annotateFromPreferences(preferences: Preferences) {
     topic = preferences.pubTopicEvents
     qos = preferences.pubQosEvents.value
     retained = preferences.pubRetainEvents

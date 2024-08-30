@@ -293,7 +293,7 @@ class ParserTest {
     `when`(encryptionProvider.isPayloadEncryptionEnabled).thenReturn(false)
     val parser = Parser(encryptionProvider)
     val input = extendedMessageLocation
-    input.addMqttPreferences(testPreferences)
+    input.annotateFromPreferences(testPreferences)
     input.setTopicVisible()
     val serialized = input.toJson(parser)
     val jsonNode = objectMapper.readTree(serialized)

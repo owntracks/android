@@ -200,7 +200,8 @@ class MQTTMessageProcessorEndpoint(
         mqttClientAndConfiguration == null) {
       throw OutgoingMessageSendingException(NotConnectedException())
     }
-    message.addMqttPreferences(preferences)
+    // Updates the message data + metadata with things that are in our preferences
+    message.annotateFromPreferences(preferences)
 
     // We want to block until this completes off-thread, because we've been called sync by the
     // outgoing message loop

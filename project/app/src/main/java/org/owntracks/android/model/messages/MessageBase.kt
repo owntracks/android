@@ -86,7 +86,7 @@ abstract class MessageBase : BaseObservable(), MessageWithId {
 
   @JsonIgnore abstract override fun toString(): String
 
-  open fun addMqttPreferences(preferences: Preferences) {}
+  open fun annotateFromPreferences(preferences: Preferences) {}
 
   @Throws(IOException::class)
   open fun toJsonBytes(parser: Parser): ByteArray {

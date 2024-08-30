@@ -16,7 +16,7 @@ class MessageWaypoints(private val messageWithId: MessageWithId = MessageWithRan
 
   override fun toString(): String = "[MessageWaypoints waypoints=${waypoints?.size}]"
 
-  override fun addMqttPreferences(preferences: Preferences) {
+  override fun annotateFromPreferences(preferences: Preferences) {
     topic = preferences.pubTopicWaypoints
     qos = preferences.pubQosWaypoints.value
     retained = preferences.pubRetainWaypoints

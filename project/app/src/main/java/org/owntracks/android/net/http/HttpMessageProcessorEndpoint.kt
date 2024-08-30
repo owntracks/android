@@ -110,7 +110,7 @@ class HttpMessageProcessorEndpoint(
           .build()
 
   override suspend fun sendMessage(message: MessageBase) {
-    message.addMqttPreferences(preferences)
+    message.annotateFromPreferences(preferences)
     // HTTP messages carry the topic field in the body of the message, rather than MQTT which
     // simply publishes the message to that topic.
     message.setTopicVisible()

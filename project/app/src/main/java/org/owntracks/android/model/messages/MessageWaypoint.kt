@@ -31,7 +31,7 @@ class MessageWaypoint(private val messageWithId: MessageWithId = MessageWithRand
   override fun toString(): String =
       "[MessageWaypoint ts=${Instant.fromEpochSeconds(timestamp)},description=$description,lat=$latitude,lon=$longitude,rad=$radius]"
 
-  override fun addMqttPreferences(preferences: Preferences) {
+  override fun annotateFromPreferences(preferences: Preferences) {
     topic = preferences.pubTopicWaypoint
     qos = preferences.pubQosWaypoints.value
     retained = preferences.pubRetainWaypoints

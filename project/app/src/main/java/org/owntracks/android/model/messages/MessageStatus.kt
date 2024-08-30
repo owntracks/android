@@ -18,7 +18,7 @@ class MessageStatus(private val messageWithId: MessageWithId = MessageWithRandom
 
   @JsonIgnore override fun toString(): String = "[MessageStatus android=${android}]"
 
-  override fun addMqttPreferences(preferences: Preferences) {
+  override fun annotateFromPreferences(preferences: Preferences) {
     topic = preferences.pubTopicStatus
     qos = preferences.pubQosStatus.value
     retained = preferences.pubRetainStatus
@@ -37,7 +37,7 @@ class MessageStatus(private val messageWithId: MessageWithId = MessageWithRandom
   }
 }
 
-class AddMessageStatus() {
+class AddMessageStatus {
   @JsonProperty("wifi") var wifistate = 0
 
   @JsonProperty("ps") var powerSave = 0

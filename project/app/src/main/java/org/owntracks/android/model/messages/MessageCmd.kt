@@ -22,7 +22,7 @@ class MessageCmd(private val messageWithId: MessageWithId = MessageWithRandomId(
 
   override fun toString(): String = "[MessageCmd action=$action]"
 
-  override fun addMqttPreferences(preferences: Preferences) {
+  override fun annotateFromPreferences(preferences: Preferences) {
     topic = preferences.receivedCommandsTopic
   }
 

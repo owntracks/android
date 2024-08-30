@@ -76,7 +76,7 @@ open class MessageLocation(
   override fun toString(): String =
       "[MessageLocation id=$messageId ts=${Instant.fromEpochSeconds(timestamp)},lat=$latitude,long=$longitude,created_at=${createdAt},trigger=$trigger]"
 
-  override fun addMqttPreferences(preferences: Preferences) {
+  override fun annotateFromPreferences(preferences: Preferences) {
     topic = preferences.pubTopicLocations
     qos = preferences.pubQosLocations.value
     retained = preferences.pubRetainLocations
