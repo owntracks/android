@@ -59,6 +59,15 @@ enum class EndpointState {
             else -> e.toString()
           }
         }
+        is SocketTimeoutException ->
+            context.getString(R.string.statusEndpointStateMessageSocketTimeout)
+        // Client cert errors show up like this
+        is SSLProtocolException ->
+            if (e.message != null && e.message!!.contains("TLSV1_ALERT_CERTIFICATE_REQUIRED")) {
+              context.getString(R.string.statusEndpointStateMessageTLSEndpointClientCertsRequired)
+            } else {
+              context.getString(R.string.statusEndpointStateMessageTLSError, e.message)
+            }
         is MqttException ->
             when (val mqttExceptionCause = e.cause) {
               // DNS fail
