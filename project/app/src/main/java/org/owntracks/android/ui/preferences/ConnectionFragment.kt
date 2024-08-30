@@ -202,7 +202,7 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
   /** Show / hide preferences based on which mode is set */
   private fun setPreferenceVisibility() {
     listOf(
-            "preferenceGroupTLS",
+            Preferences::tls.name,
             "preferenceGroupParameters",
             Preferences::host.name,
             Preferences::port.name,
