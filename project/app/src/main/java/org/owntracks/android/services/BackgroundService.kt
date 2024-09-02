@@ -243,6 +243,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
     Timber.v("Backgroundservice onStartCommand intent=$intent")
     super.onStartCommand(intent, flags, startId)
     handleIntent(intent)
+    startForegroundService()
     return START_STICKY
   }
 
@@ -320,8 +321,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
     }
   }
 
-  private fun setupAndStartService() {
-    Timber.v("setupAndStartService")
+  private fun startForegroundService() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
       try {
         startForeground(
@@ -342,6 +342,11 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
     } else {
       startForeground(NOTIFICATION_ID_ONGOING, ongoingNotification.getNotification())
     }
+  }
+
+  private fun setupAndStartService() {
+    Timber.v("setupAndStartService")
+    startForegroundService()
     setupLocationRequest()
     scheduler.scheduleLocationPing()
     messageProcessor.initialize()
