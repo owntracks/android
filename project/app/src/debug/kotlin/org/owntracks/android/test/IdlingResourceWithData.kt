@@ -48,7 +48,8 @@ class IdlingResourceWithData<T : MessageBase>(
   }
 
   private fun reconcile() {
-    Timber.v("Contents: sent=${sent.joinToString(",")}, received=${received.joinToString(",")}")
+    Timber.v(
+        "Contents: sent=${sent.joinToString(",") { it.messageId }}, received=${received.joinToString(","){it.messageId}}")
     sent.intersectByComparator(received.toSet(), comparator).let { sentToRemove ->
       received.intersectByComparator((sent.toSet()), comparator).let { receivedToRemove ->
         sent.removeAll(sentToRemove).also {

@@ -259,51 +259,47 @@ constructor(
                     LastMessageStatus.RetryableFailure(
                         message.numberOfRetries, SEND_FAILURE_BACKOFF_INITIAL_WAIT)
               } else {
-                it.sendMessage(message)
-                    .also {
-                      if (message !is MessageWaypoint) {
-                        messageReceivedIdlingResource.add(message)
-                      }
+                it.sendMessage(message).exceptionOrNull()?.run {
+                  when (this) {
+                    is MessageProcessorEndpoint.NotReadyException -> {
+                      Timber.i("Endpoint not ready yet. Re-queueing")
+                      reQueueMessage(message)
+                      resendDelayWait(SEND_FAILURE_NOT_READY_WAIT)
+                      lastMessageStatus =
+                          LastMessageStatus.RetryableFailure(
+                              message.numberOfRetries, SEND_FAILURE_BACKOFF_INITIAL_WAIT)
                     }
-                    .exceptionOrNull()
-                    ?.run {
-                      when (this) {
-                        is MessageProcessorEndpoint.NotReadyException -> {
-                          Timber.i("Endpoint not ready yet. Re-queueing")
-                          reQueueMessage(message)
-                          resendDelayWait(SEND_FAILURE_NOT_READY_WAIT)
-                          lastMessageStatus =
-                              LastMessageStatus.RetryableFailure(
-                                  message.numberOfRetries, SEND_FAILURE_BACKOFF_INITIAL_WAIT)
-                        }
-                        is MessageProcessorEndpoint.OutgoingMessageSendingException,
-                        is ConfigurationIncompleteException,
-                        is MQTTMessageProcessorEndpoint.NotConnectedException -> {
-                          Timber.w(this, "Error sending message $message. Re-queueing")
-                          reQueueMessage(message)
-                          resendDelayWait(retryWait)
+                    is MessageProcessorEndpoint.OutgoingMessageSendingException,
+                    is ConfigurationIncompleteException,
+                    is MQTTMessageProcessorEndpoint.NotConnectedException -> {
+                      Timber.w(this, "Error sending message $message. Re-queueing")
+                      reQueueMessage(message)
+                      resendDelayWait(retryWait)
 
-                          lastMessageStatus =
-                              if (retriesToGo <= 0) {
-                                Timber.w("Ran out of retries for sending. Dropping message")
-                                LastMessageStatus.PermanentFailure
-                              } else {
-                                LastMessageStatus.RetryableFailure(
-                                    retriesToGo - 1,
-                                    (retryWait * 2)
-                                        .coerceAtMost(SEND_FAILURE_BACKOFF_MAX_WAIT)
-                                        .also { Timber.v("Increasing failure retry wait to $it") })
-                              }
-                        }
-                        else -> {
-                          Timber.e(this, "Couldn't send message $message. Dropping")
-                          lastMessageStatus = LastMessageStatus.PermanentFailure
-                        }
-                      }
+                      lastMessageStatus =
+                          if (retriesToGo <= 0) {
+                            Timber.w("Ran out of retries for sending. Dropping message")
+                            LastMessageStatus.PermanentFailure
+                          } else {
+                            LastMessageStatus.RetryableFailure(
+                                retriesToGo - 1,
+                                (retryWait * 2).coerceAtMost(SEND_FAILURE_BACKOFF_MAX_WAIT).also {
+                                  Timber.v("Increasing failure retry wait to $it")
+                                })
+                          }
                     }
+                    else -> {
+                      Timber.e(this, "Couldn't send message $message. Dropping")
+                      lastMessageStatus = LastMessageStatus.PermanentFailure
+                    }
+                  }
+                }
                     ?: run {
                       Timber.d("Message sent successfully: $message")
                       lastMessageStatus = LastMessageStatus.Success
+                      if (message !is MessageWaypoint) {
+                        messageReceivedIdlingResource.add(message)
+                      }
                     }
               }
             }

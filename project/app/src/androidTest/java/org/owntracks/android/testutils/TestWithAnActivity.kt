@@ -28,7 +28,7 @@ abstract class TestWithAnActivity<T : Activity>(
     private val startActivity: Boolean = true
 ) : TestWithCoverageEnabled() {
   val baristaRule = BaristaRule.create(activityClass)
-  private val flakyRule = FlakyTestRule().allowFlakyAttemptsByDefault(2)
+  private val flakyRule = FlakyTestRule().allowFlakyAttemptsByDefault(1)
   private val clearPreferencesRule: ClearPreferencesRule = ClearPreferencesRule()
   private val clearDatabaseRule: ClearDatabaseRule = ClearDatabaseRule()
   private val clearFilesRule: ClearFilesRule = ClearFilesRule()
