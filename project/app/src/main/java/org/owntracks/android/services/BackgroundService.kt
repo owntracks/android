@@ -36,7 +36,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.components.SingletonComponent
 import java.time.Duration
-import java.util.LinkedList
 import java.util.concurrent.TimeUnit
 import java.util.stream.Collectors
 import javax.inject.Inject
@@ -88,7 +87,7 @@ import timber.log.Timber
 @AndroidEntryPoint
 class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeListener {
   private var lastLocation: Location? = null
-  private val activeNotifications = LinkedList<Spannable>()
+  private val activeNotifications = mutableListOf<Spannable>()
   private var hasBeenStartedExplicitly = false
 
   @Inject lateinit var preferences: Preferences
@@ -405,17 +404,29 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
             })
     val eventText = "$transitionText $location"
     val whenStr = formatDate(timestampInMs)
-    activeNotifications.push(
-        SpannableString("$whenStr $title $eventText").apply {
-          setSpan(
-              StyleSpan(Typeface.BOLD), 0, whenStr.length + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        })
-    Timber.v("groupedNotifications: ${activeNotifications.size}")
-    val summary =
-        resources.getQuantityString(
-            R.plurals.notificationEventsTitle, activeNotifications.size, activeNotifications.size)
-    val inbox = NotificationCompat.InboxStyle().setSummaryText(summary)
-    activeNotifications.forEach { inbox.addLine(it) }
+    // Need to lock to prevent "clear()" being called while we're adding to it
+    val summaryAndInbox =
+        synchronized(activeNotifications) {
+          activeNotifications.add(
+              SpannableString("$whenStr $title $eventText").apply {
+                setSpan(
+                    StyleSpan(Typeface.BOLD),
+                    0,
+                    whenStr.length + 1,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+              })
+          Timber.v("groupedNotifications: ${activeNotifications.size}")
+          val summary =
+              resources.getQuantityString(
+                  R.plurals.notificationEventsTitle,
+                  activeNotifications.size,
+                  activeNotifications.size)
+          val inbox = NotificationCompat.InboxStyle().setSummaryText(summary)
+          activeNotifications.forEach { inbox.addLine(it) }
+          Pair(summary, inbox)
+        }
+    val summary = summaryAndInbox.first
+    val inbox = summaryAndInbox.second
 
     NotificationCompat.Builder(this, App.NOTIFICATION_CHANNEL_EVENTS)
         .setContentTitle(getString(R.string.events))
@@ -453,7 +464,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
 
   fun clearEventStackNotification() {
     Timber.v("clearing notification stack")
-    activeNotifications.clear()
+    synchronized(activeNotifications) { activeNotifications.clear() }
   }
 
   private suspend fun onGeofencingEvent(event: GeofencingEvent) {
