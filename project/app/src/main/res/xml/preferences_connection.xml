@@ -100,18 +100,15 @@
             android:enabled="false"
             android:key="tlsClientCrt"
             android:title="@string/preferencesClientCrt"
-            app:dependency="tls"
             app:iconSpaceReserved="false" />
         <Preference
             android:key="tlsClientCertInstall"
             android:title="@string/preferencesClientCrtInstall"
-            app:dependency="tls"
             app:iconSpaceReserved="false"
             app:isPreferenceVisible="false" />
         <Preference
             android:key="tlsCAInstall"
             android:title="@string/preferencesCaCrtInstall"
-            app:dependency="tls"
             app:iconSpaceReserved="false" />
     </PreferenceCategory>
     <PreferenceCategory
