@@ -97,7 +97,7 @@ class Parser @Inject constructor(private val encryptionProvider: EncryptionProvi
     return if (a.size == 1 && a[0] is MessageEncrypted) {
       if (encryptionProvider == null || !encryptionProvider.isPayloadEncryptionEnabled) {
         throw EncryptionException(
-            "received encrypted message but payload encryption is not enabled")
+            "received encrypted message but payload encryption is not enabled", null)
       }
       defaultMapper.readValue(
           encryptionProvider.decrypt((a[0] as MessageEncrypted).data),
@@ -139,7 +139,10 @@ class Parser @Inject constructor(private val encryptionProvider: EncryptionProvi
     return input
   }
 
-  class EncryptionException internal constructor(s: String?) : Exception(s)
+  class EncryptionException internal constructor(s: String, cause: Throwable?) :
+      Exception(s, cause) {
+    constructor(s: String) : this(s, null)
+  }
 }
 
 val thisModule =

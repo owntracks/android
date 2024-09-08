@@ -326,7 +326,7 @@ class MQTTMessageProcessorEndpoint(
                       }
                       .also { Timber.d("Parsed message: $it") })
             } catch (e: Parser.EncryptionException) {
-              Timber.w("Enable to decrypt received message ${message.id} on $topic")
+              Timber.w("Unable to decrypt received message ${message.id} on $topic")
             } catch (e: InvalidFormatException) {
               Timber.w("Malformed JSON message received ${message.id} on $topic")
             }

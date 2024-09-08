@@ -16,6 +16,8 @@
 - Fix bug where geofencing client wasn't initialized properly, leading to very unreliable region transition detection
 - Fix bug where some settings (`pubQos`, `mqttProtocolLevel` etc.) couldn't be set via the config editor (#1801)
 - Fix crash when trying to decode an invalid face image on an info card
+- Fix MQTT disconnect when receiving an encrypted message that can't be decrypted (#1831)
+- Fix HTTP client certs not working properly with Nginx (#1793)
 
 ## Version 2.5.1
 

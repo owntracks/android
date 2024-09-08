@@ -68,16 +68,25 @@ public class EncryptionProvider {
     }
 
     String decrypt(String cyphertextb64) throws Parser.EncryptionException {
-        byte[] onTheWire = Base64.decode(cyphertextb64.getBytes(), Base64.DEFAULT);
-        byte[] nonce = new byte[crypto_secretbox_NONCEBYTES];
-        if (onTheWire.length <= crypto_secretbox_NONCEBYTES) {
-            throw new Parser.EncryptionException("Message length shorter than nonce");
-        }
-        byte[] cyphertext = new byte[onTheWire.length - crypto_secretbox_NONCEBYTES];
+        try {
+            byte[] onTheWire = Base64.decode(cyphertextb64.getBytes(), Base64.DEFAULT);
 
-        System.arraycopy(onTheWire, 0, nonce, 0, crypto_secretbox_NONCEBYTES);
-        System.arraycopy(onTheWire, crypto_secretbox_NONCEBYTES, cyphertext, 0, onTheWire.length - crypto_secretbox_NONCEBYTES);
-        return new String(b.decrypt(nonce, cyphertext));
+            byte[] nonce = new byte[crypto_secretbox_NONCEBYTES];
+            if (onTheWire.length <= crypto_secretbox_NONCEBYTES) {
+                throw new Parser.EncryptionException("Message length shorter than nonce");
+            }
+            byte[] cyphertext = new byte[onTheWire.length - crypto_secretbox_NONCEBYTES];
+
+            System.arraycopy(onTheWire, 0, nonce, 0, crypto_secretbox_NONCEBYTES);
+            System.arraycopy(onTheWire, crypto_secretbox_NONCEBYTES, cyphertext, 0, onTheWire.length - crypto_secretbox_NONCEBYTES);
+            try {
+                return new String(b.decrypt(nonce, cyphertext));
+            } catch (Exception e) {
+                throw new Parser.EncryptionException("Decryption failed", e);
+            }
+        } catch (IllegalArgumentException e) {
+            throw new Parser.EncryptionException("Base64 decoding failed", e);
+        }
     }
 
     String encrypt(@NonNull String plaintext) {
