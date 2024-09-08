@@ -167,8 +167,11 @@ constructor(
     scope.launch { endpointStateRepo.setQueueLength(outgoingQueue.size) }
     endpoint = getEndpoint(preferences.mode)
 
-    dequeueAndSenderJob = scope.launch(ioDispatcher) { sendAvailableMessages() }
-    endpoint?.activate()
+    dequeueAndSenderJob =
+        scope.launch(ioDispatcher) {
+          endpoint?.activate()
+          sendAvailableMessages()
+        }
   }
 
   private fun getEndpoint(mode: ConnectionMode): MessageProcessorEndpoint {

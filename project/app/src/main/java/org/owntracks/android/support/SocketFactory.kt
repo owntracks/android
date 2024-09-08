@@ -29,6 +29,7 @@ class SocketFactory(
       var socketTimeout: Int = 0
   )
 
+  // This needs to be init off the main thread, as KeyChain operations are blocking
   init {
     Timber.v("initializing CustomSocketFactory")
     val trustManagerFactory =
