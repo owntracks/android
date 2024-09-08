@@ -24,6 +24,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.owntracks.android.data.EndpointState
 import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.data.repos.EndpointStateRepo
@@ -230,108 +232,119 @@ constructor(
         LastMessageStatus()
   }
 
+  private val outboundMessageQueueMutex = Mutex(false)
+
   // Should be on the background thread here, because we block
   private suspend fun sendAvailableMessages() {
-    try {
-      Timber.d("Starting outbound message loop.")
-      var lastMessageStatus: LastMessageStatus = LastMessageStatus.Success
-      var retriesToGo = 0
-      var retryWait: Duration
-      while (true) {
-        try {
-          @Suppress("BlockingMethodInNonBlockingContext") // We're in ioDispatcher here
-          val message: MessageBase = outgoingQueue.take() // <--- blocks
-          Timber.d("Taken message off queue: $message")
-          endpointStateRepo.setQueueLength(outgoingQueue.size + 1)
-          // reset the retry logic if the last message succeeded
-          if (lastMessageStatus is LastMessageStatus.Success ||
-              lastMessageStatus is LastMessageStatus.PermanentFailure) {
-            retriesToGo = message.numberOfRetries
-            retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT
-          } else {
-            retryWait = (lastMessageStatus as LastMessageStatus.RetryableFailure).nextTimeWaitFor
-          }
-          // Let's try to send the message
+    if (outboundMessageQueueMutex.isLocked) {
+      Timber.d("Outbound message loop already running. Skipping.")
+      return
+    }
+    outboundMessageQueueMutex.withLock {
+      try {
+        Timber.d("Starting outbound message loop.")
+        var lastMessageStatus: LastMessageStatus = LastMessageStatus.Success
+        var retriesToGo = 0
+        var retryWait: Duration
+        while (true) {
           try {
-            endpoint.let {
-              if (it == null) {
-                Timber.i("Endpoint not ready yet. Re-queueing")
-                reQueueMessage(message)
-                resendDelayWait(SEND_FAILURE_NOT_READY_WAIT)
-                lastMessageStatus =
-                    LastMessageStatus.RetryableFailure(
-                        message.numberOfRetries, SEND_FAILURE_BACKOFF_INITIAL_WAIT)
-              } else {
-                it.sendMessage(message).exceptionOrNull()?.run {
-                  when (this) {
-                    is MessageProcessorEndpoint.NotReadyException -> {
-                      Timber.i("Endpoint not ready yet. Re-queueing")
-                      reQueueMessage(message)
-                      resendDelayWait(SEND_FAILURE_NOT_READY_WAIT)
-                      lastMessageStatus =
-                          LastMessageStatus.RetryableFailure(
-                              message.numberOfRetries, SEND_FAILURE_BACKOFF_INITIAL_WAIT)
-                    }
-                    is MessageProcessorEndpoint.OutgoingMessageSendingException,
-                    is ConfigurationIncompleteException,
-                    is MQTTMessageProcessorEndpoint.NotConnectedException -> {
-                      Timber.w(this, "Error sending message $message. Re-queueing")
-                      reQueueMessage(message)
-                      resendDelayWait(retryWait)
-
-                      lastMessageStatus =
-                          if (retriesToGo <= 0) {
-                            Timber.w("Ran out of retries for sending. Dropping message")
-                            LastMessageStatus.PermanentFailure
-                          } else {
+            val message: MessageBase = outgoingQueue.take() // <--- blocks
+            Timber.d("Taken message off queue: $message")
+            endpointStateRepo.setQueueLength(outgoingQueue.size + 1)
+            // reset the retry logic if the last message succeeded
+            if (lastMessageStatus is LastMessageStatus.Success ||
+                lastMessageStatus is LastMessageStatus.PermanentFailure) {
+              retriesToGo = message.numberOfRetries
+              retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT
+            } else {
+              retryWait = (lastMessageStatus as LastMessageStatus.RetryableFailure).nextTimeWaitFor
+            }
+            // Let's try to send the message
+            try {
+              endpoint.let {
+                if (it == null) {
+                  Timber.i("Endpoint not ready yet. Re-queueing")
+                  reQueueMessage(message)
+                  resendDelayWait(SEND_FAILURE_NOT_READY_WAIT)
+                  lastMessageStatus =
+                      LastMessageStatus.RetryableFailure(
+                          message.numberOfRetries, SEND_FAILURE_BACKOFF_INITIAL_WAIT)
+                } else {
+                  it.sendMessage(message).exceptionOrNull()?.run {
+                    when (this) {
+                      is MessageProcessorEndpoint.NotReadyException -> {
+                        Timber.i("Endpoint not ready yet. Re-queueing")
+                        reQueueMessage(message)
+                        resendDelayWait(SEND_FAILURE_NOT_READY_WAIT)
+                        lastMessageStatus =
                             LastMessageStatus.RetryableFailure(
-                                retriesToGo - 1,
-                                (retryWait * 2).coerceAtMost(SEND_FAILURE_BACKOFF_MAX_WAIT).also {
-                                  Timber.v("Increasing failure retry wait to $it")
-                                })
-                          }
-                    }
-                    else -> {
-                      Timber.e(this, "Couldn't send message $message. Dropping")
-                      lastMessageStatus = LastMessageStatus.PermanentFailure
-                    }
-                  }
-                }
-                    ?: run {
-                      Timber.d("Message sent successfully: $message")
-                      lastMessageStatus = LastMessageStatus.Success
-                      if (message !is MessageWaypoint) {
-                        messageReceivedIdlingResource.add(message)
+                                message.numberOfRetries, SEND_FAILURE_BACKOFF_INITIAL_WAIT)
+                      }
+
+                      is MessageProcessorEndpoint.OutgoingMessageSendingException,
+                      is ConfigurationIncompleteException,
+                      is MQTTMessageProcessorEndpoint.NotConnectedException -> {
+                        Timber.w(this, "Error sending message $message. Re-queueing")
+                        reQueueMessage(message)
+                        resendDelayWait(retryWait)
+
+                        lastMessageStatus =
+                            if (retriesToGo <= 0) {
+                              Timber.w("Ran out of retries for sending. Dropping message")
+                              LastMessageStatus.PermanentFailure
+                            } else {
+                              LastMessageStatus.RetryableFailure(
+                                  retriesToGo - 1,
+                                  (retryWait * 2).coerceAtMost(SEND_FAILURE_BACKOFF_MAX_WAIT).also {
+                                    Timber.v("Increasing failure retry wait to $it")
+                                  })
+                            }
+                      }
+
+                      else -> {
+                        Timber.e(this, "Couldn't send message $message. Dropping")
+                        lastMessageStatus = LastMessageStatus.PermanentFailure
                       }
                     }
+                  }
+                      ?: run {
+                        Timber.d("Message sent successfully: $message")
+                        lastMessageStatus = LastMessageStatus.Success
+                        if (message !is MessageWaypoint) {
+                          messageReceivedIdlingResource.add(message)
+                        }
+                      }
+                }
               }
+            } catch (e: Exception) {
+              // Who knows why we're here. We didn't plan to be.
+              Timber.e(e, "Error sending message $message. Dropping.")
+              lastMessageStatus = LastMessageStatus.PermanentFailure
             }
-          } catch (e: Exception) {
-            // Who knows why we're here. We didn't plan to be.
-            Timber.e(e, "Error sending message $message. Dropping.")
-            lastMessageStatus = LastMessageStatus.PermanentFailure
-          }
 
-          if (lastMessageStatus is LastMessageStatus.Success ||
-              lastMessageStatus is LastMessageStatus.PermanentFailure) {
-            try {
-              if (!outgoingQueueIdlingResource.isIdleNow) {
-                Timber.v("Decrementing outgoingQueueIdlingResource")
-                outgoingQueueIdlingResource.decrement()
+            if (lastMessageStatus is LastMessageStatus.Success ||
+                lastMessageStatus is LastMessageStatus.PermanentFailure) {
+              try {
+                if (!outgoingQueueIdlingResource.isIdleNow) {
+                  Timber.v("Decrementing outgoingQueueIdlingResource")
+                  outgoingQueueIdlingResource.decrement()
+                }
+              } catch (e: IllegalStateException) {
+                Timber.w(e, "outgoingQueueIdlingResource is invalid")
               }
-            } catch (e: IllegalStateException) {
-              Timber.w(e, "outgoingQueueIdlingResource is invalid")
             }
+          } catch (e: InterruptedException) {
+            Timber.w(e, "Outgoing message loop interrupted")
+            break
+          } finally {
+            endpointStateRepo.setQueueLength(outgoingQueue.size)
           }
-        } catch (e: InterruptedException) {
-          Timber.w(e, "Outgoing message loop interrupted")
-          break
-        } finally {
-          endpointStateRepo.setQueueLength(outgoingQueue.size)
         }
+      } catch (e: Exception) {
+        Timber.e(e, "Outgoing message loop failed")
+      } finally {
+        Timber.i("finishing outbound message loop")
       }
-    } catch (e: Exception) {
-      Timber.e(e, "Outgoing message loop failed")
     }
   }
 
