@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 2.5.3
+
+## New features
+
+- OSM map is a little easier to zoom without accidentally rotating.
+
 ## Version 2.5.2
 
 ### New features

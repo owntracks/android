@@ -35,7 +35,6 @@ import org.osmdroid.views.overlay.TilesOverlay
 import org.osmdroid.views.overlay.compass.CompassOverlay
 import org.osmdroid.views.overlay.compass.IOrientationConsumer
 import org.osmdroid.views.overlay.compass.IOrientationProvider
-import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow
 import org.osmdroid.views.overlay.mylocation.IMyLocationConsumer
 import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
@@ -129,7 +128,9 @@ internal constructor(
                     MapLocationZoomLevelAndRotation(
                         LatLng(mapCenter.latitude, mapCenter.longitude),
                         zoomLevelDouble,
-                        mapOrientation))
+                        mapOrientation,
+                    ),
+                )
               }
             }
 
@@ -142,7 +143,8 @@ internal constructor(
               updateViewModelMapLocation()
               return true
             }
-          })
+          },
+      )
 
   class MapRotationOrientationProvider(context: Context) : IOrientationProvider {
     private val display = context.safeGetDisplay()
@@ -237,11 +239,13 @@ internal constructor(
                   setPersonIcon(dot)
                   setPersonAnchor(0.5f, 0.5f)
                   setDirectionAnchor(0.5f, 0.5f)
-                })
+                },
+            )
           }
 
-          if (!overlays.any { it is RotationGestureOverlay } && preferences.enableMapRotation) {
-            overlays.add(RotationGestureOverlay(this))
+          if (!overlays.any { it is RotationGestureOverlayWithDeadZone } &&
+              preferences.enableMapRotation) {
+            overlays.add(RotationGestureOverlayWithDeadZone(this))
           }
           if (!overlays.any { it is CopyrightOverlay }) {
             overlays.add(CopyrightOverlay(context))
@@ -253,12 +257,16 @@ internal constructor(
 
             overlays.add(
                 ClickableCompassOverlay(
-                        requireContext().applicationContext, orientationProvider, this)
+                        requireContext().applicationContext,
+                        orientationProvider,
+                        this,
+                    )
                     .apply {
                       isPointerMode = false
                       enableCompass()
                       setCompassCenter(compassMargin, compassMargin)
-                    })
+                    },
+            )
           }
           if (!overlays.any { it is ScaleBarOverlay }) {
             overlays.add(ScaleBarOverlay(this))
@@ -301,7 +309,8 @@ internal constructor(
                 true
               }
               setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-            })
+            },
+        )
       }
       overlays
           .firstOrNull { it is Marker && it.id == id }
@@ -365,7 +374,8 @@ internal constructor(
                     points =
                         Polygon.pointsAsCircle(
                                 region.getLocation().toLatLng().toGeoPoint(),
-                                region.geofenceRadius.toDouble())
+                                region.geofenceRadius.toDouble(),
+                            )
                             .filter {
                               (TileSystemWebMercator.MinLatitude..TileSystemWebMercator.MaxLatitude)
                                   .contains(it.latitude) &&
@@ -389,7 +399,8 @@ internal constructor(
                     position = region.getLocation().toLatLng().toGeoPoint()
                     title = region.description
                     setInfoWindow(MarkerInfoWindow(R.layout.osm_region_bubble, this@run))
-                  })
+                  },
+              )
             }
             .let { overlays.addAll(0, it) }
       }
