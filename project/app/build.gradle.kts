@@ -19,7 +19,7 @@ val googleMapsAPIKey =
 
 val gmsImplementation: Configuration by configurations.creating
 
-val packageVersionCode: Int = System.getenv("VERSION_CODE")?.toInt() ?: 420502000
+val packageVersionCode: Int = System.getenv("VERSION_CODE")?.toInt() ?: 420503000
 val manuallySetVersion: Boolean = System.getenv("VERSION_CODE") != null
 
 android {
@@ -32,7 +32,7 @@ android {
     targetSdk = 34
 
     versionCode = packageVersionCode
-    versionName = "2.5.2"
+    versionName = "2.5.3"
 
     val localeCount = fileTree("src/main/res/").map {
       it.toPath()
