@@ -76,16 +76,16 @@ jobs:
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
 
-      - name: Build release APKs
+      - name: Setup gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
+
+      - name: Build release APKs
         env:
           KEYSTORE_PASSPHRASE: ${{ secrets.KEYSTORE_PASSPHRASE }}
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
-        with:
-          build-root-directory: project
-          cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
-          arguments: |
-            assembleRelease --stacktrace --scan
+        run: ./project/gradlew -p project assembleRelease --scan
 
       - name: Create release
         id: create_release
