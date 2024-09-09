@@ -6,56 +6,40 @@
     ":rebaseStalePrs",
     ":disableDependencyDashboard"
   ],
-  "assignees": [
-    "growse"
-  ],
-  "ignoreDeps": [
-    "android"
-  ],
+  "assignees": ["growse"],
+  "ignoreDeps": ["android"],
   "packageRules": [
     {
-      "matchDatasources": [
-        "pypi"
-      ],
-      "matchFileNames": [
-        ".github/google-play-api/requirements.txt"
-      ],
-      "automerge": true
-    },
-    {
-      "matchPackagePatterns": [
-        "^com.fasterxml.jackson"
-      ],
+      "matchPackagePatterns": ["com.google.flatbuffers:flatbuffers-java"],
       "enabled": false
     },
     {
-      "matchUpdateTypes": [
-        "major"
-      ],
+      "matchDatasources": ["pypi"],
+      "matchFileNames": [".github/google-play-api/requirements.txt"],
+      "automerge": true
+    },
+    {
+      "matchPackagePatterns": ["^com.fasterxml.jackson"],
+      "enabled": false
+    },
+    {
+      "matchUpdateTypes": ["major"],
       "addLabels": ["major"]
     },
     {
-      "matchUpdateTypes": [
-        "minor"
-      ],
+      "matchUpdateTypes": ["minor"],
       "addLabels": ["minor"]
     },
     {
-      "matchUpdateTypes": [
-        "patch"
-      ],
+      "matchUpdateTypes": ["patch"],
       "addLabels": ["patch"]
     },
     {
-      "matchUpdateTypes": [
-        "pin"
-      ],
+      "matchUpdateTypes": ["pin"],
       "addLabels": ["pin"]
     }
   ],
-  "labels": [
-    "dependencies"
-  ],
+  "labels": ["dependencies"],
   "platformAutomerge": true,
   "automergeStrategy": "rebase"
 }
