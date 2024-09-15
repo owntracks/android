@@ -29,7 +29,6 @@ jobs:
           route: GET /repos/owntracks/android/git/matching-refs/tags/${{ github.ref_name }}-beta
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: "echo beta tags: '${{ steps.get_beta_tags.outputs.data }}'"
       - name: Get number of matching tags
         id: tagCount
         env:
@@ -54,8 +53,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r .github/google-play-api/requirements.txt
 
+      # Step outputs are strings, so we need to use fromJSON to coerce to an integer
       - name: Get current version code from internal track
-        if: ${{ contains(github.ref_name, 'beta') || steps.tagCount.outputs.beta_tag_count == 0 }}
+        if: ${{ contains(github.ref_name, 'beta') || fromJSON(steps.tagCount.outputs.beta_tag_count) == 0 }}
         env:
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
         run: |
@@ -63,7 +63,7 @@ jobs:
           echo VERSION_CODE="${VERSION_CODE}" >> "${GITHUB_ENV}"
 
       - name: Get current version code from beta track
-        if: ${{ !contains(github.ref_name, 'beta') && steps.tagCount.outputs.beta_tag_count >= 0 }}
+        if: ${{ !contains(github.ref_name, 'beta') && fromJSON(steps.tagCount.outputs.beta_tag_count) >= 0 }}
         env:
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
         run: |
