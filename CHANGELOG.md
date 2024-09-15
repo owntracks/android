@@ -5,6 +5,7 @@
 ## New features
 
 - OSM map is a little easier to zoom without accidentally rotating.
+- Added `cmd` field to the `status` command to retrieve if `remoteConfiguration` is allowed
 
 ## Version 2.5.2
 

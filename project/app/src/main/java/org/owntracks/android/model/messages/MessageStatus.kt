@@ -47,4 +47,6 @@ class AddMessageStatus {
   @JsonProperty("hib") var appHibernation = 0
 
   @JsonProperty("loc") var locationPermission = 0
+
+  @JsonProperty("cmd") var remoteConfiguration = 0
 }

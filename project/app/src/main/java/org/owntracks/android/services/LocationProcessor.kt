@@ -257,6 +257,7 @@ constructor(
                 batteryOptimizations = deviceMetricsProvider.batteryOptimizations
                 appHibernation = deviceMetricsProvider.appHibernation
                 locationPermission = deviceMetricsProvider.locationPermission
+                remoteConfiguration = preferences.remoteConfiguration.compareTo(false)
               }
         })
     publishResponseMessageIdlingResource.setIdleState(true)

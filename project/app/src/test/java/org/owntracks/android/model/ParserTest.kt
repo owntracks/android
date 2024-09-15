@@ -829,6 +829,7 @@ class ParserTest {
                 batteryOptimizations = 1
                 appHibernation = 1
                 locationPermission = -3
+                remoteConfiguration = 1
               }
         }
     val serialized = message.toJson(parser)
@@ -840,6 +841,7 @@ class ParserTest {
     assertEquals(message.android?.batteryOptimizations, jsonNode.get("android").get("bo").asInt())
     assertEquals(message.android?.appHibernation, jsonNode.get("android").get("hib").asInt())
     assertEquals(message.android?.locationPermission, jsonNode.get("android").get("loc").asInt())
+    assertEquals(message.android?.remoteConfiguration, jsonNode.get("android").get("cmd").asInt())
   }
 
   // endregion
