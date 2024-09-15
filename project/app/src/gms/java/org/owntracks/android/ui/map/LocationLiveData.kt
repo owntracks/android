@@ -1,9 +1,9 @@
 package org.owntracks.android.ui.map
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Location
 import android.os.Looper
+import androidx.annotation.RequiresPermission
 import androidx.lifecycle.LiveData
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationAvailability
@@ -32,7 +32,9 @@ class LocationLiveData(
 
   private val lock = Semaphore(1)
 
-  @SuppressLint("MissingPermission")
+  @RequiresPermission(
+      anyOf =
+          ["android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_COARSE_LOCATION"])
   suspend fun requestLocationUpdates() {
     // We don't want to kick off another request while we're doing this one
     lock.acquire()

@@ -1,6 +1,5 @@
 package org.owntracks.android.location
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Location
 import android.location.LocationListener
@@ -8,6 +7,7 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import androidx.annotation.RequiresPermission
 import androidx.core.location.LocationManagerCompat
 import androidx.core.os.ExecutorCompat
 import java.util.WeakHashMap
@@ -39,7 +39,9 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient(
                 .intersect(availableLocationProviders)
       }
 
-  @SuppressLint("MissingPermission")
+  @RequiresPermission(
+      anyOf =
+          ["android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_COARSE_LOCATION"])
   override fun singleHighAccuracyLocation(clientCallBack: LocationCallback, looper: Looper) {
     Timber.d("Getting single high-accuracy location, posting to $clientCallBack")
     locationManager?.run {
@@ -53,7 +55,9 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient(
     }
   }
 
-  @SuppressLint("MissingPermission")
+  @RequiresPermission(
+      anyOf =
+          ["android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_COARSE_LOCATION"])
   override fun actuallyRequestLocationUpdates(
       locationRequest: LocationRequest,
       clientCallBack: LocationCallback,

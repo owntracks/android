@@ -116,16 +116,19 @@ internal constructor(
                   })
               .build())
 
-  @SuppressLint("MissingPermission")
   override fun initMap() {
     MapsInitializer.initialize(requireContext(), MapsInitializer.Renderer.LATEST, this)
     this.googleMap?.run {
       val myLocationEnabled = viewModel.hasLocationPermission()
-      Timber.d("GoogleMapFragment initMap hasLocationCapability=$myLocationEnabled")
+      if (viewModel.hasLocationPermission()) {
+        Timber.d("GoogleMapFragment initMap hasLocationCapability=$myLocationEnabled")
+        @SuppressLint("MissingPermission") // We've guarded this already
+        isMyLocationEnabled = myLocationEnabled
+      }
+
       setMaxZoomPreference(MAX_ZOOM_LEVEL.toFloat())
       setMinZoomPreference(MIN_ZOOM_LEVEL.toFloat())
       isIndoorEnabled = false
-      isMyLocationEnabled = myLocationEnabled
       uiSettings.isMyLocationButtonEnabled = false
       uiSettings.setAllGesturesEnabled(true)
       preferences.enableMapRotation.run {

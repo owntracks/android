@@ -1,7 +1,7 @@
 package org.owntracks.android.ui
 
-import android.annotation.SuppressLint
 import android.app.Notification
+import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationManagerCompat
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -20,7 +20,7 @@ class NotificationsStash @Inject constructor() {
     notifications.add(notification)
   }
 
-  @SuppressLint("MissingPermission")
+  @RequiresPermission("android.permission.POST_NOTIFICATIONS")
   fun showAll(from: NotificationManagerCompat) {
     notifications.run {
       forEach { from.notify(System.currentTimeMillis().toInt(), it) }

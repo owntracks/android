@@ -1,9 +1,9 @@
 package org.owntracks.android.gms.location
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Location
 import android.os.Looper
+import androidx.annotation.RequiresPermission
 import com.google.android.gms.location.CurrentLocationRequest
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.Granularity.GRANULARITY_PERMISSION_LEVEL
@@ -33,7 +33,9 @@ class GMSLocationProviderClient(
   private val callbackMap =
       WeakHashMap<LocationCallback, com.google.android.gms.location.LocationCallback>()
 
-  @SuppressLint("MissingPermission")
+  @RequiresPermission(
+      anyOf =
+          ["android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_COARSE_LOCATION"])
   override fun singleHighAccuracyLocation(clientCallBack: LocationCallback, looper: Looper) {
     fusedLocationProviderClient
         .getCurrentLocation(
@@ -65,7 +67,9 @@ class GMSLocationProviderClient(
    *   availability
    * @param looper a handler on which to run the location requester loop
    */
-  @SuppressLint("MissingPermission")
+  @RequiresPermission(
+      anyOf =
+          ["android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_COARSE_LOCATION"])
   override fun actuallyRequestLocationUpdates(
       locationRequest: LocationRequest,
       clientCallBack: LocationCallback,
@@ -99,7 +103,9 @@ class GMSLocationProviderClient(
     fusedLocationProviderClient.flushLocations()
   }
 
-  @SuppressLint("MissingPermission")
+  @RequiresPermission(
+      anyOf =
+          ["android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_COARSE_LOCATION"])
   override fun getLastLocation(): Location? {
     return try {
       Tasks.await(fusedLocationProviderClient.lastLocation)

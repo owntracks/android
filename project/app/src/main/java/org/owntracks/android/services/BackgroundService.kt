@@ -259,9 +259,11 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
       when (intent.action) {
         INTENT_ACTION_SEND_LOCATION_USER -> {
           lifecycleScope.launch {
-            locationProviderClient.singleHighAccuracyLocation(
-                callbackForReportType[MessageLocation.ReportType.USER]!!.value,
-                runThingsOnOtherThreads.getBackgroundLooper())
+            if (requirementsChecker.hasLocationPermissions()) {
+              locationProviderClient.singleHighAccuracyLocation(
+                  callbackForReportType[MessageLocation.ReportType.USER]!!.value,
+                  runThingsOnOtherThreads.getBackgroundLooper())
+            }
           }
           return
         }
@@ -501,95 +503,91 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
   }
 
   fun requestOnDemandLocationUpdate(reportType: MessageLocation.ReportType) {
-    if (locationPermissionIsMissing()) {
+    if (requirementsChecker.hasLocationPermissions()) {
+      Timber.d("On demand location request")
+      locationProviderClient.singleHighAccuracyLocation(
+          callbackForReportType[reportType]!!.value, runThingsOnOtherThreads.getBackgroundLooper())
+    } else {
       Timber.e("missing location permission")
-      return
     }
-    Timber.d("On demand location request")
-    locationProviderClient.singleHighAccuracyLocation(
-        callbackForReportType[reportType]!!.value, runThingsOnOtherThreads.getBackgroundLooper())
   }
 
-  private fun setupLocationRequest(): Boolean {
+  private fun setupLocationRequest(): Result<Unit> {
     Timber.v("setupLocationRequest")
-    if (locationPermissionIsMissing()) {
-      Timber.e("missing location permission")
-      return false
-    }
-
-    val monitoring = preferences.monitoring
-    var interval: Duration? = null
-    var smallestDisplacement: Float? = null
-    val priority: LocatorPriority
-    when (monitoring) {
-      MonitoringMode.QUIET,
-      MonitoringMode.MANUAL -> {
-        interval = Duration.ofSeconds(preferences.locatorInterval.toLong())
-        smallestDisplacement = preferences.locatorDisplacement.toFloat()
-        priority = preferences.locatorPriority ?: LocatorPriority.LowPower
-      }
-      MonitoringMode.SIGNIFICANT -> {
-        interval = Duration.ofSeconds(preferences.locatorInterval.toLong())
-        smallestDisplacement = preferences.locatorDisplacement.toFloat()
-        priority = preferences.locatorPriority ?: LocatorPriority.BalancedPowerAccuracy
-      }
-      MonitoringMode.MOVE -> {
-        interval = Duration.ofSeconds(preferences.moveModeLocatorInterval.toLong())
-        priority = preferences.locatorPriority ?: LocatorPriority.HighAccuracy
-      }
-    }
-    val fastestInterval =
-        if (preferences.pegLocatorFastestIntervalToInterval) {
-          interval
-        } else {
-          Duration.ofSeconds(1)
+    if (requirementsChecker.hasLocationPermissions()) {
+      val monitoring = preferences.monitoring
+      var interval: Duration? = null
+      var smallestDisplacement: Float? = null
+      val priority: LocatorPriority
+      when (monitoring) {
+        MonitoringMode.QUIET,
+        MonitoringMode.MANUAL -> {
+          interval = Duration.ofSeconds(preferences.locatorInterval.toLong())
+          smallestDisplacement = preferences.locatorDisplacement.toFloat()
+          priority = preferences.locatorPriority ?: LocatorPriority.LowPower
         }
-    val request =
-        LocationRequest(fastestInterval, smallestDisplacement, null, null, priority, interval, null)
-    Timber.d("location update request params: $request")
-    locationProviderClient.flushLocations()
-    locationProviderClient.requestLocationUpdates(
-        request,
-        callbackForReportType[MessageLocation.ReportType.DEFAULT]!!.value,
-        runThingsOnOtherThreads.getBackgroundLooper())
-    return true
+
+        MonitoringMode.SIGNIFICANT -> {
+          interval = Duration.ofSeconds(preferences.locatorInterval.toLong())
+          smallestDisplacement = preferences.locatorDisplacement.toFloat()
+          priority = preferences.locatorPriority ?: LocatorPriority.BalancedPowerAccuracy
+        }
+
+        MonitoringMode.MOVE -> {
+          interval = Duration.ofSeconds(preferences.moveModeLocatorInterval.toLong())
+          priority = preferences.locatorPriority ?: LocatorPriority.HighAccuracy
+        }
+      }
+      val fastestInterval =
+          if (preferences.pegLocatorFastestIntervalToInterval) {
+            interval
+          } else {
+            Duration.ofSeconds(1)
+          }
+      val request =
+          LocationRequest(
+              fastestInterval, smallestDisplacement, null, null, priority, interval, null)
+      Timber.d("location update request params: $request")
+      locationProviderClient.flushLocations()
+      locationProviderClient.requestLocationUpdates(
+          request,
+          callbackForReportType[MessageLocation.ReportType.DEFAULT]!!.value,
+          runThingsOnOtherThreads.getBackgroundLooper())
+      return Result.success(Unit)
+    } else {
+      return Result.failure(Exception("Missing location permission"))
+    }
   }
 
   private suspend fun setupGeofences() {
-    if (locationPermissionIsMissing()) {
-      Timber.e("missing location permission")
-      return
-    }
-    withContext(ioDispatcher) {
-      val waypoints = waypointsRepo.all
-      Timber.i("Setting up geofences for ${waypoints.size} waypoints")
-      val geofences =
-          waypoints
-              .map {
-                Geofence(
-                    it.id.toString(),
-                    Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT,
-                    2.minutes.inWholeMilliseconds.toInt(),
-                    it.geofenceLatitude,
-                    it.geofenceLongitude,
-                    it.geofenceRadius.toFloat(),
-                    Geofence.NEVER_EXPIRE,
-                    null)
-              }
-              .toList()
-      geofencingClient.removeGeofences(this@BackgroundService)
-      if (geofences.isNotEmpty()) {
-        val request = GeofencingRequest(Geofence.GEOFENCE_TRANSITION_ENTER, geofences)
-        geofencingClient.addGeofences(request, this@BackgroundService)
-      }
-    }
-  }
+    if (requirementsChecker.hasLocationPermissions()) {
 
-  private fun locationPermissionIsMissing(): Boolean {
-    return (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
-        PackageManager.PERMISSION_DENIED &&
-        ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) ==
-            PackageManager.PERMISSION_DENIED)
+      withContext(ioDispatcher) {
+        val waypoints = waypointsRepo.all
+        Timber.i("Setting up geofences for ${waypoints.size} waypoints")
+        val geofences =
+            waypoints
+                .map {
+                  Geofence(
+                      it.id.toString(),
+                      Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT,
+                      2.minutes.inWholeMilliseconds.toInt(),
+                      it.geofenceLatitude,
+                      it.geofenceLongitude,
+                      it.geofenceRadius.toFloat(),
+                      Geofence.NEVER_EXPIRE,
+                      null)
+                }
+                .toList()
+        geofencingClient.removeGeofences(this@BackgroundService)
+        if (geofences.isNotEmpty()) {
+          val request = GeofencingRequest(Geofence.GEOFENCE_TRANSITION_ENTER, geofences)
+          geofencingClient.addGeofences(request, this@BackgroundService)
+        }
+      }
+    } else {
+      Timber.e("Missing location permission")
+    }
   }
 
   fun onGeocodingProviderResult(latLng: LatLng, reverseGeocodedText: String) {
@@ -638,7 +636,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
     Timber.v("Reinitializing location requests")
     runThingsOnOtherThreads.postOnServiceHandlerDelayed(
         {
-          if (setupLocationRequest()) {
+          if (setupLocationRequest().isSuccess) {
             Timber.d("Getting last location")
             locationProviderClient.getLastLocation()?.run {
               lifecycleScope.launch {

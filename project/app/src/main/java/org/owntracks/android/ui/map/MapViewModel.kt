@@ -320,7 +320,10 @@ constructor(
 
   /** Start requesting location updates for the blue dot */
   fun requestLocationUpdatesForBlueDot() {
-    viewModelScope.launch { currentLocation.requestLocationUpdates() }
+    if (requirementsChecker.hasLocationPermissions()) {
+      @Suppress("MissingPermission") // We've already checked for permissions
+      viewModelScope.launch { currentLocation.requestLocationUpdates() }
+    }
   }
 
   /**

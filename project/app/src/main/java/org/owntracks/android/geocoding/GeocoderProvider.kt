@@ -1,6 +1,5 @@
 package org.owntracks.android.geocoding
 
-import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -89,7 +88,6 @@ constructor(
         else -> null
       }
 
-  @SuppressLint("MissingPermission")
   private fun maybeCreateErrorNotification(result: GeocodeResult) {
     if (result is GeocodeResult.Formatted ||
         result is GeocodeResult.Empty ||
