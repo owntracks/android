@@ -87,6 +87,9 @@ jobs:
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
         run: ./project/gradlew -p project assembleRelease --scan
 
+      - name: Extract changelog
+        run: awk '/^## / { if (p) {exit}; { p=1; next} } p' CHANGELOG.md > this_release_changelog.md
+
       - name: Create release
         id: create_release
         uses: softprops/action-gh-release@v2
@@ -94,7 +97,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref_name }}
-          body_path: ./CHANGELOG.md
+          body_path: ./this_release_changelog.md
           name: ${{ github.ref_name }}
           draft: true
           prerelease: ${{ contains(github.ref_name, 'beta') }}
