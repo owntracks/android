@@ -2,9 +2,13 @@
 
 ## Version 2.5.3
 
-## New features
+### New features
 
-- OSM map is a little easier to zoom without accidentally rotating.
+- OSM map is a little easier to zoom without accidentally rotating (#1825)
+
+### Bug fixes
+
+- Use AGP-provided version of R8 rather than version from Google so that F-Droid can build it (#1852)
 
 ## Version 2.5.2
 

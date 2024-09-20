@@ -44,7 +44,6 @@ okhttp = "4.12.0"
 osmdroid = "6.1.20"
 paho-mqtt = "1.2.5"
 play-services-location = "21.3.0"
-r8 = "8.6.17"
 slf4j-simple = "2.0.16"
 slf4j-timber = "1.0.1"
 square-leakcanary = "2.14"
@@ -142,7 +141,6 @@ androidx-test-orchestrator = { module = "androidx.test:orchestrator", version.re
 androidx-test-espresso-idling = { module = "androidx.test.espresso:espresso-idling-resource", version.ref = "androidx-test-espresso" }
 
 # Build utils
-r8 = { module = "com.android.tools:r8", version.ref = "r8" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 desugar = { module = "com.android.tools:desugar_jdk_libs_nio", version.ref = "desguar-jdk" }
 
@@ -156,6 +154,6 @@ androidx = ["androidx-core-ktx", "androidx-preference", "androidx-work-runtime",
 androidx-room = ["androidx-room-runtime", "androidx-room-ktx"]
 androidx-test = ["androidx-test-junit", "androidx-test-core-ktx", "androidx-test-rules", "androidx-test-runner"]
 androidx-test-util = ["androidx-test-services", "androidx-test-orchestrator"]
-buildscript = ["r8", "guava"]
+buildscript = ["guava"]
 objectbox-migration = ["lmdb-kt", "slf4j-simple", "slf4j-timber", "flatbuffers"]
 kmqtt = ["kmqtt-broker", "kmqtt-common"]
