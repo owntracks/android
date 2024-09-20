@@ -9,6 +9,7 @@
 ### Bug fixes
 
 - Use AGP-provided version of R8 rather than version from Google so that F-Droid can build it (#1852)
+- Try to not block the main thread when generating an Status Message, which causes an ANR
 
 ## Version 2.5.2
 

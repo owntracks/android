@@ -248,17 +248,20 @@ constructor(
   }
 
   fun publishStatusMessage() {
-    messageProcessor.queueMessageForSending(
-        MessageStatus().apply {
-          android =
-              AddMessageStatus().apply {
-                wifistate = wifiInfoProvider.isWiFiEnabled()
-                powerSave = deviceMetricsProvider.powerSave
-                batteryOptimizations = deviceMetricsProvider.batteryOptimizations
-                appHibernation = deviceMetricsProvider.appHibernation
-                locationPermission = deviceMetricsProvider.locationPermission
-              }
-        })
-    publishResponseMessageIdlingResource.setIdleState(true)
+    // Getting appHibernation takes a while, so lets not block the main thrad
+    scope.launch(ioDispatcher) {
+      messageProcessor.queueMessageForSending(
+          MessageStatus().apply {
+            android =
+                AddMessageStatus().apply {
+                  wifistate = wifiInfoProvider.isWiFiEnabled()
+                  powerSave = deviceMetricsProvider.powerSave
+                  batteryOptimizations = deviceMetricsProvider.batteryOptimizations
+                  appHibernation = deviceMetricsProvider.appHibernation
+                  locationPermission = deviceMetricsProvider.locationPermission
+                }
+          })
+      publishResponseMessageIdlingResource.setIdleState(true)
+    }
   }
 }
