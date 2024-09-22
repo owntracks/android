@@ -1,0 +1,65 @@
+---
+name: Push to default, build, test, lint, and publish to internal track
+"on":
+  push:
+    branches:
+      - master
+    paths:
+      - ".github/workflows/**"
+      - "project/app/src/**"
+      - "project/app/*.pro"
+      - "project/buildSrc/src/**"
+      - "project/*.gradle.kts"
+      - "project/app/*.gradle.kts"
+      - "project/gradle.properties"
+      - "project/gradle/wrapper/gradle-wrapper.properties"
+      - "project/gradle/libs.versions.toml"
+
+env:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=true -Dorg.gradle.configuration-cache=true -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.jvmargs='-Xmx3096M -Dkotlin.daemon.jvm.options=-Xmx2048M -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8 -XX:+UseParallelGC'"
+jobs:
+  build-test-lint:
+    name: Build, Test, and Lint
+    permissions:
+      contents: read
+      checks: write
+    uses: ./.github/workflows/build-test-lint.yaml
+    secrets: inherit
+  espresso-test:
+    name: Espresso Test
+    permissions:
+      contents: read
+      checks: write
+    uses: ./.github/workflows/espresso.yaml
+    secrets: inherit
+    needs:
+      - build-test-lint
+  publish-to-play-store:
+    name: "Publish to Play Store"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    needs: espresso-test
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+      - name: Create keystore
+        run: |
+          echo -n "${KEYSTORE_BASE64}" | base64 -d > project/owntracks.release.keystore.jks
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+      - name: Process GMS Version codes from Play Store
+        uses: ./.github/actions/gradle-task
+        with:
+          task: clean processGmsVersionCodes
+          gradle-cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
+        env:
+          ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
+      - name: Publish Release
+        uses: ./.github/actions/gradle-task
+        with:
+          task: publishGmsReleaseBundle
+          gradle-cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
+        env:
+          KEYSTORE_PASSPHRASE: ${{ secrets.KEYSTORE_PASSPHRASE }}
+          ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
+          GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}

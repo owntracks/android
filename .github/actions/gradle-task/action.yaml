@@ -1,0 +1,29 @@
+---
+name: "gradle-task"
+description: "Runs a gradle task"
+inputs:
+  gradle-cache-encryption-key:
+    description: "Gradle cache encryption key"
+    required: true
+  task:
+    description: "Gradle task to run"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Java setup"
+      uses: actions/setup-java@6a0805fcefea3d4657a47ac4c165951e33482018 # v4
+      with:
+        distribution: "temurin"
+        java-version: "17"
+    - name: Gradle setup
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        cache-read-only: false
+        cache-encryption-key: ${{ inputs.gradle-cache-encryption-key }}
+    - name: Ktfmt
+      shell: bash
+      run: ./project/gradlew -p project ${{ inputs.task }} --scan
+      env:
+        GRADLE_OPTS: "-Dorg.gradle.daemon=true -Dorg.gradle.configuration-cache=true -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.jvmargs='-Xmx3096M -Dkotlin.daemon.jvm.options=-Xmx2048M -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8 -XX:+UseParallelGC'"

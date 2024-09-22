@@ -39,12 +39,6 @@ jobs:
           echo "beta_tag_count=${LENGTH}"
           echo "beta_tag_count=$LENGTH" >> "${GITHUB_OUTPUT}"
 
-      - name: set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: 17
-          distribution: "temurin"
-
       - name: Set up Python
         uses: actions/setup-python@v5
 
@@ -76,16 +70,14 @@ jobs:
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
 
-      - name: Setup gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
-
       - name: Build release APKs
+        uses: ./.github/actions/gradle-task
+        with:
+          task: assembleRelease
+          gradle-cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
         env:
           KEYSTORE_PASSPHRASE: ${{ secrets.KEYSTORE_PASSPHRASE }}
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
-        run: ./project/gradlew -p project assembleRelease --scan
 
       - name: Extract changelog
         run: awk '/^## / { if (p) {exit}; { p=1; next} } p' CHANGELOG.md > this_release_changelog.md

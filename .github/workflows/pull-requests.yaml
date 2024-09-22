@@ -1,0 +1,31 @@
+---
+name: Pull Requests
+
+"on":
+  merge_group:
+    types: [checks_requested]
+  pull_request:
+    branches:
+      - master
+    paths:
+      - ".github/workflows/**"
+      - "project/app/src/**"
+      - "project/app/*.pro"
+      - "project/buildSrc/src/**"
+      - "project/*.gradle.kts"
+      - "project/app/*.gradle.kts"
+      - "project/gradle.properties"
+      - "project/gradle/wrapper/gradle-wrapper.properties"
+      - "project/gradle/libs.versions.toml"
+
+jobs:
+  build-test-lint:
+    name: Build, Test, and Lint
+    uses: ./.github/workflows/build-test-lint.yaml
+    secrets: inherit
+  espresso-test:
+    name: Espresso Test
+    uses: ./.github/workflows/espresso.yaml
+    secrets: inherit
+    needs:
+      - build-test-lint

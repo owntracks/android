@@ -1,0 +1,71 @@
+---
+name: Runs build-test-lint jobs
+on:
+  workflow_call:
+
+jobs:
+  ktfmt:
+    name: ktfmt
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+      - uses: ./.github/actions/gradle-task
+        with:
+          task: ktfmtCheck
+          gradle-cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+      - name: Build
+        uses: ./.github/actions/gradle-task
+        with:
+          task: assembleDebug
+          gradle-cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: read
+      checks: write
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+      - name: Test
+        uses: ./.github/actions/gradle-task
+        with:
+          task: app:createGmsDebugUnitTestCoverageReport
+          gradle-cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
+      - name: JUnit Report Action
+        uses: mikepenz/action-junit-report@v4
+        with:
+          report_paths: "**/TEST-*.xml"
+          detailed_summary: true
+          include_passed: false # Lots of test, much output.
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./project/app/build/reports/coverage/test/gms/debug/report.xml
+          flags: unittests
+          token: ${{ secrets.CODECOV_TOKEN }}
+  lint:
+    name: Lint
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+      - name: Build
+        uses: ./.github/actions/gradle-task
+        with:
+          task: lint
+          gradle-cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
+      - name: Upload lint report
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-report
+          path: project/app/build/reports/lint-results-gmsDebug.html
