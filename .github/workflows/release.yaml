@@ -63,7 +63,7 @@ jobs:
           echo VERSION_CODE="${VERSION_CODE}" >> "${GITHUB_ENV}"
 
       - name: Get current version code from beta track
-        if: ${{ !contains(github.ref_name, 'beta') && fromJSON(steps.tagCount.outputs.beta_tag_count) >= 0 }}
+        if: ${{ !contains(github.ref_name, 'beta') && fromJSON(steps.tagCount.outputs.beta_tag_count) > 0 }}
         env:
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
         run: |
