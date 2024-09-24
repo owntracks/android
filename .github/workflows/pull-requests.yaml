@@ -21,10 +21,16 @@ name: Pull Requests
 jobs:
   build-test-lint:
     name: Build, Test, and Lint
+    permissions:
+      contents: read
+      checks: write
     uses: ./.github/workflows/build-test-lint.yaml
     secrets: inherit
   espresso-test:
     name: Espresso Test
+    permissions:
+      contents: read
+      checks: write
     uses: ./.github/workflows/espresso.yaml
     secrets: inherit
     needs:
