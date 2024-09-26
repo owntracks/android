@@ -113,6 +113,7 @@ jobs:
 
       - name: Espresso JUnit Report
         uses: mikepenz/action-junit-report@v4
+        if: always()
         with:
           report_paths: "**/TEST-*.xml"
           detailed_summary: true
