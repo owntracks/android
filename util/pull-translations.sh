@@ -14,8 +14,10 @@ for lang in $(curl -s -X POST https://api.poeditor.com/v2/languages/list \
         locale="zh"
     elif [[ $lang == "en-gb" ]]; then
         locale="en-rGB"
-    elif [[ $lang == "id" ]]; then
+    elif [[ $lang == "id" ]]; then # Indonesian
         locale="in"
+    elif [[ $lang == "he" ]]; then # Hebrew
+        locale="iw"
     else
         locale=$lang
     fi

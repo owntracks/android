@@ -4,6 +4,8 @@
 
 ### New features
 
+- Galician Translation (thanks to Miguel Anxo Bouzada)
+
 ### Bug fixes
 
 - Try to not block the main thread when generating an Status Message, which causes an ANR
