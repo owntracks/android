@@ -6,6 +6,7 @@
 
 - Galician Translation (thanks to Miguel Anxo Bouzada)
 - Hebrew Translation (thanks to Ahiel and Natan)
+- Dutch Translation (thanks to all contributors)
 
 ### Bug fixes
 
