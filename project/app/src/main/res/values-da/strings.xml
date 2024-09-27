@@ -51,6 +51,8 @@
     <string name="contactsListPlaceholder">"Ingen kontakter fundet"</string>
     <string name="currentLocationButtonLabel">"Nuværende position"</string>
     <string name="deleteWaypointConfirmationButtonLabel">"Slet"</string>
+    <string name="deleteWaypointConfirmationText">"Er du sikker på at du vil slette dette punkt?"</string>
+    <string name="deleteWaypointTitle">"Slet punkt"</string>
     <string name="description">"Beskrivelse"</string>
     <string name="deviceLocationDisabledDialogMessage">"Positionstjenesterne på denne enhed er i øjeblikket slået fra, så OwnTracks kan ikke spore dine nuværende position.
 
@@ -129,17 +131,21 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="notificationChannelEventsDescription">"Region-notifikationer"</string>
     <string name="notificationChannelOngoing">"Vedvarende"</string>
     <string name="notificationChannelOngoingDescription">"Nødvendig for at modtage positionsopdateringer i baggrunden"</string>
+    <string name="notificationEndpointStateConnected">"%1$s til %2$s"</string>
     <plurals name="notificationEventsTitle">
         <item quantity="one">"%1$d ny begivenhed"</item>
         <item quantity="other">"%1$d nye begivenheder"</item>
     </plurals>
-    <string name="play_services_not_available">"Google Play Tjenester er ikke tilgængelige"</string>
-    <string name="play_services_now_available">"Google Play Tjenester er nu tilgængelige"</string>
+    <string name="play_services_not_available">"Google Play Services er ikke tilgængelig"</string>
+    <string name="play_services_now_available">"Google Play Services er nu tilgængelig"</string>
     <string name="play_services_update_required">"Opdatering af Google Play Tjenester er nødvendig"</string>
     <string name="preferencesAdvanced">"Avanceret"</string>
     <string name="preferencesAdvancedAutostartWarning">"Denne version af Android blokerer OwnTracks fra at modtage positioner når automatisk startet efter genstart før app'en er blevet åbnet."</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogAccept">"Acceptér"</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogCancel">"Annullér"</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogTitle">"OpenCage Privatslivspolitik"</string>
     <string name="preferencesAutostart">"Autostart"</string>
-    <string name="preferencesAutostartSummary">"Start automatisk når enhed tænder"</string>
+    <string name="preferencesAutostartSummary">"Start automatisk ved enhedsopstart"</string>
     <string name="preferencesBrokerPassword">"Adgangskode"</string>
     <string name="preferencesCaCrtInstall">"Installér CA-certifikat"</string>
     <string name="preferencesCategoryAdvancedEncryption">"Kryptering"</string>
@@ -171,6 +177,7 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="preferencesEncryptionKeyDialogMessage">"Krypteringsnøgle er afskåret efter 32 karakterer."</string>
     <string name="preferencesEncryptionKeySummary">"Symmetrisk nøgle for dekryptering"</string>
     <string name="preferencesExperimental">"Eksperimentel"</string>
+    <string name="preferencesExportError">"Fejl ved eksportering af konfiguration"</string>
     <string name="preferencesExportSuccess">"Eksport lykkedes"</string>
     <string name="preferencesHost">"Vært"</string>
     <string name="preferencesHostValidationError">"Kan ikke være tom"</string>
@@ -227,6 +234,8 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="preferencesShowWaypointsOnMapSummary">"Vis regionscirkler på kortet"</string>
     <string name="preferencesTheme">"Tema"</string>
     <string name="preferencesTrackerId">"Tracker ID"</string>
+    <string name="preferencesTrackerIdValidationError">"Skal være 1 eller 2 tegn"</string>
+    <string name="preferencesUrlValidationError">"Ugyldig HTTP URL"</string>
     <string name="preferencesUsername">"Brugernavn"</string>
     <string name="preferencesWebsocket">"Brug WebSockets"</string>
 
@@ -238,6 +247,7 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="reconnect">"Genforbind"</string>
     <string name="save">"Gem"</string>
     <string name="select">"Vælg"</string>
+    <string name="shareContactBody">"%1$s sidste lokation: %2$s (%3$s) ved %4$s"</string>
     <string name="status_background_service_started_hint">"Baggrundsservice startet"</string>
     <string name="status_battery_optimization_whitelisted_hint">"Fritaget fra batterioptimering"</string>
     <string name="status_endpoint_queue_hint">"Endpoint-kø"</string>
@@ -246,11 +256,14 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="status_last_background_update_hint">"Sidste baggrundsopdatering fra positionsservice"</string>
     <string name="statusBatteryDozeWhiteListDisabled">"Nej"</string>
     <string name="statusBatteryDozeWhiteListEnabled">"Ja"</string>
+    <string name="statusEndpointStateMessageConnectionLost">"Forbindelse tabt: %s"</string>
+    <string name="statusEndpointStateMessageInvalidProtocolVersion">"Ugyldig MQTT protokol version"</string>
     <string name="statusEndpointStateMessageTLSError">"TLS fejl: %s"</string>
     <string name="statusEndpointStateMessageUnableToConnect">"Kunne ikke forbinde"</string>
     <string name="statusLocationPermissionsFineForeground">"Præcis"</string>
     <string name="statusLocationPermissionsNone">"Ingen"</string>
     <string name="statusLocationPermissionsPromptNegativeButton">"Annullér"</string>
+    <string name="statusLocationPermissionsPromptPositiveButton">"Applikationsindstillinger"</string>
     <string name="statusLocationPermissionsPromptTitle">"Baggrundslokation"</string>
     <string name="statusLocationPermissionsUnknown">"Ukendt"</string>
     <string name="title_activity_about">"Om"</string>
@@ -282,6 +295,7 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
 
     <!-- Fuzzy -->
     <string name="waypointListPlaceholder">"Ingen regioner defineret endnu"</string>
+    <string name="waypointsImport">"Importér punkter"</string>
     <string name="welcome_connection_setup_description">"OwnTracks fungerer ved at sende din position til en server som du (eller en du stoler på) ejer, hvilket sikrer at du kontrollerer din data.
 
 Sørg for at du kender forbindelsesdetaljerne for din server, hvorvidt den er tilgængelig over HTTPS eller MQTT og eventuelle logindetaljer.
@@ -289,10 +303,10 @@ Sørg for at du kender forbindelsesdetaljerne for din server, hvorvidt den er ti
 Når du er kommet igennem denne velkomstsektion får du brug for at konfigurere app'en med dine serverdetaljer i Præferencer→Forbindelse.
 
 For flere detaljer, læs OwnTracks Booklet."</string>
-    <string name="welcome_connection_setup_learn_more_button_label">"Åben Booklet"</string>
+    <string name="welcome_connection_setup_learn_more_button_label">"Åbn Booklet"</string>
     <string name="welcome_connection_setup_title">"Opret en forbindelse"</string>
     <string name="welcome_description">"De næste instruktioner vil hjælpe dig i gang med OwnTracks"</string>
-    <string name="welcome_finish_open_preferences_button_label">"Åben Præferencer"</string>
+    <string name="welcome_finish_open_preferences_button_label">"Åbn Præferencer"</string>
     <string name="welcome_heading">"Velkommen"</string>
     <string name="welcome_play_description">"OwnTracks kræver Google Play Tjenester"</string>
     <string name="welcome_play_heading">"Google Play Tjenester"</string>
@@ -300,6 +314,6 @@ For flere detaljer, læs OwnTracks Booklet."</string>
     <string name="workmanagerInitializationErrorDialogMessage">"Nogle komponenter kunne ikke starte rigtigt, så Owntracks virker måske ikke som det skal. Det kan være nødvendigt at geninstallere app'en eller rydde den eksisterende brugerdata.
 
 Tjek venligst loggen for flere detaljer."</string>
-    <string name="workmanagerInitializationErrorDialogOpenSettingsLabel">"Åben Appindstillinger"</string>
+    <string name="workmanagerInitializationErrorDialogOpenSettingsLabel">"Åbn Appindstillinger"</string>
     <string name="workmanagerInitializationErrorDialogTitle">"Startfejl"</string>
 </resources>

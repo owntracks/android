@@ -21,6 +21,7 @@
     <string name="cancel">"Batal"</string>
     <string name="certificateMigrationRequiredNotificationText">"OwnTracks sekarang menggunakan sertifikat TLS dari penyimpanan sertifikat perangkat.\n\nJika Anda menggunakan sertifikat CA atau klien TLS, silakan tambahkan ke penyimpanan perangkat."</string>
     <string name="certificateMigrationRequiredNotificationTitle">"Migrasi Sertifikat Diperlukan"</string>
+    <string name="certificateMigrationRequiredOpenSettingsAction">"Buka Pengaturan"</string>
     <string name="clear_log">"Hapus"</string>
     <string name="configurationManagement">"Pengelolaan pengaturan"</string>
     <string name="CONNECTED">"Terhubung"</string>
@@ -48,6 +49,9 @@
     <string name="contactLocationUnknown">"Tidak ada lokasi yang tersedia"</string>
     <string name="contactsListPlaceholder">"Tidak ada kontak yang ditemukan"</string>
     <string name="currentLocationButtonLabel">"Lokasi saat ini"</string>
+    <string name="deleteWaypointConfirmationButtonLabel">"Hapus"</string>
+    <string name="deleteWaypointConfirmationText">"Apakah Anda ingin menghapus titik jalan ini?"</string>
+    <string name="deleteWaypointTitle">"Hapus Titik Jalan"</string>
     <string name="description">"Deskripsi"</string>
     <string name="deviceLocationDisabledDialogMessage">"Layanan lokasi di perangkat ini saat ini dinonaktifkan, sehingga OwnTracks tidak dapat melacak lokasi Anda saat ini.
 
@@ -121,6 +125,7 @@ Untuk memperbolehkannya, silakan aktifkan Lokasi dalam pengaturan perangkat."</s
     <string name="notificationChannelEventsDescription">"Transmisi titik jalan"</string>
     <string name="notificationChannelOngoing">"Sedang berlangsung"</string>
     <string name="notificationChannelOngoingDescription">"Diperlukan untuk menerima pembaruan lokasi di latar belakang"</string>
+    <string name="notificationEndpointStateConnected">"%1$s ke %2$s"</string>
     <plurals name="notificationEventsTitle">
         <item quantity="other">"%1$d peristiwa baru"</item>
     </plurals>
@@ -129,6 +134,13 @@ Untuk memperbolehkannya, silakan aktifkan Lokasi dalam pengaturan perangkat."</s
     <string name="play_services_update_required">"Pembaruan Layanan Google Play diperlukan"</string>
     <string name="preferencesAdvanced">"Tingkat Lanjut"</string>
     <string name="preferencesAdvancedAutostartWarning">"Versi Android ini membatasi OwnTracks untuk menerima lokasi ketika secara otomatis dimulai saat perangkat dinyalakan hingga aplikasi dibuka."</string>
+    <string name="preferencesAdvancedOpencagePrivacy">"&lt;a href=\"%s\"&gt;Kebijakan Privasi OpenCage&lt;/a&gt;"</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogAccept">"Terima"</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogCancel">"Batal"</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogMessage">"Untuk menggunakan pengodean geografis OpenCage, OwnTracks akan mengirim setiap lokasi yang diproses ke OpenCage melalui koneksi terenkripsi dengan TLS.
+
+Kebijakan privasi OpenCage dapat ditemukan &lt;a href=\"https://opencagedata.com/api#privacy\"&gt;di situs web mereka&lt;/a&gt;."</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogTitle">"Kebijakan Privasi OpenCage"</string>
     <string name="preferencesAutostart">"Mulai secara otomatis"</string>
     <string name="preferencesAutostartSummary">"Mulai secara otomatis pada pemulaian perangkat"</string>
     <string name="preferencesBrokerPassword">"Kata sandi"</string>
@@ -174,6 +186,7 @@ Untuk memperbolehkannya, silakan aktifkan Lokasi dalam pengaturan perangkat."</s
     <string name="preferencesIgnoreInaccurateLocationsSummary">"Abaikan lokasi yang tidak akurat"</string>
     <string name="preferencesImportNoURIGiven">"Tidak ada URI yang diberikan untuk mengimpor pengaturan"</string>
     <string name="preferencesKeepalive">"Selalu Nyala"</string>
+    <string name="preferencesKeepaliveDialogMessage">"Seberapa sering klien mengirim pesan keepalive ke perantara (detik)"</string>
     <string name="preferencesKeepaliveValidationError">"Nilai Selalu Nyala seharusnya minimal sebesar %d"</string>
     <string name="preferencesLicenses">"Pustaka"</string>
     <string name="preferencesLicensesSummary">"Terima kasih kepada para pembuat pustaka yang disertakan"</string>
@@ -247,6 +260,9 @@ Untuk memperbolehkannya, silakan aktifkan Lokasi dalam pengaturan perangkat."</s
     <string name="statusEndpointStateMessageAuthenticationFailed">"Autentikasi gagal"</string>
     <string name="statusEndpointStateMessageClientTimeout">"Klien kehabisan waktu"</string>
     <string name="statusEndpointStateMessageConnectionLost">"Koneksi hilang: %s"</string>
+    <string name="statusEndpointStateMessageConnectionRefused">"Koneksi ditolak"</string>
+    <string name="statusEndpointStateMessageEndpointDoesNotSupportWebsockets">"Titik akhir tidak mendukung WebSockets"</string>
+    <string name="statusEndpointStateMessageEOFError">"EOFException dari titik akhir - apakah titik akhir menduga TLS?"</string>
     <string name="statusEndpointStateMessageInvalidClientId">"ID klien tidak valid"</string>
     <string name="statusEndpointStateMessageInvalidProtocolVersion">"Versi protokol MQTT tidak valid"</string>
     <string name="statusEndpointStateMessageMalformedHostPort">"Nama &amp; porta host tidak valid"</string>
@@ -256,6 +272,9 @@ Untuk memperbolehkannya, silakan aktifkan Lokasi dalam pengaturan perangkat."</s
     <string name="statusEndpointStateMessageSocketTimeout">"Waktu koneksi habis"</string>
     <string name="statusEndpointStateMessageSubscribeFailed">"Pelangganan gagal"</string>
     <string name="statusEndpointStateMessageTLSConfigError">"Eror pengaturan TLS"</string>
+    <string name="statusEndpointStateMessageTLSConnectionClosed">"Koneksi TLS ditutup"</string>
+    <string name="statusEndpointStateMessageTLSEndpointCANotTrustedError">"CA TLS titik akhir tidak dipercayai"</string>
+    <string name="statusEndpointStateMessageTLSEndpointClientCertsRequired">"Titik akhir memerlukan sertifikat TLS klien"</string>
     <string name="statusEndpointStateMessageTLSError">"Eror TLS: %s"</string>
     <string name="statusEndpointStateMessageUnableToConnect">"Tidak dapat menghubungkan"</string>
     <string name="statusEndpointStateMessageUnknownHost">"Host tidak diketahui"</string>
@@ -308,13 +327,15 @@ Untuk detail lebih lanjut, lihat Buklet OwnTracks."</string>
 
 Anda dapat meninjau izin ini dan meminta izin lokasi tambahan (latar belakang) jika perlu dari halaman Status."</string>
     <string name="welcome_location_permission_granted">"Izin lokasi diberikan"</string>
+
+    <!-- Fuzzy -->
+    <string name="welcome_location_permission_request">"Minta"</string>
     <string name="welcome_location_permission_title">"Izin lokasi"</string>
     <string name="welcome_notification_permission_description">"Supaya berfungsi sepenuhnya, OwnTracks memerlukan izin Anda untuk menampilkan beberapa pemberitahuan.
 
 Pemberitahuan permanen akan ditampilkan agar pelacakan lokasi dan koneksi tetap aktif, dan Anda juga dapat memilih untuk mengaktifkan pemberitahuan untuk kontak yang berpindah di antara titik jalan."</string>
     <string name="welcome_notification_permission_granted">"Izin pemberitahuan diberikan"</string>
     <string name="welcome_notification_permission_title">"Izin pemberitahuan"</string>
-    <string name="welcome_permission_request">"Minta"</string>
     <string name="welcome_play_description">"OwnTracks memerlukan Layanan Google Play"</string>
     <string name="welcome_play_heading">"Layanan Google Play"</string>
     <string name="welcomeFixIssue">"Perbaiki"</string>

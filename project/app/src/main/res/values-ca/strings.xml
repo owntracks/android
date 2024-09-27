@@ -359,13 +359,15 @@ Per obtenir més detalls, feu una ullada al llibret d'OwnTracks."</string>
 
 Podeu revisar aquest permís i sol·licitar permisos d'ubicació (de fons) addicionals si cal des de la pàgina Estat."</string>
     <string name="welcome_location_permission_granted">"Permisos d'ubicació concedits"</string>
+
+    <!-- Fuzzy -->
+    <string name="welcome_location_permission_request">"Petició"</string>
     <string name="welcome_location_permission_title">"Permisos d'ubicació"</string>
     <string name="welcome_notification_permission_description">"Per funcionar completament, OwnTracks necessita el vostre permís per mostrar algunes notificacions.
 
 Es mostrarà una notificació permanent per mantenir el seguiment de la ubicació i la connexió activa, i també podeu optar per activar les notificacions per als contactes que fan la transició entre punts d'interès."</string>
     <string name="welcome_notification_permission_granted">"Permisos de notificació concedits"</string>
     <string name="welcome_notification_permission_title">"Permisos de notificació"</string>
-    <string name="welcome_permission_request">"Petició"</string>
     <string name="welcome_play_description">"OwnTracks necessita Serveis Google Play"</string>
     <string name="welcome_play_heading">"Serveis Google Play"</string>
     <string name="welcomeFixIssue">"Fix"</string>

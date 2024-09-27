@@ -318,13 +318,15 @@ Puoi controllare questo permesso e chiedere permessi per la posizione aggiutnivi
 
 Il permesso di posizionamento in background potrebbe migliorare la frequenza e l'affidabilità dei dati di posizionamento, in funzione del tuo disposiziovo e della sua configurazione."</string>
     <string name="welcome_location_permission_granted">"Permessi di localizzazione concessi"</string>
+
+    <!-- Fuzzy -->
+    <string name="welcome_location_permission_request">"Richiedi"</string>
     <string name="welcome_location_permission_title">"Permessi di localizzazione"</string>
     <string name="welcome_notification_permission_description">"Per funzionare completamente, OwnTracks ha bisogno dei tuoi permessi a visualizzare alcune notifiche.
 
 Una notifica permanente verrà visualizzata in modo da mantenere attivi il tracciamento e la connessione, e puoi anche scegliere di attivare le notifiche per i contatti al passaggio attraverso i luoghi prestabiliti."</string>
     <string name="welcome_notification_permission_granted">"Permessi per le notifiche concessi"</string>
     <string name="welcome_notification_permission_title">"Permessi per le notifiche"</string>
-    <string name="welcome_permission_request">"Richiedi"</string>
     <string name="welcome_play_description">"OwnTracks richiede i Google Play Services"</string>
     <string name="welcome_play_heading">"Google Play Services"</string>
     <string name="welcomeFixIssue">"Correggi"</string>

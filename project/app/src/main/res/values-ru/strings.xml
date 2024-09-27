@@ -327,13 +327,15 @@
 
 Разрешение на фоновое определение местоположения может повысить частоту и точность данных о местоположении в зависимости от вашего устройства и настроек."</string>
     <string name="welcome_location_permission_granted">"Доступ предоставлен"</string>
+
+    <!-- Fuzzy -->
+    <string name="welcome_location_permission_request">"Разрешить доступ"</string>
     <string name="welcome_location_permission_title">"Доступ к местоположению"</string>
     <string name="welcome_notification_permission_description">"Для полноценной работы OwnTracks необходимо разрешение на отображение уведомлений.
 
 Будет отображаться постоянное уведомление для поддержания  соединения с сервером и отслеживания вашего местоположения, а также вы можете включить уведомления о перемещениях друзей между между местами."</string>
     <string name="welcome_notification_permission_granted">"Доступ предоставлен"</string>
     <string name="welcome_notification_permission_title">"Доступ к уведомлениям"</string>
-    <string name="welcome_permission_request">"Разрешить доступ"</string>
     <string name="welcome_play_description">"Для работы OwnTracks необходимы сервисы Google Play"</string>
     <string name="welcome_play_heading">"Сервисы Google Play"</string>
     <string name="welcomeFixIssue">"Исправить"</string>

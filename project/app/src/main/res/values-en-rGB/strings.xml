@@ -136,6 +136,13 @@ To allow this, please enable Location in the device settings."</string>
     <string name="play_services_update_required">"Google Play Services update is required"</string>
     <string name="preferencesAdvanced">"Advanced"</string>
     <string name="preferencesAdvancedAutostartWarning">"This version of Android restricts OwnTracks from receiving locations when automatically started on device boot until the app is opened."</string>
+    <string name="preferencesAdvancedOpencagePrivacy">"&lt;a href=\"%s\"&gt;OpenCage Privacy Policy&lt;/a&gt;"</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogAccept">"Accept"</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogCancel">"Cancel"</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogMessage">"To use the OpenCage geocoder, OwnTracks will send every location it processes to OpenCage over a TLS-encrypted connection.
+
+The OpenCage privacy policy can be found &lt;a href=\"https://opencagedata.com/api#privacy\"&gt;on their website&lt;/a&gt;."</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogTitle">"OpenCage Privacy Policy"</string>
     <string name="preferencesAutostart">"Autostart"</string>
     <string name="preferencesAutostartSummary">"Automatically start on device boot"</string>
     <string name="preferencesBrokerPassword">"Password"</string>
@@ -238,7 +245,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesWebsocket">"Use WebSockets"</string>
 
     <!-- Fuzzy -->
-    <string name="publish">"Report"</string>
+    <string name="publish">"Report Location"</string>
     <string name="radius">"Radius (m)"</string>
     <string name="reconnect">"Reconnect"</string>
     <string name="save">"Save"</string>
@@ -320,17 +327,19 @@ For more details, take a look at the OwnTracks Booklet."</string>
     <!-- Fuzzy -->
     <string name="welcome_location_permission_description">"In order to receive your current location to send to your OwnTracks endpoint, OwnTracks needs your permission in order to access your device's location.
 
-You can review this permission and request additional (background) location permissions from the Map or Status page.
+You can review this permission and request additional (background) location permissions from the Status page.
 
 Background location permission may improve the frequency and reliability of location data, depending on your device and configuration."</string>
     <string name="welcome_location_permission_granted">"Location permissions granted"</string>
+
+    <!-- Fuzzy -->
+    <string name="welcome_location_permission_request">"Request"</string>
     <string name="welcome_location_permission_title">"Location permissions"</string>
     <string name="welcome_notification_permission_description">"To function fully, OwnTracks needs your permission in order to display some notifications.
 
 A permanent notification will be displayed in order to keep the location tracking and connection alive, and you can also choose to enable notifications for contacts transitioning between waypoints."</string>
     <string name="welcome_notification_permission_granted">"Notification permissions granted"</string>
     <string name="welcome_notification_permission_title">"Notification permissions"</string>
-    <string name="welcome_permission_request">"Request"</string>
     <string name="welcome_play_description">"OwnTracks requires Google Play Services"</string>
     <string name="welcome_play_heading">"Google Play Services"</string>
     <string name="welcomeFixIssue">"Fix"</string>

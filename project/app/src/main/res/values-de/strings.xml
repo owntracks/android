@@ -5,7 +5,7 @@
     <string name="aboutIssuesTitle">"Fehler melden"</string>
     <string name="aboutLicense">"Lizenz"</string>
     <string name="aboutSourceCodeSummary">"Auf GitHub"</string>
-    <string name="aboutTranslations">"Helfe bei der Übersetzung dieser App"</string>
+    <string name="aboutTranslations">"Hilf bei der Übersetzung dieser App"</string>
     <plurals name="aboutTranslationsSummary">
         <item quantity="one">"In %1$d Sprache verfügbar!"</item>
         <item quantity="other">"In %1$d Sprachen verfügbar!"</item>
@@ -48,6 +48,9 @@
     <string name="contactLocationUnknown">"Kein Standort verfügbar"</string>
     <string name="contactsListPlaceholder">"Keine Kontakte gefunden"</string>
     <string name="currentLocationButtonLabel">"Aktuelle Standort"</string>
+    <string name="deleteWaypointConfirmationButtonLabel">"Löschen"</string>
+    <string name="deleteWaypointConfirmationText">"Möchtest du diesen Ort löschen?"</string>
+    <string name="deleteWaypointTitle">"Ort löschen"</string>
     <string name="description">"Beschreibung"</string>
     <string name="deviceLocationDisabledDialogMessage">"Die Ortungsdienste auf diesem Gerät sind derzeit deaktiviert, sodass OwnTracks Ihren aktuellen Standort nicht verfolgen kann.
 
@@ -121,6 +124,7 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="notificationChannelEventsDescription">"Orte besucht"</string>
     <string name="notificationChannelOngoing">"Laufend"</string>
     <string name="notificationChannelOngoingDescription">"Erforderlich für den Empfang von Standortaktualisierungen im Hintergrund"</string>
+    <string name="notificationEndpointStateConnected">"%1$s zu %2$s"</string>
     <plurals name="notificationEventsTitle">
         <item quantity="one">"%1$d neues Ereignis"</item>
         <item quantity="other">"%1$d neue Ereignisse"</item>
@@ -130,6 +134,10 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="play_services_update_required">"Google Play-Dienste muss aktualisiert werden"</string>
     <string name="preferencesAdvanced">"Erweitert"</string>
     <string name="preferencesAdvancedAutostartWarning">"Diese Android-Version verhindert, dass OwnTracks Standorte empfängt, wenn es beim Hochfahren des Geräts automatisch gestartet wird, bis die App geöffnet wird."</string>
+    <string name="preferencesAdvancedOpencagePrivacy">"&lt;a href=\"%s\"&gt;OpenCage Datenschutzerklärung&lt;/a&gt;"</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogAccept">"Akzeptieren"</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogCancel">"Abbrechen"</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogTitle">"OpenCage Datenschutzerklärung"</string>
     <string name="preferencesAutostart">"Autostart"</string>
     <string name="preferencesAutostartSummary">"Automatisch beim Booten starten"</string>
     <string name="preferencesBrokerPassword">"Passwort"</string>
@@ -175,6 +183,7 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="preferencesIgnoreInaccurateLocationsSummary">"Ungenaue Positionen ignorieren"</string>
     <string name="preferencesImportNoURIGiven">"Keine URI für den Konfigurationsimport angegeben"</string>
     <string name="preferencesKeepalive">"Keepalive"</string>
+    <string name="preferencesKeepaliveDialogMessage">"Wie regelmäßig soll der Client keepalive-Nachrichten an den Broker senden? (Sekunden) "</string>
     <string name="preferencesKeepaliveValidationError">"Keepalive muss größer als %d sein"</string>
     <string name="preferencesLicenses">"Bibliotheken"</string>
     <string name="preferencesLicensesSummary">"Danke an die Autoren dieser Bibliotheken"</string>
@@ -246,6 +255,9 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="statusEndpointStateMessageAuthenticationFailed">"Authentifizierung fehlgeschlagen"</string>
     <string name="statusEndpointStateMessageClientTimeout">"Client-Zeitüberschreitung"</string>
     <string name="statusEndpointStateMessageConnectionLost">"Verbindung verloren: %s"</string>
+    <string name="statusEndpointStateMessageConnectionRefused">"Verbindung abgewiesen"</string>
+    <string name="statusEndpointStateMessageEndpointDoesNotSupportWebsockets">"Der Endpunkt unterstützt keine WebSockets"</string>
+    <string name="statusEndpointStateMessageEOFError">"EOFException vom Endpunkt - erwartet der Endpunkt TLS?"</string>
     <string name="statusEndpointStateMessageInvalidClientId">"Ungültige Client-ID"</string>
     <string name="statusEndpointStateMessageInvalidProtocolVersion">"Ungültige MQTT-Protokoll-Version"</string>
     <string name="statusEndpointStateMessageMalformedHostPort">"Ungültiger Host oder Port"</string>
@@ -255,6 +267,9 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="statusEndpointStateMessageSocketTimeout">"Zeitüberschreitung bei der Verbindung"</string>
     <string name="statusEndpointStateMessageSubscribeFailed">"Abonnieren fehlgeschlagen"</string>
     <string name="statusEndpointStateMessageTLSConfigError">"Fehler in der TLS Konfiguration"</string>
+    <string name="statusEndpointStateMessageTLSConnectionClosed">"TLS-Verbindung geschlossen"</string>
+    <string name="statusEndpointStateMessageTLSEndpointCANotTrustedError">"TLS CA des Endpunkts nicht vertrauenswürdig"</string>
+    <string name="statusEndpointStateMessageTLSEndpointClientCertsRequired">"Endpunkt erfordert TLS-Client-Zertifikate"</string>
     <string name="statusEndpointStateMessageTLSError">"TLS Fehler: %s"</string>
     <string name="statusEndpointStateMessageUnableToConnect">"Konnte keine Verbindung herstellen"</string>
     <string name="statusEndpointStateMessageUnknownHost">"Unbekannter Host"</string>
@@ -307,13 +322,15 @@ Sie können diese Berechtigung überprüfen und zusätzliche (Hintergrund-) Stan
 
 Je nach Gerät und Konfiguration kann die Erlaubnis für den Standort im Hintergrund die Häufigkeit und Zuverlässigkeit der Standortdaten verbessern."</string>
     <string name="welcome_location_permission_granted">"Standortberechtigung gewährt"</string>
+
+    <!-- Fuzzy -->
+    <string name="welcome_location_permission_request">"Anfordern"</string>
     <string name="welcome_location_permission_title">"Standortberechtigung"</string>
     <string name="welcome_notification_permission_description">"Um vollständig zu funktionieren, benötigt OwnTracks Ihre Erlaubnis, um einige Benachrichtigungen anzuzeigen.
 
 Eine permanente Benachrichtigung wird angezeigt, um die Standortverfolgung und die Verbindung aufrechtzuerhalten, und Sie können auch wählen, ob Sie Benachrichtigungen für Kontakte aktivieren möchten, die zwischen Orten wechseln."</string>
     <string name="welcome_notification_permission_granted">"Benachrichtigungs-Berechtigung gewährt"</string>
     <string name="welcome_notification_permission_title">"Benachrichtigungs-Berechtigung"</string>
-    <string name="welcome_permission_request">"Anfordern"</string>
     <string name="welcome_play_description">"OwnTracks benötigt die Google Play-Dienste"</string>
     <string name="welcome_play_heading">"Google Play-Dienste"</string>
     <string name="welcomeFixIssue">"Korrigieren"</string>
