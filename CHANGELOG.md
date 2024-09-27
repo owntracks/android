@@ -5,6 +5,7 @@
 ### New features
 
 - Galician Translation (thanks to Miguel Anxo Bouzada)
+- Hebrew Translation (thanks to Ahiel and Natan)
 
 ### Bug fixes
 
