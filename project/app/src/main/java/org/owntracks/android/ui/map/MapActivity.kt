@@ -1,5 +1,6 @@
 package org.owntracks.android.ui.map
 
+import android.Manifest.permission.POST_NOTIFICATIONS
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.ComponentName
@@ -16,19 +17,24 @@ import android.os.Bundle
 import android.os.IBinder
 import android.provider.Settings
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+import android.text.TextUtils.replace
 import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.annotation.RequiresPermission
 import androidx.annotation.VisibleForTesting
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.appcompat.widget.TooltipCompat
+import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.content.ContextCompat.startActivity
 import androidx.core.view.setPadding
 import androidx.core.widget.ImageViewCompat
 import androidx.databinding.BindingAdapter
@@ -93,7 +99,7 @@ class MapActivity :
   private var orientationSensor: Sensor? = null
   private lateinit var binding: UiMapBinding
 
-  private lateinit var locationServicesAlertDialog: AlertDialog
+  private lateinit var backPressedCallback: OnBackPressedCallback
 
   @Inject lateinit var notificationsStash: NotificationsStash
 
@@ -238,7 +244,21 @@ class MapActivity :
               }
               .also { listener -> labels.forEach { it.withListener(listener) } }
         }
-
+    backPressedCallback =
+        onBackPressedDispatcher.addCallback(this, false) {
+          Timber.w("ARSE")
+          when (bottomSheetBehavior?.state) {
+            BottomSheetBehavior.STATE_COLLAPSED -> {
+              setBottomSheetHidden()
+            }
+            BottomSheetBehavior.STATE_EXPANDED -> {
+              setBottomSheetCollapsed()
+            }
+            else -> {
+              Timber.w("HMM")
+            }
+          }
+        }
     setBottomSheetHidden()
 
     viewModel.currentContact.observe(this) { contact: Contact? ->
@@ -274,31 +294,6 @@ class MapActivity :
     NotificationManagerCompat.from(this).cancel(BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG, 0)
 
     notifyOnWorkManagerInitFailure(this)
-
-    onBackPressedDispatcher.addCallback(this) {
-      if (bottomSheetBehavior == null) {
-        finish()
-      } else {
-        when (bottomSheetBehavior?.state) {
-          BottomSheetBehavior.STATE_HIDDEN -> finish()
-          BottomSheetBehavior.STATE_COLLAPSED -> {
-            setBottomSheetHidden()
-          }
-          BottomSheetBehavior.STATE_DRAGGING -> {
-            // Noop
-          }
-          BottomSheetBehavior.STATE_EXPANDED -> {
-            setBottomSheetCollapsed()
-          }
-          BottomSheetBehavior.STATE_HALF_EXPANDED -> {
-            setBottomSheetCollapsed()
-          }
-          BottomSheetBehavior.STATE_SETTLING -> {
-            // Noop
-          }
-        }
-      }
-    }
   }
 
   private fun navigateToCurrentContact() {
@@ -385,6 +380,7 @@ class MapActivity :
   }
 
   /** User has granted notification permission. Notify everything that's in the NotificationStash */
+  @RequiresPermission(POST_NOTIFICATIONS)
   private fun notificationPermissionGranted() {
     Timber.d("Notification permission granted. Showing all notifications in stash")
     notificationsStash.showAll(NotificationManagerCompat.from(this))
@@ -672,6 +668,7 @@ class MapActivity :
     orientationSensor?.let {
       sensorManager?.registerListener(viewModel.orientationSensorEventListener, it, SENSOR_DELAY_UI)
     }
+    backPressedCallback.isEnabled = true
   }
 
   // BOTTOM SHEET CALLBACKS
@@ -683,6 +680,7 @@ class MapActivity :
     bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_COLLAPSED
     binding.mapFragment.setPadding(0)
     sensorManager?.unregisterListener(viewModel.orientationSensorEventListener)
+    backPressedCallback.isEnabled = true
   }
 
   private fun setBottomSheetHidden() {
@@ -690,6 +688,7 @@ class MapActivity :
     binding.mapFragment.setPadding(0)
     menu?.run { close() }
     sensorManager?.unregisterListener(viewModel.orientationSensorEventListener)
+    backPressedCallback.isEnabled = false
   }
 
   override fun onStart() {

@@ -64,6 +64,7 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:enableOnBackInvokedCallback="true"
         android:theme="@style/Theme.Owntracks"
         tools:ignore="UnusedAttribute"
         tools:replace="android:allowBackup">
