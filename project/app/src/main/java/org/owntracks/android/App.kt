@@ -6,6 +6,7 @@ import android.app.Application
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.ComponentCallbacks2
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
@@ -48,7 +49,11 @@ import org.owntracks.android.test.SimpleIdlingResource
 import timber.log.Timber
 
 @HiltAndroidApp
-class App : Application(), Configuration.Provider, Preferences.OnPreferenceChangeListener {
+class App :
+    Application(),
+    Configuration.Provider,
+    Preferences.OnPreferenceChangeListener,
+    ComponentCallbacks2 {
   @Inject lateinit var preferences: Preferences
 
   @Inject lateinit var workerFactory: HiltWorkerFactory
@@ -308,6 +313,25 @@ class App : Application(), Configuration.Provider, Preferences.OnPreferenceChang
       }
       Timber.v("Idling migrationIdlingResource")
       migrationIdlingResource.setIdleState(true)
+    }
+  }
+
+  override fun onTrimMemory(level: Int) {
+    Timber.w(
+        "onTrimMemory notified ${getAvailableMemory().run { "isLowMemory: $lowMemory availMem: ${android.text.format.Formatter.formatShortFileSize(applicationContext,availMem)}, threshold: ${android.text.format.Formatter.formatShortFileSize(applicationContext,threshold)} totalMemory: ${android.text.format.Formatter.formatShortFileSize(applicationContext,totalMem)} " }}")
+    super.onTrimMemory(level)
+  }
+
+  override fun onLowMemory() {
+    Timber.w(
+        "onLowMemory notified ${getAvailableMemory().run { "isLowMemory: $lowMemory availMem: ${android.text.format.Formatter.formatShortFileSize(applicationContext,availMem)}, threshold: ${android.text.format.Formatter.formatShortFileSize(applicationContext,threshold)} totalMemory: ${android.text.format.Formatter.formatShortFileSize(applicationContext,totalMem)} " }}")
+    super.onLowMemory()
+  }
+
+  private fun getAvailableMemory(): ActivityManager.MemoryInfo {
+    val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+    return ActivityManager.MemoryInfo().also { memoryInfo ->
+      activityManager.getMemoryInfo(memoryInfo)
     }
   }
 
