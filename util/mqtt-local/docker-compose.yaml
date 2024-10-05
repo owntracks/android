@@ -5,7 +5,7 @@ volumes:
   mosquitto:
 services:
   mosquitto:
-    image: eclipse-mosquitto:2.0.18-openssl
+    image: eclipse-mosquitto:2.0.19-openssl
     ports:
       - 1883:1883
       - 8883:8883
