@@ -43,7 +43,7 @@ class ContactsActivityTests :
     setNotFirstStartPreferences()
     getPreferences()
         .edit()
-        .putInt(Preferences::monitoring.name, MonitoringMode.QUIET.value)
+        .putInt(Preferences::monitoring.name, MonitoringMode.Quiet.value)
         .putString(Preferences::reverseGeocodeProvider.name, "None")
         .apply()
     launchActivity()

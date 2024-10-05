@@ -17,7 +17,6 @@ import android.os.Bundle
 import android.os.IBinder
 import android.provider.Settings
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-import android.text.TextUtils.replace
 import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
@@ -31,10 +30,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.appcompat.widget.TooltipCompat
-import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContextCompat.getSystemService
-import androidx.core.content.ContextCompat.startActivity
 import androidx.core.view.setPadding
 import androidx.core.widget.ImageViewCompat
 import androidx.databinding.BindingAdapter
@@ -609,19 +605,19 @@ class MapActivity :
   private fun updateMonitoringModeMenu() {
     menu?.findItem(R.id.menu_monitoring)?.run {
       when (preferences.monitoring) {
-        MonitoringMode.QUIET -> {
+        MonitoringMode.Quiet -> {
           setIcon(R.drawable.ic_baseline_stop_36)
           setTitle(R.string.monitoring_quiet)
         }
-        MonitoringMode.MANUAL -> {
+        MonitoringMode.Manual -> {
           setIcon(R.drawable.ic_baseline_pause_36)
           setTitle(R.string.monitoring_manual)
         }
-        MonitoringMode.SIGNIFICANT -> {
+        MonitoringMode.Significant -> {
           setIcon(R.drawable.ic_baseline_play_arrow_36)
           setTitle(R.string.monitoring_significant)
         }
-        MonitoringMode.MOVE -> {
+        MonitoringMode.Move -> {
           setIcon(R.drawable.ic_step_forward_2)
           setTitle(R.string.monitoring_move)
         }

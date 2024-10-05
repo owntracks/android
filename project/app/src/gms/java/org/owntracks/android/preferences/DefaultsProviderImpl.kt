@@ -9,7 +9,7 @@ class DefaultsProviderImpl : DefaultsProvider {
   override fun <T> getDefaultValue(preferences: Preferences, property: KProperty<*>): T {
     return when (property) {
       Preferences::mapLayerStyle -> MapLayerStyle.GoogleMapDefault
-      Preferences::reverseGeocodeProvider -> ReverseGeocodeProvider.DEVICE
+      Preferences::reverseGeocodeProvider -> ReverseGeocodeProvider.Device
       else -> super.getDefaultValue<T>(preferences, property)
     }
         as T

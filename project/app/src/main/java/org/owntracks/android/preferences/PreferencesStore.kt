@@ -121,7 +121,8 @@ abstract class PreferencesStore :
             typeOf<AppTheme>() -> AppTheme.getByValue(getInt(property.name, 0))
             typeOf<StringMaxTwoAlphaNumericChars>() ->
                 StringMaxTwoAlphaNumericChars(getString(property.name, "") ?: "")
-            typeOf<LocatorPriority?>() -> LocatorPriority.getByValue(getString(property.name, ""))
+            typeOf<LocatorPriority?>() ->
+                LocatorPriority.getByValue(getString(property.name, "") ?: "")
             else ->
                 throw UnsupportedPreferenceTypeException(
                     "Trying to get property ${property.name} has type ${property.returnType}")
@@ -212,7 +213,7 @@ abstract class PreferencesStore :
       is Int -> putInt(property.name, coercedValue)
       is Float -> putFloat(property.name, coercedValue)
       is Set<*> -> putStringSet(property.name, value as Set<String>)
-      is ReverseGeocodeProvider -> putString(property.name, coercedValue.value)
+      is ReverseGeocodeProvider -> putString(property.name, coercedValue.name)
       is MapLayerStyle -> putString(property.name, coercedValue.name)
       is ConnectionMode -> putInt(property.name, coercedValue.value)
       is MonitoringMode -> putInt(property.name, coercedValue.value)

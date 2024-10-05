@@ -520,20 +520,20 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
       var smallestDisplacement: Float? = null
       val priority: LocatorPriority
       when (monitoring) {
-        MonitoringMode.QUIET,
-        MonitoringMode.MANUAL -> {
+        MonitoringMode.Quiet,
+        MonitoringMode.Manual -> {
           interval = Duration.ofSeconds(preferences.locatorInterval.toLong())
           smallestDisplacement = preferences.locatorDisplacement.toFloat()
           priority = preferences.locatorPriority ?: LocatorPriority.LowPower
         }
 
-        MonitoringMode.SIGNIFICANT -> {
+        MonitoringMode.Significant -> {
           interval = Duration.ofSeconds(preferences.locatorInterval.toLong())
           smallestDisplacement = preferences.locatorDisplacement.toFloat()
           priority = preferences.locatorPriority ?: LocatorPriority.BalancedPowerAccuracy
         }
 
-        MonitoringMode.MOVE -> {
+        MonitoringMode.Move -> {
           interval = Duration.ofSeconds(preferences.moveModeLocatorInterval.toLong())
           priority = preferences.locatorPriority ?: LocatorPriority.HighAccuracy
         }

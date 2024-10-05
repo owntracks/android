@@ -62,7 +62,7 @@ class AdvancedFragment @Inject constructor() :
     findPreference<ListPreference>(Preferences::reverseGeocodeProvider.name)
         ?.onPreferenceChangeListener =
         Preference.OnPreferenceChangeListener { preference, newValue ->
-          if (newValue == ReverseGeocodeProvider.OPENCAGE.value) {
+          if (newValue == ReverseGeocodeProvider.OpenCage.name) {
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.preferencesAdvancedOpencagePrivacyDialogTitle)
                 .setMessage(R.string.preferencesAdvancedOpencagePrivacyDialogMessage)
@@ -86,7 +86,7 @@ class AdvancedFragment @Inject constructor() :
   private fun setOpenCageAPIKeyPreferenceVisibility() {
     setOf(Preferences::opencageApiKey.name, "opencagePrivacy").forEach {
       findPreference<Preference>(it)?.isVisible =
-          preferences.reverseGeocodeProvider == ReverseGeocodeProvider.OPENCAGE
+          preferences.reverseGeocodeProvider == ReverseGeocodeProvider.OpenCage
     }
   }
 

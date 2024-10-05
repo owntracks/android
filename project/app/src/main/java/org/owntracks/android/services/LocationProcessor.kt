@@ -93,12 +93,12 @@ constructor(
             MessageTransition.TRIGGER_LOCATION)
       }
     }
-    if (preferences.monitoring === MonitoringMode.QUIET &&
+    if (preferences.monitoring === MonitoringMode.Quiet &&
         MessageLocation.ReportType.USER != trigger) {
       Timber.v("message suppressed by monitoring settings: quiet")
       return Result.failure(Exception("message suppressed by monitoring settings: quiet"))
     }
-    if (preferences.monitoring === MonitoringMode.MANUAL &&
+    if (preferences.monitoring === MonitoringMode.Manual &&
         MessageLocation.ReportType.USER != trigger &&
         MessageLocation.ReportType.CIRCULAR != trigger) {
       Timber.v("message suppressed by monitoring settings: manual")
@@ -189,7 +189,7 @@ constructor(
         waypointModel.lastTransition = transition
         waypointModel.lastTriggered = Instant.now()
         waypointsRepo.update(waypointModel, false)
-        if (preferences.monitoring === MonitoringMode.QUIET) {
+        if (preferences.monitoring === MonitoringMode.Quiet) {
           Timber.v("message suppressed by monitoring settings: ${preferences.monitoring}")
         } else {
           publishTransitionMessage(waypointModel, location, transition, trigger)

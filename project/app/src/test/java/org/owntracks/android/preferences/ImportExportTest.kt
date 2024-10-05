@@ -113,7 +113,7 @@ class ImportExportTest {
       assertEquals(60, locatorInterval)
       assertEquals(LocatorPriority.LowPower, locatorPriority)
       assertEquals(ConnectionMode.MQTT, mode)
-      assertEquals(MonitoringMode.SIGNIFICANT, monitoring)
+      assertEquals(MonitoringMode.Significant, monitoring)
       assertEquals(10, moveModeLocatorInterval)
       assertEquals(MqttProtocolLevel.MQTT_3_1, mqttProtocolLevel)
       assert(!notificationHigherPriority)
@@ -123,12 +123,12 @@ class ImportExportTest {
       assertEquals(30, ping)
       assertEquals(1883, port)
       assert(extendedData)
-      assertEquals(MqttQos.ONE, pubQos)
+      assertEquals(MqttQos.One, pubQos)
       assert(pubRetain)
       assertEquals("owntracks/%u/%d", pubTopicBase)
       assert(remoteConfiguration)
       assert(sub)
-      assertEquals(MqttQos.TWO, subQos)
+      assertEquals(MqttQos.Two, subQos)
       assertEquals("owntracks/+/+", subTopic)
       assert(!tls)
       assertEquals("testusername", username)
@@ -155,7 +155,7 @@ class ImportExportTest {
       locatorInterval = 60
       locatorPriority = null
       mode = ConnectionMode.MQTT
-      monitoring = MonitoringMode.SIGNIFICANT
+      monitoring = MonitoringMode.Significant
       moveModeLocatorInterval = 10
       mqttProtocolLevel = MqttProtocolLevel.MQTT_3_1
       notificationHigherPriority = false
@@ -165,12 +165,12 @@ class ImportExportTest {
       ping = 30
       port = 1883
       extendedData = true
-      pubQos = MqttQos.ONE
+      pubQos = MqttQos.One
       pubRetain = true
       pubTopicBase = "owntracks/%u/%d"
       remoteConfiguration = true
       sub = true
-      subQos = MqttQos.TWO
+      subQos = MqttQos.Two
       subTopic = "owntracks/+/+"
       tls = false
       username = "testusername"
@@ -225,12 +225,12 @@ class ImportExportTest {
     assertFalse(jsonNode.get("publishLocationOnConnect").asBoolean())
     assertTrue(jsonNode.get("remoteConfiguration").asBoolean())
     assertEquals(
-        defaultReverseGeocodeProvider.value, jsonNode.get("reverseGeocodeProvider").asText())
+        defaultReverseGeocodeProvider.name, jsonNode.get("reverseGeocodeProvider").asText())
     assertFalse(jsonNode.get("showRegionsOnMap").asBoolean())
     assertTrue(jsonNode.get("sub").asBoolean())
     assertEquals(2, jsonNode.get("subQos").asInt())
     assertEquals("owntracks/+/+", jsonNode.get("subTopic").asText())
-    assertEquals(2, jsonNode.get("theme").asInt())
+    assertEquals("Auto", jsonNode.get("theme").asText())
     assertEquals("wn", jsonNode.get("tid").asText())
     assertFalse(jsonNode.get("tls").asBoolean())
     assertEquals("", jsonNode.get("tlsClientCrt").asText())

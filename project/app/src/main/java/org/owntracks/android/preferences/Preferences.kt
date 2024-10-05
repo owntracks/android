@@ -330,9 +330,9 @@ constructor(
       return pubQos
     }
 
-  val pubQosWaypoints = MqttQos.ZERO
+  val pubQosWaypoints = MqttQos.Zero
 
-  val pubQosStatus = MqttQos.ZERO
+  val pubQosStatus = MqttQos.Zero
 
   val pubRetainLocations: Boolean
     get() {

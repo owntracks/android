@@ -34,7 +34,7 @@ enum class MapLayerStyle {
     @JvmStatic
     @FromConfiguration
     fun getByValue(value: String): MapLayerStyle =
-        entries.firstOrNull { it.name == value } ?: GoogleMapDefault
+        entries.firstOrNull { it.name.equals(value, true) } ?: GoogleMapDefault
   }
 }
 

@@ -196,7 +196,7 @@ class MQTTMessagePublishTests :
   private fun setupTestActivity() {
     PreferenceManager.getDefaultSharedPreferences(app)
         .edit()
-        .putInt(Preferences::monitoring.name, MonitoringMode.QUIET.value)
+        .putInt(Preferences::monitoring.name, MonitoringMode.Quiet.value)
         .putString(Preferences::reverseGeocodeProvider.name, "None")
         .apply()
     setNotFirstStartPreferences()

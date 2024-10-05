@@ -51,10 +51,10 @@ constructor(
           withContext(ioDispatcher) {
             geocoder =
                 when (preferences.reverseGeocodeProvider) {
-                  ReverseGeocodeProvider.OPENCAGE ->
+                  ReverseGeocodeProvider.OpenCage ->
                       OpenCageGeocoder(preferences.opencageApiKey, httpClient)
-                  ReverseGeocodeProvider.DEVICE -> DeviceGeocoder(context)
-                  ReverseGeocodeProvider.NONE -> GeocoderNone()
+                  ReverseGeocodeProvider.Device -> DeviceGeocoder(context)
+                  ReverseGeocodeProvider.None -> GeocoderNone()
                 }
           }
         }

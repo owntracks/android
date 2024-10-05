@@ -20,10 +20,10 @@ class MonitoringModeBottomSheetDialog : BottomSheetDialogFragment() {
   ): View {
     binding = ModeBottomSheetDialogBinding.inflate(inflater, container, false)
     mapOf(
-            binding.fabMonitoringModeQuiet to MonitoringMode.QUIET,
-            binding.fabMonitoringModeManual to MonitoringMode.MANUAL,
-            binding.fabMonitoringModeSignificantChanges to MonitoringMode.SIGNIFICANT,
-            binding.fabMonitoringModeMove to MonitoringMode.MOVE)
+            binding.fabMonitoringModeQuiet to MonitoringMode.Quiet,
+            binding.fabMonitoringModeManual to MonitoringMode.Manual,
+            binding.fabMonitoringModeSignificantChanges to MonitoringMode.Significant,
+            binding.fabMonitoringModeMove to MonitoringMode.Move)
         .forEach {
           it.key.setOnClickListener { _ ->
             viewModel.setMonitoringMode(it.value)

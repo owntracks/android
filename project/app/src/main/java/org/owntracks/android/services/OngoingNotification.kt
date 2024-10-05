@@ -126,10 +126,10 @@ class OngoingNotification(private val context: Context, private val initialMode:
   private fun getMonitoringLabel(monitoringMode: MonitoringMode) =
       context.run {
         when (monitoringMode) {
-          MonitoringMode.QUIET -> getString(R.string.monitoring_quiet)
-          MonitoringMode.MANUAL -> getString(R.string.monitoring_manual)
-          MonitoringMode.SIGNIFICANT -> getString(R.string.monitoring_significant)
-          MonitoringMode.MOVE -> getString(R.string.monitoring_move)
+          MonitoringMode.Quiet -> getString(R.string.monitoring_quiet)
+          MonitoringMode.Manual -> getString(R.string.monitoring_manual)
+          MonitoringMode.Significant -> getString(R.string.monitoring_significant)
+          MonitoringMode.Move -> getString(R.string.monitoring_move)
         }
       }
 

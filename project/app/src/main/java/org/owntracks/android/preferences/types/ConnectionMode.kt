@@ -14,6 +14,8 @@ enum class ConnectionMode(@JsonValue val value: Int) {
     @JvmStatic
     @FromConfiguration
     fun getByValue(value: String): ConnectionMode =
-        (value.toIntOrNull() ?: Int.MIN_VALUE).run(::getByValue)
+        value.toIntOrNull()?.run(::getByValue)
+            ?: entries.firstOrNull { it.name.equals(value, true) }
+            ?: MQTT
   }
 }

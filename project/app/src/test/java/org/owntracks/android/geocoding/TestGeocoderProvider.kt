@@ -15,7 +15,6 @@ import okhttp3.Response
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.mockito.Mockito.spy
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.kotlin.any
@@ -39,7 +38,7 @@ class TestGeocoderProvider {
         val mockContext: Context = mock {}
         val notificationManager: NotificationManagerCompat = mock {}
         val preferences = Preferences(InMemoryPreferencesStore(), mockIdlingResource)
-        preferences.reverseGeocodeProvider = ReverseGeocodeProvider.NONE
+        preferences.reverseGeocodeProvider = ReverseGeocodeProvider.None
         val provider =
             GeocoderProvider(
                 mockContext,
@@ -59,7 +58,7 @@ class TestGeocoderProvider {
         val mockContext: Context = mock {}
         val notificationManager: NotificationManagerCompat = mock {}
         val preferences = Preferences(InMemoryPreferencesStore(), mockIdlingResource)
-        preferences.reverseGeocodeProvider = ReverseGeocodeProvider.NONE
+        preferences.reverseGeocodeProvider = ReverseGeocodeProvider.None
         val provider =
             GeocoderProvider(
                 mockContext,
@@ -94,7 +93,7 @@ class TestGeocoderProvider {
         val mockContext: Context = mock {}
         val notificationManager: NotificationManagerCompat = mock {}
         val preferences = Preferences(InMemoryPreferencesStore(), mockIdlingResource)
-        preferences.reverseGeocodeProvider = ReverseGeocodeProvider.OPENCAGE
+        preferences.reverseGeocodeProvider = ReverseGeocodeProvider.OpenCage
         val provider =
             GeocoderProvider(
                 mockContext,

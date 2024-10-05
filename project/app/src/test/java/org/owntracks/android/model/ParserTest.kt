@@ -51,7 +51,7 @@ class ParserTest {
         batteryStatus = BatteryStatus.CHARGING
         bssid = "12:34:56:78"
         conn = "TestConn"
-        monitoringMode = MonitoringMode.SIGNIFICANT
+        monitoringMode = MonitoringMode.Significant
         ssid = "Wifi SSID"
       }
   private val messageLocation =
@@ -81,7 +81,7 @@ class ParserTest {
     testPreferences = mock {
       on { encryptionKey } doReturn "testEncryptionKey"
       on { pubTopicLocations } doReturn "owntracks/testUsername/testDevice"
-      on { pubQosLocations } doReturn MqttQos.ONE
+      on { pubQosLocations } doReturn MqttQos.One
     }
     encryptionProvider = mock { on { isPayloadEncryptionEnabled } doReturn false }
   }

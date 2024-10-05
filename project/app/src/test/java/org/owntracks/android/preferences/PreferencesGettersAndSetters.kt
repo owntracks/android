@@ -96,25 +96,25 @@ class PreferencesGettersAndSetters(private val parameter: Parameter) {
               Parameter("fusedRegionDetection", true, Boolean::class, false),
               Parameter(
                   "reverseGeocodeProvider",
-                  ReverseGeocodeProvider.DEVICE,
+                  ReverseGeocodeProvider.Device,
                   ReverseGeocodeProvider::class,
                   false,
                   preferenceValueInConfiguration = "Device"),
               Parameter(
                   "reverseGeocodeProvider",
-                  ReverseGeocodeProvider.OPENCAGE,
+                  ReverseGeocodeProvider.OpenCage,
                   ReverseGeocodeProvider::class,
                   false,
                   preferenceValueInConfiguration = "OpenCage"),
               Parameter(
                   "reverseGeocodeProvider",
-                  ReverseGeocodeProvider.NONE,
+                  ReverseGeocodeProvider.None,
                   ReverseGeocodeProvider::class,
                   false,
                   preferenceValueInConfiguration = "None"),
               Parameter(
                   "reverseGeocodeProvider",
-                  ReverseGeocodeProvider.NONE,
+                  ReverseGeocodeProvider.None,
                   ReverseGeocodeProvider::class,
                   false,
                   preferenceValueInConfiguration = "Nonsense"),
@@ -155,19 +155,19 @@ class PreferencesGettersAndSetters(private val parameter: Parameter) {
                   preferenceValueInConfiguration = -1),
               Parameter(
                   "monitoring",
-                  MonitoringMode.SIGNIFICANT,
+                  MonitoringMode.Significant,
                   MonitoringMode::class,
                   false,
                   preferenceValueInConfiguration = 1),
               Parameter(
                   "monitoring",
-                  MonitoringMode.SIGNIFICANT,
+                  MonitoringMode.Significant,
                   MonitoringMode::class,
                   false,
                   preferenceValueInConfiguration = -5),
               Parameter(
                   "monitoring",
-                  MonitoringMode.QUIET,
+                  MonitoringMode.Quiet,
                   MonitoringMode::class,
                   false,
                   preferenceValueInConfiguration = -1),
@@ -211,17 +211,17 @@ class PreferencesGettersAndSetters(private val parameter: Parameter) {
               Parameter("port", 65535, Int::class, false),
               Parameter("extendedData", true, Boolean::class, false),
               Parameter(
-                  "pubQos", MqttQos.ONE, MqttQos::class, false, preferenceValueInConfiguration = 1),
+                  "pubQos", MqttQos.One, MqttQos::class, false, preferenceValueInConfiguration = 1),
               Parameter(
                   "pubQos",
-                  MqttQos.ZERO,
+                  MqttQos.Zero,
                   MqttQos::class,
                   false,
                   preferenceValueInConfiguration = 0),
               Parameter(
-                  "pubQos", MqttQos.TWO, MqttQos::class, false, preferenceValueInConfiguration = 2),
+                  "pubQos", MqttQos.Two, MqttQos::class, false, preferenceValueInConfiguration = 2),
               Parameter(
-                  "pubQos", MqttQos.ONE, MqttQos::class, false, preferenceValueInConfiguration = 5),
+                  "pubQos", MqttQos.One, MqttQos::class, false, preferenceValueInConfiguration = 5),
               Parameter("pubRetain", true, Boolean::class, false),
               Parameter("pubTopicBase", "testDeviceTopic", String::class, false),
               Parameter("cmd", true, Boolean::class, false),
@@ -229,7 +229,7 @@ class PreferencesGettersAndSetters(private val parameter: Parameter) {
               Parameter("publishLocationOnConnect", true, Boolean::class, false),
               Parameter("sub", true, Boolean::class, false),
               Parameter(
-                  "subQos", MqttQos.ONE, MqttQos::class, false, preferenceValueInConfiguration = 1),
+                  "subQos", MqttQos.One, MqttQos::class, false, preferenceValueInConfiguration = 1),
               Parameter("subTopic", "testSubTopic", String::class, false),
               Parameter("tls", true, Boolean::class, false),
               Parameter("tlsClientCrt", "clientCertName", String::class, false),

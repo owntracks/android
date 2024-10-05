@@ -13,7 +13,7 @@ enum class MapLayerStyle {
     @JvmStatic
     @FromConfiguration
     fun getByValue(value: String): MapLayerStyle =
-        MapLayerStyle.values().firstOrNull { it.name == value } ?: OpenStreetMapNormal
+        MapLayerStyle.values().firstOrNull { it.name.equals(value, true) } ?: OpenStreetMapNormal
   }
 }
 

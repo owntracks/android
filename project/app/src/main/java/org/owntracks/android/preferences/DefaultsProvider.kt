@@ -41,7 +41,7 @@ interface DefaultsProvider {
       Preferences::locatorInterval -> 60
       Preferences::locatorPriority -> null
       Preferences::mode -> ConnectionMode.MQTT
-      Preferences::monitoring -> MonitoringMode.SIGNIFICANT
+      Preferences::monitoring -> MonitoringMode.Significant
       Preferences::moveModeLocatorInterval -> 10
       Preferences::mqttProtocolLevel -> MqttProtocolLevel.MQTT_3_1
       Preferences::notificationEvents -> true
@@ -55,7 +55,7 @@ interface DefaultsProvider {
       Preferences::ping -> 15
       Preferences::port -> 8883
       Preferences::extendedData -> true
-      Preferences::pubQos -> MqttQos.ONE
+      Preferences::pubQos -> MqttQos.One
       Preferences::pubRetain -> true
       Preferences::pubTopicBase -> "owntracks/%u/%d"
       Preferences::publishLocationOnConnect -> false
@@ -64,9 +64,9 @@ interface DefaultsProvider {
       Preferences::setupCompleted -> false
       Preferences::showRegionsOnMap -> false
       Preferences::sub -> true
-      Preferences::subQos -> MqttQos.TWO
+      Preferences::subQos -> MqttQos.Two
       Preferences::subTopic -> DEFAULT_SUB_TOPIC
-      Preferences::theme -> AppTheme.AUTO
+      Preferences::theme -> AppTheme.Auto
       Preferences::tls -> true
       Preferences::tlsClientCrt -> ""
       Preferences::tid ->
