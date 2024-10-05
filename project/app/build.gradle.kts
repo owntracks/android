@@ -91,6 +91,7 @@ android {
     named("debug") {
       isMinifyEnabled = false
       isShrinkResources = false
+      isPseudoLocalesEnabled = true
       proguardFiles.addAll(
           listOf(
               getDefaultProguardFile("proguard-android-optimize.txt"),

@@ -574,7 +574,7 @@ constructor(
         }
 
   companion object {
-    private val SEND_FAILURE_NOT_READY_WAIT = 1.seconds
+    private val SEND_FAILURE_NOT_READY_WAIT = 10.seconds
     private val SEND_FAILURE_BACKOFF_INITIAL_WAIT = 1.seconds
     private val SEND_FAILURE_BACKOFF_MAX_WAIT = 2.minutes
   }
