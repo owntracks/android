@@ -7,6 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
+import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import com.fasterxml.jackson.databind.ObjectMapper
 import java.net.ConnectException
 import java.net.InetSocketAddress
@@ -78,6 +79,7 @@ class ConnectionErrorTest :
                 this[Preferences::host.name] = "unknown"
               })
       setupActivity(config)
+      app.mqttConnectionIdlingResource.use { Espresso.onIdle() }
       assertContains(R.id.connectedStatusMessage, R.string.statusEndpointStateMessageUnknownHost)
     }
   }
@@ -238,6 +240,7 @@ private fun Broker.use(block: () -> Unit) {
         Timber.i("Test MQTT Broker listening on port ${this.port}")
       } catch (e: ConnectException) {
         Timber.i("broker not listening on ${this.port} yet")
+        listening = false
         Thread.sleep(5000)
       }
     }
