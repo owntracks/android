@@ -17,12 +17,11 @@ import java.security.KeyStore
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.stream.Collectors
 import javax.net.ssl.SSLHandshakeException
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
-import kotlin.time.TimeSource
 import kotlin.time.measureTime
+import kotlin.time.measureTimedValue
 import kotlin.time.toDuration
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -496,23 +495,6 @@ class MQTTMessageProcessorEndpoint(
       val mqttClient: MqttAsyncClient,
       val mqttConnectionConfiguration: MqttConnectionConfiguration
   )
-
-  data class TimedValue<T>(val duration: Duration, val value: T)
-
-  /**
-   * Measure timed value. A `measureTime` but also returns the return value of the block. Backported
-   * from kotlin 1.9
-   *
-   * @param T generic type of return value
-   * @param block function to execute
-   * @return a [TimedValue] containing the result of the block and the duration it took
-   * @receiver
-   */
-  private inline fun <T> measureTimedValue(block: () -> T): TimedValue<T> {
-    val mark = TimeSource.Monotonic.markNow()
-    val result = block()
-    return TimedValue(mark.elapsedNow(), result)
-  }
 }
 
 /**
