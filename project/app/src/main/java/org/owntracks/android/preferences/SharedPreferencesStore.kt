@@ -150,8 +150,14 @@ constructor(
     }
   }
 
-  override fun putString(key: String, value: String) =
-      sharedPreferences.edit().putString(key, value).apply()
+  override fun putString(key: String, value: String): Boolean =
+      sharedPreferences.run {
+        if (contains(key) && getString(key, "") == value) false
+        else {
+          edit().putString(key, value).apply()
+          true
+        }
+      }
 
   override fun getString(key: String, default: String): String? =
       sharedPreferences.getString(key, default)
@@ -164,21 +170,45 @@ constructor(
   override fun getSharedPreferencesName(): String = sharedPreferences.toString()
 
   override fun putBoolean(key: String, value: Boolean) =
-      sharedPreferences.edit().putBoolean(key, value).apply()
+      sharedPreferences.run {
+        if (contains(key) && getBoolean(key, false) == value) false
+        else {
+          edit().putBoolean(key, value).apply()
+          true
+        }
+      }
 
   override fun getInt(key: String, default: Int): Int = sharedPreferences.getInt(key, default)
 
-  override fun putFloat(key: String, value: Float) =
-      sharedPreferences.edit().putFloat(key, value).apply()
+  override fun putFloat(key: String, value: Float): Boolean =
+      sharedPreferences.run {
+        if (contains(key) && getFloat(key, Float.MIN_VALUE) == value) false
+        else {
+          edit().putFloat(key, value).apply()
+          true
+        }
+      }
 
   override fun getFloat(key: String, default: Float): Float =
       sharedPreferences.getFloat(key, default)
 
-  override fun putInt(key: String, value: Int) = sharedPreferences.edit().putInt(key, value).apply()
+  override fun putInt(key: String, value: Int): Boolean =
+      sharedPreferences.run {
+        if (contains(key) && getInt(key, Int.MIN_VALUE) == value) false
+        else {
+          edit().putInt(key, value).apply()
+          true
+        }
+      }
 
-  override fun putStringSet(key: String, values: Set<String>) {
-    sharedPreferences.edit().putStringSet(key, values).apply()
-  }
+  override fun putStringSet(key: String, values: Set<String>): Boolean =
+      sharedPreferences.run {
+        if (contains(key) && getStringSet(key, emptySet()) == values) false
+        else {
+          edit().putStringSet(key, values).apply()
+          true
+        }
+      }
 
   override fun getStringSet(key: String, defaultValues: Set<String>): Set<String> =
       sharedPreferences.getStringSet(key, defaultValues)?.toSortedSet()

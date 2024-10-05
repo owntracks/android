@@ -7,6 +7,7 @@
 - Galician Translation (thanks to Miguel Anxo Bouzada)
 - Hebrew Translation (thanks to Ahiel and Natan)
 - Dutch Translation (thanks to all contributors)
+- Setting a preference that doesn't actually change the value won't have any effects (such as MQTT reconnecting) (#1875)
 
 ### Bug fixes
 

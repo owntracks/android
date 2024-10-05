@@ -21,23 +21,58 @@ abstract class PreferencesStore :
 
   abstract fun getSharedPreferencesName(): String
 
-  abstract fun putBoolean(key: String, value: Boolean)
+  /**
+   * Put boolean to the store
+   *
+   * @param key to set
+   * @param value to set
+   * @return boolean if value was changed
+   */
+  abstract fun putBoolean(key: String, value: Boolean): Boolean
 
   abstract fun getBoolean(key: String, default: Boolean): Boolean
 
-  abstract fun putInt(key: String, value: Int)
+  /**
+   * Put int to the store
+   *
+   * @param key to set
+   * @param value to set
+   * @return boolean if value was changed
+   */
+  abstract fun putInt(key: String, value: Int): Boolean
 
   abstract fun getInt(key: String, default: Int): Int
 
-  abstract fun putFloat(key: String, value: Float)
+  /**
+   * Put float to store
+   *
+   * @param key to set
+   * @param value to set
+   * @return boolean if value was changed
+   */
+  abstract fun putFloat(key: String, value: Float): Boolean
 
   abstract fun getFloat(key: String, default: Float): Float
 
-  abstract fun putString(key: String, value: String)
+  /**
+   * Put string to store
+   *
+   * @param key to set
+   * @param value to set
+   * @return boolean if value was changed
+   */
+  abstract fun putString(key: String, value: String): Boolean
 
   abstract fun getString(key: String, default: String): String?
 
-  abstract fun putStringSet(key: String, values: Set<String>)
+  /**
+   * Put string set to store
+   *
+   * @param key to set
+   * @param values to set
+   * @return boolean if value was changed
+   */
+  abstract fun putStringSet(key: String, values: Set<String>): Boolean
 
   abstract fun getStringSet(key: String, defaultValues: Set<String>): Set<String>
 
@@ -125,9 +160,11 @@ abstract class PreferencesStore :
    * @param value the value to be set
    */
   operator fun <T> setValue(preferences: Preferences, property: KProperty<*>, value: T) {
-    setValueWithoutNotifying(preferences, property, value)
-    setterTransaction?.apply { addProperty(property) }
-        ?: run { preferences.notifyChanged(setOf(property)) }
+    if (setValueWithoutNotifying(preferences, property, value)) {
+      // Only run the notification if the value changed.
+      setterTransaction?.apply { addProperty(property) }
+          ?: run { preferences.notifyChanged(setOf(property)) }
+    }
   }
 
   var setterTransaction: Transaction? = null
@@ -166,10 +203,10 @@ abstract class PreferencesStore :
       preferences: Preferences,
       property: KProperty<*>,
       value: T
-  ) {
+  ): Boolean {
     val coercedValue = getCoercion(property, value, preferences)
     Timber.d("Setting preference ${property.name} to $value (coerced to $coercedValue)")
-    when (coercedValue) {
+    return when (coercedValue) {
       is Boolean -> putBoolean(property.name, coercedValue)
       is String -> putString(property.name, coercedValue)
       is Int -> putInt(property.name, coercedValue)
@@ -184,7 +221,8 @@ abstract class PreferencesStore :
       is AppTheme -> putInt(property.name, coercedValue.value)
       is StringMaxTwoAlphaNumericChars -> putString(property.name, coercedValue.toString())
       is LocatorPriority? ->
-          coercedValue?.run { putString(property.name, this.name) } ?: remove(property.name)
+          coercedValue?.run { putString(property.name, this.name) }
+              ?: true.also { remove(property.name) }
       else ->
           throw UnsupportedPreferenceTypeException(
               "Trying to set property ${property.name} has type ${property.returnType}")
