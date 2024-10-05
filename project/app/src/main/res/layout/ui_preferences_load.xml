@@ -45,6 +45,7 @@
                 android:layout_height="wrap_content"
                 android:padding="@dimen/default_spacing"
                 android:text="@{vm.displayedConfiguration}"
+                android:textDirection="ltr"
                 android:textIsSelectable="true" />
 
         </ScrollView>

@@ -13,6 +13,7 @@
 
 - Try to not block the main thread when generating an Status Message, which causes an ANR
 - Messages that fail to send because the endpoint isn't ready now retry every 10 seconds, not every second
+- Import config screen displays JSON config LTR under RTL locales
 
 ## Version 2.5.3
 
