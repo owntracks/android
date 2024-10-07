@@ -16,6 +16,9 @@ import javax.inject.Inject
 import kotlin.math.asin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import org.owntracks.android.BR
 import org.owntracks.android.data.repos.ContactsRepo
@@ -46,6 +49,7 @@ constructor(
     private val geocoderProvider: GeocoderProvider,
     private val preferences: Preferences,
     private val locationRepo: LocationRepo,
+    mapLocationFlow: MapLocationFlow,
     waypointsRepo: WaypointsRepo,
     application: Application,
     private val requirementsChecker: RequirementsChecker
@@ -90,7 +94,10 @@ constructor(
   val myLocationStatus: LiveData<MyLocationStatus>
     get() = mutableMyLocationStatus
 
-  val currentLocation = LocationLiveData(application, viewModelScope)
+  val currentLocationFlow =
+      mapLocationFlow
+          .getLocationFlow(viewModelScope)
+          .shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 0)
   val waypoints = waypointsRepo.allLive
   val allContacts = contactsRepo.all
   val contactUpdatedEvent: Flow<ContactsRepoChange> = contactsRepo.repoChangedEvent
@@ -151,10 +158,12 @@ constructor(
 
   override fun onCleared() {
     super.onCleared()
+    Timber.tag("LocationFlow").i("onCleared")
     preferences.unregisterOnPreferenceChangedListener(preferenceChangeListener)
   }
 
   fun onMapReady() {
+    Timber.tag("LocationFlow").i("onCleared")
     when (viewMode) {
       is ViewMode.Contact -> {
         mutableCurrentContact.value?.run { setViewModeContact(this, true) }
@@ -174,9 +183,9 @@ constructor(
 
   fun sendLocation() {
     viewModelScope.launch {
-      currentLocation.value?.run {
+      currentLocationFlow.run {
         Timber.d("Sending current location from user request: $this")
-        locationProcessor.onLocationChanged(this, MessageLocation.ReportType.USER)
+        locationProcessor.onLocationChanged(this.last(), MessageLocation.ReportType.USER)
         locationProcessor.publishStatusMessage()
       }
     }
@@ -244,8 +253,9 @@ constructor(
     Timber.d("setting view mode: VIEW_DEVICE")
     locationRepo.viewMode = ViewMode.Device
     clearActiveContact()
-    currentLocation.value?.apply { mutableMapCenter.postValue(this.toLatLng()) }
-        ?: run { Timber.w("no location available") }
+    viewModelScope.launch {
+      currentLocationFlow.apply { mutableMapCenter.postValue(this.last().toLatLng()) }
+    }
     updateMyLocationStatus()
   }
 
@@ -272,7 +282,9 @@ constructor(
   }
 
   private fun updateActiveContactDistanceAndBearing(contact: Contact) {
-    currentLocation.value?.run { updateActiveContactDistanceAndBearing(this, contact) }
+    viewModelScope.launch {
+      currentLocationFlow.run { updateActiveContactDistanceAndBearing(last(), contact) }
+    }
   }
 
   fun updateActiveContactDistanceAndBearing(currentLocation: Location) {
@@ -320,10 +332,11 @@ constructor(
 
   /** Start requesting location updates for the blue dot */
   fun requestLocationUpdatesForBlueDot() {
-    if (requirementsChecker.hasLocationPermissions()) {
-      @Suppress("MissingPermission") // We've already checked for permissions
-      viewModelScope.launch { currentLocation.requestLocationUpdates() }
-    }
+    Timber.tag("LocationFlow").w("TODO requestLocationUpdatesForBlueDot")
+    //    if (requirementsChecker.hasLocationPermissions()) {
+    //      @Suppress("MissingPermission") // We've already checked for permissions
+    //      viewModelScope.launch { currentLocationFlow.requestLocationUpdates() }
+    //    }
   }
 
   /**
@@ -369,13 +382,13 @@ constructor(
         override fun onSensorChanged(maybeEvent: SensorEvent?) {
           maybeEvent?.let { event ->
             currentContact.value?.latLng?.let { contactLatLng ->
-              currentLocation.value?.let { currentLocation ->
+              currentLocationFlow.let { currentLocation ->
                 // Orientation is angle around the Z axis
                 val azimuth = (180 / Math.PI) * 2 * asin(event.values[2])
                 val distanceBetween = FloatArray(2)
                 Location.distanceBetween(
-                    currentLocation.latitude,
-                    currentLocation.longitude,
+                    currentLocation.replayCache[0].latitude,
+                    currentLocation.replayCache[0].longitude,
                     contactLatLng.latitude.value,
                     contactLatLng.longitude.value,
                     distanceBetween)
@@ -407,9 +420,9 @@ constructor(
   }
 
   sealed class ViewMode {
-    object Free : ViewMode()
+    data object Free : ViewMode()
 
-    object Device : ViewMode()
+    data object Device : ViewMode()
 
     data class Contact(val follow: Boolean) : ViewMode()
   }

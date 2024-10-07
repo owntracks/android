@@ -8,7 +8,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.maps.CameraUpdate
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -28,6 +28,8 @@ import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import org.owntracks.android.R
 import org.owntracks.android.data.waypoints.WaypointModel
 import org.owntracks.android.databinding.GoogleMapFragmentBinding
@@ -57,20 +59,23 @@ internal constructor(
 
   private val googleMapLocationSource: LocationSource by lazy {
     object : LocationSource {
-      private var locationObserver: Observer<Location>? = null
+      private var collectorJob: Job? = null
 
       override fun activate(onLocationChangedListener: LocationSource.OnLocationChangedListener) {
-        locationObserver =
-            Observer { location: Location ->
-                  onLocationObserved(location) {
-                    onLocationChangedListener.onLocationChanged(location)
-                  }
+        Timber.tag("LocationFlow").i("GoogleMapFragment activate")
+        collectorJob =
+            lifecycleScope.launch {
+              viewModel.currentLocationFlow.collect { location: Location ->
+                onLocationObserved(location) {
+                  onLocationChangedListener.onLocationChanged(location)
                 }
-                .apply { viewModel.currentLocation.observe(viewLifecycleOwner, this) }
+              }
+            }
       }
 
       override fun deactivate() {
-        locationObserver?.run(viewModel.currentLocation::removeObserver)
+        Timber.tag("LocationFlow").i("Google MapFragment stopLocationProvider")
+        collectorJob?.cancel()
       }
     }
   }

@@ -36,7 +36,9 @@ import androidx.core.widget.ImageViewCompat
 import androidx.databinding.BindingAdapter
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.commit
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -242,7 +244,7 @@ class MapActivity :
         }
     backPressedCallback =
         onBackPressedDispatcher.addCallback(this, false) {
-          Timber.w("ARSE")
+          Timber.w("LocationFlow")
           when (bottomSheetBehavior?.state) {
             BottomSheetBehavior.STATE_COLLAPSED -> {
               setBottomSheetHidden()
@@ -274,14 +276,16 @@ class MapActivity :
         setBottomSheetCollapsed()
       }
     }
-    viewModel.currentLocation.observe(this) { location ->
-      if (location == null) {
-        disableLocationMenus()
-      } else {
-        enableLocationMenus()
-        binding.vm?.run { updateActiveContactDistanceAndBearing(location) }
+
+    lifecycleScope.launch {
+      repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewModel.currentLocationFlow.collect { location ->
+          enableLocationMenus()
+          viewModel.updateActiveContactDistanceAndBearing(location)
+        }
       }
     }
+
     viewModel.currentMonitoringMode.observe(this) { updateMonitoringModeMenu() }
 
     startService(this)

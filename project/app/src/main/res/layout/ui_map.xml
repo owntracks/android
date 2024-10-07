@@ -140,7 +140,7 @@
                     android:orientation="vertical"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
-                    android:visibility="@{vm.currentLocation!=null ? View.VISIBLE : View.GONE}">
+                    android:visibility="@{vm.currentLocationFlow!=null ? View.VISIBLE : View.GONE}">
 
                     <include
                         android:id="@+id/contactDetailsDistance"

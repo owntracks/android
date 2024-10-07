@@ -15,9 +15,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
-import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import kotlin.math.roundToInt
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.DelayedMapListener
 import org.osmdroid.events.MapListener
@@ -62,26 +64,31 @@ internal constructor(
 
   private val osmMapLocationSource: IMyLocationProvider =
       object : IMyLocationProvider {
-        private var locationObserver: Observer<Location>? = null
+        private var collectorJob: Job? = null
 
         override fun startLocationProvider(myLocationConsumer: IMyLocationConsumer?): Boolean {
+          Timber.tag("LocationFlow").i("OSMMapFragment startLocationProvider")
           val locationProvider: IMyLocationProvider = this
-          locationObserver =
-              Observer { location: Location ->
-                    onLocationObserved(location) {
-                      myLocationConsumer?.onLocationChanged(location, locationProvider)
-                    }
+          collectorJob =
+              lifecycleScope.launch {
+                viewModel.currentLocationFlow.collect { location ->
+                  onLocationObserved(location) {
+                    myLocationConsumer?.onLocationChanged(location, locationProvider)
                   }
-                  .apply { viewModel.currentLocation.observe(viewLifecycleOwner, this) }
+                }
+              }
+
           return true
         }
 
         override fun stopLocationProvider() {
-          locationObserver?.run(viewModel.currentLocation::removeObserver)
+          Timber.tag("LocationFlow").i("OSMMapFragment stopLocationProvider")
+          collectorJob?.cancel()
         }
 
         override fun getLastKnownLocation(): Location? {
-          return viewModel.currentLocation.value
+          Timber.tag("LocationFlow").i("OSMMapFragment getLastKnownLocation")
+          return viewModel.currentLocationFlow.replayCache.lastOrNull()
         }
 
         override fun destroy() {
