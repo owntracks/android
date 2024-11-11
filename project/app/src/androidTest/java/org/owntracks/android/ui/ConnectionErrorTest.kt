@@ -118,7 +118,7 @@ class ConnectionErrorTest :
   fun given_a_config_against_a_tls_endpoint_with_self_signed_certs_when_viewing_the_connecting_status_then_a_ca_not_trusted_error_is_shown() {
     val username = "user"
     val password = "password"
-    val port = Random.nextInt(10000, 20000)
+    val port = Random(1).nextInt(10000, 20000)
     val tlsSettings = getTLSSettings(this)
     getBroker(port, username, password, tlsSettings).use {
       val config =
