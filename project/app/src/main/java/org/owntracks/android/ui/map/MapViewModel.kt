@@ -15,9 +15,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.math.asin
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import org.owntracks.android.BR
@@ -377,18 +379,19 @@ constructor(
                 LatLng(STARTING_LATITUDE, STARTING_LONGITUDE), STARTING_ZOOM)
       }
 
+  @OptIn(ExperimentalCoroutinesApi::class)
   val orientationSensorEventListener =
       object : SensorEventListener {
         override fun onSensorChanged(maybeEvent: SensorEvent?) {
           maybeEvent?.let { event ->
             currentContact.value?.latLng?.let { contactLatLng ->
-              currentLocationFlow.let { currentLocation ->
+              currentLocationFlow.mapLatest { location ->
                 // Orientation is angle around the Z axis
                 val azimuth = (180 / Math.PI) * 2 * asin(event.values[2])
                 val distanceBetween = FloatArray(2)
                 Location.distanceBetween(
-                    currentLocation.replayCache[0].latitude,
-                    currentLocation.replayCache[0].longitude,
+                    location.latitude,
+                    location.longitude,
                     contactLatLng.latitude.value,
                     contactLatLng.longitude.value,
                     distanceBetween)
