@@ -158,7 +158,7 @@ class App :
           .firstOrNull()
           ?.run {
             Timber.i(
-                "Historical process exited at ${Instant.fromEpochMilliseconds(timestamp)}. reason: $description")
+                "Historical process exited at ${Instant.fromEpochMilliseconds(timestamp)}. reason: $description, status: $status, reason: $reason")
           }
     }
     applicationContext.noBackupFilesDir.resolve("crash.log").run {
