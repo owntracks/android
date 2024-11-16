@@ -248,7 +248,7 @@ constructor(
   }
 
   fun publishStatusMessage() {
-    // Getting appHibernation takes a while, so lets not block the main thrad
+    // Getting appHibernation takes a while, so lets not block the main thread
     scope.launch(ioDispatcher) {
       messageProcessor.queueMessageForSending(
           MessageStatus().apply {

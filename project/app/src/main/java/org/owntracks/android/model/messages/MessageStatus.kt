@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import org.owntracks.android.BuildConfig
 import org.owntracks.android.preferences.Preferences
 
 @JsonTypeInfo(
@@ -47,4 +48,8 @@ class AddMessageStatus {
   @JsonProperty("hib") var appHibernation = 0
 
   @JsonProperty("loc") var locationPermission = 0
+
+  @JsonProperty("version") var version = BuildConfig.VERSION_CODE
+
+  @JsonProperty("flavour") var flavour = BuildConfig.FLAVOR
 }
