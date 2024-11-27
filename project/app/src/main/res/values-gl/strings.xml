@@ -17,7 +17,7 @@
     <string name="backgroundLocationRestrictionNotificationText">"Esta versión de Android restrinxe a OwnTrack de recibir localizacións cando se inicia en segundo plano ata que se abra a aplicación. Prema nesta notificación para abrir a aplicación e comezar a trazar a localización."</string>
     <string name="backgroundLocationRestrictionNotificationTitle">"Trazado da localización en pausa"</string>
     <string name="batteryOptimizationWhitelistDialogButtonLabel">"Axustes de optimización da batería"</string>
-    <string name="batteryOptimizationWhitelistDialogMessage">"A inclusión de OwnTracks na lista de autorización da optimización da batería pode axudarlle a realizar un trazado9 máis fiábel das localizacións e manter o contacto co servidor."</string>
+    <string name="batteryOptimizationWhitelistDialogMessage">"A inclusión de OwnTracks na lista de autorización da optimización da batería pode axudarlle a realizar un trazado máis fiábel das localizacións e manter o contacto co servidor."</string>
     <string name="batteryOptimizationWhitelistDialogTitle">"Optimización da batería"</string>
     <string name="cancel">"Cancelar"</string>
     <string name="certificateMigrationRequiredNotificationText">"OwnTracks agora usa certificados TLS do almacén de certificados do dispositivo.\n\nSe estabas a usar unha AC personalizada ou certificados de cliente TLS, engádaos ao almacén de certificados do dispositivo."</string>

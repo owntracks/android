@@ -10,30 +10,58 @@
         <item quantity="other">"目前支持 %1$d 种语言！"</item>
     </plurals>
     <string name="accept">"接受"</string>
+    <string name="addWaypoint">"添加航点"</string>
+    <string name="aLocation">"一个区域"</string>
     <string name="app_name">"OwnTracks"</string>
+    <string name="backgroundLocationRestrictionNotificationText">"此版本的 Android 限制 OwnTracks 在后台启动时接收位置信息，直到应用被打开。点击此通知打开应用并开始追踪位置。"</string>
+    <string name="backgroundLocationRestrictionNotificationTitle">"位置追踪已暂停"</string>
+    <string name="batteryOptimizationWhitelistDialogButtonLabel">"电池优化设置"</string>
+    <string name="batteryOptimizationWhitelistDialogMessage">"将 OwnTracks 从电池优化中排除可以帮助它更可靠地跟踪位置并保持与服务器的连接。"</string>
+    <string name="batteryOptimizationWhitelistDialogTitle">"电池优化"</string>
     <string name="cancel">"取消"</string>
+    <string name="certificateMigrationRequiredNotificationText">"OwnTracks 现在使用设备证书存储中的 TLS 证书。
+
+如果您之前使用了自定义 CA 或 TLS 客户端证书，请将它们添加到设备证书存储中。"</string>
+    <string name="certificateMigrationRequiredNotificationTitle">"需要迁移证书"</string>
+    <string name="certificateMigrationRequiredOpenSettingsAction">"打开设置"</string>
     <string name="clear_log">"清除"</string>
     <string name="configurationManagement">"配置管理"</string>
     <string name="CONNECTED">"已连接"</string>
     <string name="CONNECTING">"正在连接"</string>
+    <string name="contact_image">"联系人头像"</string>
     <string name="contactDetailsAccuracy">"精度"</string>
 
     <!-- Fuzzy -->
     <string name="contactDetailsAccuracyValue">"%d m"</string>
+    <string name="contactDetailsAltitude">"海拔"</string>
     <string name="contactDetailsAltitudeValue">"%,d m"</string>
     <string name="contactDetailsBattery">"电池"</string>
     <string name="contactDetailsBatteryValue">"%d %%"</string>
+    <string name="contactDetailsBearing">"方位角"</string>
     <string name="contactDetailsBearingValue">"%,.0f°"</string>
+    <string name="contactDetailsCoordinates">"坐标"</string>
     <string name="contactDetailsDistance">"距离"</string>
     <string name="contactDetailsDistanceUnitKilometres">"千米"</string>
     <string name="contactDetailsDistanceUnitMeters">"米"</string>
     <string name="contactDetailsDistanceValue">"%1$,.2f %2$s"</string>
     <string name="contactDetailsSpeed">"速度"</string>
     <string name="contactDetailsSpeedValue">"%d kph"</string>
+    <string name="contactDetailsTopic">"标识符"</string>
     <string name="contactDetailsTrackerId">"Tracker ID"</string>
+    <string name="contactLocationUnknown">"位置信息不可用"</string>
+    <string name="contactsListPlaceholder">"未找到联系人"</string>
     <string name="currentLocationButtonLabel">"当前位置"</string>
+    <string name="deleteWaypointConfirmationButtonLabel">"删除"</string>
+    <string name="deleteWaypointConfirmationText">"您要删除此路点吗？"</string>
+    <string name="deleteWaypointTitle">"删除路点"</string>
     <string name="description">"描述"</string>
+    <string name="deviceLocationDisabledDialogMessage">"此设备上的位置服务目前已禁用，因此 OwnTracks 无法跟踪您的当前位置。
+
+要允许此功能，请在设备设置中启用位置服务。"</string>
+    <string name="deviceLocationDisabledDialogPositiveButtonLabel">"位置设置"</string>
+    <string name="deviceLocationDisabledDialogTitle">"设备位置服务已禁用"</string>
     <string name="DISCONNECTED">"已断开"</string>
+    <string name="divider">"分隔符"</string>
     <string name="done_heading">"完成"</string>
 
     <!-- Fuzzy -->
@@ -46,13 +74,18 @@
     <string name="events">"事件"</string>
     <string name="exportConfiguration">"导出"</string>
     <string name="exportLogFilePrompt">"导出日志文件"</string>
+    <string name="exportLogFileSubject">"OwnTracks 日志文件"</string>
+    <string name="exportWaypointsToEndpoint">"发布航点"</string>
+    <string name="fixProblemLabel">"修复"</string>
     <string name="geocoderDisabled">"未开启地理编码服务"</string>
     <string name="geocoderError">"地理编码服务返回错误信息：%s"</string>
+    <string name="geocoderExceptionError">"地理编码服务返回错误。查看日志获取详细信息"</string>
     <string name="geocoderIPAddressRejected">"您的客户端 IP 地址已被拒绝"</string>
 
     <!-- Fuzzy -->
     <string name="geocoderProblemNotificationTitle">"地理编码服务出现问题"</string>
     <string name="geocoderRateLimited">"地理编码服务频率受限。%s 前不会重试"</string>
+    <string name="geocoderUnavailable">"地理编码服务暂时不可用"</string>
     <string name="icon_description_done">"完成"</string>
 
     <!-- Fuzzy -->
@@ -62,13 +95,47 @@
     <string name="importConfig">"导入"</string>
     <string name="INITIAL">"正在初始化"</string>
     <string name="latitude">"纬度"</string>
+    <string name="loadActivityNoFileExplorerFound">"未找到文件浏览器应用"</string>
+    <string name="loadActivitySelectAFile">"选择文件"</string>
+    <string name="locationPermissionNotGrantedNotification">"未授予位置权限"</string>
+    <string name="locationPermissionRequestDialogMessage">"要跟踪您的当前位置，请授予 OwnTracks 位置权限。"</string>
+    <string name="locationPermissionRequestDialogTitle">"位置权限请求"</string>
     <string name="logViewerActivityTitle">"日志"</string>
     <string name="longitude">"经度"</string>
+    <string name="mapLayerDialogTitle">"地图图层"</string>
+    <string name="mapLayerGoogleMapDefaultLabel">"Google 默认"</string>
+    <string name="mapLayerGoogleMapHybridLabel">"Google 混合"</string>
+    <string name="mapLayerGoogleMapTerrainLabel">"Google 地形"</string>
+    <string name="mapLayerOpenStreetMapLabel">"OpenStreetMap"</string>
+    <string name="mapLayerOpenStreetMapWikimediaLabel">"维基媒体"</string>
     <string name="menuClear">"清除"</string>
     <string name="menuContactNavigate">"导航"</string>
     <string name="mode_heading">"模式"</string>
     <string name="mode_http_private_label">"HTTP"</string>
     <string name="mode_mqtt_private_label">"MQTT"</string>
+    <string name="monitoring_manual">"手动监控模式"</string>
+    <string name="monitoring_move">"移动监控模式"</string>
+    <string name="monitoring_quiet">"静默监控模式"</string>
+    <string name="monitoring_significant">"显著变化监控模式"</string>
+    <string name="monitoringModeDialogManualDescription">"仅自动发布区域转换，不发布位置"</string>
+    <string name="monitoringModeDialogManualTitle">"手动"</string>
+    <string name="monitoringModeDialogMoveDescription">"高频率和高精度，但耗电量大"</string>
+    <string name="monitoringModeDialogMoveTitle">"移动"</string>
+    <string name="monitoringModeDialogQuietDescription">"不自动发布任何事件"</string>
+    <string name="monitoringModeDialogQuietTitle">"安静"</string>
+    <string name="monitoringModeDialogSignificantDescription">"平衡电量使用和精度/频率"</string>
+    <string name="monitoringModeDialogSignificantTitle">"显著变化"</string>
+    <string name="monitoringModeDialogTitle">"监控模式"</string>
+    <string name="na">"不可用"</string>
+    <string name="next">"下一步"</string>
+    <string name="noBrowserInstalled">"未安装合适的浏览器"</string>
+    <string name="noNavigationApp">"未安装合适的导航应用"</string>
+    <string name="notificationChangeMonitoring">"更改监控模式"</string>
+    <string name="notificationChannelErrors">"错误"</string>
+    <string name="notificationChannelEventsDescription">"航点传输"</string>
+    <string name="notificationChannelOngoing">"常驻"</string>
+    <string name="notificationChannelOngoingDescription">"后台接收位置更新所必需"</string>
+    <string name="notificationEndpointStateConnected">"已连接 %1$s 到 %2$s"</string>
     <plurals name="notificationEventsTitle">
         <item quantity="other">"%1$d 条新事件"</item>
     </plurals>
@@ -76,37 +143,92 @@
     <string name="play_services_now_available">"Google Play 服务可以使用"</string>
     <string name="play_services_update_required">"需要先更新 Google Play 服务"</string>
     <string name="preferencesAdvanced">"高级"</string>
+    <string name="preferencesAdvancedAutostartWarning">"此版本的 Android 限制 OwnTracks 在设备启动时自动接收位置信息，直到应用被打开。"</string>
+    <string name="preferencesAdvancedOpencagePrivacy">"&lt;a href=\"%s\"&gt;OpenCage 隐私政策&lt;/a&gt;"</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogAccept">"接受"</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogCancel">"取消"</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogMessage">"要使用 OpenCage 地理编码器，OwnTracks 将通过 TLS 加密连接将每个处理的位置发送给 OpenCage。
+
+OpenCage 隐私政策可以在&lt;a href=\"https://opencagedata.com/api#privacy\"&gt;他们的网站&lt;/a&gt;上找到。"</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogTitle">"OpenCage 隐私政策"</string>
     <string name="preferencesAutostart">"自动启动"</string>
     <string name="preferencesAutostartSummary">"自动随设备启动"</string>
     <string name="preferencesBrokerPassword">"密码"</string>
+    <string name="preferencesCaCrtInstall">"安装 CA 证书"</string>
     <string name="preferencesCategoryAdvancedEncryption">"加密"</string>
+    <string name="preferencesCategoryAdvancedLocator">"定位器"</string>
     <string name="preferencesCategoryAdvancedMisc">"其他"</string>
     <string name="preferencesCategoryAdvancedServices">"服务"</string>
+    <string name="preferencesCategoryConnectionCredentials">"凭据"</string>
+    <string name="preferencesCategoryConnectionEndpoint">"终端节点"</string>
+    <string name="preferencesCategoryConnectionIdentification">"身份标识"</string>
     <string name="preferencesCategoryNotificationBackground">"后台通知"</string>
+    <string name="preferencesCategoryNotificationErrors">"错误和问题"</string>
+    <string name="preferencesCategoryNotificationOngoing">"常驻通知"</string>
     <string name="preferencesChangelog">"更新日志"</string>
+    <string name="preferencesCleanSessionEnabled">"清除会话"</string>
+    <string name="preferencesClientCrt">"客户端证书"</string>
+    <string name="preferencesClientCrtInstall">"安装客户端证书"</string>
+    <string name="preferencesClientId">"客户端 ID"</string>
+    <string name="preferencesClientIdValidationError">"不能为空"</string>
+    <string name="preferencesDebugLog">"调试日志"</string>
     <string name="preferencesDeviceName">"设备 ID"</string>
+    <string name="preferencesDeviceNameValidationError">"不能为空"</string>
     <string name="preferencesDocumentation">"文档"</string>
+    <string name="preferencesEditor">"配置编辑器"</string>
+    <string name="preferencesEditorDescription">"为指定的键设置一个值。某些更改可能需要重启应用程序。"</string>
+    <string name="preferencesEditorKey">"键名"</string>
+    <string name="preferencesEditorKeyError">"无效的键名"</string>
+    <string name="preferencesEditorValue">"值"</string>
+    <string name="preferencesEditorValueError">"无效的值"</string>
+    <string name="preferencesEnableMapRotation">"启用地图旋转"</string>
+    <string name="preferencesEnableMapRotationSummary">"允许旋转地图"</string>
     <string name="preferencesEncryptionKey">"密钥"</string>
     <string name="preferencesEncryptionKeyDialogMessage">"若密钥长度超过32字符则会被截断。"</string>
     <string name="preferencesEncryptionKeySummary">"用于加密负载的对称密钥"</string>
+    <string name="preferencesExperimental">"实验性功能"</string>
+    <string name="preferencesExportError">"导出配置时出错"</string>
     <string name="preferencesExportSuccess">"导出成功"</string>
     <string name="preferencesHost">"主机"</string>
+    <string name="preferencesHostValidationError">"不能为空"</string>
     <string name="preferencesIgnoreInaccurateLocations">"不精确的位置"</string>
     <string name="preferencesIgnoreInaccurateLocationsDialog">"若精确度大于指定米数，则忽略该定位结果"</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">"忽略不够精确的定位结果"</string>
+    <string name="preferencesImportNoURIGiven">"未提供导入配置的 URI"</string>
+    <string name="preferencesKeepalive">"保活间隔"</string>
+    <string name="preferencesKeepaliveDialogMessage">"客户端应该多久向代理发送一次保活消息（秒）"</string>
+    <string name="preferencesKeepaliveValidationError">"保活间隔最小应为 %d"</string>
+    <string name="preferencesLicenses">"开源库"</string>
+    <string name="preferencesLicensesSummary">"感谢使用的开源库作者们"</string>
+    <string name="preferencesLoadFailed">"无法加载有效配置"</string>
+    <string name="preferencesLocatorDisplacement">"最小位置位移"</string>
+    <string name="preferencesLocatorDisplacementDialog">"设备移动多少距离（米）后接收新的位置更新"</string>
+    <string name="preferencesLocatorDisplacementSummary">"位置更新之间的最小距离"</string>
     <string name="preferencesLocatorInterval">"定位间隔"</string>
     <string name="preferencesLocatorIntervalDialog">"从设备获取位置信息更新的间隔（单位为秒）"</string>
     <string name="preferencesLocatorIntervalSummary">"更新位置的时间间隔"</string>
+    <string name="preferencesMap">"地图"</string>
     <string name="preferencesMoveModeLocatorInterval">"定位间隔（移动模式）"</string>
     <string name="preferencesMoveModeLocatorIntervalDialog">"移动模式下从设备获取位置信息更新的间隔（单位为秒）"</string>
     <string name="preferencesMoveModeLocatorIntervalSummary">"移动模式下更新位置的时间间隔"</string>
     <string name="preferencesNotification">"通知"</string>
     <string name="preferencesNotificationEvents">"事件"</string>
     <string name="preferencesNotificationEventsSummary">"通知收到的事件"</string>
+    <string name="preferencesNotificationGeocoderErrors">"地理编码器错误"</string>
+    <string name="preferencesNotificationGeocoderErrorsSummary">"显示地理编码器错误、速率限制和配额超限事件"</string>
     <string name="preferencesNotificationLocation">"最后上报地点"</string>
     <string name="preferencesNotificationLocationSummary">"显示最后上报时间地点"</string>
+    <string name="preferencesNotificationPermissionRequest">"通知权限已禁用"</string>
+    <string name="preferencesNotificationPermissionRequestSummary">"点击此处请求通知权限"</string>
+    <string name="preferencesNotSet">"未设置"</string>
+    <string name="preferencesOpencageGeocoderApiKey">"OpenCage API 密钥"</string>
+    <string name="preferencesOpencageGeocoderApiKeyDialog">"设置后将使用 OpenCage 代替 Google 进行位置地址解析。需要重启应用。"</string>
+    <string name="preferencesOpencageGeocoderApiKeySummary">"OpenCage 反向地理编码器的 API 密钥"</string>
     <string name="preferencesParameters">"参数"</string>
+    <string name="preferencesPegLocatorFastestIntervalToInterval">"限制最大定位频率"</string>
+    <string name="preferencesPegLocatorFastestIntervalToIntervalSummary">"请求位置提供者提供的更新不快于请求的定位间隔"</string>
     <string name="preferencesPort">"端口"</string>
+    <string name="preferencesPortValidationError">"端口必须是 1 到 65535 之间的数字"</string>
     <string name="preferencesProfileId">"模式"</string>
     <string name="preferencesPubExtendedData">"附加数据"</string>
     <string name="preferencesPubExtendedDataSummary">"在上报地点时包含附加数据"</string>
@@ -116,21 +238,69 @@
     <string name="preferencesRemoteConfigurationSummary">"允许配置文件被远程更新（需要开启远程命令）"</string>
     <string name="preferencesReporting">"上报"</string>
     <string name="preferencesRepository">"源代码"</string>
+    <string name="preferencesRepublishOnReconnect">"MQTT 连接时发布位置"</string>
+    <string name="preferencesRepublishOnReconnectSummary">"连接到 MQTT 时立即发布最后已知位置和当前扩展数据"</string>
     <string name="preferencesReverseGeocodeProvider">"逆地理编码服务提供商"</string>
     <string name="preferencesServer">"连接"</string>
+    <string name="preferencesSet">"已设置"</string>
+    <string name="preferencesShowWaypointsOnMap">"显示航点"</string>
+    <string name="preferencesShowWaypointsOnMapSummary">"在地图上绘制航点圆圈"</string>
     <string name="preferencesTheme">"主题"</string>
+    <string name="preferencesTrackerId">"追踪器 ID"</string>
+    <string name="preferencesTrackerIdValidationError">"必须是一个或两个字符"</string>
+    <string name="preferencesUrlValidationError">"无效的 HTTP URL"</string>
 
     <!-- Fuzzy -->
     <string name="preferencesUsername">"用户名"</string>
     <string name="preferencesWebsocket">"使用 WebSockets"</string>
+    <string name="publish">"上报位置"</string>
 
     <!-- Fuzzy -->
     <string name="radius">"半径"</string>
     <string name="reconnect">"重新连接"</string>
     <string name="save">"保存"</string>
+    <string name="select">"选择"</string>
+    <string name="shareContactBody">"%1$s 的最后位置：%2$s（%3$s）于 %4$s"</string>
     <string name="status_background_service_started_hint">"后台服务启动时间"</string>
     <string name="status_battery_optimization_whitelisted_hint">"未优化电池使用量"</string>
+    <string name="status_endpoint_queue_hint">"终端队列"</string>
+    <string name="status_endpoint_state_hint">"终端状态"</string>
+    <string name="status_endpoint_state_message_hint">"终端状态消息"</string>
     <string name="status_last_background_update_hint">"后台服务最后一次定位时间"</string>
+    <string name="statusBatteryDozeWhiteListDisabled">"否"</string>
+    <string name="statusBatteryDozeWhiteListEnabled">"是"</string>
+    <string name="statusEndpointStateMessageAuthenticationFailed">"认证失败"</string>
+    <string name="statusEndpointStateMessageClientTimeout">"客户端超时"</string>
+    <string name="statusEndpointStateMessageConnectionLost">"连接丢失：%s"</string>
+    <string name="statusEndpointStateMessageConnectionRefused">"连接被拒绝"</string>
+    <string name="statusEndpointStateMessageEndpointDoesNotSupportWebsockets">"终端不支持 WebSocket"</string>
+    <string name="statusEndpointStateMessageEOFError">"终端返回 EOF 异常 - 终端是否需要 TLS？"</string>
+    <string name="statusEndpointStateMessageInvalidClientId">"无效的客户端 ID"</string>
+    <string name="statusEndpointStateMessageInvalidProtocolVersion">"无效的 MQTT 协议版本"</string>
+    <string name="statusEndpointStateMessageMalformedHostPort">"无效的主机名和端口"</string>
+    <string name="statusEndpointStateMessageMissingHost">"未指定主机"</string>
+    <string name="statusEndpointStateMessageNotAuthorized">"未授权"</string>
+    <string name="statusEndpointStateMessageServerTimeout">"服务器写入超时"</string>
+    <string name="statusEndpointStateMessageSocketTimeout">"连接超时"</string>
+    <string name="statusEndpointStateMessageSubscribeFailed">"订阅失败"</string>
+    <string name="statusEndpointStateMessageTLSConfigError">"TLS 配置错误"</string>
+    <string name="statusEndpointStateMessageTLSConnectionClosed">"TLS 连接已关闭"</string>
+    <string name="statusEndpointStateMessageTLSEndpointCANotTrustedError">"终端 TLS CA 不受信任"</string>
+    <string name="statusEndpointStateMessageTLSEndpointClientCertsRequired">"终端需要 TLS 客户端证书"</string>
+    <string name="statusEndpointStateMessageTLSError">"TLS 错误：%s"</string>
+    <string name="statusEndpointStateMessageUnableToConnect">"无法连接"</string>
+    <string name="statusEndpointStateMessageUnknownHost">"未知主机"</string>
+    <string name="statusLocationPermissions">"已授予位置权限"</string>
+    <string name="statusLocationPermissionsCoarseBackground">"粗略（后台可用）"</string>
+    <string name="statusLocationPermissionsCoarseForeground">"粗略"</string>
+    <string name="statusLocationPermissionsFineBackground">"精确（后台可用）"</string>
+    <string name="statusLocationPermissionsFineForeground">"精确"</string>
+    <string name="statusLocationPermissionsNone">"无"</string>
+    <string name="statusLocationPermissionsPromptNegativeButton">"取消"</string>
+    <string name="statusLocationPermissionsPromptPositiveButton">"应用设置"</string>
+    <string name="statusLocationPermissionsPromptText">"如果您想在设备重启时自动跟踪位置，可以通过授予 OwnTracks「始终」访问您的位置来启用后台位置权限。"</string>
+    <string name="statusLocationPermissionsPromptTitle">"后台位置"</string>
+    <string name="statusLocationPermissionsUnknown">"未知"</string>
     <string name="title_activity_about">"关于"</string>
     <string name="title_activity_contacts">"好友"</string>
     <string name="title_activity_map">"地图"</string>
@@ -160,12 +330,44 @@
 
     <!-- Fuzzy -->
     <string name="waypointListPlaceholder">"还未定义区域"</string>
+    <string name="waypointMigrationErrorNotificationText">"迁移航点时发生错误。部分航点可能未被迁移，请检查日志并重新添加。"</string>
+    <string name="waypointMigrationErrorNotificationTitle">"迁移航点时出错"</string>
+    <string name="waypointsImport">"导入航点"</string>
+    <string name="welcome_connection_setup_description">"OwnTracks 通过将您的位置数据发送到您（或您信任的人）拥有的服务器来工作，确保您始终控制着自己的数据。
+
+请确保您知道服务器的连接详情，无论是通过 HTTPS 还是 MQTT 访问，以及任何登录凭据。
+
+完成欢迎部分后，您需要在首选项→连接中配置应用程序的服务器详情。
+
+欲了解更多详情，请查看 OwnTracks 手册。"</string>
+    <string name="welcome_connection_setup_learn_more_button_label">"打开手册"</string>
+    <string name="welcome_connection_setup_title">"设置连接"</string>
 
     <!-- Fuzzy -->
     <string name="welcome_description">"以下步骤将帮助您开始使用 Owntracks"</string>
+    <string name="welcome_finish_open_preferences_button_label">"打开首选项"</string>
     <string name="welcome_heading">"欢迎"</string>
+    <string name="welcome_location_permission_description">"为了接收您的当前位置并发送到 OwnTracks 终端，OwnTracks 需要获取您的设备位置权限。
+
+您可以在状态页面查看此权限并请求额外的（后台）位置权限。
+
+根据您的设备和配置，后台位置权限可能会提高位置数据的频率和可靠性。"</string>
+    <string name="welcome_location_permission_granted">"已授予位置权限"</string>
+    <string name="welcome_location_permission_request">"请求权限"</string>
+    <string name="welcome_location_permission_title">"位置权限"</string>
+    <string name="welcome_notification_permission_description">"为了完整运行，OwnTracks 需要获取显示某些通知的权限。
+
+将显示一个常驻通知以保持位置追踪和连接活跃，您还可以选择启用联系人在航点之间转换时的通知。"</string>
+    <string name="welcome_notification_permission_granted">"已授予通知权限"</string>
+    <string name="welcome_notification_permission_title">"通知权限"</string>
 
     <!-- Fuzzy -->
     <string name="welcome_play_description">"Owntracks 依赖 Google Play 服务"</string>
     <string name="welcome_play_heading">"Google Play 服务"</string>
+    <string name="welcomeFixIssue">"修复"</string>
+    <string name="workmanagerInitializationErrorDialogMessage">"某些组件未能正确初始化，OwnTracks 可能无法正常工作。可能需要重新安装应用或清除用户数据。
+
+请查看日志以了解详细信息。"</string>
+    <string name="workmanagerInitializationErrorDialogOpenSettingsLabel">"打开应用设置"</string>
+    <string name="workmanagerInitializationErrorDialogTitle">"初始化错误"</string>
 </resources>
