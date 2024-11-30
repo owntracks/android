@@ -45,10 +45,10 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
-import org.owntracks.android.App
-import org.owntracks.android.App.Companion.NOTIFICATION_GROUP_EVENTS
-import org.owntracks.android.App.Companion.NOTIFICATION_ID_EVENT_GROUP
-import org.owntracks.android.App.Companion.NOTIFICATION_ID_ONGOING
+import org.owntracks.android.BaseApp.Companion.NOTIFICATION_CHANNEL_EVENTS
+import org.owntracks.android.BaseApp.Companion.NOTIFICATION_GROUP_EVENTS
+import org.owntracks.android.BaseApp.Companion.NOTIFICATION_ID_EVENT_GROUP
+import org.owntracks.android.BaseApp.Companion.NOTIFICATION_ID_ONGOING
 import org.owntracks.android.R
 import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.data.repos.EndpointStateRepo
@@ -192,7 +192,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
         launch {
           waypointsRepo.migrationCompleteFlow.collect {
             if (it) {
-              waypointsRepo.operations.collect { waypointOperation ->
+              waypointsRepo.repoChangedEvent.collect { waypointOperation ->
                 when (waypointOperation) {
                   is WaypointsRepo.WaypointOperation.Insert ->
                       locationProcessor.publishWaypointMessage(waypointOperation.waypoint)
@@ -435,7 +435,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
     val summary = summaryAndInbox.first
     val inbox = summaryAndInbox.second
 
-    NotificationCompat.Builder(this, App.NOTIFICATION_CHANNEL_EVENTS)
+    NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_EVENTS)
         .setContentTitle(getString(R.string.events))
         .setContentText(summary)
         .setGroup(NOTIFICATION_GROUP_EVENTS) // same as group of single notifications
@@ -563,7 +563,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
     if (requirementsChecker.hasLocationPermissions()) {
 
       withContext(ioDispatcher) {
-        val waypoints = waypointsRepo.all
+        val waypoints = waypointsRepo.getAll()
         Timber.i("Setting up geofences for ${waypoints.size} waypoints")
         val geofences =
             waypoints

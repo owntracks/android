@@ -1,6 +1,5 @@
 package org.owntracks.android
 
-import android.Manifest
 import android.app.ActivityManager
 import android.app.Application
 import android.app.Notification
@@ -8,25 +7,23 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.ComponentCallbacks2
 import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.StrictMode
 import androidx.annotation.MainThread
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.app.ActivityCompat
-import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.databinding.DataBindingUtil
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.lifecycle.MutableLiveData
-import androidx.test.espresso.IdlingResource
 import androidx.work.Configuration
 import dagger.hilt.EntryPoints
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EarlyEntryPoint
+import dagger.hilt.android.EarlyEntryPoints
 import dagger.hilt.android.HiltAndroidApp
+import dagger.hilt.components.SingletonComponent
 import java.security.Security
-import javax.inject.Inject
-import javax.inject.Named
 import javax.inject.Provider
 import kotlinx.datetime.Instant
 import org.bouncycastle.jce.provider.BouncyCastleProvider
@@ -36,71 +33,79 @@ import org.owntracks.android.di.CustomBindingComponentBuilder
 import org.owntracks.android.di.CustomBindingEntryPoint
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.logging.TimberInMemoryLogTree
-import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.PreferencesStore
 import org.owntracks.android.preferences.types.AppTheme
 import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.RunThingsOnOtherThreads
-import org.owntracks.android.test.CountingIdlingResourceShim
-import org.owntracks.android.test.IdlingResourceWithData
-import org.owntracks.android.test.SimpleIdlingResource
 import timber.log.Timber
 
 @HiltAndroidApp
-class App :
+class App : BaseApp() {
+  override fun onCreate() {
+    super.onCreate()
+    //    StartBackgroundServiceReceiver.enable(this)
+  }
+}
+
+open class BaseApp :
     Application(),
     Configuration.Provider,
     Preferences.OnPreferenceChangeListener,
     ComponentCallbacks2 {
-  @Inject lateinit var preferences: Preferences
 
-  @Inject lateinit var workerFactory: HiltWorkerFactory
+  @EarlyEntryPoint
+  @InstallIn(SingletonComponent::class)
+  internal interface ApplicationEntrypoint {
+    fun preferences(): Preferences
 
-  @Inject lateinit var scheduler: Scheduler
+    fun workerFactory(): HiltWorkerFactory
 
-  @Inject lateinit var bindingComponentProvider: Provider<CustomBindingComponentBuilder>
+    fun scheduler(): Scheduler
 
-  @Inject lateinit var messageProcessor: MessageProcessor
+    fun bindingComponentProvider(): Provider<CustomBindingComponentBuilder>
 
-  @Inject lateinit var notificationManager: NotificationManagerCompat
+    fun messageProcessor(): MessageProcessor
 
-  @Inject lateinit var preferencesStore: PreferencesStore
+    fun notificationManager(): NotificationManagerCompat
 
-  @Inject lateinit var runThingsOnOtherThreads: RunThingsOnOtherThreads
+    fun preferencesStore(): PreferencesStore
 
-  @Inject
-  @get:VisibleForTesting
-  @Named("mockLocationIdlingResource")
-  lateinit var mockLocationIdlingResource: SimpleIdlingResource
+    fun runThingsOnOtherThreads(): RunThingsOnOtherThreads
 
-  @get:VisibleForTesting
-  val preferenceSetIdlingResource: SimpleIdlingResource =
-      SimpleIdlingResource("preferenceSetIdlingResource", true)
+    fun roomWaypointsRepo(): RoomWaypointsRepo
+  }
 
-  @Inject
-  @Named("outgoingQueueIdlingResource")
-  @get:VisibleForTesting
-  lateinit var outgoingQueueIdlingResource: CountingIdlingResourceShim
+  private val preferences by lazy {
+    EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).preferences()
+  }
 
-  @Inject
-  @Named("contactsClearedIdlingResource")
-  @get:VisibleForTesting
-  lateinit var contactsClearedIdlingResource: SimpleIdlingResource
+  private val workerFactory: HiltWorkerFactory by lazy {
+    EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).workerFactory()
+  }
 
-  @Inject
-  @Named("messageReceivedIdlingResource")
-  @get:VisibleForTesting
-  lateinit var messageReceivedIdlingResource: IdlingResourceWithData<MessageBase>
+  private val scheduler: Scheduler by lazy {
+    EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).scheduler()
+  }
 
-  @Inject lateinit var waypointsRepo: RoomWaypointsRepo
+  private val bindingComponentProvider: Provider<CustomBindingComponentBuilder> by lazy {
+    EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).bindingComponentProvider()
+  }
+
+  private val notificationManager: NotificationManagerCompat by lazy {
+    EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).notificationManager()
+  }
+
+  private val preferencesStore: PreferencesStore by lazy {
+    EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).preferencesStore()
+  }
+
+  private val runThingsOnOtherThreads: RunThingsOnOtherThreads by lazy {
+    EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).runThingsOnOtherThreads()
+  }
 
   val workManagerFailedToInitialize = MutableLiveData(false)
-
-  @get:VisibleForTesting
-  val migrationIdlingResource: SimpleIdlingResource =
-      SimpleIdlingResource("waypointsMigration", false)
 
   override fun onCreate() {
     // Make sure we use Conscrypt for advanced TLS features on all devices.
@@ -145,8 +150,6 @@ class App :
     preferences.registerOnPreferenceChangedListener(this)
 
     setThemeFromPreferences()
-
-    migrateWaypoints()
 
     // Notifications can be sent from multiple places, so let's make sure we've got the channels in
     // place
@@ -266,54 +269,12 @@ class App :
       runThingsOnOtherThreads.postOnMainHandlerDelayed(::setThemeFromPreferences, 0)
     }
     Timber.v("Idling preferenceSetIdlingResource because of $properties")
-    preferenceSetIdlingResource.setIdleState(true)
   }
-
-  @get:VisibleForTesting
-  val mqttConnectionIdlingResource: IdlingResource
-    get() = messageProcessor.mqttConnectionIdlingResource
 
   /** Migrate preferences. Available to be called from espresso tests. */
   @VisibleForTesting
   fun migratePreferences() {
     preferencesStore.migrate()
-  }
-
-  /**
-   * Migrate waypoints. We need a way to call this from an espresso test after it's written the test
-   * files so have this visible for testing so it can be called post-startup
-   */
-  @VisibleForTesting
-  fun migrateWaypoints() {
-    Timber.v("UnIdling migrationIdlingResource")
-    migrationIdlingResource.setIdleState(false)
-    waypointsRepo.migrateFromLegacyStorage().invokeOnCompletion { throwable ->
-      if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
-          PackageManager.PERMISSION_GRANTED) {
-        throwable?.run {
-          Timber.e(throwable, "Error migrating waypoints")
-          NotificationCompat.Builder(
-                  applicationContext, GeocoderProvider.ERROR_NOTIFICATION_CHANNEL_ID)
-              .setContentTitle(getString(R.string.waypointMigrationErrorNotificationTitle))
-              .setContentText(getString(R.string.waypointMigrationErrorNotificationText))
-              .setAutoCancel(true)
-              .setSmallIcon(R.drawable.ic_owntracks_80)
-              .setStyle(
-                  NotificationCompat.BigTextStyle()
-                      .bigText(getString(R.string.waypointMigrationErrorNotificationText)))
-              .setPriority(NotificationCompat.PRIORITY_LOW)
-              .setSilent(true)
-              .build()
-              .run { notificationManager.notify("WaypointsMigrationNotification", 0, this) }
-        }
-      } else if (throwable != null) {
-        Timber.w(
-            throwable,
-            "notification permissions not granted, can't display waypoints migration error notification")
-      }
-      Timber.v("Idling migrationIdlingResource")
-      migrationIdlingResource.setIdleState(true)
-    }
   }
 
   override fun onTrimMemory(level: Int) {

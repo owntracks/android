@@ -15,6 +15,7 @@ import java.net.URISyntaxException
 import java.net.URL
 import java.nio.charset.StandardCharsets
 import javax.inject.Inject
+import javax.inject.Named
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import okhttp3.Call
@@ -41,9 +42,10 @@ constructor(
     private val preferences: Preferences,
     private val parser: Parser,
     private val waypointsRepo: WaypointsRepo,
-    @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @Named("saveConfigurationIdlingResource")
+    private val saveConfigurationIdlingResource: SimpleIdlingResource
 ) : ViewModel() {
-  val saveConfigurationIdlingResource = SimpleIdlingResource("importStatus", true)
   private var configuration: MessageConfiguration? = null
 
   private val mutableConfig = MutableLiveData("")

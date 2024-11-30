@@ -61,15 +61,14 @@ import org.owntracks.android.services.BackgroundService.Companion.BACKGROUND_LOC
 import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.support.DrawerProvider
 import org.owntracks.android.support.RequirementsChecker
-import org.owntracks.android.test.CountingIdlingResourceShim
 import org.owntracks.android.test.SimpleIdlingResource
+import org.owntracks.android.test.ThresholdIdlingResourceInterface
 import org.owntracks.android.ui.NotificationsStash
 import org.owntracks.android.ui.mixins.BackgroundLocationPermissionRequester
 import org.owntracks.android.ui.mixins.LocationPermissionRequester
 import org.owntracks.android.ui.mixins.NotificationPermissionRequester
 import org.owntracks.android.ui.mixins.ServiceStarter
 import org.owntracks.android.ui.mixins.WorkManagerInitExceptionNotifier
-import org.owntracks.android.ui.welcome.WelcomeActivity
 import timber.log.Timber
 
 @AndroidEntryPoint
@@ -104,7 +103,7 @@ class MapActivity :
   @Inject
   @Named("outgoingQueueIdlingResource")
   @get:VisibleForTesting
-  lateinit var outgoingQueueIdlingResource: CountingIdlingResourceShim
+  lateinit var outgoingQueueIdlingResource: ThresholdIdlingResourceInterface
 
   @Inject
   @Named("publishResponseMessageIdlingResource")
@@ -142,11 +141,12 @@ class MapActivity :
 
     super.onCreate(savedInstanceState)
 
-    if (!preferences.setupCompleted) {
-      startActivity(Intent(this, WelcomeActivity::class.java))
-      finish()
-      return
-    }
+    // TODO Remove this
+    //    if (!preferences.setupCompleted) {
+    //      startActivity(Intent(this, WelcomeActivity::class.java))
+    //      finish()
+    //      return
+    //    }
 
     binding =
         DataBindingUtil.setContentView<UiMapBinding>(this, R.layout.ui_map).apply {
@@ -242,16 +242,12 @@ class MapActivity :
         }
     backPressedCallback =
         onBackPressedDispatcher.addCallback(this, false) {
-          Timber.w("ARSE")
           when (bottomSheetBehavior?.state) {
             BottomSheetBehavior.STATE_COLLAPSED -> {
               setBottomSheetHidden()
             }
             BottomSheetBehavior.STATE_EXPANDED -> {
               setBottomSheetCollapsed()
-            }
-            else -> {
-              Timber.w("HMM")
             }
           }
         }

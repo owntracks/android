@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
-import androidx.test.espresso.IdlingResource
 import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.security.KeyStore
@@ -51,9 +50,9 @@ import org.owntracks.android.preferences.Preferences.Companion.PREFERENCES_THAT_
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
-import org.owntracks.android.test.CountingIdlingResourceShim
 import org.owntracks.android.test.IdlingResourceWithData
 import org.owntracks.android.test.SimpleIdlingResource
+import org.owntracks.android.test.ThresholdIdlingResourceInterface
 import timber.log.Timber
 
 @Singleton
@@ -68,7 +67,7 @@ constructor(
     private val scheduler: Scheduler,
     private val endpointStateRepo: EndpointStateRepo,
     @Named("outgoingQueueIdlingResource")
-    private val outgoingQueueIdlingResource: CountingIdlingResourceShim,
+    private val outgoingQueueIdlingResource: ThresholdIdlingResourceInterface,
     @Named("importConfigurationIdlingResource")
     private val importConfigurationIdlingResource: SimpleIdlingResource,
     @Named("messageReceivedIdlingResource")
@@ -76,7 +75,9 @@ constructor(
     @Named("CAKeyStore") private val caKeyStore: KeyStore,
     private val locationProcessorLazy: Lazy<LocationProcessor>,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    @ApplicationScope private val scope: CoroutineScope
+    @ApplicationScope private val scope: CoroutineScope,
+    @Named("mqttConnectionIdlingResource")
+    private val mqttConnectionIdlingResource: SimpleIdlingResource
 ) : Preferences.OnPreferenceChangeListener {
   private var endpoint: MessageProcessorEndpoint? = null
   private val outgoingQueue: BlockingDeque<MessageBase> =
@@ -189,7 +190,8 @@ constructor(
               caKeyStore,
               scope,
               ioDispatcher,
-              applicationContext)
+              applicationContext,
+              mqttConnectionIdlingResource)
       ConnectionMode.HTTP ->
           HttpMessageProcessorEndpoint(
               this,
@@ -564,14 +566,6 @@ constructor(
       loadOutgoingMessageProcessor()
     }
   }
-
-  val mqttConnectionIdlingResource: IdlingResource
-    get() =
-        if (endpoint is MQTTMessageProcessorEndpoint) {
-          (endpoint as MQTTMessageProcessorEndpoint?)!!.mqttConnectionIdlingResource
-        } else {
-          SimpleIdlingResource("alwaysIdle", true)
-        }
 
   companion object {
     private val SEND_FAILURE_NOT_READY_WAIT = 10.seconds
