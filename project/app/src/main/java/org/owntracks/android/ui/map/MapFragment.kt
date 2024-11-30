@@ -12,16 +12,13 @@ import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.owntracks.android.R
 import org.owntracks.android.data.repos.ContactsRepoChange
 import org.owntracks.android.data.waypoints.WaypointModel
+import org.owntracks.android.data.waypoints.WaypointsRepo
 import org.owntracks.android.location.LatLng
 import org.owntracks.android.location.toLatLng
 import org.owntracks.android.model.Contact
@@ -52,16 +49,19 @@ internal constructor(
    */
   abstract fun initMap()
 
-  abstract fun drawRegions(regions: Set<WaypointModel>)
+  abstract fun reDrawRegions(regions: Set<WaypointModel>)
+
+  abstract fun addRegion(waypoint: WaypointModel)
+
+  abstract fun deleteRegion(waypoint: WaypointModel)
+
+  abstract fun updateRegion(waypoint: WaypointModel)
 
   abstract fun setMapLayerType(mapLayerStyle: MapLayerStyle)
 
   protected fun drawAllContactsAndRegions() {
     viewModel.allContacts.values.toSet().run(::updateAllMarkers)
-    lifecycleScope.launch {
-      val regions = withContext(Dispatchers.IO) { viewModel.waypoints.first().toSet() }
-      withContext(Dispatchers.Main) { drawRegions(regions) }
-    }
+    //    viewModel.allWaypoints.toSet().run(::reDrawRegions)
   }
 
   protected val viewModel: MapViewModel by activityViewModels()
@@ -131,12 +131,15 @@ internal constructor(
             }
           }
           launch {
-            waypoints
-                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED)
-                .collect { regions ->
-                  Timber.tag("FLIBBLE").v("Waypoints changed. Redrawing regions")
-                  drawRegions(regions.toSet())
-                }
+            viewModel.waypointUpdatedEvent.collect {
+              when (it) {
+                is WaypointsRepo.WaypointOperation.Clear -> reDrawRegions(emptySet())
+                is WaypointsRepo.WaypointOperation.Delete -> deleteRegion(it.waypoint)
+                is WaypointsRepo.WaypointOperation.Insert -> addRegion(it.waypoint)
+                is WaypointsRepo.WaypointOperation.Update -> updateRegion(it.waypoint)
+                is WaypointsRepo.WaypointOperation.InsertMany -> it.waypoints.forEach(::addRegion)
+              }
+            }
           }
         }
       }

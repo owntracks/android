@@ -11,7 +11,8 @@ import org.owntracks.android.location.geofencing.Longitude
 
 @Entity(indices = [Index(value = ["tst"], unique = true)])
 data class WaypointModel(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    // Needs to be a var so that we can update inserted models with the right ID
+    @PrimaryKey(autoGenerate = true) var id: Long = 0,
     var description: String = "",
     var geofenceLatitude: Latitude = Latitude(0.0),
     var geofenceLongitude: Longitude = Longitude(0.0),

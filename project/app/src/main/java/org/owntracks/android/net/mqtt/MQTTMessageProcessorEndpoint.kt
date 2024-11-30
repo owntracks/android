@@ -72,13 +72,13 @@ class MQTTMessageProcessorEndpoint(
     private val caKeyStore: KeyStore,
     @ApplicationScope private val scope: CoroutineScope,
     @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    @ApplicationContext private val applicationContext: Context
+    @ApplicationContext private val applicationContext: Context,
+    private val mqttConnectionIdlingResource: SimpleIdlingResource
 ) :
     MessageProcessorEndpoint(messageProcessor),
     StatefulServiceMessageProcessor,
     Preferences.OnPreferenceChangeListener {
-  val mqttConnectionIdlingResource: SimpleIdlingResource =
-      SimpleIdlingResource("mqttConnection", false)
+
   override val modeId: ConnectionMode = ConnectionMode.MQTT
 
   private val connectingLock = Semaphore(1)

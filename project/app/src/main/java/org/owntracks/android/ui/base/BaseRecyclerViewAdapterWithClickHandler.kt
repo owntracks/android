@@ -33,8 +33,8 @@ abstract class BaseRecyclerViewAdapterWithClickHandler<T, VH : BaseRecyclerViewH
   }
 
   override fun getItemCount(): Int = itemList.size
+}
 
-  interface ClickListener<T> {
-    fun onClick(thing: T, view: View, longClick: Boolean): ClickHasBeenHandled
-  }
+interface ClickListener<T> {
+  fun onClick(thing: T, view: View, longClick: Boolean): ClickHasBeenHandled
 }

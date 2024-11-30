@@ -15,14 +15,13 @@ plugins {
   alias(libs.plugins.triplet).apply(false)
   alias(libs.plugins.ktfmt).apply(false)
   alias(libs.plugins.ksp).apply(false)
-  id("com.xcporter.metaview").version("0.0.6")
 }
 
-generateUml { classTree { target = file("app/src/main") } }
-
-extensions.findByName("buildScan")?.withGroovyBuilder {
-  setProperty("termsOfServiceUrl", "https://gradle.com/terms-of-service")
-  setProperty("termsOfServiceAgree", "yes")
+extensions.findByName("develocity")?.withGroovyBuilder {
+  getProperty("buildScan")?.withGroovyBuilder {
+    setProperty("termsOfUseUrl", "https://gradle.com/help/legal-terms-of-use")
+    setProperty("termsOfUseAgree", "yes")
+  }
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
