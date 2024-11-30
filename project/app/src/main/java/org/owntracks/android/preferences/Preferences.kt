@@ -4,7 +4,6 @@ import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-import java.util.WeakHashMap
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -58,7 +57,7 @@ constructor(
       }
 
   private val placeholder = Any()
-  private val listeners = WeakHashMap<OnPreferenceChangeListener, Any>()
+  private val listeners = HashMap<OnPreferenceChangeListener, Any>()
 
   private val remappedPreferenceKeys = mapOf("pubExtendedData" to Preferences::extendedData)
 
@@ -396,6 +395,7 @@ constructor(
   // https://stackoverflow.com/a/3104265/352740
   fun registerOnPreferenceChangedListener(listener: OnPreferenceChangeListener) {
     synchronized(listeners) { listeners[listener] = placeholder }
+    println("FICKTE UN")
   }
 
   fun unregisterOnPreferenceChangedListener(listener: OnPreferenceChangeListener) {

@@ -75,6 +75,7 @@ kotlin-serialization = { module = "org.jetbrains.kotlin:kotlin-serialization", v
 # Hilt
 hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
+hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hilt" }
 hilt-androidx = { module = "androidx.hilt:hilt-compiler", version.ref = "hilt-work" }
 hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hilt-work" }
 

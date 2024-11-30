@@ -63,3 +63,4 @@ project/app/objectbox-*.dll
 project/localscripts
 
 jacoco.exec
+.env
