@@ -91,7 +91,8 @@ constructor(
     get() = mutableMyLocationStatus
 
   val currentLocation = LocationLiveData(application, viewModelScope)
-  val waypoints = waypointsRepo.allLive
+  val waypointUpdatedEvent = waypointsRepo.repoChangedEvent
+  //  val allWaypoints = waypointsRepo.getAll()
   val allContacts = contactsRepo.all
   val contactUpdatedEvent: Flow<ContactsRepoChange> = contactsRepo.repoChangedEvent
 

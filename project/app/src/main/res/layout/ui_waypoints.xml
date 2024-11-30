@@ -24,7 +24,7 @@
             android:id="@+id/waypointsRecyclerView"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:visibility="@{vm.waypointsList.empty ? View.GONE : View.VISIBLE}"
+            android:visibility="@{vm.waypointsFlow.isEmpty ? View.GONE : View.VISIBLE}"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
         <TextView
@@ -33,6 +33,6 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="@string/waypointListPlaceholder"
-            android:visibility="@{vm.waypointsList.empty ? View.VISIBLE : View.GONE}" />
+            android:visibility="@{vm.waypointsFlow.isEmpty ? View.VISIBLE : View.GONE}" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

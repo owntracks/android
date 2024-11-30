@@ -41,7 +41,8 @@ android {
         "int", "TRANSLATION_COUNT", localeCount.toString(),
     )
 
-    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    testInstrumentationRunner = "org.owntracks.android.testutils.hilt.CustomTestRunner"
+
     testInstrumentationRunnerArguments.putAll(
         mapOf(
             "clearPackageData" to "false",
@@ -140,35 +141,8 @@ android {
     }
     managedDevices {
       localDevices {
-        val hardware = "Small Phone"
-        create("api34aosp") {
-          device = hardware
-          apiLevel = 34
-          systemImageSource = "aosp-atd"
-        }
-        create("api27aosp") {
-          device = hardware
-          apiLevel = 27
-          systemImageSource = "aosp"
-        }
-        create("api34gms") {
-          device = hardware
-          apiLevel = 34
-          systemImageSource = "google-atd"
-        }
-        create("api27gms") {
-          device = hardware
-          apiLevel = 27
-          systemImageSource = "google"
-        }
       }
       groups {
-        create("allGmsApis") {
-          targetDevices.addAll(listOf(devices["api34gms"], devices["api27gms"]))
-        }
-        create("allAospApis") {
-          targetDevices.addAll(listOf(devices["api34aosp"], devices["api27aosp"]))
-        }
       }
     }
   }
@@ -301,6 +275,11 @@ dependencies {
   testImplementation(libs.kotlin.coroutines.test)
 
   androidTestImplementation(libs.bundles.androidx.test)
+
+  // Hilt Android Testing
+  androidTestImplementation(libs.hilt.android.testing)
+  kaptAndroidTest(libs.hilt.compiler)
+
   androidTestImplementation(libs.barista) {
     exclude("org.jetbrains.kotlin")
   }

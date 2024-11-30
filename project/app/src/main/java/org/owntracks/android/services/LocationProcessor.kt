@@ -71,7 +71,7 @@ constructor(
     Timber.v("Maybe publishing $location with trigger $trigger")
     if (!locationIsWithAccuracyThreshold(location))
         return Result.failure(Exception("location accuracy too low"))
-    val loadedWaypoints = withContext(ioDispatcher) { waypointsRepo.all }
+    val loadedWaypoints = withContext(ioDispatcher) { waypointsRepo.getAll() }
     Timber.d("publishLocationMessage for $location triggered by $trigger")
 
     // Check if publish would trigger a region if fusedRegionDetection is enabled
@@ -232,7 +232,7 @@ constructor(
               MessageWaypointCollection().apply {
                 withContext(ioDispatcher) {
                   addAll(
-                      waypointsRepo.all.map {
+                      waypointsRepo.getAll().map {
                         MessageWaypoint().apply {
                           description = it.description
                           latitude = it.geofenceLatitude.value
