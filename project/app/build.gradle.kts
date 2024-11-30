@@ -41,7 +41,7 @@ android {
         "int", "TRANSLATION_COUNT", localeCount.toString(),
     )
 
-    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    testInstrumentationRunner = "org.owntracks.android.e2e.CustomTestRunner"
     testInstrumentationRunnerArguments.putAll(
         mapOf(
             "clearPackageData" to "false",
@@ -301,6 +301,7 @@ dependencies {
   testImplementation(libs.kotlin.coroutines.test)
 
   androidTestImplementation(libs.bundles.androidx.test)
+  androidTestImplementation(libs.hilt.android.testing)
   androidTestImplementation(libs.barista) {
     exclude("org.jetbrains.kotlin")
   }

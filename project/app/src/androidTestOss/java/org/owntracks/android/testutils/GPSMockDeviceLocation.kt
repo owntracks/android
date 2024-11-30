@@ -14,7 +14,7 @@ open class GPSMockDeviceLocation : MockDeviceLocation {
   private lateinit var locationManager: LocationManager
 
   private val locationProvidersToMock =
-      listOf(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER)
+      listOf(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER, LocationManager.FUSED_PROVIDER)
 
   override fun initializeMockLocationProvider(context: Context) {
     Timber.d("Initialize mock location Provider")
@@ -45,7 +45,7 @@ open class GPSMockDeviceLocation : MockDeviceLocation {
             LocationCompat.setBearingAccuracyDegrees(this, 0f)
             LocationCompat.setSpeedAccuracyMetersPerSecond(this, 1f)
           }
-      Timber.i("Setting mock GPS location for $provider to $location")
+      Timber.i("Setting mock GPS location for $provider to $location with accuracy $accuracy")
       locationManager.setTestProviderLocation(provider, location)
     }
   }

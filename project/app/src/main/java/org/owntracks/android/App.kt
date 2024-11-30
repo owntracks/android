@@ -48,6 +48,7 @@ import org.owntracks.android.test.IdlingResourceWithData
 import org.owntracks.android.test.SimpleIdlingResource
 import timber.log.Timber
 
+
 @HiltAndroidApp
 class App :
     Application(),
