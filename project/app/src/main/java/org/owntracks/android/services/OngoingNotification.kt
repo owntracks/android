@@ -11,15 +11,15 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import org.owntracks.android.App
-import org.owntracks.android.App.Companion.NOTIFICATION_ID_ONGOING
+import org.owntracks.android.BaseApp.Companion.NOTIFICATION_CHANNEL_ONGOING
+import org.owntracks.android.BaseApp.Companion.NOTIFICATION_ID_ONGOING
 import org.owntracks.android.R
 import org.owntracks.android.data.EndpointState
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber
 
-class OngoingNotification(private val context: Context, private val initialMode: MonitoringMode) {
+class OngoingNotification(private val context: Context, initialMode: MonitoringMode) {
   data class ServiceNotificationState(
       val title: String,
       val content: String,
@@ -62,7 +62,7 @@ class OngoingNotification(private val context: Context, private val initialMode:
           false)
 
   private val notificationBuilder =
-      NotificationCompat.Builder(context, App.NOTIFICATION_CHANNEL_ONGOING)
+      NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ONGOING)
           .setOngoing(true)
           .setContentIntent(resultPendingIntent)
           .setStyle(NotificationCompat.BigTextStyle())

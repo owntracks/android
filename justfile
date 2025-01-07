@@ -16,8 +16,14 @@ espresso:
 single-espresso:
     {{gradlec}} clean createGmsDebugCoverageReport -Pandroid.testInstrumentationRunnerArguments.annotation=org.owntracks.android.testutils.JustThisTestPlease
 
+clean:
+    {{gradlec}} clean
+
 tasks:
     {{gradlec}} tasks --all
 
 sync-i18n:
     ./util/pull-translations.sh
+
+local-stack:
+    cd util/mqtt-local && podman-compose up
