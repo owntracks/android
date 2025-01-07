@@ -18,7 +18,7 @@ class CustomTestRunner : AndroidJUnitRunner() {
   }
 }
 
-@CustomTestApplication(BlahApp::class) class TestApp : Application()
+@CustomTestApplication(BlahApp::class) interface TestApp
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)

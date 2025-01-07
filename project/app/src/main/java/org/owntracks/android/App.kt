@@ -22,10 +22,10 @@ import androidx.hilt.work.HiltWorkerFactory
 import androidx.lifecycle.MutableLiveData
 import androidx.test.espresso.IdlingResource
 import androidx.work.Configuration
-import dagger.hilt.EntryPoint
 import dagger.hilt.EntryPoints
 import dagger.hilt.InstallIn
-import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.android.EarlyEntryPoint
+import dagger.hilt.android.EarlyEntryPoints
 import dagger.hilt.android.HiltAndroidApp
 import dagger.hilt.components.SingletonComponent
 import java.security.Security
@@ -53,39 +53,27 @@ import timber.log.Timber
 
 @HiltAndroidApp class App : BaseApp()
 
-@EntryPoint
-@InstallIn(SingletonComponent::class)
-internal interface ApplicationEntrypoint {
-  fun preferences(): Preferences
+open class BlahApp : Application() {
+  @EarlyEntryPoint
+  @InstallIn(SingletonComponent::class)
+  internal interface ApplicationEarlyEntrypoint {
+    fun preferences(): Preferences
+  }
 
-  fun workerFactory(): HiltWorkerFactory
+  private val preferences by lazy {
+    EarlyEntryPoints.get(this, ApplicationEarlyEntrypoint::class.java).preferences()
+  }
 
-  fun scheduler(): Scheduler
+  //
+  //  @Inject
+  //  lateinit var preferences: Preferences
 
-  fun bindingComponentProvider(): Provider<CustomBindingComponentBuilder>
+  override fun onCreate() {
+    super.onCreate()
 
-  fun messageProcessor(): MessageProcessor
-
-  fun notificationManager(): NotificationManagerCompat
-
-  fun preferencesStore(): PreferencesStore
-
-  fun runThingsOnOtherThreads(): RunThingsOnOtherThreads
-
-  fun roomWaypointsRepo(): RoomWaypointsRepo
-
-  @Named("mockLocationIdlingResource") fun mockLocationIdlingResource(): SimpleIdlingResource
-
-  @Named("outgoingQueueIdlingResource")
-  fun outgoingQueueIdlingResource(): CountingIdlingResourceShim
-
-  @Named("contactsClearedIdlingResource") fun contactsClearedIdlingResource(): SimpleIdlingResource
-
-  @Named("messageReceivedIdlingResource")
-  fun messageReceivedIdlingResource(): IdlingResourceWithData<MessageBase>
+    print(preferences.theme)
+  }
 }
-
-open class BlahApp : Application()
 
 open class BaseApp :
     Application(),
@@ -93,49 +81,78 @@ open class BaseApp :
     Preferences.OnPreferenceChangeListener,
     ComponentCallbacks2 {
 
+  @EarlyEntryPoint
+  @InstallIn(SingletonComponent::class)
+  internal interface ApplicationEntrypoint {
+    fun preferences(): Preferences
+
+    fun workerFactory(): HiltWorkerFactory
+
+    fun scheduler(): Scheduler
+
+    fun bindingComponentProvider(): Provider<CustomBindingComponentBuilder>
+
+    fun messageProcessor(): MessageProcessor
+
+    fun notificationManager(): NotificationManagerCompat
+
+    fun preferencesStore(): PreferencesStore
+
+    fun runThingsOnOtherThreads(): RunThingsOnOtherThreads
+
+    fun roomWaypointsRepo(): RoomWaypointsRepo
+
+    @Named("mockLocationIdlingResource") fun mockLocationIdlingResource(): SimpleIdlingResource
+
+    @Named("outgoingQueueIdlingResource")
+    fun outgoingQueueIdlingResource(): CountingIdlingResourceShim
+
+    @Named("contactsClearedIdlingResource")
+    fun contactsClearedIdlingResource(): SimpleIdlingResource
+
+    @Named("messageReceivedIdlingResource")
+    fun messageReceivedIdlingResource(): IdlingResourceWithData<MessageBase>
+  }
+
   private val preferences by lazy {
-    EntryPointAccessors.fromApplication(this, ApplicationEntrypoint::class.java).preferences()
+    EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).preferences()
   }
 
   private val workerFactory: HiltWorkerFactory by lazy {
-    EntryPointAccessors.fromApplication(this, ApplicationEntrypoint::class.java).workerFactory()
+    EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).workerFactory()
   }
 
   private val scheduler: Scheduler by lazy {
-    EntryPointAccessors.fromApplication(this, ApplicationEntrypoint::class.java).scheduler()
+    EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).scheduler()
   }
 
   private val bindingComponentProvider: Provider<CustomBindingComponentBuilder> by lazy {
-    EntryPointAccessors.fromApplication(this, ApplicationEntrypoint::class.java)
-        .bindingComponentProvider()
+    EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).bindingComponentProvider()
   }
 
   private val messageProcessor: MessageProcessor by lazy {
-    EntryPointAccessors.fromApplication(this, ApplicationEntrypoint::class.java).messageProcessor()
+    EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).messageProcessor()
   }
 
   private val notificationManager: NotificationManagerCompat by lazy {
-    EntryPointAccessors.fromApplication(this, ApplicationEntrypoint::class.java)
-        .notificationManager()
+    EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).notificationManager()
   }
 
   private val preferencesStore: PreferencesStore by lazy {
-    EntryPointAccessors.fromApplication(this, ApplicationEntrypoint::class.java).preferencesStore()
+    EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).preferencesStore()
   }
 
   private val runThingsOnOtherThreads: RunThingsOnOtherThreads by lazy {
-    EntryPointAccessors.fromApplication(this, ApplicationEntrypoint::class.java)
-        .runThingsOnOtherThreads()
+    EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).runThingsOnOtherThreads()
   }
 
   private val waypointsRepo: RoomWaypointsRepo by lazy {
-    EntryPointAccessors.fromApplication(this, ApplicationEntrypoint::class.java).roomWaypointsRepo()
+    EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).roomWaypointsRepo()
   }
 
   @get:VisibleForTesting
   val mockLocationIdlingResource: SimpleIdlingResource by lazy {
-    EntryPointAccessors.fromApplication(this, ApplicationEntrypoint::class.java)
-        .mockLocationIdlingResource()
+    EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).mockLocationIdlingResource()
   }
 
   @get:VisibleForTesting
@@ -144,20 +161,17 @@ open class BaseApp :
 
   @get:VisibleForTesting
   val outgoingQueueIdlingResource: CountingIdlingResourceShim by lazy {
-    EntryPointAccessors.fromApplication(this, ApplicationEntrypoint::class.java)
-        .outgoingQueueIdlingResource()
+    EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).outgoingQueueIdlingResource()
   }
 
   @get:VisibleForTesting
   val contactsClearedIdlingResource: SimpleIdlingResource by lazy {
-    EntryPointAccessors.fromApplication(this, ApplicationEntrypoint::class.java)
-        .contactsClearedIdlingResource()
+    EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).contactsClearedIdlingResource()
   }
 
   @get:VisibleForTesting
   val messageReceivedIdlingResource: IdlingResourceWithData<MessageBase> by lazy {
-    EntryPointAccessors.fromApplication(this, ApplicationEntrypoint::class.java)
-        .messageReceivedIdlingResource()
+    EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).messageReceivedIdlingResource()
   }
 
   val workManagerFailedToInitialize = MutableLiveData(false)
