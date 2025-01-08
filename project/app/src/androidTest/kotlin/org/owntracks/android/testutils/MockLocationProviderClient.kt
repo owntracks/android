@@ -1,8 +1,9 @@
-package org.owntracks.android
+package org.owntracks.android.testutils
 
 import android.location.Location
 import android.os.Looper
 import kotlinx.datetime.Clock
+import org.owntracks.android.location.LocationAvailability
 import org.owntracks.android.location.LocationCallback
 import org.owntracks.android.location.LocationProviderClient
 import org.owntracks.android.location.LocationRequest
@@ -13,8 +14,14 @@ class MockLocationProviderClient : LocationProviderClient() {
   private var lastLocation: Location? = null
 
   fun setLocation(location: Location) {
+
+    callbacks.forEach {
+      if (lastLocation == null) {
+        it.onLocationAvailability(LocationAvailability(true))
+      }
+      it.onLocationResult(LocationResult(location))
+    }
     lastLocation = location
-    callbacks.forEach { it.onLocationResult(LocationResult(location)) }
   }
 
   override fun singleHighAccuracyLocation(clientCallBack: LocationCallback, looper: Looper) {
@@ -27,6 +34,10 @@ class MockLocationProviderClient : LocationProviderClient() {
       looper: Looper
   ) {
     callbacks.add(clientCallBack)
+    lastLocation?.run {
+      clientCallBack.onLocationAvailability(LocationAvailability(true))
+      clientCallBack.onLocationResult(LocationResult(this))
+    }
   }
 
   override fun removeLocationUpdates(clientCallBack: LocationCallback) {
@@ -40,14 +51,12 @@ class MockLocationProviderClient : LocationProviderClient() {
   override fun getLastLocation(): Location? = lastLocation
 }
 
-
 fun LocationProviderClient.setLocation(
-  latitude: Double,
-  longitude: Double,
-  altitude: Double = 0.0,
-  accuracy: Float = 5.0f,
-  speed: Float = 0.0f
-
+    latitude: Double,
+    longitude: Double,
+    altitude: Double = 0.0,
+    accuracy: Float = 5.0f,
+    speed: Float = 0.0f
 ) {
   (this as MockLocationProviderClient).setLocation(
       Location("test").apply {

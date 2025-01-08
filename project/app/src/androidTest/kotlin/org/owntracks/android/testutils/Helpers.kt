@@ -22,6 +22,7 @@ import androidx.test.espresso.UiController
 import androidx.test.espresso.ViewAction
 import androidx.test.espresso.ViewInteraction
 import androidx.test.espresso.action.ViewActions
+import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers
@@ -31,6 +32,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
 import androidx.test.runner.lifecycle.Stage
+import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickBack
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickDialogNegativeButton
 import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickDialogPositiveButton
@@ -49,6 +51,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.datetime.Clock
 import org.hamcrest.Matcher
+import org.hamcrest.Matchers.allOf
 import org.owntracks.android.R
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.ui.map.MapActivity
@@ -347,7 +350,13 @@ fun waitUntilVisible(matcher: ViewInteraction, timeout: Duration = 1.seconds) {
       })
 }
 
-val SLEEP_MILLIS = 1.seconds.inWholeMilliseconds
+private const val SLEEP_MILLIS = 100L
+
+fun clickOnDrawerAndWait(text: Int) {
+  onView(allOf(withId(com.mikepenz.materialdrawer.R.id.material_drawer_name), withText(text)))
+      .perform(click())
+  sleep(SLEEP_MILLIS)
+}
 
 fun clickOnAndWait(int: Int) {
   clickOn(int)
@@ -356,5 +365,10 @@ fun clickOnAndWait(int: Int) {
 
 fun clickOnAndWait(str: String) {
   clickOn(str)
+  sleep(SLEEP_MILLIS)
+}
+
+fun clickBackAndWait() {
+  clickBack()
   sleep(SLEEP_MILLIS)
 }
