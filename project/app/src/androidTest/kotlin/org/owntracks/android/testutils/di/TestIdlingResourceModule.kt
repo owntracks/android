@@ -1,28 +1,20 @@
-package org.owntracks.android.di
+package org.owntracks.android.testutils.hilt
 
-import android.content.Context
-import androidx.core.app.NotificationManagerCompat
 import dagger.Module
 import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import java.security.KeyStore
-import javax.inject.Named
-import javax.inject.Singleton
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
-import okhttp3.OkHttpClient
+import dagger.hilt.testing.TestInstallIn
+import org.owntracks.android.di.IdlingResourceModule
 import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.test.CountingIdlingResourceShim
 import org.owntracks.android.test.IdlingResourceWithData
 import org.owntracks.android.test.SimpleIdlingResource
+import javax.inject.Named
+import javax.inject.Singleton
 
-@InstallIn(SingletonComponent::class)
+@TestInstallIn(components = [SingletonComponent::class], replaces = [IdlingResourceModule::class])
 @Module
-class SingletonModule {
-
+class TestIdlingResourceModule {
   /**
    * This idling resource is idled when the outgoing message queue becomes empty
    *
@@ -97,23 +89,4 @@ class SingletonModule {
   @Named("messageReceivedIdlingResource")
   fun provideLocationMessageIdlingResource(): IdlingResourceWithData<MessageBase> =
       IdlingResourceWithData("messageReceivedIdlingResource", compareBy { it.messageId })
-
-  @ApplicationScope
-  @Provides
-  fun providesCoroutineScope(
-      @CoroutineScopes.DefaultDispatcher defaultDispatcher: CoroutineDispatcher
-  ): CoroutineScope = CoroutineScope(SupervisorJob() + defaultDispatcher)
-
-  @Provides
-  fun provideNotificationManager(@ApplicationContext context: Context): NotificationManagerCompat =
-      NotificationManagerCompat.from(context)
-
-  @Provides fun provideOkHttpClient(): OkHttpClient = OkHttpClient()
-
-  @Provides
-  @Named("CAKeyStore")
-  @Singleton
-  fun privateAndroidCaKeyStore(): KeyStore {
-    return KeyStore.getInstance("AndroidCAStore").apply { load(null) }
-  }
 }
