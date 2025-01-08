@@ -2,8 +2,11 @@ package org.owntracks.android
 
 import android.app.Application
 import android.content.Context
+import android.location.Location
+import android.os.Looper
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.runner.AndroidJUnitRunner
+import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -12,16 +15,19 @@ import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
+import javax.inject.Singleton
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.di.LocationProviderClientModule
+import org.owntracks.android.location.LocationCallback
 import org.owntracks.android.location.LocationProviderClient
+import org.owntracks.android.location.LocationRequest
 import org.owntracks.android.testutils.JustThisTestPlease
 import org.owntracks.android.testutils.TestWithAnActivity
+import org.owntracks.android.testutils.setNotFirstStartPreferences
 import org.owntracks.android.ui.map.MapActivity
-import javax.inject.Singleton
 
 class CustomTestRunner : AndroidJUnitRunner() {
   override fun newApplication(cl: ClassLoader?, name: String?, context: Context?): Application {
@@ -34,7 +40,7 @@ class CustomTestRunner : AndroidJUnitRunner() {
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 @JustThisTestPlease
-class InjectTest: TestWithAnActivity<MapActivity>(MapActivity::class.java,true) {
+class InjectTest : TestWithAnActivity<MapActivity>(MapActivity::class.java, true) {
   @get:Rule(order = 0) var hiltRule = HiltAndroidRule(this)
 
   @Before
@@ -43,23 +49,45 @@ class InjectTest: TestWithAnActivity<MapActivity>(MapActivity::class.java,true) 
     hiltRule.inject()
   }
 
-  @Test
-  fun hiltInjectTest() {
-
+  @Test fun hiltInjectTest() {
+    setNotFirstStartPreferences()
+    sleep(30_000)
   }
 }
 
-@Module
 @TestInstallIn(
-    components = [SingletonComponent::class],
-    replaces = [LocationProviderClientModule::class]
-)
-abstract class FakeAnalyticsModule {
+    components = [SingletonComponent::class], replaces = [LocationProviderClientModule::class])
+@Module
+class TestLocationProviderClientModule {
   @Provides
   @Singleton
   fun getLocationProviderClient(
-    @ApplicationContext applicationContext: Context
-  ): LocationProviderClient = AospLocationProviderClient(applicationContext)
+      @ApplicationContext applicationContext: Context
+  ): LocationProviderClient = MockLocationProviderClient()
 }
 
-class Doubel
+class MockLocationProviderClient : LocationProviderClient() {
+  override fun singleHighAccuracyLocation(clientCallBack: LocationCallback, looper: Looper) {
+    TODO("Not yet implemented")
+  }
+
+  override fun actuallyRequestLocationUpdates(
+      locationRequest: LocationRequest,
+      clientCallBack: LocationCallback,
+      looper: Looper
+  ) {
+    TODO("Not yet implemented")
+  }
+
+  override fun removeLocationUpdates(clientCallBack: LocationCallback) {
+    TODO("Not yet implemented")
+  }
+
+  override fun flushLocations() {
+    TODO("Not yet implemented")
+  }
+
+  override fun getLastLocation(): Location? {
+    TODO("Not yet implemented")
+  }
+}
