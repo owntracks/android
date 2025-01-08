@@ -12,6 +12,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.testutils.JustThisTestPlease
+import org.owntracks.android.testutils.TestWithAnActivity
+import org.owntracks.android.ui.map.MapActivity
 
 class CustomTestRunner : AndroidJUnitRunner() {
   override fun newApplication(cl: ClassLoader?, name: String?, context: Context?): Application {
@@ -24,7 +26,7 @@ class CustomTestRunner : AndroidJUnitRunner() {
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 @JustThisTestPlease
-class InjectTest {
+class InjectTest: TestWithAnActivity<MapActivity>(MapActivity::class.java,true) {
   @get:Rule(order = 0) var hiltRule = HiltAndroidRule(this)
 
   @Before
