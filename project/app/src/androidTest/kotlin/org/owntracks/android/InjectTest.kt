@@ -2,12 +2,9 @@ package org.owntracks.android
 
 import android.app.Application
 import android.content.Context
-import android.location.Location
-import android.os.Looper
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.runner.AndroidJUnitRunner
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
-import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -16,15 +13,14 @@ import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
+import javax.inject.Inject
 import javax.inject.Singleton
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.owntracks.android.di.LocationProviderClientModule
-import org.owntracks.android.location.LocationCallback
 import org.owntracks.android.location.LocationProviderClient
-import org.owntracks.android.location.LocationRequest
 import org.owntracks.android.testutils.JustThisTestPlease
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.grantMapActivityPermissions
@@ -51,11 +47,14 @@ class InjectTest : TestWithAnActivity<MapActivity>(MapActivity::class.java, fals
     hiltRule.inject()
   }
 
+  @Inject lateinit var mockLocationProviderClient: LocationProviderClient
+
   @Test
   fun hiltInjectTest() {
     setNotFirstStartPreferences()
     launchActivity()
     grantMapActivityPermissions()
+    mockLocationProviderClient.setLocation(51.0, 0.0)
     assertDisplayed(R.id.menu_monitoring)
   }
 }
@@ -67,32 +66,6 @@ class TestLocationProviderClientModule {
   @Provides
   @Singleton
   fun getLocationProviderClient(
-      @ApplicationContext applicationContext: Context
+      @Suppress("UNUSED_PARAMETER") @ApplicationContext applicationContext: Context
   ): LocationProviderClient = MockLocationProviderClient()
-}
-
-class MockLocationProviderClient : LocationProviderClient() {
-  override fun singleHighAccuracyLocation(clientCallBack: LocationCallback, looper: Looper) {
-    TODO("Not yet implemented")
-  }
-
-  override fun actuallyRequestLocationUpdates(
-      locationRequest: LocationRequest,
-      clientCallBack: LocationCallback,
-      looper: Looper
-  ) {
-    TODO("Not yet implemented")
-  }
-
-  override fun removeLocationUpdates(clientCallBack: LocationCallback) {
-    TODO("Not yet implemented")
-  }
-
-  override fun flushLocations() {
-    // No-op
-  }
-
-  override fun getLastLocation(): Location? {
-    TODO("Not yet implemented")
-  }
 }
