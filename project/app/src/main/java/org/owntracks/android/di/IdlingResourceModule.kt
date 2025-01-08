@@ -4,12 +4,12 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Named
-import javax.inject.Singleton
 import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.test.CountingIdlingResourceShim
 import org.owntracks.android.test.IdlingResourceWithData
 import org.owntracks.android.test.SimpleIdlingResource
+import javax.inject.Named
+import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
 @Module
@@ -17,7 +17,7 @@ class IdlingResourceModule {
   /**
    * This idling resource is idled when the outgoing message queue becomes empty
    *
-   * @return a [CountingIdlingResourceShimShim] representing the size of the outgoing message queue
+   * @return a [CountingIdlingResourceShim] representing the size of the outgoing message queue
    */
   @Provides
   @Named("outgoingQueueIdlingResource")

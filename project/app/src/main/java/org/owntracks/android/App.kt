@@ -80,8 +80,6 @@ open class BaseApp :
 
     fun roomWaypointsRepo(): RoomWaypointsRepo
 
-    @Named("mockLocationIdlingResource") fun mockLocationIdlingResource(): SimpleIdlingResource
-
     @Named("outgoingQueueIdlingResource")
     fun outgoingQueueIdlingResource(): CountingIdlingResourceShim
 
@@ -126,11 +124,6 @@ open class BaseApp :
 
   private val waypointsRepo: RoomWaypointsRepo by lazy {
     EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).roomWaypointsRepo()
-  }
-
-  @get:VisibleForTesting
-  val mockLocationIdlingResource: SimpleIdlingResource by lazy {
-    EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).mockLocationIdlingResource()
   }
 
   @get:VisibleForTesting

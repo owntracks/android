@@ -1,4 +1,4 @@
-package org.owntracks.android.testutils.hilt
+package org.owntracks.android.testutils.di
 
 import dagger.Module
 import dagger.Provides
@@ -18,7 +18,7 @@ class TestIdlingResourceModule {
   /**
    * This idling resource is idled when the outgoing message queue becomes empty
    *
-   * @return a [CountingIdlingResourceShimShim] representing the size of the outgoing message queue
+   * @return a [CountingIdlingResourceShim] representing the size of the outgoing message queue
    */
   @Provides
   @Named("outgoingQueueIdlingResource")
