@@ -17,7 +17,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.RuleChain
-import org.owntracks.android.App
+import org.owntracks.android.BaseApp
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.testutils.rules.ScreenshotTakingOnTestEndRule
 import shark.AndroidReferenceMatchers
@@ -102,8 +102,8 @@ abstract class TestWithAnActivity<T : Activity>(
     baristaRule.launchActivity(intent)
   }
 
-  val app: App
-    get() = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as App
+  val app: BaseApp
+    get() = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as BaseApp
 
   fun waitForMQTTToCompleteAndContactsToBeCleared() {
     Timber.v("Waiting for MQTT connection to be established")

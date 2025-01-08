@@ -51,7 +51,6 @@ import kotlinx.datetime.Clock
 import org.hamcrest.Matcher
 import org.owntracks.android.R
 import org.owntracks.android.preferences.Preferences
-
 import org.owntracks.android.ui.map.MapActivity
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import timber.log.Timber

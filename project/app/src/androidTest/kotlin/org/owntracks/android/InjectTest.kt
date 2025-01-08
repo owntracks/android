@@ -40,7 +40,7 @@ class CustomTestRunner : AndroidJUnitRunner() {
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 @JustThisTestPlease
-class InjectTest : TestWithAnActivity<MapActivity>(MapActivity::class.java, true) {
+class InjectTest : TestWithAnActivity<MapActivity>(MapActivity::class.java, false) {
   @get:Rule(order = 0) var hiltRule = HiltAndroidRule(this)
 
   @Before
@@ -49,9 +49,11 @@ class InjectTest : TestWithAnActivity<MapActivity>(MapActivity::class.java, true
     hiltRule.inject()
   }
 
-  @Test fun hiltInjectTest() {
+  @Test
+  fun hiltInjectTest() {
     setNotFirstStartPreferences()
-    sleep(30_000)
+    launchActivity()
+    sleep(5_000)
   }
 }
 
@@ -84,7 +86,7 @@ class MockLocationProviderClient : LocationProviderClient() {
   }
 
   override fun flushLocations() {
-    TODO("Not yet implemented")
+    // No-op
   }
 
   override fun getLastLocation(): Location? {
