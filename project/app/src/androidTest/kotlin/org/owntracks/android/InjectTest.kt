@@ -11,6 +11,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.owntracks.android.testutils.JustThisTestPlease
 
 class CustomTestRunner : AndroidJUnitRunner() {
   override fun newApplication(cl: ClassLoader?, name: String?, context: Context?): Application {
@@ -18,10 +19,11 @@ class CustomTestRunner : AndroidJUnitRunner() {
   }
 }
 
-@CustomTestApplication(BlahApp::class) interface TestApp
+@CustomTestApplication(BaseApp::class) interface TestApp
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
+@JustThisTestPlease
 class InjectTest {
   @get:Rule(order = 0) var hiltRule = HiltAndroidRule(this)
 

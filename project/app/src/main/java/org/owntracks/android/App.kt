@@ -53,28 +53,6 @@ import timber.log.Timber
 
 @HiltAndroidApp class App : BaseApp()
 
-open class BlahApp : Application() {
-  @EarlyEntryPoint
-  @InstallIn(SingletonComponent::class)
-  internal interface ApplicationEarlyEntrypoint {
-    fun preferences(): Preferences
-  }
-
-  private val preferences by lazy {
-    EarlyEntryPoints.get(this, ApplicationEarlyEntrypoint::class.java).preferences()
-  }
-
-  //
-  //  @Inject
-  //  lateinit var preferences: Preferences
-
-  override fun onCreate() {
-    super.onCreate()
-
-    print(preferences.theme)
-  }
-}
-
 open class BaseApp :
     Application(),
     Configuration.Provider,
