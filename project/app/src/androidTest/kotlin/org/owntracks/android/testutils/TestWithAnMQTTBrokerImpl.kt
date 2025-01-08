@@ -3,10 +3,6 @@ package org.owntracks.android.testutils
 import android.content.Intent
 import android.net.Uri
 import androidx.test.platform.app.InstrumentationRegistry
-import java.net.ConnectException
-import java.net.InetSocketAddress
-import java.net.Socket
-import kotlin.concurrent.thread
 import kotlinx.coroutines.DelicateCoroutinesApi
 import mqtt.broker.Broker
 import mqtt.broker.interfaces.Authentication
@@ -19,9 +15,12 @@ import org.eclipse.paho.client.mqttv3.internal.websocket.Base64
 import org.owntracks.android.R
 import org.owntracks.android.model.Parser
 import org.owntracks.android.model.messages.MessageBase
-import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import timber.log.Timber
+import java.net.ConnectException
+import java.net.InetSocketAddress
+import java.net.Socket
+import kotlin.concurrent.thread
 
 @ExperimentalUnsignedTypes
 class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {

@@ -9,7 +9,6 @@ import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.eclipse.paho.client.mqttv3.internal.websocket.Base64
 import org.owntracks.android.R
-import org.owntracks.android.ui.clickOnAndWait
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import timber.log.Timber
 

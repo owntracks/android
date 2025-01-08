@@ -31,10 +31,12 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
 import androidx.test.runner.lifecycle.Stage
+import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickDialogNegativeButton
 import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickDialogPositiveButton
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions
+import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import com.adevinta.android.barista.interaction.PermissionGranter
 import java.io.BufferedInputStream
 import java.io.FileInputStream
@@ -49,7 +51,7 @@ import kotlinx.datetime.Clock
 import org.hamcrest.Matcher
 import org.owntracks.android.R
 import org.owntracks.android.preferences.Preferences
-import org.owntracks.android.ui.clickOnAndWait
+
 import org.owntracks.android.ui.map.MapActivity
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import timber.log.Timber
@@ -344,4 +346,16 @@ fun waitUntilVisible(matcher: ViewInteraction, timeout: Duration = 1.seconds) {
           } while (Clock.System.now() < endTime)
         }
       })
+}
+
+val SLEEP_MILLIS = 1.seconds.inWholeMilliseconds
+
+fun clickOnAndWait(int: Int) {
+  clickOn(int)
+  sleep(SLEEP_MILLIS)
+}
+
+fun clickOnAndWait(str: String) {
+  clickOn(str)
+  sleep(SLEEP_MILLIS)
 }
