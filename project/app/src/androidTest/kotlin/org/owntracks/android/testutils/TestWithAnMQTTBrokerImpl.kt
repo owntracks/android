@@ -7,8 +7,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import java.net.ConnectException
 import java.net.InetSocketAddress
 import java.net.Socket
-import javax.inject.Inject
-import javax.inject.Named
 import kotlin.concurrent.thread
 import kotlinx.coroutines.DelicateCoroutinesApi
 import mqtt.broker.Broker
@@ -22,7 +20,6 @@ import org.eclipse.paho.client.mqttv3.internal.websocket.Base64
 import org.owntracks.android.R
 import org.owntracks.android.model.Parser
 import org.owntracks.android.model.messages.MessageBase
-import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import timber.log.Timber
 
@@ -130,7 +127,7 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
     }
   }
 
-  override fun configureMQTTConnectionToLocal(idlingResource:IdlingResource,password: String) {
+  override fun configureMQTTConnectionToLocal(idlingResource: IdlingResource, password: String) {
     val config =
         Base64.encode(
             // language=JSON
@@ -165,6 +162,6 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
 
   // This will use the right password, so we should test for success
   override fun configureMQTTConnectionToLocalWithGeneratedPassword(idlingResource: IdlingResource) {
-    configureMQTTConnectionToLocal(idlingResource,mqttTestPassword)
+    configureMQTTConnectionToLocal(idlingResource, mqttTestPassword)
   }
 }

@@ -4,15 +4,12 @@ import android.content.Intent
 import android.net.Uri
 import androidx.test.espresso.IdlingResource
 import androidx.test.platform.app.InstrumentationRegistry
-import javax.inject.Inject
-import javax.inject.Named
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.eclipse.paho.client.mqttv3.internal.websocket.Base64
 import org.owntracks.android.R
-import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import timber.log.Timber
 
@@ -38,7 +35,6 @@ class TestWithAnHTTPServerImpl : TestWithAnHTTPServer {
       mockWebServer.shutdown()
     }
   }
-
 
   override fun configureHTTPConnectionToLocal(idlingResource: IdlingResource) {
     val config =

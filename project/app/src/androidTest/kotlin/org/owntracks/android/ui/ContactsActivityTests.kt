@@ -7,6 +7,8 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
 import dagger.hilt.android.testing.HiltAndroidTest
 import java.time.Instant
+import javax.inject.Inject
+import javax.inject.Named
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.random.Random
@@ -33,8 +35,6 @@ import org.owntracks.android.testutils.use
 import org.owntracks.android.testutils.waitUntilActivityVisible
 import org.owntracks.android.ui.contacts.ContactsActivity
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Named
 
 @OptIn(ExperimentalUnsignedTypes::class)
 @LargeTest
