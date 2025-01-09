@@ -42,7 +42,6 @@ class ConnectionErrorTest :
   @Inject lateinit var mockLocationProviderClient: LocationProviderClient
 
   @Test
-  @JustThisTestPlease
   fun given_a_config_with_http_mode_and_invalid_url_when_viewing_the_connecting_status_then_a_config_incomplete_message_is_shown() {
     val username = "user"
     val password = "password"
@@ -57,7 +56,6 @@ class ConnectionErrorTest :
               remove(Preferences::port.name)
             })
     setupActivity(config)
-    sleep(60_000)
     assertContains(
         R.id.connectedStatusMessage, R.string.statusEndpointStateMessageMalformedHostPort)
   }

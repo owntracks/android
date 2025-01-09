@@ -19,10 +19,11 @@ import org.owntracks.android.data.EndpointState
 import org.owntracks.android.databinding.UiStatusBinding
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.DrawerProvider
+import org.owntracks.android.ui.mixins.ServiceStarter
 import org.owntracks.android.ui.status.logs.LogViewerActivity
 
 @AndroidEntryPoint
-class StatusActivity : AppCompatActivity() {
+class StatusActivity : AppCompatActivity(), ServiceStarter by ServiceStarter.Impl() {
   @Inject lateinit var drawerProvider: DrawerProvider
 
   @Inject lateinit var preferences: Preferences
@@ -90,6 +91,7 @@ class StatusActivity : AppCompatActivity() {
             }
           }
         }
+    startService(this)
   }
 
   override fun onResume() {

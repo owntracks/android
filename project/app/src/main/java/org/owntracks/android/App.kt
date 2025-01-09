@@ -43,10 +43,16 @@ import org.owntracks.android.preferences.types.AppTheme
 import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.RunThingsOnOtherThreads
+import org.owntracks.android.support.receiver.StartBackgroundServiceReceiver
 import org.owntracks.android.test.SimpleIdlingResource
 import timber.log.Timber
 
-@HiltAndroidApp class App : BaseApp()
+@HiltAndroidApp class App : BaseApp() {
+  override fun onCreate() {
+    super.onCreate()
+    StartBackgroundServiceReceiver.enable(this)
+  }
+}
 
 open class BaseApp :
     Application(),
