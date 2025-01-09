@@ -20,6 +20,8 @@ import org.owntracks.android.model.messages.MessageClear
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.MonitoringMode
+import org.owntracks.android.test.SimpleIdlingResource
+import org.owntracks.android.testutils.JustThisTestPlease
 import org.owntracks.android.testutils.OWNTRACKS_ICON_BASE64
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.TestWithAnMQTTBroker
@@ -31,13 +33,20 @@ import org.owntracks.android.testutils.use
 import org.owntracks.android.testutils.waitUntilActivityVisible
 import org.owntracks.android.ui.contacts.ContactsActivity
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Named
 
 @OptIn(ExperimentalUnsignedTypes::class)
 @LargeTest
+@JustThisTestPlease
 @HiltAndroidTest
 class ContactsActivityTests :
     TestWithAnActivity<ContactsActivity>(ContactsActivity::class.java, false),
     TestWithAnMQTTBroker by TestWithAnMQTTBrokerImpl() {
+
+  @Inject
+  @Named("saveConfigurationIdlingResource")
+  lateinit var saveConfigurationIdlingResource: SimpleIdlingResource
 
   private fun setupTestActivity() {
     setNotFirstStartPreferences()
@@ -47,7 +56,7 @@ class ContactsActivityTests :
         .putString(Preferences::reverseGeocodeProvider.name, "None")
         .apply()
     launchActivity()
-    configureMQTTConnectionToLocalWithGeneratedPassword()
+    configureMQTTConnectionToLocalWithGeneratedPassword(saveConfigurationIdlingResource)
     waitUntilActivityVisible<ContactsActivity>()
     waitForMQTTToCompleteAndContactsToBeCleared()
   }

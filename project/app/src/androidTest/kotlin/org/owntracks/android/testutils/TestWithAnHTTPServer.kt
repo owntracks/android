@@ -1,5 +1,6 @@
 package org.owntracks.android.testutils
 
+import androidx.test.espresso.IdlingResource
 import okhttp3.mockwebserver.Dispatcher
 import org.junit.After
 
@@ -8,7 +9,7 @@ interface TestWithAnHTTPServer {
    * Configures the app on the device to use the local HTTP server, setting the mode and URL
    * correctly
    */
-  fun configureHTTPConnectionToLocal()
+  fun configureHTTPConnectionToLocal(idlingResource: IdlingResource)
 
   /** Starts the HTTP server with the given dispatcher */
   fun startServer(dispatcher: Dispatcher)

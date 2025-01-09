@@ -2,6 +2,7 @@ package org.owntracks.android.testutils
 
 import android.content.Intent
 import android.net.Uri
+import androidx.test.espresso.IdlingResource
 import androidx.test.platform.app.InstrumentationRegistry
 import javax.inject.Inject
 import javax.inject.Named
@@ -38,11 +39,8 @@ class TestWithAnHTTPServerImpl : TestWithAnHTTPServer {
     }
   }
 
-  @Inject
-  @Named("saveConfigurationIdlingResource")
-  lateinit var saveConfigurationIdlingResource: SimpleIdlingResource
 
-  override fun configureHTTPConnectionToLocal() {
+  override fun configureHTTPConnectionToLocal(idlingResource: IdlingResource) {
     val config =
         Base64.encode(
             """
@@ -62,7 +60,7 @@ class TestWithAnHTTPServerImpl : TestWithAnHTTPServer {
               flags = Intent.FLAG_ACTIVITY_NEW_TASK
             })
     waitUntilActivityVisible<LoadActivity>()
-    saveConfigurationIdlingResource.use { clickOnAndWait(R.id.save) }
+    idlingResource.use { clickOnAndWait(R.id.save) }
   }
 
   class MockJSONResponseDispatcher(private val responses: Map<String, String>) : Dispatcher() {

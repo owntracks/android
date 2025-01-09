@@ -2,6 +2,7 @@ package org.owntracks.android.testutils
 
 import android.content.Intent
 import android.net.Uri
+import androidx.test.espresso.IdlingResource
 import androidx.test.platform.app.InstrumentationRegistry
 import java.net.ConnectException
 import java.net.InetSocketAddress
@@ -129,11 +130,7 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
     }
   }
 
-  @Inject
-  @Named("saveConfigurationIdlingResource")
-  lateinit var saveConfigurationIdlingResource: SimpleIdlingResource
-
-  override fun configureMQTTConnectionToLocal(password: String) {
+  override fun configureMQTTConnectionToLocal(idlingResource:IdlingResource,password: String) {
     val config =
         Base64.encode(
             // language=JSON
@@ -163,11 +160,11 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
               flags = Intent.FLAG_ACTIVITY_NEW_TASK
             })
     waitUntilActivityVisible<LoadActivity>()
-    saveConfigurationIdlingResource.use { clickOnAndWait(R.id.save) }
+    idlingResource.use { clickOnAndWait(R.id.save) }
   }
 
   // This will use the right password, so we should test for success
-  override fun configureMQTTConnectionToLocalWithGeneratedPassword() {
-    configureMQTTConnectionToLocal(mqttTestPassword)
+  override fun configureMQTTConnectionToLocalWithGeneratedPassword(idlingResource: IdlingResource) {
+    configureMQTTConnectionToLocal(idlingResource,mqttTestPassword)
   }
 }

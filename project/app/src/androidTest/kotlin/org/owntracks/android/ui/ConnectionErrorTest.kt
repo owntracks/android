@@ -6,16 +6,8 @@ import androidx.test.espresso.Espresso
 import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
-import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import com.fasterxml.jackson.databind.ObjectMapper
 import dagger.hilt.android.testing.HiltAndroidTest
-import java.net.ConnectException
-import java.net.InetSocketAddress
-import java.net.Socket
-import javax.inject.Inject
-import javax.inject.Named
-import kotlin.concurrent.thread
-import kotlin.random.Random
 import mqtt.broker.Broker
 import mqtt.broker.interfaces.Authentication
 import org.eclipse.paho.client.mqttv3.internal.websocket.Base64
@@ -25,7 +17,6 @@ import org.owntracks.android.location.LocationProviderClient
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.test.SimpleIdlingResource
-import org.owntracks.android.testutils.JustThisTestPlease
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.clickOnAndWait
 import org.owntracks.android.testutils.use
@@ -34,6 +25,13 @@ import org.owntracks.android.ui.preferences.load.LoadActivity
 import org.owntracks.android.ui.status.StatusActivity
 import socket.tls.TLSSettings
 import timber.log.Timber
+import java.net.ConnectException
+import java.net.InetSocketAddress
+import java.net.Socket
+import javax.inject.Inject
+import javax.inject.Named
+import kotlin.concurrent.thread
+import kotlin.random.Random
 
 @MediumTest
 @HiltAndroidTest

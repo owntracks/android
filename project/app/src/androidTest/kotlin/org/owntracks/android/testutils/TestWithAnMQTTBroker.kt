@@ -1,5 +1,6 @@
 package org.owntracks.android.testutils
 
+import androidx.test.espresso.IdlingResource
 import kotlinx.coroutines.DelicateCoroutinesApi
 import mqtt.broker.Broker
 import mqtt.packets.MQTTPacket
@@ -9,9 +10,9 @@ import org.owntracks.android.model.messages.MessageBase
 
 @ExperimentalUnsignedTypes
 interface TestWithAnMQTTBroker {
-  fun configureMQTTConnectionToLocal(password: String)
+  fun configureMQTTConnectionToLocal(idlingResource: IdlingResource, password: String)
 
-  fun configureMQTTConnectionToLocalWithGeneratedPassword()
+  fun configureMQTTConnectionToLocalWithGeneratedPassword(idlingResource: IdlingResource)
 
   val mqttPacketsReceived: MutableList<MQTTPacket>
   val broker: Broker
