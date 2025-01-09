@@ -13,6 +13,7 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickDialogPositiveButton
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
+import dagger.hilt.android.testing.HiltAndroidTest
 import org.hamcrest.CoreMatchers.allOf
 import org.junit.Test
 import org.owntracks.android.R
@@ -21,6 +22,7 @@ import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.ui.preferences.editor.EditorActivity
 
 @MediumTest
+@HiltAndroidTest
 class ConfigEditorActivityTests :
     TestWithAnActivity<EditorActivity>(EditorActivity::class.java, startActivity = false) {
 

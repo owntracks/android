@@ -5,6 +5,7 @@ import com.adevinta.android.barista.assertion.BaristaListAssertions.assertDispla
 import com.adevinta.android.barista.assertion.BaristaRecyclerViewAssertions.assertRecyclerViewItemCount
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
+import dagger.hilt.android.testing.HiltAndroidTest
 import java.time.Instant
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -33,6 +34,7 @@ import timber.log.Timber
 
 @OptIn(ExperimentalUnsignedTypes::class)
 @LargeTest
+@HiltAndroidTest
 class ContactsActivityTests :
     TestWithAnActivity<ContactsActivity>(ContactsActivity::class.java, false),
     TestWithAnMQTTBroker by TestWithAnMQTTBrokerImpl() {

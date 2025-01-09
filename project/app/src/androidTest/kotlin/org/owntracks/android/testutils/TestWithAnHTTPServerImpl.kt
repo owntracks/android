@@ -9,8 +9,11 @@ import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.eclipse.paho.client.mqttv3.internal.websocket.Base64
 import org.owntracks.android.R
+import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Named
 
 class TestWithAnHTTPServerImpl : TestWithAnHTTPServer {
   private lateinit var mockWebServer: MockWebServer
@@ -35,6 +38,11 @@ class TestWithAnHTTPServerImpl : TestWithAnHTTPServer {
     }
   }
 
+
+  @Inject
+  @Named("saveConfigurationIdlingResource")
+  lateinit var saveConfigurationIdlingResource:SimpleIdlingResource
+
   override fun configureHTTPConnectionToLocal() {
     val config =
         Base64.encode(
@@ -55,8 +63,7 @@ class TestWithAnHTTPServerImpl : TestWithAnHTTPServer {
               flags = Intent.FLAG_ACTIVITY_NEW_TASK
             })
     waitUntilActivityVisible<LoadActivity>()
-    val activity = getCurrentActivity() as LoadActivity
-    activity.saveConfigurationIdlingResource.use { clickOnAndWait(R.id.save) }
+    saveConfigurationIdlingResource.use { clickOnAndWait(R.id.save) }
   }
 
   class MockJSONResponseDispatcher(private val responses: Map<String, String>) : Dispatcher() {

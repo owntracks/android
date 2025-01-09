@@ -10,10 +10,8 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.test.espresso.IdlingResource
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.IOException
@@ -143,10 +141,6 @@ class LoadActivity : AppCompatActivity() {
       return output
     }
   }
-
-  @get:VisibleForTesting
-  val saveConfigurationIdlingResource: IdlingResource
-    get() = viewModel.saveConfigurationIdlingResource
 
   companion object {
     const val FLAG_IN_APP = "INAPP"

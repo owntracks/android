@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.content.Context
 import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
+import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Assert
 import org.junit.Test
 import org.owntracks.android.R
@@ -16,6 +17,7 @@ import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber
 
 @MediumTest
+@HiltAndroidTest
 class TLSCertMigrationNotificationTests :
     TestWithAnActivity<MapActivity>(MapActivity::class.java, false) {
 

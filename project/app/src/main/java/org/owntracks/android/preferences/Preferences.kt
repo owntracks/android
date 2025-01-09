@@ -58,7 +58,7 @@ constructor(
       }
 
   private val placeholder = Any()
-  private val listeners = WeakHashMap<OnPreferenceChangeListener, Any>()
+  private val listeners = HashMap<OnPreferenceChangeListener, Any>()
 
   private val remappedPreferenceKeys = mapOf("pubExtendedData" to Preferences::extendedData)
 
@@ -396,6 +396,7 @@ constructor(
   // https://stackoverflow.com/a/3104265/352740
   fun registerOnPreferenceChangedListener(listener: OnPreferenceChangeListener) {
     synchronized(listeners) { listeners[listener] = placeholder }
+    println("FICKTE UN")
   }
 
   fun unregisterOnPreferenceChangedListener(listener: OnPreferenceChangeListener) {

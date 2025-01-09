@@ -8,6 +8,7 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.PermissionGranter.allowPermissionsIfNeeded
+import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.owntracks.android.R
@@ -18,6 +19,7 @@ import org.owntracks.android.ui.map.MapActivity
 import org.owntracks.android.ui.welcome.WelcomeActivity
 
 @MediumTest
+@HiltAndroidTest
 class WelcomeActivityTests : TestWithAnActivity<WelcomeActivity>(WelcomeActivity::class.java) {
 
   @Test

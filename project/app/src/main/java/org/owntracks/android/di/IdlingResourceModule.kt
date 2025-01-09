@@ -88,4 +88,16 @@ class IdlingResourceModule {
   @Named("messageReceivedIdlingResource")
   fun provideLocationMessageIdlingResource(): IdlingResourceWithData<MessageBase> =
       IdlingResourceWithData("messageReceivedIdlingResource", compareBy { it.messageId })
+
+  @Provides
+  @Singleton
+  @Named("mqttConnectionIdlingResource")
+  fun provideMqttConnectionIdlingResource(): SimpleIdlingResource =
+      SimpleIdlingResource("mqttConnection", false)
+
+  @Provides
+  @Singleton
+  @Named("saveConfigurationIdlingResource")
+  fun provideSaveConfigurationIdlingResource(): SimpleIdlingResource =
+      SimpleIdlingResource("importStatus", true)
 }

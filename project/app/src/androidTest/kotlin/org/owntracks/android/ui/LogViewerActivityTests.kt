@@ -16,6 +16,7 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
 import java.util.concurrent.TimeUnit
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.Matchers.`is`
@@ -26,6 +27,7 @@ import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.ui.status.logs.LogViewerActivity
 
 @MediumTest
+@HiltAndroidTest
 class LogViewerActivityTests :
     TestWithAnActivity<LogViewerActivity>(LogViewerActivity::class.java) {
   @get:Rule(order = 0) override var hiltRule = HiltAndroidRule(this)

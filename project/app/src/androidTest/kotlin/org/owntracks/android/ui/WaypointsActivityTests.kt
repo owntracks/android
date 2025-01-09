@@ -13,6 +13,7 @@ import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
 import com.fasterxml.jackson.databind.ObjectMapper
+import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -28,6 +29,7 @@ import org.owntracks.android.ui.waypoints.WaypointsActivity
 
 @OptIn(ExperimentalUnsignedTypes::class)
 @MediumTest
+@HiltAndroidTest
 class WaypointsActivityTests :
     TestWithAnActivity<WaypointsActivity>(WaypointsActivity::class.java),
     TestWithAnMQTTBroker by TestWithAnMQTTBrokerImpl() {

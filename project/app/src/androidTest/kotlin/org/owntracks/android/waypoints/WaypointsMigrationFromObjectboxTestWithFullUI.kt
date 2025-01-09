@@ -11,6 +11,7 @@ import com.adevinta.android.barista.assertion.BaristaRecyclerViewAssertions.asse
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
 import com.adevinta.android.barista.interaction.PermissionGranter.allowPermissionsIfNeeded
+import dagger.hilt.android.testing.HiltAndroidTest
 import kotlin.random.Random
 import org.junit.Assert
 import org.junit.Test
@@ -24,6 +25,7 @@ import org.owntracks.android.ui.waypoints.WaypointsActivity
 import timber.log.Timber
 
 @MediumTest
+@HiltAndroidTest
 class WaypointsMigrationFromObjectboxTestWithFullUI :
     TestWithAnActivity<WaypointsActivity>(WaypointsActivity::class.java, false) {
 

@@ -13,6 +13,8 @@ import com.adevinta.android.barista.rule.cleardata.ClearFilesRule
 import com.adevinta.android.barista.rule.cleardata.ClearPreferencesRule
 import com.adevinta.android.barista.rule.flaky.FlakyTestRule
 import dagger.hilt.android.testing.HiltAndroidRule
+import javax.inject.Inject
+import javax.inject.Named
 import leakcanary.DetectLeaksAfterTestSuccess
 import leakcanary.LeakCanary
 import org.junit.After
@@ -21,7 +23,11 @@ import org.junit.Rule
 import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.owntracks.android.BaseApp
+import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.services.BackgroundService
+import org.owntracks.android.test.CountingIdlingResourceShim
+import org.owntracks.android.test.IdlingResourceWithData
+import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.testutils.rules.ScreenshotTakingOnTestEndRule
 import shark.AndroidReferenceMatchers
 import timber.log.Timber
@@ -109,21 +115,37 @@ abstract class TestWithAnActivity<T : Activity>(
   val app: BaseApp
     get() = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as BaseApp
 
+  @Inject
+  @Named("outgoingQueueIdlingResource")
+  lateinit var outgoingQueueIdlingResource: CountingIdlingResourceShim
+
+  @Inject
+  @Named("contactsClearedIdlingResource")
+  lateinit var contactsClearedIdlingResource: SimpleIdlingResource
+
+  @Inject
+  @Named("mqttConnectionIdlingResource")
+  lateinit var mqttConnectionIdlingResource: SimpleIdlingResource
+
+  @Inject
+  @Named("messageReceivedIdlingResource")
+  lateinit var messageReceivedIdlingResource: IdlingResourceWithData<MessageBase>
+
   fun waitForMQTTToCompleteAndContactsToBeCleared() {
     Timber.v("Waiting for MQTT connection to be established")
-    app.mqttConnectionIdlingResource.use { Espresso.onIdle() }
+    mqttConnectionIdlingResource.use { Espresso.onIdle() }
     Timber.v("Waiting for MQTT outgoing queue to be empty")
-    app.outgoingQueueIdlingResource.use { Espresso.onIdle() }
+    outgoingQueueIdlingResource.use { Espresso.onIdle() }
     Timber.v("Waiting for MQTT messages that were sent to all be received")
-    app.messageReceivedIdlingResource.use { Espresso.onIdle() }
-    app.contactsClearedIdlingResource.setIdleState(false)
+    messageReceivedIdlingResource.use { Espresso.onIdle() }
+    contactsClearedIdlingResource.setIdleState(false)
     ContextCompat.startForegroundService(
         app,
         Intent(app, BackgroundService::class.java).apply {
           action = "org.owntracks.android.CLEAR_CONTACTS"
         })
     Timber.v("Waiting for contacts to be cleared")
-    app.contactsClearedIdlingResource.use { Espresso.onIdle() }
+    contactsClearedIdlingResource.use { Espresso.onIdle() }
     Timber.v("Test setup complete")
   }
 }

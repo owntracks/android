@@ -6,6 +6,7 @@ import androidx.test.filters.MediumTest
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotContains
+import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Test
 import org.owntracks.android.R
 import org.owntracks.android.preferences.DefaultsProviderImpl
@@ -21,6 +22,7 @@ import org.owntracks.android.testutils.writeToPreference
 import org.owntracks.android.ui.preferences.PreferencesActivity
 
 @MediumTest
+@HiltAndroidTest
 class PreferencesActivityTests :
     TestWithAnActivity<PreferencesActivity>(PreferencesActivity::class.java) {
 

@@ -33,6 +33,7 @@ import org.owntracks.android.model.messages.MessageWaypoints
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.test.SimpleIdlingResource
 import timber.log.Timber
+import javax.inject.Named
 
 @HiltViewModel
 class LoadViewModel
@@ -41,9 +42,10 @@ constructor(
     private val preferences: Preferences,
     private val parser: Parser,
     private val waypointsRepo: WaypointsRepo,
-    @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @Named("saveConfigurationIdlingResource")
+    private  val saveConfigurationIdlingResource :SimpleIdlingResource
 ) : ViewModel() {
-  val saveConfigurationIdlingResource = SimpleIdlingResource("importStatus", true)
   private var configuration: MessageConfiguration? = null
 
   private val mutableConfig = MutableLiveData("")

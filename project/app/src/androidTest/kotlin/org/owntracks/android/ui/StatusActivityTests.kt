@@ -3,6 +3,7 @@ package org.owntracks.android.ui
 import androidx.test.filters.MediumTest
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Rule
 import org.junit.Test
 import org.owntracks.android.R
@@ -11,6 +12,7 @@ import org.owntracks.android.testutils.clickOnAndWait
 import org.owntracks.android.ui.status.StatusActivity
 
 @MediumTest
+@HiltAndroidTest
 class StatusActivityTests : TestWithAnActivity<StatusActivity>(StatusActivity::class.java) {
   @get:Rule(order = 0) override var hiltRule = HiltAndroidRule(this)
 

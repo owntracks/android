@@ -1,4 +1,4 @@
-package org.owntracks.android.ui
+package org.owntracks.android.testutils
 
 import android.view.View
 import androidx.test.espresso.Espresso

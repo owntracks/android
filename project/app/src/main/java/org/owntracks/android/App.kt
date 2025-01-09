@@ -20,7 +20,6 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.databinding.DataBindingUtil
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.lifecycle.MutableLiveData
-import androidx.test.espresso.IdlingResource
 import androidx.work.Configuration
 import dagger.hilt.EntryPoints
 import dagger.hilt.InstallIn
@@ -29,7 +28,6 @@ import dagger.hilt.android.EarlyEntryPoints
 import dagger.hilt.android.HiltAndroidApp
 import dagger.hilt.components.SingletonComponent
 import java.security.Security
-import javax.inject.Named
 import javax.inject.Provider
 import kotlinx.datetime.Instant
 import org.bouncycastle.jce.provider.BouncyCastleProvider
@@ -39,15 +37,12 @@ import org.owntracks.android.di.CustomBindingComponentBuilder
 import org.owntracks.android.di.CustomBindingEntryPoint
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.logging.TimberInMemoryLogTree
-import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.PreferencesStore
 import org.owntracks.android.preferences.types.AppTheme
 import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.RunThingsOnOtherThreads
-import org.owntracks.android.test.CountingIdlingResourceShim
-import org.owntracks.android.test.IdlingResourceWithData
 import org.owntracks.android.test.SimpleIdlingResource
 import timber.log.Timber
 
@@ -79,15 +74,6 @@ open class BaseApp :
     fun runThingsOnOtherThreads(): RunThingsOnOtherThreads
 
     fun roomWaypointsRepo(): RoomWaypointsRepo
-
-    @Named("outgoingQueueIdlingResource")
-    fun outgoingQueueIdlingResource(): CountingIdlingResourceShim
-
-    @Named("contactsClearedIdlingResource")
-    fun contactsClearedIdlingResource(): SimpleIdlingResource
-
-    @Named("messageReceivedIdlingResource")
-    fun messageReceivedIdlingResource(): IdlingResourceWithData<MessageBase>
   }
 
   private val preferences by lazy {
@@ -104,10 +90,6 @@ open class BaseApp :
 
   private val bindingComponentProvider: Provider<CustomBindingComponentBuilder> by lazy {
     EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).bindingComponentProvider()
-  }
-
-  private val messageProcessor: MessageProcessor by lazy {
-    EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).messageProcessor()
   }
 
   private val notificationManager: NotificationManagerCompat by lazy {
@@ -129,21 +111,6 @@ open class BaseApp :
   @get:VisibleForTesting
   val preferenceSetIdlingResource: SimpleIdlingResource =
       SimpleIdlingResource("preferenceSetIdlingResource", true)
-
-  @get:VisibleForTesting
-  val outgoingQueueIdlingResource: CountingIdlingResourceShim by lazy {
-    EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).outgoingQueueIdlingResource()
-  }
-
-  @get:VisibleForTesting
-  val contactsClearedIdlingResource: SimpleIdlingResource by lazy {
-    EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).contactsClearedIdlingResource()
-  }
-
-  @get:VisibleForTesting
-  val messageReceivedIdlingResource: IdlingResourceWithData<MessageBase> by lazy {
-    EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).messageReceivedIdlingResource()
-  }
 
   val workManagerFailedToInitialize = MutableLiveData(false)
 
@@ -317,10 +284,6 @@ open class BaseApp :
     Timber.v("Idling preferenceSetIdlingResource because of $properties")
     preferenceSetIdlingResource.setIdleState(true)
   }
-
-  @get:VisibleForTesting
-  val mqttConnectionIdlingResource: IdlingResource
-    get() = messageProcessor.mqttConnectionIdlingResource
 
   /** Migrate preferences. Available to be called from espresso tests. */
   @VisibleForTesting

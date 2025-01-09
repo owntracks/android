@@ -1,9 +1,10 @@
-package org.owntracks.android
+package org.owntracks.android.testutils.hilt
 
 import android.app.Application
 import android.content.Context
 import androidx.test.runner.AndroidJUnitRunner
 import dagger.hilt.android.testing.CustomTestApplication
+import org.owntracks.android.BaseApp
 
 @Suppress("unused")
 class CustomTestRunner : AndroidJUnitRunner() {

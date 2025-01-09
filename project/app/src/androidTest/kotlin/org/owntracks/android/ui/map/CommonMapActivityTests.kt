@@ -17,7 +17,6 @@ import org.junit.Test
 import org.owntracks.android.R
 import org.owntracks.android.location.LocationProviderClient
 import org.owntracks.android.test.SimpleIdlingResource
-import org.owntracks.android.testutils.JustThisTestPlease
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.clickOnAndWait
 import org.owntracks.android.testutils.clickOnDrawerAndWait
@@ -129,7 +128,6 @@ class CommonMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::clas
   }
 
   @Test
-  @JustThisTestPlease
   fun regionsCanBeDrawnOnMap() {
     setNotFirstStartPreferences()
     launchActivity()

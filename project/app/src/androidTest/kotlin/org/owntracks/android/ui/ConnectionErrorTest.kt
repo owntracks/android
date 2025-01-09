@@ -8,23 +8,27 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import com.fasterxml.jackson.databind.ObjectMapper
-import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
 import java.net.ConnectException
 import java.net.InetSocketAddress
 import java.net.Socket
+import javax.inject.Inject
+import javax.inject.Named
 import kotlin.concurrent.thread
 import kotlin.random.Random
 import mqtt.broker.Broker
 import mqtt.broker.interfaces.Authentication
 import org.eclipse.paho.client.mqttv3.internal.websocket.Base64
-import org.junit.Rule
 import org.junit.Test
 import org.owntracks.android.R
+import org.owntracks.android.location.LocationProviderClient
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ConnectionMode
+import org.owntracks.android.test.SimpleIdlingResource
+import org.owntracks.android.testutils.JustThisTestPlease
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.clickOnAndWait
-import org.owntracks.android.testutils.getCurrentActivity
+import org.owntracks.android.testutils.setLocation
 import org.owntracks.android.testutils.use
 import org.owntracks.android.testutils.waitUntilActivityVisible
 import org.owntracks.android.ui.preferences.load.LoadActivity
@@ -33,11 +37,13 @@ import socket.tls.TLSSettings
 import timber.log.Timber
 
 @MediumTest
+@HiltAndroidTest
 class ConnectionErrorTest :
     TestWithAnActivity<StatusActivity>(StatusActivity::class.java, startActivity = true) {
-  @get:Rule(order = 0) override var hiltRule = HiltAndroidRule(this)
+  @Inject lateinit var mockLocationProviderClient: LocationProviderClient
 
   @Test
+  @JustThisTestPlease
   fun given_a_config_with_http_mode_and_invalid_url_when_viewing_the_connecting_status_then_a_config_incomplete_message_is_shown() {
     val username = "user"
     val password = "password"
@@ -48,8 +54,11 @@ class ConnectionErrorTest :
             getConfig(port, username, password).apply {
               this[Preferences::mode.name] = ConnectionMode.HTTP.value
               this[Preferences::url.name] = "not a url"
+              remove(Preferences::host.name)
+              remove(Preferences::port.name)
             })
     setupActivity(config)
+    sleep(60_000)
     assertContains(
         R.id.connectedStatusMessage, R.string.statusEndpointStateMessageMalformedHostPort)
   }
@@ -80,7 +89,7 @@ class ConnectionErrorTest :
                 this[Preferences::host.name] = "unknown"
               })
       setupActivity(config)
-      app.mqttConnectionIdlingResource.use { Espresso.onIdle() }
+      mqttConnectionIdlingResource.use { Espresso.onIdle() }
       assertContains(R.id.connectedStatusMessage, R.string.statusEndpointStateMessageUnknownHost)
     }
   }
@@ -95,7 +104,7 @@ class ConnectionErrorTest :
           encodeConfig(
               getConfig(port, username, password).apply { this[Preferences::port.name] = 1234 })
       setupActivity(config)
-      app.mqttConnectionIdlingResource.use { Espresso.onIdle() }
+      mqttConnectionIdlingResource.use { Espresso.onIdle() }
       assertContains(
           R.id.connectedStatusMessage, R.string.statusEndpointStateMessageConnectionRefused)
     }
@@ -110,7 +119,7 @@ class ConnectionErrorTest :
     getBroker(port, username, password, tlsSettings).use {
       val config = encodeConfig(getConfig(port, username, password))
       setupActivity(config)
-      app.mqttConnectionIdlingResource.use { Espresso.onIdle() }
+      mqttConnectionIdlingResource.use { Espresso.onIdle() }
       assertContains(R.id.connectedStatusMessage, R.string.statusEndpointStateMessageEOFError)
     }
   }
@@ -126,7 +135,7 @@ class ConnectionErrorTest :
           encodeConfig(
               getConfig(port, username, password).apply { this[Preferences::tls.name] = true })
       setupActivity(config)
-      app.mqttConnectionIdlingResource.use { Espresso.onIdle() }
+      mqttConnectionIdlingResource.use { Espresso.onIdle() }
       assertContains(
           R.id.connectedStatusMessage,
           R.string.statusEndpointStateMessageTLSEndpointCANotTrustedError)
@@ -143,12 +152,16 @@ class ConnectionErrorTest :
           encodeConfig(
               getConfig(port, username, password).apply { this[Preferences::ws.name] = true })
       setupActivity(config)
-      app.mqttConnectionIdlingResource.use { Espresso.onIdle() }
+      mqttConnectionIdlingResource.use { Espresso.onIdle() }
       assertContains(
           R.id.connectedStatusMessage,
           R.string.statusEndpointStateMessageEndpointDoesNotSupportWebsockets)
     }
   }
+
+  @Inject
+  @Named("saveConfigurationIdlingResource")
+  lateinit var saveConfigurationIdlingResource: SimpleIdlingResource
 
   private fun setupActivity(config: String) {
     InstrumentationRegistry.getInstrumentation()
@@ -159,8 +172,7 @@ class ConnectionErrorTest :
               flags = Intent.FLAG_ACTIVITY_NEW_TASK
             })
     waitUntilActivityVisible<LoadActivity>()
-    val activity = getCurrentActivity() as LoadActivity
-    activity.saveConfigurationIdlingResource.use { clickOnAndWait(R.id.save) }
+    saveConfigurationIdlingResource.use { clickOnAndWait(R.id.save) }
     waitUntilActivityVisible<StatusActivity>()
   }
 }

@@ -41,7 +41,7 @@ android {
         "int", "TRANSLATION_COUNT", localeCount.toString(),
     )
 
-    testInstrumentationRunner = "org.owntracks.android.CustomTestRunner"
+    testInstrumentationRunner = "org.owntracks.android.testutils.hilt.CustomTestRunner"
 
     testInstrumentationRunnerArguments.putAll(
         mapOf(

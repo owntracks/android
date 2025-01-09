@@ -5,6 +5,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso
 import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
+import dagger.hilt.android.testing.HiltAndroidTest
 import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,6 +21,7 @@ import org.owntracks.android.testutils.use
 
 @SmallTest
 @RunWith(Parameterized::class)
+@HiltAndroidTest
 class WaypointsMigrationFromObjectboxTest(private val parameter: Parameter) {
   @Before
   fun clearLocalPackageData() {

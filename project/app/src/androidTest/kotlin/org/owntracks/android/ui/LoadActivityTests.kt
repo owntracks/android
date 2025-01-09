@@ -11,6 +11,7 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotExist
 import com.fasterxml.jackson.databind.ObjectMapper
+import dagger.hilt.android.testing.HiltAndroidTest
 import java.io.File
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
@@ -23,12 +24,14 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.owntracks.android.R
 import org.owntracks.android.testutils.TestWithAnActivity
+import org.owntracks.android.testutils.ViewIdlingResource
 import org.owntracks.android.testutils.getText
 import org.owntracks.android.testutils.use
 import org.owntracks.android.testutils.writeFileToDevice
 import org.owntracks.android.ui.preferences.load.LoadActivity
 
 @MediumTest
+@HiltAndroidTest
 class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.java, false) {
 
   private var mockWebServer = MockWebServer()
