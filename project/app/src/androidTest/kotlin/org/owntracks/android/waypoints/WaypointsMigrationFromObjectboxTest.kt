@@ -27,7 +27,7 @@ class WaypointsMigrationFromObjectboxTest(private val parameter: Parameter) {
   fun clearLocalPackageData() {
     InstrumentationRegistry.getInstrumentation()
         .targetContext
-        .deleteDatabase("org/owntracks/android/waypoints")
+        .deleteDatabase("waypoints")
   }
 
   @Test

@@ -23,7 +23,6 @@ import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.test.SimpleIdlingResource
-import org.owntracks.android.testutils.JustThisTestPlease
 import org.owntracks.android.testutils.OWNTRACKS_ICON_BASE64
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.TestWithAnMQTTBroker
@@ -38,7 +37,6 @@ import timber.log.Timber
 
 @OptIn(ExperimentalUnsignedTypes::class)
 @LargeTest
-@JustThisTestPlease
 @HiltAndroidTest
 class ContactsActivityTests :
     TestWithAnActivity<ContactsActivity>(ContactsActivity::class.java, false),

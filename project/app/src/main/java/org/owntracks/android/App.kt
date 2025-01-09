@@ -51,7 +51,7 @@ import timber.log.Timber
 class App : BaseApp() {
   override fun onCreate() {
     super.onCreate()
-    StartBackgroundServiceReceiver.enable(this)
+//    StartBackgroundServiceReceiver.enable(this)
   }
 }
 

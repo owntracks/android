@@ -185,11 +185,11 @@ class WaypointsActivityTests :
     val effectiveConfiguration = getText(onView(withId(R.id.effectiveConfiguration)))
     val json = ObjectMapper().readTree(effectiveConfiguration)
     assertTrue(json.isObject)
-    assertTrue(json.has("org/owntracks/android/waypoints"))
-    assertEquals(1, json["org/owntracks/android/waypoints"].size())
-    assertEquals(waypointName, json["org/owntracks/android/waypoints"][0]["desc"].asText())
-    assertEquals(latitude, json["org/owntracks/android/waypoints"][0]["lat"].asDouble(), 0.0001)
-    assertEquals(longitude, json["org/owntracks/android/waypoints"][0]["lon"].asDouble(), 0.0001)
-    assertEquals(radius, json["org/owntracks/android/waypoints"][0]["rad"].asInt())
+    assertTrue(json.has("waypoints"))
+    assertEquals(1, json["waypoints"].size())
+    assertEquals(waypointName, json["waypoints"][0]["desc"].asText())
+    assertEquals(latitude, json["waypoints"][0]["lat"].asDouble(), 0.0001)
+    assertEquals(longitude, json["waypoints"][0]["lon"].asDouble(), 0.0001)
+    assertEquals(radius, json["waypoints"][0]["rad"].asInt())
   }
 }
