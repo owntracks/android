@@ -28,7 +28,6 @@ import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.testutils.JustThisTestPlease
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.clickOnAndWait
-import org.owntracks.android.testutils.setLocation
 import org.owntracks.android.testutils.use
 import org.owntracks.android.testutils.waitUntilActivityVisible
 import org.owntracks.android.ui.preferences.load.LoadActivity

@@ -4,7 +4,6 @@ import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-import java.util.WeakHashMap
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton

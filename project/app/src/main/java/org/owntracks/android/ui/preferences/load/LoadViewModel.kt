@@ -15,6 +15,7 @@ import java.net.URISyntaxException
 import java.net.URL
 import java.nio.charset.StandardCharsets
 import javax.inject.Inject
+import javax.inject.Named
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import okhttp3.Call
@@ -33,7 +34,6 @@ import org.owntracks.android.model.messages.MessageWaypoints
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.test.SimpleIdlingResource
 import timber.log.Timber
-import javax.inject.Named
 
 @HiltViewModel
 class LoadViewModel
@@ -44,7 +44,7 @@ constructor(
     private val waypointsRepo: WaypointsRepo,
     @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @Named("saveConfigurationIdlingResource")
-    private  val saveConfigurationIdlingResource :SimpleIdlingResource
+    private val saveConfigurationIdlingResource: SimpleIdlingResource
 ) : ViewModel() {
   private var configuration: MessageConfiguration? = null
 

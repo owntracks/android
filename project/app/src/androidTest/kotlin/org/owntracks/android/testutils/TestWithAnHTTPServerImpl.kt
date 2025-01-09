@@ -3,6 +3,8 @@ package org.owntracks.android.testutils
 import android.content.Intent
 import android.net.Uri
 import androidx.test.platform.app.InstrumentationRegistry
+import javax.inject.Inject
+import javax.inject.Named
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -12,8 +14,6 @@ import org.owntracks.android.R
 import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Named
 
 class TestWithAnHTTPServerImpl : TestWithAnHTTPServer {
   private lateinit var mockWebServer: MockWebServer
@@ -38,10 +38,9 @@ class TestWithAnHTTPServerImpl : TestWithAnHTTPServer {
     }
   }
 
-
   @Inject
   @Named("saveConfigurationIdlingResource")
-  lateinit var saveConfigurationIdlingResource:SimpleIdlingResource
+  lateinit var saveConfigurationIdlingResource: SimpleIdlingResource
 
   override fun configureHTTPConnectionToLocal() {
     val config =
