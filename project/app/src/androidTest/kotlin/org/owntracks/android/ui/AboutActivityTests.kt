@@ -7,21 +7,19 @@ import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasData
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import org.hamcrest.CoreMatchers.allOf
 import org.junit.Test
-import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.scrollToPreferenceWithText
 import org.owntracks.android.ui.preferences.about.AboutActivity
 
 @SmallTest
-@RunWith(AndroidJUnit4::class)
 class AboutActivityTests : TestWithAnActivity<AboutActivity>(AboutActivity::class.java) {
+
   @Test
   fun documentationLinkOpensSite() {
     scrollToPreferenceWithText(R.string.preferencesDocumentation)

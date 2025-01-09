@@ -1,34 +1,16 @@
 package org.owntracks.android
 
-import androidx.test.espresso.IdlingResource
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
-import dagger.hilt.android.testing.HiltAndroidRule
-import dagger.hilt.android.testing.HiltAndroidTest
 import javax.inject.Inject
-import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 import org.owntracks.android.location.LocationProviderClient
-import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.grantMapActivityPermissions
 import org.owntracks.android.testutils.setLocation
 import org.owntracks.android.testutils.setNotFirstStartPreferences
 import org.owntracks.android.ui.map.MapActivity
-import javax.inject.Named
 
-@HiltAndroidTest
-@RunWith(AndroidJUnit4::class)
 class InjectTest : TestWithAnActivity<MapActivity>(MapActivity::class.java, false) {
-  @get:Rule(order = 0) var hiltRule = HiltAndroidRule(this)
-
-  @Before
-  fun setup() {
-    // First initialize Hilt
-    hiltRule.inject()
-  }
 
   @Inject lateinit var mockLocationProviderClient: LocationProviderClient
 

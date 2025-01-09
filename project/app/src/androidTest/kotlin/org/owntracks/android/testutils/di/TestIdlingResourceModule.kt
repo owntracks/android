@@ -4,13 +4,13 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
+import javax.inject.Named
+import javax.inject.Singleton
 import org.owntracks.android.di.IdlingResourceModule
 import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.test.CountingIdlingResourceShim
 import org.owntracks.android.test.IdlingResourceWithData
 import org.owntracks.android.test.SimpleIdlingResource
-import javax.inject.Named
-import javax.inject.Singleton
 
 @TestInstallIn(components = [SingletonComponent::class], replaces = [IdlingResourceModule::class])
 @Module

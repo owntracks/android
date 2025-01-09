@@ -11,24 +11,25 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtras
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasFlag
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasType
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
+import dagger.hilt.android.testing.HiltAndroidRule
 import java.util.concurrent.TimeUnit
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.Matchers.`is`
+import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.ui.status.logs.LogViewerActivity
 
 @MediumTest
-@RunWith(AndroidJUnit4::class)
 class LogViewerActivityTests :
     TestWithAnActivity<LogViewerActivity>(LogViewerActivity::class.java) {
+  @get:Rule(order = 0) override var hiltRule = HiltAndroidRule(this)
+
   @Test
   fun logViewerActivityShowsTitle() {
     // Wait for the logviewer coroutine to start

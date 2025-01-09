@@ -2,13 +2,11 @@ package org.owntracks.android.ui
 
 import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceManager
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotContains
 import org.junit.Test
-import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.preferences.DefaultsProviderImpl
 import org.owntracks.android.preferences.Preferences
@@ -23,9 +21,9 @@ import org.owntracks.android.testutils.writeToPreference
 import org.owntracks.android.ui.preferences.PreferencesActivity
 
 @MediumTest
-@RunWith(AndroidJUnit4::class)
 class PreferencesActivityTests :
     TestWithAnActivity<PreferencesActivity>(PreferencesActivity::class.java) {
+
   @Test
   fun initialViewShowsTopLevelMenu() {
     assertDisplayed(R.string.preferencesServer)

@@ -2,7 +2,6 @@ package org.owntracks.android.ui
 
 import android.Manifest
 import androidx.test.espresso.Espresso.pressBack
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
@@ -11,7 +10,6 @@ import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.PermissionGranter.allowPermissionsIfNeeded
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.doIfViewNotVisible
@@ -19,7 +17,6 @@ import org.owntracks.android.testutils.getCurrentActivity
 import org.owntracks.android.ui.map.MapActivity
 import org.owntracks.android.ui.welcome.WelcomeActivity
 
-@RunWith(AndroidJUnit4::class)
 @MediumTest
 class WelcomeActivityTests : TestWithAnActivity<WelcomeActivity>(WelcomeActivity::class.java) {
 

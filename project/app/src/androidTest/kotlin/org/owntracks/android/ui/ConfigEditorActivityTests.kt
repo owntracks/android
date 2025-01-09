@@ -8,7 +8,6 @@ import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.anyIntent
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasExtra
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
@@ -16,16 +15,15 @@ import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickD
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
 import org.hamcrest.CoreMatchers.allOf
 import org.junit.Test
-import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.ui.preferences.editor.EditorActivity
 
 @MediumTest
-@RunWith(AndroidJUnit4::class)
 class ConfigEditorActivityTests :
     TestWithAnActivity<EditorActivity>(EditorActivity::class.java, startActivity = false) {
+
   @Test
   fun configurationManagementCanEditASetType() {
     launchActivity()

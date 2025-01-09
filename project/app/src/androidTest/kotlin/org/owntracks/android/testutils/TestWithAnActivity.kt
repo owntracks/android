@@ -5,24 +5,28 @@ import android.content.Intent
 import androidx.core.content.ContextCompat
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.intent.Intents
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.rule.BaristaRule
 import com.adevinta.android.barista.rule.cleardata.ClearDatabaseRule
 import com.adevinta.android.barista.rule.cleardata.ClearFilesRule
 import com.adevinta.android.barista.rule.cleardata.ClearPreferencesRule
 import com.adevinta.android.barista.rule.flaky.FlakyTestRule
+import dagger.hilt.android.testing.HiltAndroidRule
 import leakcanary.DetectLeaksAfterTestSuccess
 import leakcanary.LeakCanary
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.RuleChain
+import org.junit.runner.RunWith
 import org.owntracks.android.BaseApp
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.testutils.rules.ScreenshotTakingOnTestEndRule
 import shark.AndroidReferenceMatchers
 import timber.log.Timber
 
+@RunWith(AndroidJUnit4::class)
 abstract class TestWithAnActivity<T : Activity>(
     activityClass: Class<T>,
     private val startActivity: Boolean = true
@@ -35,7 +39,9 @@ abstract class TestWithAnActivity<T : Activity>(
 
   private val screenshotRule = ScreenshotTakingOnTestEndRule()
 
-  @get:Rule val leakRule = DetectLeaksAfterTestSuccess()
+  @get:Rule(order = 0) @Suppress("LeakingThis") open var hiltRule = HiltAndroidRule(this)
+
+  @get:Rule(order = 1) val leakRule = DetectLeaksAfterTestSuccess()
 
   init {
     LeakCanary.config =
@@ -77,11 +83,6 @@ abstract class TestWithAnActivity<T : Activity>(
           .around(clearFilesRule)
           .around(screenshotRule)
 
-  @Before
-  fun initIntents() {
-    Intents.init()
-  }
-
   @After
   fun releaseIntents() {
     Intents.release()
@@ -89,6 +90,9 @@ abstract class TestWithAnActivity<T : Activity>(
 
   @Before
   fun setUp() {
+
+    hiltRule.inject()
+    Intents.init()
     if (startActivity) {
       launchActivity()
     }

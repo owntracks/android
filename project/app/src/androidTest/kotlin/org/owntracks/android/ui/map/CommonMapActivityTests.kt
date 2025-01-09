@@ -3,7 +3,6 @@ package org.owntracks.android.ui.map
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.adevinta.android.barista.assertion.BaristaDrawerAssertions.assertDrawerIsClosed
 import com.adevinta.android.barista.assertion.BaristaEnabledAssertions
@@ -11,14 +10,10 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
-import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import javax.inject.Inject
 import javax.inject.Named
-import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.location.LocationProviderClient
 import org.owntracks.android.test.SimpleIdlingResource
@@ -34,20 +29,13 @@ import org.owntracks.android.testutils.setNotFirstStartPreferences
 
 @MediumTest
 @HiltAndroidTest
-@RunWith(AndroidJUnit4::class)
 class CommonMapActivityTests : TestWithAnActivity<MapActivity>(MapActivity::class.java, false) {
-  @get:Rule(order = 0) var hiltRule = HiltAndroidRule(this)
+
   @Inject lateinit var mockLocationProviderClient: LocationProviderClient
 
   @Inject
   @Named("mockLocationIdlingResource")
   lateinit var mockLocationIdlingResource: SimpleIdlingResource
-
-  @Before
-  fun setup() {
-    // First initialize Hilt
-    hiltRule.inject()
-  }
 
   @Test
   fun monitoringModeButtonShowsDialogAndAllowsUsToSelectQuietMode() {

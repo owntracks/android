@@ -1,4 +1,4 @@
-package waypoints
+package org.owntracks.android.waypoints
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
@@ -23,7 +23,9 @@ import org.owntracks.android.testutils.use
 class WaypointsMigrationFromObjectboxTest(private val parameter: Parameter) {
   @Before
   fun clearLocalPackageData() {
-    InstrumentationRegistry.getInstrumentation().targetContext.deleteDatabase("waypoints")
+    InstrumentationRegistry.getInstrumentation()
+        .targetContext
+        .deleteDatabase("org/owntracks/android/waypoints")
   }
 
   @Test
@@ -57,8 +59,7 @@ class WaypointsMigrationFromObjectboxTest(private val parameter: Parameter) {
           Parameter("10-waypoints", 10),
           Parameter("5000-waypoints", 5000),
           Parameter("empty", 0),
-          Parameter("3-created-by-real-device", 3)
-      )
+          Parameter("3-created-by-real-device", 3))
     }
   }
 }

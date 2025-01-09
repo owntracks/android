@@ -5,7 +5,6 @@ import android.net.Uri
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
@@ -22,7 +21,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.getText
@@ -31,8 +29,8 @@ import org.owntracks.android.testutils.writeFileToDevice
 import org.owntracks.android.ui.preferences.load.LoadActivity
 
 @MediumTest
-@RunWith(AndroidJUnit4::class)
 class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.java, false) {
+
   private var mockWebServer = MockWebServer()
 
   @After
@@ -108,17 +106,17 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(LoadActivity::class.j
     val json = ObjectMapper().readTree(input)
     assertTrue(json.isObject)
     assertEquals("configuration", json["_type"].asText())
-    assertEquals(2, json["waypoints"].size())
-    assertEquals("work", json["waypoints"][0]["desc"].asText())
-    assertEquals(51.5, json["waypoints"][0]["lat"].asDouble(), 0.0001)
-    assertEquals(-0.02, json["waypoints"][0]["lon"].asDouble(), 0.0001)
-    assertEquals(150, json["waypoints"][0]["rad"].asInt())
-    assertEquals(1505910709000, json["waypoints"][0]["tst"].asLong())
-    assertEquals("home", json["waypoints"][1]["desc"].asText())
-    assertEquals(53.6, json["waypoints"][1]["lat"].asDouble(), 0.0001)
-    assertEquals(-1.5, json["waypoints"][1]["lon"].asDouble(), 0.0001)
-    assertEquals(100, json["waypoints"][1]["rad"].asInt())
-    assertEquals(1558351273, json["waypoints"][1]["tst"].asLong())
+    assertEquals(2, json["org/owntracks/android/waypoints"].size())
+    assertEquals("work", json["org/owntracks/android/waypoints"][0]["desc"].asText())
+    assertEquals(51.5, json["org/owntracks/android/waypoints"][0]["lat"].asDouble(), 0.0001)
+    assertEquals(-0.02, json["org/owntracks/android/waypoints"][0]["lon"].asDouble(), 0.0001)
+    assertEquals(150, json["org/owntracks/android/waypoints"][0]["rad"].asInt())
+    assertEquals(1505910709000, json["org/owntracks/android/waypoints"][0]["tst"].asLong())
+    assertEquals("home", json["org/owntracks/android/waypoints"][1]["desc"].asText())
+    assertEquals(53.6, json["org/owntracks/android/waypoints"][1]["lat"].asDouble(), 0.0001)
+    assertEquals(-1.5, json["org/owntracks/android/waypoints"][1]["lon"].asDouble(), 0.0001)
+    assertEquals(100, json["org/owntracks/android/waypoints"][1]["rad"].asInt())
+    assertEquals(1558351273, json["org/owntracks/android/waypoints"][1]["tst"].asLong())
     assertTrue(json["auth"].asBoolean())
     assertTrue(json["autostartOnBoot"].asBoolean())
     assertFalse(json["cleanSession"].asBoolean())

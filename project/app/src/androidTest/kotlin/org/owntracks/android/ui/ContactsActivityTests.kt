@@ -1,6 +1,5 @@
 package org.owntracks.android.ui
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.adevinta.android.barista.assertion.BaristaListAssertions.assertDisplayedAtPosition
 import com.adevinta.android.barista.assertion.BaristaRecyclerViewAssertions.assertRecyclerViewItemCount
@@ -13,7 +12,6 @@ import kotlin.random.Random
 import mqtt.packets.Qos
 import mqtt.packets.mqttv5.MQTT5Properties
 import org.junit.Test
-import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.model.Parser
 import org.owntracks.android.model.messages.MessageCard
@@ -35,10 +33,10 @@ import timber.log.Timber
 
 @OptIn(ExperimentalUnsignedTypes::class)
 @LargeTest
-@RunWith(AndroidJUnit4::class)
 class ContactsActivityTests :
     TestWithAnActivity<ContactsActivity>(ContactsActivity::class.java, false),
     TestWithAnMQTTBroker by TestWithAnMQTTBrokerImpl() {
+
   private fun setupTestActivity() {
     setNotFirstStartPreferences()
     getPreferences()

@@ -3,12 +3,12 @@ package org.owntracks.android.ui
 import android.content.Intent
 import android.net.Uri
 import androidx.test.espresso.Espresso
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
 import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import com.fasterxml.jackson.databind.ObjectMapper
+import dagger.hilt.android.testing.HiltAndroidRule
 import java.net.ConnectException
 import java.net.InetSocketAddress
 import java.net.Socket
@@ -17,8 +17,8 @@ import kotlin.random.Random
 import mqtt.broker.Broker
 import mqtt.broker.interfaces.Authentication
 import org.eclipse.paho.client.mqttv3.internal.websocket.Base64
+import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 import org.owntracks.android.R
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ConnectionMode
@@ -33,9 +33,9 @@ import socket.tls.TLSSettings
 import timber.log.Timber
 
 @MediumTest
-@RunWith(AndroidJUnit4::class)
 class ConnectionErrorTest :
     TestWithAnActivity<StatusActivity>(StatusActivity::class.java, startActivity = true) {
+  @get:Rule(order = 0) override var hiltRule = HiltAndroidRule(this)
 
   @Test
   fun given_a_config_with_http_mode_and_invalid_url_when_viewing_the_connecting_status_then_a_config_incomplete_message_is_shown() {
