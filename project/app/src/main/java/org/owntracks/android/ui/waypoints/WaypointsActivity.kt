@@ -8,18 +8,12 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat.startActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
-import javax.inject.Named
-import kotlin.time.ComparableTimeMark
-import kotlin.time.TimeSource
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.owntracks.android.R
 import org.owntracks.android.data.waypoints.WaypointModel
@@ -36,6 +30,10 @@ import org.owntracks.android.ui.mixins.NotificationsPermissionRequested
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import org.owntracks.android.ui.waypoint.WaypointActivity
 import timber.log.Timber
+import javax.inject.Inject
+import javax.inject.Named
+import kotlin.time.ComparableTimeMark
+import kotlin.time.TimeSource
 
 @AndroidEntryPoint
 class WaypointsActivity :

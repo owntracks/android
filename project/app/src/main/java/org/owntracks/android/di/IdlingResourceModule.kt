@@ -100,4 +100,10 @@ class IdlingResourceModule {
   @Named("saveConfigurationIdlingResource")
   fun provideSaveConfigurationIdlingResource(): SimpleIdlingResource =
       SimpleIdlingResource("importStatus", true)
+
+  @Provides
+  @Singleton
+  @Named("waypointsMigrationIdlingResource")
+  fun provideWaypointsMigrationIdlingResource(): SimpleIdlingResource =
+      SimpleIdlingResource("waypointsMigration", false)
 }

@@ -13,10 +13,13 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.PermissionGranter.allowPermissionsIfNeeded
 import dagger.hilt.android.testing.HiltAndroidTest
+import javax.inject.Inject
+import javax.inject.Named
 import kotlin.random.Random
 import org.junit.Assert
 import org.junit.Test
 import org.owntracks.android.R
+import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.testutils.JustThisTestPlease
 import org.owntracks.android.testutils.RecyclerViewLayoutCompleteIdlingResource
 import org.owntracks.android.testutils.TestWithAnActivity
@@ -32,6 +35,10 @@ import timber.log.Timber
 @HiltAndroidTest
 class WaypointsMigrationFromObjectboxTestWithFullUI :
     TestWithAnActivity<WaypointsActivity>(WaypointsActivity::class.java, false) {
+
+  @Inject
+  @Named("migrationIdlingResource")
+  lateinit var migrationIdlingResource: SimpleIdlingResource
 
   private fun setupActivity(dataBytes: ByteArray) {
     InstrumentationRegistry.getInstrumentation()
@@ -58,8 +65,7 @@ class WaypointsMigrationFromObjectboxTestWithFullUI :
   fun migratingAnEmptyObjectboxProducesZeroWaypoints() {
     val dataBytes = this.javaClass.getResource("/objectbox-lmdbs/empty/data.mdb")!!.readBytes()
     setupActivity(dataBytes)
-    app.migrateWaypoints()
-    app.migrationIdlingResource.use { Espresso.onIdle() }
+    migrationIdlingResource.use { Espresso.onIdle() }
     assertNotDisplayed(R.id.waypointsRecyclerView)
   }
 
@@ -71,8 +77,8 @@ class WaypointsMigrationFromObjectboxTestWithFullUI :
     val waypointsActivityIdlingResource =
         RecyclerViewLayoutCompleteIdlingResource(baristaRule.activityTestRule.activity)
     waypointsActivityIdlingResource.setUnidle()
-    app.migrateWaypoints()
-    app.migrationIdlingResource.use { Espresso.onIdle() }
+
+    migrationIdlingResource.use { Espresso.onIdle() }
     waypointsActivityIdlingResource.use {
       assertDisplayed(R.id.waypointsRecyclerView)
       assertRecyclerViewItemCount(R.id.waypointsRecyclerView, 1)
@@ -88,8 +94,8 @@ class WaypointsMigrationFromObjectboxTestWithFullUI :
     val waypointsActivityIdlingResource =
         RecyclerViewLayoutCompleteIdlingResource(baristaRule.activityTestRule.activity)
     waypointsActivityIdlingResource.setUnidle()
-    app.migrateWaypoints()
-    app.migrationIdlingResource.use { Espresso.onIdle() }
+
+    migrationIdlingResource.use { Espresso.onIdle() }
     waypointsActivityIdlingResource.use {
       assertDisplayed(R.id.waypointsRecyclerView)
       assertRecyclerViewItemCount(R.id.waypointsRecyclerView, 10)
@@ -104,8 +110,8 @@ class WaypointsMigrationFromObjectboxTestWithFullUI :
     val waypointsActivityIdlingResource =
         RecyclerViewLayoutCompleteIdlingResource(baristaRule.activityTestRule.activity)
     waypointsActivityIdlingResource.setUnidle()
-    app.migrateWaypoints()
-    app.migrationIdlingResource.use { Espresso.onIdle() }
+
+    migrationIdlingResource.use { Espresso.onIdle() }
     waypointsActivityIdlingResource.use {
       assertDisplayed(R.id.waypointsRecyclerView)
       assertRecyclerViewItemCount(R.id.waypointsRecyclerView, 5000)
@@ -116,8 +122,8 @@ class WaypointsMigrationFromObjectboxTestWithFullUI :
   fun migratingACorruptObjectboxDatabaseGivesNoWaypointsAndANotification() {
     val random = Random(1)
     setupActivity(random.nextBytes(4096))
-    app.migrateWaypoints()
-    app.migrationIdlingResource.use { Espresso.onIdle() }
+
+    migrationIdlingResource.use { Espresso.onIdle() }
     assertNotDisplayed(R.id.waypointsRecyclerView)
 
     val notificationManager =

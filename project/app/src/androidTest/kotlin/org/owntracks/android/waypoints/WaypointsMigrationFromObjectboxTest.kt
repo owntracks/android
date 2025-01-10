@@ -25,9 +25,7 @@ import org.owntracks.android.testutils.use
 class WaypointsMigrationFromObjectboxTest(private val parameter: Parameter) {
   @Before
   fun clearLocalPackageData() {
-    InstrumentationRegistry.getInstrumentation()
-        .targetContext
-        .deleteDatabase("waypoints")
+    InstrumentationRegistry.getInstrumentation().targetContext.deleteDatabase("waypoints")
   }
 
   @Test
@@ -44,7 +42,6 @@ class WaypointsMigrationFromObjectboxTest(private val parameter: Parameter) {
       val roomWaypointsRepo =
           RoomWaypointsRepo(context, dispatcher, CoroutineScope(SupervisorJob()))
 
-      roomWaypointsRepo.migrateFromLegacyStorage()
       Espresso.onIdle()
       assertEquals(parameter.expectedCount, roomWaypointsRepo.all.size)
     }

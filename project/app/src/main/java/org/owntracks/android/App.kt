@@ -121,10 +121,6 @@ open class BaseApp :
 
   val workManagerFailedToInitialize = MutableLiveData(false)
 
-  @get:VisibleForTesting
-  val migrationIdlingResource: SimpleIdlingResource =
-      SimpleIdlingResource("waypointsMigration", false)
-
   override fun onCreate() {
     // Make sure we use Conscrypt for advanced TLS features on all devices.
     Security.insertProviderAt(Conscrypt.newProviderBuilder().provideTrustManager(true).build(), 1)
@@ -168,8 +164,6 @@ open class BaseApp :
     preferences.registerOnPreferenceChangedListener(this)
 
     setThemeFromPreferences()
-
-    migrateWaypoints()
 
     // Notifications can be sent from multiple places, so let's make sure we've got the channels in
     // place
@@ -298,42 +292,6 @@ open class BaseApp :
     preferencesStore.migrate()
   }
 
-  /**
-   * Migrate waypoints. We need a way to call this from an espresso test after it's written the test
-   * files so have this visible for testing so it can be called post-startup
-   */
-  @VisibleForTesting
-  fun migrateWaypoints() {
-    Timber.v("UnIdling migrationIdlingResource")
-    migrationIdlingResource.setIdleState(false)
-    waypointsRepo.migrateFromLegacyStorage().invokeOnCompletion { throwable ->
-      if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
-          PackageManager.PERMISSION_GRANTED) {
-        throwable?.run {
-          Timber.e(throwable, "Error migrating waypoints")
-          NotificationCompat.Builder(
-                  applicationContext, GeocoderProvider.ERROR_NOTIFICATION_CHANNEL_ID)
-              .setContentTitle(getString(R.string.waypointMigrationErrorNotificationTitle))
-              .setContentText(getString(R.string.waypointMigrationErrorNotificationText))
-              .setAutoCancel(true)
-              .setSmallIcon(R.drawable.ic_owntracks_80)
-              .setStyle(
-                  NotificationCompat.BigTextStyle()
-                      .bigText(getString(R.string.waypointMigrationErrorNotificationText)))
-              .setPriority(NotificationCompat.PRIORITY_LOW)
-              .setSilent(true)
-              .build()
-              .run { notificationManager.notify("WaypointsMigrationNotification", 0, this) }
-        }
-      } else if (throwable != null) {
-        Timber.w(
-            throwable,
-            "notification permissions not granted, can't display waypoints migration error notification")
-      }
-      Timber.v("Idling migrationIdlingResource")
-      migrationIdlingResource.setIdleState(true)
-    }
-  }
 
   override fun onTrimMemory(level: Int) {
     Timber.w(

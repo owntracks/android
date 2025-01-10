@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-class InMemoryWaypointsRepo : WaypointsRepo() {
+class InMemoryWaypointsRepo : WaypointsRepo(scope, applicationContext, ioDispatcher) {
   private val waypoints = mutableListOf<WaypointModel>()
 
   override suspend fun get(id: Long): WaypointModel? {
