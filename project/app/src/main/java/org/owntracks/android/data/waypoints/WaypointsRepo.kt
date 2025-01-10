@@ -68,20 +68,21 @@ abstract class WaypointsRepo protected constructor() {
    */
   suspend fun importFromMessage(waypoints: MessageWaypointCollection?) {
     waypoints
-        ?.map { Instant.ofEpochSecond(it.timestamp) to it }
-        ?.forEach {
-          getByTst(it.first)?.run { delete(this) }
+        ?.filter {
           // check if the latitude and longitude are valid, otherwise do not replace the waypoint
-          if ((it.second.latitude >= -90.0) &&
-              (it.second.latitude <= 90.0) &&
-              (it.second.longitude >= -180.0) &&
-              (it.second.longitude <= 180.0)) {
-            insert(toDaoObject(it.second))
-          } else {
-            // log a warning for the waypoint that isn't being imported
-            Timber.w("Ignoring waypoint with invalid coordinates: %s", it.second.description)
-          }
+          ((it.latitude >= -90.0) &&
+                  (it.latitude <= 90.0) &&
+                  (it.longitude >= -180.0) &&
+                  (it.longitude <= 180.0))
+              .also { valid ->
+                if (!valid)
+                    Timber.w(
+                        "Ignoring waypoint with invalid coordinates: ${it.description}",
+                    )
+              }
         }
+        ?.map { toDaoObject(it) }
+        ?.run { insertAllImpl(this) }
   }
 
   private fun toDaoObject(messageWaypoint: MessageWaypoint): WaypointModel {
@@ -109,6 +110,8 @@ abstract class WaypointsRepo protected constructor() {
   protected abstract suspend fun clearImpl()
 
   protected abstract suspend fun insertImpl(waypointModel: WaypointModel)
+
+  protected abstract suspend fun insertAllImpl(waypoints: List<WaypointModel>)
 
   protected abstract suspend fun updateImpl(waypointModel: WaypointModel)
 

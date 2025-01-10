@@ -100,6 +100,9 @@ constructor(
   override suspend fun insertImpl(waypointModel: WaypointModel) =
       withContext(ioDispatcher) { db.waypointDao().upsert(waypointModel) }
 
+  override suspend fun insertAllImpl(waypoints: List<WaypointModel>) =
+      withContext(ioDispatcher) { db.waypointDao().insertAll(waypoints) }
+
   override suspend fun updateImpl(waypointModel: WaypointModel) =
       withContext(ioDispatcher) { db.waypointDao().upsert(waypointModel) }
 
@@ -153,7 +156,9 @@ constructor(
                 "Waypoints Migration complete in ${migrationDuration.duration}. Tried to insert ${migrationDuration.value}, ended up with $rowCount waypoints in the repo")
           }
         }
-      } finally {
+      } catch (e:Throwable){
+        Timber.tag("ARSE_RoomWaypointsRepo").e(e, "Error migrating waypoints")
+      }finally {
         _migrationCompleteFlow.compareAndSet(expect = false, update = true)
       }
     }

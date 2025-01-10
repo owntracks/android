@@ -31,6 +31,10 @@ class InMemoryWaypointsRepo : WaypointsRepo() {
     waypoints.add(waypointModel)
   }
 
+  override suspend fun insertAllImpl(waypoints: List<WaypointModel>) {
+    this.waypoints.addAll(waypoints)
+  }
+
   override suspend fun updateImpl(waypointModel: WaypointModel) {
     TODO("Not yet implemented")
   }

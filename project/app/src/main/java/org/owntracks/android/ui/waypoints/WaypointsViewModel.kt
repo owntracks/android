@@ -23,7 +23,7 @@ constructor(waypointsRepo: WaypointsRepo, private val locationProcessor: Locatio
   val waypoints: StateFlow<List<WaypointModel>> = waypointsRepo.allLive
       .stateIn(
           scope = viewModelScope,
-          started = SharingStarted.Eagerly,
+          started = SharingStarted.Lazily,
           initialValue = emptyList()
       )
 

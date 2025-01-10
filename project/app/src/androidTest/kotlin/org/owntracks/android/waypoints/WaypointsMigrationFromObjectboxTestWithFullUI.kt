@@ -10,17 +10,21 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.assertion.BaristaRecyclerViewAssertions.assertRecyclerViewItemCount
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
+import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.PermissionGranter.allowPermissionsIfNeeded
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlin.random.Random
 import org.junit.Assert
 import org.junit.Test
 import org.owntracks.android.R
+import org.owntracks.android.testutils.JustThisTestPlease
 import org.owntracks.android.testutils.RecyclerViewLayoutCompleteIdlingResource
 import org.owntracks.android.testutils.TestWithAnActivity
+import org.owntracks.android.testutils.clickOnAndWait
 import org.owntracks.android.testutils.setNotFirstStartPreferences
 import org.owntracks.android.testutils.use
 import org.owntracks.android.testutils.waitUntilActivityVisible
+import org.owntracks.android.ui.status.StatusActivity
 import org.owntracks.android.ui.waypoints.WaypointsActivity
 import timber.log.Timber
 
@@ -41,6 +45,12 @@ class WaypointsMigrationFromObjectboxTestWithFullUI :
     setNotFirstStartPreferences()
     launchActivity()
     allowPermissionsIfNeeded(POST_NOTIFICATIONS)
+    waitUntilActivityVisible<WaypointsActivity>()
+    openDrawer()
+    clickOnAndWait(R.string.title_activity_status)
+    waitUntilActivityVisible<StatusActivity>()
+    openDrawer()
+    clickOnAndWait(R.string.title_activity_waypoints)
     waitUntilActivityVisible<WaypointsActivity>()
   }
 
@@ -70,6 +80,7 @@ class WaypointsMigrationFromObjectboxTestWithFullUI :
   }
 
   @Test
+  @JustThisTestPlease
   fun migratingAnObjectboxWith10PointsProduces10Waypoints() {
     val dataBytes =
         this.javaClass.getResource("/objectbox-lmdbs/10-waypoints/data.mdb")!!.readBytes()
