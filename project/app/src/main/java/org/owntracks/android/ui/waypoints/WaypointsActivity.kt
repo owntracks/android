@@ -11,8 +11,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat.startActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -67,7 +67,7 @@ class WaypointsActivity :
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    recyclerViewAdapter = WaypointsAdapter(this)
+    recyclerViewAdapter = WaypointsAdapter()
     postNotificationsPermissionInit(this, preferences, notificationsStash)
     DataBindingUtil.setContentView<UiWaypointsBinding>(this, R.layout.ui_waypoints).apply {
       vm = viewModel
@@ -79,10 +79,11 @@ class WaypointsActivity :
         adapter = recyclerViewAdapter
         emptyView = placeholder
         viewTreeObserver.addOnGlobalLayoutListener {
-          Timber.v("global layout changed")
+          Timber.tag("ARSE_WaypointsActivity").v("global layout changed")
           if (recyclerViewStartLayoutInstant != null) {
             this@WaypointsActivity.recyclerViewStartLayoutInstant?.run {
-              Timber.d("Completed waypoints layout in ${this.elapsedNow()}")
+              Timber.tag("ARSE_WaypointsActivity")
+                  .d("Completed waypoints layout in ${this.elapsedNow()}")
             }
             this@WaypointsActivity.recyclerViewStartLayoutInstant = null
           }
@@ -91,9 +92,12 @@ class WaypointsActivity :
       }
     }
     lifecycleScope.launch {
-      viewModel.waypointsList.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect {
-        recyclerViewStartLayoutInstant = TimeSource.Monotonic.markNow()
-        recyclerViewAdapter.setData(it)
+      lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewModel.waypoints.collect {
+          Timber.tag("ARSE_WaypointsActivity").i("Got waypoints list $it")
+          recyclerViewStartLayoutInstant = TimeSource.Monotonic.markNow()
+          recyclerViewAdapter.submitList(it)
+        }
       }
     }
   }
@@ -146,9 +150,12 @@ class WaypointsActivity :
   override var isRecyclerViewLayoutCompleted: Boolean
     get() =
         (recyclerViewStartLayoutInstant == null).also {
-          Timber.v("Being asked if I'm idle, saying $it")
+          Timber.tag("ARSE_WaypointsActivity")
+              .v(
+                  "Being asked if I'm idle, saying $it because recyclerViewStartLayoutInstant is $recyclerViewStartLayoutInstant")
         }
     set(value) {
+      Timber.tag("ARSE_WaypointsActivity").v("Setting layout completed to $value")
       recyclerViewStartLayoutInstant = if (!value) TimeSource.Monotonic.markNow() else null
     }
 }

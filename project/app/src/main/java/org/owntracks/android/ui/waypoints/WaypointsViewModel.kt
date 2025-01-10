@@ -4,8 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.owntracks.android.data.waypoints.WaypointModel
@@ -18,8 +20,13 @@ class WaypointsViewModel
 constructor(waypointsRepo: WaypointsRepo, private val locationProcessor: LocationProcessor) :
     ViewModel() {
 
-  val waypointsList: StateFlow<List<WaypointModel>> =
-      waypointsRepo.allLive.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+  val waypoints: StateFlow<List<WaypointModel>> = waypointsRepo.allLive
+      .stateIn(
+          scope = viewModelScope,
+          started = SharingStarted.Eagerly,
+          initialValue = emptyList()
+      )
+
 
   fun exportWaypoints() {
     viewModelScope.launch { locationProcessor.publishWaypointsMessage() }

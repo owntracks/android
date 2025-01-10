@@ -9,6 +9,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.Transaction
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import androidx.room.Upsert
@@ -63,7 +64,9 @@ constructor(
 
     @Delete fun delete(waypointModel: WaypointModel)
 
-    @Insert(onConflict = OnConflictStrategy.ABORT) fun insertAll(waypoints: List<WaypointModel>)
+    @Transaction // Add this to ensure atomic operation
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(waypoints: List<WaypointModel>)
 
     @Query("SELECT COUNT(*) FROM WaypointModel") fun getRowCount(): Int
   }
@@ -119,9 +122,11 @@ constructor(
                     applicationContext.filesDir.resolve("objectbox/objectbox").toString(),
                     readOnly = true,
                     locking = false)
-                .use {
-                  it.beginTransaction()
+                .use { lmdb ->
+                  lmdb
+                      .beginTransaction()
                       .dump()
+                      .also { Timber.tag("ARSE_WaypointsMigration").d("Dumped LMDB ${it.entries.size}") }
                       .filter { entry ->
                         // This is the magic we're looking for at the start of an LMDB key to
                         // indicate it's a waypoint
@@ -131,6 +136,8 @@ constructor(
                       .toList()
                       .run {
                         db.waypointDao().insertAll(this)
+                        Timber.tag("ARSE_WaypointsMigration")
+                            .d("Migrated ${this.size} waypoints")
                         this.size
                       }
                       .run {
