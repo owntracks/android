@@ -61,7 +61,7 @@ import org.owntracks.android.services.BackgroundService.Companion.BACKGROUND_LOC
 import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.support.DrawerProvider
 import org.owntracks.android.support.RequirementsChecker
-import org.owntracks.android.test.CountingIdlingResourceShim
+import org.owntracks.android.test.ThresholdIdlingResourceInterface
 import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.ui.NotificationsStash
 import org.owntracks.android.ui.mixins.BackgroundLocationPermissionRequester
@@ -104,7 +104,7 @@ class MapActivity :
   @Inject
   @Named("outgoingQueueIdlingResource")
   @get:VisibleForTesting
-  lateinit var outgoingQueueIdlingResource: CountingIdlingResourceShim
+  lateinit var outgoingQueueIdlingResource: ThresholdIdlingResourceInterface
 
   @Inject
   @Named("publishResponseMessageIdlingResource")

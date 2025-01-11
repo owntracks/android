@@ -24,7 +24,8 @@ import org.owntracks.android.data.waypoints.WaypointModel
 import org.owntracks.android.databinding.UiWaypointsBinding
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.DrawerProvider
-import org.owntracks.android.test.CountingIdlingResourceShim
+import org.owntracks.android.test.ThresholdIdlingResourceInterface
+
 import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.ui.NotificationsStash
 import org.owntracks.android.ui.base.ClickHasBeenHandled
@@ -53,7 +54,7 @@ class WaypointsActivity :
   @Inject
   @Named("outgoingQueueIdlingResource")
   @get:VisibleForTesting
-  lateinit var outgoingQueueIdlingResource: CountingIdlingResourceShim
+  lateinit var outgoingQueueIdlingResource: ThresholdIdlingResourceInterface
 
   @Inject
   @Named("publishResponseMessageIdlingResource")
@@ -91,9 +92,8 @@ class WaypointsActivity :
 
     lifecycleScope.launch {
       lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-        Timber.tag("ARSE_WaypointsActivity").d("Starting to collect waypoints")
         viewModel.waypointsFlow.collect {
-          Timber.tag("ARSE_WaypointsActivity").d("Received set of waypoints $it")
+          Timber.tag("ARSE_WaypointsActivity").d("Received set of ${it.size} waypoints")
           recyclerViewStartLayoutInstant = TimeSource.Monotonic.markNow()
           recyclerViewAdapter.submitList(it)
         }

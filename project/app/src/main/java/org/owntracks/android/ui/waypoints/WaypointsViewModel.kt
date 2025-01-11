@@ -4,8 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import javax.inject.Named
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
@@ -14,7 +18,7 @@ import org.owntracks.android.data.waypoints.WaypointsRepo
 import org.owntracks.android.data.waypoints.WaypointsRepo.WaypointOperation
 import org.owntracks.android.di.CoroutineScopes
 import org.owntracks.android.services.LocationProcessor
-import timber.log.Timber
+import org.owntracks.android.test.ThresholdIdlingResourceInterface
 
 @HiltViewModel
 class WaypointsViewModel
@@ -23,14 +27,17 @@ constructor(
     private val waypointsRepo: WaypointsRepo,
     private val locationProcessor: LocationProcessor,
     @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @Named("waypointsEventCountingIdlingResource")
+    private val waypointsEventCountingIdlingResource: ThresholdIdlingResourceInterface
 ) : ViewModel() {
 
+  @OptIn(FlowPreview::class)
   val waypointsFlow =
       flow {
             var currentWaypoints = waypointsRepo.getAll()
+            waypointsEventCountingIdlingResource.set(currentWaypoints.size)
             emit(currentWaypoints)
             waypointsRepo.repoChangedEvent.collect { operation ->
-              Timber.tag("ARSE_WaypointsViewModel").d("Received waypointsUpdatedEvent $operation")
               currentWaypoints =
                   currentWaypoints
                       .toMutableList()
@@ -53,13 +60,12 @@ constructor(
                         }
                       }
                       .sortedBy { it.tst }
-
-              Timber.tag("ARSE_WaypointsViewModel")
-                  .d("Emitting updated waypoints: $currentWaypoints")
+              waypointsEventCountingIdlingResource.set(currentWaypoints.size)
               emit(currentWaypoints)
             }
           }
           .flowOn(ioDispatcher)
+          .debounce(100.milliseconds)
           .stateIn(
               scope = viewModelScope,
               started = SharingStarted.WhileSubscribed(5000),

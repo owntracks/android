@@ -152,7 +152,7 @@ protected constructor(
                     .map { lmdbEntry -> deserializeWaypointModel(lmdbEntry.value) }
                     .toList()
                     .run {
-                      insertAllImpl(this)
+                      insertAll(this)
                       Timber.tag("ARSE_WaypointsRepo").d("Migrated ${this.size} waypoints")
                       this.size
                     }
@@ -165,11 +165,12 @@ protected constructor(
               }
         }
 
-        Timber.i(
-            "Waypoints Migration complete in ${migrationDuration.duration}. Migrated ${migrationDuration.value} waypoints")
+        Timber.tag("ARSE_WaypointsRepo")
+            .i(
+                "Waypoints Migration complete in ${migrationDuration.duration}. Migrated ${migrationDuration.value} waypoints")
       }
     } catch (e: Throwable) {
-      Timber.tag("ARSE_RoomWaypointsRepo").e(e, "Error migrating waypoints")
+      Timber.tag("ARSE_WaypointsRepo").e(e, "Error migrating waypoints")
     } finally {
       migrationIdlingResource.setIdleState(true)
     }

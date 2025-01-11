@@ -18,7 +18,7 @@ import org.owntracks.android.data.repos.ContactsRepoChange
 import org.owntracks.android.databinding.UiContactsBinding
 import org.owntracks.android.model.Contact
 import org.owntracks.android.support.DrawerProvider
-import org.owntracks.android.test.CountingIdlingResourceShim
+import org.owntracks.android.test.ThresholdIdlingResourceInterface
 import org.owntracks.android.ui.map.MapActivity
 import org.owntracks.android.ui.mixins.ServiceStarter
 import timber.log.Timber
@@ -31,7 +31,7 @@ class ContactsActivity :
   @Inject
   @Named("contactsActivityIdlingResource")
   @VisibleForTesting
-  lateinit var contactsCountingIdlingResource: CountingIdlingResourceShim
+  lateinit var contactsCountingIdlingResource: ThresholdIdlingResourceInterface
 
   private val viewModel: ContactsViewModel by viewModels()
   private lateinit var contactsAdapter: ContactsAdapter
