@@ -27,7 +27,6 @@ import org.owntracks.android.support.DrawerProvider
 import org.owntracks.android.test.CountingIdlingResourceShim
 import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.ui.NotificationsStash
-import org.owntracks.android.ui.base.BaseRecyclerViewAdapterWithClickHandler
 import org.owntracks.android.ui.base.ClickHasBeenHandled
 import org.owntracks.android.ui.base.ClickListener
 import org.owntracks.android.ui.base.RecyclerViewLayoutCompleteListener
@@ -39,7 +38,7 @@ import timber.log.Timber
 @AndroidEntryPoint
 class WaypointsActivity :
     AppCompatActivity(),
-  ClickListener<WaypointModel>,
+    ClickListener<WaypointModel>,
     RecyclerViewLayoutCompleteListener.RecyclerViewIdlingCallback,
     NotificationsPermissionRequested by NotificationsPermissionRequested.Impl() {
   private var recyclerViewStartLayoutInstant: ComparableTimeMark? = null
@@ -92,12 +91,11 @@ class WaypointsActivity :
 
     lifecycleScope.launch {
       lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-        launch {
-          viewModel.waypointsFlow.collect {
-            Timber.tag("ARSE_WaypointsActivity").d("Received set of waypoints $it")
-            recyclerViewStartLayoutInstant = TimeSource.Monotonic.markNow()
-            recyclerViewAdapter.submitList(it)
-          }
+        Timber.tag("ARSE_WaypointsActivity").d("Starting to collect waypoints")
+        viewModel.waypointsFlow.collect {
+          Timber.tag("ARSE_WaypointsActivity").d("Received set of waypoints $it")
+          recyclerViewStartLayoutInstant = TimeSource.Monotonic.markNow()
+          recyclerViewAdapter.submitList(it)
         }
       }
     }

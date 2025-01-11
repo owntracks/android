@@ -5,11 +5,11 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import org.owntracks.android.data.waypoints.WaypointModel
 import org.owntracks.android.data.waypoints.WaypointsRepo
 import org.owntracks.android.data.waypoints.WaypointsRepo.WaypointOperation
 import org.owntracks.android.di.CoroutineScopes
@@ -25,34 +25,45 @@ constructor(
     @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
-  private val mutableWaypointsFlow = MutableStateFlow(emptyList<WaypointModel>())
-  val waypointsFlow = mutableWaypointsFlow.asStateFlow()
+  val waypointsFlow =
+      flow {
+            var currentWaypoints = waypointsRepo.getAll()
+            emit(currentWaypoints)
+            waypointsRepo.repoChangedEvent.collect { operation ->
+              Timber.tag("ARSE_WaypointsViewModel").d("Received waypointsUpdatedEvent $operation")
+              currentWaypoints =
+                  currentWaypoints
+                      .toMutableList()
+                      .apply {
+                        when (operation) {
+                          is WaypointOperation.Insert -> {
+                            removeIf { it.tst == operation.waypoint.tst }
+                            add(operation.waypoint)
+                          }
+                          is WaypointOperation.Update -> {
+                            removeIf { it.tst == operation.waypoint.tst }
+                            add(operation.waypoint)
+                          }
+                          is WaypointOperation.Delete -> {
+                            remove(operation.waypoint)
+                          }
+                          is WaypointOperation.Clear -> {
+                            clear()
+                          }
+                        }
+                      }
+                      .sortedBy { it.tst }
 
-  init {
-    viewModelScope.launch(ioDispatcher) {
-      mutableWaypointsFlow.emit(waypointsRepo.getAll())
-      waypointsRepo.repoChangedEvent.collect { operation ->
-        Timber.tag("ARSE_WaypointsViewModel").d("Received waypointsUpdatedEvent $operation")
-        val currentWaypoints = mutableWaypointsFlow.value.toMutableList()
-        when (operation) {
-          is WaypointOperation.Insert ->
-              currentWaypoints.apply {
-                removeIf { it.tst == operation.waypoint.tst }
-                add(operation.waypoint)
-              }
-          is WaypointOperation.Update ->
-              currentWaypoints.apply {
-                removeIf { it.tst == operation.waypoint.tst }
-                add(operation.waypoint)
-              }
-          is WaypointOperation.Delete -> currentWaypoints.remove(operation.waypoint)
-          is WaypointOperation.Clear -> currentWaypoints.clear()
-        }
-        Timber.tag("ARSE_WaypointsViewModel").d("Emitting $currentWaypoints")
-        mutableWaypointsFlow.emit(currentWaypoints.sortedBy { it.tst })
-      }
-    }
-  }
+              Timber.tag("ARSE_WaypointsViewModel")
+                  .d("Emitting updated waypoints: $currentWaypoints")
+              emit(currentWaypoints)
+            }
+          }
+          .flowOn(ioDispatcher)
+          .stateIn(
+              scope = viewModelScope,
+              started = SharingStarted.WhileSubscribed(5000),
+              initialValue = emptyList())
 
   fun exportWaypoints() {
     viewModelScope.launch { locationProcessor.publishWaypointsMessage() }
