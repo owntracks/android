@@ -146,15 +146,12 @@ class WaypointsActivity :
     }
   }
 
-  override var isRecyclerViewLayoutCompleted: Boolean
+  override val isRecyclerViewLayoutCompleted: Boolean
     get() =
         (recyclerViewStartLayoutInstant == null).also {
           Timber.tag("ARSE_WaypointsActivity")
               .v(
                   "Being asked if I'm idle, saying $it because recyclerViewStartLayoutInstant is $recyclerViewStartLayoutInstant")
         }
-    set(value) {
-      Timber.tag("ARSE_WaypointsActivity").v("Setting layout completed to $value")
-      recyclerViewStartLayoutInstant = if (!value) TimeSource.Monotonic.markNow() else null
-    }
+
 }

@@ -28,7 +28,9 @@ import org.owntracks.android.di.ApplicationScope
 import org.owntracks.android.di.CoroutineScopes
 import org.owntracks.android.location.geofencing.Latitude
 import org.owntracks.android.location.geofencing.Longitude
+import org.owntracks.android.test.SimpleIdlingResource
 import timber.log.Timber
+import javax.inject.Named
 
 @Singleton
 class RoomWaypointsRepo
@@ -36,8 +38,9 @@ class RoomWaypointsRepo
 constructor(
     @ApplicationContext private val applicationContext: Context,
     @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    @ApplicationScope private val scope: CoroutineScope
-) : WaypointsRepo(applicationContext) {
+    @ApplicationScope private val scope: CoroutineScope,
+    @Named("waypointsMigrationIdlingResource")  private val migrationIdlingResource: SimpleIdlingResource
+) : WaypointsRepo(applicationContext,migrationIdlingResource) {
   @Dao
   interface WaypointDao {
     @Query("SELECT * FROM WaypointModel WHERE id = :id") fun get(id: Long): WaypointModel?

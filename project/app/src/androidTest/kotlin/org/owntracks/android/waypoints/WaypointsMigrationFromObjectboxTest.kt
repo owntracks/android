@@ -17,6 +17,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.owntracks.android.data.waypoints.RoomWaypointsRepo
+import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.testutils.idlingresources.EspressoTrackedDispatcher
 import org.owntracks.android.testutils.use
 
@@ -41,7 +42,11 @@ class WaypointsMigrationFromObjectboxTest(private val parameter: Parameter) {
     val dispatcher = EspressoTrackedDispatcher(Dispatchers.IO)
     dispatcher.idlingResource.use(2.minutes) {
       val roomWaypointsRepo =
-          RoomWaypointsRepo(context, dispatcher, CoroutineScope(SupervisorJob()))
+          RoomWaypointsRepo(
+              context,
+              dispatcher,
+              CoroutineScope(SupervisorJob()),
+              SimpleIdlingResource("waypointsMigrationIdlingResource", false))
 
       Espresso.onIdle()
       runBlocking { assertEquals(parameter.expectedCount, roomWaypointsRepo.getAll().size) }

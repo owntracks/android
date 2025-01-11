@@ -10,7 +10,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.assertion.BaristaRecyclerViewAssertions.assertRecyclerViewItemCount
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
-import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.PermissionGranter.allowPermissionsIfNeeded
 import dagger.hilt.android.testing.HiltAndroidTest
 import javax.inject.Inject
@@ -23,11 +22,9 @@ import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.testutils.JustThisTestPlease
 import org.owntracks.android.testutils.RecyclerViewLayoutCompleteIdlingResource
 import org.owntracks.android.testutils.TestWithAnActivity
-import org.owntracks.android.testutils.clickOnAndWait
 import org.owntracks.android.testutils.setNotFirstStartPreferences
 import org.owntracks.android.testutils.use
 import org.owntracks.android.testutils.waitUntilActivityVisible
-import org.owntracks.android.ui.status.StatusActivity
 import org.owntracks.android.ui.waypoints.WaypointsActivity
 import timber.log.Timber
 
@@ -53,12 +50,6 @@ class WaypointsMigrationFromObjectboxTestWithFullUI :
     launchActivity()
     allowPermissionsIfNeeded(POST_NOTIFICATIONS)
     waitUntilActivityVisible<WaypointsActivity>()
-    openDrawer()
-    clickOnAndWait(R.string.title_activity_status)
-    waitUntilActivityVisible<StatusActivity>()
-    openDrawer()
-    clickOnAndWait(R.string.title_activity_waypoints)
-    waitUntilActivityVisible<WaypointsActivity>()
   }
 
   @Test
@@ -76,7 +67,6 @@ class WaypointsMigrationFromObjectboxTestWithFullUI :
     setupActivity(dataBytes)
     val waypointsActivityIdlingResource =
         RecyclerViewLayoutCompleteIdlingResource(baristaRule.activityTestRule.activity)
-    waypointsActivityIdlingResource.setUnidle()
 
     migrationIdlingResource.use { Espresso.onIdle() }
     waypointsActivityIdlingResource.use {
@@ -93,7 +83,6 @@ class WaypointsMigrationFromObjectboxTestWithFullUI :
     setupActivity(dataBytes)
     val waypointsActivityIdlingResource =
         RecyclerViewLayoutCompleteIdlingResource(baristaRule.activityTestRule.activity)
-    waypointsActivityIdlingResource.setUnidle()
 
     migrationIdlingResource.use { Espresso.onIdle() }
     waypointsActivityIdlingResource.use {
@@ -109,7 +98,6 @@ class WaypointsMigrationFromObjectboxTestWithFullUI :
     setupActivity(dataBytes)
     val waypointsActivityIdlingResource =
         RecyclerViewLayoutCompleteIdlingResource(baristaRule.activityTestRule.activity)
-    waypointsActivityIdlingResource.setUnidle()
 
     migrationIdlingResource.use { Espresso.onIdle() }
     waypointsActivityIdlingResource.use {

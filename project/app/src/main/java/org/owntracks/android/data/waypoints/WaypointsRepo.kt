@@ -12,9 +12,14 @@ import org.owntracks.android.location.geofencing.Latitude
 import org.owntracks.android.location.geofencing.Longitude
 import org.owntracks.android.model.messages.MessageWaypoint
 import org.owntracks.android.support.MessageWaypointCollection
+import org.owntracks.android.test.SimpleIdlingResource
 import timber.log.Timber
 
-abstract class WaypointsRepo protected constructor(private val applicationContext: Context) {
+abstract class WaypointsRepo
+protected constructor(
+    private val applicationContext: Context,
+    private val migrationIdlingResource: SimpleIdlingResource
+) {
   sealed class WaypointOperation {
     data class Insert(val waypoint: WaypointModel) : WaypointOperation()
 
@@ -166,7 +171,7 @@ abstract class WaypointsRepo protected constructor(private val applicationContex
     } catch (e: Throwable) {
       Timber.tag("ARSE_RoomWaypointsRepo").e(e, "Error migrating waypoints")
     } finally {
-      //        _migrationCompleteFlow.compareAndSet(expect = false, update = true)
+      migrationIdlingResource.setIdleState(true)
     }
   }
 

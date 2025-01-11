@@ -139,7 +139,7 @@ fun getCurrentActivity(): Activity? {
  * @param timeout time to wait for the [IdlingResource] to be idle
  * @param block function to execute once idle
  */
-inline fun IdlingResource?.use(timeout: Duration = 30.seconds, block: () -> Unit) {
+inline fun IdlingResource?.use(timeout: Duration = 5.seconds, block: () -> Unit) {
   if (this == null) {
     Timber.w("Idling resource is null")
   }

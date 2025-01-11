@@ -6,12 +6,15 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import org.owntracks.android.test.SimpleIdlingResource
 
 class InMemoryWaypointsRepo(
     @Suppress("UNUSED_PARAMETER") scope: CoroutineScope,
     applicationContext: Context,
     @Suppress("UNUSED_PARAMETER") ioDispatcher: CoroutineDispatcher
-) : WaypointsRepo(applicationContext) {
+) :
+    WaypointsRepo(
+        applicationContext, SimpleIdlingResource("waypointsMigrationIdlingResource", false)) {
   private val waypoints = mutableListOf<WaypointModel>()
 
   override suspend fun get(id: Long): WaypointModel? {

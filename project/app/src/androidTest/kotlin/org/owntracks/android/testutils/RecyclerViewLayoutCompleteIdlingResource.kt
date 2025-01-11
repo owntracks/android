@@ -30,8 +30,4 @@ class RecyclerViewLayoutCompleteIdlingResource(
       onTransitionToIdle()
     }
   }
-
-  fun setUnidle() {
-    idlingCallback.isRecyclerViewLayoutCompleted = false
-  }
 }
