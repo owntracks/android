@@ -9,7 +9,7 @@ abstract class BaseRecyclerViewHolder<T>(
 ) : RecyclerView.ViewHolder(binding.root) {
   fun bind(
       item: T,
-      clickListenerRecyclerView: BaseRecyclerViewAdapterWithClickHandler.ClickListener<T>
+      clickListenerRecyclerView: ClickListener<T>
   ) {
     binding.setVariable(bindingVariable, item)
     binding.root.setOnClickListener { clickListenerRecyclerView.onClick(item, binding.root, false) }

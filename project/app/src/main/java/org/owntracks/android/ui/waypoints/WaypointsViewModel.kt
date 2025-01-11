@@ -49,7 +49,7 @@ constructor(
           is WaypointOperation.Clear -> currentWaypoints.clear()
         }
         Timber.tag("ARSE_WaypointsViewModel").d("Emitting $currentWaypoints")
-        mutableWaypointsFlow.emit(currentWaypoints)
+        mutableWaypointsFlow.emit(currentWaypoints.sortedBy { it.tst })
       }
     }
   }

@@ -29,6 +29,7 @@ import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.ui.NotificationsStash
 import org.owntracks.android.ui.base.BaseRecyclerViewAdapterWithClickHandler
 import org.owntracks.android.ui.base.ClickHasBeenHandled
+import org.owntracks.android.ui.base.ClickListener
 import org.owntracks.android.ui.base.RecyclerViewLayoutCompleteListener
 import org.owntracks.android.ui.mixins.NotificationsPermissionRequested
 import org.owntracks.android.ui.preferences.load.LoadActivity
@@ -38,7 +39,7 @@ import timber.log.Timber
 @AndroidEntryPoint
 class WaypointsActivity :
     AppCompatActivity(),
-    BaseRecyclerViewAdapterWithClickHandler.ClickListener<WaypointModel>,
+  ClickListener<WaypointModel>,
     RecyclerViewLayoutCompleteListener.RecyclerViewIdlingCallback,
     NotificationsPermissionRequested by NotificationsPermissionRequested.Impl() {
   private var recyclerViewStartLayoutInstant: ComparableTimeMark? = null
@@ -65,7 +66,7 @@ class WaypointsActivity :
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    recyclerViewAdapter = WaypointsAdapter()
+    recyclerViewAdapter = WaypointsAdapter(this)
     postNotificationsPermissionInit(this, preferences, notificationsStash)
     DataBindingUtil.setContentView<UiWaypointsBinding>(this, R.layout.ui_waypoints).apply {
       vm = viewModel
