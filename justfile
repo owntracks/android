@@ -30,3 +30,6 @@ sync-i18n:
 
 local-stack:
     cd util/mqtt-local && podman-compose up
+
+mqtt-subscribe:
+    mosquitto_sub -L mqtt://localhost/owntracks/# -u test -P test
