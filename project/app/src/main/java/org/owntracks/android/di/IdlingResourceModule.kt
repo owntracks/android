@@ -9,6 +9,7 @@ import javax.inject.Singleton
 import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.test.CountingIdlingResourceShim
 import org.owntracks.android.test.IdlingResourceWithData
+import org.owntracks.android.test.IdlingResourceWithDataNoop
 import org.owntracks.android.test.SimpleIdlingResource
 
 @InstallIn(SingletonComponent::class)
@@ -87,7 +88,7 @@ class IdlingResourceModule {
   @Singleton
   @Named("messageReceivedIdlingResource")
   fun provideLocationMessageIdlingResource(): IdlingResourceWithData<MessageBase> =
-      IdlingResourceWithData("messageReceivedIdlingResource", compareBy { it.messageId })
+      IdlingResourceWithDataNoop()
 
   @Provides
   @Singleton

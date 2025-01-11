@@ -10,6 +10,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -43,7 +44,7 @@ class WaypointsMigrationFromObjectboxTest(private val parameter: Parameter) {
           RoomWaypointsRepo(context, dispatcher, CoroutineScope(SupervisorJob()))
 
       Espresso.onIdle()
-      assertEquals(parameter.expectedCount, roomWaypointsRepo.all.size)
+      runBlocking { assertEquals(parameter.expectedCount, roomWaypointsRepo.getAll().size) }
     }
   }
 

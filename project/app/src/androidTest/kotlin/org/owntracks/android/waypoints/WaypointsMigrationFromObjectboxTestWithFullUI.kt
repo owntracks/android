@@ -37,7 +37,7 @@ class WaypointsMigrationFromObjectboxTestWithFullUI :
     TestWithAnActivity<WaypointsActivity>(WaypointsActivity::class.java, false) {
 
   @Inject
-  @Named("migrationIdlingResource")
+  @Named("waypointsMigrationIdlingResource")
   lateinit var migrationIdlingResource: SimpleIdlingResource
 
   private fun setupActivity(dataBytes: ByteArray) {

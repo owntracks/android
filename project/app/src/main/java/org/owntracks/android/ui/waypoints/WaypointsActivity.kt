@@ -14,6 +14,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+import javax.inject.Named
+import kotlin.time.ComparableTimeMark
+import kotlin.time.TimeSource
 import kotlinx.coroutines.launch
 import org.owntracks.android.R
 import org.owntracks.android.data.waypoints.WaypointModel
@@ -30,10 +34,6 @@ import org.owntracks.android.ui.mixins.NotificationsPermissionRequested
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import org.owntracks.android.ui.waypoint.WaypointActivity
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Named
-import kotlin.time.ComparableTimeMark
-import kotlin.time.TimeSource
 
 @AndroidEntryPoint
 class WaypointsActivity :
@@ -77,7 +77,6 @@ class WaypointsActivity :
         adapter = recyclerViewAdapter
         emptyView = placeholder
         viewTreeObserver.addOnGlobalLayoutListener {
-          Timber.tag("ARSE_WaypointsActivity").v("global layout changed")
           if (recyclerViewStartLayoutInstant != null) {
             this@WaypointsActivity.recyclerViewStartLayoutInstant?.run {
               Timber.tag("ARSE_WaypointsActivity")
@@ -89,12 +88,15 @@ class WaypointsActivity :
         }
       }
     }
+
     lifecycleScope.launch {
-      lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        viewModel.waypoints.collect {
-          Timber.tag("ARSE_WaypointsActivity").i("Got waypoints list $it")
-          recyclerViewStartLayoutInstant = TimeSource.Monotonic.markNow()
-          recyclerViewAdapter.submitList(it)
+      lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+        launch {
+          viewModel.waypointsFlow.collect {
+            Timber.tag("ARSE_WaypointsActivity").d("Received set of waypoints $it")
+            recyclerViewStartLayoutInstant = TimeSource.Monotonic.markNow()
+            recyclerViewAdapter.submitList(it)
+          }
         }
       }
     }

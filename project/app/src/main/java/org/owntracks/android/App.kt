@@ -1,6 +1,5 @@
 package org.owntracks.android
 
-import android.Manifest
 import android.app.ActivityManager
 import android.app.Application
 import android.app.Notification
@@ -8,14 +7,11 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.ComponentCallbacks2
 import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.StrictMode
 import androidx.annotation.MainThread
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.app.ActivityCompat
-import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.databinding.DataBindingUtil
 import androidx.hilt.work.HiltWorkerFactory
@@ -43,7 +39,6 @@ import org.owntracks.android.preferences.types.AppTheme
 import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.RunThingsOnOtherThreads
-import org.owntracks.android.support.receiver.StartBackgroundServiceReceiver
 import org.owntracks.android.test.SimpleIdlingResource
 import timber.log.Timber
 
@@ -51,7 +46,7 @@ import timber.log.Timber
 class App : BaseApp() {
   override fun onCreate() {
     super.onCreate()
-//    StartBackgroundServiceReceiver.enable(this)
+    //    StartBackgroundServiceReceiver.enable(this)
   }
 }
 
@@ -291,7 +286,6 @@ open class BaseApp :
   fun migratePreferences() {
     preferencesStore.migrate()
   }
-
 
   override fun onTrimMemory(level: Int) {
     Timber.w(

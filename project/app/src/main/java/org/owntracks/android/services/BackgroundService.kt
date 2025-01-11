@@ -192,7 +192,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
         launch {
           waypointsRepo.migrationCompleteFlow.collect {
             if (it) {
-              waypointsRepo.operations.collect { waypointOperation ->
+              waypointsRepo.repoChangedEvent.collect { waypointOperation ->
                 when (waypointOperation) {
                   is WaypointsRepo.WaypointOperation.Insert ->
                       locationProcessor.publishWaypointMessage(waypointOperation.waypoint)
@@ -563,7 +563,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
     if (requirementsChecker.hasLocationPermissions()) {
 
       withContext(ioDispatcher) {
-        val waypoints = waypointsRepo.all
+        val waypoints = waypointsRepo.getAll()
         Timber.i("Setting up geofences for ${waypoints.size} waypoints")
         val geofences =
             waypoints

@@ -353,7 +353,19 @@ internal constructor(
     compassOrientationMapListener.onScroll(null)
   }
 
-  override fun drawRegions(regions: Set<WaypointModel>) {
+  override fun addRegion(waypoint: WaypointModel) {
+    TODO("Not yet implemented")
+  }
+
+  override fun deleteRegion(waypoint: WaypointModel) {
+    TODO("Not yet implemented")
+  }
+
+  override fun updateRegion(waypoint: WaypointModel) {
+    TODO("Not yet implemented")
+  }
+
+  override fun reDrawRegions(regions: Set<WaypointModel>) {
     if (preferences.showRegionsOnMap) {
       mapView?.run {
         Timber.d("Drawing ${regions.size} regions on map")

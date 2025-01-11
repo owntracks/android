@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import org.owntracks.android.R
 import org.owntracks.android.data.waypoints.WaypointModel
 import org.owntracks.android.databinding.UiRowWaypointBinding
+import timber.log.Timber
 
 class WaypointsAdapter :
     ListAdapter<WaypointModel, WaypointsAdapter.WaypointViewHolder>(WAYPOINT_COMPARATOR) {
@@ -19,7 +20,7 @@ class WaypointsAdapter :
     return WaypointViewHolder(binding)
   }
 
-  override fun onBindViewHolder(holder: WaypointViewHolder, position: Int) {
+   override fun onBindViewHolder(holder: WaypointViewHolder, position: Int) {
     holder.bind(getItem(position))
   }
 
@@ -35,11 +36,14 @@ class WaypointsAdapter :
     private val WAYPOINT_COMPARATOR =
         object : DiffUtil.ItemCallback<WaypointModel>() {
           override fun areItemsTheSame(oldItem: WaypointModel, newItem: WaypointModel): Boolean {
-            return oldItem.id == newItem.id
+            return oldItem.tst == newItem.tst
           }
 
           override fun areContentsTheSame(oldItem: WaypointModel, newItem: WaypointModel): Boolean {
-            return oldItem == newItem
+            return oldItem.description == newItem.description &&
+                oldItem.geofenceLatitude == newItem.geofenceLatitude &&
+                oldItem.geofenceLongitude == newItem.geofenceLongitude &&
+                oldItem.geofenceRadius == newItem.geofenceRadius
           }
         }
   }

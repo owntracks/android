@@ -13,25 +13,22 @@ import androidx.room.Transaction
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import androidx.room.Upsert
-import com.google.flatbuffers.Constants
-import com.google.flatbuffers.FlatBufferBuilder
-import com.google.flatbuffers.Table
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.owntracks.android.di.ApplicationScope
 import org.owntracks.android.di.CoroutineScopes
 import org.owntracks.android.location.geofencing.Latitude
 import org.owntracks.android.location.geofencing.Longitude
+import timber.log.Timber
 
 @Singleton
 class RoomWaypointsRepo
@@ -40,15 +37,13 @@ constructor(
     @ApplicationContext private val applicationContext: Context,
     @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val scope: CoroutineScope
-) : WaypointsRepo(scope,applicationContext,ioDispatcher) {
+) : WaypointsRepo(applicationContext) {
   @Dao
   interface WaypointDao {
     @Query("SELECT * FROM WaypointModel WHERE id = :id") fun get(id: Long): WaypointModel?
 
     @Query("SELECT * FROM WaypointModel WHERE tst = :tst")
     fun getByTst(tst: Instant): WaypointModel?
-
-    @Query("SELECT * FROM WaypointModel") fun allLive(): Flow<List<WaypointModel>>
 
     @Query("SELECT * FROM WaypointModel") fun all(): List<WaypointModel>
 
@@ -76,16 +71,13 @@ constructor(
       Room.databaseBuilder(applicationContext, WaypointDatabase::class.java, "waypoints").build()
 
   override suspend fun getByTst(instant: Instant): WaypointModel? =
-      db.waypointDao().getByTst(instant)
+      withContext(ioDispatcher) { db.waypointDao().getByTst(instant) }
 
   override suspend fun get(id: Long): WaypointModel? =
       withContext(ioDispatcher) { db.waypointDao().get(id) }
 
-  override val all: List<WaypointModel>
-    get() = db.waypointDao().all()
-
-  override val allLive: Flow<List<WaypointModel>>
-    get() = db.waypointDao().allLive()
+  override suspend fun getAll(): List<WaypointModel> =
+      withContext(ioDispatcher) { db.waypointDao().all() }
 
   override suspend fun clearImpl() {
     db.waypointDao().deleteAll()
@@ -105,7 +97,6 @@ constructor(
 
   private val _migrationCompleteFlow = MutableStateFlow(false)
   override val migrationCompleteFlow: StateFlow<Boolean> = _migrationCompleteFlow
-
 
   /**
    * A converter that tells Room how to store [java.time.Instant]
@@ -130,5 +121,11 @@ constructor(
 
     @TypeConverter fun fromLongitude(longitude: Longitude): Double = longitude.value
   }
-}
 
+  init {
+    val handler = CoroutineExceptionHandler { _, exception ->
+      Timber.e(exception, "Error migrating waypoints")
+    }
+    scope.launch(ioDispatcher + handler) { migrateFromLegacyStorage() }
+  }
+}

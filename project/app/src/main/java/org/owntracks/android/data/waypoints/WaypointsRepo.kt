@@ -5,33 +5,16 @@ import com.growse.lmdb_kt.Environment
 import java.nio.ByteBuffer
 import java.time.Instant
 import kotlin.time.measureTimedValue
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import org.owntracks.android.location.geofencing.Latitude
 import org.owntracks.android.location.geofencing.Longitude
 import org.owntracks.android.model.messages.MessageWaypoint
 import org.owntracks.android.support.MessageWaypointCollection
 import timber.log.Timber
 
-abstract class WaypointsRepo
-protected constructor(
-    private val scope: CoroutineScope,
-    private val applicationContext: Context,
-    private val ioDispatcher: CoroutineDispatcher
-) {
-  init {
-    val handler = CoroutineExceptionHandler { _, exception ->
-      Timber.e(exception, "Error migrating waypoints")
-    }
-    scope.launch(ioDispatcher + handler) { migrateFromLegacyStorage() }
-  }
-
+abstract class WaypointsRepo protected constructor(private val applicationContext: Context) {
   sealed class WaypointOperation {
     data class Insert(val waypoint: WaypointModel) : WaypointOperation()
 
@@ -46,23 +29,29 @@ protected constructor(
 
   abstract suspend fun getByTst(instant: Instant): WaypointModel?
 
-  abstract val all: List<WaypointModel>
+  abstract suspend fun getAll(): List<WaypointModel>
 
-  private val mutableOperations = MutableSharedFlow<WaypointOperation>()
-  val operations: SharedFlow<WaypointOperation> = mutableOperations
+  private val mutableRepoChangedEvent = MutableSharedFlow<WaypointOperation>()
+  val repoChangedEvent: SharedFlow<WaypointOperation> = mutableRepoChangedEvent
 
   suspend fun insert(waypointModel: WaypointModel) {
     waypointModel.run {
       insertImpl(this@run)
-      mutableOperations.emit(WaypointOperation.Insert(this@run))
+      mutableRepoChangedEvent.emit(WaypointOperation.Insert(this@run))
     }
+  }
+
+  private suspend fun insertAll(waypoints: List<WaypointModel>) {
+    waypoints
+        .apply { insertAllImpl(this) }
+        .forEach { mutableRepoChangedEvent.emit(WaypointOperation.Insert(it)) }
   }
 
   suspend fun update(waypointModel: WaypointModel, notify: Boolean) {
     waypointModel.run {
       updateImpl(this@run)
       if (notify) {
-        mutableOperations.emit(WaypointOperation.Update(this@run))
+        mutableRepoChangedEvent.emit(WaypointOperation.Update(this@run))
       }
     }
   }
@@ -70,13 +59,13 @@ protected constructor(
   suspend fun delete(waypointModel: WaypointModel) {
     waypointModel.run {
       deleteImpl(this@run)
-      mutableOperations.emit(WaypointOperation.Delete(this@run))
+      mutableRepoChangedEvent.emit(WaypointOperation.Delete(this@run))
     }
   }
 
   suspend fun clearAll() {
     clearImpl()
-    mutableOperations.emit(WaypointOperation.Clear)
+    mutableRepoChangedEvent.emit(WaypointOperation.Clear)
   }
 
   /**
@@ -100,7 +89,7 @@ protected constructor(
               }
         }
         ?.map { toDaoObject(it) }
-        ?.run { insertAllImpl(this) }
+        ?.run { insertAll(this) }
   }
 
   private fun toDaoObject(messageWaypoint: MessageWaypoint): WaypointModel {
@@ -137,7 +126,7 @@ protected constructor(
 
   abstract val migrationCompleteFlow: StateFlow<Boolean>
 
-  private suspend fun migrateFromLegacyStorage() {
+  protected suspend fun migrateFromLegacyStorage() {
     try {
       val objectboxPath = applicationContext.filesDir.resolve("objectbox/objectbox")
       if (objectboxPath.exists() && objectboxPath.canRead() && objectboxPath.isDirectory) {
@@ -170,11 +159,9 @@ protected constructor(
                     }
               }
         }
-        //          db.waypointDao().getRowCount().let { rowCount ->
-        //            Timber.i(
-        //                "Waypoints Migration complete in ${migrationDuration.duration}. Tried to
-        // insert ${migrationDuration.value}, ended up with $rowCount waypoints in the repo")
-        //          }
+
+        Timber.i(
+            "Waypoints Migration complete in ${migrationDuration.duration}. Migrated ${migrationDuration.value} waypoints")
       }
     } catch (e: Throwable) {
       Timber.tag("ARSE_RoomWaypointsRepo").e(e, "Error migrating waypoints")
