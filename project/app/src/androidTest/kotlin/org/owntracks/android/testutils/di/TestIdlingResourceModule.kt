@@ -8,8 +8,8 @@ import javax.inject.Named
 import javax.inject.Singleton
 import org.owntracks.android.di.IdlingResourceModule
 import org.owntracks.android.model.messages.MessageBase
-import org.owntracks.android.test.ThresholdIdlingResourceInterface
 import org.owntracks.android.test.IdlingResourceWithData
+import org.owntracks.android.test.ThresholdIdlingResourceInterface
 import org.owntracks.android.testutils.idlingresources.IdlingResourceWithDataImpl
 import org.owntracks.android.testutils.idlingresources.TestThresholdIdlingResource
 
@@ -19,7 +19,8 @@ class TestIdlingResourceModule {
   /**
    * This idling resource is idled when the outgoing message queue becomes empty
    *
-   * @return a [ThresholdIdlingResourceInterface] representing the size of the outgoing message queue
+   * @return a [ThresholdIdlingResourceInterface] representing the size of the outgoing message
+   *   queue
    */
   @Provides
   @Named("outgoingQueueIdlingResource")

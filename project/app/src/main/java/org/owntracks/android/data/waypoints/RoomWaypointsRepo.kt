@@ -16,6 +16,7 @@ import androidx.room.Upsert
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.Instant
 import javax.inject.Inject
+import javax.inject.Named
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -30,7 +31,6 @@ import org.owntracks.android.location.geofencing.Latitude
 import org.owntracks.android.location.geofencing.Longitude
 import org.owntracks.android.test.SimpleIdlingResource
 import timber.log.Timber
-import javax.inject.Named
 
 @Singleton
 class RoomWaypointsRepo
@@ -39,8 +39,9 @@ constructor(
     @ApplicationContext private val applicationContext: Context,
     @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val scope: CoroutineScope,
-    @Named("waypointsMigrationIdlingResource")  private val migrationIdlingResource: SimpleIdlingResource
-) : WaypointsRepo(applicationContext,migrationIdlingResource) {
+    @Named("waypointsMigrationIdlingResource")
+    private val migrationIdlingResource: SimpleIdlingResource
+) : WaypointsRepo(applicationContext, migrationIdlingResource) {
   @Dao
   interface WaypointDao {
     @Query("SELECT * FROM WaypointModel WHERE id = :id") fun get(id: Long): WaypointModel?

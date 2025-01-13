@@ -50,33 +50,33 @@ import org.owntracks.android.preferences.Preferences.Companion.PREFERENCES_THAT_
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
-import org.owntracks.android.test.ThresholdIdlingResourceInterface
 import org.owntracks.android.test.IdlingResourceWithData
 import org.owntracks.android.test.SimpleIdlingResource
+import org.owntracks.android.test.ThresholdIdlingResourceInterface
 import timber.log.Timber
 
 @Singleton
 class MessageProcessor
 @Inject
 constructor(
-  @ApplicationContext private val applicationContext: Context,
-  private val contactsRepo: ContactsRepo,
-  private val preferences: Preferences,
-  private val waypointsRepo: WaypointsRepo,
-  private val parser: Parser,
-  private val scheduler: Scheduler,
-  private val endpointStateRepo: EndpointStateRepo,
-  @Named("outgoingQueueIdlingResource")
+    @ApplicationContext private val applicationContext: Context,
+    private val contactsRepo: ContactsRepo,
+    private val preferences: Preferences,
+    private val waypointsRepo: WaypointsRepo,
+    private val parser: Parser,
+    private val scheduler: Scheduler,
+    private val endpointStateRepo: EndpointStateRepo,
+    @Named("outgoingQueueIdlingResource")
     private val outgoingQueueIdlingResource: ThresholdIdlingResourceInterface,
-  @Named("importConfigurationIdlingResource")
+    @Named("importConfigurationIdlingResource")
     private val importConfigurationIdlingResource: SimpleIdlingResource,
-  @Named("messageReceivedIdlingResource")
+    @Named("messageReceivedIdlingResource")
     private val messageReceivedIdlingResource: IdlingResourceWithData<MessageBase>,
-  @Named("CAKeyStore") private val caKeyStore: KeyStore,
-  private val locationProcessorLazy: Lazy<LocationProcessor>,
-  @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-  @ApplicationScope private val scope: CoroutineScope,
-  @Named("mqttConnectionIdlingResource")
+    @Named("CAKeyStore") private val caKeyStore: KeyStore,
+    private val locationProcessorLazy: Lazy<LocationProcessor>,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @ApplicationScope private val scope: CoroutineScope,
+    @Named("mqttConnectionIdlingResource")
     private val mqttConnectionIdlingResource: SimpleIdlingResource
 ) : Preferences.OnPreferenceChangeListener {
   private var endpoint: MessageProcessorEndpoint? = null

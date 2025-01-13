@@ -4,7 +4,6 @@ import androidx.test.espresso.IdlingResource.ResourceCallback
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.concurrent.Volatile
 import org.owntracks.android.test.ThresholdIdlingResourceInterface
-import timber.log.Timber
 
 /**
  * A working implementation of [ThresholdIdlingResourceInterface] around a
@@ -24,26 +23,21 @@ class TestThresholdIdlingResource(private val name: String) : ThresholdIdlingRes
 
   override fun getName(): String = name
 
-  override fun isIdleNow(): Boolean =
-      value.get().also { Timber.tag("ARSE").d("Counter idle check. $it") }.run { this == threshold }
+  override fun isIdleNow(): Boolean = value.get().run { this == threshold }
 
   private var value = AtomicInteger(0)
 
   override fun increment() {
-    value.incrementAndGet().also { Timber.tag("ARSE").d("Incremented value to $it") }
+    value.incrementAndGet().also { if (isIdleNow) resourceCallback?.onTransitionToIdle() }
   }
 
   override fun set(value: Int) {
-    this.value.set(value).also { Timber.tag("ARSE").d("Set value to $value") }
+    this.value.set(value).also { if (isIdleNow) resourceCallback?.onTransitionToIdle() }
+  }
+
+  override fun decrement() {
+    value.decrementAndGet().also { if (isIdleNow) resourceCallback?.onTransitionToIdle() }
   }
 
   override var threshold: Int = 0
-    set(value) {
-      field = value
-      Timber.tag("ARSE").d("Set threshold to $value")
-    }
-
-  override fun decrement() {
-    value.decrementAndGet().also { Timber.tag("ARSE").d("Decremented value to $it") }
-  }
 }

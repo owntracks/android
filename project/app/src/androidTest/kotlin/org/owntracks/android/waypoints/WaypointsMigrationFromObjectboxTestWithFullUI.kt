@@ -20,8 +20,8 @@ import org.junit.Assert
 import org.junit.Ignore
 import org.junit.Test
 import org.owntracks.android.R
-import org.owntracks.android.test.ThresholdIdlingResourceInterface
 import org.owntracks.android.test.SimpleIdlingResource
+import org.owntracks.android.test.ThresholdIdlingResourceInterface
 import org.owntracks.android.testutils.JustThisTestPlease
 import org.owntracks.android.testutils.RecyclerViewLayoutCompleteIdlingResource
 import org.owntracks.android.testutils.TestWithAnActivity
@@ -30,8 +30,10 @@ import org.owntracks.android.testutils.use
 import org.owntracks.android.testutils.waitUntilActivityVisible
 import org.owntracks.android.ui.waypoints.WaypointsActivity
 import timber.log.Timber
+import kotlin.time.Duration.Companion.minutes
 
 @MediumTest
+//@JustThisTestPlease
 @HiltAndroidTest
 class WaypointsMigrationFromObjectboxTestWithFullUI :
     TestWithAnActivity<WaypointsActivity>(WaypointsActivity::class.java, false) {
@@ -60,7 +62,6 @@ class WaypointsMigrationFromObjectboxTestWithFullUI :
   }
 
   @Test
-  @Ignore
   fun migratingAnEmptyObjectboxProducesZeroWaypoints() {
     val dataBytes = this.javaClass.getResource("/objectbox-lmdbs/empty/data.mdb")!!.readBytes()
     setupActivity(dataBytes)
@@ -69,25 +70,24 @@ class WaypointsMigrationFromObjectboxTestWithFullUI :
   }
 
   @Test
-  @JustThisTestPlease
   fun migratingAnObjectboxWithSinglePointProducesOneWaypoint() {
-    waypointsEventCountingIdlingResource.threshold=1
+    waypointsEventCountingIdlingResource.threshold = 1
     val dataBytes =
         this.javaClass.getResource("/objectbox-lmdbs/single-waypoint/data.mdb")!!.readBytes()
     setupActivity(dataBytes)
     val waypointsActivityIdlingResource =
         RecyclerViewLayoutCompleteIdlingResource(baristaRule.activityTestRule.activity)
-sleep(5000)
-    migrationIdlingResource.use { Espresso.onIdle() }
-    waypointsEventCountingIdlingResource.use { Espresso.onIdle() }
-    waypointsActivityIdlingResource.use {
-      assertDisplayed(R.id.waypointsRecyclerView)
-      assertRecyclerViewItemCount(R.id.waypointsRecyclerView, 1)
+    migrationIdlingResource.use {
+      waypointsEventCountingIdlingResource.use {
+        waypointsActivityIdlingResource.use {
+          assertDisplayed(R.id.waypointsRecyclerView)
+          assertRecyclerViewItemCount(R.id.waypointsRecyclerView, 1)
+        }
+      }
     }
   }
 
   @Test
-  //  @JustThisTestPlease
   fun migratingAnObjectboxWith10PointsProduces10Waypoints() {
     waypointsEventCountingIdlingResource.threshold = 10
     val dataBytes =
@@ -107,7 +107,7 @@ sleep(5000)
   }
 
   @Test
-  //  @JustThisTestPlease
+  @JustThisTestPlease
   fun migratingAnObjectboxWith5000PointsProduces5000Waypoints() {
     waypointsEventCountingIdlingResource.threshold = 5000
     val dataBytes =
@@ -118,7 +118,7 @@ sleep(5000)
 
     migrationIdlingResource.use {
       waypointsEventCountingIdlingResource.use {
-        waypointsActivityIdlingResource.use {
+        waypointsActivityIdlingResource.use(1.minutes) {
           assertDisplayed(R.id.waypointsRecyclerView)
           assertRecyclerViewItemCount(R.id.waypointsRecyclerView, 5000)
         }
@@ -132,8 +132,7 @@ sleep(5000)
     val random = Random(1)
     setupActivity(random.nextBytes(4096))
 
-    migrationIdlingResource.use { Espresso.onIdle() }
-    assertNotDisplayed(R.id.waypointsRecyclerView)
+    migrationIdlingResource.use { assertNotDisplayed(R.id.waypointsRecyclerView) }
 
     val notificationManager =
         app.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

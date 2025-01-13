@@ -25,10 +25,9 @@ import org.junit.runner.RunWith
 import org.owntracks.android.BaseApp
 import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.services.BackgroundService
-import org.owntracks.android.test.ThresholdIdlingResourceInterface
-
 import org.owntracks.android.test.IdlingResourceWithData
 import org.owntracks.android.test.SimpleIdlingResource
+import org.owntracks.android.test.ThresholdIdlingResourceInterface
 import org.owntracks.android.testutils.rules.ScreenshotTakingOnTestEndRule
 import shark.AndroidReferenceMatchers
 import timber.log.Timber
