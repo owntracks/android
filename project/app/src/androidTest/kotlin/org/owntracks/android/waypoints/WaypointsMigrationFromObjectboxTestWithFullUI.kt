@@ -10,12 +10,12 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.assertion.BaristaRecyclerViewAssertions.assertRecyclerViewItemCount
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
-import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import com.adevinta.android.barista.interaction.PermissionGranter.allowPermissionsIfNeeded
 import dagger.hilt.android.testing.HiltAndroidTest
 import javax.inject.Inject
 import javax.inject.Named
 import kotlin.random.Random
+import kotlin.time.Duration.Companion.minutes
 import org.junit.Assert
 import org.junit.Ignore
 import org.junit.Test
@@ -30,10 +30,9 @@ import org.owntracks.android.testutils.use
 import org.owntracks.android.testutils.waitUntilActivityVisible
 import org.owntracks.android.ui.waypoints.WaypointsActivity
 import timber.log.Timber
-import kotlin.time.Duration.Companion.minutes
 
 @MediumTest
-//@JustThisTestPlease
+@JustThisTestPlease
 @HiltAndroidTest
 class WaypointsMigrationFromObjectboxTestWithFullUI :
     TestWithAnActivity<WaypointsActivity>(WaypointsActivity::class.java, false) {

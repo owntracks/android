@@ -6,7 +6,6 @@ import androidx.test.espresso.Espresso
 import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
 import dagger.hilt.android.testing.HiltAndroidTest
-import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -18,7 +17,6 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.owntracks.android.data.waypoints.RoomWaypointsRepo
 import org.owntracks.android.test.SimpleIdlingResource
-import org.owntracks.android.testutils.idlingresources.EspressoTrackedDispatcher
 import org.owntracks.android.testutils.use
 
 @SmallTest
@@ -39,17 +37,21 @@ class WaypointsMigrationFromObjectboxTest(private val parameter: Parameter) {
       mkdirs()
       resolve("data.mdb").run { outputStream().use { it.write(dataBytes) } }
     }
-    val dispatcher = EspressoTrackedDispatcher(Dispatchers.IO)
-    dispatcher.idlingResource.use(2.minutes) {
-      val roomWaypointsRepo =
-          RoomWaypointsRepo(
-              context,
-              dispatcher,
-              CoroutineScope(SupervisorJob()),
-              SimpleIdlingResource("waypointsMigrationIdlingResource", false))
 
-      Espresso.onIdle()
-      runBlocking { assertEquals(parameter.expectedCount, roomWaypointsRepo.getAll().size) }
+    val migrationIdlingResource = SimpleIdlingResource("waypointsMigrationIdlingResource", false)
+    val roomWaypointsRepo =
+        RoomWaypointsRepo(
+            context,
+            Dispatchers.IO.limitedParallelism(1),
+            CoroutineScope(SupervisorJob()),
+            migrationIdlingResource,
+        )
+    migrationIdlingResource.use { Espresso.onIdle() }
+    runBlocking {
+      assertEquals(
+          parameter.expectedCount,
+          roomWaypointsRepo.getAll().size,
+      )
     }
   }
 

@@ -91,7 +91,10 @@ constructor(
       withContext(ioDispatcher) { db.waypointDao().upsert(waypointModel) }
 
   override suspend fun insertAllImpl(waypoints: List<WaypointModel>) =
-      withContext(ioDispatcher) { db.waypointDao().insertAll(waypoints) }
+      withContext(ioDispatcher) {
+        Timber.tag("ARSE_RoomWaypointsRepo").d("Inserting ${waypoints.size} waypoints")
+        db.waypointDao().insertAll(waypoints)
+      }
 
   override suspend fun updateImpl(waypointModel: WaypointModel) =
       withContext(ioDispatcher) { db.waypointDao().upsert(waypointModel) }
