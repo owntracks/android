@@ -25,4 +25,4 @@ Both flavours are published as an APK to Github releases.
 
 Pull requests welcome! Please see [CONTRIBUTING.md](https://github.com/owntracks/android/blob/master/CONTRIBUTING.md) for details on how to build the project locally.
 
-If you spot a translation issue or want to help contribute translating the app into other languages, you can visit [POEditor](https://poeditor.com/projects/view?id=419041) and help out.
+If you spot a translation issue or want to help contribute translating the app into other languages, you can visit [POEditor](https://poeditor.com/join/project?hash=xe6LPP0Jnx) and help out.
