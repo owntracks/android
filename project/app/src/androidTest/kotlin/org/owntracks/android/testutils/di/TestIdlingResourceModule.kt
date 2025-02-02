@@ -50,4 +50,10 @@ class TestIdlingResourceModule {
   @Named("waypointsEventCountingIdlingResource")
   fun provideWaypointsEventCountingIdlingResource(): ThresholdIdlingResourceInterface =
       TestThresholdIdlingResource("waypointsEventCountingIdlingResource")
+
+  @Provides
+  @Singleton
+  @Named("waypointsRecyclerViewIdlingResource")
+  fun provideWaypointsRecyclerViewIdlingResource(): ThresholdIdlingResourceInterface =
+      TestThresholdIdlingResource("waypointsRecyclerViewIdlingResource")
 }

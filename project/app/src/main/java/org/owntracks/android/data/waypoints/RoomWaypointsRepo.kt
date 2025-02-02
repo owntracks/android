@@ -92,7 +92,7 @@ constructor(
 
   override suspend fun insertAllImpl(waypoints: List<WaypointModel>) =
       withContext(ioDispatcher) {
-        Timber.tag("ARSE_RoomWaypointsRepo").d("Inserting ${waypoints.size} waypoints")
+        Timber.d("Inserting ${waypoints.size} waypoints")
         db.waypointDao().insertAll(waypoints)
       }
 

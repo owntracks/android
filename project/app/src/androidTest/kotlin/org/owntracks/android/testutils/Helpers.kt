@@ -146,13 +146,14 @@ inline fun IdlingResource?.use(timeout: Duration = 15.seconds, block: () -> Unit
   IdlingPolicies.setIdlingResourceTimeout(timeout.inWholeSeconds, TimeUnit.SECONDS)
   try {
     this?.run {
-      Timber.i("Registering idling resource ${this.name}")
+      Timber.tag("ARSE").i("Registering idling resource ${this.name}")
       IdlingRegistry.getInstance().register(this)
+      Timber.tag("ARSE").i("${this.name} is now idle ")
     }
     block()
   } finally {
     this?.run {
-      Timber.i("Unregistering idling resource ${this.name}")
+      Timber.tag("ARSE").i("Unregistering idling resource ${this.name}")
       IdlingRegistry.getInstance().unregister(this)
     }
   }

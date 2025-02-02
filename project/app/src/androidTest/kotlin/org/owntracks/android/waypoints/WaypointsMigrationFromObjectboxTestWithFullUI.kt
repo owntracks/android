@@ -1,40 +1,32 @@
 package org.owntracks.android.waypoints
 
 import android.Manifest.permission.POST_NOTIFICATIONS
-import android.app.Notification
-import android.app.NotificationManager
-import android.content.Context
 import androidx.test.espresso.Espresso
 import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.assertion.BaristaRecyclerViewAssertions.assertRecyclerViewItemCount
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
-import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
 import com.adevinta.android.barista.interaction.PermissionGranter.allowPermissionsIfNeeded
 import dagger.hilt.android.testing.HiltAndroidTest
 import javax.inject.Inject
 import javax.inject.Named
-import kotlin.random.Random
-import kotlin.time.Duration.Companion.minutes
-import org.junit.Assert
-import org.junit.Ignore
+import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 import org.owntracks.android.R
 import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.test.ThresholdIdlingResourceInterface
-import org.owntracks.android.testutils.JustThisTestPlease
-import org.owntracks.android.testutils.RecyclerViewLayoutCompleteIdlingResource
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.setNotFirstStartPreferences
 import org.owntracks.android.testutils.use
 import org.owntracks.android.testutils.waitUntilActivityVisible
 import org.owntracks.android.ui.waypoints.WaypointsActivity
-import timber.log.Timber
 
 @MediumTest
-@JustThisTestPlease
+@RunWith(Parameterized::class)
 @HiltAndroidTest
-class WaypointsMigrationFromObjectboxTestWithFullUI :
+class WaypointsMigrationFromObjectboxTestWithFullUI(private val parameter: Parameter) :
     TestWithAnActivity<WaypointsActivity>(WaypointsActivity::class.java, false) {
 
   @Inject
@@ -44,6 +36,15 @@ class WaypointsMigrationFromObjectboxTestWithFullUI :
   @Inject
   @Named("waypointsEventCountingIdlingResource")
   lateinit var waypointsEventCountingIdlingResource: ThresholdIdlingResourceInterface
+
+  @Inject
+  @Named("waypointsRecyclerViewIdlingResource")
+  lateinit var waypointsRecyclerViewIdlingResource: ThresholdIdlingResourceInterface
+
+  @Before
+  fun clearLocalPackageData() {
+    InstrumentationRegistry.getInstrumentation().targetContext.deleteDatabase("waypoints")
+  }
 
   private fun setupActivity(dataBytes: ByteArray) {
     InstrumentationRegistry.getInstrumentation()
@@ -61,94 +62,68 @@ class WaypointsMigrationFromObjectboxTestWithFullUI :
   }
 
   @Test
-  fun migratingAnEmptyObjectboxProducesZeroWaypoints() {
-    val dataBytes = this.javaClass.getResource("/objectbox-lmdbs/empty/data.mdb")!!.readBytes()
+  fun migratingAnObjectboxDisplaysCorrectNumberOfWaypointsInActivity() {
+    waypointsEventCountingIdlingResource.threshold = parameter.expectedCount
+    waypointsRecyclerViewIdlingResource.threshold = parameter.expectedCount
+    val dataBytes =
+        this.javaClass.getResource("/objectbox-lmdbs/${parameter.dbName}/data.mdb")!!.readBytes()
     setupActivity(dataBytes)
+
     migrationIdlingResource.use { Espresso.onIdle() }
-    assertNotDisplayed(R.id.waypointsRecyclerView)
-  }
-
-  @Test
-  fun migratingAnObjectboxWithSinglePointProducesOneWaypoint() {
-    waypointsEventCountingIdlingResource.threshold = 1
-    val dataBytes =
-        this.javaClass.getResource("/objectbox-lmdbs/single-waypoint/data.mdb")!!.readBytes()
-    setupActivity(dataBytes)
-    val waypointsActivityIdlingResource =
-        RecyclerViewLayoutCompleteIdlingResource(baristaRule.activityTestRule.activity)
-    migrationIdlingResource.use {
-      waypointsEventCountingIdlingResource.use {
-        waypointsActivityIdlingResource.use {
-          assertDisplayed(R.id.waypointsRecyclerView)
-          assertRecyclerViewItemCount(R.id.waypointsRecyclerView, 1)
-        }
+    waypointsEventCountingIdlingResource.use { Espresso.onIdle() }
+    waypointsRecyclerViewIdlingResource.use {
+      Espresso.onIdle()
+      if (parameter.expectedCount == 0) {
+        assertDisplayed(R.id.placeholder)
+      } else {
+        assertDisplayed(R.id.waypointsRecyclerView)
+        assertRecyclerViewItemCount(R.id.waypointsRecyclerView, parameter.expectedCount)
       }
     }
   }
 
-  @Test
-  fun migratingAnObjectboxWith10PointsProduces10Waypoints() {
-    waypointsEventCountingIdlingResource.threshold = 10
-    val dataBytes =
-        this.javaClass.getResource("/objectbox-lmdbs/10-waypoints/data.mdb")!!.readBytes()
-    setupActivity(dataBytes)
-    val waypointsActivityIdlingResource =
-        RecyclerViewLayoutCompleteIdlingResource(baristaRule.activityTestRule.activity)
+  data class Parameter(val dbName: String, val expectedCount: Int) {
+    override fun toString(): String = dbName
+  }
 
-    migrationIdlingResource.use {
-      waypointsEventCountingIdlingResource.use {
-        waypointsActivityIdlingResource.use {
-          assertDisplayed(R.id.waypointsRecyclerView)
-          assertRecyclerViewItemCount(R.id.waypointsRecyclerView, 10)
-        }
-      }
+  companion object {
+    @JvmStatic
+    @Parameterized.Parameters(name = "{0}")
+    fun data(): Iterable<Parameter> {
+      return arrayListOf(
+          Parameter("single-waypoint", 1),
+          Parameter("10-waypoints", 10),
+          Parameter("5000-waypoints", 5000),
+          Parameter("empty", 0),
+          Parameter("3-created-by-real-device", 3),
+      )
     }
   }
-
-  @Test
-  @JustThisTestPlease
-  fun migratingAnObjectboxWith5000PointsProduces5000Waypoints() {
-    waypointsEventCountingIdlingResource.threshold = 5000
-    val dataBytes =
-        this.javaClass.getResource("/objectbox-lmdbs/5000-waypoints/data.mdb")!!.readBytes()
-    setupActivity(dataBytes)
-    val waypointsActivityIdlingResource =
-        RecyclerViewLayoutCompleteIdlingResource(baristaRule.activityTestRule.activity)
-
-    migrationIdlingResource.use {
-      waypointsEventCountingIdlingResource.use {
-        waypointsActivityIdlingResource.use(1.minutes) {
-          assertDisplayed(R.id.waypointsRecyclerView)
-          assertRecyclerViewItemCount(R.id.waypointsRecyclerView, 5000)
-        }
-      }
-    }
-  }
-
-  @Test
-  @Ignore
-  fun migratingACorruptObjectboxDatabaseGivesNoWaypointsAndANotification() {
-    val random = Random(1)
-    setupActivity(random.nextBytes(4096))
-
-    migrationIdlingResource.use { assertNotDisplayed(R.id.waypointsRecyclerView) }
-
-    val notificationManager =
-        app.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-    Assert.assertTrue(
-        "Event notification is displayed",
-        notificationManager.activeNotifications
-            .map { it.notification }
-            .also { notifications ->
-              notifications
-                  .map { it.extras.getString(Notification.EXTRA_TITLE) }
-                  .run { Timber.i("Current Notifications: $this") }
-            }
-            .any { notification ->
-              notification.extras.getString(Notification.EXTRA_TITLE) ==
-                  "Error migrating waypoints" &&
-                  notification.extras.getString(Notification.EXTRA_TEXT) ==
-                      "An error occurred whilst migrating waypoints. Some may not have been migrated, so check the logs and re-add."
-            })
-  }
+  //  @Test
+  //  @Ignore
+  //  fun migratingACorruptObjectboxDatabaseGivesNoWaypointsAndANotification() {
+  //    val random = Random(1)
+  //    setupActivity(random.nextBytes(4096))
+  //
+  //    migrationIdlingResource.use { assertNotDisplayed(R.id.waypointsRecyclerView) }
+  //
+  //    val notificationManager =
+  //        app.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+  //    Assert.assertTrue(
+  //        "Event notification is displayed",
+  //        notificationManager.activeNotifications
+  //            .map { it.notification }
+  //            .also { notifications ->
+  //              notifications
+  //                  .map { it.extras.getString(Notification.EXTRA_TITLE) }
+  //                  .run { Timber.i("Current Notifications: $this") }
+  //            }
+  //            .any { notification ->
+  //              notification.extras.getString(Notification.EXTRA_TITLE) ==
+  //                  "Error migrating waypoints" &&
+  //                  notification.extras.getString(Notification.EXTRA_TEXT) ==
+  //                      "An error occurred whilst migrating waypoints. Some may not have been
+  // migrated, so check the logs and re-add."
+  //            })
+  //  }
 }

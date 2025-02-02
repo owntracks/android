@@ -29,7 +29,6 @@ import org.owntracks.android.test.ThresholdIdlingResourceInterface
 import org.owntracks.android.ui.NotificationsStash
 import org.owntracks.android.ui.base.ClickHasBeenHandled
 import org.owntracks.android.ui.base.ClickListener
-import org.owntracks.android.ui.base.RecyclerViewLayoutCompleteListener
 import org.owntracks.android.ui.mixins.NotificationsPermissionRequested
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import org.owntracks.android.ui.waypoint.WaypointActivity
@@ -39,10 +38,8 @@ import timber.log.Timber
 class WaypointsActivity :
     AppCompatActivity(),
     ClickListener<WaypointModel>,
-    RecyclerViewLayoutCompleteListener.RecyclerViewIdlingCallback,
     NotificationsPermissionRequested by NotificationsPermissionRequested.Impl() {
   private var recyclerViewStartLayoutInstant: ComparableTimeMark? = null
-  private var layoutCompleteListener: RecyclerViewLayoutCompleteListener? = null
 
   @Inject lateinit var notificationsStash: NotificationsStash
 
@@ -60,6 +57,10 @@ class WaypointsActivity :
   @get:VisibleForTesting
   lateinit var publishResponseMessageIdlingResource: SimpleIdlingResource
 
+  @Inject
+  @Named("waypointsRecyclerViewIdlingResource")
+  lateinit var waypointsRecyclerViewIdlingResource: ThresholdIdlingResourceInterface
+
   private val viewModel: WaypointsViewModel by viewModels()
   private lateinit var recyclerViewAdapter: WaypointsAdapter
 
@@ -76,34 +77,15 @@ class WaypointsActivity :
         layoutManager = LinearLayoutManager(this@WaypointsActivity)
         adapter = recyclerViewAdapter
         emptyView = placeholder
-        var expectedItemCount = 0
         viewTreeObserver.addOnGlobalLayoutListener {
-          val layoutManager = layoutManager as LinearLayoutManager
-          val lastVisibleItem = layoutManager.findLastCompletelyVisibleItemPosition()
-          val totalItemCount = recyclerViewAdapter.itemCount
-          if (totalItemCount > 0 && lastVisibleItem >= 0) {
-            if (expectedItemCount != totalItemCount) {
-              // We've not drawn all the items in the adapter yet.
-              expectedItemCount = totalItemCount
-            } else if (layoutManager.findFirstCompletelyVisibleItemPosition() == 0 &&
-                (lastVisibleItem == totalItemCount - 1 || !canScrollVertically(1))) {
-              recyclerViewStartLayoutInstant?.run {
-                Timber.tag("ARSE_WaypointsActivity")
-                    .d(
-                        "Completed waypoints layout in ${this.elapsedNow()} " +
-                            "visible: $lastVisibleItem/$totalItemCount")
-              }
-              recyclerViewStartLayoutInstant = null
-              layoutCompleteListener?.onLayoutCompleted()
-            }
-          }
+          waypointsRecyclerViewIdlingResource.set(recyclerViewAdapter.itemCount)
         }
       }
 
       lifecycleScope.launch {
         lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
           viewModel.waypointsFlow.collect {
-            Timber.tag("ARSE_WaypointsActivity").d("Received set of ${it.size} waypoints")
+            Timber.d("Received set of ${it.size} waypoints")
             recyclerViewStartLayoutInstant = TimeSource.Monotonic.markNow()
             recyclerViewAdapter.submitList(it)
           }
@@ -128,14 +110,17 @@ class WaypointsActivity :
         startActivity(Intent(this, WaypointActivity::class.java))
         true
       }
+
       R.id.exportWaypointsService -> {
         viewModel.exportWaypoints()
         true
       }
+
       R.id.importWaypoints -> {
         startActivity(Intent(this, LoadActivity::class.java))
         true
       }
+
       else -> super.onOptionsItemSelected(item)
     }
   }
@@ -144,24 +129,4 @@ class WaypointsActivity :
     startActivity(Intent(this, WaypointActivity::class.java).putExtra("waypointId", thing.id))
     return true
   }
-
-  override fun setRecyclerViewLayoutCompleteListener(listener: RecyclerViewLayoutCompleteListener) {
-    this.layoutCompleteListener = listener
-  }
-
-  override fun removeRecyclerViewLayoutCompleteListener(
-      listener: RecyclerViewLayoutCompleteListener
-  ) {
-    if (this.layoutCompleteListener == listener) {
-      this.layoutCompleteListener = null
-    }
-  }
-
-  override val isRecyclerViewLayoutCompleted: Boolean
-    get() =
-        (recyclerViewStartLayoutInstant == null).also {
-          Timber.tag("ARSE_WaypointsActivity")
-              .v(
-                  "Being asked if I'm idle, saying $it because recyclerViewStartLayoutInstant is $recyclerViewStartLayoutInstant")
-        }
 }

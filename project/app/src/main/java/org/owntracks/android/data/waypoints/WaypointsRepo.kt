@@ -132,7 +132,7 @@ protected constructor(
   abstract val migrationCompleteFlow: StateFlow<Boolean>
 
   protected suspend fun migrateFromLegacyStorage() {
-    Timber.tag("ARSE_WaypointsRepo").i("Migrating waypoints from legacy storage")
+    Timber.i("Migrating waypoints from legacy storage")
     try {
       val objectboxPath = applicationContext.filesDir.resolve("objectbox/objectbox")
       if (objectboxPath.exists() && objectboxPath.canRead() && objectboxPath.isDirectory) {
@@ -154,7 +154,7 @@ protected constructor(
                     .toList()
                     .run {
                       insertAll(this)
-                      Timber.tag("ARSE_WaypointsRepo").d("Migrated ${this.size} waypoints")
+                      Timber.d("Migrated ${this.size} waypoints")
                       this.size
                     }
                     .run {
@@ -166,14 +166,13 @@ protected constructor(
               }
         }
 
-        Timber.tag("ARSE_WaypointsRepo")
-            .i(
-                "Waypoints Migration complete in ${migrationDuration.duration}. Migrated ${migrationDuration.value} waypoints")
+        Timber.i(
+            "Waypoints Migration complete in ${migrationDuration.duration}. Migrated ${migrationDuration.value} waypoints")
       }
     } catch (e: Throwable) {
-      Timber.tag("ARSE_WaypointsRepo").e(e, "Error migrating waypoints")
+      Timber.e(e, "Error migrating waypoints")
     } finally {
-      Timber.tag("ARSE_WaypointsRepo").d("Setting migration complete idlingresource")
+      Timber.d("Setting migration complete idlingresource")
       migrationIdlingResource.setIdleState(true)
     }
   }

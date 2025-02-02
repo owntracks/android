@@ -19,7 +19,6 @@ import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.IdlingResource.ResourceCallback
 import java.util.concurrent.atomic.AtomicBoolean
 import org.jetbrains.annotations.NotNull
-import timber.log.Timber
 
 /**
  * A very simple implementation of [IdlingResource].
@@ -39,12 +38,10 @@ class SimpleIdlingResource(private val resourceName: @NotNull String, initialIdl
   }
 
   override fun isIdleNow(): Boolean {
-    Timber.tag("ARSE_IdlingResource").d("asking isIdlieNow: ${mIsIdleNow.get()}")
     return mIsIdleNow.get()
   }
 
   override fun registerIdleTransitionCallback(callback: ResourceCallback) {
-    Timber.tag("ARSE_IdlingResource").d("registerIdleTransitionCallback: $callback")
     mCallback = callback
   }
 
@@ -54,7 +51,6 @@ class SimpleIdlingResource(private val resourceName: @NotNull String, initialIdl
    * @param isIdleNow false if there are pending operations, true if idle.
    */
   fun setIdleState(isIdleNow: Boolean) {
-    Timber.tag("ARSE_IdlingResource").d("setIdleState: $isIdleNow")
     mIsIdleNow.set(isIdleNow)
     if (isIdleNow && mCallback != null) {
       mCallback!!.onTransitionToIdle()

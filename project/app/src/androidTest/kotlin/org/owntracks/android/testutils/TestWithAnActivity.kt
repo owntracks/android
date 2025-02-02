@@ -5,7 +5,6 @@ import android.content.Intent
 import androidx.core.content.ContextCompat
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.intent.Intents
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.rule.BaristaRule
 import com.adevinta.android.barista.rule.cleardata.ClearDatabaseRule
@@ -21,7 +20,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.RuleChain
-import org.junit.runner.RunWith
 import org.owntracks.android.BaseApp
 import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.services.BackgroundService
@@ -32,7 +30,6 @@ import org.owntracks.android.testutils.rules.ScreenshotTakingOnTestEndRule
 import shark.AndroidReferenceMatchers
 import timber.log.Timber
 
-@RunWith(AndroidJUnit4::class)
 abstract class TestWithAnActivity<T : Activity>(
     activityClass: Class<T>,
     private val startActivity: Boolean = true

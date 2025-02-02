@@ -50,6 +50,12 @@ class IdlingResourceModule {
   @Named("waypointsEventCountingIdlingResource")
   fun provideWaypointsEventCountingIdlingResource(): ThresholdIdlingResourceInterface =
       NoopThresholdIdlingResource()
+
+  @Provides
+  @Singleton
+  @Named("waypointsRecyclerViewIdlingResource")
+  fun provideWaypointsRecyclerViewIdlingResource(): ThresholdIdlingResourceInterface =
+      NoopThresholdIdlingResource()
 }
 
 @Module

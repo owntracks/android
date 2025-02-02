@@ -10,11 +10,9 @@ import org.owntracks.android.test.ThresholdIdlingResourceInterface
  * [androidx.test.espresso.idling.CountingIdlingResource] that lets us provide a no-op version in
  * release mode. This is the wrapper implementation
  *
- * @param debugCounting unused
  * @param name Name of the idling resource
  */
 class TestThresholdIdlingResource(private val name: String) : ThresholdIdlingResourceInterface {
-
   @Volatile private var resourceCallback: ResourceCallback? = null
 
   override fun registerIdleTransitionCallback(resourceCallback: ResourceCallback) {
@@ -31,8 +29,8 @@ class TestThresholdIdlingResource(private val name: String) : ThresholdIdlingRes
     value.incrementAndGet().also { if (isIdleNow) resourceCallback?.onTransitionToIdle() }
   }
 
-  override fun set(value: Int) {
-    this.value.set(value).also { if (isIdleNow) resourceCallback?.onTransitionToIdle() }
+  override fun set(v: Int) {
+    value.set(v).also { if (isIdleNow) resourceCallback?.onTransitionToIdle() }
   }
 
   override fun decrement() {
@@ -40,4 +38,7 @@ class TestThresholdIdlingResource(private val name: String) : ThresholdIdlingRes
   }
 
   override var threshold: Int = 0
+    set(value) = run {
+      field = value.also { if (isIdleNow) resourceCallback?.onTransitionToIdle() }
+    }
 }
