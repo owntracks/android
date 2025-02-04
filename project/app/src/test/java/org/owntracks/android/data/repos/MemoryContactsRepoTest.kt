@@ -228,6 +228,18 @@ class MemoryContactsRepoTest {
         }
       }
 
+  @Test
+  fun `given a non-empty repo, updating a contact card should remove its entry from the cache`() =
+      runTest {
+        contactsRepo!!.run {
+          update(CONTACT_ID, messageLocation)
+          contactBitmapAndNameMemoryCache.put(
+              CONTACT_ID, ContactBitmapAndName.CardBitmap("TESTNAME", null))
+          update(CONTACT_ID, messageCard)
+          assertNull(contactBitmapAndNameMemoryCache.get(CONTACT_ID))
+        }
+      }
+
   companion object {
     private const val CONTACT_ID = "abcd1234"
   }
