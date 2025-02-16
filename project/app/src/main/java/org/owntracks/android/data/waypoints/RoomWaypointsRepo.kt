@@ -53,7 +53,7 @@ constructor(
 
     @Query("DELETE FROM WaypointModel") fun deleteAll()
 
-    @Upsert fun upsert(waypointModel: WaypointModel)
+    @Upsert fun upsert(waypointModel: WaypointModel): Long
 
     @Delete fun delete(waypointModel: WaypointModel)
 
@@ -96,7 +96,7 @@ constructor(
         db.waypointDao().insertAll(waypoints)
       }
 
-  override suspend fun updateImpl(waypointModel: WaypointModel) =
+  override suspend fun updateImpl(waypointModel: WaypointModel): Long =
       withContext(ioDispatcher) { db.waypointDao().upsert(waypointModel) }
 
   override suspend fun deleteImpl(waypointModel: WaypointModel) =

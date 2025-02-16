@@ -5,11 +5,9 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import javax.inject.Named
-import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
@@ -19,6 +17,7 @@ import org.owntracks.android.data.waypoints.WaypointsRepo.WaypointOperation
 import org.owntracks.android.di.CoroutineScopes
 import org.owntracks.android.services.LocationProcessor
 import org.owntracks.android.test.ThresholdIdlingResourceInterface
+import timber.log.Timber
 
 @HiltViewModel
 class WaypointsViewModel
@@ -52,7 +51,7 @@ constructor(
                             add(operation.waypoint)
                           }
                           is WaypointOperation.Delete -> {
-                            remove(operation.waypoint)
+                            removeIf { it.id == operation.waypoint.id }
                           }
                           is WaypointOperation.Clear -> {
                             clear()
@@ -61,11 +60,12 @@ constructor(
                       }
                       .sortedBy { it.tst }
               waypointsEventCountingIdlingResource.set(currentWaypoints.size)
+              Timber.d("Emitting ${currentWaypoints.size} waypoints")
               emit(currentWaypoints)
             }
           }
           .flowOn(ioDispatcher)
-          .debounce(100.milliseconds)
+          //          .debounce(100.milliseconds)
           .stateIn(
               scope = viewModelScope,
               started = SharingStarted.WhileSubscribed(5000),

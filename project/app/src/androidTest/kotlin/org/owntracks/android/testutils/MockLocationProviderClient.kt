@@ -65,7 +65,6 @@ fun LocationProviderClient.setLocation(
         this.time = Clock.System.now().toEpochMilliseconds()
         this.altitude = altitude
         this.accuracy = accuracy
-        this.isMock = true
         this.speed = speed
       })
 }

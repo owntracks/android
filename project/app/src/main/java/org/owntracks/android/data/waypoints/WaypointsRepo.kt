@@ -41,8 +41,10 @@ protected constructor(
 
   suspend fun insert(waypointModel: WaypointModel) {
     waypointModel.run {
-      insertImpl(this@run)
-      mutableRepoChangedEvent.emit(WaypointOperation.Insert(this@run))
+      waypointModel.id = insertImpl(this@run)
+      mutableRepoChangedEvent.emit(WaypointOperation.Insert(this@run)).also {
+        Timber.d("Inserted waypoint $this")
+      }
     }
   }
 
@@ -121,11 +123,11 @@ protected constructor(
 
   protected abstract suspend fun clearImpl()
 
-  protected abstract suspend fun insertImpl(waypointModel: WaypointModel)
+  protected abstract suspend fun insertImpl(waypointModel: WaypointModel): Long
 
   protected abstract suspend fun insertAllImpl(waypoints: List<WaypointModel>)
 
-  protected abstract suspend fun updateImpl(waypointModel: WaypointModel)
+  protected abstract suspend fun updateImpl(waypointModel: WaypointModel): Long
 
   protected abstract suspend fun deleteImpl(waypointModel: WaypointModel)
 

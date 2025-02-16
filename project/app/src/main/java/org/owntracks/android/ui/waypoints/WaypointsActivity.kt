@@ -85,7 +85,7 @@ class WaypointsActivity :
       lifecycleScope.launch {
         lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
           viewModel.waypointsFlow.collect {
-            Timber.d("Received set of ${it.size} waypoints")
+            Timber.d("Received set of ${it.size} waypoints from the repo")
             recyclerViewStartLayoutInstant = TimeSource.Monotonic.markNow()
             recyclerViewAdapter.submitList(it)
           }
