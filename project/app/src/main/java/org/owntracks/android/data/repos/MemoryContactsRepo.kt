@@ -68,6 +68,8 @@ constructor(
             Timber.v("Lock acquired")
 
             getById(id)?.apply {
+              // We just received new contact details, so invalidate the cache entry.
+              contactsBitmapAndNameMemoryCache.remove(id)
               this.setMessageCard(messageCard)
               mutableRepoChangedEvent.emit(ContactsRepoChange.ContactCardUpdated(this))
             } ?: run { Contact(id).apply { setMessageCard(messageCard) }.also { put(id, it) } }
