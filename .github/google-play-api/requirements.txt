@@ -2,7 +2,7 @@ cachetools==5.5.2
 certifi==2025.1.31
 charset-normalizer==3.4.1
 google-api-core==2.24.1
-google-api-python-client==2.162.0
+google-api-python-client==2.163.0
 google-auth==2.38.0
 google-auth-httplib2==0.2.0
 googleapis-common-protos==1.68.0
