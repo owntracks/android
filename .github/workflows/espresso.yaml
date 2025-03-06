@@ -54,7 +54,7 @@ jobs:
           dependency-graph: generate
           cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
       - name: AVD cache
-        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4
         id: avd-cache
         with:
           path: |
