@@ -41,5 +41,8 @@
   ],
   "labels": ["dependencies"],
   "platformAutomerge": true,
-  "automergeStrategy": "rebase"
+  "automergeStrategy": "rebase",
+  "pre-commit": {
+    "enabled": true
+  }
 }
