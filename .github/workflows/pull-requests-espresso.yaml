@@ -1,0 +1,42 @@
+---
+name: Pull Requests requiring espresso testing
+
+"on":
+  merge_group:
+    types: [checks_requested]
+  pull_request:
+    types: [opened]
+    branches:
+      - master
+    paths:
+      - ".github/workflows/espresso.yaml"
+      - "project/app/src/**"
+      - "project/app/*.pro"
+      - "project/*.gradle.kts"
+      - "project/app/*.gradle.kts"
+      - "project/gradle/libs.versions.toml"
+
+jobs:
+  build-test-lint:
+    name: Build, Test, and Lint
+    permissions:
+      contents: read
+      checks: write
+    uses: ./.github/workflows/build-test-lint.yaml
+    secrets: inherit
+  espresso-test:
+    name: Espresso Test
+    permissions:
+      contents: read
+      checks: write
+    uses: ./.github/workflows/espresso.yaml
+    secrets: inherit
+    needs:
+      - build-test-lint
+  pr-checkpoint-status:
+    name: "PR Checkpoint Status"
+    runs-on: ubuntu-latest
+    needs: [build-test-lint, espresso-test]
+    steps:
+      - run: |
+          echo "PR Checkpoint Status. Noop"
