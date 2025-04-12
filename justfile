@@ -1,6 +1,9 @@
 set dotenv-load := true
 gradlec := "./project/gradlew -p project"
 
+default:
+    @just --list
+
 build:
     {{gradlec}} assembleDebug
 
