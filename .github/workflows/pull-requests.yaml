@@ -5,6 +5,7 @@ name: Pull Requests
   merge_group:
     types: [checks_requested]
   pull_request:
+    types: [opened]
     branches:
       - master
     paths:
