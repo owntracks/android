@@ -19,7 +19,7 @@ import timber.log.Timber
 class MemoryContactsRepo
 @Inject
 constructor(
-    private val contactsBitmapAndNameMemoryCache: ContactBitmapAndNameMemoryCache,
+    private val contactBitmapAndNameMemoryCache: ContactBitmapAndNameMemoryCache,
 ) : ContactsRepo {
 
   private val contacts = mutableMapOf<String, Contact>()
@@ -41,7 +41,7 @@ constructor(
           repoLock.withLock {
             Timber.v("Lock acquired")
             contacts.clear()
-            contactsBitmapAndNameMemoryCache.evictAll()
+            contactBitmapAndNameMemoryCache.evictAll()
             mutableRepoChangedEvent.emit(ContactsRepoChange.AllCleared)
           }
         }
@@ -69,7 +69,7 @@ constructor(
 
             getById(id)?.apply {
               // We just received new contact details, so invalidate the cache entry.
-              contactsBitmapAndNameMemoryCache.remove(id)
+              contactBitmapAndNameMemoryCache.remove(id)
               this.setMessageCard(messageCard)
               mutableRepoChangedEvent.emit(ContactsRepoChange.ContactCardUpdated(this))
             } ?: run { Contact(id).apply { setMessageCard(messageCard) }.also { put(id, it) } }
@@ -109,7 +109,7 @@ constructor(
                         updateLocation(this)
                         // We may have seen this contact id before, and it may have been removed
                         // from the repo Check the cache to see if we have a name
-                        contactsBitmapAndNameMemoryCache[id]?.also {
+                        contactBitmapAndNameMemoryCache[id]?.also {
                           if (it is ContactBitmapAndName.CardBitmap && it.name != null) {
                             setMessageCard(MessageCard().apply { name = it.name })
                           }
