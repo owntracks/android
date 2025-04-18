@@ -60,5 +60,5 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const { owner, repo } = context.repo;
-            const sha = ${needs.check-comment.outputs.sha};
+            const sha = '${needs.check-comment.outputs.sha}';
             console.log('Setting status check for PR: ' + sha);
