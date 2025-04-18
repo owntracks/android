@@ -54,6 +54,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: [check-comment, build-test-lint]
     steps:
+      - name: debug
+        run: |
+          echo "PR Checkpoint Status"
+          echo "SHA: ${{ needs.check-comment.outputs.sha }}"
+          echo "Build status: ${{ needs.build-test-lint.outputs.status }}"
       - name: Set status check
         uses: actions/github-script@v7
         env:
