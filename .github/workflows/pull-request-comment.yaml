@@ -35,6 +35,7 @@ jobs:
             if (!pr) {
               throw new Error('Pull request not found');
             }
+            console.log(`Pull request info: ${JSON.stringify(pr)}`);
             return {
               sha: pr.head.sha
             };
