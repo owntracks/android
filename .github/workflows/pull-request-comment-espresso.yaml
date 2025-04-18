@@ -1,0 +1,34 @@
+---
+name: Pull Requests requiring builds or testing triggered by comments
+
+"on":
+  issue_comment:
+    types: [created]
+
+jobs:
+  debug:
+    name: Debug
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hmarr/debug-action@v3
+  check-comment:
+    name: PR Comment
+    runs-on: ubuntu-latest
+    if: |
+      github.event.issue.pull_request &&
+      contains(github.event.comment.body, '/run-tests') &&
+      (
+        contains(github.event.repository.owner.login, github.event.comment.user.login) ||
+        contains(github.event.repository.full_name, github.event.comment.user.login)
+      )
+    steps:
+      - name: Check comment
+        run: |
+          echo "Comment check passed. Proceeding to next job."        
+  pr-checkpoint-status:
+    name: "PR Checkpoint Status"
+    runs-on: ubuntu-latest
+    needs: [check-comment]
+    steps:
+      - run: |
+          echo "PR Checkpoint Status. Noop"
