@@ -1,5 +1,5 @@
 ---
-name: Espresso tests
+name: "Subflow: Espresso tests"
 "on":
   workflow_call:
 

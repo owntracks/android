@@ -1,5 +1,5 @@
 ---
-name: Pull Requests requiring espresso testing
+name: PR Opened (Espresso)
 
 "on":
   merge_group:

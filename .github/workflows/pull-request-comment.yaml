@@ -1,5 +1,5 @@
 ---
-name: Pull Requests requiring builds or testing triggered by comments
+name: PR comment trigger
 
 "on":
   issue_comment:

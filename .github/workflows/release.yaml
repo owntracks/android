@@ -1,6 +1,6 @@
 # This flow is designed to be used to update the production and beta tracks on the Play store. It does this by promoting the beta track build to production, triggered by the creation of a release tag.
 # As per the beta build, this does not actually do a build / upload, it simply promotes whatever's in beta to production. Best to create the
-name: Android Release
+name: Tag Triggered Release
 
 on:
   push:

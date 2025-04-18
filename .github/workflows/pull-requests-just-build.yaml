@@ -1,5 +1,5 @@
 ---
-name: Pull Requests just requiring a build
+name: PR Opened (Just Build)
 
 "on":
   merge_group:

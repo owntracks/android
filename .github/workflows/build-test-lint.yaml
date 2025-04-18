@@ -1,5 +1,5 @@
 ---
-name: Runs build-test-lint jobs
+name: "Subflow: Build, Test, and Lint"
 on:
   workflow_call:
 

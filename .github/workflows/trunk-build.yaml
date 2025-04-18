@@ -1,5 +1,5 @@
 ---
-name: Push to default, build, test, lint, and publish to internal track
+name: Push to default publish to internal track
 "on":
   workflow_dispatch:
   push:
