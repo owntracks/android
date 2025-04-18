@@ -61,4 +61,4 @@ jobs:
           script: |
             const { owner, repo } = context.repo;
             const sha = '${needs.check-comment.outputs.sha}';
-            console.log('Setting status check for PR: ' + sha);
+            console.log(context);
