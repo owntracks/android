@@ -55,10 +55,18 @@ jobs:
     steps:
       - name: Set status check
         uses: actions/github-script@v7
+        env:
+          SHA: ${{ needs.check-comment.outputs.sha }}
         with:
           debug: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const { owner, repo } = context.repo;
-            const sha = '${needs.check-comment.outputs.sha}';
-            console.log(context);
+            const sha = process.env.SHA;
+            console.log(`Setting status check for SHA: ${sha}`);
+            const { data: checkRuns } = await github.rest.checks.listForRef({
+              owner,
+              repo,
+              ref: sha
+            });
+            console.log(`Check runs: ${JSON.stringify(checkRuns)}`);
