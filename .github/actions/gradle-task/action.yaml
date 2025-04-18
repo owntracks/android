@@ -22,7 +22,7 @@ runs:
       with:
         cache-read-only: false
         cache-encryption-key: ${{ inputs.gradle-cache-encryption-key }}
-    - name: Ktfmt
+    - name: Gradle task
       shell: bash
       run: ./project/gradlew -p project ${{ inputs.task }} --scan
       env:

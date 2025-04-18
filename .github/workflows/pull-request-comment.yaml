@@ -6,19 +6,13 @@ name: PR comment trigger
     types: [created]
 
 jobs:
-  debug:
-    name: Debug
-    runs-on: ubuntu-latest
-    steps:
-      - uses: hmarr/debug-action@v3
   check-comment:
     name: PR Comment
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      checks: write
     outputs:
-      sha: ${{ steps.get-pr-info.outputs.sha }}
+      sha: ${{ fromJson(steps.get-pr-info.outputs.result).sha }}
     if: |
       github.event.issue.pull_request &&
       github.event.comment.body == '/run-tests' &&
@@ -39,6 +33,7 @@ jobs:
             if (!pr) {
               throw new Error('Pull request not found');
             }
+            console.log(`Pull request head SHA: ${pr.head.sha}`);
             return {
               sha: pr.head.sha
             };
@@ -55,23 +50,38 @@ jobs:
   pr-checkpoint-status:
     name: "PR Checkpoint Status"
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      statuses: write
+      checks: write
     needs: [check-comment, build-test-lint]
     steps:
       - name: Set status check
         uses: actions/github-script@v7
+        env:
+          SHA: ${{ needs.check-comment.outputs.sha }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const { owner, repo } = context.repo;
-            const sha = ${{ needs.check-comment.outputs.sha }}
-
-            // Set the status check
-            await github.rest.repos.createCommitStatus({
+            const sha = process.env.SHA;
+            console.log(`Setting status check for SHA: ${sha}`);
+            await github.rest.checks.create({
               owner,
               repo,
-              sha,
-              state: 'success', // 'error', 'failure', 'pending'
-              target_url: 'https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}',
-              description: 'Build and test completed successfully',
-              context: 'PR Checkpoint Status' // This must match the name in branch protection
+              name: 'PR Checkpoint Status',
+              head_sha: sha,
+              status: 'completed',
+              conclusion: 'success',
+              output: {
+                title: 'Build & Test Completed',
+                summary: 'All checks passed successfully.',
+                text: 'All checks passed successfully.'
+              }
             });
+            const { data: checkRuns } = await github.rest.checks.listForRef({
+              owner,
+              repo,
+              ref: sha
+            });
+            console.log(`Check runs: ${JSON.stringify(checkRuns)}`);
