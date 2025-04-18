@@ -13,7 +13,7 @@ jobs:
       contents: read
       checks: write
     outputs:
-      sha: ${{ steps.get-pr-info.outputs.sha }}
+      sha: ${{ steps.get-pr-info.outputs.result.sha }}
     if: |
       github.event.issue.pull_request &&
       github.event.comment.body == '/run-tests' &&
@@ -35,7 +35,7 @@ jobs:
             if (!pr) {
               throw new Error('Pull request not found');
             }
-            console.log(`Pull request info: ${JSON.stringify(pr.head)}`);
+            console.log(`Pull request head SHA: ${pr.head.sha}`);
             return {
               sha: pr.head.sha
             };
