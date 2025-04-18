@@ -2,6 +2,10 @@
 name: "Subflow: Espresso tests"
 "on":
   workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
 
 jobs:
   espresso-test:
@@ -34,6 +38,7 @@ jobs:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
         with:
           lfs: false
+          ref: ${{ inputs.ref }}
       - name: Create LFS file list
         run: git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
       - name: Restore LFS cache

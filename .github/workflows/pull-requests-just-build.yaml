@@ -21,6 +21,8 @@ jobs:
       contents: read
       checks: write
     uses: ./.github/workflows/build-test-lint.yaml
+    with:
+      ref: ${{ github.sha }}
     secrets: inherit
   pr-checkpoint-status:
     name: "PR Checkpoint Status"

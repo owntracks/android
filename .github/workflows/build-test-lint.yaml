@@ -2,6 +2,10 @@
 name: "Subflow: Build, Test, and Lint"
 on:
   workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
 
 jobs:
   ktfmt:
@@ -10,6 +14,8 @@ jobs:
     steps:
       - name: "Checkout"
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+        with:
+          ref: ${{ inputs.ref }}
       - uses: ./.github/actions/gradle-task
         with:
           task: ktfmtCheck
@@ -20,6 +26,8 @@ jobs:
     steps:
       - name: "Checkout"
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+        with:
+          ref: ${{ inputs.ref }}
       - name: Build
         uses: ./.github/actions/gradle-task
         with:
@@ -35,6 +43,8 @@ jobs:
     steps:
       - name: "Checkout"
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+        with:
+          ref: ${{ inputs.ref }}
       - name: Test
         uses: ./.github/actions/gradle-task
         with:

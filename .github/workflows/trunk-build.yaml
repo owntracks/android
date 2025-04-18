@@ -25,6 +25,8 @@ jobs:
       contents: read
       checks: write
     uses: ./.github/workflows/build-test-lint.yaml
+    with:
+      ref: ${{ github.sha }}
     secrets: inherit
   espresso-test:
     name: Espresso Test
@@ -32,6 +34,8 @@ jobs:
       contents: read
       checks: write
     uses: ./.github/workflows/espresso.yaml
+    with:
+      ref: ${{ github.sha }}
     secrets: inherit
     needs:
       - build-test-lint
