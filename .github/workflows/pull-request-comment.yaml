@@ -52,7 +52,7 @@ jobs:
           echo "Debug"
           echo "results: ${{ needs.check-comment.outputs.results }}"
           echo "result: ${{ needs.check-comment.outputs.results }}"
-          echo ": ${{ JSON.stringify(needs.check-comment.outputs) }}"
+          echo ": ${{ toJson(needs.check-comment.outputs) }}"
   build-test-lint:
     name: Build, Test, and Lint
     needs: [check-comment]
