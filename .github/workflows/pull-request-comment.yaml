@@ -11,9 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read      
-    outputs:
-      sha: ${{ steps.get-pr-info.outputs.results.sha }}
+    outputs:      
       results: ${{ steps.get-pr-info.outputs.results }}
+      result: ${{ steps.get-pr-info.outputs.result }}
+      eurgh: "parp"
     if: |
       github.event.issue.pull_request &&
       github.event.comment.body == '/run-tests' &&
@@ -49,7 +50,9 @@ jobs:
       - name: debug
         run: |
           echo "Debug"
-          echo "SHA: ${{ needs.check-comment.outputs.results }}"
+          echo "results: ${{ needs.check-comment.outputs.results }}"
+          echo "result: ${{ needs.check-comment.outputs.results }}"
+          echo ": ${{ JSON.stringify(needs.check-comment.outputs) }}"
   build-test-lint:
     name: Build, Test, and Lint
     needs: [check-comment]
