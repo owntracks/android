@@ -10,10 +10,10 @@ jobs:
     name: PR Comment
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      checks: write
+      contents: read      
     outputs:
       sha: ${{ steps.get-pr-info.outputs.result.sha }}
+      results: ${{ steps.get-pr-info.outputs.result }}
     if: |
       github.event.issue.pull_request &&
       github.event.comment.body == '/run-tests' &&
@@ -49,7 +49,7 @@ jobs:
       - name: debug
         run: |
           echo "Debug"
-          echo "SHA: ${{ needs.check-comment.outputs.sha }}"
+          echo "SHA: ${{ needs.check-comment.outputs }}"
   build-test-lint:
     name: Build, Test, and Lint
     needs: [check-comment]
