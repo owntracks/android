@@ -49,7 +49,7 @@ jobs:
       - name: debug
         run: |
           echo "Debug"
-          echo "SHA: ${{ needs.check-comment.outputs.sha }}"
+          echo "SHA: ${{ needs.check-comment.outputs.results }}"
   build-test-lint:
     name: Build, Test, and Lint
     needs: [check-comment]
