@@ -12,8 +12,8 @@ jobs:
     permissions:
       contents: read      
     outputs:
-      sha: ${{ steps.get-pr-info.outputs.result.sha }}
-      results: ${{ steps.get-pr-info.outputs.result }}
+      sha: ${{ steps.get-pr-info.outputs.results.sha }}
+      results: ${{ steps.get-pr-info.outputs.results }}
     if: |
       github.event.issue.pull_request &&
       github.event.comment.body == '/run-tests' &&
