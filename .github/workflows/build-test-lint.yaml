@@ -67,7 +67,7 @@ jobs:
           detailed_summary: true
           include_passed: false # Lots of test, much output.
       - name: Upload coverage
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           files: ./project/app/build/reports/coverage/test/gms/debug/report.xml
           flags: unittests
