@@ -130,7 +130,7 @@ jobs:
           name: espresso-test-coverage-${{ matrix.android-api }}-${{ matrix.flavour }}-${{ matrix.shard }}
           path: ./project/app/build/reports/coverage/androidTest/
       - name: Upload coverage
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           files: ./project/app/build/reports/coverage/androidTest/${{ matrix.flavour == 'Gms' && 'gms' || 'oss' }}/debug/connected/report.xml
           flags: uitests
