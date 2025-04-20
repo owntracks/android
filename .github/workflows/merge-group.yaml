@@ -1,0 +1,14 @@
+---
+name: Merge group checks (build)
+
+"on":
+  merge_group:
+    types: [checks_requested]
+
+jobs:
+  debug:
+    name: Debug
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Debug"
+        uses: hmarr/debug-action@v3
