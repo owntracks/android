@@ -35,8 +35,8 @@ jobs:
             }
             console.log(`Pull request head SHA: ${pr.head.sha}`);
             await github.rest.checks.create({
-              owner,
-              repo,
+              context.repo.owner,
+              context.repo.repo,
               name: 'PR Checkpoint Status',
               head_sha: sha,
               status: 'expected',
