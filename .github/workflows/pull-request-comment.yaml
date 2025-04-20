@@ -82,6 +82,6 @@ jobs:
           sha: ${{ needs.check-comment.outputs.sha }}
           check_id: ${{ needs.check-comment.outputs.check-id }}
           status: 'completed'
-          conclusion: ${{ job.status == 'success' && 'success' || 'failure' }}
+          conclusion: ${{ needs.build-test-lint.result == 'success' && 'success' || 'failure' }}
           output: |
             {"title":"Testing", "summary":"Build & Test complete", "text":"Build & Test complete"}
