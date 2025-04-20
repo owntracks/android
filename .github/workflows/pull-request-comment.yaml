@@ -38,7 +38,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               name: 'PR Checkpoint Status',
-              head_sha: sha,
+              head_sha: pr.head.sha,
               status: 'expected',
               started_at: new Date().toISOString(),
               output: {
