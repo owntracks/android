@@ -15,6 +15,8 @@ jobs:
     permissions:
       contents: read
       checks: write
+      issues: write
+      pull-requests: write
     outputs:
       sha: ${{ fromJson(steps.get-pr-info.outputs.result).sha }}
       check-id: ${{ steps.create-pr-check.outputs.check_id }}
@@ -43,6 +45,10 @@ jobs:
             return {
               sha: pr.head.sha
             };
+      - name: Thumbs up!
+        uses: dkershner6/reaction-action@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Create PR Check
         id: create-pr-check
         uses: LouisBrunner/checks-action@v2.0.0
