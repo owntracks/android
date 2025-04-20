@@ -41,7 +41,7 @@ jobs:
       - name: Build
         uses: ./.github/actions/gradle-task
         with:
-          task: assembleDebug
+          task: assembleDebug assembleAndroidTest
           gradle-cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
   test:
     name: Test
