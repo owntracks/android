@@ -37,6 +37,19 @@ jobs:
             return {
               sha: pr.head.sha
             };
+            await github.rest.checks.create({
+              owner,
+              repo,
+              name: 'PR Checkpoint Status',
+              head_sha: sha,
+              status: 'expected',
+              started_at: new Date().toISOString(),
+              output: {
+                title: 'Build & Test in Progress',
+                summary: 'Build and test are in progress.',
+                text: 'Build and test are in progress.'
+              }
+            });
   build-test-lint:
     name: Build, Test, and Lint
     needs: [check-comment]
