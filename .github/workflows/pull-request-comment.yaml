@@ -40,7 +40,7 @@ jobs:
               repo: context.repo.repo,
               name: 'PR Checkpoint Status',
               head_sha: pr.head.sha,
-              status: 'expected',
+              status: 'in_progress',
               started_at: new Date().toISOString(),
               output: {
                 title: 'Build & Test in Progress',
