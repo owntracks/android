@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      checks: write
     outputs:
       sha: ${{ fromJson(steps.get-pr-info.outputs.result).sha }}
     if: |
