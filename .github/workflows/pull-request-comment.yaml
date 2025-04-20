@@ -80,7 +80,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           sha: ${{ needs.check-comment.outputs.sha }}
           check_id: ${{ needs.check-comment.outputs.check-id }}
-          status: ${{ job.status }}
+          status: 'completed'
           conclusion: ${{ job.status == 'success' && 'success' || 'failure' }}
           output: |
             {"title":"Testing", "summary":"Build & Test complete", "text":"Build & Test complete"}
