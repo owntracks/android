@@ -43,6 +43,10 @@ jobs:
             return {
               sha: pr.head.sha
             };
+      - name: Thumbs up!
+        uses: dkershner6/reaction-action@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Create PR Check
         id: create-pr-check
         uses: LouisBrunner/checks-action@v2.0.0
