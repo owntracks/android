@@ -37,6 +37,7 @@ jobs:
             if (!pr) {
               throw new Error('Pull request not found');
             }
+            runId = process.env.GITHUB_RUN_ID;
             console.log(`Pull request head SHA: ${pr.head.sha}`);
             await github.rest.checks.create({
               owner: context.repo.owner,
@@ -45,7 +46,7 @@ jobs:
               head_sha: pr.head.sha,
               status: 'in_progress',
               started_at: new Date().toISOString(),
-              details_url: 'https://github.com/${context.owner}/${context.repo}/actions/runs/${context.run_id}',
+              details_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${runId}`,
               output: {
                 title: 'Build & Test in Progress',
                 summary: 'Build and test are in progress.',
