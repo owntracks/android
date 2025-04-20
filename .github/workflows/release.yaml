@@ -16,7 +16,7 @@ env:
 jobs:
   release:
     name: Create GH release and promote Play store beta to release
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
     steps:
