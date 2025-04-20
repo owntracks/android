@@ -1,4 +1,7 @@
 ---
+# When a comment is made on a pull request starting with '/run-tests' by a org member, this workflow
+# grabs the current PR, creates a checkpoint status for PR head sha and runs a build / test. If
+# successful, it updates the checkpoint status to success, which then allows the PR to be merged.
 name: PR comment trigger
 
 "on":
@@ -16,7 +19,7 @@ jobs:
       sha: ${{ fromJson(steps.get-pr-info.outputs.result).sha }}
     if: |
       github.event.issue.pull_request &&
-      github.event.comment.body == '/run-tests' &&
+      startsWith(github.event.comment.body,'/run-tests') &&
       github.event.comment.author_association == 'MEMBER'
     steps:
       - name: Get PR info
@@ -42,6 +45,7 @@ jobs:
               head_sha: pr.head.sha,
               status: 'in_progress',
               started_at: new Date().toISOString(),
+              details_url: 'https://github.com/${context.owner}/${context.repo}/actions/runs/${context.run_id}',
               output: {
                 title: 'Build & Test in Progress',
                 summary: 'Build and test are in progress.',
