@@ -18,3 +18,9 @@ tasks:
 
 sync-i18n:
     ./util/pull-translations.sh
+
+clean:
+    {{gradlec}} clean
+    rm -rf project/app/build
+    rm -rf project/.gradle/
+    rm -rf project/build/
