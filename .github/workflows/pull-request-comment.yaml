@@ -78,7 +78,6 @@ jobs:
         uses: LouisBrunner/checks-action@v2.0.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          name: PR Checkpoint Status
           sha: ${{ needs.check-comment.outputs.sha }}
           check_id: ${{ needs.check-comment.outputs.check-id }}
           status: ${{ job.status }}
