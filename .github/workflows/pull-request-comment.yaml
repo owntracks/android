@@ -49,7 +49,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           name: PR Checkpoint Status
-          sha: ${{ steps.get-pr-info.outputs.result.sha }}
+          sha: ${{ fromJson(steps.get-pr-info.outputs.result).sha }}
           status: in_progress
           details_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           output: |
