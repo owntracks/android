@@ -72,6 +72,7 @@ jobs:
       statuses: write
       checks: write
     needs: [check-comment, build-test-lint]
+    if: always()
     steps:
       - name: Set status check
         id: set-status
