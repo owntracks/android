@@ -34,9 +34,6 @@ jobs:
               throw new Error('Pull request not found');
             }
             console.log(`Pull request head SHA: ${pr.head.sha}`);
-            return {
-              sha: pr.head.sha
-            };
             await github.rest.checks.create({
               owner,
               repo,
@@ -50,6 +47,9 @@ jobs:
                 text: 'Build and test are in progress.'
               }
             });
+            return {
+              sha: pr.head.sha
+            };
   build-test-lint:
     name: Build, Test, and Lint
     needs: [check-comment]
