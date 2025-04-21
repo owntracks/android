@@ -15,6 +15,8 @@ jobs:
     permissions:
       contents: read
       checks: write
+      issues: write
+      pull-requests: write
     outputs:
       sha: ${{ fromJson(steps.get-pr-info.outputs.result).sha }}
       check-id: ${{ steps.create-pr-check.outputs.check_id }}
@@ -43,6 +45,11 @@ jobs:
             return {
               sha: pr.head.sha
             };
+      - name: Thumbs up!
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id: ${{ github.event.comment.id }}
+          reactions: '+1'
       - name: Create PR Check
         id: create-pr-check
         uses: LouisBrunner/checks-action@v2.0.0
@@ -71,8 +78,10 @@ jobs:
       actions: read
       statuses: write
       checks: write
+      issues: write
+      pull-requests: write
     needs: [check-comment, build-test-lint]
-    if: always()
+    if: ${{ needs.check-comment.result == 'success' }}
     steps:
       - name: Set status check
         id: set-status
@@ -85,3 +94,9 @@ jobs:
           conclusion: ${{ needs.build-test-lint.result == 'success' && 'success' || 'failure' }}
           output: |
             {"title":"Testing", "summary":"Build & Test complete", "text":"Build & Test complete"}
+      - name: Add a comment linking to the workflow
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            Build & Test complete. [View workflow run]("${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}")
