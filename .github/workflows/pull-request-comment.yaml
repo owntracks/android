@@ -46,9 +46,10 @@ jobs:
               sha: pr.head.sha
             };
       - name: Thumbs up!
-        uses: dkershner6/reaction-action@v2
+        uses: peter-evans/create-or-update-comment@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          comment-id: ${{ github.event.comment.id }}
+          reactions: '+1'
       - name: Create PR Check
         id: create-pr-check
         uses: LouisBrunner/checks-action@v2.0.0
@@ -77,6 +78,7 @@ jobs:
       actions: read
       statuses: write
       checks: write
+      issues: write
     needs: [check-comment, build-test-lint]
     if: always()
     steps:
@@ -91,3 +93,9 @@ jobs:
           conclusion: ${{ needs.build-test-lint.result == 'success' && 'success' || 'failure' }}
           output: |
             {"title":"Testing", "summary":"Build & Test complete", "text":"Build & Test complete"}
+      - name: Add a comment linking to the workflow
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            Build & Test complete. [View workflow run]("${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}")
