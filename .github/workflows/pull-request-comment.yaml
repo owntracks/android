@@ -79,8 +79,9 @@ jobs:
       statuses: write
       checks: write
       issues: write
+      pull-requests: write
     needs: [check-comment, build-test-lint]
-    if: always()
+    if: ${{ needs.check-comment.result == 'success' }}
     steps:
       - name: Set status check
         id: set-status
