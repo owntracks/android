@@ -118,7 +118,7 @@ jobs:
           path: ./project/app/build/reports/androidTests/connected/
 
       - name: Espresso JUnit Report
-        uses: mikepenz/action-junit-report@v4
+        uses: mikepenz/action-junit-report@v5
         if: always()
         with:
           report_paths: "**/TEST-*.xml"
