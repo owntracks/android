@@ -20,7 +20,6 @@ runs:
     - name: Gradle setup
       uses: gradle/actions/setup-gradle@v4
       with:
-        cache-read-only: false
         cache-encryption-key: ${{ inputs.gradle-cache-encryption-key }}
     - name: Gradle task
       shell: bash
