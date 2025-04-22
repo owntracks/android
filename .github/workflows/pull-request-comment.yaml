@@ -79,8 +79,9 @@ jobs:
       statuses: write
       checks: write
       issues: write
+      pull-requests: write
     needs: [check-comment, build-test-lint]
-    if: always()
+    if: ${{ needs.check-comment.result == 'success' }}
     steps:
       - name: Set status check
         id: set-status
@@ -98,4 +99,7 @@ jobs:
         with:
           issue-number: ${{ github.event.issue.number }}
           body: |
-            Build & Test complete. [View workflow run]("${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}")
+            Build & Test complete. :sparkles:
+            [View workflow run][1]
+
+            [1]: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
