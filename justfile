@@ -5,7 +5,7 @@ default:
     @just --list
 
 build:
-    {{gradlec}} assembleDebug
+    {{gradlec}} assembleDebug assembleAndroidTest
 
 test:
     {{gradlec}} app:testGmsDebugUnitTest
