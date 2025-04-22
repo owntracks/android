@@ -44,5 +44,7 @@
   "automergeStrategy": "rebase",
   "pre-commit": {
     "enabled": true
-  }
+  },
+  // Don't keep PRs up to date as that invalidates the test check
+  "rebaseWhen": "conflicted"
 }
