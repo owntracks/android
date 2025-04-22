@@ -24,3 +24,6 @@ clean:
     rm -rf project/app/build
     rm -rf project/.gradle/
     rm -rf project/build/
+
+update-all-prs:
+     gh pr list --json number|jq -r .[].number|xargs -I{} gh pr update-branch {}
