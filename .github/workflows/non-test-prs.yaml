@@ -1,10 +1,9 @@
 ---
-name: Pull Requests
+name: PR Opened (No Tests)
 
 "on":
-  merge_group:
-    types: [checks_requested]
   pull_request:
+    types: [opened, synchronize]
     branches:
       - master
     paths-ignore:

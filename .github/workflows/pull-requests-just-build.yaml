@@ -1,0 +1,31 @@
+---
+name: PR Opened (Just Build)
+
+"on":
+  pull_request:
+    types: [opened]
+    branches:
+      - master
+    paths:
+      - ".github/workflows/build-test-lint.yaml"
+      - "project/gradle.properties"
+      - "project/gradle/wrapper/gradle-wrapper.properties"
+      - "project/buildSrc/src/**"
+
+jobs:
+  build-test-lint:
+    name: Build, Test, and Lint
+    permissions:
+      contents: read
+      checks: write
+    uses: ./.github/workflows/build-test-lint.yaml
+    with:
+      ref: ${{ github.sha }}
+    secrets: inherit
+  pr-checkpoint-status:
+    name: "PR Checkpoint Status"
+    runs-on: ubuntu-latest
+    needs: [build-test-lint]
+    steps:
+      - run: |
+          echo "PR Checkpoint Status. Noop"

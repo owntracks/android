@@ -1,8 +1,11 @@
 set dotenv-load := true
 gradlec := "./project/gradlew -p project"
 
+default:
+    @just --list
+
 build:
-    {{gradlec}} assembleDebug
+    {{gradlec}} assembleDebug assembleAndroidTest
 
 test:
     {{gradlec}} app:testGmsDebugUnitTest
@@ -15,3 +18,12 @@ tasks:
 
 sync-i18n:
     ./util/pull-translations.sh
+
+clean:
+    {{gradlec}} clean
+    rm -rf project/app/build
+    rm -rf project/.gradle/
+    rm -rf project/build/
+
+update-all-prs:
+     gh pr list --json number|jq -r .[].number|xargs -I{} gh pr update-branch {}

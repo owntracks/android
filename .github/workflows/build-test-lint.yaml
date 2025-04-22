@@ -1,15 +1,26 @@
 ---
-name: Runs build-test-lint jobs
+name: "Subflow: Build, Test, and Lint"
 on:
   workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
 
 jobs:
   ktfmt:
     name: ktfmt
     runs-on: ubuntu-latest
     steps:
+      - name: "Validate input ref"
+        if: ${{ inputs.ref == '' }}
+        run: |
+          echo "Input ref is empty. Please provide a valid ref."
+          exit 1
       - name: "Checkout"
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          ref: ${{ inputs.ref }}
       - uses: ./.github/actions/gradle-task
         with:
           task: ktfmtCheck
@@ -18,12 +29,19 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
+      - name: "Validate input ref"
+        if: ${{ inputs.ref == '' }}
+        run: |
+          echo "Input ref is empty. Please provide a valid ref."
+          exit 1
       - name: "Checkout"
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          ref: ${{ inputs.ref }}
       - name: Build
         uses: ./.github/actions/gradle-task
         with:
-          task: assembleDebug
+          task: assembleDebug assembleAndroidTest
           gradle-cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
   test:
     name: Test
@@ -34,20 +52,22 @@ jobs:
       checks: write
     steps:
       - name: "Checkout"
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          ref: ${{ inputs.ref }}
       - name: Test
         uses: ./.github/actions/gradle-task
         with:
           task: app:createGmsDebugUnitTestCoverageReport
           gradle-cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
       - name: JUnit Report Action
-        uses: mikepenz/action-junit-report@v4
+        uses: mikepenz/action-junit-report@v5
         with:
           report_paths: "**/TEST-*.xml"
           detailed_summary: true
           include_passed: false # Lots of test, much output.
       - name: Upload coverage
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           files: ./project/app/build/reports/coverage/test/gms/debug/report.xml
           flags: unittests
@@ -58,7 +78,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout"
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - name: Build
         uses: ./.github/actions/gradle-task
         with:

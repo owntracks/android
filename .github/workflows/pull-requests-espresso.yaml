@@ -1,21 +1,17 @@
 ---
-name: Pull Requests
+name: PR Opened (Espresso)
 
 "on":
-  merge_group:
-    types: [checks_requested]
   pull_request:
+    types: [opened]
     branches:
       - master
     paths:
-      - ".github/workflows/**"
+      - ".github/workflows/espresso.yaml"
       - "project/app/src/**"
       - "project/app/*.pro"
-      - "project/buildSrc/src/**"
       - "project/*.gradle.kts"
       - "project/app/*.gradle.kts"
-      - "project/gradle.properties"
-      - "project/gradle/wrapper/gradle-wrapper.properties"
       - "project/gradle/libs.versions.toml"
 
 jobs:
@@ -25,6 +21,8 @@ jobs:
       contents: read
       checks: write
     uses: ./.github/workflows/build-test-lint.yaml
+    with:
+      ref: ${{ github.sha }}
     secrets: inherit
   espresso-test:
     name: Espresso Test
@@ -32,6 +30,8 @@ jobs:
       contents: read
       checks: write
     uses: ./.github/workflows/espresso.yaml
+    with:
+      ref: ${{ github.sha }}
     secrets: inherit
     needs:
       - build-test-lint

@@ -1,0 +1,105 @@
+---
+# When a comment is made on a pull request starting with '/run-tests' by a org member, this workflow
+# grabs the current PR, creates a checkpoint status for PR head sha and runs a build / test. If
+# successful, it updates the checkpoint status to success, which then allows the PR to be merged.
+name: PR comment trigger
+
+"on":
+  issue_comment:
+    types: [created]
+
+jobs:
+  check-comment:
+    name: PR Comment
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+      issues: write
+      pull-requests: write
+    outputs:
+      sha: ${{ fromJson(steps.get-pr-info.outputs.result).sha }}
+      check-id: ${{ steps.create-pr-check.outputs.check_id }}
+    if: |
+      github.event.issue.pull_request &&
+      startsWith(github.event.comment.body,'/run-tests') &&
+      github.event.comment.author_association == 'MEMBER'
+    steps:
+      - name: Get PR info
+        uses: actions/github-script@v7
+        id: get-pr-info
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prNumber = context.issue.number;
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber
+            });
+            if (!pr) {
+              throw new Error('Pull request not found');
+            }
+            runId = process.env.GITHUB_RUN_ID;
+            console.log(`Pull request head SHA: ${pr.head.sha}`);
+            return {
+              sha: pr.head.sha
+            };
+      - name: Thumbs up!
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id: ${{ github.event.comment.id }}
+          reactions: '+1'
+      - name: Create PR Check
+        id: create-pr-check
+        uses: LouisBrunner/checks-action@v2.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: PR Checkpoint Status
+          sha: ${{ fromJson(steps.get-pr-info.outputs.result).sha }}
+          status: in_progress
+          details_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          output: |
+            {"title":"Testing", "summary":"Build & Test in progress", "text":"Build & Test in progress"}
+  build-test-lint:
+    name: Build, Test, and Lint
+    needs: [check-comment]
+    permissions:
+      contents: read
+      checks: write
+    uses: ./.github/workflows/build-test-lint.yaml
+    with:
+      ref: ${{ needs.check-comment.outputs.sha }}
+    secrets: inherit
+  pr-checkpoint-status:
+    name: "PR Checkpoint Status"
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      statuses: write
+      checks: write
+      issues: write
+      pull-requests: write
+    needs: [check-comment, build-test-lint]
+    if: ${{ always() && needs.check-comment.result == 'success' }}
+    steps:
+      - name: Set status check
+        id: set-status
+        uses: LouisBrunner/checks-action@v2.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          sha: ${{ needs.check-comment.outputs.sha }}
+          check_id: ${{ needs.check-comment.outputs.check-id }}
+          status: 'completed'
+          conclusion: ${{ needs.build-test-lint.result == 'success' && 'success' || 'failure' }}
+          output: |
+            {"title":"Testing", "summary":"Build & Test complete", "text":"Build & Test complete"}
+      - name: Add a comment linking to the workflow
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            Build & Test complete. :sparkles:
+            [View workflow run][1]
+
+            [1]: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
