@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.owntracks.android.data.waypoints.WaypointsRepo
 import org.owntracks.android.model.Parser
@@ -41,13 +41,13 @@ constructor(
   val preferenceKeys = preferences.allConfigKeys.map { it.name }.toList()
 
   private fun updateEffectiveConfiguration() {
-    viewModelScope.launch {
+    viewModelScope.launch(Dispatchers.IO) {
       try {
         val message = preferences.exportToMessage()
-        waypointsRepo.allLive.stateIn(viewModelScope).value.let {
-          message.waypoints =
-              MessageWaypointCollection().apply { addAll(it.map(waypointsRepo::fromDaoObject)) }
-        }
+        message.waypoints =
+            MessageWaypointCollection().apply {
+              addAll(waypointsRepo.getAll().map(waypointsRepo::fromDaoObject))
+            }
         mutableEffectiveConfiguration.postValue(parser.toUnencryptedJsonPretty(message))
       } catch (e: Exception) {
         Timber.e(e)

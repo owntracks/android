@@ -40,6 +40,7 @@ import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.ui.map.osm.OSMMapFragment
 import timber.log.Timber
+import timber.log.Timber.Forest.tag
 
 class GoogleMapFragment
 internal constructor(
@@ -77,7 +78,7 @@ internal constructor(
 
   private var googleMap: GoogleMap? = null
   private val markersOnMap: MutableMap<String, Marker> = HashMap()
-  private val regionsOnMap: MutableList<WaypointOnMap> = mutableListOf()
+  private val regionsOnMap: MutableMap<Long, WaypointOnMap> = mutableMapOf()
 
   override fun onCreateView(
       inflater: LayoutInflater,
@@ -242,33 +243,66 @@ internal constructor(
     Timber.d("Maps SDK initialized with renderer: ${renderer.name}")
   }
 
-  override fun drawRegions(regions: Set<WaypointModel>) {
+  override fun addRegion(waypoint: WaypointModel) {
     if (preferences.showRegionsOnMap) {
       googleMap?.run {
-        Timber.d("Drawing regions on map")
-        regionsOnMap.forEach {
+        Timber.d("Adding region to map $waypoint")
+        WaypointOnMap(
+                MarkerOptions()
+                    .apply {
+                      position(waypoint.getLocation().toLatLng().toGMSLatLng())
+                      anchor(0.5f, 1.0f)
+                      title(waypoint.description)
+                    }
+                    .let { addMarker(it)!! },
+                CircleOptions()
+                    .apply {
+                      center(waypoint.getLocation().toLatLng().toGMSLatLng())
+                      radius(waypoint.geofenceRadius.toDouble())
+                      fillColor(getRegionColor())
+                      strokeWidth(1.0f)
+                    }
+                    .let { addCircle(it) })
+            .run { regionsOnMap.put(waypoint.id, this) }
+      }
+    }
+  }
+
+  override fun deleteRegion(waypoint: WaypointModel) {
+    if (preferences.showRegionsOnMap) {
+      googleMap?.run {
+        Timber.d("Deleting region from map $waypoint")
+        regionsOnMap[waypoint.id]?.run {
+          circle.remove()
+          marker.remove()
+        }
+      }
+    }
+  }
+
+  override fun updateRegion(waypoint: WaypointModel) {
+    if (preferences.showRegionsOnMap) {
+      googleMap?.run {
+        Timber.d("Updating region on map $waypoint")
+        regionsOnMap[waypoint.id]?.run {
+          circle.center = waypoint.getLocation().toLatLng().toGMSLatLng()
+          circle.radius = waypoint.geofenceRadius.toDouble()
+          marker.position = waypoint.getLocation().toLatLng().toGMSLatLng()
+          marker.title = waypoint.description
+        }
+      }
+    }
+  }
+
+  override fun reDrawRegions(regions: Set<WaypointModel>) {
+    if (preferences.showRegionsOnMap) {
+      googleMap?.run {
+        Timber.d("Drawing regions on map: $regions")
+        regionsOnMap.values.forEach {
           it.circle.remove()
           it.marker.remove()
         }
-        regions.forEach { region ->
-          WaypointOnMap(
-                  MarkerOptions()
-                      .apply {
-                        position(region.getLocation().toLatLng().toGMSLatLng())
-                        anchor(0.5f, 1.0f)
-                        title(region.description)
-                      }
-                      .let { addMarker(it)!! },
-                  CircleOptions()
-                      .apply {
-                        center(region.getLocation().toLatLng().toGMSLatLng())
-                        radius(region.geofenceRadius.toDouble())
-                        fillColor(getRegionColor())
-                        strokeWidth(1.0f)
-                      }
-                      .let { addCircle(it) })
-              .run(regionsOnMap::add)
-        }
+        regions.forEach(::addRegion)
       }
     }
   }

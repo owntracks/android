@@ -5,7 +5,7 @@ import android.net.Uri
 import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import org.owntracks.android.App
+import org.owntracks.android.BaseApp
 import org.owntracks.android.R
 
 /**
@@ -21,7 +21,7 @@ interface WorkManagerInitExceptionNotifier {
 
   class Impl : WorkManagerInitExceptionNotifier {
     override fun notifyOnWorkManagerInitFailure(appCompatActivity: AppCompatActivity) {
-      (appCompatActivity.applicationContext as App).workManagerFailedToInitialize.observe(
+      (appCompatActivity.applicationContext as BaseApp).workManagerFailedToInitialize.observe(
           appCompatActivity) { value ->
             if (value) {
               MaterialAlertDialogBuilder(appCompatActivity)
