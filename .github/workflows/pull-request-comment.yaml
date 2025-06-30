@@ -22,7 +22,7 @@ jobs:
       check-id: ${{ steps.create-pr-check.outputs.check_id }}
     if: |
       github.event.issue.pull_request &&
-      startsWith(github.event.comment.body,'/run-tests') &&
+      (startsWith(github.event.comment.body,'/run-tests') || startsWith(github.event.comment.body,'/run-espresso-tests')) &&
       github.event.comment.author_association == 'MEMBER'
     steps:
       - name: Get PR info
@@ -71,6 +71,17 @@ jobs:
     with:
       ref: ${{ needs.check-comment.outputs.sha }}
     secrets: inherit
+  espresso-test:
+    name: Espresso Test
+    permissions:
+      contents: read
+      checks: write
+    uses: ./.github/workflows/espresso.yaml
+    with:
+      ref: ${{ github.sha }}
+    secrets: inherit
+    needs:
+      - build-test-lint
   pr-checkpoint-status:
     name: "PR Checkpoint Status"
     runs-on: ubuntu-latest
@@ -80,7 +91,7 @@ jobs:
       checks: write
       issues: write
       pull-requests: write
-    needs: [check-comment, build-test-lint]
+    needs: [check-comment, build-test-lint, espresso-test]
     if: ${{ always() && needs.check-comment.result == 'success' }}
     steps:
       - name: Set status check
@@ -91,7 +102,7 @@ jobs:
           sha: ${{ needs.check-comment.outputs.sha }}
           check_id: ${{ needs.check-comment.outputs.check-id }}
           status: 'completed'
-          conclusion: ${{ needs.build-test-lint.result == 'success' && 'success' || 'failure' }}
+          conclusion: ${{ (needs.build-test-lint.result == 'success' && (needs.espresso-test.result == 'success' || needs.espresso-test.result == 'skipped')) && 'success' || 'failure' }}
           output: |
             {"title":"Testing", "summary":"Build & Test complete", "text":"Build & Test complete"}
       - name: Add a comment linking to the workflow
