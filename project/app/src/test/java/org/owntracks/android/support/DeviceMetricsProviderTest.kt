@@ -11,9 +11,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.owntracks.android.model.messages.MessageLocation.Companion.CONN_TYPE_MOBILE
-import org.owntracks.android.model.messages.MessageLocation.Companion.CONN_TYPE_OFFLINE
-import org.owntracks.android.model.messages.MessageLocation.Companion.CONN_TYPE_WIFI
+import org.owntracks.android.model.messages.MessageLocation
 
 internal class DeviceMetricsProviderTest {
   @Test
@@ -24,7 +22,8 @@ internal class DeviceMetricsProviderTest {
     val mockContext: Context = mock {
       on { getSystemService(Context.CONNECTIVITY_SERVICE) } doReturn connectivityManager
     }
-    assertEquals(CONN_TYPE_OFFLINE, DeviceMetricsProvider(mockContext).connectionType)
+    assertEquals(
+        MessageLocation.ConnectionType.OFFLINE, DeviceMetricsProvider(mockContext).connectionType)
   }
 
   @Test
@@ -36,7 +35,8 @@ internal class DeviceMetricsProviderTest {
     val mockContext: Context = mock {
       on { getSystemService(Context.CONNECTIVITY_SERVICE) } doReturn connectivityManager
     }
-    assertEquals(CONN_TYPE_OFFLINE, DeviceMetricsProvider(mockContext).connectionType)
+    assertEquals(
+        MessageLocation.ConnectionType.OFFLINE, DeviceMetricsProvider(mockContext).connectionType)
   }
 
   @Test
@@ -53,7 +53,8 @@ internal class DeviceMetricsProviderTest {
     val mockContext: Context = mock {
       on { getSystemService(Context.CONNECTIVITY_SERVICE) } doReturn connectivityManager
     }
-    assertEquals(CONN_TYPE_WIFI, DeviceMetricsProvider(mockContext).connectionType)
+    assertEquals(
+        MessageLocation.ConnectionType.WIFI, DeviceMetricsProvider(mockContext).connectionType)
   }
 
   @Test
@@ -70,7 +71,8 @@ internal class DeviceMetricsProviderTest {
     val mockContext: Context = mock {
       on { getSystemService(Context.CONNECTIVITY_SERVICE) } doReturn connectivityManager
     }
-    assertEquals(CONN_TYPE_MOBILE, DeviceMetricsProvider(mockContext).connectionType)
+    assertEquals(
+        MessageLocation.ConnectionType.MOBILE, DeviceMetricsProvider(mockContext).connectionType)
   }
 
   @Test
@@ -86,6 +88,7 @@ internal class DeviceMetricsProviderTest {
     val mockContext: Context = mock {
       on { getSystemService(Context.CONNECTIVITY_SERVICE) } doReturn connectivityManager
     }
-    assertEquals(CONN_TYPE_OFFLINE, DeviceMetricsProvider(mockContext).connectionType)
+    assertEquals(
+        MessageLocation.ConnectionType.OFFLINE, DeviceMetricsProvider(mockContext).connectionType)
   }
 }

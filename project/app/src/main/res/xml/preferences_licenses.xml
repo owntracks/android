@@ -43,14 +43,6 @@
             android:data="https://github.com/square/okhttp" />
     </Preference>
     <Preference
-        android:summary="Fasterxml"
-        android:title="Jackson"
-        app:iconSpaceReserved="false">
-        <intent
-            android:action="android.intent.action.VIEW"
-            android:data="https://github.com/FasterXML/jackson" />
-    </Preference>
-    <Preference
         android:summary="Square"
         android:title="Tape"
         app:iconSpaceReserved="false">

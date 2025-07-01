@@ -21,11 +21,11 @@ import org.owntracks.android.location.geofencing.Geofence
 import org.owntracks.android.model.messages.AddMessageStatus
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.model.messages.MessageLocation.Companion.fromLocation
-import org.owntracks.android.model.messages.MessageLocation.Companion.fromLocationAndWifiInfo
 import org.owntracks.android.model.messages.MessageStatus
 import org.owntracks.android.model.messages.MessageTransition
 import org.owntracks.android.model.messages.MessageWaypoint
 import org.owntracks.android.model.messages.MessageWaypoints
+import org.owntracks.android.model.messages.addWifi
 import org.owntracks.android.net.WifiInfoProvider
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.MonitoringMode
@@ -125,10 +125,11 @@ constructor(
 
     val message =
         if (preferences.extendedData) {
-              fromLocationAndWifiInfo(location, wifiInfoProvider).apply {
+              fromLocation(location, Build.VERSION.SDK_INT).apply {
+                addWifi(wifiInfoProvider)
                 battery = deviceMetricsProvider.batteryLevel
                 batteryStatus = deviceMetricsProvider.batteryStatus
-                conn = deviceMetricsProvider.connectionType
+                conn = deviceMetricsProvider.connectionType.value
                 monitoringMode = preferences.monitoring
                 source = location.provider
               }

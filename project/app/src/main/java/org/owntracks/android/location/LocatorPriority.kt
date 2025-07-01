@@ -1,7 +1,9 @@
 package org.owntracks.android.location
 
+import kotlinx.serialization.Serializable
 import org.owntracks.android.preferences.types.FromConfiguration
 
+@Serializable
 enum class LocatorPriority(private val value: Int) {
   HighAccuracy(3),
   BalancedPowerAccuracy(2),
@@ -11,8 +13,7 @@ enum class LocatorPriority(private val value: Int) {
   companion object {
     @JvmStatic
     @FromConfiguration
-    fun getByValue(value: Int): LocatorPriority =
-        LocatorPriority.entries.firstOrNull { it.value == value } ?: BalancedPowerAccuracy
+    fun getByValue(value: Int): LocatorPriority = entries.getOrElse(value) { BalancedPowerAccuracy }
 
     @JvmStatic
     @FromConfiguration

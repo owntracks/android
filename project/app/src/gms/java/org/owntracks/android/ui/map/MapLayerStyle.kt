@@ -1,10 +1,12 @@
 package org.owntracks.android.ui.map
 
 import androidx.databinding.ViewDataBinding
+import kotlinx.serialization.Serializable
 import org.owntracks.android.R
 import org.owntracks.android.preferences.types.FromConfiguration
 import org.owntracks.android.ui.map.osm.OSMMapFragment
 
+@Serializable
 enum class MapLayerStyle {
   GoogleMapDefault,
   GoogleMapHybrid,
