@@ -1,15 +1,17 @@
 package org.owntracks.android.model.messages
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.annotation.JsonTypeInfo
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
-@JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
-class MessageEncrypted(private val messageWithId: MessageWithId = MessageWithRandomId()) :
-    MessageBase(), MessageWithId by messageWithId {
+@Serializable
+@SerialName(MessageEncrypted.TYPE)
+class MessageEncrypted(
+    @Transient private val messageWithId: MessageWithId = MessageWithRandomId()
+) : MessageBase(), MessageWithId {
+  @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.ALWAYS)
+  @SerialName("_id")
+  override var messageId: MessageId = messageWithId.messageId
   var data: String = ""
 
   companion object {

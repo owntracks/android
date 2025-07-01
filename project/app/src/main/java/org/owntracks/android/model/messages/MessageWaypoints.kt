@@ -1,18 +1,21 @@
 package org.owntracks.android.model.messages
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.annotation.JsonTypeInfo
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.MessageWaypointCollection
 
-@JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
-class MessageWaypoints(private val messageWithId: MessageWithId = MessageWithRandomId()) :
-    MessageBase(), MessageWithId by messageWithId {
-  var waypoints: MessageWaypointCollection? = null
+@Serializable
+@SerialName(MessageWaypoints.TYPE)
+class MessageWaypoints(
+    @Transient private val messageWithId: MessageWithId = MessageWithRandomId()
+) : MessageBase(), MessageWithId {
+  @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.ALWAYS)
+  @SerialName("_id")
+  override var messageId: MessageId = messageWithId.messageId
+  @Contextual var waypoints: MessageWaypointCollection? = null
 
   override fun toString(): String = "[MessageWaypoints waypoints=${waypoints?.size}]"
 
