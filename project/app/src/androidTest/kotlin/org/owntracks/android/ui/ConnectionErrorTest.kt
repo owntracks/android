@@ -7,7 +7,7 @@ import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import dagger.hilt.android.testing.HiltAndroidTest
 import java.net.ConnectException
 import java.net.InetSocketAddress
@@ -16,6 +16,10 @@ import kotlin.concurrent.thread
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.random.Random
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import mqtt.broker.Broker
 import mqtt.broker.interfaces.Authentication
 import org.junit.Test
@@ -188,8 +192,19 @@ private fun getBroker(
             })
 
 @ExperimentalEncodingApi
-private fun encodeConfig(config: Map<String, Any>): String =
-    Base64.encode(ObjectMapper().writeValueAsBytes(config))
+private fun encodeConfig(config: Map<String, Any>): String {
+  val jsonObject = buildJsonObject {
+    for ((key, value) in config) {
+      when (value) {
+        is String -> put(key, value)
+        is Number -> put(key, value)
+        is Boolean -> put(key, value)
+        else -> put(key, value.toString()) // Fallback, might not be correct for all cases
+      }
+    }
+  }
+  return Base64.encode(Json.encodeToString(jsonObject))
+}
 
 private fun getTLSSettings(connectionErrorTest: ConnectionErrorTest): TLSSettings {
   val dataBytes = connectionErrorTest.javaClass.getResource("/rootCA.p12")!!.readBytes()

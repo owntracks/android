@@ -26,13 +26,11 @@ google-play-services-maps = "19.2.0"
 guava = "33.4.8-jre"
 hilt = "2.52"
 hilt-work = "1.2.0"
-jackson = "2.13.5"
-jaxb = "4.0.5"
-jaxb-api = "2.3.1"
 kmqtt = "0.4.6"
 kotlin = "1.9.25"
 kotlin-coroutines = "1.9.0"
 kotlin-datetime = "0.6.2"
+kotlinx-serialization = "1.6.3"
 ksp = "1.9.25-1.0.20"
 ktfmt = "0.23.0"
 lmdb-kt = "0.1.1"
@@ -55,6 +53,7 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 triplet = { id = "com.github.triplet.play", version.ref = "triplet" }
 ktfmt = { id = "com.ncorti.ktfmt.gradle", version.ref = "ktfmt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
@@ -69,22 +68,14 @@ kotlin-coroutines-jdk8 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-jd
 kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlin-coroutines" }
 kotlin-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlin-datetime" }
 kotlin-serialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
-
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+8
 # Hilt
 hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hilt" }
 hilt-androidx = { module = "androidx.hilt:hilt-compiler", version.ref = "hilt-work" }
 hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hilt-work" }
-
-# Jackson serde
-jaxb-core = { module = "com.sun.xml.bind:jaxb-core", version.ref = "jaxb" }
-jaxb-impl = { module = "com.sun.xml.bind:jaxb-impl", version.ref = "jaxb" }
-jaxb-api = { module = "javax.xml.bind:jaxb-api", version.ref = "jaxb-api" }
-jackson-core = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson" }
-jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
-jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
-jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson" }
 
 # AndroidX
 androidx-preference = { module = "androidx.preference:preference", version.ref = "androidx-preference" }
@@ -144,9 +135,7 @@ guava = { module = "com.google.guava:guava", version.ref = "guava" }
 desugar = { module = "com.android.tools:desugar_jdk_libs_nio", version.ref = "desguar-jdk" }
 
 [bundles]
-jackson = ["jackson-core", "jackson-databind", "jackson-module-kotlin", "jackson-datatype-jsr310"]
 kotlin = ["kotlin-coroutines-android", "kotlin-coroutines-jdk8", "kotlin-reflect"]
-jaxb-annotation-processors = ["jaxb-api", "jaxb-core", "jaxb-impl"]
 kapt-hilt = ["hilt-compiler", "hilt-androidx"]
 hilt = ["hilt-android", "hilt-work"]
 androidx = ["androidx-core-ktx", "androidx-preference", "androidx-work-runtime", "androidx-fragment-ktx", "androidx-concurrent-futures", "androidx-activity-ktx"]

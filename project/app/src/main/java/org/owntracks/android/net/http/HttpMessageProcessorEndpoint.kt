@@ -2,7 +2,6 @@ package org.owntracks.android.net.http
 
 import android.content.Context
 import android.net.Uri
-import com.fasterxml.jackson.core.JsonProcessingException
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.security.KeyStore
@@ -150,30 +149,6 @@ class HttpMessageProcessorEndpoint(
                   )
                   result.forEach { onMessageReceived(it) }
                 }
-                return Result.success(Unit)
-              } catch (e: JsonProcessingException) {
-                Timber.e("JsonParseException HTTP status: %s", response.code)
-                endpointStateRepo.setState(
-                    EndpointState.IDLE.withMessage(
-                        String.format(
-                            Locale.ROOT,
-                            "HTTP status %d, JsonParseException",
-                            response.code,
-                        ),
-                    ),
-                )
-                return Result.success(Unit)
-              } catch (e: Parser.EncryptionException) {
-                Timber.e("JsonParseException HTTP status: %s", response.code)
-                endpointStateRepo.setState(
-                    EndpointState.ERROR.withMessage(
-                        String.format(
-                            Locale.ROOT,
-                            "HTTP status: %d, EncryptionException",
-                            response.code,
-                        ),
-                    ),
-                )
                 return Result.success(Unit)
               } catch (e: IOException) {
                 Timber.e(e, "HTTP Delivery failed")

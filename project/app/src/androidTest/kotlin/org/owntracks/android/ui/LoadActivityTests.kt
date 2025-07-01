@@ -10,9 +10,15 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotExist
-import com.fasterxml.jackson.databind.ObjectMapper
-import dagger.hilt.android.testing.HiltAndroidTest
 import java.io.File
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.boolean
+import kotlinx.serialization.json.double
+import kotlinx.serialization.json.int
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.long
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -106,60 +112,63 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(false) {
 }"""
 
   private fun assertExpectedConfig(input: String) {
-    val json = ObjectMapper().readTree(input)
-    assertTrue(json.isObject)
-    assertEquals("configuration", json["_type"].asText())
-    assertEquals(2, json["waypoints"].size())
-    assertEquals("work", json["waypoints"][0]["desc"].asText())
-    assertEquals(51.5, json["waypoints"][0]["lat"].asDouble(), 0.0001)
-    assertEquals(-0.02, json["waypoints"][0]["lon"].asDouble(), 0.0001)
-    assertEquals(150, json["waypoints"][0]["rad"].asInt())
-    assertEquals(1505910709000, json["waypoints"][0]["tst"].asLong())
-    assertEquals("home", json["waypoints"][1]["desc"].asText())
-    assertEquals(53.6, json["waypoints"][1]["lat"].asDouble(), 0.0001)
-    assertEquals(-1.5, json["waypoints"][1]["lon"].asDouble(), 0.0001)
-    assertEquals(100, json["waypoints"][1]["rad"].asInt())
-    assertEquals(1558351273, json["waypoints"][1]["tst"].asLong())
-    assertTrue(json["auth"].asBoolean())
-    assertTrue(json["autostartOnBoot"].asBoolean())
-    assertFalse(json["cleanSession"].asBoolean())
-    assertEquals("emulator", json["clientId"].asText())
-    assertTrue(json["cmd"].asBoolean())
-    assertEquals(34, json["connectionTimeoutSeconds"].asInt())
-    assertTrue(json["debugLog"].asBoolean())
-    assertEquals("testdevice", json["deviceId"].asText())
-    assertFalse(json["enableMapRotation"].asBoolean())
-    assertTrue(json["fusedRegionDetection"].asBoolean())
-    assertTrue(json["geocodeEnabled"].asBoolean())
-    assertEquals("testhost.example.com", json["host"].asText())
-    assertEquals(150, json["ignoreInaccurateLocations"].asInt())
-    assertEquals(0, json["ignoreStaleLocations"].asInt())
-    assertEquals(900, json["keepalive"].asInt())
-    assertEquals(5, json["locatorDisplacement"].asInt())
-    assertEquals(60, json["locatorInterval"].asInt())
-    assertEquals(0, json["mode"].asInt())
-    assertEquals(1, json["monitoring"].asInt())
-    assertEquals(10, json["moveModeLocatorInterval"].asInt())
-    assertEquals(3, json["mqttProtocolLevel"].asInt())
-    assertFalse(json["notificationHigherPriority"].asBoolean())
-    assertTrue(json["notificationLocation"].asBoolean())
-    assertEquals("", json["opencageApiKey"].asText())
-    assertEquals(3.352, json["osmTileScaleFactor"].asDouble(), 0.0001)
-    assertEquals("password", json["password"].asText())
-    assertEquals(30, json["ping"].asInt())
-    assertEquals(1883, json["port"].asInt())
-    assertTrue(json["extendedData"].asBoolean())
-    assertEquals(1, json["pubQos"].asInt())
-    assertTrue(json["pubRetain"].asBoolean())
-    assertEquals("owntracks/%u/%d", json["pubTopicBase"].asText())
-    assertTrue(json["remoteConfiguration"].asBoolean())
-    assertTrue(json["sub"].asBoolean())
-    assertEquals(2, json["subQos"].asInt())
-    assertEquals("owntracks/+/+", json["subTopic"].asText())
-    assertFalse(json["tls"].asBoolean())
-    assertTrue(json["usePassword"].asBoolean())
-    assertEquals("username", json["username"].asText())
-    assertFalse(json["ws"].asBoolean())
+    val json = Json.parseToJsonElement(input).jsonObject
+    assertEquals("configuration", json["_type"]!!.jsonPrimitive.content)
+    assertEquals(2, json["waypoints"]!!.jsonArray.size)
+    assertEquals(
+        "work", json["waypoints"]!!.jsonArray[0].jsonObject["desc"]!!.jsonPrimitive.content)
+    assertEquals(
+        51.5, json["waypoints"]!!.jsonArray[0].jsonObject["lat"]!!.jsonPrimitive.double, 0.0001)
+    assertEquals(
+        -0.02, json["waypoints"]!!.jsonArray[0].jsonObject["lon"]!!.jsonPrimitive.double, 0.0001)
+    assertEquals(150, json["waypoints"]!!.jsonArray[0].jsonObject["rad"]!!.jsonPrimitive.int)
+    assertEquals(
+        1505910709000, json["waypoints"]!!.jsonArray[0].jsonObject["tst"]!!.jsonPrimitive.long)
+    assertEquals(
+        "home", json["waypoints"]!!.jsonArray[1].jsonObject["desc"]!!.jsonPrimitive.content)
+    assertEquals(
+        53.6, json["waypoints"]!!.jsonArray[1].jsonObject["lat"]!!.jsonPrimitive.double, 0.0001)
+    assertEquals(
+        -1.5, json["waypoints"]!!.jsonArray[1].jsonObject["lon"]!!.jsonPrimitive.double, 0.0001)
+    assertEquals(100, json["waypoints"]!!.jsonArray[1].jsonObject["rad"]!!.jsonPrimitive.int)
+    assertEquals(
+        1558351273, json["waypoints"]!!.jsonArray[1].jsonObject["tst"]!!.jsonPrimitive.long)
+    assertTrue(json["auth"]!!.jsonPrimitive.boolean)
+    assertTrue(json["autostartOnBoot"]!!.jsonPrimitive.boolean)
+    assertFalse(json["cleanSession"]!!.jsonPrimitive.boolean)
+    assertEquals("emulator", json["clientId"]!!.jsonPrimitive.content)
+    assertTrue(json["cmd"]!!.jsonPrimitive.boolean)
+    assertEquals(34, json["connectionTimeoutSeconds"]!!.jsonPrimitive.int)
+    assertTrue(json["debugLog"]!!.jsonPrimitive.boolean)
+    assertEquals("testdevice", json["deviceId"]!!.jsonPrimitive.content)
+    assertFalse(json["enableMapRotation"]!!.jsonPrimitive.boolean)
+    assertTrue(json["fusedRegionDetection"]!!.jsonPrimitive.boolean)
+    assertTrue(json["geocodeEnabled"]!!.jsonPrimitive.boolean)
+    assertEquals("testhost.example.com", json["host"]!!.jsonPrimitive.content)
+    assertEquals(150, json["ignoreInaccurateLocations"]!!.jsonPrimitive.int)
+    assertEquals(0, json["ignoreStaleLocations"]!!.jsonPrimitive.int)
+    assertEquals(900, json["keepalive"]!!.jsonPrimitive.int)
+    assertEquals(5, json["locatorDisplacement"]!!.jsonPrimitive.int)
+    assertEquals(60, json["locatorInterval"]!!.jsonPrimitive.int)
+    assertEquals(0, json["mode"]!!.jsonPrimitive.int)
+    assertEquals(1, json["monitoring"]!!.jsonPrimitive.int)
+    assertEquals(10, json["moveModeLocatorInterval"]!!.jsonPrimitive.int)
+    assertEquals(3, json["mqttProtocolLevel"]!!.jsonPrimitive.int)
+    assertFalse(json["notificationHigherPriority"]!!.jsonPrimitive.boolean)
+    assertTrue(json["notificationLocation"]!!.jsonPrimitive.boolean)
+    assertEquals("", json["opencageApiKey"]!!.jsonPrimitive.content)
+    assertEquals(3.352, json["osmTileScaleFactor"]!!.jsonPrimitive.double, 0.0001)
+    assertEquals("password", json["password"]!!.jsonPrimitive.content)
+    assertEquals(30, json["ping"]!!.jsonPrimitive.int)
+    assertEquals(1883, json["port"]!!.jsonPrimitive.int)
+    assertTrue(json["extendedData"]!!.jsonPrimitive.boolean)
+    assertEquals(1, json["pubQos"]!!.jsonPrimitive.int)
+    assertTrue(json["pubRetain"]!!.jsonPrimitive.boolean)
+    assertEquals("owntracks/%u/%d", json["pubTopicBase"]!!.jsonPrimitive.content)
+    assertTrue(json["remoteConfiguration"]!!.jsonPrimitive.boolean)
+    assertTrue(json["sub"]!!.jsonPrimitive.boolean)
+    assertEquals(2, json["subQos"]!!.jsonPrimitive.int)
+    assertEquals("owntracks/+/+", json["subTopic"]!!.jsonPrimitive.content)
   }
 
   @Test

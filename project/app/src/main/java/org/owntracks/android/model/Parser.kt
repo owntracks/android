@@ -1,56 +1,43 @@
 package org.owntracks.android.model
 
-import com.fasterxml.jackson.core.JsonGenerator
-import com.fasterxml.jackson.core.JsonParseException
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.JsonMappingException
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.databind.SerializerProvider
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer
-import com.fasterxml.jackson.databind.module.SimpleModule
-import com.fasterxml.jackson.databind.ser.std.StdSerializer
 import java.io.IOException
 import java.io.InputStream
-import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.model.messages.MessageEncrypted
 import org.owntracks.android.model.messages.MessageUnknown
 
 @Singleton
 class Parser @Inject constructor(private val encryptionProvider: EncryptionProvider?) {
-  private val defaultMapper =
-      ObjectMapper()
-          .registerModule(thisModule)
-          .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-          .configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true)
+  private val defaultMapper = Json {
+    prettyPrint = true
+    ignoreUnknownKeys = true
+    classDiscriminator = "_type"
+  }
 
-  private val arrayCompatMapper =
-      ObjectMapper()
-          .registerModule(thisModule)
-          .configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
-          .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+  private val arrayCompatMapper = Json {
+    ignoreUnknownKeys = true
+    isLenient = true
+    classDiscriminator = "_type"
+  }
 
   @Throws(IOException::class)
   fun toUnencryptedJsonPretty(message: MessageBase): String {
-    return defaultMapper
-        .writerWithDefaultPrettyPrinter()
-        .writeValueAsString(message)
-        .replace("\\r\\n".toRegex(), "\n")
+    return defaultMapper.encodeToString(message).replace("\\r\\n".toRegex(), "\n")
   }
 
   @Throws(IOException::class)
   fun toJsonPlain(message: MessageBase): String {
-    return defaultMapper.writeValueAsString(message)
+    return defaultMapper.encodeToString(message)
   }
 
   @Throws(IOException::class)
   fun toUnencryptedJsonBytes(message: MessageBase): ByteArray {
-    return defaultMapper.writeValueAsBytes(message)
+    return defaultMapper.encodeToString(message).toByteArray()
   }
 
   @Throws(IOException::class)
@@ -65,21 +52,19 @@ class Parser @Inject constructor(private val encryptionProvider: EncryptionProvi
 
   @Throws(IOException::class, EncryptionException::class)
   fun fromJson(input: String): MessageBase {
-    return decrypt(defaultMapper.readValue(input, MessageBase::class.java))
+    return decrypt(defaultMapper.decodeFromString(input))
   }
 
   @Throws(IOException::class)
   fun fromUnencryptedJson(input: ByteArray): MessageBase =
-      defaultMapper.readValue(input, MessageBase::class.java)
+      defaultMapper.decodeFromString(input.toString(Charsets.UTF_8))
 
   // Accepts {plain} as byte array
   @Throws(IOException::class, EncryptionException::class)
   fun fromJson(input: ByteArray): MessageBase =
       try {
         decrypt(fromUnencryptedJson(input))
-      } catch (e: JsonMappingException) {
-        MessageUnknown
-      } catch (e: JsonParseException) {
+      } catch (e: Exception) {
         MessageUnknown
       }
 
@@ -87,7 +72,7 @@ class Parser @Inject constructor(private val encryptionProvider: EncryptionProvi
   // input stream
   @Throws(IOException::class, EncryptionException::class)
   fun fromJson(input: InputStream): Array<MessageBase> {
-    return decrypt(arrayCompatMapper.readValue(input, Array<MessageBase>::class.java))
+    return decrypt(arrayCompatMapper.decodeFromString(input.bufferedReader().use { it.readText() }))
   }
 
   @Throws(IOException::class, EncryptionException::class)
@@ -99,66 +84,52 @@ class Parser @Inject constructor(private val encryptionProvider: EncryptionProvi
         throw EncryptionException(
             "received encrypted message but payload encryption is not enabled", null)
       }
-      defaultMapper.readValue(
-          encryptionProvider.decrypt((a[0] as MessageEncrypted).data),
-          Array<MessageBase>::class.java)
-    } else { // single message wrapped in array by mapper or array of messages
+      val encryptedMessage = a[0] as MessageEncrypted
+      val decrypted: String = encryptionProvider.decrypt(encryptedMessage.data)
+      fromJson(decrypted.byteInputStream())
+    } else {
       a
     }
   }
 
-  @Throws(IOException::class, EncryptionException::class)
-  private fun decrypt(m: MessageBase): MessageBase {
-    if (m is MessageEncrypted) {
+  @Throws(EncryptionException::class)
+  private fun decrypt(message: MessageBase): MessageBase {
+    return if (message is MessageEncrypted) {
       if (encryptionProvider == null || !encryptionProvider.isPayloadEncryptionEnabled) {
         throw EncryptionException(
-            "received encrypted message but payload encryption is not enabled")
+            "received encrypted message but payload encryption is not enabled", null)
       }
-      return defaultMapper.readValue(encryptionProvider.decrypt(m.data), MessageBase::class.java)
+      val decrypted: String = encryptionProvider.decrypt(message.data)
+      fromJson(decrypted)
+    } else {
+      message
     }
-    return m
   }
 
   @Throws(IOException::class)
-  private fun encryptString(input: String): String {
-    if (encryptionProvider != null && encryptionProvider.isPayloadEncryptionEnabled) {
-      val m = MessageEncrypted()
-      m.data = encryptionProvider.encrypt(input)
-      return defaultMapper.writeValueAsString(m)
+  private fun encryptString(string: String): String {
+    return if (encryptionProvider != null && encryptionProvider.isPayloadEncryptionEnabled) {
+      val encrypted = MessageEncrypted()
+      encrypted.data = encryptionProvider.encrypt(string)
+      toJsonPlain(encrypted)
+    } else {
+      string
     }
-    return input
   }
 
   @Throws(IOException::class)
-  private fun encryptBytes(input: ByteArray): ByteArray {
-    if (encryptionProvider != null && encryptionProvider.isPayloadEncryptionEnabled) {
-      val m = MessageEncrypted()
-      m.data = encryptionProvider.encrypt(input)
-      return defaultMapper.writeValueAsBytes(m)
+  private fun encryptBytes(bytes: ByteArray): ByteArray {
+    return if (encryptionProvider != null && encryptionProvider.isPayloadEncryptionEnabled) {
+      val encrypted = MessageEncrypted()
+      encrypted.data = encryptionProvider.encrypt(bytes)
+      toUnencryptedJsonBytes(encrypted)
+    } else {
+      bytes
     }
-    return input
   }
 
   class EncryptionException internal constructor(s: String, cause: Throwable?) :
       Exception(s, cause) {
     constructor(s: String) : this(s, null)
-  }
-}
-
-val thisModule =
-    SimpleModule().apply {
-      addSerializer(Instant::class.java, InstantSerializer())
-      addDeserializer(Instant::class.java, InstantDeserializer())
-    }
-
-class InstantDeserializer : StdDeserializer<Instant>(Instant::class.java) {
-  override fun deserialize(jp: JsonParser, ctxt: DeserializationContext): Instant {
-    return Instant.ofEpochSecond(jp.longValue)
-  }
-}
-
-class InstantSerializer : StdSerializer<Instant>(Instant::class.java) {
-  override fun serialize(value: Instant, gen: JsonGenerator, provider: SerializerProvider) {
-    gen.writeNumber(value.epochSecond)
   }
 }

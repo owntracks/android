@@ -1,45 +1,37 @@
 package org.owntracks.android.model.messages
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter
-import com.fasterxml.jackson.annotation.JsonAnySetter
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.annotation.JsonPropertyOrder
-import com.fasterxml.jackson.annotation.JsonTypeInfo
-import java.util.TreeMap
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import org.owntracks.android.support.MessageWaypointCollection
 
-@JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
+@Serializable
+@SerialName(MessageConfiguration.TYPE)
 class MessageConfiguration(private val messageWithId: MessageWithId = MessageWithRandomId()) :
     MessageBase(), MessageWithId by messageWithId {
-  private val map: MutableMap<String, Any?> = TreeMap()
+  private val map: MutableMap<String, Any?> = mutableMapOf()
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   var waypoints: MessageWaypointCollection = MessageWaypointCollection()
 
-  @JsonAnyGetter
-  @JsonPropertyOrder(alphabetic = true)
   fun any(): Map<String, Any?> {
     return map
   }
 
-  @JsonAnySetter
   operator fun set(key: String, value: Any?) {
     map[key] = value
   }
 
-  @JsonIgnore
+  @Transient
   operator fun get(key: String?): Any? {
     return map[key]
   }
 
-  @JsonIgnore
+  @Transient
   fun containsKey(key: String?): Boolean {
     return map.containsKey(key)
   }
 
-  @get:JsonIgnore
+  @get:Transient
   val keys: Set<String>
     get() = map.keys
 
@@ -47,5 +39,5 @@ class MessageConfiguration(private val messageWithId: MessageWithId = MessageWit
     const val TYPE = "configuration"
   }
 
-  override fun toString(): String = "[MessageConfiguration keys=${keys.joinToString(",")}]"
+  override fun toString(): String = "[MessageConfiguration]"
 }

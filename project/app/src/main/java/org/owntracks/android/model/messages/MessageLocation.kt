@@ -3,78 +3,73 @@ package org.owntracks.android.model.messages
 import android.annotation.SuppressLint
 import android.location.Location
 import android.os.Build
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.fasterxml.jackson.annotation.JsonValue
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 import kotlinx.datetime.Instant
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import org.jetbrains.annotations.NotNull
 import org.owntracks.android.model.BatteryStatus
 import org.owntracks.android.net.WifiInfoProvider
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.MonitoringMode
 
-@JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@Serializable
+@SerialName(MessageLocation.TYPE)
 open class MessageLocation(
     private val messageWithCreatedAtImpl: MessageWithCreatedAt = MessageCreatedAtNow(RealClock()),
-    private val messageWithId: MessageWithId = MessageWithRandomId()
+    private val messageWithId: MessageWithId = MessageWithRandomId(),
 ) :
     MessageBase(),
     MessageWithCreatedAt by messageWithCreatedAtImpl,
     MessageWithId by messageWithId {
 
-  @JsonIgnore
+  @Transient
   override val numberOfRetries: Int =
       100_000 // This should last a few weeks at 1 attempt per minute
 
-  @JsonProperty("source") var source: String? = null
+  @SerialName("source") var source: String? = null
 
-  @JsonProperty("t") var trigger: ReportType = ReportType.DEFAULT
+  @SerialName("t") var trigger: ReportType = ReportType.DEFAULT
 
-  @JsonProperty("batt") var battery: Int? = null
+  @SerialName("batt") var battery: Int? = null
 
-  @JsonProperty("bs") var batteryStatus: BatteryStatus? = null
+  @SerialName("bs") var batteryStatus: BatteryStatus? = null
 
-  @JsonProperty("acc") var accuracy = 0
+  @SerialName("acc") var accuracy = 0
 
-  @JsonProperty("vac") var verticalAccuracy = 0
+  @SerialName("vac") var verticalAccuracy = 0
 
-  @JsonProperty("lat") var latitude = 0.0
+  @SerialName("lat") var latitude = 0.0
 
-  @JsonProperty("lon") var longitude = 0.0
+  @SerialName("lon") var longitude = 0.0
 
-  @JsonProperty("alt") var altitude = 0
+  @SerialName("alt") var altitude = 0
 
-  @JsonProperty("vel") var velocity = 0
+  @SerialName("vel") var velocity = 0
 
-  @JsonProperty("cog") var bearing = 0
+  @SerialName("cog") var bearing = 0
 
-  @JsonProperty("tst") var timestamp: Long = 0
+  @SerialName("tst") var timestamp: Long = 0
 
-  @JsonProperty("m") var monitoringMode: MonitoringMode? = null
+  @SerialName("m") var monitoringMode: MonitoringMode? = null
 
   var conn: String? = null
 
-  @JsonProperty("inregions") var inregions: List<String>? = null
+  @SerialName("inregions") var inregions: List<String>? = null
 
-  @JsonProperty("BSSID") var bssid: String? = null
+  @SerialName("BSSID") var bssid: String? = null
 
-  @JsonProperty("SSID") var ssid: String? = null
+  @SerialName("SSID") var ssid: String? = null
 
-  @JsonInclude(JsonInclude.Include.NON_NULL) @JsonProperty("tid") var trackerId: String? = null
+  @SerialName("tid") var trackerId: String? = null
 
   override fun isValidMessage(): Boolean {
     return timestamp > 0
   }
 
-  @JsonIgnore
+  @Transient
   override fun toString(): String =
       "[MessageLocation id=$messageId ts=${Instant.fromEpochSeconds(timestamp)},lat=$latitude,long=$longitude,created_at=${createdAt},trigger=$trigger]"
 
@@ -85,6 +80,8 @@ open class MessageLocation(
   }
 
   companion object {
+    const val TYPE = "location"
+
     @SuppressLint("NewApi")
     @JvmStatic
     fun fromLocation(location: Location, sdk: Int = Build.VERSION.SDK_INT): MessageLocation =
@@ -104,36 +101,34 @@ open class MessageLocation(
                 0
               }
         }
-
-    @JvmStatic
-    fun fromLocationAndWifiInfo(
-        location: @NotNull Location,
-        wifiInfoProvider: WifiInfoProvider
-    ): @NotNull MessageLocation =
-        if (wifiInfoProvider.isConnected()) {
-          fromLocation(location).apply {
-            ssid = wifiInfoProvider.getSSID()
-            bssid = wifiInfoProvider.getBSSID()
-          }
-        } else {
-          fromLocation(location)
-        }
-
-    const val TYPE = "location"
-    const val CONN_TYPE_OFFLINE = "o"
-    const val CONN_TYPE_WIFI = "w"
-    const val CONN_TYPE_MOBILE = "m"
   }
 
-  enum class ReportType(@JsonValue val serialized: String) {
-    USER("u"), // Explicitly sent by the user
-    RESPONSE("r"), // Triggered by a remote reportLocation command
-    CIRCULAR("c"), // Region enter / leave event
-    PING("p"), // Issued by the periodic ping worker
-    TIMER("t"), // Generated by iOS devices
-    BEACON("b"), // Generated by iOS beacons
-    IOS_FREQUENT_LOCATIONS("v"), // Generated by iOS frequent locations
-    IOS_FOLLOW_CIRCULAR("C"), // Generated by iOS follow circular region
-    DEFAULT("")
+  enum class ReportType(val value: String) {
+    DEFAULT("u"), // manual
+    PING("p"), // ping
+    BEACON("b"), // beacon
+    RESPONSE("r"), // response
+    USER("u"), // user
+    TIMER("t"), // timer
+    CIRCULAR("c"), // circular region
+    BEACON_REGION("e"); // beacon region
+
+    companion object {
+      fun fromChar(s: String?): ReportType {
+        for (b in entries) {
+          if (b.value.equals(s, ignoreCase = true)) {
+            return b
+          }
+        }
+        return DEFAULT
+      }
+    }
+  }
+}
+
+fun MessageLocation.addWifi(wifiInfoProvider: @NotNull WifiInfoProvider) {
+  if (wifiInfoProvider.isWifiConnected) {
+    bssid = wifiInfoProvider.bssid
+    ssid = wifiInfoProvider.ssid
   }
 }

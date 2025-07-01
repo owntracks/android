@@ -7,23 +7,12 @@
   public protected private *;
 }
 
-## Jackson
--keepattributes *Annotation*,EnclosingMethod,Signature
--keepnames class com.fasterxml.jackson.** { *; }
- -dontwarn com.fasterxml.jackson.databind.**
- -keep class org.codehaus.** { *; }
-
--keep class com.fasterxml.jackson.databind.ObjectWriter {
-    public ** writeValueAsString(**);
+## Kotlinx.Serialization
+-keepclassmembers class ** {
+    @kotlinx.serialization.Serializable <methods>;
 }
+-keep class **$$serializer { *; }
 
--keep class com.fasterxml.jackson.databind.ObjectMapper {
-    public <methods>;
-    protected <methods>;
-}
-
-# Needed for jackson-module-kotlin
--keep class kotlin.reflect.**
 
 ## Paho
 -keep class org.eclipse.paho.clent.mqttv3.** { *; }

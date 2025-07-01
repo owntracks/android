@@ -12,8 +12,9 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
-import com.fasterxml.jackson.databind.ObjectMapper
 import dagger.hilt.android.testing.HiltAndroidTest
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -181,7 +182,8 @@ class WaypointsActivityTests :
     clickOn(R.string.title_activity_preferences)
     clickOn(R.string.configurationManagement)
     val effectiveConfiguration = getText(onView(withId(R.id.effectiveConfiguration)))
-    val json = ObjectMapper().readTree(effectiveConfiguration)
+
+    val json = Json.parseToJsonElement(effectiveConfiguration).jsonObject
     assertTrue(json.isObject)
     assertTrue(json.has("waypoints"))
     assertEquals(1, json["waypoints"].size())

@@ -9,7 +9,6 @@ import android.net.Network
 import android.os.Build
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
-import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.IOException
 import java.net.ConnectException

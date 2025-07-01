@@ -1,22 +1,18 @@
 package org.owntracks.android.model.messages
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.annotation.JsonTypeInfo
 import kotlinx.datetime.Instant
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import org.owntracks.android.location.geofencing.Geofence
 import org.owntracks.android.preferences.Preferences
 
-@JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@Serializable
+@SerialName(MessageTransition.TYPE)
 class MessageTransition(private val messageWithId: MessageWithId = MessageWithRandomId()) :
     MessageBase(), MessageWithId by messageWithId {
 
-  @JsonIgnore
+  @Transient
   fun getTransition(): Int =
       when (event) {
         EVENT_ENTER -> Geofence.GEOFENCE_TRANSITION_ENTER
@@ -34,23 +30,23 @@ class MessageTransition(private val messageWithId: MessageWithId = MessageWithRa
         }
   }
 
-  @JsonProperty("event") var event: String? = null
+  @SerialName("event") var event: String? = null
 
-  @JsonProperty("desc") var description: String? = null
+  @SerialName("desc") var description: String? = null
 
-  @JsonProperty("tid") var trackerId: String? = null
+  @SerialName("tid") var trackerId: String? = null
 
-  @JsonProperty("t") var trigger: String? = null
+  @SerialName("t") var trigger: String? = null
 
-  @JsonProperty("tst") var timestamp: Long = 0
+  @SerialName("tst") var timestamp: Long = 0
 
-  @JsonProperty("wtst") var waypointTimestamp: Long = 0
+  @SerialName("wtst") var waypointTimestamp: Long = 0
 
-  @JsonProperty("acc") var accuracy = 0
+  @SerialName("acc") var accuracy = 0
 
-  @JsonProperty("lon") var longitude = 0.0
+  @SerialName("lon") var longitude = 0.0
 
-  @JsonProperty("lat") var latitude = 0.0
+  @SerialName("lat") var latitude = 0.0
 
   override fun annotateFromPreferences(preferences: Preferences) {
     topic = preferences.pubTopicEvents

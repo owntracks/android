@@ -2,12 +2,18 @@ package org.owntracks.android.ui.preferences.load
 
 import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.double
+import kotlinx.serialization.json.int
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.long
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -87,13 +93,12 @@ class LoadViewModelTest {
             "owntracks:///config?inline=eyJfdHlwZSI6ImNvbmZpZ3VyYXRpb24ifQ==")
         advanceUntilIdle()
         assertEquals(ImportStatus.SUCCESS, vm.configurationImportStatus.value)
-        val json = ObjectMapper().readTree(vm.displayedConfiguration.value)
-        assertTrue(json.isObject)
-        assertTrue(json.has("_type"))
-        assertEquals("configuration", json.get("_type").asText())
-        assertTrue(json.has("waypoints"))
-        assertTrue(json.get("waypoints").isArray)
-        assertTrue(json.get("waypoints").isEmpty)
+        val json = Json.parseToJsonElement(vm.displayedConfiguration.value!!).jsonObject
+        assertTrue(json.isNotEmpty())
+        assertTrue(json.containsKey("_type"))
+        assertEquals("configuration", json["_type"]?.jsonPrimitive?.content)
+        assertTrue(json.containsKey("waypoints"))
+        assertTrue(json["waypoints"]?.jsonArray?.isEmpty() == true)
       }
 
   @Test
@@ -111,28 +116,41 @@ class LoadViewModelTest {
         vm.extractPreferencesFromUri(
             "owntracks:///config?inline=eyJfdHlwZSI6IndheXBvaW50cyIsIndheXBvaW50cyI6W3siX3R5cGUiOiJ3YXlwb2ludCIsImRlc2MiOiJUZXN0IFdheXBvaW50IiwibGF0Ijo1MSwibG9uIjowLCJyYWQiOjQ1MCwidHN0IjoxNTk4NDUxMzcyfV19")
         val displayedConfig = vm.displayedConfiguration.value
-        val json = ObjectMapper().readTree(displayedConfig)
-        assertTrue(json.isObject)
-        assertTrue(json.has("_type"))
-        assertEquals("waypoints", json.get("_type").asText())
-        assertTrue(json.has("_id"))
-        assertTrue(json.get("_id").isTextual)
-        assertTrue(json.has("waypoints"))
-        assertTrue(json.get("waypoints").isArray)
-        assertEquals(1, json.get("waypoints").size())
-        assertTrue(json.get("waypoints").get(0).isObject)
-        assertTrue(json.get("waypoints").get(0).has("_type"))
-        assertEquals("waypoint", json.get("waypoints").get(0).get("_type").asText())
-        assertTrue(json.get("waypoints").get(0).has("desc"))
-        assertEquals("Test Waypoint", json.get("waypoints").get(0).get("desc").asText())
-        assertTrue(json.get("waypoints").get(0).has("lat"))
-        assertEquals(51.0, json.get("waypoints").get(0).get("lat").asDouble(), 0.000001)
-        assertTrue(json.get("waypoints").get(0).has("lon"))
-        assertEquals(0.0, json.get("waypoints").get(0).get("lon").asDouble(), 0.000001)
-        assertTrue(json.get("waypoints").get(0).has("rad"))
-        assertEquals(450, json.get("waypoints").get(0).get("rad").asInt())
-        assertTrue(json.get("waypoints").get(0).has("tst"))
-        assertEquals(1598451372, json.get("waypoints").get(0).get("tst").asLong())
+        val json = Json.parseToJsonElement(displayedConfig!!).jsonObject
+        assertTrue(json.isNotEmpty())
+        assertTrue(json.containsKey("_type"))
+        assertEquals("waypoints", json["_type"]?.jsonPrimitive?.content)
+        assertTrue(json.containsKey("_id"))
+        assertTrue(json["_id"]?.jsonPrimitive?.isString == true)
+        assertTrue(json.containsKey("waypoints"))
+        assertTrue(json["waypoints"]?.jsonArray?.isNotEmpty() == true)
+        assertEquals(1, json["waypoints"]?.jsonArray?.size)
+        assertTrue(json["waypoints"]?.jsonArray?.get(0)?.jsonObject?.isNotEmpty() == true)
+        assertTrue(json["waypoints"]?.jsonArray?.get(0)?.jsonObject?.containsKey("_type") == true)
+        assertEquals(
+            "waypoint",
+            json["waypoints"]?.jsonArray?.get(0)?.jsonObject?.get("_type")?.jsonPrimitive?.content)
+        assertTrue(json["waypoints"]?.jsonArray?.get(0)?.jsonObject?.containsKey("desc") == true)
+        assertEquals(
+            "Test Waypoint",
+            json["waypoints"]?.jsonArray?.get(0)?.jsonObject?.get("desc")?.jsonPrimitive?.content)
+        assertTrue(json["waypoints"]?.jsonArray?.get(0)?.jsonObject?.containsKey("lat") == true)
+        assertEquals(
+            51.0,
+            json["waypoints"]?.jsonArray?.get(0)?.jsonObject?.get("lat")?.jsonPrimitive?.double,
+            0.000001)
+        assertTrue(json["waypoints"]?.jsonArray?.get(0)?.jsonObject?.containsKey("lon") == true)
+        assertEquals(
+            0.0,
+            json["waypoints"]?.jsonArray?.get(0)?.jsonObject?.get("lon")?.jsonPrimitive?.double,
+            0.000001)
+        assertTrue(json["waypoints"]?.jsonArray?.get(0)?.jsonObject?.containsKey("rad") == true)
+        assertEquals(
+            450, json["waypoints"]?.jsonArray?.get(0)?.jsonObject?.get("rad")?.jsonPrimitive?.int)
+        assertTrue(json["waypoints"]?.jsonArray?.get(0)?.jsonObject?.containsKey("tst") == true)
+        assertEquals(
+            1598451372,
+            json["waypoints"]?.jsonArray?.get(0)?.jsonObject?.get("tst")?.jsonPrimitive?.long)
         assertEquals(ImportStatus.SUCCESS, vm.configurationImportStatus.value)
       }
 
