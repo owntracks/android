@@ -1,10 +1,10 @@
 package org.owntracks.android.model.messages
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.Instant
+import kotlinx.serialization.SerialName
 
 interface MessageWithCreatedAt {
-  @get:JsonProperty("created_at") var createdAt: Instant
+  @get:SerialName("created_at") var createdAt: Instant
 }
 
 class MessageCreatedAtNow(clock: Clock) : MessageWithCreatedAt {

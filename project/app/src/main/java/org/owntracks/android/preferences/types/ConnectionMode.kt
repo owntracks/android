@@ -1,8 +1,9 @@
 package org.owntracks.android.preferences.types
 
-import com.fasterxml.jackson.annotation.JsonValue
+import kotlinx.serialization.Serializable
 
-enum class ConnectionMode(@JsonValue val value: Int) {
+@Serializable
+enum class ConnectionMode(val value: Int) {
   MQTT(0),
   HTTP(3);
 

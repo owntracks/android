@@ -1,15 +1,13 @@
 package org.owntracks.android.geocoding
 
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import java.math.BigDecimal
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import java.time.Instant
 import java.time.temporal.ChronoUnit
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -19,16 +17,12 @@ import timber.log.Timber
 class OpenCageGeocoder
 internal constructor(private val apiKey: String, private val httpClient: OkHttpClient) :
     CachingGeocoder() {
-  private val jsonMapper: ObjectMapper =
-      ObjectMapper()
-          .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-          .registerModule(JavaTimeModule())
-          .registerKotlinModule()
+  private val jsonMapper: Json = Json { ignoreUnknownKeys = true }
   private var tripResetTimestamp: Instant = Instant.now()
   private var something = true
 
   internal fun deserializeOpenCageResponse(json: String): OpenCageResponse =
-      jsonMapper.readValue(json, OpenCageResponse::class.java)
+      jsonMapper.decodeFromString(json)
 
   override fun doLookup(latitude: BigDecimal, longitude: BigDecimal): GeocodeResult {
     if (tripResetTimestamp > Instant.now()) {
@@ -73,7 +67,7 @@ internal constructor(private val apiKey: String, private val httpClient: OkHttpC
             }
             401 -> {
               val deserializedOpenCageResponse =
-                  jsonMapper.readValue(responseBody, OpenCageResponse::class.java)
+                  jsonMapper.decodeFromString<OpenCageResponse>(responseBody!!)
               tripResetTimestamp = Instant.now().plus(1, ChronoUnit.MINUTES)
               GeocodeResult.Fault.Error(
                   deserializedOpenCageResponse.status?.message ?: "No error message provided",
@@ -81,7 +75,7 @@ internal constructor(private val apiKey: String, private val httpClient: OkHttpC
             }
             402 -> {
               val deserializedOpenCageResponse =
-                  jsonMapper.readValue(responseBody, OpenCageResponse::class.java)
+                  jsonMapper.decodeFromString<OpenCageResponse>(responseBody!!)
               Timber.d("Opencage HTTP response: $responseBody")
               Timber.w("Opencage quota exceeded")
               deserializedOpenCageResponse.rate?.let { rate ->
@@ -92,7 +86,7 @@ internal constructor(private val apiKey: String, private val httpClient: OkHttpC
             }
             403 -> {
               val deserializedOpenCageResponse =
-                  jsonMapper.readValue(responseBody, OpenCageResponse::class.java)
+                  jsonMapper.decodeFromString<OpenCageResponse>(responseBody!!)
               Timber.e(responseBody)
               tripResetTimestamp = Instant.now().plus(1, ChronoUnit.MINUTES)
               if (deserializedOpenCageResponse.status?.message == "IP address rejected") {
@@ -133,11 +127,12 @@ internal constructor(private val apiKey: String, private val httpClient: OkHttpC
     private const val OPENCAGE_HOST = "api.opencagedata.com"
   }
 
+  @Serializable
   internal class OpenCageResult {
     val formatted: String? = null
   }
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
+  @Serializable
   internal class OpenCageResponse {
     val rate: Rate? = null
 
@@ -147,9 +142,7 @@ internal constructor(private val apiKey: String, private val httpClient: OkHttpC
       get() = if (!results.isNullOrEmpty()) results[0].formatted else null
   }
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  internal data class Rate(val limit: Int, val remaining: Int, val reset: Instant)
+  @Serializable internal data class Rate(val limit: Int, val remaining: Int, val reset: Instant)
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  internal data class Status(val code: Int, val message: String)
+  @Serializable internal data class Status(val code: Int, val message: String)
 }

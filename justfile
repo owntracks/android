@@ -1,8 +1,15 @@
 set dotenv-load := true
+set positional-arguments := true
 gradlec := "./project/gradlew -p project"
 
 default:
     @just --list
+
+gradle *args='':
+    {{gradlec}} $@
+
+format:
+    {{gradlec}} ktfmtFormat
 
 build:
     {{gradlec}} assembleDebug app:assembleAndroidTest app:assembleGmsDebugUnitTest assembleRelease

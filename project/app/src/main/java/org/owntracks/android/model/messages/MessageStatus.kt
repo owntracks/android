@@ -1,23 +1,19 @@
 package org.owntracks.android.model.messages
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.annotation.JsonTypeInfo
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import org.owntracks.android.BuildConfig
 import org.owntracks.android.preferences.Preferences
 
-@JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@Serializable
+@SerialName(MessageStatus.TYPE)
 class MessageStatus(private val messageWithId: MessageWithId = MessageWithRandomId()) :
     MessageBase(), MessageWithId by messageWithId {
 
   var android: AddMessageStatus? = null
 
-  @JsonIgnore override fun toString(): String = "[MessageStatus android=${android}]"
+  @Transient override fun toString(): String = "[MessageStatus android=${android}]"
 
   override fun annotateFromPreferences(preferences: Preferences) {
     topic = preferences.pubTopicStatus
@@ -38,18 +34,19 @@ class MessageStatus(private val messageWithId: MessageWithId = MessageWithRandom
   }
 }
 
+@Serializable
 class AddMessageStatus {
-  @JsonProperty("wifi") var wifistate = 0
+  @SerialName("wifi") var wifistate = 0
 
-  @JsonProperty("ps") var powerSave = 0
+  @SerialName("ps") var powerSave = 0
 
-  @JsonProperty("bo") var batteryOptimizations = 0
+  @SerialName("bo") var batteryOptimizations = 0
 
-  @JsonProperty("hib") var appHibernation = 0
+  @SerialName("hib") var appHibernation = 0
 
-  @JsonProperty("loc") var locationPermission = 0
+  @SerialName("loc") var locationPermission = 0
 
-  @JsonProperty("version") var version = BuildConfig.VERSION_CODE
+  @SerialName("version") var version = BuildConfig.VERSION_CODE
 
-  @JsonProperty("flavour") var flavour = BuildConfig.FLAVOR
+  @SerialName("flavour") var flavour = BuildConfig.FLAVOR
 }

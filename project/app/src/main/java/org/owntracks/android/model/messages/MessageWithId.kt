@@ -1,6 +1,6 @@
 package org.owntracks.android.model.messages
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import kotlinx.serialization.SerialName
 import kotlin.random.Random
 
 typealias MessageId = String
@@ -8,7 +8,7 @@ typealias MessageId = String
 const val ZeroMessageId: MessageId = "0"
 
 interface MessageWithId {
-  @get:JsonProperty("_id") var messageId: MessageId
+  @get:SerialName("_id") var messageId: MessageId
 }
 
 class MessageWithRandomId : MessageWithId {
