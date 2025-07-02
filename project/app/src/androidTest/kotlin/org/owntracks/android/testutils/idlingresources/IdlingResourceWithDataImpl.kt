@@ -15,7 +15,7 @@ import timber.log.Timber
 class IdlingResourceWithDataImpl<T : MessageBase>(
     private val resourceName: String,
     private val comparator: Comparator<in T>
-) : IdlingResource, IdlingResourceWithData<T> {
+) : IdlingResource, IdlingResourceWithData<T>(resourceName, comparator) {
   private var callback: IdlingResource.ResourceCallback? = null
   private val sent = mutableListOf<T>()
   private val received = mutableListOf<T>()

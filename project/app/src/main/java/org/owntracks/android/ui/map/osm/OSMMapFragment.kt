@@ -2,7 +2,6 @@ package org.owntracks.android.ui.map.osm
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
 import android.hardware.display.DisplayManager
 import android.location.Location
 import android.os.Build
@@ -15,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.Observer
 import androidx.preference.PreferenceManager
 import kotlin.math.roundToInt
@@ -314,7 +314,7 @@ internal constructor(
       }
       overlays
           .firstOrNull { it is Marker && it.id == id }
-          ?.run { (this as Marker).icon = BitmapDrawable(resources, image) }
+          ?.run { (this as Marker).icon = image.toDrawable(resources) }
       invalidate()
     }
   }
@@ -354,15 +354,79 @@ internal constructor(
   }
 
   override fun addRegion(waypoint: WaypointModel) {
-    TODO("Not yet implemented")
+    if (preferences.showRegionsOnMap) {
+      mapView?.run {
+        Timber.d("Adding region ${waypoint.id} to map")
+        val regionPolygon =
+            Polygon(this).apply {
+              id = "regionpolygon-${waypoint.id}"
+              points =
+                  Polygon.pointsAsCircle(
+                      waypoint.getLocation().toLatLng().toGeoPoint(),
+                      waypoint.geofenceRadius.toDouble(),
+                  )
+              fillPaint.color = getRegionColor()
+              outlinePaint.strokeWidth = 1f
+              setOnClickListener { _, mapView, _ ->
+                mapView.overlays
+                    .filterIsInstance<Marker>()
+                    .first { it.id == "regionmarker-${waypoint.id}" }
+                    .showInfoWindow()
+                true
+              }
+            }
+        val regionMarker =
+            Marker(this).apply {
+              id = "regionmarker-${waypoint.id}"
+              position = waypoint.getLocation().toLatLng().toGeoPoint()
+              title = waypoint.description
+              setInfoWindow(MarkerInfoWindow(R.layout.osm_region_bubble, this@run))
+            }
+        overlays.addAll(0, listOf(regionPolygon, regionMarker))
+      }
+    }
   }
 
   override fun deleteRegion(waypoint: WaypointModel) {
-    TODO("Not yet implemented")
+    if (preferences.showRegionsOnMap) {
+      mapView?.run {
+        Timber.d("Removing region ${waypoint.id} from map")
+        overlays
+            .filterIsInstance<Marker>()
+            .firstOrNull { it.id == "regionmarker-${waypoint.id}" }
+            ?.let(overlays::remove)
+        overlays
+            .filterIsInstance<Polygon>()
+            .firstOrNull { it.id == "regionpolygon-${waypoint.id}" }
+            ?.let(overlays::remove)
+      }
+    }
   }
 
   override fun updateRegion(waypoint: WaypointModel) {
-    TODO("Not yet implemented")
+    if (preferences.showRegionsOnMap) {
+      mapView?.run {
+        Timber.d("Updating region ${waypoint.id} on map")
+        overlays
+            .filterIsInstance<Polygon>()
+            .firstOrNull { it.id == "regionpolygon-${waypoint.id}" }
+            ?.apply {
+              points =
+                  Polygon.pointsAsCircle(
+                      waypoint.getLocation().toLatLng().toGeoPoint(),
+                      waypoint.geofenceRadius.toDouble(),
+                  )
+              fillPaint.color = getRegionColor()
+            }
+        overlays
+            .filterIsInstance<Marker>()
+            .firstOrNull { it.id == "regionmarker-${waypoint.id}" }
+            ?.apply {
+              position = waypoint.getLocation().toLatLng().toGeoPoint()
+              title = waypoint.description
+            }
+      }
+    }
   }
 
   override fun reDrawRegions(regions: Set<WaypointModel>) {

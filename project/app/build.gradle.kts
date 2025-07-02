@@ -21,6 +21,8 @@ val gmsImplementation: Configuration by configurations.creating
 
 val packageVersionCode: Int = System.getenv("VERSION_CODE")?.toInt() ?: 420503000
 val manuallySetVersion: Boolean = System.getenv("VERSION_CODE") != null
+val enablePlayPublishing: Boolean =
+    !System.getenv("ANDROID_PUBLISHER_CREDENTIALS").isNullOrBlank()
 
 android {
   compileSdk = 34
@@ -62,16 +64,18 @@ android {
     generateLocaleConfig = true
   }
 
-  signingConfigs {
-    register("release") {
-      keyAlias = "upload"
-      keyPassword = System.getenv("KEYSTORE_PASSPHRASE")
-      storeFile = file("../owntracks.release.keystore.jks")
-      storePassword = System.getenv("KEYSTORE_PASSPHRASE")
-      enableV1Signing = true
-      enableV2Signing = true
-      enableV3Signing = true
-      enableV4Signing = true
+  if (!System.getenv("KEYSTORE_PASSPHRASE").isNullOrBlank()) {
+    signingConfigs {
+      register("release") {
+        keyAlias = "upload"
+        keyPassword = System.getenv("KEYSTORE_PASSPHRASE")
+        storeFile = file("../owntracks.release.keystore.jks")
+        storePassword = System.getenv("KEYSTORE_PASSPHRASE")
+        enableV1Signing = true
+        enableV2Signing = true
+        enableV3Signing = true
+        enableV4Signing = true
+      }
     }
   }
 
@@ -192,7 +196,7 @@ android {
   }
   playConfigs {
     register("gms") {
-      enabled.set(true)
+      enabled.set(enablePlayPublishing)
       track.set("internal")
       if (manuallySetVersion) {
         resolutionStrategy.set(com.github.triplet.gradle.androidpublisher.ResolutionStrategy.IGNORE)
