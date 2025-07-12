@@ -12,7 +12,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
@@ -38,13 +37,15 @@ class EditorActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    DataBindingUtil.setContentView<UiPreferencesEditorBinding>(this, R.layout.ui_preferences_editor)
-        .apply {
-          vm = viewModel
-          lifecycleOwner = this@EditorActivity
-          setSupportActionBar(appbar.toolbar)
-          supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        }
+    UiPreferencesEditorBinding.inflate(layoutInflater).apply {
+      setContentView(root)
+      setSupportActionBar(appbar.toolbar)
+      viewModel.effectiveConfiguration.observe(this@EditorActivity) {
+        effectiveConfiguration.text = it
+      }
+    }
+    supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
     viewModel.configLoadError.observe(this) {
       if (it != null) {
         displayLoadFailed()

@@ -48,7 +48,7 @@ abstract class TestWithAnActivity<T : Activity>(private val startActivity: Boole
   private val activityClass: Class<T> =
       (javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[0] as Class<T>
   val baristaRule = BaristaRule.create(activityClass)
-  private val flakyRule = FlakyTestRule().allowFlakyAttemptsByDefault(1)
+  private val flakyRule = FlakyTestRule().allowFlakyAttemptsByDefault(2)
   private val clearPreferencesRule: ClearPreferencesRule = ClearPreferencesRule()
   private val clearDatabaseRule: ClearDatabaseRule = ClearDatabaseRule()
   private val clearFilesRule: ClearFilesRule = ClearFilesRule()

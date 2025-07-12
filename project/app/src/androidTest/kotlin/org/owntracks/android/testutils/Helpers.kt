@@ -36,7 +36,6 @@ import androidx.test.runner.lifecycle.Stage
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickDialogNegativeButton
 import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickDialogPositiveButton
-import com.adevinta.android.barista.interaction.BaristaEditTextInteractions
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
 import com.adevinta.android.barista.interaction.PermissionGranter
 import java.io.BufferedInputStream
@@ -69,7 +68,7 @@ fun scrollToPreferenceWithText(textResource: Int) {
 fun writeToPreference(textResource: Int, value: String) {
   scrollToPreferenceWithText(textResource)
   clickOn(textResource)
-  BaristaEditTextInteractions.writeTo(android.R.id.edit, value)
+  writeTo(android.R.id.edit, value)
   clickDialogPositiveButton()
 }
 
@@ -138,19 +137,6 @@ inline fun IdlingResource?.use(timeout: Duration = 15.seconds, block: () -> Unit
   }
 }
 
-fun disableDeviceLocation() {
-  val cmd =
-      if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) {
-        "settings put secure location_mode 0"
-      } else {
-        "settings put secure location_providers_allowed -gps"
-      }
-
-  getInstrumentation().uiAutomation.executeShellCommand(cmd).use {
-    it.dumpOutputToLog("disable devicelocation")
-  }
-}
-
 fun stopAndroidSetupProcess() {
   listOf(
           "com.google.android.setupwizard",
@@ -170,19 +156,6 @@ fun disableHeadsupNotifications() {
       .uiAutomation
       .executeShellCommand("settings put global heads_up_notifications_enabled 0")
       .use { it.dumpOutputToLog("disable heads_up_notifications") }
-}
-
-fun enableDeviceLocation() {
-  val cmd =
-      if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) {
-        "settings put secure location_mode 3"
-      } else {
-        "settings put secure location_providers_allowed +gps"
-      }
-
-  getInstrumentation().uiAutomation.executeShellCommand(cmd).use {
-    it.dumpOutputToLog("enable devicelocation")
-  }
 }
 
 fun grantNotificationAndForegroundPermissions() {

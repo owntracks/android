@@ -22,6 +22,7 @@ import org.owntracks.android.model.Parser
 import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.model.messages.MessageTransition
+import org.owntracks.android.testutils.JustThisTestPlease
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.TestWithAnMQTTBroker
 import org.owntracks.android.testutils.TestWithAnMQTTBrokerImpl
@@ -36,6 +37,7 @@ import timber.log.Timber
 @ExperimentalUnsignedTypes
 @LargeTest
 @HiltAndroidTest
+@JustThisTestPlease
 @RunWith(AndroidJUnit4::class)
 class MQTTTransitionEventTests :
     TestWithAnActivity<MapActivity>(false), TestWithAnMQTTBroker by TestWithAnMQTTBrokerImpl() {

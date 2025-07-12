@@ -69,6 +69,7 @@ import org.owntracks.android.ui.mixins.LocationPermissionRequester
 import org.owntracks.android.ui.mixins.NotificationPermissionRequester
 import org.owntracks.android.ui.mixins.ServiceStarter
 import org.owntracks.android.ui.mixins.WorkManagerInitExceptionNotifier
+import org.owntracks.android.ui.welcome.WelcomeActivity
 import timber.log.Timber
 
 @AndroidEntryPoint
@@ -141,12 +142,11 @@ class MapActivity :
 
     super.onCreate(savedInstanceState)
 
-    // TODO Remove this
-    //    if (!preferences.setupCompleted) {
-    //      startActivity(Intent(this, WelcomeActivity::class.java))
-    //      finish()
-    //      return
-    //    }
+    if (!preferences.setupCompleted) {
+      startActivity(Intent(this, WelcomeActivity::class.java))
+      finish()
+      return
+    }
 
     binding =
         DataBindingUtil.setContentView<UiMapBinding>(this, R.layout.ui_map).apply {

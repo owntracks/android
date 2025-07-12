@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <data>
-
-        <import type="org.owntracks.android.App" />
-    </data>
-
-    <RelativeLayout
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 
         android:id="@+id/welcome_fragment"
         android:layout_width="match_parent"
@@ -55,4 +49,3 @@
             android:text="@string/welcome_finish_open_preferences_button_label" />
 
     </RelativeLayout>
-</layout>
