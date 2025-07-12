@@ -31,8 +31,9 @@ class PlayFragment @Inject constructor() : WelcomeFragment() {
   ): View {
     binding =
         UiWelcomePlayBinding.inflate(inflater, container, false).apply {
-          vm = playFragmentViewModel
-          lifecycleOwner = this@PlayFragment.viewLifecycleOwner
+          playFragmentViewModel.playServicesFixAvailable.observe(this@PlayFragment) { available ->
+            recover.isEnabled = available
+          }
           recover.setOnClickListener { requestFix() }
         }
     return binding.root
@@ -46,9 +47,15 @@ class PlayFragment @Inject constructor() : WelcomeFragment() {
     val result = googleAPI.isGooglePlayServicesAvailable(requireContext())
 
     if (!googleAPI.showErrorDialogFragment(
-        requireActivity(), result, PLAY_SERVICES_RESOLUTION_REQUEST)) {
+        requireActivity(),
+        result,
+        PLAY_SERVICES_RESOLUTION_REQUEST,
+    )) {
       Snackbar.make(
-              binding.root, getString(R.string.play_services_not_available), Snackbar.LENGTH_SHORT)
+              binding.root,
+              getString(R.string.play_services_not_available),
+              Snackbar.LENGTH_SHORT,
+          )
           .show()
     }
     checkGooglePlayservicesIsAvailable()
@@ -59,19 +66,25 @@ class PlayFragment @Inject constructor() : WelcomeFragment() {
         when (val result = googleAPI.isGooglePlayServicesAvailable(requireContext())) {
           ConnectionResult.SUCCESS -> {
             playFragmentViewModel.setPlayServicesAvailable(
-                getString(R.string.play_services_now_available))
+                getString(R.string.play_services_now_available),
+            )
             WelcomeViewModel.ProgressState.PERMITTED
           }
+
           ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED,
           ConnectionResult.SERVICE_UPDATING -> {
             playFragmentViewModel.setPlayServicesNotAvailable(
-                true, getString(R.string.play_services_update_required))
+                true,
+                getString(R.string.play_services_update_required),
+            )
             WelcomeViewModel.ProgressState.NOT_PERMITTED
           }
+
           else -> {
             playFragmentViewModel.setPlayServicesNotAvailable(
                 googleAPI.isUserResolvableError(result),
-                getString(R.string.play_services_not_available))
+                getString(R.string.play_services_not_available),
+            )
             WelcomeViewModel.ProgressState.NOT_PERMITTED
           }
         }

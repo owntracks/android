@@ -1,91 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?><!--suppress EllipsizeMaxLines - You can only do single line and no ellipsis using this method, not singleLine=true -->
 
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
 
-    <data>
+    <ImageView
+        android:layout_width="24dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:id="@+id/icon"
+        android:contentDescription="@{title}"
 
-        <import type="android.view.View" />
 
-        <variable
-            name="title"
-            type="String" />
-
-        <variable
-            name="textValue"
-            type="String" />
-
-        <variable
-            name="icon"
-            type="android.graphics.drawable.Drawable" />
-
-        <variable
-            name="iconRotation"
-            type="Float" />
-
-    </data>
+        app:tint="@color/primary" />
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal">
+        android:layout_gravity="start"
+        android:orientation="vertical"
+        android:paddingStart="8dp">
 
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-
-            android:contentDescription="@{title}"
-            android:rotation="@{iconRotation}"
-            android:src="@{icon}"
-            android:visibility="@{icon !=null ? View.VISIBLE : View.INVISIBLE}"
-            app:tint="@color/primary" />
-
-        <androidx.appcompat.widget.LinearLayoutCompat
+        <TextView
+            android:id="@+id/value"
+            style="@style/ListItemPrimary"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            android:orientation="vertical"
-            android:paddingStart="8dp">
+            android:layout_height="42dp"
+            android:ellipsize="none"
+            android:gravity="bottom | start"
+            android:maxLines="1"
+            android:paddingStart="0dp"
+            android:paddingTop="@dimen/activity_horizontal_margin"
+            android:paddingEnd="0dp"
+            android:text="@{textValue}"
+            android:textIsSelectable="true"
+            android:textSize="16sp"
+            app:autoSizeMaxTextSize="16sp"
+            app:autoSizeMinTextSize="1sp"
+            app:autoSizeStepGranularity="1sp"
+            app:autoSizeTextType="uniform" />
 
-            <TextView
-                android:id="@+id/value"
-                style="@style/ListItemPrimary"
-                android:layout_width="match_parent"
-                android:layout_height="42dp"
-                android:ellipsize="none"
-                android:gravity="bottom | start"
-                android:maxLines="1"
-                android:paddingStart="0dp"
-                android:paddingTop="@dimen/activity_horizontal_margin"
-                android:paddingEnd="0dp"
-                android:text="@{textValue}"
-                android:textIsSelectable="true"
-                android:textSize="16sp"
-                app:autoSizeMaxTextSize="16sp"
-                app:autoSizeMinTextSize="1sp"
-                app:autoSizeStepGranularity="1sp"
-                app:autoSizeTextType="uniform" />
-
-            <org.owntracks.android.ui.map.AutoResizingTextViewWithListener
-                style="@style/ListItemSecondary"
-                android:id="@+id/label"
-                android:layout_width="match_parent"
-                android:layout_height="42dp"
-                android:ellipsize="none"
-                android:gravity="top | start"
-                android:maxLines="1"
-                android:paddingStart="0dp"
-                android:paddingEnd="@dimen/activity_horizontal_margin"
-                android:paddingBottom="@dimen/activity_horizontal_margin"
-                android:text="@{title}"
-                android:textIsSelectable="true"
-                app:autoSizeMaxTextSize="16sp"
-                app:autoSizeMinTextSize="1sp"
-                app:autoSizeStepGranularity="1sp"
-                app:autoSizeTextType="uniform" />
-        </androidx.appcompat.widget.LinearLayoutCompat>
-
-
+        <org.owntracks.android.ui.map.AutoResizingTextViewWithListener
+            android:id="@+id/label"
+            style="@style/ListItemSecondary"
+            android:layout_width="match_parent"
+            android:layout_height="42dp"
+            android:ellipsize="none"
+            android:gravity="top | start"
+            android:maxLines="1"
+            android:paddingStart="0dp"
+            android:paddingEnd="@dimen/activity_horizontal_margin"
+            android:paddingBottom="@dimen/activity_horizontal_margin"
+            android:text="@{title}"
+            android:textIsSelectable="true"
+            app:autoSizeMaxTextSize="16sp"
+            app:autoSizeMinTextSize="1sp"
+            app:autoSizeStepGranularity="1sp"
+            app:autoSizeTextType="uniform" />
     </androidx.appcompat.widget.LinearLayoutCompat>
-</layout>
+
+
+</androidx.appcompat.widget.LinearLayoutCompat>

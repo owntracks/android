@@ -4,7 +4,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
 import javax.inject.Inject
 import org.owntracks.android.preferences.Preferences
-import org.owntracks.android.support.ContactImageBindingAdapter
 import timber.log.Timber
 
 /**
@@ -18,15 +17,14 @@ class MapFragmentFactory
 @Inject
 constructor(
     private val preferences: Preferences,
-    private val contactImageBindingAdapter: ContactImageBindingAdapter
 ) : FragmentFactory() {
   override fun instantiate(classLoader: ClassLoader, className: String): Fragment {
     Timber.d("Instantiating Fragment for $className")
     return if (MapFragment::class.java.isAssignableFrom(classLoader.loadClass(className))) {
       preferences.mapLayerStyle
           .getFragmentClass()
-          .getConstructor(Preferences::class.java, ContactImageBindingAdapter::class.java)
-          .newInstance(preferences, contactImageBindingAdapter)
+          .getConstructor(Preferences::class.java)
+          .newInstance(preferences)
     } else {
       super.instantiate(classLoader, className)
     }

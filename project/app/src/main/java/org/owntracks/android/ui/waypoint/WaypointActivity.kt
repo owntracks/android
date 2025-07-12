@@ -2,26 +2,18 @@ package org.owntracks.android.ui.waypoint
 
 import android.content.DialogInterface
 import android.os.Bundle
-import android.text.format.DateUtils
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
-import androidx.databinding.BindingAdapter
-import androidx.databinding.BindingConversion
-import androidx.databinding.DataBindingUtil
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import dagger.hilt.android.AndroidEntryPoint
-import java.text.DateFormat
-import java.time.Instant
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiWaypointBinding
 import org.owntracks.android.location.geofencing.Latitude
 import org.owntracks.android.location.geofencing.Longitude
-import org.owntracks.android.location.roundForDisplay
 
 @AndroidEntryPoint
 class WaypointActivity : AppCompatActivity() {
@@ -35,10 +27,9 @@ class WaypointActivity : AppCompatActivity() {
     super.onCreate(savedInstanceState)
 
     binding =
-        DataBindingUtil.setContentView<UiWaypointBinding>(this, R.layout.ui_waypoint).apply {
+        UiWaypointBinding.inflate(layoutInflater).apply {
+          setContentView(root)
           textFields = listOf(description, radius, latitude, longitude)
-          vm = viewModel
-          lifecycleOwner = this@WaypointActivity
           setSupportActionBar(appbar.toolbar)
           latitude.addTextChangedListener {
             it.toString().toDoubleOrNull()
@@ -120,40 +111,40 @@ class WaypointActivity : AppCompatActivity() {
         icon?.alpha = if (isEnabled) 255 else 130
       }
 }
-
-@BindingAdapter("relativeTimeSpanString")
-fun TextView.setRelativeTimeSpanString(instant: Instant?) {
-  text =
-      if (instant == null || instant == Instant.MIN) {
-        ""
-      } else if (DateUtils.isToday(instant.toEpochMilli())) {
-        DateFormat.getTimeInstance(DateFormat.SHORT).format(instant.toEpochMilli())
-      } else {
-        DateFormat.getDateInstance(DateFormat.SHORT).format(instant.toEpochMilli())
-      }
-}
-
-@BindingAdapter("relativeTimeSpanString")
-fun TextView.setRelativeTimeSpanString(epochSeconds: Long?) {
-  val instant = epochSeconds?.run(Instant::ofEpochSecond) ?: Instant.MIN
-  text =
-      if (instant == Instant.MIN) {
-        ""
-      } else if (DateUtils.isToday(instant.toEpochMilli())) {
-        DateFormat.getTimeInstance(DateFormat.SHORT).format(instant.toEpochMilli())
-      } else {
-        DateFormat.getDateInstance(DateFormat.SHORT).format(instant.toEpochMilli())
-      }
-}
-
-@BindingAdapter("android:text")
-fun TextInputEditText.setLatitude(latitude: Latitude) {
-  setText(latitude.value.roundForDisplay())
-}
-
-@BindingAdapter("android:text")
-fun TextInputEditText.setLongitude(longitude: Longitude) {
-  setText(longitude.value.roundForDisplay())
-}
-
-@BindingConversion fun fromStringToLatitude(value: String): Latitude = Latitude(value.toDouble())
+//
+// @BindingAdapter("relativeTimeSpanString")
+// fun TextView.setRelativeTimeSpanString(instant: Instant?) {
+//  text =
+//      if (instant == null || instant == Instant.MIN) {
+//        ""
+//      } else if (DateUtils.isToday(instant.toEpochMilli())) {
+//        DateFormat.getTimeInstance(DateFormat.SHORT).format(instant.toEpochMilli())
+//      } else {
+//        DateFormat.getDateInstance(DateFormat.SHORT).format(instant.toEpochMilli())
+//      }
+// }
+//
+// @BindingAdapter("relativeTimeSpanString")
+// fun TextView.setRelativeTimeSpanString(epochSeconds: Long?) {
+//  val instant = epochSeconds?.run(Instant::ofEpochSecond) ?: Instant.MIN
+//  text =
+//      if (instant == Instant.MIN) {
+//        ""
+//      } else if (DateUtils.isToday(instant.toEpochMilli())) {
+//        DateFormat.getTimeInstance(DateFormat.SHORT).format(instant.toEpochMilli())
+//      } else {
+//        DateFormat.getDateInstance(DateFormat.SHORT).format(instant.toEpochMilli())
+//      }
+// }
+//
+// @BindingAdapter("android:text")
+// fun TextInputEditText.setLatitude(latitude: Latitude) {
+//  setText(latitude.value.roundForDisplay())
+// }
+//
+// @BindingAdapter("android:text")
+// fun TextInputEditText.setLongitude(longitude: Longitude) {
+//  setText(longitude.value.roundForDisplay())
+// }
+//
+// @BindingConversion fun fromStringToLatitude(value: String): Latitude = Latitude(value.toDouble())

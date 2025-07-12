@@ -1,11 +1,11 @@
 set dotenv-load := true
-gradlec := "./project/gradlew -p project --scan"
+gradlec := "./project/gradlew -p project"
 
 default:
     @just --list
 
 build:
-    {{gradlec}} assembleDebug
+    {{gradlec}} assembleDebug app:assembleAndroidTest app:assembleGmsDebugUnitTest
 
 build-all:
     {{gradlec}} assembleDebug app:assembleAndroidTest app:assembleGmsDebugUnitTest assembleRelease

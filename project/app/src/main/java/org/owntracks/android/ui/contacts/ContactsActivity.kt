@@ -5,19 +5,17 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import javax.inject.Named
 import kotlinx.coroutines.launch
-import org.owntracks.android.R
 import org.owntracks.android.data.repos.ContactsRepoChange
 import org.owntracks.android.databinding.UiContactsBinding
 import org.owntracks.android.model.Contact
-import org.owntracks.android.support.DrawerProvider
 import org.owntracks.android.test.ThresholdIdlingResourceInterface
+import org.owntracks.android.ui.DrawerProvider
 import org.owntracks.android.ui.map.MapActivity
 import org.owntracks.android.ui.mixins.ServiceStarter
 import timber.log.Timber
@@ -39,8 +37,8 @@ class ContactsActivity :
     super.onCreate(savedInstanceState)
     contactsAdapter = ContactsAdapter(this, viewModel.coroutineScope)
     val binding =
-        DataBindingUtil.setContentView<UiContactsBinding>(this, R.layout.ui_contacts).apply {
-          vm = viewModel
+        UiContactsBinding.inflate(layoutInflater).apply {
+          setContentView(root)
           appbar.toolbar.run {
             setSupportActionBar(this)
             drawerProvider.attach(this)

@@ -6,7 +6,6 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.location.Location
 import androidx.annotation.MainThread
-import androidx.databinding.Observable
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -18,7 +17,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
-import org.owntracks.android.BR
 import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.data.repos.ContactsRepoChange
 import org.owntracks.android.data.repos.LocationRepo
@@ -206,36 +204,9 @@ constructor(
     }
   }
 
-  /**
-   * We need a way of updating other bits in the viewmodel when the current contact's properties
-   * change.
-   *
-   * @constructor Create empty Fused contact property changed callback
-   */
-  inner class ContactPropertyChangedCallback : Observable.OnPropertyChangedCallback() {
-    override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
-      sender?.run {
-        if (this is Contact) {
-          when (propertyId) {
-            BR.latLng -> {
-              updateActiveContactDistanceAndBearing(this)
-            }
-            BR.trackerId -> {
-              mutableCurrentContact.postValue(this)
-            }
-          }
-        }
-      }
-    }
-  }
-
-  private val contactPropertyChangedCallback = ContactPropertyChangedCallback()
-
   private fun setViewModeContact(contact: Contact, center: Boolean) {
-    Timber.d("setting view mode: VIEW_CONTACT for $contact, center=$center")
     locationRepo.viewMode = ViewMode.Contact(center)
     mutableCurrentContact.value = contact
-    contact.addOnPropertyChangedCallback(contactPropertyChangedCallback)
     mutableBottomSheetHidden.value = false
     refreshGeocodeForContact(contact)
     updateActiveContactDistanceAndBearing(contact)
@@ -244,14 +215,12 @@ constructor(
   }
 
   private fun setViewModeFree() {
-    Timber.d("setting view mode: VIEW_FREE")
     locationRepo.viewMode = ViewMode.Free
     clearActiveContact()
     updateMyLocationStatus()
   }
 
   private fun setViewModeDevice() {
-    Timber.d("setting view mode: VIEW_DEVICE")
     locationRepo.viewMode = ViewMode.Device
     clearActiveContact()
     currentLocation.value?.apply { mutableMapCenter.postValue(this.toLatLng()) }
@@ -268,7 +237,6 @@ constructor(
   }
 
   private fun clearActiveContact() {
-    mutableCurrentContact.value?.removeOnPropertyChangedCallback(contactPropertyChangedCallback)
     mutableCurrentContact.postValue(null)
     mutableBottomSheetHidden.postValue(true)
   }
@@ -433,9 +401,9 @@ constructor(
   }
 
   sealed class ViewMode {
-    object Free : ViewMode()
+    data object Free : ViewMode()
 
-    object Device : ViewMode()
+    data object Device : ViewMode()
 
     data class Contact(val follow: Boolean) : ViewMode()
   }

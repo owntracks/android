@@ -1,89 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/contactRow"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?selectableItemBackground"
+    android:minHeight="72dp">
 
-    <data>
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:contentDescription="@string/contact_image"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <import type="android.view.View" />
-
-        <variable
-            name="contact"
-            type="org.owntracks.android.model.Contact" />
-
-        <variable
-            name="coroutineScope"
-            type="kotlinx.coroutines.CoroutineScope" />
-    </data>
-
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/contactRow"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/name"
+        style="@style/ListItemPrimary"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="?selectableItemBackground"
-        android:minHeight="72dp">
-
-        <ImageView
-            android:id="@+id/image"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:contentDescription="@string/contact_image"
-            app:contact="@{contact}"
-            app:coroutineScope="@{coroutineScope}"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/name"
-            style="@style/ListItemPrimary"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="72dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:ellipsize="end"
-            android:singleLine="true"
-            android:text="@{contact.displayName}"
-            app:layout_constraintEnd_toStartOf="@+id/locationDate"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        android:layout_marginStart="72dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:ellipsize="end"
+        android:singleLine="true"
+        app:layout_constraintEnd_toStartOf="@+id/locationDate"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
-        <TextView
-            android:id="@+id/locationDate"
-            style="@style/ListItemSecondary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:gravity="end"
-            android:singleLine="true"
-            android:textIsSelectable="true"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:relativeTimeSpanString="@{contact.locationTimestamp}" />
+    <TextView
+        android:id="@+id/locationDate"
+        style="@style/ListItemSecondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="end"
+        android:singleLine="true"
+        android:textIsSelectable="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/location"
-            style="@style/ListItemSecondary"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="72dp"
-            android:layout_marginEnd="16dp"
-            android:ellipsize="end"
-            android:singleLine="true"
-            android:text="@{contact.geocodedLocation!=null ? contact.geocodedLocation : @string/na}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/name" />
+    <TextView
+        android:id="@+id/location"
+        style="@style/ListItemSecondary"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="72dp"
+        android:layout_marginEnd="16dp"
+        android:ellipsize="end"
+        android:singleLine="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/name" />
 
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-</layout>
+</androidx.constraintlayout.widget.ConstraintLayout>

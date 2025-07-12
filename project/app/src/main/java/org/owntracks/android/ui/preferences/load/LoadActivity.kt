@@ -8,10 +8,10 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.IOException
@@ -28,21 +28,44 @@ class LoadActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     binding =
-        DataBindingUtil.setContentView<UiPreferencesLoadBinding?>(
-                this, R.layout.ui_preferences_load)
-            .apply {
-              vm = viewModel
-              lifecycleOwner = this@LoadActivity
-              setSupportActionBar(appbar.toolbar)
-            }
+        UiPreferencesLoadBinding.inflate(layoutInflater).apply {
+          setContentView(root)
+          setSupportActionBar(appbar.toolbar)
+        }
     viewModel.displayedConfiguration.observe(this) { invalidateOptionsMenu() }
     viewModel.configurationImportStatus.observe(this) {
       invalidateOptionsMenu()
       Timber.d("ImportStatus is $it")
-      if (it == ImportStatus.SAVED) {
-        finish()
+
+      when (it) {
+        ImportStatus.LOADING -> {
+          binding.loadingLayout.visibility = View.VISIBLE
+          binding.importError.visibility = View.GONE
+          binding.effectiveConfigurationView.visibility = View.GONE
+        }
+
+        ImportStatus.SUCCESS -> {
+          binding.effectiveConfiguration.text = viewModel.displayedConfiguration.value
+          binding.loadingLayout.visibility = View.GONE
+          binding.importError.visibility = View.GONE
+          binding.effectiveConfigurationView.visibility = View.VISIBLE
+        }
+
+        ImportStatus.SAVED -> {
+          finish()
+        }
+
+        ImportStatus.FAILED -> {
+          binding.loadingLayout.visibility = View.GONE
+          binding.importError.visibility = View.VISIBLE
+          binding.effectiveConfigurationView.visibility = View.GONE
+          binding.importError.text =
+              getString(R.string.errorPreferencesImportFailed, viewModel.importError)
+        }
+        else -> {}
       }
     }
+
     handleIntent(intent)
   }
 
@@ -101,7 +124,8 @@ class LoadActivity : AppCompatActivity() {
         }
       } else {
         viewModel.configurationImportFailed(
-            Exception(getString(R.string.preferencesImportNoURIGiven)))
+            Exception(getString(R.string.preferencesImportNoURIGiven)),
+        )
       }
     } else {
       val pickerIntent = Intent(Intent.ACTION_GET_CONTENT)
@@ -109,7 +133,8 @@ class LoadActivity : AppCompatActivity() {
       pickerIntent.type = "*/*"
       try {
         filePickerResultLauncher.launch(
-            Intent.createChooser(pickerIntent, getString(R.string.loadActivitySelectAFile)))
+            Intent.createChooser(pickerIntent, getString(R.string.loadActivitySelectAFile)),
+        )
       } catch (ex: ActivityNotFoundException) {
         Snackbar.make(binding.root, R.string.loadActivityNoFileExplorerFound, Snackbar.LENGTH_SHORT)
             .show()

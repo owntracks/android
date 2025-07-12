@@ -2,13 +2,7 @@ package org.owntracks.android.ui.map
 
 import android.graphics.Bitmap
 import android.location.Location
-import android.os.Bundle
 import android.util.TypedValue
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
-import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -23,16 +17,9 @@ import org.owntracks.android.location.LatLng
 import org.owntracks.android.location.toLatLng
 import org.owntracks.android.model.Contact
 import org.owntracks.android.preferences.Preferences
-import org.owntracks.android.support.ContactImageBindingAdapter
 import timber.log.Timber
 
-abstract class MapFragment<V : ViewDataBinding>
-internal constructor(
-    private val contactImageBindingAdapter: ContactImageBindingAdapter,
-    preferences: Preferences
-) : Fragment() {
-  protected abstract val layout: Int
-  protected lateinit var binding: V
+abstract class MapFragment internal constructor(preferences: Preferences) : Fragment() {
 
   abstract fun updateCamera(latLng: LatLng)
 
@@ -88,18 +75,7 @@ internal constructor(
     return typedValue.data
   }
 
-  override fun onCreateView(
-      inflater: LayoutInflater,
-      container: ViewGroup?,
-      savedInstanceState: Bundle?
-  ): View {
-    binding =
-        DataBindingUtil.inflate<V>(inflater, layout, container, false).apply {
-          lifecycleOwner = this@MapFragment.viewLifecycleOwner
-        }
-
-    // Here we set up all the flow collectors to react to the universe changing. Usually contacts
-    // and waypoints coming and going.
+  protected fun setupFlowCollectors() {
     viewModel.apply {
       mapCenter.observe(viewLifecycleOwner, this@MapFragment::updateCamera)
       updateAllMarkers(allContacts.values.toSet())
@@ -149,7 +125,6 @@ internal constructor(
       mapLayerStyle.observe(viewLifecycleOwner, this@MapFragment::setMapLayerType)
       onMapReady()
     }
-    return binding.root
   }
 
   private fun updateAllMarkers(contacts: Set<Contact>) {
@@ -164,9 +139,9 @@ internal constructor(
     }
     Timber.v("updating marker for contact: ${contact.id}")
     lifecycleScope.launch {
-      contactImageBindingAdapter.run {
-        updateMarkerOnMap(contact.id, contact.latLng!!, getBitmapFromCache(contact))
-      }
+      //      contactImageBindingAdapter.run {
+      //        updateMarkerOnMap(contact.id, contact.latLng!!, getBitmapFromCache(contact))
+      //      }
       if (contact == viewModel.currentContact.value) {
         viewModel.refreshGeocodeForContact(contact)
       }

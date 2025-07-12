@@ -4,12 +4,14 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.filters.MediumTest
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.adevinta.android.barista.assertion.BaristaDrawerAssertions.assertDrawerIsClosed
 import com.adevinta.android.barista.assertion.BaristaEnabledAssertions
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.Before
 import org.junit.Test
 import org.owntracks.android.R
 import org.owntracks.android.testutils.JustThisTestPlease
@@ -17,6 +19,7 @@ import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.addWaypoint
 import org.owntracks.android.testutils.clickOnDrawerAndWait
 import org.owntracks.android.testutils.di.setLocation
+import org.owntracks.android.testutils.dumpOutputToLog
 import org.owntracks.android.testutils.grantMapActivityPermissions
 import org.owntracks.android.testutils.matchers.withActionIconDrawable
 import org.owntracks.android.testutils.setNotFirstStartPreferences
@@ -25,6 +28,15 @@ import org.owntracks.android.testutils.setNotFirstStartPreferences
 @HiltAndroidTest
 @JustThisTestPlease
 class CommonMapActivityTests : TestWithAnActivity<MapActivity>(false) {
+
+  @Before
+  fun longPressDisabled() {
+    // Disable long press to avoid accidental map interactions
+    getInstrumentation()
+        .uiAutomation
+        .executeShellCommand("settings put secure long_press_timeout 1500")
+        .use { it.dumpOutputToLog("disable heads_up_notifications") }
+  }
 
   @Test
   fun monitoring_mode_button_shows_dialog_and_allows_us_to_select_quiet_mode() {

@@ -30,31 +30,20 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import org.owntracks.android.R
 import org.owntracks.android.data.waypoints.WaypointModel
-import org.owntracks.android.databinding.GoogleMapFragmentBinding
+import org.owntracks.android.databinding.UiGoogleMapFragmentBinding
 import org.owntracks.android.gms.location.toGMSLatLng
 import org.owntracks.android.location.LatLng
 import org.owntracks.android.location.geofencing.Latitude
 import org.owntracks.android.location.geofencing.Longitude
 import org.owntracks.android.location.toLatLng
 import org.owntracks.android.preferences.Preferences
-import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.ui.map.osm.OSMMapFragment
 import timber.log.Timber
-import timber.log.Timber.Forest.tag
 
-class GoogleMapFragment
-internal constructor(
-    private val preferences: Preferences,
-    contactImageBindingAdapter: ContactImageBindingAdapter
-) :
-    MapFragment<GoogleMapFragmentBinding>(contactImageBindingAdapter, preferences),
-    OnMapReadyCallback,
-    OnMapsSdkInitializedCallback {
+class GoogleMapFragment internal constructor(private val preferences: Preferences) :
+    MapFragment(preferences), OnMapReadyCallback, OnMapsSdkInitializedCallback {
 
   data class WaypointOnMap(val marker: Marker, val circle: Circle)
-
-  override val layout: Int
-    get() = R.layout.google_map_fragment
 
   private val googleMapLocationSource: LocationSource by lazy {
     object : LocationSource {
@@ -80,15 +69,22 @@ internal constructor(
   private val markersOnMap: MutableMap<String, Marker> = HashMap()
   private val regionsOnMap: MutableMap<Long, WaypointOnMap> = mutableMapOf()
 
+  private lateinit var binding: UiGoogleMapFragmentBinding
+
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
       savedInstanceState: Bundle?
   ): View {
-    val root = super.onCreateView(inflater, container, savedInstanceState)
-    binding.googleMapView.onCreate(savedInstanceState)
-    binding.googleMapView.getMapAsync(this)
-    return root
+    super.onCreateView(inflater, container, savedInstanceState)
+    binding =
+        UiGoogleMapFragmentBinding.inflate(layoutInflater).apply {
+          googleMapView.onCreate(savedInstanceState)
+          googleMapView.getMapAsync(this@GoogleMapFragment)
+        }
+
+    setupFlowCollectors()
+    return binding.root
   }
 
   override fun onMapReady(googleMap: GoogleMap) {

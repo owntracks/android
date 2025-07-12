@@ -2,16 +2,14 @@ package org.owntracks.android.ui.preferences
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.replace
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiPreferencesBinding
-import org.owntracks.android.support.DrawerProvider
+import org.owntracks.android.ui.DrawerProvider
 import org.owntracks.android.ui.mixins.ServiceStarter
 import org.owntracks.android.ui.mixins.WorkManagerInitExceptionNotifier
 
@@ -30,9 +28,9 @@ open class PreferencesActivity :
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContentView(R.layout.ui_preferences)
     binding =
-        DataBindingUtil.setContentView<UiPreferencesBinding>(this, R.layout.ui_preferences).apply {
+        UiPreferencesBinding.inflate(layoutInflater).apply {
+          setContentView(root)
           appbar.toolbar.run {
             setSupportActionBar(this)
             drawerProvider.attach(this)

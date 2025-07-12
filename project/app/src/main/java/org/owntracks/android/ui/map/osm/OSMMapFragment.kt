@@ -41,12 +41,11 @@ import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import org.owntracks.android.R
 import org.owntracks.android.data.waypoints.WaypointModel
-import org.owntracks.android.databinding.OsmMapFragmentBinding
+import org.owntracks.android.databinding.UiOsmMapFragmentBinding
 import org.owntracks.android.location.LatLng
 import org.owntracks.android.location.toGeoPoint
 import org.owntracks.android.location.toLatLng
 import org.owntracks.android.preferences.Preferences
-import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.ui.map.MapFragment
 import org.owntracks.android.ui.map.MapLayerStyle
 import org.owntracks.android.ui.map.MapLocationZoomLevelAndRotation
@@ -55,10 +54,7 @@ import timber.log.Timber
 class OSMMapFragment
 internal constructor(
     private val preferences: Preferences,
-    contactImageBindingAdapter: ContactImageBindingAdapter
-) : MapFragment<OsmMapFragmentBinding>(contactImageBindingAdapter, preferences) {
-  override val layout: Int
-    get() = R.layout.osm_map_fragment
+) : MapFragment(preferences) {
 
   private val osmMapLocationSource: IMyLocationProvider =
       object : IMyLocationProvider {
@@ -91,6 +87,8 @@ internal constructor(
 
   private var mapView: MapView? = null
 
+  private lateinit var binding: UiOsmMapFragmentBinding
+
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
@@ -105,9 +103,11 @@ internal constructor(
       }
       osmdroidTileCache = requireContext().noBackupFilesDir.resolve("osmdroid/tiles")
     }
-    val view = super.onCreateView(inflater, container, savedInstanceState)
+    super.onCreateView(inflater, container, savedInstanceState)
+    binding = UiOsmMapFragmentBinding.inflate(layoutInflater)
+    setupFlowCollectors()
     initMap()
-    return view
+    return binding.root
   }
 
   private fun setMapStyle() {
@@ -211,6 +211,7 @@ internal constructor(
           minZoomLevel = MIN_ZOOM_LEVEL
           maxZoomLevel = MAX_ZOOM_LEVEL
           viewModel.mapLayerStyle.value?.run { setMapLayerType(this) }
+
           zoomController.setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
           addMapListener(mapListener)
           zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)

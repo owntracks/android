@@ -1,65 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <RelativeLayout
-        android:id="@+id/welcome_fragment"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/welcome_fragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="false">
+
+    <ImageView
+        android:id="@+id/img"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="?attr/welcomeIconMargin"
+        android:layout_marginBottom="?attr/welcomeIconMargin"
+        android:contentDescription="@string/welcome_notification_permission_title"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_baseline_notifications_48" />
+
+    <TextView
+        android:id="@+id/screen_heading"
+        style="@style/Theme.Owntracks.Welcome.TextView.Heading"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipChildren="false">
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/img"
+        android:layout_marginBottom="12dp"
+        android:gravity="bottom|center_horizontal"
+        android:text="@string/welcome_notification_permission_title" />
 
-        <ImageView
-            android:id="@+id/img"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="?attr/welcomeIconMargin"
-            android:layout_marginBottom="?attr/welcomeIconMargin"
-            android:contentDescription="@string/welcome_notification_permission_title"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_baseline_notifications_48" />
+    <TextView
+        android:id="@+id/screen_desc"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/ui_fragment_welcome_notification_permissions_request"
+        android:layout_below="@+id/screen_heading"
+        android:layout_alignStart="@+id/screen_heading"
+        android:layout_marginBottom="8dp"
+        android:gravity="top|center_horizontal"
+        android:scrollbars="vertical"
+        android:text="@string/welcome_notification_permission_description" />
 
-        <TextView
-            android:id="@+id/screen_heading"
-            style="@style/Theme.Owntracks.Welcome.TextView.Heading"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/img"
-            android:layout_marginBottom="12dp"
-            android:gravity="bottom|center_horizontal"
-            android:text="@string/welcome_notification_permission_title" />
+    <TextView
+        android:id="@+id/ui_fragment_welcome_notification_permissions_message"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/screen_desc"
+        android:layout_alignStart="@+id/screen_desc"
+        android:gravity="center_horizontal"
+        android:text="@string/welcome_notification_permission_granted"
+        android:visibility="invisible" />
 
-        <TextView
-            android:id="@+id/screen_desc"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_above="@id/ui_fragment_welcome_notification_permissions_request"
-            android:layout_below="@+id/screen_heading"
-            android:layout_alignStart="@+id/screen_heading"
-            android:layout_marginBottom="8dp"
-            android:gravity="top|center_horizontal"
-            android:scrollbars="vertical"
-            android:text="@string/welcome_notification_permission_description" />
+    <Button
+        android:id="@+id/ui_fragment_welcome_notification_permissions_request"
+        style="?attr/materialButtonOutlinedStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="@string/welcome_notification_permission_request" />
 
-        <TextView
-            android:id="@+id/ui_fragment_welcome_notification_permissions_message"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/screen_desc"
-            android:layout_alignStart="@+id/screen_desc"
-            android:gravity="center_horizontal"
-            android:text="@string/welcome_notification_permission_granted"
-            android:visibility="invisible" />
-
-        <Button
-            android:id="@+id/ui_fragment_welcome_notification_permissions_request"
-            style="?attr/materialButtonOutlinedStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:text="@string/welcome_notification_permission_request" />
-
-    </RelativeLayout>
-</layout>
+</RelativeLayout>

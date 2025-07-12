@@ -13,11 +13,9 @@ import androidx.annotation.MainThread
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NotificationManagerCompat
-import androidx.databinding.DataBindingUtil
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.lifecycle.MutableLiveData
 import androidx.work.Configuration
-import dagger.hilt.EntryPoints
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EarlyEntryPoint
 import dagger.hilt.android.EarlyEntryPoints
@@ -28,9 +26,7 @@ import javax.inject.Provider
 import kotlinx.datetime.Instant
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.conscrypt.Conscrypt
-import org.owntracks.android.data.waypoints.RoomWaypointsRepo
 import org.owntracks.android.di.CustomBindingComponentBuilder
-import org.owntracks.android.di.CustomBindingEntryPoint
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.logging.TimberInMemoryLogTree
 import org.owntracks.android.preferences.Preferences
@@ -74,8 +70,6 @@ open class BaseApp :
     fun preferencesStore(): PreferencesStore
 
     fun runThingsOnOtherThreads(): RunThingsOnOtherThreads
-
-    fun roomWaypointsRepo(): RoomWaypointsRepo
   }
 
   private val preferences by lazy {
@@ -119,12 +113,6 @@ open class BaseApp :
     super.onCreate()
 
     setGlobalExceptionHandler()
-
-    val dataBindingComponent = bindingComponentProvider.get().build()
-    val dataBindingEntryPoint =
-        EntryPoints.get(dataBindingComponent, CustomBindingEntryPoint::class.java)
-
-    DataBindingUtil.setDefaultComponent(dataBindingEntryPoint)
 
     scheduler.cancelAllTasks()
     Timber.plant(TimberInMemoryLogTree(BuildConfig.DEBUG))

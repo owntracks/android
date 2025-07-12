@@ -10,7 +10,7 @@ class RecyclerViewWithEmptyPlaceholder : RecyclerView {
   var emptyView: View? = null
   private val emptyObserver: AdapterDataObserver =
       object : AdapterDataObserver() {
-        override fun onChanged() {
+        fun checkEmpty() {
           val adapter = adapter
           if (adapter != null && emptyView != null) {
             if (adapter.itemCount == 0) {
@@ -21,6 +21,20 @@ class RecyclerViewWithEmptyPlaceholder : RecyclerView {
               this@RecyclerViewWithEmptyPlaceholder.visibility = VISIBLE
             }
           }
+        }
+
+        override fun onChanged() {
+          checkEmpty()
+        }
+
+        override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+          super.onItemRangeInserted(positionStart, itemCount)
+          checkEmpty()
+        }
+
+        override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
+          super.onItemRangeRemoved(positionStart, itemCount)
+          checkEmpty()
         }
       }
 

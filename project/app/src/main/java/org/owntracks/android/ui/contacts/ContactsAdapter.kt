@@ -2,13 +2,11 @@ package org.owntracks.android.ui.contacts
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
-import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SortedList
+import androidx.viewbinding.ViewBinding
 import kotlinx.coroutines.CoroutineScope
-import org.owntracks.android.BR
-import org.owntracks.android.R
+import org.owntracks.android.databinding.UiRowContactBinding
 import org.owntracks.android.model.Contact
 import timber.log.Timber
 
@@ -49,8 +47,11 @@ internal class ContactsAdapter(
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
     val binding =
-        DataBindingUtil.inflate<ViewDataBinding>(
-            LayoutInflater.from(parent.context), R.layout.ui_row_contact, parent, false)
+        UiRowContactBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false,
+        )
     return ContactViewHolder(binding, coroutineScope)
   }
 
@@ -99,16 +100,15 @@ internal class ContactsAdapter(
   }
 
   class ContactViewHolder(
-      private val binding: ViewDataBinding,
+      private val binding: ViewBinding,
       private val coroutineScope: CoroutineScope
   ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(contact: Contact, clickListener: AdapterClickListener<Contact>) {
       contact.run {
-        binding.setVariable(BR.contact, this)
-        binding.setVariable(BR.coroutineScope, coroutineScope)
+        //        binding.setVariable(BR.contact, this)
+        //        binding.setVariable(BR.coroutineScope, coroutineScope)
         binding.root.setOnClickListener { clickListener.onClick(this, binding.root, false) }
       }
-      binding.executePendingBindings()
     }
   }
 }

@@ -10,7 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ShareCompat
-import androidx.databinding.DataBindingUtil
+import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -43,19 +43,6 @@ class LogViewerActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    binding =
-        DataBindingUtil.setContentView<UiPreferencesLogsBinding?>(
-                this, R.layout.ui_preferences_logs)
-            .apply {
-              lifecycleOwner = this@LogViewerActivity
-              setSupportActionBar(appbar.toolbar)
-            }
-
-    supportActionBar?.apply {
-      setDisplayShowHomeEnabled(true)
-      setDisplayHomeAsUpEnabled(true)
-    }
-
     @Suppress("DEPRECATION")
     logAdapter =
         LogEntryAdapter(
@@ -64,31 +51,44 @@ class LogViewerActivity : AppCompatActivity() {
                 resources.getColor(R.color.log_debug_tag_color),
                 resources.getColor(R.color.log_info_tag_color),
                 resources.getColor(R.color.log_warning_tag_color),
-                resources.getColor(R.color.log_error_tag_color)))
-    restartLogCollector()
+                resources.getColor(R.color.log_error_tag_color),
+            ),
+        )
+    binding =
+        UiPreferencesLogsBinding.inflate(layoutInflater).apply {
+          setContentView(root)
+          setSupportActionBar(appbar.toolbar)
 
-    binding.logsRecyclerView.apply {
-      recyclerView = this
-      layoutManager = LinearLayoutManager(context)
-      adapter = logAdapter
+          logsRecyclerView.apply {
+            recyclerView = this
+            layoutManager = LinearLayoutManager(context)
+            adapter = logAdapter
+          }
+          shareFab.setOnClickListener {
+            val key =
+                "${getRandomHexString()}/debug=${viewModel.isDebugEnabled()}/owntracks-debug.txt"
+            logExportUri = "content://${BuildConfig.APPLICATION_ID}.log/$key".toUri()
+            val shareIntent =
+                ShareCompat.IntentBuilder(this@LogViewerActivity)
+                    .setType("text/plain")
+                    .setSubject(getString(R.string.exportLogFileSubject))
+                    .setChooserTitle(R.string.exportLogFilePrompt)
+                    .setStream(logExportUri)
+                    .createChooserIntent()
+                    .addFlags(
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION) // Temporary. No need to revoke.
+                    .also { Timber.v("Created share intent of r$logExportUri") }
+            grantUriPermission("android", logExportUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                .also { Timber.v("Granted READ_URI_PERMISSION permission to $logExportUri") }
+            shareIntentActivityLauncher.launch(shareIntent)
+          }
+        }
+    supportActionBar?.apply {
+      setDisplayShowHomeEnabled(true)
+      setDisplayHomeAsUpEnabled(true)
     }
-    binding.shareFab.setOnClickListener {
-      val key = "${getRandomHexString()}/debug=${viewModel.isDebugEnabled()}/owntracks-debug.txt"
-      logExportUri = Uri.parse("content://${BuildConfig.APPLICATION_ID}.log/$key")
-      val shareIntent =
-          ShareCompat.IntentBuilder(this)
-              .setType("text/plain")
-              .setSubject(getString(R.string.exportLogFileSubject))
-              .setChooserTitle(R.string.exportLogFilePrompt)
-              .setStream(logExportUri)
-              .createChooserIntent()
-              .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION) // Temporary. No need to revoke.
-              .also { Timber.v("Created share intent of r$logExportUri") }
-      grantUriPermission("android", logExportUri, Intent.FLAG_GRANT_READ_URI_PERMISSION).also {
-        Timber.v("Granted READ_URI_PERMISSION permission to $logExportUri")
-      }
-      shareIntentActivityLauncher.launch(shareIntent)
-    }
+
+    restartLogCollector()
   }
 
   private fun restartLogCollector() {

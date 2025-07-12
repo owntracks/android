@@ -8,8 +8,6 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat.startActivity
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -24,16 +22,15 @@ import org.owntracks.android.R
 import org.owntracks.android.data.waypoints.WaypointModel
 import org.owntracks.android.databinding.UiWaypointsBinding
 import org.owntracks.android.preferences.Preferences
-import org.owntracks.android.support.DrawerProvider
 import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.test.ThresholdIdlingResourceInterface
+import org.owntracks.android.ui.DrawerProvider
 import org.owntracks.android.ui.NotificationsStash
 import org.owntracks.android.ui.base.ClickHasBeenHandled
 import org.owntracks.android.ui.base.ClickListener
 import org.owntracks.android.ui.mixins.NotificationsPermissionRequested
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import org.owntracks.android.ui.waypoint.WaypointActivity
-import timber.log.Timber
 
 @AndroidEntryPoint
 class WaypointsActivity :
@@ -69,18 +66,17 @@ class WaypointsActivity :
     super.onCreate(savedInstanceState)
     recyclerViewAdapter = WaypointsAdapter(this)
     postNotificationsPermissionInit(this, preferences, notificationsStash)
-    DataBindingUtil.setContentView<UiWaypointsBinding>(this, R.layout.ui_waypoints).apply {
-      vm = viewModel
-      lifecycleOwner = this@WaypointsActivity
-      setSupportActionBar(appbar.toolbar)
-      drawerProvider.attach(appbar.toolbar)
+    UiWaypointsBinding.inflate(layoutInflater).apply {
+      setContentView(root)
+      appbar.toolbar.run {
+        setSupportActionBar(this)
+        drawerProvider.attach(this)
+      }
       waypointsRecyclerView.apply {
         layoutManager = LinearLayoutManager(this@WaypointsActivity)
-        adapter = recyclerViewAdapter
         emptyView = placeholder
+        adapter = recyclerViewAdapter
         viewTreeObserver.addOnGlobalLayoutListener {
-          Timber.d(
-              "WaypointsActivity: RecyclerView layout took ${recyclerViewStartLayoutInstant!!.elapsedNow()} and has ${recyclerViewAdapter.itemCount} items")
           waypointsRecyclerViewIdlingResource.set(recyclerViewAdapter.itemCount)
         }
       }
@@ -89,7 +85,6 @@ class WaypointsActivity :
         lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
           viewModel.waypointsFlow.collect {
             recyclerViewStartLayoutInstant = TimeSource.Monotonic.markNow()
-            Timber.d("submitting ${it.size} waypoints to adapter")
             recyclerViewAdapter.submitList(it)
           }
         }

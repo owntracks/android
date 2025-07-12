@@ -1,55 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <data>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/welcome_fragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="false">
 
-        <import type="org.owntracks.android.App" />
-    </data>
+    <ImageView
+        android:id="@+id/img"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center"
+        android:layout_marginTop="?attr/welcomeIconMargin"
+        android:layout_marginBottom="?attr/welcomeIconMargin"
+        android:contentDescription="@string/icon_description_owntracks"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_owntracks_80" />
 
-    <RelativeLayout
-        android:id="@+id/welcome_fragment"
+    <TextView
+        android:id="@+id/screen_heading"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipChildren="false">
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/img"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="?attr/welcomeHeadingMargin"
+        android:gravity="bottom|center_horizontal"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:text="@string/welcome_heading"
+        android:textSize="24sp" />
 
-        <ImageView
-            android:id="@+id/img"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:layout_gravity="center"
-            android:layout_marginTop="?attr/welcomeIconMargin"
-            android:layout_marginBottom="?attr/welcomeIconMargin"
-            android:contentDescription="@string/icon_description_owntracks"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_owntracks_80" />
+    <TextView
+        android:id="@+id/screen_desc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/screen_heading"
+        android:layout_alignStart="@+id/screen_heading"
+        android:gravity="center_horizontal"
+        android:lineSpacingMultiplier="1.2"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:text="@string/welcome_description"
+        android:textSize="16sp" />
 
-        <TextView
-            android:id="@+id/screen_heading"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/img"
-            android:layout_alignParentStart="true"
-            android:layout_marginBottom="?attr/welcomeHeadingMargin"
-            android:gravity="bottom|center_horizontal"
-            android:paddingLeft="24dp"
-            android:paddingRight="24dp"
-            android:text="@string/welcome_heading"
-            android:textSize="24sp" />
-
-        <TextView
-            android:id="@+id/screen_desc"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/screen_heading"
-            android:layout_alignStart="@+id/screen_heading"
-            android:gravity="center_horizontal"
-            android:lineSpacingMultiplier="1.2"
-            android:paddingLeft="24dp"
-            android:paddingRight="24dp"
-            android:text="@string/welcome_description"
-            android:textSize="16sp" />
-
-    </RelativeLayout>
-</layout>
+</RelativeLayout>

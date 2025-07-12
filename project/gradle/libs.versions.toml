@@ -49,6 +49,7 @@ square-leakcanary = "2.14"
 square-tape2 = "2.0.0-beta1"
 timber = "5.0.1"
 triplet = "3.12.1"
+lifecycle-service = "2.9.1"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -97,6 +98,7 @@ androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidx-room" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidx-room" }
 androidx-concurrent-futures = { module = "androidx.concurrent:concurrent-futures", version.ref = "androidx-concurrent" }
+androidx-lifecycle-service = { group = "androidx.lifecycle", name = "lifecycle-service", version.ref = "lifecycle-service" }
 
 # Cryptography
 conscrypt = { module = "org.conscrypt:conscrypt-android", version.ref = "conscrypt" }
@@ -143,11 +145,12 @@ androidx-test-espresso-idling = { module = "androidx.test.espresso:espresso-idli
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 desugar = { module = "com.android.tools:desugar_jdk_libs_nio", version.ref = "desguar-jdk" }
 
+
 [bundles]
 jackson = ["jackson-core", "jackson-databind", "jackson-module-kotlin", "jackson-datatype-jsr310"]
 kotlin = ["kotlin-coroutines-android", "kotlin-coroutines-jdk8", "kotlin-reflect"]
 jaxb-annotation-processors = ["jaxb-api", "jaxb-core", "jaxb-impl"]
-kapt-hilt = ["hilt-compiler", "hilt-androidx"]
+hilt-compiler = ["hilt-compiler", "hilt-androidx"]
 hilt = ["hilt-android", "hilt-work"]
 androidx = ["androidx-core-ktx", "androidx-preference", "androidx-work-runtime", "androidx-fragment-ktx", "androidx-concurrent-futures", "androidx-activity-ktx"]
 androidx-room = ["androidx-room-runtime", "androidx-room-ktx"]

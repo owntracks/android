@@ -260,6 +260,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="requestLocationSent">"Request location command sent"</string>
     <string name="save">"Save"</string>
     <string name="select">"Select"</string>
+    <string name="shareContactFabDescription">"Share location"</string>
     <string name="shareContactBody">"%1$s last location: %2$s (%3$s) at %4$s"</string>
     <string name="status_background_service_started_hint">"Background service started"</string>
     <string name="status_battery_optimization_whitelisted_hint">"Battery optimization whitelisted"</string>

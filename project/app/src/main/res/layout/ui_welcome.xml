@@ -1,64 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <data>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginStart="24dp"
+    android:layout_marginEnd="24dp">
 
-        <import type="android.view.View" />
-
-        <variable
-            name="vm"
-            type="org.owntracks.android.ui.welcome.WelcomeViewModel" />
-    </data>
-
-    <RelativeLayout
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp">
+        android:layout_above="@id/btn_next"
+        android:layout_marginBottom="8dp" />
 
-            <androidx.viewpager2.widget.ViewPager2
-                android:id="@+id/viewPager"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_above="@id/btn_next"
+    <Button
+        android:id="@+id/btn_next"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/circles"
+        android:layout_centerHorizontal="true"
+        android:contentDescription="@string/next"
+        android:text="@string/next" />
 
-                android:layout_marginBottom="8dp"
-                app:userInputEnabled="@{false}" />
+    <Button
+        android:id="@+id/btn_done"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/circles"
+        android:layout_centerHorizontal="true"
+        android:contentDescription="@string/done_heading"
+        android:text="@string/done_heading" />
 
-            <Button
-                android:id="@+id/btn_next"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_above="@id/circles"
-                android:layout_centerHorizontal="true"
-                android:contentDescription="@string/next"
-                android:text="@string/next"
-                android:visibility="@{vm.nextEnabled ? View.VISIBLE : View.INVISIBLE}" />
+    <LinearLayout
+        android:id="@+id/circles"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="0dp"
+        android:gravity="center"
+        android:orientation="horizontal"
 
-            <Button
-                android:id="@+id/btn_done"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_above="@id/circles"
-                android:layout_centerHorizontal="true"
-                android:contentDescription="@string/done_heading"
-                android:text="@string/done_heading"
-                android:visibility="@{vm.doneEnabled ? View.VISIBLE : View.INVISIBLE}" />
-
-            <LinearLayout
-                android:id="@+id/circles"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_marginBottom="0dp"
-                android:gravity="center"
-                android:orientation="horizontal"
-
-                />
-        </RelativeLayout>
-
-</layout>
+        />
+</RelativeLayout>

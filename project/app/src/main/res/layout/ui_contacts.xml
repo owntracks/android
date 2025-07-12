@@ -1,40 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <data>
 
-        <import type="android.view.View" />
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-        <variable
-            name="vm"
-            type="org.owntracks.android.ui.contacts.ContactsViewModel" />
-    </data>
+    <include
+        android:id="@+id/appbar"
+        layout="@layout/appbar" />
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <org.owntracks.android.support.widgets.RecyclerViewWithEmptyPlaceholder
+        android:id="@+id/contactsRecyclerView"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    <TextView
+        android:id="@+id/placeholder"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:gravity="center"
+        android:text="@string/contactsListPlaceholder"
+         />
 
-        <include
-            android:id="@+id/appbar"
-            layout="@layout/appbar" />
-
-        <org.owntracks.android.support.widgets.RecyclerViewWithEmptyPlaceholder
-            android:id="@+id/contactsRecyclerView"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:visibility="@{vm.contacts.isEmpty ? View.GONE : View.VISIBLE}"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
-        <TextView
-            android:id="@+id/placeholder"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="@string/contactsListPlaceholder"
-            android:visibility="@{vm.contacts.isEmpty ? View.VISIBLE : View.GONE}" />
-
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-</layout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
