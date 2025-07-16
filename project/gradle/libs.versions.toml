@@ -1,7 +1,7 @@
 [versions]
 agp = "8.6.1"
 androidx-activity = "1.9.2"
-androidx-concurrent = "1.2.0"
+androidx-concurrent = "1.3.0"
 androidx-core = "1.13.1"
 androidx-core-testing = "2.2.0"
 androidx-fragment = "1.8.6"
