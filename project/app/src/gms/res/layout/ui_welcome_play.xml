@@ -1,77 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/welcome_fragment"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="false">
 
-        <variable
-            name="vm"
-            type="org.owntracks.android.ui.welcome.fragments.PlayFragmentViewModel" />
+    <ImageView
+        android:id="@+id/img"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="?attr/welcomeIconMargin"
+        android:layout_marginBottom="?attr/welcomeIconMargin"
+        android:contentDescription="@string/icon_description_warning"
+        android:gravity="center_horizontal"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_baseline_assignment_late_48" />
 
-        <import type="android.view.View" />
-    </data>
-
-    <RelativeLayout
-        android:id="@+id/welcome_fragment"
+    <TextView
+        android:id="@+id/screen_heading"
+        style="@style/Theme.Owntracks.Welcome.TextView.Heading"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipChildren="false">
-
-        <ImageView
-            android:id="@+id/img"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="?attr/welcomeIconMargin"
-            android:layout_marginBottom="?attr/welcomeIconMargin"
-            android:contentDescription="@string/icon_description_warning"
-            android:gravity="center_horizontal"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_baseline_assignment_late_48" />
-
-        <TextView
-            android:id="@+id/screen_heading"
-            style="@style/Theme.Owntracks.Welcome.TextView.Heading"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/img"
-            android:layout_marginBottom="?attr/welcomeHeadingMargin"
-            android:gravity="center_horizontal"
-            android:text="@string/welcome_play_heading" />
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/img"
+        android:layout_marginBottom="?attr/welcomeHeadingMargin"
+        android:gravity="center_horizontal"
+        android:text="@string/welcome_play_heading" />
 
 
-        <TextView
-            android:id="@+id/screen_desc"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/screen_heading"
-            android:layout_alignStart="@+id/screen_heading"
-            android:layout_centerHorizontal="true"
-            android:gravity="center_horizontal"
-            android:text="@string/welcome_play_description" />
+    <TextView
+        android:id="@+id/screen_desc"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/screen_heading"
+        android:layout_alignStart="@+id/screen_heading"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_horizontal"
+        android:text="@string/welcome_play_description" />
 
 
-        <TextView
-            android:id="@+id/message"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/screen_desc"
-            android:layout_alignStart="@+id/screen_desc"
-            android:gravity="center_horizontal"
-            android:text="@{vm.message}"
-            android:visibility="visible"
-            tools:text="@{vm.message}" />
+    <TextView
+        android:id="@+id/message"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/screen_desc"
+        android:layout_alignStart="@+id/screen_desc"
+        android:gravity="center_horizontal"
+        android:text="@{vm.message}"
+        android:visibility="visible"
+        tools:text="@{vm.message}" />
 
-        <Button
-            android:id="@+id/recover"
-            style="@style/Theme.Owntracks.Welcome.Button.Outlined"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:text="@string/welcomeFixIssue"
-            android:visibility="@{vm.playServicesFixAvailable }" />
+    <Button
+        android:id="@+id/recover"
+        style="@style/Theme.Owntracks.Welcome.Button.Outlined"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="@string/welcomeFixIssue"
+         />
 
-    </RelativeLayout>
-</layout>
+</RelativeLayout>

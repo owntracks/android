@@ -1,6 +1,5 @@
 package org.owntracks.android.ui.map
 
-import androidx.databinding.ViewDataBinding
 import org.owntracks.android.R
 import org.owntracks.android.preferences.types.FromConfiguration
 import org.owntracks.android.ui.map.osm.OSMMapFragment
@@ -19,7 +18,7 @@ enum class MapLayerStyle {
     }
   }
 
-  fun getFragmentClass(): Class<out MapFragment<out ViewDataBinding>> {
+  fun getFragmentClass(): Class<out MapFragment> {
     return when (this) {
       GoogleMapDefault,
       GoogleMapHybrid,

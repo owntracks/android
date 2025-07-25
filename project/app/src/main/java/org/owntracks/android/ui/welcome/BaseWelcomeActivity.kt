@@ -8,7 +8,6 @@ import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.databinding.DataBindingUtil
 import androidx.viewpager2.widget.ViewPager2
 import javax.inject.Inject
 import org.owntracks.android.R
@@ -49,24 +48,29 @@ abstract class BaseWelcomeActivity : AppCompatActivity() {
     }
 
     binding =
-        DataBindingUtil.setContentView<UiWelcomeBinding>(this, R.layout.ui_welcome).apply {
-          vm = viewModel
-          lifecycleOwner = this@BaseWelcomeActivity
-          viewPager.adapter =
-              WelcomeAdapter(this@BaseWelcomeActivity).apply { addFragmentsToAdapter(this) }
-          viewPager.registerOnPageChangeCallback(
-              object : ViewPager2.OnPageChangeCallback() {
-                override fun onPageSelected(position: Int) {
-                  viewModel.moveToPage(position)
-                  super.onPageSelected(position)
-                }
-              })
-          btnNext.setOnClickListener { viewModel.nextPage() }
-          btnDone.setOnClickListener {
-            startActivity(
-                Intent(this@BaseWelcomeActivity, MapActivity::class.java).apply {
-                  flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+        UiWelcomeBinding.inflate(layoutInflater).apply {
+          setContentView(root).apply {
+            viewModel.doneEnabled.observe(this@BaseWelcomeActivity) { enabled: Boolean ->
+              btnDone.isEnabled = enabled
+              btnDone.alpha = if (enabled) 1f else 0.5f
+            }
+
+            viewPager.adapter =
+                WelcomeAdapter(this@BaseWelcomeActivity).apply { addFragmentsToAdapter(this) }
+            viewPager.registerOnPageChangeCallback(
+                object : ViewPager2.OnPageChangeCallback() {
+                  override fun onPageSelected(position: Int) {
+                    viewModel.moveToPage(position)
+                    super.onPageSelected(position)
+                  }
                 })
+            btnNext.setOnClickListener { viewModel.nextPage() }
+            btnDone.setOnClickListener {
+              startActivity(
+                  Intent(this@BaseWelcomeActivity, MapActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                  })
+            }
           }
         }
 

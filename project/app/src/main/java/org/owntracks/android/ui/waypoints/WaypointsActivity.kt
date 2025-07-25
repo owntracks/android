@@ -8,8 +8,6 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat.startActivity
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -69,11 +67,12 @@ class WaypointsActivity :
     super.onCreate(savedInstanceState)
     recyclerViewAdapter = WaypointsAdapter(this)
     postNotificationsPermissionInit(this, preferences, notificationsStash)
-    DataBindingUtil.setContentView<UiWaypointsBinding>(this, R.layout.ui_waypoints).apply {
-      vm = viewModel
-      lifecycleOwner = this@WaypointsActivity
-      setSupportActionBar(appbar.toolbar)
-      drawerProvider.attach(appbar.toolbar)
+    UiWaypointsBinding.inflate(layoutInflater).apply {
+      setContentView(root)
+      appbar.toolbar.run {
+        setSupportActionBar(this)
+        drawerProvider.attach(this)
+      }
       waypointsRecyclerView.apply {
         layoutManager = LinearLayoutManager(this@WaypointsActivity)
         adapter = recyclerViewAdapter
@@ -91,6 +90,13 @@ class WaypointsActivity :
             recyclerViewStartLayoutInstant = TimeSource.Monotonic.markNow()
             Timber.d("submitting ${it.size} waypoints to adapter")
             recyclerViewAdapter.submitList(it)
+            if (it.isEmpty()) {
+              placeholder.visibility = View.VISIBLE
+              waypointsRecyclerView.visibility = View.GONE
+            } else {
+              placeholder.visibility = View.GONE
+              waypointsRecyclerView.visibility = View.VISIBLE
+            }
           }
         }
       }

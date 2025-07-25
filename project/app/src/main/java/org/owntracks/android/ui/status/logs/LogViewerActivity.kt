@@ -10,7 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ShareCompat
-import androidx.databinding.DataBindingUtil
+import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -44,12 +44,9 @@ class LogViewerActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     binding =
-        DataBindingUtil.setContentView<UiPreferencesLogsBinding?>(
-                this, R.layout.ui_preferences_logs)
-            .apply {
-              lifecycleOwner = this@LogViewerActivity
-              setSupportActionBar(appbar.toolbar)
-            }
+        UiPreferencesLogsBinding.inflate(layoutInflater).apply {
+          setSupportActionBar(appbar.toolbar)
+        }
 
     supportActionBar?.apply {
       setDisplayShowHomeEnabled(true)
@@ -64,7 +61,9 @@ class LogViewerActivity : AppCompatActivity() {
                 resources.getColor(R.color.log_debug_tag_color),
                 resources.getColor(R.color.log_info_tag_color),
                 resources.getColor(R.color.log_warning_tag_color),
-                resources.getColor(R.color.log_error_tag_color)))
+                resources.getColor(R.color.log_error_tag_color),
+            ),
+        )
     restartLogCollector()
 
     binding.logsRecyclerView.apply {
@@ -74,7 +73,7 @@ class LogViewerActivity : AppCompatActivity() {
     }
     binding.shareFab.setOnClickListener {
       val key = "${getRandomHexString()}/debug=${viewModel.isDebugEnabled()}/owntracks-debug.txt"
-      logExportUri = Uri.parse("content://${BuildConfig.APPLICATION_ID}.log/$key")
+      logExportUri = "content://${BuildConfig.APPLICATION_ID}.log/$key".toUri()
       val shareIntent =
           ShareCompat.IntentBuilder(this)
               .setType("text/plain")

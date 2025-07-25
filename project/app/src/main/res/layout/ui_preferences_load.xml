@@ -1,68 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <data>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
 
-        <import type="android.view.View" />
+    <include
+        android:id="@+id/appbar"
+        layout="@layout/appbar" />
 
-        <import type="org.owntracks.android.ui.preferences.load.ImportStatus" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:id="@+id/loadingLayout">
 
-        <variable
-            name="vm"
-            type="org.owntracks.android.ui.preferences.load.LoadViewModel" />
-    </data>
-
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
-
-        <include
-            android:id="@+id/appbar"
-            layout="@layout/appbar" />
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:visibility="@{vm.configurationImportStatus==ImportStatus.LOADING ? View.VISIBLE : View.GONE}">
-
-            <ProgressBar
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true" />
-        </RelativeLayout>
-
-        <ScrollView
-            android:layout_width="match_parent"
+        <ProgressBar
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="@{vm.configurationImportStatus==ImportStatus.SUCCESS ? View.VISIBLE : View.GONE}"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            android:layout_centerInParent="true" />
+    </RelativeLayout>
 
-            <TextView
-                android:id="@+id/effectiveConfiguration"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/default_spacing"
-                android:text="@{vm.displayedConfiguration}"
-                android:textDirection="ltr"
-                android:textIsSelectable="true" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/effective_configuration_view"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        </ScrollView>
+        <TextView
+            android:id="@+id/effectiveConfiguration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/default_spacing"
+            android:text="@{vm.displayedConfiguration}"
+            android:textDirection="ltr"
+            android:textIsSelectable="true" />
 
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="@{vm.configurationImportStatus==ImportStatus.FAILED ? View.VISIBLE : View.GONE}"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+    </ScrollView>
 
-            <TextView
-                android:id="@+id/importError"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/default_spacing"
-                android:text="@{String.format(@string/errorPreferencesImportFailed, vm.importError)}"
-                android:textIsSelectable="true" />
-        </ScrollView>
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
-</layout>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <TextView
+            android:id="@+id/importError"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/default_spacing"
+            android:textIsSelectable="true" />
+    </ScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

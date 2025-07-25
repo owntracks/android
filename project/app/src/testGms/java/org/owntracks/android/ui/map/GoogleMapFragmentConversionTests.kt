@@ -17,7 +17,7 @@ class GoogleMapFragmentConversionTests(
 ) {
   @Test
   fun `given a starting point in a range, when running a linear conversion twice, then we should end up back in the same place`() {
-    val fn = GoogleMapFragment(mock {}, mock {})::linearConversion
+    val fn = GoogleMapFragment(mock {})::linearConversion
     assertEquals(
         startingPoint, fn(range1, range2, startingPoint).run { fn(range2, range1, this) }, 0.001)
   }

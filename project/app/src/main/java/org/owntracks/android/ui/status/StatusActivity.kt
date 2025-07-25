@@ -1,21 +1,20 @@
 package org.owntracks.android.ui.status
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.isVisible
-import androidx.databinding.BindingAdapter
-import androidx.databinding.DataBindingUtil
+import androidx.core.net.toUri
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 import org.owntracks.android.R
-import org.owntracks.android.data.EndpointState
 import org.owntracks.android.databinding.UiStatusBinding
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.DrawerProvider
@@ -35,9 +34,8 @@ class StatusActivity : AppCompatActivity(), ServiceStarter by ServiceStarter.Imp
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     binding =
-        DataBindingUtil.setContentView<UiStatusBinding>(this, R.layout.ui_status).apply {
-          vm = viewModel
-          lifecycleOwner = this@StatusActivity
+        UiStatusBinding.inflate(layoutInflater).apply {
+          setContentView(root)
           appbar.toolbar.apply {
             setSupportActionBar(this)
             drawerProvider.attach(this)
@@ -49,26 +47,29 @@ class StatusActivity : AppCompatActivity(), ServiceStarter by ServiceStarter.Imp
                 .setMessage(getString(R.string.batteryOptimizationWhitelistDialogMessage))
                 .setCancelable(true)
                 .setPositiveButton(
-                    getString(R.string.batteryOptimizationWhitelistDialogButtonLabel)) { _, _ ->
-                      if (viewModel.dozeWhitelisted.value == true) {
-                        startActivity(batteryOptimizationIntents.settingsIntent)
-                      } else {
-                        startActivity(batteryOptimizationIntents.directPackageIntent)
-                      }
-                    }
+                    getString(R.string.batteryOptimizationWhitelistDialogButtonLabel),
+                ) { _, _ ->
+                  if (viewModel.dozeWhitelisted.value == true) {
+                    startActivity(batteryOptimizationIntents.settingsIntent)
+                  } else {
+                    startActivity(batteryOptimizationIntents.directPackageIntent)
+                  }
+                }
                 .show()
           }
           viewLogsButton.setOnClickListener {
             startActivity(
                 Intent(this@StatusActivity, LogViewerActivity::class.java)
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+            )
           }
           locationPermissions.setOnClickListener {
             val showLocationPermissionsStarter = {
               startActivity(
                   Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                    data = Uri.parse("package:$packageName")
-                  })
+                    data = "package:$packageName".toUri()
+                  },
+              )
             }
             if (viewModel.locationPermissions.value !=
                 R.string.statusLocationPermissionsFineBackground) {
@@ -90,6 +91,27 @@ class StatusActivity : AppCompatActivity(), ServiceStarter by ServiceStarter.Imp
               showLocationPermissionsStarter()
             }
           }
+          lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+              launch {
+                viewModel.endpointState.collect { endpointState ->
+                  connectedStatus.text = endpointState.getLabel(this@StatusActivity)
+                  endpointStateContainer.visibility =
+                      if (endpointState.error == null && endpointState.message == null) {
+                        LinearLayout.GONE
+                      } else {
+                        LinearLayout.VISIBLE
+                      }
+                  connectedStatusMessage.text =
+                      if (endpointState.error != null) {
+                        endpointState.getErrorLabel(this@StatusActivity)
+                      } else {
+                        endpointState.message
+                      }
+                }
+              }
+            }
+          }
         }
     startService(this)
   }
@@ -99,19 +121,4 @@ class StatusActivity : AppCompatActivity(), ServiceStarter by ServiceStarter.Imp
     viewModel.refreshDozeModeWhitelisted()
     viewModel.refreshLocationPermissions()
   }
-}
-
-@BindingAdapter("endpointState")
-fun LinearLayout.setVisibility(endpointState: EndpointState) {
-  isVisible = !(endpointState.error == null && endpointState.message == null)
-}
-
-@BindingAdapter("endpointState")
-fun TextView.setText(endpointState: EndpointState) {
-  text =
-      if (endpointState.error != null) {
-        endpointState.getErrorLabel(context)
-      } else {
-        endpointState.message
-      }
 }

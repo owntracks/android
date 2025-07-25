@@ -1,10 +1,7 @@
 package org.owntracks.android.model
 
-import androidx.databinding.BaseObservable
-import androidx.databinding.Bindable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import org.owntracks.android.BR
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.location.LatLng
 import org.owntracks.android.location.toLatLng
@@ -13,10 +10,9 @@ import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.model.messages.MessageTransition
 import timber.log.Timber
 
-class Contact(id: String) : BaseObservable() {
-  @get:Bindable val id: String = id.ifEmpty { "NOID" }
+class Contact(id: String) {
+  val id: String = id.ifEmpty { "NOID" }
 
-  @get:Bindable
   val displayName: String
     get() = name?.ifEmpty { trackerId } ?: trackerId
 
@@ -24,29 +20,23 @@ class Contact(id: String) : BaseObservable() {
   private var name: String? = null
     private set(value) {
       field = value
-      notifyPropertyChanged(BR.displayName)
     }
 
-  @get:Bindable
+  var locationAccuracy: Int = 0
+  var altitude: Int = 0
+  var velocity: Int = 0
+  var battery: Int? = null
+  var geocodedLocation: String? = null
+  var trackerId: String = id.takeLast(2)
+
   var latLng: LatLng? = null
-    private set(value) {
-      field = value
-      notifyPropertyChanged(BR.latLng)
-    }
+    private set
 
-  @get:Bindable
   var locationTimestamp: Long = 0
-    private set(value) {
-      field = value
-      notifyPropertyChanged(BR.locationTimestamp)
-    }
+    private set
 
-  @get:Bindable
   var face: String? = null
-    private set(value) {
-      field = value
-      notifyPropertyChanged(BR.face)
-    }
+    private set
 
   fun setMessageCard(messageCard: MessageCard) {
     name = messageCard.name
@@ -79,49 +69,6 @@ class Contact(id: String) : BaseObservable() {
     locationAccuracy = messageLocation.accuracy
     return true
   }
-
-  @get:Bindable
-  var locationAccuracy: Int = 0
-    private set(value) {
-      field = value
-      notifyPropertyChanged(BR.locationAccuracy)
-    }
-
-  @get:Bindable
-  var altitude: Int = 0
-    private set(value) {
-      field = value
-      notifyPropertyChanged(BR.altitude)
-    }
-
-  @get:Bindable
-  var velocity: Int = 0
-    private set(value) {
-      field = value
-      notifyPropertyChanged(BR.velocity)
-    }
-
-  @get:Bindable
-  var battery: Int? = null
-    private set(value) {
-      field = value
-      notifyPropertyChanged(BR.battery)
-    }
-
-  @get:Bindable
-  var geocodedLocation: String? = null
-    private set(value) {
-      field = value
-      notifyPropertyChanged(BR.geocodedLocation)
-    }
-
-  @get:Bindable
-  var trackerId: String = id.takeLast(2)
-    private set(value) {
-      field = value
-      notifyPropertyChanged(BR.trackerId)
-      notifyPropertyChanged(BR.displayName)
-    }
 
   fun geocodeLocation(geocoderProvider: GeocoderProvider, scope: CoroutineScope) {
     latLng?.let { scope.launch { geocodedLocation = geocoderProvider.resolve(it) } }

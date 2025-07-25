@@ -6,7 +6,6 @@ plugins {
   id("com.google.dagger.hilt.android")
   id("com.github.triplet.play")
   kotlin("android")
-  kotlin("kapt")
   alias(libs.plugins.ktfmt)
   alias(libs.plugins.ksp)
 }
@@ -112,7 +111,7 @@ android {
 
   buildFeatures {
     buildConfig = true
-    dataBinding = true
+    dataBinding = false
     viewBinding = true
   }
 
@@ -207,11 +206,6 @@ android {
   }
 }
 
-kapt {
-  useBuildCache = true
-  correctErrorTypes = true
-}
-
 ksp {
   arg("room.schemaLocation", "$projectDir/schemas")
 }
@@ -264,15 +258,11 @@ dependencies {
   // Widget libraries
   implementation(libs.widgets.materialdrawer) { artifact { type = "aar" } }
   implementation(libs.widgets.materialize) { artifact { type = "aar" } }
-
-  // These Java EE libs are no longer included in JDKs, so we include explicitly
-  kapt(libs.bundles.jaxb.annotation.processors)
+  implementation(libs.androidx.lifecycle.service)
 
   // Preprocessors
-  kapt(libs.bundles.kapt.hilt)
   ksp(libs.androidx.room.compiler)
-
-  kaptTest(libs.bundles.kapt.hilt)
+  ksp(libs.bundles.hilt.compiler)
 
   testImplementation(libs.mockito.kotlin)
   testImplementation(libs.androidx.core.testing)
@@ -282,7 +272,7 @@ dependencies {
 
   // Hilt Android Testing
   androidTestImplementation(libs.hilt.android.testing)
-  kaptAndroidTest(libs.hilt.compiler)
+
 
   androidTestImplementation(libs.barista) {
     exclude("org.jetbrains.kotlin")
