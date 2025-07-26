@@ -7,6 +7,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.res.ColorStateList
 import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.hardware.SensorManager.SENSOR_DELAY_UI
@@ -32,11 +33,13 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import androidx.core.view.setPadding
+import androidx.core.widget.ImageViewCompat
 import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
@@ -190,7 +193,7 @@ class MapActivity :
             TooltipCompat.setTooltipText(this, getString(R.string.currentLocationButtonLabel))
             setOnClickListener {
               if (checkAndRequestLocationPermissions(true) ==
-                  CheckPermissionsResult.HAS_PERMISSIONS) {
+                CheckPermissionsResult.HAS_PERMISSIONS) {
                 // Trigger a check for location services to be enabled
                 checkAndRequestLocationServicesEnabled(true)
               }
@@ -224,30 +227,30 @@ class MapActivity :
 
     val labels =
         listOf(
-                binding.contactDetailsAccuracy.root,
-                binding.contactDetailsAltitude.root,
-                binding.contactDetailsBattery.root,
-                binding.contactDetailsBearing.root,
-                binding.contactDetailsSpeed.root,
-                binding.contactDetailsDistance.root,
-            )
+            binding.contactDetailsAccuracy.root,
+            binding.contactDetailsAltitude.root,
+            binding.contactDetailsBattery.root,
+            binding.contactDetailsBearing.root,
+            binding.contactDetailsSpeed.root,
+            binding.contactDetailsDistance.root,
+        )
             .map { it.findViewById<AutoResizingTextViewWithListener>(R.id.label) }
 
     object : AutoResizingTextViewWithListener.OnTextSizeChangedListener {
-          @SuppressLint("RestrictedApi")
-          override fun onTextSizeChanged(view: View, newSize: Float) {
-            labels
-                .filter { it != view }
-                .filter { it.textSize > newSize || it.configurationChangedFlag }
-                .forEach {
-                  it.setAutoSizeTextTypeUniformWithPresetSizes(
-                      intArrayOf(newSize.toInt()),
-                      TypedValue.COMPLEX_UNIT_PX,
-                  )
-                  it.configurationChangedFlag = false
-                }
-          }
-        }
+      @SuppressLint("RestrictedApi")
+      override fun onTextSizeChanged(view: View, newSize: Float) {
+        labels
+            .filter { it != view }
+            .filter { it.textSize > newSize || it.configurationChangedFlag }
+            .forEach {
+              it.setAutoSizeTextTypeUniformWithPresetSizes(
+                  intArrayOf(newSize.toInt()),
+                  TypedValue.COMPLEX_UNIT_PX,
+              )
+              it.configurationChangedFlag = false
+            }
+      }
+    }
         .also { listener -> labels.forEach { it.withListener(listener) } }
     backPressedCallback =
         onBackPressedDispatcher.addCallback(this, false) {
@@ -287,7 +290,7 @@ class MapActivity :
                 getString(R.string.contactDetailsAltitudeValue, it.altitude)
             contactDetailsBattery.value.text =
                 it.battery?.let { b -> getString(R.string.contactDetailsBatteryValue, b) }
-                    ?: getString(R.string.na)
+                  ?: getString(R.string.na)
             contactDetailsSpeed.value.text =
                 getString(R.string.contactDetailsSpeedValue, it.velocity)
             contactDetailsTrackerId.value.text = it.trackerId
@@ -325,43 +328,48 @@ class MapActivity :
     viewModel.currentMonitoringMode.observe(this) { updateMonitoringModeMenu() }
 
     viewModel.myLocationStatus.observe(this) { status ->
-      //      val color =
-      //          when (status) {
-      //            MyLocationStatus.FOLLOWING,
-      //            MyLocationStatus.AVAILABLE -> R.color.fabMyLocationBackground
-      //            MyLocationStatus.DISABLED -> R.color.fabMyLocationBackgroundDisabled
-      //            else -> R.color.fabMyLocationBackgroundDisabled
-      //          }
-      //      ImageViewCompat.setImageTintList(
-      //          binding.fabMyLocation, ColorStateList.valueOf(getColor(color)),
-      //      )
-      //    }
-      //
+      binding.fabMyLocation.run {
+        val tint =
+            when (status) {
+              MyLocationStatus.FOLLOWING ->
+                resources.getColor(R.color.fabMyLocationForegroundActiveTint, null)
 
-      viewModel.contactDistance.observe(this) { distance ->
-        binding.contactDetailsBearing.value.text =
-            getString(R.string.contactDetailsBearingValue, distance)
-      }
-      viewModel.relativeContactBearing.observe(this) { relativeBearing ->
-        binding.contactDetailsBearing.icon.rotation = relativeBearing
-      }
-      viewModel.contactBearing.observe(this) { bearing ->
-        binding.distanceBearingDetails.visibility =
-            if (bearing != null) {
-              binding.contactDetailsDistance.value.text =
-                  getString(
-                      R.string.contactDetailsDistanceValue,
-                      if (bearing > 1000f) bearing / 1000 else bearing,
-                      if (bearing > 1000f) getString(R.string.contactDetailsDistanceUnitKilometres)
-                      else getString(R.string.contactDetailsDistanceUnitMeters),
-                  )
-
-              View.VISIBLE
-            } else {
-              View.GONE
+              else -> resources.getColor(R.color.fabMyLocationForegroundInActiveTint, null)
             }
+        when (status) {
+          MyLocationStatus.DISABLED -> setImageResource(R.drawable.ic_baseline_location_disabled_24)
+          MyLocationStatus.AVAILABLE -> setImageResource(R.drawable.ic_baseline_location_searching_24)
+          MyLocationStatus.FOLLOWING -> setImageResource(R.drawable.ic_baseline_my_location_24)
+          else -> setImageResource(R.drawable.ic_baseline_location_disabled_24)
+        }
+        ImageViewCompat.setImageTintList(this, ColorStateList.valueOf(tint))
       }
     }
+
+    viewModel.contactDistance.observe(this) { distance ->
+      binding.contactDetailsBearing.value.text =
+          getString(R.string.contactDetailsBearingValue, distance)
+    }
+    viewModel.relativeContactBearing.observe(this) { relativeBearing ->
+      binding.contactDetailsBearing.icon.rotation = relativeBearing
+    }
+    viewModel.contactBearing.observe(this) { bearing ->
+      binding.distanceBearingDetails.visibility =
+          if (bearing != null) {
+            binding.contactDetailsDistance.value.text =
+                getString(
+                    R.string.contactDetailsDistanceValue,
+                    if (bearing > 1000f) bearing / 1000 else bearing,
+                    if (bearing > 1000f) getString(R.string.contactDetailsDistanceUnitKilometres)
+                    else getString(R.string.contactDetailsDistanceUnitMeters),
+                )
+
+            View.VISIBLE
+          } else {
+            View.GONE
+          }
+    }
+
 
     startService(this)
 
@@ -802,33 +810,5 @@ class MapActivity :
     const val BUNDLE_KEY_CONTACT_ID = "BUNDLE_KEY_CONTACT_ID"
     const val IMPLICIT_LOCATION_PERMISSION_REQUEST = 1
     const val EXPLICIT_LOCATION_PERMISSION_REQUEST = 2
-
-    //    @JvmStatic
-    //    @BindingAdapter("locationIcon")
-    //    fun setMyLocationFabIcon(fab: FloatingActionButton, status: MyLocationStatus?) {
-    //      when (status) {
-    //        MyLocationStatus.FOLLOWING ->
-    // fab.setImageResource(R.drawable.ic_baseline_my_location_24)
-    //        MyLocationStatus.NOT_FOLLOWING ->
-    //            fab.setImageResource(R.drawable.ic_baseline_location_searching_24)
-    //        MyLocationStatus.DISABLED ->
-    //            fab.setImageResource(R.drawable.ic_baseline_location_disabled_24)
-    //        null -> fab.setImageResource(R.drawable.ic_baseline_location_disabled_24)
-    //      }
-    //    }
-    //
-    //    @JvmStatic
-    //    @BindingAdapter("fabTint")
-    //    fun setFabTint(fab: FloatingActionButton, status: MyLocationStatus?) {
-    //      val color =
-    //          when (status) {
-    //            MyLocationStatus.FOLLOWING,
-    //            MyLocationStatus.NOT_FOLLOWING -> R.color.fabMyLocationBackground
-    //            MyLocationStatus.DISABLED -> R.color.fabMyLocationBackgroundDisabled
-    //            null -> R.color.fabMyLocationBackgroundDisabled
-    //          }
-    //      ImageViewCompat.setImageTintList(fab,
-    // ColorStateList.valueOf(fab.context.getColor(color)))
-    //    }
   }
 }
