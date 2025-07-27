@@ -249,7 +249,6 @@ dependencies {
   implementation(libs.bundles.jackson)
   implementation(libs.square.tape2)
   implementation(libs.timber)
-  implementation(libs.libsodium)
   implementation(libs.apache.httpcore)
   implementation(libs.commons.codec)
   implementation(libs.bundles.androidx.room)

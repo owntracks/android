@@ -36,7 +36,6 @@ kotlin-coroutines = "1.9.0"
 kotlin-datetime = "0.6.2"
 ksp = "1.9.25-1.0.20"
 ktfmt = "0.20.1"
-libsodium = "2.0.2"
 lmdb-kt = "0.1.1"
 materialdrawer = "6.1.2"
 materialize = "1.2.1"
@@ -103,7 +102,6 @@ androidx-concurrent-futures = { module = "androidx.concurrent:concurrent-futures
 # Cryptography
 conscrypt = { module = "org.conscrypt:conscrypt-android", version.ref = "conscrypt" }
 bouncycastle = { module = "org.bouncycastle:bcprov-jdk14", version.ref = "bouncycastle" }
-libsodium = { module = "com.github.joshjdevl.libsodiumjni:libsodium-jni-aar", version.ref = "libsodium" }
 
 # Migration
 lmdb-kt = { module = "com.growse:lmdb-kt", version.ref = "lmdb-kt" }

@@ -67,14 +67,6 @@
             android:data="https://github.com/JakeWharton/timber" />
     </Preference>
     <Preference
-        android:summary="joshjdevl"
-        android:title="Libsodium cryptography library JNI bindings"
-        app:iconSpaceReserved="false">
-        <intent
-            android:action="android.intent.action.VIEW"
-            android:data="https://github.com/joshjdevl/libsodium-jni" />
-    </Preference>
-    <Preference
         android:summary="Apache"
         android:title="HTTP Components Core 5"
         app:iconSpaceReserved="false">
