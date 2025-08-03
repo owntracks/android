@@ -25,13 +25,13 @@ val enablePlayPublishing: Boolean =
     !System.getenv("ANDROID_PUBLISHER_CREDENTIALS").isNullOrBlank()
 
 android {
-  compileSdk = 34
+  compileSdk = 36
   namespace = "org.owntracks.android"
 
   defaultConfig {
     applicationId = "org.owntracks.android"
     minSdk = 24
-    targetSdk = 34
+    targetSdk = 36
 
     versionCode = packageVersionCode
     versionName = "2.5.3"
