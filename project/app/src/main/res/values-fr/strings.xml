@@ -13,14 +13,18 @@
         <item quantity="other">"Actuellement disponible en %1$d langues!"</item>
     </plurals>
     <string name="accept">"J'accepte"</string>
-
-    <!-- Why POI ? -->
     <string name="addWaypoint">"Ajouter un POI"</string>
     <string name="aLocation">"Région"</string>
     <string name="app_name">"OwnTracks"</string>
+    <string name="backgroundLocationRestrictionNotificationText">"Cette version d'Android empêche OwnTracks de recevoir les positions lorsqu'il est démarré en arrière-plan jusqu'à ce que l'application soit ouverte. Cliquez sur cette notification pour ouvrir l'application et commencer le suivi de position."</string>
+    <string name="backgroundLocationRestrictionNotificationTitle">"Suivi de localisation interrompu"</string>
     <string name="batteryOptimizationWhitelistDialogButtonLabel">"Paramètres de l'optimisation de la batterie"</string>
+    <string name="batteryOptimizationWhitelistDialogMessage">"Autoriser OwnTracks dans les exceptions d'optimisation de la batterie peut l'aider à suivre les positions de manière plus fiable et à maintenir le contact avec le serveur."</string>
     <string name="batteryOptimizationWhitelistDialogTitle">"Optimisation de la batterie"</string>
     <string name="cancel">"Annuler"</string>
+    <string name="certificateMigrationRequiredNotificationText">"OwnTracks utilise désormais les certificats TLS du magasin de certificats de l'appareil.\n\nSi vous utilisiez une autorité de certification personnalisée ou des certificats client TLS, veuillez les ajouter au magasin de certificats de l'appareil."</string>
+    <string name="certificateMigrationRequiredNotificationTitle">"Migration de certificat requise"</string>
+    <string name="certificateMigrationRequiredOpenSettingsAction">"Ouvrir les paramètres"</string>
     <string name="clear_log">"Vider le journal"</string>
     <string name="configurationManagement">"Gestion de la configuration"</string>
     <string name="CONNECTED">"Connecté"</string>
@@ -36,6 +40,7 @@
     <string name="contactDetailsBatteryValue">"%d %%"</string>
     <string name="contactDetailsBearing">"Orientation"</string>
     <string name="contactDetailsBearingValue">"%,.0f°"</string>
+    <string name="contactDetailsCoordinates">"Coordonnées"</string>
     <string name="contactDetailsDistance">"Distance"</string>
     <string name="contactDetailsDistanceUnitKilometres">"km"</string>
     <string name="contactDetailsDistanceUnitMeters">"m"</string>
@@ -45,19 +50,26 @@
     <string name="contactDetailsTopic">"Identifiant"</string>
     <string name="contactDetailsTrackerId">"Tracker ID"</string>
     <string name="contactLocationUnknown">"Aucune localisation disponible"</string>
+    <string name="contactsListPlaceholder">"Aucun contact trouvé"</string>
     <string name="currentLocationButtonLabel">"Localisation actuelle"</string>
+    <string name="deleteWaypointConfirmationButtonLabel">"Supprimer"</string>
+    <string name="deleteWaypointConfirmationText">"Voulez-vous supprimer ce point de cheminement ?"</string>
+    <string name="deleteWaypointTitle">"Supprimer le point de cheminement"</string>
     <string name="description">"Description"</string>
+    <string name="deviceLocationDisabledDialogMessage">"Les services de localisation sur cet appareil sont actuellement désactivés, OwnTracks ne peut donc pas suivre votre position actuelle.
+
+Pour autoriser cela, veuillez activer la localisation dans les paramètres de l'appareil."</string>
     <string name="deviceLocationDisabledDialogPositiveButtonLabel">"Paramètres de localisation"</string>
     <string name="deviceLocationDisabledDialogTitle">"Localisation désactivée"</string>
     <string name="DISCONNECTED">"Déconnecté"</string>
     <string name="divider">"Diviseur"</string>
     <string name="done_heading">"Terminé"</string>
-    <string name="enjoy_description">"Sélectionnez les préférences dans le menu et configurez OwnTracks pour votre serveur avant de l'utiliser"</string>
+    <string name="enjoy_description">"Sélectionnez les préférences dans le menu (ou utilisez le lien ci-dessous) et configurez OwnTracks pour votre serveur avant de l'utiliser"</string>
     <string name="ERROR">"Erreur"</string>
     <string name="ERROR_CONFIGURATION">"Configuration incomplète"</string>
 
     <!-- Fuzzy -->
-    <string name="errorPreferencesImportFailed">"L'importation a échoué"</string>
+    <string name="errorPreferencesImportFailed">"L'importation a échoué : %s"</string>
     <string name="events">"Événements"</string>
     <string name="exportConfiguration">"Exporter"</string>
     <string name="exportLogFilePrompt">"Exporter le journal"</string>
@@ -66,9 +78,11 @@
     <string name="fixProblemLabel">"Corrigé"</string>
     <string name="geocoderDisabled">"Le service de géocodage est désactivé"</string>
     <string name="geocoderError">"Une erreur a été reçue du service de géocodage: %s"</string>
+    <string name="geocoderExceptionError">"Une erreur a été reçue du service de géocodage, consultez les journaux pour plus de détails."</string>
     <string name="geocoderIPAddressRejected">"L'adresse IP du client a été rejetée"</string>
     <string name="geocoderProblemNotificationTitle">"Problème de géocodage"</string>
     <string name="geocoderRateLimited">"Le service de géocodage a été limité. Ne pas réessayer avant %s"</string>
+    <string name="geocoderUnavailable">"Le service de géocodage est temporairement indisponible"</string>
     <string name="icon_description_done">"Terminé"</string>
     <string name="icon_description_owntracks">"OwnTracks"</string>
     <string name="icon_description_warning">"Attention"</string>
@@ -76,9 +90,19 @@
     <string name="importConfig">"Importer"</string>
     <string name="INITIAL">"Initialisation"</string>
     <string name="latitude">"Latitude"</string>
+    <string name="loadActivityNoFileExplorerFound">"Aucune application d'exploration de fichiers trouvée"</string>
+    <string name="loadActivitySelectAFile">"Sélectionnez un fichier"</string>
+    <string name="locationPermissionNotGrantedNotification">"Autorisation de localisation non accordée"</string>
     <string name="locationPermissionRequestDialogMessage">"Pour suivre votre localisation, autorisez OwnTracks à utiliser la localisation."</string>
+    <string name="locationPermissionRequestDialogTitle">"Demande d'autorisation de localisation"</string>
     <string name="logViewerActivityTitle">"Journal d'activité"</string>
     <string name="longitude">"Longitude"</string>
+    <string name="mapLayerDialogTitle">"Couches de la carte"</string>
+    <string name="mapLayerGoogleMapDefaultLabel">"Google par défaut"</string>
+    <string name="mapLayerGoogleMapHybridLabel">"Google Hybride"</string>
+    <string name="mapLayerGoogleMapTerrainLabel">"Google Terrain"</string>
+    <string name="mapLayerOpenStreetMapLabel">"OpenStreetMap"</string>
+    <string name="mapLayerOpenStreetMapWikimediaLabel">"Wikimedia"</string>
     <string name="menuClear">"Nettoyer"</string>
     <string name="menuContactNavigate">"Naviguer"</string>
     <string name="mode_heading">"Mode"</string>
@@ -88,10 +112,18 @@
     <string name="monitoring_move">"Mode de surveillance déplacement"</string>
     <string name="monitoring_quiet">"Mode de surveillance arrêté"</string>
     <string name="monitoring_significant">"Modifications importantes du mode de surveillance"</string>
+    <string name="monitoringModeDialogManualDescription">"Seules les transitions de points de cheminement sont publiées automatiquement, pas les emplacements"</string>
     <string name="monitoringModeDialogManualTitle">"Manuel"</string>
+    <string name="monitoringModeDialogMoveDescription">"Haute fréquence et précision, mais consommation d'énergie élevée"</string>
+    <string name="monitoringModeDialogMoveTitle">"Se déplacer"</string>
+    <string name="monitoringModeDialogQuietDescription">"Aucun événement publié automatiquement"</string>
     <string name="monitoringModeDialogQuietTitle">"Silencieux"</string>
+    <string name="monitoringModeDialogSignificantDescription">"Consommation d'énergie équilibrée et précision/fréquence"</string>
+    <string name="monitoringModeDialogSignificantTitle">"Modifications importantes"</string>
+    <string name="monitoringModeDialogTitle">"Mode de surveillance"</string>
     <string name="na">"Indisponible"</string>
     <string name="next">"Prochain"</string>
+    <string name="noBrowserInstalled">"Aucun navigateur installé"</string>
     <string name="noNavigationApp">"Aucune application appropriée installée"</string>
     <string name="notificationChangeMonitoring">"Changer le mode de surveillance"</string>
     <string name="notificationChannelErrors">"Erreurs"</string>
@@ -100,6 +132,7 @@
     <string name="notificationChannelEventsDescription">"Transmissions par région"</string>
     <string name="notificationChannelOngoing">"En cours"</string>
     <string name="notificationChannelOngoingDescription">"Requis pour recevoir des mises à jour de localisation en arrière-plan"</string>
+    <string name="notificationEndpointStateConnected">"%1$s à %2$s"</string>
     <plurals name="notificationEventsTitle">
         <item quantity="one">"%1$d nouvel événement"</item>
         <item quantity="other">"%1$d nouveaux événements"</item>
@@ -108,24 +141,37 @@
     <string name="play_services_now_available">"Les services Google Play sont maintenant disponibles"</string>
     <string name="play_services_update_required">"La mise à jour des services Google Play est nécessaire"</string>
     <string name="preferencesAdvanced">"Avancé"</string>
-    <string name="preferencesAdvancedAutostartWarning">"Cette version d'Android limite OwnTracks dans l'acquisition des positions en démarrage auto. Ouvrez l'app pour remédier à ce problème "</string>
+    <string name="preferencesAdvancedAutostartWarning">"Cette version d'Android limite OwnTracks dans l'acquisition des positions en démarrage auto, ouvrez l'app pour remédier à ce problème."</string>
+    <string name="preferencesAdvancedOpencagePrivacy">"&lt;a href=\"%s\"&gt;OpenCage Privacy Policy&lt;/a&gt;"</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogAccept">"Accepter"</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogCancel">"Annuler"</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogMessage">"Pour utiliser le géocodeur OpenCage, OwnTracks enverra chaque emplacement qu'il traite à OpenCage via une connexion cryptée TLS.
+
+La politique de confidentialité d'OpenCage peut être trouvée &lt;a href=\"https://opencagedata.com/api#privacy\"&gt;sur leur site Web&lt;/a&gt;."</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogTitle">"OpenCage Privacy Policy"</string>
     <string name="preferencesAutostart">"Démarrage auto"</string>
     <string name="preferencesAutostartSummary">"Démarrer automatiquement au démarrage de l'appareil"</string>
     <string name="preferencesBrokerPassword">"Mot de passe"</string>
+    <string name="preferencesCaCrtInstall">"Installer le certificat CA"</string>
     <string name="preferencesCategoryAdvancedEncryption">"Chiffrement"</string>
     <string name="preferencesCategoryAdvancedLocator">"Localisateur"</string>
     <string name="preferencesCategoryAdvancedMisc">"Autres"</string>
     <string name="preferencesCategoryAdvancedServices">"Services"</string>
+    <string name="preferencesCategoryConnectionCredentials">"Identification"</string>
+    <string name="preferencesCategoryConnectionEndpoint">"Point d'accès"</string>
+    <string name="preferencesCategoryConnectionIdentification">"Identification"</string>
     <string name="preferencesCategoryNotificationBackground">"Notifications en arrière-plan"</string>
     <string name="preferencesCategoryNotificationErrors">"Erreurs &amp; Problèmes"</string>
     <string name="preferencesCategoryNotificationOngoing">"Notification en cours"</string>
-
-    <!-- This can be "Notes de version" -->
     <string name="preferencesChangelog">"Version"</string>
     <string name="preferencesCleanSessionEnabled">"Vider la session"</string>
+    <string name="preferencesClientCrt">"Certificats client TLS"</string>
+    <string name="preferencesClientCrtInstall">"Installer le certificat client"</string>
     <string name="preferencesClientId">"ID Client"</string>
+    <string name="preferencesClientIdValidationError">"Ne peut pas être vide"</string>
     <string name="preferencesDebugLog">"Débogage du journal"</string>
     <string name="preferencesDeviceName">"Device ID"</string>
+    <string name="preferencesDeviceNameValidationError">"Ne peut pas être vide"</string>
     <string name="preferencesDocumentation">"Documentation"</string>
     <string name="preferencesEditor">"Éditeur"</string>
     <string name="preferencesEditorDescription">"Définissez une valeur unique pour la clé spécifiée. Certaines modifications peuvent nécessiter un redémarrage de l'application."</string>
@@ -135,27 +181,29 @@
     <string name="preferencesEditorValueError">"Valeur non valide spécifiée"</string>
     <string name="preferencesEnableMapRotation">"Activer la rotation de carte"</string>
     <string name="preferencesEnableMapRotationSummary">"Autoriser la rotation de la carte"</string>
-
-    <!-- Clé de chiffrage -->
     <string name="preferencesEncryptionKey">"Clé de cryptage"</string>
     <string name="preferencesEncryptionKeyDialogMessage">"La clé de chiffrement est coupée après 32 caractères."</string>
     <string name="preferencesEncryptionKeySummary">"Clé symétrique pour le chiffrement de la charge utile"</string>
     <string name="preferencesExperimental">"Expérimental"</string>
+    <string name="preferencesExportError">"Erreur lors de l'exportation de la configuration"</string>
     <string name="preferencesExportSuccess">"Exportation réussie"</string>
     <string name="preferencesHost">"Hôte"</string>
+    <string name="preferencesHostValidationError">"Ne peut pas être vide"</string>
     <string name="preferencesIgnoreInaccurateLocations">"Emplacements inexacts"</string>
     <string name="preferencesIgnoreInaccurateLocationsDialog">"Ignorer l'emplacement, si la précision est supérieure aux mètres donnés"</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">"Ignorer les emplacements inexacts"</string>
+    <string name="preferencesImportNoURIGiven">"Aucune URI donnée pour l'importation de la configuration"</string>
     <string name="preferencesKeepalive">"Keepalive"</string>
+    <string name="preferencesKeepaliveDialogMessage">"À quelle fréquence le client doit-il envoyer un message de maintien de connexion au courtier (en secondes)"</string>
     <string name="preferencesKeepaliveValidationError">"Keepalive doit être au minimum %d"</string>
     <string name="preferencesLicenses">"Bibliothèques"</string>
     <string name="preferencesLicensesSummary">"Merci à leurs auteurs"</string>
     <string name="preferencesLoadFailed">"Erreur de chargement de la configuration"</string>
     <string name="preferencesLocatorDisplacement">"Distance minimale de déplacement"</string>
-    <string name="preferencesLocatorDisplacementDialog">"De combien de mètres l'appareil doit il être déplace avant une mise à jour de la localisation"</string>
+    <string name="preferencesLocatorDisplacementDialog">"De combien de mètres l'appareil doit-il être déplacé avant une mise à jour de la localisation"</string>
     <string name="preferencesLocatorDisplacementSummary">"Distance minimale de déplacement entre deux mises à jour"</string>
     <string name="preferencesLocatorInterval">"Intervalle de localisation"</string>
-    <string name="preferencesLocatorIntervalDialog">"Intervalle en secondes pendant lequel l'appareil doit se déplacer entre les mises à jour d'emplacement en Mode de changements d'emplacement importants."</string>
+    <string name="preferencesLocatorIntervalDialog">"Intervalle en secondes pendant lequel l'appareil doit se déplacer entre les mises à jour d'emplacement en Mode de changements d'emplacement importants (seconds)"</string>
     <string name="preferencesLocatorIntervalSummary">"Intervalle entre les mises à jour de position"</string>
     <string name="preferencesMap">"Carte"</string>
     <string name="preferencesMoveModeLocatorInterval">"Intervalle de localisation (Mode déplacement)"</string>
@@ -165,14 +213,20 @@
     <string name="preferencesNotificationEvents">"Événements"</string>
     <string name="preferencesNotificationEventsSummary">"Alerte des événements reçus"</string>
     <string name="preferencesNotificationGeocoderErrors">"Erreurs de géocodage"</string>
-    <string name="preferencesNotificationGeocoderErrorsSummary">"Afficher les erreurs de geocodage, les évènement de quota dépasse"</string>
+    <string name="preferencesNotificationGeocoderErrorsSummary">"Afficher les erreurs de géocodage, les évènement de quota dépassé"</string>
     <string name="preferencesNotificationLocation">"Dernier emplacement signalé"</string>
     <string name="preferencesNotificationLocationSummary">"Afficher le dernier lieu et l'heure signalés"</string>
+    <string name="preferencesNotificationPermissionRequest">"Autorisation de notification désactivée"</string>
+    <string name="preferencesNotificationPermissionRequestSummary">"Appuyez ici pour demander l'autorisation de notification"</string>
+    <string name="preferencesNotSet">"Non défini"</string>
     <string name="preferencesOpencageGeocoderApiKey">"Clé API OpenCage"</string>
     <string name="preferencesOpencageGeocoderApiKeyDialog">"Si défini, OpenCage est utilisé pour résoudre les adresses au lieu de Google. Redémarrage requis."</string>
     <string name="preferencesOpencageGeocoderApiKeySummary">"Clé API OpenCage géocodage inversé"</string>
     <string name="preferencesParameters">"Paramètres"</string>
+    <string name="preferencesPegLocatorFastestIntervalToInterval">"Limiter les requêtes de localisation"</string>
+    <string name="preferencesPegLocatorFastestIntervalToIntervalSummary">"Demander au fournisseur de localisation de ne pas fournir de mises à jour plus rapidement que l'intervalle de localisation demandé"</string>
     <string name="preferencesPort">"Port"</string>
+    <string name="preferencesPortValidationError">"Le port doit être un numéro compris entre 1 et 65535"</string>
     <string name="preferencesProfileId">"Mode"</string>
     <string name="preferencesPubExtendedData">"Données étendues"</string>
     <string name="preferencesPubExtendedDataSummary">"Inclure des données étendues dans les rapports de localisation"</string>
@@ -184,10 +238,11 @@
     <string name="preferencesRemoteConfigurationSummary">"Activer la mise à jour de la configuration à distance (nécessite les commandes à distance)"</string>
     <string name="preferencesReporting">"Rapports"</string>
     <string name="preferencesRepository">"Code source"</string>
+    <string name="preferencesRepublishOnReconnect">"Publier l'emplacement sur MQTT Connect"</string>
+    <string name="preferencesRepublishOnReconnectSummary">"Publiez le dernier emplacement connu et les données étendues actuelles immédiatement lors de la connexion à MQTT"</string>
     <string name="preferencesReverseGeocodeProvider">"Fournisseur de géocodage inversé"</string>
-
-    <!-- In french, connection is "connexion" -->
-    <string name="preferencesServer">"Connection"</string>
+    <string name="preferencesServer">"Connexion"</string>
+    <string name="preferencesSet">"Ensemble"</string>
 
     <!-- Fuzzy -->
     <string name="preferencesShowWaypointsOnMap">"Afficher les régions"</string>
@@ -196,6 +251,8 @@
     <string name="preferencesShowWaypointsOnMapSummary">"Dessiner des cercles de régions sur la carte"</string>
     <string name="preferencesTheme">"Thème"</string>
     <string name="preferencesTrackerId">"Tracker ID"</string>
+    <string name="preferencesTrackerIdValidationError">"Doit contenir un ou deux caractères"</string>
+    <string name="preferencesUrlValidationError">"URL HTTP non valide"</string>
 
     <!-- Fuzzy -->
     <string name="preferencesUsername">"Nom d'utilisateur"</string>
@@ -205,18 +262,51 @@
     <string name="publish">"Envoyer"</string>
 
     <!-- Fuzzy -->
-    <string name="radius">"Rayon"</string>
+    <string name="radius">"Rayon (m)"</string>
     <string name="reconnect">"Reconnecter"</string>
     <string name="save">"Sauvegarder"</string>
     <string name="select">"Sélectionner"</string>
+    <string name="shareContactBody">"%1$s dernière localisation: %2$s (%3$s) at %4$s"</string>
     <string name="status_background_service_started_hint">"Service d'arrière-plan démarré"</string>
     <string name="status_battery_optimization_whitelisted_hint">"Optimisation de la batterie en liste blanche"</string>
-    <string name="status_endpoint_queue_hint">"File d'attente du Endpoint"</string>
-    <string name="status_endpoint_state_hint">"Etat du Endpoint"</string>
-    <string name="status_endpoint_state_message_hint">"Message d'état du Endpoint"</string>
+    <string name="status_endpoint_queue_hint">"En file d'attente"</string>
+    <string name="status_endpoint_state_hint">"Etat de la connexion"</string>
+    <string name="status_endpoint_state_message_hint">"Détails de la connexion"</string>
     <string name="status_last_background_update_hint">"Dernière mise à jour en arrière-plan du service de localisation"</string>
     <string name="statusBatteryDozeWhiteListDisabled">"Non"</string>
     <string name="statusBatteryDozeWhiteListEnabled">"Oui"</string>
+    <string name="statusEndpointStateMessageAuthenticationFailed">"L'authentification a échoué"</string>
+    <string name="statusEndpointStateMessageClientTimeout">"Délai d'expiration du client"</string>
+    <string name="statusEndpointStateMessageConnectionLost">"Connexion perdue: %s"</string>
+    <string name="statusEndpointStateMessageConnectionRefused">"Connexion refusée"</string>
+    <string name="statusEndpointStateMessageEndpointDoesNotSupportWebsockets">"Le point de terminaison ne prend pas en charge les WebSockets"</string>
+    <string name="statusEndpointStateMessageEOFError">"EOFException du point de terminaison - le point de terminaison attend-il TLS ?"</string>
+    <string name="statusEndpointStateMessageInvalidClientId">"ID client non valide"</string>
+    <string name="statusEndpointStateMessageInvalidProtocolVersion">"Version du protocole MQTT non valide"</string>
+    <string name="statusEndpointStateMessageMalformedHostPort">"Nom d'hôte et port non valides"</string>
+    <string name="statusEndpointStateMessageMissingHost">"Aucun hôte spécifié"</string>
+    <string name="statusEndpointStateMessageNotAuthorized">"Non autorisé"</string>
+    <string name="statusEndpointStateMessageServerTimeout">"Délai d'expiration d'écriture du serveur"</string>
+    <string name="statusEndpointStateMessageSocketTimeout">"Délai d'attente de connexion expiré"</string>
+    <string name="statusEndpointStateMessageSubscribeFailed">"Abonnement échoué"</string>
+    <string name="statusEndpointStateMessageTLSConfigError">"Erreur de configuration TLS"</string>
+    <string name="statusEndpointStateMessageTLSConnectionClosed">"Connexion TLS fermée"</string>
+    <string name="statusEndpointStateMessageTLSEndpointCANotTrustedError">"L'autorité de certification TLS CA n'est pas approuvée"</string>
+    <string name="statusEndpointStateMessageTLSEndpointClientCertsRequired">"Le point d'accès nécessite des certificats client TLS"</string>
+    <string name="statusEndpointStateMessageTLSError">"Erreur TLS : %s"</string>
+    <string name="statusEndpointStateMessageUnableToConnect">"Impossible de se connecter"</string>
+    <string name="statusEndpointStateMessageUnknownHost">"Hôte inconnu"</string>
+    <string name="statusLocationPermissions">"Autorisation de localisation accordée"</string>
+    <string name="statusLocationPermissionsCoarseBackground">"Approximative (en arrière-plan)"</string>
+    <string name="statusLocationPermissionsCoarseForeground">"Approximative"</string>
+    <string name="statusLocationPermissionsFineBackground">"Précis (en arrière-plan)"</string>
+    <string name="statusLocationPermissionsFineForeground">"Précis"</string>
+    <string name="statusLocationPermissionsNone">"Aucune"</string>
+    <string name="statusLocationPermissionsPromptNegativeButton">"Annuler"</string>
+    <string name="statusLocationPermissionsPromptPositiveButton">"Paramètres"</string>
+    <string name="statusLocationPermissionsPromptText">"Si vous souhaitez suivre automatiquement les positions lors du redémarrage de l'appareil, vous pouvez activer les autorisations de localisation en arrière-plan en accordant à OwnTracks l'accès à votre position \"tout le temps\"."</string>
+    <string name="statusLocationPermissionsPromptTitle">"Localisation en arrière-plan"</string>
+    <string name="statusLocationPermissionsUnknown">"Inconnue"</string>
 
     <!-- Fuzzy -->
     <string name="title_activity_about">"A propos"</string>
@@ -248,12 +338,34 @@
 
     <!-- Fuzzy -->
     <string name="waypointListPlaceholder">"Aucune région définie"</string>
+    <string name="waypointMigrationErrorNotificationText">"Une erreur s'est produite lors de la migration des points de cheminement. Certains n'ont peut-être pas été migrés, vérifiez donc les journaux et rajoutez-les."</string>
+    <string name="waypointMigrationErrorNotificationTitle">"Erreur lors de la migration des points de cheminement"</string>
+    <string name="waypointsImport">"Importer des points de cheminement"</string>
+    <string name="welcome_connection_setup_description">"OwnTracks fonctionne en envoyant vos données de localisation à un serveur que vous (ou une personne de confiance) possédez, vous assurant ainsi de garder le contrôle de vos données.
+
+Assurez-vous de connaître les détails de connexion de votre serveur, qu'il soit accessible via HTTPS ou MQTT, ainsi que toutes les informations d'identification.
+
+Une fois cette section de bienvenue terminée, vous devrez configurer l'application avec les détails du serveur, disponibles dans Préférences→Connexion.
+
+Pour plus de détails, consultez la Documentation OwnTracks."</string>
+    <string name="welcome_connection_setup_learn_more_button_label">"Ouvrir la Documentation"</string>
     <string name="welcome_connection_setup_title">"Configurer une connexion"</string>
     <string name="welcome_description">"Les étapes suivantes vous aideront à démarrer avec OwnTracks"</string>
     <string name="welcome_finish_open_preferences_button_label">"Ouvrir les préférences"</string>
-
-    <!-- If this is use as a greeting, it should be "Bienvenue" -->
     <string name="welcome_heading">"Bienvenu"</string>
+    <string name="welcome_location_permission_description">"Afin de recevoir votre position actuelle pour l'envoyer à votre point de terminaison OwnTracks, OwnTracks a besoin de votre autorisation pour accéder à la position de votre appareil.
+
+Vous pouvez consulter cette autorisation et demander des autorisations de localisation supplémentaires (en arrière-plan) à partir de la page Statut.
+
+L'autorisation de localisation en arrière-plan peut améliorer la fréquence et la fiabilité des données de localisation, en fonction de votre appareil et de sa configuration."</string>
+    <string name="welcome_location_permission_granted">"Autorisations de localisation accordées"</string>
+    <string name="welcome_location_permission_request">"Requête"</string>
+    <string name="welcome_location_permission_title">"Autorisations de localisation"</string>
+    <string name="welcome_notification_permission_description">"Pour fonctionner pleinement, OwnTracks nécessite votre autorisation pour afficher certaines notifications.
+
+Une notification permanente sera affichée afin de maintenir le suivi de la position et la connexion actifs, vous pouvez également choisir d'activer les notifications pour les transitions de contacts entre les points de passage."</string>
+    <string name="welcome_notification_permission_granted">"Autorisations de notification accordées"</string>
+    <string name="welcome_notification_permission_title">"Autorisations de notification"</string>
     <string name="welcome_play_description">"OwnTracks nécessite les services Google Play"</string>
     <string name="welcome_play_heading">"Services Google Play"</string>
     <string name="welcomeFixIssue">"Autoriser"</string>

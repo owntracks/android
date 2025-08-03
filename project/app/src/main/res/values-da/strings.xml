@@ -93,7 +93,7 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="locationPermissionRequestDialogMessage">"For at spore din nuværende position, giv venligst OwnTracks positionstilladelser."</string>
     <string name="locationPermissionRequestDialogTitle">"Anmodning om adgang til position"</string>
     <string name="logViewerActivityTitle">"Logs"</string>
-    <string name="longitude">"Længdregrad"</string>
+    <string name="longitude">"Længdegrad"</string>
     <string name="mapLayerDialogTitle">"Kortlag"</string>
     <string name="mapLayerGoogleMapDefaultLabel">"Google Standard"</string>
     <string name="mapLayerGoogleMapHybridLabel">"Google Hybrid"</string>
@@ -124,7 +124,7 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="next">"Næste"</string>
     <string name="noBrowserInstalled">"Ingen passende browser installeret"</string>
     <string name="noNavigationApp">"ingen passende app installeret"</string>
-    <string name="notificationChangeMonitoring">"Ændring overvågningstilstand"</string>
+    <string name="notificationChangeMonitoring">"Skift overvågningstilstand"</string>
     <string name="notificationChannelErrors">"Fejl"</string>
 
     <!-- Fuzzy -->
@@ -152,6 +152,8 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="preferencesCategoryAdvancedLocator">"Lokaliseringsløsning"</string>
     <string name="preferencesCategoryAdvancedMisc">"Andet"</string>
     <string name="preferencesCategoryAdvancedServices">"Tjenester"</string>
+    <string name="preferencesCategoryConnectionCredentials">"Legitimationsoplysninger"</string>
+    <string name="preferencesCategoryConnectionIdentification">"Identifikation"</string>
     <string name="preferencesCategoryNotificationBackground">"Baggrundsnotifikationer"</string>
     <string name="preferencesCategoryNotificationErrors">"Fejl og Problemer"</string>
     <string name="preferencesCategoryNotificationOngoing">"Vedvarende notifikation"</string>
@@ -240,7 +242,7 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="preferencesWebsocket">"Brug WebSockets"</string>
 
     <!-- Fuzzy -->
-    <string name="publish">"Rapport"</string>
+    <string name="publish">"Rapportér"</string>
 
     <!-- Fuzzy -->
     <string name="radius">"Radius"</string>
@@ -257,6 +259,8 @@ Slå venligst position til i enhedsindstillingerne for at løse dette."</string>
     <string name="statusBatteryDozeWhiteListDisabled">"Nej"</string>
     <string name="statusBatteryDozeWhiteListEnabled">"Ja"</string>
     <string name="statusEndpointStateMessageConnectionLost">"Forbindelse tabt: %s"</string>
+    <string name="statusEndpointStateMessageConnectionRefused">"Forbindelse nægtet"</string>
+    <string name="statusEndpointStateMessageInvalidClientId">"Ugyldigt klient id"</string>
     <string name="statusEndpointStateMessageInvalidProtocolVersion">"Ugyldig MQTT protokol version"</string>
     <string name="statusEndpointStateMessageTLSError">"TLS fejl: %s"</string>
     <string name="statusEndpointStateMessageUnableToConnect">"Kunne ikke forbinde"</string>

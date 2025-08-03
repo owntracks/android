@@ -15,15 +15,9 @@
     <string name="accept">"Сохранить"</string>
     <string name="addWaypoint">"Добавить место"</string>
     <string name="aLocation">"место"</string>
-
-    <!-- So, OwnTracks or Owntracks? -->
     <string name="app_name">"OwnTracks"</string>
     <string name="backgroundLocationRestrictionNotificationText">"Ваша версия Android ограничивает возможность определения местоположения при автоматическом запуске приложения до его открытия. Нажмите на это уведомление, чтобы открыть OwnTracks и начать отслеживание местоположения."</string>
     <string name="backgroundLocationRestrictionNotificationTitle">"Отслеживание местоположения приостановлено"</string>
-
-    <!-- Comment for translators:
-
-"Настройки оптимизации энергопотребления" звучит красиво, но на кнопку не влазит. -->
     <string name="batteryOptimizationWhitelistDialogButtonLabel">"Настройки"</string>
     <string name="batteryOptimizationWhitelistDialogMessage">"Добавление OwnTracks в исключения сервиса оптимизации энергопотребления может помочь надежно отслеживать ваши местоположения и обеспечит бесперебойную связь с сервером."</string>
     <string name="batteryOptimizationWhitelistDialogTitle">"Оптимизация энергопотребления"</string>
@@ -37,12 +31,8 @@
     <string name="CONNECTING">"Подключение"</string>
     <string name="contact_image">"Изображение друга"</string>
     <string name="contactDetailsAccuracy">"Точность"</string>
-
-    <!-- meters in Russian is "метров", i.e. "%dм" instead if "%d m" -->
     <string name="contactDetailsAccuracyValue">"%dм"</string>
     <string name="contactDetailsAltitude">"Высота"</string>
-
-    <!-- meters in Russian is "метров", i.e. "%dм" instead if "%d m" -->
     <string name="contactDetailsAltitudeValue">"%,dм"</string>
     <string name="contactDetailsBattery">"Батарея"</string>
     <string name="contactDetailsBatteryValue">"%d%%"</string>
@@ -54,12 +44,8 @@
     <string name="contactDetailsDistanceUnitMeters">"м"</string>
     <string name="contactDetailsDistanceValue">"%1$,.2f%2$s"</string>
     <string name="contactDetailsSpeed">"Скорость"</string>
-
-    <!-- kph in Russian is "км/ч", i.e. "%d км/ч" instead of "%d kph" -->
     <string name="contactDetailsSpeedValue">"%d км/ч"</string>
     <string name="contactDetailsTopic">"Идентификатор"</string>
-
-    <!-- Non-translatable? Why? -->
     <string name="contactDetailsTrackerId">"Метка на карте"</string>
     <string name="contactLocationUnknown">"Местоположение недоступно"</string>
     <string name="contactsListPlaceholder">"Друзья не найдены"</string>
@@ -242,8 +228,6 @@
     <string name="preferencesShowWaypointsOnMap">"Показывать места"</string>
     <string name="preferencesShowWaypointsOnMapSummary">"Отображать окружность для известных мест на карте"</string>
     <string name="preferencesTheme">"Тема"</string>
-
-    <!-- but contactDetailsTrackerId is untranslated? -->
     <string name="preferencesTrackerId">"Метка на карте"</string>
     <string name="preferencesTrackerIdValidationError">"Должен состоять из одного или двух символов"</string>
     <string name="preferencesUrlValidationError">"Некорректный HTTP URL"</string>
@@ -342,8 +326,6 @@
     <string name="workmanagerInitializationErrorDialogMessage">"Некоторые компоненты не были корректно инициализированы, поэтому OwnTracks может работать не в полной мере. Может потребоваться переустановка приложения или очистка данных приложения.
 
 Пожалуйста, проверьте журнал для получения более подробной информации."</string>
-
-    <!-- Where is it? -->
     <string name="workmanagerInitializationErrorDialogOpenSettingsLabel">"Перейти к настройкам"</string>
     <string name="workmanagerInitializationErrorDialogTitle">"Ошибка инициализации"</string>
 </resources>
