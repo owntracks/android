@@ -1,5 +1,5 @@
-import org.gradle.api.tasks.testing.logging.TestLogEvent
 import kotlin.io.path.isRegularFile
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
   id("com.android.application")
@@ -14,15 +14,15 @@ plugins {
 apply<EspressoMetadataEmbeddingPlugin>()
 
 val googleMapsAPIKey =
-    System.getenv("GOOGLE_MAPS_API_KEY")?.toString() ?: extra.get("google_maps_api_key")?.toString()
-    ?: "PLACEHOLDER_API_KEY"
+    System.getenv("GOOGLE_MAPS_API_KEY")?.toString()
+        ?: extra.get("google_maps_api_key")?.toString()
+        ?: "PLACEHOLDER_API_KEY"
 
 val gmsImplementation: Configuration by configurations.creating
 
-val packageVersionCode: Int = System.getenv("VERSION_CODE")?.toInt() ?: 420503000
+val packageVersionCode: Int = System.getenv("VERSION_CODE")?.toInt() ?: 420504000
 val manuallySetVersion: Boolean = System.getenv("VERSION_CODE") != null
-val enablePlayPublishing: Boolean =
-    !System.getenv("ANDROID_PUBLISHER_CREDENTIALS").isNullOrBlank()
+val enablePlayPublishing: Boolean = !System.getenv("ANDROID_PUBLISHER_CREDENTIALS").isNullOrBlank()
 
 android {
   compileSdk = 36
@@ -34,13 +34,16 @@ android {
     targetSdk = 36
 
     versionCode = packageVersionCode
-    versionName = "2.5.3"
+    versionName = "2.5.4"
 
-    val localeCount = fileTree("src/main/res/").map {
-      it.toPath()
-    }.count { it.isRegularFile() && it.fileName.toString() == "strings.xml" }
+    val localeCount =
+        fileTree("src/main/res/")
+            .map { it.toPath() }
+            .count { it.isRegularFile() && it.fileName.toString() == "strings.xml" }
     buildConfigField(
-        "int", "TRANSLATION_COUNT", localeCount.toString(),
+        "int",
+        "TRANSLATION_COUNT",
+        localeCount.toString(),
     )
 
     testInstrumentationRunner = "org.owntracks.android.testutils.hilt.CustomTestRunner"
@@ -54,15 +57,11 @@ android {
         ),
     )
     javaCompileOptions {
-      annotationProcessorOptions {
-        arguments["room.schemaLocation"] = "$projectDir/schemas"
-      }
+      annotationProcessorOptions { arguments["room.schemaLocation"] = "$projectDir/schemas" }
     }
   }
 
-  androidResources {
-    generateLocaleConfig = true
-  }
+  androidResources { generateLocaleConfig = true }
 
   if (!System.getenv("KEYSTORE_PASSPHRASE").isNullOrBlank()) {
     signingConfigs {
@@ -116,9 +115,7 @@ android {
     viewBinding = true
   }
 
-  dataBinding {
-    addKtx = true
-  }
+  dataBinding { addKtx = true }
 
   packaging {
     resources.excludes.add("META-INF/*")
@@ -133,21 +130,19 @@ android {
     abortOnError = false
     disable.addAll(
         setOf(
-            "TypographyFractions", "TypographyQuotes", "Typos",
+            "TypographyFractions",
+            "TypographyQuotes",
+            "Typos",
         ),
     )
   }
   testOptions {
     execution = "ANDROIDX_TEST_ORCHESTRATOR"
     animationsDisabled = true
-    unitTests {
-      isIncludeAndroidResources = true
-    }
+    unitTests { isIncludeAndroidResources = true }
     managedDevices {
-      localDevices {
-      }
-      groups {
-      }
+      localDevices {}
+      groups {}
     }
   }
 
@@ -177,9 +172,7 @@ android {
     isCoreLibraryDesugaringEnabled = true
   }
 
-  kotlinOptions {
-    jvmTarget = JavaVersion.VERSION_21.toString()
-  }
+  kotlinOptions { jvmTarget = JavaVersion.VERSION_21.toString() }
 
   flavorDimensions.add("locationProvider")
   productFlavors {
@@ -190,9 +183,7 @@ android {
         gmsImplementation(libs.play.services.location)
       }
     }
-    create("oss") {
-      dimension = "locationProvider"
-    }
+    create("oss") { dimension = "locationProvider" }
   }
   playConfigs {
     register("gms") {
@@ -212,9 +203,7 @@ kapt {
   correctErrorTypes = true
 }
 
-ksp {
-  arg("room.schemaLocation", "$projectDir/schemas")
-}
+ksp { arg("room.schemaLocation", "$projectDir/schemas") }
 
 tasks.withType<Test> {
   systemProperties["junit.jupiter.execution.parallel.enabled"] = false
@@ -223,9 +212,7 @@ tasks.withType<Test> {
   maxParallelForks = 1
 }
 
-tasks.withType<JavaCompile>().configureEach {
-  options.isFork = true
-}
+tasks.withType<JavaCompile>().configureEach { options.isFork = true }
 
 dependencies {
   implementation(libs.bundles.kotlin)
@@ -283,9 +270,7 @@ dependencies {
   androidTestImplementation(libs.hilt.android.testing)
   kaptAndroidTest(libs.hilt.compiler)
 
-  androidTestImplementation(libs.barista) {
-    exclude("org.jetbrains.kotlin")
-  }
+  androidTestImplementation(libs.barista) { exclude("org.jetbrains.kotlin") }
   androidTestImplementation(libs.okhttp.mockwebserver)
   androidTestImplementation(libs.bundles.kmqtt)
   androidTestImplementation(libs.square.leakcanary)
@@ -297,6 +282,4 @@ dependencies {
 
 // Publishing
 // Handled now in the android / playConfigs block
-play {
-  enabled.set(false)
-}
+play { enabled.set(false) }
