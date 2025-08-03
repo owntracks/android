@@ -236,6 +236,7 @@ dependencies {
   implementation(libs.bundles.jackson)
   implementation(libs.square.tape2)
   implementation(libs.timber)
+  implementation(libs.kermit)
   implementation(libs.apache.httpcore)
   implementation(libs.bundles.androidx.room)
   implementation(libs.bundles.objectbox.migration)

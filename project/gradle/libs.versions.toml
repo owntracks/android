@@ -29,6 +29,7 @@ hilt-work = "1.2.0"
 jackson = "2.13.5"
 jaxb = "4.0.5"
 jaxb-api = "2.3.1"
+kermit = "2.0.6"
 kmqtt = "0.4.6"
 kotlin = "1.9.25"
 kotlin-coroutines = "1.9.0"
@@ -117,6 +118,7 @@ osmdroid = { module = "org.osmdroid:osmdroid-android", version.ref = "osmdroid" 
 google-material = { module = "com.google.android.material:material", version.ref = "google-material" }
 paho-mqttclient = { module = "org.eclipse.paho:org.eclipse.paho.client.mqttv3", version.ref = "paho-mqtt" }
 apache-httpcore = { module = "org.apache.httpcomponents.core5:httpcore5", version.ref = "apache-httpcore" }
+kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 square-tape2 = { module = "com.squareup.tape2:tape", version.ref = "square-tape2" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
