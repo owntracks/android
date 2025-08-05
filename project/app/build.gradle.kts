@@ -237,7 +237,6 @@ dependencies {
   implementation(libs.square.tape2)
   implementation(libs.timber)
   implementation(libs.apache.httpcore)
-  implementation(libs.commons.codec)
   implementation(libs.bundles.androidx.room)
   implementation(libs.bundles.objectbox.migration)
   implementation(libs.kotlin.datetime)

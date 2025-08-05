@@ -1,5 +1,5 @@
 [versions]
-agp = "8.8.0"
+agp = "8.8.2"
 androidx-activity = "1.9.2"
 androidx-concurrent = "1.2.0"
 androidx-core = "1.13.1"
@@ -18,7 +18,6 @@ androidx-work = "2.9.1"
 apache-httpcore = "5.3.4"
 barista = "4.3.0"
 bouncycastle = "1.81"
-commons-codec = "1.18.0"
 conscrypt = "2.5.3"
 desguar-jdk = "2.1.5"
 flatbuffers = "23.5.26"
@@ -118,7 +117,6 @@ osmdroid = { module = "org.osmdroid:osmdroid-android", version.ref = "osmdroid" 
 google-material = { module = "com.google.android.material:material", version.ref = "google-material" }
 paho-mqttclient = { module = "org.eclipse.paho:org.eclipse.paho.client.mqttv3", version.ref = "paho-mqtt" }
 apache-httpcore = { module = "org.apache.httpcomponents.core5:httpcore5", version.ref = "apache-httpcore" }
-commons-codec = { module = "commons-codec:commons-codec", version.ref = "commons-codec" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 square-tape2 = { module = "com.squareup.tape2:tape", version.ref = "square-tape2" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
