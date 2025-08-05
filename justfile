@@ -1,5 +1,5 @@
 set dotenv-load := true
-gradlec := "./project/gradlew -p project"
+gradlec := "./project/gradlew -p project --scan"
 
 default:
     @just --list
