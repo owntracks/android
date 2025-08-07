@@ -137,6 +137,9 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="preferencesAdvancedOpencagePrivacy">"&lt;a href=\"%s\"&gt;OpenCage Datenschutzerklärung&lt;/a&gt;"</string>
     <string name="preferencesAdvancedOpencagePrivacyDialogAccept">"Akzeptieren"</string>
     <string name="preferencesAdvancedOpencagePrivacyDialogCancel">"Abbrechen"</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogMessage">"Um den OpenCage-Geocoder zu nutzen, wird OwnTracks jeden Standort, den es verarbeitet, über eine TLS-verschlüsselte Verbindung an OpenCage senden.
+
+Die OpenCage-Datenschutzerklärung kann auf &lt;a href=\"https://opencagedata.com/api#privacy\"&gt;deren Website&lt;/a&gt; gefunden werden."</string>
     <string name="preferencesAdvancedOpencagePrivacyDialogTitle">"OpenCage Datenschutzerklärung"</string>
     <string name="preferencesAutostart">"Autostart"</string>
     <string name="preferencesAutostartSummary">"Automatisch beim Booten starten"</string>
@@ -171,7 +174,7 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="preferencesEnableMapRotation">"Kartenrotation aktivieren"</string>
     <string name="preferencesEnableMapRotationSummary">"Zulassen, dass die Karte gedreht wird"</string>
     <string name="preferencesEncryptionKey">"Schlüssel"</string>
-    <string name="preferencesEncryptionKeyDialogMessage">"Schlüssel wird nach 32 Zeichen abgeschnitten"</string>
+    <string name="preferencesEncryptionKeyDialogMessage">"Schlüssel wird nach 32 Zeichen abgeschnitten."</string>
     <string name="preferencesEncryptionKeySummary">"Symmetrischer Schlüssel für Inhalts-Verschlüsselung"</string>
     <string name="preferencesExperimental">"Experimentell"</string>
     <string name="preferencesExportError">"Fehler beim Konfigurationsexport"</string>
@@ -183,7 +186,7 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="preferencesIgnoreInaccurateLocationsSummary">"Ungenaue Positionen ignorieren"</string>
     <string name="preferencesImportNoURIGiven">"Keine URI für den Konfigurationsimport angegeben"</string>
     <string name="preferencesKeepalive">"Keepalive"</string>
-    <string name="preferencesKeepaliveDialogMessage">"Wie regelmäßig soll der Client keepalive-Nachrichten an den Broker senden? (Sekunden) "</string>
+    <string name="preferencesKeepaliveDialogMessage">"Wie regelmäßig soll der Client keepalive-Nachrichten an den Broker senden? (Sekunden)"</string>
     <string name="preferencesKeepaliveValidationError">"Keepalive muss größer als %d sein"</string>
     <string name="preferencesLicenses">"Bibliotheken"</string>
     <string name="preferencesLicensesSummary">"Danke an die Autoren dieser Bibliotheken"</string>
@@ -301,7 +304,7 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="waypoint_region_outside">"Aktuell außerhalb"</string>
     <string name="waypoint_region_unknown">"Status unbekannt"</string>
     <string name="waypointListPlaceholder">"Keine Orte angelegt"</string>
-    <string name="waypointMigrationErrorNotificationText">"Beim Migrieren der Orte ist ein Fehler aufgetreten. Einige Orte wurden möglicherweise nicht migriert. Prüfe die Logs und versuche es erneut. "</string>
+    <string name="waypointMigrationErrorNotificationText">"Beim Migrieren der Orte ist ein Fehler aufgetreten. Einige Orte wurden möglicherweise nicht migriert. Prüfe die Logs und versuche es erneut."</string>
     <string name="waypointMigrationErrorNotificationTitle">"Fehler beim Migrieren der Orte"</string>
     <string name="waypointsImport">"Orte importieren"</string>
     <string name="welcome_connection_setup_description">"OwnTracks sendet Ihre Standortdaten an einen Server, der Ihnen (oder einer Person Ihres Vertrauens) gehört, so dass Sie die Kontrolle über Ihre Daten behalten.
@@ -322,8 +325,6 @@ Sie können diese Berechtigung überprüfen und zusätzliche (Hintergrund-) Stan
 
 Je nach Gerät und Konfiguration kann die Erlaubnis für den Standort im Hintergrund die Häufigkeit und Zuverlässigkeit der Standortdaten verbessern."</string>
     <string name="welcome_location_permission_granted">"Standortberechtigung gewährt"</string>
-
-    <!-- Fuzzy -->
     <string name="welcome_location_permission_request">"Anfordern"</string>
     <string name="welcome_location_permission_title">"Standortberechtigung"</string>
     <string name="welcome_notification_permission_description">"Um vollständig zu funktionieren, benötigt OwnTracks Ihre Erlaubnis, um einige Benachrichtigungen anzuzeigen.

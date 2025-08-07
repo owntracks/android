@@ -9,6 +9,8 @@ import java.net.ConnectException
 import java.net.InetSocketAddress
 import java.net.Socket
 import kotlin.concurrent.thread
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlinx.coroutines.DelicateCoroutinesApi
 import mqtt.broker.Broker
 import mqtt.broker.interfaces.Authentication
@@ -17,7 +19,6 @@ import mqtt.packets.MQTTPacket
 import mqtt.packets.Qos
 import mqtt.packets.mqtt.MQTTPublish
 import mqtt.packets.mqttv5.MQTT5Properties
-import org.eclipse.paho.client.mqttv3.internal.websocket.Base64
 import org.owntracks.android.R
 import org.owntracks.android.model.Parser
 import org.owntracks.android.model.messages.MessageBase
@@ -128,6 +129,7 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
     }
   }
 
+  @OptIn(ExperimentalEncodingApi::class)
   override fun configureMQTTConnectionToLocal(idlingResource: IdlingResource, password: String) {
     val config =
         Base64.encode(
@@ -149,7 +151,8 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
                 "reverseGeocodeProvider": "None"
             }
             """
-                .trimIndent())
+                .trimIndent()
+                .toByteArray())
     InstrumentationRegistry.getInstrumentation()
         .targetContext
         .startActivity(

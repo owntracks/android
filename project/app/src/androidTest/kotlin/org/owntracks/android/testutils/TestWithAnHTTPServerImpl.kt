@@ -5,14 +5,16 @@ import android.net.Uri
 import androidx.test.espresso.IdlingResource
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
-import org.eclipse.paho.client.mqttv3.internal.websocket.Base64
 import org.owntracks.android.R
 import timber.log.Timber
 
+@OptIn(ExperimentalEncodingApi::class)
 class TestWithAnHTTPServerImpl : TestWithAnHTTPServer {
   private lateinit var mockWebServer: MockWebServer
   override val webserverPort
@@ -47,7 +49,8 @@ class TestWithAnHTTPServerImpl : TestWithAnHTTPServer {
                 "url": "http://localhost:${mockWebServer.port}"
             }
             """
-                .trimIndent())
+                .trimIndent()
+                .toByteArray())
     InstrumentationRegistry.getInstrumentation()
         .targetContext
         .startActivity(

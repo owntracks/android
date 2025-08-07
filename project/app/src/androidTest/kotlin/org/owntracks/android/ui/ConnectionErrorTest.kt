@@ -13,10 +13,11 @@ import java.net.ConnectException
 import java.net.InetSocketAddress
 import java.net.Socket
 import kotlin.concurrent.thread
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.random.Random
 import mqtt.broker.Broker
 import mqtt.broker.interfaces.Authentication
-import org.eclipse.paho.client.mqttv3.internal.websocket.Base64
 import org.junit.Test
 import org.owntracks.android.R
 import org.owntracks.android.preferences.Preferences
@@ -28,6 +29,7 @@ import org.owntracks.android.ui.status.StatusActivity
 import socket.tls.TLSSettings
 import timber.log.Timber
 
+@OptIn(ExperimentalEncodingApi::class)
 @MediumTest
 @HiltAndroidTest
 class ConnectionErrorTest : TestWithAnActivity<StatusActivity>(startActivity = true) {
@@ -185,8 +187,9 @@ private fun getBroker(
               }
             })
 
+@ExperimentalEncodingApi
 private fun encodeConfig(config: Map<String, Any>): String =
-    Base64.encode(ObjectMapper().writeValueAsString(config))
+    Base64.encode(ObjectMapper().writeValueAsBytes(config))
 
 private fun getTLSSettings(connectionErrorTest: ConnectionErrorTest): TLSSettings {
   val dataBytes = connectionErrorTest.javaClass.getResource("/rootCA.p12")!!.readBytes()
@@ -235,7 +238,7 @@ private fun Broker.use(block: () -> Unit) {
         it.apply { connect(InetSocketAddress("localhost", this.port)) }
         listening = true
         Timber.i("Test MQTT Broker listening on port ${this.port}")
-      } catch (e: ConnectException) {
+      } catch (_: ConnectException) {
         Timber.i("broker not listening on ${this.port} yet")
         listening = false
         Thread.sleep(5000)
@@ -243,6 +246,7 @@ private fun Broker.use(block: () -> Unit) {
     }
   }
   block()
+  @Suppress("AssignedValueIsNeverRead") // Used in the monitor thread
   shouldBeRunning = false
   stop()
   Timber.i("Waiting to join thread")
