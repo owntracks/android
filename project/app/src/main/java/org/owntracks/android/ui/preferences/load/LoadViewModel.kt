@@ -16,6 +16,8 @@ import java.net.URL
 import java.nio.charset.StandardCharsets
 import javax.inject.Inject
 import javax.inject.Named
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import okhttp3.Call
@@ -23,7 +25,6 @@ import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import org.apache.commons.codec.binary.Base64
 import org.apache.hc.core5.net.URIBuilder
 import org.owntracks.android.data.waypoints.WaypointsRepo
 import org.owntracks.android.di.CoroutineScopes
@@ -116,6 +117,7 @@ constructor(
    *
    * @param uriString a string containing maybe a URI
    */
+  @OptIn(ExperimentalEncodingApi::class)
   fun extractPreferencesFromUri(uriString: String) {
     val uri =
         try {
@@ -153,7 +155,7 @@ constructor(
         }
         when {
           configQueryParam.size == 1 -> {
-            val config: ByteArray = Base64.decodeBase64(configQueryParam[0].toByteArray())
+            val config: ByteArray = Base64.decode(configQueryParam[0].toByteArray())
             setConfiguration(String(config, StandardCharsets.UTF_8))
           }
           urlQueryParam.size == 1 -> {

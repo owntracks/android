@@ -6,7 +6,9 @@ name: Push to default publish to internal track
     branches:
       - master
     paths:
-      - ".github/workflows/**"
+      - ".github/workflows/trunk-build.yaml"
+      - ".github/workflows/build-test-lint.yaml"
+      - ".github/workflows/release.yaml"
       - "project/app/src/**"
       - "project/app/*.pro"
       - "project/buildSrc/src/**"
@@ -31,17 +33,6 @@ jobs:
     with:
       ref: ${{ github.sha }}
     secrets: inherit
-  # espresso-test:
-  #   name: Espresso Test
-  #   permissions:
-  #     contents: read
-  #     checks: write
-  #   uses: ./.github/workflows/espresso.yaml
-  #   with:
-  #     ref: ${{ github.sha }}
-  #   secrets: inherit
-  #   needs:
-  #     - build-test-lint
   publish-to-play-store:
     name: "Publish to Play Store"
     runs-on: ubuntu-latest

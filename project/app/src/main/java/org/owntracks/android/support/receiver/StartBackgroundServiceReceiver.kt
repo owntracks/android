@@ -17,7 +17,7 @@ import timber.log.Timber
 class StartBackgroundServiceReceiver : BroadcastReceiver() {
   companion object {
     fun enable(context: Context) {
-      val receiver = ComponentName(context, BroadcastReceiver::class.java)
+      val receiver = ComponentName(context, StartBackgroundServiceReceiver::class.java)
       context.packageManager.setComponentEnabledSetting(
           receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP)
     }
@@ -38,6 +38,7 @@ class StartBackgroundServiceReceiver : BroadcastReceiver() {
             context.startForegroundService(startIntent)
           } catch (e: ForegroundServiceStartNotAllowedException) {
             Timber.e(
+                e,
                 "Unable to start foreground service, because Android has prevented it. " +
                     "This should not happen if intent action is ${Intent.ACTION_MY_PACKAGE_REPLACED} or " +
                     "${Intent.ACTION_BOOT_COMPLETED}. intent action was ${intent.action}")

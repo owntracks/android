@@ -395,7 +395,6 @@ constructor(
   // https://stackoverflow.com/a/3104265/352740
   fun registerOnPreferenceChangedListener(listener: OnPreferenceChangeListener) {
     synchronized(listeners) { listeners[listener] = placeholder }
-    println("FICKTE UN")
   }
 
   fun unregisterOnPreferenceChangedListener(listener: OnPreferenceChangeListener) {
