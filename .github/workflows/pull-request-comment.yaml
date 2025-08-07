@@ -82,6 +82,7 @@ jobs:
     secrets: inherit
     needs:
       - build-test-lint
+    if: ${{ startsWith(github.event.comment.body, '/run-espresso-tests') }}
   pr-checkpoint-status:
     name: "PR Checkpoint Status"
     runs-on: ubuntu-latest

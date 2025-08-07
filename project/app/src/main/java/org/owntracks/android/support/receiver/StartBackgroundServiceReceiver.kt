@@ -17,7 +17,7 @@ import timber.log.Timber
 class StartBackgroundServiceReceiver : BroadcastReceiver() {
   companion object {
     fun enable(context: Context) {
-      val receiver = ComponentName(context, BroadcastReceiver::class.java)
+      val receiver = ComponentName(context, StartBackgroundServiceReceiver::class.java)
       context.packageManager.setComponentEnabledSetting(
           receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP)
     }
