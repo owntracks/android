@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 class MessageEncrypted(private val messageWithId: MessageWithId = MessageWithRandomId()) :
     MessageBase(), MessageWithId by messageWithId {
-  var data: String? = null
+  var data: String = ""
 
   companion object {
     const val TYPE = "encrypted"

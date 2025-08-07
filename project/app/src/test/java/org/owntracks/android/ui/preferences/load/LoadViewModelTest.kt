@@ -84,7 +84,7 @@ class LoadViewModelTest {
                 UnconfinedTestDispatcher(),
                 SimpleIdlingResource("", true))
         vm.extractPreferencesFromUri(
-            "owntracks:///config?inline=eyJfdHlwZSI6ImNvbmZpZ3VyYXRpb24ifQ")
+            "owntracks:///config?inline=eyJfdHlwZSI6ImNvbmZpZ3VyYXRpb24ifQ==")
         advanceUntilIdle()
         assertEquals(ImportStatus.SUCCESS, vm.configurationImportStatus.value)
         val json = ObjectMapper().readTree(vm.displayedConfiguration.value)

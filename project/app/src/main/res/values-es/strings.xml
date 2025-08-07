@@ -11,10 +11,15 @@
         <item quantity="other">"¡Actualmente disponible en %1$d idiomas!"</item>
     </plurals>
     <string name="accept">"Aceptar"</string>
-    <string name="addWaypoint">"Añadir waypoint"</string>
+    <string name="addWaypoint">"Añadir Región"</string>
     <string name="aLocation">"a region"</string>
     <string name="app_name">"OwnTracks"</string>
+    <string name="backgroundLocationRestrictionNotificationText">"Esta versión de Android no permite a OwnTracks recibir ubicaciones cuando se inicia en segundo plano, hasta abrir la app. Haga clic en esta notificación para abrir la app e iniciar el rastreo."</string>
+    <string name="backgroundLocationRestrictionNotificationTitle">"Servicio de localización ha sido pausado"</string>
+    <string name="batteryOptimizationWhitelistDialogButtonLabel">"Ajustes de optimización de la batería"</string>
+    <string name="batteryOptimizationWhitelistDialogTitle">"Optimización de la batería"</string>
     <string name="cancel">"Cancelar"</string>
+    <string name="certificateMigrationRequiredOpenSettingsAction">"Abrir ajustes"</string>
     <string name="clear_log">"Limpiar"</string>
     <string name="configurationManagement">"Configuration management"</string>
     <string name="CONNECTED">"Conectado"</string>
@@ -24,16 +29,29 @@
 
     <!-- Fuzzy -->
     <string name="contactDetailsAccuracyValue">"%d m"</string>
+    <string name="contactDetailsAltitude">"Altitud"</string>
     <string name="contactDetailsAltitudeValue">"%,d m"</string>
+    <string name="contactDetailsBattery">"Batería"</string>
     <string name="contactDetailsBatteryValue">"%d %%"</string>
+    <string name="contactDetailsBearing">"Orientación"</string>
     <string name="contactDetailsBearingValue">"%,.0f°"</string>
+    <string name="contactDetailsDistance">"Distancia"</string>
+    <string name="contactDetailsDistanceUnitKilometres">"km"</string>
+    <string name="contactDetailsDistanceUnitMeters">"m"</string>
     <string name="contactDetailsDistanceValue">"%1$,.2f %2$s"</string>
+    <string name="contactDetailsSpeed">"Velocidad"</string>
     <string name="contactDetailsSpeedValue">"%d kph"</string>
     <string name="contactDetailsTopic">"Identificador"</string>
     <string name="contactDetailsTrackerId">"Tracker ID"</string>
     <string name="contactLocationUnknown">"Ubicación no disponible"</string>
+    <string name="contactsListPlaceholder">"No se encontraron contactos"</string>
     <string name="currentLocationButtonLabel">"Ubicación actual"</string>
+    <string name="deleteWaypointConfirmationButtonLabel">"Eliminar"</string>
+    <string name="deleteWaypointConfirmationText">"Quieres eliminar este región?"</string>
+    <string name="deleteWaypointTitle">"Eliminar Región"</string>
     <string name="description">"Descripción"</string>
+    <string name="deviceLocationDisabledDialogPositiveButtonLabel">"Ajustes de ubicación"</string>
+    <string name="deviceLocationDisabledDialogTitle">"Ubicación del dispositivo deshabilitada"</string>
     <string name="DISCONNECTED">"Desconectado"</string>
     <string name="divider">"Divisor"</string>
     <string name="done_heading">"Hecho"</string>
@@ -48,7 +66,9 @@
     <string name="events">"Eventos"</string>
     <string name="exportConfiguration">"Exportar"</string>
     <string name="exportLogFilePrompt">"Exportar archivo de registro"</string>
-    <string name="exportWaypointsToEndpoint">"Publicar Waypoints"</string>
+    <string name="exportLogFileSubject">"OwnTracks archivo de registro"</string>
+    <string name="exportWaypointsToEndpoint">"Publicar regiones"</string>
+    <string name="fixProblemLabel">"Arreglar"</string>
     <string name="geocoderDisabled">"El servicio de geocodificador está deshabilitado"</string>
     <string name="geocoderError">"Se recibió un error del servicio de geocodificador: %s"</string>
     <string name="geocoderIPAddressRejected">"La IP del cliente fue rechazada"</string>
@@ -61,8 +81,13 @@
     <string name="importConfig">"Importar"</string>
     <string name="INITIAL">"Inicializando"</string>
     <string name="latitude">"Latitud"</string>
+    <string name="loadActivitySelectAFile">"Seleccionar un archivo"</string>
     <string name="logViewerActivityTitle">"Registros"</string>
     <string name="longitude">"Longitud"</string>
+    <string name="mapLayerDialogTitle">"Capas de mapa"</string>
+    <string name="mapLayerGoogleMapDefaultLabel">"Google predeterminado"</string>
+    <string name="mapLayerGoogleMapHybridLabel">"Google híbrido"</string>
+    <string name="mapLayerGoogleMapTerrainLabel">"Google terreno"</string>
     <string name="menuClear">"Borrar"</string>
     <string name="menuContactNavigate">"Navegar"</string>
     <string name="mode_heading">"Modo"</string>
@@ -72,8 +97,12 @@
     <string name="monitoring_move">"Modo movimiento"</string>
     <string name="monitoring_quiet">"Modo silencio"</string>
     <string name="monitoring_significant">"Modo de cambio significante"</string>
+    <string name="monitoringModeDialogManualTitle">"Manual"</string>
+    <string name="monitoringModeDialogMoveTitle">"Desplazar"</string>
+    <string name="monitoringModeDialogQuietTitle">"Silencioso"</string>
     <string name="na">"No disponible"</string>
     <string name="next">"Siguiente"</string>
+    <string name="noBrowserInstalled">"No hay navegador compatible instalado"</string>
     <string name="noNavigationApp">"No hay aplicaciones compatibles"</string>
     <string name="notificationChangeMonitoring">"Cambio modo"</string>
     <string name="notificationChannelErrors">"Errores"</string>
@@ -90,6 +119,8 @@
     <string name="play_services_now_available">"Google Play Services disponibles"</string>
     <string name="play_services_update_required">"Google Play Services deben actualizarse"</string>
     <string name="preferencesAdvanced">"Avanzado"</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogAccept">"Aceptado"</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogCancel">"Cancelar"</string>
     <string name="preferencesAutostart">"Autoarranque"</string>
     <string name="preferencesAutostartSummary">"Arrancar cuando se enciende el dispositivo"</string>
     <string name="preferencesBrokerPassword">"Contraseña"</string>
@@ -97,11 +128,14 @@
     <string name="preferencesCategoryAdvancedLocator">"Locator"</string>
     <string name="preferencesCategoryAdvancedMisc">"Miscelánea"</string>
     <string name="preferencesCategoryAdvancedServices">"Servicios"</string>
+    <string name="preferencesCategoryConnectionEndpoint">"Punto de destino"</string>
     <string name="preferencesCategoryNotificationBackground">"Notificaciones en segundo plano"</string>
+    <string name="preferencesCategoryNotificationErrors">"Errores y problemas"</string>
     <string name="preferencesCategoryNotificationOngoing">"Notificación en progreso"</string>
     <string name="preferencesChangelog">"Registro de cambios"</string>
     <string name="preferencesCleanSessionEnabled">"Limpiar sesión"</string>
     <string name="preferencesClientId">"ID de cliente"</string>
+    <string name="preferencesClientIdValidationError">"No puede estar vacío"</string>
     <string name="preferencesDebugLog">"Registro de depuración"</string>
     <string name="preferencesDeviceName">"ID de Dispositivo"</string>
     <string name="preferencesDocumentation">"Documentación"</string>
@@ -111,9 +145,12 @@
     <string name="preferencesEditorKeyError">"Clave inválida"</string>
     <string name="preferencesEditorValue">"Valor"</string>
     <string name="preferencesEditorValueError">"Valor inválido"</string>
+    <string name="preferencesEnableMapRotation">"Activar rotación de mapa"</string>
+    <string name="preferencesEnableMapRotationSummary">"Permitir rotación de mapa"</string>
     <string name="preferencesEncryptionKey">"Clave de encriptación"</string>
     <string name="preferencesEncryptionKeyDialogMessage">"La clave se corta después de 32 caracteres"</string>
     <string name="preferencesEncryptionKeySummary">"Clave simétrica para encriptación del payload"</string>
+    <string name="preferencesExperimental">"Experimental"</string>
     <string name="preferencesExportSuccess">"Preferencias exportadas"</string>
     <string name="preferencesHost">"Host"</string>
     <string name="preferencesIgnoreInaccurateLocations">"Ubicación imprecisa"</string>
@@ -121,20 +158,22 @@
     <string name="preferencesIgnoreInaccurateLocationsSummary">"Ignorar ubicaciones imprecisas"</string>
     <string name="preferencesKeepalive">"Keepalive"</string>
     <string name="preferencesKeepaliveValidationError">"Mantener activo debe ser un mínimo de %d"</string>
-    <string name="preferencesLicenses">"Librerías"</string>
-    <string name="preferencesLicensesSummary">"Gracias a los autores de las librerías incluidas"</string>
+    <string name="preferencesLicenses">"Bibliotecas"</string>
+    <string name="preferencesLicensesSummary">"Gracias a los autores de las bibliotecas incluidas"</string>
     <string name="preferencesLoadFailed">"No se pudo cargar la configuración"</string>
     <string name="preferencesLocatorInterval">"Intervalo de ubicación"</string>
     <string name="preferencesLocatorIntervalDialog">"Cada cuánto tiempo se deben solicitar ubicaciones del dispositivo (segundos)"</string>
     <string name="preferencesLocatorIntervalSummary">"Intervalo entre actualizaciones de ubicación"</string>
+    <string name="preferencesMap">"Mapa"</string>
     <string name="preferencesMoveModeLocatorInterval">"Intervalo de ubicación (modo Movimiento)"</string>
     <string name="preferencesMoveModeLocatorIntervalDialog">"Cada cuánto tiempo se deben solicitar ubicaciones del dispositivo en modo Movimiento (segundos)"</string>
     <string name="preferencesMoveModeLocatorIntervalSummary">"Intervalo entre actualizaciones de ubicación en modo Movimiento"</string>
     <string name="preferencesNotification">"Notificaciones"</string>
     <string name="preferencesNotificationEvents">"Eventos"</string>
     <string name="preferencesNotificationEventsSummary">"Notificar sobre los eventos recientes"</string>
-    <string name="preferencesNotificationLocation">"Última ubicación"</string>
-    <string name="preferencesNotificationLocationSummary">"Mostrar la última ubicación y fecha"</string>
+    <string name="preferencesNotificationGeocoderErrors">"Errores de geocodificación"</string>
+    <string name="preferencesNotificationLocation">"Última ubicación publicada"</string>
+    <string name="preferencesNotificationLocationSummary">"Mostrar las últimas ubicación y fecha publicadas"</string>
     <string name="preferencesOpencageGeocoderApiKey">"OpenCage API Key"</string>
     <string name="preferencesOpencageGeocoderApiKeyDialog">"Si se activa, OpenCage se usará para buscar la ubicación en lugar de Google. Requiere reiniciar."</string>
     <string name="preferencesOpencageGeocoderApiKeySummary">"API key para Geocoder alternativo"</string>
@@ -151,7 +190,10 @@
     <string name="preferencesRepository">"Código fuente"</string>
     <string name="preferencesReverseGeocodeProvider">"Geocodificación"</string>
     <string name="preferencesServer">"Conexión"</string>
+    <string name="preferencesShowWaypointsOnMap">"Mostrar los Regiones"</string>
+    <string name="preferencesTheme">"Personalizar apariencia"</string>
     <string name="preferencesTrackerId">"Tracker ID"</string>
+    <string name="preferencesUrlValidationError">"URL http inválida"</string>
 
     <!-- Fuzzy -->
     <string name="preferencesUsername">"Nombre de Usuario"</string>
@@ -161,7 +203,7 @@
     <string name="publish">"Reportar"</string>
 
     <!-- Fuzzy -->
-    <string name="radius">"Radio"</string>
+    <string name="radius">"Radio (m)"</string>
     <string name="reconnect">"Reconectar"</string>
     <string name="save">"Guardar"</string>
     <string name="select">"Seleccione"</string>
@@ -171,6 +213,14 @@
     <string name="status_endpoint_state_hint">"Estado del punto de conexión"</string>
     <string name="status_endpoint_state_message_hint">"Mensaje de estado del punto de conexión"</string>
     <string name="status_last_background_update_hint">"Ultima actualización en segundo plano del servicio de ubicación"</string>
+    <string name="statusBatteryDozeWhiteListDisabled">"No"</string>
+    <string name="statusBatteryDozeWhiteListEnabled">"Sí"</string>
+    <string name="statusEndpointStateMessageAuthenticationFailed">"Error de identificación"</string>
+    <string name="statusEndpointStateMessageNotAuthorized">"Sin autorización"</string>
+    <string name="statusLocationPermissionsCoarseForeground">"Aproximado"</string>
+    <string name="statusLocationPermissionsFineForeground">"Preciso"</string>
+    <string name="statusLocationPermissionsNone">"ninguno"</string>
+    <string name="statusLocationPermissionsUnknown">"Desconocido"</string>
     <string name="title_activity_about">"Información"</string>
     <string name="title_activity_contacts">"Amigos"</string>
     <string name="title_activity_map">"Mapa"</string>
@@ -200,9 +250,19 @@
 
     <!-- Fuzzy -->
     <string name="waypointListPlaceholder">"No hay regiones definidas"</string>
+    <string name="waypointMigrationErrorNotificationTitle">"Error al migrar los regiones"</string>
+    <string name="waypointsImport">"Importar los regiones"</string>
+    <string name="welcome_connection_setup_title">"Configurar una conexión"</string>
     <string name="welcome_description">"Los siguientes pasos te ayudarán a comenzar con OwnTracks"</string>
+    <string name="welcome_finish_open_preferences_button_label">"Abrir preferencias"</string>
     <string name="welcome_heading">"Bienvenido"</string>
+    <string name="welcome_location_permission_granted">"Permisos de ubicación aceptado"</string>
+    <string name="welcome_location_permission_request">"Solicitar"</string>
+    <string name="welcome_notification_permission_granted">"Permisos de notificación aceptado"</string>
+    <string name="welcome_notification_permission_title">"Permisos de notificación"</string>
     <string name="welcome_play_description">"OwnTracks necesita Google Play Services"</string>
     <string name="welcome_play_heading">"Google Play Services"</string>
     <string name="welcomeFixIssue">"Fix"</string>
+    <string name="workmanagerInitializationErrorDialogOpenSettingsLabel">"Abrir los ajustes de la aplicación"</string>
+    <string name="workmanagerInitializationErrorDialogTitle">"Error de inicialización"</string>
 </resources>

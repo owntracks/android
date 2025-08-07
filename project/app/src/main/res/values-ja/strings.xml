@@ -16,9 +16,7 @@
     <string name="backgroundLocationRestrictionNotificationText">"このバージョンのAndroidは、バックグラウンドで起動されたときに、アプリが開かれるまで位置情報の取得が制限されます。そのため、トラッキングを開始するには、通知をタップしてアプリを開いてください。"</string>
     <string name="backgroundLocationRestrictionNotificationTitle">"位置トラッキングが一時停止されました"</string>
     <string name="batteryOptimizationWhitelistDialogButtonLabel">"バッテリー最適化の設定"</string>
-
-    <!-- Fuzzy -->
-    <string name="batteryOptimizationWhitelistDialogMessage">"バッテリー最適化のホワイトリストにこのアプリを登録することで、より確実に位置のトラッキングやサーバとの通信ができるようになります。"</string>
+    <string name="batteryOptimizationWhitelistDialogMessage">"バッテリー最適化のホワイトリストにOwnTracksを登録することで、より確実に位置のトラッキングやサーバとの通信ができるようになります。"</string>
     <string name="batteryOptimizationWhitelistDialogTitle">"バッテリー最適化"</string>
     <string name="cancel">"キャンセル"</string>
     <string name="clear_log">"ログクリア"</string>
@@ -27,9 +25,7 @@
     <string name="CONNECTING">"接続中"</string>
     <string name="contact_image">"連絡先画像"</string>
     <string name="contactDetailsAccuracy">"精度"</string>
-
-    <!-- Fuzzy -->
-    <string name="contactDetailsAccuracyValue">"%d m"</string>
+    <string name="contactDetailsAccuracyValue">"%,d m"</string>
     <string name="contactDetailsAltitude">"高度"</string>
     <string name="contactDetailsAltitudeValue">"%,d m"</string>
     <string name="contactDetailsBattery">"バッテリー"</string>
@@ -46,6 +42,9 @@
     <string name="contactDetailsTrackerId">"Tracker ID"</string>
     <string name="contactLocationUnknown">"位置情報が存在しません"</string>
     <string name="currentLocationButtonLabel">"現在位置"</string>
+    <string name="deleteWaypointConfirmationButtonLabel">"削除"</string>
+    <string name="deleteWaypointConfirmationText">"このウェイポイントを削除してもよろしいですか?"</string>
+    <string name="deleteWaypointTitle">"ウェイポイントの削除"</string>
     <string name="description">"説明"</string>
     <string name="deviceLocationDisabledDialogMessage">"デバイスの位置情報サービスが無効になっているため、Owntracksは現在地をトラッキングできません。
 
@@ -54,14 +53,10 @@
     <string name="deviceLocationDisabledDialogTitle">"デバイスの位置情報が無効になっています"</string>
     <string name="DISCONNECTED">"切断済み"</string>
     <string name="done_heading">"完了"</string>
-
-    <!-- Fuzzy -->
-    <string name="enjoy_description">"Owntracksの利用を開始する前に、メニューから環境設定を選択し、サーバの設定を行ってください"</string>
+    <string name="enjoy_description">"OwnTracksの利用を開始する前に、メニュー(または以下のリンク)から環境設定を選択し、サーバの設定を行ってください"</string>
     <string name="ERROR">"エラー"</string>
     <string name="ERROR_CONFIGURATION">"構成設定が完全ではありません"</string>
-
-    <!-- Fuzzy -->
-    <string name="errorPreferencesImportFailed">"インポートに失敗しました"</string>
+    <string name="errorPreferencesImportFailed">"インポートに失敗しました: %s"</string>
     <string name="events">"イベント"</string>
     <string name="exportConfiguration">"エクスポート"</string>
     <string name="exportLogFilePrompt">"ログファイルをエクスポート"</string>
@@ -76,19 +71,25 @@
     <string name="geocoderRateLimited">"ジオコーダーサービスのレート制限に到達しました。 %s までは再試行しません"</string>
     <string name="geocoderUnavailable">"ジオコーダーサービスは一時的に利用できません"</string>
     <string name="icon_description_done">"完了"</string>
-
-    <!-- Fuzzy -->
-    <string name="icon_description_owntracks">"Owntracks"</string>
+    <string name="icon_description_owntracks">"OwnTracks"</string>
     <string name="icon_description_warning">"警告"</string>
     <string name="IDLE">"アイドル"</string>
     <string name="importConfig">"インポート"</string>
     <string name="INITIAL">"初期化中"</string>
     <string name="latitude">"緯度"</string>
+    <string name="loadActivityNoFileExplorerFound">"ファイルエクスプローラアプリが見つかりません"</string>
+    <string name="loadActivitySelectAFile">"ファイルを選択"</string>
     <string name="locationPermissionNotGrantedNotification">"位置情報の権限が付与されていません"</string>
     <string name="locationPermissionRequestDialogMessage">"現在位置をトラッキングするには、Owntracksに位置情報の権限を付与してください。"</string>
     <string name="locationPermissionRequestDialogTitle">"位置情報の権限のリクエスト"</string>
     <string name="logViewerActivityTitle">"ログ"</string>
     <string name="longitude">"経度"</string>
+    <string name="mapLayerDialogTitle">"マップレイヤ"</string>
+    <string name="mapLayerGoogleMapDefaultLabel">"Google 標準"</string>
+    <string name="mapLayerGoogleMapHybridLabel">"Google 航空写真"</string>
+    <string name="mapLayerGoogleMapTerrainLabel">"Google 地形"</string>
+    <string name="mapLayerOpenStreetMapLabel">"オープンストリートマップ"</string>
+    <string name="mapLayerOpenStreetMapWikimediaLabel">"ウィキメディア"</string>
     <string name="menuClear">"クリア"</string>
     <string name="menuContactNavigate">"ナビゲーション"</string>
     <string name="mode_heading">"モード"</string>
@@ -97,9 +98,17 @@
     <string name="monitoring_manual">"手動モニタリングモード"</string>
     <string name="monitoring_move">"移動モニタリングモード"</string>
     <string name="monitoring_quiet">"静寂モニタリングモード"</string>
-    <string name="monitoring_significant">"大雑把な移動モニタリングモード"</string>
+    <string name="monitoring_significant">"おおよその移動モニタリングモード"</string>
+    <string name="monitoringModeDialogManualTitle">"手動"</string>
+    <string name="monitoringModeDialogMoveDescription">"精度/頻度は高くなりますが、消費電力も高くなります"</string>
+    <string name="monitoringModeDialogMoveTitle">"移動"</string>
+    <string name="monitoringModeDialogQuietTitle">"静寂"</string>
+    <string name="monitoringModeDialogSignificantDescription">"消費電力と精度/頻度のバランスを保ちます"</string>
+    <string name="monitoringModeDialogSignificantTitle">"おおよその移動"</string>
+    <string name="monitoringModeDialogTitle">"モニタリングモード"</string>
     <string name="na">"利用不可"</string>
     <string name="next">"次"</string>
+    <string name="noBrowserInstalled">"適切なブラウザがインストールされていません"</string>
     <string name="noNavigationApp">"適切なアプリがインストールされていません"</string>
     <string name="notificationChangeMonitoring">"モニタリングモード変更"</string>
     <string name="notificationChannelErrors">"エラー"</string>
@@ -113,6 +122,13 @@
     <string name="play_services_update_required">"Google Play開発者サービスの更新が必要です"</string>
     <string name="preferencesAdvanced">"高度な設定"</string>
     <string name="preferencesAdvancedAutostartWarning">"このバージョンのAndroidは、デバイス起動時にOwntracksが開始されたときに、アプリが開かれるまで位置情報の取得が制限されます。"</string>
+    <string name="preferencesAdvancedOpencagePrivacy">"&lt;a href=\"%s\"&gt;OpenCageプライバシーポリシー&lt;/a&gt;"</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogAccept">"承諾"</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogCancel">"キャンセル"</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogMessage">"OpenCageジオコーダを使用する場合、OwnTracksは位置情報を都度TLSで暗号化し、OpenCageに送信します。
+
+OpenCageのプライバシーポリシーは、&lt;a href=\"https://opencagedata.com/api#privacy\"&gt;同社のWebサイト&lt;/a&gt;で確認できます。"</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogTitle">"OpenCageプライバシーポリシー"</string>
     <string name="preferencesAutostart">"自動開始"</string>
     <string name="preferencesAutostartSummary">"デバイス起動時に自動的に開始する"</string>
     <string name="preferencesBrokerPassword">"パスワード"</string>
@@ -120,14 +136,19 @@
     <string name="preferencesCategoryAdvancedLocator">"位置情報取得"</string>
     <string name="preferencesCategoryAdvancedMisc">"その他"</string>
     <string name="preferencesCategoryAdvancedServices">"サービス"</string>
+    <string name="preferencesCategoryConnectionCredentials">"認証情報"</string>
+    <string name="preferencesCategoryConnectionEndpoint">"エンドポイント"</string>
+    <string name="preferencesCategoryConnectionIdentification">"識別子"</string>
     <string name="preferencesCategoryNotificationBackground">"バックグラウンド通知"</string>
     <string name="preferencesCategoryNotificationErrors">"エラー・問題"</string>
     <string name="preferencesCategoryNotificationOngoing">"起動中の常時通知"</string>
     <string name="preferencesChangelog">"変更履歴"</string>
     <string name="preferencesCleanSessionEnabled">"クリーンセッション"</string>
     <string name="preferencesClientId">"クライアントID"</string>
+    <string name="preferencesClientIdValidationError">"空にすることはできません"</string>
     <string name="preferencesDebugLog">"デバッグログ"</string>
     <string name="preferencesDeviceName">"デバイスID"</string>
+    <string name="preferencesDeviceNameValidationError">"空にすることはできません"</string>
     <string name="preferencesDocumentation">"ドキュメント"</string>
     <string name="preferencesEditor">"編集"</string>
     <string name="preferencesEditorDescription">"指定されたキーに値を設定します。一部の変更は、アプリの再起動が必要となる場合があります。"</string>
@@ -139,8 +160,10 @@
     <string name="preferencesEncryptionKeyDialogMessage">"32文字目より後は切り捨てられます。"</string>
     <string name="preferencesEncryptionKeySummary">"ペイロード暗号化のための共通鍵"</string>
     <string name="preferencesExperimental">"試験段階"</string>
+    <string name="preferencesExportError">"構成のエクスポートでエラーが発生しました"</string>
     <string name="preferencesExportSuccess">"エクスポートに成功しました"</string>
     <string name="preferencesHost">"ホスト"</string>
+    <string name="preferencesHostValidationError">"空にすることはできません"</string>
     <string name="preferencesIgnoreInaccurateLocations">"低精度な位置情報"</string>
     <string name="preferencesIgnoreInaccurateLocationsDialog">"位置情報の精度が指定されたメートル値よりも大きい場合、当該位置情報を無視します"</string>
     <string name="preferencesIgnoreInaccurateLocationsSummary">"低精度な位置情報を無視する"</string>
@@ -154,6 +177,7 @@
     <string name="preferencesLocatorInterval">"位置情報更新間隔"</string>
     <string name="preferencesLocatorIntervalDialog">"デバイスから位置情報をリクエストする時間の間隔を指定してください(秒単位)"</string>
     <string name="preferencesLocatorIntervalSummary">"位置情報を更新する時間の間隔"</string>
+    <string name="preferencesMap">"マップ"</string>
     <string name="preferencesMoveModeLocatorInterval">"位置情報更新間隔(移動モード)"</string>
     <string name="preferencesMoveModeLocatorIntervalDialog">"移動モード時にデバイスから位置情報をリクエストする時間の間隔を指定してください(秒単位)"</string>
     <string name="preferencesMoveModeLocatorIntervalSummary">"移動モードの際に位置情報を更新する時間の間隔"</string>
@@ -164,11 +188,13 @@
     <string name="preferencesNotificationGeocoderErrorsSummary">"ジオコーダーのエラー、レート制限、クォータ超過に関する情報を表示する"</string>
     <string name="preferencesNotificationLocation">"直近のレポート位置"</string>
     <string name="preferencesNotificationLocationSummary">"直近のレポート位置と時刻を表示する"</string>
+    <string name="preferencesNotSet">"未設定"</string>
     <string name="preferencesOpencageGeocoderApiKey">"OpenCageのAPIキー"</string>
     <string name="preferencesOpencageGeocoderApiKeyDialog">"キーが設定されている場合、Googleの代わりにOpenCageを使用して住所を判定します。アプリの再起動が必要です。"</string>
     <string name="preferencesOpencageGeocoderApiKeySummary">"OpenCage逆ジオコーディングに必要なAPIキー"</string>
     <string name="preferencesParameters">"パラメータ"</string>
     <string name="preferencesPort">"ポート"</string>
+    <string name="preferencesPortValidationError">"ポート番号は 1 から 65535 の間である必要があります"</string>
     <string name="preferencesProfileId">"モード"</string>
     <string name="preferencesPubExtendedData">"拡張データ"</string>
     <string name="preferencesPubExtendedDataSummary">"位置レポートに拡張データを含める"</string>
@@ -180,8 +206,12 @@
     <string name="preferencesRepository">"ソースコード"</string>
     <string name="preferencesReverseGeocodeProvider">"逆ジオコーディングのプロバイダ"</string>
     <string name="preferencesServer">"接続"</string>
+    <string name="preferencesSet">"設定済み"</string>
+    <string name="preferencesShowWaypointsOnMap">"ウェイポイントを表示"</string>
+    <string name="preferencesShowWaypointsOnMapSummary">"ウェイポイントの円をマップに描画する"</string>
     <string name="preferencesTheme">"テーマ"</string>
     <string name="preferencesTrackerId">"トラッカーID"</string>
+    <string name="preferencesUrlValidationError">"無効なHTTP URLです"</string>
 
     <!-- Fuzzy -->
     <string name="preferencesUsername">"ユーザ名"</string>
@@ -189,9 +219,7 @@
 
     <!-- Fuzzy -->
     <string name="publish">"レポート"</string>
-
-    <!-- Fuzzy -->
-    <string name="radius">"半径"</string>
+    <string name="radius">"半径 (m)"</string>
     <string name="reconnect">"再接続"</string>
     <string name="save">"保存"</string>
     <string name="select">"選択"</string>
@@ -203,17 +231,16 @@
     <string name="status_last_background_update_hint">"バックグラウンドでの直近の位置情報更新時刻"</string>
     <string name="statusBatteryDozeWhiteListDisabled">"いいえ"</string>
     <string name="statusBatteryDozeWhiteListEnabled">"はい"</string>
+    <string name="statusEndpointStateMessageAuthenticationFailed">"認証に失敗しました"</string>
+    <string name="statusEndpointStateMessageClientTimeout">"クライアントタイムアウト"</string>
+    <string name="statusLocationPermissionsPromptNegativeButton">"キャンセル"</string>
     <string name="title_activity_about">"アプリについて"</string>
     <string name="title_activity_contacts">"友だち"</string>
     <string name="title_activity_map">"マップ"</string>
     <string name="title_activity_preferences">"環境設定"</string>
     <string name="title_activity_status">"ステータス"</string>
-
-    <!-- Fuzzy -->
-    <string name="title_activity_waypoint">"リージョン"</string>
-
-    <!-- Fuzzy -->
-    <string name="title_activity_waypoints">"リージョン一覧"</string>
+    <string name="title_activity_waypoint">"ウェイポイント"</string>
+    <string name="title_activity_waypoints">"ウェイポイント一覧"</string>
     <string name="title_exit">"アプリを終了"</string>
     <string name="unableToCopyCertificate">"証明書を内部ストレージにコピーできません"</string>
     <string name="version">"バージョン"</string>
@@ -227,16 +254,19 @@
 
     <!-- Fuzzy -->
     <string name="waypoint_region_unknown">"ステータス不明"</string>
+    <string name="waypointListPlaceholder">"ウェイポイントが1つもありません"</string>
+    <string name="welcome_connection_setup_description">"OwnTracksは、あなた自身(または信頼できる人物)が所有するサーバーに位置情報データを送信する機能を有しており、あなた自身がデータを制御できるようになります。
 
-    <!-- Fuzzy -->
-    <string name="waypointListPlaceholder">"リージョンが1つもありません"</string>
+サーバの接続情報(HTTPSまたはMQTT経由でアクセスできるかどうか、およびログイン認証情報)をあらかじめ確認してください。
 
-    <!-- Fuzzy -->
-    <string name="welcome_description">"いくつかのステップを実施し、Owntracksを利用開始できるようにします"</string>
+このウェルカムセクションを完了したら、サーバの情報をアプリケーションの環境設定に入力する必要があります。[環境設定] → [接続] で設定できます。
+
+詳しくは、OwnTracksのブックレットをご確認ください。"</string>
+    <string name="welcome_connection_setup_learn_more_button_label">"ブックレットを開く"</string>
+    <string name="welcome_description">"いくつかのステップを実施し、OwnTracksを利用開始できるようにします"</string>
+    <string name="welcome_finish_open_preferences_button_label">"環境設定を開く"</string>
     <string name="welcome_heading">"ようこそ"</string>
-
-    <!-- Fuzzy -->
-    <string name="welcome_play_description">"Owntrack"</string>
+    <string name="welcome_play_description">"OwnTracksの実行にはGoogle Play開発者サービスが必要です"</string>
     <string name="welcome_play_heading">"Google Play開発者サービス"</string>
     <string name="welcomeFixIssue">"権限を設定"</string>
     <string name="workmanagerInitializationErrorDialogMessage">"一部のコンポーネントが正しく初期化できなかったため、Owntracksが正常に動作しない可能性があります。アプリを再インストールするか、ユーザデータの消去が必要となる場合があります。
