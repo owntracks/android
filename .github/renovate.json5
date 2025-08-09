@@ -19,10 +19,6 @@
       "automerge": true
     },
     {
-      "matchPackagePatterns": ["^com.fasterxml.jackson"],
-      "enabled": false
-    },
-    {
       "matchUpdateTypes": ["major"],
       "addLabels": ["major"]
     },
