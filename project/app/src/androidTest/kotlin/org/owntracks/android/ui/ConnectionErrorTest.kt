@@ -6,9 +6,8 @@ import androidx.test.espresso.Espresso
 import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
-import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import dagger.hilt.android.testing.HiltAndroidTest
 import java.net.ConnectException
 import java.net.InetSocketAddress
@@ -191,6 +190,7 @@ private fun getBroker(
                     givenPassword.contentEquals(password.toByteArray().toUByteArray())
               }
             })
+
 @ExperimentalEncodingApi
 private fun encodeConfig(config: Map<String, Any>): String {
   val jsonObject = buildJsonObject {

@@ -1,7 +1,7 @@
 package org.owntracks.android.model.messages
 
-import kotlinx.serialization.SerialName
 import kotlin.random.Random
+import kotlinx.serialization.SerialName
 
 typealias MessageId = String
 

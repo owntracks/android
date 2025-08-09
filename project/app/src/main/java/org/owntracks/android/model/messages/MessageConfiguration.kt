@@ -32,8 +32,7 @@ class MessageConfiguration(private val messageWithId: MessageWithId = MessageWit
   }
 
   @get:Transient
-  val keys:
-      Set<String>
+  val keys: Set<String>
     get() = map.keys
 
   companion object {

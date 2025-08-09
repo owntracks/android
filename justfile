@@ -8,9 +8,6 @@ default:
 gradle *args='':
     {{gradlec}} $@
 
-format:
-    {{gradlec}} ktfmtFormat
-
 build:
     {{gradlec}} assembleDebug app:assembleAndroidTest app:assembleGmsDebugUnitTest assembleRelease
 

@@ -115,7 +115,8 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(false) {
     val json = Json.parseToJsonElement(input).jsonObject
     assertEquals("configuration", json["_type"]!!.jsonPrimitive.content)
     assertEquals(2, json["waypoints"]!!.jsonArray.size)
-    assertEquals("work", json["waypoints"]!!.jsonArray[0].jsonObject["desc"]!!.jsonPrimitive.content)
+    assertEquals(
+        "work", json["waypoints"]!!.jsonArray[0].jsonObject["desc"]!!.jsonPrimitive.content)
     assertEquals(
         51.5, json["waypoints"]!!.jsonArray[0].jsonObject["lat"]!!.jsonPrimitive.double, 0.0001)
     assertEquals(
@@ -123,13 +124,15 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(false) {
     assertEquals(150, json["waypoints"]!!.jsonArray[0].jsonObject["rad"]!!.jsonPrimitive.int)
     assertEquals(
         1505910709000, json["waypoints"]!!.jsonArray[0].jsonObject["tst"]!!.jsonPrimitive.long)
-    assertEquals("home", json["waypoints"]!!.jsonArray[1].jsonObject["desc"]!!.jsonPrimitive.content)
+    assertEquals(
+        "home", json["waypoints"]!!.jsonArray[1].jsonObject["desc"]!!.jsonPrimitive.content)
     assertEquals(
         53.6, json["waypoints"]!!.jsonArray[1].jsonObject["lat"]!!.jsonPrimitive.double, 0.0001)
     assertEquals(
         -1.5, json["waypoints"]!!.jsonArray[1].jsonObject["lon"]!!.jsonPrimitive.double, 0.0001)
     assertEquals(100, json["waypoints"]!!.jsonArray[1].jsonObject["rad"]!!.jsonPrimitive.int)
-    assertEquals(1558351273, json["waypoints"]!!.jsonArray[1].jsonObject["tst"]!!.jsonPrimitive.long)
+    assertEquals(
+        1558351273, json["waypoints"]!!.jsonArray[1].jsonObject["tst"]!!.jsonPrimitive.long)
     assertTrue(json["auth"]!!.jsonPrimitive.boolean)
     assertTrue(json["autostartOnBoot"]!!.jsonPrimitive.boolean)
     assertFalse(json["cleanSession"]!!.jsonPrimitive.boolean)
