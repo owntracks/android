@@ -40,7 +40,7 @@ jobs:
       contents: read
     needs: build-test-lint
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4
       - name: Create keystore
         run: |
           echo -n "${KEYSTORE_BASE64}" | base64 -d > project/owntracks.release.keystore.jks
