@@ -3,6 +3,7 @@ package org.owntracks.android.ui.map
 import androidx.databinding.ViewDataBinding
 import org.owntracks.android.R
 import org.owntracks.android.preferences.types.FromConfiguration
+import org.owntracks.android.ui.map.maplibre.MapLibreFragment
 import org.owntracks.android.ui.map.osm.OSMMapFragment
 
 enum class MapLayerStyle {
@@ -11,10 +12,11 @@ enum class MapLayerStyle {
   GoogleMapSatellite,
   GoogleMapTerrain,
   OpenStreetMapNormal,
-  OpenStreetMapWikimedia;
+  OpenStreetMapWikimedia,
+  MapLibrePlaceholder;
 
   fun isSameProviderAs(mapLayerStyle: MapLayerStyle): Boolean {
-    return setOf("GoogleMap", "OpenStreetMap").any {
+    return setOf("GoogleMap", "OpenStreetMap", "MapLibre").any {
       name.startsWith(it) && mapLayerStyle.name.startsWith(it)
     }
   }
@@ -27,6 +29,7 @@ enum class MapLayerStyle {
       GoogleMapTerrain -> GoogleMapFragment::class.java
       OpenStreetMapNormal,
       OpenStreetMapWikimedia -> OSMMapFragment::class.java
+      MapLibrePlaceholder -> MapLibreFragment::class.java
     }
   }
 
@@ -44,4 +47,5 @@ val mapLayerSelectorButtonsToStyles =
         R.id.fabMapLayerGoogleHybrid to MapLayerStyle.GoogleMapHybrid,
         R.id.fabMapLayerGoogleTerrain to MapLayerStyle.GoogleMapTerrain,
         R.id.fabMapLayerOpenStreetMap to MapLayerStyle.OpenStreetMapNormal,
-        R.id.fabMapLayerOpenStreetMapWikimedia to MapLayerStyle.OpenStreetMapWikimedia)
+        R.id.fabMapLayerOpenStreetMapWikimedia to MapLayerStyle.OpenStreetMapWikimedia,
+        R.id.fabMapLibrePlaceholder to MapLayerStyle.MapLibrePlaceholder)

@@ -226,6 +226,7 @@ dependencies {
 
   // Mapping
   implementation(libs.osmdroid)
+  implementation(libs.maplibre)
 
   // Connectivity
   implementation(libs.paho.mqttclient)

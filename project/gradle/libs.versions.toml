@@ -36,6 +36,7 @@ kotlin-datetime = "0.6.2"
 ksp = "1.9.25-1.0.20"
 ktfmt = "0.23.0"
 lmdb-kt = "0.1.1"
+maplibre = "11.8.0"
 materialdrawer = "6.1.2"
 materialize = "1.2.1"
 mockito-kotlin = "5.4.0"
@@ -112,8 +113,12 @@ flatbuffers = { module = "com.google.flatbuffers:flatbuffers-java", version.ref 
 gms-play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "google-play-services-maps" }
 play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "play-services-location" }
 
-# Others
+# Mapping
 osmdroid = { module = "org.osmdroid:osmdroid-android", version.ref = "osmdroid" }
+maplibre = { module = "org.maplibre.gl:android-sdk", version.ref = "maplibre" }
+
+# Others
+
 google-material = { module = "com.google.android.material:material", version.ref = "google-material" }
 paho-mqttclient = { module = "org.eclipse.paho:org.eclipse.paho.client.mqttv3", version.ref = "paho-mqtt" }
 apache-httpcore = { module = "org.apache.httpcomponents.core5:httpcore5", version.ref = "apache-httpcore" }
