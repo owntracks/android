@@ -5,6 +5,9 @@ default:
     @just --list
 
 build:
+    {{gradlec}} assembleDebug
+
+build-all:
     {{gradlec}} assembleDebug app:assembleAndroidTest app:assembleGmsDebugUnitTest assembleRelease
 
 unit-test:

@@ -21,6 +21,7 @@ import org.owntracks.android.BR
 import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.data.repos.ContactsRepoChange
 import org.owntracks.android.data.repos.LocationRepo
+import org.owntracks.android.data.waypoints.WaypointModel
 import org.owntracks.android.data.waypoints.WaypointsRepo
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.location.LatLng
@@ -46,7 +47,7 @@ constructor(
     private val geocoderProvider: GeocoderProvider,
     private val preferences: Preferences,
     private val locationRepo: LocationRepo,
-    waypointsRepo: WaypointsRepo,
+    private val waypointsRepo: WaypointsRepo,
     application: Application,
     private val requirementsChecker: RequirementsChecker
 ) : AndroidViewModel(application) {
@@ -91,8 +92,13 @@ constructor(
     get() = mutableMyLocationStatus
 
   val currentLocation = LocationLiveData(application, viewModelScope)
+
   val waypointUpdatedEvent = waypointsRepo.repoChangedEvent
-  //  val allWaypoints = waypointsRepo.getAll()
+
+  suspend fun getAllWaypoints(): List<WaypointModel> {
+    return waypointsRepo.getAll()
+  }
+
   val allContacts = contactsRepo.all
   val contactUpdatedEvent: Flow<ContactsRepoChange> = contactsRepo.repoChangedEvent
 
