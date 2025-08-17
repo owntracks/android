@@ -26,6 +26,7 @@ interface DefaultsProvider {
           Build.DEVICE?.replace(" ", "-")
               ?.replace("[^a-zA-Z0-9]+".toRegex(), "")
               ?.lowercase(Locale.getDefault()) ?: "unknown"
+      Preferences::discardNetworkLocationThresholdSeconds -> 0
       Preferences::dontReuseHttpClient -> false
       Preferences::enableMapRotation -> true
       Preferences::encryptionKey -> ""

@@ -34,6 +34,8 @@ open class MessageLocation(
   override val numberOfRetries: Int =
       100_000 // This should last a few weeks at 1 attempt per minute
 
+  @JsonProperty("source") var source: String? = null
+
   @JsonProperty("t") var trigger: ReportType = ReportType.DEFAULT
 
   @JsonProperty("batt") var battery: Int? = null

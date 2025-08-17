@@ -203,6 +203,10 @@ constructor(
 
   @Preference var deviceId: String by preferencesStore
 
+  // Number of seconds that must have elapsed since the last GPS location before we accept a network
+  // location
+  @Preference var discardNetworkLocationThresholdSeconds: Int by preferencesStore
+
   @Preference(exportModeMqtt = false) var dontReuseHttpClient: Boolean by preferencesStore
 
   @Preference var enableMapRotation: Boolean by preferencesStore
