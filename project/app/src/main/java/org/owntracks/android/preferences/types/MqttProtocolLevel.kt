@@ -20,3 +20,15 @@ enum class MqttProtocolLevel(@JsonValue val value: Int) {
             ?: MQTT_3_1
   }
 }
+
+enum class UnitsDisplay {
+  METRIC,
+  IMPERIAL;
+
+  companion object {
+    @JvmStatic
+    @FromConfiguration
+    fun getByValue(value: String): UnitsDisplay =
+        entries.firstOrNull { it.name.equals(value, true) } ?: METRIC
+  }
+}

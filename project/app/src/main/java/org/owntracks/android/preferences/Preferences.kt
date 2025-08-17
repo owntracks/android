@@ -26,6 +26,7 @@ import org.owntracks.android.preferences.types.MqttProtocolLevel
 import org.owntracks.android.preferences.types.MqttQos
 import org.owntracks.android.preferences.types.ReverseGeocodeProvider
 import org.owntracks.android.preferences.types.StringMaxTwoAlphaNumericChars
+import org.owntracks.android.preferences.types.UnitsDisplay
 import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.ui.map.MapLayerStyle
 import timber.log.Timber
@@ -222,6 +223,9 @@ constructor(
   @Preference var ignoreInaccurateLocations: Int by preferencesStore
 
   @Preference var ignoreStaleLocations: Float by preferencesStore
+
+  // Whether or not the UI should display measurements in imperial (miles/feet) or metric (km/m)
+  @Preference var imperialUnitsDisplay: UnitsDisplay by preferencesStore
 
   @Preference(exportModeHttp = false) var info: Boolean by preferencesStore
 
