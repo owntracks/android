@@ -39,7 +39,7 @@ class AsyncPingSender(private val scope: CoroutineScope) : MqttPingSender {
           Timber.v("Sending keepalive")
           try {
             comms.checkForActivity()?.waitForCompletion()
-                ?: Timber.w("MQTT keepalive token was null")
+                ?: Timber.d("MQTT keepalive token was null")
           } catch (e: Exception) {
             Timber.w(e, "Unable to send MQTT ping")
           }

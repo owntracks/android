@@ -227,7 +227,7 @@ class MQTTMessageProcessorEndpoint(
                               message.retained)
                           .also { Timber.v("MQTT message sent with messageId=${it.messageId}. ") }
                     }
-                    .apply { Timber.i("Message $message dispatched in $this") }
+                    .apply { Timber.i("Message ${message.messageId} sent in $this") }
               } catch (e: Exception) {
                 Timber.e(e, "Error publishing message $message")
                 when (e) {
