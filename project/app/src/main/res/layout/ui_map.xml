@@ -189,37 +189,63 @@
                     app:title="@{@string/contactDetailsCoordinates}" />
 
                 <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_marginBottom="16dp">
+                    android:layout_marginBottom="8dp"
+                    android:clipChildren="false"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/contactNavigateButton"
-                        style="?attr/materialButtonOutlinedStyle"
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/contactActionButtons"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:text="@string/menuContactNavigate"
-                        android:visibility="@{vm.currentContact.latLng!=null ?  View.VISIBLE : View.GONE}"
-                        app:icon="@drawable/baseline_navigation_24" />
+                        android:layout_height="match_parent">
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/contactClearButton"
-                        style="?attr/materialButtonOutlinedStyle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginStart="4dp"
-                        android:layout_toEndOf="@id/contactNavigateButton"
-                        android:text="@string/menuClear"
-                        app:icon="@drawable/baseline_clear_24" />
+                        <androidx.constraintlayout.helper.widget.Flow
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            app:constraint_referenced_ids="requestLocationReportButton,contactNavigateButton,contactClearButton"
+                            app:flow_horizontalBias="0"
+                            app:flow_horizontalGap="10dp"
+                            app:flow_horizontalStyle="packed"
+                            app:flow_verticalBias="0"
+                            app:flow_wrapMode="chain"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/requestLocationReportButton"
+                            style="?attr/materialButtonOutlinedStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/menuContactRequestLocation"
+                            app:icon="@drawable/ic_baseline_my_location_24" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/contactNavigateButton"
+                            style="?attr/materialButtonOutlinedStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/menuContactNavigate"
+                            android:visibility="@{vm.currentContact.latLng!=null ?  View.VISIBLE : View.GONE}"
+                            app:icon="@drawable/baseline_navigation_24" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/contactClearButton"
+                            style="?attr/materialButtonOutlinedStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/menuClear"
+                            app:icon="@drawable/baseline_clear_24" />
+
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
                         android:id="@+id/contactShareButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
+                        android:layout_alignParentBottom="true"
                         android:src="@drawable/ic_baseline_share_24"
                         android:visibility="@{vm.currentContact.latLng!=null ?  View.VISIBLE : View.GONE}"
                         app:fabSize="mini" />

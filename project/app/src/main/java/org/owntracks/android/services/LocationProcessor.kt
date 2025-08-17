@@ -81,6 +81,7 @@ constructor(
         preferences.fusedRegionDetection &&
         trigger != MessageLocation.ReportType.CIRCULAR) {
       loadedWaypoints.forEach { waypoint ->
+        Timber.d("onWaypointTransition triggered by location waypoint intersection event")
         onWaypointTransition(
             waypoint,
             location,
