@@ -16,6 +16,7 @@ import javax.inject.Inject
 import kotlin.math.asin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import org.owntracks.android.BR
 import org.owntracks.android.data.repos.ContactsRepo
@@ -26,8 +27,10 @@ import org.owntracks.android.data.waypoints.WaypointsRepo
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.location.LatLng
 import org.owntracks.android.location.toLatLng
+import org.owntracks.android.model.CommandAction
 import org.owntracks.android.model.Contact
 import org.owntracks.android.model.messages.MessageClear
+import org.owntracks.android.model.messages.MessageCmd
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ConnectionMode
@@ -276,6 +279,22 @@ constructor(
       viewModelScope.launch { contactsRepo.remove(it.id) }
     }
     clearActiveContact()
+  }
+
+  private val mutableLocationRequestContactCommandFlow =
+      MutableSharedFlow<Contact>(extraBufferCapacity = 1)
+
+  val locationRequestContactCommandFlow: Flow<Contact> = mutableLocationRequestContactCommandFlow
+
+  fun sendLocationRequestToCurrentContact() {
+    mutableCurrentContact.value?.also {
+      messageProcessor.queueMessageForSending(
+          MessageCmd().apply {
+            topic = it.id
+            action = CommandAction.REPORT_LOCATION
+          })
+      mutableLocationRequestContactCommandFlow.tryEmit(it)
+    }
   }
 
   private fun updateActiveContactDistanceAndBearing(contact: Contact) {

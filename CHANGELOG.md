@@ -9,6 +9,7 @@
 - Dutch Translation (thanks to all contributors)
 - Setting a preference that doesn't actually change the value won't have any effects (such as MQTT reconnecting) (#1875)
 - Status messages contain the app version and flavour
+- There's now an option to send a remote command "request location" to selected contacts from the map view
 
 ### Bug fixes
 

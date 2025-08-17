@@ -103,6 +103,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="mapLayerOpenStreetMapWikimediaLabel">"Wikimedia"</string>
     <string name="menuClear">"Clear"</string>
     <string name="menuContactNavigate">"Navigate"</string>
+    <string name="menuContactRequestLocation">"Request Location"</string>
     <string name="mode_heading">"Mode"</string>
     <string name="mode_http_private_label">"HTTP"</string>
     <string name="mode_mqtt_private_label">"MQTT"</string>
@@ -256,6 +257,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="publish">"Report Location"</string>
     <string name="radius">"Radius (m)"</string>
     <string name="reconnect">"Reconnect"</string>
+    <string name="requestLocationSent">"Request location command sent"</string>
     <string name="save">"Save"</string>
     <string name="select">"Select"</string>
     <string name="shareContactBody">"%1$s last location: %2$s (%3$s) at %4$s"</string>
