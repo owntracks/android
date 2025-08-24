@@ -1,4 +1,3 @@
-import kotlin.io.path.isRegularFile
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
@@ -14,7 +13,7 @@ plugins {
 apply<EspressoMetadataEmbeddingPlugin>()
 
 val googleMapsAPIKey =
-    System.getenv("GOOGLE_MAPS_API_KEY")?.toString()
+    System.getenv("GOOGLE_MAPS_API_KEY")
         ?: extra.get("google_maps_api_key")?.toString()
         ?: "PLACEHOLDER_API_KEY"
 
@@ -23,6 +22,15 @@ val gmsImplementation: Configuration by configurations.creating
 val packageVersionCode: Int = System.getenv("VERSION_CODE")?.toInt() ?: 420504000
 val manuallySetVersion: Boolean = System.getenv("VERSION_CODE") != null
 val enablePlayPublishing: Boolean = !System.getenv("ANDROID_PUBLISHER_CREDENTIALS").isNullOrBlank()
+
+val gitDescribe: String by lazy {
+  providers
+      .exec { commandLine("git", "describe", "--tags", "--always") }
+      .standardOutput
+      .asText
+      .get()
+      .trim()
+}
 
 android {
   compileSdk = 36
@@ -34,12 +42,14 @@ android {
     targetSdk = 36
 
     versionCode = packageVersionCode
-    versionName = "2.5.4"
+    versionName = gitDescribe
 
-    val localeCount =
-        fileTree("src/main/res/")
-            .map { it.toPath() }
-            .count { it.isRegularFile() && it.fileName.toString() == "strings.xml" }
+    val localeCount = fileTree("src/main/res") { include("**/strings.xml") }.files.count()
+    buildConfigField(
+        "int",
+        "TRANSLATION_COUNT",
+        localeCount.toString(),
+    )
     buildConfigField(
         "int",
         "TRANSLATION_COUNT",

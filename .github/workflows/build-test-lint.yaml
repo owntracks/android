@@ -37,6 +37,7 @@ jobs:
       - name: "Checkout"
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
+          fetch-depth: 0
           ref: ${{ inputs.ref }}
       - name: Build
         uses: ./.github/actions/gradle-task
