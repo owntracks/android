@@ -29,7 +29,6 @@ class TLSCertMigrationNotificationTests : TestWithAnActivity<MapActivity>(false)
         .putString("tlsCaCrt", "TestValue")
         .apply()
     setNotFirstStartPreferences()
-    app.migratePreferences()
     launchActivity()
     grantMapActivityPermissions()
 
@@ -56,7 +55,6 @@ class TLSCertMigrationNotificationTests : TestWithAnActivity<MapActivity>(false)
   fun when_migrating_a_current_tls_ca_preference_then_the_notification_is_shown() {
     getPreferences().edit().putString("tlsCaCrt", "TestValue").apply()
     setNotFirstStartPreferences()
-    app.migratePreferences()
     launchActivity()
     grantMapActivityPermissions()
 

@@ -10,7 +10,6 @@ import android.content.Context
 import android.os.Build
 import android.os.StrictMode
 import androidx.annotation.MainThread
-import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NotificationManagerCompat
 import androidx.databinding.DataBindingUtil
@@ -270,12 +269,6 @@ open class BaseApp :
       runThingsOnOtherThreads.postOnMainHandlerDelayed(::setThemeFromPreferences, 0)
     }
     Timber.v("Idling preferenceSetIdlingResource because of $properties")
-  }
-
-  /** Migrate preferences. Available to be called from espresso tests. */
-  @VisibleForTesting
-  fun migratePreferences() {
-    preferencesStore.migrate()
   }
 
   override fun onTrimMemory(level: Int) {
