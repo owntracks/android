@@ -20,7 +20,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
       # We need to find out if there's been a previous beta release for this tag, as it'll affect which google play track we promote from
       - uses: octokit/request-action@v2.x
         name: Find beta tags if this is a prod release
