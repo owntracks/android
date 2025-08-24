@@ -1,0 +1,26 @@
+---
+name: Build and test the release Google Play store API helper
+"on":
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - ".github/google-play-api/**"
+  pull_request:
+    types: [opened]
+    branches:
+      - master
+    paths:
+      - ".github/google-play-api/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+      - name: uv sync
+        run: uv --directory .github/google-play-api sync --frozen
