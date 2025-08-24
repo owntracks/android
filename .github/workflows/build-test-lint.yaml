@@ -18,7 +18,7 @@ jobs:
           echo "Input ref is empty. Please provide a valid ref."
           exit 1
       - name: "Checkout"
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4
         with:
           ref: ${{ inputs.ref }}
       - uses: ./.github/actions/gradle-task
@@ -35,7 +35,7 @@ jobs:
           echo "Input ref is empty. Please provide a valid ref."
           exit 1
       - name: "Checkout"
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4
         with:
           fetch-depth: 0
           ref: ${{ inputs.ref }}
@@ -53,7 +53,7 @@ jobs:
       checks: write
     steps:
       - name: "Checkout"
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4
         with:
           ref: ${{ inputs.ref }}
       - name: Test
@@ -79,7 +79,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout"
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4
       - name: Build
         uses: ./.github/actions/gradle-task
         with:
