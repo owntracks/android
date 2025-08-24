@@ -39,27 +39,24 @@ abstract class MessageBase : BaseObservable(), MessageWithId {
    *
    * @return
    */
-  @kotlin.jvm.Transient fun getContactId(): String = getBaseTopic(topic)
+  fun getContactId(): String = getBaseTopic(topic)
 
-  @get:Transient
-  @set:Transient
-  @kotlin.jvm.Transient
   @SerialName("modeId")
   var modeId = ConnectionMode.MQTT
 
-  @get:Transient @set:Transient @kotlin.jvm.Transient @SerialName("qos") var qos = 0
+   @SerialName("qos") var qos = 0
 
-  @get:Transient @set:Transient @kotlin.jvm.Transient @SerialName("retained") var retained = false
+   @SerialName("retained") var retained = false
 
-  @get:Transient
+
   open val baseTopicSuffix: String
     get() = BASETOPIC_SUFFIX
 
   // Called after deserialization to check if all required attributes are set or not.
   // The message is discarded if false is returned.
-  @kotlin.jvm.Transient open fun isValidMessage(): Boolean = true
+   open fun isValidMessage(): Boolean = true
 
-  @kotlin.jvm.Transient
+
   private fun getBaseTopic(topic: String): String {
     return if (topic.endsWith(baseTopicSuffix)) {
       topic.substring(0, topic.length - baseTopicSuffix.length)
@@ -68,16 +65,13 @@ abstract class MessageBase : BaseObservable(), MessageWithId {
     }
   }
 
-  @kotlin.jvm.Transient abstract override fun toString(): String
+abstract override fun toString(): String
 
   open fun annotateFromPreferences(preferences: Preferences) {}
-
-  @Throws(IOException::class)
-  open fun toJsonBytes(parser: Parser): ByteArray {
+open fun toJsonBytes(parser: Parser): ByteArray {
     return parser.toJsonBytes(this)
   }
 
-  @Throws(IOException::class)
   open fun toJson(parser: Parser): String? {
     return parser.toJson(this)
   }

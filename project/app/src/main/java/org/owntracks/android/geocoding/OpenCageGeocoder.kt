@@ -1,9 +1,12 @@
 package org.owntracks.android.geocoding
 
+import android.annotation.SuppressLint
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import java.math.BigDecimal
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
-import java.time.Instant
+
 import java.time.temporal.ChronoUnit
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -13,19 +16,20 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.owntracks.android.net.http.HttpMessageProcessorEndpoint
 import timber.log.Timber
+import kotlin.time.Duration.Companion.minutes
 
 class OpenCageGeocoder
 internal constructor(private val apiKey: String, private val httpClient: OkHttpClient) :
     CachingGeocoder() {
   private val jsonMapper: Json = Json { ignoreUnknownKeys = true }
-  private var tripResetTimestamp: Instant = Instant.now()
+  private var tripResetTimestamp: Instant = Clock.System.now()
   private var something = true
 
   internal fun deserializeOpenCageResponse(json: String): OpenCageResponse =
       jsonMapper.decodeFromString(json)
 
   override fun doLookup(latitude: BigDecimal, longitude: BigDecimal): GeocodeResult {
-    if (tripResetTimestamp > Instant.now()) {
+    if (tripResetTimestamp > Clock.System.now()) {
       Timber.w("Rate-limited, not querying until $tripResetTimestamp")
       something = false
       return GeocodeResult.Fault.RateLimited(tripResetTimestamp)
@@ -68,7 +72,7 @@ internal constructor(private val apiKey: String, private val httpClient: OkHttpC
             401 -> {
               val deserializedOpenCageResponse =
                   jsonMapper.decodeFromString<OpenCageResponse>(responseBody!!)
-              tripResetTimestamp = Instant.now().plus(1, ChronoUnit.MINUTES)
+              tripResetTimestamp = Clock.System.now().plus(1.minutes)
               GeocodeResult.Fault.Error(
                   deserializedOpenCageResponse.status?.message ?: "No error message provided",
                   tripResetTimestamp)
@@ -88,7 +92,7 @@ internal constructor(private val apiKey: String, private val httpClient: OkHttpC
               val deserializedOpenCageResponse =
                   jsonMapper.decodeFromString<OpenCageResponse>(responseBody!!)
               Timber.e(responseBody)
-              tripResetTimestamp = Instant.now().plus(1, ChronoUnit.MINUTES)
+              tripResetTimestamp = Clock.System.now().plus(1.minutes)
               if (deserializedOpenCageResponse.status?.message == "IP address rejected") {
                 GeocodeResult.Fault.IPAddressRejected(tripResetTimestamp)
               } else {
@@ -96,11 +100,11 @@ internal constructor(private val apiKey: String, private val httpClient: OkHttpC
               }
             }
             429 -> {
-              tripResetTimestamp = Instant.now().plus(1, ChronoUnit.MINUTES)
+              tripResetTimestamp = Clock.System.now().plus(1.minutes)
               GeocodeResult.Fault.RateLimited(tripResetTimestamp)
             }
             else -> {
-              tripResetTimestamp = Instant.now().plus(1, ChronoUnit.MINUTES)
+              tripResetTimestamp = Clock.System.now().plus(1.minutes)
               Timber.e("Unexpected response from Opencage: $response")
               GeocodeResult.Fault.Error(
                   "status: ${response.code} $responseBody", tripResetTimestamp)
@@ -112,7 +116,7 @@ internal constructor(private val apiKey: String, private val httpClient: OkHttpC
         }
       }
     } catch (e: Exception) {
-      tripResetTimestamp = Instant.now().plus(1, ChronoUnit.MINUTES)
+      tripResetTimestamp = Clock.System.now().plus(1.minutes)
       when (e) {
         is SocketTimeoutException -> Timber.e("Error reverse geocoding from opencage. Timeout")
         is UnknownHostException ->
@@ -127,12 +131,10 @@ internal constructor(private val apiKey: String, private val httpClient: OkHttpC
     private const val OPENCAGE_HOST = "api.opencagedata.com"
   }
 
-  @Serializable
   internal class OpenCageResult {
     val formatted: String? = null
   }
 
-  @Serializable
   internal class OpenCageResponse {
     val rate: Rate? = null
 
@@ -142,7 +144,7 @@ internal constructor(private val apiKey: String, private val httpClient: OkHttpC
       get() = if (!results.isNullOrEmpty()) results[0].formatted else null
   }
 
-  @Serializable internal data class Rate(val limit: Int, val remaining: Int, val reset: Instant)
+  internal data class Rate(val limit: Int, val remaining: Int, val reset: Instant)
 
-  @Serializable internal data class Status(val code: Int, val message: String)
+  internal data class Status(val code: Int, val message: String)
 }

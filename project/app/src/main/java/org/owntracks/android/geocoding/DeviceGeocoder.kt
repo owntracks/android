@@ -2,29 +2,30 @@ package org.owntracks.android.geocoding
 
 import android.content.Context
 import android.location.Address
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import java.math.BigDecimal
-import java.time.Instant
-import java.time.temporal.ChronoUnit
 import java.util.Locale
 import org.owntracks.android.location.LatLng
 import timber.log.Timber
+import kotlin.time.Duration.Companion.minutes
 
 class DeviceGeocoder internal constructor(context: Context) : CachingGeocoder() {
   private val geocoder: android.location.Geocoder =
       android.location.Geocoder(context, Locale.getDefault())
-  private var tripResetTimestamp: Instant = Instant.MIN
+  private var tripResetTimestamp: Instant = Instant.DISTANT_PAST
 
   override suspend fun reverse(latLng: LatLng): GeocodeResult {
     return if (geocoderAvailable()) {
       super.reverse(latLng)
     } else {
-      tripResetTimestamp = Instant.now().plus(1, ChronoUnit.MINUTES)
+      tripResetTimestamp = Clock.System.now().plus(1.minutes)
       GeocodeResult.Fault.Unavailable(tripResetTimestamp)
     }
   }
 
   override fun doLookup(latitude: BigDecimal, longitude: BigDecimal): GeocodeResult {
-    if (tripResetTimestamp > Instant.now()) {
+    if (tripResetTimestamp > Clock.System.now()) {
       Timber.w("Rate-limited, not querying until $tripResetTimestamp")
       return GeocodeResult.Fault.RateLimited(tripResetTimestamp)
     }
@@ -41,7 +42,7 @@ class DeviceGeocoder internal constructor(context: Context) : CachingGeocoder() 
         GeocodeResult.Empty
       }
     } catch (e: Exception) {
-      tripResetTimestamp = Instant.now().plus(1, ChronoUnit.MINUTES)
+      tripResetTimestamp = Clock.System.now().plus(1.minutes)
       GeocodeResult.Fault.Error(e.toString(), tripResetTimestamp)
     }
   }

@@ -3,18 +3,18 @@ package org.owntracks.android.model.messages
 import android.annotation.SuppressLint
 import android.location.Location
 import android.os.Build
-import java.util.concurrent.TimeUnit
-import kotlin.math.roundToInt
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import org.jetbrains.annotations.NotNull
 import org.owntracks.android.model.BatteryStatus
 import org.owntracks.android.net.WifiInfoProvider
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.MonitoringMode
+import java.util.concurrent.TimeUnit
+import kotlin.math.roundToInt
 
+@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 @SerialName(MessageLocation.TYPE)
 open class MessageLocation(
@@ -25,7 +25,6 @@ open class MessageLocation(
     MessageWithCreatedAt by messageWithCreatedAtImpl,
     MessageWithId by messageWithId {
 
-  @Transient
   override val numberOfRetries: Int =
       100_000 // This should last a few weeks at 1 attempt per minute
 
@@ -69,7 +68,6 @@ open class MessageLocation(
     return timestamp > 0
   }
 
-  @Transient
   override fun toString(): String =
       "[MessageLocation id=$messageId ts=${Instant.fromEpochSeconds(timestamp)},lat=$latitude,long=$longitude,created_at=${createdAt},trigger=$trigger]"
 
@@ -101,6 +99,12 @@ open class MessageLocation(
                 0
               }
         }
+  }
+
+  enum class ConnectionType(val value:String) {
+    WIFI("w"),
+    MOBILE("m"),
+    OFFLINE("o");
   }
 
   enum class ReportType(val value: String) {

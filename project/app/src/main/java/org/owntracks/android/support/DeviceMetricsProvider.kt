@@ -46,7 +46,7 @@ internal constructor(@ApplicationContext private val context: Context) {
       }
     }
 
-  val connectionType: String
+  val connectionType: MessageLocation.ConnectionType
     get() {
       val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
@@ -55,12 +55,12 @@ internal constructor(@ApplicationContext private val context: Context) {
           cm.getNetworkCapabilities(cm.activeNetwork)?.run {
             if (hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
               if (hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-                MessageLocation.CONN_TYPE_WIFI
+                MessageLocation.ConnectionType.WIFI
               } else {
-                MessageLocation.CONN_TYPE_MOBILE
+                MessageLocation.ConnectionType.MOBILE
               }
             } else {
-              MessageLocation.CONN_TYPE_OFFLINE
+              MessageLocation.ConnectionType.OFFLINE
             }
           }
           // Android bug: https://issuetracker.google.com/issues/175055271
@@ -69,7 +69,7 @@ internal constructor(@ApplicationContext private val context: Context) {
           Timber.e(e, "Exception fetching NetworkCapabilities")
           null
         }
-      } ?: MessageLocation.CONN_TYPE_OFFLINE
+      } ?: MessageLocation.ConnectionType.OFFLINE
     }
 
   val powerSave: Int

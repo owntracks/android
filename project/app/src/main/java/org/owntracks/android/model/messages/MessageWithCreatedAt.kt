@@ -4,7 +4,7 @@ import java.time.Instant
 import kotlinx.serialization.SerialName
 
 interface MessageWithCreatedAt {
-  @get:SerialName("created_at") var createdAt: Instant
+  @SerialName("created_at") var createdAt: Instant
 }
 
 class MessageCreatedAtNow(clock: Clock) : MessageWithCreatedAt {

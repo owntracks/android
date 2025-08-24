@@ -1,10 +1,12 @@
 package org.owntracks.android.model.messages
 
+import android.annotation.SuppressLint
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import org.owntracks.android.support.MessageWaypointCollection
 
+@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 @SerialName(MessageConfiguration.TYPE)
 class MessageConfiguration(private val messageWithId: MessageWithId = MessageWithRandomId()) :
@@ -21,17 +23,17 @@ class MessageConfiguration(private val messageWithId: MessageWithId = MessageWit
     map[key] = value
   }
 
-  @Transient
+
   operator fun get(key: String?): Any? {
     return map[key]
   }
 
-  @Transient
+
   fun containsKey(key: String?): Boolean {
     return map.containsKey(key)
   }
 
-  @get:Transient
+
   val keys: Set<String>
     get() = map.keys
 

@@ -8,7 +8,7 @@ typealias MessageId = String
 const val ZeroMessageId: MessageId = "0"
 
 interface MessageWithId {
-  @get:SerialName("_id") var messageId: MessageId
+  @SerialName("_id") var messageId: MessageId
 }
 
 class MessageWithRandomId : MessageWithId {
