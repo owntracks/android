@@ -1,4 +1,3 @@
-import kotlin.io.path.isRegularFile
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
@@ -20,7 +19,7 @@ val googleMapsAPIKey =
 
 val gmsImplementation: Configuration by configurations.creating
 
-val packageVersionCode: Int = System.getenv("VERSION_CODE")?.toInt() ?: 420504000
+val packageVersionCode: Int = System.getenv("VERSION_CODE")?.toInt() ?: 420505000
 val manuallySetVersion: Boolean = System.getenv("VERSION_CODE") != null
 val enablePlayPublishing: Boolean = !System.getenv("ANDROID_PUBLISHER_CREDENTIALS").isNullOrBlank()
 
@@ -34,12 +33,10 @@ android {
     targetSdk = 36
 
     versionCode = packageVersionCode
-    versionName = "2.5.4"
+    versionName = "2.5.5"
 
-    val localeCount =
-        fileTree("src/main/res/")
-            .map { it.toPath() }
-            .count { it.isRegularFile() && it.fileName.toString() == "strings.xml" }
+    val localeCount = fileTree("src/main/res/").matching { include("**/strings.xml") }.files.size
+
     buildConfigField(
         "int",
         "TRANSLATION_COUNT",
