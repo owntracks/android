@@ -100,7 +100,7 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient(
         } catch (e: IllegalArgumentException) {
           if (e.message == "unregistered listener cannot be flushed") {
             Timber.d(
-                "Unable to flush locations for ${it.second} callback, as provider {it.second} is not registered")
+                "Unable to flush locations for ${it.second} callback, as provider ${it.second} is not registered")
           } else {
             Timber.e(e, "Unable to flush locations for ${it.second} callback")
           }

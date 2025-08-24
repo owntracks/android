@@ -20,6 +20,7 @@
 - setting / importing configuration options that are enums are now case-insensitive
 - Fix regression where setting the locatorPriority preference using a number wasn't working (#1874)
 - Slightly less noisey and more useful logging at the info level
+- Persistent notification updates its "when" displayed time to be that of the last update (#1954)
 
 ## Version 2.5.3
 

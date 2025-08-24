@@ -10,7 +10,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import org.owntracks.android.BaseApp.Companion.NOTIFICATION_CHANNEL_ONGOING
 import org.owntracks.android.BaseApp.Companion.NOTIFICATION_ID_ONGOING
 import org.owntracks.android.R
@@ -23,7 +22,6 @@ class OngoingNotification(private val context: Context, initialMode: MonitoringM
   data class ServiceNotificationState(
       val title: String,
       val content: String,
-      val `when`: Instant,
       val subText: String,
       val notificationHigherPriority: Boolean
   )
@@ -55,11 +53,7 @@ class OngoingNotification(private val context: Context, initialMode: MonitoringM
   }
   private var serviceNotificationState =
       ServiceNotificationState(
-          context.getString(R.string.app_name),
-          "",
-          Clock.System.now(),
-          getMonitoringLabel(initialMode),
-          false)
+          context.getString(R.string.app_name), "", getMonitoringLabel(initialMode), false)
 
   private val notificationBuilder =
       NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ONGOING)
@@ -84,7 +78,7 @@ class OngoingNotification(private val context: Context, initialMode: MonitoringM
       notificationBuilder
           .setContentTitle(serviceNotificationState.title)
           .setContentText(serviceNotificationState.content)
-          .setWhen(serviceNotificationState.`when`.toEpochMilliseconds())
+          .setWhen(Clock.System.now().toEpochMilliseconds())
           .setSubText(serviceNotificationState.subText)
           .setPriority(
               if (serviceNotificationState.notificationHigherPriority) {

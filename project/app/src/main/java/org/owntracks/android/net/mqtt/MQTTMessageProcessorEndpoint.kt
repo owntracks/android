@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.IOException
 import java.net.ConnectException
+import java.net.UnknownHostException
 import java.security.KeyStore
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.stream.Collectors
@@ -423,6 +424,9 @@ class MQTTMessageProcessorEndpoint(
                           when (e.cause) {
                             is SSLHandshakeException ->
                                 Timber.e("$errorLog: ${(e.cause as SSLHandshakeException).message}")
+                            is UnknownHostException ->
+                                Timber.e(
+                                    "$errorLog: Unknown host \"${(e.cause as UnknownHostException).message}\"")
                             else -> Timber.e(e, errorLog)
                           }
                       REASON_CODE_SERVER_CONNECT_ERROR.toInt() -> {
