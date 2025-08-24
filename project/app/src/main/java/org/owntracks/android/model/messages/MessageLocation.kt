@@ -3,6 +3,8 @@ package org.owntracks.android.model.messages
 import android.annotation.SuppressLint
 import android.location.Location
 import android.os.Build
+import java.util.concurrent.TimeUnit
+import kotlin.math.roundToInt
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -11,8 +13,6 @@ import org.owntracks.android.model.BatteryStatus
 import org.owntracks.android.net.WifiInfoProvider
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.MonitoringMode
-import java.util.concurrent.TimeUnit
-import kotlin.math.roundToInt
 
 @SuppressLint("UnsafeOptInUsageError")
 @Serializable
@@ -101,10 +101,10 @@ open class MessageLocation(
         }
   }
 
-  enum class ConnectionType(val value:String) {
+  enum class ConnectionType(val value: String) {
     WIFI("w"),
     MOBILE("m"),
-    OFFLINE("o");
+    OFFLINE("o")
   }
 
   enum class ReportType(val value: String) {

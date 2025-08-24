@@ -72,7 +72,9 @@ class Parser @Inject constructor(private val encryptionProvider: EncryptionProvi
   // input stream
   @Throws(IOException::class, EncryptionException::class)
   fun fromJson(input: InputStream): Array<MessageBase> {
-    return decrypt(arrayCompatMapper.decodeFromString<Array<MessageBase>>(input.bufferedReader().use { it.readText() }))
+    return decrypt(
+        arrayCompatMapper.decodeFromString<Array<MessageBase>>(
+            input.bufferedReader().use { it.readText() }))
   }
 
   @Throws(IOException::class, EncryptionException::class)

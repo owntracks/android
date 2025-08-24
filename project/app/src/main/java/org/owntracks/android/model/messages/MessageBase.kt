@@ -41,21 +41,18 @@ abstract class MessageBase : BaseObservable(), MessageWithId {
    */
   fun getContactId(): String = getBaseTopic(topic)
 
-  @SerialName("modeId")
-  var modeId = ConnectionMode.MQTT
+  @SerialName("modeId") var modeId = ConnectionMode.MQTT
 
-   @SerialName("qos") var qos = 0
+  @SerialName("qos") var qos = 0
 
-   @SerialName("retained") var retained = false
-
+  @SerialName("retained") var retained = false
 
   open val baseTopicSuffix: String
     get() = BASETOPIC_SUFFIX
 
   // Called after deserialization to check if all required attributes are set or not.
   // The message is discarded if false is returned.
-   open fun isValidMessage(): Boolean = true
-
+  open fun isValidMessage(): Boolean = true
 
   private fun getBaseTopic(topic: String): String {
     return if (topic.endsWith(baseTopicSuffix)) {
@@ -65,10 +62,11 @@ abstract class MessageBase : BaseObservable(), MessageWithId {
     }
   }
 
-abstract override fun toString(): String
+  abstract override fun toString(): String
 
   open fun annotateFromPreferences(preferences: Preferences) {}
-open fun toJsonBytes(parser: Parser): ByteArray {
+
+  open fun toJsonBytes(parser: Parser): ByteArray {
     return parser.toJsonBytes(this)
   }
 

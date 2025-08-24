@@ -1,14 +1,11 @@
 package org.owntracks.android.geocoding
 
-import android.annotation.SuppressLint
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import java.math.BigDecimal
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
-
-import java.time.temporal.ChronoUnit
-import kotlinx.serialization.Serializable
+import kotlin.time.Duration.Companion.minutes
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import okhttp3.HttpUrl
@@ -16,7 +13,6 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.owntracks.android.net.http.HttpMessageProcessorEndpoint
 import timber.log.Timber
-import kotlin.time.Duration.Companion.minutes
 
 class OpenCageGeocoder
 internal constructor(private val apiKey: String, private val httpClient: OkHttpClient) :

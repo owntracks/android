@@ -2,13 +2,13 @@ package org.owntracks.android.geocoding
 
 import android.content.Context
 import android.location.Address
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import java.math.BigDecimal
 import java.util.Locale
+import kotlin.time.Duration.Companion.minutes
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import org.owntracks.android.location.LatLng
 import timber.log.Timber
-import kotlin.time.Duration.Companion.minutes
 
 class DeviceGeocoder internal constructor(context: Context) : CachingGeocoder() {
   private val geocoder: android.location.Geocoder =

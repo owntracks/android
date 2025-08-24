@@ -7,6 +7,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_LOW
 import androidx.core.app.NotificationManagerCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -26,8 +28,6 @@ import org.owntracks.android.preferences.types.ReverseGeocodeProvider
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 class GeocoderProvider
@@ -107,7 +107,18 @@ constructor(
           is GeocodeResult.Fault.RateLimited ->
               context.getString(
                   R.string.geocoderRateLimited,
-                  result.until.format(DateTimeComponents.Format { year();char('-');monthNumber();char('-');dayOfMonth();char(' ');hour();char(':');minute() }))
+                  result.until.format(
+                      DateTimeComponents.Format {
+                        year()
+                        char('-')
+                        monthNumber()
+                        char('-')
+                        dayOfMonth()
+                        char(' ')
+                        hour()
+                        char(':')
+                        minute()
+                      }))
           is GeocodeResult.Fault.Unavailable -> context.getString(R.string.geocoderUnavailable)
           else -> ""
         }

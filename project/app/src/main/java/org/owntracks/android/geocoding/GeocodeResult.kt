@@ -2,7 +2,6 @@ package org.owntracks.android.geocoding
 
 import kotlinx.datetime.Instant
 
-
 sealed class GeocodeResult {
   data class Formatted(val text: String) : GeocodeResult()
 
