@@ -20,7 +20,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
       # We need to find out if there's been a previous beta release for this tag, as it'll affect which google play track we promote from
       - uses: octokit/request-action@v2.x
         name: Find beta tags if this is a prod release
@@ -39,13 +39,8 @@ jobs:
           echo "beta_tag_count=${LENGTH}"
           echo "beta_tag_count=$LENGTH" >> "${GITHUB_OUTPUT}"
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-
-      - name: Install python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r .github/google-play-api/requirements.txt
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
 
       # Step outputs are strings, so we need to use fromJSON to coerce to an integer
       - name: Get current version code from internal track
@@ -53,7 +48,7 @@ jobs:
         env:
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
         run: |
-          VERSION_CODE="$(python .github/google-play-api/google-play-api.py internal)"
+          VERSION_CODE="$(uv --directory .github/google-play-api run google-play-api.py internal)"
           echo VERSION_CODE="${VERSION_CODE}" >> "${GITHUB_ENV}"
 
       - name: Get current version code from beta track
@@ -61,7 +56,7 @@ jobs:
         env:
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
         run: |
-          VERSION_CODE="$(python .github/google-play-api/google-play-api.py beta)"
+          VERSION_CODE="$(uv --directory .github/google-play-api run google-play-api.py beta)"
           echo VERSION_CODE="${VERSION_CODE}" >> "${GITHUB_ENV}"
 
       - name: Create keystore

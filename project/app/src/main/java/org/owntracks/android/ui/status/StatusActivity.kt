@@ -91,6 +91,10 @@ class StatusActivity : AppCompatActivity(), ServiceStarter by ServiceStarter.Imp
             }
           }
         }
+    supportActionBar?.apply {
+      setDisplayShowHomeEnabled(true)
+      setDisplayHomeAsUpEnabled(false)
+    }
     startService(this)
   }
 

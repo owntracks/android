@@ -53,7 +53,9 @@ protected constructor(
   private suspend fun insertAll(waypoints: List<WaypointModel>) {
     waypoints.apply {
       insertAllImpl(this)
-      mutableRepoChangedEvent.emit(WaypointOperation.InsertMany(this))
+      mutableRepoChangedEvent.emit(WaypointOperation.InsertMany(this)).also {
+        Timber.d("Inserted waypoints $this")
+      }
     }
   }
 
@@ -61,7 +63,9 @@ protected constructor(
     waypointModel.run {
       updateImpl(this@run)
       if (notify) {
-        mutableRepoChangedEvent.emit(WaypointOperation.Update(this@run))
+        mutableRepoChangedEvent.emit(WaypointOperation.Update(this@run)).also {
+          Timber.d("Updated waypoint $this")
+        }
       }
     }
   }
@@ -75,7 +79,7 @@ protected constructor(
 
   suspend fun clearAll() {
     clearImpl()
-    mutableRepoChangedEvent.emit(WaypointOperation.Clear)
+    mutableRepoChangedEvent.emit(WaypointOperation.Clear).also { Timber.d("clearall waypoints") }
   }
 
   /**

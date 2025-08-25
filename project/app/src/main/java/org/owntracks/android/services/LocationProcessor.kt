@@ -64,6 +64,8 @@ constructor(
   suspend fun publishLocationMessage(trigger: MessageLocation.ReportType) =
       locationRepo.currentPublishedLocation.value?.run { publishLocationMessage(trigger, this) }
 
+  private val highAccuracyProviders = setOf("gps", "fused")
+
   private suspend fun publishLocationMessage(
       trigger: MessageLocation.ReportType,
       location: Location
@@ -71,6 +73,21 @@ constructor(
     Timber.v("Maybe publishing $location with trigger $trigger")
     if (!locationIsWithAccuracyThreshold(location))
         return Result.failure(Exception("location accuracy too low"))
+
+    // If this location has come from the network *and* the most recent location was both recent and
+    // high-accuracy, then it's probably not usefully accurate. Drop it.
+    locationRepo.currentPublishedLocation.value?.let { lastLocation ->
+      if (highAccuracyProviders.contains(location.provider) &&
+          lastLocation.provider == "network" &&
+          location.time - lastLocation.time <
+              preferences.discardNetworkLocationThresholdSeconds * 1000) {
+        Timber.d(
+            "Ignoring location from ${location.provider}, last was from gps, and time difference is less than 1s")
+        return Result.failure(
+            Exception("Ignoring location from ${location.provider}, last was recent and from gps"))
+      }
+    }
+
     val loadedWaypoints = withContext(ioDispatcher) { waypointsRepo.getAll() }
     Timber.d("publishLocationMessage for $location triggered by $trigger")
 
@@ -81,6 +98,7 @@ constructor(
         preferences.fusedRegionDetection &&
         trigger != MessageLocation.ReportType.CIRCULAR) {
       loadedWaypoints.forEach { waypoint ->
+        Timber.d("onWaypointTransition triggered by location waypoint intersection event")
         onWaypointTransition(
             waypoint,
             location,
@@ -112,6 +130,7 @@ constructor(
                 batteryStatus = deviceMetricsProvider.batteryStatus
                 conn = deviceMetricsProvider.connectionType
                 monitoringMode = preferences.monitoring
+                source = location.provider
               }
             } else {
               fromLocation(location, Build.VERSION.SDK_INT)

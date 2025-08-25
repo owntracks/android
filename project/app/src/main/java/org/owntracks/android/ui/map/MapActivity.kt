@@ -36,7 +36,9 @@ import androidx.core.widget.ImageViewCompat
 import androidx.databinding.BindingAdapter
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.commit
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -161,6 +163,9 @@ class MapActivity :
           contactPeek.contactRow.setOnClickListener(this@MapActivity)
           contactPeek.contactRow.setOnLongClickListener(this@MapActivity)
           contactClearButton.setOnClickListener { viewModel.onClearContactClicked() }
+          requestLocationReportButton.setOnClickListener {
+            viewModel.sendLocationRequestToCurrentContact()
+          }
           contactShareButton.setOnClickListener {
             startActivity(
                 Intent.createChooser(
@@ -240,6 +245,7 @@ class MapActivity :
               }
               .also { listener -> labels.forEach { it.withListener(listener) } }
         }
+
     backPressedCallback =
         onBackPressedDispatcher.addCallback(this, false) {
           when (bottomSheetBehavior?.state) {
@@ -249,36 +255,57 @@ class MapActivity :
             BottomSheetBehavior.STATE_EXPANDED -> {
               setBottomSheetCollapsed()
             }
+            else -> {
+              // If the bottom sheet is hidden, we can just finish the activity
+              if (bottomSheetBehavior?.state == BottomSheetBehavior.STATE_HIDDEN) {
+                finish()
+              } else {
+                setBottomSheetHidden()
+              }
+            }
           }
         }
     setBottomSheetHidden()
 
-    viewModel.currentContact.observe(this) { contact: Contact? ->
-      contact?.let {
-        binding.contactPeek.run {
-          image.setImageResource(0) // Remove old image before async loading the new one
-          lifecycleScope.launch {
-            contactImageBindingAdapter.run { image.setImageBitmap(getBitmapFromCache(it)) }
+    viewModel.apply {
+      lifecycleScope.launch {
+        lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+          launch {
+            locationRequestContactCommandFlow.collect { contact ->
+              Snackbar.make(
+                      binding.root, getString(R.string.requestLocationSent), Snackbar.LENGTH_SHORT)
+                  .show()
+            }
           }
         }
       }
-    }
-    viewModel.bottomSheetHidden.observe(this) { o: Boolean? ->
-      if (o == null || o) {
-        setBottomSheetHidden()
-      } else {
-        setBottomSheetCollapsed()
+      currentContact.observe(this@MapActivity) { contact: Contact? ->
+        contact?.let {
+          binding.contactPeek.run {
+            image.setImageResource(0) // Remove old image before async loading the new one
+            lifecycleScope.launch {
+              contactImageBindingAdapter.run { image.setImageBitmap(getBitmapFromCache(it)) }
+            }
+          }
+        }
       }
-    }
-    viewModel.currentLocation.observe(this) { location ->
-      if (location == null) {
-        disableLocationMenus()
-      } else {
-        enableLocationMenus()
-        binding.vm?.run { updateActiveContactDistanceAndBearing(location) }
+      bottomSheetHidden.observe(this@MapActivity) { o: Boolean? ->
+        if (o == null || o) {
+          setBottomSheetHidden()
+        } else {
+          setBottomSheetCollapsed()
+        }
       }
+      currentLocation.observe(this@MapActivity) { location ->
+        if (location == null) {
+          disableLocationMenus()
+        } else {
+          enableLocationMenus()
+          binding.vm?.run { updateActiveContactDistanceAndBearing(location) }
+        }
+      }
+      currentMonitoringMode.observe(this@MapActivity) { updateMonitoringModeMenu() }
     }
-    viewModel.currentMonitoringMode.observe(this) { updateMonitoringModeMenu() }
 
     startService(this)
 

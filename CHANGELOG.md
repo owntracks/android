@@ -9,6 +9,8 @@
 - Dutch Translation (thanks to all contributors)
 - Setting a preference that doesn't actually change the value won't have any effects (such as MQTT reconnecting) (#1875)
 - Status messages contain the app version and flavour
+- There's now an option to send a remote command "request location" to selected contacts from the map view
+- New experimental preference `discardNetworkLocationThresholdSeconds` that allows OT to discard locations from inaccurate providers (e.g. network) if there's been a recent location from an accurate provider (e.g. gps/fused). (#2053)
 
 ### Bug fixes
 
@@ -17,6 +19,8 @@
 - Import config screen displays JSON config LTR under RTL locales
 - setting / importing configuration options that are enums are now case-insensitive
 - Fix regression where setting the locatorPriority preference using a number wasn't working (#1874)
+- Slightly less noisey and more useful logging at the info level
+- Persistent notification updates its "when" displayed time to be that of the last update (#1954)
 
 ## Version 2.5.3
 

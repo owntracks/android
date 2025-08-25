@@ -130,8 +130,10 @@ internal constructor(
               }
             }
           }
+          launch { reDrawRegions(getAllWaypoints().toSet()) }
           launch {
             viewModel.waypointUpdatedEvent.collect {
+              Timber.d("waypointUpdatedEvent $it")
               when (it) {
                 is WaypointsRepo.WaypointOperation.Clear -> reDrawRegions(emptySet())
                 is WaypointsRepo.WaypointOperation.Delete -> deleteRegion(it.waypoint)
@@ -143,6 +145,7 @@ internal constructor(
           }
         }
       }
+
       mapLayerStyle.observe(viewLifecycleOwner, this@MapFragment::setMapLayerType)
       onMapReady()
     }

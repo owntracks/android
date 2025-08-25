@@ -286,7 +286,14 @@ constructor(
                       is MessageProcessorEndpoint.OutgoingMessageSendingException,
                       is ConfigurationIncompleteException,
                       is MQTTMessageProcessorEndpoint.NotConnectedException -> {
-                        Timber.w(this, "Error sending message $message. Re-queueing")
+                        when (this) {
+                          is MessageProcessorEndpoint.OutgoingMessageSendingException ->
+                              Timber.w(this, "Error sending message $message. Re-queueing")
+                          is ConfigurationIncompleteException ->
+                              Timber.w("Configuration incomplete for message $message. Re-queueing")
+                          is MQTTMessageProcessorEndpoint.NotConnectedException ->
+                              Timber.w("MQTT not connected for message $message. Re-queueing")
+                        }
                         reQueueMessage(message)
                         resendDelayWait(retryWait)
 
@@ -414,7 +421,7 @@ constructor(
   }
 
   fun processIncomingMessage(message: MessageBase) {
-    Timber.i(
+    Timber.d(
         "Received incoming message: ${message.javaClass.simpleName} on ${message.topic} with id=${message.messageId}")
     when (message) {
       is MessageClear -> {
@@ -441,6 +448,7 @@ constructor(
 
   private fun processIncomingMessage(message: MessageClear) {
     scope.launch {
+      Timber.i("Received clear message for ${message.getContactId()}")
       contactsRepo.remove(message.getContactId())
       messageReceivedIdlingResource.remove(message)
     }
@@ -451,10 +459,17 @@ constructor(
     if (preferences.ignoreStaleLocations > 0 &&
         System.currentTimeMillis() - message.timestamp * 1000 >
             preferences.ignoreStaleLocations.toDouble().days.inWholeMilliseconds) {
-      Timber.e("discarding stale location")
+      Timber.d("discarding stale location from ${message.getContactId()} at ${message.timestamp}")
       messageReceivedIdlingResource.remove(message)
     } else {
       scope.launch {
+        if (message.topic == preferences.pubTopicLocations) {
+          Timber.d(
+              "Received our own location update ${message.latitude},${message.longitude} at ${message.timestamp}")
+        } else {
+          Timber.i(
+              "Contact ${message.getContactId()} moved to ${message.latitude},${message.longitude} at ${message.timestamp}")
+        }
         contactsRepo.update(message.getContactId(), message)
         /*
         We need to idle the selfMessageReceivedIdlingResource synchronously after we call update, because
@@ -471,10 +486,12 @@ constructor(
     if (preferences.ignoreStaleLocations > 0 &&
         System.currentTimeMillis() - message.timestamp * 1000 >
             preferences.ignoreStaleLocations.toDouble().days.inWholeMilliseconds) {
-      Timber.e("discarding stale transition")
+      Timber.d("discarding stale transition from $message.topic at $message.timestamp")
       messageReceivedIdlingResource.remove(message)
     } else {
       scope.launch {
+        Timber.i(
+            "Contact ${message.getContactId()} transitioned waypoint ${message.description} (${message.event}) at ${message.timestamp}")
         contactsRepo.update(message.getContactId(), message)
         service?.sendEventNotification(message)
         messageReceivedIdlingResource.remove(message)
@@ -484,6 +501,7 @@ constructor(
 
   private fun processIncomingMessage(message: MessageCard) {
     scope.launch {
+      Timber.i("Received card message from ${message.topic}")
       contactsRepo.update(message.getContactId(), message)
       messageReceivedIdlingResource.remove(message)
     }

@@ -1,6 +1,5 @@
 """Fetches the latest version code for the given track"""
 
-
 from apiclient.discovery import build
 import json
 import os
