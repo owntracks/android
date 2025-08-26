@@ -6,9 +6,29 @@ name: "Subflow: Espresso tests"
       ref:
         required: true
         type: string
+      test-annotation:
+        default: "*"
+        required: false
+        type: string
+      shards:
+        default: 6
+        required: false
+        type: number
 
 jobs:
+  generate-shards-matrix:
+    name: Generate shard matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Set Matrix
+        id: set-matrix
+        run: |
+            jq -cn --argjson count "${{ inputs.shards }}" '[range(1; $count + 1) | {"shard":.}]' > matrix.json
+            echo "matrix=$(cat matrix.json)" >> "$GITHUB_OUTPUT"
   espresso-test:
+    needs: [generate-shards-matrix]
     name: "Espresso tests"
     runs-on: ubuntu-latest
     permissions:
@@ -19,7 +39,7 @@ jobs:
       matrix:
         android-api: [31]
         flavour: [Gms, Oss]
-        shard: [1, 2, 3, 4, 5, 6]
+        include: ${{ fromJSON(needs.generate-shards-matrix.outputs.matrix) }}
     steps:
       - name: Enable KVM group perms
         run: |
@@ -92,6 +112,7 @@ jobs:
           SHARD_COUNT: 6
           SHARD_INDEX: ${{ matrix.shard }}
           GRADLE_OPTS: "-Dorg.gradle.daemon=true -Dorg.gradle.configuration-cache=true -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.jvmargs='-Xmx3096M -Dkotlin.daemon.jvm.options=-Xmx2048M -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8 -XX:+UseParallelGC'"
+          TEST_ANNOTATION: ${{ inputs.test-annotation }}
         with:
           api-level: ${{ matrix.android-api }}
           force-avd-creation: false
@@ -110,7 +131,7 @@ jobs:
             adb shell rm -rf /sdcard/googletest || echo "Couldn't delete googletest folder"
             adb uninstall org.owntracks.android.debug || echo "org.owntracks.android not installed"
             adb uninstall org.owntracks.android.debug.test || echo "org.owntracks.android.test not installed"
-            ./project/gradlew -p project :app:create${FLAVOUR}DebugAndroidTestCoverageReport -Pandroid.testInstrumentationRunnerArguments.numShards=${SHARD_COUNT} -Pandroid.testInstrumentationRunnerArguments.shardIndex=${SHARD_INDEX} --max-workers=1 --scan
+            ./project/gradlew -p project :app:create${FLAVOUR}DebugAndroidTestCoverageReport -Pandroid.testInstrumentationRunnerArguments.numShards=${SHARD_COUNT} -Pandroid.testInstrumentationRunnerArguments.shardIndex=${SHARD_INDEX} --max-workers=1 --scan -Pandroid.testInstrumentationRunnerArguments.annotation=${TEST_ANNOTATION}
       - name: Upload connected test result artifact
         uses: actions/upload-artifact@v4
         with:

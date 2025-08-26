@@ -14,7 +14,10 @@ unit-test:
     {{gradlec}} app:testGmsDebugUnitTest
 
 espresso:
-    {{gradlec}} app:createGmsDebugCoverageReport
+    {{gradlec}} app:createGmsDebugCoverageReport -Pandroid.testInstrumentationRunnerArguments.annotation=*
+
+small-espresso:
+    {{gradlec}} clean createGmsDebugCoverageReport -Pandroid.testInstrumentationRunnerArguments.annotation=androidx.test.filters.SmallTest
 
 single-espresso:
     {{gradlec}} clean createGmsDebugCoverageReport -Pandroid.testInstrumentationRunnerArguments.annotation=org.owntracks.android.testutils.JustThisTestPlease

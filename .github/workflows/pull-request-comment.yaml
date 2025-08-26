@@ -22,7 +22,7 @@ jobs:
       check-id: ${{ steps.create-pr-check.outputs.check_id }}
     if: |
       github.event.issue.pull_request &&
-      (startsWith(github.event.comment.body,'/run-tests') || startsWith(github.event.comment.body,'/run-espresso-tests')) &&
+      (startsWith(github.event.comment.body,'/run-tests') || startsWith(github.event.comment.body,'/run-espresso-tests') || startsWith(github.event.comment.body,'/run-small-espresso-tests')) &&
       github.event.comment.author_association == 'MEMBER'
     steps:
       - name: Get PR info
@@ -71,6 +71,21 @@ jobs:
     with:
       ref: ${{ needs.check-comment.outputs.sha }}
     secrets: inherit
+  small-espresso-test:
+    name: Espresso Test
+    if: ${{ startsWith(github.event.comment.body, '/run-small-espresso-tests') }}
+    needs:
+      - build-test-lint
+    permissions:
+      contents: read
+      checks: write
+    uses: ./.github/workflows/espresso.yaml
+    with:
+      ref: ${{ github.sha }}
+      test-annotation: androidx.test.filters.SmallTest
+      shards: 1
+    secrets: inherit
+
   espresso-test:
     name: Espresso Test
     permissions:
@@ -92,7 +107,7 @@ jobs:
       checks: write
       issues: write
       pull-requests: write
-    needs: [check-comment, build-test-lint, espresso-test]
+    needs: [check-comment, build-test-lint, espresso-test, small-espresso-test]
     if: ${{ always() && needs.check-comment.result == 'success' }}
     steps:
       - name: Set status check
