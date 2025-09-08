@@ -273,7 +273,9 @@ class MapActivity :
           launch {
             locationRequestContactCommandFlow.collect { contact ->
               Snackbar.make(
-                      binding.root, getString(R.string.requestLocationSent), Snackbar.LENGTH_SHORT)
+                      binding.root,
+                      getString(R.string.requestLocationSent, contact.displayName),
+                      Snackbar.LENGTH_SHORT)
                   .show()
             }
           }

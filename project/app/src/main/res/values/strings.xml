@@ -257,7 +257,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="publish">"Report Location"</string>
     <string name="radius">"Radius (m)"</string>
     <string name="reconnect">"Reconnect"</string>
-    <string name="requestLocationSent">"Request location command sent"</string>
+    <string name="requestLocationSent">"Request location command sent to %s"</string>
     <string name="save">"Save"</string>
     <string name="select">"Select"</string>
     <string name="shareContactBody">"%1$s last location: %2$s (%3$s) at %4$s"</string>

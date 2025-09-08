@@ -290,7 +290,7 @@ constructor(
     mutableCurrentContact.value?.also {
       messageProcessor.queueMessageForSending(
           MessageCmd().apply {
-            topic = it.id
+            topic = it.id + preferences.commandTopicSuffix
             action = CommandAction.REPORT_LOCATION
           })
       mutableLocationRequestContactCommandFlow.tryEmit(it)

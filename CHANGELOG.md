@@ -2,6 +2,10 @@
 
 ## Version 2.5.5
 
+### Bug fixes
+
+- "Request Location" button on contact now sends the command message to the right topic in MQTT mode (#2101)
+
 ## Version 2.5.4
 
 ### New features

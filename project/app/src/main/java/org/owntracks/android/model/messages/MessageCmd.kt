@@ -22,9 +22,7 @@ class MessageCmd(private val messageWithId: MessageWithId = MessageWithRandomId(
 
   override fun toString(): String = "[MessageCmd action=$action]"
 
-  override fun annotateFromPreferences(preferences: Preferences) {
-    topic = preferences.receivedCommandsTopic
-  }
+  override fun annotateFromPreferences(preferences: Preferences) {}
 
   override val baseTopicSuffix: String
     get() = BASETOPIC_SUFFIX
