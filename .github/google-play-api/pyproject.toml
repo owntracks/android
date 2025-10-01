@@ -8,7 +8,7 @@ dependencies = [
     "charset-normalizer==3.4.4",
     "google-api-core==2.25.1",
     "google-api-python-client==2.179.0",
-    "google-auth==2.40.3",
+    "google-auth==2.41.1",
     "google-auth-httplib2==0.2.0",
     "googleapis-common-protos==1.70.0",
     "httplib2==0.30.0",
