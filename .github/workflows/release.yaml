@@ -40,7 +40,7 @@ jobs:
           echo "beta_tag_count=$LENGTH" >> "${GITHUB_OUTPUT}"
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
 
       # Step outputs are strings, so we need to use fromJSON to coerce to an integer
       - name: Get current version code from internal track
