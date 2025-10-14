@@ -5,7 +5,7 @@ description = "Google Play API utilities for OwnTracks Android"
 requires-python = ">=3.13"
 dependencies = [
     "certifi==2025.10.5",
-    "charset-normalizer==3.4.3",
+    "charset-normalizer==3.4.4",
     "google-api-core==2.25.1",
     "google-api-python-client==2.179.0",
     "google-auth==2.40.3",
