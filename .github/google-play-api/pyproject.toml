@@ -11,7 +11,7 @@ dependencies = [
     "google-auth==2.40.3",
     "google-auth-httplib2==0.2.0",
     "googleapis-common-protos==1.70.0",
-    "httplib2==0.30.0",
+    "httplib2==0.31.0",
     "idna==3.11",
     "jmespath==1.0.1",
     "pyasn1==0.6.1",
