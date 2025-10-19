@@ -18,7 +18,7 @@ runs:
         distribution: "temurin"
         java-version: "21"
     - name: Gradle setup
-      uses: gradle/actions/setup-gradle@v4
+      uses: gradle/actions/setup-gradle@v5
       with:
         cache-encryption-key: ${{ inputs.gradle-cache-encryption-key }}
     - name: Gradle task

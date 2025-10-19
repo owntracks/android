@@ -107,10 +107,7 @@ class MQTTMessageProcessorEndpoint(
         override fun onLost(network: Network) {
           super.onLost(network)
 
-          scope.launch {
-            connectingLock.withPermitLogged("network lost") { disconnect() }
-            scheduler.cancelAllTasks()
-          }
+          scope.launch { connectingLock.withPermitLogged("network lost") { disconnect() } }
         }
       }
 

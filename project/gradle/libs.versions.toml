@@ -15,13 +15,13 @@ androidx-test-rules = "1.7.0"
 androidx-test-runner = "1.7.0"
 androidx-test-services = "1.6.0"
 androidx-work = "2.9.1"
-apache-httpcore = "5.3.4"
+apache-httpcore = "5.3.6"
 barista = "4.3.0"
-bouncycastle = "1.81"
+bouncycastle = "1.82"
 conscrypt = "2.5.3"
 desguar-jdk = "2.1.5"
 flatbuffers = "23.5.26"
-google-material = "1.12.0"
+google-material = "1.13.0"
 google-play-services-maps = "19.2.0"
 guava = "33.4.8-jre"
 hilt = "2.52"
@@ -48,14 +48,12 @@ slf4j-timber = "1.0.1"
 square-leakcanary = "2.14"
 square-tape2 = "2.0.0-beta1"
 timber = "5.0.1"
-triplet = "3.12.1"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-triplet = { id = "com.github.triplet.play", version.ref = "triplet" }
 ktfmt = { id = "com.ncorti.ktfmt.gradle", version.ref = "ktfmt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 

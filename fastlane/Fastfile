@@ -1,0 +1,91 @@
+# Fastfile for OwnTracks Android
+
+default_platform(:android)
+
+platform :android do
+  desc "Promote internal track to beta"
+  lane :promote_internal_to_beta do
+    supply(
+      track: 'internal',
+      track_promote_to: 'beta',
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      json_key_data: ENV['ANDROID_PUBLISHER_CREDENTIALS']
+    )
+  end
+
+  desc "Promote beta to production with staged rollout"
+  lane :promote_beta_to_production do |options|
+    rollout_percentage = options[:rollout] || 0.1
+
+    supply(
+      track: 'beta',
+      track_promote_to: 'production',
+      rollout: rollout_percentage.to_s,
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      json_key_data: ENV['ANDROID_PUBLISHER_CREDENTIALS']
+    )
+  end
+
+  desc "Promote internal to production with staged rollout"
+  lane :promote_internal_to_production do |options|
+    rollout_percentage = options[:rollout] || 0.1
+
+    supply(
+      track: 'internal',
+      track_promote_to: 'production',
+      rollout: rollout_percentage.to_s,
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      json_key_data: ENV['ANDROID_PUBLISHER_CREDENTIALS']
+    )
+  end
+
+  desc "Upload APK/AAB to internal track"
+  lane :upload_to_internal do |options|
+    apk_path = options[:apk]
+    aab_path = options[:aab]
+
+    supply(
+      track: 'internal',
+      apk: apk_path,
+      aab: aab_path,
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      json_key_data: ENV['ANDROID_PUBLISHER_CREDENTIALS']
+    )
+  end
+
+  desc "Get version code from a track"
+  lane :get_version_code do |options|
+    track = options[:track] || 'internal'
+
+    version_codes = google_play_track_version_codes(
+      track: track,
+      json_key_data: ENV['ANDROID_PUBLISHER_CREDENTIALS']
+    )
+
+    # Return the highest version code
+    version_codes.max
+  end
+
+  desc "Update metadata only"
+  lane :update_metadata do
+    supply(
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      json_key_data: ENV['ANDROID_PUBLISHER_CREDENTIALS']
+    )
+  end
+end

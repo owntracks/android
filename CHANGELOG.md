@@ -5,6 +5,8 @@
 ### Bug fixes
 
 - "Request Location" button on contact now sends the command message to the right topic in MQTT mode (#2101)
+- Fixed MQTT not automatically reconnecting after network loss by preventing reconnect tasks from being cancelled prematurely (#2132)
+- Fixed crash when location provider returns null location on Android 16 (#2110)
 
 ## Version 2.5.4
 

@@ -49,8 +49,9 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient(
           this,
           LocationSources.GPS.name.lowercase(),
           android.os.CancellationSignal(),
-          ExecutorCompat.create(Handler(looper))) { location: Location ->
-            clientCallBack.onLocationResult(LocationResult(location))
+          ExecutorCompat.create(Handler(looper))) { location: Location? ->
+            location?.run { clientCallBack.onLocationResult(LocationResult(this)) }
+                ?: Timber.w("Got null location from getCurrentLocation")
           }
     }
   }
