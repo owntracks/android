@@ -75,7 +75,7 @@ jobs:
           distribution: "temurin" # See 'Supported distributions' for available options
           java-version: "21"
       - name: Gradle setup
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
         with:
           dependency-graph: generate
           cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
