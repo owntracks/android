@@ -57,7 +57,6 @@ jobs:
       - name: Setup Ruby and Fastlane
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.2'
           bundler-cache: true
           working-directory: fastlane
       - name: Upload to Internal Track
