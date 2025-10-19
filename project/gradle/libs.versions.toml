@@ -48,14 +48,12 @@ slf4j-timber = "1.0.1"
 square-leakcanary = "2.14"
 square-tape2 = "2.0.0-beta1"
 timber = "5.0.1"
-triplet = "3.12.1"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-triplet = { id = "com.github.triplet.play", version.ref = "triplet" }
 ktfmt = { id = "com.ncorti.ktfmt.gradle", version.ref = "ktfmt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 

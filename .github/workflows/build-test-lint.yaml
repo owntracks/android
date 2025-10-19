@@ -43,13 +43,6 @@ jobs:
         with:
           task: assembleDebug assembleAndroidTest assembleRelease
           gradle-cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
-      - name: Save build outputs
-        uses: actions/cache/save@v4
-        with:
-          path: |
-            project/*/build
-            project/.gradle
-          key: build-outputs-${{ github.sha }}
   test:
     name: Test
     runs-on: ubuntu-latest
@@ -62,13 +55,6 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
         with:
           ref: ${{ inputs.ref }}
-      - name: Restore build outputs
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            project/*/build
-            project/.gradle
-          key: build-outputs-${{ github.sha }}
       - name: Test
         uses: ./.github/actions/gradle-task
         with:
@@ -93,13 +79,6 @@ jobs:
     steps:
       - name: "Checkout"
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
-      - name: Restore build outputs
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            project/*/build
-            project/.gradle
-          key: build-outputs-${{ github.sha }}
       - name: Build
         uses: ./.github/actions/gradle-task
         with:

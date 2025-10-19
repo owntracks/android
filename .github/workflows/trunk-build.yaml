@@ -46,19 +46,22 @@ jobs:
           echo -n "${KEYSTORE_BASE64}" | base64 -d > project/owntracks.release.keystore.jks
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
-      - name: Process GMS Version codes from Play Store
+      - name: Build Release Bundle
         uses: ./.github/actions/gradle-task
         with:
-          task: clean processGmsVersionCodes
-          gradle-cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
-        env:
-          ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
-      - name: Publish Release
-        uses: ./.github/actions/gradle-task
-        with:
-          task: publishGmsReleaseBundle
+          task: bundleGmsRelease
           gradle-cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
         env:
           KEYSTORE_PASSPHRASE: ${{ secrets.KEYSTORE_PASSPHRASE }}
-          ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
           GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+      - name: Setup Ruby and Fastlane
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          working-directory: fastlane
+      - name: Upload to Internal Track
+        run: bundle exec fastlane upload_to_internal aab:../project/app/build/outputs/bundle/gmsRelease/app-gms-release.aab
+        working-directory: fastlane
+        env:
+          ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
