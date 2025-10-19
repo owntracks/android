@@ -3,7 +3,6 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 plugins {
   id("com.android.application")
   id("com.google.dagger.hilt.android")
-  id("com.github.triplet.play")
   kotlin("android")
   kotlin("kapt")
   alias(libs.plugins.ktfmt)
@@ -182,17 +181,6 @@ android {
     }
     create("oss") { dimension = "locationProvider" }
   }
-  playConfigs {
-    register("gms") {
-      enabled.set(enablePlayPublishing)
-      track.set("internal")
-      if (manuallySetVersion) {
-        resolutionStrategy.set(com.github.triplet.gradle.androidpublisher.ResolutionStrategy.IGNORE)
-      } else {
-        resolutionStrategy.set(com.github.triplet.gradle.androidpublisher.ResolutionStrategy.AUTO)
-      }
-    }
-  }
 }
 
 kapt {
@@ -275,7 +263,3 @@ dependencies {
 
   coreLibraryDesugaring(libs.desugar)
 }
-
-// Publishing
-// Handled now in the android / playConfigs block
-play { enabled.set(false) }

@@ -10,8 +10,8 @@ on:
       - release-test-tag
 
 env:
-  # Config cache is false for releases, because tripleT doesn't work with it.
-  GRADLE_OPTS: "-Dorg.gradle.daemon=true -Dorg.gradle.configuration-cache=false -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.jvmargs='-Xmx3096M -Dkotlin.daemon.jvm.options=-Xmx2048M -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8 -XX:+UseParallelGC'"
+  # Config cache can be enabled now that we're not using Triplet
+  GRADLE_OPTS: "-Dorg.gradle.daemon=true -Dorg.gradle.configuration-cache=true -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.jvmargs='-Xmx3096M -Dkotlin.daemon.jvm.options=-Xmx2048M -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8 -XX:+UseParallelGC'"
 
 jobs:
   release:
@@ -96,23 +96,30 @@ jobs:
           files: |
             ./owntracks-release-*.apk
 
+      - name: Setup Ruby and Fastlane
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          working-directory: fastlane
+
       - name: Promote play store beta from internal
-        run: ./gradlew promoteGmsReleaseArtifact --from-track internal --promote-track beta --release-status completed
-        working-directory: project
+        run: bundle exec fastlane promote_internal_to_beta
+        working-directory: fastlane
         if: ${{ contains(github.ref_name, 'beta') }}
         env:
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
 
       - name: Promote play store production from beta
-        run: ./gradlew promoteArtifact --from-track beta --promote-track production --release-status inProgress --user-fraction .1
-        working-directory: project
+        run: bundle exec fastlane promote_beta_to_production rollout:0.1
+        working-directory: fastlane
         if: ${{ !contains(github.ref_name, 'beta') && steps.tagCount.outputs.beta_tag_count > 0 }}
         env:
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
 
       - name: Promote play store production from internal
-        run: ./gradlew promoteArtifact --from-track internal --promote-track production --release-status inProgress --user-fraction .1
-        working-directory: project
+        run: bundle exec fastlane promote_internal_to_production rollout:0.1
+        working-directory: fastlane
         if: ${{ !contains(github.ref_name, 'beta') && steps.tagCount.outputs.beta_tag_count == 0 }}
         env:
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
