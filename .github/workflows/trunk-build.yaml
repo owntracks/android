@@ -24,21 +24,25 @@ concurrency:
 env:
   GRADLE_OPTS: "-Dorg.gradle.daemon=true -Dorg.gradle.configuration-cache=true -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.jvmargs='-Xmx3096M -Dkotlin.daemon.jvm.options=-Xmx2048M -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8 -XX:+UseParallelGC'"
 jobs:
-  build-test-lint:
-    name: Build, Test, and Lint
+  build:
+    name: Build
+    runs-on: ubuntu-latest
     permissions:
       contents: read
-      checks: write
-    uses: ./.github/workflows/build-test-lint.yaml
-    with:
-      ref: ${{ github.sha }}
-    secrets: inherit
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+      - name: Build
+        uses: ./.github/actions/gradle-task
+        with:
+          task: assembleDebug ktfmtCheck assembleRelease
+          gradle-cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
   publish-to-play-store:
     name: "Publish to Play Store"
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    needs: build-test-lint
+    needs: build
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
       - name: Create keystore
