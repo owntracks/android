@@ -45,6 +45,19 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+      - name: Setup Ruby and Fastlane
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - name: Get next version code
+        id: version_code
+        run: |
+          LATEST_VERSION_CODE="$(bundle exec fastlane get_version_code track:internal)"
+          NEXT_VERSION_CODE="$((LATEST_VERSION_CODE + 1))"
+          echo "version_code=$NEXT_VERSION_CODE" >> "$GITHUB_OUTPUT"
+          echo "Next version code will be: $NEXT_VERSION_CODE"
+        env:
+          ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
       - name: Create keystore
         run: |
           echo -n "${KEYSTORE_BASE64}" | base64 -d > project/owntracks.release.keystore.jks
@@ -58,10 +71,7 @@ jobs:
         env:
           KEYSTORE_PASSPHRASE: ${{ secrets.KEYSTORE_PASSPHRASE }}
           GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
-      - name: Setup Ruby and Fastlane
-        uses: ruby/setup-ruby@v1
-        with:
-          bundler-cache: true
+          VERSION_CODE: ${{ steps.version_code.outputs.version_code }}
       - name: Upload to Internal Track
         run: bundle exec fastlane upload_to_internal aab:project/app/build/outputs/bundle/gmsRelease/app-gms-release.aab
         env:
