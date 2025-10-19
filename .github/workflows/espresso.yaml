@@ -86,7 +86,10 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: owntracks-test-${{ matrix.android-api }}-${{ matrix.flavour }}
+          key: owntracks-avd-${{ matrix.android-api }}-${{ matrix.flavour }}-v2
+          restore-keys: |
+            owntracks-avd-${{ matrix.android-api }}-${{ matrix.flavour }}-
+            owntracks-avd-${{ matrix.android-api }}-
       - name: Create AVD and generate snapshot for caching
         timeout-minutes: 10
         uses: reactivecircus/android-emulator-runner@v2
