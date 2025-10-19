@@ -62,9 +62,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-          working-directory: fastlane
       - name: Upload to Internal Track
-        run: bundle exec fastlane upload_to_internal aab:../project/app/build/outputs/bundle/gmsRelease/app-gms-release.aab
-        working-directory: fastlane
+        run: bundle exec fastlane upload_to_internal aab:project/app/build/outputs/bundle/gmsRelease/app-gms-release.aab
         env:
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
