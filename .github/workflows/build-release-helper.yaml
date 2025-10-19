@@ -21,6 +21,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
       - name: uv sync
         run: uv --directory .github/google-play-api sync --frozen
