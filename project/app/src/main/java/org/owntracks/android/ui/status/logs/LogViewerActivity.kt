@@ -6,10 +6,14 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ShareCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -42,6 +46,7 @@ class LogViewerActivity : AppCompatActivity() {
   private var collectorJob: Job? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
+    enableEdgeToEdge()
     super.onCreate(savedInstanceState)
     binding =
         DataBindingUtil.setContentView<UiPreferencesLogsBinding?>(
@@ -49,6 +54,13 @@ class LogViewerActivity : AppCompatActivity() {
             .apply {
               lifecycleOwner = this@LogViewerActivity
               setSupportActionBar(appbar.toolbar)
+
+              // Handle window insets for edge-to-edge
+              ViewCompat.setOnApplyWindowInsetsListener(frame) { view, windowInsets ->
+                val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+                appbar.root.updatePadding(top = insets.top)
+                WindowInsetsCompat.CONSUMED
+              }
             }
 
     supportActionBar?.apply {

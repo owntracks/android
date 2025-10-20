@@ -8,9 +8,13 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.databinding.DataBindingUtil
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,6 +30,7 @@ class LoadActivity : AppCompatActivity() {
   private lateinit var binding: UiPreferencesLoadBinding
 
   override fun onCreate(savedInstanceState: Bundle?) {
+    enableEdgeToEdge()
     super.onCreate(savedInstanceState)
     binding =
         DataBindingUtil.setContentView<UiPreferencesLoadBinding?>(
@@ -34,6 +39,13 @@ class LoadActivity : AppCompatActivity() {
               vm = viewModel
               lifecycleOwner = this@LoadActivity
               setSupportActionBar(appbar.toolbar)
+
+              // Handle window insets for edge-to-edge
+              ViewCompat.setOnApplyWindowInsetsListener(root) { view, windowInsets ->
+                val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+                appbar.root.updatePadding(top = insets.top)
+                WindowInsetsCompat.CONSUMED
+              }
             }
     viewModel.displayedConfiguration.observe(this) { invalidateOptionsMenu() }
     viewModel.configurationImportStatus.observe(this) {

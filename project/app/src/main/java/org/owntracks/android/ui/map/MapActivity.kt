@@ -21,8 +21,10 @@ import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.addCallback
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresPermission
@@ -31,7 +33,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.appcompat.widget.TooltipCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.setPadding
+import androidx.core.view.updateLayoutParams
 import androidx.core.widget.ImageViewCompat
 import androidx.databinding.BindingAdapter
 import androidx.databinding.DataBindingUtil
@@ -61,12 +66,13 @@ import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.services.BackgroundService.Companion.BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG
 import org.owntracks.android.support.ContactImageBindingAdapter
-import org.owntracks.android.support.DrawerProvider
 import org.owntracks.android.support.RequirementsChecker
 import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.test.ThresholdIdlingResourceInterface
+import org.owntracks.android.ui.DrawerProvider
 import org.owntracks.android.ui.NotificationsStash
 import org.owntracks.android.ui.mixins.BackgroundLocationPermissionRequester
+import org.owntracks.android.ui.mixins.EdgeToEdgeInsetHandler
 import org.owntracks.android.ui.mixins.LocationPermissionRequester
 import org.owntracks.android.ui.mixins.NotificationPermissionRequester
 import org.owntracks.android.ui.mixins.ServiceStarter
@@ -80,7 +86,8 @@ class MapActivity :
     View.OnClickListener,
     View.OnLongClickListener,
     WorkManagerInitExceptionNotifier by WorkManagerInitExceptionNotifier.Impl(),
-    ServiceStarter by ServiceStarter.Impl() {
+    ServiceStarter by ServiceStarter.Impl(),
+    EdgeToEdgeInsetHandler by EdgeToEdgeInsetHandler.Impl() {
   private val viewModel: MapViewModel by viewModels()
   private val notificationPermissionRequester =
       NotificationPermissionRequester(
@@ -138,6 +145,7 @@ class MapActivity :
       }
 
   override fun onCreate(savedInstanceState: Bundle?) {
+    enableEdgeToEdge()
     EntryPointAccessors.fromActivity(this, MapActivityEntryPoint::class.java).let {
       supportFragmentManager.fragmentFactory = it.fragmentFactory
     }
@@ -156,10 +164,23 @@ class MapActivity :
           lifecycleOwner = this@MapActivity
           appbar.toolbar.run {
             setSupportActionBar(this)
-            drawerProvider.attach(this)
+            drawerProvider.attach(this, drawerLayout, navigationView)
           }
           supportActionBar?.setDisplayShowTitleEnabled(false)
-          bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetLayout)
+          bottomSheetBehavior =
+              BottomSheetBehavior.from(bottomSheetLayout).apply {
+                addBottomSheetCallback(
+                    object : BottomSheetBehavior.BottomSheetCallback() {
+                      override fun onStateChanged(bottomSheet: View, newState: Int) {
+                        updateFabMyLocationPosition(newState)
+                        updateMapPaddingForBottomSheet(newState)
+                      }
+
+                      override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                        // No-op
+                      }
+                    })
+              }
           contactPeek.contactRow.setOnClickListener(this@MapActivity)
           contactPeek.contactRow.setOnLongClickListener(this@MapActivity)
           contactClearButton.setOnClickListener { viewModel.onClearContactClicked() }
@@ -244,6 +265,19 @@ class MapActivity :
                 }
               }
               .also { listener -> labels.forEach { it.withListener(listener) } }
+
+          applyDrawerEdgeToEdgeInsets(drawerLayout, appbar.root, navigationView)
+
+          // Apply bottom insets to FABs to avoid navigation bar
+          ViewCompat.setOnApplyWindowInsetsListener(mapCoordinatorLayout) { _, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+            fabMapLayers.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+              bottomMargin = insets.bottom + resources.getDimensionPixelSize(R.dimen.fab_margin)
+            }
+
+            windowInsets
+          }
         }
 
     backPressedCallback =
@@ -579,6 +613,7 @@ class MapActivity :
     super.onResume()
     updateMonitoringModeMenu()
     viewModel.updateMyLocationStatus()
+    drawerProvider.updateHighlight()
 
     if (checkAndRequestNotificationPermissions() ==
         CheckPermissionsResult.NO_PERMISSIONS_LAUNCHED_REQUEST) {
@@ -699,7 +734,7 @@ class MapActivity :
 
   private fun setBottomSheetCollapsed() {
     bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_COLLAPSED
-    binding.mapFragment.setPadding(0)
+    binding.mapFragment.setPaddingRelative(0, 0, 0, bottomSheetBehavior?.peekHeight ?: 0)
     sensorManager?.unregisterListener(viewModel.orientationSensorEventListener)
     backPressedCallback.isEnabled = true
   }
@@ -710,6 +745,32 @@ class MapActivity :
     menu?.run { close() }
     sensorManager?.unregisterListener(viewModel.orientationSensorEventListener)
     backPressedCallback.isEnabled = false
+  }
+
+  private fun updateFabMyLocationPosition(bottomSheetState: Int) {
+    binding.fabMyLocation.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+      bottomMargin =
+          when (bottomSheetState) {
+            BottomSheetBehavior.STATE_COLLAPSED -> {
+              bottomSheetBehavior?.peekHeight ?: 0
+            }
+            else -> 0
+          }
+    }
+  }
+
+  private fun updateMapPaddingForBottomSheet(bottomSheetState: Int) {
+    when (bottomSheetState) {
+      BottomSheetBehavior.STATE_EXPANDED -> {
+        binding.mapFragment.setPaddingRelative(0, 0, 0, binding.bottomSheetLayout.height)
+      }
+      BottomSheetBehavior.STATE_COLLAPSED -> {
+        binding.mapFragment.setPaddingRelative(0, 0, 0, bottomSheetBehavior?.peekHeight ?: 0)
+      }
+      else -> {
+        binding.mapFragment.setPadding(0)
+      }
+    }
   }
 
   override fun onStart() {
