@@ -52,7 +52,8 @@ jobs:
       - name: Get next version code
         id: version_code
         run: |
-          LATEST_VERSION_CODE="$(bundle exec fastlane get_version_code track:internal)"
+          LATEST_VERSION_CODE="$(bundle exec fastlane get_version_code track:internal | sed -n "s/.*Found '\([0-9]*\)'.*/\1/p")"
+          echo "Latest version code is: $LATEST_VERSION_CODE"
           NEXT_VERSION_CODE="$((LATEST_VERSION_CODE + 1))"
           echo "version_code=$NEXT_VERSION_CODE" >> "$GITHUB_OUTPUT"
           echo "Next version code will be: $NEXT_VERSION_CODE"

@@ -76,8 +76,6 @@ platform :android do
       json_key_data: ENV['ANDROID_PUBLISHER_CREDENTIALS']
     )
 
-    # Return the highest version code
-    version_codes.max
   end
 
   desc "Update metadata only"
