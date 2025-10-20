@@ -86,6 +86,7 @@ public class DrawerProvider {
                 .withToolbar(toolbar)
                 .withStickyFooterShadow(false)
                 .withStickyFooterDivider(true)
+                .withFullscreen(true)
                 .addDrawerItems(
                         drawerItemForClass(activity, MapActivity.class, R.string.title_activity_map, R.drawable.ic_baseline_layers_24),
                         drawerItemForClass(activity, ContactsActivity.class, R.string.title_activity_contacts, R.drawable.ic_baseline_supervisor_account_24),
