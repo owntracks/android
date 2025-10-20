@@ -12,10 +12,12 @@ import timber.log.Timber.DebugTree
 class TimberInMemoryLogTree(private val debugBuild: Boolean) : DebugTree() {
   companion object {
     const val LOG_PREFIX = "FARTSHOES"
+    private const val MAX_LOG_ENTRIES = 500
   }
 
   private val mutableLogFlow =
-      MutableSharedFlow<LogEntry>(replay = 10_000, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+      MutableSharedFlow<LogEntry>(
+          replay = MAX_LOG_ENTRIES, onBufferOverflow = BufferOverflow.DROP_OLDEST)
   val liveLogs: SharedFlow<LogEntry> = mutableLogFlow
 
   override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {

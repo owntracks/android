@@ -23,8 +23,10 @@ data class LogEntry(
         else -> "U"
       }
 
-  private val longDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.ROOT)
-  private val shortDateFormat = SimpleDateFormat("HH:mm:ss.SSS", Locale.ROOT)
+  companion object {
+    private val longDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.ROOT)
+    private val shortDateFormat = SimpleDateFormat("HH:mm:ss.SSS", Locale.ROOT)
+  }
 
   /**
    * Returns the string indexes of the boundaries of the priority and tag components, so that we can
