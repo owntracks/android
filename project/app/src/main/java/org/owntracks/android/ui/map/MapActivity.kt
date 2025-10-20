@@ -61,10 +61,10 @@ import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.services.BackgroundService.Companion.BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG
 import org.owntracks.android.support.ContactImageBindingAdapter
-import org.owntracks.android.support.DrawerProvider
 import org.owntracks.android.support.RequirementsChecker
 import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.test.ThresholdIdlingResourceInterface
+import org.owntracks.android.ui.DrawerProvider
 import org.owntracks.android.ui.NotificationsStash
 import org.owntracks.android.ui.mixins.BackgroundLocationPermissionRequester
 import org.owntracks.android.ui.mixins.LocationPermissionRequester
@@ -156,7 +156,7 @@ class MapActivity :
           lifecycleOwner = this@MapActivity
           appbar.toolbar.run {
             setSupportActionBar(this)
-            drawerProvider.attach(this)
+            drawerProvider.attach(this, drawerLayout, navigationView)
           }
           supportActionBar?.setDisplayShowTitleEnabled(false)
           bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetLayout)

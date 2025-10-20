@@ -16,8 +16,8 @@ import org.owntracks.android.R
 import org.owntracks.android.data.repos.ContactsRepoChange
 import org.owntracks.android.databinding.UiContactsBinding
 import org.owntracks.android.model.Contact
-import org.owntracks.android.support.DrawerProvider
 import org.owntracks.android.test.ThresholdIdlingResourceInterface
+import org.owntracks.android.ui.DrawerProvider
 import org.owntracks.android.ui.map.MapActivity
 import org.owntracks.android.ui.mixins.ServiceStarter
 import timber.log.Timber
@@ -43,7 +43,7 @@ class ContactsActivity :
           vm = viewModel
           appbar.toolbar.run {
             setSupportActionBar(this)
-            drawerProvider.attach(this)
+            drawerProvider.attach(this, drawerLayout, navigationView)
           }
           contactsRecyclerView.run {
             layoutManager = LinearLayoutManager(this@ContactsActivity)

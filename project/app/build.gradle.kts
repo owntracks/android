@@ -232,7 +232,6 @@ dependencies {
   implementation(libs.bouncycastle)
 
   // Widget libraries
-  implementation(libs.widgets.materialdrawer) { artifact { type = "aar" } }
   implementation(libs.widgets.materialize) { artifact { type = "aar" } }
 
   // These Java EE libs are no longer included in JDKs, so we include explicitly

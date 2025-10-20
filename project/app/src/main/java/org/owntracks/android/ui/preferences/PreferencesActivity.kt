@@ -11,7 +11,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiPreferencesBinding
-import org.owntracks.android.support.DrawerProvider
+import org.owntracks.android.ui.DrawerProvider
 import org.owntracks.android.ui.mixins.ServiceStarter
 import org.owntracks.android.ui.mixins.WorkManagerInitExceptionNotifier
 
@@ -35,7 +35,7 @@ open class PreferencesActivity :
         DataBindingUtil.setContentView<UiPreferencesBinding>(this, R.layout.ui_preferences).apply {
           appbar.toolbar.run {
             setSupportActionBar(this)
-            drawerProvider.attach(this)
+            drawerProvider.attach(this, drawerLayout, navigationView)
           }
         }
 

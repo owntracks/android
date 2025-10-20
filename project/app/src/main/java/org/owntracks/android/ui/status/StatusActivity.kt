@@ -18,7 +18,7 @@ import org.owntracks.android.R
 import org.owntracks.android.data.EndpointState
 import org.owntracks.android.databinding.UiStatusBinding
 import org.owntracks.android.preferences.Preferences
-import org.owntracks.android.support.DrawerProvider
+import org.owntracks.android.ui.DrawerProvider
 import org.owntracks.android.ui.mixins.ServiceStarter
 import org.owntracks.android.ui.status.logs.LogViewerActivity
 
@@ -40,7 +40,7 @@ class StatusActivity : AppCompatActivity(), ServiceStarter by ServiceStarter.Imp
           lifecycleOwner = this@StatusActivity
           appbar.toolbar.apply {
             setSupportActionBar(this)
-            drawerProvider.attach(this)
+            drawerProvider.attach(this, drawerLayout, navigationView)
           }
           dozeWhiteListed.setOnClickListener {
             MaterialAlertDialogBuilder(this@StatusActivity)

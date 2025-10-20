@@ -24,9 +24,9 @@ import org.owntracks.android.R
 import org.owntracks.android.data.waypoints.WaypointModel
 import org.owntracks.android.databinding.UiWaypointsBinding
 import org.owntracks.android.preferences.Preferences
-import org.owntracks.android.support.DrawerProvider
 import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.test.ThresholdIdlingResourceInterface
+import org.owntracks.android.ui.DrawerProvider
 import org.owntracks.android.ui.NotificationsStash
 import org.owntracks.android.ui.base.ClickHasBeenHandled
 import org.owntracks.android.ui.base.ClickListener
@@ -73,7 +73,7 @@ class WaypointsActivity :
       vm = viewModel
       lifecycleOwner = this@WaypointsActivity
       setSupportActionBar(appbar.toolbar)
-      drawerProvider.attach(appbar.toolbar)
+      drawerProvider.attach(appbar.toolbar, drawerLayout, navigationView)
       waypointsRecyclerView.apply {
         layoutManager = LinearLayoutManager(this@WaypointsActivity)
         adapter = recyclerViewAdapter
