@@ -10,7 +10,7 @@ dependencies = [
     "google-api-python-client==2.185.0",
     "google-auth==2.41.1",
     "google-auth-httplib2==0.2.0",
-    "googleapis-common-protos==1.70.0",
+    "googleapis-common-protos==1.71.0",
     "httplib2==0.31.0",
     "idna==3.11",
     "jmespath==1.0.1",
