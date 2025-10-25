@@ -71,11 +71,11 @@ constructor(@ActivityContext activity: Context?, private val scheduler: Schedule
       is StatusActivity -> {
         itemId = R.id.nav_status
       }
-      is PreferencesActivity -> {
-        itemId = R.id.nav_preferences
-      }
       is AboutActivity -> {
         itemId = R.id.nav_about
+      }
+      is PreferencesActivity -> {
+        itemId = R.id.nav_preferences
       }
     }
 

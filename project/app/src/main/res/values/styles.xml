@@ -19,6 +19,16 @@
         <item name="colorRegion">@color/MapRegion</item>
         <item name="actionMenuTextColor">?attr/colorOnPrimary</item>
         <item name="android:actionMenuTextColor">?attr/colorOnPrimary</item>
+
+        <!-- Navigation drawer styling -->
+        <item name="navigationViewStyle">@style/Theme.Owntracks.NavigationView</item>
+    </style>
+
+    <!-- Navigation drawer style -->
+    <style name="Theme.Owntracks.NavigationView" parent="Widget.MaterialComponents.NavigationView">
+        <item name="itemIconTint">?android:textColorSecondary</item>
+        <item name="itemTextColor">?android:textColorSecondary</item>
+        <item name="itemIconPadding">32dp</item>
     </style>
 
     <!-- Hamburger theme -->
