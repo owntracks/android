@@ -1,7 +1,11 @@
 package org.owntracks.android.ui.preferences
 
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.replace
@@ -29,6 +33,7 @@ open class PreferencesActivity :
     get() = PreferencesFragment()
 
   override fun onCreate(savedInstanceState: Bundle?) {
+    enableEdgeToEdge()
     super.onCreate(savedInstanceState)
     setContentView(R.layout.ui_preferences)
     binding =
@@ -36,6 +41,16 @@ open class PreferencesActivity :
           appbar.toolbar.run {
             setSupportActionBar(this)
             drawerProvider.attach(this, drawerLayout, navigationView)
+          }
+
+          // Handle window insets for edge-to-edge
+          ViewCompat.setOnApplyWindowInsetsListener(drawerLayout) { view, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+            appbar.root.updatePadding(top = insets.top)
+            navigationView.updatePadding(top = insets.top, bottom = insets.bottom)
+
+            WindowInsetsCompat.CONSUMED
           }
         }
 

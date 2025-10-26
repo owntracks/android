@@ -3,8 +3,12 @@ package org.owntracks.android.ui.contacts
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -35,6 +39,7 @@ class ContactsActivity :
   private lateinit var contactsAdapter: ContactsAdapter
 
   override fun onCreate(savedInstanceState: Bundle?) {
+    enableEdgeToEdge()
     startService(this)
     super.onCreate(savedInstanceState)
     contactsAdapter = ContactsAdapter(this, viewModel.coroutineScope)
@@ -48,6 +53,16 @@ class ContactsActivity :
           contactsRecyclerView.run {
             layoutManager = LinearLayoutManager(this@ContactsActivity)
             adapter = contactsAdapter
+          }
+
+          // Handle window insets for edge-to-edge
+          ViewCompat.setOnApplyWindowInsetsListener(drawerLayout) { view, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+            appbar.root.updatePadding(top = insets.top)
+            navigationView.updatePadding(top = insets.top, bottom = insets.bottom)
+
+            WindowInsetsCompat.CONSUMED
           }
         }
 

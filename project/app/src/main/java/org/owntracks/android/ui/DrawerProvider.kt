@@ -60,11 +60,9 @@ constructor(@ActivityContext activity: Context?, private val scheduler: Schedule
       is MapActivity -> {
         itemId = R.id.nav_map
       }
-
       is ContactsActivity -> {
         itemId = R.id.nav_contacts
       }
-
       is WaypointsActivity -> {
         itemId = R.id.nav_waypoints
       }

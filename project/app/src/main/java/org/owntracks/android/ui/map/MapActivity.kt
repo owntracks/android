@@ -23,6 +23,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.addCallback
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresPermission
@@ -31,7 +32,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.appcompat.widget.TooltipCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.setPadding
+import androidx.core.view.updatePadding
 import androidx.core.widget.ImageViewCompat
 import androidx.databinding.BindingAdapter
 import androidx.databinding.DataBindingUtil
@@ -138,6 +142,7 @@ class MapActivity :
       }
 
   override fun onCreate(savedInstanceState: Bundle?) {
+    enableEdgeToEdge()
     EntryPointAccessors.fromActivity(this, MapActivityEntryPoint::class.java).let {
       supportFragmentManager.fragmentFactory = it.fragmentFactory
     }
@@ -244,6 +249,19 @@ class MapActivity :
                 }
               }
               .also { listener -> labels.forEach { it.withListener(listener) } }
+
+          // Handle window insets for edge-to-edge
+          ViewCompat.setOnApplyWindowInsetsListener(drawerLayout) { view, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+            // Apply top inset to appbar
+            appbar.root.updatePadding(top = insets.top)
+
+            // Apply side insets to navigation view
+            navigationView.updatePadding(top = insets.top, bottom = insets.bottom)
+
+            WindowInsetsCompat.CONSUMED
+          }
         }
 
     backPressedCallback =

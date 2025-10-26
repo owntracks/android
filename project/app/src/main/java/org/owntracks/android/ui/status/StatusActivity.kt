@@ -6,9 +6,13 @@ import android.os.Bundle
 import android.provider.Settings
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.databinding.BindingAdapter
 import androidx.databinding.DataBindingUtil
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -33,6 +37,7 @@ class StatusActivity : AppCompatActivity(), ServiceStarter by ServiceStarter.Imp
   private lateinit var binding: UiStatusBinding
 
   override fun onCreate(savedInstanceState: Bundle?) {
+    enableEdgeToEdge()
     super.onCreate(savedInstanceState)
     binding =
         DataBindingUtil.setContentView<UiStatusBinding>(this, R.layout.ui_status).apply {
@@ -89,6 +94,16 @@ class StatusActivity : AppCompatActivity(), ServiceStarter by ServiceStarter.Imp
             } else {
               showLocationPermissionsStarter()
             }
+          }
+
+          // Handle window insets for edge-to-edge
+          ViewCompat.setOnApplyWindowInsetsListener(drawerLayout) { view, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+            appbar.root.updatePadding(top = insets.top)
+            navigationView.updatePadding(top = insets.top, bottom = insets.bottom)
+
+            WindowInsetsCompat.CONSUMED
           }
         }
     supportActionBar?.apply {

@@ -5,10 +5,14 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat.startActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -66,6 +70,7 @@ class WaypointsActivity :
   private lateinit var recyclerViewAdapter: WaypointsAdapter
 
   override fun onCreate(savedInstanceState: Bundle?) {
+    enableEdgeToEdge()
     super.onCreate(savedInstanceState)
     recyclerViewAdapter = WaypointsAdapter(this)
     postNotificationsPermissionInit(this, preferences, notificationsStash)
@@ -93,6 +98,16 @@ class WaypointsActivity :
             recyclerViewAdapter.submitList(it)
           }
         }
+      }
+
+      // Handle window insets for edge-to-edge
+      ViewCompat.setOnApplyWindowInsetsListener(drawerLayout) { view, windowInsets ->
+        val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+        appbar.root.updatePadding(top = insets.top)
+        navigationView.updatePadding(top = insets.top, bottom = insets.bottom)
+
+        WindowInsetsCompat.CONSUMED
       }
     }
   }

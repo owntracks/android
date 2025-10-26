@@ -8,10 +8,14 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ArrayAdapter
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
@@ -37,6 +41,7 @@ class EditorActivity : AppCompatActivity() {
   @Inject @CoroutineScopes.IoDispatcher lateinit var ioDispatcher: CoroutineDispatcher
 
   override fun onCreate(savedInstanceState: Bundle?) {
+    enableEdgeToEdge()
     super.onCreate(savedInstanceState)
     DataBindingUtil.setContentView<UiPreferencesEditorBinding>(this, R.layout.ui_preferences_editor)
         .apply {
@@ -44,6 +49,13 @@ class EditorActivity : AppCompatActivity() {
           lifecycleOwner = this@EditorActivity
           setSupportActionBar(appbar.toolbar)
           supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+          // Handle window insets for edge-to-edge
+          ViewCompat.setOnApplyWindowInsetsListener(frame) { view, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            appbar.root.updatePadding(top = insets.top)
+            WindowInsetsCompat.CONSUMED
+          }
         }
     viewModel.configLoadError.observe(this) {
       if (it != null) {
