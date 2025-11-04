@@ -51,6 +51,7 @@ constructor(
     @Named("mockLocationIdlingResource")
     private val mockLocationIdlingResource: SimpleIdlingResource
 ) {
+  var lastAddress: String? = null
   private fun locationIsWithAccuracyThreshold(l: Location): Boolean =
       preferences.ignoreInaccurateLocations
           .run { preferences.ignoreInaccurateLocations == 0 || l.accuracy < this }
@@ -139,6 +140,7 @@ constructor(
               this.trigger = trigger
               trackerId = preferences.tid.toString()
               inregions = calculateInRegions(loadedWaypoints)
+              address = lastAddress
             }
     Timber.v("Actually publishing location $location triggered by $trigger as message=$message")
     messageProcessor.queueMessageForSending(message)

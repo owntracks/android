@@ -70,6 +70,8 @@ open class MessageLocation(
 
   @JsonInclude(JsonInclude.Include.NON_NULL) @JsonProperty("tid") var trackerId: String? = null
 
+  @JsonProperty("address") var address: String? = null
+
   override fun isValidMessage(): Boolean {
     return timestamp > 0
   }

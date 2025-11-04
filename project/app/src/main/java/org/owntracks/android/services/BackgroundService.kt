@@ -594,6 +594,11 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
     if (latLng == lastLocation?.toLatLng()) {
       Timber.v("New reverse geocode for $latLng: $reverseGeocodedText")
 
+      if (lastLocation != null) {
+        reverseGeocodedText.ifBlank { lastLocation!!.toLatLng().toDisplayString() }
+        locationProcessor.lastAddress = reverseGeocodedText
+      }
+
       if (lastLocation != null && preferences.notificationLocation) {
             reverseGeocodedText.ifBlank { lastLocation!!.toLatLng().toDisplayString() }
           } else {
