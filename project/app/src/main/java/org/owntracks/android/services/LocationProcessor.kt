@@ -49,16 +49,18 @@ constructor(
     @Named("publishResponseMessageIdlingResource")
     private val publishResponseMessageIdlingResource: SimpleIdlingResource,
     @Named("mockLocationIdlingResource")
-    private val mockLocationIdlingResource: SimpleIdlingResource
+    private val mockLocationIdlingResource: SimpleIdlingResource,
 ) {
   var lastAddress: String? = null
+
   private fun locationIsWithAccuracyThreshold(l: Location): Boolean =
       preferences.ignoreInaccurateLocations
           .run { preferences.ignoreInaccurateLocations == 0 || l.accuracy < this }
           .also {
             if (!it) {
               Timber.v(
-                  "Location accuracy ${l.accuracy} is outside accuracy threshold of ${preferences.ignoreInaccurateLocations}")
+                  "Location accuracy ${l.accuracy} is outside accuracy threshold of ${preferences.ignoreInaccurateLocations}"
+              )
             }
           }
 
@@ -69,7 +71,7 @@ constructor(
 
   private suspend fun publishLocationMessage(
       trigger: MessageLocation.ReportType,
-      location: Location
+      location: Location,
   ): Result<Unit> {
     Timber.v("Maybe publishing $location with trigger $trigger")
     if (!locationIsWithAccuracyThreshold(location))
@@ -78,14 +80,18 @@ constructor(
     // If this location has come from the network *and* the most recent location was both recent and
     // high-accuracy, then it's probably not usefully accurate. Drop it.
     locationRepo.currentPublishedLocation.value?.let { lastLocation ->
-      if (highAccuracyProviders.contains(location.provider) &&
-          lastLocation.provider == "network" &&
-          location.time - lastLocation.time <
-              preferences.discardNetworkLocationThresholdSeconds * 1000) {
+      if (
+          highAccuracyProviders.contains(location.provider) &&
+              lastLocation.provider == "network" &&
+              location.time - lastLocation.time <
+                  preferences.discardNetworkLocationThresholdSeconds * 1000
+      ) {
         Timber.d(
-            "Ignoring location from ${location.provider}, last was from gps, and time difference is less than 1s")
+            "Ignoring location from ${location.provider}, last was from gps, and time difference is less than 1s"
+        )
         return Result.failure(
-            Exception("Ignoring location from ${location.provider}, last was recent and from gps"))
+            Exception("Ignoring location from ${location.provider}, last was recent and from gps")
+        )
       }
     }
 
@@ -94,32 +100,42 @@ constructor(
 
     // Check if publish would trigger a region if fusedRegionDetection is enabled
     Timber.v(
-        "Checking if location triggers waypoint transitions. waypoints: $loadedWaypoints, trigger=$trigger, fusedRegionDetection: ${preferences.fusedRegionDetection}")
-    if (loadedWaypoints.isNotEmpty() &&
-        preferences.fusedRegionDetection &&
-        trigger != MessageLocation.ReportType.CIRCULAR) {
+        "Checking if location triggers waypoint transitions. waypoints: $loadedWaypoints, trigger=$trigger, fusedRegionDetection: ${preferences.fusedRegionDetection}"
+    )
+    if (
+        loadedWaypoints.isNotEmpty() &&
+            preferences.fusedRegionDetection &&
+            trigger != MessageLocation.ReportType.CIRCULAR
+    ) {
       loadedWaypoints.forEach { waypoint ->
         Timber.d("onWaypointTransition triggered by location waypoint intersection event")
         onWaypointTransition(
             waypoint,
             location,
-            if (location.distanceTo(waypoint.getLocation()) <=
-                waypoint.geofenceRadius + location.accuracy) {
+            if (
+                location.distanceTo(waypoint.getLocation()) <=
+                    waypoint.geofenceRadius + location.accuracy
+            ) {
               Geofence.GEOFENCE_TRANSITION_ENTER
             } else {
               Geofence.GEOFENCE_TRANSITION_EXIT
             },
-            MessageTransition.TRIGGER_LOCATION)
+            MessageTransition.TRIGGER_LOCATION,
+        )
       }
     }
-    if (preferences.monitoring === MonitoringMode.Quiet &&
-        MessageLocation.ReportType.USER != trigger) {
+    if (
+        preferences.monitoring === MonitoringMode.Quiet &&
+            MessageLocation.ReportType.USER != trigger
+    ) {
       Timber.v("message suppressed by monitoring settings: quiet")
       return Result.failure(Exception("message suppressed by monitoring settings: quiet"))
     }
-    if (preferences.monitoring === MonitoringMode.Manual &&
-        MessageLocation.ReportType.USER != trigger &&
-        MessageLocation.ReportType.CIRCULAR != trigger) {
+    if (
+        preferences.monitoring === MonitoringMode.Manual &&
+            MessageLocation.ReportType.USER != trigger &&
+            MessageLocation.ReportType.CIRCULAR != trigger
+    ) {
       Timber.v("message suppressed by monitoring settings: manual")
       return Result.failure(Exception("message suppressed by monitoring settings: manual"))
     }
@@ -154,7 +170,8 @@ constructor(
       listOf(
           MessageLocation.ReportType.RESPONSE,
           MessageLocation.ReportType.USER,
-          MessageLocation.ReportType.CIRCULAR)
+          MessageLocation.ReportType.CIRCULAR,
+      )
 
   private fun calculateInRegions(loadedWaypoints: List<WaypointModel>): List<String> =
       loadedWaypoints
@@ -170,8 +187,10 @@ constructor(
    */
   suspend fun onLocationChanged(location: Location, reportType: MessageLocation.ReportType) {
     Timber.v("OnLocationChanged $location $reportType")
-    if (location.time > locationRepo.currentLocationTime ||
-        reportType != MessageLocation.ReportType.DEFAULT) {
+    if (
+        location.time > locationRepo.currentLocationTime ||
+            reportType != MessageLocation.ReportType.DEFAULT
+    ) {
       if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || location.isMock) {
         Timber.v("Idling location")
         mockLocationIdlingResource.setIdleState(true)
@@ -192,18 +211,21 @@ constructor(
       waypointModel: WaypointModel,
       location: Location,
       transition: Int,
-      trigger: String
+      trigger: String,
   ) {
     if (!locationIsWithAccuracyThreshold(location)) {
       Timber.d(
-          "ignoring transition for $location, transition=$transition, trigger=$trigger: low accuracy")
+          "ignoring transition for $location, transition=$transition, trigger=$trigger: low accuracy"
+      )
       return
     }
     Timber.d("OnWaypointTransition $waypointModel $location $transition $trigger")
     scope.launch {
       // If the transition hasn't changed, or has moved from unknown to exit, don't notify.
-      if (transition == waypointModel.lastTransition ||
-          (waypointModel.isUnknown() && transition == Geofence.GEOFENCE_TRANSITION_EXIT)) {
+      if (
+          transition == waypointModel.lastTransition ||
+              (waypointModel.isUnknown() && transition == Geofence.GEOFENCE_TRANSITION_EXIT)
+      ) {
         waypointModel.lastTransition = transition
         waypointsRepo.update(waypointModel, false)
       } else {
@@ -230,7 +252,7 @@ constructor(
       waypointModel: WaypointModel,
       triggeringLocation: Location,
       transition: Int,
-      trigger: String
+      trigger: String,
   ) {
     messageProcessor.queueMessageForSending(
         MessageTransition().apply {
@@ -243,7 +265,8 @@ constructor(
           timestamp = TimeUnit.MILLISECONDS.toSeconds(triggeringLocation.time)
           waypointTimestamp = waypointModel.tst.epochSecond
           description = waypointModel.description
-        })
+        }
+    )
   }
 
   suspend fun publishWaypointsMessage() {
@@ -261,10 +284,12 @@ constructor(
                           radius = it.geofenceRadius
                           timestamp = it.tst.epochSecond
                         }
-                      })
+                      }
+                  )
                 }
               }
-        })
+        }
+    )
     publishResponseMessageIdlingResource.setIdleState(true)
   }
 
@@ -281,7 +306,8 @@ constructor(
                   appHibernation = deviceMetricsProvider.appHibernation
                   locationPermission = deviceMetricsProvider.locationPermission
                 }
-          })
+          }
+      )
       publishResponseMessageIdlingResource.setIdleState(true)
     }
   }
