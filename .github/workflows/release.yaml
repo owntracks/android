@@ -39,16 +39,19 @@ jobs:
           echo "beta_tag_count=${LENGTH}"
           echo "beta_tag_count=$LENGTH" >> "${GITHUB_OUTPUT}"
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
+      - name: Setup Ruby and Fastlane
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          working-directory: fastlane
 
-      # Step outputs are strings, so we need to use fromJSON to coerce to an integer
-      - name: Get current version code from internal track
+      - name: Get internal track current version code
         if: ${{ contains(github.ref_name, 'beta') || fromJSON(steps.tagCount.outputs.beta_tag_count) == 0 }}
         env:
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
         run: |
-          VERSION_CODE="$(uv --directory .github/google-play-api run google-play-api.py internal)"
+          VERSION_CODE="$(bundle exec fastlane get_version_code track:internal | sed -n "s/.*Found '\([0-9]*\)'.*/\1/p")"
+          echo "Latest version code is: $VERSION_CODE"
           echo VERSION_CODE="${VERSION_CODE}" >> "${GITHUB_ENV}"
 
       - name: Get current version code from beta track
@@ -56,7 +59,8 @@ jobs:
         env:
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
         run: |
-          VERSION_CODE="$(uv --directory .github/google-play-api run google-play-api.py beta)"
+          VERSION_CODE="$(bundle exec fastlane get_version_code track:beta | sed -n "s/.*Found '\([0-9]*\)'.*/\1/p")"
+          echo "Latest version code is: $VERSION_CODE"
           echo VERSION_CODE="${VERSION_CODE}" >> "${GITHUB_ENV}"
 
       - name: Create keystore
@@ -95,12 +99,6 @@ jobs:
           prerelease: ${{ contains(github.ref_name, 'beta') }}
           files: |
             ./owntracks-release-*.apk
-
-      - name: Setup Ruby and Fastlane
-        uses: ruby/setup-ruby@v1
-        with:
-          bundler-cache: true
-          working-directory: fastlane
 
       - name: Promote play store beta from internal
         run: bundle exec fastlane promote_internal_to_beta
