@@ -136,7 +136,7 @@ jobs:
             adb uninstall org.owntracks.android.debug.test || echo "org.owntracks.android.test not installed"
             ./project/gradlew -p project :app:create${FLAVOUR}DebugAndroidTestCoverageReport -Pandroid.testInstrumentationRunnerArguments.numShards=${SHARD_COUNT} -Pandroid.testInstrumentationRunnerArguments.shardIndex=${SHARD_INDEX} --max-workers=1 --scan -Pandroid.testInstrumentationRunnerArguments.annotation=${TEST_ANNOTATION}
       - name: Upload connected test result artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: espresso-test-reports-${{ matrix.android-api }}-${{ matrix.flavour }}-${{ matrix.shard }}
           path: ./project/app/build/reports/androidTests/connected/
