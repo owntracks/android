@@ -148,6 +148,7 @@ constructor(
                 conn = deviceMetricsProvider.connectionType
                 monitoringMode = preferences.monitoring
                 source = location.provider
+                address = lastAddress
               }
             } else {
               fromLocation(location, Build.VERSION.SDK_INT)
@@ -156,7 +157,6 @@ constructor(
               this.trigger = trigger
               trackerId = preferences.tid.toString()
               inregions = calculateInRegions(loadedWaypoints)
-              address = lastAddress
             }
     Timber.v("Actually publishing location $location triggered by $trigger as message=$message")
     messageProcessor.queueMessageForSending(message)
