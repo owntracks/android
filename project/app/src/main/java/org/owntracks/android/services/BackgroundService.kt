@@ -142,6 +142,9 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
         }
       }
 
+  // Significant motion sensor for triggering location requests when device movement is detected
+  private lateinit var significantMotionSensor: SignificantMotionSensor
+
   @EntryPoint
   @InstallIn(SingletonComponent::class)
   internal interface ServiceEntrypoint {
@@ -171,6 +174,16 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
     super.onCreate()
 
     preferences.registerOnPreferenceChangedListener(this)
+
+    // Initialize significant motion sensor
+    significantMotionSensor =
+        SignificantMotionSensor(
+            this,
+            preferences,
+            locationProviderClient,
+            requirementsChecker,
+            callbackForReportType[MessageLocation.ReportType.SIGNIFICANT_MOTION]!!.value,
+            runThingsOnOtherThreads.getBackgroundLooper())
 
     registerReceiver(
         powerBroadcastReceiver,
@@ -234,6 +247,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
     Timber.v("Backgroundservice onDestroy")
     stopForeground(STOP_FOREGROUND_REMOVE)
     unregisterReceiver(powerBroadcastReceiver)
+    significantMotionSensor.cancel()
     preferences.unregisterOnPreferenceChangedListener(this)
     messageProcessor.stopSendingMessages()
     super.onDestroy()
@@ -351,6 +365,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
     startForegroundService()
     setupLocationRequest()
     scheduler.scheduleLocationPing()
+    significantMotionSensor.setup()
     messageProcessor.initialize()
   }
 
@@ -629,6 +644,17 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
     }
     if (properties.intersect(PREFERENCES_THAT_WIPE_QUEUE_AND_CONTACTS).isNotEmpty()) {
       lifecycleScope.launch { contactsRepo.clearAll() }
+    }
+    if (properties.contains(Preferences::experimentalFeatures.name)) {
+      // Handle significant motion sensor based on experimental feature toggle
+      if (preferences.experimentalFeatures.contains(
+          Preferences.EXPERIMENTAL_FEATURE_REQUEST_LOCATION_ON_SIGNIFICANT_MOTION)) {
+        Timber.d("Significant motion feature enabled, setting up sensor")
+        significantMotionSensor.setup()
+      } else {
+        Timber.d("Significant motion feature disabled, cancelling sensor")
+        significantMotionSensor.cancel()
+      }
     }
   }
 
