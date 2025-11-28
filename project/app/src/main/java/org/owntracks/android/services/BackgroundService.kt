@@ -134,11 +134,28 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
   private val activityManager by lazy {
     this.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
   }
+  private val powerManager by lazy { getSystemService(Context.POWER_SERVICE) as PowerManager }
   private val powerStateLogger by lazy { PowerStateLogger(this.applicationContext) }
   private val powerBroadcastReceiver =
       object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-          intent.action?.run(powerStateLogger::logPowerState)
+          val action = intent.action ?: return
+          powerStateLogger.logPowerState(action)
+          when (action) {
+            PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED -> {
+              if (!powerManager.isDeviceIdleMode) {
+                Timber.d("Device exited idle mode; reinitializing location requests")
+                reInitializeLocationRequests()
+              }
+            }
+            PowerManager.ACTION_DEVICE_LIGHT_IDLE_MODE_CHANGED -> {
+              if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                  !powerManager.isDeviceLightIdleMode) {
+                Timber.d("Device exited light idle mode; reinitializing location requests")
+                reInitializeLocationRequests()
+              }
+            }
+          }
         }
       }
 
@@ -546,7 +563,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
           }
       val request =
           LocationRequest(
-              fastestInterval, smallestDisplacement, null, null, priority, interval, null)
+              fastestInterval, smallestDisplacement, null, null, priority, interval, false)
       Timber.d("location update request params: $request")
       locationProviderClient.flushLocations()
       locationProviderClient.requestLocationUpdates(
