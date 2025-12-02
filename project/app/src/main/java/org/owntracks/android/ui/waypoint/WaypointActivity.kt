@@ -6,8 +6,12 @@ import android.text.format.DateUtils
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.BindingAdapter
 import androidx.databinding.BindingConversion
@@ -32,6 +36,7 @@ class WaypointActivity : AppCompatActivity() {
   private lateinit var textFields: List<TextInputEditText>
 
   override fun onCreate(savedInstanceState: Bundle?) {
+    enableEdgeToEdge()
     super.onCreate(savedInstanceState)
 
     binding =
@@ -49,6 +54,13 @@ class WaypointActivity : AppCompatActivity() {
                 ?: run { longitude.error = getString(R.string.invalidLongitudeError) }
           }
           textFields.forEach { it.addTextChangedListener { setSaveButtonEnabledStatus() } }
+
+          // Handle window insets for edge-to-edge
+          ViewCompat.setOnApplyWindowInsetsListener(root) { view, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            appbar.root.updatePadding(top = insets.top)
+            WindowInsetsCompat.CONSUMED
+          }
         }
 
     supportActionBar?.run {

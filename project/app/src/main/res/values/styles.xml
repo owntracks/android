@@ -7,10 +7,6 @@
         <item name="colorSecondary">@color/OTPrimaryBlue</item>
         <item name="colorOnSecondary">@color/md_white_1000</item>
         <item name="colorAccent">@color/OTPrimaryBlue</item>
-        <item name="material_drawer_background">?android:windowBackground</item>
-        <item name="material_drawer_primary_text">?android:textColorSecondary</item>
-        <item name="material_drawer_primary_icon">?attr/material_drawer_primary_text</item>
-        <item name="material_drawer_secondary_text">?attr/material_drawer_primary_text</item>
 
         <item name="preferenceTheme">@style/Theme.Owntracks.Preferences</item>
         <item name="toolbarStyle">@style/Theme.Owntracks.Toolbar</item>
@@ -23,6 +19,16 @@
         <item name="colorRegion">@color/MapRegion</item>
         <item name="actionMenuTextColor">?attr/colorOnPrimary</item>
         <item name="android:actionMenuTextColor">?attr/colorOnPrimary</item>
+
+        <!-- Navigation drawer styling -->
+        <item name="navigationViewStyle">@style/Theme.Owntracks.NavigationView</item>
+    </style>
+
+    <!-- Navigation drawer style -->
+    <style name="Theme.Owntracks.NavigationView" parent="Widget.MaterialComponents.NavigationView">
+        <item name="itemIconTint">?android:textColorSecondary</item>
+        <item name="itemTextColor">?android:textColorSecondary</item>
+        <item name="itemIconPadding">32dp</item>
     </style>
 
     <!-- Hamburger theme -->

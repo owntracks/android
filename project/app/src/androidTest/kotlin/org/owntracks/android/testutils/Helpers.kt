@@ -51,7 +51,6 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime
 import kotlinx.datetime.Clock
 import org.hamcrest.Matcher
-import org.hamcrest.Matchers.allOf
 import org.owntracks.android.R
 import org.owntracks.android.preferences.Preferences
 import timber.log.Timber
@@ -334,13 +333,17 @@ fun waitUntilVisible(matcher: ViewInteraction, timeout: Duration = 1.seconds) {
 }
 
 fun clickOnDrawerAndWait(text: Int) {
-  onView(
-          allOf(
-              withId(com.mikepenz.materialdrawer.R.id.material_drawer_name),
-              withText(text),
-          ),
-      )
-      .perform(click())
+  val menuItemId =
+      when (text) {
+        R.string.title_activity_map -> R.id.nav_map
+        R.string.title_activity_contacts -> R.id.nav_contacts
+        R.string.title_activity_waypoints -> R.id.nav_waypoints
+        R.string.title_activity_status -> R.id.nav_status
+        R.string.title_activity_preferences -> R.id.nav_preferences
+        R.string.title_activity_about -> R.id.nav_about
+        else -> throw IllegalArgumentException("Unknown drawer item: $text")
+      }
+  onView(withId(menuItemId)).perform(click())
 }
 
 fun addWaypoint(description: String, latitude: String, longitude: String, radius: String) {

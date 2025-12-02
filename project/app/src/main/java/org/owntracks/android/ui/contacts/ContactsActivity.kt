@@ -3,6 +3,7 @@ package org.owntracks.android.ui.contacts
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -16,15 +17,19 @@ import org.owntracks.android.R
 import org.owntracks.android.data.repos.ContactsRepoChange
 import org.owntracks.android.databinding.UiContactsBinding
 import org.owntracks.android.model.Contact
-import org.owntracks.android.support.DrawerProvider
 import org.owntracks.android.test.ThresholdIdlingResourceInterface
+import org.owntracks.android.ui.DrawerProvider
 import org.owntracks.android.ui.map.MapActivity
+import org.owntracks.android.ui.mixins.EdgeToEdgeInsetHandler
 import org.owntracks.android.ui.mixins.ServiceStarter
 import timber.log.Timber
 
 @AndroidEntryPoint
 class ContactsActivity :
-    AppCompatActivity(), AdapterClickListener<Contact>, ServiceStarter by ServiceStarter.Impl() {
+    AppCompatActivity(),
+    AdapterClickListener<Contact>,
+    ServiceStarter by ServiceStarter.Impl(),
+    EdgeToEdgeInsetHandler by EdgeToEdgeInsetHandler.Impl() {
   @Inject lateinit var drawerProvider: DrawerProvider
 
   @Inject
@@ -35,6 +40,7 @@ class ContactsActivity :
   private lateinit var contactsAdapter: ContactsAdapter
 
   override fun onCreate(savedInstanceState: Bundle?) {
+    enableEdgeToEdge()
     startService(this)
     super.onCreate(savedInstanceState)
     contactsAdapter = ContactsAdapter(this, viewModel.coroutineScope)
@@ -43,12 +49,14 @@ class ContactsActivity :
           vm = viewModel
           appbar.toolbar.run {
             setSupportActionBar(this)
-            drawerProvider.attach(this)
+            drawerProvider.attach(this, drawerLayout, navigationView)
           }
           contactsRecyclerView.run {
             layoutManager = LinearLayoutManager(this@ContactsActivity)
             adapter = contactsAdapter
           }
+
+          applyDrawerEdgeToEdgeInsets(drawerLayout, appbar.root, navigationView)
         }
 
     contactsAdapter.setContactList(viewModel.contacts.values)
@@ -92,5 +100,10 @@ class ContactsActivity :
         Intent(this, MapActivity::class.java)
             .putExtra(
                 "_args", Bundle().apply { putString(MapActivity.BUNDLE_KEY_CONTACT_ID, item.id) }))
+  }
+
+  override fun onResume() {
+    super.onResume()
+    drawerProvider.updateHighlight()
   }
 }
