@@ -5,9 +5,13 @@ import android.os.Bundle
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.activity.addCallback
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.databinding.DataBindingUtil
 import androidx.viewpager2.widget.ViewPager2
 import javax.inject.Inject
@@ -40,6 +44,7 @@ abstract class BaseWelcomeActivity : AppCompatActivity() {
   @Inject lateinit var preferences: Preferences
 
   override fun onCreate(savedInstanceState: Bundle?) {
+    enableEdgeToEdge()
     super.onCreate(savedInstanceState)
     if (preferences.setupCompleted) {
       startActivity(
@@ -67,6 +72,16 @@ abstract class BaseWelcomeActivity : AppCompatActivity() {
                 Intent(this@BaseWelcomeActivity, MapActivity::class.java).apply {
                   flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                 })
+          }
+
+          // Handle window insets for edge-to-edge
+          ViewCompat.setOnApplyWindowInsetsListener(root) { view, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+            // Apply insets to circles (bottom navigation dots)
+            circles.updatePadding(bottom = insets.bottom)
+
+            WindowInsetsCompat.CONSUMED
           }
         }
 

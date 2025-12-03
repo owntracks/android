@@ -4,7 +4,7 @@
     <item
         android:id="@+id/close"
         android:icon="@drawable/ic_baseline_close_24"
-        android:title="@string/material_drawer_close"
+        android:title="@string/cancel"
         android:visible="false"
         android:orderInCategory="97"
         app:showAsAction="ifRoom"/>

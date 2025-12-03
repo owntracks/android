@@ -358,4 +358,6 @@ A permanent notification will be displayed in order to keep the location trackin
 Please check the logs for more details."</string>
     <string name="workmanagerInitializationErrorDialogOpenSettingsLabel">"Open Application Settings"</string>
     <string name="workmanagerInitializationErrorDialogTitle">"Initialization Error"</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 </resources>
