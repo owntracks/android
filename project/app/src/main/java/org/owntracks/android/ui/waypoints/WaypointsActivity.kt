@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
@@ -24,12 +25,13 @@ import org.owntracks.android.R
 import org.owntracks.android.data.waypoints.WaypointModel
 import org.owntracks.android.databinding.UiWaypointsBinding
 import org.owntracks.android.preferences.Preferences
-import org.owntracks.android.support.DrawerProvider
 import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.test.ThresholdIdlingResourceInterface
+import org.owntracks.android.ui.DrawerProvider
 import org.owntracks.android.ui.NotificationsStash
 import org.owntracks.android.ui.base.ClickHasBeenHandled
 import org.owntracks.android.ui.base.ClickListener
+import org.owntracks.android.ui.mixins.EdgeToEdgeInsetHandler
 import org.owntracks.android.ui.mixins.NotificationsPermissionRequested
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import org.owntracks.android.ui.waypoint.WaypointActivity
@@ -39,7 +41,8 @@ import timber.log.Timber
 class WaypointsActivity :
     AppCompatActivity(),
     ClickListener<WaypointModel>,
-    NotificationsPermissionRequested by NotificationsPermissionRequested.Impl() {
+    NotificationsPermissionRequested by NotificationsPermissionRequested.Impl(),
+    EdgeToEdgeInsetHandler by EdgeToEdgeInsetHandler.Impl() {
   private var recyclerViewStartLayoutInstant: ComparableTimeMark? = null
 
   @Inject lateinit var notificationsStash: NotificationsStash
@@ -66,6 +69,7 @@ class WaypointsActivity :
   private lateinit var recyclerViewAdapter: WaypointsAdapter
 
   override fun onCreate(savedInstanceState: Bundle?) {
+    enableEdgeToEdge()
     super.onCreate(savedInstanceState)
     recyclerViewAdapter = WaypointsAdapter(this)
     postNotificationsPermissionInit(this, preferences, notificationsStash)
@@ -73,7 +77,7 @@ class WaypointsActivity :
       vm = viewModel
       lifecycleOwner = this@WaypointsActivity
       setSupportActionBar(appbar.toolbar)
-      drawerProvider.attach(appbar.toolbar)
+      drawerProvider.attach(appbar.toolbar, drawerLayout, navigationView)
       waypointsRecyclerView.apply {
         layoutManager = LinearLayoutManager(this@WaypointsActivity)
         adapter = recyclerViewAdapter
@@ -94,11 +98,14 @@ class WaypointsActivity :
           }
         }
       }
+
+      applyDrawerEdgeToEdgeInsets(drawerLayout, appbar.root, navigationView)
     }
   }
 
   override fun onResume() {
     super.onResume()
+    drawerProvider.updateHighlight()
     requestNotificationsPermission()
   }
 
