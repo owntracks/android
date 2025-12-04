@@ -77,12 +77,15 @@ constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val scope: CoroutineScope,
     @Named("mqttConnectionIdlingResource")
-    private val mqttConnectionIdlingResource: SimpleIdlingResource
+    private val mqttConnectionIdlingResource: SimpleIdlingResource,
 ) : Preferences.OnPreferenceChangeListener {
   private var endpoint: MessageProcessorEndpoint? = null
   private val outgoingQueue: BlockingDeque<MessageBase> =
       BlockingDequeThatAlsoSometimesPersistsThingsToDiskMaybe(
-          100_000, applicationContext.filesDir, parser)
+          100_000,
+          applicationContext.filesDir,
+          parser,
+      )
   private var dequeueAndSenderJob: Job? = null
   private var retryDelayJob: Job? = null
   private var initialized = false
@@ -122,7 +125,8 @@ constructor(
         applicationContext.bindService(
             Intent(applicationContext, BackgroundService::class.java),
             serviceConnection,
-            Context.BIND_AUTO_CREATE)
+            Context.BIND_AUTO_CREATE,
+        )
         endpointStateRepo.setState(EndpointState.INITIAL)
         reconnect()
         initialized = true
@@ -191,7 +195,8 @@ constructor(
               scope,
               ioDispatcher,
               applicationContext,
-              mqttConnectionIdlingResource)
+              mqttConnectionIdlingResource,
+          )
       ConnectionMode.HTTP ->
           HttpMessageProcessorEndpoint(
               this,
@@ -201,7 +206,8 @@ constructor(
               endpointStateRepo,
               caKeyStore,
               scope,
-              ioDispatcher)
+              ioDispatcher,
+          )
     }
   }
 
@@ -254,8 +260,10 @@ constructor(
             Timber.d("Taken message off queue: $message")
             endpointStateRepo.setQueueLength(outgoingQueue.size + 1)
             // reset the retry logic if the last message succeeded
-            if (lastMessageStatus is LastMessageStatus.Success ||
-                lastMessageStatus is LastMessageStatus.PermanentFailure) {
+            if (
+                lastMessageStatus is LastMessageStatus.Success ||
+                    lastMessageStatus is LastMessageStatus.PermanentFailure
+            ) {
               retriesToGo = message.numberOfRetries
               retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT
             } else {
@@ -270,7 +278,9 @@ constructor(
                   resendDelayWait(SEND_FAILURE_NOT_READY_WAIT)
                   lastMessageStatus =
                       LastMessageStatus.RetryableFailure(
-                          message.numberOfRetries, SEND_FAILURE_BACKOFF_INITIAL_WAIT)
+                          message.numberOfRetries,
+                          SEND_FAILURE_BACKOFF_INITIAL_WAIT,
+                      )
                 } else {
                   it.sendMessage(message).exceptionOrNull()?.run {
                     when (this) {
@@ -280,7 +290,9 @@ constructor(
                         resendDelayWait(SEND_FAILURE_NOT_READY_WAIT)
                         lastMessageStatus =
                             LastMessageStatus.RetryableFailure(
-                                message.numberOfRetries, SEND_FAILURE_BACKOFF_INITIAL_WAIT)
+                                message.numberOfRetries,
+                                SEND_FAILURE_BACKOFF_INITIAL_WAIT,
+                            )
                       }
 
                       is MessageProcessorEndpoint.OutgoingMessageSendingException,
@@ -306,7 +318,8 @@ constructor(
                                   retriesToGo - 1,
                                   (retryWait * 2).coerceAtMost(SEND_FAILURE_BACKOFF_MAX_WAIT).also {
                                     Timber.v("Increasing failure retry wait to $it")
-                                  })
+                                  },
+                              )
                             }
                       }
 
@@ -331,8 +344,10 @@ constructor(
               lastMessageStatus = LastMessageStatus.PermanentFailure
             }
 
-            if (lastMessageStatus is LastMessageStatus.Success ||
-                lastMessageStatus is LastMessageStatus.PermanentFailure) {
+            if (
+                lastMessageStatus is LastMessageStatus.Success ||
+                    lastMessageStatus is LastMessageStatus.PermanentFailure
+            ) {
               try {
                 if (!outgoingQueueIdlingResource.isIdleNow) {
                   Timber.v("Decrementing outgoingQueueIdlingResource")
@@ -422,7 +437,8 @@ constructor(
 
   fun processIncomingMessage(message: MessageBase) {
     Timber.d(
-        "Received incoming message: ${message.javaClass.simpleName} on ${message.topic} with id=${message.messageId}")
+        "Received incoming message: ${message.javaClass.simpleName} on ${message.topic} with id=${message.messageId}"
+    )
     when (message) {
       is MessageClear -> {
         processIncomingMessage(message)
@@ -456,19 +472,23 @@ constructor(
 
   private fun processIncomingMessage(message: MessageLocation) {
     // do not use TimeUnit.DAYS.toMillis to avoid long/double conversion issues...
-    if (preferences.ignoreStaleLocations > 0 &&
-        System.currentTimeMillis() - message.timestamp * 1000 >
-            preferences.ignoreStaleLocations.toDouble().days.inWholeMilliseconds) {
+    if (
+        preferences.ignoreStaleLocations > 0 &&
+            System.currentTimeMillis() - message.timestamp * 1000 >
+                preferences.ignoreStaleLocations.toDouble().days.inWholeMilliseconds
+    ) {
       Timber.d("discarding stale location from ${message.getContactId()} at ${message.timestamp}")
       messageReceivedIdlingResource.remove(message)
     } else {
       scope.launch {
         if (message.topic == preferences.pubTopicLocations) {
           Timber.d(
-              "Received our own location update ${message.latitude},${message.longitude} at ${message.timestamp}")
+              "Received our own location update ${message.latitude},${message.longitude} at ${message.timestamp}"
+          )
         } else {
           Timber.i(
-              "Contact ${message.getContactId()} moved to ${message.latitude},${message.longitude} at ${message.timestamp}")
+              "Contact ${message.getContactId()} moved to ${message.latitude},${message.longitude} at ${message.timestamp}"
+          )
         }
         contactsRepo.update(message.getContactId(), message)
         /*
@@ -483,15 +503,18 @@ constructor(
   }
 
   private fun processIncomingMessage(message: MessageTransition) {
-    if (preferences.ignoreStaleLocations > 0 &&
-        System.currentTimeMillis() - message.timestamp * 1000 >
-            preferences.ignoreStaleLocations.toDouble().days.inWholeMilliseconds) {
+    if (
+        preferences.ignoreStaleLocations > 0 &&
+            System.currentTimeMillis() - message.timestamp * 1000 >
+                preferences.ignoreStaleLocations.toDouble().days.inWholeMilliseconds
+    ) {
       Timber.d("discarding stale transition from $message.topic at $message.timestamp")
       messageReceivedIdlingResource.remove(message)
     } else {
       scope.launch {
         Timber.i(
-            "Contact ${message.getContactId()} transitioned waypoint ${message.description} (${message.event}) at ${message.timestamp}")
+            "Contact ${message.getContactId()} transitioned waypoint ${message.description} (${message.event}) at ${message.timestamp}"
+        )
         contactsRepo.update(message.getContactId(), message)
         service?.sendEventNotification(message)
         messageReceivedIdlingResource.remove(message)
@@ -511,10 +534,12 @@ constructor(
     if (!preferences.cmd) {
       Timber.w("remote commands are disabled")
       messageReceivedIdlingResource.remove(message)
-    } else if (message.modeId !== ConnectionMode.HTTP &&
-        preferences.receivedCommandsTopic != message.topic &&
-        preferences.subTopic ==
-            DEFAULT_SUB_TOPIC // If we're not using the default subtopic, we receive commands from
+    } else if (
+        message.modeId !== ConnectionMode.HTTP &&
+            preferences.receivedCommandsTopic != message.topic &&
+            preferences.subTopic ==
+                DEFAULT_SUB_TOPIC // If we're not using the default subtopic, we receive commands
+                                  // from
     // anywhere
     ) {
       Timber.e("cmd message received on wrong topic")
@@ -534,7 +559,8 @@ constructor(
           CommandAction.SET_CONFIGURATION -> {
             if (!preferences.remoteConfiguration) {
               Timber.w(
-                  "Received a remote configuration command but remote config setting is disabled")
+                  "Received a remote configuration command but remote config setting is disabled"
+              )
             } else {
               if (message.configuration != null) {
                 preferences.importConfiguration(message.configuration!!)
