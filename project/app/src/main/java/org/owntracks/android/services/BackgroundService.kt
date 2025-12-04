@@ -132,7 +132,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
   private val ongoingNotification by lazy { OngoingNotification(this, preferences.monitoring) }
   private val notificationManagerCompat by lazy { NotificationManagerCompat.from(this) }
   private val activityManager by lazy {
-    this.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+    this.getSystemService(ACTIVITY_SERVICE) as ActivityManager
   }
   private val powerStateLogger by lazy { PowerStateLogger(this.applicationContext) }
   private val powerBroadcastReceiver =
@@ -770,7 +770,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
 
   class PowerStateLogger(private val applicationContext: Context) {
     private val powerManager =
-        applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
+        applicationContext.getSystemService(POWER_SERVICE) as PowerManager
 
     fun logPowerState(action: String) {
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
