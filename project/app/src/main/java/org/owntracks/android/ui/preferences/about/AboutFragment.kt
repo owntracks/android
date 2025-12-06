@@ -2,9 +2,9 @@ package org.owntracks.android.ui.preferences.about
 
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import androidx.core.net.toUri
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import org.owntracks.android.BuildConfig.TRANSLATION_COUNT
@@ -19,7 +19,7 @@ class AboutFragment : PreferenceFragmentCompat() {
             .packageManager
             .getPackageInfoCompat(requireActivity().packageName)
             .versionName
-    versionPreference?.intent?.data = Uri.parse(getString(R.string.changelogUrl))
+    versionPreference?.intent?.data = getString(R.string.changelogUrl).toUri()
     versionPreference?.setSummaryProvider {
       try {
         val pm = requireActivity().packageManager
@@ -40,7 +40,10 @@ class AboutFragment : PreferenceFragmentCompat() {
 
     findPreference<Preference>(UI_PREFERENCE_TRANSLATION)?.setSummaryProvider {
       resources.getQuantityString(
-          R.plurals.aboutTranslationsSummary, TRANSLATION_COUNT, TRANSLATION_COUNT)
+          R.plurals.aboutTranslationsSummary,
+          TRANSLATION_COUNT,
+          TRANSLATION_COUNT,
+      )
     }
   }
 

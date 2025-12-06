@@ -32,8 +32,8 @@ class LocationMessageRetryTest :
   // language=JSON
   private val locationResponse =
       """
-        {"_type":"location","acc":20,"al":0,"batt":100,"bs":0,"conn":"w","created_at":1610748273,"lat":51.2,"lon":-4,"tid":"aa","tst":1610799026,"vac":40,"vel":7}
-    """
+      {"_type":"location","acc":20,"al":0,"batt":100,"bs":0,"conn":"w","created_at":1610748273,"lat":51.2,"lon":-4,"tid":"aa","tst":1610799026,"vac":40,"vel":7}
+      """
           .trimIndent()
 
   @Test

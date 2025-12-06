@@ -11,6 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ShareCompat
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
@@ -86,7 +87,7 @@ class LogViewerActivity : AppCompatActivity() {
     }
     binding.shareFab.setOnClickListener {
       val key = "${getRandomHexString()}/debug=${viewModel.isDebugEnabled()}/owntracks-debug.txt"
-      logExportUri = Uri.parse("content://${BuildConfig.APPLICATION_ID}.log/$key")
+      logExportUri = "content://${BuildConfig.APPLICATION_ID}.log/$key".toUri()
       val shareIntent =
           ShareCompat.IntentBuilder(this)
               .setType("text/plain")

@@ -1,7 +1,6 @@
 package org.owntracks.android.ui.status
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.LinearLayout
@@ -9,6 +8,7 @@ import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
 import androidx.databinding.DataBindingUtil
@@ -55,26 +55,29 @@ class StatusActivity :
                 .setMessage(getString(R.string.batteryOptimizationWhitelistDialogMessage))
                 .setCancelable(true)
                 .setPositiveButton(
-                    getString(R.string.batteryOptimizationWhitelistDialogButtonLabel)) { _, _ ->
-                      if (viewModel.dozeWhitelisted.value == true) {
-                        startActivity(batteryOptimizationIntents.settingsIntent)
-                      } else {
-                        startActivity(batteryOptimizationIntents.directPackageIntent)
-                      }
-                    }
+                    getString(R.string.batteryOptimizationWhitelistDialogButtonLabel),
+                ) { _, _ ->
+                  if (viewModel.dozeWhitelisted.value == true) {
+                    startActivity(batteryOptimizationIntents.settingsIntent)
+                  } else {
+                    startActivity(batteryOptimizationIntents.directPackageIntent)
+                  }
+                }
                 .show()
           }
           viewLogsButton.setOnClickListener {
             startActivity(
                 Intent(this@StatusActivity, LogViewerActivity::class.java)
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+            )
           }
           locationPermissions.setOnClickListener {
             val showLocationPermissionsStarter = {
               startActivity(
                   Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                    data = Uri.parse("package:$packageName")
-                  })
+                    data = "package:$packageName".toUri()
+                  },
+              )
             }
             if (viewModel.locationPermissions.value !=
                 R.string.statusLocationPermissionsFineBackground) {
