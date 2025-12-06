@@ -78,8 +78,8 @@ abstract class BaseWelcomeActivity : AppCompatActivity() {
           ViewCompat.setOnApplyWindowInsetsListener(root) { view, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
 
-            // Apply insets to circles (bottom navigation dots)
-            circles.updatePadding(bottom = insets.bottom)
+            // Apply top and bottom insets to the root layout
+            view.updatePadding(top = insets.top, bottom = insets.bottom)
 
             WindowInsetsCompat.CONSUMED
           }
