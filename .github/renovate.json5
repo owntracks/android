@@ -32,6 +32,10 @@
     {
       "matchUpdateTypes": ["pin"],
       "addLabels": ["pin"]
+    },
+    {
+      "matchManagers": ["bundler"],
+      "automerge": true
     }
   ],
   "labels": ["dependencies"],
