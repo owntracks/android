@@ -44,7 +44,6 @@ import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -172,7 +171,9 @@ class MapActivity :
             setSupportActionBar(this)
             drawerProvider.attach(this, drawerLayout, navigationView)
           }
+
           supportActionBar?.setDisplayShowTitleEnabled(false)
+
           bottomSheetBehavior =
               BottomSheetBehavior.from(bottomSheetLayout).apply {
                 addBottomSheetCallback(
@@ -180,6 +181,22 @@ class MapActivity :
                       override fun onStateChanged(bottomSheet: View, newState: Int) {
                         updateFabMyLocationPosition(newState)
                         updateMapPaddingForBottomSheet(newState)
+
+                        ViewCompat.getRootWindowInsets(bottomSheetLayout)?.run {
+                          val insets =
+                              getInsetsIgnoringVisibility(WindowInsetsCompat.Type.systemBars())
+                          val topPadding =
+                              when (newState) {
+                                BottomSheetBehavior.STATE_EXPANDED,
+                                BottomSheetBehavior.STATE_SETTLING -> insets.top
+                                else -> 0
+                              }
+                          bottomSheetLayout.setPadding(
+                              bottomSheetLayout.paddingLeft,
+                              topPadding,
+                              bottomSheetLayout.paddingRight,
+                              bottomSheetLayout.paddingBottom)
+                        }
                       }
 
                       override fun onSlide(bottomSheet: View, slideOffset: Float) {
@@ -221,16 +238,6 @@ class MapActivity :
           }
 
           contactNavigateButton.setOnClickListener { navigateToCurrentContact() }
-
-          // Need to set the appbar layout behaviour to be non-drag, so that we can drag the map
-          AppBarLayout.Behavior()
-              .setDragCallback(
-                  object : AppBarLayout.Behavior.DragCallback() {
-                    override fun canDrag(appBarLayout: AppBarLayout): Boolean {
-                      return false
-                    }
-                  },
-              )
 
           fabMyLocation.apply {
             TooltipCompat.setTooltipText(this, getString(R.string.currentLocationButtonLabel))
