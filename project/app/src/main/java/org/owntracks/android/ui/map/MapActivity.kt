@@ -71,8 +71,8 @@ import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.test.ThresholdIdlingResourceInterface
 import org.owntracks.android.ui.DrawerProvider
 import org.owntracks.android.ui.NotificationsStash
+import org.owntracks.android.ui.mixins.AppBarInsetHandler
 import org.owntracks.android.ui.mixins.BackgroundLocationPermissionRequester
-import org.owntracks.android.ui.mixins.EdgeToEdgeInsetHandler
 import org.owntracks.android.ui.mixins.LocationPermissionRequester
 import org.owntracks.android.ui.mixins.NotificationPermissionRequester
 import org.owntracks.android.ui.mixins.ServiceStarter
@@ -87,7 +87,7 @@ class MapActivity :
     View.OnLongClickListener,
     WorkManagerInitExceptionNotifier by WorkManagerInitExceptionNotifier.Impl(),
     ServiceStarter by ServiceStarter.Impl(),
-    EdgeToEdgeInsetHandler by EdgeToEdgeInsetHandler.Impl() {
+    AppBarInsetHandler by AppBarInsetHandler.Impl() {
   private val viewModel: MapViewModel by viewModels()
   private val notificationPermissionRequester =
       NotificationPermissionRequester(
@@ -281,7 +281,7 @@ class MapActivity :
               }
               .also { listener -> labels.forEach { it.withListener(listener) } }
 
-          applyDrawerEdgeToEdgeInsets(drawerLayout, appbar.root, navigationView)
+          applyAppBarEdgeToEdgeInsets(drawerLayout, appbar.root, navigationView)
 
           // Apply bottom insets to FABs to avoid navigation bar
           ViewCompat.setOnApplyWindowInsetsListener(mapCoordinatorLayout) { _, windowInsets ->
@@ -378,7 +378,7 @@ class MapActivity :
             )
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
-      } catch (e: ActivityNotFoundException) {
+      } catch (_: ActivityNotFoundException) {
         Snackbar.make(
                 binding.mapCoordinatorLayout,
                 getString(R.string.noNavigationApp),
