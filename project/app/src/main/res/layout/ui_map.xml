@@ -68,7 +68,6 @@
             android:background="?android:attr/windowBackground"
             android:clickable="true"
             android:elevation="6dp"
-            android:fitsSystemWindows="true"
             android:focusable="true"
             android:orientation="vertical"
             app:behavior_hideable="true"

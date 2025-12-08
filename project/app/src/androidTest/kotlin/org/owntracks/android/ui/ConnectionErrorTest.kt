@@ -1,7 +1,7 @@
 package org.owntracks.android.ui
 
 import android.content.Intent
-import android.net.Uri
+import androidx.core.net.toUri
 import androidx.test.espresso.Espresso
 import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -154,7 +154,7 @@ class ConnectionErrorTest : TestWithAnActivity<StatusActivity>(startActivity = t
         .targetContext
         .startActivity(
             Intent(Intent.ACTION_VIEW).apply {
-              data = Uri.parse("owntracks:///config?inline=$config")
+              data = "owntracks:///config?inline=$config".toUri()
               flags = Intent.FLAG_ACTIVITY_NEW_TASK
             })
     waitUntilActivityVisible(LoadActivity::class.java)

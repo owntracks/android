@@ -2,10 +2,10 @@ package org.owntracks.android.ui.preferences
 
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+import androidx.core.net.toUri
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,7 +28,8 @@ class NotificationFragment @Inject constructor() : AbstractPreferenceFragment() 
     listOf(
             Preferences::notificationLocation.name,
             Preferences::notificationEvents.name,
-            Preferences::notificationGeocoderErrors.name)
+            Preferences::notificationGeocoderErrors.name,
+        )
         .forEach { preferenceKey ->
           findPreference<SwitchPreferenceCompat>(preferenceKey)?.isEnabled =
               requirementsChecker.hasNotificationPermissions()
@@ -39,9 +40,10 @@ class NotificationFragment @Inject constructor() : AbstractPreferenceFragment() 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
           startActivity(
               Intent(ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                data = Uri.parse("package:${context.packageName}")
+                data = "package:${context.packageName}".toUri()
                 flags = FLAG_ACTIVITY_NEW_TASK
-              })
+              },
+          )
         }
         true
       }

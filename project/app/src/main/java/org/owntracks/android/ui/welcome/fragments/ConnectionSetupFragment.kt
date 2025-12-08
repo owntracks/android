@@ -3,12 +3,12 @@ package org.owntracks.android.ui.welcome.fragments
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.net.toUri
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -30,7 +30,8 @@ class ConnectionSetupFragment @Inject constructor() : WelcomeFragment() {
           welcomeConnectionSetupLearnMoreButton.setOnClickListener {
             try {
               startActivity(
-                  Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.documentationUrl))))
+                  Intent(Intent.ACTION_VIEW, getString(R.string.documentationUrl).toUri()),
+              )
             } catch (e: ActivityNotFoundException) {
               Snackbar.make(root, getString(R.string.noBrowserInstalled), Snackbar.LENGTH_SHORT)
                   .show()

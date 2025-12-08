@@ -12,7 +12,7 @@ import com.google.android.material.navigation.NavigationView
  * Mixin interface for handling edge-to-edge window insets on activities with drawer navigation.
  * Provides default implementation for applying system bar insets to appbar and navigation drawer.
  */
-interface EdgeToEdgeInsetHandler {
+interface AppBarInsetHandler {
 
   /**
    * Applies window insets to drawer layout, appbar, and navigation view for edge-to-edge display.
@@ -21,7 +21,7 @@ interface EdgeToEdgeInsetHandler {
    * @param appBarView The app bar view to receive top insets (must be an AppBarLayout)
    * @param navigationView The navigation drawer to receive top and bottom insets
    */
-  fun AppCompatActivity.applyDrawerEdgeToEdgeInsets(
+  fun AppCompatActivity.applyAppBarEdgeToEdgeInsets(
       drawerLayout: DrawerLayout,
       appBarView: View,
       navigationView: NavigationView
@@ -30,12 +30,11 @@ interface EdgeToEdgeInsetHandler {
       val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
 
       appBarView.updatePadding(top = insets.top)
-      navigationView.updatePadding(top = insets.top, bottom = insets.bottom)
 
-      WindowInsetsCompat.CONSUMED
+      windowInsets
     }
   }
 
   /** Default implementation that can be used by activities */
-  class Impl : EdgeToEdgeInsetHandler
+  class Impl : AppBarInsetHandler
 }
