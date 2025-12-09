@@ -9,6 +9,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -38,6 +39,12 @@ class PreferencesMenuProvider(
                 .show()
 
             val reconnectResult = messageProcessor.reconnect()
+
+            context.activity?.takeIf { !it.isFinishing && !it.isDestroyed } ?: return@launch
+            if (!context.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+              return@launch
+            }
+
             reconnectResult
                 .onSuccess {
                   Snackbar.make(
