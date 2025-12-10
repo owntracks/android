@@ -1,7 +1,7 @@
 package org.owntracks.android.net.http
 
 import android.content.Context
-import android.net.Uri
+import androidx.core.net.toUri
 import com.fasterxml.jackson.core.JsonProcessingException
 import java.io.ByteArrayInputStream
 import java.io.IOException
@@ -90,7 +90,8 @@ class HttpMessageProcessorEndpoint(
               message
                   .toJson(parser)
                   .also { Timber.d("Publishing Message JSON $it") }
-                  ?.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull()))
+                  ?.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull()),
+          )
           .apply {
             val url = configuration.url.toHttpUrl()
             val username = url.username.ifEmpty { configuration.username }
@@ -126,7 +127,9 @@ class HttpMessageProcessorEndpoint(
             Timber.e("HTTP request failed. Status: ${response.code}")
             endpointStateRepo.setState(
                 EndpointState.ERROR.withMessage(
-                    String.format(Locale.ROOT, "HTTP code %d", response.code)))
+                    String.format(Locale.ROOT, "HTTP code %d", response.code),
+                ),
+            )
             messageProcessor.onMessageDeliveryFailed(message)
             Result.failure(OutgoingMessageSendingException(httpException))
           } else {
@@ -217,7 +220,9 @@ class HttpMessageProcessorEndpoint(
           httpClientAndConfiguration = setClientAndConfiguration(applicationContext, preferences)
         } catch (e: ConfigurationIncompleteException) {
           Timber.d(
-              e, "Configuration is incomplete, not doing anything with this preference change yet")
+              e,
+              "Configuration is incomplete, not doing anything with this preference change yet",
+          )
         }
         messageProcessor.notifyOutgoingMessageQueue()
       }
@@ -235,19 +240,26 @@ class HttpMessageProcessorEndpoint(
     val socketFactory =
         httpConfiguration.getSocketFactory(
             preferences.connectionTimeoutSeconds,
-            Uri.parse(preferences.url).scheme == "https",
+            preferences.url.toUri().scheme == "https",
             preferences.tlsClientCrt,
             context,
-            caKeyStore)
+            caKeyStore,
+        )
 
     return HttpClientAndConfiguration(
-        createHttpClient(socketFactory, hostnameVerifier), httpConfiguration)
+        createHttpClient(socketFactory, hostnameVerifier),
+        httpConfiguration,
+    )
   }
 
   override fun getEndpointConfiguration(): HttpConfiguration {
     val configuration =
         HttpConfiguration(
-            preferences.url, preferences.username, preferences.password, preferences.deviceId)
+            preferences.url,
+            preferences.username,
+            preferences.password,
+            preferences.deviceId,
+        )
     configuration.validate()
     return configuration
   }

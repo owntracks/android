@@ -20,7 +20,7 @@ import org.owntracks.android.model.Contact
 import org.owntracks.android.test.ThresholdIdlingResourceInterface
 import org.owntracks.android.ui.DrawerProvider
 import org.owntracks.android.ui.map.MapActivity
-import org.owntracks.android.ui.mixins.EdgeToEdgeInsetHandler
+import org.owntracks.android.ui.mixins.AppBarInsetHandler
 import org.owntracks.android.ui.mixins.ServiceStarter
 import timber.log.Timber
 
@@ -29,7 +29,7 @@ class ContactsActivity :
     AppCompatActivity(),
     AdapterClickListener<Contact>,
     ServiceStarter by ServiceStarter.Impl(),
-    EdgeToEdgeInsetHandler by EdgeToEdgeInsetHandler.Impl() {
+    AppBarInsetHandler by AppBarInsetHandler.Impl() {
   @Inject lateinit var drawerProvider: DrawerProvider
 
   @Inject
@@ -56,7 +56,7 @@ class ContactsActivity :
             adapter = contactsAdapter
           }
 
-          applyDrawerEdgeToEdgeInsets(drawerLayout, appbar.root, navigationView)
+          applyAppBarEdgeToEdgeInsets(drawerLayout, appbar.root, navigationView)
         }
 
     contactsAdapter.setContactList(viewModel.contacts.values)

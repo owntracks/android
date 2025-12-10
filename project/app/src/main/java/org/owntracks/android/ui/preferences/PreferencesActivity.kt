@@ -5,7 +5,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.replace
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import dagger.hilt.android.AndroidEntryPoint
@@ -13,7 +12,7 @@ import javax.inject.Inject
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiPreferencesBinding
 import org.owntracks.android.ui.DrawerProvider
-import org.owntracks.android.ui.mixins.EdgeToEdgeInsetHandler
+import org.owntracks.android.ui.mixins.AppBarInsetHandler
 import org.owntracks.android.ui.mixins.ServiceStarter
 import org.owntracks.android.ui.mixins.WorkManagerInitExceptionNotifier
 
@@ -23,7 +22,7 @@ open class PreferencesActivity :
     PreferenceFragmentCompat.OnPreferenceStartFragmentCallback,
     WorkManagerInitExceptionNotifier by WorkManagerInitExceptionNotifier.Impl(),
     ServiceStarter by ServiceStarter.Impl(),
-    EdgeToEdgeInsetHandler by EdgeToEdgeInsetHandler.Impl() {
+    AppBarInsetHandler by AppBarInsetHandler.Impl() {
   private lateinit var binding: UiPreferencesBinding
 
   @Inject lateinit var drawerProvider: DrawerProvider
@@ -42,7 +41,7 @@ open class PreferencesActivity :
             drawerProvider.attach(this, drawerLayout, navigationView)
           }
 
-          applyDrawerEdgeToEdgeInsets(drawerLayout, appbar.root, navigationView)
+          applyAppBarEdgeToEdgeInsets(drawerLayout, appbar.root, navigationView)
         }
 
     supportFragmentManager.run {

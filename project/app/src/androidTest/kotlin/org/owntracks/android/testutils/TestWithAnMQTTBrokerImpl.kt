@@ -1,7 +1,7 @@
 package org.owntracks.android.testutils
 
 import android.content.Intent
-import android.net.Uri
+import androidx.core.net.toUri
 import androidx.test.espresso.IdlingResource
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
@@ -157,7 +157,7 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
         .targetContext
         .startActivity(
             Intent(Intent.ACTION_VIEW).apply {
-              data = Uri.parse("owntracks:///config?inline=$config")
+              data = "owntracks:///config?inline=$config".toUri()
               flags = Intent.FLAG_ACTIVITY_NEW_TASK
             })
     idlingResource.use { clickOn(R.id.save) }

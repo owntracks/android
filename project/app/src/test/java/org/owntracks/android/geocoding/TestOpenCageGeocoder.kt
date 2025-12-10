@@ -27,7 +27,7 @@ class TestOpenCageGeocoder {
         val openCageJSON =
             """
             {"documentation":"https://opencagedata.com/api","rate":{"reset":123}}
-        """
+            """
                 .trimIndent()
 
         val deserialized =

@@ -9,7 +9,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat.startActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -31,7 +30,7 @@ import org.owntracks.android.ui.DrawerProvider
 import org.owntracks.android.ui.NotificationsStash
 import org.owntracks.android.ui.base.ClickHasBeenHandled
 import org.owntracks.android.ui.base.ClickListener
-import org.owntracks.android.ui.mixins.EdgeToEdgeInsetHandler
+import org.owntracks.android.ui.mixins.AppBarInsetHandler
 import org.owntracks.android.ui.mixins.NotificationsPermissionRequested
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import org.owntracks.android.ui.waypoint.WaypointActivity
@@ -42,7 +41,7 @@ class WaypointsActivity :
     AppCompatActivity(),
     ClickListener<WaypointModel>,
     NotificationsPermissionRequested by NotificationsPermissionRequested.Impl(),
-    EdgeToEdgeInsetHandler by EdgeToEdgeInsetHandler.Impl() {
+    AppBarInsetHandler by AppBarInsetHandler.Impl() {
   private var recyclerViewStartLayoutInstant: ComparableTimeMark? = null
 
   @Inject lateinit var notificationsStash: NotificationsStash
@@ -99,7 +98,7 @@ class WaypointsActivity :
         }
       }
 
-      applyDrawerEdgeToEdgeInsets(drawerLayout, appbar.root, navigationView)
+      applyAppBarEdgeToEdgeInsets(drawerLayout, appbar.root, navigationView)
     }
   }
 

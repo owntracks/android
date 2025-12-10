@@ -82,26 +82,26 @@ class ParserTest {
     // language=JSON
     val expected =
         """
-            {
-              "_type" : "location",
-              "BSSID" : "12:34:56:78",
-              "SSID" : "Wifi SSID",
-              "_id" : "dummyTestId",
-              "acc" : 10,
-              "alt" : 20,
-              "batt" : 30,
-              "bs" : 2,
-              "cog" : 56,
-              "conn" : "TestConn",
-              "created_at" : 25,
-              "inregions" : [ "Testregion1", "Testregion2" ],
-              "lat" : 50.1,
-              "lon" : 60.2,
-              "m" : 1,
-              "tst" : 123456789,
-              "vac" : 1,
-              "vel" : 5
-            }
+        {
+          "_type" : "location",
+          "BSSID" : "12:34:56:78",
+          "SSID" : "Wifi SSID",
+          "_id" : "dummyTestId",
+          "acc" : 10,
+          "alt" : 20,
+          "batt" : 30,
+          "bs" : 2,
+          "cog" : 56,
+          "conn" : "TestConn",
+          "created_at" : 25,
+          "inregions" : [ "Testregion1", "Testregion2" ],
+          "lat" : 50.1,
+          "lon" : 60.2,
+          "m" : 1,
+          "tst" : 123456789,
+          "vac" : 1,
+          "vel" : 5
+        }
         """
             .trimIndent()
     assertEquals(expected, parser.toUnencryptedJsonPretty(extendedMessageLocation))
@@ -113,20 +113,20 @@ class ParserTest {
 
     val expected =
         """
-            {
-              "_type" : "location",
-              "_id" : "dummyTestId",
-              "acc" : 10,
-              "alt" : 20,
-              "cog" : 56,
-              "created_at" : 25,
-              "inregions" : [ "Testregion1", "Testregion2" ],
-              "lat" : 50.1,
-              "lon" : 60.2,
-              "tst" : 123456789,
-              "vac" : 1,
-              "vel" : 5
-            }
+        {
+          "_type" : "location",
+          "_id" : "dummyTestId",
+          "acc" : 10,
+          "alt" : 20,
+          "cog" : 56,
+          "created_at" : 25,
+          "inregions" : [ "Testregion1", "Testregion2" ],
+          "lat" : 50.1,
+          "lon" : 60.2,
+          "tst" : 123456789,
+          "vac" : 1,
+          "vel" : 5
+        }
         """
             .trimIndent()
     // language=JSON
@@ -141,27 +141,27 @@ class ParserTest {
     // language=JSON
     val input =
         """
-            {
-                "_type": "location",
-                "tid": "s5",
-                "acc": 1600,
-                "alt": 0.0,
-                "batt": 99,
-                "bs": 3,
-                "cog" : 56,
-                "conn": "w",
-                "_id" : "inputTestId",
-                "lat": 52.3153748,
-                "lon": 5.0408462,
-                "t": "p",
-                "tst": 1514455575,
-                "vac": 0,
-                "inregions":
-                [
-                    "Testregion1",
-                    "Testregion2"
-                ]
-            }
+        {
+            "_type": "location",
+            "tid": "s5",
+            "acc": 1600,
+            "alt": 0.0,
+            "batt": 99,
+            "bs": 3,
+            "cog" : 56,
+            "conn": "w",
+            "_id" : "inputTestId",
+            "lat": 52.3153748,
+            "lon": 5.0408462,
+            "t": "p",
+            "tst": 1514455575,
+            "vac": 0,
+            "inregions":
+            [
+                "Testregion1",
+                "Testregion2"
+            ]
+        }
         """
             .trimIndent()
     val messageBase = parser.fromJson(input)
@@ -189,25 +189,25 @@ class ParserTest {
     val parser = Parser(encryptionProvider)
     val input =
         """
-      {
-        "_type": "location",
-        "acc": 5,
-        "alt": 84,
-        "batt": 34,
-        "bs": 1,
-        "cog": 277,
-        "conn": "m",
-        "lat": -25.762245,
-        "lon": 126.074502,
-        "m": 2,
-        "p": 100.477,
-        "tid": "AA",
-        "t": "t",
-        "tst": 1721896446,
-        "vac": 3,
-        "vel": 79
-      }
-    """
+        {
+          "_type": "location",
+          "acc": 5,
+          "alt": 84,
+          "batt": 34,
+          "bs": 1,
+          "cog": 277,
+          "conn": "m",
+          "lat": -25.762245,
+          "lon": 126.074502,
+          "m": 2,
+          "p": 100.477,
+          "tid": "AA",
+          "t": "t",
+          "tst": 1721896446,
+          "vac": 3,
+          "vel": 79
+        }
+        """
             .trimIndent()
     val messageBase = parser.fromJson(input)
     assertEquals(MessageLocation::class.java, messageBase.javaClass)
@@ -221,25 +221,25 @@ class ParserTest {
     val parser = Parser(encryptionProvider)
     val input =
         """
-      {
-        "_type": "location",
-        "acc": 5,
-        "alt": 84,
-        "batt": 34,
-        "bs": 1,
-        "cog": 277,
-        "conn": "m",
-        "lat": -25.762245,
-        "lon": 126.074502,
-        "m": 2,
-        "p": 100.477,
-        "tid": "AA",
-        "t": "b",
-        "tst": 1721896446,
-        "vac": 3,
-        "vel": 79
-      }
-    """
+        {
+          "_type": "location",
+          "acc": 5,
+          "alt": 84,
+          "batt": 34,
+          "bs": 1,
+          "cog": 277,
+          "conn": "m",
+          "lat": -25.762245,
+          "lon": 126.074502,
+          "m": 2,
+          "p": 100.477,
+          "tid": "AA",
+          "t": "b",
+          "tst": 1721896446,
+          "vac": 3,
+          "vel": 79
+        }
+        """
             .trimIndent()
     val messageBase = parser.fromJson(input)
     assertEquals(MessageLocation::class.java, messageBase.javaClass)
@@ -317,10 +317,10 @@ class ParserTest {
     // language=JSON
     val input =
         """
-            {
-              "_type": "encrypted",
-              "data": "TestCipherText"
-            }
+        {
+          "_type": "encrypted",
+          "data": "TestCipherText"
+        }
         """
             .trimIndent()
     parser.fromJson(input)
@@ -331,36 +331,36 @@ class ParserTest {
     // language=JSON
     val multipleMessageLocationJSON =
         """
-            [
-              {
-                "_type": "location",
-                "tid": "s5",
-                "acc": 1600,
-                "alt": 0.0,
-                "batt": 99,
-                "cog" : 45,
-                "conn": "w",
-                "lat": 52.3153748,
-                "lon": 5.0408462,
-                "t": "p",
-                "tst": 1514455575,
-                "vac": 0
-              },
-              {
-                "_type": "location",
-                "tid": "s5",
-                "acc": 95,
-                "alt": 0.0,
-                "batt": 99,
-                "cog" : 56,
-                "conn": "w",
-                "lat": 12.3153748,
-                "lon": 15.0408462,
-                "t": "p",
-                "tst": 1514455579,
-                "vac": 0
-              }
-            ]
+        [
+          {
+            "_type": "location",
+            "tid": "s5",
+            "acc": 1600,
+            "alt": 0.0,
+            "batt": 99,
+            "cog" : 45,
+            "conn": "w",
+            "lat": 52.3153748,
+            "lon": 5.0408462,
+            "t": "p",
+            "tst": 1514455575,
+            "vac": 0
+          },
+          {
+            "_type": "location",
+            "tid": "s5",
+            "acc": 95,
+            "alt": 0.0,
+            "batt": 99,
+            "cog" : 56,
+            "conn": "w",
+            "lat": 12.3153748,
+            "lon": 15.0408462,
+            "t": "p",
+            "tst": 1514455579,
+            "vac": 0
+          }
+        ]
         """
             .trimIndent()
     val parser = Parser(encryptionProvider)
@@ -386,10 +386,10 @@ class ParserTest {
     // language=JSON
     val input =
         """
-            {
-              "_type": "cmd",
-              "action": "reportLocation"
-            }
+        {
+          "_type": "cmd",
+          "action": "reportLocation"
+        }
         """
             .trimIndent()
     val messageBase = parser.fromJson(input)
@@ -408,15 +408,15 @@ class ParserTest {
     // language=JSON
     val input =
         """
-            {
-              "_type": "cmd",
-              "action": "setWaypoints",
-              "waypoints": {
-                "_type": "waypoints",
-                "waypoints": []
-              }
-            }
-            """
+        {
+          "_type": "cmd",
+          "action": "setWaypoints",
+          "waypoints": {
+            "_type": "waypoints",
+            "waypoints": []
+          }
+        }
+        """
             .trimIndent()
     val messageBase = parser.fromJson(input)
     assertEquals(MessageCmd::class.java, messageBase.javaClass)
@@ -433,14 +433,14 @@ class ParserTest {
     // language=JSON
     val input =
         """
-            {
-              "_type": "cmd",
-              "action": "setConfiguration",
-              "configuration": {
-                "_type": "configuration",
-                "host": "newHost"
-              }
-            }
+        {
+          "_type": "cmd",
+          "action": "setConfiguration",
+          "configuration": {
+            "_type": "configuration",
+            "host": "newHost"
+          }
+        }
         """
             .trimIndent()
     val messageBase = parser.fromJson(input)
@@ -458,10 +458,10 @@ class ParserTest {
     // language=JSON
     val input =
         """
-            {
-              "_type": "cmd",
-              "action": "status"
-            }
+        {
+          "_type": "cmd",
+          "action": "status"
+        }
         """
             .trimIndent()
     val messageBase = parser.fromJson(input)
@@ -480,11 +480,11 @@ class ParserTest {
     // language=JSON
     val input =
         """
-            {
-              "_type": "cmd",
-              "action": "nope",
-              "sometgi": "parp"
-            }
+        {
+          "_type": "cmd",
+          "action": "nope",
+          "sometgi": "parp"
+        }
         """
             .trimIndent()
     parser.fromJson(input)
@@ -500,18 +500,18 @@ class ParserTest {
     // language=JSON
     val input =
         """
-            {
-              "_type": "transition",
-              "acc": 3,
-              "desc": "myregion",
-              "event": "leave",
-              "lat": 52.71234,
-              "lon": -1.61234123,
-              "t": "l",
-              "tid": "ce",
-              "tst": 1603209966,
-              "wtst": 1558351273
-            }
+        {
+          "_type": "transition",
+          "acc": 3,
+          "desc": "myregion",
+          "event": "leave",
+          "lat": 52.71234,
+          "lon": -1.61234123,
+          "t": "l",
+          "tid": "ce",
+          "tst": 1603209966,
+          "wtst": 1558351273
+        }
         """
             .trimIndent()
     val messageBase = parser.fromJson(input)
@@ -572,64 +572,64 @@ class ParserTest {
     // language=JSON
     val input =
         """
+        {
+          "_type": "configuration",
+          "waypoints": [
             {
-              "_type": "configuration",
-              "waypoints": [
-                {
-                  "_type": "waypoint",
-                  "desc": "work",
-                  "lat": 51.504778900000005,
-                  "lon": -0.023851299999999995,
-                  "rad": 150,
-                  "tst": 1505910709000
-                },
-                {
-                  "_type": "waypoint",
-                  "desc": "home",
-                  "lat": 53.6776261,
-                  "lon": -1.58268,
-                  "rad": 100,
-                  "tst": 1558351273
-                }
-              ],
-              "auth": true,
-              "autostartOnBoot": true,
-              "cleanSession": false,
-              "clientId": "emulator",
-              "cmd": true,
-              "debugLog": true,
-              "deviceId": "testdevice",
-              "fusedRegionDetection": true,
-              "geocodeEnabled": true,
-              "host": "127.0.0.1",
-              "ignoreInaccurateLocations": 150,
-              "ignoreStaleLocations": 0.0,
-              "keepalive": 900,
-              "locatorDisplacement": 5,
-              "locatorInterval": 60,
-              "mode": 0,
-              "monitoring": 1,
-              "moveModeLocatorInterval": 10,
-              "mqttProtocolLevel": 3,
-              "notificationHigherPriority": false,
-              "notificationLocation": true,
-              "opencageApiKey": "testkey",
-              "password": "testpassword",
-              "ping": 30,
-              "port": 1883,
-              "extendedData": true,
-              "pubQos": 1,
-              "pubRetain": true,
-              "pubTopicBase": "owntracks/%u/%d",
-              "remoteConfiguration": true,
-              "sub": true,
-              "subQos": 2,
-              "subTopic": "owntracks/+/+",
-              "tls": false,
-              "usePassword": true,
-              "username": "testusername",
-              "ws": false
+              "_type": "waypoint",
+              "desc": "work",
+              "lat": 51.504778900000005,
+              "lon": -0.023851299999999995,
+              "rad": 150,
+              "tst": 1505910709000
+            },
+            {
+              "_type": "waypoint",
+              "desc": "home",
+              "lat": 53.6776261,
+              "lon": -1.58268,
+              "rad": 100,
+              "tst": 1558351273
             }
+          ],
+          "auth": true,
+          "autostartOnBoot": true,
+          "cleanSession": false,
+          "clientId": "emulator",
+          "cmd": true,
+          "debugLog": true,
+          "deviceId": "testdevice",
+          "fusedRegionDetection": true,
+          "geocodeEnabled": true,
+          "host": "127.0.0.1",
+          "ignoreInaccurateLocations": 150,
+          "ignoreStaleLocations": 0.0,
+          "keepalive": 900,
+          "locatorDisplacement": 5,
+          "locatorInterval": 60,
+          "mode": 0,
+          "monitoring": 1,
+          "moveModeLocatorInterval": 10,
+          "mqttProtocolLevel": 3,
+          "notificationHigherPriority": false,
+          "notificationLocation": true,
+          "opencageApiKey": "testkey",
+          "password": "testpassword",
+          "ping": 30,
+          "port": 1883,
+          "extendedData": true,
+          "pubQos": 1,
+          "pubRetain": true,
+          "pubTopicBase": "owntracks/%u/%d",
+          "remoteConfiguration": true,
+          "sub": true,
+          "subQos": 2,
+          "subTopic": "owntracks/+/+",
+          "tls": false,
+          "usePassword": true,
+          "username": "testusername",
+          "ws": false
+        }
         """
             .trimIndent()
     val messageBase = parser.fromJson(input)
@@ -690,14 +690,14 @@ class ParserTest {
     // language=JSON
     val input =
         """
-            {
-              "_type": "waypoint",
-              "desc": "mypoint",
-              "lat": 52.0027789,
-              "lon": -1.0829312,
-              "rad": 150,
-              "tst": 1558351273
-            }
+        {
+          "_type": "waypoint",
+          "desc": "mypoint",
+          "lat": 52.0027789,
+          "lon": -1.0829312,
+          "rad": 150,
+          "tst": 1558351273
+        }
         """
             .trimIndent()
     val messageBase = parser.fromJson(input)
@@ -793,11 +793,11 @@ class ParserTest {
     // language=JSON
     val input =
         """
-            {
-              "_type": "card",
-              "face": "iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAABIElEQVRYhe2XsQ2DMBBFvQkrUNEihvEOTMEU9IzAAuxAwxz3UxCIIxw58n0LC/lXURI/Xs65MxhkHnO3QChFUJvnCxpjLq9FRIv9MDWLx3H0Q42hSUYLhgTcymoSTamqivKdUKIF/6nQuq6x+M91ohcWwfd1YheGmkREKJ2sarWu635+tiyLBn1GPQu2bYO1FsBeNWttPoPaDVPKDVWQNZzd0IiHXN/3LOTOpYESVA8gCYoI5nlmoC6h/uyjUZjVpJCGYWBgvKEINk0DEUHbtud70zQx0Nwt9t1dq5lqgCPiNsrtd9ReWM6DGsDXf5CV5z92XoDkbabRUmwvkOAsFhHUdc3C8gTdEZPdUZcyyQSzOup8MtkcdalTBLUpgtq8ACxgjcQLy0DfAAAAAElFTkSuQmCC",
-              "name": "MyName!"
-            }
+        {
+          "_type": "card",
+          "face": "iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAABIElEQVRYhe2XsQ2DMBBFvQkrUNEihvEOTMEU9IzAAuxAwxz3UxCIIxw58n0LC/lXURI/Xs65MxhkHnO3QChFUJvnCxpjLq9FRIv9MDWLx3H0Q42hSUYLhgTcymoSTamqivKdUKIF/6nQuq6x+M91ohcWwfd1YheGmkREKJ2sarWu635+tiyLBn1GPQu2bYO1FsBeNWttPoPaDVPKDVWQNZzd0IiHXN/3LOTOpYESVA8gCYoI5nlmoC6h/uyjUZjVpJCGYWBgvKEINk0DEUHbtud70zQx0Nwt9t1dq5lqgCPiNsrtd9ReWM6DGsDXf5CV5z92XoDkbabRUmwvkOAsFhHUdc3C8gTdEZPdUZcyyQSzOup8MtkcdalTBLUpgtq8ACxgjcQLy0DfAAAAAElFTkSuQmCC",
+          "name": "MyName!"
+        }
         """
             .trimIndent()
     val messageBase = parser.fromJson(input)
@@ -815,11 +815,11 @@ class ParserTest {
     // language=JSON
     val input =
         """
-          {
-          "_type": "card",
-          "tid": "overridden-topic",
-          "name": "MyName!"
-          }
+        {
+        "_type": "card",
+        "tid": "overridden-topic",
+        "name": "MyName!"
+        }
         """
             .trimIndent()
     val messageBase = parser.fromJson(input)
