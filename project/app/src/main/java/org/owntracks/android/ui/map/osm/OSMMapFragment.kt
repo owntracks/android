@@ -55,7 +55,7 @@ import timber.log.Timber
 class OSMMapFragment
 internal constructor(
     private val preferences: Preferences,
-    contactImageBindingAdapter: ContactImageBindingAdapter
+    contactImageBindingAdapter: ContactImageBindingAdapter,
 ) : MapFragment<OsmMapFragmentBinding>(contactImageBindingAdapter, preferences) {
   override val layout: Int
     get() = R.layout.osm_map_fragment
@@ -94,7 +94,7 @@ internal constructor(
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
-      savedInstanceState: Bundle?
+      savedInstanceState: Bundle?,
   ): View {
     Configuration.getInstance().apply {
       load(requireContext(), PreferenceManager.getDefaultSharedPreferences(requireContext()))
@@ -111,8 +111,10 @@ internal constructor(
   }
 
   private fun setMapStyle() {
-    if (resources.configuration.uiMode.and(android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
-        android.content.res.Configuration.UI_MODE_NIGHT_YES) {
+    if (
+        resources.configuration.uiMode.and(android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
+            android.content.res.Configuration.UI_MODE_NIGHT_YES
+    ) {
       mapView?.run { overlayManager.tilesOverlay.setColorFilter(TilesOverlay.INVERT_COLORS) }
     } else {
       mapView?.run { overlayManager.tilesOverlay.setColorFilter(null) }
@@ -215,9 +217,11 @@ internal constructor(
           addMapListener(mapListener)
           zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
           // Make sure we don't add to the mylocation overlay
-          if (!overlays.any {
-            it is MyLocationNewOverlay && it.mMyLocationProvider == osmMapLocationSource
-          }) {
+          if (
+              !overlays.any {
+                it is MyLocationNewOverlay && it.mMyLocationProvider == osmMapLocationSource
+              }
+          ) {
             overlays.add(
                 MyLocationNewOverlay(osmMapLocationSource, this).apply {
                   setOnClickListener { onMapClick() }
@@ -243,8 +247,10 @@ internal constructor(
             )
           }
 
-          if (!overlays.any { it is RotationGestureOverlayWithDeadZone } &&
-              preferences.enableMapRotation) {
+          if (
+              !overlays.any { it is RotationGestureOverlayWithDeadZone } &&
+                  preferences.enableMapRotation
+          ) {
             overlays.add(RotationGestureOverlayWithDeadZone(this))
           }
           if (!overlays.any { it is CopyrightOverlay }) {
@@ -357,31 +363,8 @@ internal constructor(
     if (preferences.showRegionsOnMap) {
       mapView?.run {
         Timber.d("Adding region ${waypoint.id} to map")
-        val regionPolygon =
-            Polygon(this).apply {
-              id = "regionpolygon-${waypoint.id}"
-              points =
-                  Polygon.pointsAsCircle(
-                      waypoint.getLocation().toLatLng().toGeoPoint(),
-                      waypoint.geofenceRadius.toDouble(),
-                  )
-              fillPaint.color = getRegionColor()
-              outlinePaint.strokeWidth = 1f
-              setOnClickListener { _, mapView, _ ->
-                mapView.overlays
-                    .filterIsInstance<Marker>()
-                    .first { it.id == "regionmarker-${waypoint.id}" }
-                    .showInfoWindow()
-                true
-              }
-            }
-        val regionMarker =
-            Marker(this).apply {
-              id = "regionmarker-${waypoint.id}"
-              position = waypoint.getLocation().toLatLng().toGeoPoint()
-              title = waypoint.description
-              setInfoWindow(MarkerInfoWindow(R.layout.osm_region_bubble, this@run))
-            }
+        val regionPolygon = createPolygon(this, waypoint)
+        val regionMarker = createMarker(this, waypoint)
         overlays.addAll(0, listOf(regionPolygon, regionMarker))
       }
     }
@@ -445,37 +428,8 @@ internal constructor(
         regions
             .flatMap { region ->
               listOf(
-                  Polygon(this).apply {
-                    id = "regionpolygon-${region.id}"
-                    points =
-                        Polygon.pointsAsCircle(
-                                region.getLocation().toLatLng().toGeoPoint(),
-                                region.geofenceRadius.toDouble(),
-                            )
-                            .filter {
-                              (TileSystemWebMercator.MinLatitude..TileSystemWebMercator.MaxLatitude)
-                                  .contains(it.latitude) &&
-                                  (TileSystemWebMercator.MinLongitude..TileSystemWebMercator
-                                              .MaxLongitude)
-                                      .contains(it.longitude)
-                            }
-
-                    fillPaint.color = getRegionColor()
-                    outlinePaint.strokeWidth = 1f
-                    setOnClickListener { _, mapView, _ ->
-                      mapView.overlays
-                          .filterIsInstance<Marker>()
-                          .first { it.id == "regionmarker-${region.id}" }
-                          .showInfoWindow()
-                      true
-                    }
-                  },
-                  Marker(this).apply {
-                    id = "regionmarker-${region.id}"
-                    position = region.getLocation().toLatLng().toGeoPoint()
-                    title = region.description
-                    setInfoWindow(MarkerInfoWindow(R.layout.osm_region_bubble, this@run))
-                  },
+                  createPolygon(this, region),
+                  createMarker(this, region),
               )
             }
             .let { overlays.addAll(0, it) }
@@ -490,6 +444,42 @@ internal constructor(
       MapLayerStyle.OpenStreetMapWikimedia ->
           binding.osmMapView.setTileSource(TileSourceFactory.WIKIMEDIA)
       else -> Timber.w("Unsupported map layer type $mapLayerStyle")
+    }
+  }
+
+  fun createPolygon(mapView: MapView, waypoint: WaypointModel): Polygon {
+    return Polygon(mapView).apply {
+      id = "regionpolygon-${waypoint.id}"
+      points =
+          Polygon.pointsAsCircle(
+                  waypoint.getLocation().toLatLng().toGeoPoint(),
+                  waypoint.geofenceRadius.toDouble(),
+              )
+              .filter {
+                (TileSystemWebMercator.MinLatitude..TileSystemWebMercator.MaxLatitude).contains(
+                    it.latitude
+                ) &&
+                    (TileSystemWebMercator.MinLongitude..TileSystemWebMercator.MaxLongitude)
+                        .contains(it.longitude)
+              }
+      fillPaint.color = getRegionColor()
+      outlinePaint.strokeWidth = 1f
+      setOnClickListener { _, mapView, _ ->
+        mapView.overlays
+            .filterIsInstance<Marker>()
+            .first { it.id == "regionmarker-${waypoint.id}" }
+            .showInfoWindow()
+        true
+      }
+    }
+  }
+
+  fun createMarker(mapView: MapView, waypoint: WaypointModel): Marker {
+    return Marker(mapView).apply {
+      id = "regionmarker-${waypoint.id}"
+      position = waypoint.getLocation().toLatLng().toGeoPoint()
+      title = waypoint.description
+      setInfoWindow(MarkerInfoWindow(R.layout.osm_region_bubble, mapView))
     }
   }
 
