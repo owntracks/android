@@ -357,31 +357,8 @@ internal constructor(
     if (preferences.showRegionsOnMap) {
       mapView?.run {
         Timber.d("Adding region ${waypoint.id} to map")
-        val regionPolygon =
-            Polygon(this).apply {
-              id = "regionpolygon-${waypoint.id}"
-              points =
-                  Polygon.pointsAsCircle(
-                      waypoint.getLocation().toLatLng().toGeoPoint(),
-                      waypoint.geofenceRadius.toDouble(),
-                  )
-              fillPaint.color = getRegionColor()
-              outlinePaint.strokeWidth = 1f
-              setOnClickListener { _, mapView, _ ->
-                mapView.overlays
-                    .filterIsInstance<Marker>()
-                    .first { it.id == "regionmarker-${waypoint.id}" }
-                    .showInfoWindow()
-                true
-              }
-            }
-        val regionMarker =
-            Marker(this).apply {
-              id = "regionmarker-${waypoint.id}"
-              position = waypoint.getLocation().toLatLng().toGeoPoint()
-              title = waypoint.description
-              setInfoWindow(MarkerInfoWindow(R.layout.osm_region_bubble, this@run))
-            }
+        val regionPolygon = createPolygon(this, waypoint)
+        val regionMarker = createMarker(this, waypoint)
         overlays.addAll(0, listOf(regionPolygon, regionMarker))
       }
     }
@@ -445,37 +422,8 @@ internal constructor(
         regions
             .flatMap { region ->
               listOf(
-                  Polygon(this).apply {
-                    id = "regionpolygon-${region.id}"
-                    points =
-                        Polygon.pointsAsCircle(
-                                region.getLocation().toLatLng().toGeoPoint(),
-                                region.geofenceRadius.toDouble(),
-                            )
-                            .filter {
-                              (TileSystemWebMercator.MinLatitude..TileSystemWebMercator.MaxLatitude)
-                                  .contains(it.latitude) &&
-                                  (TileSystemWebMercator.MinLongitude..TileSystemWebMercator
-                                              .MaxLongitude)
-                                      .contains(it.longitude)
-                            }
-
-                    fillPaint.color = getRegionColor()
-                    outlinePaint.strokeWidth = 1f
-                    setOnClickListener { _, mapView, _ ->
-                      mapView.overlays
-                          .filterIsInstance<Marker>()
-                          .first { it.id == "regionmarker-${region.id}" }
-                          .showInfoWindow()
-                      true
-                    }
-                  },
-                  Marker(this).apply {
-                    id = "regionmarker-${region.id}"
-                    position = region.getLocation().toLatLng().toGeoPoint()
-                    title = region.description
-                    setInfoWindow(MarkerInfoWindow(R.layout.osm_region_bubble, this@run))
-                  },
+                  createPolygon(this, region),
+                  createMarker(this, region),
               )
             }
             .let { overlays.addAll(0, it) }
@@ -490,6 +438,42 @@ internal constructor(
       MapLayerStyle.OpenStreetMapWikimedia ->
           binding.osmMapView.setTileSource(TileSourceFactory.WIKIMEDIA)
       else -> Timber.w("Unsupported map layer type $mapLayerStyle")
+    }
+  }
+
+  fun createPolygon(mapView: MapView, waypoint: WaypointModel): Polygon {
+    return Polygon(mapView).apply {
+      id = "regionpolygon-${waypoint.id}"
+      points =
+          Polygon.pointsAsCircle(
+              waypoint.getLocation().toLatLng().toGeoPoint(),
+              waypoint.geofenceRadius.toDouble(),
+          )
+              .filter {
+                (TileSystemWebMercator.MinLatitude..TileSystemWebMercator.MaxLatitude).contains(
+                    it.latitude
+                ) &&
+                    (TileSystemWebMercator.MinLongitude..TileSystemWebMercator.MaxLongitude)
+                        .contains(it.longitude)
+              }
+      fillPaint.color = getRegionColor()
+      outlinePaint.strokeWidth = 1f
+      setOnClickListener { _, mapView, _ ->
+        mapView.overlays
+            .filterIsInstance<Marker>()
+            .first { it.id == "regionmarker-${waypoint.id}" }
+            .showInfoWindow()
+        true
+      }
+    }
+  }
+
+  fun createMarker(mapView: MapView, waypoint: WaypointModel): Marker {
+    return Marker(mapView).apply {
+      id = "regionmarker-${waypoint.id}"
+      position = waypoint.getLocation().toLatLng().toGeoPoint()
+      title = waypoint.description
+      setInfoWindow(MarkerInfoWindow(R.layout.osm_region_bubble, mapView))
     }
   }
 
