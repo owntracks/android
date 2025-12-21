@@ -111,10 +111,8 @@ internal constructor(
   }
 
   private fun setMapStyle() {
-    if (
-        resources.configuration.uiMode.and(android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
-            android.content.res.Configuration.UI_MODE_NIGHT_YES
-    ) {
+    if (resources.configuration.uiMode.and(android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
+        android.content.res.Configuration.UI_MODE_NIGHT_YES) {
       mapView?.run { overlayManager.tilesOverlay.setColorFilter(TilesOverlay.INVERT_COLORS) }
     } else {
       mapView?.run { overlayManager.tilesOverlay.setColorFilter(null) }
@@ -217,11 +215,9 @@ internal constructor(
           addMapListener(mapListener)
           zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
           // Make sure we don't add to the mylocation overlay
-          if (
-              !overlays.any {
-                it is MyLocationNewOverlay && it.mMyLocationProvider == osmMapLocationSource
-              }
-          ) {
+          if (!overlays.any {
+            it is MyLocationNewOverlay && it.mMyLocationProvider == osmMapLocationSource
+          }) {
             overlays.add(
                 MyLocationNewOverlay(osmMapLocationSource, this).apply {
                   setOnClickListener { onMapClick() }
@@ -247,10 +243,8 @@ internal constructor(
             )
           }
 
-          if (
-              !overlays.any { it is RotationGestureOverlayWithDeadZone } &&
-                  preferences.enableMapRotation
-          ) {
+          if (!overlays.any { it is RotationGestureOverlayWithDeadZone } &&
+              preferences.enableMapRotation) {
             overlays.add(RotationGestureOverlayWithDeadZone(this))
           }
           if (!overlays.any { it is CopyrightOverlay }) {
@@ -457,8 +451,7 @@ internal constructor(
               )
               .filter {
                 (TileSystemWebMercator.MinLatitude..TileSystemWebMercator.MaxLatitude).contains(
-                    it.latitude
-                ) &&
+                    it.latitude) &&
                     (TileSystemWebMercator.MinLongitude..TileSystemWebMercator.MaxLongitude)
                         .contains(it.longitude)
               }
