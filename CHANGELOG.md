@@ -2,6 +2,10 @@
 
 ## Version 2.5.5
 
+### New features
+
+- Visible reconnection feedback on Connection preferences page (#2156)
+
 ### Bug fixes
 
 - "Request Location" button on contact now sends the command message to the right topic in MQTT mode (#2101)
