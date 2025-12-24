@@ -43,7 +43,6 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-          working-directory: fastlane
 
       - name: Get internal track current version code
         if: ${{ contains(github.ref_name, 'beta') || fromJSON(steps.tagCount.outputs.beta_tag_count) == 0 }}
