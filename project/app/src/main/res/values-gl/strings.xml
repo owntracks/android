@@ -286,6 +286,8 @@ A política de privacidade de OpenCage pódese atopar en &lt;a href=\"https://op
     <string name="statusLocationPermissionsNone">"Ningún"</string>
     <string name="statusLocationPermissionsPromptNegativeButton">"Cancelar"</string>
     <string name="statusLocationPermissionsPromptPositiveButton">"Axustes da aplicación"</string>
+
+    <!-- Fuzzy -->
     <string name="statusLocationPermissionsPromptText">"Se querefacer un trazado automático das localizacións ao reiniciar o dispositivo, pode activar os permisos de localización en segundo plano concedendo a OwnTracks acceso á súa localización «sempre»."</string>
     <string name="statusLocationPermissionsPromptTitle">"Localización en segundo plano"</string>
     <string name="statusLocationPermissionsUnknown">"Descoñecido"</string>
@@ -321,12 +323,16 @@ Para obter máis detalles, bótelle un ollo ao folleto de OwnTracks."</string>
     <string name="welcome_description">"Os seguintes pasos axudaralle a comezar con OwnTracks"</string>
     <string name="welcome_finish_open_preferences_button_label">"Abrir as preferencias"</string>
     <string name="welcome_heading">"Dámoslle a benvida"</string>
+
+    <!-- Fuzzy -->
     <string name="welcome_location_permission_description">"A fin de recibir a súa localización actual para enviar ao seu punto final de OwnTracks, OwnTracks precisa do seu permiso para acceder á localización do seu dispositivo.
 
 Pode revisar este permiso e solicitar permisos adicionais de localización (en segundo plano) dende a páxina Estado.
 
 O permiso de localización en segundo plano pode mellorar a frecuencia e a fiabilidade dos datos de localización, dependendo do seu dispositivo e da configuración."</string>
     <string name="welcome_location_permission_granted">"Concedéronse os permisos de localización"</string>
+
+    <!-- Fuzzy -->
     <string name="welcome_location_permission_request">"Solicitar"</string>
     <string name="welcome_location_permission_title">"Permisos de localización"</string>
     <string name="welcome_notification_permission_description">"Para funcionar plenamente, OwnTracks precisa do seu permiso para presentar algunhas notificacións.

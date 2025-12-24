@@ -284,6 +284,8 @@ Die OpenCage-Datenschutzerklärung kann auf &lt;a href=\"https://opencagedata.co
     <string name="statusLocationPermissionsNone">"Keine"</string>
     <string name="statusLocationPermissionsPromptNegativeButton">"Abbrechen"</string>
     <string name="statusLocationPermissionsPromptPositiveButton">"App-Einstellungen"</string>
+
+    <!-- Fuzzy -->
     <string name="statusLocationPermissionsPromptText">"Wenn Sie Ihren Standort bei einem Neustart des Geräts automatisch verfolgen lassen möchten, können Sie die Standortberechtigung im Hintergrund aktivieren, indem Sie OwnTracks den Zugriff auf Ihren Standort \"die ganze Zeit\" gewähren."</string>
     <string name="statusLocationPermissionsPromptTitle">"Standorterfassung im Hintergrund"</string>
     <string name="statusLocationPermissionsUnknown">"Unbekannt"</string>
@@ -319,12 +321,16 @@ Weitere Details finden Sie im OwnTracks Booklet."</string>
     <string name="welcome_description">"Die folgenden Schritte werden Dir helfen, OwnTracks einzurichten"</string>
     <string name="welcome_finish_open_preferences_button_label">"Einstellungen öffnen"</string>
     <string name="welcome_heading">"Willkommen"</string>
+
+    <!-- Fuzzy -->
     <string name="welcome_location_permission_description">"Um Ihren aktuellen Standort zu erhalten und an Ihren OwnTracks Endpunkt zu senden, benötigt OwnTracks Ihre Erlaubnis, um auf den Standort Ihres Geräts zuzugreifen.
 
 Sie können diese Berechtigung überprüfen und zusätzliche (Hintergrund-) Standortberechtigungen auf der Status-Seite anfordern.
 
 Je nach Gerät und Konfiguration kann die Erlaubnis für den Standort im Hintergrund die Häufigkeit und Zuverlässigkeit der Standortdaten verbessern."</string>
     <string name="welcome_location_permission_granted">"Standortberechtigung gewährt"</string>
+
+    <!-- Fuzzy -->
     <string name="welcome_location_permission_request">"Anfordern"</string>
     <string name="welcome_location_permission_title">"Standortberechtigung"</string>
     <string name="welcome_notification_permission_description">"Um vollständig zu funktionieren, benötigt OwnTracks Ihre Erlaubnis, um einige Benachrichtigungen anzuzeigen.

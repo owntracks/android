@@ -14,12 +14,14 @@
     <string name="addWaypoint">"Afegir punt de pas"</string>
     <string name="aLocation">"a regió"</string>
     <string name="app_name">"OwnTracks"</string>
+    <string name="backgroundLocationPermissionRequestDialogText">"Si voleu que OwnTracks recopili dades d'ubicació fins i tot quan s'executa en segon pla, necessiteu un permís addicional per permetre que OwnTracks rebi ubicacions \"tot el temps\"."</string>
+    <string name="backgroundLocationPermissionRequestDialogTitle">"Permís d'ubicació en segon pla"</string>
     <string name="backgroundLocationRestrictionNotificationText">"Aquesta versió d'Android impedeix a OwnTracks rebre ubicacions quan s'inicia en segon pla fins que s'obre l'aplicació. Feu clic a aquesta notificació per obrir l'aplicació i començar a fer el seguiment de la ubicació."</string>
     <string name="backgroundLocationRestrictionNotificationTitle">"Seguiment d'ubicació en pausa"</string>
     <string name="batteryOptimizationWhitelistDialogButtonLabel">"Configuració d'optimització de la bateria"</string>
 
     <!-- Fuzzy -->
-    <string name="batteryOptimizationWhitelistDialogMessage">"Posar OwnTracks a la llista de l'optimització de la bateria pot ajudar-lo a fer un seguiment més fiable de les ubicacions i del contacte principal amb el servidor."</string>
+    <string name="batteryOptimizationWhitelistDialogMessage">"Incorporar OwnTracks a la llista blanca de l'optimització de la bateria pot ajudar-lo a rastrejar ubicacions de manera més fiable i a mantenir el contacte amb el servidor."</string>
     <string name="batteryOptimizationWhitelistDialogTitle">"Optimització de la bateria"</string>
     <string name="cancel">"Cancel·la"</string>
     <string name="certificateMigrationRequiredNotificationText">"OwnTracks ara fa servir certificats TLS del magatzem de certificats del dispositiu.\n\nSi feieu servir un CA personalitzat o certificats TLS de client, afegiu-los al magatzem de certificats del dispositiu."</string>
@@ -31,8 +33,6 @@
     <string name="CONNECTING">"Connectant"</string>
     <string name="contact_image">"Imatge de contacte"</string>
     <string name="contactDetailsAccuracy">"Precisió"</string>
-
-    <!-- Fuzzy -->
     <string name="contactDetailsAccuracyValue">"%d m"</string>
     <string name="contactDetailsAltitude">"Alçada"</string>
     <string name="contactDetailsAltitudeValue">"%,d m"</string>
@@ -66,12 +66,12 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="done_heading">"Fet"</string>
 
     <!-- Fuzzy -->
-    <string name="enjoy_description">"Escull preferències des del menú i configura Owntracks per al teu servidor abans d'utilitzar-lo"</string>
+    <string name="enjoy_description">"Seleccioneu les preferències del menú (o utilitzeu l'enllaç següent) i configureu OwnTracks per al vostre servidor abans d'utilitzar-lo."</string>
     <string name="ERROR">"Error"</string>
     <string name="ERROR_CONFIGURATION">"Configuració incompleta"</string>
 
     <!-- Fuzzy -->
-    <string name="errorPreferencesImportFailed">"Error importació"</string>
+    <string name="errorPreferencesImportFailed">"La importació ha fallat: %s"</string>
     <string name="events">"Esdeveniments"</string>
     <string name="exportConfiguration">"Exportar"</string>
     <string name="exportLogFilePrompt">"Exportar informes"</string>
@@ -91,6 +91,8 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="IDLE">"Inactiu"</string>
     <string name="importConfig">"Importar"</string>
     <string name="INITIAL">"Inicialitzant"</string>
+    <string name="invalidLatitudeError">"Latitud no vàlida"</string>
+    <string name="invalidLongitudeError">"Longitud no vàlida"</string>
     <string name="latitude">"Latitud"</string>
     <string name="loadActivityNoFileExplorerFound">"No s'ha trobat cap aplicació d'explorador de fitxers"</string>
     <string name="loadActivitySelectAFile">"Seleccioneu un fitxer"</string>
@@ -107,6 +109,7 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="mapLayerOpenStreetMapWikimediaLabel">"Wilimedia"</string>
     <string name="menuClear">"Esborrar"</string>
     <string name="menuContactNavigate">"Navegar"</string>
+    <string name="menuContactRequestLocation">"Sol·licita la ubicació"</string>
     <string name="mode_heading">"Mode"</string>
     <string name="mode_http_private_label">"HTTP"</string>
     <string name="mode_mqtt_private_label">"MQTT"</string>
@@ -116,7 +119,7 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="monitoring_significant">"Mode de control de canvis significatius"</string>
 
     <!-- Fuzzy -->
-    <string name="monitoringModeDialogManualDescription">"Només les transicions de regió es publiquen automàticament, no les ubicacions"</string>
+    <string name="monitoringModeDialogManualDescription">"Només es publiquen automàticament les transicions de punts de referència, no les ubicacions."</string>
     <string name="monitoringModeDialogManualTitle">"Manual"</string>
     <string name="monitoringModeDialogMoveDescription">"Alta freqüència i precisió, però ús elevat d'energia"</string>
     <string name="monitoringModeDialogMoveTitle">"Moure"</string>
@@ -133,7 +136,7 @@ Per permetre-ho, activeu la ubicació a la configuració del dispositiu."</strin
     <string name="notificationChannelErrors">"Errors"</string>
 
     <!-- Fuzzy -->
-    <string name="notificationChannelEventsDescription">"Transmissions regionals "</string>
+    <string name="notificationChannelEventsDescription">"Transmissions de punts de referència"</string>
     <string name="notificationChannelOngoing">"En marxa"</string>
     <string name="notificationChannelOngoingDescription">"Obligatori per rebre actualitzacions d’ubicació en segon pla"</string>
     <string name="notificationEndpointStateConnected">"%1$s a %2$s"</string>
@@ -247,10 +250,10 @@ La política de privadesa d'OpenCage es pot trobar &lt;a href=\"https://opencage
     <string name="preferencesSet">"Configurat"</string>
 
     <!-- Fuzzy -->
-    <string name="preferencesShowWaypointsOnMap">"Mostra regions"</string>
+    <string name="preferencesShowWaypointsOnMap">"Mostra els punts de referència"</string>
 
     <!-- Fuzzy -->
-    <string name="preferencesShowWaypointsOnMapSummary">" preferencesShowRegionsOnMapSummary "</string>
+    <string name="preferencesShowWaypointsOnMapSummary">"Dibuixa cercles de punts de referència al mapa"</string>
     <string name="preferencesTheme">"Tema"</string>
     <string name="preferencesTrackerId">"Tracker ID"</string>
     <string name="preferencesTrackerIdValidationError">"Ha de tenir un o dos caràcters"</string>
@@ -259,11 +262,12 @@ La política de privadesa d'OpenCage es pot trobar &lt;a href=\"https://opencage
     <string name="preferencesWebsocket">"Utilitza WebSockets"</string>
 
     <!-- Fuzzy -->
-    <string name="publish">"Informe"</string>
+    <string name="publish">"Informar de la ubicació"</string>
 
     <!-- Fuzzy -->
-    <string name="radius">"Radi"</string>
+    <string name="radius">"Radi (m)"</string>
     <string name="reconnect">"Reconnectar"</string>
+    <string name="requestLocationSent">"S'ha enviat l'ordre de sol·licitud d'ubicació"</string>
     <string name="save">"Desa"</string>
     <string name="select">"Seleccionar"</string>
     <string name="shareContactBody">"
@@ -306,6 +310,8 @@ La política de privadesa d'OpenCage es pot trobar &lt;a href=\"https://opencage
     <string name="statusLocationPermissionsNone">"Cap"</string>
     <string name="statusLocationPermissionsPromptNegativeButton">"Cancel·lar"</string>
     <string name="statusLocationPermissionsPromptPositiveButton">"Configuració de l'aplicació"</string>
+
+    <!-- Fuzzy -->
     <string name="statusLocationPermissionsPromptText">"Si voleu fer un seguiment automàtic de les ubicacions en reiniciar el dispositiu podeu habilitar els permisos d'ubicació en segon pla concedint a OwnTracks accés a la vostra ubicació \"tot el temps\"."</string>
     <string name="statusLocationPermissionsPromptTitle">"Ubicació de fons"</string>
     <string name="statusLocationPermissionsUnknown">"Desconegut"</string>
@@ -316,10 +322,10 @@ La política de privadesa d'OpenCage es pot trobar &lt;a href=\"https://opencage
     <string name="title_activity_status">"Estat"</string>
 
     <!-- Fuzzy -->
-    <string name="title_activity_waypoint">"Regió"</string>
+    <string name="title_activity_waypoint">"Punt de referència"</string>
 
     <!-- Fuzzy -->
-    <string name="title_activity_waypoints">"Regions"</string>
+    <string name="title_activity_waypoints">"Punts de referència"</string>
     <string name="title_exit">"Sortir"</string>
     <string name="transitionEntering">"entra"</string>
     <string name="transitionLeaving">"surt"</string>
@@ -337,10 +343,11 @@ La política de privadesa d'OpenCage es pot trobar &lt;a href=\"https://opencage
     <string name="waypoint_region_unknown">"Estat desconegut"</string>
 
     <!-- Fuzzy -->
-    <string name="waypointListPlaceholder">"Cap regió definida"</string>
+    <string name="waypointListPlaceholder">"Encara no s'han definit punts de referència"</string>
     <string name="waypointMigrationErrorNotificationText">"S'ha produït un error en migrar els waypoints. És possible que alguns no s'hagin migrat, així que comproveu els registres i torneu-los a afegir."</string>
     <string name="waypointMigrationErrorNotificationTitle">"S'ha produït un error en migrar els waypoints"</string>
     <string name="waypointsImport">"Importa punts de ruta"</string>
+    <string name="welcome_background_location_permission_request">"Sol·licita permís de fons"</string>
     <string name="welcome_connection_setup_description">"OwnTracks funciona enviant les vostres dades d'ubicació a un servidor vostre (o d'algú de la vostra confiança), per estar segurs que manteniu el control de les vostres dades.
 
 Assegureu-vos de conèixer els detalls de connexió del vostre servidor, ja sigui accessible mitjançant HTTPS o MQTT i qualssevol credencials d'inici de sessió.
@@ -357,16 +364,19 @@ Per obtenir més detalls, feu una ullada al llibret d'OwnTracks."</string>
     <!-- Fuzzy -->
     <string name="welcome_location_permission_description">"Per rebre la vostra ubicació actual per enviar-la al vostre punt final d'OwnTracks, OwnTracks necessita el vostre permís per accedir a la ubicació del vostre dispositiu.
 
-Podeu revisar aquest permís i sol·licitar permisos d'ubicació (de fons) addicionals si cal des de la pàgina Estat."</string>
+Podeu revisar aquest permís des de la pàgina d'estat.
+
+El permís d'ubicació en segon pla pot millorar la freqüència i la fiabilitat de les dades d'ubicació, depenent del vostre dispositiu i la configuració."</string>
     <string name="welcome_location_permission_granted">"Permisos d'ubicació concedits"</string>
 
     <!-- Fuzzy -->
-    <string name="welcome_location_permission_request">"Petició"</string>
+    <string name="welcome_location_permission_request">"Sol·licita permís"</string>
     <string name="welcome_location_permission_title">"Permisos d'ubicació"</string>
     <string name="welcome_notification_permission_description">"Per funcionar completament, OwnTracks necessita el vostre permís per mostrar algunes notificacions.
 
 Es mostrarà una notificació permanent per mantenir el seguiment de la ubicació i la connexió activa, i també podeu optar per activar les notificacions per als contactes que fan la transició entre punts d'interès."</string>
     <string name="welcome_notification_permission_granted">"Permisos de notificació concedits"</string>
+    <string name="welcome_notification_permission_request">"Sol·licita permís"</string>
     <string name="welcome_notification_permission_title">"Permisos de notificació"</string>
     <string name="welcome_play_description">"OwnTracks necessita Serveis Google Play"</string>
     <string name="welcome_play_heading">"Serveis Google Play"</string>
