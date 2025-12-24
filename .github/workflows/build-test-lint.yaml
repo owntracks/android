@@ -85,7 +85,7 @@ jobs:
           task: lint
           gradle-cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
       - name: Upload lint report
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: lint-report
           path: project/app/build/reports/lint-results-gmsDebug.html

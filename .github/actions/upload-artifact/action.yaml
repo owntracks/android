@@ -34,7 +34,7 @@ runs:
       shell: bash
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         if-no-files-found: ${{ inputs.if-no-files-found }}
         name: ${{ inputs.name }}
