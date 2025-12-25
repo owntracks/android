@@ -15,7 +15,7 @@ env:
 
 jobs:
   release:
-    name: Create GH release and promote Play store beta to release
+    name: Create GH release and promote Play store release
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -78,7 +78,7 @@ jobs:
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
 
       - name: Extract changelog
-        run: awk '/^## / { if (p) {exit}; { p=1; next} } p' CHANGELOG.md > this_release_changelog.md
+        run: awk '/^## / { if (p) {exit}; { p=1; next} } p' CHANGELOG.md > fastlane/metadata/android/en-US/changelogs/${{ env.VERSION_CODE}}.txt
 
       - name: Move APKs to project root
         run: |
@@ -92,7 +92,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref_name }}
-          body_path: ./this_release_changelog.md
+          body_path: ./fastlane/metadata/android/en-US/changelogs/${{ env.VERSION_CODE}}.txt
           name: ${{ github.ref_name }}
           draft: true
           prerelease: ${{ contains(github.ref_name, 'beta') }}
