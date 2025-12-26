@@ -100,7 +100,7 @@ jobs:
             ./owntracks-release-*.apk
 
       - name: Promote play store beta from internal
-        run: bundle exec fastlane promote_internal_to_beta version_code:${{ env.VERSION_CODE }}
+        run: bundle exec fastlane promote_internal_to_beta
         working-directory: fastlane
         if: ${{ contains(github.ref_name, 'beta') }}
         env:
