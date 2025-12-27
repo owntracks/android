@@ -68,6 +68,13 @@ jobs:
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
 
+      - name: Assert that version code is valid
+        run: |
+          if ! [[ "${VERSION_CODE}" =~ ^[0-9]+$ ]]; then
+            echo "VERSION_CODE is not a valid integer: ${VERSION_CODE}"
+            exit 1
+          fi
+
       - name: Build release APKs
         uses: ./.github/actions/gradle-task
         with:

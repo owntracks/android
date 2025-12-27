@@ -18,7 +18,7 @@ val googleMapsAPIKey =
 
 val gmsImplementation: Configuration by configurations.creating
 
-val packageVersionCode: Int = System.getenv("VERSION_CODE")?.toInt() ?: 420505000
+val packageVersionCode: Int = System.getenv("VERSION_CODE")?.toInt() ?: 1
 val manuallySetVersion: Boolean = System.getenv("VERSION_CODE") != null
 val enablePlayPublishing: Boolean = !System.getenv("ANDROID_PUBLISHER_CREDENTIALS").isNullOrBlank()
 
