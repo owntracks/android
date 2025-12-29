@@ -15,7 +15,7 @@ import timber.log.Timber
 class BlockingDequeThatAlsoSometimesPersistsThingsToDiskMaybe(
     capacity: Int,
     path: File,
-    parser: Parser
+    parser: Parser,
 ) : LinkedBlockingDeque<MessageBase>(capacity) {
   private val parallelDiskQueueHead: ObjectQueue<MessageBase>
   private val parallelDiskQueue: ObjectQueue<MessageBase>

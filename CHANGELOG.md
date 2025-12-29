@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 2.5.6
+
+### Bug fixes
+
+- Fix slow starts by avoiding blocking the main thread on startup with the disk-backed queue.
+
 ## Version 2.5.5
 
 ### New features
