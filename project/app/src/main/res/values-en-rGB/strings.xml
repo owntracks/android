@@ -14,6 +14,8 @@
     <string name="addWaypoint">"Add waypoint"</string>
     <string name="aLocation">"a region"</string>
     <string name="app_name">"OwnTracks"</string>
+    <string name="backgroundLocationPermissionRequestDialogText">"If you'd like OwnTracks to collect location data even when it's running in the background, an additional permission is needed to allow OwnTracks to receive locations \"all the time\"."</string>
+    <string name="backgroundLocationPermissionRequestDialogTitle">"Background Location Permission"</string>
     <string name="backgroundLocationRestrictionNotificationText">"This version of Android restricts OwnTracks from receiving locations when started in the background until the app is opened. Click this notification to open the app and start tracking location."</string>
     <string name="backgroundLocationRestrictionNotificationTitle">"Location Tracking Paused"</string>
     <string name="batteryOptimizationWhitelistDialogButtonLabel">"Battery optimisation settings"</string>
@@ -85,6 +87,8 @@ To allow this, please enable Location in the device settings."</string>
     <string name="IDLE">"Idle"</string>
     <string name="importConfig">"Import"</string>
     <string name="INITIAL">"Initialising"</string>
+    <string name="invalidLatitudeError">"Invalid latitude"</string>
+    <string name="invalidLongitudeError">"Invalid longitude"</string>
     <string name="latitude">"Latitude"</string>
     <string name="loadActivityNoFileExplorerFound">"No file explorer app found"</string>
     <string name="loadActivitySelectAFile">"Select a file"</string>
@@ -101,6 +105,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="mapLayerOpenStreetMapWikimediaLabel">"Wikimedia"</string>
     <string name="menuClear">"Clear"</string>
     <string name="menuContactNavigate">"Navigate"</string>
+    <string name="menuContactRequestLocation">"Request Location"</string>
     <string name="mode_heading">"Mode"</string>
     <string name="mode_http_private_label">"HTTP"</string>
     <string name="mode_mqtt_private_label">"MQTT"</string>
@@ -248,6 +253,7 @@ The OpenCage privacy policy can be found &lt;a href=\"https://opencagedata.com/a
     <string name="publish">"Report Location"</string>
     <string name="radius">"Radius (m)"</string>
     <string name="reconnect">"Reconnect"</string>
+    <string name="requestLocationSent">"Request location command sent"</string>
     <string name="save">"Save"</string>
     <string name="select">"Select"</string>
     <string name="shareContactBody">"%1$s last location: %2$s (%3$s) at %4$s"</string>
@@ -288,6 +294,8 @@ The OpenCage privacy policy can be found &lt;a href=\"https://opencagedata.com/a
     <string name="statusLocationPermissionsNone">"None"</string>
     <string name="statusLocationPermissionsPromptNegativeButton">"Cancel"</string>
     <string name="statusLocationPermissionsPromptPositiveButton">"Application Settings"</string>
+
+    <!-- Fuzzy -->
     <string name="statusLocationPermissionsPromptText">"If you want to automatically track locations on device restart, you can enable background location permissions by granting OwnTracks access to your location \"all the time\"."</string>
     <string name="statusLocationPermissionsPromptTitle">"Background location"</string>
     <string name="statusLocationPermissionsUnknown">"Unknown"</string>
@@ -311,6 +319,7 @@ The OpenCage privacy policy can be found &lt;a href=\"https://opencagedata.com/a
     <string name="waypointMigrationErrorNotificationText">"An error occurred whilst migrating waypoints. Some may not have been migrated, so check the logs and re-add."</string>
     <string name="waypointMigrationErrorNotificationTitle">"Error migrating waypoints"</string>
     <string name="waypointsImport">"Import Waypoints"</string>
+    <string name="welcome_background_location_permission_request">"Request Background Permission"</string>
     <string name="welcome_connection_setup_description">"OwnTracks works by sending your location data to a server that you (or someone you trust) owns, making sure you remain in control of your data.
 
 Make sure you know the connection details of your server, whether it's accessible over HTTPS or MQTT and any login credentials.
@@ -339,6 +348,7 @@ Background location permission may improve the frequency and reliability of loca
 
 A permanent notification will be displayed in order to keep the location tracking and connection alive, and you can also choose to enable notifications for contacts transitioning between waypoints."</string>
     <string name="welcome_notification_permission_granted">"Notification permissions granted"</string>
+    <string name="welcome_notification_permission_request">"Request Permission"</string>
     <string name="welcome_notification_permission_title">"Notification permissions"</string>
     <string name="welcome_play_description">"OwnTracks requires Google Play Services"</string>
     <string name="welcome_play_heading">"Google Play Services"</string>

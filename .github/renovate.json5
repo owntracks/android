@@ -3,8 +3,7 @@
   "extends": [
     "config:recommended",
     ":disableRateLimiting",
-    ":rebaseStalePrs",
-    ":disableDependencyDashboard"
+    ":rebaseStalePrs"
   ],
   "assignees": ["growse"],
   "ignoreDeps": ["android"],
