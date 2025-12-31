@@ -272,6 +272,8 @@
     <string name="statusLocationPermissionsNone">"ללא"</string>
     <string name="statusLocationPermissionsPromptNegativeButton">"ביטול"</string>
     <string name="statusLocationPermissionsPromptPositiveButton">"הגדרות אפליקציה"</string>
+
+    <!-- Fuzzy -->
     <string name="statusLocationPermissionsPromptText">"אם ברצונך לעקוב אוטומטית אחר מיקומים בעת הפעלה מחדש של המכשיר, תוכל להפעיל הרשאות מיקום ברקע על ידי הענקת גישה ל- OwnTracks למיקום שלך \"כל הזמן\"."</string>
     <string name="statusLocationPermissionsPromptTitle">"מיקום ברקע"</string>
     <string name="statusLocationPermissionsUnknown">"לא ידוע"</string>
