@@ -18,7 +18,7 @@ val googleMapsAPIKey =
 
 val gmsImplementation: Configuration by configurations.creating
 
-val packageVersionCode: Int = System.getenv("VERSION_CODE")?.toInt() ?: 420505000
+val packageVersionCode: Int = System.getenv("VERSION_CODE")?.toInt() ?: 1
 val manuallySetVersion: Boolean = System.getenv("VERSION_CODE") != null
 val enablePlayPublishing: Boolean = !System.getenv("ANDROID_PUBLISHER_CREDENTIALS").isNullOrBlank()
 
@@ -32,7 +32,7 @@ android {
     targetSdk = 36
 
     versionCode = packageVersionCode
-    versionName = "2.5.5"
+    versionName = "2.5.6"
 
     val localeCount = fileTree("src/main/res/").matching { include("**/strings.xml") }.files.size
 

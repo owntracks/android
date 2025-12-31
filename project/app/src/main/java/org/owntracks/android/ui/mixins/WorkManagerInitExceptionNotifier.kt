@@ -4,7 +4,11 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import org.owntracks.android.BaseApp
 import org.owntracks.android.R
 
@@ -21,8 +25,10 @@ interface WorkManagerInitExceptionNotifier {
 
   class Impl : WorkManagerInitExceptionNotifier {
     override fun notifyOnWorkManagerInitFailure(appCompatActivity: AppCompatActivity) {
-      (appCompatActivity.applicationContext as BaseApp).workManagerFailedToInitialize.observe(
-          appCompatActivity) { value ->
+      (appCompatActivity.applicationContext as BaseApp)
+          .workManagerFailedToInitialize
+          .flowWithLifecycle(appCompatActivity.lifecycle)
+          .onEach { value ->
             if (value) {
               MaterialAlertDialogBuilder(appCompatActivity)
                   .setIcon(R.drawable.ic_baseline_warning_24)
@@ -44,6 +50,7 @@ interface WorkManagerInitExceptionNotifier {
                   .show()
             }
           }
+          .launchIn(appCompatActivity.lifecycleScope)
     }
   }
 }

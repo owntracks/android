@@ -18,7 +18,7 @@ jobs:
           echo "Input ref is empty. Please provide a valid ref."
           exit 1
       - name: "Checkout"
-        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
         with:
           ref: ${{ inputs.ref }}
       - uses: ./.github/actions/gradle-task
@@ -35,7 +35,7 @@ jobs:
           echo "Input ref is empty. Please provide a valid ref."
           exit 1
       - name: "Checkout"
-        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
         with:
           ref: ${{ inputs.ref }}
       - name: Build
@@ -52,7 +52,7 @@ jobs:
       checks: write
     steps:
       - name: "Checkout"
-        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
         with:
           ref: ${{ inputs.ref }}
       - name: Test
@@ -61,7 +61,7 @@ jobs:
           task: app:createGmsDebugUnitTestCoverageReport
           gradle-cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
       - name: JUnit Report Action
-        uses: mikepenz/action-junit-report@v5
+        uses: mikepenz/action-junit-report@v6
         with:
           report_paths: "**/TEST-*.xml"
           detailed_summary: true
@@ -78,14 +78,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout"
-        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
       - name: Build
         uses: ./.github/actions/gradle-task
         with:
           task: lint
           gradle-cache-encryption-key: ${{ secrets.GradleEncryptionKey }}
       - name: Upload lint report
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: lint-report
           path: project/app/build/reports/lint-results-gmsDebug.html

@@ -55,3 +55,10 @@ repos:
         types_or:
           - kotlin
         language: system
+      - id: fastlane
+        name: Fastlane lint
+        description: Lints fastlane configuration
+        entry: bundle exec fastlane list
+        pass_filenames: false
+        language: system
+        files: ^fastlane/Fastfile$

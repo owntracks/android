@@ -20,7 +20,7 @@ import org.owntracks.android.data.EndpointState
 import org.owntracks.android.databinding.UiStatusBinding
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.ui.DrawerProvider
-import org.owntracks.android.ui.mixins.EdgeToEdgeInsetHandler
+import org.owntracks.android.ui.mixins.AppBarInsetHandler
 import org.owntracks.android.ui.mixins.ServiceStarter
 import org.owntracks.android.ui.status.logs.LogViewerActivity
 
@@ -28,7 +28,7 @@ import org.owntracks.android.ui.status.logs.LogViewerActivity
 class StatusActivity :
     AppCompatActivity(),
     ServiceStarter by ServiceStarter.Impl(),
-    EdgeToEdgeInsetHandler by EdgeToEdgeInsetHandler.Impl() {
+    AppBarInsetHandler by AppBarInsetHandler.Impl() {
   @Inject lateinit var drawerProvider: DrawerProvider
 
   @Inject lateinit var preferences: Preferences
@@ -100,7 +100,7 @@ class StatusActivity :
             }
           }
 
-          applyDrawerEdgeToEdgeInsets(drawerLayout, appbar.root, navigationView)
+          applyAppBarEdgeToEdgeInsets(drawerLayout, appbar.root, navigationView)
         }
     supportActionBar?.apply {
       setDisplayShowHomeEnabled(true)

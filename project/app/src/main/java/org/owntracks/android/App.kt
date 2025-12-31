@@ -6,7 +6,6 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.ComponentCallbacks2
-import android.content.Context
 import android.os.Build
 import android.os.StrictMode
 import androidx.annotation.MainThread
@@ -14,7 +13,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NotificationManagerCompat
 import androidx.databinding.DataBindingUtil
 import androidx.hilt.work.HiltWorkerFactory
-import androidx.lifecycle.MutableLiveData
 import androidx.work.Configuration
 import dagger.hilt.EntryPoints
 import dagger.hilt.InstallIn
@@ -24,16 +22,16 @@ import dagger.hilt.android.HiltAndroidApp
 import dagger.hilt.components.SingletonComponent
 import java.security.Security
 import javax.inject.Provider
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.datetime.Instant
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.conscrypt.Conscrypt
-import org.owntracks.android.data.waypoints.RoomWaypointsRepo
 import org.owntracks.android.di.CustomBindingComponentBuilder
 import org.owntracks.android.di.CustomBindingEntryPoint
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.logging.TimberInMemoryLogTree
 import org.owntracks.android.preferences.Preferences
-import org.owntracks.android.preferences.PreferencesStore
 import org.owntracks.android.preferences.types.AppTheme
 import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.services.worker.Scheduler
@@ -70,11 +68,7 @@ open class BaseApp :
 
     fun notificationManager(): NotificationManagerCompat
 
-    fun preferencesStore(): PreferencesStore
-
     fun runThingsOnOtherThreads(): RunThingsOnOtherThreads
-
-    fun roomWaypointsRepo(): RoomWaypointsRepo
   }
 
   private val preferences by lazy {
@@ -97,15 +91,12 @@ open class BaseApp :
     EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).notificationManager()
   }
 
-  private val preferencesStore: PreferencesStore by lazy {
-    EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).preferencesStore()
-  }
-
   private val runThingsOnOtherThreads: RunThingsOnOtherThreads by lazy {
     EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).runThingsOnOtherThreads()
   }
 
-  val workManagerFailedToInitialize = MutableLiveData(false)
+  private val _workManagerFailedToInitialize = MutableStateFlow(false)
+  val workManagerFailedToInitialize: StateFlow<Boolean> = _workManagerFailedToInitialize
 
   override fun onCreate() {
     // Make sure we use Conscrypt for advanced TLS features on all devices.
@@ -156,7 +147,7 @@ open class BaseApp :
     createNotificationChannels()
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-      (this.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager)
+      (this.getSystemService(ACTIVITY_SERVICE) as ActivityManager)
           .getHistoricalProcessExitReasons(this.packageName, 0, 10)
           .firstOrNull()
           ?.run {
@@ -284,7 +275,7 @@ open class BaseApp :
   }
 
   private fun getAvailableMemory(): ActivityManager.MemoryInfo {
-    val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+    val activityManager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
     return ActivityManager.MemoryInfo().also { memoryInfo ->
       activityManager.getMemoryInfo(memoryInfo)
     }
@@ -304,7 +295,7 @@ open class BaseApp :
             .setWorkerFactory(workerFactory)
             .setInitializationExceptionHandler { throwable ->
               Timber.e(throwable, "Exception thrown when initializing WorkManager")
-              workManagerFailedToInitialize.postValue(true)
+              _workManagerFailedToInitialize.value = true
             }
             .setMinimumLoggingLevel(android.util.Log.INFO)
             .build()

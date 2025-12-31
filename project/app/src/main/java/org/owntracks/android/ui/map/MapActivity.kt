@@ -44,7 +44,6 @@ import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -71,8 +70,8 @@ import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.test.ThresholdIdlingResourceInterface
 import org.owntracks.android.ui.DrawerProvider
 import org.owntracks.android.ui.NotificationsStash
+import org.owntracks.android.ui.mixins.AppBarInsetHandler
 import org.owntracks.android.ui.mixins.BackgroundLocationPermissionRequester
-import org.owntracks.android.ui.mixins.EdgeToEdgeInsetHandler
 import org.owntracks.android.ui.mixins.LocationPermissionRequester
 import org.owntracks.android.ui.mixins.NotificationPermissionRequester
 import org.owntracks.android.ui.mixins.ServiceStarter
@@ -87,7 +86,7 @@ class MapActivity :
     View.OnLongClickListener,
     WorkManagerInitExceptionNotifier by WorkManagerInitExceptionNotifier.Impl(),
     ServiceStarter by ServiceStarter.Impl(),
-    EdgeToEdgeInsetHandler by EdgeToEdgeInsetHandler.Impl() {
+    AppBarInsetHandler by AppBarInsetHandler.Impl() {
   private val viewModel: MapViewModel by viewModels()
   private val notificationPermissionRequester =
       NotificationPermissionRequester(
@@ -172,7 +171,9 @@ class MapActivity :
             setSupportActionBar(this)
             drawerProvider.attach(this, drawerLayout, navigationView)
           }
+
           supportActionBar?.setDisplayShowTitleEnabled(false)
+
           bottomSheetBehavior =
               BottomSheetBehavior.from(bottomSheetLayout).apply {
                 addBottomSheetCallback(
@@ -180,6 +181,22 @@ class MapActivity :
                       override fun onStateChanged(bottomSheet: View, newState: Int) {
                         updateFabMyLocationPosition(newState)
                         updateMapPaddingForBottomSheet(newState)
+
+                        ViewCompat.getRootWindowInsets(bottomSheetLayout)?.run {
+                          val insets =
+                              getInsetsIgnoringVisibility(WindowInsetsCompat.Type.systemBars())
+                          val topPadding =
+                              when (newState) {
+                                BottomSheetBehavior.STATE_EXPANDED,
+                                BottomSheetBehavior.STATE_SETTLING -> insets.top
+                                else -> 0
+                              }
+                          bottomSheetLayout.setPadding(
+                              bottomSheetLayout.paddingLeft,
+                              topPadding,
+                              bottomSheetLayout.paddingRight,
+                              bottomSheetLayout.paddingBottom)
+                        }
                       }
 
                       override fun onSlide(bottomSheet: View, slideOffset: Float) {
@@ -221,16 +238,6 @@ class MapActivity :
           }
 
           contactNavigateButton.setOnClickListener { navigateToCurrentContact() }
-
-          // Need to set the appbar layout behaviour to be non-drag, so that we can drag the map
-          AppBarLayout.Behavior()
-              .setDragCallback(
-                  object : AppBarLayout.Behavior.DragCallback() {
-                    override fun canDrag(appBarLayout: AppBarLayout): Boolean {
-                      return false
-                    }
-                  },
-              )
 
           fabMyLocation.apply {
             TooltipCompat.setTooltipText(this, getString(R.string.currentLocationButtonLabel))
@@ -281,7 +288,7 @@ class MapActivity :
               }
               .also { listener -> labels.forEach { it.withListener(listener) } }
 
-          applyDrawerEdgeToEdgeInsets(drawerLayout, appbar.root, navigationView)
+          applyAppBarEdgeToEdgeInsets(drawerLayout, appbar.root, navigationView)
 
           // Apply bottom insets to FABs to avoid navigation bar
           ViewCompat.setOnApplyWindowInsetsListener(mapCoordinatorLayout) { _, windowInsets ->
@@ -378,7 +385,7 @@ class MapActivity :
             )
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
-      } catch (e: ActivityNotFoundException) {
+      } catch (_: ActivityNotFoundException) {
         Snackbar.make(
                 binding.mapCoordinatorLayout,
                 getString(R.string.noNavigationApp),
