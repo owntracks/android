@@ -1,211 +1,290 @@
 package org.owntracks.android.ui
 
 import android.Manifest
-import androidx.test.espresso.Espresso.pressBack
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
-import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
-import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
-import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.PermissionGranter.allowPermissionsIfNeeded
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Assert.assertTrue
+import org.junit.Rule
 import org.junit.Test
 import org.owntracks.android.R
 import org.owntracks.android.testutils.TestWithAnActivity
-import org.owntracks.android.testutils.doIfViewNotVisible
 import org.owntracks.android.testutils.getCurrentActivity
 import org.owntracks.android.ui.map.MapActivity
 import org.owntracks.android.ui.welcome.WelcomeActivity
+import org.owntracks.android.ui.welcome.WelcomeTestTags
 
 @MediumTest
 @HiltAndroidTest
 class WelcomeActivityTests : TestWithAnActivity<WelcomeActivity>() {
+  @get:Rule val composeTestRule = createAndroidComposeRule<WelcomeActivity>()
 
   @Test
   fun welcome_activity_starts_with_intro_fragment() {
-    assertDisplayed(R.string.welcome_heading)
-    assertDisplayed(R.string.welcome_description)
-    assertDisplayed(R.id.btn_next)
+    composeTestRule
+        .onNodeWithText(composeTestRule.activity.getString(R.string.welcome_heading))
+        .assertIsDisplayed()
+    composeTestRule
+        .onNodeWithText(composeTestRule.activity.getString(R.string.welcome_description))
+        .assertIsDisplayed()
+    composeTestRule.onNodeWithTag(WelcomeTestTags.NextButton).assertIsDisplayed()
   }
 
   @Test
   fun welcome_activity_shows_connection_setup_details() {
     // Intro fragment
-    clickOn(R.id.btn_next)
+    composeTestRule.onNodeWithTag(WelcomeTestTags.NextButton).performClick()
     // Connection setup fragment
-    assertDisplayed(R.string.welcome_connection_setup_title)
-    assertDisplayed(R.string.welcome_connection_setup_description)
-    assertDisplayed(R.id.btn_next)
+    composeTestRule
+        .onNodeWithText(composeTestRule.activity.getString(R.string.welcome_connection_setup_title))
+        .assertIsDisplayed()
+    composeTestRule
+        .onNodeWithText(
+            composeTestRule.activity.getString(R.string.welcome_connection_setup_description))
+        .assertIsDisplayed()
+    composeTestRule.onNodeWithTag(WelcomeTestTags.NextButton).assertIsDisplayed()
   }
 
   @SdkSuppress(minSdkVersion = 34)
   @Test
   fun welcome_activity_starts_the_map_activity_when_done() {
     // Intro fragment
-    clickOn(R.id.btn_next)
+    composeTestRule.onNodeWithTag(WelcomeTestTags.NextButton).performClick()
     // Connection setup fragment
-    clickOn(R.id.btn_next)
+    composeTestRule.onNodeWithTag(WelcomeTestTags.NextButton).performClick()
     // Location Permission fragment
-    doIfViewNotVisible(R.id.btn_next) {
-      R.id.ui_fragment_welcome_location_permissions_request.run {
-        assertDisplayed(this)
-        clickOn(this)
-      }
+    composeTestRule.waitForIdle()
+    try {
+      composeTestRule.onNodeWithTag(WelcomeTestTags.LocationPermissionButton).assertIsDisplayed()
+      composeTestRule.onNodeWithTag(WelcomeTestTags.LocationPermissionButton).performClick()
       allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+    } catch (e: AssertionError) {
+      // Permission button not visible, already have permission
     }
-    clickOn(R.id.btn_next)
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag(WelcomeTestTags.NextButton).performClick()
     // Notification permission fragment
-    doIfViewNotVisible(R.id.btn_next) {
-      R.id.ui_fragment_welcome_notification_permissions_request.run {
-        assertDisplayed(this)
-        clickOn(this)
-      }
+    composeTestRule.waitForIdle()
+    try {
+      composeTestRule
+          .onNodeWithTag(WelcomeTestTags.NotificationPermissionButton)
+          .assertIsDisplayed()
+      composeTestRule.onNodeWithTag(WelcomeTestTags.NotificationPermissionButton).performClick()
       allowPermissionsIfNeeded(Manifest.permission.POST_NOTIFICATIONS)
+    } catch (e: AssertionError) {
+      // Permission button not visible, already have permission
     }
-    clickOn(R.id.btn_next)
-    clickOn(R.id.btn_done)
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag(WelcomeTestTags.NextButton).performClick()
+    composeTestRule.onNodeWithTag(WelcomeTestTags.DoneButton).performClick()
     assertTrue(getCurrentActivity() is MapActivity)
   }
 
   @SdkSuppress(minSdkVersion = 29)
   @Test
   fun welcome_activity_prompts_for_background_location_permission() {
-    clickOn(R.id.btn_next)
-    clickOn(R.id.btn_next)
+    composeTestRule.onNodeWithTag(WelcomeTestTags.NextButton).performClick()
+    composeTestRule.onNodeWithTag(WelcomeTestTags.NextButton).performClick()
 
     // Location permissions fragment
-    assertDisplayed(R.string.welcome_location_permission_description)
-    doIfViewNotVisible(R.id.btn_next) {
-      R.id.ui_fragment_welcome_location_permissions_request.run {
-        assertDisplayed(this)
-        clickOn(this)
-      }
+    composeTestRule
+        .onNodeWithText(
+            composeTestRule.activity.getString(R.string.welcome_location_permission_description))
+        .assertIsDisplayed()
+    composeTestRule.waitForIdle()
+    try {
+      composeTestRule.onNodeWithTag(WelcomeTestTags.LocationPermissionButton).assertIsDisplayed()
+      composeTestRule.onNodeWithTag(WelcomeTestTags.LocationPermissionButton).performClick()
       allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+    } catch (e: AssertionError) {
+      // Permission button not visible, already have permission
     }
 
-    assertDisplayed(R.id.btn_next)
-    assertDisplayed(R.id.ui_fragment_welcome_location_background_permissions_request)
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag(WelcomeTestTags.NextButton).assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag(WelcomeTestTags.BackgroundLocationPermissionButton)
+        .assertIsDisplayed()
   }
 
   @SdkSuppress(maxSdkVersion = 28)
   @Test
   fun welcome_activity_doesnt_prompt_for_background_location_permission() {
-    clickOn(R.id.btn_next)
-    clickOn(R.id.btn_next)
+    composeTestRule.onNodeWithTag(WelcomeTestTags.NextButton).performClick()
+    composeTestRule.onNodeWithTag(WelcomeTestTags.NextButton).performClick()
 
     // Location permissions fragment
-    assertDisplayed(R.string.welcome_location_permission_description)
-    doIfViewNotVisible(R.id.btn_next) {
-      R.id.ui_fragment_welcome_location_permissions_request.run {
-        assertDisplayed(this)
-        clickOn(this)
-      }
+    composeTestRule
+        .onNodeWithText(
+            composeTestRule.activity.getString(R.string.welcome_location_permission_description))
+        .assertIsDisplayed()
+    composeTestRule.waitForIdle()
+    try {
+      composeTestRule.onNodeWithTag(WelcomeTestTags.LocationPermissionButton).assertIsDisplayed()
+      composeTestRule.onNodeWithTag(WelcomeTestTags.LocationPermissionButton).performClick()
       allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+    } catch (e: AssertionError) {
+      // Permission button not visible, already have permission
     }
 
-    assertDisplayed(R.id.btn_next)
-    assertNotDisplayed(R.id.ui_fragment_welcome_location_background_permissions_request)
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag(WelcomeTestTags.NextButton).assertIsDisplayed()
+    // Background permission button should not exist on SDK <= 28
+    try {
+      composeTestRule
+          .onNodeWithTag(WelcomeTestTags.BackgroundLocationPermissionButton)
+          .assertIsDisplayed()
+      throw AssertionError(
+          "Background location permission button should not be displayed on SDK <= 28")
+    } catch (e: AssertionError) {
+      if (e.message?.contains("should not be displayed") == true) {
+        throw e
+      }
+      // Expected - button not found
+    }
   }
 
   @SdkSuppress(minSdkVersion = 34)
   @Test
   fun welcome_activity_displays_correct_fragments_with_notification_permissions() {
     // Intro fragment
-    assertDisplayed(R.string.welcome_heading)
-    R.id.btn_next.run {
-      assertDisplayed(this)
-      clickOn(this)
-    }
+    composeTestRule
+        .onNodeWithText(composeTestRule.activity.getString(R.string.welcome_heading))
+        .assertIsDisplayed()
+    composeTestRule.onNodeWithTag(WelcomeTestTags.NextButton).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(WelcomeTestTags.NextButton).performClick()
 
     // Connection setup fragment
-    assertDisplayed(R.string.welcome_connection_setup_title)
-    assertDisplayed(R.string.welcome_connection_setup_description)
-    R.id.btn_next.run {
-      assertDisplayed(this)
-      clickOn(this)
-    }
+    composeTestRule
+        .onNodeWithText(composeTestRule.activity.getString(R.string.welcome_connection_setup_title))
+        .assertIsDisplayed()
+    composeTestRule
+        .onNodeWithText(
+            composeTestRule.activity.getString(R.string.welcome_connection_setup_description))
+        .assertIsDisplayed()
+    composeTestRule.onNodeWithTag(WelcomeTestTags.NextButton).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(WelcomeTestTags.NextButton).performClick()
 
     // Location permissions fragment
-    assertDisplayed(R.string.welcome_location_permission_description)
-    doIfViewNotVisible(R.id.btn_next) {
-      R.id.ui_fragment_welcome_location_permissions_request.run {
-        assertDisplayed(this)
-        clickOn(this)
-      }
+    composeTestRule
+        .onNodeWithText(
+            composeTestRule.activity.getString(R.string.welcome_location_permission_description))
+        .assertIsDisplayed()
+    composeTestRule.waitForIdle()
+    try {
+      composeTestRule.onNodeWithTag(WelcomeTestTags.LocationPermissionButton).assertIsDisplayed()
+      composeTestRule.onNodeWithTag(WelcomeTestTags.LocationPermissionButton).performClick()
       allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+    } catch (e: AssertionError) {
+      // Permission button not visible, already have permission
     }
-    R.id.btn_next.run {
-      assertDisplayed(this)
-      assertDisplayed(R.id.ui_fragment_welcome_location_background_permissions_request)
-      clickOn(this)
-    }
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag(WelcomeTestTags.NextButton).assertIsDisplayed()
+    composeTestRule
+        .onNodeWithTag(WelcomeTestTags.BackgroundLocationPermissionButton)
+        .assertIsDisplayed()
+    composeTestRule.onNodeWithTag(WelcomeTestTags.NextButton).performClick()
 
     // Notification permissions fragment
-    assertDisplayed(R.string.welcome_notification_permission_description)
-    doIfViewNotVisible(R.id.btn_next) {
-      R.id.ui_fragment_welcome_notification_permissions_request.run {
-        assertDisplayed(this)
-        clickOn(this)
-      }
+    composeTestRule
+        .onNodeWithText(
+            composeTestRule.activity.getString(
+                R.string.welcome_notification_permission_description))
+        .assertIsDisplayed()
+    composeTestRule.waitForIdle()
+    try {
+      composeTestRule
+          .onNodeWithTag(WelcomeTestTags.NotificationPermissionButton)
+          .assertIsDisplayed()
+      composeTestRule.onNodeWithTag(WelcomeTestTags.NotificationPermissionButton).performClick()
       allowPermissionsIfNeeded(Manifest.permission.POST_NOTIFICATIONS)
+    } catch (e: AssertionError) {
+      // Permission button not visible, already have permission
     }
-    R.id.btn_next.run {
-      assertDisplayed(this)
-      clickOn(this)
-    }
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag(WelcomeTestTags.NextButton).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(WelcomeTestTags.NextButton).performClick()
 
     // Done fragment
-    assertDisplayed(R.string.done_heading)
-    assertDisplayed(R.string.enjoy_description)
-    assertDisplayed(R.string.welcome_finish_open_preferences_button_label)
-    assertDisplayed(R.id.btn_done)
+    composeTestRule
+        .onNodeWithText(composeTestRule.activity.getString(R.string.done_heading))
+        .assertIsDisplayed()
+    composeTestRule
+        .onNodeWithText(composeTestRule.activity.getString(R.string.enjoy_description))
+        .assertIsDisplayed()
+    composeTestRule
+        .onNodeWithText(
+            composeTestRule.activity.getString(
+                R.string.welcome_finish_open_preferences_button_label))
+        .assertIsDisplayed()
+    composeTestRule.onNodeWithTag(WelcomeTestTags.DoneButton).assertIsDisplayed()
   }
 
   @Test
   @SdkSuppress(minSdkVersion = 24, maxSdkVersion = 33)
   fun welcome_activity_displays_correct_fragments() {
     // Intro fragment
-    assertDisplayed(R.string.welcome_heading)
-    R.id.btn_next.run {
-      assertDisplayed(this)
-      clickOn(this)
-    }
+    composeTestRule
+        .onNodeWithText(composeTestRule.activity.getString(R.string.welcome_heading))
+        .assertIsDisplayed()
+    composeTestRule.onNodeWithTag(WelcomeTestTags.NextButton).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(WelcomeTestTags.NextButton).performClick()
 
     // Connection setup fragment
-    assertDisplayed(R.string.welcome_connection_setup_title)
-
-    assertDisplayed(R.string.welcome_connection_setup_description)
-    R.id.btn_next.run {
-      assertDisplayed(this)
-      clickOn(this)
-    }
+    composeTestRule
+        .onNodeWithText(composeTestRule.activity.getString(R.string.welcome_connection_setup_title))
+        .assertIsDisplayed()
+    composeTestRule
+        .onNodeWithText(
+            composeTestRule.activity.getString(R.string.welcome_connection_setup_description))
+        .assertIsDisplayed()
+    composeTestRule.onNodeWithTag(WelcomeTestTags.NextButton).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(WelcomeTestTags.NextButton).performClick()
 
     // Location permissions fragment
-    assertDisplayed(R.string.welcome_location_permission_description)
-    doIfViewNotVisible(R.id.btn_next) {
-      R.id.ui_fragment_welcome_location_permissions_request.run {
-        assertDisplayed(this)
-        clickOn(this)
-      }
+    composeTestRule
+        .onNodeWithText(
+            composeTestRule.activity.getString(R.string.welcome_location_permission_description))
+        .assertIsDisplayed()
+    composeTestRule.waitForIdle()
+    try {
+      composeTestRule.onNodeWithTag(WelcomeTestTags.LocationPermissionButton).assertIsDisplayed()
+      composeTestRule.onNodeWithTag(WelcomeTestTags.LocationPermissionButton).performClick()
       allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
+    } catch (e: AssertionError) {
+      // Permission button not visible, already have permission
     }
-    R.id.btn_next.run {
-      assertDisplayed(this)
-      clickOn(this)
-    }
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag(WelcomeTestTags.NextButton).assertIsDisplayed()
+    composeTestRule.onNodeWithTag(WelcomeTestTags.NextButton).performClick()
 
     // Done fragment
-    assertDisplayed(R.string.done_heading)
-    assertDisplayed(R.string.enjoy_description)
-    assertDisplayed(R.string.welcome_finish_open_preferences_button_label)
-    assertDisplayed(R.id.btn_done)
+    composeTestRule
+        .onNodeWithText(composeTestRule.activity.getString(R.string.done_heading))
+        .assertIsDisplayed()
+    composeTestRule
+        .onNodeWithText(composeTestRule.activity.getString(R.string.enjoy_description))
+        .assertIsDisplayed()
+    composeTestRule
+        .onNodeWithText(
+            composeTestRule.activity.getString(
+                R.string.welcome_finish_open_preferences_button_label))
+        .assertIsDisplayed()
+    composeTestRule.onNodeWithTag(WelcomeTestTags.DoneButton).assertIsDisplayed()
   }
 
   @Test
   fun welcome_activity_can_be_swiped_back_to_start() {
-    clickOn(R.id.btn_next)
-    pressBack()
-    assertDisplayed(R.string.welcome_heading)
+    composeTestRule.onNodeWithTag(WelcomeTestTags.NextButton).performClick()
+    composeTestRule.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }
+    composeTestRule
+        .onNodeWithText(composeTestRule.activity.getString(R.string.welcome_heading))
+        .assertIsDisplayed()
   }
 }

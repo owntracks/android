@@ -109,9 +109,12 @@ android {
     buildConfig = true
     dataBinding = true
     viewBinding = true
+    compose = true
   }
 
   dataBinding { addKtx = true }
+
+  composeOptions { kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get() }
 
   packaging {
     resources.excludes.add("META-INF/*")
@@ -200,9 +203,20 @@ tasks.withType<Test> {
 tasks.withType<JavaCompile>().configureEach { options.isFork = true }
 
 dependencies {
+  implementation(platform(libs.androidx.compose.bom))
+  androidTestImplementation(platform(libs.androidx.compose.bom))
+
   implementation(libs.bundles.kotlin)
   implementation(libs.bundles.androidx)
   implementation(libs.androidx.test.espresso.idling)
+
+  implementation(libs.androidx.compose.ui)
+  implementation(libs.androidx.compose.material3)
+  implementation(libs.androidx.compose.foundation)
+  implementation(libs.androidx.compose.runtime.livedata)
+  implementation(libs.androidx.compose.ui.tooling.preview)
+  implementation(libs.androidx.compose.activity)
+  implementation(libs.androidx.lifecycle.runtime.compose)
 
   implementation(libs.google.material)
 
@@ -218,6 +232,7 @@ dependencies {
 
   // Utility libraries
   implementation(libs.bundles.hilt)
+  implementation(libs.hilt.navigation.compose)
   implementation(libs.bundles.jackson)
   implementation(libs.square.tape2)
   implementation(libs.timber)
@@ -257,6 +272,10 @@ dependencies {
   androidTestImplementation(libs.okhttp.mockwebserver)
   androidTestImplementation(libs.bundles.kmqtt)
   androidTestImplementation(libs.square.leakcanary)
+  androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+
+  debugImplementation(libs.androidx.compose.ui.tooling)
+  debugImplementation(libs.androidx.compose.ui.test.manifest)
 
   androidTestUtil(libs.bundles.androidx.test.util)
 
