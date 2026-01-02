@@ -70,7 +70,7 @@ jobs:
       - name: Git LFS Pull
         run: git lfs pull
 
-      - uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165 # v5
+      - uses: actions/setup-java@f2beeb24e141e01a676f977032f5a29d81c9e27e # v5
         with:
           distribution: "temurin" # See 'Supported distributions' for available options
           java-version: "21"
