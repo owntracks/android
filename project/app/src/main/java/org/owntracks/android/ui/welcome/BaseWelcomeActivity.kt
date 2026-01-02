@@ -1,138 +1,216 @@
 package org.owntracks.android.ui.welcome
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
-import android.view.ViewGroup
-import android.widget.ImageView
+import androidx.activity.ComponentActivity
 import androidx.activity.addCallback
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updatePadding
-import androidx.databinding.DataBindingUtil
-import androidx.viewpager2.widget.ViewPager2
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
+import androidx.core.net.toUri
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import org.owntracks.android.R
-import org.owntracks.android.databinding.UiWelcomeBinding
 import org.owntracks.android.preferences.Preferences
+import org.owntracks.android.support.RequirementsChecker
+import org.owntracks.android.ui.colorScheme
 import org.owntracks.android.ui.map.MapActivity
-import org.owntracks.android.ui.welcome.fragments.ConnectionSetupFragment
-import org.owntracks.android.ui.welcome.fragments.FinishFragment
-import org.owntracks.android.ui.welcome.fragments.IntroFragment
-import org.owntracks.android.ui.welcome.fragments.LocationPermissionFragment
-import org.owntracks.android.ui.welcome.fragments.NotificationPermissionFragment
-import org.owntracks.android.ui.welcome.fragments.WelcomeFragment
+import org.owntracks.android.ui.mixins.BackgroundLocationPermissionRequester
+import org.owntracks.android.ui.mixins.LocationPermissionRequester
+import org.owntracks.android.ui.preferences.PreferencesActivity
 
-abstract class BaseWelcomeActivity : AppCompatActivity() {
-  private val viewModel: WelcomeViewModel by viewModels()
-  private lateinit var binding: UiWelcomeBinding
-  abstract val fragmentList: List<WelcomeFragment>
-
-  @Inject lateinit var introFragment: IntroFragment
-
-  @Inject lateinit var connectionSetupFragment: ConnectionSetupFragment
-
-  @Inject lateinit var locationPermissionFragment: LocationPermissionFragment
-
-  @Inject lateinit var notificationPermissionFragment: NotificationPermissionFragment
-
-  @Inject lateinit var finishFragment: FinishFragment
+abstract class BaseWelcomeActivity : ComponentActivity() {
+  protected val welcomeViewModel: WelcomeViewModel by viewModels()
 
   @Inject lateinit var preferences: Preferences
+
+  @Inject lateinit var requirementsChecker: RequirementsChecker
+
+  private val locationPermissionRefresh = MutableStateFlow(0)
+
+  private val locationPermissionRequester by
+      lazy(LazyThreadSafetyMode.NONE) {
+        LocationPermissionRequester(
+            this,
+            { _ ->
+              preferences.userDeclinedEnableLocationPermissions = false
+              notifyLocationPermissionsChanged()
+            },
+            { _ ->
+              preferences.userDeclinedEnableLocationPermissions = true
+              notifyLocationPermissionsChanged()
+            })
+      }
+
+  private val backgroundLocationPermissionRequester =
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        BackgroundLocationPermissionRequester(
+            this,
+            {
+              preferences.userDeclinedEnableBackgroundLocationPermissions = false
+              notifyLocationPermissionsChanged()
+            },
+            {
+              preferences.userDeclinedEnableBackgroundLocationPermissions = true
+              notifyLocationPermissionsChanged()
+            })
+      } else {
+        null
+      }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     enableEdgeToEdge()
     super.onCreate(savedInstanceState)
+
     if (preferences.setupCompleted) {
-      startActivity(
-          Intent(this, MapActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK })
+      startMapActivity(true)
       finish()
       return
     }
 
-    binding =
-        DataBindingUtil.setContentView<UiWelcomeBinding>(this, R.layout.ui_welcome).apply {
-          vm = viewModel
-          lifecycleOwner = this@BaseWelcomeActivity
-          viewPager.adapter =
-              WelcomeAdapter(this@BaseWelcomeActivity).apply { addFragmentsToAdapter(this) }
-          viewPager.registerOnPageChangeCallback(
-              object : ViewPager2.OnPageChangeCallback() {
-                override fun onPageSelected(position: Int) {
-                  viewModel.moveToPage(position)
-                  super.onPageSelected(position)
-                }
-              })
-          btnNext.setOnClickListener { viewModel.nextPage() }
-          btnDone.setOnClickListener {
-            startActivity(
-                Intent(this@BaseWelcomeActivity, MapActivity::class.java).apply {
-                  flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-                })
-          }
-
-          // Handle window insets for edge-to-edge
-          ViewCompat.setOnApplyWindowInsetsListener(root) { view, windowInsets ->
-            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-
-            // Apply top and bottom insets to the root layout
-            view.updatePadding(top = insets.top, bottom = insets.bottom)
-
-            WindowInsetsCompat.CONSUMED
-          }
-        }
-
-    viewModel.currentFragmentPosition.observe(this) { position: Int ->
-      binding.viewPager.currentItem = position
-      setPagerIndicator(position)
-    }
-
-    buildPagerIndicator()
     onBackPressedDispatcher.addCallback(this) {
-      if (binding.viewPager.currentItem == 0) {
+      val current = welcomeViewModel.currentFragmentPosition.value ?: 0
+      if (current == 0) {
         finish()
       } else {
-        viewModel.previousPage()
+        welcomeViewModel.previousPage()
+      }
+    }
+
+    setContent {
+      val snackbarHostState = remember { SnackbarHostState() }
+      val pageDescriptors =
+          remember(snackbarHostState) {
+                corePages(snackbarHostState) + additionalPages(snackbarHostState)
+              }
+              .filter { it.visible }
+      val nextEnabled by welcomeViewModel.nextEnabled.observeAsState(true)
+      val doneEnabled by welcomeViewModel.doneEnabled.observeAsState(false)
+      val currentPage by welcomeViewModel.currentFragmentPosition.observeAsState(0)
+
+      MaterialTheme(colorScheme = colorScheme()) {
+        WelcomeFlowScreen(
+            pageDescriptors = pageDescriptors,
+            currentPageIndex = currentPage,
+            nextEnabled = nextEnabled,
+            doneEnabled = doneEnabled,
+            snackbarHostState = snackbarHostState,
+            onNext = { handleNext(pageDescriptors.size) },
+            onDone = { startMapActivity(clearTask = true) })
       }
     }
   }
 
-  private fun addFragmentsToAdapter(welcomeAdapter: WelcomeAdapter) {
-    welcomeAdapter.setupFragments(fragmentList)
+  protected open fun additionalPages(
+      @Suppress("UNUSED_PARAMETER") snackbarHostState: SnackbarHostState
+  ): List<WelcomePageDescriptor> = emptyList()
+
+  private fun handleNext(pageCount: Int) {
+    if (pageCount <= 0) {
+      return
+    }
+    val current = welcomeViewModel.currentFragmentPosition.value ?: 0
+    if (current < pageCount - 1) {
+      welcomeViewModel.nextPage()
+    }
   }
 
-  private fun setPagerIndicator(position: Int) {
-    val itemCount = (binding.viewPager.adapter?.itemCount ?: 0) // TODO Can we globalize
-    if (position < itemCount) {
-      for (i in 0 until itemCount) {
-        val circle = binding.circles.getChildAt(i) as ImageView
-        if (i == position) {
-          circle.alpha = 1f
+  private fun corePages(snackbarHostState: SnackbarHostState): List<WelcomePageDescriptor> {
+    val showNotificationPage = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+    val backgroundRequest =
+        if (backgroundLocationPermissionRequester != null) {
+          { requestBackgroundLocationPermissions() }
         } else {
-          circle.alpha = 0.5f
+          null
         }
+
+    return buildList {
+      add(WelcomePageDescriptor("intro") { IntroPage(welcomeViewModel) })
+      add(
+          WelcomePageDescriptor("connection") {
+            ConnectionSetupPage(
+                viewModel = welcomeViewModel,
+                snackbarHostState = snackbarHostState,
+                onLearnMore = { openDocumentationLink() })
+          })
+      add(
+          WelcomePageDescriptor("location") {
+            LocationPermissionPage(
+                viewModel = welcomeViewModel,
+                preferences = preferences,
+                requirementsChecker = requirementsChecker,
+                permissionUpdates = locationPermissionRefresh.asStateFlow(),
+                onRequestLocationPermissions = ::requestForegroundLocationPermissions,
+                onRequestBackgroundPermissions = backgroundRequest)
+          })
+      if (showNotificationPage) {
+        add(
+            WelcomePageDescriptor("notification") {
+              NotificationPermissionPage(
+                  viewModel = welcomeViewModel,
+                  preferences = preferences,
+                  requirementsChecker = requirementsChecker)
+            })
       }
+      add(
+          WelcomePageDescriptor("finish") {
+            FinishPage(viewModel = welcomeViewModel, onOpenPreferences = ::openPreferences)
+          })
     }
   }
 
-  private fun buildPagerIndicator() {
-    val itemCount = (binding.viewPager.adapter?.itemCount ?: 0)
-    val scale = resources.displayMetrics.density
-    val padding = (5 * scale + 0.5f).toInt()
-    for (i in 0 until itemCount) {
-      val circle = ImageView(this)
-      circle.setImageDrawable(
-          ContextCompat.getDrawable(this, R.drawable.ic_baseline_fiber_manual_record_24))
-      circle.layoutParams =
-          ViewGroup.LayoutParams(
-              ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-      circle.adjustViewBounds = true
-      circle.setPadding(padding, 0, padding, 0)
-      binding.circles.addView(circle)
+  private fun requestForegroundLocationPermissions() {
+    locationPermissionRequester.requestLocationPermissions(
+        0,
+        this,
+        ::shouldShowRequestPermissionRationale,
+    )
+  }
+
+  private fun requestBackgroundLocationPermissions() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+      backgroundLocationPermissionRequester?.requestLocationPermissions(
+          this,
+          ::shouldShowRequestPermissionRationale,
+      )
     }
-    setPagerIndicator(0)
+  }
+
+  private fun notifyLocationPermissionsChanged() {
+    locationPermissionRefresh.update { it + 1 }
+  }
+
+  private fun openPreferences() {
+    startActivity(Intent(this, PreferencesActivity::class.java))
+  }
+
+  private fun openDocumentationLink(): Boolean {
+    return try {
+      startActivity(Intent(Intent.ACTION_VIEW, getString(R.string.documentationUrl).toUri()))
+      true
+    } catch (_: ActivityNotFoundException) {
+      false
+    }
+  }
+
+  private fun startMapActivity(clearTask: Boolean) {
+    val intent =
+        Intent(this, MapActivity::class.java).apply {
+          if (clearTask) {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+          } else {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+          }
+        }
+    startActivity(intent)
   }
 }
