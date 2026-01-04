@@ -14,16 +14,18 @@
     <string name="addWaypoint">"Voeg routepunt toe"</string>
     <string name="aLocation">"een locatie"</string>
     <string name="app_name">"OwnTracks"</string>
+    <string name="backgroundLocationPermissionRequestDialogText">"Als u wilt dat OwnTracks ook locatiedata verzamelt terwijl het op de achtergrond draait, dan is een extra machtiging vereist om OwnTracks toe te staan om \"altijd\" locatie-informatie te ontvangen."</string>
+    <string name="backgroundLocationPermissionRequestDialogTitle">"Machtiging voor achtergrondlocatie"</string>
     <string name="backgroundLocationRestrictionNotificationText">"Deze versie van Android beperkt de ontvangst van locaties door OwnTracks wanneer deze op de achtergrond wordt gestart, totdat de app wordt geopend. Klik op deze melding om de app te openen en het registreren van locaties te starten."</string>
     <string name="backgroundLocationRestrictionNotificationTitle">"Locatieregistratie gepauzeerd"</string>
     <string name="batteryOptimizationWhitelistDialogButtonLabel">"Instellingen voor batterij-optimalisatie"</string>
     <string name="batteryOptimizationWhitelistDialogMessage">"Voor betrouwbare achtergrondwerking moet OwnTracks vrijgesteld zijn van batterij optimalisaties."</string>
-    <string name="batteryOptimizationWhitelistDialogTitle">"Batterij optimalisatie"</string>
+    <string name="batteryOptimizationWhitelistDialogTitle">"Batterij-optimalisatie"</string>
     <string name="cancel">"Annuleren"</string>
     <string name="certificateMigrationRequiredNotificationText">"OwnTracks gebruikt nu TLS-certificaten uit het certificaatarchief van het apparaat.\n\nAls u een aangepast CA of TLS-clientcertificaat gebruikte, voegt u deze toe aan het certificaatarchief van het apparaat."</string>
     <string name="certificateMigrationRequiredNotificationTitle">"Certificaatmigratie vereist"</string>
     <string name="certificateMigrationRequiredOpenSettingsAction">"Open instellingen"</string>
-    <string name="clear_log">"Leegmaken"</string>
+    <string name="clear_log">"Wissen"</string>
     <string name="configurationManagement">"Configuratiebeheer"</string>
     <string name="CONNECTED">"Verbonden"</string>
     <string name="CONNECTING">"Verbinden"</string>
@@ -83,6 +85,8 @@ Om dit mogelijk te maken, schakelt u Locatie in de apparaatinstellingen in."</st
     <string name="IDLE">"Vrij"</string>
     <string name="importConfig">"Importeren"</string>
     <string name="INITIAL">"Initialiseren"</string>
+    <string name="invalidLatitudeError">"Ongeldige breedtegraad"</string>
+    <string name="invalidLongitudeError">"Ongeldige lengtegraad"</string>
     <string name="latitude">"Breedtegraad"</string>
     <string name="loadActivityNoFileExplorerFound">"Geen bestandsverkenner-app gevonden"</string>
     <string name="loadActivitySelectAFile">"Selecteer een bestand"</string>
@@ -99,6 +103,7 @@ Om dit mogelijk te maken, schakelt u Locatie in de apparaatinstellingen in."</st
     <string name="mapLayerOpenStreetMapWikimediaLabel">"Wikimedia"</string>
     <string name="menuClear">"Wissen"</string>
     <string name="menuContactNavigate">"Navigeren"</string>
+    <string name="menuContactRequestLocation">"Locatie opvragen"</string>
     <string name="mode_heading">"Modus"</string>
     <string name="mode_http_private_label">"HTTP"</string>
     <string name="mode_mqtt_private_label">"MQTT"</string>
@@ -162,7 +167,7 @@ Het privacybeleid van OpenCage is te vinden op &lt;a href=\"https://opencagedata
     <string name="preferencesClientId">"Client ID"</string>
     <string name="preferencesClientIdValidationError">"Mag niet leeg zijn"</string>
     <string name="preferencesDebugLog">"Foutopsporing logboek"</string>
-    <string name="preferencesDeviceName">"Apparaat ID"</string>
+    <string name="preferencesDeviceName">"Apparaat-ID"</string>
     <string name="preferencesDeviceNameValidationError">"Mag niet leeg zijn"</string>
     <string name="preferencesDocumentation">"Documentatie"</string>
     <string name="preferencesEditor">"Voorkeuren bewerker"</string>
@@ -175,7 +180,7 @@ Het privacybeleid van OpenCage is te vinden op &lt;a href=\"https://opencagedata
     <string name="preferencesEnableMapRotationSummary">"Draaien van kaart toestaan"</string>
     <string name="preferencesEncryptionKey">"Beveiligingssleutel"</string>
     <string name="preferencesEncryptionKeyDialogMessage">"Beveiligingssleutel wordt na 32 karakters afgekapt"</string>
-    <string name="preferencesEncryptionKeySummary">"Symmetrische sleutel voor payload beveiliging"</string>
+    <string name="preferencesEncryptionKeySummary">"Symmetrische sleutel voor payloadbeveiliging"</string>
     <string name="preferencesExperimental">"Experimenteel"</string>
     <string name="preferencesExportError">"Fout bij het exporteren van configuratie"</string>
     <string name="preferencesExportSuccess">"Export succesvol"</string>
@@ -204,7 +209,7 @@ Het privacybeleid van OpenCage is te vinden op &lt;a href=\"https://opencagedata
     <string name="preferencesNotification">"Meldingen"</string>
     <string name="preferencesNotificationEvents">"Gebeurtenissen"</string>
     <string name="preferencesNotificationEventsSummary">"Notificatie over ontvangen gebeurtenissen"</string>
-    <string name="preferencesNotificationGeocoderErrors">"Geocoder-fouten"</string>
+    <string name="preferencesNotificationGeocoderErrors">"Geocoderfouten"</string>
     <string name="preferencesNotificationGeocoderErrorsSummary">"Geocoderfouten, snelheidslimieten en overschrijding van quota weergeven"</string>
     <string name="preferencesNotificationLocation">"Laatste gerapporteerde lokatie"</string>
     <string name="preferencesNotificationLocationSummary">"Toon laatste gerapporteerde lokatie en tijd"</string>
@@ -221,7 +226,7 @@ Het privacybeleid van OpenCage is te vinden op &lt;a href=\"https://opencagedata
     <string name="preferencesPortValidationError">"Poort moet een getal zijn tussen 1 en 65535"</string>
     <string name="preferencesProfileId">"Modus"</string>
     <string name="preferencesPubExtendedData">"Uitgebreide data"</string>
-    <string name="preferencesPubExtendedDataSummary">"Voeg uitgebreide gegevens toe aan de locatie rapporten"</string>
+    <string name="preferencesPubExtendedDataSummary">"Voeg uitgebreide gegevens toe aan de locatierapporten"</string>
     <string name="preferencesRemoteCommand">"Commando's op afstand"</string>
     <string name="preferencesRemoteCommandSummary">"Sta commando's op afstand toe"</string>
     <string name="preferencesRemoteConfiguration">"Configuratie op afstand"</string>
@@ -240,7 +245,7 @@ Het privacybeleid van OpenCage is te vinden op &lt;a href=\"https://opencagedata
     <string name="preferencesTrackerIdValidationError">"Moet 1 of 2 karakters zijn"</string>
     <string name="preferencesUrlValidationError">"Ongeldige HTTP URL"</string>
     <string name="preferencesUsername">"Gebruikersnaam"</string>
-    <string name="preferencesWebsocket">"Gebruik websockets"</string>
+    <string name="preferencesWebsocket">"Gebruik WebSockets"</string>
 
     <!-- Fuzzy -->
     <string name="publish">"Rapporteer"</string>
@@ -248,14 +253,15 @@ Het privacybeleid van OpenCage is te vinden op &lt;a href=\"https://opencagedata
     <!-- Fuzzy -->
     <string name="radius">"Diameter"</string>
     <string name="reconnect">"Opnieuw verbinden"</string>
+    <string name="requestLocationSent">"Commando voor locatie-aanvraag verzonden"</string>
     <string name="save">"Opslaan"</string>
     <string name="select">"Selecteer"</string>
     <string name="shareContactBody">"%1$s laatste locatie: %2$s (%3$s) bij %4$s"</string>
-    <string name="status_background_service_started_hint">"Achtergrond service gestart"</string>
+    <string name="status_background_service_started_hint">"Achtergrondservice gestart"</string>
     <string name="status_battery_optimization_whitelisted_hint">"Batterijoptimalisatie uitgeschakeld"</string>
-    <string name="status_endpoint_queue_hint">"Eindpunt wachtrij"</string>
-    <string name="status_endpoint_state_hint">"Eindpunt status"</string>
-    <string name="status_endpoint_state_message_hint">"Eindpunt status bericht"</string>
+    <string name="status_endpoint_queue_hint">"Eindpuntwachtrij"</string>
+    <string name="status_endpoint_state_hint">"Eindpuntstatus"</string>
+    <string name="status_endpoint_state_message_hint">"Eindpuntstatusbericht"</string>
     <string name="status_last_background_update_hint">"Locatieservice laatste achtergrondupdate"</string>
     <string name="statusBatteryDozeWhiteListDisabled">"Nee"</string>
     <string name="statusBatteryDozeWhiteListEnabled">"Ja"</string>
@@ -265,7 +271,7 @@ Het privacybeleid van OpenCage is te vinden op &lt;a href=\"https://opencagedata
     <string name="statusEndpointStateMessageConnectionRefused">"Verbinding geweigerd"</string>
     <string name="statusEndpointStateMessageEndpointDoesNotSupportWebsockets">"Endpoint ondersteunt geen WebSockets"</string>
     <string name="statusEndpointStateMessageEOFError">"EOFException van endpoint: verwacht het eindpunt TLS?"</string>
-    <string name="statusEndpointStateMessageInvalidClientId">"Ongeldige cloient ID"</string>
+    <string name="statusEndpointStateMessageInvalidClientId">"Ongeldige client ID"</string>
     <string name="statusEndpointStateMessageInvalidProtocolVersion">"Ongeldige MQTT-protocolversie"</string>
     <string name="statusEndpointStateMessageMalformedHostPort">"Ongeldige hostnaam &amp; poort"</string>
     <string name="statusEndpointStateMessageMissingHost">"Geen host opgegeven"</string>
@@ -288,6 +294,8 @@ Het privacybeleid van OpenCage is te vinden op &lt;a href=\"https://opencagedata
     <string name="statusLocationPermissionsNone">"Geen"</string>
     <string name="statusLocationPermissionsPromptNegativeButton">"Afbreken"</string>
     <string name="statusLocationPermissionsPromptPositiveButton">"Doorgaan"</string>
+
+    <!-- Fuzzy -->
     <string name="statusLocationPermissionsPromptText">"OwnTracks heeft permanent toegang tot uw locatie nodig om naar behoren te werken."</string>
     <string name="statusLocationPermissionsPromptTitle">"Achtergrondlocatie"</string>
     <string name="statusLocationPermissionsUnknown">"Onbekend"</string>
@@ -311,6 +319,7 @@ Het privacybeleid van OpenCage is te vinden op &lt;a href=\"https://opencagedata
     <string name="waypointMigrationErrorNotificationText">"Er is een fout opgetreden tijdens het migreren van routepunten. Sommige zijn mogelijk niet gemigreerd, dus controleer de logboeken en voeg ze opnieuw toe."</string>
     <string name="waypointMigrationErrorNotificationTitle">"Fout bij migreren van routepunten"</string>
     <string name="waypointsImport">"Routepunten importeren"</string>
+    <string name="welcome_background_location_permission_request">"Machtiging voor achtergrondlocatie aanvragen"</string>
     <string name="welcome_connection_setup_description">"OwnTracks werkt door je locatiegegevens te versturen naar een server die jij (of iemand die je vertrouwt) beheert, zodat je de controle over je gegevens behoudt.
 
 Zorg ervoor dat je de verbindingsgegevens van je server kent, of deze toegankelijk is via HTTPS of MQTT, en eventuele inloggegevens.
@@ -323,18 +332,23 @@ Raadpleeg de OwnTracks-Booklet voor meer informatie."</string>
     <string name="welcome_description">"De volgende stappen helpen je met OwnTracks te beginnen"</string>
     <string name="welcome_finish_open_preferences_button_label">"Open voorkeuren"</string>
     <string name="welcome_heading">"Welkom"</string>
+
+    <!-- Fuzzy -->
     <string name="welcome_location_permission_description">"Om uw huidige locatie te ontvangen en naar uw OwnTracks-eindpunt te sturen, heeft OwnTracks uw toestemming nodig om toegang te krijgen tot de locatie van uw apparaat.
 
-U kunt deze toestemming bekijken en aanvullende (achtergrond)locatietoestemmingen instrellen op de statuspagina.
+U kunt deze toestemming bekijken en aanvullende (achtergrond)locatietoestemmingen instellen op de statuspagina.
 
 Achtergrondlocatietoestemming kan de frequentie en betrouwbaarheid van locatiegegevens verbeteren, afhankelijk van uw apparaat en configuratie."</string>
     <string name="welcome_location_permission_granted">"Locatierechten verleend"</string>
+
+    <!-- Fuzzy -->
     <string name="welcome_location_permission_request">"Verzoek"</string>
     <string name="welcome_location_permission_title">"Locatietoestemming"</string>
     <string name="welcome_notification_permission_description">"Om volledig te kunnen functioneren, heeft OwnTracks uw toestemming nodig om bepaalde meldingen weer te geven.
 
 Er wordt een permanente melding weergegeven om de locatiebepaling en verbinding actief te houden. U kunt er ook voor kiezen om meldingen in te schakelen voor contacten die tussen waypoints wisselen."</string>
     <string name="welcome_notification_permission_granted">"Machtiging voor notificaties verleend"</string>
+    <string name="welcome_notification_permission_request">"Machtiging aanvragen"</string>
     <string name="welcome_notification_permission_title">"Machtiging voor notificaties"</string>
     <string name="welcome_play_description">"OwnTracks vereist Google Play Services"</string>
     <string name="welcome_play_heading">"Google Play Services"</string>

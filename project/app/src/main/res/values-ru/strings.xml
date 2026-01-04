@@ -270,6 +270,8 @@
     <string name="statusLocationPermissionsNone">"Нет"</string>
     <string name="statusLocationPermissionsPromptNegativeButton">"Отмена"</string>
     <string name="statusLocationPermissionsPromptPositiveButton">"Настройки"</string>
+
+    <!-- Fuzzy -->
     <string name="statusLocationPermissionsPromptText">"Если вы хотите, чтобы ваше местоположение отслеживалось сразу после перезапуска устройства, дайте разрешение на определение местоположения в варианте «Разрешить в любом режиме»."</string>
     <string name="statusLocationPermissionsPromptTitle">"Фоновое определение местоположения"</string>
     <string name="statusLocationPermissionsUnknown">"Неизвестно"</string>
@@ -305,6 +307,8 @@
     <string name="welcome_description">"Следующие шаги помогут вам начать работу с OwnTracks"</string>
     <string name="welcome_finish_open_preferences_button_label">"Настройки"</string>
     <string name="welcome_heading">"Добро пожаловать!"</string>
+
+    <!-- Fuzzy -->
     <string name="welcome_location_permission_description">"Для отслеживания вашего местоположения и последующей отправки его на сервер, OwnTracks необходимо разрешение на доступ к сервисам определения местоположения вашего устройства.
 
 Вы можете проверить это разрешение и предоставить дополнительное разрешение на доступ к фоновому определению местоположения позднее в разделе «Статус».

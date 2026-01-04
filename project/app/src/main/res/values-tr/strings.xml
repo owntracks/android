@@ -240,6 +240,8 @@ To allow this, please enable Location in the device settings."</string>
     <string name="statusBatteryDozeWhiteListEnabled">"Evet"</string>
     <string name="statusLocationPermissionsPromptNegativeButton">"İptal"</string>
     <string name="statusLocationPermissionsPromptPositiveButton">"Uygulama Ayarları"</string>
+
+    <!-- Fuzzy -->
     <string name="statusLocationPermissionsPromptText">"Aygıt yeniden başlatıldığında konumları otomatik olarak izlemek istiyorsanız, arka planda konum erişimini \"her zaman\" olarak ayarlamalısınız."</string>
     <string name="statusLocationPermissionsPromptTitle">"Arka plan konumu"</string>
     <string name="title_activity_about">"Hakkında"</string>

@@ -23,6 +23,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.owntracks.android.data.EndpointState
@@ -80,9 +81,17 @@ constructor(
     private val mqttConnectionIdlingResource: SimpleIdlingResource
 ) : Preferences.OnPreferenceChangeListener {
   private var endpoint: MessageProcessorEndpoint? = null
-  private val outgoingQueue: BlockingDeque<MessageBase> =
-      BlockingDequeThatAlsoSometimesPersistsThingsToDiskMaybe(
-          100_000, applicationContext.filesDir, parser)
+  private lateinit var outgoingQueue: BlockingDeque<MessageBase>
+  private val queueInitJob: Job =
+      scope.launch(ioDispatcher) {
+        outgoingQueue =
+            BlockingDequeThatAlsoSometimesPersistsThingsToDiskMaybe(
+                    100_000, applicationContext.filesDir, parser)
+                .apply {
+                  repeat(indices.count()) { outgoingQueueIdlingResource.increment() }
+                  Timber.d("Initialized outgoingQueue with size: $size")
+                }
+      }
   private var dequeueAndSenderJob: Job? = null
   private var retryDelayJob: Job? = null
   private var initialized = false
@@ -102,12 +111,6 @@ constructor(
       }
 
   init {
-    synchronized(outgoingQueue) {
-      for (i in outgoingQueue.indices) {
-        outgoingQueueIdlingResource.increment()
-      }
-      Timber.d("Initializing the outgoingQueueIdlingResource at ${outgoingQueue.size})")
-    }
     preferences.registerOnPreferenceChangedListener(this)
   }
 
@@ -124,6 +127,7 @@ constructor(
             serviceConnection,
             Context.BIND_AUTO_CREATE)
         endpointStateRepo.setState(EndpointState.INITIAL)
+        queueInitJob.join()
         reconnect()
         initialized = true
       }
@@ -165,6 +169,7 @@ constructor(
     }
 
   private fun loadOutgoingMessageProcessor() {
+    runBlocking { queueInitJob.join() }
     Timber.d("Reloading outgoing message processor")
     endpoint?.deactivate().also { Timber.d("Destroying previous endpoint") }
     scope.launch { endpointStateRepo.setQueueLength(outgoingQueue.size) }
@@ -572,6 +577,7 @@ constructor(
   override fun onPreferenceChanged(properties: Set<String>) {
     if (properties.intersect(PREFERENCES_THAT_WIPE_QUEUE_AND_CONTACTS).isNotEmpty()) {
       Timber.v("Preferences changed: [${properties.joinToString(",")}] triggering queue wipe")
+      runBlocking { queueInitJob.join() }
       outgoingQueue.also { Timber.i("Clearing outgoing message queue length=${it.size}") }.clear()
       while (!outgoingQueueIdlingResource.isIdleNow) {
         Timber.v("Decrementing outgoingQueueIdlingResource")
