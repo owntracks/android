@@ -121,6 +121,9 @@ constructor(
 
   val viewMode: ViewMode by locationRepo::viewMode
 
+  val zoomLevel: Double?
+    get() = locationRepo.mapViewWindowLocationAndZoom?.zoom
+
   /**
    * Sets the status of the "My Location" button based on whether the location permissions are
    * granted and what the current viewmode is. Whenever these things change, we should call this to
