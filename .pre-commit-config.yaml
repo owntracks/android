@@ -31,7 +31,7 @@ repos:
         exclude: project/gradlew.bat
         args: ["--fix=lf"]
   - repo: https://github.com/rhysd/actionlint
-    rev: v1.7.9
+    rev: v1.7.10
     hooks:
       - id: actionlint-docker
         name: Actionlint
@@ -55,3 +55,10 @@ repos:
         types_or:
           - kotlin
         language: system
+      - id: fastlane
+        name: Fastlane lint
+        description: Lints fastlane configuration
+        entry: bundle exec fastlane list
+        pass_filenames: false
+        language: system
+        files: ^fastlane/Fastfile$

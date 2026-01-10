@@ -286,6 +286,8 @@ Kebijakan privasi OpenCage dapat ditemukan &lt;a href=\"https://opencagedata.com
     <string name="statusLocationPermissionsNone">"Tidak ada"</string>
     <string name="statusLocationPermissionsPromptNegativeButton">"Batal"</string>
     <string name="statusLocationPermissionsPromptPositiveButton">"Pengaturan Aplikasi"</string>
+
+    <!-- Fuzzy -->
     <string name="statusLocationPermissionsPromptText">"Jika Anda ingin melacak lokasi secara otomatis setelah perangkst dimulai ulang, Anda dapat mengaktifkan perizinan lokasi latar belakang dengan memberikan akses OwnTracks ke lokasi Anda \"sepanjang waktu\"."</string>
     <string name="statusLocationPermissionsPromptTitle">"Lokasi latar belakang"</string>
     <string name="statusLocationPermissionsUnknown">"Tidak diketahui"</string>

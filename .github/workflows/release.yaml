@@ -15,7 +15,7 @@ env:
 
 jobs:
   release:
-    name: Create GH release and promote Play store beta to release
+    name: Create GH release and promote Play store release
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -43,7 +43,6 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-          working-directory: fastlane
 
       - name: Get internal track current version code
         if: ${{ contains(github.ref_name, 'beta') || fromJSON(steps.tagCount.outputs.beta_tag_count) == 0 }}
@@ -69,6 +68,13 @@ jobs:
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
 
+      - name: Assert that version code is valid
+        run: |
+          if ! [[ "${VERSION_CODE}" =~ ^[0-9]+$ ]]; then
+            echo "VERSION_CODE is not a valid integer: ${VERSION_CODE}"
+            exit 1
+          fi
+
       - name: Build release APKs
         uses: ./.github/actions/gradle-task
         with:
@@ -79,7 +85,7 @@ jobs:
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
 
       - name: Extract changelog
-        run: awk '/^## / { if (p) {exit}; { p=1; next} } p' CHANGELOG.md > this_release_changelog.md
+        run: awk '/^## / { if (p) {exit}; { p=1; next} } p' CHANGELOG.md > fastlane/metadata/android/en-US/changelogs/${{ env.VERSION_CODE}}.txt
 
       - name: Move APKs to project root
         run: |
@@ -93,7 +99,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref_name }}
-          body_path: ./this_release_changelog.md
+          body_path: ./fastlane/metadata/android/en-US/changelogs/${{ env.VERSION_CODE}}.txt
           name: ${{ github.ref_name }}
           draft: true
           prerelease: ${{ contains(github.ref_name, 'beta') }}

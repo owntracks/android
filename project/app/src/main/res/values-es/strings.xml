@@ -257,6 +257,8 @@
     <string name="welcome_finish_open_preferences_button_label">"Abrir preferencias"</string>
     <string name="welcome_heading">"Bienvenido"</string>
     <string name="welcome_location_permission_granted">"Permisos de ubicación aceptado"</string>
+
+    <!-- Fuzzy -->
     <string name="welcome_location_permission_request">"Solicitar"</string>
     <string name="welcome_notification_permission_granted">"Permisos de notificación aceptado"</string>
     <string name="welcome_notification_permission_title">"Permisos de notificación"</string>

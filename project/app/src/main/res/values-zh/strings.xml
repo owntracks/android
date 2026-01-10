@@ -298,6 +298,8 @@ OpenCage 隐私政策可以在&lt;a href=\"https://opencagedata.com/api#privacy\
     <string name="statusLocationPermissionsNone">"无"</string>
     <string name="statusLocationPermissionsPromptNegativeButton">"取消"</string>
     <string name="statusLocationPermissionsPromptPositiveButton">"应用设置"</string>
+
+    <!-- Fuzzy -->
     <string name="statusLocationPermissionsPromptText">"如果您想在设备重启时自动跟踪位置，可以通过授予 OwnTracks「始终」访问您的位置来启用后台位置权限。"</string>
     <string name="statusLocationPermissionsPromptTitle">"后台位置"</string>
     <string name="statusLocationPermissionsUnknown">"未知"</string>
@@ -347,12 +349,16 @@ OpenCage 隐私政策可以在&lt;a href=\"https://opencagedata.com/api#privacy\
     <string name="welcome_description">"以下步骤将帮助您开始使用 Owntracks"</string>
     <string name="welcome_finish_open_preferences_button_label">"打开首选项"</string>
     <string name="welcome_heading">"欢迎"</string>
+
+    <!-- Fuzzy -->
     <string name="welcome_location_permission_description">"为了接收您的当前位置并发送到 OwnTracks 终端，OwnTracks 需要获取您的设备位置权限。
 
 您可以在状态页面查看此权限并请求额外的（后台）位置权限。
 
 根据您的设备和配置，后台位置权限可能会提高位置数据的频率和可靠性。"</string>
     <string name="welcome_location_permission_granted">"已授予位置权限"</string>
+
+    <!-- Fuzzy -->
     <string name="welcome_location_permission_request">"请求权限"</string>
     <string name="welcome_location_permission_title">"位置权限"</string>
     <string name="welcome_notification_permission_description">"为了完整运行，OwnTracks 需要获取显示某些通知的权限。

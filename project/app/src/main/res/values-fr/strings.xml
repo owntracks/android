@@ -8,7 +8,6 @@
     <string name="aboutTranslations">"Aidez à traduire cette application"</string>
     <plurals name="aboutTranslationsSummary">
         <item quantity="one">"Actuellement disponible en %1$d langue !"</item>
-        <item quantity="many">"Actuellement disponible en %1$d langues !"</item>
         <item quantity="other">"Actuellement disponible en %1$d langues !"</item>
     </plurals>
     <string name="accept">"Accepter"</string>
@@ -130,7 +129,6 @@ Pour y remédier, veuillez activer la localisation dans les paramètres de l'app
     <string name="notificationEndpointStateConnected">"%1$s à %2$s"</string>
     <plurals name="notificationEventsTitle">
         <item quantity="one">"%1$d nouvel événement"</item>
-        <item quantity="many">"%1$d nouveaux événements"</item>
         <item quantity="other">"%1$d nouveaux événements"</item>
     </plurals>
     <string name="play_services_not_available">"Les services Google Play ne sont pas disponibles"</string>
@@ -227,6 +225,8 @@ La politique de confidentialité d'OpenCage est disponible &lt;a href=\"https://
     <string name="preferencesPubExtendedData">"Données étendues"</string>
     <string name="preferencesPubExtendedDataSummary">"Inclure l'état de la batterie, le type de connexion et le mode de surveillance dans les rapports de position"</string>
     <string name="preferencesRemoteCommand">"Commandes à distance"</string>
+
+    <!-- Fuzzy -->
     <string name="preferencesRemoteCommandSummary">"Activer les commandes à distance"</string>
     <string name="preferencesRemoteConfiguration">"Configuration à distance"</string>
     <string name="preferencesRemoteConfigurationSummary">"Activer la mise à jour de la configuration à distance (nécessite des commandes à distance)"</string>
@@ -246,6 +246,8 @@ La politique de confidentialité d'OpenCage est disponible &lt;a href=\"https://
     <string name="preferencesUsername">"Utilisateur"</string>
     <string name="preferencesWebsocket">"Utiliser WebSockets"</string>
     <string name="publish">"Transmettre la position"</string>
+
+    <!-- Fuzzy -->
     <string name="radius">"Rayon (m)"</string>
     <string name="reconnect">"Reconnecter"</string>
     <string name="save">"Enregistrer"</string>
@@ -288,6 +290,8 @@ La politique de confidentialité d'OpenCage est disponible &lt;a href=\"https://
     <string name="statusLocationPermissionsNone">"Aucun"</string>
     <string name="statusLocationPermissionsPromptNegativeButton">"Annuler"</string>
     <string name="statusLocationPermissionsPromptPositiveButton">"Paramètres de l'application"</string>
+
+    <!-- Fuzzy -->
     <string name="statusLocationPermissionsPromptText">"Si vous souhaitez suivre automatiquement les emplacements au redémarrage de l'appareil, vous pouvez activer les autorisations de localisation en arrière-plan en accordant à OwnTracks l'accès à votre localisation \"tout le temps\"."</string>
     <string name="statusLocationPermissionsPromptTitle">"Localisation en arrière-plan"</string>
     <string name="statusLocationPermissionsUnknown">"Inconnu"</string>
@@ -304,7 +308,11 @@ La politique de confidentialité d'OpenCage est disponible &lt;a href=\"https://
     <string name="unableToCopyCertificate">"Impossible de copier le certificat vers le stockage interne"</string>
     <string name="version">"Version"</string>
     <string name="viewLogs">"Afficher les journaux"</string>
+
+    <!-- Fuzzy -->
     <string name="waypoint_region_inside">"Actuellement à l'intérieur"</string>
+
+    <!-- Fuzzy -->
     <string name="waypoint_region_outside">"Actuellement à l'extérieur"</string>
     <string name="waypoint_region_unknown">"État inconnu"</string>
     <string name="waypointListPlaceholder">"Aucun point de passage n'est encore défini"</string>
@@ -323,12 +331,16 @@ Pour plus de détails, consultez le livret OwnTracks."</string>
     <string name="welcome_description">"Les étapes suivantes vous aideront à démarrer avec OwnTracks"</string>
     <string name="welcome_finish_open_preferences_button_label">"Ouvrir les préférences"</string>
     <string name="welcome_heading">"Bienvenue"</string>
+
+    <!-- Fuzzy -->
     <string name="welcome_location_permission_description">"Afin de recevoir votre position actuelle pour l'envoyer à votre point de terminaison OwnTracks, OwnTracks a besoin de votre autorisation pour accéder à la position de votre appareil.
 
 Vous pouvez consulter cette autorisation et demander des permissions de localisation supplémentaires (en arrière-plan) à partir de la page Statut.
 
 L'autorisation de localisation en arrière-plan peut améliorer la fréquence et la fiabilité des données de localisation, en fonction de votre appareil et de votre configuration."</string>
     <string name="welcome_location_permission_granted">"Permissions de localisation accordées"</string>
+
+    <!-- Fuzzy -->
     <string name="welcome_location_permission_request">"Requête"</string>
     <string name="welcome_location_permission_title">"Permissions de localisation"</string>
     <string name="welcome_notification_permission_description">"Pour fonctionner pleinement, OwnTracks a besoin de votre autorisation pour afficher certaines notifications.

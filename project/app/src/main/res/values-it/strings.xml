@@ -277,6 +277,8 @@ Per permetterlo, abilita la geocolizzazione nelle impostazioni del dispositivo."
     <string name="statusLocationPermissionsNone">"Nessuno"</string>
     <string name="statusLocationPermissionsPromptNegativeButton">"Cancella"</string>
     <string name="statusLocationPermissionsPromptPositiveButton">"Impostazioni dell\'applicazione"</string>
+
+    <!-- Fuzzy -->
     <string name="statusLocationPermissionsPromptText">"Se vuoi tracciare automaticamente le posizioni al riavvio del dispositivo, puoi abilitare i permessi di posizionamento in background concedendo a OwnTracks di accedere \"sempre\" alla tua posizione."</string>
     <string name="statusLocationPermissionsPromptTitle">"Posizione in background"</string>
     <string name="statusLocationPermissionsUnknown">"Sconosciuto"</string>
@@ -312,6 +314,8 @@ Per maggiori dettagli, consulta il Manuale OwnTracks."</string>
     <string name="welcome_description">"I prossimi passi ti aiuteranno ad impostare OwnTracks"</string>
     <string name="welcome_finish_open_preferences_button_label">"Apri le Impostazioni"</string>
     <string name="welcome_heading">"Benvenuto"</string>
+
+    <!-- Fuzzy -->
     <string name="welcome_location_permission_description">"Affinché il tuo endpoint OwnTracks riceva la tua posizione corrente, OwnTracks ha bisogno dei tuoi permessi ad acceddere alla posizione del tuo dispositivo.
 
 Puoi controllare questo permesso e chiedere permessi per la posizione aggiutnivi (in background) dalla pagina di Stato.
