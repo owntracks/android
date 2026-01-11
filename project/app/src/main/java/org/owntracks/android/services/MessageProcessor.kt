@@ -86,7 +86,10 @@ constructor(
       scope.launch(ioDispatcher) {
         outgoingQueue =
             BlockingDequeThatAlsoSometimesPersistsThingsToDiskMaybe(
-                    100_000, applicationContext.filesDir, parser)
+                    100_000,
+                    applicationContext.filesDir,
+                    parser,
+                )
                 .apply {
                   repeat(indices.count()) { outgoingQueueIdlingResource.increment() }
                   Timber.d("Initialized outgoingQueue with size: $size")
@@ -541,7 +544,7 @@ constructor(
             preferences.receivedCommandsTopic != message.topic &&
             preferences.subTopic ==
                 DEFAULT_SUB_TOPIC // If we're not using the default subtopic, we receive commands
-                                  // from
+    // from
     // anywhere
     ) {
       Timber.e("cmd message received on wrong topic")
