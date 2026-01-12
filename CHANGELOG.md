@@ -2,6 +2,10 @@
 
 ## Version 2.5.6
 
+### New features
+
+- Migrated message queue to use Room database instead of tape2 for better async performance and reliability
+
 ### Bug fixes
 
 - Fix slow starts by avoiding blocking the main thread on startup with the disk-backed queue.
