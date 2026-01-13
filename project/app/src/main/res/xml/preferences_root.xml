@@ -45,4 +45,18 @@
         android:key="configuration"
         android:title="@string/configurationManagement"
         app:icon="@drawable/ic_baseline_import_export_24" />
+    <PreferenceCategory android:title="@string/preferencesInfo">
+        <Preference
+            android:key="status"
+            android:title="@string/title_activity_status"
+            app:icon="@drawable/ic_baseline_beenhere_24" />
+        <Preference
+            android:key="about"
+            android:title="@string/title_activity_about"
+            app:icon="@drawable/ic_baseline_info_24" />
+        <Preference
+            android:key="exit"
+            android:title="@string/title_exit"
+            app:icon="@drawable/ic_baseline_power_settings_new_24" />
+    </PreferenceCategory>
 </PreferenceScreen>

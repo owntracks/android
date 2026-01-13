@@ -37,6 +37,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.setPadding
 import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import androidx.core.widget.ImageViewCompat
 import androidx.databinding.BindingAdapter
 import androidx.databinding.DataBindingUtil
@@ -68,9 +69,10 @@ import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.support.RequirementsChecker
 import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.test.ThresholdIdlingResourceInterface
-import org.owntracks.android.ui.DrawerProvider
+import org.owntracks.android.ui.contacts.ContactsActivity
+import org.owntracks.android.ui.preferences.PreferencesActivity
+import org.owntracks.android.ui.waypoints.WaypointsActivity
 import org.owntracks.android.ui.NotificationsStash
-import org.owntracks.android.ui.mixins.AppBarInsetHandler
 import org.owntracks.android.ui.mixins.BackgroundLocationPermissionRequester
 import org.owntracks.android.ui.mixins.LocationPermissionRequester
 import org.owntracks.android.ui.mixins.NotificationPermissionRequester
@@ -85,8 +87,7 @@ class MapActivity :
     View.OnClickListener,
     View.OnLongClickListener,
     WorkManagerInitExceptionNotifier by WorkManagerInitExceptionNotifier.Impl(),
-    ServiceStarter by ServiceStarter.Impl(),
-    AppBarInsetHandler by AppBarInsetHandler.Impl() {
+    ServiceStarter by ServiceStarter.Impl() {
   private val viewModel: MapViewModel by viewModels()
   private val notificationPermissionRequester =
       NotificationPermissionRequester(
@@ -134,8 +135,6 @@ class MapActivity :
 
   @Inject lateinit var preferences: Preferences
 
-  @Inject lateinit var drawerProvider: DrawerProvider
-
   private val serviceConnection =
       object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -169,7 +168,27 @@ class MapActivity :
           lifecycleOwner = this@MapActivity
           appbar.toolbar.run {
             setSupportActionBar(this)
-            drawerProvider.attach(this, drawerLayout, navigationView)
+          }
+
+          // Setup bottom navigation
+          bottomNavigation.selectedItemId = R.id.nav_map
+          bottomNavigation.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+              R.id.nav_map -> true
+              R.id.nav_contacts -> {
+                startActivity(Intent(this@MapActivity, ContactsActivity::class.java))
+                true
+              }
+              R.id.nav_waypoints -> {
+                startActivity(Intent(this@MapActivity, WaypointsActivity::class.java))
+                true
+              }
+              R.id.nav_preferences -> {
+                startActivity(Intent(this@MapActivity, PreferencesActivity::class.java))
+                true
+              }
+              else -> false
+            }
           }
 
           supportActionBar?.setDisplayShowTitleEnabled(false)
@@ -288,14 +307,15 @@ class MapActivity :
               }
               .also { listener -> labels.forEach { it.withListener(listener) } }
 
-          applyAppBarEdgeToEdgeInsets(drawerLayout, appbar.root, navigationView)
-
-          // Apply bottom insets to FABs to avoid navigation bar
+          // Apply edge-to-edge insets
           ViewCompat.setOnApplyWindowInsetsListener(mapCoordinatorLayout) { _, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
 
+            appbar.root.updatePadding(top = insets.top)
+            bottomNavigation.updatePadding(bottom = insets.bottom)
+
             fabMapLayers.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-              bottomMargin = insets.bottom + resources.getDimensionPixelSize(R.dimen.fab_margin)
+              bottomMargin = resources.getDimensionPixelSize(R.dimen.fab_margin)
             }
 
             windowInsets
@@ -648,7 +668,6 @@ class MapActivity :
     super.onResume()
     updateMonitoringModeMenu()
     viewModel.updateMyLocationStatus()
-    drawerProvider.updateHighlight()
 
     if (checkAndRequestNotificationPermissions() ==
         CheckPermissionsResult.NO_PERMISSIONS_LAUNCHED_REQUEST) {
@@ -674,7 +693,7 @@ class MapActivity :
     Timber.v("handleIntentExtras")
     val b = if (intent.hasExtra("_args")) intent.getBundleExtra("_args") else Bundle()
     if (b != null) {
-      Timber.v("intent has extras from drawerProvider")
+      Timber.v("intent has extras with contact ID")
       val contactId = b.getString(BUNDLE_KEY_CONTACT_ID)
       if (contactId != null) {
         viewModel.setLiveContact(contactId)

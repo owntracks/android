@@ -109,6 +109,11 @@ android {
     buildConfig = true
     dataBinding = true
     viewBinding = true
+    compose = true
+  }
+
+  composeOptions {
+    kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
   }
 
   dataBinding { addKtx = true }
@@ -203,6 +208,11 @@ dependencies {
   implementation(libs.bundles.kotlin)
   implementation(libs.bundles.androidx)
   implementation(libs.androidx.test.espresso.idling)
+
+  // Compose
+  implementation(platform(libs.compose.bom))
+  implementation(libs.bundles.compose)
+  debugImplementation(libs.compose.ui.tooling)
 
   implementation(libs.google.material)
 

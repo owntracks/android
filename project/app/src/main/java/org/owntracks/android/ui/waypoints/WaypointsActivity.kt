@@ -2,140 +2,98 @@ package org.owntracks.android.ui.waypoints
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import javax.inject.Named
-import kotlin.time.ComparableTimeMark
-import kotlin.time.TimeSource
-import kotlinx.coroutines.launch
-import org.owntracks.android.R
-import org.owntracks.android.data.waypoints.WaypointModel
-import org.owntracks.android.databinding.UiWaypointsBinding
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.test.ThresholdIdlingResourceInterface
-import org.owntracks.android.ui.DrawerProvider
 import org.owntracks.android.ui.NotificationsStash
-import org.owntracks.android.ui.base.ClickHasBeenHandled
-import org.owntracks.android.ui.base.ClickListener
-import org.owntracks.android.ui.mixins.AppBarInsetHandler
 import org.owntracks.android.ui.mixins.NotificationsPermissionRequested
+import org.owntracks.android.ui.navigation.Destination
+import org.owntracks.android.ui.navigation.toActivityClass
 import org.owntracks.android.ui.preferences.load.LoadActivity
+import org.owntracks.android.ui.theme.OwnTracksTheme
 import org.owntracks.android.ui.waypoint.WaypointActivity
-import timber.log.Timber
 
 @AndroidEntryPoint
 class WaypointsActivity :
     AppCompatActivity(),
-    ClickListener<WaypointModel>,
-    NotificationsPermissionRequested by NotificationsPermissionRequested.Impl(),
-    AppBarInsetHandler by AppBarInsetHandler.Impl() {
-  private var recyclerViewStartLayoutInstant: ComparableTimeMark? = null
+    NotificationsPermissionRequested by NotificationsPermissionRequested.Impl() {
 
-  @Inject lateinit var notificationsStash: NotificationsStash
+    @Inject lateinit var notificationsStash: NotificationsStash
 
-  @Inject lateinit var drawerProvider: DrawerProvider
+    @Inject lateinit var preferences: Preferences
 
-  @Inject lateinit var preferences: Preferences
+    @Inject
+    @Named("outgoingQueueIdlingResource")
+    @get:VisibleForTesting
+    lateinit var outgoingQueueIdlingResource: ThresholdIdlingResourceInterface
 
-  @Inject
-  @Named("outgoingQueueIdlingResource")
-  @get:VisibleForTesting
-  lateinit var outgoingQueueIdlingResource: ThresholdIdlingResourceInterface
+    @Inject
+    @Named("publishResponseMessageIdlingResource")
+    @get:VisibleForTesting
+    lateinit var publishResponseMessageIdlingResource: SimpleIdlingResource
 
-  @Inject
-  @Named("publishResponseMessageIdlingResource")
-  @get:VisibleForTesting
-  lateinit var publishResponseMessageIdlingResource: SimpleIdlingResource
+    @Inject
+    @Named("waypointsRecyclerViewIdlingResource")
+    lateinit var waypointsRecyclerViewIdlingResource: ThresholdIdlingResourceInterface
 
-  @Inject
-  @Named("waypointsRecyclerViewIdlingResource")
-  lateinit var waypointsRecyclerViewIdlingResource: ThresholdIdlingResourceInterface
+    private val viewModel: WaypointsViewModel by viewModels()
 
-  private val viewModel: WaypointsViewModel by viewModels()
-  private lateinit var recyclerViewAdapter: WaypointsAdapter
+    override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
+        super.onCreate(savedInstanceState)
+        postNotificationsPermissionInit(this, preferences, notificationsStash)
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    enableEdgeToEdge()
-    super.onCreate(savedInstanceState)
-    recyclerViewAdapter = WaypointsAdapter(this)
-    postNotificationsPermissionInit(this, preferences, notificationsStash)
-    DataBindingUtil.setContentView<UiWaypointsBinding>(this, R.layout.ui_waypoints).apply {
-      vm = viewModel
-      lifecycleOwner = this@WaypointsActivity
-      setSupportActionBar(appbar.toolbar)
-      drawerProvider.attach(appbar.toolbar, drawerLayout, navigationView)
-      waypointsRecyclerView.apply {
-        layoutManager = LinearLayoutManager(this@WaypointsActivity)
-        adapter = recyclerViewAdapter
-        emptyView = placeholder
-        viewTreeObserver.addOnGlobalLayoutListener {
-          Timber.d(
-              "WaypointsActivity: RecyclerView layout took ${recyclerViewStartLayoutInstant!!.elapsedNow()} and has ${recyclerViewAdapter.itemCount} items")
-          waypointsRecyclerViewIdlingResource.set(recyclerViewAdapter.itemCount)
+        setContent {
+            OwnTracksTheme {
+                val waypoints by viewModel.waypointsFlow.collectAsStateWithLifecycle()
+
+                WaypointsScreen(
+                    waypoints = waypoints,
+                    onNavigate = { destination ->
+                        navigateToDestination(destination)
+                    },
+                    onAddClick = {
+                        startActivity(Intent(this@WaypointsActivity, WaypointActivity::class.java))
+                    },
+                    onWaypointClick = { waypoint ->
+                        startActivity(
+                            Intent(this@WaypointsActivity, WaypointActivity::class.java)
+                                .putExtra("waypointId", waypoint.id)
+                        )
+                    },
+                    onImportClick = {
+                        startActivity(Intent(this@WaypointsActivity, LoadActivity::class.java))
+                    },
+                    onExportClick = {
+                        viewModel.exportWaypoints()
+                    },
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
         }
-      }
+    }
 
-      lifecycleScope.launch {
-        lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-          viewModel.waypointsFlow.collect {
-            recyclerViewStartLayoutInstant = TimeSource.Monotonic.markNow()
-            Timber.d("submitting ${it.size} waypoints to adapter")
-            recyclerViewAdapter.submitList(it)
-          }
+    override fun onResume() {
+        super.onResume()
+        requestNotificationsPermission()
+    }
+
+    private fun navigateToDestination(destination: Destination) {
+        val activityClass = destination.toActivityClass() ?: return
+        if (this.javaClass != activityClass) {
+            startActivity(Intent(this, activityClass))
         }
-      }
-
-      applyAppBarEdgeToEdgeInsets(drawerLayout, appbar.root, navigationView)
     }
-  }
-
-  override fun onResume() {
-    super.onResume()
-    drawerProvider.updateHighlight()
-    requestNotificationsPermission()
-  }
-
-  override fun onCreateOptionsMenu(menu: Menu): Boolean {
-    menuInflater.inflate(R.menu.activity_waypoints, menu)
-    return true
-  }
-
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    return when (item.itemId) {
-      R.id.add -> {
-        startActivity(Intent(this, WaypointActivity::class.java))
-        true
-      }
-
-      R.id.exportWaypointsService -> {
-        viewModel.exportWaypoints()
-        true
-      }
-
-      R.id.importWaypoints -> {
-        startActivity(Intent(this, LoadActivity::class.java))
-        true
-      }
-
-      else -> super.onOptionsItemSelected(item)
-    }
-  }
-
-  override fun onClick(thing: WaypointModel, view: View, longClick: Boolean): ClickHasBeenHandled {
-    startActivity(Intent(this, WaypointActivity::class.java).putExtra("waypointId", thing.id))
-    return true
-  }
 }

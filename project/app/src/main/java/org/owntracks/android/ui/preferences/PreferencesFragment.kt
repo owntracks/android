@@ -23,6 +23,22 @@ class PreferencesFragment : AbstractPreferenceFragment() {
           preferences.experimentalFeatures.contains(
               EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI)
     }
+
+    // Setup click handlers for Status, About, and Exit
+    findPreference<Preference>(UI_PREFERENCE_STATUS)?.setOnPreferenceClickListener {
+      (activity as? PreferencesActivity)?.navigateToStatus()
+      true
+    }
+
+    findPreference<Preference>(UI_PREFERENCE_ABOUT)?.setOnPreferenceClickListener {
+      (activity as? PreferencesActivity)?.navigateToAbout()
+      true
+    }
+
+    findPreference<Preference>(UI_PREFERENCE_EXIT)?.setOnPreferenceClickListener {
+      (activity as? PreferencesActivity)?.exitApp()
+      true
+    }
   }
 
   override fun onResume() {
@@ -39,5 +55,8 @@ class PreferencesFragment : AbstractPreferenceFragment() {
     private const val UI_PREFERENCE_SCREEN_CONNECTION = "connectionScreen"
     private const val UI_SCREEN_CONFIGURATION = "configuration"
     private const val UI_PREFERENCE_SCREEN_EXPERIMENTAL = "experimentalScreen"
+    private const val UI_PREFERENCE_STATUS = "status"
+    private const val UI_PREFERENCE_ABOUT = "about"
+    private const val UI_PREFERENCE_EXIT = "exit"
   }
 }
