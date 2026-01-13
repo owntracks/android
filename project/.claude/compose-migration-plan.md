@@ -75,11 +75,22 @@ Replaced drawer navigation with 4-tab bottom navigation across all main screens:
 - **Navigation**: Bottom navigation bar
 - **Contains**: Status, About, and Exit menu items
 
-#### 6. Map Screen
+#### 6. Map Screen (Partial Compose Migration)
 - **Current**: `MapActivity.kt`, `MapFragment.kt` (GMS/OSS variants), `ui_map.xml`
-- **Layout**: CoordinatorLayout with BottomNavigationView (drawer removed)
+- **Layout**: CoordinatorLayout with BottomNavigationView + ComposeView overlay for FABs and bottom sheet
 - **Navigation**: Bottom navigation bar
-- **Features**: Map fragment, bottom sheet for contact details, FABs
+- **Features**: Map fragment, Compose FABs, Compose ModalBottomSheet for contact details
+- **Bottom Sheet Migration (Phase 2 COMPLETED)**:
+  - Created `ContactBottomSheet.kt` - Compose ModalBottomSheet for contact details
+  - Displays contact info: avatar, name, timestamp, geocoded location
+  - Contact details grid: accuracy, altitude, battery, speed, distance, bearing
+  - Action buttons: Request Location, Navigate, Clear, Share
+  - Deleted `ui_contactsheet_parameter.xml` and `AutoResizingTextViewWithListener.kt`
+- **FABs Migration (Phase 3 COMPLETED)**:
+  - Created `MapFabs.kt` - Compose component with MapLayersFab and MyLocationFab
+  - MyLocationFab shows dynamic icon based on `MyLocationStatus` (disabled, available, following)
+  - Removed FABs from `ui_map.xml`
+  - Removed `@BindingAdapter("locationIcon")` from MapActivity companion object
 
 ### Secondary Screens (Back Navigation)
 
@@ -241,17 +252,41 @@ fun SecondaryScreen(
 - LiveData: `val state by viewModel.liveData.observeAsState(initial = defaultValue)`
 - Flow events: Use `LaunchedEffect` to collect
 
+### Hybrid View + Compose (MapActivity Pattern)
+For screens that can't fully migrate to Compose (e.g., MapActivity with MapFragment):
+```kotlin
+// In XML layout, add a ComposeView for Compose overlay:
+<androidx.compose.ui.platform.ComposeView
+    android:id="@+id/composeBottomSheet"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" />
+
+// In Activity, set Compose content on the ComposeView:
+binding.composeBottomSheet.setContent {
+    OwnTracksTheme {
+        val state by viewModel.someState.observeAsState()
+        if (showBottomSheet) {
+            ContactBottomSheet(
+                contact = contact,
+                onDismiss = { /* handle dismiss */ },
+                // ... other callbacks
+            )
+        }
+    }
+}
+```
+
 ## Future Work
 
 ### Potential Improvements
 1. **Single Activity Architecture**: Consolidate all screens into a single MainActivity with NavHost
-2. **Map Screen Compose Migration**: Phase 2-4 as outlined below
+2. **Map Screen Compose Migration**: Phase 4 as outlined below (Phases 1-3 completed)
 3. **Preferences Screen Compose Migration**: Build custom Compose preferences UI
 
 ### Map Screen Migration Phases (Optional)
 1. ~~**Phase 1 (Completed)**: Added bottom navigation, removed drawer~~
-2. **Phase 2 (Partial migration)**: Migrate bottom sheet content to Compose ModalBottomSheet
-3. **Phase 3 (FABs)**: Migrate FABs to Compose FloatingActionButton
+2. ~~**Phase 2 (Completed)**: Migrated bottom sheet content to Compose ModalBottomSheet~~
+3. ~~**Phase 3 (Completed)**: Migrated FABs to Compose FloatingActionButton~~
 4. **Phase 4 (Full migration)**: Convert to single-Activity with NavHost
 
 ## Build Command

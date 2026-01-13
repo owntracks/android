@@ -7,7 +7,13 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.content.res.ColorStateList
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.hardware.SensorManager.SENSOR_DELAY_UI
@@ -16,11 +22,8 @@ import android.os.Bundle
 import android.os.IBinder
 import android.provider.Settings
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.addCallback
 import androidx.activity.enableEdgeToEdge
@@ -29,25 +32,22 @@ import androidx.activity.viewModels
 import androidx.annotation.RequiresPermission
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.LinearLayoutCompat
-import androidx.appcompat.widget.TooltipCompat
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.setPadding
-import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
-import androidx.core.widget.ImageViewCompat
-import androidx.databinding.BindingAdapter
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
@@ -78,14 +78,13 @@ import org.owntracks.android.ui.mixins.LocationPermissionRequester
 import org.owntracks.android.ui.mixins.NotificationPermissionRequester
 import org.owntracks.android.ui.mixins.ServiceStarter
 import org.owntracks.android.ui.mixins.WorkManagerInitExceptionNotifier
+import org.owntracks.android.ui.theme.OwnTracksTheme
 import org.owntracks.android.ui.welcome.WelcomeActivity
 import timber.log.Timber
 
 @AndroidEntryPoint
 class MapActivity :
     AppCompatActivity(),
-    View.OnClickListener,
-    View.OnLongClickListener,
     WorkManagerInitExceptionNotifier by WorkManagerInitExceptionNotifier.Impl(),
     ServiceStarter by ServiceStarter.Impl() {
   private val viewModel: MapViewModel by viewModels()
@@ -104,7 +103,6 @@ class MapActivity :
           ::backgroundLocationPermissionDenied,
       )
   private var service: BackgroundService? = null
-  private var bottomSheetBehavior: BottomSheetBehavior<LinearLayoutCompat>? = null
   private var menu: Menu? = null
   private var sensorManager: SensorManager? = null
   private var orientationSensor: Sensor? = null
@@ -148,6 +146,7 @@ class MapActivity :
         }
       }
 
+  @OptIn(ExperimentalMaterial3Api::class)
   override fun onCreate(savedInstanceState: Bundle?) {
     enableEdgeToEdge()
     EntryPointAccessors.fromActivity(this, MapActivityEntryPoint::class.java).let {
@@ -193,120 +192,6 @@ class MapActivity :
 
           supportActionBar?.setDisplayShowTitleEnabled(false)
 
-          bottomSheetBehavior =
-              BottomSheetBehavior.from(bottomSheetLayout).apply {
-                addBottomSheetCallback(
-                    object : BottomSheetBehavior.BottomSheetCallback() {
-                      override fun onStateChanged(bottomSheet: View, newState: Int) {
-                        updateFabMyLocationPosition(newState)
-                        updateMapPaddingForBottomSheet(newState)
-
-                        ViewCompat.getRootWindowInsets(bottomSheetLayout)?.run {
-                          val insets =
-                              getInsetsIgnoringVisibility(WindowInsetsCompat.Type.systemBars())
-                          val topPadding =
-                              when (newState) {
-                                BottomSheetBehavior.STATE_EXPANDED,
-                                BottomSheetBehavior.STATE_SETTLING -> insets.top
-                                else -> 0
-                              }
-                          bottomSheetLayout.setPadding(
-                              bottomSheetLayout.paddingLeft,
-                              topPadding,
-                              bottomSheetLayout.paddingRight,
-                              bottomSheetLayout.paddingBottom)
-                        }
-                      }
-
-                      override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                        // No-op
-                      }
-                    },
-                )
-              }
-          contactPeek.contactRow.setOnClickListener(this@MapActivity)
-          contactPeek.contactRow.setOnLongClickListener(this@MapActivity)
-          contactClearButton.setOnClickListener { viewModel.onClearContactClicked() }
-          requestLocationReportButton.setOnClickListener {
-            viewModel.sendLocationRequestToCurrentContact()
-          }
-          contactShareButton.setOnClickListener {
-            startActivity(
-                Intent.createChooser(
-                    Intent().apply {
-                      action = Intent.ACTION_SEND
-                      type = "text/plain"
-                      putExtra(
-                          Intent.EXTRA_TEXT,
-                          viewModel.currentContact.value?.run {
-                            getString(
-                                R.string.shareContactBody,
-                                this.displayName,
-                                this.geocodedLocation,
-                                this.latLng?.toDisplayString() ?: "",
-                                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-                                    .withZone(ZoneId.systemDefault())
-                                    .format(Instant.ofEpochSecond(this.locationTimestamp)),
-                            )
-                          } ?: R.string.na,
-                      )
-                    },
-                    "Share Location",
-                ),
-            )
-          }
-
-          contactNavigateButton.setOnClickListener { navigateToCurrentContact() }
-
-          fabMyLocation.apply {
-            TooltipCompat.setTooltipText(this, getString(R.string.currentLocationButtonLabel))
-            setOnClickListener {
-              if (checkAndRequestLocationPermissions(true) ==
-                  CheckPermissionsResult.HAS_PERMISSIONS) {
-                checkAndRequestLocationServicesEnabled(true)
-              }
-              if (viewModel.myLocationStatus.value != MyLocationStatus.DISABLED) {
-                viewModel.onMyLocationClicked()
-              }
-            }
-          }
-
-          fabMapLayers.apply {
-            TooltipCompat.setTooltipText(this, getString(R.string.mapLayerDialogTitle))
-            setOnClickListener {
-              MapLayerBottomSheetDialog().show(supportFragmentManager, "layerBottomSheetDialog")
-            }
-          }
-
-          val labels =
-              listOf(
-                      R.id.contactDetailsAccuracy,
-                      R.id.contactDetailsAltitude,
-                      R.id.contactDetailsBattery,
-                      R.id.contactDetailsBearing,
-                      R.id.contactDetailsSpeed,
-                      R.id.contactDetailsDistance,
-                  )
-                  .map { bottomSheetLayout.findViewById<View>(it) }
-                  .map { it.findViewById<AutoResizingTextViewWithListener>(R.id.label) }
-
-          object : AutoResizingTextViewWithListener.OnTextSizeChangedListener {
-                @SuppressLint("RestrictedApi")
-                override fun onTextSizeChanged(view: View, newSize: Float) {
-                  labels
-                      .filter { it != view }
-                      .filter { it.textSize > newSize || it.configurationChangedFlag }
-                      .forEach {
-                        it.setAutoSizeTextTypeUniformWithPresetSizes(
-                            intArrayOf(newSize.toInt()),
-                            TypedValue.COMPLEX_UNIT_PX,
-                        )
-                        it.configurationChangedFlag = false
-                      }
-                }
-              }
-              .also { listener -> labels.forEach { it.withListener(listener) } }
-
           // Apply edge-to-edge insets
           ViewCompat.setOnApplyWindowInsetsListener(mapCoordinatorLayout) { _, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -314,34 +199,100 @@ class MapActivity :
             appbar.root.updatePadding(top = insets.top)
             bottomNavigation.updatePadding(bottom = insets.bottom)
 
-            fabMapLayers.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-              bottomMargin = resources.getDimensionPixelSize(R.dimen.fab_margin)
-            }
-
             windowInsets
+          }
+
+          // Setup Compose content (FABs and bottom sheet)
+          composeBottomSheet.setContent {
+            OwnTracksTheme {
+              val currentContact by viewModel.currentContact.observeAsState()
+              val bottomSheetHidden by viewModel.bottomSheetHidden.observeAsState(true)
+              val contactDistance by viewModel.contactDistance.observeAsState(0f)
+              val contactBearing by viewModel.contactBearing.observeAsState(0f)
+              val relativeContactBearing by viewModel.relativeContactBearing.observeAsState(0f)
+              val currentLocation by viewModel.currentLocation.observeAsState()
+              val myLocationStatus by viewModel.myLocationStatus.observeAsState(MyLocationStatus.DISABLED)
+              val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+              val scope = rememberCoroutineScope()
+
+              Box(modifier = Modifier.fillMaxSize()) {
+                // FABs positioned at bottom-end, above bottom navigation
+                MapFabs(
+                    myLocationStatus = myLocationStatus,
+                    myLocationEnabled = currentLocation != null,
+                    onMyLocationClick = {
+                      if (checkAndRequestLocationPermissions(true) ==
+                          CheckPermissionsResult.HAS_PERMISSIONS) {
+                        checkAndRequestLocationServicesEnabled(true)
+                      }
+                      if (viewModel.myLocationStatus.value != MyLocationStatus.DISABLED) {
+                        viewModel.onMyLocationClicked()
+                      }
+                    },
+                    onMapLayersClick = {
+                      MapLayerBottomSheetDialog().show(supportFragmentManager, "layerBottomSheetDialog")
+                    },
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(bottom = 72.dp)
+                        .navigationBarsPadding()
+                )
+
+                // Contact bottom sheet
+                currentContact?.let { contact ->
+                  if (!bottomSheetHidden) {
+                    ContactBottomSheet(
+                        contact = contact,
+                        contactDistance = contactDistance,
+                        contactBearing = contactBearing,
+                        relativeContactBearing = relativeContactBearing,
+                        hasCurrentLocation = currentLocation != null,
+                        contactImageBindingAdapter = contactImageBindingAdapter,
+                        sheetState = sheetState,
+                        onDismiss = {
+                          viewModel.onClearContactClicked()
+                        },
+                        onRequestLocation = {
+                          viewModel.sendLocationRequestToCurrentContact()
+                        },
+                        onNavigate = {
+                          navigateToCurrentContact()
+                        },
+                        onClear = {
+                          viewModel.onClearContactClicked()
+                        },
+                        onShare = {
+                          shareCurrentContact()
+                        },
+                        onPeekClick = {
+                          // Expand the bottom sheet
+                          scope.launch {
+                            sheetState.expand()
+                          }
+                          // Register sensor for bearing updates
+                          orientationSensor?.let { sensor ->
+                            sensorManager?.registerListener(
+                                viewModel.orientationSensorEventListener,
+                                sensor,
+                                SENSOR_DELAY_UI
+                            )
+                          }
+                        },
+                        onPeekLongClick = {
+                          viewModel.onBottomSheetLongClick()
+                        }
+                    )
+                  }
+                }
+              }
+            }
           }
         }
 
     backPressedCallback =
         onBackPressedDispatcher.addCallback(this, false) {
-          when (bottomSheetBehavior?.state) {
-            BottomSheetBehavior.STATE_COLLAPSED -> {
-              setBottomSheetHidden()
-            }
-            BottomSheetBehavior.STATE_EXPANDED -> {
-              setBottomSheetCollapsed()
-            }
-            else -> {
-              // If the bottom sheet is hidden, we can just finish the activity
-              if (bottomSheetBehavior?.state == BottomSheetBehavior.STATE_HIDDEN) {
-                finish()
-              } else {
-                setBottomSheetHidden()
-              }
-            }
-          }
+          viewModel.onClearContactClicked()
         }
-    setBottomSheetHidden()
 
     viewModel.apply {
       lifecycleScope.launch {
@@ -359,21 +310,7 @@ class MapActivity :
         }
       }
       currentContact.observe(this@MapActivity) { contact: Contact? ->
-        contact?.let {
-          binding.contactPeek.run {
-            image.setImageResource(0) // Remove old image before async loading the new one
-            lifecycleScope.launch {
-              contactImageBindingAdapter.run { image.setImageBitmap(getBitmapFromCache(it)) }
-            }
-          }
-        }
-      }
-      bottomSheetHidden.observe(this@MapActivity) { o: Boolean? ->
-        if (o == null || o) {
-          setBottomSheetHidden()
-        } else {
-          setBottomSheetCollapsed()
-        }
+        backPressedCallback.isEnabled = contact != null
       }
       currentLocation.observe(this@MapActivity) { location ->
         if (location == null) {
@@ -392,6 +329,32 @@ class MapActivity :
     NotificationManagerCompat.from(this).cancel(BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG, 0)
 
     notifyOnWorkManagerInitFailure(this)
+  }
+
+  private fun shareCurrentContact() {
+    viewModel.currentContact.value?.let { contact ->
+      startActivity(
+          Intent.createChooser(
+              Intent().apply {
+                action = Intent.ACTION_SEND
+                type = "text/plain"
+                putExtra(
+                    Intent.EXTRA_TEXT,
+                    getString(
+                        R.string.shareContactBody,
+                        contact.displayName,
+                        contact.geocodedLocation,
+                        contact.latLng?.toDisplayString() ?: "",
+                        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+                            .withZone(ZoneId.systemDefault())
+                            .format(Instant.ofEpochSecond(contact.locationTimestamp)),
+                    ),
+                )
+              },
+              "Share Location",
+          ),
+      )
+    }
   }
 
   private fun navigateToCurrentContact() {
@@ -689,6 +652,11 @@ class MapActivity :
     }
   }
 
+  override fun onPause() {
+    super.onPause()
+    sensorManager?.unregisterListener(viewModel.orientationSensorEventListener)
+  }
+
   private fun handleIntentExtras(intent: Intent) {
     Timber.v("handleIntentExtras")
     val b = if (intent.hasExtra("_args")) intent.getBundleExtra("_args") else Bundle()
@@ -758,73 +726,11 @@ class MapActivity :
   }
 
   private fun disableLocationMenus() {
-    binding.fabMyLocation.isEnabled = false
     menu?.run { findItem(R.id.menu_report).setEnabled(false).icon?.alpha = 128 }
   }
 
   private fun enableLocationMenus() {
-    binding.fabMyLocation.isEnabled = true
     menu?.run { findItem(R.id.menu_report).setEnabled(true).icon?.alpha = 255 }
-  }
-
-  override fun onLongClick(view: View): Boolean {
-    viewModel.onBottomSheetLongClick()
-    return true
-  }
-
-  private fun setBottomSheetExpanded() {
-    bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_EXPANDED
-    binding.mapFragment.setPaddingRelative(0, 0, 0, binding.bottomSheetLayout.height)
-    orientationSensor?.let {
-      sensorManager?.registerListener(viewModel.orientationSensorEventListener, it, SENSOR_DELAY_UI)
-    }
-    backPressedCallback.isEnabled = true
-  }
-
-  // BOTTOM SHEET CALLBACKS
-  override fun onClick(view: View) {
-    setBottomSheetExpanded()
-  }
-
-  private fun setBottomSheetCollapsed() {
-    bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_COLLAPSED
-    binding.mapFragment.setPaddingRelative(0, 0, 0, bottomSheetBehavior?.peekHeight ?: 0)
-    sensorManager?.unregisterListener(viewModel.orientationSensorEventListener)
-    backPressedCallback.isEnabled = true
-  }
-
-  private fun setBottomSheetHidden() {
-    bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_HIDDEN
-    binding.mapFragment.setPadding(0)
-    menu?.run { close() }
-    sensorManager?.unregisterListener(viewModel.orientationSensorEventListener)
-    backPressedCallback.isEnabled = false
-  }
-
-  private fun updateFabMyLocationPosition(bottomSheetState: Int) {
-    binding.fabMyLocation.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-      bottomMargin =
-          when (bottomSheetState) {
-            BottomSheetBehavior.STATE_COLLAPSED -> {
-              bottomSheetBehavior?.peekHeight ?: 0
-            }
-            else -> 0
-          }
-    }
-  }
-
-  private fun updateMapPaddingForBottomSheet(bottomSheetState: Int) {
-    when (bottomSheetState) {
-      BottomSheetBehavior.STATE_EXPANDED -> {
-        binding.mapFragment.setPaddingRelative(0, 0, 0, binding.bottomSheetLayout.height)
-      }
-      BottomSheetBehavior.STATE_COLLAPSED -> {
-        binding.mapFragment.setPaddingRelative(0, 0, 0, bottomSheetBehavior?.peekHeight ?: 0)
-      }
-      else -> {
-        binding.mapFragment.setPadding(0)
-      }
-    }
   }
 
   override fun onStart() {
@@ -846,21 +752,5 @@ class MapActivity :
     const val IMPLICIT_LOCATION_PERMISSION_REQUEST = 1
     const val EXPLICIT_LOCATION_PERMISSION_REQUEST = 2
 
-    @JvmStatic
-    @BindingAdapter("locationIcon")
-    fun FloatingActionButton.setIcon(status: MyLocationStatus) {
-      val tint =
-          when (status) {
-            MyLocationStatus.FOLLOWING ->
-                resources.getColor(R.color.fabMyLocationForegroundActiveTint, null)
-            else -> resources.getColor(R.color.fabMyLocationForegroundInActiveTint, null)
-          }
-      when (status) {
-        MyLocationStatus.DISABLED -> setImageResource(R.drawable.ic_baseline_location_disabled_24)
-        MyLocationStatus.AVAILABLE -> setImageResource(R.drawable.ic_baseline_location_searching_24)
-        MyLocationStatus.FOLLOWING -> setImageResource(R.drawable.ic_baseline_my_location_24)
-      }
-      ImageViewCompat.setImageTintList(this, ColorStateList.valueOf(tint))
-    }
   }
 }
