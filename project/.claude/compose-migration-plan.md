@@ -32,8 +32,7 @@ Replaced drawer navigation with 4-tab bottom navigation across all main screens:
 - Updated `WaypointsActivity/WaypointsScreen` - replaced drawer with BottomNavBar
 - Updated `PreferencesActivity` - removed drawer, added BottomNavigationView
 - Updated `StatusActivity/StatusScreen` - removed drawer, now uses back navigation (accessed from Preferences)
-- Added Status, About, Exit to preferences_root.xml as menu items
-- Updated `PreferencesFragment` to handle Status/About/Exit clicks
+- Status, About, Exit are now handled directly in PreferencesScreen.kt Compose UI
 
 ### Migrated Screens
 
@@ -66,14 +65,25 @@ Replaced drawer navigation with 4-tab bottom navigation across all main screens:
   - Feedback section (Issues, Mastodon)
 - **Navigation**: Back button (accessed from Preferences > About)
 
-### Screens Using View System (with Bottom Nav)
+### Migrated Main Screens
 
-#### 5. Preferences Screen
-- **Current**: `PreferencesActivity.kt`, multiple `*Fragment.kt` files
-- **Layout**: `ui_preferences.xml` with BottomNavigationView
-- **Complexity**: High - uses PreferenceFragmentCompat with XML preferences
-- **Navigation**: Bottom navigation bar
-- **Contains**: Status, About, and Exit menu items
+#### 5. Preferences Screen (MIGRATED TO COMPOSE - CLEANUP COMPLETED)
+- **Files**: `PreferencesActivity.kt`, `PreferencesScreen.kt`
+- **New Files**:
+  - `PreferenceItems.kt` - Reusable preference composables (SwitchPreference, EditTextPreference, ListPreference, etc.)
+  - `ConnectionPreferencesContent.kt` - Connection/server settings with reconnect action
+  - `MapPreferencesContent.kt` - Map display settings
+  - `ReportingPreferencesContent.kt` - Location reporting settings
+  - `NotificationPreferencesContent.kt` - Notification settings
+  - `AdvancedPreferencesContent.kt` - Advanced settings (services, locator, encryption, misc)
+  - `ExperimentalPreferencesContent.kt` - Experimental features placeholder
+- **Deleted Legacy Files**:
+  - Kotlin: `PreferencesFragment.kt`, `AbstractPreferenceFragment.kt`, `ConnectionFragment.kt`, `MapFragment.kt`, `ReportingFragment.kt`, `NotificationFragment.kt`, `AdvancedFragment.kt`, `ExperimentalFragment.kt`, `ValidatingEditTextPreferenceDialogFragmentCompat.kt`, `PreferencesMenuProvider.kt`
+  - XML: `preferences_root.xml`, `preferences_connection.xml`, `preferences_map.xml`, `preferences_reporting.xml`, `preferences_notification.xml`, `preferences_advanced.xml`, `preferences_experimental.xml`, `menu/preferences_connection.xml`
+- **Layout**: Uses `setContent` with Compose, no longer uses XML layouts or fragments
+- **Navigation**: Bottom navigation bar via `BottomNavBar` composable
+- **Contains**: Internal navigation to sub-screens (Connection, Map, Reporting, Notification, Advanced, Experimental)
+- **Links to**: Status, About, Editor screens via Activity intents
 
 #### 6. Map Screen (Partial Compose Migration)
 - **Current**: `MapActivity.kt`, `MapFragment.kt` (GMS/OSS variants), `ui_map.xml`
@@ -281,7 +291,7 @@ binding.composeBottomSheet.setContent {
 ### Potential Improvements
 1. **Single Activity Architecture**: Consolidate all screens into a single MainActivity with NavHost
 2. **Map Screen Compose Migration**: Phase 4 as outlined below (Phases 1-3 completed)
-3. **Preferences Screen Compose Migration**: Build custom Compose preferences UI
+3. ~~**Preferences Screen Compose Migration**: Build custom Compose preferences UI~~ (COMPLETED)
 
 ### Map Screen Migration Phases (Optional)
 1. ~~**Phase 1 (Completed)**: Added bottom navigation, removed drawer~~
@@ -311,7 +321,9 @@ navigation-compose, lifecycle-runtime-compose
 
 ## Notes
 - Kotlin version is 1.9.25, requires Compose Compiler 1.5.x (not 2.x)
-- DataBinding is still enabled for non-migrated screens (MapActivity, PreferencesActivity)
+- DataBinding is still enabled for MapActivity (uses Compose overlay pattern)
 - ViewModels remain unchanged - they work with both View system and Compose
 - Hilt injection unchanged - @AndroidEntryPoint still works
 - AppDrawer.kt deleted - bottom navigation is now used instead
+- PreferencesActivity fully migrated to Compose - all legacy Fragment files and XML resources deleted
+- SharedPreferencesStore.kt updated to remove references to deleted ConnectionFragment

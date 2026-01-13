@@ -181,6 +181,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesEncryptionKeyDialogMessage">"Encryption key is cut off after 32 characters."</string>
     <string name="preferencesEncryptionKeySummary">"Symmetric key for payload encryption"</string>
     <string name="preferencesExperimental">"Experimental"</string>
+    <string name="noExperimentalFeatures">"No experimental features available"</string>
     <string name="preferencesExportSuccess">"Export successful"</string>
     <string name="preferencesExportError">"Error exporting configuration"</string>
     <string name="preferencesHost">"Host"</string>
@@ -248,6 +249,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesShowWaypointsOnMap">"Show Waypoints"</string>
     <string name="preferencesShowWaypointsOnMapSummary">"Draw waypoint circles on the map"</string>
     <string name="preferencesTheme">"Theme"</string>
+    <string name="preferencesActions">"Actions"</string>
     <string name="preferencesInfo">"Info"</string>
     <string name="preferencesTrackerId">"Tracker ID"</string>
     <string name="preferencesTrackerIdValidationError">"Must be one or two characters"</string>

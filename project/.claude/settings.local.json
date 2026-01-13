@@ -5,7 +5,9 @@
       "Bash(./gradlew dependencies:*)",
       "Bash(where java:*)",
       "Bash(set \"JAVA_HOME=C:\\\\Program Files\\\\Java\\\\jdk-22\")",
-      "Bash(./gradlew compileGmsDebugKotlin:*)"
+      "Bash(./gradlew compileGmsDebugKotlin:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }
