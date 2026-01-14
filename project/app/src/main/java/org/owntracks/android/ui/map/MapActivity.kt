@@ -40,6 +40,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.NotificationManagerCompat
@@ -184,6 +185,11 @@ class MapActivity :
         val currentLocation by viewModel.currentLocation.observeAsState()
         val sendingLocation by viewModel.sendingLocation.observeAsState(false)
 
+        // Sync status state
+        val endpointState by viewModel.endpointState.collectAsStateWithLifecycle()
+        val queueLength by viewModel.queueLength.collectAsStateWithLifecycle()
+        val lastSuccessfulSync by viewModel.lastSuccessfulSync.collectAsStateWithLifecycle()
+
         // Send location when GPS fix becomes available while waiting
         LaunchedEffect(currentLocation, sendingLocation) {
           if (sendingLocation && currentLocation != null) {
@@ -193,6 +199,9 @@ class MapActivity :
 
         // State for monitoring mode bottom sheet
         var showMonitoringSheet by remember { mutableStateOf(false) }
+
+        // State for sync status dialog
+        var showSyncStatusDialog by remember { mutableStateOf(false) }
 
         // State for waypoints menu and export trigger
         var showWaypointsMenu by remember { mutableStateOf(false) }
@@ -248,8 +257,11 @@ class MapActivity :
                   MapTopAppBar(
                       monitoringMode = monitoringMode,
                       sendingLocation = sendingLocation,
+                      endpointState = endpointState,
+                      queueLength = queueLength,
                       onMonitoringClick = { showMonitoringSheet = true },
-                      onReportClick = { viewModel.sendLocation() }
+                      onReportClick = { viewModel.sendLocation() },
+                      onSyncStatusClick = { showSyncStatusDialog = true }
                   )
                 }
                 Destination.Contacts -> {
@@ -372,6 +384,17 @@ class MapActivity :
                 viewModel.setMonitoringMode(mode)
                 showMonitoringSheet = false
               }
+          )
+        }
+
+        // Sync status dialog
+        if (showSyncStatusDialog) {
+          SyncStatusDialog(
+              endpointState = endpointState,
+              queueLength = queueLength,
+              lastSuccessfulSync = lastSuccessfulSync,
+              onDismiss = { showSyncStatusDialog = false },
+              onSyncNow = { viewModel.triggerSync() }
           )
         }
 

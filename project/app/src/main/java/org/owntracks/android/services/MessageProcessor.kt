@@ -325,6 +325,7 @@ constructor(
                       ?: run {
                         Timber.d("Message sent successfully: $message")
                         lastMessageStatus = LastMessageStatus.Success
+                        endpointStateRepo.setLastSuccessfulMessageTime(java.time.Instant.now())
                         if (message !is MessageWaypoint) {
                           messageReceivedIdlingResource.add(message)
                         }
@@ -410,6 +411,11 @@ constructor(
       cancel(CancellationException("Connectivity changed"))
       Timber.d("Resetting message send loop wait.")
     }
+  }
+
+  fun triggerImmediateSync() {
+    Timber.d("Triggering immediate sync")
+    notifyOutgoingMessageQueue()
   }
 
   fun onMessageDeliveryFailedFinal(message: MessageBase) {

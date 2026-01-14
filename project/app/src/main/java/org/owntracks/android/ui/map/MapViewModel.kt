@@ -6,21 +6,23 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.location.Location
 import androidx.annotation.MainThread
-import androidx.databinding.Observable
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.time.Instant
 import javax.inject.Inject
 import kotlin.math.asin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import org.owntracks.android.BR
+import org.owntracks.android.data.EndpointState
 import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.data.repos.ContactsRepoChange
+import org.owntracks.android.data.repos.EndpointStateRepo
 import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.data.waypoints.WaypointModel
 import org.owntracks.android.data.waypoints.WaypointsRepo
@@ -51,6 +53,7 @@ constructor(
     private val preferences: Preferences,
     private val locationRepo: LocationRepo,
     private val waypointsRepo: WaypointsRepo,
+    private val endpointStateRepo: EndpointStateRepo,
     application: Application,
     private val requirementsChecker: RequirementsChecker
 ) : AndroidViewModel(application) {
@@ -98,6 +101,15 @@ constructor(
   private val mutableSendingLocation = MutableLiveData(false)
   val sendingLocation: LiveData<Boolean>
     get() = mutableSendingLocation
+
+  // Sync status state from EndpointStateRepo
+  val endpointState: StateFlow<EndpointState> = endpointStateRepo.endpointState
+  val queueLength: StateFlow<Int> = endpointStateRepo.endpointQueueLength
+  val lastSuccessfulSync: StateFlow<Instant?> = endpointStateRepo.lastSuccessfulMessageTime
+
+  fun triggerSync() {
+    messageProcessor.triggerImmediateSync()
+  }
 
   val currentLocation = LocationLiveData(application, viewModelScope)
 
@@ -234,33 +246,22 @@ constructor(
   /**
    * We need a way of updating other bits in the viewmodel when the current contact's properties
    * change.
-   *
-   * @constructor Create empty Fused contact property changed callback
    */
-  inner class ContactPropertyChangedCallback : Observable.OnPropertyChangedCallback() {
-    override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
-      sender?.run {
-        if (this is Contact) {
-          when (propertyId) {
-            BR.latLng -> {
-              updateActiveContactDistanceAndBearing(this)
-            }
-            BR.trackerId -> {
-              mutableCurrentContact.postValue(this)
-            }
-          }
-        }
-      }
+  private val contactPropertyChangedCallback = object : Contact.PropertyChangedCallback {
+    override fun onLatLngChanged(contact: Contact) {
+      updateActiveContactDistanceAndBearing(contact)
+    }
+
+    override fun onTrackerIdChanged(contact: Contact) {
+      mutableCurrentContact.postValue(contact)
     }
   }
-
-  private val contactPropertyChangedCallback = ContactPropertyChangedCallback()
 
   private fun setViewModeContact(contact: Contact, center: Boolean) {
     Timber.d("setting view mode: VIEW_CONTACT for $contact, center=$center")
     locationRepo.viewMode = ViewMode.Contact(center)
     mutableCurrentContact.value = contact
-    contact.addOnPropertyChangedCallback(contactPropertyChangedCallback)
+    contact.propertyChangedCallback = contactPropertyChangedCallback
     mutableBottomSheetHidden.value = false
     refreshGeocodeForContact(contact)
     updateActiveContactDistanceAndBearing(contact)
@@ -293,7 +294,7 @@ constructor(
   }
 
   private fun clearActiveContact() {
-    mutableCurrentContact.value?.removeOnPropertyChangedCallback(contactPropertyChangedCallback)
+    mutableCurrentContact.value?.propertyChangedCallback = null
     mutableCurrentContact.postValue(null)
     mutableBottomSheetHidden.postValue(true)
   }

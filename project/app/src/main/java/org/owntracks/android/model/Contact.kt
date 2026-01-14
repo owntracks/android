@@ -1,10 +1,7 @@
 package org.owntracks.android.model
 
-import androidx.databinding.BaseObservable
-import androidx.databinding.Bindable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import org.owntracks.android.BR
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.location.LatLng
 import org.owntracks.android.location.toLatLng
@@ -13,10 +10,9 @@ import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.model.messages.MessageTransition
 import timber.log.Timber
 
-class Contact(id: String) : BaseObservable() {
-  @get:Bindable val id: String = id.ifEmpty { "NOID" }
+class Contact(id: String) {
+  val id: String = id.ifEmpty { "NOID" }
 
-  @get:Bindable
   val displayName: String
     get() = name?.ifEmpty { trackerId } ?: trackerId
 
@@ -24,29 +20,22 @@ class Contact(id: String) : BaseObservable() {
   private var name: String? = null
     private set(value) {
       field = value
-      notifyPropertyChanged(BR.displayName)
     }
 
-  @get:Bindable
   var latLng: LatLng? = null
     private set(value) {
+      val changed = field != value
       field = value
-      notifyPropertyChanged(BR.latLng)
+      if (changed) {
+        propertyChangedCallback?.onLatLngChanged(this)
+      }
     }
 
-  @get:Bindable
   var locationTimestamp: Long = 0
-    private set(value) {
-      field = value
-      notifyPropertyChanged(BR.locationTimestamp)
-    }
+    private set
 
-  @get:Bindable
   var face: String? = null
-    private set(value) {
-      field = value
-      notifyPropertyChanged(BR.face)
-    }
+    private set
 
   fun setMessageCard(messageCard: MessageCard) {
     name = messageCard.name
@@ -61,7 +50,11 @@ class Contact(id: String) : BaseObservable() {
       Timber.v("Contact ${this.id} has moved to $latLng")
       latLng = messageLocation.toLatLng()
     }
+    val oldTrackerId = trackerId
     trackerId = messageLocation.trackerId?.take(2) ?: messageLocation.topic.takeLast(2)
+    if (oldTrackerId != trackerId) {
+      propertyChangedCallback?.onTrackerIdChanged(this)
+    }
     locationAccuracy = messageLocation.accuracy
     altitude = messageLocation.altitude
     velocity = messageLocation.velocity
@@ -80,48 +73,23 @@ class Contact(id: String) : BaseObservable() {
     return true
   }
 
-  @get:Bindable
   var locationAccuracy: Int = 0
-    private set(value) {
-      field = value
-      notifyPropertyChanged(BR.locationAccuracy)
-    }
+    private set
 
-  @get:Bindable
   var altitude: Int = 0
-    private set(value) {
-      field = value
-      notifyPropertyChanged(BR.altitude)
-    }
+    private set
 
-  @get:Bindable
   var velocity: Int = 0
-    private set(value) {
-      field = value
-      notifyPropertyChanged(BR.velocity)
-    }
+    private set
 
-  @get:Bindable
   var battery: Int? = null
-    private set(value) {
-      field = value
-      notifyPropertyChanged(BR.battery)
-    }
+    private set
 
-  @get:Bindable
   var geocodedLocation: String? = null
-    private set(value) {
-      field = value
-      notifyPropertyChanged(BR.geocodedLocation)
-    }
+    private set
 
-  @get:Bindable
   var trackerId: String = id.takeLast(2)
-    private set(value) {
-      field = value
-      notifyPropertyChanged(BR.trackerId)
-      notifyPropertyChanged(BR.displayName)
-    }
+    private set
 
   fun geocodeLocation(geocoderProvider: GeocoderProvider, scope: CoroutineScope) {
     latLng?.let { scope.launch { geocodedLocation = geocoderProvider.resolve(it) } }
@@ -130,4 +98,12 @@ class Contact(id: String) : BaseObservable() {
   override fun toString(): String {
     return "Contact $id ($name)"
   }
+
+  // Property change callback for observers
+  interface PropertyChangedCallback {
+    fun onLatLngChanged(contact: Contact)
+    fun onTrackerIdChanged(contact: Contact)
+  }
+
+  var propertyChangedCallback: PropertyChangedCallback? = null
 }

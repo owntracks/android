@@ -16,6 +16,8 @@ class EndpointStateRepo @Inject constructor() {
 
   val serviceStartedDate: MutableStateFlow<Instant> = MutableStateFlow(Instant.now())
 
+  val lastSuccessfulMessageTime: MutableStateFlow<Instant?> = MutableStateFlow(null)
+
   suspend fun setState(newEndpointState: EndpointState) {
     Timber.v(
         "Setting endpoint state $newEndpointState called from: ${
@@ -33,5 +35,10 @@ class EndpointStateRepo @Inject constructor() {
 
   suspend fun setServiceStartedNow() {
     serviceStartedDate.emit(Instant.now())
+  }
+
+  suspend fun setLastSuccessfulMessageTime(time: Instant) {
+    Timber.v("Setting lastSuccessfulMessageTime=$time")
+    lastSuccessfulMessageTime.emit(time)
   }
 }

@@ -25,7 +25,7 @@ extensions.findByName("develocity")?.withGroovyBuilder {
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-  kotlinOptions { jvmTarget = JavaVersion.VERSION_21.toString() }
+  compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21) }
 }
 
 tasks.wrapper { distributionType = Wrapper.DistributionType.BIN }

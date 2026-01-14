@@ -30,6 +30,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.CloudDone
+import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -51,6 +53,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.owntracks.android.R
+import org.owntracks.android.data.EndpointState
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.support.ContactImageBindingAdapter
 
@@ -80,8 +83,11 @@ fun ContactsTopAppBar(
 fun MapTopAppBar(
     monitoringMode: MonitoringMode,
     sendingLocation: Boolean,
+    endpointState: EndpointState,
+    queueLength: Int,
     onMonitoringClick: () -> Unit,
     onReportClick: () -> Unit,
+    onSyncStatusClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val monitoringIcon = when (monitoringMode) {
@@ -129,6 +135,25 @@ fun MapTopAppBar(
             )
         },
         actions = {
+            // Sync status icon button
+            val isSyncError = endpointState == EndpointState.ERROR ||
+                endpointState == EndpointState.ERROR_CONFIGURATION ||
+                endpointState == EndpointState.DISCONNECTED
+            val isSynced = queueLength == 0 && (endpointState == EndpointState.CONNECTED ||
+                endpointState == EndpointState.IDLE)
+
+            IconButton(onClick = onSyncStatusClick) {
+                Icon(
+                    imageVector = if (isSynced) Icons.Filled.CloudDone else Icons.Filled.CloudOff,
+                    contentDescription = stringResource(R.string.sync_status_content_description),
+                    tint = if (isSyncError) {
+                        MaterialTheme.colorScheme.error
+                    } else {
+                        MaterialTheme.colorScheme.onPrimary
+                    }
+                )
+            }
+
             // Send location chip aligned to right
             AssistChip(
                 onClick = onReportClick,

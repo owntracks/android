@@ -367,4 +367,14 @@ Please check the logs for more details."</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="back">Navigate back</string>
+
+    <!-- Sync status dialog -->
+    <string name="sync_status_dialog_title">"Sync Status"</string>
+    <string name="sync_status_connection">"Connection"</string>
+    <string name="sync_status_queue_length">"Messages in queue"</string>
+    <string name="sync_status_last_success">"Last successful sync"</string>
+    <string name="sync_status_never">"Never"</string>
+    <string name="sync_status_sync_now">"Sync Now"</string>
+    <string name="sync_status_close">"Close"</string>
+    <string name="sync_status_content_description">"Sync status"</string>
 </resources>
