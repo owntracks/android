@@ -78,6 +78,7 @@ hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt"
 hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hilt" }
 hilt-androidx = { module = "androidx.hilt:hilt-compiler", version.ref = "hilt-work" }
 hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hilt-work" }
+hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hilt-work" }
 
 # Jackson serde
 jaxb-core = { module = "com.sun.xml.bind:jaxb-core", version.ref = "jaxb" }

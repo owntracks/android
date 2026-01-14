@@ -7,7 +7,18 @@
       "Bash(set \"JAVA_HOME=C:\\\\Program Files\\\\Java\\\\jdk-22\")",
       "Bash(./gradlew compileGmsDebugKotlin:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(.gradlew.bat :app:compileGmsDebugKotlin)",
+      "Bash(./gradlew.bat:*)",
+      "Bash(./gradlew :app:compileOssDebugKotlin:*)",
+      "Bash(./gradlew :app:compileGmsDebugKotlin:*)",
+      "Bash(adb logcat:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(git rm:*)",
+      "Bash(ls:*)",
+      "Bash(file:*)",
+      "Bash(git config:*)",
+      "Bash(~/.gitignore_global)"
     ]
   }
 }

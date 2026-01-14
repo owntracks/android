@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -39,6 +40,10 @@ import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.ui.navigation.BottomNavBar
 import org.owntracks.android.ui.navigation.Destination
 
+/**
+ * Full Contacts screen with Scaffold, TopAppBar, and BottomNavBar.
+ * Used when ContactsActivity is launched as a standalone activity.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ContactsScreen(
@@ -66,36 +71,56 @@ fun ContactsScreen(
         },
         modifier = modifier
     ) { paddingValues ->
-        if (contacts.isEmpty()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = stringResource(R.string.contactsListPlaceholder),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center
+        ContactsScreenContent(
+            contacts = contacts,
+            contactImageBindingAdapter = contactImageBindingAdapter,
+            onContactClick = onContactClick,
+            modifier = Modifier.padding(paddingValues)
+        )
+    }
+}
+
+/**
+ * Content-only version of the Contacts screen without Scaffold.
+ * Used within the NavHost when hosted in a single-activity architecture.
+ * The top bar is managed by the parent MapActivity's Scaffold.
+ */
+@Composable
+fun ContactsScreenContent(
+    contacts: List<Contact>,
+    contactImageBindingAdapter: ContactImageBindingAdapter,
+    onContactClick: (Contact) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    if (contacts.isEmpty()) {
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = stringResource(R.string.contactsListPlaceholder),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
+        }
+    } else {
+        LazyColumn(
+            modifier = modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            items(
+                items = contacts,
+                key = { it.id }
+            ) { contact ->
+                ContactItem(
+                    contact = contact,
+                    contactImageBindingAdapter = contactImageBindingAdapter,
+                    onClick = { onContactClick(contact) }
                 )
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-            ) {
-                items(
-                    items = contacts,
-                    key = { it.id }
-                ) { contact ->
-                    ContactItem(
-                        contact = contact,
-                        contactImageBindingAdapter = contactImageBindingAdapter,
-                        onClick = { onContactClick(contact) }
-                    )
-                }
             }
         }
     }

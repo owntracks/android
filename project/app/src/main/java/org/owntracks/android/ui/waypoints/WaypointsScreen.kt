@@ -1,11 +1,13 @@
 package org.owntracks.android.ui.waypoints
 
 import android.text.format.DateUtils
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -42,6 +44,10 @@ import org.owntracks.android.location.geofencing.Geofence
 import org.owntracks.android.ui.navigation.BottomNavBar
 import org.owntracks.android.ui.navigation.Destination
 
+/**
+ * Full Waypoints screen with Scaffold, TopAppBar, and BottomNavBar.
+ * Used when WaypointsActivity is launched as a standalone activity.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WaypointsScreen(
@@ -57,42 +63,19 @@ fun WaypointsScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.title_activity_waypoints)) },
-                actions = {
-                    IconButton(onClick = onAddClick) {
-                        Icon(Icons.Default.Add, contentDescription = stringResource(R.string.addWaypoint))
-                    }
-                    Box {
-                        IconButton(onClick = { showMenu = true }) {
-                            Icon(Icons.Default.MoreVert, contentDescription = null)
-                        }
-                        DropdownMenu(
-                            expanded = showMenu,
-                            onDismissRequest = { showMenu = false }
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.waypointsImport)) },
-                                onClick = {
-                                    showMenu = false
-                                    onImportClick()
-                                }
-                            )
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.exportWaypointsToEndpoint)) },
-                                onClick = {
-                                    showMenu = false
-                                    onExportClick()
-                                }
-                            )
-                        }
-                    }
+            WaypointsTopAppBar(
+                onAddClick = onAddClick,
+                showMenu = showMenu,
+                onShowMenu = { showMenu = true },
+                onDismissMenu = { showMenu = false },
+                onImportClick = {
+                    showMenu = false
+                    onImportClick()
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary
-                )
+                onExportClick = {
+                    showMenu = false
+                    onExportClick()
+                }
             )
         },
         bottomBar = {
@@ -103,38 +86,107 @@ fun WaypointsScreen(
         },
         modifier = modifier
     ) { paddingValues ->
-        if (waypoints.isEmpty()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = stringResource(R.string.waypointListPlaceholder),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center
+        WaypointsScreenContent(
+            waypoints = waypoints,
+            onWaypointClick = onWaypointClick,
+            modifier = Modifier.padding(paddingValues)
+        )
+    }
+}
+
+/**
+ * Content-only version of the Waypoints screen without Scaffold.
+ * Used within the NavHost when hosted in a single-activity architecture.
+ * The top bar is managed by the parent MapActivity's Scaffold.
+ */
+@Composable
+fun WaypointsScreenContent(
+    waypoints: List<WaypointModel>,
+    onWaypointClick: (WaypointModel) -> Unit,
+    onAddClick: () -> Unit = {},
+    onImportClick: () -> Unit = {},
+    onExportClick: () -> Unit = {},
+    modifier: Modifier = Modifier
+) {
+    if (waypoints.isEmpty()) {
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = stringResource(R.string.waypointListPlaceholder),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
+        }
+    } else {
+        LazyColumn(
+            modifier = modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            items(
+                items = waypoints,
+                key = { it.id }
+            ) { waypoint ->
+                WaypointItem(
+                    waypoint = waypoint,
+                    onClick = { onWaypointClick(waypoint) }
                 )
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-            ) {
-                items(
-                    items = waypoints,
-                    key = { it.id }
-                ) { waypoint ->
-                    WaypointItem(
-                        waypoint = waypoint,
-                        onClick = { onWaypointClick(waypoint) }
-                    )
-                }
             }
         }
     }
+}
+
+/**
+ * TopAppBar for Waypoints screen, extracted for reuse.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun WaypointsTopAppBar(
+    onAddClick: () -> Unit,
+    showMenu: Boolean,
+    onShowMenu: () -> Unit,
+    onDismissMenu: () -> Unit,
+    onImportClick: () -> Unit,
+    onExportClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    TopAppBar(
+        title = { Text(stringResource(R.string.title_activity_waypoints)) },
+        actions = {
+            IconButton(onClick = onAddClick) {
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.addWaypoint))
+            }
+            Box {
+                IconButton(onClick = onShowMenu) {
+                    Icon(Icons.Default.MoreVert, contentDescription = null)
+                }
+                DropdownMenu(
+                    expanded = showMenu,
+                    onDismissRequest = onDismissMenu
+                ) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.waypointsImport)) },
+                        onClick = onImportClick
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.exportWaypointsToEndpoint)) },
+                        onClick = onExportClick
+                    )
+                }
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            titleContentColor = MaterialTheme.colorScheme.onPrimary,
+            actionIconContentColor = MaterialTheme.colorScheme.onPrimary
+        ),
+        modifier = modifier
+    )
 }
 
 @Composable

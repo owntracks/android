@@ -212,6 +212,7 @@ dependencies {
   // Compose
   implementation(platform(libs.compose.bom))
   implementation(libs.bundles.compose)
+  implementation(libs.hilt.navigation.compose)
   debugImplementation(libs.compose.ui.tooling)
 
   implementation(libs.google.material)

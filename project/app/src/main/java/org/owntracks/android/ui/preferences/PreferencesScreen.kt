@@ -1,6 +1,9 @@
 package org.owntracks.android.ui.preferences
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -70,6 +73,10 @@ sealed class PreferenceScreen(val titleResId: Int) {
     }
 }
 
+/**
+ * Full Preferences screen with Scaffold, TopAppBar, and BottomNavBar.
+ * Used when PreferencesActivity is launched as a standalone activity.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PreferencesScreen(
@@ -87,23 +94,9 @@ fun PreferencesScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(currentScreen.titleResId)) },
-                navigationIcon = {
-                    if (currentScreen != PreferenceScreen.Root) {
-                        IconButton(onClick = { currentScreen = PreferenceScreen.Root }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = stringResource(R.string.back)
-                            )
-                        }
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
-                )
+            PreferencesTopAppBar(
+                currentScreen = currentScreen,
+                onBackClick = { currentScreen = PreferenceScreen.Root }
             )
         },
         bottomBar = {
@@ -114,43 +107,142 @@ fun PreferencesScreen(
         },
         modifier = modifier
     ) { paddingValues ->
-        when (currentScreen) {
-            PreferenceScreen.Root -> RootPreferencesContent(
-                preferences = preferences,
-                onNavigateToScreen = { currentScreen = it },
-                onNavigateToStatus = onNavigateToStatus,
-                onNavigateToAbout = onNavigateToAbout,
-                onNavigateToEditor = onNavigateToEditor,
-                onExitApp = onExitApp,
-                onThemeChange = onThemeChange,
-                modifier = Modifier.padding(paddingValues)
-            )
-            PreferenceScreen.Connection -> ConnectionPreferencesContent(
-                preferences = preferences,
-                onReconnect = onReconnect,
-                modifier = Modifier.padding(paddingValues)
-            )
-            PreferenceScreen.Map -> MapPreferencesContent(
-                preferences = preferences,
-                modifier = Modifier.padding(paddingValues)
-            )
-            PreferenceScreen.Reporting -> ReportingPreferencesContent(
-                preferences = preferences,
-                modifier = Modifier.padding(paddingValues)
-            )
-            PreferenceScreen.Notification -> NotificationPreferencesContent(
-                preferences = preferences,
-                modifier = Modifier.padding(paddingValues)
-            )
-            PreferenceScreen.Advanced -> AdvancedPreferencesContent(
-                preferences = preferences,
-                modifier = Modifier.padding(paddingValues)
-            )
-            PreferenceScreen.Experimental -> ExperimentalPreferencesContent(
-                preferences = preferences,
-                modifier = Modifier.padding(paddingValues)
-            )
-        }
+        PreferencesScreenInner(
+            preferences = preferences,
+            currentScreen = currentScreen,
+            onNavigateToScreen = { currentScreen = it },
+            onNavigateToStatus = onNavigateToStatus,
+            onNavigateToAbout = onNavigateToAbout,
+            onNavigateToEditor = onNavigateToEditor,
+            onExitApp = onExitApp,
+            onThemeChange = onThemeChange,
+            onReconnect = onReconnect,
+            modifier = Modifier.padding(paddingValues)
+        )
+    }
+}
+
+/**
+ * Content-only version of the Preferences screen without Scaffold.
+ * Used within the NavHost when hosted in a single-activity architecture.
+ * The top bar is managed by the parent MapActivity's Scaffold.
+ */
+@Composable
+fun PreferencesScreenContent(
+    preferences: Preferences,
+    currentScreen: PreferenceScreen,
+    onNavigateToScreen: (PreferenceScreen) -> Unit,
+    onNavigateToStatus: () -> Unit,
+    onNavigateToAbout: () -> Unit,
+    onNavigateToEditor: () -> Unit,
+    onExitApp: () -> Unit,
+    onThemeChange: (AppTheme) -> Unit,
+    onReconnect: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        PreferencesScreenInner(
+            preferences = preferences,
+            currentScreen = currentScreen,
+            onNavigateToScreen = onNavigateToScreen,
+            onNavigateToStatus = onNavigateToStatus,
+            onNavigateToAbout = onNavigateToAbout,
+            onNavigateToEditor = onNavigateToEditor,
+            onExitApp = onExitApp,
+            onThemeChange = onThemeChange,
+            onReconnect = onReconnect,
+            modifier = Modifier.fillMaxSize()
+        )
+    }
+}
+
+/**
+ * TopAppBar for Preferences screen with back navigation for sub-screens.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PreferencesTopAppBar(
+    currentScreen: PreferenceScreen,
+    onBackClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    TopAppBar(
+        title = { Text(stringResource(currentScreen.titleResId)) },
+        navigationIcon = {
+            if (currentScreen != PreferenceScreen.Root) {
+                IconButton(onClick = onBackClick) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.back)
+                    )
+                }
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            titleContentColor = MaterialTheme.colorScheme.onPrimary,
+            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
+        ),
+        modifier = modifier
+    )
+}
+
+/**
+ * Inner content of the Preferences screen, switched based on current sub-screen.
+ */
+@Composable
+private fun PreferencesScreenInner(
+    preferences: Preferences,
+    currentScreen: PreferenceScreen,
+    onNavigateToScreen: (PreferenceScreen) -> Unit,
+    onNavigateToStatus: () -> Unit,
+    onNavigateToAbout: () -> Unit,
+    onNavigateToEditor: () -> Unit,
+    onExitApp: () -> Unit,
+    onThemeChange: (AppTheme) -> Unit,
+    onReconnect: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    when (currentScreen) {
+        PreferenceScreen.Root -> RootPreferencesContent(
+            preferences = preferences,
+            onNavigateToScreen = onNavigateToScreen,
+            onNavigateToStatus = onNavigateToStatus,
+            onNavigateToAbout = onNavigateToAbout,
+            onNavigateToEditor = onNavigateToEditor,
+            onExitApp = onExitApp,
+            onThemeChange = onThemeChange,
+            modifier = modifier
+        )
+        PreferenceScreen.Connection -> ConnectionPreferencesContent(
+            preferences = preferences,
+            onReconnect = onReconnect,
+            modifier = modifier
+        )
+        PreferenceScreen.Map -> MapPreferencesContent(
+            preferences = preferences,
+            modifier = modifier
+        )
+        PreferenceScreen.Reporting -> ReportingPreferencesContent(
+            preferences = preferences,
+            modifier = modifier
+        )
+        PreferenceScreen.Notification -> NotificationPreferencesContent(
+            preferences = preferences,
+            modifier = modifier
+        )
+        PreferenceScreen.Advanced -> AdvancedPreferencesContent(
+            preferences = preferences,
+            modifier = modifier
+        )
+        PreferenceScreen.Experimental -> ExperimentalPreferencesContent(
+            preferences = preferences,
+            modifier = modifier
+        )
     }
 }
 
