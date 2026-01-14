@@ -72,6 +72,8 @@ import org.owntracks.android.support.RequirementsChecker
 import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.test.ThresholdIdlingResourceInterface
 import org.owntracks.android.ui.NotificationsStash
+import org.owntracks.android.ui.common.CustomToastHost
+import org.owntracks.android.ui.common.rememberToastState
 import org.owntracks.android.ui.mixins.BackgroundLocationPermissionRequester
 import org.owntracks.android.ui.mixins.LocationPermissionRequester
 import org.owntracks.android.ui.mixins.NotificationPermissionRequester
@@ -180,6 +182,14 @@ class MapActivity :
         // Observe state from ViewModel
         val monitoringMode by viewModel.currentMonitoringMode.observeAsState(MonitoringMode.Significant)
         val currentLocation by viewModel.currentLocation.observeAsState()
+        val sendingLocation by viewModel.sendingLocation.observeAsState(false)
+
+        // Send location when GPS fix becomes available while waiting
+        LaunchedEffect(currentLocation, sendingLocation) {
+          if (sendingLocation && currentLocation != null) {
+            viewModel.onLocationAvailableWhileSending(currentLocation!!)
+          }
+        }
 
         // State for monitoring mode bottom sheet
         var showMonitoringSheet by remember { mutableStateOf(false) }
@@ -196,6 +206,9 @@ class MapActivity :
         // Snackbar state
         val snackbarState = remember { SnackbarHostState() }
         snackbarHostState = snackbarState
+
+        // Toast state
+        val toastState = rememberToastState()
 
         // Determine current destination for bottom nav highlighting
         val currentDestination = when (currentRoute) {
@@ -221,13 +234,20 @@ class MapActivity :
           }
         }
 
+        // Show toast when location report is triggered
+        LaunchedEffect(Unit) {
+          viewModel.locationSentFlow.collect {
+            toastState.show(getString(R.string.publishQueued))
+          }
+        }
+
         Scaffold(
             topBar = {
               when (currentDestination) {
                 Destination.Map -> {
                   MapTopAppBar(
                       monitoringMode = monitoringMode,
-                      locationEnabled = currentLocation != null,
+                      sendingLocation = sendingLocation,
                       onMonitoringClick = { showMonitoringSheet = true },
                       onReportClick = { viewModel.sendLocation() }
                   )
@@ -354,6 +374,9 @@ class MapActivity :
               }
           )
         }
+
+        // Custom toast overlay
+        CustomToastHost(toastState = toastState)
       }
     }
 

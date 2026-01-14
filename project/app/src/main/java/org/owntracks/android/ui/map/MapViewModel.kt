@@ -94,6 +94,11 @@ constructor(
   val myLocationStatus: LiveData<MyLocationStatus>
     get() = mutableMyLocationStatus
 
+  // Tracks whether we're waiting to send location once GPS fix is available
+  private val mutableSendingLocation = MutableLiveData(false)
+  val sendingLocation: LiveData<Boolean>
+    get() = mutableSendingLocation
+
   val currentLocation = LocationLiveData(application, viewModelScope)
 
   val waypointUpdatedEvent = waypointsRepo.repoChangedEvent
@@ -184,10 +189,30 @@ constructor(
 
   fun sendLocation() {
     viewModelScope.launch {
-      currentLocation.value?.run {
-        Timber.d("Sending current location from user request: $this")
-        locationProcessor.onLocationChanged(this, MessageLocation.ReportType.USER)
+      mutableLocationSentFlow.tryEmit(Unit)
+      currentLocation.value?.let { location ->
+        Timber.d("Sending current location from user request: $location")
+        locationProcessor.onLocationChanged(location, MessageLocation.ReportType.USER)
         locationProcessor.publishStatusMessage()
+      } ?: run {
+        // No location available yet, start waiting for GPS fix
+        Timber.d("No location available, waiting for GPS fix to send location")
+        mutableSendingLocation.postValue(true)
+      }
+    }
+  }
+
+  /**
+   * Called when location becomes available while we're waiting to send.
+   * Should be observed from the Activity/Fragment.
+   */
+  fun onLocationAvailableWhileSending(location: Location) {
+    if (mutableSendingLocation.value == true) {
+      viewModelScope.launch {
+        Timber.d("GPS fix acquired, sending location: $location")
+        locationProcessor.onLocationChanged(location, MessageLocation.ReportType.USER)
+        locationProcessor.publishStatusMessage()
+        mutableSendingLocation.postValue(false)
       }
     }
   }
@@ -285,6 +310,9 @@ constructor(
       MutableSharedFlow<Contact>(extraBufferCapacity = 1)
 
   val locationRequestContactCommandFlow: Flow<Contact> = mutableLocationRequestContactCommandFlow
+
+  private val mutableLocationSentFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+  val locationSentFlow: Flow<Unit> = mutableLocationSentFlow
 
   fun sendLocationRequestToCurrentContact() {
     mutableCurrentContact.value?.also {

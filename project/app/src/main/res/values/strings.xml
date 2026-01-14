@@ -259,6 +259,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesUsername">"Username"</string>
     <string name="preferencesWebsocket">"Use WebSockets"</string>
     <string name="publish">"Report Location"</string>
+    <string name="publishQueued">"Location queued for sending"</string>
     <string name="radius">"Radius (m)"</string>
     <string name="reconnect">"Reconnect"</string>
     <string name="reconnecting">"Reconnecting"</string>

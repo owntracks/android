@@ -211,6 +211,7 @@ constructor(
   }
 
   fun queueMessageForSending(message: MessageBase) {
+    runBlocking { queueInitJob.join() }
     outgoingQueueIdlingResource.increment()
     Timber.d("Queueing message=$message, current queueLength:${outgoingQueue.size}")
     synchronized(outgoingQueue) {

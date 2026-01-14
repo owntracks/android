@@ -18,7 +18,8 @@
       "Bash(ls:*)",
       "Bash(file:*)",
       "Bash(git config:*)",
-      "Bash(~/.gitignore_global)"
+      "Bash(~/.gitignore_global)",
+      "Bash(.\\\\gradlew:*)"
     ]
   }
 }

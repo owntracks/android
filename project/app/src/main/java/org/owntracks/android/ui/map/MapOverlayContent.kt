@@ -9,16 +9,27 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -68,7 +79,7 @@ fun ContactsTopAppBar(
 @Composable
 fun MapTopAppBar(
     monitoringMode: MonitoringMode,
-    locationEnabled: Boolean,
+    sendingLocation: Boolean,
     onMonitoringClick: () -> Unit,
     onReportClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -80,35 +91,79 @@ fun MapTopAppBar(
         MonitoringMode.Move -> R.drawable.ic_step_forward_2
     }
 
+    // Use shorter titles for the chip
     val monitoringTitle = when (monitoringMode) {
-        MonitoringMode.Quiet -> R.string.monitoring_quiet
-        MonitoringMode.Manual -> R.string.monitoring_manual
-        MonitoringMode.Significant -> R.string.monitoring_significant
-        MonitoringMode.Move -> R.string.monitoring_move
+        MonitoringMode.Quiet -> R.string.monitoringModeDialogQuietTitle
+        MonitoringMode.Manual -> R.string.monitoringModeDialogManualTitle
+        MonitoringMode.Significant -> R.string.monitoringModeDialogSignificantTitle
+        MonitoringMode.Move -> R.string.monitoringModeDialogMoveTitle
     }
 
     TopAppBar(
-        title = { /* No title */ },
+        title = {
+            // Monitoring mode chip aligned to left
+            AssistChip(
+                onClick = onMonitoringClick,
+                label = { Text(text = stringResource(monitoringTitle)) },
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(monitoringIcon),
+                        contentDescription = null,
+                        modifier = Modifier.size(AssistChipDefaults.IconSize)
+                    )
+                },
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.ArrowDropDown,
+                        contentDescription = null,
+                        modifier = Modifier.size(AssistChipDefaults.IconSize)
+                    )
+                },
+                colors = AssistChipDefaults.assistChipColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    labelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    leadingIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    trailingIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                ),
+                modifier = Modifier.defaultMinSize(minHeight = 40.dp)
+            )
+        },
         actions = {
-            IconButton(onClick = onMonitoringClick) {
-                Icon(
-                    painter = painterResource(monitoringIcon),
-                    contentDescription = stringResource(monitoringTitle)
-                )
-            }
-            IconButton(
+            // Send location chip aligned to right
+            AssistChip(
                 onClick = onReportClick,
-                enabled = locationEnabled
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_baseline_publish_24),
-                    contentDescription = stringResource(R.string.publish)
-                )
-            }
+                enabled = !sendingLocation,
+                label = { Text(text = stringResource(R.string.publish)) },
+                leadingIcon = {
+                    if (sendingLocation) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(AssistChipDefaults.IconSize),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    } else {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_baseline_publish_24),
+                            contentDescription = null,
+                            modifier = Modifier.size(AssistChipDefaults.IconSize)
+                        )
+                    }
+                },
+                colors = AssistChipDefaults.assistChipColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    labelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    leadingIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                    disabledLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    disabledLeadingIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                ),
+                modifier = Modifier.defaultMinSize(minHeight = 40.dp)
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            actionIconContentColor = MaterialTheme.colorScheme.onPrimary
+            containerColor = MaterialTheme.colorScheme.primary
         ),
         modifier = modifier
     )
@@ -124,7 +179,7 @@ fun MonitoringModeBottomSheet(
     onModeSelected: (MonitoringMode) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val sheetState = rememberModalBottomSheetState()
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -138,14 +193,15 @@ fun MonitoringModeBottomSheet(
         ) {
             Text(
                 text = stringResource(R.string.monitoringModeDialogTitle),
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(12.dp)
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 12.dp)
             )
 
             // First row: Significant and Move
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .height(IntrinsicSize.Min)
                     .padding(bottom = 24.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
@@ -154,14 +210,14 @@ fun MonitoringModeBottomSheet(
                     title = stringResource(R.string.monitoringModeDialogSignificantTitle),
                     description = stringResource(R.string.monitoringModeDialogSignificantDescription),
                     onClick = { onModeSelected(MonitoringMode.Significant) },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f).fillMaxHeight()
                 )
                 MonitoringModeOption(
                     iconRes = R.drawable.ic_step_forward_2,
                     title = stringResource(R.string.monitoringModeDialogMoveTitle),
                     description = stringResource(R.string.monitoringModeDialogMoveDescription),
                     onClick = { onModeSelected(MonitoringMode.Move) },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f).fillMaxHeight()
                 )
             }
 
@@ -169,6 +225,7 @@ fun MonitoringModeBottomSheet(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .height(IntrinsicSize.Min)
                     .padding(bottom = 24.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
@@ -177,14 +234,14 @@ fun MonitoringModeBottomSheet(
                     title = stringResource(R.string.monitoringModeDialogManualTitle),
                     description = stringResource(R.string.monitoringModeDialogManualDescription),
                     onClick = { onModeSelected(MonitoringMode.Manual) },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f).fillMaxHeight()
                 )
                 MonitoringModeOption(
                     iconRes = R.drawable.ic_baseline_stop_36,
                     title = stringResource(R.string.monitoringModeDialogQuietTitle),
                     description = stringResource(R.string.monitoringModeDialogQuietDescription),
                     onClick = { onModeSelected(MonitoringMode.Quiet) },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f).fillMaxHeight()
                 )
             }
         }
@@ -203,7 +260,7 @@ private fun MonitoringModeOption(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .clickable(onClick = onClick)
-            .padding(horizontal = 8.dp)
+            .padding(horizontal = 8.dp, vertical = 12.dp)
     ) {
         Box(
             contentAlignment = Alignment.Center,
@@ -221,10 +278,10 @@ private fun MonitoringModeOption(
         }
         Text(
             text = title,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodyLarge,
             fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 8.dp)
+            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
         )
         Text(
             text = description,

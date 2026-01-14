@@ -5,6 +5,7 @@ plugins {
   id("com.google.dagger.hilt.android")
   kotlin("android")
   kotlin("kapt")
+  alias(libs.plugins.kotlin.compose)
   alias(libs.plugins.ktfmt)
   alias(libs.plugins.ksp)
 }
@@ -110,10 +111,6 @@ android {
     dataBinding = true
     viewBinding = true
     compose = true
-  }
-
-  composeOptions {
-    kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
   }
 
   dataBinding { addKtx = true }
