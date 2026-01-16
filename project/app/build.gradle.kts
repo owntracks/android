@@ -216,6 +216,7 @@ dependencies {
   implementation(libs.osmdroid)
   "gmsImplementation"(libs.gms.play.services.maps)
   "gmsImplementation"(libs.play.services.location)
+  "gmsImplementation"(libs.maps.compose)
 
   // Connectivity
   implementation(libs.paho.mqttclient)
@@ -264,4 +265,5 @@ dependencies {
   androidTestUtil(libs.bundles.androidx.test.util)
 
   coreLibraryDesugaring(libs.desugar)
+
 }

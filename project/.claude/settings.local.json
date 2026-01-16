@@ -32,7 +32,8 @@
       "Bash(./gradlew :app:kspGmsDebugKotlin:*)",
       "WebFetch(domain:dagger.dev)",
       "Bash(./gradlew :app:dependencies:*)",
-      "Bash(./gradlew clean:*)"
+      "Bash(./gradlew clean:*)",
+      "Bash(./gradlew:*)"
     ]
   }
 }

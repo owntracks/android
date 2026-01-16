@@ -305,39 +305,52 @@ class MapActivity :
             snackbarHost = { SnackbarHost(snackbarState) },
             contentWindowInsets = WindowInsets(0, 0, 0, 0)
         ) { paddingValues ->
+          // Observe map layer style to determine which map to show
+          val mapLayerStyle by viewModel.mapLayerStyle.observeAsState()
+
           Box(
               modifier = Modifier
                   .fillMaxSize()
                   .padding(paddingValues)
           ) {
-            // MapFragment hosted via AndroidView - only visible when on Map destination
-            AndroidView(
-                factory = { context ->
-                  FragmentContainerView(context).apply {
-                    id = R.id.mapFragment
-                    layoutParams = FrameLayout.LayoutParams(
-                        FrameLayout.LayoutParams.MATCH_PARENT,
-                        FrameLayout.LayoutParams.MATCH_PARENT
-                    )
-                    mapFragmentContainerView = this
-                    // Add the map fragment immediately after the container is created
-                    post {
-                      if (supportFragmentManager.findFragmentById(R.id.mapFragment) == null) {
-                        val mapFragment =
-                            supportFragmentManager.fragmentFactory.instantiate(
-                                this@MapActivity.classLoader,
-                                MapFragment::class.java.name,
-                            )
-                        supportFragmentManager.commit(true) { replace(R.id.mapFragment, mapFragment, "map") }
+            // Map content - conditionally show Compose-based map or Fragment-based map (AndroidView)
+            if (currentDestination == Destination.Map) {
+              if (shouldUseComposeMaps(mapLayerStyle)) {
+                // Use Compose-based map (GoogleMapContent for GMS, no-op for OSS)
+                MapContentCompose(
+                    viewModel = viewModel,
+                    contactImageBindingAdapter = contactImageBindingAdapter,
+                    preferences = preferences,
+                    modifier = Modifier.fillMaxSize()
+                )
+              } else {
+                // Use AndroidView with Fragment-based map (OSMMapFragment)
+                AndroidView(
+                    factory = { context ->
+                      FragmentContainerView(context).apply {
+                        id = R.id.mapFragment
+                        layoutParams = FrameLayout.LayoutParams(
+                            FrameLayout.LayoutParams.MATCH_PARENT,
+                            FrameLayout.LayoutParams.MATCH_PARENT
+                        )
+                        mapFragmentContainerView = this
+                        // Add the map fragment immediately after the container is created
+                        post {
+                          if (supportFragmentManager.findFragmentById(R.id.mapFragment) == null) {
+                            val mapFragment =
+                                supportFragmentManager.fragmentFactory.instantiate(
+                                    this@MapActivity.classLoader,
+                                    MapFragment::class.java.name,
+                                )
+                            supportFragmentManager.commit(true) { replace(R.id.mapFragment, mapFragment, "map") }
+                          }
+                        }
                       }
-                    }
-                  }
-                },
-                update = { view ->
-                  view.visibility = if (currentDestination == Destination.Map) View.VISIBLE else View.INVISIBLE
-                },
-                modifier = Modifier.fillMaxSize()
-            )
+                    },
+                    modifier = Modifier.fillMaxSize()
+                )
+              }
+            }
 
             // NavHost for screen content (overlays on top of map when not on Map destination)
             OwnTracksNavHost(

@@ -27,6 +27,7 @@ desguar-jdk = "2.1.5"
 flatbuffers = "23.5.26"
 google-material = "1.13.0"
 google-play-services-maps = "19.2.0"
+maps-compose = "6.2.1"
 guava = "33.5.0-jre"
 hilt = "2.57.1"
 hilt-work = "1.2.0"
@@ -34,10 +35,10 @@ jackson = "2.13.5"
 jaxb = "4.0.6"
 jaxb-api = "2.3.1"
 kmqtt = "0.4.6"
-kotlin = "2.2.21"
+kotlin = "2.0.21"
 kotlin-coroutines = "1.9.0"
 kotlin-datetime = "0.6.2"
-ksp = "2.2.21-2.0.4"
+ksp = "2.0.21-1.0.26"
 ktfmt = "0.25.0"
 lmdb-kt = "0.1.1"
 materialdrawer = "6.1.2"
@@ -130,6 +131,7 @@ flatbuffers = { module = "com.google.flatbuffers:flatbuffers-java", version.ref 
 # GMS
 gms-play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "google-play-services-maps" }
 play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "play-services-location" }
+maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "maps-compose" }
 
 # Others
 osmdroid = { module = "org.osmdroid:osmdroid-android", version.ref = "osmdroid" }
