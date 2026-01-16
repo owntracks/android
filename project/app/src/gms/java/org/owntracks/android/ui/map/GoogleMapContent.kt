@@ -20,8 +20,10 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.rememberCameraPositionState
+import androidx.lifecycle.asFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.filterNotNull
 import org.owntracks.android.data.repos.ContactsRepoChange
 import org.owntracks.android.data.waypoints.WaypointModel
 import org.owntracks.android.data.waypoints.WaypointsRepo
@@ -68,12 +70,16 @@ fun GoogleMapContent(
             .build()
   }
 
-  // Observe map center for programmatic camera moves
-  val mapCenter by viewModel.mapCenter.observeAsState()
-  LaunchedEffect(mapCenter) {
-    mapCenter?.let { center ->
-      cameraPositionState.animate(CameraUpdateFactory.newLatLng(center.toGMSLatLng()))
-    }
+  // Observe map center for programmatic camera moves using flow collection
+  // This ensures camera animates on every emission, even when the same location is posted again
+  // drop(1) skips the initial value since we already set initial position above
+  LaunchedEffect(Unit) {
+    viewModel.mapCenter.asFlow()
+        .drop(1) // Drop initial LiveData value before filtering
+        .filterNotNull()
+        .collectLatest { center ->
+          cameraPositionState.animate(CameraUpdateFactory.newLatLng(center.toGMSLatLng()))
+        }
   }
 
   // Handle camera gestures - trigger map click when user pans/zooms

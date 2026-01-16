@@ -14,16 +14,24 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.owntracks.android.R
+import org.owntracks.android.data.EndpointState
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ConnectionMode
 
 @Composable
 fun ConnectionPreferencesContent(
     preferences: Preferences,
+    endpointState: EndpointState,
+    onStartConnection: () -> Unit,
+    onStopConnection: () -> Unit,
+    onReconnect: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Trigger recomposition when mode changes
+    // Trigger recomposition when mode or toggle preferences change
     var currentMode by remember { mutableStateOf(preferences.mode) }
+    var tlsEnabled by remember { mutableStateOf(preferences.tls) }
+    var wsEnabled by remember { mutableStateOf(preferences.ws) }
+    var cleanSessionEnabled by remember { mutableStateOf(preferences.cleanSession) }
 
     val modeEntries = listOf(
         ConnectionMode.MQTT to stringResource(R.string.mode_mqtt_private_label),
@@ -35,6 +43,15 @@ fun ConnectionPreferencesContent(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
+        // Connection status card at top
+        ConnectionStatusCard(
+            endpointState = endpointState,
+            canStartConnection = isConfigurationComplete(preferences),
+            onStartConnection = onStartConnection,
+            onStopConnection = onStopConnection,
+            onReconnect = onReconnect
+        )
+
         // Endpoint section
         PreferenceCategory(title = stringResource(R.string.preferencesCategoryConnectionEndpoint))
 
@@ -91,8 +108,11 @@ fun ConnectionPreferencesContent(
 
             SwitchPreference(
                 title = stringResource(R.string.preferencesWebsocket),
-                checked = preferences.ws,
-                onCheckedChange = { preferences.ws = it }
+                checked = wsEnabled,
+                onCheckedChange = {
+                    preferences.ws = it
+                    wsEnabled = it
+                }
             )
         }
 
@@ -139,12 +159,15 @@ fun ConnectionPreferencesContent(
 
             SwitchPreference(
                 title = stringResource(R.string.tls),
-                checked = preferences.tls,
-                onCheckedChange = { preferences.tls = it }
+                checked = tlsEnabled,
+                onCheckedChange = {
+                    preferences.tls = it
+                    tlsEnabled = it
+                }
             )
 
             // Certificate options only shown when TLS is enabled
-            if (preferences.tls) {
+            if (tlsEnabled) {
                 PreferenceItem(
                     title = stringResource(R.string.preferencesClientCrt),
                     summary = if (preferences.tlsClientCrt.isNotBlank()) {
@@ -181,8 +204,11 @@ fun ConnectionPreferencesContent(
 
             SwitchPreference(
                 title = stringResource(R.string.preferencesCleanSessionEnabled),
-                checked = preferences.cleanSession,
-                onCheckedChange = { preferences.cleanSession = it }
+                checked = cleanSessionEnabled,
+                onCheckedChange = {
+                    preferences.cleanSession = it
+                    cleanSessionEnabled = it
+                }
             )
         }
     }

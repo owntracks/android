@@ -227,13 +227,6 @@ class MapActivity :
           else -> Destination.Map
         }
 
-        // Reset preferences screen when navigating away
-        LaunchedEffect(currentDestination) {
-          if (currentDestination != Destination.Preferences) {
-            preferencesCurrentScreen = PreferenceScreen.Root
-          }
-        }
-
         // Collect location request events for snackbar
         LaunchedEffect(Unit) {
           viewModel.locationRequestContactCommandFlow.collect { contact ->
@@ -288,12 +281,7 @@ class MapActivity :
                 Destination.Preferences -> {
                   PreferencesTopAppBar(
                       currentScreen = preferencesCurrentScreen,
-                      endpointState = endpointState,
-                      preferences = preferences,
-                      onBackClick = { preferencesCurrentScreen = PreferenceScreen.Root },
-                      onStartConnection = { viewModel.startConnection() },
-                      onStopConnection = { viewModel.stopConnection() },
-                      onReconnect = { viewModel.reconnect() }
+                      onBackClick = { preferencesCurrentScreen = PreferenceScreen.Root }
                   )
                 }
                 else -> {}
@@ -368,6 +356,10 @@ class MapActivity :
                 onPreferencesNavigateToScreen = { preferencesCurrentScreen = it },
                 triggerWaypointsExport = triggerWaypointsExport,
                 onWaypointsExportTriggered = { triggerWaypointsExport = false },
+                endpointState = endpointState,
+                onStartConnection = { viewModel.startConnection() },
+                onStopConnection = { viewModel.stopConnection() },
+                onReconnect = { viewModel.reconnect() },
                 modifier = Modifier.fillMaxSize()
             )
 

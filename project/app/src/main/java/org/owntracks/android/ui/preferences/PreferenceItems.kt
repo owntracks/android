@@ -10,14 +10,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -346,9 +342,8 @@ fun EditIntPreference(
 }
 
 /**
- * List preference with dropdown dialog
+ * List preference with radio button dialog
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <T> ListPreference(
     title: String,
@@ -361,7 +356,6 @@ fun <T> ListPreference(
     enabled: Boolean = true
 ) {
     var showDialog by remember { mutableStateOf(false) }
-    var expanded by remember { mutableStateOf(false) }
 
     val displaySummary = summary ?: entries.find { it.first == value }?.second ?: value.toString()
 
@@ -379,31 +373,29 @@ fun <T> ListPreference(
             onDismissRequest = { showDialog = false },
             title = { Text(title) },
             text = {
-                ExposedDropdownMenuBox(
-                    expanded = expanded,
-                    onExpandedChange = { expanded = it }
-                ) {
-                    OutlinedTextField(
-                        value = entries.find { it.first == value }?.second ?: "",
-                        onValueChange = {},
-                        readOnly = true,
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                    )
-                    ExposedDropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false }
-                    ) {
-                        entries.forEach { (entryValue, entryLabel) ->
-                            DropdownMenuItem(
-                                text = { Text(entryLabel) },
-                                onClick = {
+                Column {
+                    entries.forEach { (entryValue, entryLabel) ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
                                     onValueChange(entryValue)
-                                    expanded = false
                                     showDialog = false
                                 }
+                                .padding(vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = entryValue == value,
+                                onClick = {
+                                    onValueChange(entryValue)
+                                    showDialog = false
+                                }
+                            )
+                            Text(
+                                text = entryLabel,
+                                style = MaterialTheme.typography.bodyLarge,
+                                modifier = Modifier.padding(start = 8.dp)
                             )
                         }
                     }

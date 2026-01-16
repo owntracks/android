@@ -41,6 +41,7 @@ import org.owntracks.android.ui.status.StatusActivity
 import org.owntracks.android.ui.waypoint.WaypointActivity
 import org.owntracks.android.ui.waypoints.WaypointsScreenContent
 import org.owntracks.android.ui.waypoints.WaypointsViewModel
+import org.owntracks.android.data.EndpointState
 import timber.log.Timber
 
 /**
@@ -62,7 +63,11 @@ fun OwnTracksNavHost(
     preferencesCurrentScreen: PreferenceScreen = PreferenceScreen.Root,
     onPreferencesNavigateToScreen: (PreferenceScreen) -> Unit = {},
     triggerWaypointsExport: Boolean = false,
-    onWaypointsExportTriggered: () -> Unit = {}
+    onWaypointsExportTriggered: () -> Unit = {},
+    endpointState: EndpointState = EndpointState.INITIAL,
+    onStartConnection: () -> Unit = {},
+    onStopConnection: () -> Unit = {},
+    onReconnect: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val activity = context as? Activity
@@ -186,6 +191,7 @@ fun OwnTracksNavHost(
                 PreferencesScreenContent(
                     preferences = preferences,
                     currentScreen = preferencesCurrentScreen,
+                    endpointState = endpointState,
                     onNavigateToScreen = onPreferencesNavigateToScreen,
                     onNavigateToStatus = {
                         context.startActivity(Intent(context, StatusActivity::class.java))
@@ -212,6 +218,9 @@ fun OwnTracksNavHost(
                     onDynamicColorsChange = {
                         activity?.recreate()
                     },
+                    onStartConnection = onStartConnection,
+                    onStopConnection = onStopConnection,
+                    onReconnect = onReconnect,
                     modifier = Modifier.fillMaxSize()
                 )
             }

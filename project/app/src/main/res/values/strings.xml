@@ -252,6 +252,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesDynamicColors">"Use device colors"</string>
     <string name="preferencesDynamicColorsSummary">"Apply colors from your device wallpaper (Material You)"</string>
     <string name="preferencesActions">"Actions"</string>
+    <string name="preferencesAppearance">"Appearance"</string>
     <string name="preferencesInfo">"Info"</string>
     <string name="preferencesTrackerId">"Tracker ID"</string>
     <string name="preferencesTrackerIdValidationError">"Must be one or two characters"</string>

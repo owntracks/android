@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,15 +20,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material3.ModalBottomSheet
@@ -38,12 +34,14 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,6 +54,7 @@ import org.owntracks.android.R
 import org.owntracks.android.data.EndpointState
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.support.ContactImageBindingAdapter
+import timber.log.Timber
 
 /**
  * TopAppBar for the Contacts screen.
@@ -97,7 +96,7 @@ fun MapTopAppBar(
         MonitoringMode.Move -> R.drawable.ic_step_forward_2
     }
 
-    // Use shorter titles for the chip
+    // Use shorter titles for accessibility
     val monitoringTitle = when (monitoringMode) {
         MonitoringMode.Quiet -> R.string.monitoringModeDialogQuietTitle
         MonitoringMode.Manual -> R.string.monitoringModeDialogManualTitle
@@ -105,40 +104,44 @@ fun MapTopAppBar(
         MonitoringMode.Move -> R.string.monitoringModeDialogMoveTitle
     }
 
+    // Color logging
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val onPrimaryColor = MaterialTheme.colorScheme.onPrimary
+    val onErrorContainerColor = MaterialTheme.colorScheme.onErrorContainer
+
+    val isSyncError = endpointState == EndpointState.ERROR ||
+        endpointState == EndpointState.ERROR_CONFIGURATION
+    val isDisconnected = endpointState == EndpointState.DISCONNECTED
+
+    // Use onErrorContainer for error state - it's darker and contrasts better with primary background
+    val syncIconTint = when {
+        isSyncError -> onErrorContainerColor
+        isDisconnected -> onPrimaryColor.copy(alpha = 0.5f)
+        else -> onPrimaryColor
+    }
+
+    LaunchedEffect(endpointState) {
+        Timber.d("MapTopAppBar colors - TopBar background (primary): #${Integer.toHexString(primaryColor.toArgb())}")
+        Timber.d("MapTopAppBar colors - onPrimary: #${Integer.toHexString(onPrimaryColor.toArgb())}")
+        Timber.d("MapTopAppBar colors - onErrorContainer: #${Integer.toHexString(onErrorContainerColor.toArgb())}")
+        Timber.d("MapTopAppBar colors - endpointState: $endpointState, isSyncError: $isSyncError, isDisconnected: $isDisconnected")
+        Timber.d("MapTopAppBar colors - syncIconTint: #${Integer.toHexString(syncIconTint.toArgb())}")
+    }
+
     TopAppBar(
-        title = {
-            // Monitoring mode chip aligned to left
-            AssistChip(
-                onClick = onMonitoringClick,
-                label = { Text(text = stringResource(monitoringTitle)) },
-                leadingIcon = {
-                    Icon(
-                        painter = painterResource(monitoringIcon),
-                        contentDescription = null,
-                        modifier = Modifier.size(AssistChipDefaults.IconSize)
-                    )
-                },
-                trailingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.ArrowDropDown,
-                        contentDescription = null,
-                        modifier = Modifier.size(AssistChipDefaults.IconSize)
-                    )
-                },
-                colors = AssistChipDefaults.assistChipColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    labelColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    leadingIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    trailingIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                ),
-                modifier = Modifier.defaultMinSize(minHeight = 40.dp)
-            )
+        title = { },
+        navigationIcon = {
+            // Monitoring mode icon button
+            IconButton(onClick = onMonitoringClick) {
+                Icon(
+                    painter = painterResource(monitoringIcon),
+                    contentDescription = stringResource(monitoringTitle),
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
+            }
         },
         actions = {
             // Sync status icon button
-            val isSyncError = endpointState == EndpointState.ERROR ||
-                endpointState == EndpointState.ERROR_CONFIGURATION ||
-                endpointState == EndpointState.DISCONNECTED
             val isSynced = queueLength == 0 && (endpointState == EndpointState.CONNECTED ||
                 endpointState == EndpointState.IDLE)
 
@@ -146,46 +149,29 @@ fun MapTopAppBar(
                 Icon(
                     imageVector = if (isSynced) Icons.Filled.CloudDone else Icons.Filled.CloudOff,
                     contentDescription = stringResource(R.string.sync_status_content_description),
-                    tint = if (isSyncError) {
-                        MaterialTheme.colorScheme.error
-                    } else {
-                        MaterialTheme.colorScheme.onPrimary
-                    }
+                    tint = syncIconTint
                 )
             }
 
-            // Send location chip aligned to right
-            AssistChip(
+            // Send location icon button
+            IconButton(
                 onClick = onReportClick,
-                enabled = !sendingLocation,
-                label = { Text(text = stringResource(R.string.publish)) },
-                leadingIcon = {
-                    if (sendingLocation) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(AssistChipDefaults.IconSize),
-                            strokeWidth = 2.dp,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    } else {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_baseline_publish_24),
-                            contentDescription = null,
-                            modifier = Modifier.size(AssistChipDefaults.IconSize)
-                        )
-                    }
-                },
-                colors = AssistChipDefaults.assistChipColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    labelColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    leadingIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    disabledLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    disabledLeadingIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                ),
-                modifier = Modifier.defaultMinSize(minHeight = 40.dp)
-            )
-
-            Spacer(modifier = Modifier.width(8.dp))
+                enabled = !sendingLocation
+            ) {
+                if (sendingLocation) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                } else {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_baseline_publish_24),
+                        contentDescription = stringResource(R.string.publish),
+                        tint = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
+            }
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primary
