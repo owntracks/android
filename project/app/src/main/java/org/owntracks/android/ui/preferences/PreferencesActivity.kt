@@ -88,6 +88,11 @@ class PreferencesActivity :
                         lifecycleScope.launch {
                             messageProcessor.disconnect()
                         }
+                    },
+                    onTryReconnectNow = {
+                        lifecycleScope.launch {
+                            messageProcessor.tryReconnectNow()
+                        }
                     }
                 )
             }

@@ -106,6 +106,7 @@ constructor(
   val endpointState: StateFlow<EndpointState> = endpointStateRepo.endpointState
   val queueLength: StateFlow<Int> = endpointStateRepo.endpointQueueLength
   val lastSuccessfulSync: StateFlow<Instant?> = endpointStateRepo.lastSuccessfulMessageTime
+  val nextReconnectTime: StateFlow<Instant?> = endpointStateRepo.nextReconnectTime
 
   fun triggerSync() {
     messageProcessor.triggerImmediateSync()
@@ -126,6 +127,12 @@ constructor(
   fun reconnect() {
     viewModelScope.launch {
       messageProcessor.reconnect()
+    }
+  }
+
+  fun tryReconnectNow() {
+    viewModelScope.launch {
+      messageProcessor.tryReconnectNow()
     }
   }
 

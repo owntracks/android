@@ -56,9 +56,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import org.owntracks.android.R
 import org.owntracks.android.data.EndpointState
 import org.owntracks.android.data.repos.EndpointStateRepo
@@ -130,10 +132,12 @@ fun PreferencesScreen(
     onReconnect: () -> Unit,
     onStartConnection: () -> Unit,
     onStopConnection: () -> Unit,
+    onTryReconnectNow: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var currentScreen by rememberSaveable(stateSaver = PreferenceScreen.Saver) { mutableStateOf(PreferenceScreen.Root) }
     val endpointState by endpointStateRepo.endpointState.collectAsState()
+    val nextReconnectTime by endpointStateRepo.nextReconnectTime.collectAsState()
 
     Scaffold(
         topBar = {
@@ -162,6 +166,7 @@ fun PreferencesScreen(
                 preferences = preferences,
                 currentScreen = currentScreen,
                 endpointState = endpointState,
+                nextReconnectTime = nextReconnectTime,
                 onNavigateToScreen = { currentScreen = it },
                 onNavigateToStatus = onNavigateToStatus,
                 onNavigateToAbout = onNavigateToAbout,
@@ -172,6 +177,7 @@ fun PreferencesScreen(
                 onStartConnection = onStartConnection,
                 onStopConnection = onStopConnection,
                 onReconnect = onReconnect,
+                onTryReconnectNow = onTryReconnectNow,
                 modifier = Modifier.weight(1f)
             )
         }
@@ -198,6 +204,8 @@ fun PreferencesScreenContent(
     onStartConnection: () -> Unit,
     onStopConnection: () -> Unit,
     onReconnect: () -> Unit,
+    onTryReconnectNow: () -> Unit,
+    nextReconnectTime: java.time.Instant?,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -216,6 +224,7 @@ fun PreferencesScreenContent(
             preferences = preferences,
             currentScreen = currentScreen,
             endpointState = endpointState,
+            nextReconnectTime = nextReconnectTime,
             onNavigateToScreen = onNavigateToScreen,
             onNavigateToStatus = onNavigateToStatus,
             onNavigateToAbout = onNavigateToAbout,
@@ -226,6 +235,7 @@ fun PreferencesScreenContent(
             onStartConnection = onStartConnection,
             onStopConnection = onStopConnection,
             onReconnect = onReconnect,
+            onTryReconnectNow = onTryReconnectNow,
             modifier = Modifier
                 .fillMaxSize()
                 .weight(1f)
@@ -271,17 +281,36 @@ fun PreferencesTopAppBar(
 @Composable
 fun ConnectionStatusCard(
     endpointState: EndpointState,
+    connectionEnabled: Boolean,
     canStartConnection: Boolean,
+    nextReconnectTime: java.time.Instant?,
     onStartConnection: () -> Unit,
     onStopConnection: () -> Unit,
     onReconnect: () -> Unit,
+    onTryReconnectNow: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var isStartingConnection by remember { mutableStateOf(false) }
+    var secondsUntilReconnect by remember { mutableStateOf<Long?>(null) }
 
-    // Reset loading state when endpoint state changes
-    LaunchedEffect(endpointState) {
+    // Reset loading state when endpoint state or connectionEnabled changes
+    LaunchedEffect(endpointState, connectionEnabled) {
         isStartingConnection = false
+    }
+
+    // Update countdown timer
+    LaunchedEffect(nextReconnectTime) {
+        if (nextReconnectTime != null) {
+            while (true) {
+                val now = java.time.Instant.now()
+                val remaining = java.time.Duration.between(now, nextReconnectTime).seconds
+                secondsUntilReconnect = if (remaining > 0) remaining else null
+                if (remaining <= 0) break
+                kotlinx.coroutines.delay(1000)
+            }
+        } else {
+            secondsUntilReconnect = null
+        }
     }
 
     val statusColor = when (endpointState) {
@@ -340,10 +369,26 @@ fun ConnectionStatusCard(
                     )
 
                     // Show error message if available
-                    if ((endpointState == EndpointState.ERROR || endpointState == EndpointState.ERROR_CONFIGURATION)
-                        && endpointState.message != null) {
+                    if (endpointState == EndpointState.ERROR || endpointState == EndpointState.ERROR_CONFIGURATION) {
+                        val context = LocalContext.current
+                        val errorMessage = when {
+                            endpointState.error != null -> endpointState.getErrorLabel(context)
+                            endpointState.message != null -> endpointState.message
+                            else -> null
+                        }
+                        if (errorMessage != null) {
+                            Text(
+                                text = errorMessage,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+
+                    // Show countdown to next reconnect
+                    if (secondsUntilReconnect != null && connectionEnabled) {
                         Text(
-                            text = endpointState.message!!,
+                            text = stringResource(R.string.reconnectingInSeconds, secondsUntilReconnect!!),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -358,22 +403,8 @@ fun ConnectionStatusCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                when (endpointState) {
-                    EndpointState.CONNECTING -> {
-                        OutlinedButton(
-                            onClick = onStopConnection,
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Close,
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(stringResource(R.string.connectionStop))
-                        }
-                    }
-                    EndpointState.CONNECTED -> {
+                when {
+                    endpointState == EndpointState.CONNECTED -> {
                         OutlinedButton(
                             onClick = onReconnect,
                             modifier = Modifier.weight(1f)
@@ -402,7 +433,38 @@ fun ConnectionStatusCard(
                             Text(stringResource(R.string.connectionStop))
                         }
                     }
+                    connectionEnabled -> {
+                        // Connection is enabled but not connected yet
+                        // Show Try Again button if waiting to reconnect
+                        if (secondsUntilReconnect != null) {
+                            Button(
+                                onClick = onTryReconnectNow,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Refresh,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(stringResource(R.string.tryAgain))
+                            }
+                        }
+                        OutlinedButton(
+                            onClick = onStopConnection,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(stringResource(R.string.connectionStop))
+                        }
+                    }
                     else -> {
+                        // Connection is disabled - show Start button
                         Button(
                             onClick = {
                                 isStartingConnection = true
@@ -577,6 +639,7 @@ private fun PreferencesScreenInner(
     preferences: Preferences,
     currentScreen: PreferenceScreen,
     endpointState: EndpointState,
+    nextReconnectTime: java.time.Instant?,
     onNavigateToScreen: (PreferenceScreen) -> Unit,
     onNavigateToStatus: () -> Unit,
     onNavigateToAbout: () -> Unit,
@@ -587,6 +650,7 @@ private fun PreferencesScreenInner(
     onStartConnection: () -> Unit,
     onStopConnection: () -> Unit,
     onReconnect: () -> Unit,
+    onTryReconnectNow: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     when (currentScreen) {
@@ -608,9 +672,11 @@ private fun PreferencesScreenInner(
         PreferenceScreen.Connection -> ConnectionPreferencesContent(
             preferences = preferences,
             endpointState = endpointState,
+            nextReconnectTime = nextReconnectTime,
             onStartConnection = onStartConnection,
             onStopConnection = onStopConnection,
             onReconnect = onReconnect,
+            onTryReconnectNow = onTryReconnectNow,
             modifier = modifier
         )
         PreferenceScreen.Map -> MapPreferencesContent(

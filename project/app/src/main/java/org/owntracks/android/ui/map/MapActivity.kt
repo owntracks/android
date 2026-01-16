@@ -191,6 +191,7 @@ class MapActivity :
         val endpointState by viewModel.endpointState.collectAsStateWithLifecycle()
         val queueLength by viewModel.queueLength.collectAsStateWithLifecycle()
         val lastSuccessfulSync by viewModel.lastSuccessfulSync.collectAsStateWithLifecycle()
+        val nextReconnectTime by viewModel.nextReconnectTime.collectAsStateWithLifecycle()
 
         // Send location when GPS fix becomes available while waiting
         LaunchedEffect(currentLocation, sendingLocation) {
@@ -359,9 +360,11 @@ class MapActivity :
                 triggerWaypointsExport = triggerWaypointsExport,
                 onWaypointsExportTriggered = { triggerWaypointsExport = false },
                 endpointState = endpointState,
+                nextReconnectTime = nextReconnectTime,
                 onStartConnection = { viewModel.startConnection() },
                 onStopConnection = { viewModel.stopConnection() },
                 onReconnect = { viewModel.reconnect() },
+                onTryReconnectNow = { viewModel.tryReconnectNow() },
                 modifier = Modifier.fillMaxSize()
             )
 

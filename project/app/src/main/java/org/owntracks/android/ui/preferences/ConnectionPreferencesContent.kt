@@ -37,9 +37,11 @@ import org.owntracks.android.preferences.types.ConnectionMode
 fun ConnectionPreferencesContent(
     preferences: Preferences,
     endpointState: EndpointState,
+    nextReconnectTime: java.time.Instant?,
     onStartConnection: () -> Unit,
     onStopConnection: () -> Unit,
     onReconnect: () -> Unit,
+    onTryReconnectNow: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     // Trigger recomposition when mode or toggle preferences change
@@ -61,10 +63,13 @@ fun ConnectionPreferencesContent(
         // Connection status card at top
         ConnectionStatusCard(
             endpointState = endpointState,
+            connectionEnabled = preferences.connectionEnabled,
             canStartConnection = isConfigurationComplete(preferences),
+            nextReconnectTime = nextReconnectTime,
             onStartConnection = onStartConnection,
             onStopConnection = onStopConnection,
-            onReconnect = onReconnect
+            onReconnect = onReconnect,
+            onTryReconnectNow = onTryReconnectNow
         )
 
         // Endpoint section

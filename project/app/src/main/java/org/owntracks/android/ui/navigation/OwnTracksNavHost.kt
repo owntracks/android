@@ -65,9 +65,11 @@ fun OwnTracksNavHost(
     triggerWaypointsExport: Boolean = false,
     onWaypointsExportTriggered: () -> Unit = {},
     endpointState: EndpointState = EndpointState.INITIAL,
+    nextReconnectTime: java.time.Instant? = null,
     onStartConnection: () -> Unit = {},
     onStopConnection: () -> Unit = {},
-    onReconnect: () -> Unit = {}
+    onReconnect: () -> Unit = {},
+    onTryReconnectNow: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val activity = context as? Activity
@@ -221,6 +223,8 @@ fun OwnTracksNavHost(
                     onStartConnection = onStartConnection,
                     onStopConnection = onStopConnection,
                     onReconnect = onReconnect,
+                    onTryReconnectNow = onTryReconnectNow,
+                    nextReconnectTime = nextReconnectTime,
                     modifier = Modifier.fillMaxSize()
                 )
             }

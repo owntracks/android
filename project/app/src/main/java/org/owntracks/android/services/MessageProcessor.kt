@@ -136,6 +136,7 @@ constructor(
     Timber.v("reconnect")
     if (!preferences.connectionEnabled) {
       Timber.i("Connection is disabled, not reconnecting")
+      endpointStateRepo.setState(EndpointState.IDLE)
       return Result.success(Unit)
     }
     return try {
@@ -168,6 +169,13 @@ constructor(
   suspend fun startConnection() {
     Timber.v("startConnection requested")
     preferences.connectionEnabled = true
+    reconnect()
+  }
+
+  /** Cancels any scheduled reconnect and tries to reconnect immediately */
+  suspend fun tryReconnectNow() {
+    Timber.v("tryReconnectNow requested")
+    scheduler.cancelMqttReconnect()
     reconnect()
   }
 

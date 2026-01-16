@@ -13,7 +13,7 @@ apply<EspressoMetadataEmbeddingPlugin>()
 
 val googleMapsAPIKey =
     System.getenv("GOOGLE_MAPS_API_KEY")?.toString()
-        ?: extra.get("google_maps_api_key")?.toString()
+        ?: findProperty("google_maps_api_key")?.toString()
         ?: "PLACEHOLDER_API_KEY"
 
 val gmsImplementation: Configuration by configurations.creating
