@@ -77,6 +77,11 @@ abstract class BaseWelcomeActivity : ComponentActivity() {
       return
     }
 
+    // Force initialization of permission requesters before setContent
+    // registerForActivityResult must be called before the activity is created
+    locationPermissionRequester
+    backgroundLocationPermissionRequester
+
     onBackPressedDispatcher.addCallback(this) {
       val current = welcomeViewModel.currentFragmentPosition.value ?: 0
       if (current == 0) {
