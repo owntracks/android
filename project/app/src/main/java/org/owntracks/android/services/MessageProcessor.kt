@@ -109,6 +109,10 @@ constructor(
 
   init {
     preferences.registerOnPreferenceChangedListener(this)
+    // Collect queue size changes and propagate to endpoint state repo
+    scope.launch(ioDispatcher) {
+      outgoingQueue.queueSize.collect { size -> endpointStateRepo.setQueueLength(size) }
+    }
   }
 
   /**
@@ -169,7 +173,6 @@ constructor(
     runBlocking { queueInitJob.join() }
     Timber.d("Reloading outgoing message processor")
     endpoint?.deactivate().also { Timber.d("Destroying previous endpoint") }
-    scope.launch { endpointStateRepo.setQueueLength(outgoingQueue.size()) }
     endpoint = getEndpoint(preferences.mode)
 
     dequeueAndSenderJob =
@@ -219,7 +222,6 @@ constructor(
           Timber.e("Still can't put message onto the queue. Dropping: $message")
         }
       }
-      endpointStateRepo.setQueueLength(outgoingQueue.size())
     }
   }
 
@@ -253,13 +255,9 @@ constructor(
         var retryWait: Duration
         while (true) {
           try {
-            val message: MessageBase? = outgoingQueue.dequeue()
-            if (message == null) {
-              delay(100) // Poll every 100ms when queue is empty
-              continue
-            }
+            // Suspends efficiently until a message is available - no polling
+            val message: MessageBase = outgoingQueue.awaitMessage()
             Timber.d("Taken message off queue: $message")
-            endpointStateRepo.setQueueLength(outgoingQueue.size() + 1)
             // reset the retry logic if the last message succeeded
             if (lastMessageStatus is LastMessageStatus.Success ||
                 lastMessageStatus is LastMessageStatus.PermanentFailure) {
@@ -352,8 +350,6 @@ constructor(
           } catch (e: CancellationException) {
             Timber.w(e, "Outgoing message loop cancelled")
             break
-          } finally {
-            endpointStateRepo.setQueueLength(outgoingQueue.size())
           }
         }
       } catch (e: Exception) {
@@ -409,20 +405,18 @@ constructor(
       cancel(CancellationException("Connectivity changed"))
       Timber.d("Resetting message send loop wait.")
     }
+    // Wake up any suspended awaitMessage() call to retry immediately
+    outgoingQueue.signalMessageAvailable()
   }
 
   fun onMessageDeliveryFailedFinal(message: MessageBase) {
-    scope.launch {
-      Timber.e("Message delivery failed, not retryable. $message")
-      endpointStateRepo.setQueueLength(outgoingQueue.size())
-    }
+    scope.launch { Timber.e("Message delivery failed, not retryable. $message") }
   }
 
   fun onMessageDeliveryFailed(message: MessageBase) {
     scope.launch {
       Timber.e(
           "Message delivery failed. queueLength: ${outgoingQueue.size() + 1}, message=$message")
-      endpointStateRepo.setQueueLength(outgoingQueue.size())
     }
   }
 

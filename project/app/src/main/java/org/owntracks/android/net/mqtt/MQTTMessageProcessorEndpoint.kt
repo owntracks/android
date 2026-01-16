@@ -191,7 +191,7 @@ class MQTTMessageProcessorEndpoint(
   override fun onFinalizeMessage(message: MessageBase): MessageBase = message
 
   override suspend fun sendMessage(message: MessageBase): Result<Unit> {
-    Timber.i("Sending message $message")
+    Timber.d("Sending message $message")
     if (mqttClientAndConfiguration == null) {
       return Result.failure(NotReadyException())
     }
@@ -225,7 +225,7 @@ class MQTTMessageProcessorEndpoint(
                               message.retained)
                           .also { Timber.v("MQTT message sent with messageId=${it.messageId}. ") }
                     }
-                    .apply { Timber.i("Message ${message.messageId} sent in $this") }
+                    .apply { Timber.i("Message $message sent in $this") }
               } catch (e: Exception) {
                 Timber.w(e, "Error publishing message $message")
                 when (e) {
@@ -296,8 +296,8 @@ class MQTTMessageProcessorEndpoint(
 
         override fun connectionLost(cause: Throwable) {
           when (cause) {
-            is IOException -> Timber.i("Connection Lost: ${cause.message}")
-            else -> Timber.i(cause, "Connection Lost")
+            is IOException -> Timber.w("Connection Lost: ${cause.message}")
+            else -> Timber.w(cause, "Connection Lost")
           }
           scope.launch { endpointStateRepo.setState(EndpointState.DISCONNECTED) }
           scheduler.scheduleMqttReconnect()
