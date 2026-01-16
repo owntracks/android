@@ -111,7 +111,7 @@ class RoomBackedMessageQueue(
               enqueueInternal(message)
               migratedCount++
             } catch (e: Exception) {
-              Timber.w(e, "Failed to migrate message: $message")
+              Timber.d(e, "Failed to migrate message: $message")
             }
           }
 
@@ -196,7 +196,7 @@ class RoomBackedMessageQueue(
       mutex.withLock {
         val currentSize = dao.getCount()
         if (currentSize >= capacity) {
-          Timber.w("Queue at capacity ($capacity), cannot enqueue message")
+          Timber.i("Queue at capacity ($capacity), cannot enqueue message")
           return@withContext false
         }
 
@@ -234,7 +234,7 @@ class RoomBackedMessageQueue(
       mutex.withLock {
         val currentSize = dao.getCount()
         if (currentSize >= capacity) {
-          Timber.w("Queue at capacity ($capacity), cannot requeue message")
+          Timber.i("Queue at capacity ($capacity), cannot requeue message")
           return@withContext false
         }
 
