@@ -62,13 +62,15 @@ constructor(
                 // Pause in case there's network turmoil
                 .setInitialDelay(Duration.ofSeconds(RECONNECT_DELAY_SECONDS))
                 .addTag(ONETIME_TASK_MQTT_RECONNECT)
-                .setBackoffCriteria(BackoffPolicy.LINEAR, MIN_BACKOFF_MILLIS, TimeUnit.MILLISECONDS)
+                .setBackoffCriteria(
+                    BackoffPolicy.EXPONENTIAL, MIN_BACKOFF_MILLIS, TimeUnit.MILLISECONDS)
                 .setConstraints(anyNetworkConstraint)
                 .build()
           } else {
             OneTimeWorkRequest.Builder(MQTTReconnectWorker::class.java)
                 .addTag(ONETIME_TASK_MQTT_RECONNECT)
-                .setBackoffCriteria(BackoffPolicy.LINEAR, MIN_BACKOFF_MILLIS, TimeUnit.MILLISECONDS)
+                .setBackoffCriteria(
+                    BackoffPolicy.EXPONENTIAL, MIN_BACKOFF_MILLIS, TimeUnit.MILLISECONDS)
                 .setConstraints(anyNetworkConstraint)
                 .build()
           }
