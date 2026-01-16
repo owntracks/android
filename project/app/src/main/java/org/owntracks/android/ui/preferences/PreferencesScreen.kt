@@ -44,9 +44,11 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -275,6 +277,13 @@ fun ConnectionStatusCard(
     onReconnect: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var isStartingConnection by remember { mutableStateOf(false) }
+
+    // Reset loading state when endpoint state changes
+    LaunchedEffect(endpointState) {
+        isStartingConnection = false
+    }
+
     val statusColor = when (endpointState) {
         EndpointState.CONNECTED -> Color(0xFF4CAF50) // Green
         EndpointState.CONNECTING -> Color(0xFFFFC107) // Amber
@@ -395,15 +404,26 @@ fun ConnectionStatusCard(
                     }
                     else -> {
                         Button(
-                            onClick = onStartConnection,
-                            enabled = canStartConnection,
+                            onClick = {
+                                isStartingConnection = true
+                                onStartConnection()
+                            },
+                            enabled = canStartConnection && !isStartingConnection,
                             modifier = Modifier.weight(1f)
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.PlayArrow,
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
-                            )
+                            if (isStartingConnection) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(18.dp),
+                                    strokeWidth = 2.dp,
+                                    color = MaterialTheme.colorScheme.onPrimary
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = Icons.Default.PlayArrow,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(stringResource(R.string.connectionStart))
                         }

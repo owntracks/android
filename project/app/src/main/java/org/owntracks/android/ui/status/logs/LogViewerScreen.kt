@@ -8,9 +8,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
@@ -149,24 +150,26 @@ fun LogViewerScreen(
         },
         modifier = modifier
     ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .horizontalScroll(rememberScrollState())
-        ) {
-            LazyColumn(
-                state = listState,
-                modifier = Modifier.fillMaxWidth()
+        SelectionContainer {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .horizontalScroll(rememberScrollState())
             ) {
-                items(
-                    items = logEntries,
-                    key = { "${it.time.time}_${it.hashCode()}" }
-                ) { logEntry ->
-                    LogEntryRow(
-                        logEntry = logEntry,
-                        previousEntry = logEntries.getOrNull(logEntries.indexOf(logEntry) - 1)
-                    )
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    itemsIndexed(
+                        items = logEntries,
+                        key = { index, entry -> "${index}_${entry.time.time}" }
+                    ) { index, logEntry ->
+                        LogEntryRow(
+                            logEntry = logEntry,
+                            previousEntry = logEntries.getOrNull(index - 1)
+                        )
+                    }
                 }
             }
         }

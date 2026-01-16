@@ -5,12 +5,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -67,9 +71,9 @@ fun PreferenceItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(56.dp)
+            .heightIn(min = 56.dp)
             .clickable(enabled = enabled, onClick = onClick)
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -169,6 +173,7 @@ fun EditTextPreference(
     var showDialog by remember { mutableStateOf(false) }
     var editedValue by remember(value) { mutableStateOf(value) }
     var isError by remember { mutableStateOf(false) }
+    var passwordVisible by remember { mutableStateOf(false) }
 
     val displaySummary = if (isPassword && value.isNotBlank()) {
         stringResource(R.string.preferencesSet)
@@ -186,6 +191,7 @@ fun EditTextPreference(
         onClick = {
             editedValue = value
             isError = false
+            passwordVisible = false
             showDialog = true
         },
         modifier = modifier
@@ -213,11 +219,29 @@ fun EditTextPreference(
                         supportingText = if (isError && validationError != null) {
                             { Text(validationError) }
                         } else null,
-                        visualTransformation = if (isPassword) {
+                        visualTransformation = if (isPassword && !passwordVisible) {
                             PasswordVisualTransformation()
                         } else {
                             VisualTransformation.None
                         },
+                        trailingIcon = if (isPassword) {
+                            {
+                                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                    Icon(
+                                        imageVector = if (passwordVisible) {
+                                            Icons.Filled.VisibilityOff
+                                        } else {
+                                            Icons.Filled.Visibility
+                                        },
+                                        contentDescription = if (passwordVisible) {
+                                            stringResource(R.string.hide_password)
+                                        } else {
+                                            stringResource(R.string.show_password)
+                                        }
+                                    )
+                                }
+                            }
+                        } else null,
                         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
@@ -445,8 +469,8 @@ fun InfoPreference(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(56.dp)
-            .padding(horizontal = 16.dp),
+            .heightIn(min = 56.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {

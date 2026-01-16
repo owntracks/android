@@ -163,6 +163,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesCleanSessionEnabled">"Clean Session"</string>
     <string name="preferencesClientCrtInstall">"Install client certificate"</string>
     <string name="preferencesClientCrt">"Client certificate"</string>
+    <string name="preferencesTlsCertificatesInfo">"Client and CA certificates are optional. Only configure these if your server requires custom certificates."</string>
     <string name="preferencesClientId">"Client ID"</string>
     <string name="preferencesClientIdValidationError">"Cannot be empty"</string>
     <string name="preferencesDebugLog">"Debug log"</string>
@@ -266,8 +267,8 @@ To allow this, please enable Location in the device settings."</string>
     <string name="radius">"Radius (m)"</string>
     <string name="reconnect">"Reconnect"</string>
     <string name="reconnecting">"Reconnecting"</string>
-    <string name="connectionStart">"Start connection"</string>
-    <string name="connectionStop">"Stop connection"</string>
+    <string name="connectionStart">"Connect"</string>
+    <string name="connectionStop">"Disconnect"</string>
     <string name="requestLocationSent">"Request location command sent to %s"</string>
     <string name="save">"Save"</string>
     <string name="select">"Select"</string>
@@ -388,4 +389,8 @@ Please check the logs for more details."</string>
     <string name="configuration_missing_mqtt_host">"MQTT host is not configured"</string>
     <string name="configuration_missing_http_url">"HTTP URL is not configured"</string>
     <string name="configuration_missing_action">"Configure"</string>
+
+    <!-- Password visibility -->
+    <string name="show_password">"Show password"</string>
+    <string name="hide_password">"Hide password"</string>
 </resources>
