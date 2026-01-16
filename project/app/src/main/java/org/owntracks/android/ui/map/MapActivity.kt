@@ -11,6 +11,7 @@ import android.content.res.ColorStateList
 import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.hardware.SensorManager.SENSOR_DELAY_UI
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
@@ -55,6 +56,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Named
+import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiMapBinding
@@ -195,7 +197,8 @@ class MapActivity :
                               bottomSheetLayout.paddingLeft,
                               topPadding,
                               bottomSheetLayout.paddingRight,
-                              bottomSheetLayout.paddingBottom)
+                              bottomSheetLayout.paddingBottom,
+                          )
                         }
                       }
 
@@ -211,6 +214,7 @@ class MapActivity :
           requestLocationReportButton.setOnClickListener {
             viewModel.sendLocationRequestToCurrentContact()
           }
+
           contactShareButton.setOnClickListener {
             startActivity(
                 Intent.createChooser(
@@ -237,7 +241,7 @@ class MapActivity :
             )
           }
 
-          contactNavigateButton.setOnClickListener { navigateToCurrentContact() }
+          contactOpenInAnotherAppButton.setOnClickListener { openContactCoordsInApp() }
 
           fabMyLocation.apply {
             TooltipCompat.setTooltipText(this, getString(R.string.currentLocationButtonLabel))
@@ -374,14 +378,22 @@ class MapActivity :
     notifyOnWorkManagerInitFailure(this)
   }
 
-  private fun navigateToCurrentContact() {
+  private fun openContactCoordsInApp() {
     viewModel.currentContact.value?.latLng?.apply {
       try {
+        val builder =
+            Uri.Builder()
+                .scheme("geo")
+                .authority("")
+                .appendPath(
+                    "${latitude.value.roundForDisplay()},${longitude.value.roundForDisplay()}")
+        viewModel.zoomLevel?.let { builder.appendQueryParameter("z", it.roundToInt().toString()) }
+        builder.appendQueryParameter(
+            "q", "${latitude.value.roundForDisplay()},${longitude.value.roundForDisplay()}")
         val intent =
             Intent(
                 Intent.ACTION_VIEW,
-                "google.navigation:q=${latitude.value.roundForDisplay()},${longitude.value.roundForDisplay()}"
-                    .toUri(),
+                builder.build(),
             )
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
