@@ -2,108 +2,127 @@ package org.owntracks.android.ui.contacts
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import javax.inject.Named
-import kotlinx.coroutines.launch
-import org.owntracks.android.R
 import org.owntracks.android.data.repos.ContactsRepoChange
-import org.owntracks.android.databinding.UiContactsBinding
 import org.owntracks.android.model.Contact
+import org.owntracks.android.preferences.Preferences
+import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.test.ThresholdIdlingResourceInterface
-import org.owntracks.android.ui.DrawerProvider
 import org.owntracks.android.ui.map.MapActivity
-import org.owntracks.android.ui.mixins.AppBarInsetHandler
 import org.owntracks.android.ui.mixins.ServiceStarter
+import org.owntracks.android.ui.navigation.Destination
+import org.owntracks.android.ui.navigation.toActivityClass
+import org.owntracks.android.ui.theme.OwnTracksTheme
 import timber.log.Timber
 
 @AndroidEntryPoint
 class ContactsActivity :
     AppCompatActivity(),
-    AdapterClickListener<Contact>,
-    ServiceStarter by ServiceStarter.Impl(),
-    AppBarInsetHandler by AppBarInsetHandler.Impl() {
-  @Inject lateinit var drawerProvider: DrawerProvider
+    ServiceStarter by ServiceStarter.Impl() {
 
-  @Inject
-  @Named("contactsActivityIdlingResource")
-  lateinit var contactsCountingIdlingResource: ThresholdIdlingResourceInterface
+    @Inject
+    @Named("contactsActivityIdlingResource")
+    lateinit var contactsCountingIdlingResource: ThresholdIdlingResourceInterface
 
-  private val viewModel: ContactsViewModel by viewModels()
-  private lateinit var contactsAdapter: ContactsAdapter
+    @Inject
+    lateinit var contactImageBindingAdapter: ContactImageBindingAdapter
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    enableEdgeToEdge()
-    startService(this)
-    super.onCreate(savedInstanceState)
-    contactsAdapter = ContactsAdapter(this, viewModel.coroutineScope)
-    val binding =
-        DataBindingUtil.setContentView<UiContactsBinding>(this, R.layout.ui_contacts).apply {
-          vm = viewModel
-          appbar.toolbar.run {
-            setSupportActionBar(this)
-            drawerProvider.attach(this, drawerLayout, navigationView)
-          }
-          contactsRecyclerView.run {
-            layoutManager = LinearLayoutManager(this@ContactsActivity)
-            adapter = contactsAdapter
-          }
+    @Inject
+    lateinit var preferences: Preferences
 
-          applyAppBarEdgeToEdgeInsets(drawerLayout, appbar.root, navigationView)
+    private val viewModel: ContactsViewModel by viewModels()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
+        startService(this)
+        super.onCreate(savedInstanceState)
+
+        setContent {
+            OwnTracksTheme(dynamicColor = preferences.dynamicColorsEnabled) {
+                // Convert contacts map to a mutable state list sorted by timestamp
+                val contactsList = remember {
+                    mutableStateListOf<Contact>().apply {
+                        addAll(viewModel.contacts.values.sortedByDescending { it.locationTimestamp })
+                    }
+                }
+
+                // Observe contact changes
+                androidx.compose.runtime.LaunchedEffect(Unit) {
+                    viewModel.contactUpdatedEvent.collect { change ->
+                        Timber.v("Received contactUpdatedEvent $change")
+                        when (change) {
+                            is ContactsRepoChange.ContactAdded -> {
+                                contactsList.add(change.contact)
+                                contactsList.sortByDescending { it.locationTimestamp }
+                                viewModel.refreshGeocode(change.contact)
+                            }
+                            is ContactsRepoChange.ContactRemoved -> {
+                                contactsList.removeAll { it.id == change.contact.id }
+                            }
+                            is ContactsRepoChange.ContactLocationUpdated -> {
+                                val index = contactsList.indexOfFirst { it.id == change.contact.id }
+                                if (index >= 0) {
+                                    contactsList[index] = change.contact
+                                    contactsList.sortByDescending { it.locationTimestamp }
+                                }
+                                viewModel.refreshGeocode(change.contact)
+                            }
+                            is ContactsRepoChange.ContactCardUpdated -> {
+                                val index = contactsList.indexOfFirst { it.id == change.contact.id }
+                                if (index >= 0) {
+                                    contactsList[index] = change.contact
+                                }
+                            }
+                            is ContactsRepoChange.AllCleared -> {
+                                contactsList.clear()
+                            }
+                        }
+                        contactsCountingIdlingResource.run { if (!isIdleNow) decrement() }
+                    }
+                }
+
+                // Trigger geocode refresh on startup
+                androidx.compose.runtime.LaunchedEffect(Unit) {
+                    viewModel.contacts.values.forEach(viewModel::refreshGeocode)
+                }
+
+                ContactsScreen(
+                    contacts = contactsList,
+                    contactImageBindingAdapter = contactImageBindingAdapter,
+                    onNavigate = { destination ->
+                        navigateToDestination(destination)
+                    },
+                    onContactClick = { contact ->
+                        startActivity(
+                            Intent(this@ContactsActivity, MapActivity::class.java)
+                                .putExtra(
+                                    "_args",
+                                    Bundle().apply {
+                                        putString(MapActivity.BUNDLE_KEY_CONTACT_ID, contact.id)
+                                    }
+                                )
+                        )
+                    },
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
         }
-
-    contactsAdapter.setContactList(viewModel.contacts.values)
-
-    // Trigger a geocode refresh on startup, because future refreshes will only be triggered on
-    // update events
-    viewModel.contacts.values.forEach(viewModel::refreshGeocode)
-
-    // Observe changes to the contacts repo in our lifecycle and forward it onto the
-    // [ContactsAdapter], optionally
-    // updating the geocode for the contact.
-    lifecycleScope.launch {
-      viewModel.contactUpdatedEvent.collect {
-        Timber.v("Received contactUpdatedEvent $it")
-        when (it) {
-          is ContactsRepoChange.ContactAdded -> {
-            contactsAdapter.addContact(it.contact)
-            viewModel.refreshGeocode(it.contact)
-          }
-          is ContactsRepoChange.ContactRemoved -> contactsAdapter.removeContact(it.contact)
-          is ContactsRepoChange.ContactLocationUpdated -> {
-            contactsAdapter.updateContact(it.contact)
-            viewModel.refreshGeocode(it.contact)
-          }
-          is ContactsRepoChange.ContactCardUpdated -> contactsAdapter.updateContact(it.contact)
-          is ContactsRepoChange.AllCleared -> contactsAdapter.clearAll()
-        }
-        binding.run {
-          placeholder.visibility = if (viewModel.contacts.isEmpty()) View.VISIBLE else View.GONE
-          contactsRecyclerView.visibility =
-              if (viewModel.contacts.isEmpty()) View.GONE else View.VISIBLE
-        }
-
-        contactsCountingIdlingResource.run { if (!isIdleNow) decrement() }
-      }
     }
-  }
 
-  override fun onClick(item: Contact, view: View, longClick: Boolean) {
-    startActivity(
-        Intent(this, MapActivity::class.java)
-            .putExtra(
-                "_args", Bundle().apply { putString(MapActivity.BUNDLE_KEY_CONTACT_ID, item.id) }))
-  }
-
-  override fun onResume() {
-    super.onResume()
-    drawerProvider.updateHighlight()
-  }
+    private fun navigateToDestination(destination: Destination) {
+        val activityClass = destination.toActivityClass() ?: return
+        if (this.javaClass != activityClass) {
+            startActivity(Intent(this, activityClass))
+        }
+    }
 }

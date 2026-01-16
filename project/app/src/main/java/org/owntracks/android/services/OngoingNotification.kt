@@ -61,7 +61,7 @@ class OngoingNotification(private val context: Context, initialMode: MonitoringM
           .setContentIntent(resultPendingIntent)
           .setStyle(NotificationCompat.BigTextStyle())
           .addAction(
-              R.drawable.ic_baseline_publish_24,
+              R.drawable.ic_add_location_alt,
               context.getString(R.string.publish),
               publishPendingIntent)
           .addAction(

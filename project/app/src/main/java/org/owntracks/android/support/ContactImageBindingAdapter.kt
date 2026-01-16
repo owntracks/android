@@ -11,16 +11,12 @@ import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import android.widget.ImageView
 import androidx.core.graphics.scale
-import androidx.databinding.BindingAdapter
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -34,11 +30,6 @@ constructor(
     @ApplicationContext context: Context,
     private val memoryCache: ContactBitmapAndNameMemoryCache
 ) {
-  @BindingAdapter(value = ["contact", "coroutineScope"])
-  fun ImageView.displayFaceInViewAsync(contact: Contact?, scope: CoroutineScope) {
-    contact?.also { scope.launch(Dispatchers.Main) { setImageBitmap(getBitmapFromCache(it)) } }
-  }
-
   private val faceDimensions = (48 * (context.resources.displayMetrics.densityDpi / 160f)).toInt()
   private val cacheMutex = Mutex()
 

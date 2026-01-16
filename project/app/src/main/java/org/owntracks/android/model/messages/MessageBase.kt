@@ -1,6 +1,5 @@
 package org.owntracks.android.model.messages
 
-import androidx.databinding.BaseObservable
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
@@ -29,7 +28,7 @@ import org.owntracks.android.preferences.types.ConnectionMode
     JsonSubTypes.Type(value = MessageLwt::class, name = MessageLwt.TYPE),
     JsonSubTypes.Type(value = MessageStatus::class, name = MessageStatus.TYPE))
 @JsonPropertyOrder(alphabetic = true)
-abstract class MessageBase : BaseObservable(), MessageWithId {
+abstract class MessageBase : MessageWithId {
   @JsonIgnore open val numberOfRetries: Int = 10
 
   @JsonIgnore

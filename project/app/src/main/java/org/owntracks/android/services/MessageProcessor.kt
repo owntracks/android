@@ -134,6 +134,10 @@ constructor(
   /** Called either by the connection activity user button, or by receiving a RECONNECT message */
   suspend fun reconnect(): Result<Unit> {
     Timber.v("reconnect")
+    if (!preferences.connectionEnabled) {
+      Timber.i("Connection is disabled, not reconnecting")
+      return Result.success(Unit)
+    }
     return try {
       when (endpoint) {
         null -> {
@@ -150,6 +154,21 @@ constructor(
     } catch (e: Exception) {
       Result.failure(e)
     }
+  }
+
+  /** Disconnects the endpoint and stops sending messages */
+  suspend fun disconnect() {
+    Timber.v("disconnect requested")
+    preferences.connectionEnabled = false
+    endpoint?.deactivate()
+    endpointStateRepo.setState(EndpointState.DISCONNECTED)
+  }
+
+  /** Starts the connection if it was manually stopped */
+  suspend fun startConnection() {
+    Timber.v("startConnection requested")
+    preferences.connectionEnabled = true
+    reconnect()
   }
 
   val isEndpointReady: Boolean
@@ -208,6 +227,7 @@ constructor(
   }
 
   fun queueMessageForSending(message: MessageBase) {
+    runBlocking { queueInitJob.join() }
     outgoingQueueIdlingResource.increment()
     scope.launch(ioDispatcher) {
       val currentSize = outgoingQueue.size()
@@ -326,6 +346,7 @@ constructor(
                       ?: run {
                         Timber.d("Message sent successfully: $message")
                         lastMessageStatus = LastMessageStatus.Success
+                        endpointStateRepo.setLastSuccessfulMessageTime(java.time.Instant.now())
                         if (message !is MessageWaypoint) {
                           messageReceivedIdlingResource.add(message)
                         }
@@ -409,6 +430,11 @@ constructor(
       cancel(CancellationException("Connectivity changed"))
       Timber.d("Resetting message send loop wait.")
     }
+  }
+
+  fun triggerImmediateSync() {
+    Timber.d("Triggering immediate sync")
+    notifyOutgoingMessageQueue()
   }
 
   fun onMessageDeliveryFailedFinal(message: MessageBase) {

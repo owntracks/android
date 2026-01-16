@@ -11,24 +11,19 @@ import android.os.StrictMode
 import androidx.annotation.MainThread
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.NotificationManagerCompat
-import androidx.databinding.DataBindingUtil
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
-import dagger.hilt.EntryPoints
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EarlyEntryPoint
 import dagger.hilt.android.EarlyEntryPoints
 import dagger.hilt.android.HiltAndroidApp
 import dagger.hilt.components.SingletonComponent
 import java.security.Security
-import javax.inject.Provider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.datetime.Instant
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.conscrypt.Conscrypt
-import org.owntracks.android.di.CustomBindingComponentBuilder
-import org.owntracks.android.di.CustomBindingEntryPoint
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.logging.TimberInMemoryLogTree
 import org.owntracks.android.preferences.Preferences
@@ -62,8 +57,6 @@ open class BaseApp :
 
     fun scheduler(): Scheduler
 
-    fun bindingComponentProvider(): Provider<CustomBindingComponentBuilder>
-
     fun messageProcessor(): MessageProcessor
 
     fun notificationManager(): NotificationManagerCompat
@@ -81,10 +74,6 @@ open class BaseApp :
 
   private val scheduler: Scheduler by lazy {
     EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).scheduler()
-  }
-
-  private val bindingComponentProvider: Provider<CustomBindingComponentBuilder> by lazy {
-    EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).bindingComponentProvider()
   }
 
   private val notificationManager: NotificationManagerCompat by lazy {
@@ -109,12 +98,6 @@ open class BaseApp :
     super.onCreate()
 
     setGlobalExceptionHandler()
-
-    val dataBindingComponent = bindingComponentProvider.get().build()
-    val dataBindingEntryPoint =
-        EntryPoints.get(dataBindingComponent, CustomBindingEntryPoint::class.java)
-
-    DataBindingUtil.setDefaultComponent(dataBindingEntryPoint)
 
     scheduler.cancelAllTasks()
     Timber.plant(TimberInMemoryLogTree(BuildConfig.DEBUG))
