@@ -250,6 +250,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:layout_alignParentBottom="true"
+                        android:layout_marginEnd="8dp"
                         android:src="@drawable/ic_baseline_share_24"
                         android:visibility="@{vm.currentContact.latLng!=null ?  View.VISIBLE : View.GONE}"
                         app:fabSize="mini" />
