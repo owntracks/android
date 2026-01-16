@@ -477,7 +477,7 @@ internal constructor(
   }
 
   companion object {
-    const val MIN_ZOOM_LEVEL: Double = 5.0
+    const val MIN_ZOOM_LEVEL: Double = 1.0
     const val MAX_ZOOM_LEVEL: Double = 21.0
   }
 }
