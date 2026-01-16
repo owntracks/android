@@ -13,13 +13,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import org.owntracks.android.location.geofencing.Latitude
+import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.location.geofencing.Longitude
 import org.owntracks.android.location.roundForDisplay
 import org.owntracks.android.ui.theme.OwnTracksTheme
 
 @AndroidEntryPoint
 class WaypointActivity : AppCompatActivity() {
+    @Inject
+    lateinit var preferences: Preferences
+
     private val viewModel: WaypointViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,7 +42,7 @@ class WaypointActivity : AppCompatActivity() {
         }
 
         setContent {
-            OwnTracksTheme {
+            OwnTracksTheme(dynamicColor = preferences.dynamicColorsEnabled) {
                 val waypoint by viewModel.waypoint.observeAsState()
 
                 // Initialize state from waypoint when it loads

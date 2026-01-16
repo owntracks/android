@@ -97,8 +97,9 @@ class MQTTMessageProcessorEndpoint(
           super.onAvailable(network)
           Timber.v("Network becomes available")
           if (!justRegistered &&
-              endpointStateRepo.endpointState.value == EndpointState.DISCONNECTED) {
-            Timber.v("Currently disconnected, so attempting reconnect")
+              endpointStateRepo.endpointState.value == EndpointState.DISCONNECTED &&
+              preferences.connectionEnabled) {
+            Timber.v("Currently disconnected and connection enabled, so attempting reconnect")
             scope.launch { reconnect() }
           }
           justRegistered = false
@@ -116,6 +117,11 @@ class MQTTMessageProcessorEndpoint(
     preferences.registerOnPreferenceChangedListener(this)
     networkChangeCallback.justRegistered = true
     connectivityManager.registerDefaultNetworkCallback(networkChangeCallback)
+    if (!preferences.connectionEnabled) {
+      Timber.i("Connection is disabled by user, not connecting")
+      scope.launch { endpointStateRepo.setState(EndpointState.DISCONNECTED) }
+      return
+    }
     scope.launch {
       try {
         val configuration = getEndpointConfiguration()
@@ -300,7 +306,9 @@ class MQTTMessageProcessorEndpoint(
             else -> Timber.e(cause, "Connection Lost")
           }
           scope.launch { endpointStateRepo.setState(EndpointState.DISCONNECTED) }
-          scheduler.scheduleMqttReconnect()
+          if (preferences.connectionEnabled) {
+            scheduler.scheduleMqttReconnect()
+          }
         }
 
         override fun messageArrived(topic: String, message: MqttMessage) {
@@ -441,7 +449,9 @@ class MQTTMessageProcessorEndpoint(
                   }
                 }
                 endpointStateRepo.setState(EndpointState.ERROR.withError(e))
-                scheduler.scheduleMqttReconnect()
+                if (preferences.connectionEnabled) {
+                  scheduler.scheduleMqttReconnect()
+                }
                 Result.failure(e)
               }
             }

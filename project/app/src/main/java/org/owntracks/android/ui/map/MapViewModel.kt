@@ -111,6 +111,24 @@ constructor(
     messageProcessor.triggerImmediateSync()
   }
 
+  fun startConnection() {
+    viewModelScope.launch {
+      messageProcessor.startConnection()
+    }
+  }
+
+  fun stopConnection() {
+    viewModelScope.launch {
+      messageProcessor.disconnect()
+    }
+  }
+
+  fun reconnect() {
+    viewModelScope.launch {
+      messageProcessor.reconnect()
+    }
+  }
+
   val currentLocation = LocationLiveData(application, viewModelScope)
 
   val waypointUpdatedEvent = waypointsRepo.repoChangedEvent

@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.launch
+import org.owntracks.android.data.repos.EndpointStateRepo
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.AppTheme
 import org.owntracks.android.services.BackgroundService
@@ -38,14 +39,18 @@ class PreferencesActivity :
     @Inject
     lateinit var messageProcessor: MessageProcessor
 
+    @Inject
+    lateinit var endpointStateRepo: EndpointStateRepo
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         setContent {
-            OwnTracksTheme {
+            OwnTracksTheme(dynamicColor = preferences.dynamicColorsEnabled) {
                 PreferencesScreen(
                     preferences = preferences,
+                    endpointStateRepo = endpointStateRepo,
                     onNavigate = { destination ->
                         navigateToDestination(destination)
                     },
@@ -66,9 +71,22 @@ class PreferencesActivity :
                     onThemeChange = { theme ->
                         applyTheme(theme)
                     },
+                    onDynamicColorsChange = {
+                        recreate()
+                    },
                     onReconnect = {
                         lifecycleScope.launch {
                             messageProcessor.reconnect()
+                        }
+                    },
+                    onStartConnection = {
+                        lifecycleScope.launch {
+                            messageProcessor.startConnection()
+                        }
+                    },
+                    onStopConnection = {
+                        lifecycleScope.launch {
+                            messageProcessor.disconnect()
                         }
                     }
                 )

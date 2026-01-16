@@ -12,6 +12,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.ui.theme.OwnTracksTheme
 
 /**
@@ -24,12 +26,15 @@ private enum class AboutNavState {
 
 @AndroidEntryPoint
 class AboutActivity : AppCompatActivity() {
+    @Inject
+    lateinit var preferences: Preferences
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         setContent {
-            OwnTracksTheme {
+            OwnTracksTheme(dynamicColor = preferences.dynamicColorsEnabled) {
                 var currentScreen by rememberSaveable { mutableStateOf(AboutNavState.About) }
 
                 // Handle system back button for internal navigation

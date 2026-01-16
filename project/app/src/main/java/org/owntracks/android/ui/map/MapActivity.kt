@@ -174,7 +174,7 @@ class MapActivity :
     }
 
     setContent {
-      OwnTracksTheme {
+      OwnTracksTheme(dynamicColor = preferences.dynamicColorsEnabled) {
         val navController = rememberNavController()
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
@@ -288,7 +288,12 @@ class MapActivity :
                 Destination.Preferences -> {
                   PreferencesTopAppBar(
                       currentScreen = preferencesCurrentScreen,
-                      onBackClick = { preferencesCurrentScreen = PreferenceScreen.Root }
+                      endpointState = endpointState,
+                      preferences = preferences,
+                      onBackClick = { preferencesCurrentScreen = PreferenceScreen.Root },
+                      onStartConnection = { viewModel.startConnection() },
+                      onStopConnection = { viewModel.stopConnection() },
+                      onReconnect = { viewModel.reconnect() }
                   )
                 }
                 else -> {}

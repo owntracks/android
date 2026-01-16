@@ -47,7 +47,7 @@ abstract class BaseWelcomeActivity : AppCompatActivity() {
         }
 
         setContent {
-            OwnTracksTheme {
+            OwnTracksTheme(dynamicColor = preferences.dynamicColorsEnabled) {
                 WelcomeScreen(
                     pages = welcomePages,
                     hasLocationPermissions = { requirementsChecker.hasLocationPermissions() },

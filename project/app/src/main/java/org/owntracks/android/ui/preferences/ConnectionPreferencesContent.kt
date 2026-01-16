@@ -20,7 +20,6 @@ import org.owntracks.android.preferences.types.ConnectionMode
 @Composable
 fun ConnectionPreferencesContent(
     preferences: Preferences,
-    onReconnect: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     // Trigger recomposition when mode changes
@@ -36,6 +35,9 @@ fun ConnectionPreferencesContent(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
+        // Endpoint section
+        PreferenceCategory(title = stringResource(R.string.preferencesCategoryConnectionEndpoint))
+
         // Connection Mode
         ListPreference(
             title = stringResource(R.string.preferencesProfileId),
@@ -46,9 +48,6 @@ fun ConnectionPreferencesContent(
                 currentMode = it
             }
         )
-
-        // Endpoint section
-        PreferenceCategory(title = stringResource(R.string.preferencesCategoryConnectionEndpoint))
 
         // HTTP URL (only visible in HTTP mode)
         if (preferences.mode == ConnectionMode.HTTP) {
@@ -144,27 +143,28 @@ fun ConnectionPreferencesContent(
                 onCheckedChange = { preferences.tls = it }
             )
 
-            // TLS Client Certificate selection
-            PreferenceItem(
-                title = stringResource(R.string.preferencesClientCrt),
-                summary = if (preferences.tlsClientCrt.isNotBlank()) {
-                    preferences.tlsClientCrt
-                } else {
-                    stringResource(R.string.preferencesNotSet)
-                },
-                enabled = preferences.tls,
-                onClick = {
-                    // Certificate selection is handled by the activity
-                    // This would require a callback
-                }
-            )
+            // Certificate options only shown when TLS is enabled
+            if (preferences.tls) {
+                PreferenceItem(
+                    title = stringResource(R.string.preferencesClientCrt),
+                    summary = if (preferences.tlsClientCrt.isNotBlank()) {
+                        preferences.tlsClientCrt
+                    } else {
+                        stringResource(R.string.preferencesNotSet)
+                    },
+                    onClick = {
+                        // Certificate selection is handled by the activity
+                        // This would require a callback
+                    }
+                )
 
-            PreferenceItem(
-                title = stringResource(R.string.preferencesCaCrtInstall),
-                onClick = {
-                    // Opens security settings - handled by activity
-                }
-            )
+                PreferenceItem(
+                    title = stringResource(R.string.preferencesCaCrtInstall),
+                    onClick = {
+                        // Opens security settings - handled by activity
+                    }
+                )
+            }
 
             // Parameters section
             PreferenceCategory(title = stringResource(R.string.preferencesParameters))
@@ -185,13 +185,5 @@ fun ConnectionPreferencesContent(
                 onCheckedChange = { preferences.cleanSession = it }
             )
         }
-
-        // Actions section
-        PreferenceCategory(title = stringResource(R.string.preferencesActions))
-
-        PreferenceItem(
-            title = stringResource(R.string.reconnect),
-            onClick = onReconnect
-        )
     }
 }

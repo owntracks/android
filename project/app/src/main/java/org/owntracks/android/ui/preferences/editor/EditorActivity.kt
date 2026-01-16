@@ -21,6 +21,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.owntracks.android.R
 import org.owntracks.android.di.CoroutineScopes
+import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import org.owntracks.android.ui.theme.OwnTracksTheme
 import timber.log.Timber
@@ -28,6 +29,8 @@ import timber.log.Timber
 @AndroidEntryPoint
 class EditorActivity : AppCompatActivity() {
     private val viewModel: EditorViewModel by viewModels()
+
+    @Inject lateinit var preferences: Preferences
 
     @Inject @CoroutineScopes.MainDispatcher lateinit var mainDispatcher: CoroutineDispatcher
 
@@ -40,7 +43,7 @@ class EditorActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            OwnTracksTheme {
+            OwnTracksTheme(dynamicColor = preferences.dynamicColorsEnabled) {
                 val effectiveConfiguration by viewModel.effectiveConfiguration.observeAsState(initial = "")
                 val snackbarState = remember { SnackbarHostState() }
                 snackbarHostState = snackbarState

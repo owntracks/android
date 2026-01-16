@@ -18,6 +18,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.livedata.observeAsState
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.IOException
+import javax.inject.Inject
+import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.R
 import org.owntracks.android.ui.theme.OwnTracksTheme
 import timber.log.Timber
@@ -25,6 +27,9 @@ import timber.log.Timber
 @SuppressLint("GoogleAppIndexingApiWarning")
 @AndroidEntryPoint
 class LoadActivity : AppCompatActivity() {
+    @Inject
+    lateinit var preferences: Preferences
+
     private val viewModel: LoadViewModel by viewModels()
     private var hasBackArrow by mutableStateOf(false)
 
@@ -33,7 +38,7 @@ class LoadActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            OwnTracksTheme {
+            OwnTracksTheme(dynamicColor = preferences.dynamicColorsEnabled) {
                 val importStatus by viewModel.configurationImportStatus.observeAsState(initial = ImportStatus.LOADING)
                 val displayedConfiguration by viewModel.displayedConfiguration.observeAsState(initial = "")
                 val importError by viewModel.importError.observeAsState(initial = null)

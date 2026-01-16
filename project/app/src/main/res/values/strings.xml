@@ -249,6 +249,8 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesShowWaypointsOnMap">"Show Waypoints"</string>
     <string name="preferencesShowWaypointsOnMapSummary">"Draw waypoint circles on the map"</string>
     <string name="preferencesTheme">"Theme"</string>
+    <string name="preferencesDynamicColors">"Use device colors"</string>
+    <string name="preferencesDynamicColorsSummary">"Apply colors from your device wallpaper (Material You)"</string>
     <string name="preferencesActions">"Actions"</string>
     <string name="preferencesInfo">"Info"</string>
     <string name="preferencesTrackerId">"Tracker ID"</string>
@@ -263,6 +265,8 @@ To allow this, please enable Location in the device settings."</string>
     <string name="radius">"Radius (m)"</string>
     <string name="reconnect">"Reconnect"</string>
     <string name="reconnecting">"Reconnecting"</string>
+    <string name="connectionStart">"Start connection"</string>
+    <string name="connectionStop">"Stop connection"</string>
     <string name="requestLocationSent">"Request location command sent to %s"</string>
     <string name="save">"Save"</string>
     <string name="select">"Select"</string>
@@ -377,4 +381,10 @@ Please check the logs for more details."</string>
     <string name="sync_status_sync_now">"Sync Now"</string>
     <string name="sync_status_close">"Close"</string>
     <string name="sync_status_content_description">"Sync status"</string>
+
+    <!-- Configuration missing alert -->
+    <string name="configuration_missing_alert_title">"Configuration incomplete"</string>
+    <string name="configuration_missing_mqtt_host">"MQTT host is not configured"</string>
+    <string name="configuration_missing_http_url">"HTTP URL is not configured"</string>
+    <string name="configuration_missing_action">"Configure"</string>
 </resources>

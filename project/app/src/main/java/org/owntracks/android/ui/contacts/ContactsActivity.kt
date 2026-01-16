@@ -15,6 +15,7 @@ import javax.inject.Inject
 import javax.inject.Named
 import org.owntracks.android.data.repos.ContactsRepoChange
 import org.owntracks.android.model.Contact
+import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.test.ThresholdIdlingResourceInterface
 import org.owntracks.android.ui.map.MapActivity
@@ -36,6 +37,9 @@ class ContactsActivity :
     @Inject
     lateinit var contactImageBindingAdapter: ContactImageBindingAdapter
 
+    @Inject
+    lateinit var preferences: Preferences
+
     private val viewModel: ContactsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,7 +48,7 @@ class ContactsActivity :
         super.onCreate(savedInstanceState)
 
         setContent {
-            OwnTracksTheme {
+            OwnTracksTheme(dynamicColor = preferences.dynamicColorsEnabled) {
                 // Convert contacts map to a mutable state list sorted by timestamp
                 val contactsList = remember {
                     mutableStateListOf<Contact>().apply {

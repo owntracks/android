@@ -30,7 +30,7 @@ class StatusActivity :
         super.onCreate(savedInstanceState)
 
         setContent {
-            OwnTracksTheme {
+            OwnTracksTheme(dynamicColor = preferences.dynamicColorsEnabled) {
                 StatusScreen(
                     viewModel = viewModel,
                     onBackClick = { finish() },

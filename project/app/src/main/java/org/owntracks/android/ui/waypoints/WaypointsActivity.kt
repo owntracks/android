@@ -56,7 +56,7 @@ class WaypointsActivity :
         postNotificationsPermissionInit(this, preferences, notificationsStash)
 
         setContent {
-            OwnTracksTheme {
+            OwnTracksTheme(dynamicColor = preferences.dynamicColorsEnabled) {
                 val waypoints by viewModel.waypointsFlow.collectAsStateWithLifecycle()
 
                 WaypointsScreen(

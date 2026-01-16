@@ -3,6 +3,7 @@ package org.owntracks.android.ui.navigation
 import android.app.Activity
 import android.content.Intent
 import android.os.Process
+import androidx.activity.compose.BackHandler
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -175,10 +176,13 @@ fun OwnTracksNavHost(
 
         composable(Destination.Preferences.route) {
             val preferences = entryPoint?.preferences()
-            val messageProcessor = entryPoint?.messageProcessor()
-            val scope = rememberCoroutineScope()
 
-            if (preferences != null && messageProcessor != null) {
+            // Handle back button when on a preferences sub-screen
+            BackHandler(enabled = preferencesCurrentScreen != PreferenceScreen.Root) {
+                onPreferencesNavigateToScreen(PreferenceScreen.Root)
+            }
+
+            if (preferences != null) {
                 PreferencesScreenContent(
                     preferences = preferences,
                     currentScreen = preferencesCurrentScreen,
@@ -205,10 +209,8 @@ fun OwnTracksNavHost(
                         }
                         AppCompatDelegate.setDefaultNightMode(mode)
                     },
-                    onReconnect = {
-                        scope.launch {
-                            messageProcessor.reconnect()
-                        }
+                    onDynamicColorsChange = {
+                        activity?.recreate()
                     },
                     modifier = Modifier.fillMaxSize()
                 )

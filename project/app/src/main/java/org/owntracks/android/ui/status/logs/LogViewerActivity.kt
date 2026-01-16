@@ -21,7 +21,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlin.random.Random
+import org.owntracks.android.preferences.Preferences
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
@@ -33,6 +35,9 @@ import timber.log.Timber
 
 @AndroidEntryPoint
 class LogViewerActivity : AppCompatActivity() {
+    @Inject
+    lateinit var preferences: Preferences
+
     val viewModel: LogViewerViewModel by viewModels()
 
     private val shareIntentActivityLauncher =
@@ -52,7 +57,7 @@ class LogViewerActivity : AppCompatActivity() {
         isDebugEnabled = viewModel.isDebugEnabled()
 
         setContent {
-            OwnTracksTheme {
+            OwnTracksTheme(dynamicColor = preferences.dynamicColorsEnabled) {
                 LogViewerScreen(
                     logEntries = logEntries,
                     isDebugEnabled = isDebugEnabled,
