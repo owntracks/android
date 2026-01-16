@@ -40,7 +40,6 @@ import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.ui.map.osm.OSMMapFragment
 import timber.log.Timber
-import timber.log.Timber.Forest.tag
 
 class GoogleMapFragment
 internal constructor(
@@ -308,7 +307,7 @@ internal constructor(
   }
 
   companion object {
-    private const val MIN_ZOOM_LEVEL: Double = 4.0
+    private const val MIN_ZOOM_LEVEL: Double = 1.0
     private const val MAX_ZOOM_LEVEL: Double = 20.0
   }
 
