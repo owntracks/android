@@ -54,6 +54,11 @@ class HttpMessageProcessorEndpoint(
   override fun activate() {
     Timber.v("HTTP Activate")
     preferences.registerOnPreferenceChangedListener(this)
+    if (!preferences.connectionEnabled) {
+      Timber.i("Connection is disabled by user, not activating")
+      scope.launch { endpointStateRepo.setState(EndpointState.IDLE) }
+      return
+    }
     try {
       httpClientAndConfiguration = setClientAndConfiguration(applicationContext, preferences)
     } catch (e: ConfigurationIncompleteException) {

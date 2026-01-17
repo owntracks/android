@@ -7,8 +7,6 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
-import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -26,13 +24,13 @@ import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.ContactImageBindingAdapter
 import timber.log.Timber
 
-abstract class MapFragment<V : ViewDataBinding>
+abstract class MapFragment
 internal constructor(
     private val contactImageBindingAdapter: ContactImageBindingAdapter,
     preferences: Preferences
 ) : Fragment() {
   protected abstract val layout: Int
-  protected lateinit var binding: V
+  protected lateinit var rootView: View
 
   abstract fun updateCamera(latLng: LatLng)
 
@@ -93,10 +91,7 @@ internal constructor(
       container: ViewGroup?,
       savedInstanceState: Bundle?
   ): View {
-    binding =
-        DataBindingUtil.inflate<V>(inflater, layout, container, false).apply {
-          lifecycleOwner = this@MapFragment.viewLifecycleOwner
-        }
+    rootView = inflater.inflate(layout, container, false)
 
     // Here we set up all the flow collectors to react to the universe changing. Usually contacts
     // and waypoints coming and going.
@@ -149,7 +144,7 @@ internal constructor(
       mapLayerStyle.observe(viewLifecycleOwner, this@MapFragment::setMapLayerType)
       onMapReady()
     }
-    return binding.root
+    return rootView
   }
 
   private fun updateAllMarkers(contacts: Set<Contact>) {

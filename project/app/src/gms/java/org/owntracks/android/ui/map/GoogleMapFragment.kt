@@ -28,9 +28,9 @@ import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.MapView
 import org.owntracks.android.R
 import org.owntracks.android.data.waypoints.WaypointModel
-import org.owntracks.android.databinding.GoogleMapFragmentBinding
 import org.owntracks.android.gms.location.toGMSLatLng
 import org.owntracks.android.location.LatLng
 import org.owntracks.android.location.geofencing.Latitude
@@ -47,7 +47,7 @@ internal constructor(
     private val preferences: Preferences,
     contactImageBindingAdapter: ContactImageBindingAdapter
 ) :
-    MapFragment<GoogleMapFragmentBinding>(contactImageBindingAdapter, preferences),
+    MapFragment(contactImageBindingAdapter, preferences),
     OnMapReadyCallback,
     OnMapsSdkInitializedCallback {
 
@@ -55,6 +55,8 @@ internal constructor(
 
   override val layout: Int
     get() = R.layout.google_map_fragment
+
+  private lateinit var googleMapView: MapView
 
   private val googleMapLocationSource: LocationSource by lazy {
     object : LocationSource {
@@ -86,8 +88,9 @@ internal constructor(
       savedInstanceState: Bundle?
   ): View {
     val root = super.onCreateView(inflater, container, savedInstanceState)
-    binding.googleMapView.onCreate(savedInstanceState)
-    binding.googleMapView.getMapAsync(this)
+    googleMapView = root.findViewById(R.id.google_map_view)
+    googleMapView.onCreate(savedInstanceState)
+    googleMapView.getMapAsync(this)
     return root
   }
 
@@ -205,37 +208,37 @@ internal constructor(
 
   override fun onResume() {
     super.onResume()
-    binding.googleMapView.onResume()
+    googleMapView.onResume()
     setMapStyle()
   }
 
   override fun onLowMemory() {
-    binding.googleMapView.onLowMemory()
+    googleMapView.onLowMemory()
     super.onLowMemory()
   }
 
   override fun onPause() {
-    binding.googleMapView.onPause()
+    googleMapView.onPause()
     super.onPause()
   }
 
   override fun onDestroy() {
-    binding.googleMapView.onDestroy()
+    googleMapView.onDestroy()
     super.onDestroy()
   }
 
   override fun onSaveInstanceState(outState: Bundle) {
-    binding.googleMapView.onSaveInstanceState(outState)
+    googleMapView.onSaveInstanceState(outState)
     super.onSaveInstanceState(outState)
   }
 
   override fun onStart() {
     super.onStart()
-    binding.googleMapView.onStart()
+    googleMapView.onStart()
   }
 
   override fun onStop() {
-    binding.googleMapView.onStop()
+    googleMapView.onStop()
     super.onStop()
   }
 

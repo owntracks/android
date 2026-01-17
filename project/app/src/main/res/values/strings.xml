@@ -164,6 +164,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesCleanSessionEnabled">"Clean Session"</string>
     <string name="preferencesClientCrtInstall">"Install client certificate"</string>
     <string name="preferencesClientCrt">"Client certificate"</string>
+    <string name="preferencesTlsCertificatesInfo">"Client and CA certificates are optional. Only configure these if your server requires custom certificates."</string>
     <string name="preferencesClientId">"Client ID"</string>
     <string name="preferencesClientIdValidationError">"Cannot be empty"</string>
     <string name="preferencesDebugLog">"Debug log"</string>
@@ -182,6 +183,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesEncryptionKeyDialogMessage">"Encryption key is cut off after 32 characters."</string>
     <string name="preferencesEncryptionKeySummary">"Symmetric key for payload encryption"</string>
     <string name="preferencesExperimental">"Experimental"</string>
+    <string name="noExperimentalFeatures">"No experimental features available"</string>
     <string name="preferencesExportSuccess">"Export successful"</string>
     <string name="preferencesExportError">"Error exporting configuration"</string>
     <string name="preferencesHost">"Host"</string>
@@ -249,6 +251,11 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesShowWaypointsOnMap">"Show Waypoints"</string>
     <string name="preferencesShowWaypointsOnMapSummary">"Draw waypoint circles on the map"</string>
     <string name="preferencesTheme">"Theme"</string>
+    <string name="preferencesDynamicColors">"Use device colors"</string>
+    <string name="preferencesDynamicColorsSummary">"Apply colors from your device wallpaper (Material You)"</string>
+    <string name="preferencesActions">"Actions"</string>
+    <string name="preferencesAppearance">"Appearance"</string>
+    <string name="preferencesInfo">"Info"</string>
     <string name="preferencesTrackerId">"Tracker ID"</string>
     <string name="preferencesTrackerIdValidationError">"Must be one or two characters"</string>
     <string name="preferencesMastodon" translatable="false">"Mastodon"</string>
@@ -257,9 +264,14 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesUsername">"Username"</string>
     <string name="preferencesWebsocket">"Use WebSockets"</string>
     <string name="publish">"Report Location"</string>
+    <string name="publishQueued">"Location queued for sending"</string>
     <string name="radius">"Radius (m)"</string>
     <string name="reconnect">"Reconnect"</string>
     <string name="reconnecting">"Reconnecting"</string>
+    <string name="reconnectingInSeconds">"Reconnecting in %d seconds"</string>
+    <string name="tryAgain">"Try Now"</string>
+    <string name="connectionStart">"Connect"</string>
+    <string name="connectionStop">"Disconnect"</string>
     <string name="requestLocationSent">"Request location command sent to %s"</string>
     <string name="save">"Save"</string>
     <string name="select">"Select"</string>
@@ -363,4 +375,25 @@ Please check the logs for more details."</string>
     <string name="workmanagerInitializationErrorDialogTitle">"Initialization Error"</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="back">Navigate back</string>
+
+    <!-- Sync status dialog -->
+    <string name="sync_status_dialog_title">"Sync Status"</string>
+    <string name="sync_status_connection">"Connection"</string>
+    <string name="sync_status_queue_length">"Messages in queue"</string>
+    <string name="sync_status_last_success">"Last successful sync"</string>
+    <string name="sync_status_never">"Never"</string>
+    <string name="sync_status_sync_now">"Sync Now"</string>
+    <string name="sync_status_close">"Close"</string>
+    <string name="sync_status_content_description">"Sync status"</string>
+
+    <!-- Configuration missing alert -->
+    <string name="configuration_missing_alert_title">"Configuration incomplete"</string>
+    <string name="configuration_missing_mqtt_host">"MQTT host is not configured"</string>
+    <string name="configuration_missing_http_url">"HTTP URL is not configured"</string>
+    <string name="configuration_missing_action">"Configure"</string>
+
+    <!-- Password visibility -->
+    <string name="show_password">"Show password"</string>
+    <string name="hide_password">"Hide password"</string>
 </resources>

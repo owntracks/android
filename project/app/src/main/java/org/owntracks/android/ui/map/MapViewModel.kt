@@ -6,21 +6,23 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.location.Location
 import androidx.annotation.MainThread
-import androidx.databinding.Observable
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.time.Instant
 import javax.inject.Inject
 import kotlin.math.asin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import org.owntracks.android.BR
+import org.owntracks.android.data.EndpointState
 import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.data.repos.ContactsRepoChange
+import org.owntracks.android.data.repos.EndpointStateRepo
 import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.data.waypoints.WaypointModel
 import org.owntracks.android.data.waypoints.WaypointsRepo
@@ -51,6 +53,7 @@ constructor(
     private val preferences: Preferences,
     private val locationRepo: LocationRepo,
     private val waypointsRepo: WaypointsRepo,
+    private val endpointStateRepo: EndpointStateRepo,
     application: Application,
     private val requirementsChecker: RequirementsChecker
 ) : AndroidViewModel(application) {
@@ -93,6 +96,45 @@ constructor(
   private val mutableMyLocationStatus = MutableLiveData(MyLocationStatus.DISABLED)
   val myLocationStatus: LiveData<MyLocationStatus>
     get() = mutableMyLocationStatus
+
+  // Tracks whether we're waiting to send location once GPS fix is available
+  private val mutableSendingLocation = MutableLiveData(false)
+  val sendingLocation: LiveData<Boolean>
+    get() = mutableSendingLocation
+
+  // Sync status state from EndpointStateRepo
+  val endpointState: StateFlow<EndpointState> = endpointStateRepo.endpointState
+  val queueLength: StateFlow<Int> = endpointStateRepo.endpointQueueLength
+  val lastSuccessfulSync: StateFlow<Instant?> = endpointStateRepo.lastSuccessfulMessageTime
+  val nextReconnectTime: StateFlow<Instant?> = endpointStateRepo.nextReconnectTime
+
+  fun triggerSync() {
+    messageProcessor.triggerImmediateSync()
+  }
+
+  fun startConnection() {
+    viewModelScope.launch {
+      messageProcessor.startConnection()
+    }
+  }
+
+  fun stopConnection() {
+    viewModelScope.launch {
+      messageProcessor.disconnect()
+    }
+  }
+
+  fun reconnect() {
+    viewModelScope.launch {
+      messageProcessor.reconnect()
+    }
+  }
+
+  fun tryReconnectNow() {
+    viewModelScope.launch {
+      messageProcessor.tryReconnectNow()
+    }
+  }
 
   val currentLocation = LocationLiveData(application, viewModelScope)
 
@@ -187,10 +229,30 @@ constructor(
 
   fun sendLocation() {
     viewModelScope.launch {
-      currentLocation.value?.run {
-        Timber.d("Sending current location from user request: $this")
-        locationProcessor.onLocationChanged(this, MessageLocation.ReportType.USER)
+      mutableLocationSentFlow.tryEmit(Unit)
+      currentLocation.value?.let { location ->
+        Timber.d("Sending current location from user request: $location")
+        locationProcessor.onLocationChanged(location, MessageLocation.ReportType.USER)
         locationProcessor.publishStatusMessage()
+      } ?: run {
+        // No location available yet, start waiting for GPS fix
+        Timber.d("No location available, waiting for GPS fix to send location")
+        mutableSendingLocation.postValue(true)
+      }
+    }
+  }
+
+  /**
+   * Called when location becomes available while we're waiting to send.
+   * Should be observed from the Activity/Fragment.
+   */
+  fun onLocationAvailableWhileSending(location: Location) {
+    if (mutableSendingLocation.value == true) {
+      viewModelScope.launch {
+        Timber.d("GPS fix acquired, sending location: $location")
+        locationProcessor.onLocationChanged(location, MessageLocation.ReportType.USER)
+        locationProcessor.publishStatusMessage()
+        mutableSendingLocation.postValue(false)
       }
     }
   }
@@ -212,33 +274,22 @@ constructor(
   /**
    * We need a way of updating other bits in the viewmodel when the current contact's properties
    * change.
-   *
-   * @constructor Create empty Fused contact property changed callback
    */
-  inner class ContactPropertyChangedCallback : Observable.OnPropertyChangedCallback() {
-    override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
-      sender?.run {
-        if (this is Contact) {
-          when (propertyId) {
-            BR.latLng -> {
-              updateActiveContactDistanceAndBearing(this)
-            }
-            BR.trackerId -> {
-              mutableCurrentContact.postValue(this)
-            }
-          }
-        }
-      }
+  private val contactPropertyChangedCallback = object : Contact.PropertyChangedCallback {
+    override fun onLatLngChanged(contact: Contact) {
+      updateActiveContactDistanceAndBearing(contact)
+    }
+
+    override fun onTrackerIdChanged(contact: Contact) {
+      mutableCurrentContact.postValue(contact)
     }
   }
-
-  private val contactPropertyChangedCallback = ContactPropertyChangedCallback()
 
   private fun setViewModeContact(contact: Contact, center: Boolean) {
     Timber.d("setting view mode: VIEW_CONTACT for $contact, center=$center")
     locationRepo.viewMode = ViewMode.Contact(center)
     mutableCurrentContact.value = contact
-    contact.addOnPropertyChangedCallback(contactPropertyChangedCallback)
+    contact.propertyChangedCallback = contactPropertyChangedCallback
     mutableBottomSheetHidden.value = false
     refreshGeocodeForContact(contact)
     updateActiveContactDistanceAndBearing(contact)
@@ -271,7 +322,7 @@ constructor(
   }
 
   private fun clearActiveContact() {
-    mutableCurrentContact.value?.removeOnPropertyChangedCallback(contactPropertyChangedCallback)
+    mutableCurrentContact.value?.propertyChangedCallback = null
     mutableCurrentContact.postValue(null)
     mutableBottomSheetHidden.postValue(true)
   }
@@ -288,6 +339,9 @@ constructor(
       MutableSharedFlow<Contact>(extraBufferCapacity = 1)
 
   val locationRequestContactCommandFlow: Flow<Contact> = mutableLocationRequestContactCommandFlow
+
+  private val mutableLocationSentFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+  val locationSentFlow: Flow<Unit> = mutableLocationSentFlow
 
   fun sendLocationRequestToCurrentContact() {
     mutableCurrentContact.value?.also {

@@ -20,6 +20,7 @@ interface DefaultsProvider {
           (preferences.username + preferences.deviceId)
               .replace("\\W".toRegex(), "")
               .lowercase(Locale.getDefault())
+      Preferences::connectionEnabled -> true
       Preferences::connectionTimeoutSeconds -> 30
       Preferences::debugLog -> false
       Preferences::deviceId ->
@@ -28,6 +29,7 @@ interface DefaultsProvider {
               ?.lowercase(Locale.getDefault()) ?: "unknown"
       Preferences::discardNetworkLocationThresholdSeconds -> 0
       Preferences::dontReuseHttpClient -> false
+      Preferences::dynamicColorsEnabled -> true
       Preferences::enableMapRotation -> true
       Preferences::encryptionKey -> ""
       Preferences::experimentalFeatures -> emptySet<String>()

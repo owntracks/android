@@ -197,6 +197,9 @@ constructor(
 
   @Preference(exportModeHttp = false) var clientId: String by preferencesStore
 
+  @Preference(exportModeMqtt = false, exportModeHttp = false)
+  var connectionEnabled: Boolean by preferencesStore
+
   @Preference var connectionTimeoutSeconds: Int by preferencesStore
 
   @Preference var debugLog: Boolean by preferencesStore
@@ -208,6 +211,8 @@ constructor(
   @Preference var discardNetworkLocationThresholdSeconds: Int by preferencesStore
 
   @Preference(exportModeMqtt = false) var dontReuseHttpClient: Boolean by preferencesStore
+
+  @Preference var dynamicColorsEnabled: Boolean by preferencesStore
 
   @Preference var enableMapRotation: Boolean by preferencesStore
 
