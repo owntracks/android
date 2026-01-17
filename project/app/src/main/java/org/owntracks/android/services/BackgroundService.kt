@@ -155,19 +155,15 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
     endpointStateRepo = entrypoint.endpointStateRepo()
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
       Timber.v(
-          "Permissions. ACCESS_BACKGROUND_LOCATION: ${ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION)==PERMISSION_GRANTED}"
-      )
+          "Permissions. ACCESS_BACKGROUND_LOCATION: ${ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION)==PERMISSION_GRANTED}")
     }
     Timber.v(
-        "Permissions. ACCESS_COARSE_LOCATION: ${ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)==PERMISSION_GRANTED}"
-    )
+        "Permissions. ACCESS_COARSE_LOCATION: ${ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)==PERMISSION_GRANTED}")
     Timber.v(
-        "Permissions. ACCESS_FINE_LOCATION: ${ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)==PERMISSION_GRANTED}"
-    )
+        "Permissions. ACCESS_FINE_LOCATION: ${ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)==PERMISSION_GRANTED}")
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
       Timber.v(
-          "Permissions. POST_NOTIFICATIONS: ${ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)==PERMISSION_GRANTED}"
-      )
+          "Permissions. POST_NOTIFICATIONS: ${ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)==PERMISSION_GRANTED}")
     }
 
     super.onCreate()
@@ -306,9 +302,8 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
         INTENT_ACTION_BOOT_COMPLETED,
         INTENT_ACTION_PACKAGE_REPLACED -> {
           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            if (
-                !requirementsChecker.hasBackgroundLocationPermission() && !hasBeenStartedExplicitly
-            ) {
+            if (!requirementsChecker.hasBackgroundLocationPermission() &&
+                !hasBeenStartedExplicitly) {
               notifyUserOfBackgroundLocationRestriction()
             }
           }
@@ -323,8 +318,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
       }
     } else {
       Timber.d(
-          "no intent or action provided, setting up location request and scheduling location ping."
-      )
+          "no intent or action provided, setting up location request and scheduling location ping.")
       hasBeenStartedExplicitly = true
       setupAndStartService()
     }
@@ -372,10 +366,8 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
   }
 
   private fun notifyUserOfBackgroundLocationRestriction() {
-    if (
-        ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) !=
-            PackageManager.PERMISSION_GRANTED
-    ) {
+    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) !=
+        PackageManager.PERMISSION_GRANTED) {
       return
     }
     val activityLaunchIntent =
@@ -401,8 +393,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
                     0,
                     activityLaunchIntent,
                     UPDATE_CURRENT_INTENT_FLAGS,
-                )
-            )
+                ))
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setSilent(true)
             .build()
@@ -415,11 +406,9 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
 
   fun sendEventNotification(message: MessageTransition) {
     Timber.d("Sending event notification for $message")
-    if (
-        !preferences.notificationEvents ||
-            ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) !=
-                PackageManager.PERMISSION_GRANTED
-    ) {
+    if (!preferences.notificationEvents ||
+        ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) !=
+            PackageManager.PERMISSION_GRANTED) {
       return
     }
     val contact = contactsRepo.getById(message.getContactId())
@@ -432,8 +421,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
               R.string.transitionEntering
             } else {
               R.string.transitionLeaving
-            }
-        )
+            })
     val eventText = "$transitionText $location"
     val whenStr = formatDate(timestampInMs)
     // Need to lock to prevent "clear()" being called while we're adding to it
@@ -447,8 +435,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
                     whenStr.length + 1,
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
-              }
-          )
+              })
           Timber.v("groupedNotifications: ${activeNotifications.size}")
           val summary =
               resources.getQuantityString(
@@ -482,8 +469,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
                 System.currentTimeMillis().toInt() / 1000,
                 Intent(this, MapActivity::class.java),
                 UPDATE_CURRENT_INTENT_FLAGS,
-            )
-        )
+            ))
         .setDeleteIntent(
             PendingIntent.getService(
                 this,
@@ -491,8 +477,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
                 Intent(this, BackgroundService::class.java)
                     .setAction(INTENT_ACTION_CLEAR_NOTIFICATIONS),
                 UPDATE_CURRENT_INTENT_FLAGS,
-            )
-        )
+            ))
         .build()
         .run {
           notificationManagerCompat
@@ -511,11 +496,9 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
       Timber.e("geofencingEvent hasError: ${event.errorCode}")
       return
     }
-    if (
-        event.geofenceTransition == null ||
-            event.triggeringGeofences == null ||
-            event.triggeringLocation == null
-    ) {
+    if (event.geofenceTransition == null ||
+        event.triggeringGeofences == null ||
+        event.triggeringLocation == null) {
       Timber.e("geofencingEvent has no transition or trigger")
       return
     }
@@ -656,8 +639,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
           .run(ongoingNotification::setTitle)
     } else {
       Timber.v(
-          "Ignoring reverse geocode for $latLng: $reverseGeocodedText, because my lastPublished location is ${lastLocation?.toLatLng()}"
-      )
+          "Ignoring reverse geocode for $latLng: $reverseGeocodedText, because my lastPublished location is ${lastLocation?.toLatLng()}")
     }
   }
 
@@ -671,13 +653,11 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
             Preferences::notificationHigherPriority.name,
             Preferences::locatorPriority.name,
         )
-    if (
-        propertiesWeCareAbout
-            .stream()
-            .filter { o: String -> properties.contains(o) }
-            .collect(Collectors.toSet())
-            .isNotEmpty()
-    ) {
+    if (propertiesWeCareAbout
+        .stream()
+        .filter { o: String -> properties.contains(o) }
+        .collect(Collectors.toSet())
+        .isNotEmpty()) {
       Timber.d("locator preferences changed. Resetting location request.")
       setupLocationRequest()
     }
@@ -782,8 +762,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
                   ""
                 } +
                 "isInteractive=${powerManager.isInteractive} " +
-                "isIgnoringBatteryOptimizations=${powerManager.isIgnoringBatteryOptimizations(applicationContext.packageName)}"
-        )
+                "isIgnoringBatteryOptimizations=${powerManager.isIgnoringBatteryOptimizations(applicationContext.packageName)}")
       }
     }
   }
