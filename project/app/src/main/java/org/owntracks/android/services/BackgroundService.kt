@@ -157,15 +157,15 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
     preferences = entrypoint.preferences()
     endpointStateRepo = entrypoint.endpointStateRepo()
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-      Timber.v(
+      Timber.i(
           "Permissions. ACCESS_BACKGROUND_LOCATION: ${ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION)==PERMISSION_GRANTED}")
     }
-    Timber.v(
+    Timber.i(
         "Permissions. ACCESS_COARSE_LOCATION: ${ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)==PERMISSION_GRANTED}")
-    Timber.v(
+    Timber.i(
         "Permissions. ACCESS_FINE_LOCATION: ${ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)==PERMISSION_GRANTED}")
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-      Timber.v(
+      Timber.i(
           "Permissions. POST_NOTIFICATIONS: ${ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)==PERMISSION_GRANTED}")
     }
 

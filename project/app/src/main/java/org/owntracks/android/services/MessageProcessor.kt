@@ -275,7 +275,7 @@ constructor(
             try {
               endpoint.let {
                 if (it == null) {
-                  Timber.i("Endpoint not ready yet. Re-queueing")
+                  Timber.d("Endpoint not ready yet. Re-queueing")
                   reQueueMessage(message)
                   resendDelayWait(SEND_FAILURE_NOT_READY_WAIT)
                   lastMessageStatus =
@@ -287,7 +287,7 @@ constructor(
                   it.sendMessage(message).exceptionOrNull()?.run {
                     when (this) {
                       is MessageProcessorEndpoint.NotReadyException -> {
-                        Timber.i("Endpoint not ready yet. Re-queueing")
+                        Timber.d("Endpoint not ready yet. Re-queueing")
                         reQueueMessage(message)
                         resendDelayWait(SEND_FAILURE_NOT_READY_WAIT)
                         lastMessageStatus =
@@ -304,7 +304,7 @@ constructor(
                           is MessageProcessorEndpoint.OutgoingMessageSendingException ->
                               Timber.w(this, "Error sending message $message. Re-queueing")
                           is ConfigurationIncompleteException ->
-                              Timber.w("Configuration incomplete for message $message. Re-queueing")
+                              Timber.e("Configuration incomplete for message $message. Re-queueing")
                           is MQTTMessageProcessorEndpoint.NotConnectedException ->
                               Timber.w("MQTT not connected for message $message. Re-queueing")
                         }
@@ -313,7 +313,7 @@ constructor(
 
                         lastMessageStatus =
                             if (retriesToGo <= 0) {
-                              Timber.w("Ran out of retries for sending. Dropping message")
+                              Timber.e("Ran out of retries for sending. Dropping message")
                               LastMessageStatus.PermanentFailure
                             } else {
                               LastMessageStatus.RetryableFailure(
@@ -381,7 +381,7 @@ constructor(
   private suspend fun resendDelayWait(waitFor: Duration): Boolean =
       scope
           .launch {
-            Timber.i("Waiting for $waitFor before retrying send")
+            Timber.d("Waiting for $waitFor before retrying send")
             delay(waitFor)
           }
           .run {
@@ -462,7 +462,7 @@ constructor(
 
   private fun processIncomingMessage(message: MessageClear) {
     scope.launch {
-      Timber.i("Received clear message for ${message.getContactId()}")
+      Timber.d("Received clear message for ${message.getContactId()}")
       contactsRepo.remove(message.getContactId())
       messageReceivedIdlingResource.remove(message)
     }
@@ -481,7 +481,7 @@ constructor(
           Timber.d(
               "Received our own location update ${message.latitude},${message.longitude} at ${message.timestamp}")
         } else {
-          Timber.i(
+          Timber.d(
               "Contact ${message.getContactId()} moved to ${message.latitude},${message.longitude} at ${message.timestamp}")
         }
         contactsRepo.update(message.getContactId(), message)
@@ -504,7 +504,7 @@ constructor(
       messageReceivedIdlingResource.remove(message)
     } else {
       scope.launch {
-        Timber.i(
+        Timber.d(
             "Contact ${message.getContactId()} transitioned waypoint ${message.description} (${message.event}) at ${message.timestamp}")
         contactsRepo.update(message.getContactId(), message)
         service?.sendEventNotification(message)
@@ -515,7 +515,7 @@ constructor(
 
   private fun processIncomingMessage(message: MessageCard) {
     scope.launch {
-      Timber.i("Received card message from ${message.topic}")
+      Timber.d("Received card message from ${message.topic}")
       contactsRepo.update(message.getContactId(), message)
       messageReceivedIdlingResource.remove(message)
     }
