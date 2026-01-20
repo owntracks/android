@@ -21,6 +21,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
@@ -318,16 +319,20 @@ constructor(
                                 message.numberOfRetries, SEND_FAILURE_BACKOFF_INITIAL_WAIT)
                       }
 
-                      is MessageProcessorEndpoint.OutgoingMessageSendingException,
-                      is ConfigurationIncompleteException,
                       is MQTTMessageProcessorEndpoint.NotConnectedException -> {
+                        Timber.w("MQTT not connected for message $message. Waiting for connection")
+                        reQueueMessage(message)
+                        waitForConnection()
+                        // Don't change lastMessageStatus - retry immediately when connected
+                      }
+
+                      is MessageProcessorEndpoint.OutgoingMessageSendingException,
+                      is ConfigurationIncompleteException -> {
                         when (this) {
                           is MessageProcessorEndpoint.OutgoingMessageSendingException ->
                               Timber.w(this, "Error sending message $message. Re-queueing")
                           is ConfigurationIncompleteException ->
                               Timber.w("Configuration incomplete for message $message. Re-queueing")
-                          is MQTTMessageProcessorEndpoint.NotConnectedException ->
-                              Timber.w("MQTT not connected for message $message. Re-queueing")
                         }
                         reQueueMessage(message)
                         resendDelayWait(retryWait)
@@ -399,19 +404,34 @@ constructor(
    * @param waitFor how long to wait for
    * @return whether or not the wait job was cancelled
    */
-  private suspend fun resendDelayWait(waitFor: Duration): Boolean =
-      scope
-          .launch {
-            Timber.i("Waiting for $waitFor before retrying send")
-            delay(waitFor)
-          }
-          .run {
-            Timber.v("Joining on backoff delay job")
-            retryDelayJob = this
-            measureTime { join() }
-                .run { Timber.d("Retry wait finished after $this. Cancelled=${isCancelled}}") }
-            return isCancelled
-          }
+  private suspend fun resendDelayWait(waitFor: Duration): Boolean {
+    // Update the next reconnect time so the UI can show a countdown
+    val nextReconnectTime = java.time.Instant.now().plusMillis(waitFor.inWholeMilliseconds)
+    endpointStateRepo.setNextReconnectTime(nextReconnectTime)
+
+    return scope
+        .launch {
+          Timber.i("Waiting for $waitFor before retrying send")
+          delay(waitFor)
+        }
+        .run {
+          Timber.v("Joining on backoff delay job")
+          retryDelayJob = this
+          measureTime { join() }
+              .run { Timber.d("Retry wait finished after $this. Cancelled=${isCancelled}}") }
+          return isCancelled
+        }
+  }
+
+  /**
+   * Suspends until the endpoint state becomes CONNECTED.
+   * Used when messages can't be sent because MQTT is disconnected.
+   */
+  private suspend fun waitForConnection() {
+    Timber.i("Waiting for connection state to become CONNECTED")
+    endpointStateRepo.endpointState.first { it == EndpointState.CONNECTED }
+    Timber.i("Connection state is now CONNECTED, resuming message send")
+  }
 
   // Takes a message and sticks it on the head of the queue
   private suspend fun reQueueMessage(message: MessageBase) {

@@ -291,25 +291,37 @@ fun ConnectionStatusCard(
     modifier: Modifier = Modifier
 ) {
     var isStartingConnection by remember { mutableStateOf(false) }
-    var secondsUntilReconnect by remember { mutableStateOf<Long?>(null) }
 
     // Reset loading state when endpoint state or connectionEnabled changes
     LaunchedEffect(endpointState, connectionEnabled) {
         isStartingConnection = false
     }
 
-    // Update countdown timer
-    LaunchedEffect(nextReconnectTime) {
+    // Update countdown timer - restart when nextReconnectTime OR endpointState changes
+    // This ensures we pick up new values after connection attempts
+    val secondsUntilReconnect by androidx.compose.runtime.produceState<Long?>(
+        initialValue = null,
+        key1 = nextReconnectTime,
+        key2 = endpointState
+    ) {
+        timber.log.Timber.d("ConnectionStatusCard: nextReconnectTime=$nextReconnectTime, endpointState=$endpointState, connectionEnabled=$connectionEnabled")
         if (nextReconnectTime != null) {
-            while (true) {
-                val now = java.time.Instant.now()
-                val remaining = java.time.Duration.between(now, nextReconnectTime).seconds
-                secondsUntilReconnect = if (remaining > 0) remaining else null
-                if (remaining <= 0) break
-                kotlinx.coroutines.delay(1000)
+            val now = java.time.Instant.now()
+            val initialRemaining = java.time.Duration.between(now, nextReconnectTime).seconds
+            timber.log.Timber.d("ConnectionStatusCard: initial remaining=$initialRemaining seconds")
+
+            // Only show countdown if time is in the future
+            if (initialRemaining > 0) {
+                var remaining = initialRemaining
+                while (remaining > 0) {
+                    value = remaining
+                    delay(1000)
+                    remaining = java.time.Duration.between(java.time.Instant.now(), nextReconnectTime).seconds
+                }
             }
+            value = null
         } else {
-            secondsUntilReconnect = null
+            value = null
         }
     }
 

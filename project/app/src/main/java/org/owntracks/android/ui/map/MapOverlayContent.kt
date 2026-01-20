@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.border
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -126,13 +128,36 @@ fun MapTopAppBar(
     TopAppBar(
         title = { },
         navigationIcon = {
-            // Monitoring mode icon button
-            IconButton(onClick = onMonitoringClick) {
-                Icon(
-                    painter = painterResource(monitoringIcon),
-                    contentDescription = stringResource(monitoringTitle),
-                    tint = MaterialTheme.colorScheme.onPrimary
-                )
+            // Monitoring mode button with "Mode:" label and icon
+            Box(
+                modifier = Modifier
+                    .padding(start = 8.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.15f))
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f),
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                    .clickable(onClick = onMonitoringClick)
+                    .padding(horizontal = 12.dp, vertical = 6.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = "Mode:",
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                    Icon(
+                        painter = painterResource(monitoringIcon),
+                        contentDescription = stringResource(monitoringTitle),
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
             }
         },
         actions = {
@@ -144,7 +169,7 @@ fun MapTopAppBar(
                 Icon(
                     imageVector = if (isSynced) Icons.Filled.CloudDone else Icons.Filled.CloudOff,
                     contentDescription = stringResource(R.string.sync_status_content_description),
-                    tint = syncIconTint
+                    tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
 

@@ -62,6 +62,7 @@ fun ConnectionPreferencesContent(
     ) {
         // Connection status card at top
         ConnectionStatusCard(
+            modifier = Modifier.padding(top = 12.dp),
             endpointState = endpointState,
             connectionEnabled = preferences.connectionEnabled,
             canStartConnection = isConfigurationComplete(preferences),

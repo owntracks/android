@@ -20,7 +20,7 @@ import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.owntracks.android.data.repos.EndpointStateRepo
-import org.owntracks.android.di.CoroutineScopes
+import org.owntracks.android.di.ApplicationScope
 import org.owntracks.android.preferences.Preferences
 import timber.log.Timber
 
@@ -30,7 +30,7 @@ class Scheduler
 constructor(
     private val preferences: Preferences,
     private val endpointStateRepo: EndpointStateRepo,
-    @CoroutineScopes.DefaultScope private val scope: CoroutineScope,
+    @ApplicationScope private val scope: CoroutineScope,
     @param:ApplicationContext private val context: Context
 ) : Preferences.OnPreferenceChangeListener {
   init {
@@ -83,8 +83,18 @@ constructor(
           }
       workManager.enqueueUniqueWork(
           ONETIME_TASK_MQTT_RECONNECT, ExistingWorkPolicy.KEEP, request)
+      // Only set nextReconnectTime if not already set to a future time
+      // (the Worker may have already set it with the correct backoff)
       scope.launch {
-          endpointStateRepo.setNextReconnectTime(Instant.now().plusSeconds(RECONNECT_DELAY_SECONDS))
+          val currentTime = endpointStateRepo.nextReconnectTime.value
+          val now = Instant.now()
+          if (currentTime == null || currentTime.isBefore(now)) {
+              val newTime = now.plusSeconds(RECONNECT_DELAY_SECONDS)
+              Timber.d("Scheduler setting nextReconnectTime to $newTime")
+              endpointStateRepo.setNextReconnectTime(newTime)
+          } else {
+              Timber.d("Scheduler: nextReconnectTime already set to future time $currentTime, not overwriting")
+          }
       }
       Timber.d("Scheduled ONETIME_TASK_MQTT_RECONNECT job")
   }
