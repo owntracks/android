@@ -1,6 +1,6 @@
 source "https://gem.coop"
 
-gem "fastlane", "~> 2.230.0"
+gem "fastlane", "~> 2.231.0"
 
 # Ruby 3.4+ compatibility
 gem "abbrev", "~> 0.1"
