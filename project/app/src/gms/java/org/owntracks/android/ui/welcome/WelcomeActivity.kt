@@ -1,30 +1,39 @@
 package org.owntracks.android.ui.welcome
 
-import android.content.Intent
+import android.os.Build
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.Composable
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
-import org.owntracks.android.ui.welcome.fragments.PlayFragment
 
 @AndroidEntryPoint
 class WelcomeActivity : BaseWelcomeActivity() {
-  @Inject lateinit var playFragment: PlayFragment
 
-  override val fragmentList by lazy {
-    listOf(
-        introFragment,
-        connectionSetupFragment,
-        locationPermissionFragment,
-        notificationPermissionFragment,
-        playFragment,
-        finishFragment)
-  }
+    private val googleApi by lazy { GoogleApiAvailability.getInstance() }
 
-  @Deprecated("Deprecated in Java")
-  @Suppress("DEPRECATION")
-  public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-    super.onActivityResult(requestCode, resultCode, data)
-    if (requestCode == PlayFragment.PLAY_SERVICES_RESOLUTION_REQUEST) {
-      playFragment.onPlayServicesResolutionResult()
+    override val welcomePages: List<WelcomePage> by lazy {
+        buildList {
+            add(WelcomePage.Intro)
+            add(WelcomePage.ConnectionSetup)
+            add(WelcomePage.LocationPermission)
+            // Notification permission only for Android 13+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                add(WelcomePage.NotificationPermission)
+            }
+            // Play Services page only if not available
+            if (googleApi.isGooglePlayServicesAvailable(this@WelcomeActivity) != ConnectionResult.SUCCESS) {
+                add(WelcomePage.PlayServices)
+            }
+            add(WelcomePage.Finish)
+        }
     }
-  }
+
+    override val playServicesPageContent: (@Composable (snackbarHostState: SnackbarHostState, onCanProceed: (Boolean) -> Unit) -> Unit)?
+        get() = { snackbarHostState, onCanProceed ->
+            PlayServicesPage(
+                onCanProceed = onCanProceed,
+                snackbarHostState = snackbarHostState
+            )
+        }
 }

@@ -1,6 +1,5 @@
 package org.owntracks.android.model.messages
 
-import androidx.databinding.Bindable
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
@@ -13,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 class MessageCard(private val messageWithId: MessageWithId = MessageWithRandomId()) :
     MessageBase(), MessageWithId by messageWithId {
-  @get:Bindable var name: String? = null
+  var name: String? = null
 
   @set:JsonSetter var face: String? = null
 

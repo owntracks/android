@@ -65,3 +65,6 @@ project/localscripts
 jacoco.exec
 .env
 fastlane/report.xml
+
+# API keys
+project/app/gradle.properties

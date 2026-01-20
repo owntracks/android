@@ -13,9 +13,14 @@ import androidx.work.WorkRequest
 import androidx.work.WorkRequest.Companion.MIN_BACKOFF_MILLIS
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.Duration
+import java.time.Instant
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import org.owntracks.android.data.repos.EndpointStateRepo
+import org.owntracks.android.di.CoroutineScopes
 import org.owntracks.android.preferences.Preferences
 import timber.log.Timber
 
@@ -24,6 +29,8 @@ class Scheduler
 @Inject
 constructor(
     private val preferences: Preferences,
+    private val endpointStateRepo: EndpointStateRepo,
+    @CoroutineScopes.DefaultScope private val scope: CoroutineScope,
     @param:ApplicationContext private val context: Context
 ) : Preferences.OnPreferenceChangeListener {
   init {
@@ -56,8 +63,8 @@ constructor(
     workManager.cancelAllWorkByTag(PERIODIC_TASK_SEND_LOCATION_PING)
   }
 
-  fun scheduleMqttReconnect() =
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+  fun scheduleMqttReconnect() {
+      val request = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             OneTimeWorkRequest.Builder(MQTTReconnectWorker::class.java)
                 // Pause in case there's network turmoil
                 .setInitialDelay(Duration.ofSeconds(RECONNECT_DELAY_SECONDS))
@@ -74,11 +81,21 @@ constructor(
                 .setConstraints(anyNetworkConstraint)
                 .build()
           }
-          .run {
-            workManager.enqueueUniqueWork(
-                ONETIME_TASK_MQTT_RECONNECT, ExistingWorkPolicy.KEEP, this)
-            Timber.d("Scheduled ONETIME_TASK_MQTT_RECONNECT job")
-          }
+      workManager.enqueueUniqueWork(
+          ONETIME_TASK_MQTT_RECONNECT, ExistingWorkPolicy.KEEP, request)
+      scope.launch {
+          endpointStateRepo.setNextReconnectTime(Instant.now().plusSeconds(RECONNECT_DELAY_SECONDS))
+      }
+      Timber.d("Scheduled ONETIME_TASK_MQTT_RECONNECT job")
+  }
+
+  fun cancelMqttReconnect() {
+      workManager.cancelUniqueWork(ONETIME_TASK_MQTT_RECONNECT)
+      scope.launch {
+          endpointStateRepo.setNextReconnectTime(null)
+      }
+      Timber.d("Cancelled ONETIME_TASK_MQTT_RECONNECT job")
+  }
 
   companion object {
     private const val PERIODIC_TASK_SEND_LOCATION_PING = "PERIODIC_TASK_SEND_LOCATION_PING"

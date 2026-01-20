@@ -11,6 +11,7 @@ plugins {
   alias(libs.plugins.android.application).apply(false)
   alias(libs.plugins.kotlin.android).apply(false)
   alias(libs.plugins.kotlin.jvm).apply(false)
+  alias(libs.plugins.kotlin.compose).apply(false)
   alias(libs.plugins.hilt.android).apply(false)
   alias(libs.plugins.ktfmt).apply(false)
   alias(libs.plugins.ksp).apply(false)
@@ -24,7 +25,7 @@ extensions.findByName("develocity")?.withGroovyBuilder {
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-  kotlinOptions { jvmTarget = JavaVersion.VERSION_21.toString() }
+  compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21) }
 }
 
 tasks.wrapper { distributionType = Wrapper.DistributionType.BIN }
