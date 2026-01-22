@@ -69,7 +69,8 @@ fun OwnTracksNavHost(
     onStartConnection: () -> Unit = {},
     onStopConnection: () -> Unit = {},
     onReconnect: () -> Unit = {},
-    onTryReconnectNow: () -> Unit = {}
+    onTryReconnectNow: () -> Unit = {},
+    currentWifiSsid: String? = null
 ) {
     val context = LocalContext.current
     val activity = context as? Activity
@@ -225,6 +226,7 @@ fun OwnTracksNavHost(
                     onReconnect = onReconnect,
                     onTryReconnectNow = onTryReconnectNow,
                     nextReconnectTime = nextReconnectTime,
+                    currentWifiSsid = currentWifiSsid,
                     modifier = Modifier.fillMaxSize()
                 )
             }

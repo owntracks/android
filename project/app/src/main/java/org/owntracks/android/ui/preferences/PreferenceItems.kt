@@ -513,3 +513,113 @@ fun PreferenceDivider(modifier: Modifier = Modifier) {
         color = MaterialTheme.colorScheme.outlineVariant
     )
 }
+
+/**
+ * Text input preference with dialog and an action button
+ */
+@Composable
+fun EditTextWithButtonPreference(
+    title: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    buttonLabel: String,
+    onButtonClick: () -> String?,
+    modifier: Modifier = Modifier,
+    summary: String? = null,
+    icon: Painter? = null,
+    enabled: Boolean = true,
+    dialogMessage: String? = null,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    validator: ((String) -> Boolean)? = null,
+    validationError: String? = null
+) {
+    var showDialog by remember { mutableStateOf(false) }
+    var editedValue by remember(value) { mutableStateOf(value) }
+    var isError by remember { mutableStateOf(false) }
+
+    val displaySummary = if (value.isNotBlank()) {
+        value
+    } else {
+        stringResource(R.string.preferencesNotSet)
+    }
+
+    PreferenceItem(
+        title = title,
+        summary = displaySummary,
+        icon = icon,
+        enabled = enabled,
+        onClick = {
+            editedValue = value
+            isError = false
+            showDialog = true
+        },
+        modifier = modifier
+    )
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text(title) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    if (dialogMessage != null) {
+                        Text(
+                            text = dialogMessage,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        OutlinedTextField(
+                            value = editedValue,
+                            onValueChange = {
+                                editedValue = it
+                                isError = validator?.invoke(it) == false
+                            },
+                            isError = isError,
+                            supportingText = if (isError && validationError != null) {
+                                { Text(validationError) }
+                            } else null,
+                            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+                            singleLine = true,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    TextButton(
+                        onClick = {
+                            val newValue = onButtonClick()
+                            if (newValue != null) {
+                                editedValue = newValue
+                                isError = validator?.invoke(newValue) == false
+                            }
+                        }
+                    ) {
+                        Text(buttonLabel)
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        if (validator == null || validator(editedValue)) {
+                            onValueChange(editedValue)
+                            showDialog = false
+                        } else {
+                            isError = true
+                        }
+                    }
+                ) {
+                    Text(stringResource(android.R.string.ok))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDialog = false }) {
+                    Text(stringResource(android.R.string.cancel))
+                }
+            }
+        )
+    }
+}

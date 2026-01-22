@@ -12,6 +12,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 import org.owntracks.android.data.repos.EndpointStateRepo
+import org.owntracks.android.net.WifiInfoProvider
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.AppTheme
 import org.owntracks.android.services.BackgroundService
@@ -42,6 +43,9 @@ class PreferencesActivity :
     @Inject
     lateinit var endpointStateRepo: EndpointStateRepo
 
+    @Inject
+    lateinit var wifiInfoProvider: WifiInfoProvider
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -51,6 +55,7 @@ class PreferencesActivity :
                 PreferencesScreen(
                     preferences = preferences,
                     endpointStateRepo = endpointStateRepo,
+                    currentWifiSsid = wifiInfoProvider.getSSID(),
                     onNavigate = { destination ->
                         navigateToDestination(destination)
                     },

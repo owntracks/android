@@ -42,6 +42,7 @@ fun ConnectionPreferencesContent(
     onStopConnection: () -> Unit,
     onReconnect: () -> Unit,
     onTryReconnectNow: () -> Unit,
+    currentWifiSsid: String? = null,
     modifier: Modifier = Modifier
 ) {
     // Trigger recomposition when mode or toggle preferences change
@@ -49,6 +50,8 @@ fun ConnectionPreferencesContent(
     var tlsEnabled by remember { mutableStateOf(preferences.tls) }
     var wsEnabled by remember { mutableStateOf(preferences.ws) }
     var cleanSessionEnabled by remember { mutableStateOf(preferences.cleanSession) }
+    var localNetworkEnabled by remember { mutableStateOf(preferences.localNetworkEnabled) }
+    var localNetworkTlsEnabled by remember { mutableStateOf(preferences.localNetworkTls) }
 
     val modeEntries = listOf(
         ConnectionMode.MQTT to stringResource(R.string.mode_mqtt_private_label),
@@ -262,6 +265,91 @@ fun ConnectionPreferencesContent(
                     cleanSessionEnabled = it
                 }
             )
+
+            // Local Network section
+            PreferenceCategory(title = stringResource(R.string.preferencesCategoryLocalNetwork))
+
+            SwitchPreference(
+                title = stringResource(R.string.preferencesLocalNetworkEnabled),
+                summary = stringResource(R.string.preferencesLocalNetworkEnabledSummary),
+                checked = localNetworkEnabled,
+                onCheckedChange = {
+                    preferences.localNetworkEnabled = it
+                    localNetworkEnabled = it
+                }
+            )
+
+            if (localNetworkEnabled) {
+                EditTextWithButtonPreference(
+                    title = stringResource(R.string.preferencesLocalNetworkSsid),
+                    value = preferences.localNetworkSsid,
+                    onValueChange = { preferences.localNetworkSsid = it },
+                    buttonLabel = stringResource(R.string.preferencesLocalNetworkUseCurrentSsid),
+                    onButtonClick = { currentWifiSsid }
+                )
+
+                EditTextPreference(
+                    title = stringResource(R.string.preferencesLocalNetworkHost),
+                    value = preferences.localNetworkHost,
+                    onValueChange = { preferences.localNetworkHost = it },
+                    keyboardType = KeyboardType.Uri
+                )
+
+                EditIntPreference(
+                    title = stringResource(R.string.preferencesLocalNetworkPort),
+                    value = preferences.localNetworkPort,
+                    onValueChange = { preferences.localNetworkPort = it },
+                    summary = preferences.localNetworkPort.toString(),
+                    minValue = 1,
+                    maxValue = 65535,
+                    validationError = stringResource(R.string.preferencesPortValidationError)
+                )
+
+                SwitchPreference(
+                    title = stringResource(R.string.preferencesLocalNetworkTls),
+                    checked = localNetworkTlsEnabled,
+                    onCheckedChange = {
+                        preferences.localNetworkTls = it
+                        localNetworkTlsEnabled = it
+                    }
+                )
+
+                // Show info card when currently on local network
+                val isOnLocalNetwork = currentWifiSsid != null &&
+                        preferences.localNetworkSsid.isNotBlank() &&
+                        currentWifiSsid == preferences.localNetworkSsid
+
+                if (isOnLocalNetwork) {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer
+                        )
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Info,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Text(
+                                text = stringResource(R.string.preferencesLocalNetworkActive),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }

@@ -147,6 +147,8 @@ class MapActivity :
 
   @Inject lateinit var preferences: Preferences
 
+  @Inject lateinit var wifiInfoProvider: org.owntracks.android.net.WifiInfoProvider
+
   private val serviceConnection =
       object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -365,6 +367,7 @@ class MapActivity :
                 onStopConnection = { viewModel.stopConnection() },
                 onReconnect = { viewModel.reconnect() },
                 onTryReconnectNow = { viewModel.tryReconnectNow() },
+                currentWifiSsid = wifiInfoProvider.getSSID(),
                 modifier = Modifier.fillMaxSize()
             )
 

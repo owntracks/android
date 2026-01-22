@@ -396,4 +396,15 @@ Please check the logs for more details."</string>
     <!-- Password visibility -->
     <string name="show_password">"Show password"</string>
     <string name="hide_password">"Hide password"</string>
+
+    <!-- Local Network -->
+    <string name="preferencesCategoryLocalNetwork">"Local Network"</string>
+    <string name="preferencesLocalNetworkEnabled">"Enable local network switching"</string>
+    <string name="preferencesLocalNetworkEnabledSummary">"Use alternate host/port when connected to specified WiFi"</string>
+    <string name="preferencesLocalNetworkSsid">"WiFi Network (SSID)"</string>
+    <string name="preferencesLocalNetworkUseCurrentSsid">"Use current connection"</string>
+    <string name="preferencesLocalNetworkHost">"Local Host"</string>
+    <string name="preferencesLocalNetworkPort">"Local Port"</string>
+    <string name="preferencesLocalNetworkTls">"Local TLS"</string>
+    <string name="preferencesLocalNetworkActive">"Currently using local network connection"</string>
 </resources>

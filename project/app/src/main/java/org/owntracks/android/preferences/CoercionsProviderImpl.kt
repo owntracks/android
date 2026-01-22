@@ -25,6 +25,9 @@ class CoercionsProviderImpl : CoercionsProvider {
       Preferences::port -> {
         (value as Int).coerceAtLeast(1).coerceAtMost(65535)
       }
+      Preferences::localNetworkPort -> {
+        (value as Int).coerceAtLeast(1).coerceAtMost(65535)
+      }
       else -> value
     }
         as T

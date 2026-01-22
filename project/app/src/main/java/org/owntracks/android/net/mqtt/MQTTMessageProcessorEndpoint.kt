@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.net.Network
+import android.net.NetworkCapabilities
 import android.os.Build
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
@@ -55,6 +56,7 @@ import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageClear
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.net.MessageProcessorEndpoint
+import org.owntracks.android.net.WifiInfoProvider
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.services.MessageProcessor
@@ -74,7 +76,8 @@ class MQTTMessageProcessorEndpoint(
     @ApplicationScope private val scope: CoroutineScope,
     @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationContext private val applicationContext: Context,
-    private val mqttConnectionIdlingResource: SimpleIdlingResource
+    private val mqttConnectionIdlingResource: SimpleIdlingResource,
+    private val wifiInfoProvider: WifiInfoProvider
 ) :
     MessageProcessorEndpoint(messageProcessor),
     StatefulServiceMessageProcessor,
@@ -88,6 +91,8 @@ class MQTTMessageProcessorEndpoint(
   private var mqttClientAndConfiguration: MqttClientAndConfiguration? = null
 
   private var pingAlarmReceiver: BroadcastReceiver? = null
+
+  private var lastConnectedSsid: String? = null
 
   private val networkChangeCallback =
       object : ConnectivityManager.NetworkCallback() {
@@ -105,9 +110,30 @@ class MQTTMessageProcessorEndpoint(
           justRegistered = false
         }
 
+        override fun onCapabilitiesChanged(
+            network: Network,
+            networkCapabilities: NetworkCapabilities
+        ) {
+          super.onCapabilitiesChanged(network, networkCapabilities)
+          // Check if SSID changed and we need to reconnect due to local network settings
+          if (preferences.localNetworkEnabled && preferences.localNetworkSsid.isNotBlank()) {
+            val currentSsid = wifiInfoProvider.getSSID()
+            if (currentSsid != lastConnectedSsid) {
+              Timber.d("WiFi SSID changed from $lastConnectedSsid to $currentSsid")
+              lastConnectedSsid = currentSsid
+              // Reconnect to use appropriate host/port based on new network
+              if (endpointStateRepo.endpointState.value == EndpointState.CONNECTED &&
+                  preferences.connectionEnabled) {
+                Timber.i("Reconnecting due to SSID change for local network switching")
+                scope.launch { reconnect() }
+              }
+            }
+          }
+        }
+
         override fun onLost(network: Network) {
           super.onLost(network)
-
+          lastConnectedSsid = null
           scope.launch { connectingLock.withPermitLogged("network lost") { disconnect() } }
         }
       }
@@ -189,7 +215,7 @@ class MQTTMessageProcessorEndpoint(
   }
 
   override fun getEndpointConfiguration(): MqttConnectionConfiguration {
-    val configuration = preferences.toMqttConnectionConfiguration()
+    val configuration = preferences.toMqttConnectionConfiguration(wifiInfoProvider)
     configuration.validate() // Throws an exception if not valid
     return configuration
   }
@@ -276,7 +302,12 @@ class MQTTMessageProcessorEndpoint(
             Preferences::mqttProtocolLevel.name,
             Preferences::password.name,
             Preferences::tls.name,
-            Preferences::ws.name)
+            Preferences::ws.name,
+            Preferences::localNetworkEnabled.name,
+            Preferences::localNetworkSsid.name,
+            Preferences::localNetworkHost.name,
+            Preferences::localNetworkPort.name,
+            Preferences::localNetworkTls.name)
     if (propertiesWeWantToReconnectOn
         .stream()
         .filter(properties::contains)

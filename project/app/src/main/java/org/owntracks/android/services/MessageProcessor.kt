@@ -44,6 +44,7 @@ import org.owntracks.android.model.messages.MessageTransition
 import org.owntracks.android.model.messages.MessageUnknown
 import org.owntracks.android.model.messages.MessageWaypoint
 import org.owntracks.android.net.MessageProcessorEndpoint
+import org.owntracks.android.net.WifiInfoProvider
 import org.owntracks.android.net.http.HttpMessageProcessorEndpoint
 import org.owntracks.android.net.mqtt.MQTTMessageProcessorEndpoint
 import org.owntracks.android.preferences.DefaultsProvider.Companion.DEFAULT_SUB_TOPIC
@@ -80,7 +81,8 @@ constructor(
     @ApplicationScope private val scope: CoroutineScope,
     @Named("mqttConnectionIdlingResource")
     private val mqttConnectionIdlingResource: SimpleIdlingResource,
-    private val outgoingQueue: RoomBackedMessageQueue
+    private val outgoingQueue: RoomBackedMessageQueue,
+    private val wifiInfoProvider: WifiInfoProvider
 ) : Preferences.OnPreferenceChangeListener {
   private var endpoint: MessageProcessorEndpoint? = null
   private val queueInitJob: Job =
@@ -221,7 +223,8 @@ constructor(
               scope,
               ioDispatcher,
               applicationContext,
-              mqttConnectionIdlingResource)
+              mqttConnectionIdlingResource,
+              wifiInfoProvider)
       ConnectionMode.HTTP ->
           HttpMessageProcessorEndpoint(
               this,

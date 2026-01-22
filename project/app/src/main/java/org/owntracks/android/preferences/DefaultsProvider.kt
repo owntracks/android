@@ -57,6 +57,11 @@ interface DefaultsProvider {
       Preferences::pegLocatorFastestIntervalToInterval -> false
       Preferences::ping -> 15
       Preferences::port -> 8883
+      Preferences::localNetworkEnabled -> false
+      Preferences::localNetworkSsid -> ""
+      Preferences::localNetworkHost -> ""
+      Preferences::localNetworkPort -> 1883
+      Preferences::localNetworkTls -> false
       Preferences::extendedData -> true
       Preferences::pubQos -> MqttQos.One
       Preferences::pubRetain -> true

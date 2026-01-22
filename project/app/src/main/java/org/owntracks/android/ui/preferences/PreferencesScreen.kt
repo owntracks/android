@@ -133,6 +133,7 @@ fun PreferencesScreen(
     onStartConnection: () -> Unit,
     onStopConnection: () -> Unit,
     onTryReconnectNow: () -> Unit,
+    currentWifiSsid: String? = null,
     modifier: Modifier = Modifier
 ) {
     var currentScreen by rememberSaveable(stateSaver = PreferenceScreen.Saver) { mutableStateOf(PreferenceScreen.Root) }
@@ -178,6 +179,7 @@ fun PreferencesScreen(
                 onStopConnection = onStopConnection,
                 onReconnect = onReconnect,
                 onTryReconnectNow = onTryReconnectNow,
+                currentWifiSsid = currentWifiSsid,
                 modifier = Modifier.weight(1f)
             )
         }
@@ -206,6 +208,7 @@ fun PreferencesScreenContent(
     onReconnect: () -> Unit,
     onTryReconnectNow: () -> Unit,
     nextReconnectTime: java.time.Instant?,
+    currentWifiSsid: String? = null,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -236,6 +239,7 @@ fun PreferencesScreenContent(
             onStopConnection = onStopConnection,
             onReconnect = onReconnect,
             onTryReconnectNow = onTryReconnectNow,
+            currentWifiSsid = currentWifiSsid,
             modifier = Modifier
                 .fillMaxSize()
                 .weight(1f)
@@ -663,6 +667,7 @@ private fun PreferencesScreenInner(
     onStopConnection: () -> Unit,
     onReconnect: () -> Unit,
     onTryReconnectNow: () -> Unit,
+    currentWifiSsid: String? = null,
     modifier: Modifier = Modifier
 ) {
     when (currentScreen) {
@@ -689,6 +694,7 @@ private fun PreferencesScreenInner(
             onStopConnection = onStopConnection,
             onReconnect = onReconnect,
             onTryReconnectNow = onTryReconnectNow,
+            currentWifiSsid = currentWifiSsid,
             modifier = modifier
         )
         PreferenceScreen.Map -> MapPreferencesContent(
