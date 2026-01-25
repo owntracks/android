@@ -232,10 +232,11 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
         }
         launch {
           endpointStateRepo.endpointState.collect {
-            ongoingNotification.setEndpointState(
-                it,
-                if (preferences.mode == ConnectionMode.MQTT) preferences.host
-                else preferences.url.toHttpUrlOrNull()?.host ?: "")
+            val host =
+                if (preferences.mode == ConnectionMode.MQTT)
+                    endpointStateRepo.currentEndpointHost.value.ifBlank { preferences.host }
+                else preferences.url.toHttpUrlOrNull()?.host ?: ""
+            ongoingNotification.setEndpointState(it, host)
           }
         }
         endpointStateRepo.setServiceStartedNow()

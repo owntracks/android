@@ -101,10 +101,11 @@ class MQTTMessageProcessorEndpoint(
         override fun onAvailable(network: Network) {
           super.onAvailable(network)
           Timber.v("Network becomes available")
+          val currentState = endpointStateRepo.endpointState.value
           if (!justRegistered &&
-              endpointStateRepo.endpointState.value == EndpointState.DISCONNECTED &&
+              (currentState == EndpointState.DISCONNECTED || currentState == EndpointState.ERROR) &&
               preferences.connectionEnabled) {
-            Timber.v("Currently disconnected and connection enabled, so attempting reconnect")
+            Timber.v("Currently $currentState and connection enabled, so attempting reconnect")
             scope.launch { reconnect() }
           }
           justRegistered = false
@@ -122,9 +123,12 @@ class MQTTMessageProcessorEndpoint(
               Timber.d("WiFi SSID changed from $lastConnectedSsid to $currentSsid")
               lastConnectedSsid = currentSsid
               // Reconnect to use appropriate host/port based on new network
-              if (endpointStateRepo.endpointState.value == EndpointState.CONNECTED &&
-                  preferences.connectionEnabled) {
-                Timber.i("Reconnecting due to SSID change for local network switching")
+              val currentState = endpointStateRepo.endpointState.value
+              if (preferences.connectionEnabled &&
+                  (currentState == EndpointState.CONNECTED ||
+                      currentState == EndpointState.DISCONNECTED ||
+                      currentState == EndpointState.ERROR)) {
+                Timber.i("Reconnecting due to SSID change for local network switching (state=$currentState)")
                 scope.launch { reconnect() }
               }
             }
@@ -430,6 +434,7 @@ class MQTTMessageProcessorEndpoint(
                           .also { Timber.d("Registered ping alarm receiver") }
                       Timber.i(
                           "MQTT Connected. Subscribing to ${mqttConnectionConfiguration.topicsToSubscribeTo}")
+                      endpointStateRepo.setCurrentEndpointHost(mqttConnectionConfiguration.host)
                       endpointStateRepo.setState(EndpointState.CONNECTED)
                       setCallback(mqttCallback)
                       subscribe(
@@ -491,8 +496,8 @@ class MQTTMessageProcessorEndpoint(
       }
 
   override suspend fun reconnect(): Result<Unit> =
-      mqttClientAndConfiguration?.mqttConnectionConfiguration?.run { reconnect(this) }
-          ?: run { reconnect(getEndpointConfiguration()) }
+      // Always get fresh configuration to check current WiFi status for local network switching
+      reconnect(getEndpointConfiguration())
 
   private suspend fun reconnect(
       mqttConnectionConfiguration: MqttConnectionConfiguration
