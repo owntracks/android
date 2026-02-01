@@ -68,6 +68,22 @@ class WifiInfoProvider @Inject constructor(@ApplicationContext context: Context)
       } else {
         MessageStatus.STATUS_WIFI_DISABLED
       }
+
+  /**
+   * Update SSID/BSSID from network capabilities. Call this before checking SSID to ensure
+   * we have the latest info from a network callback.
+   */
+  fun updateFromCapabilities(networkCapabilities: NetworkCapabilities) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+      if (networkCapabilities.transportInfo is WifiInfo) {
+        ssid = (networkCapabilities.transportInfo as WifiInfo).getUnquotedSSID()
+        bssid = (networkCapabilities.transportInfo as WifiInfo).bssid
+      } else {
+        ssid = null
+        bssid = null
+      }
+    }
+  }
 }
 
 fun WifiInfo.getUnquotedSSID(): String = this.ssid.replace(Regex("^\"(.*)\"$"), "$1")

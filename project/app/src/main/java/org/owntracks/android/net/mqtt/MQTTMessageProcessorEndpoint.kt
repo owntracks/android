@@ -116,6 +116,9 @@ class MQTTMessageProcessorEndpoint(
             networkCapabilities: NetworkCapabilities
         ) {
           super.onCapabilitiesChanged(network, networkCapabilities)
+          // Update WifiInfoProvider with latest capabilities before checking SSID
+          // This ensures we have fresh SSID info regardless of callback ordering
+          wifiInfoProvider.updateFromCapabilities(networkCapabilities)
           // Check if SSID changed and we need to reconnect due to local network settings
           if (preferences.localNetworkEnabled && preferences.localNetworkSsid.isNotBlank()) {
             val currentSsid = wifiInfoProvider.getSSID()
