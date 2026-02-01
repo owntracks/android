@@ -7,6 +7,7 @@ import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.os.Build
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
@@ -93,14 +94,16 @@ class MQTTMessageProcessorEndpoint(
   private var pingAlarmReceiver: BroadcastReceiver? = null
 
   private var lastConnectedSsid: String? = null
+  private var wifiCallbackRegistered = false
 
+  // Callback for default network changes - handles general connectivity
   private val networkChangeCallback =
       object : ConnectivityManager.NetworkCallback() {
         var justRegistered = true
 
         override fun onAvailable(network: Network) {
           super.onAvailable(network)
-          Timber.v("Network becomes available")
+          Timber.v("Default network becomes available")
           val currentState = endpointStateRepo.endpointState.value
           if (!justRegistered &&
               (currentState == EndpointState.DISCONNECTED || currentState == EndpointState.ERROR) &&
@@ -111,14 +114,31 @@ class MQTTMessageProcessorEndpoint(
           justRegistered = false
         }
 
+        override fun onLost(network: Network) {
+          super.onLost(network)
+          Timber.v("Default network lost")
+          scope.launch { connectingLock.withPermitLogged("network lost") { disconnect() } }
+        }
+      }
+
+  // Callback specifically for WiFi changes - handles local network switching
+  private val wifiChangeCallback =
+      object : ConnectivityManager.NetworkCallback() {
+        var justRegistered = true
+
+        override fun onAvailable(network: Network) {
+          super.onAvailable(network)
+          Timber.v("WiFi network becomes available")
+          justRegistered = false
+        }
+
         override fun onCapabilitiesChanged(
             network: Network,
             networkCapabilities: NetworkCapabilities
         ) {
           super.onCapabilitiesChanged(network, networkCapabilities)
-          // Update WifiInfoProvider with latest capabilities before checking SSID
-          // This ensures we have fresh SSID info regardless of callback ordering
-          wifiInfoProvider.updateFromCapabilities(networkCapabilities)
+          if (justRegistered) return
+
           // Check if SSID changed and we need to reconnect due to local network settings
           if (preferences.localNetworkEnabled && preferences.localNetworkSsid.isNotBlank()) {
             val currentSsid = wifiInfoProvider.getSSID()
@@ -131,7 +151,7 @@ class MQTTMessageProcessorEndpoint(
                   (currentState == EndpointState.CONNECTED ||
                       currentState == EndpointState.DISCONNECTED ||
                       currentState == EndpointState.ERROR)) {
-                Timber.i("Reconnecting due to SSID change for local network switching (state=$currentState)")
+                Timber.i("Reconnecting due to WiFi SSID change for local network switching (state=$currentState)")
                 scope.launch { reconnect() }
               }
             }
@@ -140,8 +160,22 @@ class MQTTMessageProcessorEndpoint(
 
         override fun onLost(network: Network) {
           super.onLost(network)
+          Timber.v("WiFi network lost")
+          val previousSsid = lastConnectedSsid
           lastConnectedSsid = null
-          scope.launch { connectingLock.withPermitLogged("network lost") { disconnect() } }
+          // Reconnect if we were using local network and WiFi is now gone
+          if (preferences.localNetworkEnabled &&
+              preferences.localNetworkSsid.isNotBlank() &&
+              previousSsid == preferences.localNetworkSsid) {
+            val currentState = endpointStateRepo.endpointState.value
+            if (preferences.connectionEnabled &&
+                (currentState == EndpointState.CONNECTED ||
+                    currentState == EndpointState.DISCONNECTED ||
+                    currentState == EndpointState.ERROR)) {
+              Timber.i("Reconnecting due to WiFi lost for local network switching (state=$currentState)")
+              scope.launch { reconnect() }
+            }
+          }
         }
       }
 
@@ -150,6 +184,17 @@ class MQTTMessageProcessorEndpoint(
     preferences.registerOnPreferenceChangedListener(this)
     networkChangeCallback.justRegistered = true
     connectivityManager.registerDefaultNetworkCallback(networkChangeCallback)
+
+    // Register WiFi-specific callback for local network switching
+    if (preferences.localNetworkEnabled) {
+      wifiChangeCallback.justRegistered = true
+      val wifiNetworkRequest = NetworkRequest.Builder()
+          .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+          .build()
+      connectivityManager.registerNetworkCallback(wifiNetworkRequest, wifiChangeCallback)
+      wifiCallbackRegistered = true
+    }
+
     if (!preferences.connectionEnabled) {
       Timber.i("Connection is disabled by user, not connecting")
       scope.launch { endpointStateRepo.setState(EndpointState.DISCONNECTED) }
@@ -173,6 +218,10 @@ class MQTTMessageProcessorEndpoint(
   override fun deactivate() {
     preferences.unregisterOnPreferenceChangedListener(this)
     connectivityManager.unregisterNetworkCallback(networkChangeCallback)
+    if (wifiCallbackRegistered) {
+      connectivityManager.unregisterNetworkCallback(wifiChangeCallback)
+      wifiCallbackRegistered = false
+    }
     scope.launch {
       connectingLock.withPermitLogged("mqtt deactivate") { disconnect() }
       scheduler.cancelAllTasks()
