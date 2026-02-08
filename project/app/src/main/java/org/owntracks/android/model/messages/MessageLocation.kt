@@ -19,12 +19,15 @@ import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.MonitoringMode
 
 @JsonTypeInfo(
-    use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "_type")
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.EXTERNAL_PROPERTY,
+    property = "_type",
+)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 open class MessageLocation(
     private val messageWithCreatedAtImpl: MessageWithCreatedAt = MessageCreatedAtNow(RealClock()),
-    private val messageWithId: MessageWithId = MessageWithRandomId()
+    private val messageWithId: MessageWithId = MessageWithRandomId(),
 ) :
     MessageBase(),
     MessageWithCreatedAt by messageWithCreatedAtImpl,
@@ -70,6 +73,8 @@ open class MessageLocation(
 
   @JsonInclude(JsonInclude.Include.NON_NULL) @JsonProperty("tid") var trackerId: String? = null
 
+  @JsonProperty("address") var address: String? = null
+
   override fun isValidMessage(): Boolean {
     return timestamp > 0
   }
@@ -108,7 +113,7 @@ open class MessageLocation(
     @JvmStatic
     fun fromLocationAndWifiInfo(
         location: @NotNull Location,
-        wifiInfoProvider: WifiInfoProvider
+        wifiInfoProvider: WifiInfoProvider,
     ): @NotNull MessageLocation =
         if (wifiInfoProvider.isConnected()) {
           fromLocation(location).apply {
