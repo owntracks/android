@@ -89,6 +89,7 @@ class MapActivity :
     WorkManagerInitExceptionNotifier by WorkManagerInitExceptionNotifier.Impl(),
     ServiceStarter by ServiceStarter.Impl(),
     AppBarInsetHandler by AppBarInsetHandler.Impl() {
+  private var bottom: Int = 0
   private val viewModel: MapViewModel by viewModels()
   private val notificationPermissionRequester =
       NotificationPermissionRequester(
@@ -245,6 +246,7 @@ class MapActivity :
 
           fabMyLocation.apply {
             TooltipCompat.setTooltipText(this, getString(R.string.currentLocationButtonLabel))
+
             setOnClickListener {
               if (checkAndRequestLocationPermissions(true) ==
                   CheckPermissionsResult.HAS_PERMISSIONS) {
@@ -799,9 +801,9 @@ class MapActivity :
       bottomMargin =
           when (bottomSheetState) {
             BottomSheetBehavior.STATE_COLLAPSED -> {
-              bottomSheetBehavior?.peekHeight ?: 0
+              bottomSheetBehavior?.peekHeight ?: bottom
             }
-            else -> 0
+            else -> bottom
           }
     }
   }
