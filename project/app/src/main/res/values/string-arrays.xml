@@ -14,4 +14,8 @@
         <item>Always in dark theme</item>
         <item>Same as device</item>
     </string-array>
+    <string-array name="unitsDisplayLabels">
+        <item>Metric</item>
+        <item>Imperial</item>
+    </string-array>
 </resources>

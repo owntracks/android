@@ -20,6 +20,7 @@ import org.owntracks.android.preferences.types.MqttProtocolLevel
 import org.owntracks.android.preferences.types.MqttQos
 import org.owntracks.android.preferences.types.ReverseGeocodeProvider
 import org.owntracks.android.preferences.types.StringMaxTwoAlphaNumericChars
+import org.owntracks.android.preferences.types.UnitsDisplay
 import org.owntracks.android.test.SimpleIdlingResource
 
 @RunWith(Parameterized::class)
@@ -249,7 +250,25 @@ class PreferencesGettersAndSetters(private val parameter: Parameter) {
                   preferenceValueInConfiguration = "trackerId"),
               Parameter("url", "https://www.example.com", String::class, true),
               Parameter("username", "testUser", String::class, false),
-              Parameter("ws", true, Boolean::class, false))
+              Parameter("ws", true, Boolean::class, false),
+              Parameter(
+                  "imperialUnitsDisplay",
+                  UnitsDisplay.IMPERIAL,
+                  UnitsDisplay::class,
+                  false,
+                  preferenceValueInConfiguration = "IMPERIAL"),
+              Parameter(
+                  "imperialUnitsDisplay",
+                  UnitsDisplay.METRIC,
+                  UnitsDisplay::class,
+                  false,
+                  preferenceValueInConfiguration = "METRIC"),
+              Parameter(
+                  "imperialUnitsDisplay",
+                  UnitsDisplay.METRIC,
+                  UnitsDisplay::class,
+                  false,
+                  preferenceValueInConfiguration = "Nonsense"))
           .toList()
     }
   }

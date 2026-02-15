@@ -10,6 +10,8 @@
             type="org.owntracks.android.ui.map.MapViewModel" />
 
         <import type="android.view.View" />
+        <import type="org.owntracks.android.preferences.types.UnitsDisplay" />
+        <import type="org.owntracks.android.support.UnitConversions" />
     </data>
 
     <androidx.drawerlayout.widget.DrawerLayout
@@ -101,14 +103,14 @@
                         android:id="@+id/contactDetailsAccuracy"
                         layout="@layout/ui_contactsheet_parameter"
                         app:icon="@{@drawable/ic_baseline_my_location_24}"
-                        app:textValue="@{String.format(@string/contactDetailsAccuracyValue,vm.currentContact.locationAccuracy)}"
+                        app:textValue="@{UnitConversions.formatAccuracy(context, vm.currentContact.locationAccuracy, vm.unitsDisplay)}"
                         app:title="@{@string/contactDetailsAccuracy}" />
 
                     <include
                         android:id="@+id/contactDetailsAltitude"
                         layout="@layout/ui_contactsheet_parameter"
                         app:icon="@{@drawable/ic_baseline_airplanemode_active_24}"
-                        app:textValue="@{String.format(@string/contactDetailsAltitudeValue, vm.currentContact.altitude)}"
+                        app:textValue="@{UnitConversions.formatAltitude(context, vm.currentContact.altitude, vm.unitsDisplay)}"
                         app:title="@{@string/contactDetailsAltitude}" />
                 </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -132,7 +134,7 @@
                         android:id="@+id/contactDetailsSpeed"
                         layout="@layout/ui_contactsheet_parameter"
                         app:icon="@{@drawable/ic_baseline_speed_24}"
-                        app:textValue="@{String.format(@string/contactDetailsSpeedValue,vm.currentContact.velocity)}"
+                        app:textValue="@{UnitConversions.formatSpeed(context, vm.currentContact.velocity, vm.unitsDisplay)}"
                         app:title="@{@string/contactDetailsSpeed}" />
 
                 </androidx.appcompat.widget.LinearLayoutCompat>
@@ -151,7 +153,7 @@
                         android:id="@+id/contactDetailsDistance"
                         layout="@layout/ui_contactsheet_parameter"
                         app:icon="@{@drawable/ic_baseline_architecture_24}"
-                        app:textValue="@{String.format(@string/contactDetailsDistanceValue, vm.contactDistance > 1000f ? (vm.contactDistance / 1000) : vm.contactDistance, vm.contactDistance > 1000f ? @string/contactDetailsDistanceUnitKilometres : @string/contactDetailsDistanceUnitMeters)}"
+                        app:textValue="@{UnitConversions.formatDistance(context, vm.contactDistance, vm.unitsDisplay)}"
                         app:title="@{@string/contactDetailsDistance}" />
 
                     <include

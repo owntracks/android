@@ -14,4 +14,8 @@
         <item>1</item>
         <item>2</item>
     </string-array>
+    <string-array name="unitsDisplayValues" translatable="false">
+        <item>METRIC</item>
+        <item>IMPERIAL</item>
+    </string-array>
 </resources>

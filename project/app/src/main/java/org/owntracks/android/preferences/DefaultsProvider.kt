@@ -9,6 +9,7 @@ import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.preferences.types.MqttProtocolLevel
 import org.owntracks.android.preferences.types.MqttQos
 import org.owntracks.android.preferences.types.StringMaxTwoAlphaNumericChars
+import org.owntracks.android.preferences.types.UnitsDisplay
 
 interface DefaultsProvider {
   @Suppress("IMPLICIT_CAST_TO_ANY", "UNCHECKED_CAST")
@@ -79,6 +80,7 @@ interface DefaultsProvider {
       Preferences::userDeclinedEnableNotificationPermissions -> false
       Preferences::username -> ""
       Preferences::ws -> false
+      Preferences::imperialUnitsDisplay -> UnitsDisplay.METRIC
       else -> {
         throw Exception("No default defined for ${property.name}")
       }

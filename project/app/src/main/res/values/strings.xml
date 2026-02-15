@@ -32,8 +32,10 @@
     <string name="contact_image">"Contact Image"</string>
     <string name="contactDetailsAccuracy">"Accuracy"</string>
     <string name="contactDetailsAccuracyValue">"%,d m"</string>
+    <string name="contactDetailsAccuracyValueImperial">"%,d ft"</string>
     <string name="contactDetailsAltitude">"Altitude"</string>
     <string name="contactDetailsAltitudeValue">"%,d m"</string>
+    <string name="contactDetailsAltitudeValueImperial">"%,d ft"</string>
     <string name="contactDetailsBattery">"Battery"</string>
     <string name="contactDetailsBatteryValue">"%d %%"</string>
     <string name="contactDetailsBearing">"Bearing"</string>
@@ -42,9 +44,12 @@
     <string name="contactDetailsDistance">"Distance"</string>
     <string name="contactDetailsDistanceUnitKilometres">"km"</string>
     <string name="contactDetailsDistanceUnitMeters">"m"</string>
+    <string name="contactDetailsDistanceUnitMiles">"mi"</string>
+    <string name="contactDetailsDistanceUnitFeet">"ft"</string>
     <string name="contactDetailsDistanceValue">"%1$,.2f %2$s"</string>
     <string name="contactDetailsSpeed">"Speed"</string>
     <string name="contactDetailsSpeedValue">"%d kph"</string>
+    <string name="contactDetailsSpeedValueImperial">"%d mph"</string>
     <string name="contactDetailsTopic">"Identifier"</string>
     <string name="contactDetailsTrackerId">"Tracker ID"</string>
     <string name="contactLocationUnknown">"No location is available"</string>
@@ -178,6 +183,8 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesEditorValueError">"Invalid value specified"</string>
     <string name="preferencesEnableMapRotation">"Enable Map Rotation"</string>
     <string name="preferencesEnableMapRotationSummary">"Allow the map to be rotated"</string>
+    <string name="preferencesUnitsDisplay">"Units"</string>
+    <string name="preferencesUnitsDisplaySummary">"Display distances, speeds, and altitudes in metric or imperial units"</string>
     <string name="preferencesEncryptionKey">"Encryption Key"</string>
     <string name="preferencesEncryptionKeyDialogMessage">"Encryption key is cut off after 32 characters."</string>
     <string name="preferencesEncryptionKeySummary">"Symmetric key for payload encryption"</string>

@@ -14,4 +14,13 @@
         app:summary="@string/preferencesEnableMapRotationSummary"
         app:title="@string/preferencesEnableMapRotation" />
 
+    <androidx.preference.ListPreference
+        app:entries="@array/unitsDisplayLabels"
+        app:entryValues="@array/unitsDisplayValues"
+        app:iconSpaceReserved="false"
+        app:key="imperialUnitsDisplay"
+        app:summary="@string/preferencesUnitsDisplaySummary"
+        app:title="@string/preferencesUnitsDisplay"
+        app:useSimpleSummaryProvider="true" />
+
 </PreferenceScreen>

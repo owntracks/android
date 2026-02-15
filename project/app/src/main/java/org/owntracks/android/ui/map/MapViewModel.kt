@@ -35,6 +35,7 @@ import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.preferences.types.MonitoringMode
+import org.owntracks.android.preferences.types.UnitsDisplay
 import org.owntracks.android.services.LocationProcessor
 import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.support.RequirementsChecker
@@ -88,6 +89,11 @@ constructor(
   private val mutableMapLayerStyle = MutableLiveData(preferences.mapLayerStyle)
   val mapLayerStyle: LiveData<MapLayerStyle>
     get() = mutableMapLayerStyle
+
+  // Controls the display units (metric/imperial)
+  private val mutableUnitsDisplay = MutableLiveData(preferences.imperialUnitsDisplay)
+  val unitsDisplay: LiveData<UnitsDisplay>
+    get() = mutableUnitsDisplay
 
   // Controls the status of the MyLocation FAB on the map
   private val mutableMyLocationStatus = MutableLiveData(MyLocationStatus.DISABLED)
@@ -154,6 +160,9 @@ constructor(
           if (properties.contains("mode")) {
             currentConnectionMode.postValue(preferences.mode)
             clearActiveContact()
+          }
+          if (properties.contains("imperialUnitsDisplay")) {
+            mutableUnitsDisplay.postValue(preferences.imperialUnitsDisplay)
           }
         }
       }

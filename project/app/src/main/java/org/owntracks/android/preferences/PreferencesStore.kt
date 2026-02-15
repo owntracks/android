@@ -12,6 +12,7 @@ import org.owntracks.android.preferences.types.MqttProtocolLevel
 import org.owntracks.android.preferences.types.MqttQos
 import org.owntracks.android.preferences.types.ReverseGeocodeProvider
 import org.owntracks.android.preferences.types.StringMaxTwoAlphaNumericChars
+import org.owntracks.android.preferences.types.UnitsDisplay
 import org.owntracks.android.ui.map.MapLayerStyle
 import timber.log.Timber
 
@@ -113,6 +114,7 @@ abstract class PreferencesStore :
             typeOf<Set<String>>() -> getStringSet(property.name, emptySet())
             typeOf<ReverseGeocodeProvider>() ->
                 ReverseGeocodeProvider.getByValue(getString(property.name, "") ?: "")
+            typeOf<UnitsDisplay>() -> UnitsDisplay.getByValue(getString(property.name, "") ?: "")
             typeOf<MapLayerStyle>() -> MapLayerStyle.valueOf(getString(property.name, "") ?: "")
             typeOf<ConnectionMode>() -> ConnectionMode.getByValue(getInt(property.name, -1))
             typeOf<MonitoringMode>() -> MonitoringMode.getByValue(getInt(property.name, 1))
@@ -214,6 +216,7 @@ abstract class PreferencesStore :
       is Float -> putFloat(property.name, coercedValue)
       is Set<*> -> putStringSet(property.name, value as Set<String>)
       is ReverseGeocodeProvider -> putString(property.name, coercedValue.name)
+      is UnitsDisplay -> putString(property.name, coercedValue.name)
       is MapLayerStyle -> putString(property.name, coercedValue.name)
       is ConnectionMode -> putInt(property.name, coercedValue.value)
       is MonitoringMode -> putInt(property.name, coercedValue.value)

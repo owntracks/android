@@ -371,6 +371,13 @@ These settings apply only when using HTTP mode (`mode=3`).
 - **MQTT**: ✓ | **HTTP**: ✓
 - **Description**: Scale factor for OpenStreetMap tiles (OSS flavor only). Values >1.0 increase tile size for better readability on high-DPI displays.
 
+### `imperialUnitsDisplay`
+- **Type**: String (UnitsDisplay)
+- **Values**: `METRIC`, `IMPERIAL`
+- **Default**: `METRIC`
+- **MQTT**: ✓ | **HTTP**: ✓
+- **Description**: Controls whether the UI displays measurements in metric (m, km, kph) or imperial (ft, mi, mph) units. Affects distance, speed, altitude, and accuracy values shown in the contact detail bottom sheet.
+
 ---
 
 ## Reverse Geocoding

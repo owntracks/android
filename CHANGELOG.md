@@ -5,11 +5,13 @@
 ### New features
 
 - Migrated message queue to use Room database instead of tape2 for better async performance and reliability
+- Added imperial units display option in Map preferences, allowing distances, speeds, altitudes, and accuracy to be shown in feet/miles/mph instead of meters/km/kph
 
 ### Bug fixes
 
 - Fix slow starts by avoiding blocking the main thread on startup with the disk-backed queue.
 - Significantly reduced battery drain and improved responsiveness in MQTT mode during poor network conditions by changing reconnection retry strategy from linear to exponential backoff
+- Fixed `imperialUnitsDisplay` preference not being persisted or read correctly from the preferences store
 
 ## Version 2.5.5
 
