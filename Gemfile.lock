@@ -181,7 +181,7 @@ GEM
     nanaimo (0.4.0)
     naturally (2.3.0)
     nkf (0.2.0)
-    openssl (4.0.0)
+    openssl (4.0.1)
     optparse (0.8.1)
     os (1.1.4)
     ostruct (0.6.3)
