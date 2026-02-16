@@ -11,6 +11,8 @@ import org.owntracks.android.location.toLatLng
 import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.model.messages.MessageTransition
+import org.owntracks.android.support.Meters
+import org.owntracks.android.support.Speed
 import timber.log.Timber
 
 class Contact(id: String) : BaseObservable() {
@@ -62,40 +64,40 @@ class Contact(id: String) : BaseObservable() {
       latLng = messageLocation.toLatLng()
     }
     trackerId = messageLocation.trackerId?.take(2) ?: messageLocation.topic.takeLast(2)
-    locationAccuracy = messageLocation.accuracy
-    altitude = messageLocation.altitude
-    velocity = messageLocation.velocity
+    locationAccuracy = Meters(messageLocation.accuracy)
+    altitude = Meters(messageLocation.altitude)
+    velocity = Speed(messageLocation.velocity)
     battery = messageLocation.battery
     return true
   }
 
   fun setLocationFromMessageTransition(messageLocation: MessageTransition): Boolean {
-    if (locationAccuracy > messageLocation.timestamp) return false
+    if (locationAccuracy.value > messageLocation.timestamp) return false
     locationTimestamp = messageLocation.timestamp
     if (latLng != messageLocation.toLatLng()) {
       Timber.v("Contact ${this.id} has moved to $latLng")
       latLng = messageLocation.toLatLng()
     }
-    locationAccuracy = messageLocation.accuracy
+    locationAccuracy = Meters(messageLocation.accuracy)
     return true
   }
 
   @get:Bindable
-  var locationAccuracy: Int = 0
+  var locationAccuracy: Meters = Meters(0)
     private set(value) {
       field = value
       notifyPropertyChanged(BR.locationAccuracy)
     }
 
   @get:Bindable
-  var altitude: Int = 0
+  var altitude: Meters = Meters(0)
     private set(value) {
       field = value
       notifyPropertyChanged(BR.altitude)
     }
 
   @get:Bindable
-  var velocity: Int = 0
+  var velocity: Speed = Speed(0)
     private set(value) {
       field = value
       notifyPropertyChanged(BR.velocity)

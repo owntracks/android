@@ -83,7 +83,7 @@ class MemoryContactsRepoTest {
           getById(CONTACT_ID)!!.let { c ->
             assertEquals(messageLocation.battery, c.battery)
             assertEquals(messageLocation.toLatLng(), c.latLng)
-            assertEquals(messageLocation.altitude, c.altitude)
+            assertEquals(messageLocation.altitude, c.altitude.value.toInt())
             assertEquals(messageLocation.timestamp, c.locationTimestamp)
             assertEquals("aa", c.trackerId)
             assertEquals(CONTACT_ID, c.id)
@@ -99,7 +99,7 @@ class MemoryContactsRepoTest {
           getById(CONTACT_ID)!!.let { c ->
             assertEquals(messageLocation.battery, c.battery)
             assertEquals(messageLocation.toLatLng(), c.latLng)
-            assertEquals(messageLocation.altitude, c.altitude)
+            assertEquals(messageLocation.altitude, c.altitude.value.toInt())
             assertEquals(messageLocation.timestamp, c.locationTimestamp)
             assertEquals("me", c.trackerId)
             assertEquals(CONTACT_ID, c.id)

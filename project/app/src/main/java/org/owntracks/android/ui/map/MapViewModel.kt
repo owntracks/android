@@ -38,6 +38,7 @@ import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.preferences.types.UnitsDisplay
 import org.owntracks.android.services.LocationProcessor
 import org.owntracks.android.services.MessageProcessor
+import org.owntracks.android.support.Meters
 import org.owntracks.android.support.RequirementsChecker
 import timber.log.Timber
 
@@ -71,8 +72,8 @@ constructor(
     get() = mutableMapCenter
 
   // Shows the current distance to the selected contact
-  private val mutableContactDistance = MutableLiveData(0f)
-  val contactDistance: LiveData<Float>
+  private val mutableContactDistance = MutableLiveData(Meters(0f))
+  val contactDistance: LiveData<Meters>
     get() = mutableContactDistance
 
   // Shows the bearing to the selected contact
@@ -328,7 +329,7 @@ constructor(
           latitude.value,
           longitude.value,
           distanceBetween)
-      mutableContactDistance.postValue(distanceBetween[0])
+      mutableContactDistance.postValue(Meters(distanceBetween[0]))
       mutableContactBearing.postValue(distanceBetween[1])
       mutableRelativeContactBearing.postValue(distanceBetween[1])
     }
