@@ -33,6 +33,7 @@ kmqtt = "0.4.6"
 kotlin = "1.9.25"
 kotlin-coroutines = "1.9.0"
 kotlin-datetime = "0.6.2"
+kotest = "5.8.0"
 ksp = "1.9.25-1.0.20"
 ktfmt = "0.25.0"
 lmdb-kt = "0.1.1"
@@ -148,6 +149,9 @@ desugar = { module = "com.android.tools:desugar_jdk_libs_nio", version.ref = "de
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso-core" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
+kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
+kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
 
 [bundles]
 jackson = ["jackson-core", "jackson-databind", "jackson-module-kotlin", "jackson-datatype-jsr310"]

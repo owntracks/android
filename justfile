@@ -23,7 +23,7 @@ single-espresso:
     {{gradlec}} clean createGmsDebugCoverageReport -Pandroid.testInstrumentationRunnerArguments.annotation=org.owntracks.android.testutils.JustThisTestPlease
 
 format:
-    {{gradlec}} app:ktfmtFormat
+    {{gradlec}} ktfmtFormat
 
 tasks:
     {{gradlec}} tasks --all
