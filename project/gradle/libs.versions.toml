@@ -49,7 +49,7 @@ square-leakcanary = "2.14"
 square-tape2 = "2.0.0-beta1"
 timber = "5.0.1"
 junit = "4.13.2"
-espresso-core = "3.5.1"
+espresso-core = "3.7.0"
 appcompat = "1.6.1"
 
 [plugins]
