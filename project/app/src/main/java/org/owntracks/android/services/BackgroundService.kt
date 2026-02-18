@@ -199,6 +199,15 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
     powerStateLogger.logPowerState("serviceOnCreate")
 
     lifecycleScope.launch {
+      endpointStateRepo.endpointState.collect {
+        val host =
+            if (preferences.mode == ConnectionMode.MQTT)
+                endpointStateRepo.currentEndpointHost.value.ifBlank { preferences.host }
+            else preferences.url.toHttpUrlOrNull()?.host ?: ""
+        ongoingNotification.setEndpointState(it, host)
+      }
+    }
+    lifecycleScope.launch {
       // Every time a waypoint is inserted, updated or deleted, we need to update the geofences, and
       // maybe publish that waypoint
       repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -228,15 +237,6 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
                 geocoderProvider.resolve(location.toLatLng(), this@BackgroundService)
               }
             }
-          }
-        }
-        launch {
-          endpointStateRepo.endpointState.collect {
-            val host =
-                if (preferences.mode == ConnectionMode.MQTT)
-                    endpointStateRepo.currentEndpointHost.value.ifBlank { preferences.host }
-                else preferences.url.toHttpUrlOrNull()?.host ?: ""
-            ongoingNotification.setEndpointState(it, host)
           }
         }
         endpointStateRepo.setServiceStartedNow()
