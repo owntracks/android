@@ -48,6 +48,9 @@ slf4j-timber = "1.0.1"
 square-leakcanary = "2.14"
 square-tape2 = "2.0.0-beta1"
 timber = "5.0.1"
+junit = "4.13.2"
+espresso-core = "3.5.1"
+appcompat = "1.6.1"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -56,6 +59,7 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 ktfmt = { id = "com.ncorti.ktfmt.gradle", version.ref = "ktfmt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
 
 [libraries]
 android-gradle-api = { module = "com.android.tools.build:gradle-api", version.ref = "agp" }
@@ -135,11 +139,15 @@ androidx-test-rules = { module = "androidx.test:rules", version.ref = "androidx-
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidx-test-runner" }
 androidx-test-services = { module = "androidx.test.services:test-services", version.ref = "androidx-test-services" }
 androidx-test-orchestrator = { module = "androidx.test:orchestrator", version.ref = "androidx-test-orchestrator" }
+androidx-test-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidx-test-espresso" }
 androidx-test-espresso-idling = { module = "androidx.test.espresso:espresso-idling-resource", version.ref = "androidx-test-espresso" }
 
 # Build utils
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 desugar = { module = "com.android.tools:desugar_jdk_libs_nio", version.ref = "desguar-jdk" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso-core" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 
 [bundles]
 jackson = ["jackson-core", "jackson-databind", "jackson-module-kotlin", "jackson-datatype-jsr310"]
@@ -149,7 +157,7 @@ kapt-hilt = ["hilt-compiler", "hilt-androidx"]
 hilt = ["hilt-android", "hilt-work"]
 androidx = ["androidx-core-ktx", "androidx-preference", "androidx-work-runtime", "androidx-fragment-ktx", "androidx-concurrent-futures", "androidx-activity-ktx"]
 androidx-room = ["androidx-room-runtime", "androidx-room-ktx"]
-androidx-test = ["androidx-test-junit", "androidx-test-core-ktx", "androidx-test-rules", "androidx-test-runner"]
+androidx-test = ["androidx-test-junit", "androidx-test-core-ktx", "androidx-test-rules", "androidx-test-runner", "androidx-test-espresso-core"]
 androidx-test-util = ["androidx-test-services", "androidx-test-orchestrator"]
 buildscript = ["guava"]
 objectbox-migration = ["lmdb-kt", "slf4j-simple", "slf4j-timber", "flatbuffers"]

@@ -123,8 +123,8 @@ class MQTTMessageProcessorEndpoint(
       } catch (e: ConfigurationIncompleteException) {
         when (e.cause) {
           is MqttConnectionConfiguration.MissingHostException ->
-              Timber.w("MQTT Configuration not complete because host is missing, cannot activate")
-          else -> Timber.w(e, "MQTT Configuration not complete, cannot activate")
+              Timber.e("MQTT Configuration not complete because host is missing, cannot activate")
+          else -> Timber.e(e, "MQTT Configuration not complete, cannot activate")
         }
         endpointStateRepo.setState(EndpointState.ERROR_CONFIGURATION.withError(e))
       }
@@ -191,7 +191,7 @@ class MQTTMessageProcessorEndpoint(
   override fun onFinalizeMessage(message: MessageBase): MessageBase = message
 
   override suspend fun sendMessage(message: MessageBase): Result<Unit> {
-    Timber.i("Sending message $message")
+    Timber.d("Sending message $message")
     if (mqttClientAndConfiguration == null) {
       return Result.failure(NotReadyException())
     }
@@ -225,9 +225,9 @@ class MQTTMessageProcessorEndpoint(
                               message.retained)
                           .also { Timber.v("MQTT message sent with messageId=${it.messageId}. ") }
                     }
-                    .apply { Timber.i("Message ${message.messageId} sent in $this") }
+                    .apply { Timber.i("Message $message sent in $this") }
               } catch (e: Exception) {
-                Timber.e(e, "Error publishing message $message")
+                Timber.w(e, "Error publishing message $message")
                 when (e) {
                   is IOException -> messageProcessor.onMessageDeliveryFailedFinal(message)
                   is MqttException -> {
@@ -296,8 +296,8 @@ class MQTTMessageProcessorEndpoint(
 
         override fun connectionLost(cause: Throwable) {
           when (cause) {
-            is IOException -> Timber.e("Connection Lost: ${cause.message}")
-            else -> Timber.e(cause, "Connection Lost")
+            is IOException -> Timber.w("Connection Lost: ${cause.message}")
+            else -> Timber.w(cause, "Connection Lost")
           }
           scope.launch { endpointStateRepo.setState(EndpointState.DISCONNECTED) }
           scheduler.scheduleMqttReconnect()
@@ -323,7 +323,7 @@ class MQTTMessageProcessorEndpoint(
                       }
                       .also { Timber.d("Parsed message: $it") })
             } catch (e: Parser.EncryptionException) {
-              Timber.w("Unable to decrypt received message ${message.id} on $topic")
+              Timber.e("Unable to decrypt received message ${message.id} on $topic")
             } catch (e: InvalidFormatException) {
               Timber.w("Malformed JSON message received ${message.id} on $topic")
             }
@@ -378,7 +378,7 @@ class MQTTMessageProcessorEndpoint(
                       mqttConnectionConfiguration
                           .getConnectOptions(applicationContext, caKeyStore)
                           .also {
-                            Timber.i(
+                            Timber.d(
                                 "Connecting to ${mqttConnectionConfiguration.connectionString} timeout = ${ it.connectionTimeout.toDuration(DurationUnit.SECONDS)}")
                           }
                           .run { connect(this).waitForCompletion() }
@@ -399,7 +399,7 @@ class MQTTMessageProcessorEndpoint(
                                 mqttConnectionConfiguration.subQos.value
                               })
                           .waitForCompletion()
-                      Timber.i("MQTT Subscribed")
+                      Timber.d("MQTT Subscribed")
 
                       messageProcessor.notifyOutgoingMessageQueue()
                       if (preferences.publishLocationOnConnect) {
@@ -414,7 +414,7 @@ class MQTTMessageProcessorEndpoint(
                   is MqttException -> {
                     when (e.reasonCode) {
                       REASON_CODE_CONNECTION_LOST.toInt() ->
-                          Timber.e(
+                          Timber.w(
                               e.cause,
                               "MQTT client unable to connect to endpoint because the connection was lost")
                       REASON_CODE_CLIENT_EXCEPTION.toInt() ->
@@ -429,7 +429,7 @@ class MQTTMessageProcessorEndpoint(
                       REASON_CODE_SERVER_CONNECT_ERROR.toInt() -> {
                         when (e.cause) {
                           is ConnectException -> {
-                            Timber.e("$errorLog: ${(e.cause as ConnectException).message}")
+                            Timber.w("$errorLog: ${(e.cause as ConnectException).message}")
                           }
                         }
                       }

@@ -109,6 +109,10 @@ constructor(
 
   init {
     preferences.registerOnPreferenceChangedListener(this)
+    // Collect queue size changes and propagate to endpoint state repo
+    scope.launch(ioDispatcher) {
+      outgoingQueue.queueSize.collect { size -> endpointStateRepo.setQueueLength(size) }
+    }
   }
 
   /**
@@ -169,7 +173,6 @@ constructor(
     runBlocking { queueInitJob.join() }
     Timber.d("Reloading outgoing message processor")
     endpoint?.deactivate().also { Timber.d("Destroying previous endpoint") }
-    scope.launch { endpointStateRepo.setQueueLength(outgoingQueue.size()) }
     endpoint = getEndpoint(preferences.mode)
 
     dequeueAndSenderJob =
@@ -219,7 +222,6 @@ constructor(
           Timber.e("Still can't put message onto the queue. Dropping: $message")
         }
       }
-      endpointStateRepo.setQueueLength(outgoingQueue.size())
     }
   }
 
@@ -253,13 +255,9 @@ constructor(
         var retryWait: Duration
         while (true) {
           try {
-            val message: MessageBase? = outgoingQueue.dequeue()
-            if (message == null) {
-              delay(100) // Poll every 100ms when queue is empty
-              continue
-            }
+            // Suspends efficiently until a message is available - no polling
+            val message: MessageBase = outgoingQueue.awaitMessage()
             Timber.d("Taken message off queue: $message")
-            endpointStateRepo.setQueueLength(outgoingQueue.size() + 1)
             // reset the retry logic if the last message succeeded
             if (lastMessageStatus is LastMessageStatus.Success ||
                 lastMessageStatus is LastMessageStatus.PermanentFailure) {
@@ -272,7 +270,7 @@ constructor(
             try {
               endpoint.let {
                 if (it == null) {
-                  Timber.i("Endpoint not ready yet. Re-queueing")
+                  Timber.d("Endpoint not ready yet. Re-queueing")
                   reQueueMessage(message)
                   resendDelayWait(SEND_FAILURE_NOT_READY_WAIT)
                   lastMessageStatus =
@@ -282,7 +280,7 @@ constructor(
                   it.sendMessage(message).exceptionOrNull()?.run {
                     when (this) {
                       is MessageProcessorEndpoint.NotReadyException -> {
-                        Timber.i("Endpoint not ready yet. Re-queueing")
+                        Timber.d("Endpoint not ready yet. Re-queueing")
                         reQueueMessage(message)
                         resendDelayWait(SEND_FAILURE_NOT_READY_WAIT)
                         lastMessageStatus =
@@ -297,7 +295,7 @@ constructor(
                           is MessageProcessorEndpoint.OutgoingMessageSendingException ->
                               Timber.w(this, "Error sending message $message. Re-queueing")
                           is ConfigurationIncompleteException ->
-                              Timber.w("Configuration incomplete for message $message. Re-queueing")
+                              Timber.e("Configuration incomplete for message $message. Re-queueing")
                           is MQTTMessageProcessorEndpoint.NotConnectedException ->
                               Timber.w("MQTT not connected for message $message. Re-queueing")
                         }
@@ -306,7 +304,7 @@ constructor(
 
                         lastMessageStatus =
                             if (retriesToGo <= 0) {
-                              Timber.w("Ran out of retries for sending. Dropping message")
+                              Timber.e("Ran out of retries for sending. Dropping message")
                               LastMessageStatus.PermanentFailure
                             } else {
                               LastMessageStatus.RetryableFailure(
@@ -352,8 +350,6 @@ constructor(
           } catch (e: CancellationException) {
             Timber.w(e, "Outgoing message loop cancelled")
             break
-          } finally {
-            endpointStateRepo.setQueueLength(outgoingQueue.size())
           }
         }
       } catch (e: Exception) {
@@ -373,7 +369,7 @@ constructor(
   private suspend fun resendDelayWait(waitFor: Duration): Boolean =
       scope
           .launch {
-            Timber.i("Waiting for $waitFor before retrying send")
+            Timber.d("Waiting for $waitFor before retrying send")
             delay(waitFor)
           }
           .run {
@@ -409,20 +405,18 @@ constructor(
       cancel(CancellationException("Connectivity changed"))
       Timber.d("Resetting message send loop wait.")
     }
+    // Wake up any suspended awaitMessage() call to retry immediately
+    outgoingQueue.signalMessageAvailable()
   }
 
   fun onMessageDeliveryFailedFinal(message: MessageBase) {
-    scope.launch {
-      Timber.e("Message delivery failed, not retryable. $message")
-      endpointStateRepo.setQueueLength(outgoingQueue.size())
-    }
+    scope.launch { Timber.e("Message delivery failed, not retryable. $message") }
   }
 
   fun onMessageDeliveryFailed(message: MessageBase) {
     scope.launch {
       Timber.e(
           "Message delivery failed. queueLength: ${outgoingQueue.size() + 1}, message=$message")
-      endpointStateRepo.setQueueLength(outgoingQueue.size())
     }
   }
 
@@ -454,7 +448,7 @@ constructor(
 
   private fun processIncomingMessage(message: MessageClear) {
     scope.launch {
-      Timber.i("Received clear message for ${message.getContactId()}")
+      Timber.d("Received clear message for ${message.getContactId()}")
       contactsRepo.remove(message.getContactId())
       messageReceivedIdlingResource.remove(message)
     }
@@ -473,7 +467,7 @@ constructor(
           Timber.d(
               "Received our own location update ${message.latitude},${message.longitude} at ${message.timestamp}")
         } else {
-          Timber.i(
+          Timber.d(
               "Contact ${message.getContactId()} moved to ${message.latitude},${message.longitude} at ${message.timestamp}")
         }
         contactsRepo.update(message.getContactId(), message)
@@ -496,7 +490,7 @@ constructor(
       messageReceivedIdlingResource.remove(message)
     } else {
       scope.launch {
-        Timber.i(
+        Timber.d(
             "Contact ${message.getContactId()} transitioned waypoint ${message.description} (${message.event}) at ${message.timestamp}")
         contactsRepo.update(message.getContactId(), message)
         service?.sendEventNotification(message)
@@ -507,7 +501,7 @@ constructor(
 
   private fun processIncomingMessage(message: MessageCard) {
     scope.launch {
-      Timber.i("Received card message from ${message.topic}")
+      Timber.d("Received card message from ${message.topic}")
       contactsRepo.update(message.getContactId(), message)
       messageReceivedIdlingResource.remove(message)
     }

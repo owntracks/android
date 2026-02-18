@@ -9,6 +9,7 @@ import java.io.IOException
 import java.io.OutputStream
 import java.util.concurrent.atomic.AtomicLong
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -37,7 +38,7 @@ class RoomBackedMessageQueue(
     private val applicationContext: Context,
     private val parser: Parser,
     private val ioDispatcher: CoroutineDispatcher
-) {
+) : AsyncDeQueue {
   private val db: MessageQueueDatabase =
       Room.databaseBuilder(applicationContext, MessageQueueDatabase::class.java, "message_queue")
           .build()
@@ -47,10 +48,16 @@ class RoomBackedMessageQueue(
   private val mutex = Mutex()
 
   private val _queueSize = MutableStateFlow(0)
-  val queueSize: StateFlow<Int> = _queueSize.asStateFlow()
+  override val queueSize: StateFlow<Int> = _queueSize.asStateFlow()
+
+  /**
+   * Channel used to signal that a message is available. Uses CONFLATED to avoid buffering multiple
+   * signals - we only need to know "there's something to process".
+   */
+  private val messageAvailableSignal = Channel<Unit>(Channel.CONFLATED)
 
   /** Initializes the queue by loading persisted messages and migrating from legacy storage */
-  suspend fun initialize(legacyStoragePath: File) {
+  override suspend fun initialize(legacyStoragePath: File) {
     withContext(ioDispatcher) {
       mutex.withLock {
         // Initialize sequence number from database
@@ -65,6 +72,11 @@ class RoomBackedMessageQueue(
 
         // Migrate from legacy tape2 storage if exists
         migrateLegacyStorage(legacyStoragePath)
+
+        // Signal if there are messages waiting to be processed
+        if (dao.getCount() > 0) {
+          messageAvailableSignal.trySend(Unit)
+        }
       }
     }
   }
@@ -111,7 +123,7 @@ class RoomBackedMessageQueue(
               enqueueInternal(message)
               migratedCount++
             } catch (e: Exception) {
-              Timber.w(e, "Failed to migrate message: $message")
+              Timber.d(e, "Failed to migrate message: $message")
             }
           }
 
@@ -191,12 +203,12 @@ class RoomBackedMessageQueue(
    * @param message The message to enqueue
    * @return true if the message was added, false if the queue is full
    */
-  suspend fun enqueue(message: MessageBase): Boolean {
+  override suspend fun enqueue(message: MessageBase): Boolean {
     return withContext(ioDispatcher) {
       mutex.withLock {
         val currentSize = dao.getCount()
         if (currentSize >= capacity) {
-          Timber.w("Queue at capacity ($capacity), cannot enqueue message")
+          Timber.i("Queue at capacity ($capacity), cannot enqueue message")
           return@withContext false
         }
 
@@ -216,6 +228,7 @@ class RoomBackedMessageQueue(
 
       dao.insert(entity)
       _queueSize.value = dao.getCount()
+      messageAvailableSignal.trySend(Unit)
       Timber.d("Enqueued message with sequence $sequenceNumber")
     } catch (e: Exception) {
       Timber.e(e, "Error enqueuing message to database")
@@ -229,12 +242,12 @@ class RoomBackedMessageQueue(
    * @param message The message to add to the head
    * @return true if the message was added, false if the queue is full
    */
-  suspend fun requeue(message: MessageBase): Boolean {
+  override suspend fun requeue(message: MessageBase): Boolean {
     return withContext(ioDispatcher) {
       mutex.withLock {
         val currentSize = dao.getCount()
         if (currentSize >= capacity) {
-          Timber.w("Queue at capacity ($capacity), cannot requeue message")
+          Timber.i("Queue at capacity ($capacity), cannot requeue message")
           return@withContext false
         }
 
@@ -247,6 +260,7 @@ class RoomBackedMessageQueue(
 
           dao.insert(entity)
           _queueSize.value = dao.getCount()
+          messageAvailableSignal.trySend(Unit)
           Timber.d("Requeued message to head with sequence $sequenceNumber")
           true
         } catch (e: Exception) {
@@ -262,7 +276,7 @@ class RoomBackedMessageQueue(
    *
    * @return The next message, or null if the queue is empty
    */
-  suspend fun dequeue(): MessageBase? {
+  override suspend fun dequeue(): MessageBase? {
     return withContext(ioDispatcher) {
       mutex.withLock {
         try {
@@ -296,13 +310,42 @@ class RoomBackedMessageQueue(
     }
   }
 
+  /**
+   * Suspends until a message is available and returns it. This is more efficient than polling as it
+   * uses a Channel to wait for signals when new messages are enqueued.
+   *
+   * @return The next message from the queue
+   * @throws kotlinx.coroutines.CancellationException if the coroutine is cancelled while waiting
+   */
+  override suspend fun awaitMessage(): MessageBase {
+    while (true) {
+      // Try to get a message first
+      val message = dequeue()
+      if (message != null) {
+        return message
+      }
+      // No message available, suspend until signaled
+      Timber.v("No message available, suspending until signaled")
+      messageAvailableSignal.receive()
+      Timber.v("Woke up from signal, checking for messages")
+    }
+  }
+
+  /**
+   * Signals any waiting consumers that a message may be available. Used to wake up suspended
+   * awaitMessage() calls, e.g., after connectivity changes.
+   */
+  override fun signalMessageAvailable() {
+    messageAvailableSignal.trySend(Unit)
+  }
+
   /** Returns the current size of the queue */
-  suspend fun size(): Int {
+  override suspend fun size(): Int {
     return withContext(ioDispatcher) { dao.getCount() }
   }
 
   /** Clears all messages from the queue */
-  suspend fun clear() {
+  override suspend fun clear() {
     withContext(ioDispatcher) {
       mutex.withLock {
         try {
@@ -317,7 +360,7 @@ class RoomBackedMessageQueue(
   }
 
   /** Closes the database connection */
-  fun close() {
+  override fun close() {
     db.close()
   }
 }

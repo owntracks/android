@@ -22,7 +22,7 @@ constructor(
   override suspend fun doWork(): Result {
     Timber.i("MQTT reconnect worker job started")
     if (!messageProcessor.isEndpointReady) {
-      return Result.failure().also { Timber.w("Unable to reconnect as endpoint is not ready") }
+      return Result.failure().also { Timber.d("Unable to reconnect as endpoint is not ready") }
     }
     return if (messageProcessor.reconnect().isSuccess) {
           Result.success()

@@ -33,8 +33,7 @@ class LoadActivity : AppCompatActivity() {
     enableEdgeToEdge()
     super.onCreate(savedInstanceState)
     binding =
-        DataBindingUtil.setContentView<UiPreferencesLoadBinding?>(
-                this, R.layout.ui_preferences_load)
+        DataBindingUtil.setContentView<UiPreferencesLoadBinding>(this, R.layout.ui_preferences_load)
             .apply {
               vm = viewModel
               lifecycleOwner = this@LoadActivity

@@ -57,7 +57,7 @@ class HttpMessageProcessorEndpoint(
     try {
       httpClientAndConfiguration = setClientAndConfiguration(applicationContext, preferences)
     } catch (e: ConfigurationIncompleteException) {
-      Timber.w(e)
+      Timber.e(e)
       scope.launch { endpointStateRepo.setState(EndpointState.ERROR_CONFIGURATION.withError(e)) }
     }
   }
