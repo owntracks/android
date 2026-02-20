@@ -41,12 +41,13 @@ fun <T : Distance> ScalarMeasurement<T>.toMetres(): ScalarMeasurement<Metres> {
 }
 
 /** Some extension functions */
-inline val Int.metres
-  get(): ScalarMeasurement<Metres> = this.to()
-inline val Int.feet
-  get(): ScalarMeasurement<Feet> = this.to()
-inline val Int.miles
-  get(): ScalarMeasurement<Miles> = this.to()
+inline fun <reified U : Unit> Int.toMeasurement(unit: (BigDecimal) -> U): ScalarMeasurement<U> =
+    ScalarMeasurement(unit(BigDecimal(this)))
+
+inline val Int.metres get() = toMeasurement(::Metres)
+inline val Int.feet   get() = toMeasurement(::Feet)
+inline val Int.miles  get() = toMeasurement(::Miles)
+
 inline val Double.metres
   get(): ScalarMeasurement<Metres> = this.to()
 inline val Double.feet
