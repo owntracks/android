@@ -5,6 +5,8 @@
 ### New features
 
 - Migrated message queue to use Room database instead of tape2 for better async performance and reliability
+- Updated map min zoom levels to allow viewing most of the world (#2176)
+
 
 ### Bug fixes
 
