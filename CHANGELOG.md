@@ -12,6 +12,7 @@
 
 - Fix slow starts by avoiding blocking the main thread on startup with the disk-backed queue.
 - Significantly reduced battery drain and improved responsiveness in MQTT mode during poor network conditions by changing reconnection retry strategy from linear to exponential backoff
+- Don't show the directions toolbar on Google Maps when the user selects a region
 
 ## Version 2.5.5
 

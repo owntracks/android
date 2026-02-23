@@ -129,8 +129,11 @@ internal constructor(
       setMaxZoomPreference(MAX_ZOOM_LEVEL.toFloat())
       setMinZoomPreference(MIN_ZOOM_LEVEL.toFloat())
       isIndoorEnabled = false
-      uiSettings.isMyLocationButtonEnabled = false
-      uiSettings.setAllGesturesEnabled(true)
+      uiSettings.apply {
+        isMyLocationButtonEnabled = false
+        isMapToolbarEnabled = false
+        setAllGesturesEnabled(true)
+      }
       preferences.enableMapRotation.run {
         uiSettings.isCompassEnabled = this
         uiSettings.isRotateGesturesEnabled = this
