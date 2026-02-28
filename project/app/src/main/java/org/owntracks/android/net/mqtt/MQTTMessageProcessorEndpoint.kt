@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.IntentFilter
 import android.net.ConnectivityManager
-import android.net.Network
 import android.os.Build
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
@@ -89,32 +88,16 @@ class MQTTMessageProcessorEndpoint(
 
   private var pingAlarmReceiver: BroadcastReceiver? = null
 
-  private val networkChangeCallback =
-      object : ConnectivityManager.NetworkCallback() {
-        var justRegistered = true
-
-        override fun onAvailable(network: Network) {
-          super.onAvailable(network)
-          Timber.v("Network becomes available")
-          if (!justRegistered &&
-              endpointStateRepo.endpointState.value == EndpointState.DISCONNECTED) {
-            Timber.v("Currently disconnected, so attempting reconnect")
-            scope.launch { reconnect() }
-          }
-          justRegistered = false
-        }
-
-        override fun onLost(network: Network) {
-          super.onLost(network)
-
-          scope.launch { connectingLock.withPermitLogged("network lost") { disconnect() } }
-        }
-      }
+  internal val networkChangeCallback =
+      NetworkTrackingCallback(
+          { endpointStateRepo.endpointState.value },
+          { scope.launch { reconnect() } },
+          { scope.launch { connectingLock.withPermitLogged("network lost") { disconnect() } } })
 
   override fun activate() {
     Timber.v("MQTT Activate")
     preferences.registerOnPreferenceChangedListener(this)
-    networkChangeCallback.justRegistered = true
+    networkChangeCallback.reset()
     connectivityManager.registerDefaultNetworkCallback(networkChangeCallback)
     scope.launch {
       try {
