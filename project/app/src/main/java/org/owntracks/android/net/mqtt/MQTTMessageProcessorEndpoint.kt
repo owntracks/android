@@ -92,7 +92,15 @@ class MQTTMessageProcessorEndpoint(
       NetworkTrackingCallback(
           { endpointStateRepo.endpointState.value },
           { scope.launch { reconnect() } },
-          { scope.launch { connectingLock.withPermitLogged("network lost") { disconnect() } } })
+          {
+            scope.launch {
+              connectingLock.withPermitLogged("network lost") { disconnect() }
+              // Schedule a reconnect in case onAvailable already ran and its reconnect completed
+              // before this coroutine acquired the lock — without this, the freshly-established
+              // connection is torn down and no further reconnect is ever triggered.
+              scheduler.scheduleMqttReconnect()
+            }
+          })
 
   override fun activate() {
     Timber.v("MQTT Activate")
