@@ -181,6 +181,7 @@ class MQTTRemoteCommandTests :
     clickOn(R.string.title_activity_waypoints)
 
     addWaypoint("test waypoint", "51.123", "0.456", "20")
+    Thread.sleep(1000) // ensure distinct epoch-second tst values (tst has second precision)
     addWaypoint("test waypoint 2", "51.00", "0.4", "25")
 
     openDrawer()

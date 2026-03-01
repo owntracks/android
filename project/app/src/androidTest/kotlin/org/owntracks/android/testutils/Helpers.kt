@@ -49,6 +49,7 @@ import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime
+import org.hamcrest.CoreMatchers.not
 import org.hamcrest.Matcher
 import org.owntracks.android.R
 import org.owntracks.android.preferences.Preferences
@@ -321,6 +322,26 @@ fun clickOnDrawerAndWait(text: Int) {
         else -> throw IllegalArgumentException("Unknown drawer item: $text")
       }
   onView(withId(menuItemId)).perform(click())
+}
+
+/**
+ * Polls until the view with [viewId] is not displayed, or throws if [timeout] is exceeded. Needed
+ * for views whose hide animation does not respect animator_duration_scale=0 (e.g.
+ * BottomSheetBehavior using SpringAnimation).
+ */
+fun waitUntilViewNotDisplayed(@IdRes viewId: Int, timeout: Long = TIMEOUT) {
+  val deadline = System.currentTimeMillis() + timeout
+  var lastError: Throwable? = null
+  while (System.currentTimeMillis() < deadline) {
+    try {
+      onView(withId(viewId)).check(matches(not(ViewMatchers.isDisplayed())))
+      return
+    } catch (e: Throwable) {
+      lastError = e
+      Thread.sleep(CONDITION_CHECK_INTERVAL)
+    }
+  }
+  throw lastError ?: AssertionError("Timed out waiting for view $viewId to not be displayed")
 }
 
 fun addWaypoint(description: String, latitude: String, longitude: String, radius: String) {
