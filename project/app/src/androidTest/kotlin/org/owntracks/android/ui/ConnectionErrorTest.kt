@@ -16,6 +16,7 @@ import kotlin.concurrent.thread
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.random.Random
+import kotlin.time.Duration.Companion.seconds
 import mqtt.broker.Broker
 import mqtt.broker.interfaces.Authentication
 import org.junit.Test
@@ -24,6 +25,7 @@ import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.use
+import org.owntracks.android.testutils.waitUntilViewContains
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import org.owntracks.android.ui.status.StatusActivity
 import socket.tls.TLSSettings
@@ -109,8 +111,8 @@ class ConnectionErrorTest : TestWithAnActivity<StatusActivity>(startActivity = t
     getBroker(port, username, password, tlsSettings).use {
       val config = encodeConfig(getConfig(port, username, password))
       setupActivity(config)
-      mqttConnectionIdlingResource.use { Espresso.onIdle() }
-      assertContains(R.id.connectedStatusMessage, R.string.statusEndpointStateMessageEOFError)
+      waitUntilViewContains(
+          R.id.connectedStatusMessage, R.string.statusEndpointStateMessageEOFError, 15.seconds)
     }
   }
 
