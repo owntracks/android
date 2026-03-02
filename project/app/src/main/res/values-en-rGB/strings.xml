@@ -253,6 +253,8 @@ The OpenCage privacy policy can be found &lt;a href=\"https://opencagedata.com/a
     <string name="publish">"Report Location"</string>
     <string name="radius">"Radius (m)"</string>
     <string name="reconnect">"Reconnect"</string>
+
+    <!-- Fuzzy -->
     <string name="requestLocationSent">"Request location command sent"</string>
     <string name="save">"Save"</string>
     <string name="select">"Select"</string>

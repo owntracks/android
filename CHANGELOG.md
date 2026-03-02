@@ -1,5 +1,15 @@
 # Changelog
 
+## Version 2.5.7
+
+### New features
+
+- Belgian and Estonian translations added
+
+### Bug fixes
+
+None
+
 ## Version 2.5.6
 
 ### New features
