@@ -12,7 +12,7 @@ plugins {
 apply<EspressoMetadataEmbeddingPlugin>()
 
 val googleMapsAPIKey =
-    System.getenv("GOOGLE_MAPS_API_KEY")?.toString()
+    System.getenv("GOOGLE_MAPS_API_KEY")
         ?: extra.get("google_maps_api_key")?.toString()
         ?: "PLACEHOLDER_API_KEY"
 
@@ -238,7 +238,6 @@ dependencies {
   implementation(libs.bundles.jackson)
   implementation(libs.square.tape2)
   implementation(libs.timber)
-  implementation(libs.apache.httpcore)
   implementation(libs.bundles.androidx.room)
   implementation(libs.bundles.objectbox.migration)
   implementation(libs.kotlin.datetime)

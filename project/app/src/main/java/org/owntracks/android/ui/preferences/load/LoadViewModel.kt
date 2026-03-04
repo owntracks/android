@@ -25,7 +25,6 @@ import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import org.apache.hc.core5.net.URIBuilder
 import org.owntracks.android.data.waypoints.WaypointsRepo
 import org.owntracks.android.di.CoroutineScopes
 import org.owntracks.android.model.Parser
@@ -142,17 +141,19 @@ constructor(
       } else if ("owntracks" == uri.scheme && "/config" == uri.path) {
         Timber.v("Importing config using owntracks: scheme")
 
-        val queryParams = URIBuilder(uri, Charsets.UTF_8).queryParams
-        val urlQueryParam: MutableList<String> = ArrayList()
-        val configQueryParam: MutableList<String> = ArrayList()
-        for (queryParam in queryParams) {
-          if (queryParam.name == "url") {
-            urlQueryParam.add(queryParam.value)
-          }
-          if (queryParam.name == "inline") {
-            configQueryParam.add(queryParam.value)
-          }
-        }
+        val queryParams =
+            uri.rawQuery
+                ?.split("&")
+                ?.mapNotNull { param ->
+                  val parts = param.split("=", limit = 2)
+                  if (parts.size == 2)
+                      java.net.URLDecoder.decode(parts[0], "UTF-8") to
+                          java.net.URLDecoder.decode(parts[1], "UTF-8")
+                  else null
+                }
+                ?.groupBy({ it.first }, { it.second }) ?: emptyMap()
+        val urlQueryParam = queryParams["url"] ?: emptyList()
+        val configQueryParam = queryParams["inline"] ?: emptyList()
         when {
           configQueryParam.size == 1 -> {
             val config: ByteArray = Base64.decode(configQueryParam[0].toByteArray())
