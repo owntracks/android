@@ -393,6 +393,25 @@ constructor(
                 LatLng(STARTING_LATITUDE, STARTING_LONGITUDE), STARTING_ZOOM)
       }
 
+  /**
+   * Returns a sensible map starting location for when the map is resumed, but only when in Device
+   * view mode. In Device mode, prefers the current blue dot location, then the most recently
+   * published location, then falls back to the Paris default. Returns null for other view modes so
+   * that the camera is left where the user last positioned it.
+   */
+  fun mapStartingLocationOnResume(): MapLocationZoomLevelAndRotation? {
+    if (viewMode != ViewMode.Device) return null
+    val currentZoom = locationRepo.mapViewWindowLocationAndZoom?.zoom ?: STARTING_ZOOM
+    return locationRepo.currentBlueDotOnMapLocation?.let {
+      MapLocationZoomLevelAndRotation(it, currentZoom)
+    }
+        ?: locationRepo.currentPublishedLocation.value?.let {
+          MapLocationZoomLevelAndRotation(it.toLatLng(), currentZoom)
+        }
+        ?: MapLocationZoomLevelAndRotation(
+            LatLng(STARTING_LATITUDE, STARTING_LONGITUDE), currentZoom)
+  }
+
   val orientationSensorEventListener =
       object : SensorEventListener {
         override fun onSensorChanged(maybeEvent: SensorEvent?) {

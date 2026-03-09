@@ -209,6 +209,7 @@ internal constructor(
     super.onResume()
     binding.googleMapView.onResume()
     setMapStyle()
+    viewModel.mapStartingLocationOnResume()?.run { googleMap?.animateCamera(toCameraUpdate()) }
   }
 
   override fun onLowMemory() {

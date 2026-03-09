@@ -9,6 +9,7 @@
 ### Bug fixes
 
 - Fix slow start caused by replacing the map SDK on every resume.
+- Fixed map to show a sensible view when the activity is being resumed
 
 ## Version 2.5.6
 

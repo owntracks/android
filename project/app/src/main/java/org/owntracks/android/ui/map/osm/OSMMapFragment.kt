@@ -330,6 +330,9 @@ internal constructor(
     super.onResume()
     mapView?.onResume()
     setMapStyle()
+    viewModel.mapStartingLocationOnResume()?.run {
+      mapView?.controller?.animateTo(latLng.toGeoPoint(), zoom, 0L, rotation)
+    }
   }
 
   override fun onPause() {
