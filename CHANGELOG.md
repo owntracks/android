@@ -8,7 +8,7 @@
 
 ### Bug fixes
 
-None
+- Fix slow start caused by replacing the map SDK on every resume.
 
 ## Version 2.5.6
 

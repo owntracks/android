@@ -648,12 +648,14 @@ class MapActivity :
   }
 
   override fun onResume() {
-    val mapFragment =
-        supportFragmentManager.fragmentFactory.instantiate(
-            this.classLoader,
-            MapFragment::class.java.name,
-        )
-    supportFragmentManager.commit(true) { replace(R.id.mapFragment, mapFragment, "map") }
+    if (supportFragmentManager.findFragmentByTag("map") == null) {
+      val mapFragment =
+          supportFragmentManager.fragmentFactory.instantiate(
+              this.classLoader,
+              MapFragment::class.java.name,
+          )
+      supportFragmentManager.commit(true) { replace(R.id.mapFragment, mapFragment, "map") }
+    }
     sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
     sensorManager?.let {
       orientationSensor = it.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
