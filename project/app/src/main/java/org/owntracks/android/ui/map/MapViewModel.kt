@@ -54,6 +54,11 @@ constructor(
     application: Application,
     private val requirementsChecker: RequirementsChecker
 ) : AndroidViewModel(application) {
+  // Reused buffers for Location.distanceBetween() calls. Two separate instances are required
+  // because the two call-sites run on different threads (main thread vs sensor callback thread).
+  private val locationDistanceResult = FloatArray(2)
+  private val sensorDistanceResult = FloatArray(2)
+
   // controls who the currently selected contact is
   private val mutableCurrentContact = MutableLiveData<Contact?>()
   val currentContact: LiveData<Contact?>
@@ -312,16 +317,15 @@ constructor(
 
   private fun updateActiveContactDistanceAndBearing(currentLocation: Location, contact: Contact) {
     contact.latLng?.run {
-      val distanceBetween = FloatArray(2)
       Location.distanceBetween(
           currentLocation.latitude,
           currentLocation.longitude,
           latitude.value,
           longitude.value,
-          distanceBetween)
-      mutableContactDistance.postValue(distanceBetween[0])
-      mutableContactBearing.postValue(distanceBetween[1])
-      mutableRelativeContactBearing.postValue(distanceBetween[1])
+          locationDistanceResult)
+      mutableContactDistance.postValue(locationDistanceResult[0])
+      mutableContactBearing.postValue(locationDistanceResult[1])
+      mutableRelativeContactBearing.postValue(locationDistanceResult[1])
     }
   }
 
@@ -420,14 +424,13 @@ constructor(
               currentLocation.value?.let { currentLocation ->
                 // Orientation is angle around the Z axis
                 val azimuth = (180 / Math.PI) * 2 * asin(event.values[2])
-                val distanceBetween = FloatArray(2)
                 Location.distanceBetween(
                     currentLocation.latitude,
                     currentLocation.longitude,
                     contactLatLng.latitude.value,
                     contactLatLng.longitude.value,
-                    distanceBetween)
-                mutableRelativeContactBearing.postValue(distanceBetween[1] + azimuth.toFloat())
+                    sensorDistanceResult)
+                mutableRelativeContactBearing.postValue(sensorDistanceResult[1] + azimuth.toFloat())
               }
             }
           }

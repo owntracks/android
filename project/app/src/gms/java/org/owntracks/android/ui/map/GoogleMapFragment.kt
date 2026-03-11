@@ -180,8 +180,6 @@ internal constructor(
 
   override fun updateMarkerOnMap(id: String, latLng: LatLng, image: Bitmap) {
     googleMap?.run { // If we don't have a google Map, we can't add markers to it
-      // Remove null markers from the collection
-      markersOnMap.values.removeAll { it.tag == null }
       markersOnMap
           .getOrPut(id) {
             addMarker(
@@ -200,7 +198,7 @@ internal constructor(
   }
 
   override fun removeMarkerFromMap(id: String) {
-    markersOnMap[id]?.remove()
+    markersOnMap.remove(id)?.remove()
   }
 
   override fun currentMarkersOnMap(): Set<String> = markersOnMap.keys

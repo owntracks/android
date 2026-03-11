@@ -291,6 +291,7 @@ internal constructor(
       val existingMarker: Marker? = overlays.firstOrNull { it is Marker && it.id == id } as Marker?
       if (existingMarker != null) {
         existingMarker.position = latLng.toGeoPoint()
+        existingMarker.icon = image.toDrawable(resources)
       } else if (activity?.isDestroyed == false) {
         /*
         There's a race condition where in the time it takes to create all the markers, the
@@ -303,6 +304,7 @@ internal constructor(
             Marker(this).apply {
               this.id = id
               position = latLng.toGeoPoint()
+              icon = image.toDrawable(resources)
               infoWindow = null
               setOnMarkerClickListener { marker, _ ->
                 onMarkerClicked(marker.id)
@@ -312,9 +314,6 @@ internal constructor(
             },
         )
       }
-      overlays
-          .firstOrNull { it is Marker && it.id == id }
-          ?.run { (this as Marker).icon = image.toDrawable(resources) }
       invalidate()
     }
   }
