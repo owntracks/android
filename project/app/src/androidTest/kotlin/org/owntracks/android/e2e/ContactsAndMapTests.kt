@@ -20,6 +20,7 @@ import org.owntracks.android.testutils.di.setLocation
 import org.owntracks.android.testutils.grantMapActivityPermissions
 import org.owntracks.android.testutils.setNotFirstStartPreferences
 import org.owntracks.android.testutils.use
+import org.owntracks.android.testutils.waitUntilViewDisplayed
 import org.owntracks.android.testutils.waitUntilViewNotDisplayed
 import org.owntracks.android.ui.map.MapActivity
 
@@ -58,6 +59,7 @@ class ContactsAndMapTests :
     clickOn("aa")
     waitUntilActivityVisible(MapActivity::class.java)
 
+    waitUntilViewDisplayed(R.id.bottomSheetLayout)
     assertDisplayed(R.id.bottomSheetLayout)
     assertDisplayed(R.id.contactPeek)
     assertContains(R.id.name, "aa")

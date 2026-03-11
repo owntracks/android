@@ -328,6 +328,40 @@ fun clickOnDrawerAndWait(text: Int) {
 }
 
 /**
+ * Polls until the view with [viewId] is displayed (on-screen and non-empty), or throws if [timeout]
+ * is exceeded. Needed for views whose show animation does not respect animator_duration_scale=0
+ * (e.g. BottomSheetBehavior using SpringAnimation).
+ */
+fun waitUntilViewDisplayed(@IdRes viewId: Int, timeout: Duration = TIMEOUT) {
+  val deadline = Clock.System.now().plus(timeout)
+  var lastError: Throwable? = null
+  while (Clock.System.now() < deadline) {
+    try {
+      onView(withId(viewId)).check(matches(ViewMatchers.isDisplayed()))
+      return
+    } catch (e: Throwable) {
+      lastError = e
+      Thread.sleep(CONDITION_CHECK_INTERVAL)
+    }
+  }
+  throw lastError ?: AssertionError("Timed out waiting for view $viewId to be displayed")
+}
+
+/**
+ * Polls until [condition] returns true, or throws if [timeout] is exceeded. Useful for waiting on
+ * external state that is not directly observable via an Espresso ViewInteraction (e.g. data
+ * received by a test MQTT broker).
+ */
+fun waitUntilTrue(timeout: Duration = TIMEOUT, condition: () -> Boolean) {
+  val deadline = Clock.System.now().plus(timeout)
+  while (Clock.System.now() < deadline) {
+    if (condition()) return
+    Thread.sleep(CONDITION_CHECK_INTERVAL)
+  }
+  throw AssertionError("Timed out waiting for condition to become true")
+}
+
+/**
  * Polls until the view with [viewId] is not displayed, or throws if [timeout] is exceeded. Needed
  * for views whose hide animation does not respect animator_duration_scale=0 (e.g.
  * BottomSheetBehavior using SpringAnimation).
