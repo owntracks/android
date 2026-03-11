@@ -1,8 +1,6 @@
 package org.owntracks.android.ui.preferences.load
 
 import android.content.ContentResolver
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,6 +17,8 @@ import javax.inject.Named
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import okhttp3.Call
 import okhttp3.Callback
@@ -48,22 +48,22 @@ constructor(
 ) : ViewModel() {
   private var configuration: MessageConfiguration? = null
 
-  private val mutableConfig = MutableLiveData("")
-  val displayedConfiguration: LiveData<String> = mutableConfig
+  private val mutableConfig = MutableStateFlow("")
+  val displayedConfiguration: StateFlow<String> = mutableConfig
 
-  private val mutableImportStatus = MutableLiveData(ImportStatus.LOADING)
-  val configurationImportStatus: LiveData<ImportStatus> = mutableImportStatus
+  private val mutableImportStatus = MutableStateFlow(ImportStatus.LOADING)
+  val configurationImportStatus: StateFlow<ImportStatus> = mutableImportStatus
 
-  private val mutableImportError = MutableLiveData<String>()
-  val importError: LiveData<String> = mutableImportError
+  private val mutableImportError = MutableStateFlow<String?>(null)
+  val importError: StateFlow<String?> = mutableImportError
 
   private fun setConfiguration(json: String) {
     when (val message = parser.fromJson(json.toByteArray())) {
       is MessageConfiguration -> {
         configuration = message
         try {
-          mutableConfig.postValue(parser.toUnencryptedJsonPretty(message))
-          mutableImportStatus.postValue(ImportStatus.SUCCESS)
+          mutableConfig.value = parser.toUnencryptedJsonPretty(message)
+          mutableImportStatus.value = ImportStatus.SUCCESS
         } catch (e: IOException) {
           configurationImportFailed(e)
         }
@@ -71,8 +71,8 @@ constructor(
       is MessageWaypoints -> {
         configuration = MessageConfiguration().apply { message.waypoints?.run { waypoints = this } }
         try {
-          mutableConfig.postValue(parser.toUnencryptedJsonPretty(message))
-          mutableImportStatus.postValue(ImportStatus.SUCCESS)
+          mutableConfig.value = parser.toUnencryptedJsonPretty(message)
+          mutableImportStatus.value = ImportStatus.SUCCESS
         } catch (e: IOException) {
           configurationImportFailed(e)
         }
@@ -86,7 +86,7 @@ constructor(
   fun saveConfiguration() {
     viewModelScope.launch(ioDispatcher) {
       saveConfigurationIdlingResource.setIdleState(false)
-      mutableImportStatus.postValue(ImportStatus.LOADING)
+      mutableImportStatus.value = ImportStatus.LOADING
       Timber.d("Saving configuration $configuration")
       configuration?.run {
         preferences.importConfiguration(this)
@@ -95,7 +95,7 @@ constructor(
         }
       }
       Timber.d("Setting ImportStatus to saved")
-      mutableImportStatus.postValue(ImportStatus.SAVED)
+      mutableImportStatus.value = ImportStatus.SAVED
       saveConfigurationIdlingResource.setIdleState(true)
     }
   }
@@ -211,7 +211,7 @@ constructor(
 
   fun configurationImportFailed(e: Throwable) {
     Timber.e(e)
-    mutableImportError.postValue(e.message)
-    mutableImportStatus.postValue(ImportStatus.FAILED)
+    mutableImportError.value = e.message
+    mutableImportStatus.value = ImportStatus.FAILED
   }
 }
