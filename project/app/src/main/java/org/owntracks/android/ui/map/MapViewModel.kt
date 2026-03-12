@@ -269,10 +269,7 @@ constructor(
 
   @MainThread
   fun setLiveContact(contactId: String?) {
-    contactId?.let {
-      locationRepo.viewMode = ViewMode.Contact(true)
-      contactsRepo.getById(it)?.run(mutableCurrentContact::setValue)
-    }
+    contactId?.let { setViewModeContact(it, true) }
   }
 
   private fun clearActiveContact() {
