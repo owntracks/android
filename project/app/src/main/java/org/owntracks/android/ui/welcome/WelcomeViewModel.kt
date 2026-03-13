@@ -1,50 +1,50 @@
 package org.owntracks.android.ui.welcome
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import org.owntracks.android.preferences.Preferences
 
 @HiltViewModel
 class WelcomeViewModel @Inject constructor(private val preferences: Preferences) : ViewModel() {
-  private val mutableCurrentFragmentPosition: MutableLiveData<Int> = MutableLiveData(0)
-  val currentFragmentPosition: LiveData<Int> = mutableCurrentFragmentPosition
+  private val mutableCurrentFragmentPosition = MutableStateFlow(0)
+  val currentFragmentPosition: StateFlow<Int> = mutableCurrentFragmentPosition
 
-  private val mutableNextEnabled = MutableLiveData(true)
-  val nextEnabled: LiveData<Boolean> = mutableNextEnabled
+  private val mutableNextEnabled = MutableStateFlow(true)
+  val nextEnabled: StateFlow<Boolean> = mutableNextEnabled
 
-  private val mutableDoneEnabled = MutableLiveData(false)
-  val doneEnabled: LiveData<Boolean> = mutableDoneEnabled
+  private val mutableDoneEnabled = MutableStateFlow(false)
+  val doneEnabled: StateFlow<Boolean> = mutableDoneEnabled
 
   fun moveToPage(position: Int) {
-    mutableCurrentFragmentPosition.postValue(position)
+    mutableCurrentFragmentPosition.value = position
   }
 
   fun nextPage() {
-    mutableNextEnabled.postValue(false)
-    moveToPage((currentFragmentPosition.value?.plus(1)) ?: 0)
+    mutableNextEnabled.value = false
+    moveToPage(currentFragmentPosition.value + 1)
   }
 
   fun previousPage() {
-    moveToPage((currentFragmentPosition.value?.minus(1)) ?: 0)
+    moveToPage(currentFragmentPosition.value - 1)
   }
 
   fun setWelcomeState(progressState: ProgressState) {
     when (progressState) {
       ProgressState.PERMITTED -> {
-        mutableNextEnabled.postValue(true)
-        mutableDoneEnabled.postValue(false)
+        mutableNextEnabled.value = true
+        mutableDoneEnabled.value = false
       }
       ProgressState.NOT_PERMITTED -> {
-        mutableNextEnabled.postValue(false)
-        mutableDoneEnabled.postValue(false)
+        mutableNextEnabled.value = false
+        mutableDoneEnabled.value = false
       }
       ProgressState.FINISHED -> {
         preferences.setupCompleted = true
-        mutableNextEnabled.postValue(false)
-        mutableDoneEnabled.postValue(true)
+        mutableNextEnabled.value = false
+        mutableDoneEnabled.value = true
       }
     }
   }
