@@ -17,7 +17,9 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.android.material.textfield.TextInputEditText
@@ -57,9 +59,13 @@ class EditorActivity : AppCompatActivity() {
             WindowInsetsCompat.CONSUMED
           }
         }
-    viewModel.configLoadError.observe(this) {
-      if (it != null) {
-        displayLoadFailed()
+    lifecycleScope.launch {
+      repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewModel.configLoadError.collect {
+          if (it != null) {
+            displayLoadFailed()
+          }
+        }
       }
     }
   }
