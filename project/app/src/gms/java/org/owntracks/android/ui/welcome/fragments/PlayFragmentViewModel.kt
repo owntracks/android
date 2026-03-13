@@ -1,26 +1,26 @@
 package org.owntracks.android.ui.welcome.fragments
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @HiltViewModel
 class PlayFragmentViewModel @Inject constructor() : ViewModel() {
   fun setPlayServicesAvailable(message: String) {
-    mutableMessage.postValue(message)
-    mutablePlayServicesFixAvailable.postValue(false)
+    mutableMessage.value = message
+    mutablePlayServicesFixAvailable.value = false
   }
 
   fun setPlayServicesNotAvailable(fixAvailable: Boolean, message: String) {
-    mutableMessage.postValue(message)
-    mutablePlayServicesFixAvailable.postValue(fixAvailable)
+    mutableMessage.value = message
+    mutablePlayServicesFixAvailable.value = fixAvailable
   }
 
-  private val mutableMessage = MutableLiveData<String>()
-  val message: LiveData<String> = mutableMessage
+  private val mutableMessage = MutableStateFlow("")
+  val message: StateFlow<String> = mutableMessage
 
-  private val mutablePlayServicesFixAvailable = MutableLiveData(false)
-  val playServicesFixAvailable: LiveData<Boolean> = mutablePlayServicesFixAvailable
+  private val mutablePlayServicesFixAvailable = MutableStateFlow(false)
+  val playServicesFixAvailable: StateFlow<Boolean> = mutablePlayServicesFixAvailable
 }
