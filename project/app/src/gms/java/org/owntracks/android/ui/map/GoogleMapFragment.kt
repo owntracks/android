@@ -174,7 +174,7 @@ internal constructor(
             })
       }
 
-      viewModel.mapLayerStyle.value?.run { setMapLayerType(this) }
+      setMapLayerType(viewModel.mapLayerStyle.value)
       drawAllContactsAndRegions()
     }
   }

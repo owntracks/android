@@ -8,8 +8,6 @@ import android.location.Location
 import androidx.annotation.MainThread
 import androidx.databinding.Observable
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -18,6 +16,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -39,7 +38,6 @@ import org.owntracks.android.model.messages.MessageClear
 import org.owntracks.android.model.messages.MessageCmd
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.preferences.Preferences
-import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.services.LocationProcessor
 import org.owntracks.android.services.MessageProcessor
@@ -66,43 +64,43 @@ constructor(
   private val sensorDistanceResult = FloatArray(2)
 
   // controls who the currently selected contact is
-  private val mutableCurrentContact = MutableLiveData<Contact?>()
-  val currentContact: LiveData<Contact?>
+  private val mutableCurrentContact = MutableStateFlow<Contact?>(null)
+  val currentContact: StateFlow<Contact?>
     get() = mutableCurrentContact
 
   // controls the state of the bottom sheet on the map
-  private val mutableBottomSheetHidden = MutableLiveData<Boolean>()
-  val bottomSheetHidden: LiveData<Boolean>
+  private val mutableBottomSheetHidden = MutableStateFlow(true)
+  val bottomSheetHidden: StateFlow<Boolean>
     get() = mutableBottomSheetHidden
 
-  // Controls where the map should set the camera to
-  private val mutableMapCenter = MutableLiveData<LatLng>()
-  val mapCenter: LiveData<LatLng>
+  // Controls where the map should set the camera to (fire-and-forget event)
+  private val mutableMapCenter = MutableSharedFlow<LatLng>(extraBufferCapacity = 1)
+  val mapCenter: SharedFlow<LatLng>
     get() = mutableMapCenter
 
   // Shows the current distance to the selected contact
-  private val mutableContactDistance = MutableLiveData(0f)
-  val contactDistance: LiveData<Float>
+  private val mutableContactDistance = MutableStateFlow(0f)
+  val contactDistance: StateFlow<Float>
     get() = mutableContactDistance
 
   // Shows the bearing to the selected contact
-  private val mutableContactBearing = MutableLiveData(0f)
-  val contactBearing: LiveData<Float>
+  private val mutableContactBearing = MutableStateFlow(0f)
+  val contactBearing: StateFlow<Float>
     get() = mutableContactBearing
 
   // Shows the relative bearing from this device orientation to the contact
-  private val mutableRelativeContactBearing = MutableLiveData(0f)
-  val relativeContactBearing: LiveData<Float>
+  private val mutableRelativeContactBearing = MutableStateFlow(0f)
+  val relativeContactBearing: StateFlow<Float>
     get() = mutableRelativeContactBearing
 
   // Controls the current map layer style
-  private val mutableMapLayerStyle = MutableLiveData(preferences.mapLayerStyle)
-  val mapLayerStyle: LiveData<MapLayerStyle>
+  private val mutableMapLayerStyle = MutableStateFlow(preferences.mapLayerStyle)
+  val mapLayerStyle: StateFlow<MapLayerStyle>
     get() = mutableMapLayerStyle
 
   // Controls the status of the MyLocation FAB on the map
-  private val mutableMyLocationStatus = MutableLiveData(MyLocationStatus.DISABLED)
-  val myLocationStatus: LiveData<MyLocationStatus>
+  private val mutableMyLocationStatus = MutableStateFlow(MyLocationStatus.DISABLED)
+  val myLocationStatus: StateFlow<MyLocationStatus>
     get() = mutableMyLocationStatus
 
   private val locationUpdatesRequested = MutableStateFlow(false)
@@ -126,16 +124,10 @@ constructor(
   val scope: CoroutineScope
     get() = viewModelScope
 
-  private val mutableCurrentMonitoringMode: MutableLiveData<MonitoringMode> by lazy {
-    MutableLiveData(preferences.monitoring)
-  }
+  private val mutableCurrentMonitoringMode = MutableStateFlow(preferences.monitoring)
 
-  val currentMonitoringMode: LiveData<MonitoringMode>
+  val currentMonitoringMode: StateFlow<MonitoringMode>
     get() = mutableCurrentMonitoringMode
-
-  private val currentConnectionMode: MutableLiveData<ConnectionMode> by lazy {
-    MutableLiveData(preferences.mode)
-  }
 
   val viewMode: ViewMode by locationRepo::viewMode
 
@@ -148,7 +140,7 @@ constructor(
    * update
    */
   fun updateMyLocationStatus() {
-    mutableMyLocationStatus.postValue(
+    mutableMyLocationStatus.value =
         if (requirementsChecker.hasLocationPermissions() &&
             requirementsChecker.isLocationServiceEnabled()) {
           if (viewMode == ViewMode.Device) {
@@ -158,7 +150,7 @@ constructor(
           }
         } else {
           MyLocationStatus.DISABLED
-        })
+        }
   }
 
   fun hasLocationPermission() = requirementsChecker.hasLocationPermissions()
@@ -167,10 +159,9 @@ constructor(
       object : Preferences.OnPreferenceChangeListener {
         override fun onPreferenceChanged(properties: Set<String>) {
           if (properties.contains("monitoring")) {
-            mutableCurrentMonitoringMode.postValue(preferences.monitoring)
+            mutableCurrentMonitoringMode.value = preferences.monitoring
           }
           if (properties.contains("mode")) {
-            currentConnectionMode.postValue(preferences.mode)
             clearActiveContact()
           }
         }
@@ -242,7 +233,7 @@ constructor(
               updateActiveContactDistanceAndBearing(this)
             }
             BR.trackerId -> {
-              mutableCurrentContact.postValue(this)
+              mutableCurrentContact.value = this
             }
           }
         }
@@ -260,7 +251,7 @@ constructor(
     mutableBottomSheetHidden.value = false
     refreshGeocodeForContact(contact)
     updateActiveContactDistanceAndBearing(contact)
-    if (center && contact.latLng != null) mutableMapCenter.postValue(contact.latLng)
+    if (center) contact.latLng?.let { mutableMapCenter.tryEmit(it) }
     updateMyLocationStatus()
   }
 
@@ -275,7 +266,7 @@ constructor(
     Timber.d("setting view mode: VIEW_DEVICE")
     locationRepo.viewMode = ViewMode.Device
     clearActiveContact()
-    currentLocation.value?.apply { mutableMapCenter.postValue(this.toLatLng()) }
+    currentLocation.value?.apply { mutableMapCenter.tryEmit(this.toLatLng()) }
         ?: run { Timber.w("no location available") }
     updateMyLocationStatus()
   }
@@ -287,8 +278,8 @@ constructor(
 
   private fun clearActiveContact() {
     mutableCurrentContact.value?.removeOnPropertyChangedCallback(contactPropertyChangedCallback)
-    mutableCurrentContact.postValue(null)
-    mutableBottomSheetHidden.postValue(true)
+    mutableCurrentContact.value = null
+    mutableBottomSheetHidden.value = true
   }
 
   fun onClearContactClicked() {
@@ -333,9 +324,9 @@ constructor(
           latitude.value,
           longitude.value,
           locationDistanceResult)
-      mutableContactDistance.postValue(locationDistanceResult[0])
-      mutableContactBearing.postValue(locationDistanceResult[1])
-      mutableRelativeContactBearing.postValue(locationDistanceResult[1])
+      mutableContactDistance.value = locationDistanceResult[0]
+      mutableContactBearing.value = locationDistanceResult[1]
+      mutableRelativeContactBearing.value = locationDistanceResult[1]
     }
   }
 
@@ -439,7 +430,7 @@ constructor(
                     contactLatLng.latitude.value,
                     contactLatLng.longitude.value,
                     sensorDistanceResult)
-                mutableRelativeContactBearing.postValue(sensorDistanceResult[1] + azimuth.toFloat())
+                mutableRelativeContactBearing.value = sensorDistanceResult[1] + azimuth.toFloat()
               }
             }
           }
@@ -456,7 +447,7 @@ constructor(
 
   fun setMapLayerStyle(mapLayerStyle: MapLayerStyle) {
     preferences.mapLayerStyle = mapLayerStyle
-    mutableMapLayerStyle.postValue(mapLayerStyle)
+    mutableMapLayerStyle.value = mapLayerStyle
   }
 
   companion object {

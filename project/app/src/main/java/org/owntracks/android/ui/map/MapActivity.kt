@@ -344,21 +344,29 @@ class MapActivity :
           }
         }
       }
-      currentContact.observe(this@MapActivity) { contact: Contact? ->
-        contact?.let {
-          binding.contactPeek.run {
-            image.setImageResource(0) // Remove old image before async loading the new one
-            lifecycleScope.launch {
-              contactImageBindingAdapter.run { image.setImageBitmap(getBitmapFromCache(it)) }
+      lifecycleScope.launch {
+        repeatOnLifecycle(Lifecycle.State.STARTED) {
+          currentContact.collect { contact: Contact? ->
+            contact?.let {
+              binding.contactPeek.run {
+                image.setImageResource(0) // Remove old image before async loading the new one
+                lifecycleScope.launch {
+                  contactImageBindingAdapter.run { image.setImageBitmap(getBitmapFromCache(it)) }
+                }
+              }
             }
           }
         }
       }
-      bottomSheetHidden.observe(this@MapActivity) { o: Boolean? ->
-        if (o == null || o) {
-          setBottomSheetHidden()
-        } else {
-          setBottomSheetCollapsed()
+      lifecycleScope.launch {
+        repeatOnLifecycle(Lifecycle.State.STARTED) {
+          bottomSheetHidden.collect { hidden ->
+            if (hidden) {
+              setBottomSheetHidden()
+            } else {
+              setBottomSheetCollapsed()
+            }
+          }
         }
       }
       lifecycleScope.launch {
@@ -373,7 +381,11 @@ class MapActivity :
           }
         }
       }
-      currentMonitoringMode.observe(this@MapActivity) { updateMonitoringModeMenu() }
+      lifecycleScope.launch {
+        repeatOnLifecycle(Lifecycle.State.STARTED) {
+          currentMonitoringMode.collect { updateMonitoringModeMenu() }
+        }
+      }
     }
 
     startService(this)
