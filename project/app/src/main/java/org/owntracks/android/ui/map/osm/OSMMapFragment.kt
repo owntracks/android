@@ -15,9 +15,11 @@ import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.drawable.toDrawable
-import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import kotlin.math.roundToInt
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.DelayedMapListener
 import org.osmdroid.events.MapListener
@@ -62,22 +64,26 @@ internal constructor(
 
   private val osmMapLocationSource: IMyLocationProvider =
       object : IMyLocationProvider {
-        private var locationObserver: Observer<Location>? = null
+        private var locationJob: Job? = null
 
         override fun startLocationProvider(myLocationConsumer: IMyLocationConsumer?): Boolean {
           val locationProvider: IMyLocationProvider = this
-          locationObserver =
-              Observer { location: Location ->
+          locationJob =
+              viewLifecycleOwner.lifecycleScope.launch {
+                viewModel.currentLocation.collect { location ->
+                  if (location != null) {
                     onLocationObserved(location) {
                       myLocationConsumer?.onLocationChanged(location, locationProvider)
                     }
                   }
-                  .apply { viewModel.currentLocation.observe(viewLifecycleOwner, this) }
+                }
+              }
           return true
         }
 
         override fun stopLocationProvider() {
-          locationObserver?.run(viewModel.currentLocation::removeObserver)
+          locationJob?.cancel()
+          locationJob = null
         }
 
         override fun getLastKnownLocation(): Location? {

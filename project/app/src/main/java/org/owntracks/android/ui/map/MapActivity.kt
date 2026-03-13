@@ -361,12 +361,16 @@ class MapActivity :
           setBottomSheetCollapsed()
         }
       }
-      currentLocation.observe(this@MapActivity) { location ->
-        if (location == null) {
-          disableLocationMenus()
-        } else {
-          enableLocationMenus()
-          binding.vm?.run { updateActiveContactDistanceAndBearing(location) }
+      lifecycleScope.launch {
+        repeatOnLifecycle(Lifecycle.State.STARTED) {
+          currentLocation.collect { location ->
+            if (location == null) {
+              disableLocationMenus()
+            } else {
+              enableLocationMenus()
+              binding.vm?.run { updateActiveContactDistanceAndBearing(location) }
+            }
+          }
         }
       }
       currentMonitoringMode.observe(this@MapActivity) { updateMonitoringModeMenu() }

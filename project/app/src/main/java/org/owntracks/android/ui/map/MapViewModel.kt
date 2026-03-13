@@ -17,6 +17,12 @@ import kotlin.math.asin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.owntracks.android.BR
 import org.owntracks.android.data.repos.ContactsRepo
@@ -99,7 +105,14 @@ constructor(
   val myLocationStatus: LiveData<MyLocationStatus>
     get() = mutableMyLocationStatus
 
-  val currentLocation = LocationLiveData(application, viewModelScope)
+  private val locationUpdatesRequested = MutableStateFlow(false)
+
+  @Suppress("MissingPermission") // Permission is checked in requestLocationUpdatesForBlueDot
+  @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+  val currentLocation: StateFlow<Location?> =
+      locationUpdatesRequested
+          .flatMapLatest { if (it) locationCallbackFlow(application) else emptyFlow() }
+          .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
   val waypointUpdatedEvent = waypointsRepo.repoChangedEvent
 
@@ -351,8 +364,7 @@ constructor(
   /** Start requesting location updates for the blue dot */
   fun requestLocationUpdatesForBlueDot() {
     if (requirementsChecker.hasLocationPermissions()) {
-      @Suppress("MissingPermission") // We've already checked for permissions
-      viewModelScope.launch { currentLocation.requestLocationUpdates() }
+      locationUpdatesRequested.value = true
     }
   }
 
