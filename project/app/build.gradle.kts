@@ -1,3 +1,4 @@
+import java.util.Properties
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
@@ -11,8 +12,12 @@ plugins {
 
 apply<EspressoMetadataEmbeddingPlugin>()
 
+val localProperties = Properties()
+rootProject.file("local.properties").takeIf { it.exists() }?.reader()?.use { localProperties.load(it) }
+
 val googleMapsAPIKey =
     System.getenv("GOOGLE_MAPS_API_KEY")?.toString()
+        ?: localProperties.getProperty("google_maps_api_key")
         ?: findProperty("google_maps_api_key")?.toString()
         ?: "PLACEHOLDER_API_KEY"
 

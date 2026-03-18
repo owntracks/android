@@ -133,12 +133,15 @@ fun PreferencesScreen(
     onStartConnection: () -> Unit,
     onStopConnection: () -> Unit,
     onTryReconnectNow: () -> Unit,
+    onSyncNow: () -> Unit = {},
     currentWifiSsid: String? = null,
     modifier: Modifier = Modifier
 ) {
     var currentScreen by rememberSaveable(stateSaver = PreferenceScreen.Saver) { mutableStateOf(PreferenceScreen.Root) }
     val endpointState by endpointStateRepo.endpointState.collectAsState()
     val nextReconnectTime by endpointStateRepo.nextReconnectTime.collectAsState()
+    val queueLength by endpointStateRepo.endpointQueueLength.collectAsState()
+    val lastSuccessfulSync by endpointStateRepo.lastSuccessfulMessageTime.collectAsState()
 
     Scaffold(
         topBar = {
@@ -179,6 +182,9 @@ fun PreferencesScreen(
                 onStopConnection = onStopConnection,
                 onReconnect = onReconnect,
                 onTryReconnectNow = onTryReconnectNow,
+                onSyncNow = onSyncNow,
+                queueLength = queueLength,
+                lastSuccessfulSync = lastSuccessfulSync,
                 currentWifiSsid = currentWifiSsid,
                 modifier = Modifier.weight(1f)
             )
@@ -207,6 +213,9 @@ fun PreferencesScreenContent(
     onStopConnection: () -> Unit,
     onReconnect: () -> Unit,
     onTryReconnectNow: () -> Unit,
+    onSyncNow: () -> Unit = {},
+    queueLength: Int = 0,
+    lastSuccessfulSync: java.time.Instant? = null,
     nextReconnectTime: java.time.Instant?,
     currentWifiSsid: String? = null,
     modifier: Modifier = Modifier
@@ -239,6 +248,9 @@ fun PreferencesScreenContent(
             onStopConnection = onStopConnection,
             onReconnect = onReconnect,
             onTryReconnectNow = onTryReconnectNow,
+            onSyncNow = onSyncNow,
+            queueLength = queueLength,
+            lastSuccessfulSync = lastSuccessfulSync,
             currentWifiSsid = currentWifiSsid,
             modifier = Modifier
                 .fillMaxSize()
@@ -292,6 +304,9 @@ fun ConnectionStatusCard(
     onStopConnection: () -> Unit,
     onReconnect: () -> Unit,
     onTryReconnectNow: () -> Unit,
+    onSyncNow: () -> Unit = {},
+    queueLength: Int = 0,
+    lastSuccessfulSync: java.time.Instant? = null,
     modifier: Modifier = Modifier
 ) {
     var isStartingConnection by remember { mutableStateOf(false) }
@@ -409,6 +424,25 @@ fun ConnectionStatusCard(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
+
+                    // Queue length and last sync info
+                    if (endpointState == EndpointState.CONNECTED || endpointState == EndpointState.IDLE || queueLength > 0) {
+                        if (queueLength > 0) {
+                            Text(
+                                text = stringResource(R.string.sync_status_queue_length) + ": $queueLength",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        if (lastSuccessfulSync != null) {
+                            Text(
+                                text = stringResource(R.string.sync_status_last_success) + ": " +
+                                    org.owntracks.android.support.DateFormatter.formatDate(lastSuccessfulSync),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
                 }
             }
 
@@ -506,6 +540,23 @@ fun ConnectionStatusCard(
                             Text(stringResource(R.string.connectionStart))
                         }
                     }
+                }
+            }
+
+            // Sync Now button - shown when connected and there are queued messages
+            if (queueLength > 0 && (endpointState == EndpointState.CONNECTED || endpointState == EndpointState.IDLE)) {
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedButton(
+                    onClick = onSyncNow,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(stringResource(R.string.sync_status_sync_now))
                 }
             }
         }
@@ -667,6 +718,9 @@ private fun PreferencesScreenInner(
     onStopConnection: () -> Unit,
     onReconnect: () -> Unit,
     onTryReconnectNow: () -> Unit,
+    onSyncNow: () -> Unit = {},
+    queueLength: Int = 0,
+    lastSuccessfulSync: java.time.Instant? = null,
     currentWifiSsid: String? = null,
     modifier: Modifier = Modifier
 ) {
@@ -694,6 +748,9 @@ private fun PreferencesScreenInner(
             onStopConnection = onStopConnection,
             onReconnect = onReconnect,
             onTryReconnectNow = onTryReconnectNow,
+            onSyncNow = onSyncNow,
+            queueLength = queueLength,
+            lastSuccessfulSync = lastSuccessfulSync,
             currentWifiSsid = currentWifiSsid,
             modifier = modifier
         )

@@ -3,55 +3,33 @@ package org.owntracks.android.ui.map
 import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.hardware.SensorManager.SENSOR_DELAY_UI
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.border
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CloudDone
-import androidx.compose.material.icons.filled.CloudOff
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.owntracks.android.R
 import org.owntracks.android.data.EndpointState
-import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.support.ContactImageBindingAdapter
-import timber.log.Timber
 
 /**
  * TopAppBar for the Contacts screen.
@@ -72,37 +50,18 @@ fun ContactsTopAppBar(
 }
 
 /**
- * TopAppBar for the Map screen with monitoring mode and report buttons.
+ * TopAppBar for the Map screen with connection status and report buttons.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapTopAppBar(
-    monitoringMode: MonitoringMode,
     sendingLocation: Boolean,
     endpointState: EndpointState,
     queueLength: Int,
-    onMonitoringClick: () -> Unit,
     onReportClick: () -> Unit,
-    onSyncStatusClick: () -> Unit,
+    onConnectionClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val monitoringIcon = when (monitoringMode) {
-        MonitoringMode.Quiet -> R.drawable.ic_baseline_stop_36
-        MonitoringMode.Manual -> R.drawable.ic_baseline_pause_36
-        MonitoringMode.Significant -> R.drawable.ic_baseline_play_arrow_36
-        MonitoringMode.Move -> R.drawable.ic_step_forward_2
-    }
-
-    // Use shorter titles for accessibility
-    val monitoringTitle = when (monitoringMode) {
-        MonitoringMode.Quiet -> R.string.monitoringModeDialogQuietTitle
-        MonitoringMode.Manual -> R.string.monitoringModeDialogManualTitle
-        MonitoringMode.Significant -> R.string.monitoringModeDialogSignificantTitle
-        MonitoringMode.Move -> R.string.monitoringModeDialogMoveTitle
-    }
-
-    // Color logging
-    val primaryColor = MaterialTheme.colorScheme.primary
     val onPrimaryColor = MaterialTheme.colorScheme.onPrimary
     val onErrorContainerColor = MaterialTheme.colorScheme.onErrorContainer
 
@@ -110,66 +69,27 @@ fun MapTopAppBar(
         endpointState == EndpointState.ERROR_CONFIGURATION
     val isDisconnected = endpointState == EndpointState.DISCONNECTED
 
-    // Use onErrorContainer for error state - it's darker and contrasts better with primary background
     val syncIconTint = when {
         isSyncError -> onErrorContainerColor
         isDisconnected -> onPrimaryColor.copy(alpha = 0.5f)
         else -> onPrimaryColor
     }
 
-    LaunchedEffect(endpointState) {
-        Timber.d("MapTopAppBar colors - TopBar background (primary): #${Integer.toHexString(primaryColor.toArgb())}")
-        Timber.d("MapTopAppBar colors - onPrimary: #${Integer.toHexString(onPrimaryColor.toArgb())}")
-        Timber.d("MapTopAppBar colors - onErrorContainer: #${Integer.toHexString(onErrorContainerColor.toArgb())}")
-        Timber.d("MapTopAppBar colors - endpointState: $endpointState, isSyncError: $isSyncError, isDisconnected: $isDisconnected")
-        Timber.d("MapTopAppBar colors - syncIconTint: #${Integer.toHexString(syncIconTint.toArgb())}")
-    }
-
     TopAppBar(
-        title = { },
-        navigationIcon = {
-            // Monitoring mode button with "Mode:" label and icon
-            Box(
-                modifier = Modifier
-                    .padding(start = 8.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.15f))
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f),
-                        shape = RoundedCornerShape(16.dp)
-                    )
-                    .clickable(onClick = onMonitoringClick)
-                    .padding(horizontal = 12.dp, vertical = 6.dp)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Text(
-                        text = "Mode:",
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        style = MaterialTheme.typography.labelMedium
-                    )
-                    Icon(
-                        painter = painterResource(monitoringIcon),
-                        contentDescription = stringResource(monitoringTitle),
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-            }
-        },
+        title = { Text(stringResource(R.string.title_activity_map)) },
         actions = {
-            // Sync status icon button
-            val isSynced = queueLength == 0 && (endpointState == EndpointState.CONNECTED ||
-                endpointState == EndpointState.IDLE)
+            // Connection status icon button - navigates to connection settings
+            val connectionIconRes = when (endpointState) {
+                EndpointState.CONNECTED -> if (queueLength > 0) R.drawable.cloud_upload else R.drawable.cloud_done
+                EndpointState.IDLE -> R.drawable.cloud_off
+                else -> R.drawable.cloud_alert
+            }
 
-            IconButton(onClick = onSyncStatusClick) {
+            IconButton(onClick = onConnectionClick) {
                 Icon(
-                    imageVector = if (isSynced) Icons.Filled.CloudDone else Icons.Filled.CloudOff,
-                    contentDescription = stringResource(R.string.sync_status_content_description),
-                    tint = MaterialTheme.colorScheme.onPrimary
+                    painter = painterResource(connectionIconRes),
+                    contentDescription = stringResource(R.string.connectionStatusContentDescription),
+                    tint = syncIconTint
                 )
             }
 
@@ -194,133 +114,11 @@ fun MapTopAppBar(
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primary
+            containerColor = MaterialTheme.colorScheme.primary,
+            titleContentColor = MaterialTheme.colorScheme.onPrimary
         ),
         modifier = modifier
     )
-}
-
-/**
- * Bottom sheet for selecting monitoring mode.
- */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun MonitoringModeBottomSheet(
-    onDismiss: () -> Unit,
-    onModeSelected: (MonitoringMode) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = sheetState,
-        modifier = modifier
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 24.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.monitoringModeDialogTitle),
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 12.dp)
-            )
-
-            // First row: Significant and Move
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(IntrinsicSize.Min)
-                    .padding(bottom = 24.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                MonitoringModeOption(
-                    iconRes = R.drawable.ic_baseline_play_arrow_36,
-                    title = stringResource(R.string.monitoringModeDialogSignificantTitle),
-                    description = stringResource(R.string.monitoringModeDialogSignificantDescription),
-                    onClick = { onModeSelected(MonitoringMode.Significant) },
-                    modifier = Modifier.weight(1f).fillMaxHeight()
-                )
-                MonitoringModeOption(
-                    iconRes = R.drawable.ic_step_forward_2,
-                    title = stringResource(R.string.monitoringModeDialogMoveTitle),
-                    description = stringResource(R.string.monitoringModeDialogMoveDescription),
-                    onClick = { onModeSelected(MonitoringMode.Move) },
-                    modifier = Modifier.weight(1f).fillMaxHeight()
-                )
-            }
-
-            // Second row: Manual and Quiet
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(IntrinsicSize.Min)
-                    .padding(bottom = 24.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                MonitoringModeOption(
-                    iconRes = R.drawable.ic_baseline_pause_36,
-                    title = stringResource(R.string.monitoringModeDialogManualTitle),
-                    description = stringResource(R.string.monitoringModeDialogManualDescription),
-                    onClick = { onModeSelected(MonitoringMode.Manual) },
-                    modifier = Modifier.weight(1f).fillMaxHeight()
-                )
-                MonitoringModeOption(
-                    iconRes = R.drawable.ic_baseline_stop_36,
-                    title = stringResource(R.string.monitoringModeDialogQuietTitle),
-                    description = stringResource(R.string.monitoringModeDialogQuietDescription),
-                    onClick = { onModeSelected(MonitoringMode.Quiet) },
-                    modifier = Modifier.weight(1f).fillMaxHeight()
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun MonitoringModeOption(
-    iconRes: Int,
-    title: String,
-    description: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-            .clickable(onClick = onClick)
-            .padding(horizontal = 8.dp, vertical = 12.dp)
-    ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .size(64.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primaryContainer)
-        ) {
-            Icon(
-                painter = painterResource(iconRes),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                modifier = Modifier.size(36.dp)
-            )
-        }
-        Text(
-            text = title,
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
-        )
-        Text(
-            text = description,
-            style = MaterialTheme.typography.bodySmall,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    }
 }
 
 /**

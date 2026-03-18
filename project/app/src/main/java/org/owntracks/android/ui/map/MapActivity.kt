@@ -67,7 +67,6 @@ import org.owntracks.android.R
 import org.owntracks.android.location.roundForDisplay
 import org.owntracks.android.model.Contact
 import org.owntracks.android.preferences.Preferences
-import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.services.BackgroundService.Companion.BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG
 import org.owntracks.android.support.ContactImageBindingAdapter
@@ -185,14 +184,12 @@ class MapActivity :
         val scope = rememberCoroutineScope()
 
         // Observe state from ViewModel
-        val monitoringMode by viewModel.currentMonitoringMode.observeAsState(MonitoringMode.Significant)
         val currentLocation by viewModel.currentLocation.observeAsState()
         val sendingLocation by viewModel.sendingLocation.observeAsState(false)
 
-        // Sync status state
+        // Connection state
         val endpointState by viewModel.endpointState.collectAsStateWithLifecycle()
         val queueLength by viewModel.queueLength.collectAsStateWithLifecycle()
-        val lastSuccessfulSync by viewModel.lastSuccessfulSync.collectAsStateWithLifecycle()
         val nextReconnectTime by viewModel.nextReconnectTime.collectAsStateWithLifecycle()
 
         // Send location when GPS fix becomes available while waiting
@@ -201,12 +198,6 @@ class MapActivity :
             viewModel.onLocationAvailableWhileSending(currentLocation!!)
           }
         }
-
-        // State for monitoring mode bottom sheet
-        var showMonitoringSheet by remember { mutableStateOf(false) }
-
-        // State for sync status dialog
-        var showSyncStatusDialog by remember { mutableStateOf(false) }
 
         // State for waypoints menu and export trigger
         var showWaypointsMenu by remember { mutableStateOf(false) }
@@ -253,13 +244,14 @@ class MapActivity :
               when (currentDestination) {
                 Destination.Map -> {
                   MapTopAppBar(
-                      monitoringMode = monitoringMode,
                       sendingLocation = sendingLocation,
                       endpointState = endpointState,
                       queueLength = queueLength,
-                      onMonitoringClick = { showMonitoringSheet = true },
                       onReportClick = { viewModel.sendLocation() },
-                      onSyncStatusClick = { showSyncStatusDialog = true }
+                      onConnectionClick = {
+                        navController.navigateToDestination(Destination.Preferences)
+                        preferencesCurrentScreen = PreferenceScreen.Connection
+                      }
                   )
                 }
                 Destination.Contacts -> {
@@ -367,6 +359,9 @@ class MapActivity :
                 onStopConnection = { viewModel.stopConnection() },
                 onReconnect = { viewModel.reconnect() },
                 onTryReconnectNow = { viewModel.tryReconnectNow() },
+                onSyncNow = { viewModel.triggerSync() },
+                queueLength = queueLength,
+                lastSuccessfulSync = viewModel.lastSuccessfulSync.collectAsStateWithLifecycle().value,
                 currentWifiSsid = wifiInfoProvider.getSSID(),
                 modifier = Modifier.fillMaxSize()
             )
@@ -392,28 +387,6 @@ class MapActivity :
               )
             }
           }
-        }
-
-        // Monitoring mode bottom sheet
-        if (showMonitoringSheet) {
-          MonitoringModeBottomSheet(
-              onDismiss = { showMonitoringSheet = false },
-              onModeSelected = { mode ->
-                viewModel.setMonitoringMode(mode)
-                showMonitoringSheet = false
-              }
-          )
-        }
-
-        // Sync status dialog
-        if (showSyncStatusDialog) {
-          SyncStatusDialog(
-              endpointState = endpointState,
-              queueLength = queueLength,
-              lastSuccessfulSync = lastSuccessfulSync,
-              onDismiss = { showSyncStatusDialog = false },
-              onSyncNow = { viewModel.triggerSync() }
-          )
         }
 
         // Custom toast overlay

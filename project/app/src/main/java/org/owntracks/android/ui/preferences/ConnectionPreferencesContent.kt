@@ -42,6 +42,9 @@ fun ConnectionPreferencesContent(
     onStopConnection: () -> Unit,
     onReconnect: () -> Unit,
     onTryReconnectNow: () -> Unit,
+    onSyncNow: () -> Unit = {},
+    queueLength: Int = 0,
+    lastSuccessfulSync: java.time.Instant? = null,
     currentWifiSsid: String? = null,
     modifier: Modifier = Modifier
 ) {
@@ -87,7 +90,10 @@ fun ConnectionPreferencesContent(
             onStartConnection = onStartConnection,
             onStopConnection = onStopConnection,
             onReconnect = onReconnect,
-            onTryReconnectNow = onTryReconnectNow
+            onTryReconnectNow = onTryReconnectNow,
+            onSyncNow = onSyncNow,
+            queueLength = queueLength,
+            lastSuccessfulSync = lastSuccessfulSync
         )
 
         // Endpoint section

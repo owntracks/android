@@ -9,17 +9,32 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import org.owntracks.android.R
 import org.owntracks.android.preferences.Preferences
+import org.owntracks.android.preferences.types.MonitoringMode
 
 @Composable
 fun ReportingPreferencesContent(
     preferences: Preferences,
     modifier: Modifier = Modifier
 ) {
+    val monitoringModeEntries = listOf(
+        MonitoringMode.Quiet to stringResource(R.string.monitoringModeDialogQuietTitle),
+        MonitoringMode.Manual to stringResource(R.string.monitoringModeDialogManualTitle),
+        MonitoringMode.Significant to stringResource(R.string.monitoringModeDialogSignificantTitle),
+        MonitoringMode.Move to stringResource(R.string.monitoringModeDialogMoveTitle)
+    )
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
+        ListPreference(
+            title = stringResource(R.string.monitoringModeDialogTitle),
+            value = preferences.monitoring,
+            entries = monitoringModeEntries,
+            onValueChange = { preferences.monitoring = it }
+        )
+
         SwitchPreference(
             title = stringResource(R.string.preferencesPubExtendedData),
             summary = stringResource(R.string.preferencesPubExtendedDataSummary),

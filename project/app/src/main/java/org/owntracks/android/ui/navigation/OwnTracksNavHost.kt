@@ -70,6 +70,9 @@ fun OwnTracksNavHost(
     onStopConnection: () -> Unit = {},
     onReconnect: () -> Unit = {},
     onTryReconnectNow: () -> Unit = {},
+    onSyncNow: () -> Unit = {},
+    queueLength: Int = 0,
+    lastSuccessfulSync: java.time.Instant? = null,
     currentWifiSsid: String? = null
 ) {
     val context = LocalContext.current
@@ -225,6 +228,9 @@ fun OwnTracksNavHost(
                     onStopConnection = onStopConnection,
                     onReconnect = onReconnect,
                     onTryReconnectNow = onTryReconnectNow,
+                    onSyncNow = onSyncNow,
+                    queueLength = queueLength,
+                    lastSuccessfulSync = lastSuccessfulSync,
                     nextReconnectTime = nextReconnectTime,
                     currentWifiSsid = currentWifiSsid,
                     modifier = Modifier.fillMaxSize()
