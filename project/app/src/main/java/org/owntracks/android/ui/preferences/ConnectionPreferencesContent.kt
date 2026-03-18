@@ -53,6 +53,20 @@ fun ConnectionPreferencesContent(
     var localNetworkEnabled by remember { mutableStateOf(preferences.localNetworkEnabled) }
     var localNetworkTlsEnabled by remember { mutableStateOf(preferences.localNetworkTls) }
 
+    // String preferences also need local state for recomposition
+    var host by remember { mutableStateOf(preferences.host) }
+    var url by remember { mutableStateOf(preferences.url) }
+    var port by remember { mutableStateOf(preferences.port) }
+    var clientId by remember { mutableStateOf(preferences.clientId) }
+    var deviceId by remember { mutableStateOf(preferences.deviceId) }
+    var tid by remember { mutableStateOf(preferences.tid.toString()) }
+    var username by remember { mutableStateOf(preferences.username) }
+    var password by remember { mutableStateOf(preferences.password) }
+    var keepalive by remember { mutableStateOf(preferences.keepalive) }
+    var localNetworkSsid by remember { mutableStateOf(preferences.localNetworkSsid) }
+    var localNetworkHost by remember { mutableStateOf(preferences.localNetworkHost) }
+    var localNetworkPort by remember { mutableStateOf(preferences.localNetworkPort) }
+
     val modeEntries = listOf(
         ConnectionMode.MQTT to stringResource(R.string.mode_mqtt_private_label),
         ConnectionMode.HTTP to stringResource(R.string.mode_http_private_label)
@@ -94,8 +108,11 @@ fun ConnectionPreferencesContent(
         if (preferences.mode == ConnectionMode.HTTP) {
             EditTextPreference(
                 title = stringResource(R.string.preferencesUrl),
-                value = preferences.url,
-                onValueChange = { preferences.url = it },
+                value = url,
+                onValueChange = {
+                    preferences.url = it
+                    url = it
+                },
                 keyboardType = KeyboardType.Uri,
                 validator = { it.toHttpUrlOrNull() != null },
                 validationError = stringResource(R.string.preferencesUrlValidationError)
@@ -106,8 +123,11 @@ fun ConnectionPreferencesContent(
         if (preferences.mode == ConnectionMode.MQTT) {
             EditTextPreference(
                 title = stringResource(R.string.preferencesHost),
-                value = preferences.host,
-                onValueChange = { preferences.host = it },
+                value = host,
+                onValueChange = {
+                    preferences.host = it
+                    host = it
+                },
                 keyboardType = KeyboardType.Uri,
                 validator = { it.isNotBlank() },
                 validationError = stringResource(R.string.preferencesHostValidationError)
@@ -115,9 +135,12 @@ fun ConnectionPreferencesContent(
 
             EditIntPreference(
                 title = stringResource(R.string.preferencesPort),
-                value = preferences.port,
-                onValueChange = { preferences.port = it },
-                summary = preferences.port.toString(),
+                value = port,
+                onValueChange = {
+                    preferences.port = it
+                    port = it
+                },
+                summary = port.toString(),
                 minValue = 1,
                 maxValue = 65535,
                 validationError = stringResource(R.string.preferencesPortValidationError)
@@ -125,8 +148,11 @@ fun ConnectionPreferencesContent(
 
             EditTextPreference(
                 title = stringResource(R.string.preferencesClientId),
-                value = preferences.clientId,
-                onValueChange = { preferences.clientId = it },
+                value = clientId,
+                onValueChange = {
+                    preferences.clientId = it
+                    clientId = it
+                },
                 validator = { it.isNotBlank() && it.length <= 23 },
                 validationError = stringResource(R.string.preferencesClientIdValidationError)
             )
@@ -146,17 +172,21 @@ fun ConnectionPreferencesContent(
 
         EditTextPreference(
             title = stringResource(R.string.preferencesDeviceName),
-            value = preferences.deviceId,
-            onValueChange = { preferences.deviceId = it },
+            value = deviceId,
+            onValueChange = {
+                preferences.deviceId = it
+                deviceId = it
+            },
             validator = { it.isNotBlank() },
             validationError = stringResource(R.string.preferencesDeviceNameValidationError)
         )
 
         EditTextPreference(
             title = stringResource(R.string.preferencesTrackerId),
-            value = preferences.tid.toString(),
+            value = tid,
             onValueChange = {
                 preferences.tid = org.owntracks.android.preferences.types.StringMaxTwoAlphaNumericChars(it)
+                tid = it
             },
             validator = { it.isNotBlank() && it.length <= 2 },
             validationError = stringResource(R.string.preferencesTrackerIdValidationError)
@@ -167,14 +197,20 @@ fun ConnectionPreferencesContent(
 
         EditTextPreference(
             title = stringResource(R.string.preferencesUsername),
-            value = preferences.username,
-            onValueChange = { preferences.username = it }
+            value = username,
+            onValueChange = {
+                preferences.username = it
+                username = it
+            }
         )
 
         EditTextPreference(
             title = stringResource(R.string.preferencesBrokerPassword),
-            value = preferences.password,
-            onValueChange = { preferences.password = it },
+            value = password,
+            onValueChange = {
+                preferences.password = it
+                password = it
+            },
             isPassword = true
         )
 
@@ -249,9 +285,12 @@ fun ConnectionPreferencesContent(
 
             EditIntPreference(
                 title = stringResource(R.string.preferencesKeepalive),
-                value = preferences.keepalive,
-                onValueChange = { preferences.keepalive = it },
-                summary = preferences.keepalive.toString(),
+                value = keepalive,
+                onValueChange = {
+                    preferences.keepalive = it
+                    keepalive = it
+                },
+                summary = keepalive.toString(),
                 dialogMessage = stringResource(R.string.preferencesKeepaliveDialogMessage),
                 minValue = 0,
                 validationError = stringResource(R.string.preferencesKeepaliveValidationError, 0)
@@ -282,24 +321,33 @@ fun ConnectionPreferencesContent(
             if (localNetworkEnabled) {
                 EditTextWithButtonPreference(
                     title = stringResource(R.string.preferencesLocalNetworkSsid),
-                    value = preferences.localNetworkSsid,
-                    onValueChange = { preferences.localNetworkSsid = it },
+                    value = localNetworkSsid,
+                    onValueChange = {
+                        preferences.localNetworkSsid = it
+                        localNetworkSsid = it
+                    },
                     buttonLabel = stringResource(R.string.preferencesLocalNetworkUseCurrentSsid),
                     onButtonClick = { currentWifiSsid }
                 )
 
                 EditTextPreference(
                     title = stringResource(R.string.preferencesLocalNetworkHost),
-                    value = preferences.localNetworkHost,
-                    onValueChange = { preferences.localNetworkHost = it },
+                    value = localNetworkHost,
+                    onValueChange = {
+                        preferences.localNetworkHost = it
+                        localNetworkHost = it
+                    },
                     keyboardType = KeyboardType.Uri
                 )
 
                 EditIntPreference(
                     title = stringResource(R.string.preferencesLocalNetworkPort),
-                    value = preferences.localNetworkPort,
-                    onValueChange = { preferences.localNetworkPort = it },
-                    summary = preferences.localNetworkPort.toString(),
+                    value = localNetworkPort,
+                    onValueChange = {
+                        preferences.localNetworkPort = it
+                        localNetworkPort = it
+                    },
+                    summary = localNetworkPort.toString(),
                     minValue = 1,
                     maxValue = 65535,
                     validationError = stringResource(R.string.preferencesPortValidationError)
@@ -316,8 +364,8 @@ fun ConnectionPreferencesContent(
 
                 // Show info card when currently on local network
                 val isOnLocalNetwork = currentWifiSsid != null &&
-                        preferences.localNetworkSsid.isNotBlank() &&
-                        currentWifiSsid == preferences.localNetworkSsid
+                        localNetworkSsid.isNotBlank() &&
+                        currentWifiSsid == localNetworkSsid
 
                 if (isOnLocalNetwork) {
                     Card(
