@@ -274,6 +274,10 @@ constructor(
   @Preference(exportModeHttp = false) var localNetworkPort: Int by preferencesStore
   @Preference(exportModeHttp = false) var localNetworkTls: Boolean by preferencesStore
 
+  @Preference var dataRetentionHours: Int by preferencesStore
+
+  @Preference var sentDataRetentionHours: Int by preferencesStore
+
   @Preference var extendedData: Boolean by preferencesStore
 
   @Preference(exportModeHttp = false) var pubQos: MqttQos by preferencesStore

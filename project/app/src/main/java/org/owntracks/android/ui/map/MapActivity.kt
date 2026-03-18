@@ -148,6 +148,10 @@ class MapActivity :
 
   @Inject lateinit var wifiInfoProvider: org.owntracks.android.net.WifiInfoProvider
 
+  @Inject lateinit var sentMessagesRepo: org.owntracks.android.data.repos.SentMessagesRepo
+
+  @Inject lateinit var messageProcessorForPrefs: org.owntracks.android.services.MessageProcessor
+
   private val serviceConnection =
       object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -360,6 +364,12 @@ class MapActivity :
                 onReconnect = { viewModel.reconnect() },
                 onTryReconnectNow = { viewModel.tryReconnectNow() },
                 onSyncNow = { viewModel.triggerSync() },
+                onDeleteSentData = {
+                  lifecycleScope.launch { sentMessagesRepo.clearAll() }
+                },
+                onResendSentData = {
+                  lifecycleScope.launch { messageProcessorForPrefs.resendAllSentMessages() }
+                },
                 queueLength = queueLength,
                 lastSuccessfulSync = viewModel.lastSuccessfulSync.collectAsStateWithLifecycle().value,
                 currentWifiSsid = wifiInfoProvider.getSSID(),

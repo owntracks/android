@@ -30,6 +30,7 @@ import org.owntracks.android.data.EndpointState
 import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.data.repos.EndpointStateRepo
 import org.owntracks.android.data.repos.RoomBackedMessageQueue
+import org.owntracks.android.data.repos.SentMessagesRepo
 import org.owntracks.android.data.waypoints.WaypointsRepo
 import org.owntracks.android.di.ApplicationScope
 import org.owntracks.android.di.CoroutineScopes.IoDispatcher
@@ -82,7 +83,8 @@ constructor(
     @Named("mqttConnectionIdlingResource")
     private val mqttConnectionIdlingResource: SimpleIdlingResource,
     private val outgoingQueue: RoomBackedMessageQueue,
-    private val wifiInfoProvider: WifiInfoProvider
+    private val wifiInfoProvider: WifiInfoProvider,
+    private val sentMessagesRepo: SentMessagesRepo
 ) : Preferences.OnPreferenceChangeListener {
   private var endpoint: MessageProcessorEndpoint? = null
   private val queueInitJob: Job =
@@ -115,6 +117,11 @@ constructor(
     // Collect queue size changes and propagate to endpoint state repo
     scope.launch(ioDispatcher) {
       outgoingQueue.queueSize.collect { size -> endpointStateRepo.setQueueLength(size) }
+    }
+    // Run data retention cleanup on startup
+    scope.launch(ioDispatcher) {
+      queueInitJob.join()
+      runDataRetentionCleanup()
     }
   }
 
@@ -363,6 +370,7 @@ constructor(
                         Timber.d("Message sent successfully: $message")
                         lastMessageStatus = LastMessageStatus.Success
                         endpointStateRepo.setLastSuccessfulMessageTime(java.time.Instant.now())
+                        sentMessagesRepo.archiveMessage(message)
                         if (message !is MessageWaypoint) {
                           messageReceivedIdlingResource.add(message)
                         }
@@ -623,6 +631,16 @@ constructor(
     locationProcessorLazy.get().publishLocationMessage(trigger)
   }
 
+  suspend fun clearSentMessages() {
+    sentMessagesRepo.clearAll()
+  }
+
+  suspend fun resendAllSentMessages() {
+    val messages = sentMessagesRepo.getAllMessages()
+    Timber.i("Re-queueing ${messages.size} sent messages for resend")
+    messages.forEach { queueMessageForSending(it) }
+  }
+
   fun stopSendingMessages() {
     Timber.d("Interrupting background sending thread")
     dequeueAndSenderJob?.cancel()
@@ -646,6 +664,19 @@ constructor(
       }
       loadOutgoingMessageProcessor()
     }
+    if (properties.contains(Preferences::dataRetentionHours.name) ||
+        properties.contains(Preferences::sentDataRetentionHours.name)) {
+      scope.launch(ioDispatcher) { runDataRetentionCleanup() }
+    }
+  }
+
+  private suspend fun runDataRetentionCleanup() {
+    val dataRetentionHours = preferences.dataRetentionHours
+    if (dataRetentionHours > 0) {
+      val cutoff = System.currentTimeMillis() - dataRetentionHours.toLong() * 3600 * 1000
+      outgoingQueue.deleteOlderThan(cutoff)
+    }
+    sentMessagesRepo.cleanupIfNeeded()
   }
 
   companion object {

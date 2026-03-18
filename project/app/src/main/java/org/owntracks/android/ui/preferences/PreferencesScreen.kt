@@ -134,6 +134,8 @@ fun PreferencesScreen(
     onStopConnection: () -> Unit,
     onTryReconnectNow: () -> Unit,
     onSyncNow: () -> Unit = {},
+    onDeleteSentData: () -> Unit = {},
+    onResendSentData: () -> Unit = {},
     currentWifiSsid: String? = null,
     modifier: Modifier = Modifier
 ) {
@@ -183,6 +185,8 @@ fun PreferencesScreen(
                 onReconnect = onReconnect,
                 onTryReconnectNow = onTryReconnectNow,
                 onSyncNow = onSyncNow,
+                onDeleteSentData = onDeleteSentData,
+                onResendSentData = onResendSentData,
                 queueLength = queueLength,
                 lastSuccessfulSync = lastSuccessfulSync,
                 currentWifiSsid = currentWifiSsid,
@@ -214,6 +218,8 @@ fun PreferencesScreenContent(
     onReconnect: () -> Unit,
     onTryReconnectNow: () -> Unit,
     onSyncNow: () -> Unit = {},
+    onDeleteSentData: () -> Unit = {},
+    onResendSentData: () -> Unit = {},
     queueLength: Int = 0,
     lastSuccessfulSync: java.time.Instant? = null,
     nextReconnectTime: java.time.Instant?,
@@ -249,6 +255,8 @@ fun PreferencesScreenContent(
             onReconnect = onReconnect,
             onTryReconnectNow = onTryReconnectNow,
             onSyncNow = onSyncNow,
+            onDeleteSentData = onDeleteSentData,
+            onResendSentData = onResendSentData,
             queueLength = queueLength,
             lastSuccessfulSync = lastSuccessfulSync,
             currentWifiSsid = currentWifiSsid,
@@ -719,6 +727,8 @@ private fun PreferencesScreenInner(
     onReconnect: () -> Unit,
     onTryReconnectNow: () -> Unit,
     onSyncNow: () -> Unit = {},
+    onDeleteSentData: () -> Unit = {},
+    onResendSentData: () -> Unit = {},
     queueLength: Int = 0,
     lastSuccessfulSync: java.time.Instant? = null,
     currentWifiSsid: String? = null,
@@ -760,6 +770,8 @@ private fun PreferencesScreenInner(
         )
         PreferenceScreen.Reporting -> ReportingPreferencesContent(
             preferences = preferences,
+            onDeleteSentData = onDeleteSentData,
+            onResendSentData = onResendSentData,
             modifier = modifier
         )
         PreferenceScreen.Notification -> NotificationPreferencesContent(

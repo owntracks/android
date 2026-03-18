@@ -41,4 +41,7 @@ interface MessageQueueDao {
   @Transaction
   @Query("DELETE FROM MessageQueue WHERE isHeadSlot = 0")
   suspend fun clearRegularQueue()
+
+  @Query("DELETE FROM MessageQueue WHERE timestamp < :cutoffTimestamp")
+  suspend fun deleteOlderThan(cutoffTimestamp: Long): Int
 }

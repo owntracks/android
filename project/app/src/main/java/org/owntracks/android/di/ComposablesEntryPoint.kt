@@ -3,6 +3,7 @@ package org.owntracks.android.di
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
+import org.owntracks.android.data.repos.SentMessagesRepo
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.support.ContactImageBindingAdapter
@@ -18,4 +19,5 @@ interface ComposablesEntryPoint {
     fun contactImageBindingAdapter(): ContactImageBindingAdapter
     fun preferences(): Preferences
     fun messageProcessor(): MessageProcessor
+    fun sentMessagesRepo(): SentMessagesRepo
 }

@@ -12,6 +12,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 import org.owntracks.android.data.repos.EndpointStateRepo
+import org.owntracks.android.data.repos.SentMessagesRepo
 import org.owntracks.android.net.WifiInfoProvider
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.AppTheme
@@ -45,6 +46,9 @@ class PreferencesActivity :
 
     @Inject
     lateinit var wifiInfoProvider: WifiInfoProvider
+
+    @Inject
+    lateinit var sentMessagesRepo: SentMessagesRepo
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -97,6 +101,16 @@ class PreferencesActivity :
                     onTryReconnectNow = {
                         lifecycleScope.launch {
                             messageProcessor.tryReconnectNow()
+                        }
+                    },
+                    onDeleteSentData = {
+                        lifecycleScope.launch {
+                            sentMessagesRepo.clearAll()
+                        }
+                    },
+                    onResendSentData = {
+                        lifecycleScope.launch {
+                            messageProcessor.resendAllSentMessages()
                         }
                     }
                 )

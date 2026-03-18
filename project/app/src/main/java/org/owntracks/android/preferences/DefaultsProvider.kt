@@ -62,6 +62,8 @@ interface DefaultsProvider {
       Preferences::localNetworkHost -> ""
       Preferences::localNetworkPort -> 1883
       Preferences::localNetworkTls -> false
+      Preferences::dataRetentionHours -> 0
+      Preferences::sentDataRetentionHours -> 0
       Preferences::extendedData -> true
       Preferences::pubQos -> MqttQos.One
       Preferences::pubRetain -> true

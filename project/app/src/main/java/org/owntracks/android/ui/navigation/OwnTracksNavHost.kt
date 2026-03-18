@@ -71,6 +71,8 @@ fun OwnTracksNavHost(
     onReconnect: () -> Unit = {},
     onTryReconnectNow: () -> Unit = {},
     onSyncNow: () -> Unit = {},
+    onDeleteSentData: () -> Unit = {},
+    onResendSentData: () -> Unit = {},
     queueLength: Int = 0,
     lastSuccessfulSync: java.time.Instant? = null,
     currentWifiSsid: String? = null
@@ -229,6 +231,8 @@ fun OwnTracksNavHost(
                     onReconnect = onReconnect,
                     onTryReconnectNow = onTryReconnectNow,
                     onSyncNow = onSyncNow,
+                    onDeleteSentData = onDeleteSentData,
+                    onResendSentData = onResendSentData,
                     queueLength = queueLength,
                     lastSuccessfulSync = lastSuccessfulSync,
                     nextReconnectTime = nextReconnectTime,
