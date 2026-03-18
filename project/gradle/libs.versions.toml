@@ -19,14 +19,14 @@ androidx-test-rules = "1.7.0"
 androidx-test-runner = "1.7.0"
 androidx-test-services = "1.6.0"
 androidx-work = "2.9.1"
-apache-httpcore = "5.4"
 barista = "4.3.0"
+
 bouncycastle = "1.83"
 conscrypt = "2.5.3"
 desguar-jdk = "2.1.5"
 flatbuffers = "23.5.26"
 google-material = "1.13.0"
-google-play-services-maps = "19.2.0"
+google-play-services-maps = "20.0.0"
 maps-compose = "6.2.1"
 guava = "33.5.0-jre"
 hilt = "2.57.1"
@@ -48,11 +48,13 @@ okhttp = "4.12.0"
 osmdroid = "6.1.20"
 paho-mqtt = "1.2.5"
 play-services-location = "21.3.0"
-slf4j-simple = "2.0.17"
 slf4j-timber = "1.0.1"
 square-leakcanary = "2.14"
 square-tape2 = "2.0.0-beta1"
 timber = "5.0.1"
+junit = "4.13.2"
+espresso-core = "3.5.1"
+appcompat = "1.6.1"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -62,6 +64,7 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 ktfmt = { id = "com.ncorti.ktfmt.gradle", version.ref = "ktfmt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
 
 [libraries]
 android-gradle-api = { module = "com.android.tools.build:gradle-api", version.ref = "agp" }
@@ -124,7 +127,6 @@ bouncycastle = { module = "org.bouncycastle:bcprov-jdk14", version.ref = "bouncy
 
 # Migration
 lmdb-kt = { module = "com.growse:lmdb-kt", version.ref = "lmdb-kt" }
-slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j-simple" }
 slf4j-timber = { module = "at.favre.lib:slf4j-timber", version.ref = "slf4j-timber" }
 flatbuffers = { module = "com.google.flatbuffers:flatbuffers-java", version.ref = "flatbuffers" }
 
@@ -137,8 +139,8 @@ maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = 
 osmdroid = { module = "org.osmdroid:osmdroid-android", version.ref = "osmdroid" }
 google-material = { module = "com.google.android.material:material", version.ref = "google-material" }
 paho-mqttclient = { module = "org.eclipse.paho:org.eclipse.paho.client.mqttv3", version.ref = "paho-mqtt" }
-apache-httpcore = { module = "org.apache.httpcomponents.core5:httpcore5", version.ref = "apache-httpcore" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+
 square-tape2 = { module = "com.squareup.tape2:tape", version.ref = "square-tape2" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 okhttp-mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "okhttp" }
@@ -158,11 +160,15 @@ androidx-test-rules = { module = "androidx.test:rules", version.ref = "androidx-
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidx-test-runner" }
 androidx-test-services = { module = "androidx.test.services:test-services", version.ref = "androidx-test-services" }
 androidx-test-orchestrator = { module = "androidx.test:orchestrator", version.ref = "androidx-test-orchestrator" }
+androidx-test-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidx-test-espresso" }
 androidx-test-espresso-idling = { module = "androidx.test.espresso:espresso-idling-resource", version.ref = "androidx-test-espresso" }
 
 # Build utils
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 desugar = { module = "com.android.tools:desugar_jdk_libs_nio", version.ref = "desguar-jdk" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso-core" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 
 [bundles]
 jackson = ["jackson-core", "jackson-databind", "jackson-module-kotlin", "jackson-datatype-jsr310"]
@@ -172,9 +178,9 @@ kapt-hilt = ["hilt-compiler", "hilt-androidx"]
 hilt = ["hilt-android", "hilt-work"]
 androidx = ["androidx-core-ktx", "androidx-preference", "androidx-work-runtime", "androidx-fragment-ktx", "androidx-concurrent-futures", "androidx-activity-ktx"]
 androidx-room = ["androidx-room-runtime", "androidx-room-ktx"]
-androidx-test = ["androidx-test-junit", "androidx-test-core-ktx", "androidx-test-rules", "androidx-test-runner"]
+androidx-test = ["androidx-test-junit", "androidx-test-core-ktx", "androidx-test-rules", "androidx-test-runner", "androidx-test-espresso-core"]
 androidx-test-util = ["androidx-test-services", "androidx-test-orchestrator"]
 buildscript = ["guava"]
-objectbox-migration = ["lmdb-kt", "slf4j-simple", "slf4j-timber", "flatbuffers"]
+objectbox-migration = ["lmdb-kt", "slf4j-timber", "flatbuffers"]
 kmqtt = ["kmqtt-broker", "kmqtt-common"]
 compose = ["compose-ui", "compose-ui-graphics", "compose-ui-tooling-preview", "compose-material3", "compose-material-icons-extended", "compose-foundation", "compose-runtime-livedata", "activity-compose", "navigation-compose", "lifecycle-runtime-compose"]

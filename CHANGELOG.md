@@ -1,15 +1,31 @@
 # Changelog
 
+## Version 2.5.7
+
+### New features
+
+- Belgian and Estonian translations added
+
+### Bug fixes
+
+- Fix slow start caused by replacing the map SDK on every resume.
+- Fixed map to show a sensible view when the activity is being resumed
+
 ## Version 2.5.6
 
 ### New features
 
 - Migrated message queue to use Room database instead of tape2 for better async performance and reliability
+- Updated map min zoom levels to allow viewing most of the world (#2176)
+
 
 ### Bug fixes
 
 - Fix slow starts by avoiding blocking the main thread on startup with the disk-backed queue.
 - Significantly reduced battery drain and improved responsiveness in MQTT mode during poor network conditions by changing reconnection retry strategy from linear to exponential backoff
+- Don't show the directions toolbar on Google Maps when the user selects a region
+- Fix race condition on network change events (#2201 & #2202)
+- Fix MQTT reconnect task being silently ignored if another reconnect was already queued (#2203)
 
 ## Version 2.5.5
 

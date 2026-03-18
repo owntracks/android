@@ -2,7 +2,6 @@
 
     <style name="Theme.Owntracks" parent="@style/Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">@color/OTPrimaryBlue</item>
-        <item name="colorPrimaryDark">@color/OTDarkerBlue</item>
         <item name="colorOnPrimary">@color/md_white_1000</item>
         <item name="colorSecondary">@color/OTPrimaryBlue</item>
         <item name="colorOnSecondary">@color/md_white_1000</item>

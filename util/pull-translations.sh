@@ -9,7 +9,7 @@ APP_ID=419041
 
 for lang in $(curl -s -X POST https://api.poeditor.com/v2/languages/list \
     -d api_token="${POEDITOR_API_KEY}" \
-    -d id=${APP_ID} | jq -r .result.languages[].code); do
+    -d id=${APP_ID} | jq -r .result.languages[].code | sort); do
     if [[ $lang == "zh-CN" ]]; then
         locale="zh"
     elif [[ $lang == "en-gb" ]]; then
@@ -18,6 +18,8 @@ for lang in $(curl -s -X POST https://api.poeditor.com/v2/languages/list \
         locale="in"
     elif [[ $lang == "he" ]]; then # Hebrew
         locale="iw"
+    elif [[ $lang == "fr-be" ]]; then
+        locale="fr-rBE"
     else
         locale=$lang
     fi

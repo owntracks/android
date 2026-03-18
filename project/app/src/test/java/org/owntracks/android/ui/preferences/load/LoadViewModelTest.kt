@@ -1,7 +1,6 @@
 package org.owntracks.android.ui.preferences.load
 
 import android.content.Context
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -11,7 +10,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -27,8 +25,6 @@ class LoadViewModelTest {
   private lateinit var mockContext: Context
   private lateinit var preferencesStore: PreferencesStore
   private val mockIdlingResource = SimpleIdlingResource("mock", true)
-
-  @get:Rule val instantExecutorRule = InstantTaskExecutorRule()
 
   @Before
   fun createMocks() {

@@ -184,7 +184,7 @@ class MapActivity :
         val scope = rememberCoroutineScope()
 
         // Observe state from ViewModel
-        val currentLocation by viewModel.currentLocation.observeAsState()
+        val currentLocation by viewModel.currentLocation.collectAsStateWithLifecycle()
         val sendingLocation by viewModel.sendingLocation.observeAsState(false)
 
         // Connection state
@@ -296,7 +296,7 @@ class MapActivity :
             contentWindowInsets = WindowInsets(0, 0, 0, 0)
         ) { paddingValues ->
           // Observe map layer style to determine which map to show
-          val mapLayerStyle by viewModel.mapLayerStyle.observeAsState()
+          val mapLayerStyle by viewModel.mapLayerStyle.collectAsStateWithLifecycle()
 
           Box(
               modifier = Modifier
@@ -399,13 +399,19 @@ class MapActivity :
           viewModel.onClearContactClicked()
         }
 
-    viewModel.apply {
-      currentContact.observe(this@MapActivity) { contact: Contact? ->
-        backPressedCallback.isEnabled = contact != null
-      }
-      currentLocation.observe(this@MapActivity) { location ->
-        if (location != null) {
-          updateActiveContactDistanceAndBearing(location)
+    lifecycleScope.launch {
+      repeatOnLifecycle(Lifecycle.State.STARTED) {
+        launch {
+          viewModel.currentContact.collect { contact: Contact? ->
+            backPressedCallback.isEnabled = contact != null
+          }
+        }
+        launch {
+          viewModel.currentLocation.collect { location ->
+            if (location != null) {
+              viewModel.updateActiveContactDistanceAndBearing(location)
+            }
+          }
         }
       }
     }

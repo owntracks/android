@@ -120,10 +120,10 @@ internal constructor(private val apiKey: String, private val httpClient: OkHttpC
     } catch (e: Exception) {
       tripResetTimestamp = Instant.now().plus(1, ChronoUnit.MINUTES)
       when (e) {
-        is SocketTimeoutException -> Timber.e("Error reverse geocoding from opencage. Timeout")
+        is SocketTimeoutException -> Timber.w("Error reverse geocoding from opencage. Timeout")
         is UnknownHostException ->
-            Timber.e("Error reverse geocoding from opencage. Unable to resolve host")
-        else -> Timber.e(e, "Error reverse geocoding from opencage")
+            Timber.w("Error reverse geocoding from opencage. Unable to resolve host")
+        else -> Timber.w(e, "Error reverse geocoding from opencage")
       }
       GeocodeResult.Fault.ExceptionError(e, tripResetTimestamp)
     }

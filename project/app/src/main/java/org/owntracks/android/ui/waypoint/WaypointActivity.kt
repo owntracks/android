@@ -7,7 +7,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -43,7 +43,7 @@ class WaypointActivity : AppCompatActivity() {
 
         setContent {
             OwnTracksTheme(dynamicColor = preferences.dynamicColorsEnabled) {
-                val waypoint by viewModel.waypoint.observeAsState()
+                val waypoint by viewModel.waypoint.collectAsStateWithLifecycle()
 
                 // Initialize state from waypoint when it loads
                 var description by remember(waypoint?.id) {

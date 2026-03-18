@@ -96,10 +96,10 @@ internal constructor(
     // Here we set up all the flow collectors to react to the universe changing. Usually contacts
     // and waypoints coming and going.
     viewModel.apply {
-      mapCenter.observe(viewLifecycleOwner, this@MapFragment::updateCamera)
       updateAllMarkers(allContacts.values.toSet())
       lifecycleScope.launch {
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+          launch { mapCenter.collect { updateCamera(it) } }
           launch {
             contactUpdatedEvent.collect {
               when (it) {
@@ -138,10 +138,10 @@ internal constructor(
               }
             }
           }
+          launch { mapLayerStyle.collect { setMapLayerType(it) } }
         }
       }
 
-      mapLayerStyle.observe(viewLifecycleOwner, this@MapFragment::setMapLayerType)
       onMapReady()
     }
     return rootView

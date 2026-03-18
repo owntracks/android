@@ -1,12 +1,12 @@
 package org.owntracks.android.ui.preferences.editor
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.owntracks.android.data.waypoints.WaypointsRepo
 import org.owntracks.android.model.Parser
@@ -22,11 +22,11 @@ constructor(
     private val parser: Parser,
     private val waypointsRepo: WaypointsRepo
 ) : ViewModel(), Preferences.OnPreferenceChangeListener {
-  private val mutableEffectiveConfiguration = MutableLiveData<String>()
-  val effectiveConfiguration: LiveData<String> = mutableEffectiveConfiguration
+  private val mutableEffectiveConfiguration = MutableStateFlow("")
+  val effectiveConfiguration: StateFlow<String> = mutableEffectiveConfiguration
 
-  private val mutableConfigLoadError = MutableLiveData<Exception>()
-  val configLoadError: LiveData<Exception> = mutableConfigLoadError
+  private val mutableConfigLoadError = MutableStateFlow<Exception?>(null)
+  val configLoadError: StateFlow<Exception?> = mutableConfigLoadError
 
   init {
     preferences.registerOnPreferenceChangedListener(this)
@@ -48,10 +48,10 @@ constructor(
             MessageWaypointCollection().apply {
               addAll(waypointsRepo.getAll().map(waypointsRepo::fromDaoObject))
             }
-        mutableEffectiveConfiguration.postValue(parser.toUnencryptedJsonPretty(message))
+        mutableEffectiveConfiguration.value = parser.toUnencryptedJsonPretty(message)
       } catch (e: Exception) {
         Timber.e(e)
-        mutableConfigLoadError.postValue(e)
+        mutableConfigLoadError.value = e
       }
     }
   }

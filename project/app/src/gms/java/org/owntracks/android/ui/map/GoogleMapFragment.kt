@@ -3,12 +3,11 @@ package org.owntracks.android.ui.map
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.graphics.Bitmap
-import android.location.Location
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.maps.CameraUpdate
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -29,6 +28,8 @@ import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.MapView
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import org.owntracks.android.R
 import org.owntracks.android.data.waypoints.WaypointModel
 import org.owntracks.android.gms.location.toGMSLatLng
@@ -40,7 +41,6 @@ import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.ContactImageBindingAdapter
 import org.owntracks.android.ui.map.osm.OSMMapFragment
 import timber.log.Timber
-import timber.log.Timber.Forest.tag
 
 class GoogleMapFragment
 internal constructor(
@@ -60,20 +60,24 @@ internal constructor(
 
   private val googleMapLocationSource: LocationSource by lazy {
     object : LocationSource {
-      private var locationObserver: Observer<Location>? = null
+      private var locationJob: Job? = null
 
       override fun activate(onLocationChangedListener: LocationSource.OnLocationChangedListener) {
-        locationObserver =
-            Observer { location: Location ->
+        locationJob =
+            viewLifecycleOwner.lifecycleScope.launch {
+              viewModel.currentLocation.collect { location ->
+                if (location != null) {
                   onLocationObserved(location) {
                     onLocationChangedListener.onLocationChanged(location)
                   }
                 }
-                .apply { viewModel.currentLocation.observe(viewLifecycleOwner, this) }
+              }
+            }
       }
 
       override fun deactivate() {
-        locationObserver?.run(viewModel.currentLocation::removeObserver)
+        locationJob?.cancel()
+        locationJob = null
       }
     }
   }
@@ -133,8 +137,11 @@ internal constructor(
       setMaxZoomPreference(MAX_ZOOM_LEVEL.toFloat())
       setMinZoomPreference(MIN_ZOOM_LEVEL.toFloat())
       isIndoorEnabled = false
-      uiSettings.isMyLocationButtonEnabled = false
-      uiSettings.setAllGesturesEnabled(true)
+      uiSettings.apply {
+        isMyLocationButtonEnabled = false
+        isMapToolbarEnabled = false
+        setAllGesturesEnabled(true)
+      }
       preferences.enableMapRotation.run {
         uiSettings.isCompassEnabled = this
         uiSettings.isRotateGesturesEnabled = this
@@ -170,7 +177,7 @@ internal constructor(
             })
       }
 
-      viewModel.mapLayerStyle.value?.run { setMapLayerType(this) }
+      setMapLayerType(viewModel.mapLayerStyle.value)
       drawAllContactsAndRegions()
     }
   }
@@ -181,8 +188,6 @@ internal constructor(
 
   override fun updateMarkerOnMap(id: String, latLng: LatLng, image: Bitmap) {
     googleMap?.run { // If we don't have a google Map, we can't add markers to it
-      // Remove null markers from the collection
-      markersOnMap.values.removeAll { it.tag == null }
       markersOnMap
           .getOrPut(id) {
             addMarker(
@@ -201,7 +206,7 @@ internal constructor(
   }
 
   override fun removeMarkerFromMap(id: String) {
-    markersOnMap[id]?.remove()
+    markersOnMap.remove(id)?.remove()
   }
 
   override fun currentMarkersOnMap(): Set<String> = markersOnMap.keys
@@ -210,6 +215,7 @@ internal constructor(
     super.onResume()
     googleMapView.onResume()
     setMapStyle()
+    viewModel.mapStartingLocationOnResume()?.run { googleMap?.animateCamera(toCameraUpdate()) }
   }
 
   override fun onLowMemory() {
@@ -311,7 +317,7 @@ internal constructor(
   }
 
   companion object {
-    private const val MIN_ZOOM_LEVEL: Double = 4.0
+    private const val MIN_ZOOM_LEVEL: Double = 1.0
     private const val MAX_ZOOM_LEVEL: Double = 20.0
   }
 

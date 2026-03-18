@@ -15,8 +15,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.io.IOException
 import javax.inject.Inject
 import org.owntracks.android.preferences.Preferences
@@ -39,9 +43,9 @@ class LoadActivity : AppCompatActivity() {
 
         setContent {
             OwnTracksTheme(dynamicColor = preferences.dynamicColorsEnabled) {
-                val importStatus by viewModel.configurationImportStatus.observeAsState(initial = ImportStatus.LOADING)
-                val displayedConfiguration by viewModel.displayedConfiguration.observeAsState(initial = "")
-                val importError by viewModel.importError.observeAsState(initial = null)
+                val importStatus by viewModel.configurationImportStatus.collectAsStateWithLifecycle()
+                val displayedConfiguration by viewModel.displayedConfiguration.collectAsStateWithLifecycle()
+                val importError by viewModel.importError.collectAsStateWithLifecycle()
 
                 LoadScreen(
                     importStatus = importStatus,
@@ -55,10 +59,14 @@ class LoadActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.configurationImportStatus.observe(this) {
-            Timber.d("ImportStatus is $it")
-            if (it == ImportStatus.SAVED) {
-                finish()
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.configurationImportStatus.collect {
+                    Timber.d("ImportStatus is $it")
+                    if (it == ImportStatus.SAVED) {
+                        finish()
+                    }
+                }
             }
         }
 

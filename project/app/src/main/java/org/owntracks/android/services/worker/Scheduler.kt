@@ -82,7 +82,7 @@ constructor(
                 .build()
           }
       workManager.enqueueUniqueWork(
-          ONETIME_TASK_MQTT_RECONNECT, ExistingWorkPolicy.KEEP, request)
+          ONETIME_TASK_MQTT_RECONNECT, ExistingWorkPolicy.REPLACE, request)
       // Only set nextReconnectTime if not already set to a future time
       // (the Worker may have already set it with the correct backoff)
       scope.launch {

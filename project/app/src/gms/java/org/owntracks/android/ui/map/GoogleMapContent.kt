@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
@@ -20,10 +21,8 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.rememberCameraPositionState
-import androidx.lifecycle.asFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.filterNotNull
 import org.owntracks.android.data.repos.ContactsRepoChange
 import org.owntracks.android.data.waypoints.WaypointModel
 import org.owntracks.android.data.waypoints.WaypointsRepo
@@ -74,9 +73,7 @@ fun GoogleMapContent(
   // This ensures camera animates on every emission, even when the same location is posted again
   // drop(1) skips the initial value since we already set initial position above
   LaunchedEffect(Unit) {
-    viewModel.mapCenter.asFlow()
-        .drop(1) // Drop initial LiveData value before filtering
-        .filterNotNull()
+    viewModel.mapCenter
         .collectLatest { center ->
           cameraPositionState.animate(CameraUpdateFactory.newLatLng(center.toGMSLatLng()))
         }
@@ -111,10 +108,10 @@ fun GoogleMapContent(
   }
 
   // Observe map layer style for map type changes
-  val mapLayerStyle by viewModel.mapLayerStyle.observeAsState()
+  val mapLayerStyle by viewModel.mapLayerStyle.collectAsStateWithLifecycle()
 
   // Observe current location for blue dot and sending location
-  val currentLocation by viewModel.currentLocation.observeAsState()
+  val currentLocation by viewModel.currentLocation.collectAsStateWithLifecycle()
 
   // Handle sending location when GPS fix becomes available
   val sendingLocation by viewModel.sendingLocation.observeAsState(false)

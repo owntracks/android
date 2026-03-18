@@ -23,7 +23,7 @@ val googleMapsAPIKey =
 
 val gmsImplementation: Configuration by configurations.creating
 
-val versionNameValue = "2.5.6"
+val versionNameValue = "2.5.7"
 
 fun generateVersionCode(versionName: String): Int {
   val parts = versionName.split(".")
@@ -249,7 +249,6 @@ dependencies {
   implementation(libs.bundles.jackson)
   implementation(libs.square.tape2)
   implementation(libs.timber)
-  implementation(libs.apache.httpcore)
   implementation(libs.bundles.androidx.room)
   implementation(libs.bundles.objectbox.migration)
   implementation(libs.kotlin.datetime)

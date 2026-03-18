@@ -99,3 +99,7 @@
 -dontwarn org.jetbrains.kotlin.compiler.plugin.CliOption
 -dontwarn org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
 -dontwarn org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar
+
+# SLF4J 2.x optional APIs referenced by kotlin-logging (used by lmdb-kt)
+-dontwarn org.slf4j.spi.CallerBoundaryAware
+-dontwarn org.slf4j.spi.LoggingEventBuilder

@@ -34,7 +34,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import java.time.Instant
 import org.owntracks.android.R
@@ -55,8 +54,8 @@ fun StatusScreen(
     val endpointQueueLength by viewModel.endpointQueueLength.collectAsStateWithLifecycle()
     val serviceStarted by viewModel.serviceStarted.collectAsStateWithLifecycle()
     val currentLocation by viewModel.currentLocation.collectAsStateWithLifecycle()
-    val dozeWhitelisted by viewModel.dozeWhitelisted.observeAsState(initial = false)
-    val locationPermissions by viewModel.locationPermissions.observeAsState(initial = R.string.statusLocationPermissionsUnknown)
+    val dozeWhitelisted by viewModel.dozeWhitelisted.collectAsStateWithLifecycle()
+    val locationPermissions by viewModel.locationPermissions.collectAsStateWithLifecycle()
 
     var showBatteryDialog by remember { mutableStateOf(false) }
     var showLocationPermissionsDialog by remember { mutableStateOf(false) }

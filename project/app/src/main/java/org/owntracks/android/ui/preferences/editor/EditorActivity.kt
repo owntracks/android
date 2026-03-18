@@ -13,8 +13,12 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -44,7 +48,7 @@ class EditorActivity : AppCompatActivity() {
 
         setContent {
             OwnTracksTheme(dynamicColor = preferences.dynamicColorsEnabled) {
-                val effectiveConfiguration by viewModel.effectiveConfiguration.observeAsState(initial = "")
+                val effectiveConfiguration by viewModel.effectiveConfiguration.collectAsStateWithLifecycle()
                 val snackbarState = remember { SnackbarHostState() }
                 snackbarHostState = snackbarState
                 val scope = rememberCoroutineScope()
@@ -78,9 +82,13 @@ class EditorActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.configLoadError.observe(this) {
-            if (it != null) {
-                displayLoadFailed()
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.configLoadError.collect {
+                    if (it != null) {
+                        displayLoadFailed()
+                    }
+                }
             }
         }
     }

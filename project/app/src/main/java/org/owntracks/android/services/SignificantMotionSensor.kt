@@ -71,7 +71,7 @@ class SignificantMotionSensor(
       if (success) {
         Timber.d("Significant motion sensor listener registered successfully")
       } else {
-        Timber.w("Failed to register significant motion sensor listener")
+        Timber.i("Failed to register significant motion sensor listener")
       }
     }
         ?: run {
@@ -83,7 +83,7 @@ class SignificantMotionSensor(
                     it.name.contains("motion", ignoreCase = true) ||
                     it.name.contains("movement", ignoreCase = true)
               }
-          Timber.w(
+          Timber.i(
               "Significant motion sensor not available. Motion-related sensors found: ${motionRelatedSensors.map { "${it.name} (type=${it.type})" }}")
         }
   }
@@ -138,7 +138,7 @@ class SignificantMotionSensor(
       lastSignificantMotionLocationRequestTime = now
       locationProviderClient.singleHighAccuracyLocation(locationCallback, looper)
     } else {
-      Timber.w("Missing location permission, cannot request location for significant motion")
+      Timber.e("Missing location permission, cannot request location for significant motion")
     }
   }
 }

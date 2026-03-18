@@ -267,6 +267,8 @@ La política de privadesa d'OpenCage es pot trobar &lt;a href=\"https://opencage
     <!-- Fuzzy -->
     <string name="radius">"Radi (m)"</string>
     <string name="reconnect">"Reconnectar"</string>
+
+    <!-- Fuzzy -->
     <string name="requestLocationSent">"S'ha enviat l'ordre de sol·licitud d'ubicació"</string>
     <string name="save">"Desa"</string>
     <string name="select">"Seleccionar"</string>

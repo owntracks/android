@@ -20,6 +20,7 @@ import java.lang.reflect.ParameterizedType
 import javax.inject.Inject
 import javax.inject.Named
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.datetime.Clock
 import leakcanary.DetectLeaksAfterTestSuccess
 import leakcanary.LeakCanary
 import org.junit.After
@@ -193,11 +194,11 @@ abstract class TestWithAnActivity<T : Activity>(private val startActivity: Boole
   }
 
   fun waitUntilActivityVisible(clazz: Class<out Activity>) {
-    val startTime = System.currentTimeMillis()
+    val startTime = Clock.System.now()
     Timber.d("Waiting for ${activityClass.simpleName} to be visible")
     while (!clazz.isInstance(getCurrentActivity())) {
       Thread.sleep(CONDITION_CHECK_INTERVAL)
-      if (System.currentTimeMillis() - startTime >= TIMEOUT) {
+      if (Clock.System.now().minus(startTime) >= TIMEOUT) {
         throw AssertionError(
             "Activity ${activityClass.simpleName} not visible after $TIMEOUT milliseconds",
         )

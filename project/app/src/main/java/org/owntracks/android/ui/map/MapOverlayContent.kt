@@ -19,7 +19,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -139,13 +139,13 @@ fun MapOverlayContent(
     onShareContact: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val currentContact by viewModel.currentContact.observeAsState()
-    val bottomSheetHidden by viewModel.bottomSheetHidden.observeAsState(true)
-    val contactDistance by viewModel.contactDistance.observeAsState(0f)
-    val contactBearing by viewModel.contactBearing.observeAsState(0f)
-    val relativeContactBearing by viewModel.relativeContactBearing.observeAsState(0f)
-    val currentLocation by viewModel.currentLocation.observeAsState()
-    val myLocationStatus by viewModel.myLocationStatus.observeAsState(MyLocationStatus.DISABLED)
+    val currentContact by viewModel.currentContact.collectAsStateWithLifecycle()
+    val bottomSheetHidden by viewModel.bottomSheetHidden.collectAsStateWithLifecycle()
+    val contactDistance by viewModel.contactDistance.collectAsStateWithLifecycle()
+    val contactBearing by viewModel.contactBearing.collectAsStateWithLifecycle()
+    val relativeContactBearing by viewModel.relativeContactBearing.collectAsStateWithLifecycle()
+    val currentLocation by viewModel.currentLocation.collectAsStateWithLifecycle()
+    val myLocationStatus by viewModel.myLocationStatus.collectAsStateWithLifecycle()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
     val scope = rememberCoroutineScope()
 

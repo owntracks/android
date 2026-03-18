@@ -1,11 +1,11 @@
 package org.owntracks.android.ui.waypoint
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.data.waypoints.WaypointModel
@@ -24,20 +24,18 @@ constructor(private val waypointsRepo: WaypointsRepo, locationRepo: LocationRepo
       locationRepo.currentBlueDotOnMapLocation?.run { LatLng(latitude, longitude) }
           ?: LatLng(0.0, 0.0)
 
-  val waypoint: LiveData<WaypointModel>
-    get() = mutableWaypoint
-
   private val mutableWaypoint =
-      MutableLiveData(
+      MutableStateFlow(
           WaypointModel(
               geofenceLatitude = initialLocation.latitude,
               geofenceLongitude = initialLocation.longitude,
               geofenceRadius = 20))
+  val waypoint: StateFlow<WaypointModel> = mutableWaypoint
 
   fun loadWaypoint(id: Long) {
     viewModelScope.launch {
       Timber.d("Loading waypoint $id")
-      waypointsRepo.get(id)?.apply { mutableWaypoint.postValue(this) }
+      waypointsRepo.get(id)?.apply { mutableWaypoint.value = this }
           ?: run { Timber.w("Waypoint $id not found in the repo") }
     }
   }

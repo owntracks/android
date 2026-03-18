@@ -253,6 +253,8 @@ Het privacybeleid van OpenCage is te vinden op &lt;a href=\"https://opencagedata
     <!-- Fuzzy -->
     <string name="radius">"Diameter"</string>
     <string name="reconnect">"Opnieuw verbinden"</string>
+
+    <!-- Fuzzy -->
     <string name="requestLocationSent">"Commando voor locatie-aanvraag verzonden"</string>
     <string name="save">"Opslaan"</string>
     <string name="select">"Selecteer"</string>

@@ -16,6 +16,8 @@
     <string name="addWaypoint">"Добавить место"</string>
     <string name="aLocation">"место"</string>
     <string name="app_name">"OwnTracks"</string>
+    <string name="backgroundLocationPermissionRequestDialogText">"Если вы хотите, чтобы OwnTracks обрабатывал данные о местоположении даже в фоне, необходимо дополнительное разрешение, позволяющее OwnTracks получать данные о местоположении \"в любом режиме\"."</string>
+    <string name="backgroundLocationPermissionRequestDialogTitle">"Разрешение на фоновое определение"</string>
     <string name="backgroundLocationRestrictionNotificationText">"Ваша версия Android ограничивает возможность определения местоположения при автоматическом запуске приложения до его открытия. Нажмите на это уведомление, чтобы открыть OwnTracks и начать отслеживание местоположения."</string>
     <string name="backgroundLocationRestrictionNotificationTitle">"Отслеживание местоположения приостановлено"</string>
     <string name="batteryOptimizationWhitelistDialogButtonLabel">"Настройки"</string>
@@ -50,6 +52,9 @@
     <string name="contactLocationUnknown">"Местоположение недоступно"</string>
     <string name="contactsListPlaceholder">"Друзья не найдены"</string>
     <string name="currentLocationButtonLabel">"Текущее местоположение"</string>
+    <string name="deleteWaypointConfirmationButtonLabel">"Удалить"</string>
+    <string name="deleteWaypointConfirmationText">"Вы хотите удалить это место?"</string>
+    <string name="deleteWaypointTitle">"Удалить место"</string>
     <string name="description">"Описание"</string>
     <string name="deviceLocationDisabledDialogMessage">"Сервисы определения местоположения на этом устройстве отключены, поэтому OwnTracks не может отслеживать ваше местоположение.
 
@@ -82,6 +87,8 @@
     <string name="IDLE">"Простой"</string>
     <string name="importConfig">"Импорт"</string>
     <string name="INITIAL">"Инициализация"</string>
+    <string name="invalidLatitudeError">"Неверная широта"</string>
+    <string name="invalidLongitudeError">"Неверная долгота"</string>
     <string name="latitude">"Широта"</string>
     <string name="loadActivityNoFileExplorerFound">"Менеджер файлов не обнаружен"</string>
     <string name="loadActivitySelectAFile">"Выберите файл"</string>
@@ -98,6 +105,7 @@
     <string name="mapLayerOpenStreetMapWikimediaLabel">"Wikimedia"</string>
     <string name="menuClear">"Очистить"</string>
     <string name="menuContactNavigate">"Показать на карте"</string>
+    <string name="menuContactRequestLocation">"Обновить местоположение"</string>
     <string name="mode_heading">"Режим"</string>
     <string name="mode_http_private_label">"HTTP"</string>
     <string name="mode_mqtt_private_label">"MQTT"</string>
@@ -123,6 +131,7 @@
     <string name="notificationChannelEventsDescription">"Передача места"</string>
     <string name="notificationChannelOngoing">"Постоянное"</string>
     <string name="notificationChannelOngoingDescription">"Необходимо для обновления местоположения в фоновом режиме"</string>
+    <string name="notificationEndpointStateConnected">"%1$s к %2$s"</string>
     <plurals name="notificationEventsTitle">
         <item quantity="one">"%1$d новое событие"</item>
         <item quantity="few">"%1$d новых события"</item>
@@ -134,6 +143,13 @@
     <string name="play_services_update_required">"Необходимо обновить сервисы Google Play"</string>
     <string name="preferencesAdvanced">"Расширенные"</string>
     <string name="preferencesAdvancedAutostartWarning">"Ваша версия Android ограничивает возможность определения местоположения при автоматическом запуске приложения до его открытия."</string>
+    <string name="preferencesAdvancedOpencagePrivacy">"&lt;a href=\"%s\"&gt;Политика конфиденциальности OpenCage&lt;/a&gt;"</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogAccept">"Принимаю"</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogCancel">"Отмена"</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogMessage">"При использовании геокодера OpenCage, OwnTracks будет отправлять каждое  местоположение в OpenCage по зашифрованному TLS-соединению.
+
+С политикой конфиденциальности OpenCage можно ознакомиться &lt;a href=\"https://opencagedata.com/api#privacy\"&gt;на их веб-сайте.&lt;/a&gt;."</string>
+    <string name="preferencesAdvancedOpencagePrivacyDialogTitle">"Политика конфиденциальности OpenCage"</string>
     <string name="preferencesAutostart">"Автозапуск"</string>
     <string name="preferencesAutostartSummary">"Автоматический запуск приложения при включении устройства"</string>
     <string name="preferencesBrokerPassword">"Пароль"</string>
@@ -179,6 +195,7 @@
     <string name="preferencesIgnoreInaccurateLocationsSummary">"Игнорировать неточные местоположения"</string>
     <string name="preferencesImportNoURIGiven">"Не указан URI для импорта настроек"</string>
     <string name="preferencesKeepalive">"Постоянное соединение"</string>
+    <string name="preferencesKeepaliveDialogMessage">"Как часто клиент должен отправлять брокеру сообщение с подтверждением соединения (в секундах)"</string>
     <string name="preferencesKeepaliveValidationError">"Должно быть более %d секунд"</string>
     <string name="preferencesLicenses">"Библиотеки"</string>
     <string name="preferencesLicensesSummary">"Благодарим авторов использованных библиотек"</string>
@@ -236,6 +253,9 @@
     <string name="publish">"Сообщить местоположение"</string>
     <string name="radius">"Радиус"</string>
     <string name="reconnect">"Переподключение"</string>
+
+    <!-- Fuzzy -->
+    <string name="requestLocationSent">"Запрос на обновление местоположения отправлен"</string>
     <string name="save">"Сохранить"</string>
     <string name="select">"Выбрать"</string>
     <string name="shareContactBody">"%1$s, последнее местоположение: %2$s (%3$s) в %4$s"</string>
@@ -250,6 +270,9 @@
     <string name="statusEndpointStateMessageAuthenticationFailed">"Ошибка авторизации"</string>
     <string name="statusEndpointStateMessageClientTimeout">"Таймаут клиента"</string>
     <string name="statusEndpointStateMessageConnectionLost">"Подключение потеряно: %s"</string>
+    <string name="statusEndpointStateMessageConnectionRefused">"В соединении отказано"</string>
+    <string name="statusEndpointStateMessageEndpointDoesNotSupportWebsockets">"Сервер не поддерживает WebSockets"</string>
+    <string name="statusEndpointStateMessageEOFError">"Ошибка EOFException — сервер требует TLS?"</string>
     <string name="statusEndpointStateMessageInvalidClientId">"Некорректный ID клиента"</string>
     <string name="statusEndpointStateMessageInvalidProtocolVersion">"Некорректная версия протокола MQTT"</string>
     <string name="statusEndpointStateMessageMalformedHostPort">"Некорректный адрес и порт"</string>
@@ -259,6 +282,9 @@
     <string name="statusEndpointStateMessageSocketTimeout">"Таймаут подключения"</string>
     <string name="statusEndpointStateMessageSubscribeFailed">"Ошибка при подписке на сообщения MQTT"</string>
     <string name="statusEndpointStateMessageTLSConfigError">"Ошибка конфигурации TLS"</string>
+    <string name="statusEndpointStateMessageTLSConnectionClosed">"Соединение TLS закрыто"</string>
+    <string name="statusEndpointStateMessageTLSEndpointCANotTrustedError">"Корневой сертификат TLS сервера не является доверенным"</string>
+    <string name="statusEndpointStateMessageTLSEndpointClientCertsRequired">"Серверу необходим клиентский сертификат TLS"</string>
     <string name="statusEndpointStateMessageTLSError">"Ошибка TLS: %s"</string>
     <string name="statusEndpointStateMessageUnableToConnect">"Не удалось подключиться"</string>
     <string name="statusEndpointStateMessageUnknownHost">"Неизвестный адрес"</string>
@@ -295,6 +321,7 @@
     <string name="waypointMigrationErrorNotificationText">"Произошла ошибка при переносе списка мест. Некоторые из них, возможно, не были перенесены, поэтому проверьте журнал и добавьте пропущенные места заново."</string>
     <string name="waypointMigrationErrorNotificationTitle">"Ошибка переноса списка мест"</string>
     <string name="waypointsImport">"Импортировать"</string>
+    <string name="welcome_background_location_permission_request">"Доступ к местоположению"</string>
     <string name="welcome_connection_setup_description">"OwnTracks в процессе работы отправляет данные о вашем местоположении на сервер, которым владеете вы или кто-то, кому вы доверяете, тем самым гарантируя, что ваши данные контролируются только вами.
 
 Убедитесь, что вам известны данные подключения к вашему серверу - его протокол (HTTPS или MQTT), а также все необходимые учетные данные.
@@ -323,6 +350,7 @@
 
 Будет отображаться постоянное уведомление для поддержания  соединения с сервером и отслеживания вашего местоположения, а также вы можете включить уведомления о перемещениях друзей между между местами."</string>
     <string name="welcome_notification_permission_granted">"Доступ предоставлен"</string>
+    <string name="welcome_notification_permission_request">"Запросить разрешение"</string>
     <string name="welcome_notification_permission_title">"Доступ к уведомлениям"</string>
     <string name="welcome_play_description">"Для работы OwnTracks необходимы сервисы Google Play"</string>
     <string name="welcome_play_heading">"Сервисы Google Play"</string>
