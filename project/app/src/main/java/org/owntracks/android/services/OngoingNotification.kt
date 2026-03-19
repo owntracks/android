@@ -88,10 +88,17 @@ class OngoingNotification(private val context: Context, initialMode: MonitoringM
               })
           .build()
 
+  private fun isNotificationVisible(): Boolean =
+      notificationManagerCompat.activeNotifications.any { it.id == NOTIFICATION_ID_ONGOING }
+
   private fun updateNotification() {
     if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) ==
         PackageManager.PERMISSION_GRANTED) {
-      notificationManagerCompat.notify(NOTIFICATION_ID_ONGOING, getNotification())
+      if (isNotificationVisible()) {
+        notificationManagerCompat.notify(NOTIFICATION_ID_ONGOING, getNotification())
+      } else {
+        Timber.d("Skipping notification update as user has dismissed the notification")
+      }
     } else {
       Timber.w(
           "Tried to update ongoing notification with $this but notification permissions were missing")
