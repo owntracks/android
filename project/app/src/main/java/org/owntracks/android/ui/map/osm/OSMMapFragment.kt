@@ -43,7 +43,6 @@ import org.osmdroid.views.overlay.mylocation.IMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import org.owntracks.android.R
 import org.owntracks.android.data.waypoints.WaypointModel
-import org.owntracks.android.databinding.OsmMapFragmentBinding
 import org.owntracks.android.location.LatLng
 import org.owntracks.android.location.toGeoPoint
 import org.owntracks.android.location.toLatLng
@@ -58,7 +57,7 @@ class OSMMapFragment
 internal constructor(
     private val preferences: Preferences,
     contactImageBindingAdapter: ContactImageBindingAdapter,
-) : MapFragment<OsmMapFragmentBinding>(contactImageBindingAdapter, preferences) {
+) : MapFragment(contactImageBindingAdapter, preferences) {
   override val layout: Int
     get() = R.layout.osm_map_fragment
 
@@ -212,8 +211,9 @@ internal constructor(
   override fun initMap() {
     val myLocationEnabled = viewModel.hasLocationPermission()
     Timber.d("OSMMapFragment initMap locationEnabled=$myLocationEnabled")
+    val osmMapView = rootView.findViewById<MapView>(R.id.osm_map_view)
     mapView =
-        this.binding.osmMapView.apply {
+        osmMapView.apply {
           minZoomLevel = MIN_ZOOM_LEVEL
           maxZoomLevel = MAX_ZOOM_LEVEL
           viewModel.mapLayerStyle.value?.run { setMapLayerType(this) }
@@ -442,9 +442,9 @@ internal constructor(
   override fun setMapLayerType(mapLayerStyle: MapLayerStyle) {
     when (mapLayerStyle) {
       MapLayerStyle.OpenStreetMapNormal ->
-          binding.osmMapView.setTileSource(TileSourceFactory.MAPNIK)
+          mapView?.setTileSource(TileSourceFactory.MAPNIK)
       MapLayerStyle.OpenStreetMapWikimedia ->
-          binding.osmMapView.setTileSource(TileSourceFactory.WIKIMEDIA)
+          mapView?.setTileSource(TileSourceFactory.WIKIMEDIA)
       else -> Timber.w("Unsupported map layer type $mapLayerStyle")
     }
   }

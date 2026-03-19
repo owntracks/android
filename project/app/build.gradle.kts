@@ -1,19 +1,24 @@
+import java.util.Properties
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
   id("com.android.application")
-  id("com.google.dagger.hilt.android")
   kotlin("android")
-  kotlin("kapt")
-  alias(libs.plugins.ktfmt)
+  alias(libs.plugins.kotlin.compose)
   alias(libs.plugins.ksp)
+  id("com.google.dagger.hilt.android")
+  alias(libs.plugins.ktfmt)
 }
 
 apply<EspressoMetadataEmbeddingPlugin>()
 
+val localProperties = Properties()
+rootProject.file("local.properties").takeIf { it.exists() }?.reader()?.use { localProperties.load(it) }
+
 val googleMapsAPIKey =
-    System.getenv("GOOGLE_MAPS_API_KEY")
-        ?: extra.get("google_maps_api_key")?.toString()
+    System.getenv("GOOGLE_MAPS_API_KEY")?.toString()
+        ?: localProperties.getProperty("google_maps_api_key")
+        ?: findProperty("google_maps_api_key")?.toString()
         ?: "PLACEHOLDER_API_KEY"
 
 val gmsImplementation: Configuration by configurations.creating
@@ -124,11 +129,8 @@ android {
 
   buildFeatures {
     buildConfig = true
-    dataBinding = true
-    viewBinding = true
+    compose = true
   }
-
-  dataBinding { addKtx = true }
 
   packaging {
     resources.excludes.add("META-INF/*")
@@ -185,25 +187,24 @@ android {
     isCoreLibraryDesugaringEnabled = true
   }
 
-  kotlinOptions { jvmTarget = JavaVersion.VERSION_21.toString() }
-
   flavorDimensions.add("locationProvider")
   productFlavors {
-    create("gms") {
-      dimension = "locationProvider"
-      dependencies {
-        gmsImplementation(libs.gms.play.services.maps)
-        gmsImplementation(libs.play.services.location)
-      }
-    }
+    create("gms") { dimension = "locationProvider" }
     create("oss") { dimension = "locationProvider" }
   }
 }
 
-kapt {
-  useBuildCache = true
-  correctErrorTypes = true
+kotlin {
+  compilerOptions {
+    jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+  }
 }
+
+// kapt block disabled - using KSP instead
+// kapt {
+//   useBuildCache = true
+//   correctErrorTypes = true
+// }
 
 ksp { arg("room.schemaLocation", "$projectDir/schemas") }
 
@@ -219,7 +220,14 @@ tasks.withType<JavaCompile>().configureEach { options.isFork = true }
 dependencies {
   implementation(libs.bundles.kotlin)
   implementation(libs.bundles.androidx)
+  implementation(libs.lifecycle.service)
   implementation(libs.androidx.test.espresso.idling)
+
+  // Compose
+  implementation(platform(libs.compose.bom))
+  implementation(libs.bundles.compose)
+  implementation(libs.hilt.navigation.compose)
+  debugImplementation(libs.compose.ui.tooling)
 
   implementation(libs.google.material)
 
@@ -228,6 +236,9 @@ dependencies {
 
   // Mapping
   implementation(libs.osmdroid)
+  "gmsImplementation"(libs.gms.play.services.maps)
+  "gmsImplementation"(libs.play.services.location)
+  "gmsImplementation"(libs.maps.compose)
 
   // Connectivity
   implementation(libs.paho.mqttclient)
@@ -251,13 +262,12 @@ dependencies {
   implementation(libs.widgets.materialize) { artifact { type = "aar" } }
 
   // These Java EE libs are no longer included in JDKs, so we include explicitly
-  kapt(libs.bundles.jaxb.annotation.processors)
+  // kapt(libs.bundles.jaxb.annotation.processors) // Temporarily disabled to test KSP
 
-  // Preprocessors
-  kapt(libs.bundles.kapt.hilt)
+  // Preprocessors (using KSP)
+  ksp(libs.hilt.compiler)
+  ksp(libs.hilt.androidx)
   ksp(libs.androidx.room.compiler)
-
-  kaptTest(libs.bundles.kapt.hilt)
 
   testImplementation(libs.mockito.kotlin)
   testImplementation(libs.androidx.core.testing)
@@ -267,7 +277,6 @@ dependencies {
 
   // Hilt Android Testing
   androidTestImplementation(libs.hilt.android.testing)
-  kaptAndroidTest(libs.hilt.compiler)
 
   androidTestImplementation(libs.barista) { exclude("org.jetbrains.kotlin") }
   androidTestImplementation(libs.okhttp.mockwebserver)
@@ -277,4 +286,5 @@ dependencies {
   androidTestUtil(libs.bundles.androidx.test.util)
 
   coreLibraryDesugaring(libs.desugar)
+
 }

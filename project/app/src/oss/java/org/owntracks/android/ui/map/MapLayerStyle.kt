@@ -9,6 +9,9 @@ enum class MapLayerStyle {
 
   fun isSameProviderAs(@Suppress("UNUSED_PARAMETER") mapLayerStyle: MapLayerStyle): Boolean = true
 
+  /** OSS flavor only has OpenStreetMap, so this always returns false. */
+  fun isGoogleMaps(): Boolean = false
+
   companion object {
     @JvmStatic
     @FromConfiguration

@@ -1,6 +1,6 @@
 package org.owntracks.android.ui.map
 
-import androidx.databinding.ViewDataBinding
+import com.google.android.gms.maps.GoogleMap
 import org.owntracks.android.R
 import org.owntracks.android.preferences.types.FromConfiguration
 import org.owntracks.android.ui.map.osm.OSMMapFragment
@@ -19,7 +19,28 @@ enum class MapLayerStyle {
     }
   }
 
-  fun getFragmentClass(): Class<out MapFragment<out ViewDataBinding>> {
+  /** Returns true if this layer style uses Google Maps, false for OpenStreetMap. */
+  fun isGoogleMaps(): Boolean =
+      when (this) {
+        GoogleMapDefault,
+        GoogleMapHybrid,
+        GoogleMapSatellite,
+        GoogleMapTerrain -> true
+        OpenStreetMapNormal,
+        OpenStreetMapWikimedia -> false
+      }
+
+  /** Returns the Google Maps map type constant for this layer style. */
+  fun toGoogleMapType(): Int =
+      when (this) {
+        GoogleMapDefault -> GoogleMap.MAP_TYPE_NORMAL
+        GoogleMapHybrid -> GoogleMap.MAP_TYPE_HYBRID
+        GoogleMapSatellite -> GoogleMap.MAP_TYPE_SATELLITE
+        GoogleMapTerrain -> GoogleMap.MAP_TYPE_TERRAIN
+        else -> GoogleMap.MAP_TYPE_NORMAL
+      }
+
+  fun getFragmentClass(): Class<out MapFragment> {
     return when (this) {
       GoogleMapDefault,
       GoogleMapHybrid,

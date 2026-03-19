@@ -9,20 +9,18 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.commit
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.owntracks.android.R
-import org.owntracks.android.databinding.MapLayerBottomSheetDialogBinding
 
 class MapLayerBottomSheetDialog : BottomSheetDialogFragment() {
   private val viewModel: MapViewModel by activityViewModels()
-  private lateinit var binding: MapLayerBottomSheetDialogBinding
 
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
       savedInstanceState: Bundle?
   ): View {
-    binding = MapLayerBottomSheetDialogBinding.inflate(inflater, container, false)
+    val rootView = inflater.inflate(R.layout.map_layer_bottom_sheet_dialog, container, false)
     mapLayerSelectorButtonsToStyles.forEach {
-      binding.root.findViewById<AppCompatImageButton>(it.key).setOnClickListener { _ ->
+      rootView.findViewById<AppCompatImageButton>(it.key).setOnClickListener { _ ->
         val currentMapLayerStyle = viewModel.mapLayerStyle.value
         val newMapLayerStyle = it.value
         viewModel.setMapLayerStyle(it.value)
@@ -37,6 +35,6 @@ class MapLayerBottomSheetDialog : BottomSheetDialogFragment() {
         dismiss()
       }
     }
-    return binding.root
+    return rootView
   }
 }

@@ -5,6 +5,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
 import android.os.Build
@@ -27,7 +28,14 @@ class WifiInfoProvider @Inject constructor(@ApplicationContext context: Context)
       val connectivityManager: ConnectivityManager =
           context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-      connectivityManager.registerDefaultNetworkCallback(
+      // Register callback specifically for WiFi networks, not just default network.
+      // This ensures we track WiFi even when mobile data is the default network.
+      val wifiNetworkRequest = NetworkRequest.Builder()
+          .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+          .build()
+
+      connectivityManager.registerNetworkCallback(
+          wifiNetworkRequest,
           object : ConnectivityManager.NetworkCallback(FLAG_INCLUDE_LOCATION_INFO) {
             override fun onCapabilitiesChanged(
                 network: Network,
@@ -36,11 +44,15 @@ class WifiInfoProvider @Inject constructor(@ApplicationContext context: Context)
               if (networkCapabilities.transportInfo is WifiInfo) {
                 ssid = (networkCapabilities.transportInfo as WifiInfo).getUnquotedSSID()
                 bssid = (networkCapabilities.transportInfo as WifiInfo).bssid
-              } else {
-                ssid = null
-                bssid = null
               }
               super.onCapabilitiesChanged(network, networkCapabilities)
+            }
+
+            override fun onLost(network: Network) {
+              // Clear WiFi info when WiFi network is lost
+              ssid = null
+              bssid = null
+              super.onLost(network)
             }
           })
     }
@@ -68,6 +80,29 @@ class WifiInfoProvider @Inject constructor(@ApplicationContext context: Context)
       } else {
         MessageStatus.STATUS_WIFI_DISABLED
       }
+
+  /**
+   * Update SSID/BSSID from network capabilities if they contain WiFi info.
+   * Only updates when WiFi info is present - doesn't clear when receiving
+   * non-WiFi capabilities (e.g., mobile data) to handle dual-connectivity.
+   */
+  fun updateFromCapabilities(networkCapabilities: NetworkCapabilities) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+      if (networkCapabilities.transportInfo is WifiInfo) {
+        ssid = (networkCapabilities.transportInfo as WifiInfo).getUnquotedSSID()
+        bssid = (networkCapabilities.transportInfo as WifiInfo).bssid
+      }
+      // Don't clear SSID for non-WiFi capabilities - WiFi might still be connected
+    }
+  }
+
+  /**
+   * Clear WiFi info. Call this when WiFi network is lost.
+   */
+  fun clearWifiInfo() {
+    ssid = null
+    bssid = null
+  }
 }
 
 fun WifiInfo.getUnquotedSSID(): String = this.ssid.replace(Regex("^\"(.*)\"$"), "$1")

@@ -10,6 +10,7 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions
 import org.json.JSONObject
 import org.owntracks.android.net.CALeafCertMatchingHostnameVerifier
 import org.owntracks.android.net.ConnectionConfiguration
+import org.owntracks.android.net.WifiInfoProvider
 import org.owntracks.android.preferences.DefaultsProvider
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.MqttProtocolLevel
@@ -97,35 +98,54 @@ data class MqttConnectionConfiguration(
   class MissingHostException : Exception()
 }
 
-fun Preferences.toMqttConnectionConfiguration(): MqttConnectionConfiguration =
-    MqttConnectionConfiguration(
-        tls,
-        ws,
-        host,
-        port,
-        clientId,
-        username,
-        password,
-        keepalive.seconds,
-        connectionTimeoutSeconds.seconds,
-        cleanSession,
-        mqttProtocolLevel,
-        tlsClientCrt,
-        pubTopicBaseWithUserDetails,
-        if (subTopic.contains(" ")) {
-          subTopic.split(" ").toSortedSet()
-        } else if (subTopic == DefaultsProvider.DEFAULT_SUB_TOPIC) {
-          if (info) {
-            sortedSetOf(
-                subTopic,
-                subTopic + infoTopicSuffix,
-                subTopic + eventTopicSuffix,
-                subTopic + statusTopicSuffix,
-                receivedCommandsTopic)
-          } else {
-            sortedSetOf(subTopic, subTopic + eventTopicSuffix, receivedCommandsTopic)
-          }
+fun Preferences.toMqttConnectionConfiguration(
+    wifiInfoProvider: WifiInfoProvider? = null
+): MqttConnectionConfiguration {
+  val isOnLocalNetwork =
+      localNetworkEnabled &&
+          localNetworkSsid.isNotBlank() &&
+          localNetworkHost.isNotBlank() &&
+          wifiInfoProvider != null &&
+          wifiInfoProvider.isConnected() &&
+          wifiInfoProvider.getSSID() == localNetworkSsid
+
+  val (effectiveHost, effectivePort, effectiveTls) =
+      if (isOnLocalNetwork) {
+        Timber.d("Using local network configuration: $localNetworkHost:$localNetworkPort (TLS: $localNetworkTls)")
+        Triple(localNetworkHost, localNetworkPort, localNetworkTls)
+      } else {
+        Triple(host, port, tls)
+      }
+
+  return MqttConnectionConfiguration(
+      effectiveTls,
+      ws,
+      effectiveHost,
+      effectivePort,
+      clientId,
+      username,
+      password,
+      keepalive.seconds,
+      connectionTimeoutSeconds.seconds,
+      cleanSession,
+      mqttProtocolLevel,
+      tlsClientCrt,
+      pubTopicBaseWithUserDetails,
+      if (subTopic.contains(" ")) {
+        subTopic.split(" ").toSortedSet()
+      } else if (subTopic == DefaultsProvider.DEFAULT_SUB_TOPIC) {
+        if (info) {
+          sortedSetOf(
+              subTopic,
+              subTopic + infoTopicSuffix,
+              subTopic + eventTopicSuffix,
+              subTopic + statusTopicSuffix,
+              receivedCommandsTopic)
         } else {
-          sortedSetOf(subTopic)
-        },
-        subQos)
+          sortedSetOf(subTopic, subTopic + eventTopicSuffix, receivedCommandsTopic)
+        }
+      } else {
+        sortedSetOf(subTopic)
+      },
+      subQos)
+}

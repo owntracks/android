@@ -21,6 +21,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
@@ -29,6 +30,7 @@ import org.owntracks.android.data.EndpointState
 import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.data.repos.EndpointStateRepo
 import org.owntracks.android.data.repos.RoomBackedMessageQueue
+import org.owntracks.android.data.repos.SentMessagesRepo
 import org.owntracks.android.data.waypoints.WaypointsRepo
 import org.owntracks.android.di.ApplicationScope
 import org.owntracks.android.di.CoroutineScopes.IoDispatcher
@@ -43,6 +45,7 @@ import org.owntracks.android.model.messages.MessageTransition
 import org.owntracks.android.model.messages.MessageUnknown
 import org.owntracks.android.model.messages.MessageWaypoint
 import org.owntracks.android.net.MessageProcessorEndpoint
+import org.owntracks.android.net.WifiInfoProvider
 import org.owntracks.android.net.http.HttpMessageProcessorEndpoint
 import org.owntracks.android.net.mqtt.MQTTMessageProcessorEndpoint
 import org.owntracks.android.preferences.DefaultsProvider.Companion.DEFAULT_SUB_TOPIC
@@ -79,7 +82,9 @@ constructor(
     @ApplicationScope private val scope: CoroutineScope,
     @Named("mqttConnectionIdlingResource")
     private val mqttConnectionIdlingResource: SimpleIdlingResource,
-    private val outgoingQueue: RoomBackedMessageQueue
+    private val outgoingQueue: RoomBackedMessageQueue,
+    private val wifiInfoProvider: WifiInfoProvider,
+    private val sentMessagesRepo: SentMessagesRepo
 ) : Preferences.OnPreferenceChangeListener {
   private var endpoint: MessageProcessorEndpoint? = null
   private val queueInitJob: Job =
@@ -113,6 +118,11 @@ constructor(
     scope.launch(ioDispatcher) {
       outgoingQueue.queueSize.collect { size -> endpointStateRepo.setQueueLength(size) }
     }
+    // Run data retention cleanup on startup
+    scope.launch(ioDispatcher) {
+      queueInitJob.join()
+      runDataRetentionCleanup()
+    }
   }
 
   /**
@@ -138,6 +148,11 @@ constructor(
   /** Called either by the connection activity user button, or by receiving a RECONNECT message */
   suspend fun reconnect(): Result<Unit> {
     Timber.v("reconnect")
+    if (!preferences.connectionEnabled) {
+      Timber.i("Connection is disabled, not reconnecting")
+      endpointStateRepo.setState(EndpointState.IDLE)
+      return Result.success(Unit)
+    }
     return try {
       when (endpoint) {
         null -> {
@@ -154,6 +169,28 @@ constructor(
     } catch (e: Exception) {
       Result.failure(e)
     }
+  }
+
+  /** Disconnects the endpoint and stops sending messages */
+  suspend fun disconnect() {
+    Timber.v("disconnect requested")
+    preferences.connectionEnabled = false
+    endpoint?.deactivate()
+    endpointStateRepo.setState(EndpointState.DISCONNECTED)
+  }
+
+  /** Starts the connection if it was manually stopped */
+  suspend fun startConnection() {
+    Timber.v("startConnection requested")
+    preferences.connectionEnabled = true
+    reconnect()
+  }
+
+  /** Cancels any scheduled reconnect and tries to reconnect immediately */
+  suspend fun tryReconnectNow() {
+    Timber.v("tryReconnectNow requested")
+    scheduler.cancelMqttReconnect()
+    reconnect()
   }
 
   val isEndpointReady: Boolean
@@ -196,7 +233,8 @@ constructor(
               scope,
               ioDispatcher,
               applicationContext,
-              mqttConnectionIdlingResource)
+              mqttConnectionIdlingResource,
+              wifiInfoProvider)
       ConnectionMode.HTTP ->
           HttpMessageProcessorEndpoint(
               this,
@@ -211,6 +249,7 @@ constructor(
   }
 
   fun queueMessageForSending(message: MessageBase) {
+    runBlocking { queueInitJob.join() }
     outgoingQueueIdlingResource.increment()
     scope.launch(ioDispatcher) {
       val currentSize = outgoingQueue.size()
@@ -288,9 +327,15 @@ constructor(
                                 message.numberOfRetries, SEND_FAILURE_BACKOFF_INITIAL_WAIT)
                       }
 
-                      is MessageProcessorEndpoint.OutgoingMessageSendingException,
-                      is ConfigurationIncompleteException,
                       is MQTTMessageProcessorEndpoint.NotConnectedException -> {
+                        Timber.w("MQTT not connected for message $message. Waiting for connection")
+                        reQueueMessage(message)
+                        waitForConnection()
+                        // Don't change lastMessageStatus - retry immediately when connected
+                      }
+
+                      is MessageProcessorEndpoint.OutgoingMessageSendingException,
+                      is ConfigurationIncompleteException -> {
                         when (this) {
                           is MessageProcessorEndpoint.OutgoingMessageSendingException ->
                               Timber.w(this, "Error sending message $message. Re-queueing")
@@ -324,6 +369,8 @@ constructor(
                       ?: run {
                         Timber.d("Message sent successfully: $message")
                         lastMessageStatus = LastMessageStatus.Success
+                        endpointStateRepo.setLastSuccessfulMessageTime(java.time.Instant.now())
+                        sentMessagesRepo.archiveMessage(message)
                         if (message !is MessageWaypoint) {
                           messageReceivedIdlingResource.add(message)
                         }
@@ -366,19 +413,34 @@ constructor(
    * @param waitFor how long to wait for
    * @return whether or not the wait job was cancelled
    */
-  private suspend fun resendDelayWait(waitFor: Duration): Boolean =
-      scope
-          .launch {
-            Timber.d("Waiting for $waitFor before retrying send")
-            delay(waitFor)
-          }
-          .run {
-            Timber.v("Joining on backoff delay job")
-            retryDelayJob = this
-            measureTime { join() }
-                .run { Timber.d("Retry wait finished after $this. Cancelled=${isCancelled}}") }
-            return isCancelled
-          }
+  private suspend fun resendDelayWait(waitFor: Duration): Boolean {
+    // Update the next reconnect time so the UI can show a countdown
+    val nextReconnectTime = java.time.Instant.now().plusMillis(waitFor.inWholeMilliseconds)
+    endpointStateRepo.setNextReconnectTime(nextReconnectTime)
+
+    return scope
+        .launch {
+          Timber.d("Waiting for $waitFor before retrying send")
+          delay(waitFor)
+        }
+        .run {
+          Timber.v("Joining on backoff delay job")
+          retryDelayJob = this
+          measureTime { join() }
+              .run { Timber.d("Retry wait finished after $this. Cancelled=${isCancelled}}") }
+          return isCancelled
+        }
+  }
+
+  /**
+   * Suspends until the endpoint state becomes CONNECTED.
+   * Used when messages can't be sent because MQTT is disconnected.
+   */
+  private suspend fun waitForConnection() {
+    Timber.i("Waiting for connection state to become CONNECTED")
+    endpointStateRepo.endpointState.first { it == EndpointState.CONNECTED }
+    Timber.i("Connection state is now CONNECTED, resuming message send")
+  }
 
   // Takes a message and sticks it on the head of the queue
   private suspend fun reQueueMessage(message: MessageBase) {
@@ -407,6 +469,11 @@ constructor(
     }
     // Wake up any suspended awaitMessage() call to retry immediately
     outgoingQueue.signalMessageAvailable()
+  }
+
+  fun triggerImmediateSync() {
+    Timber.d("Triggering immediate sync")
+    notifyOutgoingMessageQueue()
   }
 
   fun onMessageDeliveryFailedFinal(message: MessageBase) {
@@ -564,6 +631,16 @@ constructor(
     locationProcessorLazy.get().publishLocationMessage(trigger)
   }
 
+  suspend fun clearSentMessages() {
+    sentMessagesRepo.clearAll()
+  }
+
+  suspend fun resendAllSentMessages() {
+    val messages = sentMessagesRepo.getAllMessages()
+    Timber.i("Re-queueing ${messages.size} sent messages for resend")
+    messages.forEach { queueMessageForSending(it) }
+  }
+
   fun stopSendingMessages() {
     Timber.d("Interrupting background sending thread")
     dequeueAndSenderJob?.cancel()
@@ -587,6 +664,19 @@ constructor(
       }
       loadOutgoingMessageProcessor()
     }
+    if (properties.contains(Preferences::dataRetentionHours.name) ||
+        properties.contains(Preferences::sentDataRetentionHours.name)) {
+      scope.launch(ioDispatcher) { runDataRetentionCleanup() }
+    }
+  }
+
+  private suspend fun runDataRetentionCleanup() {
+    val dataRetentionHours = preferences.dataRetentionHours
+    if (dataRetentionHours > 0) {
+      val cutoff = System.currentTimeMillis() - dataRetentionHours.toLong() * 3600 * 1000
+      outgoingQueue.deleteOlderThan(cutoff)
+    }
+    sentMessagesRepo.cleanupIfNeeded()
   }
 
   companion object {

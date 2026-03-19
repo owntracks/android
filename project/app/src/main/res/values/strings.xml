@@ -164,6 +164,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesCleanSessionEnabled">"Clean Session"</string>
     <string name="preferencesClientCrtInstall">"Install client certificate"</string>
     <string name="preferencesClientCrt">"Client certificate"</string>
+    <string name="preferencesTlsCertificatesInfo">"Client and CA certificates are optional. Only configure these if your server requires custom certificates."</string>
     <string name="preferencesClientId">"Client ID"</string>
     <string name="preferencesClientIdValidationError">"Cannot be empty"</string>
     <string name="preferencesDebugLog">"Debug log"</string>
@@ -182,6 +183,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesEncryptionKeyDialogMessage">"Encryption key is cut off after 32 characters."</string>
     <string name="preferencesEncryptionKeySummary">"Symmetric key for payload encryption"</string>
     <string name="preferencesExperimental">"Experimental"</string>
+    <string name="noExperimentalFeatures">"No experimental features available"</string>
     <string name="preferencesExportSuccess">"Export successful"</string>
     <string name="preferencesExportError">"Error exporting configuration"</string>
     <string name="preferencesHost">"Host"</string>
@@ -240,6 +242,27 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesRemoteConfiguration">"Remote configuration"</string>
     <string name="preferencesRemoteConfigurationSummary">"Enable configuration to be updated remotely (requires remote commands)"</string>
     <string name="preferencesReporting">"Reporting"</string>
+    <string name="preferencesDataRetention">"Data retention"</string>
+    <string name="preferencesDataRetentionTitle">"All data retention"</string>
+    <string name="preferencesDataRetentionSummary">"How long to keep all location data on device"</string>
+    <string name="preferencesSentDataRetentionTitle">"Sent data retention"</string>
+    <string name="preferencesSentDataRetentionSummary">"How long to keep successfully sent location data"</string>
+    <string name="preferencesDeleteSentData">"Delete sent data"</string>
+    <string name="preferencesDeleteSentDataSummary">"Remove all synchronized location data from device"</string>
+    <string name="preferencesDeleteSentDataConfirmTitle">"Delete sent data?"</string>
+    <string name="preferencesDeleteSentDataConfirmMessage">"This will permanently delete all synchronized location data stored on this device."</string>
+    <string name="preferencesRetentionForever">"Forever"</string>
+    <string name="preferencesRetention1Hour">"1 hour"</string>
+    <string name="preferencesRetention6Hours">"6 hours"</string>
+    <string name="preferencesRetention1Day">"1 day"</string>
+    <string name="preferencesRetention7Days">"7 days"</string>
+    <string name="preferencesRetention30Days">"30 days"</string>
+    <string name="preferencesRetention90Days">"90 days"</string>
+    <string name="preferencesRetention1Year">"1 year"</string>
+    <string name="preferencesResendSentData">"Resend all sent data"</string>
+    <string name="preferencesResendSentDataSummary">"Re-queue all archived messages for publishing"</string>
+    <string name="preferencesResendSentDataConfirmTitle">"Resend all data?"</string>
+    <string name="preferencesResendSentDataConfirmMessage">"This will re-queue all archived sent messages for publishing. This may take a while depending on the amount of data."</string>
     <string name="preferencesRepository">"Source Code"</string>
     <string name="preferencesRepublishOnReconnect">"Publish location on MQTT connect"</string>
     <string name="preferencesRepublishOnReconnectSummary">"Publish the last known location and current extended data immediately on connecting to MQTT"</string>
@@ -249,6 +272,11 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesShowWaypointsOnMap">"Show Waypoints"</string>
     <string name="preferencesShowWaypointsOnMapSummary">"Draw waypoint circles on the map"</string>
     <string name="preferencesTheme">"Theme"</string>
+    <string name="preferencesDynamicColors">"Use device colors"</string>
+    <string name="preferencesDynamicColorsSummary">"Apply colors from your device wallpaper (Material You)"</string>
+    <string name="preferencesActions">"Actions"</string>
+    <string name="preferencesAppearance">"Appearance"</string>
+    <string name="preferencesInfo">"Info"</string>
     <string name="preferencesTrackerId">"Tracker ID"</string>
     <string name="preferencesTrackerIdValidationError">"Must be one or two characters"</string>
     <string name="preferencesMastodon" translatable="false">"Mastodon"</string>
@@ -257,9 +285,14 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesUsername">"Username"</string>
     <string name="preferencesWebsocket">"Use WebSockets"</string>
     <string name="publish">"Report Location"</string>
+    <string name="publishQueued">"Location queued for sending"</string>
     <string name="radius">"Radius (m)"</string>
     <string name="reconnect">"Reconnect"</string>
     <string name="reconnecting">"Reconnecting"</string>
+    <string name="reconnectingInSeconds">"Reconnecting in %d seconds"</string>
+    <string name="tryAgain">"Try Now"</string>
+    <string name="connectionStart">"Connect"</string>
+    <string name="connectionStop">"Disconnect"</string>
     <string name="requestLocationSent">"Request location command sent to %s"</string>
     <string name="save">"Save"</string>
     <string name="select">"Select"</string>
@@ -363,4 +396,32 @@ Please check the logs for more details."</string>
     <string name="workmanagerInitializationErrorDialogTitle">"Initialization Error"</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="back">Navigate back</string>
+
+    <!-- Connection status -->
+    <string name="sync_status_queue_length">"Messages in queue"</string>
+    <string name="sync_status_last_success">"Last sync"</string>
+    <string name="sync_status_sync_now">"Sync Now"</string>
+    <string name="connectionStatusContentDescription">"Connection status"</string>
+
+    <!-- Configuration missing alert -->
+    <string name="configuration_missing_alert_title">"Configuration incomplete"</string>
+    <string name="configuration_missing_mqtt_host">"MQTT host is not configured"</string>
+    <string name="configuration_missing_http_url">"HTTP URL is not configured"</string>
+    <string name="configuration_missing_action">"Configure"</string>
+
+    <!-- Password visibility -->
+    <string name="show_password">"Show password"</string>
+    <string name="hide_password">"Hide password"</string>
+
+    <!-- Local Network -->
+    <string name="preferencesCategoryLocalNetwork">"Local Network"</string>
+    <string name="preferencesLocalNetworkEnabled">"Enable local network switching"</string>
+    <string name="preferencesLocalNetworkEnabledSummary">"Use alternate host/port when connected to specified WiFi"</string>
+    <string name="preferencesLocalNetworkSsid">"WiFi Network (SSID)"</string>
+    <string name="preferencesLocalNetworkUseCurrentSsid">"Use current connection"</string>
+    <string name="preferencesLocalNetworkHost">"Local Host"</string>
+    <string name="preferencesLocalNetworkPort">"Local Port"</string>
+    <string name="preferencesLocalNetworkTls">"Local TLS"</string>
+    <string name="preferencesLocalNetworkActive">"Currently using local network connection"</string>
 </resources>

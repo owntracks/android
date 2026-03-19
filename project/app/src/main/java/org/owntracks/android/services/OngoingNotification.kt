@@ -61,7 +61,7 @@ class OngoingNotification(private val context: Context, initialMode: MonitoringM
           .setContentIntent(resultPendingIntent)
           .setStyle(NotificationCompat.BigTextStyle())
           .addAction(
-              R.drawable.ic_baseline_publish_24,
+              R.drawable.ic_add_location_alt,
               context.getString(R.string.publish),
               publishPendingIntent)
           .addAction(
@@ -88,10 +88,17 @@ class OngoingNotification(private val context: Context, initialMode: MonitoringM
               })
           .build()
 
+  private fun isNotificationVisible(): Boolean =
+      notificationManagerCompat.activeNotifications.any { it.id == NOTIFICATION_ID_ONGOING }
+
   private fun updateNotification() {
     if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) ==
         PackageManager.PERMISSION_GRANTED) {
-      notificationManagerCompat.notify(NOTIFICATION_ID_ONGOING, getNotification())
+      if (isNotificationVisible()) {
+        notificationManagerCompat.notify(NOTIFICATION_ID_ONGOING, getNotification())
+      } else {
+        Timber.d("Skipping notification update as user has dismissed the notification")
+      }
     } else {
       Timber.w(
           "Tried to update ongoing notification with $this but notification permissions were missing")
@@ -101,8 +108,7 @@ class OngoingNotification(private val context: Context, initialMode: MonitoringM
   fun setEndpointState(endpointState: EndpointState, host: String) {
     val notificationContent =
         when (endpointState) {
-          EndpointState.CONNECTED,
-          EndpointState.IDLE ->
+          EndpointState.CONNECTED ->
               context.getString(
                   R.string.notificationEndpointStateConnected,
                   context.resources.getString(R.string.CONNECTED),

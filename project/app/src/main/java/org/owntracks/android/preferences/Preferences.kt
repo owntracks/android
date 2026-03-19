@@ -197,6 +197,9 @@ constructor(
 
   @Preference(exportModeHttp = false) var clientId: String by preferencesStore
 
+  @Preference(exportModeMqtt = false, exportModeHttp = false)
+  var connectionEnabled: Boolean by preferencesStore
+
   @Preference var connectionTimeoutSeconds: Int by preferencesStore
 
   @Preference var debugLog: Boolean by preferencesStore
@@ -208,6 +211,8 @@ constructor(
   @Preference var discardNetworkLocationThresholdSeconds: Int by preferencesStore
 
   @Preference(exportModeMqtt = false) var dontReuseHttpClient: Boolean by preferencesStore
+
+  @Preference var dynamicColorsEnabled: Boolean by preferencesStore
 
   @Preference var enableMapRotation: Boolean by preferencesStore
 
@@ -262,6 +267,16 @@ constructor(
   @Preference var ping: Int by preferencesStore
 
   @Preference(exportModeHttp = false) var port: Int by preferencesStore
+
+  @Preference(exportModeHttp = false) var localNetworkEnabled: Boolean by preferencesStore
+  @Preference(exportModeHttp = false) var localNetworkSsid: String by preferencesStore
+  @Preference(exportModeHttp = false) var localNetworkHost: String by preferencesStore
+  @Preference(exportModeHttp = false) var localNetworkPort: Int by preferencesStore
+  @Preference(exportModeHttp = false) var localNetworkTls: Boolean by preferencesStore
+
+  @Preference var dataRetentionHours: Int by preferencesStore
+
+  @Preference var sentDataRetentionHours: Int by preferencesStore
 
   @Preference var extendedData: Boolean by preferencesStore
 
@@ -454,7 +469,12 @@ constructor(
             Preferences::host.name,
             Preferences::username.name,
             Preferences::clientId.name,
-            Preferences::tlsClientCrt.name)
+            Preferences::tlsClientCrt.name,
+            Preferences::localNetworkEnabled.name,
+            Preferences::localNetworkSsid.name,
+            Preferences::localNetworkHost.name,
+            Preferences::localNetworkPort.name,
+            Preferences::localNetworkTls.name)
   }
 
   @Target(AnnotationTarget.PROPERTY)

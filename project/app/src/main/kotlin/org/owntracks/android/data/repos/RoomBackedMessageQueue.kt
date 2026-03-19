@@ -359,6 +359,20 @@ class RoomBackedMessageQueue(
     }
   }
 
+  /** Deletes messages older than the given cutoff timestamp */
+  suspend fun deleteOlderThan(cutoffTimestamp: Long): Int {
+    return withContext(ioDispatcher) {
+      mutex.withLock {
+        val deleted = dao.deleteOlderThan(cutoffTimestamp)
+        if (deleted > 0) {
+          _queueSize.value = dao.getCount()
+          Timber.i("Deleted $deleted expired messages from queue")
+        }
+        deleted
+      }
+    }
+  }
+
   /** Closes the database connection */
   override fun close() {
     db.close()

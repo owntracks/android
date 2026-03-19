@@ -20,6 +20,7 @@ interface DefaultsProvider {
           (preferences.username + preferences.deviceId)
               .replace("\\W".toRegex(), "")
               .lowercase(Locale.getDefault())
+      Preferences::connectionEnabled -> true
       Preferences::connectionTimeoutSeconds -> 30
       Preferences::debugLog -> false
       Preferences::deviceId ->
@@ -28,6 +29,7 @@ interface DefaultsProvider {
               ?.lowercase(Locale.getDefault()) ?: "unknown"
       Preferences::discardNetworkLocationThresholdSeconds -> 0
       Preferences::dontReuseHttpClient -> false
+      Preferences::dynamicColorsEnabled -> true
       Preferences::enableMapRotation -> true
       Preferences::encryptionKey -> ""
       Preferences::experimentalFeatures -> emptySet<String>()
@@ -55,6 +57,13 @@ interface DefaultsProvider {
       Preferences::pegLocatorFastestIntervalToInterval -> false
       Preferences::ping -> 15
       Preferences::port -> 8883
+      Preferences::localNetworkEnabled -> false
+      Preferences::localNetworkSsid -> ""
+      Preferences::localNetworkHost -> ""
+      Preferences::localNetworkPort -> 1883
+      Preferences::localNetworkTls -> false
+      Preferences::dataRetentionHours -> 0
+      Preferences::sentDataRetentionHours -> 0
       Preferences::extendedData -> true
       Preferences::pubQos -> MqttQos.One
       Preferences::pubRetain -> true

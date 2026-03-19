@@ -12,9 +12,15 @@ class EndpointStateRepo @Inject constructor() {
 
   val endpointState: MutableStateFlow<EndpointState> = MutableStateFlow(EndpointState.IDLE)
 
+  val currentEndpointHost: MutableStateFlow<String> = MutableStateFlow("")
+
   val endpointQueueLength: MutableStateFlow<Int> = MutableStateFlow(0)
 
   val serviceStartedDate: MutableStateFlow<Instant> = MutableStateFlow(Instant.now())
+
+  val lastSuccessfulMessageTime: MutableStateFlow<Instant?> = MutableStateFlow(null)
+
+  val nextReconnectTime: MutableStateFlow<Instant?> = MutableStateFlow(null)
 
   suspend fun setState(newEndpointState: EndpointState) {
     Timber.v(
@@ -24,6 +30,10 @@ class EndpointStateRepo @Inject constructor() {
             }
             }")
     endpointState.emit(newEndpointState)
+    // Clear next reconnect time when we start connecting or are connected
+    if (newEndpointState == EndpointState.CONNECTING || newEndpointState == EndpointState.CONNECTED) {
+      nextReconnectTime.emit(null)
+    }
   }
 
   suspend fun setQueueLength(queueLength: Int) {
@@ -33,5 +43,20 @@ class EndpointStateRepo @Inject constructor() {
 
   suspend fun setServiceStartedNow() {
     serviceStartedDate.emit(Instant.now())
+  }
+
+  suspend fun setLastSuccessfulMessageTime(time: Instant) {
+    Timber.v("Setting lastSuccessfulMessageTime=$time")
+    lastSuccessfulMessageTime.emit(time)
+  }
+
+  suspend fun setNextReconnectTime(time: Instant?) {
+    Timber.v("Setting nextReconnectTime=$time")
+    nextReconnectTime.emit(time)
+  }
+
+  suspend fun setCurrentEndpointHost(host: String) {
+    Timber.v("Setting currentEndpointHost=$host")
+    currentEndpointHost.emit(host)
   }
 }
