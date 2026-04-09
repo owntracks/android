@@ -196,7 +196,6 @@
             <intent-filter>
                 <action android:name="org.owntracks.android.CLEAR_NOTIFICATIONS" />
                 <action android:name="org.owntracks.android.SEND_LOCATION_USER" />
-                <action android:name="org.owntracks.android.SEND_EVENT_CIRCULAR" />
                 <action android:name="org.owntracks.android.REREQUEST_LOCATION_UPDATES" />
                 <action android:name="org.owntracks.android.CHANGE_MONITORING" />
             </intent-filter>

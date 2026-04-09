@@ -282,7 +282,10 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
         }
         // This comes from the [GeofencingBroadcastReceiver]
         INTENT_ACTION_SEND_EVENT_CIRCULAR -> {
-          lifecycleScope.launch { onGeofencingEvent(fromIntent(intent)) }
+          val event = fromIntent(intent)
+          if (!event.hasError() && !event.triggeringGeofences.isNullOrEmpty()) {
+            lifecycleScope.launch { onGeofencingEvent(fromIntent(intent)) }
+          }
           return
         }
 
