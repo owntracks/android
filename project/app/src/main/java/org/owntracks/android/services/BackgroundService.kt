@@ -17,7 +17,6 @@ import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
-import android.os.Process
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.StyleSpan
@@ -323,10 +322,6 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
           setupAndStartService()
           return
         }
-        INTENT_ACTION_EXIT -> {
-          exit()
-          return
-        }
         else -> {}
       }
     } else {
@@ -367,13 +362,6 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
     scheduler.scheduleLocationPing()
     significantMotionSensor.setup()
     messageProcessor.initialize()
-  }
-
-  private fun exit() {
-    Timber.v("exit() called. Stopping service and process.")
-    stopSelf()
-    scheduler.cancelAllTasks()
-    Process.killProcess(Process.myPid())
   }
 
   private fun notifyUserOfBackgroundLocationRestriction() {
@@ -697,7 +685,6 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
         "org.owntracks.android.CLEAR_EVENT_NOTIFICATIONS"
     private const val INTENT_ACTION_CLEAR_CONTACTS = "org.owntracks.android.CLEAR_CONTACTS"
     const val INTENT_ACTION_CHANGE_MONITORING = "org.owntracks.android.CHANGE_MONITORING"
-    private const val INTENT_ACTION_EXIT = "org.owntracks.android.EXIT"
     private const val INTENT_ACTION_BOOT_COMPLETED = "android.intent.action.BOOT_COMPLETED"
     private const val INTENT_ACTION_PACKAGE_REPLACED = "android.intent.action.MY_PACKAGE_REPLACED"
     const val UPDATE_CURRENT_INTENT_FLAGS =
