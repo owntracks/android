@@ -146,6 +146,8 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesAdvancedOpencagePrivacyDialogTitle">OpenCage Privacy Policy</string>
     <string name="preferencesAdvancedOpencagePrivacyDialogAccept">Accept</string>
     <string name="preferencesAdvancedOpencagePrivacyDialogCancel">Cancel</string>
+    <string name="preferencesAllowIntentControl">"Allow intent control"</string>
+    <string name="preferencesAllowIntentControlSummary">"Allow external apps (e.g. Tasker) to trigger location publishes and change monitoring mode via intents"</string>
     <string name="preferencesAutostart">"Autostart"</string>
     <string name="preferencesAutostartSummary">"Automatically start on device boot"</string>
     <string name="preferencesBrokerPassword">"Password"</string>
