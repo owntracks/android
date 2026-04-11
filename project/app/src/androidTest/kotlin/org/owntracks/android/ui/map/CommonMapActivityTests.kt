@@ -12,7 +12,6 @@ import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDr
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Test
 import org.owntracks.android.R
-import org.owntracks.android.testutils.JustThisTestPlease
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.addWaypoint
 import org.owntracks.android.testutils.clickOnDrawerAndWait
@@ -23,7 +22,7 @@ import org.owntracks.android.testutils.setNotFirstStartPreferences
 
 @MediumTest
 @HiltAndroidTest
-@JustThisTestPlease
+// @JustThisTestPlease
 class CommonMapActivityTests : TestWithAnActivity<MapActivity>(false) {
 
   @Test
