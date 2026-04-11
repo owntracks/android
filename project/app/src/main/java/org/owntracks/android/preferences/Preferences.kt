@@ -219,6 +219,8 @@ constructor(
 
   @Preference(exportModeHttp = false) var host: String by preferencesStore
 
+  @Preference var allowIntentControl: Boolean by preferencesStore
+
   @Preference var ignoreInaccurateLocations: Int by preferencesStore
 
   @Preference var ignoreStaleLocations: Float by preferencesStore
