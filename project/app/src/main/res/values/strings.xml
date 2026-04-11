@@ -155,13 +155,14 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesCategoryAdvancedEncryption">"Encryption"</string>
     <string name="preferencesCategoryAdvancedLocator">"Locator"</string>
     <string name="preferencesCategoryAdvancedMisc">"Misc"</string>
-    <string name="preferencesCategoryAdvancedServices">"Services"</string>
     <string name="preferencesCategoryConnectionEndpoint">"Endpoint"</string>
     <string name="preferencesCategoryConnectionIdentification">"Identification"</string>
     <string name="preferencesCategoryConnectionCredentials">"Credentials"</string>
     <string name="preferencesCategoryNotificationBackground">"Background notifications"</string>
     <string name="preferencesCategoryNotificationErrors">"Errors &amp; Issues"</string>
     <string name="preferencesCategoryNotificationOngoing">"Ongoing notification"</string>
+    <string name="preferencesCategoryRemoteControlDevice">"From Device"</string>
+    <string name="preferencesCategoryRemoteControlEndpoint">"From Endpoint"</string>
     <string name="preferencesChangelog">"Changelog"</string>
     <string name="preferencesCleanSessionEnabled">"Clean Session"</string>
     <string name="preferencesClientCrtInstall">"Install client certificate"</string>
@@ -237,6 +238,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesProfileId">"Mode"</string>
     <string name="preferencesPubExtendedData">"Extended data"</string>
     <string name="preferencesPubExtendedDataSummary">"Include battery status, connection type and monitoring mode in location reports"</string>
+    <string name="preferencesRemoteControl">"Remote Control"</string>
     <string name="preferencesRemoteCommand">"Remote commands"</string>
     <string name="preferencesRemoteCommandSummary">"Enable remote commands"</string>
     <string name="preferencesRemoteConfiguration">"Remote configuration"</string>

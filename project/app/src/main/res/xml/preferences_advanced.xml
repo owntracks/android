@@ -4,20 +4,6 @@
     app:title="@string/preferencesAdvanced">
     <androidx.preference.PreferenceCategory
         app:iconSpaceReserved="false"
-        app:title="@string/preferencesCategoryAdvancedServices">
-        <androidx.preference.SwitchPreferenceCompat
-            app:iconSpaceReserved="false"
-            app:key="cmd"
-            app:summary="@string/preferencesRemoteCommandSummary"
-            app:title="@string/preferencesRemoteCommand" />
-        <androidx.preference.SwitchPreferenceCompat
-            app:iconSpaceReserved="false"
-            app:key="remoteConfiguration"
-            app:summary="@string/preferencesRemoteConfigurationSummary"
-            app:title="@string/preferencesRemoteConfiguration" />
-    </androidx.preference.PreferenceCategory>
-    <androidx.preference.PreferenceCategory
-        app:iconSpaceReserved="false"
         app:title="@string/preferencesCategoryAdvancedLocator">
         <org.owntracks.android.support.widgets.EditIntegerPreference
             android:digits="0123456789"
