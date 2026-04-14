@@ -2,6 +2,7 @@ package org.owntracks.android.ui
 
 import android.content.Intent
 import androidx.core.net.toUri
+import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -28,8 +29,10 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 import org.owntracks.android.R
+import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.getText
 import org.owntracks.android.testutils.idlingresources.ViewIdlingResource
@@ -42,6 +45,14 @@ import org.owntracks.android.ui.preferences.load.LoadActivity
 class LoadActivityTests : TestWithAnActivity<LoadActivity>(false) {
 
   private var mockWebServer = MockWebServer()
+
+  @Before
+  fun enableConfigLoading() {
+    PreferenceManager.getDefaultSharedPreferences(app)
+        .edit()
+        .putBoolean(Preferences::allowConfigurationByURIAndConfigFile.name, true)
+        .commit()
+  }
 
   @After
   fun teardown() {
