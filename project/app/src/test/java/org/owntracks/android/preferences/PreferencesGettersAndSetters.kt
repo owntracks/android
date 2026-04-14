@@ -84,6 +84,7 @@ class PreferencesGettersAndSetters(private val parameter: Parameter) {
       return arrayListOf(
               Parameter("autostartOnBoot", true, Boolean::class, false),
               Parameter("allowIntentControl", true, Boolean::class, false),
+              Parameter("allowConfigurationByURIAndConfigFile", true, Boolean::class, false),
               Parameter("cleanSession", true, Boolean::class, false),
               Parameter("clientId", "testClientId", String::class, false),
               Parameter("connectionTimeoutSeconds", 20, Int::class, false),

@@ -150,6 +150,8 @@ To allow this, please enable Location in the device settings."</string>
     <string name="permissionControlTrackingDescription">"Allows an app to trigger location publishes and change the monitoring mode in OwnTracks"</string>
     <string name="preferencesAllowIntentControl">"Allow intent control"</string>
     <string name="preferencesAllowIntentControlSummary">"Allow external apps (e.g. Tasker) to trigger location publishes and change monitoring mode via intents"</string>
+    <string name="preferencesAllowConfigurationByURIAndConfigFile">"Allow external configuration"</string>
+    <string name="preferencesAllowConfigurationByURIAndConfigFileSummary">"Allow loading configuration from owntracks: scheme URIs and config files"</string>
     <string name="preferencesAutostart">"Autostart"</string>
     <string name="preferencesAutostartSummary">"Automatically start on device boot"</string>
     <string name="preferencesBrokerPassword">"Password"</string>
