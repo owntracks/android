@@ -124,15 +124,16 @@ class IntentTests :
       configureMQTTConnectionToLocalWithGeneratedPassword(saveConfigurationIdlingResource)
     }
 
-    PreferenceManager.getDefaultSharedPreferences(app)
-        .edit()
-        .putBoolean(Preferences::allowIntentControl.name, true)
-        .commit()
+    val prefs = PreferenceManager.getDefaultSharedPreferences(app)
+    prefs.edit().putBoolean(Preferences::allowIntentControl.name, true).commit()
+    val authKey = prefs.getString(Preferences::intentAuthKey.name, null)
+        ?: throw IllegalStateException("intentAuthKey not set")
 
     // setupTestActivity starts in Quiet (stop icon); cycling should advance to Manual (pause icon)
     app.sendBroadcast(
         Intent(app, ExternalIntentReceiver::class.java).apply {
           action = BackgroundService.INTENT_ACTION_CHANGE_MONITORING
+          putExtra(ExternalIntentReceiver.INTENT_EXTRA_AUTH_KEY, authKey)
         })
 
     // Allow time for broadcast delivery → receiver → service → UI update
@@ -142,6 +143,34 @@ class IntentTests :
         .check(
             ViewAssertions.matches(
                 withActionIconDrawable(R.drawable.ic_baseline_pause_36),
+            ),
+        )
+  }
+
+  @Test
+  fun given_intent_control_enabled_when_change_monitoring_sent_with_wrong_key_then_monitoring_mode_does_not_change() {
+    setupTestActivity {
+      configureMQTTConnectionToLocalWithGeneratedPassword(saveConfigurationIdlingResource)
+    }
+
+    PreferenceManager.getDefaultSharedPreferences(app)
+        .edit()
+        .putBoolean(Preferences::allowIntentControl.name, true)
+        .commit()
+
+    app.sendBroadcast(
+        Intent(app, ExternalIntentReceiver::class.java).apply {
+          action = BackgroundService.INTENT_ACTION_CHANGE_MONITORING
+          putExtra(ExternalIntentReceiver.INTENT_EXTRA_AUTH_KEY, "wrong-key")
+        })
+
+    Thread.sleep(500)
+
+    // Monitoring should remain Quiet (stop icon) — wrong key rejected
+    onView(ViewMatchers.withId(R.id.menu_monitoring))
+        .check(
+            ViewAssertions.matches(
+                withActionIconDrawable(R.drawable.ic_baseline_stop_36),
             ),
         )
   }
@@ -176,10 +205,10 @@ class IntentTests :
       configureMQTTConnectionToLocalWithGeneratedPassword(saveConfigurationIdlingResource)
     }
 
-    PreferenceManager.getDefaultSharedPreferences(app)
-        .edit()
-        .putBoolean(Preferences::allowIntentControl.name, true)
-        .commit()
+    val prefs = PreferenceManager.getDefaultSharedPreferences(app)
+    prefs.edit().putBoolean(Preferences::allowIntentControl.name, true).commit()
+    val authKey = prefs.getString(Preferences::intentAuthKey.name, null)
+        ?: throw IllegalStateException("intentAuthKey not set")
 
     waitUntilActivityVisible()
     clickOn(R.id.menu_monitoring)
@@ -193,6 +222,7 @@ class IntentTests :
     app.sendBroadcast(
         Intent(app, ExternalIntentReceiver::class.java).apply {
           action = BackgroundService.INTENT_ACTION_SEND_LOCATION_USER
+          putExtra(ExternalIntentReceiver.INTENT_EXTRA_AUTH_KEY, authKey)
         })
     packetReceivedIdlingResource.use(10.seconds) { Espresso.onIdle() }
 

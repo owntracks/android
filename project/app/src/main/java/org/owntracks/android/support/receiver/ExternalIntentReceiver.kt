@@ -12,7 +12,8 @@ import timber.log.Timber
 
 /**
  * Exported receiver that allows external apps (e.g. Tasker) to trigger location publishes and
- * change the monitoring mode, gated behind the [Preferences.allowIntentControl] preference.
+ * change the monitoring mode, gated behind the [Preferences.allowIntentControl] preference and
+ * authenticated by the [Preferences.intentAuthKey] value supplied as an intent extra.
  */
 @AndroidEntryPoint
 class ExternalIntentReceiver : BroadcastReceiver(), ServiceStarter by ServiceStarter.Impl() {
@@ -23,6 +24,11 @@ class ExternalIntentReceiver : BroadcastReceiver(), ServiceStarter by ServiceSta
       Timber.w("Received external intent ${intent.action} but allowIntentControl is disabled")
       return
     }
+    val providedKey = intent.getStringExtra(INTENT_EXTRA_AUTH_KEY)
+    if (providedKey != preferences.intentAuthKey) {
+      Timber.w("Received external intent ${intent.action} with invalid auth key")
+      return
+    }
     when (intent.action) {
       BackgroundService.INTENT_ACTION_SEND_LOCATION_USER,
       BackgroundService.INTENT_ACTION_CHANGE_MONITORING -> {
@@ -31,5 +37,9 @@ class ExternalIntentReceiver : BroadcastReceiver(), ServiceStarter by ServiceSta
       }
       else -> Timber.w("Received unexpected action ${intent.action} in ExternalIntentReceiver")
     }
+  }
+
+  companion object {
+    const val INTENT_EXTRA_AUTH_KEY = "intentAuthKey"
   }
 }
