@@ -43,6 +43,13 @@ constructor(
         property.annotations.any { annotation -> annotation is Preference }
       }
 
+  private val importableConfigKeys =
+      allConfigKeys.filter { property ->
+        property.annotations.any { annotation ->
+          annotation is Preference && annotation.importable
+        }
+      }
+
   private val mqttExportedConfigKeys =
       allConfigKeys.filter { property ->
         property.annotations.any { annotation ->
@@ -92,7 +99,7 @@ constructor(
    */
   fun importConfiguration(configuration: MessageConfiguration) {
     PreferencesStore.Transaction(this, preferencesStore).use {
-      allConfigKeys
+      importableConfigKeys
           .filterIsInstance<KMutableProperty<*>>()
           .filter { configuration.containsKey(it.name) }
           .forEach {
@@ -219,12 +226,14 @@ constructor(
 
   @Preference(exportModeHttp = false) var host: String by preferencesStore
 
-  @Preference var allowIntentControl: Boolean by preferencesStore
+  @Preference(exportModeMqtt = false, exportModeHttp = false, importable = false)
+  var allowIntentControl: Boolean by preferencesStore
 
-  @Preference(exportModeMqtt = false, exportModeHttp = false)
+  @Preference(exportModeMqtt = false, exportModeHttp = false, importable = false)
   var intentAuthKey: String by preferencesStore
 
-  @Preference var allowConfigurationByURIAndConfigFile: Boolean by preferencesStore
+  @Preference(exportModeMqtt = false, exportModeHttp = false, importable = false)
+  var allowConfigurationByURIAndConfigFile: Boolean by preferencesStore
 
   @Preference var ignoreInaccurateLocations: Int by preferencesStore
 
@@ -468,7 +477,8 @@ constructor(
   @Retention(AnnotationRetention.RUNTIME)
   annotation class Preference(
       val exportModeMqtt: Boolean = true,
-      val exportModeHttp: Boolean = true
+      val exportModeHttp: Boolean = true,
+      val importable: Boolean = true
   )
 
   interface OnPreferenceChangeListener {
