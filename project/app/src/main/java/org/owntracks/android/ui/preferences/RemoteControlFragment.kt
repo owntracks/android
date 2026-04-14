@@ -3,15 +3,12 @@ package org.owntracks.android.ui.preferences
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.content.Intent
-import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import android.widget.Toast
-import androidx.core.net.toUri
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import org.owntracks.android.R
@@ -25,10 +22,13 @@ class RemoteControlFragment @Inject constructor() : AbstractPreferenceFragment()
   override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
     super.onCreatePreferences(savedInstanceState, rootKey)
     setPreferencesFromResource(R.xml.preferences_remote_control, rootKey)
-    findPreference<SwitchPreferenceCompat>(Preferences::allowIntentControl.name)?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-      refreshPreferenceState()
-      false
-    }
+
+    findPreference<SwitchPreferenceCompat>(Preferences::allowIntentControl.name)?.onPreferenceClickListener =
+        Preference.OnPreferenceClickListener {
+          refreshPreferenceState()
+          false
+        }
+
     findPreference<Preference>(Preferences::intentAuthKey.name)?.apply {
       summary = preferences.intentAuthKey
       onPreferenceClickListener = Preference.OnPreferenceClickListener {
@@ -40,6 +40,26 @@ class RemoteControlFragment @Inject constructor() : AbstractPreferenceFragment()
         true
       }
     }
+
+    findPreference<SwitchPreferenceCompat>(Preferences::allowConfigurationByURIAndConfigFile.name)
+        ?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { preference, newValue ->
+      if (newValue == true) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.preferencesAllowConfigurationByURIAndConfigFileWarningTitle)
+            .setMessage(R.string.preferencesAllowConfigurationByURIAndConfigFileWarningMessage)
+            .setIcon(R.drawable.ic_baseline_warning_24)
+            .setPositiveButton(R.string.enable) { _, _ ->
+              preferences.allowConfigurationByURIAndConfigFile = true
+              (preference as SwitchPreferenceCompat).isChecked = true
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+        false // block the commit; dialog's positive button handles it if confirmed
+      } else {
+        true // disabling needs no confirmation
+      }
+    }
+
     refreshPreferenceState()
   }
 
