@@ -221,6 +221,9 @@ constructor(
 
   @Preference var allowIntentControl: Boolean by preferencesStore
 
+  @Preference(exportModeMqtt = false, exportModeHttp = false)
+  var intentAuthKey: String by preferencesStore
+
   @Preference var allowConfigurationByURIAndConfigFile: Boolean by preferencesStore
 
   @Preference var ignoreInaccurateLocations: Int by preferencesStore

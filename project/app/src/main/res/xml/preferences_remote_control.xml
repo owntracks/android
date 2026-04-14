@@ -9,6 +9,11 @@
             app:key="allowIntentControl"
             app:summary="@string/preferencesAllowIntentControlSummary"
             app:title="@string/preferencesAllowIntentControl" />
+        <androidx.preference.Preference
+            app:iconSpaceReserved="false"
+            app:key="intentAuthKey"
+            app:summary="@string/preferencesIntentAuthKeySummary"
+            app:title="@string/preferencesIntentAuthKey" />
         <androidx.preference.SwitchPreferenceCompat
             app:iconSpaceReserved="false"
             app:key="allowConfigurationByURIAndConfigFile"
