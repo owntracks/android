@@ -9,6 +9,11 @@
             app:key="allowIntentControl"
             app:summary="@string/preferencesAllowIntentControlSummary"
             app:title="@string/preferencesAllowIntentControl" />
+        <androidx.preference.SwitchPreferenceCompat
+            app:iconSpaceReserved="false"
+            app:key="allowConfigurationByURIAndConfigFile"
+            app:summary="@string/preferencesAllowConfigurationByURIAndConfigFileSummary"
+            app:title="@string/preferencesAllowConfigurationByURIAndConfigFile" />
     </androidx.preference.PreferenceCategory>
     <androidx.preference.PreferenceCategory
         app:iconSpaceReserved="false"

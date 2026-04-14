@@ -35,6 +35,7 @@ interface DefaultsProvider {
       Preferences::firstStart -> true
       Preferences::host -> ""
       Preferences::allowIntentControl -> false
+      Preferences::allowConfigurationByURIAndConfigFile -> false
       Preferences::ignoreInaccurateLocations -> 0
       Preferences::ignoreStaleLocations -> 0f
       Preferences::info -> true

@@ -221,6 +221,8 @@ constructor(
 
   @Preference var allowIntentControl: Boolean by preferencesStore
 
+  @Preference var allowConfigurationByURIAndConfigFile: Boolean by preferencesStore
+
   @Preference var ignoreInaccurateLocations: Int by preferencesStore
 
   @Preference var ignoreStaleLocations: Float by preferencesStore

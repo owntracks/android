@@ -126,6 +126,9 @@ constructor(
           return
         }
     try {
+      if (!preferences.allowConfigurationByURIAndConfigFile) {
+        throw IOException("External configuration loading is disabled")
+      }
       if (ContentResolver.SCHEME_FILE == uri.scheme) {
         // Note: left here to avoid breaking compatibility.  May be removed
         // with sufficient testing. Will not work on Android >5 without granting
