@@ -1,10 +1,14 @@
 package org.owntracks.android.ui.preferences
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
@@ -21,33 +25,26 @@ class RemoteControlFragment @Inject constructor() : AbstractPreferenceFragment()
   override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
     super.onCreatePreferences(savedInstanceState, rootKey)
     setPreferencesFromResource(R.xml.preferences_remote_control, rootKey)
-    refreshPreferenceState()
-  }
-
-  private fun refreshPreferenceState() {
-    listOf(
-            Preferences::notificationLocation.name,
-            Preferences::notificationEvents.name,
-            Preferences::notificationGeocoderErrors.name,
-        )
-        .forEach { preferenceKey ->
-          findPreference<SwitchPreferenceCompat>(preferenceKey)?.isEnabled =
-              requirementsChecker.hasNotificationPermissions()
-        }
-    findPreference<Preference>("notificationPermission")?.apply {
-      isVisible = !requirementsChecker.hasNotificationPermissions()
-      setOnPreferenceClickListener {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-          startActivity(
-              Intent(ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                data = "package:${context.packageName}".toUri()
-                flags = FLAG_ACTIVITY_NEW_TASK
-              },
-          )
+    findPreference<SwitchPreferenceCompat>(Preferences::allowIntentControl.name)?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+      refreshPreferenceState()
+      false
+    }
+    findPreference<Preference>(Preferences::intentAuthKey.name)?.apply {
+      summary = preferences.intentAuthKey
+      onPreferenceClickListener = Preference.OnPreferenceClickListener {
+        val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        clipboard.setPrimaryClip(ClipData.newPlainText("intentAuthKey", preferences.intentAuthKey))
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+          Toast.makeText(requireContext(), R.string.intentAuthKeyCopied, Toast.LENGTH_SHORT).show()
         }
         true
       }
     }
+    refreshPreferenceState()
+  }
+
+  private fun refreshPreferenceState() {
+    findPreference<Preference>(Preferences::intentAuthKey.name)?.isEnabled = preferences.allowIntentControl
   }
 
   override fun onResume() {
