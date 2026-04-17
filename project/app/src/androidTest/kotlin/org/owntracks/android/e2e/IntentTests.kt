@@ -126,8 +126,9 @@ class IntentTests :
 
     val prefs = PreferenceManager.getDefaultSharedPreferences(app)
     prefs.edit().putBoolean(Preferences::allowIntentControl.name, true).commit()
-    val authKey = prefs.getString(Preferences::intentAuthKey.name, null)
-        ?: throw IllegalStateException("intentAuthKey not set")
+    val authKey =
+        prefs.getString(Preferences::intentAuthKey.name, null)
+            ?: throw IllegalStateException("intentAuthKey not set")
 
     // setupTestActivity starts in Quiet (stop icon); cycling should advance to Manual (pause icon)
     app.sendBroadcast(
@@ -207,8 +208,9 @@ class IntentTests :
 
     val prefs = PreferenceManager.getDefaultSharedPreferences(app)
     prefs.edit().putBoolean(Preferences::allowIntentControl.name, true).commit()
-    val authKey = prefs.getString(Preferences::intentAuthKey.name, null)
-        ?: throw IllegalStateException("intentAuthKey not set")
+    val authKey =
+        prefs.getString(Preferences::intentAuthKey.name, null)
+            ?: throw IllegalStateException("intentAuthKey not set")
 
     waitUntilActivityVisible()
     clickOn(R.id.menu_monitoring)
