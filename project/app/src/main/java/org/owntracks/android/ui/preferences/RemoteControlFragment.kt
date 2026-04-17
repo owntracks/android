@@ -23,7 +23,8 @@ class RemoteControlFragment @Inject constructor() : AbstractPreferenceFragment()
     super.onCreatePreferences(savedInstanceState, rootKey)
     setPreferencesFromResource(R.xml.preferences_remote_control, rootKey)
 
-    findPreference<SwitchPreferenceCompat>(Preferences::allowIntentControl.name)?.onPreferenceClickListener =
+    findPreference<SwitchPreferenceCompat>(Preferences::allowIntentControl.name)
+        ?.onPreferenceClickListener =
         Preference.OnPreferenceClickListener {
           refreshPreferenceState()
           false
@@ -31,40 +32,46 @@ class RemoteControlFragment @Inject constructor() : AbstractPreferenceFragment()
 
     findPreference<Preference>(Preferences::intentAuthKey.name)?.apply {
       summary = preferences.intentAuthKey
-      onPreferenceClickListener = Preference.OnPreferenceClickListener {
-        val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        clipboard.setPrimaryClip(ClipData.newPlainText("intentAuthKey", preferences.intentAuthKey))
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-          Toast.makeText(requireContext(), R.string.intentAuthKeyCopied, Toast.LENGTH_SHORT).show()
-        }
-        true
-      }
+      onPreferenceClickListener =
+          Preference.OnPreferenceClickListener {
+            val clipboard =
+                requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            clipboard.setPrimaryClip(
+                ClipData.newPlainText("intentAuthKey", preferences.intentAuthKey))
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+              Toast.makeText(requireContext(), R.string.intentAuthKeyCopied, Toast.LENGTH_SHORT)
+                  .show()
+            }
+            true
+          }
     }
 
     findPreference<SwitchPreferenceCompat>(Preferences::allowConfigurationByURIAndConfigFile.name)
-        ?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { preference, newValue ->
-      if (newValue == true) {
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle(R.string.preferencesAllowConfigurationByURIAndConfigFileWarningTitle)
-            .setMessage(R.string.preferencesAllowConfigurationByURIAndConfigFileWarningMessage)
-            .setIcon(R.drawable.ic_baseline_warning_24)
-            .setPositiveButton(R.string.enable) { _, _ ->
-              preferences.allowConfigurationByURIAndConfigFile = true
-              (preference as SwitchPreferenceCompat).isChecked = true
-            }
-            .setNegativeButton(R.string.cancel, null)
-            .show()
-        false // block the commit; dialog's positive button handles it if confirmed
-      } else {
-        true // disabling needs no confirmation
-      }
-    }
+        ?.onPreferenceChangeListener =
+        Preference.OnPreferenceChangeListener { preference, newValue ->
+          if (newValue == true) {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.preferencesAllowConfigurationByURIAndConfigFileWarningTitle)
+                .setMessage(R.string.preferencesAllowConfigurationByURIAndConfigFileWarningMessage)
+                .setIcon(R.drawable.ic_baseline_warning_24)
+                .setPositiveButton(R.string.enable) { _, _ ->
+                  preferences.allowConfigurationByURIAndConfigFile = true
+                  (preference as SwitchPreferenceCompat).isChecked = true
+                }
+                .setNegativeButton(R.string.cancel, null)
+                .show()
+            false // block the commit; dialog's positive button handles it if confirmed
+          } else {
+            true // disabling needs no confirmation
+          }
+        }
 
     refreshPreferenceState()
   }
 
   private fun refreshPreferenceState() {
-    findPreference<Preference>(Preferences::intentAuthKey.name)?.isEnabled = preferences.allowIntentControl
+    findPreference<Preference>(Preferences::intentAuthKey.name)?.isEnabled =
+        preferences.allowIntentControl
   }
 
   override fun onResume() {

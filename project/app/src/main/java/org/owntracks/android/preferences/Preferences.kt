@@ -45,9 +45,7 @@ constructor(
 
   private val importableConfigKeys =
       allConfigKeys.filter { property ->
-        property.annotations.any { annotation ->
-          annotation is Preference && annotation.importable
-        }
+        property.annotations.any { annotation -> annotation is Preference && annotation.importable }
       }
 
   private val mqttExportedConfigKeys =
