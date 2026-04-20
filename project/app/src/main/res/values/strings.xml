@@ -158,8 +158,6 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesAdvancedOpencagePrivacyDialogTitle">OpenCage Privacy Policy</string>
     <string name="preferencesAdvancedOpencagePrivacyDialogAccept">Accept</string>
     <string name="preferencesAdvancedOpencagePrivacyDialogCancel">Cancel</string>
-    <string name="permissionControlTrackingLabel">"Control OwnTracks tracking"</string>
-    <string name="permissionControlTrackingDescription">"Allows an app to trigger location publishes and change the monitoring mode in OwnTracks"</string>
     <string name="preferencesAllowIntentControl">"Allow intent control"</string>
     <string name="preferencesAllowIntentControlSummary">"Allow external apps (e.g. Tasker) to trigger location publishes and change monitoring mode via intents. Make sure to send the intent auth key (below) in the intent extra data."</string>
     <string name="preferencesIntentAuthKey">"Intent auth key"</string>
