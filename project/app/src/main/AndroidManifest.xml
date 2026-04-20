@@ -52,12 +52,6 @@
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
 
-    <permission
-        android:name="org.owntracks.android.permission.CONTROL_TRACKING"
-        android:description="@string/permissionControlTrackingDescription"
-        android:label="@string/permissionControlTrackingLabel"
-        android:protectionLevel="dangerous" />
-
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -200,8 +194,7 @@
 
         <receiver
             android:name=".support.receiver.ExternalIntentReceiver"
-            android:exported="true"
-            android:permission="org.owntracks.android.permission.CONTROL_TRACKING">
+            android:exported="true">
             <intent-filter>
                 <action android:name="org.owntracks.android.SEND_LOCATION_USER" />
                 <action android:name="org.owntracks.android.CHANGE_MONITORING" />
