@@ -9,7 +9,6 @@ This release addresses a security advisory covering several intent-handling vuln
 - External configuration loading (via `owntracks://` URLs and config files) is now disabled by default and must be explicitly enabled in Settings → Advanced
 - A confirmation dialog is shown when enabling external configuration, warning that any config URL can fully reconfigure the app
 - The `allowIntentControl` intent receiver now requires a shared secret (`intentAuthKey`) in every intent, preventing unauthorised apps from triggering location publishes or changing monitoring mode
-- The `CONTROL_TRACKING` permission is now enforced on the external intent receiver
 - `BackgroundService` is no longer exported; only explicit intents from within the app are accepted
 - `EXIT` and `SEND_EVENT_CIRCULAR` intent actions have been removed
 - `OngoingNotification` service intents are now explicit
@@ -43,7 +42,7 @@ This release addresses a security advisory covering several intent-handling vuln
 
 ### Bug fixes
 
-TODO
+- DEBUG and VERBOSE log messages are no longer emitted to the system Logcat in release builds, preventing potential PII (e.g. coordinates) leakage via `TimberInMemoryLogTree` (CWE-532)
 
 ## Version 2.5.7
 
