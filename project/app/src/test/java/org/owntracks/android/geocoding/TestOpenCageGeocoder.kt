@@ -1,8 +1,9 @@
 package org.owntracks.android.geocoding
 
-import java.time.Instant
-import java.time.temporal.ChronoUnit
+import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.test.runTest
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import okhttp3.Call
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
@@ -37,7 +38,7 @@ class TestOpenCageGeocoder {
         assertNotNull(deserialized.rate)
         assertEquals(0, deserialized.rate?.limit)
         assertEquals(0, deserialized.rate?.remaining)
-        assertEquals(Instant.ofEpochSecond(123), deserialized.rate?.reset)
+        assertEquals(Instant.fromEpochSeconds(123), deserialized.rate?.reset)
       }
 
   @Test
@@ -141,8 +142,8 @@ class TestOpenCageGeocoder {
 
         val response = geocoder.reverse(LatLng(0.0, 0.0))
         assert(response is GeocodeResult.Fault.RateLimited)
-        assert((response as GeocodeResult.Fault.RateLimited).until > Instant.now())
-        assert(response.until < Instant.now().plus(5, ChronoUnit.MINUTES))
+        assert((response as GeocodeResult.Fault.RateLimited).until > Clock.System.now())
+        assert(response.until < Clock.System.now().plus(5.minutes))
       }
 
   @Test

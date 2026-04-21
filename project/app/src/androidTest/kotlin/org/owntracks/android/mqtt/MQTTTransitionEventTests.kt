@@ -31,6 +31,7 @@ import org.owntracks.android.testutils.disableHeadsupNotifications
 import org.owntracks.android.testutils.stopAndroidSetupProcess
 import org.owntracks.android.testutils.use
 import org.owntracks.android.ui.map.MapActivity
+import org.owntracks.android.ui.waypoints.WaypointsActivity
 import timber.log.Timber
 
 @ExperimentalUnsignedTypes
@@ -209,6 +210,7 @@ class MQTTTransitionEventTests :
     addWaypoint(
         waypointDescription, waypointLatitude.toString(), waypointLongitude.toString(), "100")
 
+    waitUntilActivityVisible(WaypointsActivity::class.java)
     reportLocationFromMap(mockLocationIdlingResource) {
       mockLocationProviderClient.setLocation(waypointLatitude, waypointLongitude)
     }

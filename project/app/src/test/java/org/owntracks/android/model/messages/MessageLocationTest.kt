@@ -74,7 +74,10 @@ class MessageLocationTest {
     }
     val wifiInfoProvider = WifiInfoProvider(mockContext)
 
-    val messageLocation = MessageLocation.fromLocationAndWifiInfo(location, wifiInfoProvider)
+    val messageLocation =
+        MessageLocation.fromLocation(location, Build.VERSION_CODES.N).apply {
+          addWifi(wifiInfoProvider)
+        }
     assertEquals("My SSID", messageLocation.ssid)
     assertEquals("12:34:56:78", messageLocation.bssid)
   }
@@ -101,7 +104,10 @@ class MessageLocationTest {
     }
     val wifiInfoProvider = WifiInfoProvider(mockContext)
 
-    val messageLocation = MessageLocation.fromLocationAndWifiInfo(location, wifiInfoProvider)
+    val messageLocation =
+        MessageLocation.fromLocation(location, Build.VERSION_CODES.N).apply {
+          addWifi(wifiInfoProvider)
+        }
     assertNull(messageLocation.ssid)
     assertNull(messageLocation.bssid)
   }

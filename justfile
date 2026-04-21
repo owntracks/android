@@ -1,8 +1,12 @@
 set dotenv-load := true
+set positional-arguments := true
 gradlec := "./project/gradlew -p project --scan"
 
 default:
     @just --list
+
+gradle *args='':
+    {{gradlec}} $@
 
 build:
     {{gradlec}} assembleDebug
@@ -21,9 +25,6 @@ small-espresso:
 
 single-espresso:
     {{gradlec}} clean createGmsDebugCoverageReport -Pandroid.testInstrumentationRunnerArguments.annotation=org.owntracks.android.testutils.JustThisTestPlease
-
-format:
-    {{gradlec}} app:ktfmtFormat
 
 tasks:
     {{gradlec}} tasks --all
