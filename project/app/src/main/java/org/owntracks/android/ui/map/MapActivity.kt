@@ -89,6 +89,7 @@ class MapActivity :
     WorkManagerInitExceptionNotifier by WorkManagerInitExceptionNotifier.Impl(),
     ServiceStarter by ServiceStarter.Impl(),
     AppBarInsetHandler by AppBarInsetHandler.Impl() {
+  private var bottom: Int = 0
   private val viewModel: MapViewModel by viewModels()
   private val notificationPermissionRequester =
       NotificationPermissionRequester(
@@ -245,6 +246,7 @@ class MapActivity :
 
           fabMyLocation.apply {
             TooltipCompat.setTooltipText(this, getString(R.string.currentLocationButtonLabel))
+
             setOnClickListener {
               if (checkAndRequestLocationPermissions(true) ==
                   CheckPermissionsResult.HAS_PERMISSIONS) {
@@ -342,32 +344,48 @@ class MapActivity :
           }
         }
       }
-      currentContact.observe(this@MapActivity) { contact: Contact? ->
-        contact?.let {
-          binding.contactPeek.run {
-            image.setImageResource(0) // Remove old image before async loading the new one
-            lifecycleScope.launch {
-              contactImageBindingAdapter.run { image.setImageBitmap(getBitmapFromCache(it)) }
+      lifecycleScope.launch {
+        repeatOnLifecycle(Lifecycle.State.STARTED) {
+          currentContact.collect { contact: Contact? ->
+            contact?.let {
+              binding.contactPeek.run {
+                image.setImageResource(0) // Remove old image before async loading the new one
+                lifecycleScope.launch {
+                  contactImageBindingAdapter.run { image.setImageBitmap(getBitmapFromCache(it)) }
+                }
+              }
             }
           }
         }
       }
-      bottomSheetHidden.observe(this@MapActivity) { o: Boolean? ->
-        if (o == null || o) {
-          setBottomSheetHidden()
-        } else {
-          setBottomSheetCollapsed()
+      lifecycleScope.launch {
+        repeatOnLifecycle(Lifecycle.State.STARTED) {
+          bottomSheetHidden.collect { hidden ->
+            if (hidden) {
+              setBottomSheetHidden()
+            } else {
+              setBottomSheetCollapsed()
+            }
+          }
         }
       }
-      currentLocation.observe(this@MapActivity) { location ->
-        if (location == null) {
-          disableLocationMenus()
-        } else {
-          enableLocationMenus()
-          binding.vm?.run { updateActiveContactDistanceAndBearing(location) }
+      lifecycleScope.launch {
+        repeatOnLifecycle(Lifecycle.State.STARTED) {
+          currentLocation.collect { location ->
+            if (location == null) {
+              disableLocationMenus()
+            } else {
+              enableLocationMenus()
+              binding.vm?.run { updateActiveContactDistanceAndBearing(location) }
+            }
+          }
         }
       }
-      currentMonitoringMode.observe(this@MapActivity) { updateMonitoringModeMenu() }
+      lifecycleScope.launch {
+        repeatOnLifecycle(Lifecycle.State.STARTED) {
+          currentMonitoringMode.collect { updateMonitoringModeMenu() }
+        }
+      }
     }
 
     startService(this)
@@ -646,12 +664,14 @@ class MapActivity :
   }
 
   override fun onResume() {
-    val mapFragment =
-        supportFragmentManager.fragmentFactory.instantiate(
-            this.classLoader,
-            MapFragment::class.java.name,
-        )
-    supportFragmentManager.commit(true) { replace(R.id.mapFragment, mapFragment, "map") }
+    if (supportFragmentManager.findFragmentByTag("map") == null) {
+      val mapFragment =
+          supportFragmentManager.fragmentFactory.instantiate(
+              this.classLoader,
+              MapFragment::class.java.name,
+          )
+      supportFragmentManager.commit(true) { replace(R.id.mapFragment, mapFragment, "map") }
+    }
     sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
     sensorManager?.let {
       orientationSensor = it.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
@@ -799,9 +819,9 @@ class MapActivity :
       bottomMargin =
           when (bottomSheetState) {
             BottomSheetBehavior.STATE_COLLAPSED -> {
-              bottomSheetBehavior?.peekHeight ?: 0
+              bottomSheetBehavior?.peekHeight ?: bottom
             }
-            else -> 0
+            else -> bottom
           }
     }
   }

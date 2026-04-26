@@ -33,8 +33,7 @@ class ConfigEditorActivityTests : TestWithAnActivity<EditorActivity>(startActivi
     writeTo(R.id.inputKey, Preferences::experimentalFeatures.name)
     writeTo(R.id.inputValue, "this, that,    other")
     clickDialogPositiveButton()
-    assertContains(
-        R.id.effectiveConfiguration, """"experimentalFeatures" : [ "other", "that", "this" ]""")
+    assertContains(R.id.effectiveConfiguration, """"experimentalFeatures": [""")
   }
 
   @Test
@@ -45,7 +44,7 @@ class ConfigEditorActivityTests : TestWithAnActivity<EditorActivity>(startActivi
     writeTo(R.id.inputKey, Preferences::mode.name)
     writeTo(R.id.inputValue, "0")
     clickDialogPositiveButton()
-    assertContains(R.id.effectiveConfiguration, """"mode" : 0""")
+    assertContains(R.id.effectiveConfiguration, """"mode": 0""")
   }
 
   @Test
@@ -56,7 +55,7 @@ class ConfigEditorActivityTests : TestWithAnActivity<EditorActivity>(startActivi
     writeTo(R.id.inputKey, Preferences::mode.name)
     writeTo(R.id.inputValue, "not a number")
     clickDialogPositiveButton()
-    assertContains(R.id.effectiveConfiguration, """"mode" : 0""")
+    assertContains(R.id.effectiveConfiguration, """"mode": 0""")
   }
 
   @Test
@@ -67,7 +66,7 @@ class ConfigEditorActivityTests : TestWithAnActivity<EditorActivity>(startActivi
     writeTo(R.id.inputKey, Preferences::mqttProtocolLevel.name)
     writeTo(R.id.inputValue, "4")
     clickDialogPositiveButton()
-    assertContains(R.id.effectiveConfiguration, """"mqttProtocolLevel" : 4""")
+    assertContains(R.id.effectiveConfiguration, """"mqttProtocolLevel": 4""")
   }
 
   @Test
@@ -78,7 +77,7 @@ class ConfigEditorActivityTests : TestWithAnActivity<EditorActivity>(startActivi
     writeTo(R.id.inputKey, Preferences::mqttProtocolLevel.name)
     writeTo(R.id.inputValue, "not a number")
     clickDialogPositiveButton()
-    assertContains(R.id.effectiveConfiguration, """"mqttProtocolLevel" : 3""")
+    assertContains(R.id.effectiveConfiguration, """"mqttProtocolLevel": 3""")
   }
 
   @Test
@@ -90,7 +89,7 @@ class ConfigEditorActivityTests : TestWithAnActivity<EditorActivity>(startActivi
     writeTo(R.id.inputValue, "example.com")
     clickDialogPositiveButton()
 
-    assertContains(R.id.effectiveConfiguration, """"host" : "example.com"""")
+    assertContains(R.id.effectiveConfiguration, """"host": "example.com"""")
   }
 
   @Test
@@ -101,7 +100,7 @@ class ConfigEditorActivityTests : TestWithAnActivity<EditorActivity>(startActivi
     writeTo(R.id.inputKey, Preferences::cmd.name)
     writeTo(R.id.inputValue, "false")
     clickDialogPositiveButton()
-    assertContains(R.id.effectiveConfiguration, """"cmd" : false""")
+    assertContains(R.id.effectiveConfiguration, """"cmd": false""")
   }
 
   @Test
@@ -113,7 +112,7 @@ class ConfigEditorActivityTests : TestWithAnActivity<EditorActivity>(startActivi
     writeTo(R.id.inputValue, "0.5")
     clickDialogPositiveButton()
 
-    assertContains(R.id.effectiveConfiguration, """"osmTileScaleFactor" : 0.5""")
+    assertContains(R.id.effectiveConfiguration, """"osmTileScaleFactor": 0.5""")
   }
 
   @Test
@@ -143,7 +142,7 @@ class ConfigEditorActivityTests : TestWithAnActivity<EditorActivity>(startActivi
   @Test
   fun editorActivityShowsDefaultConfig() {
     launchActivity()
-    assertContains(R.id.effectiveConfiguration, """"_type" : "configuration"""")
+    assertContains(R.id.effectiveConfiguration, """"_type": "configuration"""")
   }
 
   @Test

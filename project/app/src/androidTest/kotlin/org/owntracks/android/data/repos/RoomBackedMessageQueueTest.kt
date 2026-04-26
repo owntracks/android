@@ -29,6 +29,7 @@ class RoomBackedMessageQueueTest {
 
   @After
   fun teardown() {
+    runBlocking { queue.clear() }
     queue.close()
   }
 

@@ -12,11 +12,10 @@ import androidx.core.content.PermissionChecker
 import androidx.core.content.PermissionChecker.PERMISSION_DENIED
 import androidx.core.content.PermissionChecker.PERMISSION_GRANTED
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Instant
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.owntracks.android.R
 import org.owntracks.android.data.EndpointState
@@ -38,11 +37,11 @@ constructor(
   private val powerManager =
       (getApplication<Application>().applicationContext.getSystemService(Context.POWER_SERVICE)
           as PowerManager)
-  internal val dozeWhitelisted = MutableLiveData<Boolean>()
+  internal val dozeWhitelisted = MutableStateFlow(false)
 
   private val mutableLocationPermissions =
-      MutableLiveData(R.string.statusLocationPermissionsUnknown)
-  val locationPermissions: LiveData<Int> = mutableLocationPermissions
+      MutableStateFlow(R.string.statusLocationPermissionsUnknown)
+  val locationPermissions: StateFlow<Int> = mutableLocationPermissions
 
   fun refreshLocationPermissions() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -77,13 +76,13 @@ constructor(
             else -> R.string.statusLocationPermissionsUnknown
           }
         }
-        .run { mutableLocationPermissions.postValue(this) }
+        .run { mutableLocationPermissions.value = this }
   }
 
-  fun getDozeWhitelisted(): LiveData<Boolean> = dozeWhitelisted
+  fun getDozeWhitelisted(): StateFlow<Boolean> = dozeWhitelisted
 
   fun refreshDozeModeWhitelisted() {
-    dozeWhitelisted.postValue(isIgnoringBatteryOptimizations())
+    dozeWhitelisted.value = isIgnoringBatteryOptimizations()
   }
 
   private fun isIgnoringBatteryOptimizations(): Boolean {

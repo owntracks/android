@@ -38,6 +38,7 @@ import org.owntracks.android.testutils.addWaypoint
 import org.owntracks.android.testutils.di.setLocation
 import org.owntracks.android.testutils.getPreferences
 import org.owntracks.android.testutils.use
+import org.owntracks.android.testutils.waitUntilTrue
 import org.owntracks.android.ui.map.MapActivity
 
 @OptIn(ExperimentalUnsignedTypes::class)
@@ -111,12 +112,12 @@ class MQTTRemoteCommandTests :
       clickOn(R.id.fabMyLocation)
     }
     baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.use {
-      assertTrue(
-          mqttPacketsReceived
-              .filterIsInstance<MQTTPublish>()
-              .map { Parser(null).fromJson((it.payload)!!.toByteArray()) }
-              .any { it is MessageLocation && it.trigger == MessageLocation.ReportType.RESPONSE },
-      )
+      waitUntilTrue {
+        mqttPacketsReceived
+            .filterIsInstance<MQTTPublish>()
+            .map { Parser(null).fromJson((it.payload)!!.toByteArray()) }
+            .any { it is MessageLocation && it.trigger == MessageLocation.ReportType.RESPONSE }
+      }
     }
   }
 
@@ -159,12 +160,12 @@ class MQTTRemoteCommandTests :
       clickOn(R.id.fabMyLocation)
     }
     baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.use {
-      assertTrue(
-          mqttPacketsReceived
-              .filterIsInstance<MQTTPublish>()
-              .map { Parser(null).fromJson((it.payload)!!.toByteArray()) }
-              .any { it is MessageWaypoints && it.waypoints?.size == 2 },
-      )
+      waitUntilTrue {
+        mqttPacketsReceived
+            .filterIsInstance<MQTTPublish>()
+            .map { Parser(null).fromJson((it.payload)!!.toByteArray()) }
+            .any { it is MessageWaypoints && it.waypoints?.size == 2 }
+      }
     }
   }
 
@@ -181,6 +182,7 @@ class MQTTRemoteCommandTests :
     clickOn(R.string.title_activity_waypoints)
 
     addWaypoint("test waypoint", "51.123", "0.456", "20")
+    Thread.sleep(1000) // ensure distinct epoch-second tst values (tst has second precision)
     addWaypoint("test waypoint 2", "51.00", "0.4", "25")
 
     openDrawer()

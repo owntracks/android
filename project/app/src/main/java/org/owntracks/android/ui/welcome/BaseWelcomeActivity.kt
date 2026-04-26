@@ -13,8 +13,12 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.widget.ViewPager2
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiWelcomeBinding
 import org.owntracks.android.preferences.Preferences
@@ -85,9 +89,13 @@ abstract class BaseWelcomeActivity : AppCompatActivity() {
           }
         }
 
-    viewModel.currentFragmentPosition.observe(this) { position: Int ->
-      binding.viewPager.currentItem = position
-      setPagerIndicator(position)
+    lifecycleScope.launch {
+      repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewModel.currentFragmentPosition.collect { position ->
+          binding.viewPager.currentItem = position
+          setPagerIndicator(position)
+        }
+      }
     }
 
     buildPagerIndicator()

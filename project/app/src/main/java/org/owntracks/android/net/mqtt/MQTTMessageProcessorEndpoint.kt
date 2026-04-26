@@ -5,11 +5,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.IntentFilter
 import android.net.ConnectivityManager
-import android.net.Network
 import android.os.Build
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
-import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.IOException
 import java.net.ConnectException
@@ -34,6 +32,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.SerializationException
 import org.eclipse.paho.client.mqttv3.IMqttActionListener
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken
 import org.eclipse.paho.client.mqttv3.IMqttToken
@@ -89,32 +88,24 @@ class MQTTMessageProcessorEndpoint(
 
   private var pingAlarmReceiver: BroadcastReceiver? = null
 
-  private val networkChangeCallback =
-      object : ConnectivityManager.NetworkCallback() {
-        var justRegistered = true
-
-        override fun onAvailable(network: Network) {
-          super.onAvailable(network)
-          Timber.v("Network becomes available")
-          if (!justRegistered &&
-              endpointStateRepo.endpointState.value == EndpointState.DISCONNECTED) {
-            Timber.v("Currently disconnected, so attempting reconnect")
-            scope.launch { reconnect() }
-          }
-          justRegistered = false
-        }
-
-        override fun onLost(network: Network) {
-          super.onLost(network)
-
-          scope.launch { connectingLock.withPermitLogged("network lost") { disconnect() } }
-        }
-      }
+  internal val networkChangeCallback =
+      NetworkTrackingCallback(
+          { endpointStateRepo.endpointState.value },
+          { scope.launch { reconnect() } },
+          {
+            scope.launch {
+              connectingLock.withPermitLogged("network lost") { disconnect() }
+              // Schedule a reconnect in case onAvailable already ran and its reconnect completed
+              // before this coroutine acquired the lock — without this, the freshly-established
+              // connection is torn down and no further reconnect is ever triggered.
+              scheduler.scheduleMqttReconnect()
+            }
+          })
 
   override fun activate() {
     Timber.v("MQTT Activate")
     preferences.registerOnPreferenceChangedListener(this)
-    networkChangeCallback.justRegistered = true
+    networkChangeCallback.reset()
     connectivityManager.registerDefaultNetworkCallback(networkChangeCallback)
     scope.launch {
       try {
@@ -191,7 +182,7 @@ class MQTTMessageProcessorEndpoint(
   override fun onFinalizeMessage(message: MessageBase): MessageBase = message
 
   override suspend fun sendMessage(message: MessageBase): Result<Unit> {
-    Timber.i("Sending message $message")
+    Timber.d("Sending message $message")
     if (mqttClientAndConfiguration == null) {
       return Result.failure(NotReadyException())
     }
@@ -225,7 +216,7 @@ class MQTTMessageProcessorEndpoint(
                               message.retained)
                           .also { Timber.v("MQTT message sent with messageId=${it.messageId}. ") }
                     }
-                    .apply { Timber.i("Message ${message.messageId} sent in $this") }
+                    .apply { Timber.i("Message $message sent in $this") }
               } catch (e: Exception) {
                 Timber.w(e, "Error publishing message $message")
                 when (e) {
@@ -296,8 +287,8 @@ class MQTTMessageProcessorEndpoint(
 
         override fun connectionLost(cause: Throwable) {
           when (cause) {
-            is IOException -> Timber.i("Connection Lost: ${cause.message}")
-            else -> Timber.i(cause, "Connection Lost")
+            is IOException -> Timber.w("Connection Lost: ${cause.message}")
+            else -> Timber.w(cause, "Connection Lost")
           }
           scope.launch { endpointStateRepo.setState(EndpointState.DISCONNECTED) }
           scheduler.scheduleMqttReconnect()
@@ -324,7 +315,7 @@ class MQTTMessageProcessorEndpoint(
                       .also { Timber.d("Parsed message: $it") })
             } catch (e: Parser.EncryptionException) {
               Timber.e("Unable to decrypt received message ${message.id} on $topic")
-            } catch (e: InvalidFormatException) {
+            } catch (e: SerializationException) {
               Timber.w("Malformed JSON message received ${message.id} on $topic")
             }
           }

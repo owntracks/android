@@ -7,18 +7,19 @@ plugins {
   kotlin("kapt")
   alias(libs.plugins.ktfmt)
   alias(libs.plugins.ksp)
+  alias(libs.plugins.kotlin.plugin.serialization)
 }
 
 apply<EspressoMetadataEmbeddingPlugin>()
 
 val googleMapsAPIKey =
-    System.getenv("GOOGLE_MAPS_API_KEY")?.toString()
+    System.getenv("GOOGLE_MAPS_API_KEY")
         ?: extra.get("google_maps_api_key")?.toString()
         ?: "PLACEHOLDER_API_KEY"
 
 val gmsImplementation: Configuration by configurations.creating
 
-val versionNameValue = "2.5.6"
+val versionNameValue = "2.5.7"
 
 fun generateVersionCode(versionName: String): Int {
   val parts = versionName.split(".")
@@ -235,14 +236,12 @@ dependencies {
 
   // Utility libraries
   implementation(libs.bundles.hilt)
-  implementation(libs.bundles.jackson)
   implementation(libs.square.tape2)
   implementation(libs.timber)
-  implementation(libs.apache.httpcore)
   implementation(libs.bundles.androidx.room)
   implementation(libs.bundles.objectbox.migration)
   implementation(libs.kotlin.datetime)
-  implementation(libs.kotlin.serialization)
+  implementation(libs.kotlinx.serialization.json)
 
   // The BC version shipped under com.android is half-broken. Weird certificate issues etc.
   // To solve, we bring in our own version of BC
@@ -250,9 +249,6 @@ dependencies {
 
   // Widget libraries
   implementation(libs.widgets.materialize) { artifact { type = "aar" } }
-
-  // These Java EE libs are no longer included in JDKs, so we include explicitly
-  kapt(libs.bundles.jaxb.annotation.processors)
 
   // Preprocessors
   kapt(libs.bundles.kapt.hilt)

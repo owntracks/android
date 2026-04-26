@@ -16,11 +16,15 @@ import androidx.core.widget.addTextChangedListener
 import androidx.databinding.BindingAdapter
 import androidx.databinding.BindingConversion
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.DateFormat
 import java.time.Instant
+import kotlinx.coroutines.launch
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiWaypointBinding
 import org.owntracks.android.location.geofencing.Latitude
@@ -70,7 +74,11 @@ class WaypointActivity : AppCompatActivity() {
 
     if (intent.hasExtra("waypointId")) {
       viewModel.loadWaypoint(intent.getLongExtra("waypointId", 0))
-      viewModel.waypoint.observe(this) { setDeleteButtonEnabledStatus() }
+      lifecycleScope.launch {
+        repeatOnLifecycle(Lifecycle.State.STARTED) {
+          viewModel.waypoint.collect { setDeleteButtonEnabledStatus() }
+        }
+      }
     }
   }
 

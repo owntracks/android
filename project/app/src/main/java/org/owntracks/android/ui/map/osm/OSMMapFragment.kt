@@ -15,9 +15,11 @@ import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.drawable.toDrawable
-import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import kotlin.math.roundToInt
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.DelayedMapListener
 import org.osmdroid.events.MapListener
@@ -62,22 +64,26 @@ internal constructor(
 
   private val osmMapLocationSource: IMyLocationProvider =
       object : IMyLocationProvider {
-        private var locationObserver: Observer<Location>? = null
+        private var locationJob: Job? = null
 
         override fun startLocationProvider(myLocationConsumer: IMyLocationConsumer?): Boolean {
           val locationProvider: IMyLocationProvider = this
-          locationObserver =
-              Observer { location: Location ->
+          locationJob =
+              viewLifecycleOwner.lifecycleScope.launch {
+                viewModel.currentLocation.collect { location ->
+                  if (location != null) {
                     onLocationObserved(location) {
                       myLocationConsumer?.onLocationChanged(location, locationProvider)
                     }
                   }
-                  .apply { viewModel.currentLocation.observe(viewLifecycleOwner, this) }
+                }
+              }
           return true
         }
 
         override fun stopLocationProvider() {
-          locationObserver?.run(viewModel.currentLocation::removeObserver)
+          locationJob?.cancel()
+          locationJob = null
         }
 
         override fun getLastKnownLocation(): Location? {
@@ -291,6 +297,7 @@ internal constructor(
       val existingMarker: Marker? = overlays.firstOrNull { it is Marker && it.id == id } as Marker?
       if (existingMarker != null) {
         existingMarker.position = latLng.toGeoPoint()
+        existingMarker.icon = image.toDrawable(resources)
       } else if (activity?.isDestroyed == false) {
         /*
         There's a race condition where in the time it takes to create all the markers, the
@@ -303,6 +310,7 @@ internal constructor(
             Marker(this).apply {
               this.id = id
               position = latLng.toGeoPoint()
+              icon = image.toDrawable(resources)
               infoWindow = null
               setOnMarkerClickListener { marker, _ ->
                 onMarkerClicked(marker.id)
@@ -312,9 +320,6 @@ internal constructor(
             },
         )
       }
-      overlays
-          .firstOrNull { it is Marker && it.id == id }
-          ?.run { (this as Marker).icon = image.toDrawable(resources) }
       invalidate()
     }
   }
@@ -330,6 +335,9 @@ internal constructor(
     super.onResume()
     mapView?.onResume()
     setMapStyle()
+    viewModel.mapStartingLocationOnResume()?.run {
+      mapView?.controller?.animateTo(latLng.toGeoPoint(), zoom, 0L, rotation)
+    }
   }
 
   override fun onPause() {
@@ -477,7 +485,7 @@ internal constructor(
   }
 
   companion object {
-    const val MIN_ZOOM_LEVEL: Double = 5.0
+    const val MIN_ZOOM_LEVEL: Double = 1.0
     const val MAX_ZOOM_LEVEL: Double = 21.0
   }
 }

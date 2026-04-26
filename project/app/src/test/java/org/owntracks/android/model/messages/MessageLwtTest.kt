@@ -9,6 +9,6 @@ class MessageLwtTest {
   fun `an lwt message has a timestamp and created_at which are equal`() {
     val messageLwt = MessageLwt(MessageCreatedAtNow(FakeFixedClock()))
     assertEquals(25, messageLwt.timestamp)
-    assert(messageLwt.timestamp == messageLwt.createdAt.epochSecond)
+    assert(messageLwt.timestamp == messageLwt.createdAt.epochSeconds)
   }
 }

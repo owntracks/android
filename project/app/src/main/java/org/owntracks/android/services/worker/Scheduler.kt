@@ -76,7 +76,7 @@ constructor(
           }
           .run {
             workManager.enqueueUniqueWork(
-                ONETIME_TASK_MQTT_RECONNECT, ExistingWorkPolicy.KEEP, this)
+                ONETIME_TASK_MQTT_RECONNECT, ExistingWorkPolicy.REPLACE, this)
             Timber.d("Scheduled ONETIME_TASK_MQTT_RECONNECT job")
           }
 

@@ -1,8 +1,10 @@
 package org.owntracks.android.preferences.types
 
-import com.fasterxml.jackson.annotation.JsonValue
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
 
-enum class MonitoringMode(@JsonValue val value: Int) {
+@Serializable(with = MonitoringMode.MonitoringModeSerializer::class)
+enum class MonitoringMode(val value: Int) {
   Quiet(-1),
   Manual(0),
   Significant(1),
@@ -29,4 +31,8 @@ enum class MonitoringMode(@JsonValue val value: Int) {
             ?: entries.firstOrNull { it.name.equals(value, true) }
             ?: Significant
   }
+
+  object MonitoringModeSerializer :
+      KSerializer<MonitoringMode> by intValueEnumSerializer(
+          "MonitoringMode", entries, { it.value }, Significant)
 }

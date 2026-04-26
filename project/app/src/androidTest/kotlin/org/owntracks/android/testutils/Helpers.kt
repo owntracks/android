@@ -12,6 +12,7 @@ import android.provider.MediaStore
 import android.view.View
 import android.widget.TextView
 import androidx.annotation.IdRes
+import androidx.annotation.StringRes
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso
@@ -50,6 +51,8 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime
 import kotlinx.datetime.Clock
+import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.CoreMatchers.not
 import org.hamcrest.Matcher
 import org.owntracks.android.R
 import org.owntracks.android.preferences.Preferences
@@ -83,7 +86,7 @@ fun setNotFirstStartPreferences() {
       .apply()
 }
 
-const val TIMEOUT = 5000L
+val TIMEOUT = 5.seconds
 const val CONDITION_CHECK_INTERVAL = 100L
 const val OWNTRACKS_ICON_BASE64: String =
     "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"
@@ -194,9 +197,11 @@ fun grantNotificationAndForegroundPermissions() {
 /** Who knows what order these will appear in. */
 fun grantMapActivityPermissions() {
   grantNotificationAndForegroundPermissions()
-  // Wait for the dialog to appear
+  // On API 29+, the app shows a background location rationale dialog during onResume.
+  // waitForIdleSync() ensures onResume has fully run (and the dialog is visible with focus)
+  // before Espresso picks a root, so it correctly targets the dialog window, not the main window.
   if (Build.VERSION.SDK_INT >= 29) {
-    waitUntilVisible(onView(withId(android.R.id.button2)))
+    getInstrumentation().waitForIdleSync()
     clickDialogNegativeButton()
   }
 }
@@ -308,30 +313,6 @@ fun getText(matcher: ViewInteraction): String {
   return text
 }
 
-fun waitUntilVisible(matcher: ViewInteraction, timeout: Duration = 1.seconds) {
-  matcher.perform(
-      object : ViewAction {
-        override fun getConstraints(): Matcher<View> {
-          return ViewMatchers.isAssignableFrom(TextView::class.java)
-        }
-
-        override fun getDescription(): String {
-          return "Wait until this is visible"
-        }
-
-        override fun perform(uiController: UiController, view: View) {
-          val endTime = Clock.System.now().plus(timeout)
-          do {
-            if (view.visibility == View.VISIBLE) {
-              return
-            }
-            uiController.loopMainThreadUntilIdle()
-          } while (Clock.System.now() < endTime)
-        }
-      },
-  )
-}
-
 fun clickOnDrawerAndWait(text: Int) {
   val menuItemId =
       when (text) {
@@ -344,6 +325,85 @@ fun clickOnDrawerAndWait(text: Int) {
         else -> throw IllegalArgumentException("Unknown drawer item: $text")
       }
   onView(withId(menuItemId)).perform(click())
+}
+
+/**
+ * Polls until the view with [viewId] is displayed (on-screen and non-empty), or throws if [timeout]
+ * is exceeded. Needed for views whose show animation does not respect animator_duration_scale=0
+ * (e.g. BottomSheetBehavior using SpringAnimation).
+ */
+fun waitUntilViewDisplayed(@IdRes viewId: Int, timeout: Duration = TIMEOUT) {
+  val deadline = Clock.System.now().plus(timeout)
+  var lastError: Throwable? = null
+  while (Clock.System.now() < deadline) {
+    try {
+      onView(withId(viewId)).check(matches(ViewMatchers.isDisplayed()))
+      return
+    } catch (e: Throwable) {
+      lastError = e
+      Thread.sleep(CONDITION_CHECK_INTERVAL)
+    }
+  }
+  throw lastError ?: AssertionError("Timed out waiting for view $viewId to be displayed")
+}
+
+/**
+ * Polls until [condition] returns true, or throws if [timeout] is exceeded. Useful for waiting on
+ * external state that is not directly observable via an Espresso ViewInteraction (e.g. data
+ * received by a test MQTT broker).
+ */
+fun waitUntilTrue(timeout: Duration = TIMEOUT, condition: () -> Boolean) {
+  val deadline = Clock.System.now().plus(timeout)
+  while (Clock.System.now() < deadline) {
+    if (condition()) return
+    Thread.sleep(CONDITION_CHECK_INTERVAL)
+  }
+  throw AssertionError("Timed out waiting for condition to become true")
+}
+
+/**
+ * Polls until the view with [viewId] is not displayed, or throws if [timeout] is exceeded. Needed
+ * for views whose hide animation does not respect animator_duration_scale=0 (e.g.
+ * BottomSheetBehavior using SpringAnimation).
+ */
+fun waitUntilViewNotDisplayed(@IdRes viewId: Int, timeout: Duration = TIMEOUT) {
+  val deadline = Clock.System.now().plus(timeout)
+  var lastError: Throwable? = null
+  while (Clock.System.now() < deadline) {
+    try {
+      onView(withId(viewId)).check(matches(not(ViewMatchers.isDisplayed())))
+      return
+    } catch (e: Throwable) {
+      lastError = e
+      Thread.sleep(CONDITION_CHECK_INTERVAL)
+    }
+  }
+  throw lastError ?: AssertionError("Timed out waiting for view $viewId to not be displayed")
+}
+
+/**
+ * Polls until the view with [viewId] contains [stringId] as a substring, or throws if [timeout] is
+ * exceeded. Needed when the UI state may temporarily cycle through intermediate states (e.g.
+ * CONNECTING) before settling on the expected error state.
+ */
+fun waitUntilViewContains(
+    @IdRes viewId: Int,
+    @StringRes stringId: Int,
+    timeout: Duration = TIMEOUT
+) {
+  val text = getInstrumentation().targetContext.getString(stringId)
+  val deadline = Clock.System.now().plus(timeout)
+  var lastError: Throwable? = null
+  while (Clock.System.now() < deadline) {
+    try {
+      onView(withId(viewId)).check(matches(withText(containsString(text))))
+      return
+    } catch (e: Throwable) {
+      lastError = e
+      Thread.sleep(CONDITION_CHECK_INTERVAL)
+    }
+  }
+  throw lastError ?: AssertionError("Timed out waiting for view $viewId to contain '$text'")
 }
 
 fun addWaypoint(description: String, latitude: String, longitude: String, radius: String) {
