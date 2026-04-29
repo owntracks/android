@@ -85,7 +85,7 @@ open class MessageLocation(
 
   @SerialName("tid") var trackerId: String? = null
 
-  @JsonProperty("address") var address: String? = null
+  @SerialName("address") var address: String? = null
 
   override fun isValidMessage(): Boolean {
     return timestamp > 0
