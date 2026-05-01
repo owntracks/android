@@ -49,8 +49,10 @@ constructor(
     @Named("publishResponseMessageIdlingResource")
     private val publishResponseMessageIdlingResource: SimpleIdlingResource,
     @Named("mockLocationIdlingResource")
-    private val mockLocationIdlingResource: SimpleIdlingResource
+    private val mockLocationIdlingResource: SimpleIdlingResource,
 ) {
+  var lastAddress: String? = null
+
   private fun locationIsWithAccuracyThreshold(l: Location): Boolean =
       preferences.ignoreInaccurateLocations
           .run { preferences.ignoreInaccurateLocations == 0 || l.accuracy < this }
@@ -68,7 +70,7 @@ constructor(
 
   private suspend fun publishLocationMessage(
       trigger: MessageLocation.ReportType,
-      location: Location
+      location: Location,
   ): Result<Unit> {
     Timber.v("Maybe publishing $location with trigger $trigger")
     if (!locationIsWithAccuracyThreshold(location))
@@ -108,7 +110,8 @@ constructor(
             } else {
               Geofence.GEOFENCE_TRANSITION_EXIT
             },
-            MessageTransition.TRIGGER_LOCATION)
+            MessageTransition.TRIGGER_LOCATION,
+        )
       }
     }
     if (preferences.monitoring === MonitoringMode.Quiet &&
@@ -132,6 +135,7 @@ constructor(
                 conn = deviceMetricsProvider.connectionType.value
                 monitoringMode = preferences.monitoring
                 source = location.provider
+                address = lastAddress
               }
             } else {
               fromLocation(location, Build.VERSION.SDK_INT)
@@ -153,7 +157,8 @@ constructor(
       listOf(
           MessageLocation.ReportType.RESPONSE,
           MessageLocation.ReportType.USER,
-          MessageLocation.ReportType.CIRCULAR)
+          MessageLocation.ReportType.CIRCULAR,
+      )
 
   private fun calculateInRegions(loadedWaypoints: List<WaypointModel>): List<String> =
       loadedWaypoints
@@ -191,7 +196,7 @@ constructor(
       waypointModel: WaypointModel,
       location: Location,
       transition: Int,
-      trigger: String
+      trigger: String,
   ) {
     if (!locationIsWithAccuracyThreshold(location)) {
       Timber.d(
@@ -229,7 +234,7 @@ constructor(
       waypointModel: WaypointModel,
       triggeringLocation: Location,
       transition: Int,
-      trigger: String
+      trigger: String,
   ) {
     messageProcessor.queueMessageForSending(
         MessageTransition().apply {
