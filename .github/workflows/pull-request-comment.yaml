@@ -52,7 +52,7 @@ jobs:
           reactions: '+1'
       - name: Create PR Check
         id: create-pr-check
-        uses: LouisBrunner/checks-action@v2.0.0
+        uses: LouisBrunner/checks-action@v3.1.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           name: PR Checkpoint Status
@@ -112,7 +112,7 @@ jobs:
     steps:
       - name: Set status check
         id: set-status
-        uses: LouisBrunner/checks-action@v2.0.0
+        uses: LouisBrunner/checks-action@v3.1.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           sha: ${{ needs.check-comment.outputs.sha }}
