@@ -12,6 +12,7 @@ data class MessageQueueEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     @ColumnInfo(name = "sequenceNumber") val sequenceNumber: Long,
     @ColumnInfo(name = "messageJson") val messageJson: String,
+    @ColumnInfo(name = "topic") val topic: String = "",
     @ColumnInfo(name = "isHeadSlot") val isHeadSlot: Boolean = false,
     @ColumnInfo(name = "timestamp") val timestamp: Long = System.currentTimeMillis()
 )
