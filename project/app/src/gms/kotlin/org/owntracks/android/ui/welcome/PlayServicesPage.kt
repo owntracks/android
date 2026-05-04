@@ -8,9 +8,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -19,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.StateFlow
 import org.owntracks.android.R
 import org.owntracks.android.ui.welcome.fragments.PlayFragmentViewModel
@@ -31,7 +30,7 @@ fun PlayServicesPage(
     onCheckAvailability: (PlayFragmentViewModel) -> WelcomeViewModel.ProgressState,
 ) {
   val playViewModel: PlayFragmentViewModel = hiltViewModel()
-  val refreshKey by refreshFlow.collectAsState(initial = 0)
+  val refreshKey by refreshFlow.collectAsStateWithLifecycle()
 
   val updateState = {
     val state = onCheckAvailability(playViewModel)
@@ -42,8 +41,8 @@ fun PlayServicesPage(
   LaunchedEffect(refreshKey) { updateState() }
   LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { updateState() }
 
-  val message by playViewModel.message.observeAsState("")
-  val fixAvailable by playViewModel.playServicesFixAvailable.observeAsState(false)
+  val message by playViewModel.message.collectAsStateWithLifecycle()
+  val fixAvailable by playViewModel.playServicesFixAvailable.collectAsStateWithLifecycle()
 
   WelcomePageLayout(
       iconRes = R.drawable.ic_baseline_assignment_late_48,
@@ -52,13 +51,13 @@ fun PlayServicesPage(
       description = stringResource(id = R.string.welcome_play_description)) {
         Spacer(modifier = Modifier.height(12.dp))
         Text(
-            text = message.orEmpty(),
+            text = message,
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth())
         if (fixAvailable) {
           OutlinedButton(
-              modifier = Modifier.testTag(WelcomeTestTags.PLAY_SERVICES_FIX_BUTTON),
+              modifier = Modifier.testTag(WelcomeTestTags.PlayServicesFixButton),
               onClick = onRequestFix) {
                 Text(text = stringResource(id = R.string.welcomeFixIssue))
               }

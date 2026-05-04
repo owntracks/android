@@ -34,8 +34,8 @@ fun colorScheme(): androidx.compose.material3.ColorScheme {
         onSurface = white)
   } else {
     lightColorScheme(
-        primary = otPrimaryBlue,
-        onPrimary = white,
+        primary = white,
+        onPrimary = otPrimaryBlue,
         primaryContainer = otDarkerBlue,
         onPrimaryContainer = white,
         secondary = otAccent,

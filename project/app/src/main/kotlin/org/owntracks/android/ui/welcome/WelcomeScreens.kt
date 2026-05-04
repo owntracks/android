@@ -66,12 +66,12 @@ data class WelcomePageDescriptor(
 )
 
 object WelcomeTestTags {
-  const val NEXT_BUTTON = "welcome_next_button"
-  const val DONE_BUTTON = "welcome_done_button"
-  const val LOCATION_PERMISSION_BUTTON = "welcome_location_permission_button"
-  const val BACKGROUND_LOCATION_PERMISSION_BUTTON = "welcome_background_location_permission_button"
-  const val NOTIFICATION_PERMISSION_BUTTON = "welcome_notification_permission_button"
-  const val PLAY_SERVICES_FIX_BUTTON = "welcome_play_services_fix_button"
+  const val NextButton = "welcome_next_button"
+  const val DoneButton = "welcome_done_button"
+  const val LocationPermissionButton = "welcome_location_permission_button"
+  const val BackgroundLocationPermissionButton = "welcome_background_location_permission_button"
+  const val NotificationPermissionButton = "welcome_notification_permission_button"
+  const val PlayServicesFixButton = "welcome_play_services_fix_button"
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -134,14 +134,14 @@ fun WelcomeFlowScreen(
           Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             if (nextEnabled && pageCount > 0) {
               Button(
-                  modifier = Modifier.fillMaxWidth().testTag(WelcomeTestTags.NEXT_BUTTON),
+                  modifier = Modifier.fillMaxWidth().testTag(WelcomeTestTags.NextButton),
                   onClick = onNext) {
                     Text(text = stringResource(id = R.string.next))
                   }
             }
             if (doneEnabled) {
               Button(
-                  modifier = Modifier.fillMaxWidth().testTag(WelcomeTestTags.DONE_BUTTON),
+                  modifier = Modifier.fillMaxWidth().testTag(WelcomeTestTags.DoneButton),
                   onClick = onDone) {
                     Text(text = stringResource(id = R.string.done_heading))
                   }
@@ -304,15 +304,14 @@ fun LocationPermissionPage(
             verticalArrangement = Arrangement.spacedBy(12.dp)) {
               if (!uiState.hasForegroundPermission) {
                 OutlinedButton(
-                    modifier = Modifier.testTag(WelcomeTestTags.LOCATION_PERMISSION_BUTTON),
+                    modifier = Modifier.testTag(WelcomeTestTags.LocationPermissionButton),
                     onClick = onRequestLocationPermissions) {
                       Text(text = stringResource(id = R.string.welcome_location_permission_request))
                     }
               }
               if (showBackgroundButton && onRequestBackgroundPermissions != null) {
                 OutlinedButton(
-                    modifier =
-                        Modifier.testTag(WelcomeTestTags.BACKGROUND_LOCATION_PERMISSION_BUTTON),
+                    modifier = Modifier.testTag(WelcomeTestTags.BackgroundLocationPermissionButton),
                     onClick = onRequestBackgroundPermissions) {
                       Text(
                           text =
@@ -394,7 +393,7 @@ fun NotificationPermissionPage(
             verticalArrangement = Arrangement.spacedBy(12.dp)) {
               if (!uiState.hasPermission) {
                 OutlinedButton(
-                    modifier = Modifier.testTag(WelcomeTestTags.NOTIFICATION_PERMISSION_BUTTON),
+                    modifier = Modifier.testTag(WelcomeTestTags.NotificationPermissionButton),
                     onClick = { launcher.launch(POST_NOTIFICATIONS) }) {
                       Text(
                           text =

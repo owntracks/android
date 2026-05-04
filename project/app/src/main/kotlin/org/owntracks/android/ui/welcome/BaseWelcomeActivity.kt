@@ -12,9 +12,9 @@ import androidx.activity.viewModels
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.core.net.toUri
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -83,7 +83,7 @@ abstract class BaseWelcomeActivity : ComponentActivity() {
     backgroundLocationPermissionRequester
 
     onBackPressedDispatcher.addCallback(this) {
-      val current = welcomeViewModel.currentFragmentPosition.value ?: 0
+      val current = welcomeViewModel.currentFragmentPosition.value
       if (current == 0) {
         finish()
       } else {
@@ -98,9 +98,9 @@ abstract class BaseWelcomeActivity : ComponentActivity() {
                 corePages(snackbarHostState) + additionalPages(snackbarHostState)
               }
               .filter { it.visible }
-      val nextEnabled by welcomeViewModel.nextEnabled.observeAsState(true)
-      val doneEnabled by welcomeViewModel.doneEnabled.observeAsState(false)
-      val currentPage by welcomeViewModel.currentFragmentPosition.observeAsState(0)
+      val nextEnabled by welcomeViewModel.nextEnabled.collectAsStateWithLifecycle()
+      val doneEnabled by welcomeViewModel.doneEnabled.collectAsStateWithLifecycle()
+      val currentPage by welcomeViewModel.currentFragmentPosition.collectAsStateWithLifecycle()
 
       MaterialTheme(colorScheme = colorScheme()) {
         WelcomeFlowScreen(
@@ -123,7 +123,7 @@ abstract class BaseWelcomeActivity : ComponentActivity() {
     if (pageCount <= 0) {
       return
     }
-    val current = welcomeViewModel.currentFragmentPosition.value ?: 0
+    val current = welcomeViewModel.currentFragmentPosition.value
     if (current < pageCount - 1) {
       welcomeViewModel.nextPage()
     }

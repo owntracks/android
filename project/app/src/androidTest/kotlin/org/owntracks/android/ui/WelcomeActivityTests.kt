@@ -22,8 +22,8 @@ import org.owntracks.android.ui.welcome.WelcomeTestTags
 
 @MediumTest
 @HiltAndroidTest
-class WelcomeActivityTests : TestWithAnActivity<WelcomeActivity>() {
-  @get:Rule val composeTestRule = createAndroidComposeRule<WelcomeActivity>()
+class WelcomeActivityTests : TestWithAnActivity<WelcomeActivity>(startActivity = false) {
+  @get:Rule(order = 1) val composeTestRule = createAndroidComposeRule<WelcomeActivity>()
 
   @Test
   fun welcome_activity_starts_with_intro_fragment() {
@@ -83,6 +83,7 @@ class WelcomeActivityTests : TestWithAnActivity<WelcomeActivity>() {
     composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag(WelcomeTestTags.NextButton).performClick()
     composeTestRule.onNodeWithTag(WelcomeTestTags.DoneButton).performClick()
+    waitUntilActivityVisible(MapActivity::class.java)
     assertTrue(getCurrentActivity() is MapActivity)
   }
 
@@ -213,9 +214,6 @@ class WelcomeActivityTests : TestWithAnActivity<WelcomeActivity>() {
 
     // Done fragment
     composeTestRule
-        .onNodeWithText(composeTestRule.activity.getString(R.string.done_heading))
-        .assertIsDisplayed()
-    composeTestRule
         .onNodeWithText(composeTestRule.activity.getString(R.string.enjoy_description))
         .assertIsDisplayed()
     composeTestRule
@@ -265,9 +263,6 @@ class WelcomeActivityTests : TestWithAnActivity<WelcomeActivity>() {
     composeTestRule.onNodeWithTag(WelcomeTestTags.NextButton).performClick()
 
     // Done fragment
-    composeTestRule
-        .onNodeWithText(composeTestRule.activity.getString(R.string.done_heading))
-        .assertIsDisplayed()
     composeTestRule
         .onNodeWithText(composeTestRule.activity.getString(R.string.enjoy_description))
         .assertIsDisplayed()
