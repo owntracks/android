@@ -10,6 +10,7 @@
 
 - Fix slow start caused by replacing the map SDK on every resume.
 - Fixed map to show a sensible view when the activity is being resumed
+- My location fab now has a little more space from the edge of the display
 
 ## Version 2.5.6
 
