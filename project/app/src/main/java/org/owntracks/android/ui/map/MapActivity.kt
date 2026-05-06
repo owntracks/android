@@ -140,6 +140,10 @@ class MapActivity :
 
   @Inject lateinit var drawerProvider: DrawerProvider
 
+  @Inject
+  lateinit var externalGnssController:
+      org.owntracks.android.location.external.ExternalGnssController
+
   private val serviceConnection =
       object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -710,6 +714,11 @@ class MapActivity :
     if (checkAndRequestLocationServicesEnabled(false)) {
       viewModel.requestLocationUpdatesForBlueDot()
     }
+    if (intent?.action == android.hardware.usb.UsbManager.ACTION_USB_DEVICE_ATTACHED) {
+      externalGnssController.handleUsbAttachIntent(intent)
+    } else if (externalGnssController.isExternalGnssEnabled) {
+      externalGnssController.tryStartFromAttachedDevices()
+    }
   }
 
   private fun handleIntentExtras(intent: Intent) {
@@ -728,6 +737,9 @@ class MapActivity :
     super.onNewIntent(intent)
     service?.clearEventStackNotification()
     handleIntentExtras(intent)
+    if (intent.action == android.hardware.usb.UsbManager.ACTION_USB_DEVICE_ATTACHED) {
+      externalGnssController.handleUsbAttachIntent(intent)
+    }
   }
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {

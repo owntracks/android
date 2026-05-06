@@ -64,7 +64,7 @@ constructor(
   suspend fun publishLocationMessage(trigger: MessageLocation.ReportType) =
       locationRepo.currentPublishedLocation.value?.run { publishLocationMessage(trigger, this) }
 
-  private val highAccuracyProviders = setOf("gps", "fused")
+  private val highAccuracyProviders = setOf("gps", "fused", "external_gnss")
 
   private suspend fun publishLocationMessage(
       trigger: MessageLocation.ReportType,
