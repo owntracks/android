@@ -1,5 +1,12 @@
 # Changelog
 
+## Version 2.5.8
+
+### Bug fixes
+
+- Don't crash when MQTT reconnect is attempted with an invalid configuration (whoops!)
+- Don't crash when the MQTT client throws an unexpected exception during disconnect
+
 ## Version 2.5.7
 
 ### New features

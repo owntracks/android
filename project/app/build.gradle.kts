@@ -19,7 +19,7 @@ val googleMapsAPIKey =
 
 val gmsImplementation: Configuration by configurations.creating
 
-val versionNameValue = "2.5.7"
+val versionNameValue = "2.5.8"
 
 fun generateVersionCode(versionName: String): Int {
   val parts = versionName.split(".")
