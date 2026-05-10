@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 2.5.9
+
+### Bug fixes
+
+- Location message validation now properly enforces minimum required fields (timestamp, latitude, longitude, and tracker ID or topic). Also, hopefully we don't crash on receiving a message with null values in (!) (#2235)
+
 ## Version 2.5.8
 
 ### Bug fixes

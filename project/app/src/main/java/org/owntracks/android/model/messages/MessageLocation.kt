@@ -6,6 +6,7 @@ import android.os.Build
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 import kotlinx.datetime.Instant
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -20,12 +21,34 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.JsonTransformingSerializer
 import kotlinx.serialization.json.doubleOrNull
+import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.jsonPrimitive
 import org.jetbrains.annotations.NotNull
 import org.owntracks.android.model.BatteryStatus
 import org.owntracks.android.net.WifiInfoProvider
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.MonitoringMode
 
+/** Accepts both integer and float JSON values for Int fields (some clients send `0.0`). */
+object LenientIntSerializer : JsonTransformingSerializer<Int>(Int.serializer()) {
+  override fun transformDeserialize(element: JsonElement): JsonElement =
+      if (element is JsonPrimitive && element.content != "null" && element.doubleOrNull != null) {
+        JsonPrimitive(element.doubleOrNull!!.toInt())
+      } else {
+        element
+      }
+
+  fun parseIntLenient(element: JsonElement?): Int =
+      if (element == null) {
+        0
+      } else if (element is JsonPrimitive && element.doubleOrNull != null) {
+        element.doubleOrNull!!.toInt()
+      } else {
+        element.jsonPrimitive.intOrNull ?: 0
+      }
+}
+
+@OptIn(ExperimentalSerializationApi::class)
 @SuppressLint("UnsafeOptInUsageError")
 @Serializable
 @SerialName(MessageLocation.TYPE)
@@ -40,9 +63,7 @@ open class MessageLocation(
 
   @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.ALWAYS)
   @SerialName("created_at")
-  override var createdAt:
-      @kotlinx.serialization.Serializable(with = InstantEpochSecondsSerializer::class)
-      Instant =
+  override var createdAt: @Serializable(with = InstantEpochSecondsSerializer::class) Instant =
       messageWithCreatedAtImpl.createdAt
 
   @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.ALWAYS)
@@ -57,19 +78,19 @@ open class MessageLocation(
 
   @SerialName("bs") var batteryStatus: BatteryStatus? = null
 
-  @SerialName("acc") var accuracy = 0
+  @SerialName("acc") @Serializable(with = LenientIntSerializer::class) var accuracy = 0
 
-  @SerialName("vac") var verticalAccuracy = 0
+  @SerialName("vac") @Serializable(with = LenientIntSerializer::class) var verticalAccuracy = 0
 
-  @SerialName("lat") var latitude = 0.0
+  @SerialName("lat") var latitude: Double = 0.0
 
-  @SerialName("lon") var longitude = 0.0
+  @SerialName("lon") var longitude: Double = 0.0
 
-  @Serializable(with = LenientIntSerializer::class) @SerialName("alt") var altitude = 0
+  @SerialName("alt") @Serializable(with = LenientIntSerializer::class) var altitude = 0
 
-  @SerialName("vel") var velocity = 0
+  @SerialName("vel") @Serializable(with = LenientIntSerializer::class) var velocity = 0
 
-  @SerialName("cog") var bearing = 0
+  @SerialName("cog") @Serializable(with = LenientIntSerializer::class) var bearing = 0
 
   @SerialName("tst") var timestamp: Long = 0
 
@@ -86,7 +107,9 @@ open class MessageLocation(
   @SerialName("tid") var trackerId: String? = null
 
   override fun isValidMessage(): Boolean {
-    return timestamp > 0
+    // The deserializer validates that required fields are present in JSON
+    // Constraints: timestamp > 0 and (trackerId is not empty OR visibleTopic is not empty)
+    return timestamp > 0 && (!trackerId.isNullOrEmpty() || visibleTopic.isNotEmpty())
   }
 
   override fun toString(): String =
@@ -101,19 +124,6 @@ open class MessageLocation(
   companion object {
     const val TYPE = "location"
 
-    /** Accepts both integer and float JSON values for Int fields (some clients send `0.0`). */
-    object LenientIntSerializer : JsonTransformingSerializer<Int>(Int.serializer()) {
-      override fun transformDeserialize(element: JsonElement): JsonElement =
-          if (element is JsonPrimitive &&
-              element.content != "null" &&
-              element.doubleOrNull != null) {
-            JsonPrimitive(element.doubleOrNull!!.toInt())
-          } else {
-            element
-          }
-    }
-
-    @SuppressLint("NewApi")
     @JvmStatic
     fun fromLocation(location: Location, sdk: Int = Build.VERSION.SDK_INT): MessageLocation =
         MessageLocation().apply {
