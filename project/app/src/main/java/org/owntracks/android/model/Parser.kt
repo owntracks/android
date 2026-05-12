@@ -21,6 +21,7 @@ import org.owntracks.android.model.messages.MessageCmd
 import org.owntracks.android.model.messages.MessageConfiguration
 import org.owntracks.android.model.messages.MessageEncrypted
 import org.owntracks.android.model.messages.MessageLocation
+import org.owntracks.android.model.messages.MessageLocationDeserializer
 import org.owntracks.android.model.messages.MessageLwt
 import org.owntracks.android.model.messages.MessageStatus
 import org.owntracks.android.model.messages.MessageTransition
@@ -28,6 +29,7 @@ import org.owntracks.android.model.messages.MessageUnknown
 import org.owntracks.android.model.messages.MessageWaypoint
 import org.owntracks.android.model.messages.MessageWaypointCollectionSerializer
 import org.owntracks.android.model.messages.MessageWaypoints
+import timber.log.Timber
 
 @Singleton
 class Parser @Inject constructor(private val encryptionProvider: EncryptionProvider?) {
@@ -40,7 +42,7 @@ class Parser @Inject constructor(private val encryptionProvider: EncryptionProvi
       subclass(MessageCmd::class)
       subclass(MessageConfiguration::class, MessageConfiguration.MessageConfigurationSerializer)
       subclass(MessageEncrypted::class)
-      subclass(MessageLocation::class)
+      subclass(MessageLocation::class, MessageLocationDeserializer)
       subclass(MessageLwt::class)
       subclass(MessageStatus::class)
       subclass(MessageTransition::class)
@@ -132,6 +134,9 @@ class Parser @Inject constructor(private val encryptionProvider: EncryptionProvi
   fun fromJson(input: ByteArray): MessageBase =
       try {
         decrypt(fromUnencryptedJson(input))
+      } catch (e: SerializationException) {
+        Timber.w(e, "Error parsing message: %s", e.toString())
+        MessageUnknown
       } catch (e: Exception) {
         MessageUnknown
       }

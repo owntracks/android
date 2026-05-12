@@ -1,0 +1,9 @@
+{
+  "_type": "location",
+  "tst": 1778266175,
+  "lat": 0.000,
+  "lon": 0.000,
+  "topic": "owntracks/user/device",
+  "acc": 15,
+  "alt": 300
+}
