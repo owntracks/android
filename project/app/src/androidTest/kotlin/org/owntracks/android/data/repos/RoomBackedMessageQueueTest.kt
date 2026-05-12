@@ -2,6 +2,7 @@ package org.owntracks.android.data.repos
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import kotlin.random.Random
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -12,7 +13,9 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.owntracks.android.model.CommandAction
 import org.owntracks.android.model.Parser
+import org.owntracks.android.model.messages.MessageCmd
 import org.owntracks.android.model.messages.MessageLocation
 
 @RunWith(AndroidJUnit4::class)
@@ -23,6 +26,7 @@ class RoomBackedMessageQueueTest {
 
   @Before
   fun setup() {
+    InstrumentationRegistry.getInstrumentation().targetContext.deleteDatabase("message_queue")
     val context = ApplicationProvider.getApplicationContext<android.content.Context>()
     queue = RoomBackedMessageQueue(100, context, parser, Dispatchers.IO)
   }
@@ -74,5 +78,48 @@ class RoomBackedMessageQueueTest {
     val third = queue.dequeue() as MessageLocation
     assertEquals(regularMessage2.longitude, third.longitude, 0.0001)
     assertNull(queue.dequeue())
+  }
+
+  @Test
+  fun givenMessageCmdWithTopicWhenPersistedAndRestoredThenTopicIsSurvived() = runBlocking {
+    val context = ApplicationProvider.getApplicationContext<android.content.Context>()
+    queue.initialize(context.filesDir)
+
+    val cmd =
+        MessageCmd().apply {
+          topic = "owntracks/friend/phone/cmd"
+          action = CommandAction.REPORT_LOCATION
+        }
+    queue.enqueue(cmd)
+    queue.close()
+
+    // Recreate queue to simulate app restart / dequeue from persisted storage
+    val queue2 = RoomBackedMessageQueue(100, context, parser, Dispatchers.IO)
+    queue2.initialize(context.filesDir)
+    val dequeued = queue2.dequeue() as MessageCmd
+    assertEquals("owntracks/friend/phone/cmd", dequeued.topic)
+    assertEquals(CommandAction.REPORT_LOCATION, dequeued.action)
+    queue2.close()
+  }
+
+  @Test
+  fun givenMessageCmdWithTopicWhenRequeuedAndRestoredThenTopicIsSurvived() = runBlocking {
+    val context = ApplicationProvider.getApplicationContext<android.content.Context>()
+    queue.initialize(context.filesDir)
+
+    val cmd =
+        MessageCmd().apply {
+          topic = "owntracks/friend/phone/cmd"
+          action = CommandAction.REPORT_LOCATION
+        }
+    queue.requeue(cmd)
+    queue.close()
+
+    val queue2 = RoomBackedMessageQueue(100, context, parser, Dispatchers.IO)
+    queue2.initialize(context.filesDir)
+    val dequeued = queue2.dequeue() as MessageCmd
+    assertEquals("owntracks/friend/phone/cmd", dequeued.topic)
+    assertEquals(CommandAction.REPORT_LOCATION, dequeued.action)
+    queue2.close()
   }
 }

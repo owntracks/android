@@ -1,0 +1,12 @@
+{
+  "_type": "transition",
+  "acc": 3,
+  "desc": "myregion",
+  "event": "leave",
+  "lat": 52.71234,
+  "lon": -1.61234123,
+  "t": "l",
+  "tid": "ce",
+  "tst": 1603209966,
+  "wtst": 1558351273
+}

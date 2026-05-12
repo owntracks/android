@@ -152,15 +152,18 @@ class MQTTMessageProcessorEndpoint(
                           disconnectTimeout.inWholeMilliseconds,
                           disconnectTimeout.inWholeMilliseconds,
                           true)
-                    } catch (e: NullPointerException) {
-                      Timber.d(
-                          "Could not forcibly disconnect client, NPE thrown by bug in Paho MQTT. Ignoring.")
+                    } catch (e: Exception) {
+                      Timber.d(e, "Could not forcibly disconnect MQTT client. Ignoring.")
                     }
                   }
                 }
               }
               endpointStateRepo.setState(EndpointState.DISCONNECTED)
-              mqttClient.close(true)
+              try {
+                mqttClient.close(true)
+              } catch (e: Exception) {
+                Timber.w(e, "Error closing MQTT client. Ignoring.")
+              }
               try {
                 pingAlarmReceiver?.run(applicationContext::unregisterReceiver)
                 Timber.d("Unregistered ping alarm receiver")
@@ -442,7 +445,13 @@ class MQTTMessageProcessorEndpoint(
 
   override suspend fun reconnect(): Result<Unit> =
       mqttClientAndConfiguration?.mqttConnectionConfiguration?.run { reconnect(this) }
-          ?: run { reconnect(getEndpointConfiguration()) }
+          ?: try {
+            reconnect(getEndpointConfiguration())
+          } catch (e: ConfigurationIncompleteException) {
+            Timber.w("MQTT not configured, skipping reconnect: ${e.message}")
+            endpointStateRepo.setState(EndpointState.ERROR_CONFIGURATION.withError(e))
+            Result.failure(e)
+          }
 
   private suspend fun reconnect(
       mqttConnectionConfiguration: MqttConnectionConfiguration
