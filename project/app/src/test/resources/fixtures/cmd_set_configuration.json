@@ -1,0 +1,8 @@
+{
+  "_type": "cmd",
+  "action": "setConfiguration",
+  "configuration": {
+    "_type": "configuration",
+    "host": "newHost"
+  }
+}

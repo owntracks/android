@@ -1,5 +1,18 @@
 # Changelog
 
+## Version 2.5.9
+
+### Bug fixes
+
+- Location message validation now properly enforces minimum required fields (timestamp, latitude, longitude, and tracker ID or topic). Also, hopefully we don't crash on receiving a message with null values in (!) (#2235)
+
+## Version 2.5.8
+
+### Bug fixes
+
+- Don't crash when MQTT reconnect is attempted with an invalid configuration (whoops!)
+- Don't crash when the MQTT client throws an unexpected exception during disconnect
+
 ## Version 2.5.7
 
 ### New features
@@ -10,6 +23,8 @@
 
 - Fix slow start caused by replacing the map SDK on every resume.
 - Fixed map to show a sensible view when the activity is being resumed
+- My location fab now has a little more space from the edge of the display (#2182)
+- Google drive log export doesn't appear to fail (#2213)
 
 ## Version 2.5.6
 

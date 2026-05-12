@@ -107,6 +107,7 @@ class MapActivity :
       )
   private var service: BackgroundService? = null
   private var bottomSheetBehavior: BottomSheetBehavior<LinearLayoutCompat>? = null
+  private var navBarInset: Int = 0
   private var menu: Menu? = null
   private var sensorManager: SensorManager? = null
   private var orientationSensor: Sensor? = null
@@ -303,10 +304,19 @@ class MapActivity :
           // Apply bottom insets to FABs to avoid navigation bar
           ViewCompat.setOnApplyWindowInsetsListener(mapCoordinatorLayout) { _, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val fabMargin = resources.getDimensionPixelSize(R.dimen.fab_margin)
+
+            navBarInset = insets.bottom
 
             fabMapLayers.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-              bottomMargin = insets.bottom + resources.getDimensionPixelSize(R.dimen.fab_margin)
+              bottomMargin = insets.bottom + fabMargin
             }
+
+            fabMyLocation.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+              marginEnd = insets.right + fabMargin
+            }
+
+            bottomSheetBehavior?.state?.let { updateFabMyLocationPosition(it) }
 
             windowInsets
           }
@@ -831,9 +841,9 @@ class MapActivity :
       bottomMargin =
           when (bottomSheetState) {
             BottomSheetBehavior.STATE_COLLAPSED -> {
-              bottomSheetBehavior?.peekHeight ?: bottom
+              (bottomSheetBehavior?.peekHeight ?: 0) + navBarInset
             }
-            else -> bottom
+            else -> navBarInset
           }
     }
   }

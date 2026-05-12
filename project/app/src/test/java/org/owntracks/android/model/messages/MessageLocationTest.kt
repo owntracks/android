@@ -111,4 +111,62 @@ class MessageLocationTest {
     assertNull(messageLocation.ssid)
     assertNull(messageLocation.bssid)
   }
+
+  @Test
+  fun `given a valid message with timestamp, tracker id and coordinates, when checking validity, the message should be valid`() {
+    val messageLocation = MessageLocation()
+    messageLocation.timestamp = 1234567890
+    messageLocation.latitude = 51.0
+    messageLocation.longitude = 0.3
+    messageLocation.trackerId = "aa"
+
+    assertEquals(true, messageLocation.isValidMessage())
+  }
+
+  @Test
+  fun `given a message with zero timestamp, when checking validity, the message should be invalid`() {
+    val messageLocation = MessageLocation()
+    messageLocation.timestamp = 0
+    messageLocation.latitude = 51.0
+    messageLocation.longitude = 0.3
+    messageLocation.trackerId = "aa"
+
+    assertEquals(false, messageLocation.isValidMessage())
+  }
+
+  @Test
+  fun `given a message with missing tracker id and empty topic, when checking validity, the message should be invalid`() {
+    val messageLocation = MessageLocation()
+    messageLocation.timestamp = 1234567890
+    messageLocation.latitude = 51.0
+    messageLocation.longitude = 0.3
+    messageLocation.trackerId = null
+    messageLocation.visibleTopic = ""
+
+    assertEquals(false, messageLocation.isValidMessage())
+  }
+
+  @Test
+  fun `given a message with valid topic but no tracker id, when checking validity, the message should be valid`() {
+    val messageLocation = MessageLocation()
+    messageLocation.timestamp = 1234567890
+    messageLocation.latitude = 51.0
+    messageLocation.longitude = 0.3
+    messageLocation.trackerId = null
+    messageLocation.visibleTopic = "owntracks/user/device"
+
+    assertEquals(true, messageLocation.isValidMessage())
+  }
+
+  @Test
+  fun `given a message with empty tracker id, when checking validity, the message should be invalid if topic is also empty`() {
+    val messageLocation = MessageLocation()
+    messageLocation.timestamp = 1234567890
+    messageLocation.latitude = 51.0
+    messageLocation.longitude = 0.3
+    messageLocation.trackerId = ""
+    messageLocation.visibleTopic = ""
+
+    assertEquals(false, messageLocation.isValidMessage())
+  }
 }

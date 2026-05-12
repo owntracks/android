@@ -1,0 +1,17 @@
+{
+  "_type": "location",
+  "tid": "s5",
+  "acc": 1600,
+  "alt": 0.0,
+  "batt": 99,
+  "bs": 3,
+  "cog": 56,
+  "conn": "w",
+  "_id": "inputTestId",
+  "lat": 52.3153748,
+  "lon": 5.0408462,
+  "t": "p",
+  "tst": 1514455575,
+  "vac": 0,
+  "inregions": ["Testregion1", "Testregion2"]
+}

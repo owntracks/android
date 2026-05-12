@@ -33,6 +33,8 @@ class EncryptionProviderTest {
           latitude = 50.1182933
           longitude = -5.5407733
           accuracy = 5
+          timestamp = System.currentTimeMillis() / 1000
+          trackerId = "test"
         }
     val encrypted = parser.toJson(message)
 
