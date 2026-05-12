@@ -41,17 +41,17 @@ constructor(private val waypointsRepo: WaypointsRepo, locationRepo: LocationRepo
   }
 
   fun delete() {
-    viewModelScope.launch { waypoint.value?.run { waypointsRepo.delete(this) } }
+    viewModelScope.launch { waypoint.value.run { waypointsRepo.delete(this) } }
   }
 
   fun canDeleteWaypoint(): Boolean {
-    return waypoint.value?.id?.run { this != 0L } ?: false
+    return waypoint.value.id.run { this != 0L }
   }
 
   fun saveWaypoint(description: String, latitude: Latitude, longitude: Longitude, radius: Int) {
     viewModelScope.launch {
       waypointsRepo.insert(
-          (waypoint.value ?: WaypointModel()).apply {
+          waypoint.value.apply {
             this.description = description
             this.geofenceLatitude = latitude
             this.geofenceLongitude = longitude

@@ -89,7 +89,7 @@ class LoadViewModelTest {
             "owntracks:///config?inline=eyJfdHlwZSI6ImNvbmZpZ3VyYXRpb24ifQ==")
         advanceUntilIdle()
         assertEquals(ImportStatus.SUCCESS, vm.configurationImportStatus.value)
-        val json = Json.parseToJsonElement(vm.displayedConfiguration.value!!).jsonObject
+        val json = Json.parseToJsonElement(vm.displayedConfiguration.value).jsonObject
         assertTrue(json.isNotEmpty())
         assertTrue(json.containsKey("_type"))
         assertEquals("configuration", json["_type"]?.jsonPrimitive?.content)
@@ -112,7 +112,7 @@ class LoadViewModelTest {
         vm.extractPreferencesFromUri(
             "owntracks:///config?inline=eyJfdHlwZSI6IndheXBvaW50cyIsIndheXBvaW50cyI6W3siX3R5cGUiOiJ3YXlwb2ludCIsImRlc2MiOiJUZXN0IFdheXBvaW50IiwibGF0Ijo1MSwibG9uIjowLCJyYWQiOjQ1MCwidHN0IjoxNTk4NDUxMzcyfV19")
         val displayedConfig = vm.displayedConfiguration.value
-        val json = Json.parseToJsonElement(displayedConfig!!).jsonObject
+        val json = Json.parseToJsonElement(displayedConfig).jsonObject
         assertTrue(json.isNotEmpty())
         assertTrue(json.containsKey("_type"))
         assertEquals("waypoints", json["_type"]?.jsonPrimitive?.content)

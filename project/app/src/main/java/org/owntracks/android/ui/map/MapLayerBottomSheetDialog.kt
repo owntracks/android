@@ -26,7 +26,7 @@ class MapLayerBottomSheetDialog : BottomSheetDialogFragment() {
         val currentMapLayerStyle = viewModel.mapLayerStyle.value
         val newMapLayerStyle = it.value
         viewModel.setMapLayerStyle(it.value)
-        if (currentMapLayerStyle?.isSameProviderAs(newMapLayerStyle) != true) {
+        if (!currentMapLayerStyle.isSameProviderAs(newMapLayerStyle)) {
           // Replace the map fragment
           val mapFragment =
               parentFragmentManager.fragmentFactory.instantiate(
