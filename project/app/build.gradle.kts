@@ -186,7 +186,12 @@ android {
     isCoreLibraryDesugaringEnabled = true
   }
 
-  kotlinOptions { jvmTarget = JavaVersion.VERSION_21.toString() }
+  //kotlinOptions { jvmTarget = JavaVersion.VERSION_21.toString() }
+//  kotlin {
+//    compilerOptions {
+//      jvmTarget = "21"
+//    }
+//  }
 
   flavorDimensions.add("locationProvider")
   productFlavors {
