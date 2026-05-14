@@ -22,7 +22,10 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.IOException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiPreferencesLoadBinding
 import timber.log.Timber
@@ -32,6 +35,7 @@ import timber.log.Timber
 class LoadActivity : AppCompatActivity() {
   private val viewModel: LoadViewModel by viewModels()
   private lateinit var binding: UiPreferencesLoadBinding
+  private var importJob: Job? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     enableEdgeToEdge()
@@ -116,7 +120,18 @@ class LoadActivity : AppCompatActivity() {
       if (uri != null) {
         Timber.v("uri: %s", uri)
         if (ContentResolver.SCHEME_CONTENT == uri.scheme) {
-          viewModel.extractPreferences(getContentFromURI(uri))
+          importJob?.cancel()
+          importJob =
+              lifecycleScope.launch {
+                try {
+                  val content = withContext(Dispatchers.IO) { getContentFromURI(uri) }
+                  viewModel.extractPreferences(content)
+                } catch (e: IOException) {
+                  viewModel.configurationImportFailed(e)
+                } catch (e: SecurityException) {
+                  viewModel.configurationImportFailed(e)
+                }
+              }
         } else {
           viewModel.extractPreferencesFromUri(uri.toString())
         }
@@ -141,27 +156,35 @@ class LoadActivity : AppCompatActivity() {
   private val filePickerResultLauncher =
       registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == RESULT_OK) {
-          var content = ByteArray(0)
-          try {
-            content = it.data?.data?.run(this::getContentFromURI) ?: ByteArray(0)
-          } catch (e: IOException) {
-            Timber.e(e, "Could not extract content from ${it.data}")
-          }
-          viewModel.extractPreferences(content)
+          val uri = it.data?.data
+          importJob?.cancel()
+          importJob =
+              lifecycleScope.launch {
+                val content =
+                    if (uri != null) {
+                      try {
+                        withContext(Dispatchers.IO) { getContentFromURI(uri) }
+                      } catch (e: IOException) {
+                        Timber.e(e, "Could not extract content from $uri")
+                        ByteArray(0)
+                      } catch (e: SecurityException) {
+                        Timber.e(e, "Could not extract content from $uri")
+                        ByteArray(0)
+                      }
+                    } else {
+                      ByteArray(0)
+                    }
+                viewModel.extractPreferences(content)
+              }
         } else {
           finish()
         }
       }
 
   @Throws(IOException::class)
-  private fun getContentFromURI(uri: Uri): ByteArray {
-    contentResolver.openInputStream(uri).use { stream ->
-      val output = ByteArray(stream!!.available())
-      val bytesRead = stream.read(output)
-      Timber.d("Read %d bytes from content URI", bytesRead)
-      return output
-    }
-  }
+  private fun getContentFromURI(uri: Uri): ByteArray =
+      contentResolver.openInputStream(uri)?.use { it.readBytes() }
+          ?: throw IOException("Could not open input stream for $uri")
 
   companion object {
     const val FLAG_IN_APP = "INAPP"
