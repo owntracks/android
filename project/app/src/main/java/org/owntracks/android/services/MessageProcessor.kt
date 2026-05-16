@@ -126,7 +126,8 @@ constructor(
         applicationContext.bindService(
             Intent(applicationContext, BackgroundService::class.java),
             serviceConnection,
-            Context.BIND_AUTO_CREATE)
+            Context.BIND_AUTO_CREATE,
+        )
         endpointStateRepo.setState(EndpointState.INITIAL)
         queueInitJob.join()
         reconnect()
@@ -196,7 +197,8 @@ constructor(
               scope,
               ioDispatcher,
               applicationContext,
-              mqttConnectionIdlingResource)
+              mqttConnectionIdlingResource,
+          )
       ConnectionMode.HTTP ->
           HttpMessageProcessorEndpoint(
               this,
@@ -206,7 +208,8 @@ constructor(
               endpointStateRepo,
               caKeyStore,
               scope,
-              ioDispatcher)
+              ioDispatcher,
+          )
     }
   }
 
@@ -275,7 +278,9 @@ constructor(
                   resendDelayWait(SEND_FAILURE_NOT_READY_WAIT)
                   lastMessageStatus =
                       LastMessageStatus.RetryableFailure(
-                          message.numberOfRetries, SEND_FAILURE_BACKOFF_INITIAL_WAIT)
+                          message.numberOfRetries,
+                          SEND_FAILURE_BACKOFF_INITIAL_WAIT,
+                      )
                 } else {
                   it.sendMessage(message).exceptionOrNull()?.run {
                     when (this) {
@@ -285,7 +290,9 @@ constructor(
                         resendDelayWait(SEND_FAILURE_NOT_READY_WAIT)
                         lastMessageStatus =
                             LastMessageStatus.RetryableFailure(
-                                message.numberOfRetries, SEND_FAILURE_BACKOFF_INITIAL_WAIT)
+                                message.numberOfRetries,
+                                SEND_FAILURE_BACKOFF_INITIAL_WAIT,
+                            )
                       }
 
                       is MessageProcessorEndpoint.OutgoingMessageSendingException,
@@ -311,7 +318,8 @@ constructor(
                                   retriesToGo - 1,
                                   (retryWait * 2).coerceAtMost(SEND_FAILURE_BACKOFF_MAX_WAIT).also {
                                     Timber.v("Increasing failure retry wait to $it")
-                                  })
+                                  },
+                              )
                             }
                       }
 
@@ -514,7 +522,8 @@ constructor(
     } else if (message.modeId !== ConnectionMode.HTTP &&
         preferences.receivedCommandsTopic != message.topic &&
         preferences.subTopic ==
-            DEFAULT_SUB_TOPIC // If we're not using the default subtopic, we receive commands from
+            DEFAULT_SUB_TOPIC // If we're not using the default subtopic, we receive commands
+    // from
     // anywhere
     ) {
       Timber.e("cmd message received on wrong topic")
