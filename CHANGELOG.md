@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 2.5.10
+
+### Bug fixes
+
+- Fix blocking file I/O on the main thread when loading a configuration from a content:// URI, which could cause ANR on slow storage (#2151). Also fixes potentially truncated reads and an uncaught IOException in that path.
+
 ## Version 2.5.9
 
 ### Bug fixes
