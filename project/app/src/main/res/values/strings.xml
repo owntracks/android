@@ -140,6 +140,21 @@ To allow this, please enable Location in the device settings."</string>
     <string name="play_services_now_available">"Google Play Services are now available"</string>
     <string name="play_services_update_required">"Google Play Services update is required"</string>
     <string name="preferencesAdvanced">"Advanced"</string>
+    <string name="preferencesExternalGnss">"External GNSS"</string>
+    <string name="preferencesExternalGnssUsb">"USB receiver"</string>
+    <string name="preferencesExternalGnssEnabled">"Use external GNSS"</string>
+    <string name="preferencesExternalGnssEnabledSummary">"Publish positions coming from a USB GNSS receiver (e.g. u-blox F9P) instead of the phone\'s built-in GPS."</string>
+    <string name="preferencesExternalGnssConnect">"Connect to attached device"</string>
+    <string name="preferencesExternalGnssConnectSummary">"Request USB permission and open the currently attached receiver."</string>
+    <string name="preferencesExternalGnssNtripCaster">"NTRIP caster (RTK)"</string>
+    <string name="preferencesExternalGnssNtripEnabled">"Enable NTRIP"</string>
+    <string name="preferencesExternalGnssNtripEnabledSummary">"Forward RTCM corrections from an NTRIP caster to the external GNSS receiver."</string>
+    <string name="preferencesExternalGnssNtripHost">"Caster host"</string>
+    <string name="preferencesExternalGnssNtripPort">"Caster port"</string>
+    <string name="preferencesExternalGnssNtripMountpoint">"Mountpoint"</string>
+    <string name="preferencesExternalGnssNtripUser">"Username"</string>
+    <string name="preferencesExternalGnssNtripPassword">"Password"</string>
+    <string name="preferencesExternalGnssNtripPasswordSummary">"Password for the NTRIP mountpoint."</string>
     <string name="preferencesAdvancedAutostartWarning">"This version of Android restricts OwnTracks from receiving locations when automatically started on device boot until the app is opened."</string>
     <string name="preferencesAdvancedOpencagePrivacy"><a href="%s">OpenCage Privacy Policy</a></string>
     <string name="preferencesAdvancedOpencagePrivacyDialogMessage">To use the OpenCage geocoder, OwnTracks will send every location it processes to OpenCage over a TLS-encrypted connection.\n\nThe OpenCage privacy policy can be found <a href="https://opencagedata.com/api#privacy">on their website</a>.</string>
