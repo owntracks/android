@@ -1,5 +1,6 @@
 package org.owntracks.android.gms.location.geofencing
 
+import android.os.SystemClock
 import org.owntracks.android.location.geofencing.Geofence
 import org.owntracks.android.location.geofencing.GeofencingRequest
 
@@ -24,7 +25,10 @@ fun Geofence.toGMSGeofence(): com.google.android.gms.location.Geofence {
       }
     }
   }
-  this.expirationDuration?.run(builder::setExpirationDuration)
+  this.expirationDuration?.run {
+    builder.setExpirationDuration(
+        minOf(this, Long.MAX_VALUE - SystemClock.elapsedRealtime()))
+  }
   this.transitionTypes?.run(builder::setTransitionTypes)
   this.notificationResponsiveness?.run(builder::setNotificationResponsiveness)
   this.loiteringDelay?.run(builder::setLoiteringDelay)
