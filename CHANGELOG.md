@@ -15,6 +15,17 @@ This release addresses a security advisory covering several intent-handling vuln
 - Security-related preferences (`allowConfigurationByURIAndConfigFile`, `allowIntentControl`, `intentAuthKey`) cannot be changed via imported config files or URLs
 - Certificate fingerprint verification migrated from SHA-1 to SHA-256
 
+### New features
+
+- New **Remote Control** preferences screen showing the intent auth key (with a copy-to-clipboard button) for use with automation apps such as Tasker
+- Config import screen now shows a structured diff of what is changing, with human-readable preference names, highlighting new values alongside the current values — unchanged settings are summarised rather than listed in full
+- Waypoints in an imported config are listed individually in the import review screen
+
+### Bug fixes
+
+- DEBUG and VERBOSE log messages are no longer emitted to the system Logcat in release builds, preventing potential PII (e.g. coordinates) leakage via `TimberInMemoryLogTree` (CWE-532)
+
+
 ## Version 2.5.10
 
 ### Bug fixes
@@ -33,16 +44,6 @@ This release addresses a security advisory covering several intent-handling vuln
 
 - Don't crash when MQTT reconnect is attempted with an invalid configuration (whoops!)
 - Don't crash when the MQTT client throws an unexpected exception during disconnect
-
-### New features
-
-- New **Remote Control** preferences screen showing the intent auth key (with a copy-to-clipboard button) for use with automation apps such as Tasker
-- Config import screen now shows a structured diff of what is changing, with human-readable preference names, highlighting new values alongside the current values — unchanged settings are summarised rather than listed in full
-- Waypoints in an imported config are listed individually in the import review screen
-
-### Bug fixes
-
-- DEBUG and VERBOSE log messages are no longer emitted to the system Logcat in release builds, preventing potential PII (e.g. coordinates) leakage via `TimberInMemoryLogTree` (CWE-532)
 
 ## Version 2.5.7
 
