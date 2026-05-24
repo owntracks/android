@@ -61,15 +61,20 @@ constructor(
   private val mutableImportError = MutableStateFlow<String?>(null)
   val importError: StateFlow<String?> = mutableImportError
 
+  private val mutableDisplayedConfiguration = MutableStateFlow("")
+  val displayedConfiguration: StateFlow<String> = mutableDisplayedConfiguration
+
   private fun setConfiguration(json: String) {
     when (val message = parser.fromJson(json.toByteArray())) {
       is MessageConfiguration -> {
         configuration = message
+        mutableDisplayedConfiguration.value = parser.toJsonPlain(message)
         mutableConfigItems.value = buildConfigItems(message)
         mutableImportStatus.value = ImportStatus.SUCCESS
       }
       is MessageWaypoints -> {
         configuration = MessageConfiguration().apply { message.waypoints?.run { waypoints = this } }
+        mutableDisplayedConfiguration.value = parser.toJsonPlain(message)
         mutableConfigItems.value = buildConfigItems(configuration!!)
         mutableImportStatus.value = ImportStatus.SUCCESS
       }
