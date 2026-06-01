@@ -52,7 +52,7 @@
             android:orientation="horizontal"
             android:padding="12dp"
             android:gravity="end"
-            android:visibility="@{vm.configurationImportStatus==ImportStatus.SUCCESS ? View.VISIBLE : View.GONE}">
+            android:visibility="@{(vm.configurationImportStatus==ImportStatus.SUCCESS || vm.configurationImportStatus==ImportStatus.FAILED) ? View.VISIBLE : View.GONE}">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/cancelButton"
@@ -66,9 +66,17 @@
                 android:id="@+id/applyButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/loadActivityApply" />
+                android:text="@string/loadActivityApply"
+                android:visibility="@{vm.configurationImportStatus==ImportStatus.SUCCESS ? View.VISIBLE : View.GONE}" />
 
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/effectiveConfiguration"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            android:text="@{vm.displayedConfiguration}" />
 
         <ScrollView
             android:layout_width="match_parent"

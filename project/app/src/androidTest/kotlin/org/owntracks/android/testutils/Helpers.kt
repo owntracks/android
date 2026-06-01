@@ -83,6 +83,10 @@ fun setNotFirstStartPreferences() {
       .edit()
       .putBoolean(Preferences::firstStart.name, false)
       .putBoolean(Preferences::setupCompleted.name, true)
+      // Reset "user declined" flags so permission/services dialogs appear consistently on each
+      // test run regardless of what previous tests in the same session may have set.
+      .putBoolean(Preferences::userDeclinedEnableBackgroundLocationPermissions.name, false)
+      .putBoolean(Preferences::userDeclinedEnableLocationServices.name, false)
       .apply()
 }
 
@@ -379,6 +383,61 @@ fun waitUntilViewNotDisplayed(@IdRes viewId: Int, timeout: Duration = TIMEOUT) {
     }
   }
   throw lastError ?: AssertionError("Timed out waiting for view $viewId to not be displayed")
+}
+
+/**
+ * Polls until at least [areaPercentage]% of the view with [viewId] is within the global visible
+ * rectangle, or throws if [timeout] is exceeded. Use this before clicking views that may still be
+ * animating into position (e.g. BottomSheetBehavior with SpringAnimation, which does not respect
+ * animator_duration_scale=0). Barista's clickOn requires 90% visibility by default.
+ */
+fun waitUntilViewFullyVisible(
+    @IdRes viewId: Int,
+    areaPercentage: Int = 90,
+    timeout: Duration = TIMEOUT
+) {
+  val deadline = Clock.System.now().plus(timeout)
+  var lastError: Throwable? = null
+  while (Clock.System.now() < deadline) {
+    try {
+      onView(withId(viewId)).check(matches(ViewMatchers.isDisplayingAtLeast(areaPercentage)))
+      return
+    } catch (e: Throwable) {
+      lastError = e
+      Thread.sleep(CONDITION_CHECK_INTERVAL)
+    }
+  }
+  throw lastError
+      ?: AssertionError(
+          "Timed out waiting for view $viewId to be at least $areaPercentage% visible")
+}
+
+/**
+ * Waits until at least [minVisibility]% of the view is within the global visible rectangle, then
+ * performs a click using a custom [ViewAction] constrained to the same visibility level. Use
+ * instead of [waitUntilViewFullyVisible] + [clickOn] for views that are structurally partially
+ * off-screen (e.g. a button in a [androidx.constraintlayout.helper.widget.Flow] chain that wraps to
+ * a second row on a small screen, permanently clipping the view below the 90% threshold that
+ * Barista's [clickOn] and Espresso's [ViewActions.click] require).
+ */
+fun waitAndClickWithMinVisibility(
+    @IdRes viewId: Int,
+    minVisibility: Int = 80,
+    timeout: Duration = TIMEOUT
+) {
+  waitUntilViewFullyVisible(viewId, minVisibility, timeout)
+  onView(withId(viewId))
+      .perform(
+          object : ViewAction {
+            override fun getConstraints() = ViewMatchers.isDisplayingAtLeast(minVisibility)
+
+            override fun getDescription() = "click with at-least-$minVisibility% visibility"
+
+            override fun perform(uiController: UiController, view: View) {
+              view.performClick()
+              uiController.loopMainThreadUntilIdle()
+            }
+          })
 }
 
 /**

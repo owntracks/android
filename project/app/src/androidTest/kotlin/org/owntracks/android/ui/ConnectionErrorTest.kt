@@ -173,7 +173,7 @@ class ConnectionErrorTest : TestWithAnActivity<StatusActivity>(startActivity = t
               flags = Intent.FLAG_ACTIVITY_NEW_TASK
             })
     waitUntilActivityVisible(LoadActivity::class.java)
-    ViewIdlingResource(withId(R.id.save), isDisplayed()).use { clickOn(R.id.save) }
+    ViewIdlingResource(withId(R.id.applyButton), isDisplayed()).use { clickOn(R.id.applyButton) }
     waitUntilActivityVisible()
   }
 }

@@ -46,7 +46,7 @@ class ContactsAndMapTests :
     configureHTTPConnectionToLocal(saveConfigurationIdlingResource)
     waitUntilActivityVisible()
     reportLocationFromMap(mockLocationIdlingResource) {
-      mockLocationProviderClient.setLocation(51.0, 0.0)
+      mockLocationProviderClient.setLocation(51.0, 1.0)
     }
 
     baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.use {
