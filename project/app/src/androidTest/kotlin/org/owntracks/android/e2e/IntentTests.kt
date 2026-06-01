@@ -26,9 +26,9 @@ import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.TestWithAnMQTTBroker
 import org.owntracks.android.testutils.TestWithAnMQTTBrokerImpl
 import org.owntracks.android.testutils.di.setLocation
-import org.owntracks.android.testutils.idlingresources.ViewIdlingResource
 import org.owntracks.android.testutils.matchers.withActionIconDrawable
 import org.owntracks.android.testutils.use
+import org.owntracks.android.testutils.waitAndClickWithMinVisibility
 import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber
 
@@ -47,8 +47,8 @@ class IntentTests :
 
     waitUntilActivityVisible()
     clickOn(R.id.menu_monitoring)
-    clickOn(R.id.fabMonitoringModeMove)
-    mockLocationProviderClient.setLocation(51.0, 0.0)
+    waitAndClickWithMinVisibility(R.id.fabMonitoringModeMove)
+    mockLocationProviderClient.setLocation(51.0, 1.0)
 
     mockLocationIdlingResource.use(15.seconds) { clickOn(R.id.fabMyLocation) }
 
@@ -214,9 +214,8 @@ class IntentTests :
 
     waitUntilActivityVisible()
     clickOn(R.id.menu_monitoring)
-    ViewIdlingResource(ViewMatchers.withId(R.id.fabMonitoringModeMove), ViewMatchers.isDisplayed())
-        .use { clickOn(R.id.fabMonitoringModeMove) }
-    mockLocationProviderClient.setLocation(51.0, 0.0)
+    waitAndClickWithMinVisibility(R.id.fabMonitoringModeMove)
+    mockLocationProviderClient.setLocation(51.0, 1.0)
 
     mockLocationIdlingResource.use(15.seconds) { clickOn(R.id.fabMyLocation) }
 
@@ -249,9 +248,8 @@ class IntentTests :
 
     waitUntilActivityVisible()
     clickOn(R.id.menu_monitoring)
-    ViewIdlingResource(ViewMatchers.withId(R.id.fabMonitoringModeMove), ViewMatchers.isDisplayed())
-        .use { clickOn(R.id.fabMonitoringModeMove) }
-    mockLocationProviderClient.setLocation(51.0, 0.0)
+    waitAndClickWithMinVisibility(R.id.fabMonitoringModeMove)
+    mockLocationProviderClient.setLocation(51.0, 1.0)
 
     mockLocationIdlingResource.use(15.seconds) { clickOn(R.id.fabMyLocation) }
 

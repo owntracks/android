@@ -68,7 +68,7 @@ class TestWithAnHTTPServerImpl : TestWithAnHTTPServer {
               data = "owntracks:///config?inline=$config".toUri()
               flags = Intent.FLAG_ACTIVITY_NEW_TASK
             })
-    ViewIdlingResource(withId(R.id.save), isDisplayed()).use { clickOn(R.id.save) }
+    ViewIdlingResource(withId(R.id.applyButton), isDisplayed()).use { clickOn(R.id.applyButton) }
   }
 
   class MockJSONResponseDispatcher(private val responses: Map<String, String>) : Dispatcher() {

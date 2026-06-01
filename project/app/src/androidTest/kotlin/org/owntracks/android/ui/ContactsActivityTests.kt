@@ -121,11 +121,9 @@ class ContactsActivityTests :
       configureMQTTConnectionToLocalWithGeneratedPassword(saveConfigurationIdlingResource)
     })
 
-    (baristaRule.activityTestRule.activity as ContactsActivity)
-        .contactsCountingIdlingResource
-        .increment()
     val contactName = "TestName"
-    listOf(
+    val messages =
+        listOf(
             MessageCard().apply {
               name = contactName
               face = OWNTRACKS_ICON_BASE64
@@ -134,9 +132,15 @@ class ContactsActivityTests :
               latitude = 52.123
               longitude = 0.56789
               timestamp = Instant.parse("2006-01-02T15:04:05Z").epochSecond
+              trackerId = "testUser"
             },
         )
-        .sendFromBroker(broker)
+    repeat(messages.size) {
+      (baristaRule.activityTestRule.activity as ContactsActivity)
+          .contactsCountingIdlingResource
+          .increment()
+    }
+    messages.sendFromBroker(broker)
 
     (baristaRule.activityTestRule.activity as ContactsActivity).contactsCountingIdlingResource.use {
       assertNotDisplayed(R.id.placeholder)
@@ -159,7 +163,8 @@ class ContactsActivityTests :
     MessageLocation()
         .apply {
           latitude = 34.0
-          longitude = 0.0
+          longitude = 1.0
+          timestamp = 1695137000
           trackerId = contactName
         }
         .sendFromBroker(broker)
@@ -242,7 +247,7 @@ class ContactsActivityTests :
     MessageLocation()
         .apply {
           latitude = 51.0
-          longitude = 0.0
+          longitude = 1.0
           timestamp = 1695137000
           trackerId = "aa"
         }

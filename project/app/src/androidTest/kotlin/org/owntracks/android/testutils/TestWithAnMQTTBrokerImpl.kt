@@ -174,7 +174,7 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
     // The save button is hidden until LoadActivity parses the config (ImportStatus.SUCCESS),
     // which triggers an async invalidateOptionsMenu() → onPrepareOptionsMenu(). Without
     // explicitly waiting for the button to be displayed, the click races against menu inflation.
-    ViewIdlingResource(withId(R.id.save), isDisplayed()).use { clickOn(R.id.save) }
+    ViewIdlingResource(withId(R.id.applyButton), isDisplayed()).use { clickOn(R.id.applyButton) }
   }
 
   // This will use the right password, so we should test for success
