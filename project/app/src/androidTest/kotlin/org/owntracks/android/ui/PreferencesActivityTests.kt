@@ -17,6 +17,7 @@ import org.owntracks.android.preferences.SharedPreferencesStore
 import org.owntracks.android.preferences.types.ReverseGeocodeProvider
 import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.testutils.TestWithAnActivity
+import org.owntracks.android.testutils.clickOnPreference
 import org.owntracks.android.testutils.scrollToPreferenceWithText
 import org.owntracks.android.testutils.writeToPreference
 import org.owntracks.android.ui.preferences.PreferencesActivity
@@ -45,16 +46,14 @@ class PreferencesActivityTests : TestWithAnActivity<PreferencesActivity>() {
     writeToPreference(
         R.string.preferencesClientId, "test-clientId") // This hyphen will get squelched
 
-    scrollToPreferenceWithText(R.string.preferencesWebsocket)
-    clickOn(R.string.preferencesWebsocket)
+    clickOnPreference(R.string.preferencesWebsocket)
 
     writeToPreference(R.string.preferencesUsername, "testUsername")
     writeToPreference(R.string.preferencesBrokerPassword, "testPassword")
     writeToPreference(R.string.preferencesDeviceName, "testDeviceId")
     writeToPreference(R.string.preferencesTrackerId, "t5")
 
-    scrollToPreferenceWithText(R.string.preferencesCleanSessionEnabled)
-    clickOn(R.string.preferencesCleanSessionEnabled)
+    clickOnPreference(R.string.preferencesCleanSessionEnabled)
 
     writeToPreference(R.string.preferencesKeepalive, "1570")
 
@@ -126,14 +125,11 @@ class PreferencesActivityTests : TestWithAnActivity<PreferencesActivity>() {
     writeToPreference(R.string.preferencesLocatorDisplacement, "567")
     writeToPreference(R.string.preferencesMoveModeLocatorInterval, "5")
 
-    scrollToPreferenceWithText(R.string.preferencesPegLocatorFastestIntervalToInterval)
-    clickOn(R.string.preferencesPegLocatorFastestIntervalToInterval)
+    clickOnPreference(R.string.preferencesPegLocatorFastestIntervalToInterval)
 
-    scrollToPreferenceWithText(R.string.preferencesAutostart)
-    clickOn(R.string.preferencesAutostart)
+    clickOnPreference(R.string.preferencesAutostart)
 
-    scrollToPreferenceWithText(R.string.preferencesReverseGeocodeProvider)
-    clickOn(R.string.preferencesReverseGeocodeProvider)
+    clickOnPreference(R.string.preferencesReverseGeocodeProvider)
 
     clickOn("OpenCage")
     clickOn(android.R.id.button1)
