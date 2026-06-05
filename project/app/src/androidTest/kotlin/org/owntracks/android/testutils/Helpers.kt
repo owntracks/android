@@ -68,9 +68,24 @@ fun scrollToPreferenceWithText(textResource: Int) {
       )
 }
 
+fun clickOnPreference(textResource: Int) {
+  onView(withId(androidx.preference.R.id.recycler_view))
+      .perform(
+          RecyclerViewActions.actionOnItem<RecyclerView.ViewHolder>(
+              hasDescendant(withText(textResource)),
+              click(),
+          ),
+      )
+}
+
 fun writeToPreference(textResource: Int, value: String) {
-  scrollToPreferenceWithText(textResource)
-  clickOn(textResource)
+  onView(withId(androidx.preference.R.id.recycler_view))
+      .perform(
+          RecyclerViewActions.actionOnItem<RecyclerView.ViewHolder>(
+              hasDescendant(withText(textResource)),
+              click(),
+          ),
+      )
   BaristaEditTextInteractions.writeTo(android.R.id.edit, value)
   clickDialogPositiveButton()
 }
