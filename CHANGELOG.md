@@ -24,6 +24,7 @@ This release addresses a security advisory covering several intent-handling vuln
 ### Bug fixes
 
 - DEBUG and VERBOSE log messages are no longer emitted to the system Logcat in release builds, preventing potential PII (e.g. coordinates) leakage via `TimberInMemoryLogTree` (CWE-532)
+- HTTP mode no longer treats an unparsable or empty response body as a send failure. A `200 OK` response is sufficient to confirm a message was delivered successfully; response body parse errors are logged as warnings and ignored (#2242)
 
 
 ## Version 2.5.10
