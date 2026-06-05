@@ -25,7 +25,7 @@ jobs:
       - name: Set Matrix
         id: set-matrix
         run: |
-            jq -cn --argjson count "${{ inputs.shards }}" '[range(1; $count + 1) | {"shard":.}]' > matrix.json
+            jq -cn --argjson count "${{ inputs.shards }}" '[range(1; $count + 1)]' > matrix.json
             echo "matrix=$(cat matrix.json)" >> "$GITHUB_OUTPUT"
   espresso-test:
     needs: [generate-shards-matrix]
@@ -39,7 +39,7 @@ jobs:
       matrix:
         android-api: [31]
         flavour: [Gms, Oss]
-        include: ${{ fromJSON(needs.generate-shards-matrix.outputs.matrix) }}
+        shard: ${{ fromJSON(needs.generate-shards-matrix.outputs.matrix) }}
     steps:
       - name: Enable KVM group perms
         run: |
@@ -112,7 +112,7 @@ jobs:
         timeout-minutes: 30
         env:
           FLAVOUR: ${{ matrix.flavour }}
-          SHARD_COUNT: 6
+          SHARD_COUNT: ${{ inputs.shards }}
           SHARD_INDEX: ${{ matrix.shard }}
           GRADLE_OPTS: "-Dorg.gradle.daemon=true -Dorg.gradle.configuration-cache=true -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dorg.gradle.jvmargs='-Xmx3096M -Dkotlin.daemon.jvm.options=-Xmx2048M -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8 -XX:+UseParallelGC'"
           TEST_ANNOTATION: ${{ inputs.test-annotation }}
