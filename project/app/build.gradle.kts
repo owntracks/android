@@ -259,6 +259,7 @@ dependencies {
   testImplementation(libs.mockito.kotlin)
   testImplementation(libs.androidx.core.testing)
   testImplementation(libs.kotlin.coroutines.test)
+  testImplementation(libs.okhttp.mockwebserver)
 
   androidTestImplementation(libs.bundles.androidx.test)
 
