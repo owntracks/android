@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:title="@string/preferencesRemoteControl">
+    <androidx.preference.PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="@string/preferencesCategoryRemoteControlDevice">
+        <androidx.preference.SwitchPreferenceCompat
+            app:iconSpaceReserved="false"
+            app:key="allowIntentControl"
+            app:summary="@string/preferencesAllowIntentControlSummary"
+            app:title="@string/preferencesAllowIntentControl" />
+        <androidx.preference.Preference
+            app:iconSpaceReserved="false"
+            app:key="intentAuthKey"
+            app:summary="@string/preferencesIntentAuthKeySummary"
+            app:title="@string/preferencesIntentAuthKey" />
+        <androidx.preference.SwitchPreferenceCompat
+            app:iconSpaceReserved="false"
+            app:key="allowConfigurationByURIAndConfigFile"
+            app:summary="@string/preferencesAllowConfigurationByURIAndConfigFileSummary"
+            app:title="@string/preferencesAllowConfigurationByURIAndConfigFile" />
+    </androidx.preference.PreferenceCategory>
+    <androidx.preference.PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="@string/preferencesCategoryRemoteControlEndpoint">
+        <androidx.preference.SwitchPreferenceCompat
+            app:iconSpaceReserved="false"
+            app:key="cmd"
+            app:summary="@string/preferencesRemoteCommandSummary"
+            app:title="@string/preferencesRemoteCommand" />
+        <androidx.preference.SwitchPreferenceCompat
+            app:iconSpaceReserved="false"
+            app:key="remoteConfiguration"
+            app:summary="@string/preferencesRemoteConfigurationSummary"
+            app:title="@string/preferencesRemoteConfiguration" />
+    </androidx.preference.PreferenceCategory>
+</PreferenceScreen>

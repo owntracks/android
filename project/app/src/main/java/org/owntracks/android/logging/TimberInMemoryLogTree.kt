@@ -21,10 +21,14 @@ class TimberInMemoryLogTree(private val debugBuild: Boolean) : DebugTree() {
   val liveLogs: SharedFlow<LogEntry> = mutableLogFlow
 
   override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-    val prefix = if (BuildConfig.DEBUG) LOG_PREFIX else ""
-    super.log(priority, "${prefix}_$tag", message, t)
-    // Verbose messages are loggable in this impl, so we want them going to logcat. But not to our
-    // buffer.
+    // In release builds, suppress DEBUG and VERBOSE from Logcat to avoid leaking PII
+    // (e.g. coordinates) to the system log (CWE-532). The in-memory buffer is unaffected.
+    if (BuildConfig.DEBUG || priority >= Log.INFO) {
+      val prefix = if (BuildConfig.DEBUG) LOG_PREFIX else ""
+      super.log(priority, "${prefix}_$tag", message, t)
+    }
+    // Verbose messages are excluded from the buffer; DEBUG and above are kept for the
+    // in-app log viewer.
     if (priority >= Log.DEBUG) {
       LogEntry(priority, tag, message, Thread.currentThread().name).run {
         mutableLogFlow.tryEmit(this)

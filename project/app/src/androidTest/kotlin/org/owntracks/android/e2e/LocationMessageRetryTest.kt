@@ -47,7 +47,7 @@ class LocationMessageRetryTest :
     configureHTTPConnectionToLocal(saveConfigurationIdlingResource)
 
     reportLocationFromMap(mockLocationIdlingResource) {
-      mockLocationProviderClient.setLocation(51.0, 0.0)
+      mockLocationProviderClient.setLocation(51.0, 1.0)
     }
 
     baristaRule.activityTestRule.activity.outgoingQueueIdlingResource.use(2.minutes) {

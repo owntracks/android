@@ -217,7 +217,13 @@ abstract class TestWithAnActivity<T : Activity>(private val startActivity: Boole
     }
     waitUntilActivityVisible()
     clickOn(R.id.menu_monitoring)
-    clickOn(R.id.fabMonitoringModeMove)
+    // If dialog didn't open (e.g., tap became long press under GC pressure), retry once
+    try {
+      waitUntilViewDisplayed(R.id.fabMonitoringModeMove, timeout = 2.seconds)
+    } catch (_: Throwable) {
+      clickOn(R.id.menu_monitoring)
+    }
+    waitAndClickWithMinVisibility(R.id.fabMonitoringModeMove)
     mockLocationFunction()
 
     locationIdlingResource.use(5.seconds) {
