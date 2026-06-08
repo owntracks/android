@@ -116,8 +116,11 @@ class PreferencesActivityTests : TestWithAnActivity<PreferencesActivity>() {
     // This is an ugly hack, but there's some race conditions on underpowered hardware
     // causing the test to move on before the view has been fully built/rendered.
 
-    clickOn(R.string.preferencesAdvanced)
+    clickOn(R.string.preferencesRemoteControl)
     clickOn(R.string.preferencesRemoteCommand)
+    clickBack()
+
+    clickOn(R.string.preferencesAdvanced)
     writeToPreference(R.string.preferencesIgnoreInaccurateLocations, "950")
     writeToPreference(R.string.preferencesLocatorInterval, "123")
     writeToPreference(R.string.preferencesLocatorDisplacement, "567")

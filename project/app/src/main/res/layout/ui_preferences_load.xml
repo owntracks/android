@@ -33,22 +33,50 @@
                 android:layout_centerInParent="true" />
         </RelativeLayout>
 
-        <ScrollView
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/configRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="80dp"
+            android:clipToPadding="false"
+            android:visibility="@{vm.configurationImportStatus==ImportStatus.SUCCESS ? View.VISIBLE : View.GONE}"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+        <LinearLayout
+            android:id="@+id/actionButtons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="@{vm.configurationImportStatus==ImportStatus.SUCCESS ? View.VISIBLE : View.GONE}"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            android:layout_gravity="bottom"
+            android:background="?attr/colorSurface"
+            android:elevation="4dp"
+            android:orientation="horizontal"
+            android:padding="12dp"
+            android:gravity="end"
+            android:visibility="@{(vm.configurationImportStatus==ImportStatus.SUCCESS || vm.configurationImportStatus==ImportStatus.FAILED) ? View.VISIBLE : View.GONE}">
 
-            <TextView
-                android:id="@+id/effectiveConfiguration"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/cancelButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="@dimen/default_spacing"
-                android:text="@{vm.displayedConfiguration}"
-                android:textDirection="ltr"
-                android:textIsSelectable="true" />
+                android:layout_marginEnd="8dp"
+                android:text="@string/cancel" />
 
-        </ScrollView>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/applyButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/loadActivityApply"
+                android:visibility="@{vm.configurationImportStatus==ImportStatus.SUCCESS ? View.VISIBLE : View.GONE}" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/effectiveConfiguration"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            android:text="@{vm.displayedConfiguration}" />
 
         <ScrollView
             android:layout_width="match_parent"

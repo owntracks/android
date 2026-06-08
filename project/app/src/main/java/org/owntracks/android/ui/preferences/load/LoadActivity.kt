@@ -19,6 +19,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.IOException
@@ -48,22 +49,39 @@ class LoadActivity : AppCompatActivity() {
               setSupportActionBar(appbar.toolbar)
 
               // Handle window insets for edge-to-edge
-              ViewCompat.setOnApplyWindowInsetsListener(root) { view, windowInsets ->
+              ViewCompat.setOnApplyWindowInsetsListener(root) { _, windowInsets ->
                 val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+                val basePaddingPx = (12 * resources.displayMetrics.density).toInt()
+                val recyclerBasePaddingPx = (80 * resources.displayMetrics.density).toInt()
                 appbar.root.updatePadding(top = insets.top)
+                actionButtons.updatePadding(
+                    left = basePaddingPx,
+                    top = basePaddingPx,
+                    right = basePaddingPx,
+                    bottom = basePaddingPx + insets.bottom)
+                configRecyclerView.updatePadding(bottom = recyclerBasePaddingPx + insets.bottom)
                 WindowInsetsCompat.CONSUMED
+              }
+
+              val adapter = ConfigItemAdapter()
+              configRecyclerView.layoutManager = LinearLayoutManager(this@LoadActivity)
+              configRecyclerView.adapter = adapter
+
+              cancelButton.setOnClickListener { finish() }
+              applyButton.setOnClickListener { viewModel.saveConfiguration() }
+
+              lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                  viewModel.configItems.collect { adapter.submitList(it) }
+                }
               }
             }
     lifecycleScope.launch {
       repeatOnLifecycle(Lifecycle.State.STARTED) {
-        launch { viewModel.displayedConfiguration.collect { invalidateOptionsMenu() } }
-        launch {
-          viewModel.configurationImportStatus.collect {
-            invalidateOptionsMenu()
-            Timber.d("ImportStatus is $it")
-            if (it == ImportStatus.SAVED) {
-              finish()
-            }
+        viewModel.configurationImportStatus.collect {
+          Timber.d("ImportStatus is $it")
+          if (it == ImportStatus.SAVED) {
+            finish()
           }
         }
       }
@@ -78,15 +96,12 @@ class LoadActivity : AppCompatActivity() {
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    val itemId = item.itemId
-    if (itemId == R.id.save) {
-      viewModel.saveConfiguration()
-      return true
-    } else if (itemId == R.id.close || itemId == android.R.id.home) {
+    return if (item.itemId == android.R.id.home) {
       finish()
-      return true
+      true
+    } else {
+      super.onOptionsItemSelected(item)
     }
-    return super.onOptionsItemSelected(item)
   }
 
   private fun setHasBack(hasBackArrow: Boolean) {
@@ -94,15 +109,6 @@ class LoadActivity : AppCompatActivity() {
   }
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
-    menuInflater.inflate(R.menu.activity_load, menu)
-    return true
-  }
-
-  override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-    menu.findItem(R.id.close).isVisible =
-        viewModel.configurationImportStatus.value !== ImportStatus.LOADING
-    menu.findItem(R.id.save).isVisible =
-        viewModel.configurationImportStatus.value === ImportStatus.SUCCESS
     return true
   }
 

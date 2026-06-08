@@ -42,6 +42,8 @@ class RoomBackedMessageQueueTest {
       longitude = random.nextDouble()
       latitude = random.nextDouble()
       accuracy = random.nextInt()
+      timestamp = System.currentTimeMillis() / 1000
+      trackerId = "te"
     }
   }
 

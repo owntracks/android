@@ -189,19 +189,17 @@
         <service
             android:name=".services.BackgroundService"
             android:enabled="true"
-            android:exported="true"
-            android:foregroundServiceType="connectedDevice"
-            tools:ignore="ExportedService">
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice" />
 
+        <receiver
+            android:name=".support.receiver.ExternalIntentReceiver"
+            android:exported="true">
             <intent-filter>
-                <action android:name="org.owntracks.android.CLEAR_NOTIFICATIONS" /> <!-- INTENT_ACTION_CLEAR_NOTIFICATIONS -->
-                <action android:name="org.owntracks.android.SEND_LOCATION_USER" /> <!-- INTENT_ACTION_SEND_LOCATION_PING -->
-                <action android:name="org.owntracks.android.SEND_EVENT_CIRCULAR" /> <!-- INTENT_ACTION_SEND_WAYPOINTS -->
-                <action android:name="org.owntracks.android.REREQUEST_LOCATION_UPDATES" /> <!-- REREQUEST_LOCATION_UPDATES -->
-                <action android:name="org.owntracks.android.CHANGE_MONITORING" /> <!-- INTENT_ACTION_CHANGE_MONITORING -->
-                <action android:name="org.owntracks.android.EXIT" /> <!-- INTENT_ACTION_CHANGE_MONITORING -->
+                <action android:name="org.owntracks.android.SEND_LOCATION_USER" />
+                <action android:name="org.owntracks.android.CHANGE_MONITORING" />
             </intent-filter>
-        </service>
+        </receiver>
 
         <receiver
             android:name=".support.receiver.StartBackgroundServiceReceiver"
@@ -217,7 +215,7 @@
 
         <activity
             android:name=".ui.status.StatusActivity"
-            android:exported="true"
+            android:exported="false"
             android:label="@string/title_activity_status"
             android:launchMode="singleTop"
             android:parentActivityName=".ui.map.MapActivity">
