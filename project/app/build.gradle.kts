@@ -19,7 +19,7 @@ val googleMapsAPIKey =
 
 val gmsImplementation: Configuration by configurations.creating
 
-val versionNameValue = "2.5.9"
+val versionNameValue = "2.6.0"
 
 fun generateVersionCode(versionName: String): Int {
   val parts = versionName.split(".")
@@ -259,6 +259,7 @@ dependencies {
   testImplementation(libs.mockito.kotlin)
   testImplementation(libs.androidx.core.testing)
   testImplementation(libs.kotlin.coroutines.test)
+  testImplementation(libs.okhttp.mockwebserver)
 
   androidTestImplementation(libs.bundles.androidx.test)
 

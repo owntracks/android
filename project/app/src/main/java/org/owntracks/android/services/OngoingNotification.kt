@@ -41,14 +41,16 @@ class OngoingNotification(private val context: Context, initialMode: MonitoringM
     PendingIntent.getService(
         context,
         0,
-        Intent().setAction(BackgroundService.INTENT_ACTION_SEND_LOCATION_USER),
+        Intent(context, BackgroundService::class.java)
+            .setAction(BackgroundService.INTENT_ACTION_SEND_LOCATION_USER),
         BackgroundService.UPDATE_CURRENT_INTENT_FLAGS)
   }
   private val changeMonitoringPendingIntent by lazy {
     PendingIntent.getService(
         context,
         0,
-        Intent().setAction(BackgroundService.INTENT_ACTION_CHANGE_MONITORING),
+        Intent(context, BackgroundService::class.java)
+            .setAction(BackgroundService.INTENT_ACTION_CHANGE_MONITORING),
         BackgroundService.UPDATE_CURRENT_INTENT_FLAGS)
   }
   private var serviceNotificationState =

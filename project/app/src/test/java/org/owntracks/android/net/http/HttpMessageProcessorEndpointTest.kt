@@ -4,9 +4,14 @@ import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
+import okhttp3.OkHttpClient
+import okhttp3.mockwebserver.MockResponse
+import okhttp3.mockwebserver.MockWebServer
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -14,6 +19,8 @@ import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.owntracks.android.data.repos.EndpointStateRepo
 import org.owntracks.android.model.EncryptionProvider
 import org.owntracks.android.model.Parser
@@ -21,6 +28,7 @@ import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageCmd
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.preferences.Preferences
+import org.owntracks.android.preferences.types.MqttQos
 import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
 
@@ -39,9 +47,11 @@ class HttpMessageProcessorEndpointTest {
 
   @Mock private lateinit var parser: Parser
   private lateinit var messageLocation: MessageLocation
+  private val mockWebServer = MockWebServer()
 
   @Before
   fun setupPreferences() {
+    mockWebServer.start()
     testPreferences = mock {
       on { encryptionKey } doReturn "testEncryptionKey"
       on { tlsClientCrt } doReturn ""
@@ -49,6 +59,9 @@ class HttpMessageProcessorEndpointTest {
       on { deviceId } doReturn ""
       on { password } doReturn ""
       on { url } doReturn "http://example.com/owntracks/test"
+      on { pubTopicLocations } doReturn "owntracks/test/phone"
+      on { pubQosLocations } doReturn MqttQos.Zero
+      on { pubRetainLocations } doReturn false
     }
     encryptionProvider = mock { on { isPayloadEncryptionEnabled } doReturn false }
     messageProcessor = mock {}
@@ -64,6 +77,11 @@ class HttpMessageProcessorEndpointTest {
     messageLocation.verticalAccuracy = 1.7.toInt()
     parser = Parser(encryptionProvider)
     application = mock {}
+  }
+
+  @After
+  fun tearDown() {
+    mockWebServer.shutdown()
   }
 
   @Test
@@ -257,4 +275,53 @@ class HttpMessageProcessorEndpointTest {
         httpMessageProcessorEndpoint.onMessageReceived(messageCmd)
         assertEquals("NOKEY", messageCmd.getContactId())
       }
+
+  @Test
+  fun `Given a 200 OK response with an unparsable body, sendMessage returns success and does not fail delivery`() =
+      runTest {
+        mockWebServer.enqueue(MockResponse().setResponseCode(200).setBody("this is not valid json"))
+        val dispatcher = StandardTestDispatcher(testScheduler)
+        val endpoint =
+            HttpMessageProcessorEndpoint(
+                messageProcessor,
+                parser,
+                testPreferences,
+                application,
+                endpointStateRepo,
+                mock {},
+                this,
+                dispatcher)
+        endpoint.httpClientAndConfiguration =
+            HttpMessageProcessorEndpoint.HttpClientAndConfiguration(
+                OkHttpClient(),
+                HttpConfiguration(mockWebServer.url("/owntracks/test").toString(), "", "", ""),
+            )
+        val result = endpoint.sendMessage(messageLocation)
+        assertTrue(result.isSuccess)
+        verify(messageProcessor, never()).onMessageDeliveryFailed(messageLocation)
+      }
+
+  @Test
+  fun `Given a 200 OK response with no body, sendMessage returns success`() = runTest {
+    mockWebServer.enqueue(MockResponse().setResponseCode(200))
+    val dispatcher = StandardTestDispatcher(testScheduler)
+    val endpoint =
+        HttpMessageProcessorEndpoint(
+            messageProcessor,
+            parser,
+            testPreferences,
+            application,
+            endpointStateRepo,
+            mock {},
+            this,
+            dispatcher)
+    endpoint.httpClientAndConfiguration =
+        HttpMessageProcessorEndpoint.HttpClientAndConfiguration(
+            OkHttpClient(),
+            HttpConfiguration(mockWebServer.url("/owntracks/test").toString(), "", "", ""),
+        )
+    val result = endpoint.sendMessage(messageLocation)
+    assertTrue(result.isSuccess)
+    verify(messageProcessor, never()).onMessageDeliveryFailed(messageLocation)
+  }
 }

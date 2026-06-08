@@ -2,7 +2,10 @@ package org.owntracks.android.testutils
 
 import android.content.Intent
 import androidx.core.net.toUri
+import androidx.preference.PreferenceManager
 import androidx.test.espresso.IdlingResource
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import java.net.ConnectException
@@ -22,7 +25,9 @@ import mqtt.packets.mqttv5.MQTT5Properties
 import org.owntracks.android.R
 import org.owntracks.android.model.Parser
 import org.owntracks.android.model.messages.MessageBase
+import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.testutils.idlingresources.LatchingIdlingResourceWithData
+import org.owntracks.android.testutils.idlingresources.ViewIdlingResource
 import timber.log.Timber
 
 @ExperimentalUnsignedTypes
@@ -153,6 +158,11 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
             """
                 .trimIndent()
                 .toByteArray())
+    PreferenceManager.getDefaultSharedPreferences(
+            InstrumentationRegistry.getInstrumentation().targetContext)
+        .edit()
+        .putBoolean(Preferences::allowConfigurationByURIAndConfigFile.name, true)
+        .commit()
     InstrumentationRegistry.getInstrumentation()
         .targetContext
         .startActivity(
@@ -160,7 +170,11 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
               data = "owntracks:///config?inline=$config".toUri()
               flags = Intent.FLAG_ACTIVITY_NEW_TASK
             })
-    idlingResource.use { clickOn(R.id.save) }
+    // Wait for the save button to become visible before clicking.
+    // The save button is hidden until LoadActivity parses the config (ImportStatus.SUCCESS),
+    // which triggers an async invalidateOptionsMenu() → onPrepareOptionsMenu(). Without
+    // explicitly waiting for the button to be displayed, the click races against menu inflation.
+    ViewIdlingResource(withId(R.id.applyButton), isDisplayed()).use { clickOn(R.id.applyButton) }
   }
 
   // This will use the right password, so we should test for success

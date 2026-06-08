@@ -1,9 +1,11 @@
 package org.owntracks.android.ui.preferences.load
 
 import android.content.ContentResolver
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.BufferedReader
 import java.io.FileInputStream
 import java.io.IOException
@@ -25,6 +27,7 @@ import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
+import org.owntracks.android.R
 import org.owntracks.android.data.waypoints.WaypointsRepo
 import org.owntracks.android.di.CoroutineScopes
 import org.owntracks.android.model.Parser
@@ -44,12 +47,13 @@ constructor(
     private val waypointsRepo: WaypointsRepo,
     @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @Named("saveConfigurationIdlingResource")
-    private val saveConfigurationIdlingResource: SimpleIdlingResource
+    private val saveConfigurationIdlingResource: SimpleIdlingResource,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
   private var configuration: MessageConfiguration? = null
 
-  private val mutableConfig = MutableStateFlow("")
-  val displayedConfiguration: StateFlow<String> = mutableConfig
+  private val mutableConfigItems = MutableStateFlow<List<ConfigItem>>(emptyList())
+  val configItems: StateFlow<List<ConfigItem>> = mutableConfigItems
 
   private val mutableImportStatus = MutableStateFlow(ImportStatus.LOADING)
   val configurationImportStatus: StateFlow<ImportStatus> = mutableImportStatus
@@ -57,30 +61,78 @@ constructor(
   private val mutableImportError = MutableStateFlow<String?>(null)
   val importError: StateFlow<String?> = mutableImportError
 
+  private val mutableDisplayedConfiguration = MutableStateFlow("")
+  val displayedConfiguration: StateFlow<String> = mutableDisplayedConfiguration
+
   private fun setConfiguration(json: String) {
     when (val message = parser.fromJson(json.toByteArray())) {
       is MessageConfiguration -> {
         configuration = message
-        try {
-          mutableConfig.value = parser.toUnencryptedJsonPretty(message)
-          mutableImportStatus.value = ImportStatus.SUCCESS
-        } catch (e: IOException) {
-          configurationImportFailed(e)
-        }
+        mutableDisplayedConfiguration.value = parser.toJsonPlain(message)
+        mutableConfigItems.value = buildConfigItems(message)
+        mutableImportStatus.value = ImportStatus.SUCCESS
       }
       is MessageWaypoints -> {
         configuration = MessageConfiguration().apply { message.waypoints?.run { waypoints = this } }
-        try {
-          mutableConfig.value = parser.toUnencryptedJsonPretty(message)
-          mutableImportStatus.value = ImportStatus.SUCCESS
-        } catch (e: IOException) {
-          configurationImportFailed(e)
-        }
+        mutableDisplayedConfiguration.value = parser.toJsonPlain(message)
+        mutableConfigItems.value = buildConfigItems(configuration!!)
+        mutableImportStatus.value = ImportStatus.SUCCESS
       }
       else -> {
-        throw IOException("Message is not a valid configuration message")
+        throw IOException(context.getString(R.string.loadActivityErrorInvalidConfigMessage))
       }
     }
+  }
+
+  private fun buildConfigItems(message: MessageConfiguration): List<ConfigItem> {
+    val items = mutableListOf<ConfigItem>()
+    val keys = message.keys
+    if (keys.isNotEmpty()) {
+      val changedItems = mutableListOf<ConfigItem.KeyValue>()
+      var unchangedCount = 0
+      keys.forEach { key ->
+        val incoming = message[key]
+        val pair = preferences.resolvedPreferencePair(key, incoming)
+        if (pair == null) {
+          // Key not in importable preferences — show raw value as a change
+          changedItems +=
+              ConfigItem.KeyValue(
+                  key,
+                  incoming?.toString() ?: "",
+                  oldValue = null,
+                  labelRes = PREFERENCE_KEY_LABELS[key])
+        } else {
+          val (currentStr, newStr) = pair
+          if (currentStr == newStr) {
+            unchangedCount++
+          } else {
+            changedItems +=
+                ConfigItem.KeyValue(
+                    key, newStr ?: "", oldValue = currentStr, labelRes = PREFERENCE_KEY_LABELS[key])
+          }
+        }
+      }
+      if (changedItems.isNotEmpty() || unchangedCount > 0) {
+        items += ConfigItem.Header(SECTION_SETTINGS)
+        items += changedItems
+        if (unchangedCount > 0) {
+          items += ConfigItem.Summary(unchangedCount)
+        }
+      }
+    }
+    val waypoints = message.waypoints
+    if (waypoints.isNotEmpty()) {
+      items += ConfigItem.Header(SECTION_WAYPOINTS)
+      waypoints.forEach { waypoint ->
+        items +=
+            ConfigItem.Waypoint(
+                description = waypoint.description ?: "",
+                latitude = waypoint.latitude,
+                longitude = waypoint.longitude,
+                radius = waypoint.radius)
+      }
+    }
+    return items
   }
 
   fun saveConfiguration() {
@@ -126,6 +178,9 @@ constructor(
           return
         }
     try {
+      if (!preferences.allowConfigurationByURIAndConfigFile) {
+        throw IOException(context.getString(R.string.loadActivityErrorExternalConfigDisabled))
+      }
       if (ContentResolver.SCHEME_FILE == uri.scheme) {
         // Note: left here to avoid breaking compatibility.  May be removed
         // with sufficient testing. Will not work on Android >5 without granting
@@ -169,7 +224,7 @@ constructor(
                     object : Callback {
                       override fun onFailure(call: Call, e: IOException) {
                         configurationImportFailed(
-                            Exception("Failure fetching config from remote URL", e))
+                            Exception(context.getString(R.string.loadActivityErrorFetchFailed), e))
                       }
 
                       @Throws(IOException::class)
@@ -179,7 +234,9 @@ constructor(
                             if (!response.isSuccessful) {
                               configurationImportFailed(
                                   IOException(
-                                      String.format("Unexpected status code: %s", response)))
+                                      context.getString(
+                                          R.string.loadActivityErrorUnexpectedStatusCode,
+                                          response)))
                               return
                             }
                             setConfiguration(responseBody?.string() ?: "")
@@ -192,11 +249,11 @@ constructor(
             // This is async, so result handled on the callback
           }
           else -> {
-            throw IOException("Invalid config URL")
+            throw IOException(context.getString(R.string.loadActivityErrorInvalidConfigUrl))
           }
         }
       } else {
-        throw IOException("Invalid config URL")
+        throw IOException(context.getString(R.string.loadActivityErrorInvalidConfigUrl))
       }
     } catch (e: OutOfMemoryError) {
       configurationImportFailed(e)
@@ -213,5 +270,10 @@ constructor(
     Timber.e(e)
     mutableImportError.value = e.message
     mutableImportStatus.value = ImportStatus.FAILED
+  }
+
+  companion object {
+    val SECTION_SETTINGS = R.string.loadActivitySectionSettings
+    val SECTION_WAYPOINTS = R.string.loadActivitySectionWaypoints
   }
 }

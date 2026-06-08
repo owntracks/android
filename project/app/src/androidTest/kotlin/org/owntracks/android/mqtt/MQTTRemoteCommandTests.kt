@@ -38,6 +38,7 @@ import org.owntracks.android.testutils.addWaypoint
 import org.owntracks.android.testutils.di.setLocation
 import org.owntracks.android.testutils.getPreferences
 import org.owntracks.android.testutils.use
+import org.owntracks.android.testutils.waitAndClickWithMinVisibility
 import org.owntracks.android.testutils.waitUntilTrue
 import org.owntracks.android.ui.map.MapActivity
 
@@ -86,10 +87,10 @@ class MQTTRemoteCommandTests :
     })
 
     reportLocationFromMap(mockLocationIdlingResource) {
-      mockLocationProviderClient.setLocation(52.0, 0.0)
+      mockLocationProviderClient.setLocation(52.0, 1.0)
     }
     clickOn(R.id.menu_monitoring)
-    clickOn(R.id.fabMonitoringModeSignificantChanges)
+    waitAndClickWithMinVisibility(R.id.fabMonitoringModeSignificantChanges)
 
     baristaRule.activityTestRule.activity.publishResponseMessageIdlingResource.setIdleState(false)
     listOf(MessageCmd().apply { action = CommandAction.REPORT_LOCATION })
@@ -128,12 +129,13 @@ class MQTTRemoteCommandTests :
     })
 
     clickOn(R.id.menu_monitoring)
-    clickOn(R.id.fabMonitoringModeSignificantChanges)
+    waitAndClickWithMinVisibility(R.id.fabMonitoringModeSignificantChanges)
 
     openDrawer()
     clickOn(R.string.title_activity_waypoints)
 
     addWaypoint("test waypoint", "51.123", "0.456", "20")
+    Thread.sleep(1000) // ensure distinct epoch-second tst values (tst has second precision)
     addWaypoint("test waypoint 2", "51.00", "0.4", "25")
 
     openDrawer()
@@ -176,7 +178,7 @@ class MQTTRemoteCommandTests :
     })
 
     clickOn(R.id.menu_monitoring)
-    clickOn(R.id.fabMonitoringModeSignificantChanges)
+    waitAndClickWithMinVisibility(R.id.fabMonitoringModeSignificantChanges)
 
     openDrawer()
     clickOn(R.string.title_activity_waypoints)
@@ -247,7 +249,7 @@ class MQTTRemoteCommandTests :
     })
 
     clickOn(R.id.menu_monitoring)
-    clickOn(R.id.fabMonitoringModeSignificantChanges)
+    waitAndClickWithMinVisibility(R.id.fabMonitoringModeSignificantChanges)
 
     openDrawer()
     clickOn(R.string.title_activity_waypoints)
@@ -287,7 +289,7 @@ class MQTTRemoteCommandTests :
     })
 
     clickOn(R.id.menu_monitoring)
-    clickOn(R.id.fabMonitoringModeSignificantChanges)
+    waitAndClickWithMinVisibility(R.id.fabMonitoringModeSignificantChanges)
 
     openDrawer()
     clickOn(R.string.title_activity_waypoints)
@@ -409,10 +411,10 @@ class MQTTRemoteCommandTests :
       configureMQTTConnectionToLocalWithGeneratedPassword(saveConfigurationIdlingResource)
     })
     reportLocationFromMap(mockLocationIdlingResource) {
-      mockLocationProviderClient.setLocation(52.0, 0.0)
+      mockLocationProviderClient.setLocation(52.0, 1.0)
     }
     clickOn(R.id.menu_monitoring)
-    clickOn(R.id.fabMonitoringModeSignificantChanges)
+    waitAndClickWithMinVisibility(R.id.fabMonitoringModeSignificantChanges)
 
     baristaRule.activityTestRule.activity.publishResponseMessageIdlingResource.setIdleState(false)
     listOf(MessageCmd().apply { action = CommandAction.STATUS })

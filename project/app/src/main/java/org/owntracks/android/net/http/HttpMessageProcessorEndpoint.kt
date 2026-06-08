@@ -48,7 +48,7 @@ class HttpMessageProcessorEndpoint(
     @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : MessageProcessorEndpoint(messageProcessor), Preferences.OnPreferenceChangeListener {
   override val modeId: ConnectionMode = ConnectionMode.HTTP
-  private var httpClientAndConfiguration: HttpClientAndConfiguration? = null
+  internal var httpClientAndConfiguration: HttpClientAndConfiguration? = null
 
   override fun activate() {
     Timber.v("HTTP Activate")
@@ -154,13 +154,22 @@ class HttpMessageProcessorEndpoint(
                 }
                 return Result.success(Unit)
               } catch (e: IOException) {
-                Timber.e(e, "HTTP Delivery failed")
-                endpointStateRepo.setState(EndpointState.ERROR.withError(e))
-                messageProcessor.onMessageDeliveryFailed(message)
-                return Result.failure(OutgoingMessageSendingException(e))
+                Timber.w(e, "HTTP response body could not be parsed, ignoring")
+                endpointStateRepo.setState(
+                    EndpointState.IDLE.withMessage(
+                        String.format(
+                            Locale.ROOT, "Response %d (response not parseable)", response.code),
+                    ),
+                )
+                return Result.success(Unit)
               }
             } else {
-              Result.failure(OutgoingMessageSendingException(null))
+              endpointStateRepo.setState(
+                  EndpointState.IDLE.withMessage(
+                      String.format(Locale.ROOT, "Response %d", response.code),
+                  ),
+              )
+              Result.success(Unit)
             }
           }
         }

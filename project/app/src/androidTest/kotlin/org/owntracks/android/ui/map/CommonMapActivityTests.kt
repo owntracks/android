@@ -12,7 +12,6 @@ import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDr
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Test
 import org.owntracks.android.R
-import org.owntracks.android.testutils.JustThisTestPlease
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.addWaypoint
 import org.owntracks.android.testutils.clickOnDrawerAndWait
@@ -20,10 +19,11 @@ import org.owntracks.android.testutils.di.setLocation
 import org.owntracks.android.testutils.grantMapActivityPermissions
 import org.owntracks.android.testutils.matchers.withActionIconDrawable
 import org.owntracks.android.testutils.setNotFirstStartPreferences
+import org.owntracks.android.testutils.waitAndClickWithMinVisibility
 
 @MediumTest
 @HiltAndroidTest
-@JustThisTestPlease
+// @JustThisTestPlease
 class CommonMapActivityTests : TestWithAnActivity<MapActivity>(false) {
 
   @Test
@@ -38,7 +38,7 @@ class CommonMapActivityTests : TestWithAnActivity<MapActivity>(false) {
     assertDisplayed(R.id.fabMonitoringModeQuiet)
     assertDisplayed(R.id.fabMonitoringModeSignificantChanges)
     assertDisplayed(R.id.fabMonitoringModeMove)
-    clickOn(R.id.fabMonitoringModeQuiet)
+    waitAndClickWithMinVisibility(R.id.fabMonitoringModeQuiet)
     onView(withId(R.id.menu_monitoring))
         .check(matches(withActionIconDrawable(R.drawable.ic_baseline_stop_36)))
   }
@@ -55,7 +55,7 @@ class CommonMapActivityTests : TestWithAnActivity<MapActivity>(false) {
     assertDisplayed(R.id.fabMonitoringModeQuiet)
     assertDisplayed(R.id.fabMonitoringModeSignificantChanges)
     assertDisplayed(R.id.fabMonitoringModeMove)
-    clickOn(R.id.fabMonitoringModeManual)
+    waitAndClickWithMinVisibility(R.id.fabMonitoringModeManual)
     onView(withId(R.id.menu_monitoring))
         .check(matches(withActionIconDrawable(R.drawable.ic_baseline_pause_36)))
   }
@@ -72,7 +72,7 @@ class CommonMapActivityTests : TestWithAnActivity<MapActivity>(false) {
     assertDisplayed(R.id.fabMonitoringModeQuiet)
     assertDisplayed(R.id.fabMonitoringModeSignificantChanges)
     assertDisplayed(R.id.fabMonitoringModeMove)
-    clickOn(R.id.fabMonitoringModeSignificantChanges)
+    waitAndClickWithMinVisibility(R.id.fabMonitoringModeSignificantChanges)
     onView(withId(R.id.menu_monitoring))
         .check(matches(withActionIconDrawable(R.drawable.ic_baseline_play_arrow_36)))
   }
@@ -89,7 +89,7 @@ class CommonMapActivityTests : TestWithAnActivity<MapActivity>(false) {
     assertDisplayed(R.id.fabMonitoringModeQuiet)
     assertDisplayed(R.id.fabMonitoringModeSignificantChanges)
     assertDisplayed(R.id.fabMonitoringModeMove)
-    clickOn(R.id.fabMonitoringModeMove)
+    waitAndClickWithMinVisibility(R.id.fabMonitoringModeMove)
     onView(withId(R.id.menu_monitoring))
         .check(matches(withActionIconDrawable(R.drawable.ic_step_forward_2)))
   }
