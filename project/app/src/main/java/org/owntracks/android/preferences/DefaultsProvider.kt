@@ -34,6 +34,9 @@ interface DefaultsProvider {
       Preferences::fusedRegionDetection -> true
       Preferences::firstStart -> true
       Preferences::host -> ""
+      Preferences::allowIntentControl -> false
+      Preferences::intentAuthKey -> java.util.UUID.randomUUID().toString()
+      Preferences::allowConfigurationByURIAndConfigFile -> false
       Preferences::ignoreInaccurateLocations -> 0
       Preferences::ignoreStaleLocations -> 0f
       Preferences::info -> true

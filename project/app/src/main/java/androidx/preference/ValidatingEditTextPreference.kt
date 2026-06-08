@@ -80,24 +80,16 @@ open class ValidatingEditTextPreference : EditTextPreference {
       }
     }
     super.setOnBindEditTextListener { editText ->
+      val newFilters = mutableListOf<InputFilter>()
       attributes.forEach { attribute, value ->
         when (attribute) {
           android.R.attr.inputType -> editText.inputType = value.data
           android.R.attr.lines -> editText.setLines(value.data)
-          android.R.attr.maxLength ->
-              editText.filters =
-                  editText.filters
-                      .toMutableList()
-                      .apply { add(LengthFilter(value.data)) }
-                      .toTypedArray()
-          android.R.attr.digits ->
-              editText.filters =
-                  editText.filters
-                      .toMutableList()
-                      .apply { add(SpecificCharsInputFilter(value.string.toList())) }
-                      .toTypedArray()
+          android.R.attr.maxLength -> newFilters.add(LengthFilter(value.data))
+          android.R.attr.digits -> newFilters.add(SpecificCharsInputFilter(value.string.toList()))
         }
       }
+      editText.filters = newFilters.toTypedArray()
       onBindEditTextListener?.onBindEditText(editText)
     }
   }

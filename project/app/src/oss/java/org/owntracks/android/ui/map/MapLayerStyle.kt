@@ -1,8 +1,10 @@
 package org.owntracks.android.ui.map
 
+import kotlinx.serialization.Serializable
 import org.owntracks.android.R
 import org.owntracks.android.preferences.types.FromConfiguration
 
+@Serializable
 enum class MapLayerStyle {
   OpenStreetMapNormal,
   OpenStreetMapWikimedia;

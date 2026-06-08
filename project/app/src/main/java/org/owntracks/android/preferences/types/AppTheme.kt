@@ -1,5 +1,8 @@
 package org.owntracks.android.preferences.types
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 enum class AppTheme(val value: Int) {
   Light(0),
   Dark(1),

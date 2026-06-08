@@ -1,8 +1,10 @@
 package org.owntracks.android.preferences.types
 
-import com.fasterxml.jackson.annotation.JsonValue
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
 
-enum class MqttProtocolLevel(@JsonValue val value: Int) {
+@Serializable(with = MqttProtocolLevel.MqttProtocolLevelSerializer::class)
+enum class MqttProtocolLevel(val value: Int) {
   MQTT_3_1(3),
   MQTT_3_1_1(4);
 
@@ -19,4 +21,8 @@ enum class MqttProtocolLevel(@JsonValue val value: Int) {
             ?: entries.firstOrNull { it.name.equals(value, true) }
             ?: MQTT_3_1
   }
+
+  object MqttProtocolLevelSerializer :
+      KSerializer<MqttProtocolLevel> by intValueEnumSerializer(
+          "MqttProtocolLevel", entries, { it.value }, MQTT_3_1)
 }

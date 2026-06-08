@@ -7,9 +7,6 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_LOW
 import androidx.core.app.NotificationManagerCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
@@ -17,6 +14,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.Instant
+import kotlinx.datetime.format
+import kotlinx.datetime.format.DateTimeComponents
+import kotlinx.datetime.format.char
 import okhttp3.OkHttpClient
 import org.owntracks.android.R
 import org.owntracks.android.di.ApplicationScope
@@ -106,16 +107,25 @@ constructor(
           is GeocodeResult.Fault.RateLimited ->
               context.getString(
                   R.string.geocoderRateLimited,
-                  DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
-                      .withZone(ZoneId.systemDefault())
-                      .format(result.until))
+                  result.until.format(
+                      DateTimeComponents.Format {
+                        year()
+                        char('-')
+                        monthNumber()
+                        char('-')
+                        dayOfMonth()
+                        char(' ')
+                        hour()
+                        char(':')
+                        minute()
+                      }))
           is GeocodeResult.Fault.Unavailable -> context.getString(R.string.geocoderUnavailable)
           else -> ""
         }
     val until =
         when (result) {
           is GeocodeResult.Fault -> result.until
-          else -> Instant.MIN
+          else -> Instant.DISTANT_PAST
         }
 
     if (until == lastRateLimitedNotificationTime) {

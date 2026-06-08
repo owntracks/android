@@ -2,6 +2,7 @@ package org.owntracks.android.ui
 
 import android.content.Intent
 import androidx.core.net.toUri
+import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -9,10 +10,17 @@ import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
-import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotExist
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
 import dagger.hilt.android.testing.HiltAndroidTest
 import java.io.File
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.boolean
+import kotlinx.serialization.json.double
+import kotlinx.serialization.json.int
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.long
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -21,8 +29,10 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 import org.owntracks.android.R
+import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.getText
 import org.owntracks.android.testutils.idlingresources.ViewIdlingResource
@@ -35,6 +45,14 @@ import org.owntracks.android.ui.preferences.load.LoadActivity
 class LoadActivityTests : TestWithAnActivity<LoadActivity>(false) {
 
   private var mockWebServer = MockWebServer()
+
+  @Before
+  fun enableConfigLoading() {
+    PreferenceManager.getDefaultSharedPreferences(app)
+        .edit()
+        .putBoolean(Preferences::allowConfigurationByURIAndConfigFile.name, true)
+        .commit()
+  }
 
   @After
   fun teardown() {
@@ -106,60 +124,63 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(false) {
 }"""
 
   private fun assertExpectedConfig(input: String) {
-    val json = ObjectMapper().readTree(input)
-    assertTrue(json.isObject)
-    assertEquals("configuration", json["_type"].asText())
-    assertEquals(2, json["waypoints"].size())
-    assertEquals("work", json["waypoints"][0]["desc"].asText())
-    assertEquals(51.5, json["waypoints"][0]["lat"].asDouble(), 0.0001)
-    assertEquals(-0.02, json["waypoints"][0]["lon"].asDouble(), 0.0001)
-    assertEquals(150, json["waypoints"][0]["rad"].asInt())
-    assertEquals(1505910709000, json["waypoints"][0]["tst"].asLong())
-    assertEquals("home", json["waypoints"][1]["desc"].asText())
-    assertEquals(53.6, json["waypoints"][1]["lat"].asDouble(), 0.0001)
-    assertEquals(-1.5, json["waypoints"][1]["lon"].asDouble(), 0.0001)
-    assertEquals(100, json["waypoints"][1]["rad"].asInt())
-    assertEquals(1558351273, json["waypoints"][1]["tst"].asLong())
-    assertTrue(json["auth"].asBoolean())
-    assertTrue(json["autostartOnBoot"].asBoolean())
-    assertFalse(json["cleanSession"].asBoolean())
-    assertEquals("emulator", json["clientId"].asText())
-    assertTrue(json["cmd"].asBoolean())
-    assertEquals(34, json["connectionTimeoutSeconds"].asInt())
-    assertTrue(json["debugLog"].asBoolean())
-    assertEquals("testdevice", json["deviceId"].asText())
-    assertFalse(json["enableMapRotation"].asBoolean())
-    assertTrue(json["fusedRegionDetection"].asBoolean())
-    assertTrue(json["geocodeEnabled"].asBoolean())
-    assertEquals("testhost.example.com", json["host"].asText())
-    assertEquals(150, json["ignoreInaccurateLocations"].asInt())
-    assertEquals(0, json["ignoreStaleLocations"].asInt())
-    assertEquals(900, json["keepalive"].asInt())
-    assertEquals(5, json["locatorDisplacement"].asInt())
-    assertEquals(60, json["locatorInterval"].asInt())
-    assertEquals(0, json["mode"].asInt())
-    assertEquals(1, json["monitoring"].asInt())
-    assertEquals(10, json["moveModeLocatorInterval"].asInt())
-    assertEquals(3, json["mqttProtocolLevel"].asInt())
-    assertFalse(json["notificationHigherPriority"].asBoolean())
-    assertTrue(json["notificationLocation"].asBoolean())
-    assertEquals("", json["opencageApiKey"].asText())
-    assertEquals(3.352, json["osmTileScaleFactor"].asDouble(), 0.0001)
-    assertEquals("password", json["password"].asText())
-    assertEquals(30, json["ping"].asInt())
-    assertEquals(1883, json["port"].asInt())
-    assertTrue(json["extendedData"].asBoolean())
-    assertEquals(1, json["pubQos"].asInt())
-    assertTrue(json["pubRetain"].asBoolean())
-    assertEquals("owntracks/%u/%d", json["pubTopicBase"].asText())
-    assertTrue(json["remoteConfiguration"].asBoolean())
-    assertTrue(json["sub"].asBoolean())
-    assertEquals(2, json["subQos"].asInt())
-    assertEquals("owntracks/+/+", json["subTopic"].asText())
-    assertFalse(json["tls"].asBoolean())
-    assertTrue(json["usePassword"].asBoolean())
-    assertEquals("username", json["username"].asText())
-    assertFalse(json["ws"].asBoolean())
+    val json = Json.parseToJsonElement(input).jsonObject
+    assertEquals("configuration", json["_type"]!!.jsonPrimitive.content)
+    assertEquals(2, json["waypoints"]!!.jsonArray.size)
+    assertEquals(
+        "work", json["waypoints"]!!.jsonArray[0].jsonObject["desc"]!!.jsonPrimitive.content)
+    assertEquals(
+        51.5, json["waypoints"]!!.jsonArray[0].jsonObject["lat"]!!.jsonPrimitive.double, 0.0001)
+    assertEquals(
+        -0.02, json["waypoints"]!!.jsonArray[0].jsonObject["lon"]!!.jsonPrimitive.double, 0.0001)
+    assertEquals(150, json["waypoints"]!!.jsonArray[0].jsonObject["rad"]!!.jsonPrimitive.int)
+    assertEquals(
+        1505910709000, json["waypoints"]!!.jsonArray[0].jsonObject["tst"]!!.jsonPrimitive.long)
+    assertEquals(
+        "home", json["waypoints"]!!.jsonArray[1].jsonObject["desc"]!!.jsonPrimitive.content)
+    assertEquals(
+        53.6, json["waypoints"]!!.jsonArray[1].jsonObject["lat"]!!.jsonPrimitive.double, 0.0001)
+    assertEquals(
+        -1.5, json["waypoints"]!!.jsonArray[1].jsonObject["lon"]!!.jsonPrimitive.double, 0.0001)
+    assertEquals(100, json["waypoints"]!!.jsonArray[1].jsonObject["rad"]!!.jsonPrimitive.int)
+    assertEquals(
+        1558351273, json["waypoints"]!!.jsonArray[1].jsonObject["tst"]!!.jsonPrimitive.long)
+    assertTrue(json["auth"]!!.jsonPrimitive.boolean)
+    assertTrue(json["autostartOnBoot"]!!.jsonPrimitive.boolean)
+    assertFalse(json["cleanSession"]!!.jsonPrimitive.boolean)
+    assertEquals("emulator", json["clientId"]!!.jsonPrimitive.content)
+    assertTrue(json["cmd"]!!.jsonPrimitive.boolean)
+    assertEquals(34, json["connectionTimeoutSeconds"]!!.jsonPrimitive.int)
+    assertTrue(json["debugLog"]!!.jsonPrimitive.boolean)
+    assertEquals("testdevice", json["deviceId"]!!.jsonPrimitive.content)
+    assertFalse(json["enableMapRotation"]!!.jsonPrimitive.boolean)
+    assertTrue(json["fusedRegionDetection"]!!.jsonPrimitive.boolean)
+    assertTrue(json["geocodeEnabled"]!!.jsonPrimitive.boolean)
+    assertEquals("testhost.example.com", json["host"]!!.jsonPrimitive.content)
+    assertEquals(150, json["ignoreInaccurateLocations"]!!.jsonPrimitive.int)
+    assertEquals(0, json["ignoreStaleLocations"]!!.jsonPrimitive.int)
+    assertEquals(900, json["keepalive"]!!.jsonPrimitive.int)
+    assertEquals(5, json["locatorDisplacement"]!!.jsonPrimitive.int)
+    assertEquals(60, json["locatorInterval"]!!.jsonPrimitive.int)
+    assertEquals(0, json["mode"]!!.jsonPrimitive.int)
+    assertEquals(1, json["monitoring"]!!.jsonPrimitive.int)
+    assertEquals(10, json["moveModeLocatorInterval"]!!.jsonPrimitive.int)
+    assertEquals(3, json["mqttProtocolLevel"]!!.jsonPrimitive.int)
+    assertFalse(json["notificationHigherPriority"]!!.jsonPrimitive.boolean)
+    assertTrue(json["notificationLocation"]!!.jsonPrimitive.boolean)
+    assertEquals("", json["opencageApiKey"]!!.jsonPrimitive.content)
+    assertEquals(3.352, json["osmTileScaleFactor"]!!.jsonPrimitive.double, 0.0001)
+    assertEquals("password", json["password"]!!.jsonPrimitive.content)
+    assertEquals(30, json["ping"]!!.jsonPrimitive.int)
+    assertEquals(1883, json["port"]!!.jsonPrimitive.int)
+    assertTrue(json["extendedData"]!!.jsonPrimitive.boolean)
+    assertEquals(1, json["pubQos"]!!.jsonPrimitive.int)
+    assertTrue(json["pubRetain"]!!.jsonPrimitive.boolean)
+    assertEquals("owntracks/%u/%d", json["pubTopicBase"]!!.jsonPrimitive.content)
+    assertTrue(json["remoteConfiguration"]!!.jsonPrimitive.boolean)
+    assertTrue(json["sub"]!!.jsonPrimitive.boolean)
+    assertEquals(2, json["subQos"]!!.jsonPrimitive.int)
+    assertEquals("owntracks/+/+", json["subTopic"]!!.jsonPrimitive.content)
   }
 
   @Test
@@ -169,29 +190,36 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(false) {
             Intent.ACTION_VIEW,
             "owntracks:///config?inline=eyJfdHlwZSI6ImNvbmZpZ3VyYXRpb24iLCJ3YXlwb2ludHMiOlt7Il90eXBlIjoid2F5cG9pbnQiLCJkZXNjIjoid29yayIsImxhdCI6NTEuNSwibG9uIjotMC4wMiwicmFkIjoxNTAsInRzdCI6MTUwNTkxMDcwOTAwMH0seyJfdHlwZSI6IndheXBvaW50IiwiZGVzYyI6ImhvbWUiLCJsYXQiOjUzLjYsImxvbiI6LTEuNSwicmFkIjoxMDAsInRzdCI6MTU1ODM1MTI3M31dLCJhdXRoIjp0cnVlLCJhdXRvc3RhcnRPbkJvb3QiOnRydWUsImNvbm5lY3Rpb25UaW1lb3V0U2Vjb25kcyI6MzQsImNsZWFuU2Vzc2lvbiI6ZmFsc2UsImNsaWVudElkIjoiZW11bGF0b3IiLCJjbWQiOnRydWUsImRlYnVnTG9nIjp0cnVlLCJkZXZpY2VJZCI6InRlc3RkZXZpY2UiLCJmdXNlZFJlZ2lvbkRldGVjdGlvbiI6dHJ1ZSwiZ2VvY29kZUVuYWJsZWQiOnRydWUsImhvc3QiOiJ0ZXN0aG9zdC5leGFtcGxlLmNvbSIsImlnbm9yZUluYWNjdXJhdGVMb2NhdGlvbnMiOjE1MCwiaWdub3JlU3RhbGVMb2NhdGlvbnMiOjAsImtlZXBhbGl2ZSI6OTAwLCJsb2NhdG9yRGlzcGxhY2VtZW50Ijo1LCJsb2NhdG9ySW50ZXJ2YWwiOjYwLCJtb2RlIjowLCJtb25pdG9yaW5nIjoxLCJlbmFibGVNYXBSb3RhdGlvbiI6ZmFsc2UsIm9zbVRpbGVTY2FsZUZhY3RvciI6My4zNTIsIm1vdmVNb2RlTG9jYXRvckludGVydmFsIjoxMCwibXF0dFByb3RvY29sTGV2ZWwiOjMsIm5vdGlmaWNhdGlvbkhpZ2hlclByaW9yaXR5IjpmYWxzZSwibm90aWZpY2F0aW9uTG9jYXRpb24iOnRydWUsIm9wZW5jYWdlQXBpS2V5IjoiIiwicGFzc3dvcmQiOiJwYXNzd29yZCIsInBpbmciOjMwLCJwb3J0IjoxODgzLCJleHRlbmRlZERhdGEiOnRydWUsInB1YlFvcyI6MSwicHViUmV0YWluIjp0cnVlLCJwdWJUb3BpY0Jhc2UiOiJvd250cmFja3MvJXUvJWQiLCJyZW1vdGVDb25maWd1cmF0aW9uIjp0cnVlLCJzdWIiOnRydWUsInN1YlFvcyI6Miwic3ViVG9waWMiOiJvd250cmFja3MvKy8rIiwidGxzIjpmYWxzZSwidXNlUGFzc3dvcmQiOnRydWUsInVzZXJuYW1lIjoidXNlcm5hbWUiLCJ3cyI6ZmFsc2V9"
                 .toUri()))
-    assertExpectedConfig(getText(onView(withId(R.id.effectiveConfiguration))))
-    assertDisplayed(R.id.save)
-    assertDisplayed(R.id.close)
+    ViewIdlingResource(withId(R.id.applyButton), isDisplayed()).use {
+      assertExpectedConfig(getText(onView(withId(R.id.effectiveConfiguration))))
+    }
+    assertDisplayed(R.id.applyButton)
+    assertDisplayed(R.id.cancelButton)
   }
 
   @Test
   fun load_activity_shows_error_when_loading_from_inline_config_url_containing_invalid_json() {
     launchActivity(Intent(Intent.ACTION_VIEW, "owntracks:///config?inline=e30k".toUri()))
-    assertContains(
-        R.id.importError,
-        app.getString(
-            R.string.errorPreferencesImportFailed, "Message is not a valid configuration message"))
-    assertNotExist(R.id.save)
-    assertDisplayed(R.id.close)
+    ViewIdlingResource(withId(R.id.importError), isDisplayed()).use {
+      assertContains(
+          R.id.importError,
+          app.getString(
+              R.string.errorPreferencesImportFailed,
+              "Message is not a valid configuration message"))
+    }
+    assertNotDisplayed(R.id.applyButton)
+    assertDisplayed(R.id.cancelButton)
   }
 
   @Test
   fun load_activity_shows_error_when_loading_from_inline_config_url_containing_invalid_base64() {
     launchActivity(
         Intent(Intent.ACTION_VIEW, "owntracks:///config?inline=aaaaaaaaaaaaaaaaaaaaaaaaa".toUri()))
-    assertContains(R.id.importError, app.getString(R.string.errorPreferencesImportFailed, ""))
-    assertNotExist(R.id.save)
-    assertDisplayed(R.id.close)
+    ViewIdlingResource(withId(R.id.importError), isDisplayed()).use {
+      assertContains(R.id.importError, app.getString(R.string.errorPreferencesImportFailed, ""))
+    }
+    assertNotDisplayed(R.id.applyButton)
+    assertDisplayed(R.id.cancelButton)
   }
 
   @Test
@@ -203,11 +231,11 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(false) {
         Intent(
             Intent.ACTION_VIEW,
             "owntracks:///config?url=http%3A%2F%2Flocalhost%3A8080%2Fmyconfig.otrc".toUri()))
-    ViewIdlingResource(withId(R.id.effectiveConfiguration), isDisplayed()).use {
+    ViewIdlingResource(withId(R.id.applyButton), isDisplayed()).use {
       assertExpectedConfig(getText(onView(withId(R.id.effectiveConfiguration))))
     }
-    assertDisplayed(R.id.save)
-    assertDisplayed(R.id.close)
+    assertDisplayed(R.id.applyButton)
+    assertDisplayed(R.id.cancelButton)
   }
 
   @Test
@@ -219,9 +247,11 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(false) {
         Intent(
             Intent.ACTION_VIEW,
             "owntracks:///config?url=http%3A%2F%2Flocalhost%3A8080%2Fnotfound".toUri()))
-    assertContains(R.id.importError, "Unexpected status code")
-    assertNotExist(R.id.save)
-    assertDisplayed(R.id.close)
+    ViewIdlingResource(withId(R.id.importError), isDisplayed()).use {
+      assertContains(R.id.importError, "Unexpected status code")
+    }
+    assertNotDisplayed(R.id.applyButton)
+    assertDisplayed(R.id.cancelButton)
   }
 
   @Test
@@ -230,12 +260,12 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(false) {
     val localConfig = File(dir, "espresso-testconfig.otrc")
     localConfig.writeText(servedConfig)
     launchActivity(Intent(Intent.ACTION_VIEW, "file://${localConfig.absoluteFile}".toUri()))
-    ViewIdlingResource(withId(R.id.effectiveConfiguration), isDisplayed()).use {
+    ViewIdlingResource(withId(R.id.applyButton), isDisplayed()).use {
       assertExpectedConfig(getText(onView(withId(R.id.effectiveConfiguration))))
     }
     assertExpectedConfig(getText(onView(withId(R.id.effectiveConfiguration))))
-    assertDisplayed(R.id.save)
-    assertDisplayed(R.id.close)
+    assertDisplayed(R.id.applyButton)
+    assertDisplayed(R.id.cancelButton)
   }
 
   @Test
@@ -244,20 +274,22 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(false) {
         Intent(
             Intent.ACTION_VIEW,
             writeFileToDevice("espresso-testconfig.otrc", servedConfig.toByteArray())))
-    ViewIdlingResource(withId(R.id.effectiveConfiguration), isDisplayed()).use {
+    ViewIdlingResource(withId(R.id.applyButton), isDisplayed()).use {
       assertExpectedConfig(getText(onView(withId(R.id.effectiveConfiguration))))
     }
     assertExpectedConfig(getText(onView(withId(R.id.effectiveConfiguration))))
-    assertDisplayed(R.id.save)
-    assertDisplayed(R.id.close)
+    assertDisplayed(R.id.applyButton)
+    assertDisplayed(R.id.cancelButton)
   }
 
   @Test
   fun load_activity_errors_correctly_from_invalid_content_url() {
     launchActivity(Intent(Intent.ACTION_VIEW, null))
-    assertContains(R.id.importError, "Import failed: No URI given for importing configuration")
-    assertNotExist(R.id.save)
-    assertDisplayed(R.id.close)
+    ViewIdlingResource(withId(R.id.importError), isDisplayed()).use {
+      assertContains(R.id.importError, "Import failed: No URI given for importing configuration")
+    }
+    assertNotDisplayed(R.id.applyButton)
+    assertDisplayed(R.id.cancelButton)
   }
 
   class MockWebserverConfigDispatcher(private val config: String) : Dispatcher() {

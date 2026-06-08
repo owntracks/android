@@ -7,6 +7,8 @@ import android.database.MatrixCursor
 import android.net.Uri
 import android.os.ParcelFileDescriptor
 import android.provider.OpenableColumns
+import android.system.ErrnoException
+import android.system.OsConstants
 import android.util.Log
 import java.io.FileOutputStream
 import org.owntracks.android.logging.TimberInMemoryLogTree
@@ -70,7 +72,15 @@ class ExportedLogContentProvider : ContentProvider() {
       try {
         FileOutputStream(output.fileDescriptor).write(l!!)
       } catch (e: Exception) {
-        Timber.e(e, "Can't write logs to output")
+        // EPIPE means the reader closed the pipe after consuming all data — this is normal
+        // behaviour (e.g. Google Drive closes its end once the upload is complete). Log at
+        // debug level only so it doesn't appear as a spurious error in the exported log.
+        val errno = (e.cause as? ErrnoException)?.errno
+        if (errno == OsConstants.EPIPE) {
+          Timber.d("Log pipe closed by reader (data transfer complete)")
+        } else {
+          Timber.e(e, "Can't write logs to output")
+        }
       }
     }
   }

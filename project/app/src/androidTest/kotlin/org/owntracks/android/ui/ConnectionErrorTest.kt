@@ -2,12 +2,15 @@ package org.owntracks.android.ui
 
 import android.content.Intent
 import androidx.core.net.toUri
+import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import dagger.hilt.android.testing.HiltAndroidTest
 import java.net.ConnectException
 import java.net.InetSocketAddress
@@ -17,6 +20,10 @@ import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import mqtt.broker.Broker
 import mqtt.broker.interfaces.Authentication
 import org.junit.Test
@@ -24,6 +31,7 @@ import org.owntracks.android.R
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.testutils.TestWithAnActivity
+import org.owntracks.android.testutils.idlingresources.ViewIdlingResource
 import org.owntracks.android.testutils.use
 import org.owntracks.android.testutils.waitUntilViewContains
 import org.owntracks.android.ui.preferences.load.LoadActivity
@@ -81,8 +89,8 @@ class ConnectionErrorTest : TestWithAnActivity<StatusActivity>(startActivity = t
                 this[Preferences::host.name] = "unknown"
               })
       setupActivity(config)
-      mqttConnectionIdlingResource.use { Espresso.onIdle() }
-      assertContains(R.id.connectedStatusMessage, R.string.statusEndpointStateMessageUnknownHost)
+      waitUntilViewContains(
+          R.id.connectedStatusMessage, R.string.statusEndpointStateMessageUnknownHost, 15.seconds)
     }
   }
 
@@ -127,10 +135,10 @@ class ConnectionErrorTest : TestWithAnActivity<StatusActivity>(startActivity = t
           encodeConfig(
               getConfig(port, username, password).apply { this[Preferences::tls.name] = true })
       setupActivity(config)
-      mqttConnectionIdlingResource.use { Espresso.onIdle() }
-      assertContains(
+      waitUntilViewContains(
           R.id.connectedStatusMessage,
-          R.string.statusEndpointStateMessageTLSEndpointCANotTrustedError)
+          R.string.statusEndpointStateMessageTLSEndpointCANotTrustedError,
+          15.seconds)
     }
   }
 
@@ -152,6 +160,11 @@ class ConnectionErrorTest : TestWithAnActivity<StatusActivity>(startActivity = t
   }
 
   private fun setupActivity(config: String) {
+    PreferenceManager.getDefaultSharedPreferences(
+            InstrumentationRegistry.getInstrumentation().targetContext)
+        .edit()
+        .putBoolean(Preferences::allowConfigurationByURIAndConfigFile.name, true)
+        .commit()
     InstrumentationRegistry.getInstrumentation()
         .targetContext
         .startActivity(
@@ -160,7 +173,7 @@ class ConnectionErrorTest : TestWithAnActivity<StatusActivity>(startActivity = t
               flags = Intent.FLAG_ACTIVITY_NEW_TASK
             })
     waitUntilActivityVisible(LoadActivity::class.java)
-    saveConfigurationIdlingResource.use { clickOn(R.id.save) }
+    ViewIdlingResource(withId(R.id.applyButton), isDisplayed()).use { clickOn(R.id.applyButton) }
     waitUntilActivityVisible()
   }
 }
@@ -190,8 +203,19 @@ private fun getBroker(
             })
 
 @ExperimentalEncodingApi
-private fun encodeConfig(config: Map<String, Any>): String =
-    Base64.encode(ObjectMapper().writeValueAsBytes(config))
+private fun encodeConfig(config: Map<String, Any>): String {
+  val jsonObject = buildJsonObject {
+    for ((key, value) in config) {
+      when (value) {
+        is String -> put(key, value)
+        is Number -> put(key, value)
+        is Boolean -> put(key, value)
+        else -> put(key, value.toString()) // Fallback, might not be correct for all cases
+      }
+    }
+  }
+  return Base64.encode(Json.encodeToString(jsonObject).encodeToByteArray())
+}
 
 private fun getTLSSettings(connectionErrorTest: ConnectionErrorTest): TLSSettings {
   val dataBytes = connectionErrorTest.javaClass.getResource("/rootCA.p12")!!.readBytes()

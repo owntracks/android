@@ -8,7 +8,6 @@ import android.net.ConnectivityManager
 import android.os.Build
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
-import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.IOException
 import java.net.ConnectException
@@ -33,6 +32,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.SerializationException
 import org.eclipse.paho.client.mqttv3.IMqttActionListener
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken
 import org.eclipse.paho.client.mqttv3.IMqttToken
@@ -152,15 +152,18 @@ class MQTTMessageProcessorEndpoint(
                           disconnectTimeout.inWholeMilliseconds,
                           disconnectTimeout.inWholeMilliseconds,
                           true)
-                    } catch (e: NullPointerException) {
-                      Timber.d(
-                          "Could not forcibly disconnect client, NPE thrown by bug in Paho MQTT. Ignoring.")
+                    } catch (e: Exception) {
+                      Timber.d(e, "Could not forcibly disconnect MQTT client. Ignoring.")
                     }
                   }
                 }
               }
               endpointStateRepo.setState(EndpointState.DISCONNECTED)
-              mqttClient.close(true)
+              try {
+                mqttClient.close(true)
+              } catch (e: Exception) {
+                Timber.w(e, "Error closing MQTT client. Ignoring.")
+              }
               try {
                 pingAlarmReceiver?.run(applicationContext::unregisterReceiver)
                 Timber.d("Unregistered ping alarm receiver")
@@ -315,7 +318,7 @@ class MQTTMessageProcessorEndpoint(
                       .also { Timber.d("Parsed message: $it") })
             } catch (e: Parser.EncryptionException) {
               Timber.e("Unable to decrypt received message ${message.id} on $topic")
-            } catch (e: InvalidFormatException) {
+            } catch (e: SerializationException) {
               Timber.w("Malformed JSON message received ${message.id} on $topic")
             }
           }
@@ -442,7 +445,13 @@ class MQTTMessageProcessorEndpoint(
 
   override suspend fun reconnect(): Result<Unit> =
       mqttClientAndConfiguration?.mqttConnectionConfiguration?.run { reconnect(this) }
-          ?: run { reconnect(getEndpointConfiguration()) }
+          ?: try {
+            reconnect(getEndpointConfiguration())
+          } catch (e: ConfigurationIncompleteException) {
+            Timber.w("MQTT not configured, skipping reconnect: ${e.message}")
+            endpointStateRepo.setState(EndpointState.ERROR_CONFIGURATION.withError(e))
+            Result.failure(e)
+          }
 
   private suspend fun reconnect(
       mqttConnectionConfiguration: MqttConnectionConfiguration

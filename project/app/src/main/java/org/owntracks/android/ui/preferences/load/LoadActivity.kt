@@ -19,10 +19,14 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.IOException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiPreferencesLoadBinding
 import timber.log.Timber
@@ -32,6 +36,7 @@ import timber.log.Timber
 class LoadActivity : AppCompatActivity() {
   private val viewModel: LoadViewModel by viewModels()
   private lateinit var binding: UiPreferencesLoadBinding
+  private var importJob: Job? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     enableEdgeToEdge()
@@ -44,22 +49,39 @@ class LoadActivity : AppCompatActivity() {
               setSupportActionBar(appbar.toolbar)
 
               // Handle window insets for edge-to-edge
-              ViewCompat.setOnApplyWindowInsetsListener(root) { view, windowInsets ->
+              ViewCompat.setOnApplyWindowInsetsListener(root) { _, windowInsets ->
                 val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+                val basePaddingPx = (12 * resources.displayMetrics.density).toInt()
+                val recyclerBasePaddingPx = (80 * resources.displayMetrics.density).toInt()
                 appbar.root.updatePadding(top = insets.top)
+                actionButtons.updatePadding(
+                    left = basePaddingPx,
+                    top = basePaddingPx,
+                    right = basePaddingPx,
+                    bottom = basePaddingPx + insets.bottom)
+                configRecyclerView.updatePadding(bottom = recyclerBasePaddingPx + insets.bottom)
                 WindowInsetsCompat.CONSUMED
+              }
+
+              val adapter = ConfigItemAdapter()
+              configRecyclerView.layoutManager = LinearLayoutManager(this@LoadActivity)
+              configRecyclerView.adapter = adapter
+
+              cancelButton.setOnClickListener { finish() }
+              applyButton.setOnClickListener { viewModel.saveConfiguration() }
+
+              lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                  viewModel.configItems.collect { adapter.submitList(it) }
+                }
               }
             }
     lifecycleScope.launch {
       repeatOnLifecycle(Lifecycle.State.STARTED) {
-        launch { viewModel.displayedConfiguration.collect { invalidateOptionsMenu() } }
-        launch {
-          viewModel.configurationImportStatus.collect {
-            invalidateOptionsMenu()
-            Timber.d("ImportStatus is $it")
-            if (it == ImportStatus.SAVED) {
-              finish()
-            }
+        viewModel.configurationImportStatus.collect {
+          Timber.d("ImportStatus is $it")
+          if (it == ImportStatus.SAVED) {
+            finish()
           }
         }
       }
@@ -74,15 +96,12 @@ class LoadActivity : AppCompatActivity() {
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    val itemId = item.itemId
-    if (itemId == R.id.save) {
-      viewModel.saveConfiguration()
-      return true
-    } else if (itemId == R.id.close || itemId == android.R.id.home) {
+    return if (item.itemId == android.R.id.home) {
       finish()
-      return true
+      true
+    } else {
+      super.onOptionsItemSelected(item)
     }
-    return super.onOptionsItemSelected(item)
   }
 
   private fun setHasBack(hasBackArrow: Boolean) {
@@ -90,15 +109,6 @@ class LoadActivity : AppCompatActivity() {
   }
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
-    menuInflater.inflate(R.menu.activity_load, menu)
-    return true
-  }
-
-  override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-    menu.findItem(R.id.close).isVisible =
-        viewModel.configurationImportStatus.value !== ImportStatus.LOADING
-    menu.findItem(R.id.save).isVisible =
-        viewModel.configurationImportStatus.value === ImportStatus.SUCCESS
     return true
   }
 
@@ -116,7 +126,18 @@ class LoadActivity : AppCompatActivity() {
       if (uri != null) {
         Timber.v("uri: %s", uri)
         if (ContentResolver.SCHEME_CONTENT == uri.scheme) {
-          viewModel.extractPreferences(getContentFromURI(uri))
+          importJob?.cancel()
+          importJob =
+              lifecycleScope.launch {
+                try {
+                  val content = withContext(Dispatchers.IO) { getContentFromURI(uri) }
+                  viewModel.extractPreferences(content)
+                } catch (e: IOException) {
+                  viewModel.configurationImportFailed(e)
+                } catch (e: SecurityException) {
+                  viewModel.configurationImportFailed(e)
+                }
+              }
         } else {
           viewModel.extractPreferencesFromUri(uri.toString())
         }
@@ -141,27 +162,35 @@ class LoadActivity : AppCompatActivity() {
   private val filePickerResultLauncher =
       registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == RESULT_OK) {
-          var content = ByteArray(0)
-          try {
-            content = it.data?.data?.run(this::getContentFromURI) ?: ByteArray(0)
-          } catch (e: IOException) {
-            Timber.e(e, "Could not extract content from ${it.data}")
-          }
-          viewModel.extractPreferences(content)
+          val uri = it.data?.data
+          importJob?.cancel()
+          importJob =
+              lifecycleScope.launch {
+                val content =
+                    if (uri != null) {
+                      try {
+                        withContext(Dispatchers.IO) { getContentFromURI(uri) }
+                      } catch (e: IOException) {
+                        Timber.e(e, "Could not extract content from $uri")
+                        ByteArray(0)
+                      } catch (e: SecurityException) {
+                        Timber.e(e, "Could not extract content from $uri")
+                        ByteArray(0)
+                      }
+                    } else {
+                      ByteArray(0)
+                    }
+                viewModel.extractPreferences(content)
+              }
         } else {
           finish()
         }
       }
 
   @Throws(IOException::class)
-  private fun getContentFromURI(uri: Uri): ByteArray {
-    contentResolver.openInputStream(uri).use { stream ->
-      val output = ByteArray(stream!!.available())
-      val bytesRead = stream.read(output)
-      Timber.d("Read %d bytes from content URI", bytesRead)
-      return output
-    }
-  }
+  private fun getContentFromURI(uri: Uri): ByteArray =
+      contentResolver.openInputStream(uri)?.use { it.readBytes() }
+          ?: throw IOException("Could not open input stream for $uri")
 
   companion object {
     const val FLAG_IN_APP = "INAPP"

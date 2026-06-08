@@ -1,8 +1,10 @@
 package org.owntracks.android.preferences.types
 
-import com.fasterxml.jackson.annotation.JsonValue
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
 
-enum class ConnectionMode(@JsonValue val value: Int) {
+@Serializable(with = ConnectionMode.ConnectionModeSerializer::class)
+enum class ConnectionMode(val value: Int) {
   MQTT(0),
   HTTP(3);
 
@@ -18,4 +20,8 @@ enum class ConnectionMode(@JsonValue val value: Int) {
             ?: entries.firstOrNull { it.name.equals(value, true) }
             ?: MQTT
   }
+
+  object ConnectionModeSerializer :
+      KSerializer<ConnectionMode> by intValueEnumSerializer(
+          "ConnectionMode", entries, { it.value }, MQTT)
 }

@@ -2,7 +2,6 @@ package org.owntracks.android.net.http
 
 import android.content.Context
 import androidx.core.net.toUri
-import com.fasterxml.jackson.core.JsonProcessingException
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.security.KeyStore
@@ -49,7 +48,7 @@ class HttpMessageProcessorEndpoint(
     @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : MessageProcessorEndpoint(messageProcessor), Preferences.OnPreferenceChangeListener {
   override val modeId: ConnectionMode = ConnectionMode.HTTP
-  private var httpClientAndConfiguration: HttpClientAndConfiguration? = null
+  internal var httpClientAndConfiguration: HttpClientAndConfiguration? = null
 
   override fun activate() {
     Timber.v("HTTP Activate")
@@ -154,38 +153,23 @@ class HttpMessageProcessorEndpoint(
                   result.forEach { onMessageReceived(it) }
                 }
                 return Result.success(Unit)
-              } catch (e: JsonProcessingException) {
-                Timber.e("JsonParseException HTTP status: %s", response.code)
+              } catch (e: IOException) {
+                Timber.w(e, "HTTP response body could not be parsed, ignoring")
                 endpointStateRepo.setState(
                     EndpointState.IDLE.withMessage(
                         String.format(
-                            Locale.ROOT,
-                            "HTTP status %d, JsonParseException",
-                            response.code,
-                        ),
+                            Locale.ROOT, "Response %d (response not parseable)", response.code),
                     ),
                 )
                 return Result.success(Unit)
-              } catch (e: Parser.EncryptionException) {
-                Timber.e("JsonParseException HTTP status: %s", response.code)
-                endpointStateRepo.setState(
-                    EndpointState.ERROR.withMessage(
-                        String.format(
-                            Locale.ROOT,
-                            "HTTP status: %d, EncryptionException",
-                            response.code,
-                        ),
-                    ),
-                )
-                return Result.success(Unit)
-              } catch (e: IOException) {
-                Timber.e(e, "HTTP Delivery failed")
-                endpointStateRepo.setState(EndpointState.ERROR.withError(e))
-                messageProcessor.onMessageDeliveryFailed(message)
-                return Result.failure(OutgoingMessageSendingException(e))
               }
             } else {
-              Result.failure(OutgoingMessageSendingException(null))
+              endpointStateRepo.setState(
+                  EndpointState.IDLE.withMessage(
+                      String.format(Locale.ROOT, "Response %d", response.code),
+                  ),
+              )
+              Result.success(Unit)
             }
           }
         }

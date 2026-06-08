@@ -32,6 +32,12 @@
         app:fragment="org.owntracks.android.ui.preferences.NotificationFragment"
         app:icon="@drawable/ic_baseline_notifications_24" />
     <Preference
+        android:key="remoteControlScreen"
+        android:title="@string/preferencesRemoteControl"
+        app:fragment="org.owntracks.android.ui.preferences.RemoteControlFragment"
+        app:icon="@drawable/baseline_settings_remote_24" />
+
+    <Preference
         android:key="advancedScreen"
         android:title="@string/preferencesAdvanced"
         app:fragment="org.owntracks.android.ui.preferences.AdvancedFragment"

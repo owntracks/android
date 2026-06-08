@@ -1,5 +1,51 @@
 # Changelog
 
+## Version 2.6.0
+
+### Security
+
+This release addresses a security advisory covering several intent-handling vulnerabilities. Users are strongly encouraged to upgrade. Thanks to [Noel Gomillion](https://github.com/engomillion) & [Pranati Majhi](https://github.com/pmajhi) at Texas A&M for working with us on this.
+
+- External configuration loading (via `owntracks://` URLs and config files) is now disabled by default and must be explicitly enabled in Settings → Advanced
+- A confirmation dialog is shown when enabling external configuration, warning that any config URL can fully reconfigure the app
+- The `allowIntentControl` intent receiver now requires a shared secret (`intentAuthKey`) in every intent, preventing unauthorised apps from triggering location publishes or changing monitoring mode
+- `BackgroundService` is no longer exported; only explicit intents from within the app are accepted
+- `EXIT` and `SEND_EVENT_CIRCULAR` intent actions have been removed
+- `OngoingNotification` service intents are now explicit
+- Security-related preferences (`allowConfigurationByURIAndConfigFile`, `allowIntentControl`, `intentAuthKey`) cannot be changed via imported config files or URLs
+- Certificate fingerprint verification migrated from SHA-1 to SHA-256
+
+### New features
+
+- New **Remote Control** preferences screen showing the intent auth key (with a copy-to-clipboard button) for use with automation apps such as Tasker
+- Config import screen now shows a structured diff of what is changing, with human-readable preference names, highlighting new values alongside the current values — unchanged settings are summarised rather than listed in full
+- Waypoints in an imported config are listed individually in the import review screen
+
+### Bug fixes
+
+- DEBUG and VERBOSE log messages are no longer emitted to the system Logcat in release builds, preventing potential PII (e.g. coordinates) leakage via `TimberInMemoryLogTree` (CWE-532)
+- HTTP mode no longer treats an unparsable or empty response body as a send failure. A `200 OK` response is sufficient to confirm a message was delivered successfully; response body parse errors are logged as warnings and ignored (#2242)
+
+
+## Version 2.5.10
+
+### Bug fixes
+
+- Fix blocking file I/O on the main thread when loading a configuration from a content:// URI, which could cause ANR on slow storage (#2151). Also fixes potentially truncated reads and an uncaught IOException in that path.
+
+## Version 2.5.9
+
+### Bug fixes
+
+- Location message validation now properly enforces minimum required fields (timestamp, latitude, longitude, and tracker ID or topic). Also, hopefully we don't crash on receiving a message with null values in (!) (#2235)
+
+## Version 2.5.8
+
+### Bug fixes
+
+- Don't crash when MQTT reconnect is attempted with an invalid configuration (whoops!)
+- Don't crash when the MQTT client throws an unexpected exception during disconnect
+
 ## Version 2.5.7
 
 ### New features
@@ -10,6 +56,8 @@
 
 - Fix slow start caused by replacing the map SDK on every resume.
 - Fixed map to show a sensible view when the activity is being resumed
+- My location fab now has a little more space from the edge of the display (#2182)
+- Google drive log export doesn't appear to fail (#2213)
 
 ## Version 2.5.6
 

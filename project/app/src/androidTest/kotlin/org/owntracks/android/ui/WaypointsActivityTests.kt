@@ -12,8 +12,11 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
-import com.fasterxml.jackson.databind.ObjectMapper
 import dagger.hilt.android.testing.HiltAndroidTest
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -181,13 +184,16 @@ class WaypointsActivityTests :
     clickOn(R.string.title_activity_preferences)
     clickOn(R.string.configurationManagement)
     val effectiveConfiguration = getText(onView(withId(R.id.effectiveConfiguration)))
-    val json = ObjectMapper().readTree(effectiveConfiguration)
-    assertTrue(json.isObject)
-    assertTrue(json.has("waypoints"))
-    assertEquals(1, json["waypoints"].size())
-    assertEquals(waypointName, json["waypoints"][0]["desc"].asText())
-    assertEquals(latitude, json["waypoints"][0]["lat"].asDouble(), 0.0001)
-    assertEquals(longitude, json["waypoints"][0]["lon"].asDouble(), 0.0001)
-    assertEquals(radius, json["waypoints"][0]["rad"].asInt())
+
+    val json = Json.parseToJsonElement(effectiveConfiguration).jsonObject
+    assertTrue(json.containsKey("waypoints"))
+    val waypoints = json["waypoints"]!!.jsonArray
+    assertEquals(1, waypoints.size)
+    assertEquals(waypointName, waypoints[0].jsonObject["desc"]!!.jsonPrimitive.content)
+    assertEquals(
+        latitude, waypoints[0].jsonObject["lat"]!!.jsonPrimitive.content.toDouble(), 0.0001)
+    assertEquals(
+        longitude, waypoints[0].jsonObject["lon"]!!.jsonPrimitive.content.toDouble(), 0.0001)
+    assertEquals(radius, waypoints[0].jsonObject["rad"]!!.jsonPrimitive.content.toInt())
   }
 }

@@ -1,8 +1,10 @@
 package org.owntracks.android.preferences.types
 
-import com.fasterxml.jackson.annotation.JsonValue
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
 
-enum class MqttQos(@JsonValue val value: Int) {
+@Serializable(with = MqttQos.MqttQosSerializer::class)
+enum class MqttQos(val value: Int) {
   Zero(0),
   One(1),
   Two(2);
@@ -19,4 +21,7 @@ enum class MqttQos(@JsonValue val value: Int) {
             ?: entries.firstOrNull { it.name.equals(value, true) }
             ?: One
   }
+
+  object MqttQosSerializer :
+      KSerializer<MqttQos> by intValueEnumSerializer("MqttQos", entries, { it.value }, One)
 }

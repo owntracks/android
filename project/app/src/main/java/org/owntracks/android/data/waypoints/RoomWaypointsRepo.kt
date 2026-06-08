@@ -133,6 +133,9 @@ constructor(
     val handler = CoroutineExceptionHandler { _, exception ->
       Timber.e(exception, "Error migrating waypoints")
     }
-    scope.launch(ioDispatcher + handler) { migrateFromLegacyStorage() }
+    scope.launch(ioDispatcher + handler) {
+      migrateFromLegacyStorage()
+      _migrationCompleteFlow.value = true
+    }
   }
 }

@@ -41,6 +41,7 @@ class RoomBackedMessageQueue(
 ) : AsyncDeQueue {
   private val db: MessageQueueDatabase =
       Room.databaseBuilder(applicationContext, MessageQueueDatabase::class.java, "message_queue")
+          .addMigrations(MessageQueueDatabase.MIGRATION_1_2)
           .build()
 
   private val dao = db.messageQueueDao()
@@ -224,7 +225,10 @@ class RoomBackedMessageQueue(
       val sequenceNumber = sequenceNumberGenerator.incrementAndGet()
       val entity =
           MessageQueueEntity(
-              sequenceNumber = sequenceNumber, messageJson = messageJson, isHeadSlot = false)
+              sequenceNumber = sequenceNumber,
+              messageJson = messageJson,
+              topic = message.topic,
+              isHeadSlot = false)
 
       dao.insert(entity)
       _queueSize.value = dao.getCount()
@@ -256,7 +260,10 @@ class RoomBackedMessageQueue(
           val sequenceNumber = sequenceNumberGenerator.incrementAndGet()
           val entity =
               MessageQueueEntity(
-                  sequenceNumber = sequenceNumber, messageJson = messageJson, isHeadSlot = true)
+                  sequenceNumber = sequenceNumber,
+                  messageJson = messageJson,
+                  topic = message.topic,
+                  isHeadSlot = true)
 
           dao.insert(entity)
           _queueSize.value = dao.getCount()
@@ -292,6 +299,9 @@ class RoomBackedMessageQueue(
                   Timber.w(e, "Unable to deserialize message from queue: ${entity.messageJson}")
                   MessageUnknown
                 }
+
+            // Restore the publish topic (transient, not serialized into JSON)
+            message.topic = entity.topic
 
             // Remove from database
             dao.deleteById(entity.id)

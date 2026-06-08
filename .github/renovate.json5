@@ -13,8 +13,9 @@
       "enabled": false
     },
     {
-      "matchPackagePatterns": ["^com.fasterxml.jackson"],
-      "enabled": false
+      "matchDatasources": ["pypi"],
+      "matchFileNames": [".github/google-play-api/requirements.txt"],
+      "automerge": true
     },
     {
       "matchUpdateTypes": ["major"],

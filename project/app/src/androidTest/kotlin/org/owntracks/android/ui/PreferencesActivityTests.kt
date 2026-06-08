@@ -17,6 +17,7 @@ import org.owntracks.android.preferences.SharedPreferencesStore
 import org.owntracks.android.preferences.types.ReverseGeocodeProvider
 import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.testutils.TestWithAnActivity
+import org.owntracks.android.testutils.clickOnPreference
 import org.owntracks.android.testutils.scrollToPreferenceWithText
 import org.owntracks.android.testutils.writeToPreference
 import org.owntracks.android.ui.preferences.PreferencesActivity
@@ -45,42 +46,40 @@ class PreferencesActivityTests : TestWithAnActivity<PreferencesActivity>() {
     writeToPreference(
         R.string.preferencesClientId, "test-clientId") // This hyphen will get squelched
 
-    scrollToPreferenceWithText(R.string.preferencesWebsocket)
-    clickOn(R.string.preferencesWebsocket)
+    clickOnPreference(R.string.preferencesWebsocket)
 
     writeToPreference(R.string.preferencesUsername, "testUsername")
     writeToPreference(R.string.preferencesBrokerPassword, "testPassword")
     writeToPreference(R.string.preferencesDeviceName, "testDeviceId")
     writeToPreference(R.string.preferencesTrackerId, "t5")
 
-    scrollToPreferenceWithText(R.string.preferencesCleanSessionEnabled)
-    clickOn(R.string.preferencesCleanSessionEnabled)
+    clickOnPreference(R.string.preferencesCleanSessionEnabled)
 
     writeToPreference(R.string.preferencesKeepalive, "1570")
 
     clickBack()
     clickOn(R.string.configurationManagement)
 
-    assertContains(R.id.effectiveConfiguration, "\"_type\" : \"configuration\"")
-    assertContains(R.id.effectiveConfiguration, " \"waypoints\" : [ ]")
+    assertContains(R.id.effectiveConfiguration, "\"_type\": \"configuration\"")
+    assertContains(R.id.effectiveConfiguration, "\"waypoints\": []")
 
-    assertContains(R.id.effectiveConfiguration, "\"host\" : \"mqtt.example.com\"")
-    assertContains(R.id.effectiveConfiguration, "\"port\" : 1234")
-    assertContains(R.id.effectiveConfiguration, "\"clientId\" : \"testclientId\"")
-    assertContains(R.id.effectiveConfiguration, "\"username\" : \"testUsername\"")
-    assertContains(R.id.effectiveConfiguration, "\"password\" : \"testPassword\"")
-    assertContains(R.id.effectiveConfiguration, "\"deviceId\" : \"testDeviceId\"")
-    assertContains(R.id.effectiveConfiguration, "\"tid\" : \"t5\"")
+    assertContains(R.id.effectiveConfiguration, "\"host\": \"mqtt.example.com\"")
+    assertContains(R.id.effectiveConfiguration, "\"port\": 1234")
+    assertContains(R.id.effectiveConfiguration, "\"clientId\": \"testclientId\"")
+    assertContains(R.id.effectiveConfiguration, "\"username\": \"testUsername\"")
+    assertContains(R.id.effectiveConfiguration, "\"password\": \"testPassword\"")
+    assertContains(R.id.effectiveConfiguration, "\"deviceId\": \"testDeviceId\"")
+    assertContains(R.id.effectiveConfiguration, "\"tid\": \"t5\"")
 
-    assertContains(R.id.effectiveConfiguration, "\"pubQos\" : 1")
-    assertContains(R.id.effectiveConfiguration, "\"subQos\" : 2")
-    assertContains(R.id.effectiveConfiguration, "\"info\" : true")
-    assertContains(R.id.effectiveConfiguration, "\"tlsClientCrt\" : \"\"")
-    assertContains(R.id.effectiveConfiguration, "\"tls\" : true")
-    assertContains(R.id.effectiveConfiguration, "\"mqttProtocolLevel\" : 3")
-    assertContains(R.id.effectiveConfiguration, "\"subTopic\" : \"owntracks/+/+\"")
-    assertContains(R.id.effectiveConfiguration, "\"pubTopicBase\" : \"owntracks/%u/%d\"")
-    assertContains(R.id.effectiveConfiguration, "\"ws\" : true")
+    assertContains(R.id.effectiveConfiguration, "\"pubQos\": 1")
+    assertContains(R.id.effectiveConfiguration, "\"subQos\": 2")
+    assertContains(R.id.effectiveConfiguration, "\"info\": true")
+    assertContains(R.id.effectiveConfiguration, "\"tlsClientCrt\": \"\"")
+    assertContains(R.id.effectiveConfiguration, "\"tls\": true")
+    assertContains(R.id.effectiveConfiguration, "\"mqttProtocolLevel\": 3")
+    assertContains(R.id.effectiveConfiguration, "\"subTopic\": \"owntracks/+/+\"")
+    assertContains(R.id.effectiveConfiguration, "\"pubTopicBase\": \"owntracks/%u/%d\"")
+    assertContains(R.id.effectiveConfiguration, "\"ws\": true")
 
     assertNotContains(R.id.effectiveConfiguration, "\"url\"")
     assertNotContains(R.id.effectiveConfiguration, "\"preferenceKeyDontReuseHttpClient\"")
@@ -116,21 +115,21 @@ class PreferencesActivityTests : TestWithAnActivity<PreferencesActivity>() {
     // This is an ugly hack, but there's some race conditions on underpowered hardware
     // causing the test to move on before the view has been fully built/rendered.
 
-    clickOn(R.string.preferencesAdvanced)
+    clickOn(R.string.preferencesRemoteControl)
     clickOn(R.string.preferencesRemoteCommand)
+    clickBack()
+
+    clickOn(R.string.preferencesAdvanced)
     writeToPreference(R.string.preferencesIgnoreInaccurateLocations, "950")
     writeToPreference(R.string.preferencesLocatorInterval, "123")
     writeToPreference(R.string.preferencesLocatorDisplacement, "567")
     writeToPreference(R.string.preferencesMoveModeLocatorInterval, "5")
 
-    scrollToPreferenceWithText(R.string.preferencesPegLocatorFastestIntervalToInterval)
-    clickOn(R.string.preferencesPegLocatorFastestIntervalToInterval)
+    clickOnPreference(R.string.preferencesPegLocatorFastestIntervalToInterval)
 
-    scrollToPreferenceWithText(R.string.preferencesAutostart)
-    clickOn(R.string.preferencesAutostart)
+    clickOnPreference(R.string.preferencesAutostart)
 
-    scrollToPreferenceWithText(R.string.preferencesReverseGeocodeProvider)
-    clickOn(R.string.preferencesReverseGeocodeProvider)
+    clickOnPreference(R.string.preferencesReverseGeocodeProvider)
 
     clickOn("OpenCage")
     clickOn(android.R.id.button1)
@@ -141,25 +140,25 @@ class PreferencesActivityTests : TestWithAnActivity<PreferencesActivity>() {
 
     clickOn(R.string.configurationManagement)
 
-    assertContains(R.id.effectiveConfiguration, "\"_type\" : \"configuration\"")
-    assertContains(R.id.effectiveConfiguration, " \"waypoints\" : [ ]")
+    assertContains(R.id.effectiveConfiguration, "\"_type\": \"configuration\"")
+    assertContains(R.id.effectiveConfiguration, "\"waypoints\": []")
 
-    assertContains(R.id.effectiveConfiguration, "\"url\" : \"https://www.example.com:8080/\"")
-    assertContains(R.id.effectiveConfiguration, "\"username\" : \"testUsername\"")
-    assertContains(R.id.effectiveConfiguration, "\"password\" : \"testPassword\"")
-    assertContains(R.id.effectiveConfiguration, "\"deviceId\" : \"testDeviceId\"")
-    assertContains(R.id.effectiveConfiguration, "\"tid\" : \"t1\"")
-    assertContains(R.id.effectiveConfiguration, "\"notificationEvents\" : true")
-    assertContains(R.id.effectiveConfiguration, "\"extendedData\" : false")
-    assertContains(R.id.effectiveConfiguration, "\"ignoreInaccurateLocations\" : 950")
-    assertContains(R.id.effectiveConfiguration, "\"locatorInterval\" : 123")
-    assertContains(R.id.effectiveConfiguration, "\"locatorDisplacement\" : 567")
-    assertContains(R.id.effectiveConfiguration, "\"moveModeLocatorInterval\" : 5")
-    assertContains(R.id.effectiveConfiguration, "\"autostartOnBoot\" : false")
-    assertContains(R.id.effectiveConfiguration, "\"reverseGeocodeProvider\" : \"OpenCage\"")
-    assertContains(R.id.effectiveConfiguration, "\"opencageApiKey\" : \"geocodeAPIKey\"")
-    assertContains(R.id.effectiveConfiguration, "\"connectionTimeoutSeconds\" : 30")
-    assertContains(R.id.effectiveConfiguration, "\"pegLocatorFastestIntervalToInterval\" : true")
+    assertContains(R.id.effectiveConfiguration, "\"url\": \"https://www.example.com:8080/\"")
+    assertContains(R.id.effectiveConfiguration, "\"username\": \"testUsername\"")
+    assertContains(R.id.effectiveConfiguration, "\"password\": \"testPassword\"")
+    assertContains(R.id.effectiveConfiguration, "\"deviceId\": \"testDeviceId\"")
+    assertContains(R.id.effectiveConfiguration, "\"tid\": \"t1\"")
+    assertContains(R.id.effectiveConfiguration, "\"notificationEvents\": true")
+    assertContains(R.id.effectiveConfiguration, "\"extendedData\": false")
+    assertContains(R.id.effectiveConfiguration, "\"ignoreInaccurateLocations\": 950")
+    assertContains(R.id.effectiveConfiguration, "\"locatorInterval\": 123")
+    assertContains(R.id.effectiveConfiguration, "\"locatorDisplacement\": 567")
+    assertContains(R.id.effectiveConfiguration, "\"moveModeLocatorInterval\": 5")
+    assertContains(R.id.effectiveConfiguration, "\"autostartOnBoot\": false")
+    assertContains(R.id.effectiveConfiguration, "\"reverseGeocodeProvider\": \"OpenCage\"")
+    assertContains(R.id.effectiveConfiguration, "\"opencageApiKey\": \"geocodeAPIKey\"")
+    assertContains(R.id.effectiveConfiguration, "\"connectionTimeoutSeconds\": 30")
+    assertContains(R.id.effectiveConfiguration, "\"pegLocatorFastestIntervalToInterval\": true")
 
     // Make sure that the MQTT-specific settings aren't present
     assertNotContains(R.id.effectiveConfiguration, "\"host\"")
