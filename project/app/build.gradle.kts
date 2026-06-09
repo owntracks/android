@@ -234,6 +234,9 @@ dependencies {
   implementation(libs.paho.mqttclient)
   implementation(libs.okhttp)
 
+  // External USB GNSS (u-blox F9P et al.)
+  implementation("com.github.mik3y:usb-serial-for-android:3.5.1")
+
   // Utility libraries
   implementation(libs.bundles.hilt)
   implementation(libs.square.tape2)
