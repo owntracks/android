@@ -8,12 +8,4 @@
         android:visible="false"
         android:orderInCategory="97"
         app:showAsAction="ifRoom"/>
-    <item
-        android:id="@+id/save"
-        android:icon="@drawable/ic_baseline_done_24"
-        android:title="@string/save"
-        android:visible="false"
-        android:orderInCategory="97"
-        app:showAsAction="ifRoom"/>
-
 </menu>

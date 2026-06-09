@@ -39,6 +39,7 @@ import org.owntracks.android.testutils.grantMapActivityPermissions
 import org.owntracks.android.testutils.idlingresources.BottomSheetResource
 import org.owntracks.android.testutils.setNotFirstStartPreferences
 import org.owntracks.android.testutils.use
+import org.owntracks.android.testutils.waitAndClickWithMinVisibility
 import org.owntracks.android.ui.map.MapActivity
 
 @ExperimentalUnsignedTypes
@@ -59,7 +60,7 @@ class MQTTMessagePublishTests :
     })
 
     val mockLatitude = 51.0
-    val mockLongitude = 0.0
+    val mockLongitude = 1.0
 
     reportLocationFromMap(mockLocationIdlingResource) {
       mockLocationProviderClient.setLocation(mockLatitude, mockLongitude)
@@ -145,6 +146,7 @@ class MQTTMessagePublishTests :
               batteryStatus = BatteryStatus.CHARGING
               velocity = 99
               timestamp = Instant.parse("2006-01-02T15:04:05Z").epochSecond
+              trackerId = "testUser"
             },
             MessageCard().apply {
               name = contactName
@@ -164,7 +166,7 @@ class MQTTMessagePublishTests :
         )
         .use {
           assertDisplayed(R.id.contactClearButton)
-          clickOn(R.id.contactClearButton)
+          waitAndClickWithMinVisibility(R.id.contactClearButton)
         }
 
     openDrawer()
@@ -177,6 +179,7 @@ class MQTTMessagePublishTests :
               latitude = 50.123
               longitude = 3.56789
               timestamp = Instant.parse("2006-01-02T15:04:05Z").epochSecond
+              trackerId = "testUser"
             },
         )
         .sendFromBroker(broker)
