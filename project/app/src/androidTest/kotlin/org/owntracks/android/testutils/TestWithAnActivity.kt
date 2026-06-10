@@ -20,7 +20,7 @@ import java.lang.reflect.ParameterizedType
 import javax.inject.Inject
 import javax.inject.Named
 import kotlin.time.Duration.Companion.seconds
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 import leakcanary.DetectLeaksAfterTestSuccess
 import leakcanary.LeakCanary
 import org.junit.After

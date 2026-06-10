@@ -2,7 +2,7 @@ package org.owntracks.android.model
 
 import java.io.ByteArrayInputStream
 import java.io.IOException
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.boolean

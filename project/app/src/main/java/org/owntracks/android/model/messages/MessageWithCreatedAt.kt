@@ -1,6 +1,6 @@
 package org.owntracks.android.model.messages
 
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -22,7 +22,7 @@ interface Clock {
 }
 
 class RealClock : Clock {
-  override val time: Instant = kotlinx.datetime.Clock.System.now()
+  override val time: Instant = kotlin.time.Clock.System.now()
 }
 
 /** Serializes [Instant] as Unix epoch seconds (Long) matching the OwnTracks protocol. */

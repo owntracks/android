@@ -24,7 +24,7 @@ import java.security.Security
 import javax.inject.Provider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.conscrypt.Conscrypt
 import org.owntracks.android.di.CustomBindingComponentBuilder

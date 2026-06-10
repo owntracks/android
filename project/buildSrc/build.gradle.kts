@@ -5,4 +5,4 @@ repositories {
   mavenCentral()
 }
 
-dependencies { implementation(libs.android.gradle.api) }
+dependencies { }

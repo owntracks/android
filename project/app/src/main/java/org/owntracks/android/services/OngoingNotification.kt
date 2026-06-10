@@ -9,7 +9,7 @@ import android.media.AudioManager
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 import org.owntracks.android.BaseApp.Companion.NOTIFICATION_CHANNEL_ONGOING
 import org.owntracks.android.BaseApp.Companion.NOTIFICATION_ID_ONGOING
 import org.owntracks.android.R

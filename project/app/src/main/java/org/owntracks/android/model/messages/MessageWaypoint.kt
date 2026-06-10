@@ -2,7 +2,7 @@
 
 package org.owntracks.android.model.messages
 
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName

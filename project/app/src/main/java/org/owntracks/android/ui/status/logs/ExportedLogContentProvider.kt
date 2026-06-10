@@ -44,7 +44,7 @@ class ExportedLogContentProvider : ContentProvider() {
   ): Cursor? =
       logForUri(uri)?.let {
         val m = MatrixCursor(arrayOf(OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE), 1)
-        m.addRow(arrayOf("owntracks-log.txt", it.size.toLong()))
+        m.addRow(arrayOf<Any?>("owntracks-log.txt", it.size.toLong()))
         m
       }
 

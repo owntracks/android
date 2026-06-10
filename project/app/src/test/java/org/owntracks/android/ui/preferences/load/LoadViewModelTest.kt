@@ -17,9 +17,11 @@ import kotlinx.serialization.json.long
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.owntracks.android.MainDispatcherRule
 import org.owntracks.android.R
 import org.owntracks.android.data.waypoints.InMemoryWaypointsRepo
 import org.owntracks.android.model.Parser
@@ -30,6 +32,8 @@ import org.owntracks.android.test.SimpleIdlingResource
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class LoadViewModelTest {
+  @get:Rule
+  val mainDispatcherRule = MainDispatcherRule()
   private lateinit var mockContext: Context
   private lateinit var preferencesStore: PreferencesStore
   private val mockIdlingResource = SimpleIdlingResource("mock", true)

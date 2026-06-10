@@ -6,7 +6,7 @@ androidx-core = "1.13.1"
 androidx-core-testing = "2.2.0"
 androidx-fragment = "1.8.9"
 androidx-preference = "1.2.1"
-androidx-room = "2.6.1"
+androidx-room = "2.7.2"
 androidx-test-core-ktx = "1.7.0"
 androidx-test-espresso = "3.7.0"
 androidx-test-junit = "1.3.0"
@@ -27,11 +27,11 @@ guava = "33.6.0-jre"
 hilt = "2.58"
 hilt-work = "1.3.0"
 kmqtt = "0.4.6"
-kotlin = "2.3.21"
+kotlin = "2.4.0"
 kotlin-coroutines = "1.11.0"
 kotlin-datetime = "0.8.0"
 kotlinx-serialization = "1.11.0"
-ksp = "2.3.8"
+ksp = "2.4.0"
 ktfmt = "0.25.0"
 lmdb-kt = "0.1.1"
 materialdrawer = "6.1.2"
@@ -139,7 +139,7 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 
 [bundles]
 kotlin = ["kotlin-coroutines-android", "kotlin-coroutines-jdk8", "kotlin-reflect"]
-kapt-hilt = ["hilt-compiler", "hilt-androidx"]
+ksp-hilt = ["hilt-compiler", "hilt-androidx"]
 hilt = ["hilt-android", "hilt-work"]
 androidx = ["androidx-core-ktx", "androidx-preference", "androidx-work-runtime", "androidx-fragment-ktx", "androidx-concurrent-futures", "androidx-activity-ktx"]
 androidx-room = ["androidx-room-runtime", "androidx-room-ktx"]

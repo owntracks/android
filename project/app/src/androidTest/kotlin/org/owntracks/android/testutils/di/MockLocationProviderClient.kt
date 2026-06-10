@@ -3,7 +3,7 @@ package org.owntracks.android.testutils.di
 import android.location.Location
 import android.os.Build
 import android.os.Looper
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 import org.owntracks.android.location.LocationAvailability
 import org.owntracks.android.location.LocationCallback
 import org.owntracks.android.location.LocationProviderClient

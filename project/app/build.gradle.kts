@@ -155,7 +155,13 @@ android {
     animationsDisabled = true
     unitTests { isIncludeAndroidResources = true }
     managedDevices {
-      localDevices {}
+      localDevices {
+        register("pixel5api34") {
+          device = "Pixel 5"
+          apiLevel = 34
+          systemImageSource = "aosp-atd"
+        }
+      }
       groups {}
     }
   }
@@ -186,13 +192,6 @@ android {
     isCoreLibraryDesugaringEnabled = true
   }
 
-  //kotlinOptions { jvmTarget = JavaVersion.VERSION_21.toString() }
-//  kotlin {
-//    compilerOptions {
-//      jvmTarget = "21"
-//    }
-//  }
-
   flavorDimensions.add("locationProvider")
   productFlavors {
     create("gms") {
@@ -206,12 +205,15 @@ android {
   }
 }
 
-kapt {
-  useBuildCache = true
-  correctErrorTypes = true
-}
-
 ksp { arg("room.schemaLocation", "$projectDir/schemas") }
+
+// KSP 2.3.x with AGP 8.x: wire ksp config to variant processor classpaths manually
+// (AGP 9.x adds addKspConfigurations() for this; AGP 8.x does not have that API)
+configurations.configureEach {
+  if (name.endsWith("KotlinProcessorClasspath")) {
+    extendsFrom(configurations.getByName("ksp"))
+  }
+}
 
 tasks.withType<Test> {
   systemProperties["junit.jupiter.execution.parallel.enabled"] = false
@@ -256,10 +258,8 @@ dependencies {
   implementation(libs.widgets.materialize) { artifact { type = "aar" } }
 
   // Preprocessors
-  kapt(libs.bundles.kapt.hilt)
+  ksp(libs.bundles.ksp.hilt)
   ksp(libs.androidx.room.compiler)
-
-  kaptTest(libs.bundles.kapt.hilt)
 
   testImplementation(libs.mockito.kotlin)
   testImplementation(libs.androidx.core.testing)
@@ -270,8 +270,6 @@ dependencies {
 
   // Hilt Android Testing
   androidTestImplementation(libs.hilt.android.testing)
-  kaptAndroidTest(libs.hilt.compiler)
-
   androidTestImplementation(libs.barista) { exclude("org.jetbrains.kotlin") }
   androidTestImplementation(libs.okhttp.mockwebserver)
   androidTestImplementation(libs.bundles.kmqtt)

@@ -13,6 +13,7 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.contextual
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
+import kotlin.time.Instant
 import org.owntracks.android.model.messages.InstantEpochSecondsSerializer
 import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.model.messages.MessageCard
@@ -35,7 +36,7 @@ import timber.log.Timber
 class Parser @Inject constructor(private val encryptionProvider: EncryptionProvider?) {
   private val serializersModule = SerializersModule {
     contextual(MessageWaypointCollectionSerializer)
-    contextual(kotlinx.datetime.Instant::class, InstantEpochSecondsSerializer)
+    contextual(Instant::class, InstantEpochSecondsSerializer)
     polymorphic(MessageBase::class) {
       subclass(MessageCard::class)
       subclass(MessageClear::class)

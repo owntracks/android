@@ -5,7 +5,7 @@ import android.location.Location
 import android.os.Build
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
