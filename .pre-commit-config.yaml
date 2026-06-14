@@ -1,7 +1,4 @@
 ---
-default_language_version:
-  python: python3.14
-
 repos:
   - repo: meta
     hooks:
