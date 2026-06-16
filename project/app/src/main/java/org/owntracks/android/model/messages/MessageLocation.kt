@@ -5,7 +5,7 @@ import android.location.Location
 import android.os.Build
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
@@ -28,6 +28,7 @@ import org.owntracks.android.model.BatteryStatus
 import org.owntracks.android.net.WifiInfoProvider
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.MonitoringMode
+import kotlin.time.ExperimentalTime
 
 /** Accepts both integer and float JSON values for Int fields (some clients send `0.0`). */
 object LenientIntSerializer : JsonTransformingSerializer<Int>(Int.serializer()) {
@@ -39,16 +40,21 @@ object LenientIntSerializer : JsonTransformingSerializer<Int>(Int.serializer()) 
       }
 
   fun parseIntLenient(element: JsonElement?): Int =
-      if (element == null) {
-        0
-      } else if (element is JsonPrimitive && element.doubleOrNull != null) {
-        element.doubleOrNull!!.toInt()
-      } else {
-        element.jsonPrimitive.intOrNull ?: 0
+      when (element) {
+          null -> {
+            0
+          }
+          is JsonPrimitive if element.doubleOrNull != null -> {
+            element.doubleOrNull!!.toInt()
+          }
+
+        else -> {
+          element.jsonPrimitive.intOrNull ?: 0
+        }
       }
 }
 
-@OptIn(ExperimentalSerializationApi::class)
+@OptIn(ExperimentalSerializationApi::class, ExperimentalTime::class)
 @SuppressLint("UnsafeOptInUsageError")
 @Serializable
 @SerialName(MessageLocation.TYPE)

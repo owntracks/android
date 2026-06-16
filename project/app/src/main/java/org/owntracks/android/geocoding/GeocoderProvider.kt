@@ -1,8 +1,11 @@
 package org.owntracks.android.geocoding
 
+import android.Manifest
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.PRIORITY_LOW
 import androidx.core.app.NotificationManagerCompat
@@ -14,9 +17,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.datetime.format
 import kotlinx.datetime.format.DateTimeComponents
+import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
 import okhttp3.OkHttpClient
 import org.owntracks.android.R
@@ -28,17 +32,19 @@ import org.owntracks.android.preferences.types.ReverseGeocodeProvider
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 @Singleton
 class GeocoderProvider
 @Inject
 constructor(
-    @ApplicationContext private val context: Context,
-    private val preferences: Preferences,
-    private val notificationManager: NotificationManagerCompat,
-    @ApplicationScope private val scope: CoroutineScope,
-    @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val httpClient: OkHttpClient
+  @param:ApplicationContext private val context: Context,
+  private val preferences: Preferences,
+  private val notificationManager: NotificationManagerCompat,
+  @param:ApplicationScope private val scope: CoroutineScope,
+  @param:CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+  private val httpClient: OkHttpClient
 ) {
   private var lastRateLimitedNotificationTime: Instant? = null
   private var geocoder: Geocoder = GeocoderNone()
@@ -113,7 +119,7 @@ constructor(
                         char('-')
                         monthNumber()
                         char('-')
-                        dayOfMonth()
+                        this@Format.day(padding = Padding.ZERO)
                         char(' ')
                         hour()
                         char(':')
@@ -155,6 +161,19 @@ constructor(
             .setSilent(true)
             .build()
 
+    if (ActivityCompat.checkSelfPermission(
+          this.context,
+          Manifest.permission.POST_NOTIFICATIONS
+      ) != PackageManager.PERMISSION_GRANTED) {
+      // TODO: Consider calling
+      //    ActivityCompat#requestPermissions
+      // here to request the missing permissions, and then overriding
+      //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+      //                                          int[] grantResults)
+      // to handle the case where the user grants the permission. See the documentation
+      // for ActivityCompat#requestPermissions for more details.
+      return
+    }
     notificationManager.notify(GEOCODE_ERROR_NOTIFICATION_TAG, 0, notification)
   }
 

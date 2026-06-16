@@ -8,8 +8,9 @@ buildscript {
 }
 
 plugins {
+  // The Android app uses AGP's built-in Kotlin; the standalone kotlin.jvm
+  // plugin is only applied by the pure-JVM :location-kalman module.
   alias(libs.plugins.android.application).apply(false)
-  alias(libs.plugins.kotlin.android).apply(false)
   alias(libs.plugins.kotlin.jvm).apply(false)
   alias(libs.plugins.hilt.android).apply(false)
   alias(libs.plugins.ktfmt).apply(false)
@@ -21,10 +22,6 @@ extensions.findByName("develocity")?.withGroovyBuilder {
     setProperty("termsOfUseUrl", "https://gradle.com/help/legal-terms-of-use")
     setProperty("termsOfUseAgree", "yes")
   }
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-  kotlinOptions { jvmTarget = JavaVersion.VERSION_21.toString() }
 }
 
 tasks.wrapper { distributionType = Wrapper.DistributionType.BIN }

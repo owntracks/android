@@ -9,7 +9,6 @@ import android.media.AudioManager
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import kotlinx.datetime.Clock
 import org.owntracks.android.BaseApp.Companion.NOTIFICATION_CHANNEL_ONGOING
 import org.owntracks.android.BaseApp.Companion.NOTIFICATION_ID_ONGOING
 import org.owntracks.android.R
@@ -17,7 +16,10 @@ import org.owntracks.android.data.EndpointState
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 class OngoingNotification(private val context: Context, initialMode: MonitoringMode) {
   data class ServiceNotificationState(
       val title: String,

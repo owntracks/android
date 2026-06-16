@@ -2,8 +2,8 @@ package org.owntracks.android.geocoding
 
 import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.test.runTest
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
+import kotlin.time.Clock
+import kotlin.time.Instant
 import okhttp3.Call
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
@@ -19,7 +19,9 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.owntracks.android.location.LatLng
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 class TestOpenCageGeocoder {
 
   @Test

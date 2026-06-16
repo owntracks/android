@@ -53,8 +53,8 @@ class MQTTMessageProcessorEndpointNetworkCallbackTest {
   private val mockConnectivityManager: ConnectivityManager = mock {}
   private val mockAlarmManager: AlarmManager = mock {}
   private val mockContext: Context = mock {
-    on { getSystemService(Context.CONNECTIVITY_SERVICE) } doReturn mockConnectivityManager
-    on { getSystemService(Context.ALARM_SERVICE) } doReturn mockAlarmManager
+    on { getSystemService(ConnectivityManager::class.java) } doReturn mockConnectivityManager
+    on { getSystemService(AlarmManager::class.java) } doReturn mockAlarmManager
   }
 
   private lateinit var endpoint: MQTTMessageProcessorEndpoint

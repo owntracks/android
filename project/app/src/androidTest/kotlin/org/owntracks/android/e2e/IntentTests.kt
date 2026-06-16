@@ -10,8 +10,7 @@ import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import dagger.hilt.android.testing.HiltAndroidTest
-import kotlin.time.Duration.Companion.seconds
-import mqtt.packets.mqtt.MQTTPublish
+import io.github.davidepianca98.mqtt.packets.mqtt.MQTTPublish
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,6 +30,7 @@ import org.owntracks.android.testutils.use
 import org.owntracks.android.testutils.waitAndClickWithMinVisibility
 import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalUnsignedTypes::class)
 @HiltAndroidTest

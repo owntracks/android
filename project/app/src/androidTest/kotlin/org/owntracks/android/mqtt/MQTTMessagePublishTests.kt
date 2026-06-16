@@ -13,10 +13,7 @@ import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.testing.HiltAndroidTest
-import java.time.Instant
-import javax.inject.Inject
-import javax.inject.Named
-import mqtt.packets.mqtt.MQTTPublish
+import io.github.davidepianca98.mqtt.packets.mqtt.MQTTPublish
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -41,6 +38,9 @@ import org.owntracks.android.testutils.setNotFirstStartPreferences
 import org.owntracks.android.testutils.use
 import org.owntracks.android.testutils.waitAndClickWithMinVisibility
 import org.owntracks.android.ui.map.MapActivity
+import java.time.Instant
+import javax.inject.Inject
+import javax.inject.Named
 
 @ExperimentalUnsignedTypes
 @LargeTest
@@ -55,9 +55,9 @@ class MQTTMessagePublishTests :
 
   @Test
   fun given_an_MQTT_configured_client_when_the_report_button_is_pressed_then_the_broker_receives_a_packet_with_the_correct_location_message_in() {
-    setupTestActivity({
+    setupTestActivity {
       configureMQTTConnectionToLocalWithGeneratedPassword(saveConfigurationIdlingResource)
-    })
+    }
 
     val mockLatitude = 51.0
     val mockLongitude = 1.0
@@ -97,9 +97,9 @@ class MQTTMessagePublishTests :
 
   @Test
   fun given_an_MQTT_configured_client_when_the_user_publishes_waypoints_then_the_broker_receives_a_waypoint_message() {
-    setupTestActivity({
+    setupTestActivity {
       configureMQTTConnectionToLocalWithGeneratedPassword(saveConfigurationIdlingResource)
-    })
+    }
 
     openDrawer()
     clickOn(R.string.title_activity_waypoints)
@@ -127,9 +127,9 @@ class MQTTMessagePublishTests :
 
   @Test
   fun given_an_MQTT_configured_client_when_the_broker_sends_a_location_for_a_cleared_contact_then_a_the_contact_returns_with_the_correct_details() {
-    setupTestActivity({
+    setupTestActivity {
       configureMQTTConnectionToLocalWithGeneratedPassword(saveConfigurationIdlingResource)
-    })
+    }
 
     openDrawer()
     clickOn(R.string.title_activity_contacts)

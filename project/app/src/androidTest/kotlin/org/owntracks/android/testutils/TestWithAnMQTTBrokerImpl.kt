@@ -8,6 +8,13 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
+import io.github.davidepianca98.mqtt.broker.Broker
+import io.github.davidepianca98.mqtt.broker.interfaces.Authentication
+import io.github.davidepianca98.mqtt.broker.interfaces.PacketInterceptor
+import io.github.davidepianca98.mqtt.packets.MQTTPacket
+import io.github.davidepianca98.mqtt.packets.Qos
+import io.github.davidepianca98.mqtt.packets.mqtt.MQTTPublish
+import io.github.davidepianca98.mqtt.packets.mqttv5.MQTT5Properties
 import java.net.ConnectException
 import java.net.InetSocketAddress
 import java.net.Socket
@@ -15,13 +22,6 @@ import kotlin.concurrent.thread
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlinx.coroutines.DelicateCoroutinesApi
-import mqtt.broker.Broker
-import mqtt.broker.interfaces.Authentication
-import mqtt.broker.interfaces.PacketInterceptor
-import mqtt.packets.MQTTPacket
-import mqtt.packets.Qos
-import mqtt.packets.mqtt.MQTTPublish
-import mqtt.packets.mqttv5.MQTT5Properties
 import org.owntracks.android.R
 import org.owntracks.android.model.Parser
 import org.owntracks.android.model.messages.MessageBase

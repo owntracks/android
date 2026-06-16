@@ -2,7 +2,7 @@ package org.owntracks.android.model
 
 import java.io.ByteArrayInputStream
 import java.io.IOException
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.boolean
@@ -38,7 +38,9 @@ import org.owntracks.android.model.messages.MessageWaypoint
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.preferences.types.MqttQos
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 class ParserTest {
   private val testId = "dummyTestId"
   private val extendedMessageLocation =

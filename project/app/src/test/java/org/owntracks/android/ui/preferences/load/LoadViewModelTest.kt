@@ -1,12 +1,15 @@
 package org.owntracks.android.ui.preferences.load
 
 import android.content.Context
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.double
 import kotlinx.serialization.json.int
@@ -14,6 +17,7 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.long
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -36,6 +40,7 @@ class LoadViewModelTest {
 
   @Before
   fun createMocks() {
+    Dispatchers.setMain(UnconfinedTestDispatcher())
     mockContext = mock {
       on { packageName } doReturn javaClass.canonicalName
       on { getString(R.string.loadActivityErrorExternalConfigDisabled) } doReturn
@@ -47,6 +52,11 @@ class LoadViewModelTest {
           "Failure fetching config from remote URL"
     }
     preferencesStore = InMemoryPreferencesStore()
+  }
+
+  @After
+  fun tearDown() {
+    Dispatchers.resetMain()
   }
 
   private fun TestScope.makeVm(preferences: Preferences) =

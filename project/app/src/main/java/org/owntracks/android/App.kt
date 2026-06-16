@@ -24,7 +24,7 @@ import java.security.Security
 import javax.inject.Provider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.conscrypt.Conscrypt
 import org.owntracks.android.di.CustomBindingComponentBuilder
@@ -38,6 +38,7 @@ import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.RunThingsOnOtherThreads
 import org.owntracks.android.support.receiver.StartBackgroundServiceReceiver
 import timber.log.Timber
+import kotlin.time.ExperimentalTime
 
 @HiltAndroidApp
 class App : BaseApp() {
@@ -47,6 +48,7 @@ class App : BaseApp() {
   }
 }
 
+@OptIn(ExperimentalTime::class)
 open class BaseApp :
     Application(),
     Configuration.Provider,

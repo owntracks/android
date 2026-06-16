@@ -3,12 +3,13 @@ package org.owntracks.android.testutils.di
 import android.location.Location
 import android.os.Build
 import android.os.Looper
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 import org.owntracks.android.location.LocationAvailability
 import org.owntracks.android.location.LocationCallback
 import org.owntracks.android.location.LocationProviderClient
 import org.owntracks.android.location.LocationRequest
 import org.owntracks.android.location.LocationResult
+import kotlin.time.ExperimentalTime
 
 class MockLocationProviderClient : LocationProviderClient() {
   private val callbacks = mutableSetOf<LocationCallback>()
@@ -62,6 +63,7 @@ fun LocationProviderClient.setLocation(
       Location("test").apply {
         this.latitude = latitude
         this.longitude = longitude
+        @OptIn(ExperimentalTime::class)
         this.time = Clock.System.now().toEpochMilliseconds()
         this.altitude = altitude
         this.accuracy = accuracy

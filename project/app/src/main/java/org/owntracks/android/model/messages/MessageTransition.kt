@@ -2,14 +2,16 @@
 
 package org.owntracks.android.model.messages
 
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import org.owntracks.android.location.geofencing.Geofence
 import org.owntracks.android.preferences.Preferences
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 @Serializable
 @SerialName(MessageTransition.TYPE)
 class MessageTransition(

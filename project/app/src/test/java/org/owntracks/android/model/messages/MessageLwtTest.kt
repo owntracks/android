@@ -3,7 +3,9 @@ package org.owntracks.android.model.messages
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.owntracks.android.model.FakeFixedClock
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 class MessageLwtTest {
   @Test
   fun `an lwt message has a timestamp and created_at which are equal`() {

@@ -1,10 +1,11 @@
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
-  id("com.android.application")
-  id("com.google.dagger.hilt.android")
-  kotlin("android")
-  kotlin("kapt")
+  alias(libs.plugins.android.application)
+  alias(libs.plugins.hilt.android)
+  // Kotlin is provided by AGP's built-in Kotlin support; the legacy-kapt plugin
+  // drives data binding's annotation processing (everything else is on KSP).
+  alias(libs.plugins.android.legacy.kapt)
   alias(libs.plugins.ktfmt)
   alias(libs.plugins.ksp)
   alias(libs.plugins.kotlin.plugin.serialization)
@@ -127,6 +128,7 @@ android {
     buildConfig = true
     dataBinding = true
     viewBinding = true
+    resValues = true
   }
 
   dataBinding { addKtx = true }
@@ -186,8 +188,6 @@ android {
     isCoreLibraryDesugaringEnabled = true
   }
 
-  kotlinOptions { jvmTarget = JavaVersion.VERSION_21.toString() }
-
   flavorDimensions.add("locationProvider")
   productFlavors {
     create("gms") {
@@ -199,11 +199,6 @@ android {
     }
     create("oss") { dimension = "locationProvider" }
   }
-}
-
-kapt {
-  useBuildCache = true
-  correctErrorTypes = true
 }
 
 ksp { arg("room.schemaLocation", "$projectDir/schemas") }
@@ -251,10 +246,10 @@ dependencies {
   implementation(libs.widgets.materialize) { artifact { type = "aar" } }
 
   // Preprocessors
-  kapt(libs.bundles.kapt.hilt)
+  ksp(libs.bundles.ksp.hilt)
   ksp(libs.androidx.room.compiler)
 
-  kaptTest(libs.bundles.kapt.hilt)
+  kspTest(libs.bundles.ksp.hilt)
 
   testImplementation(libs.mockito.kotlin)
   testImplementation(libs.androidx.core.testing)
@@ -265,7 +260,7 @@ dependencies {
 
   // Hilt Android Testing
   androidTestImplementation(libs.hilt.android.testing)
-  kaptAndroidTest(libs.hilt.compiler)
+  kspAndroidTest(libs.hilt.compiler)
 
   androidTestImplementation(libs.barista) { exclude("org.jetbrains.kotlin") }
   androidTestImplementation(libs.okhttp.mockwebserver)
