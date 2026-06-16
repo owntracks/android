@@ -1,12 +1,14 @@
 package org.owntracks.android.geocoding
 
-import kotlinx.datetime.Instant
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 sealed class GeocodeResult {
   data class Formatted(val text: String) : GeocodeResult()
 
   object Empty : GeocodeResult()
 
+  @OptIn(ExperimentalTime::class)
   sealed class Fault(open val until: Instant) : GeocodeResult() {
     data class Error(val message: String, override val until: Instant) : Fault(until)
 

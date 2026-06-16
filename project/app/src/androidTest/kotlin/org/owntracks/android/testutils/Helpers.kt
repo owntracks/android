@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalTime::class)
+
 package org.owntracks.android.testutils
 
 import android.Manifest
@@ -37,7 +39,6 @@ import androidx.test.runner.lifecycle.Stage
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickDialogNegativeButton
 import com.adevinta.android.barista.interaction.BaristaDialogInteractions.clickDialogPositiveButton
-import com.adevinta.android.barista.interaction.BaristaEditTextInteractions
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
 import com.adevinta.android.barista.interaction.PermissionGranter
 import java.io.BufferedInputStream
@@ -50,13 +51,14 @@ import kotlin.random.Random
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.Matcher
 import org.owntracks.android.R
 import org.owntracks.android.preferences.Preferences
 import timber.log.Timber
+import kotlin.time.ExperimentalTime
 
 fun scrollToPreferenceWithText(textResource: Int) {
   onView(withId(androidx.preference.R.id.recycler_view))
@@ -86,7 +88,7 @@ fun writeToPreference(textResource: Int, value: String) {
               click(),
           ),
       )
-  BaristaEditTextInteractions.writeTo(android.R.id.edit, value)
+  writeTo(android.R.id.edit, value)
   clickDialogPositiveButton()
 }
 
@@ -159,19 +161,6 @@ inline fun IdlingResource?.use(timeout: Duration = 15.seconds, block: () -> Unit
   }
 }
 
-fun disableDeviceLocation() {
-  val cmd =
-      if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) {
-        "settings put secure location_mode 0"
-      } else {
-        "settings put secure location_providers_allowed -gps"
-      }
-
-  getInstrumentation().uiAutomation.executeShellCommand(cmd).use {
-    it.dumpOutputToLog("disable devicelocation")
-  }
-}
-
 fun stopAndroidSetupProcess() {
   listOf(
           "com.google.android.setupwizard",
@@ -191,19 +180,6 @@ fun disableHeadsupNotifications() {
       .uiAutomation
       .executeShellCommand("settings put global heads_up_notifications_enabled 0")
       .use { it.dumpOutputToLog("disable heads_up_notifications") }
-}
-
-fun enableDeviceLocation() {
-  val cmd =
-      if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) {
-        "settings put secure location_mode 3"
-      } else {
-        "settings put secure location_providers_allowed +gps"
-      }
-
-  getInstrumentation().uiAutomation.executeShellCommand(cmd).use {
-    it.dumpOutputToLog("enable devicelocation")
-  }
 }
 
 fun grantNotificationAndForegroundPermissions() {
@@ -299,7 +275,7 @@ fun Random.string(length: Int) =
 fun doIfViewNotVisible(@IdRes id: Int, doThat: () -> Unit) {
   try {
     onView(withId(id)).check(matches(ViewMatchers.isDisplayed()))
-  } catch (e: AssertionFailedError) {
+  } catch (_: AssertionFailedError) {
     doThat()
   }
 }
@@ -352,7 +328,7 @@ fun clickOnDrawerAndWait(text: Int) {
  * (e.g. BottomSheetBehavior using SpringAnimation).
  */
 fun waitUntilViewDisplayed(@IdRes viewId: Int, timeout: Duration = TIMEOUT) {
-  val deadline = Clock.System.now().plus(timeout)
+  val deadline =  Clock.System.now().plus(timeout)
   var lastError: Throwable? = null
   while (Clock.System.now() < deadline) {
     try {

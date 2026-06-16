@@ -50,14 +50,14 @@ class LogViewerActivity : AppCompatActivity() {
     enableEdgeToEdge()
     super.onCreate(savedInstanceState)
     binding =
-        DataBindingUtil.setContentView<UiPreferencesLogsBinding?>(
+        DataBindingUtil.setContentView<UiPreferencesLogsBinding>(
                 this, R.layout.ui_preferences_logs)
             .apply {
               lifecycleOwner = this@LogViewerActivity
               setSupportActionBar(appbar.toolbar)
 
               // Handle window insets for edge-to-edge
-              ViewCompat.setOnApplyWindowInsetsListener(frame) { view, windowInsets ->
+              ViewCompat.setOnApplyWindowInsetsListener(frame) { _, windowInsets ->
                 val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
                 appbar.root.updatePadding(top = insets.top)
                 WindowInsetsCompat.CONSUMED

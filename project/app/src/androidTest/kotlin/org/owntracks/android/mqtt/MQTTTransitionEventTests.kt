@@ -9,10 +9,9 @@ import androidx.test.filters.LargeTest
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import dagger.hilt.android.testing.HiltAndroidTest
-import java.time.Instant
-import mqtt.packets.Qos
-import mqtt.packets.mqtt.MQTTPublish
-import mqtt.packets.mqttv5.MQTT5Properties
+import io.github.davidepianca98.mqtt.packets.Qos
+import io.github.davidepianca98.mqtt.packets.mqtt.MQTTPublish
+import io.github.davidepianca98.mqtt.packets.mqttv5.MQTT5Properties
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -33,6 +32,7 @@ import org.owntracks.android.testutils.use
 import org.owntracks.android.ui.map.MapActivity
 import org.owntracks.android.ui.waypoints.WaypointsActivity
 import timber.log.Timber
+import java.time.Instant
 
 @ExperimentalUnsignedTypes
 @LargeTest
@@ -54,13 +54,11 @@ class MQTTTransitionEventTests :
 
   @Test
   fun given_an_mqtt_configured_client_when_the_broker_sends_a_transition_message_then_a_notification_appears() {
-    setupTestActivity(
-        {
-          configureMQTTConnectionToLocalWithGeneratedPassword(
-              saveConfigurationIdlingResource,
-          )
-        },
-    )
+    setupTestActivity {
+      configureMQTTConnectionToLocalWithGeneratedPassword(
+          saveConfigurationIdlingResource,
+      )
+    }
 
     listOf(
             MessageLocation().apply {
@@ -122,11 +120,11 @@ class MQTTTransitionEventTests :
 
   @Test
   fun given_an_mqtt_configured_client_when_the_broker_sends_a_transition_message_for_a_contact_with_a_card_then_a_notification_appears() {
-    setupTestActivity({
+    setupTestActivity {
       configureMQTTConnectionToLocalWithGeneratedPassword(
           saveConfigurationIdlingResource,
       )
-    })
+    }
 
     listOf(
             MessageCard().apply { name = "Test Contact" },
@@ -192,11 +190,11 @@ class MQTTTransitionEventTests :
     val waypointLongitude = -1.0
     val waypointDescription = "Test Region"
 
-    setupTestActivity({
+    setupTestActivity {
       configureMQTTConnectionToLocalWithGeneratedPassword(
           saveConfigurationIdlingResource,
       )
-    })
+    }
 
     reportLocationFromMap(mockLocationIdlingResource) {
       mockLocationProviderClient.setLocation(

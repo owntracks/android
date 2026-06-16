@@ -6,8 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import dagger.hilt.android.testing.HiltAndroidTest
-import kotlin.random.Random
-import mqtt.packets.mqtt.MQTTPublish
+import io.github.davidepianca98.mqtt.packets.mqtt.MQTTPublish
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -21,6 +20,7 @@ import org.owntracks.android.testutils.TestWithAnMQTTBrokerImpl
 import org.owntracks.android.testutils.di.setLocation
 import org.owntracks.android.testutils.use
 import org.owntracks.android.ui.map.MapActivity
+import kotlin.random.Random
 
 @ExperimentalUnsignedTypes
 @LargeTest
@@ -42,9 +42,9 @@ class LocationBehaviourTests :
         .edit()
         .putInt(Preferences::ignoreInaccurateLocations.name, 50)
         .apply()
-    setupTestActivity({
+    setupTestActivity {
       configureMQTTConnectionToLocalWithGeneratedPassword(saveConfigurationIdlingResource)
-    })
+    }
     reportLocationFromMap(mockLocationIdlingResource) {
       mockLocationProviderClient.setLocation(
           inaccurateMockLongitude,

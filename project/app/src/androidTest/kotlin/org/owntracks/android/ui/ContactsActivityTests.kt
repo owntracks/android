@@ -6,12 +6,8 @@ import com.adevinta.android.barista.assertion.BaristaRecyclerViewAssertions.asse
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
 import dagger.hilt.android.testing.HiltAndroidTest
-import java.time.Instant
-import kotlin.io.encoding.Base64
-import kotlin.io.encoding.ExperimentalEncodingApi
-import kotlin.random.Random
-import mqtt.packets.Qos
-import mqtt.packets.mqttv5.MQTT5Properties
+import io.github.davidepianca98.mqtt.packets.Qos
+import io.github.davidepianca98.mqtt.packets.mqttv5.MQTT5Properties
 import org.junit.Test
 import org.owntracks.android.R
 import org.owntracks.android.model.Parser
@@ -26,6 +22,10 @@ import org.owntracks.android.testutils.string
 import org.owntracks.android.testutils.use
 import org.owntracks.android.ui.contacts.ContactsActivity
 import timber.log.Timber
+import java.time.Instant
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
+import kotlin.random.Random
 
 @OptIn(ExperimentalUnsignedTypes::class)
 @LargeTest
@@ -36,17 +36,17 @@ class ContactsActivityTests :
 
   @Test
   fun initial_regions_activity_is_empty() {
-    setupTestActivity({
+    setupTestActivity {
       configureMQTTConnectionToLocalWithGeneratedPassword(saveConfigurationIdlingResource)
-    })
+    }
     assertDisplayed(R.string.contactsListPlaceholder)
   }
 
   @Test
   fun contact_appears_when_broker_adds_a_card_message() {
-    setupTestActivity({
+    setupTestActivity {
       configureMQTTConnectionToLocalWithGeneratedPassword(saveConfigurationIdlingResource)
-    })
+    }
     val contactName = "TestName"
     (baristaRule.activityTestRule.activity as ContactsActivity)
         .contactsCountingIdlingResource
@@ -68,9 +68,9 @@ class ContactsActivityTests :
 
   @Test
   fun contact_appears_when_broker_adds_a_card_message_with_an_invalid_face_base64() {
-    setupTestActivity({
+    setupTestActivity {
       configureMQTTConnectionToLocalWithGeneratedPassword(saveConfigurationIdlingResource)
-    })
+    }
     val contactName = "TestName"
     (baristaRule.activityTestRule.activity as ContactsActivity)
         .contactsCountingIdlingResource
@@ -93,9 +93,9 @@ class ContactsActivityTests :
   @OptIn(ExperimentalEncodingApi::class)
   @Test
   fun contact_appears_when_broker_adds_a_card_message_with_an_invalid_face_image() {
-    setupTestActivity({
+    setupTestActivity {
       configureMQTTConnectionToLocalWithGeneratedPassword(saveConfigurationIdlingResource)
-    })
+    }
     val contactName = "TestName"
     (baristaRule.activityTestRule.activity as ContactsActivity)
         .contactsCountingIdlingResource
@@ -117,9 +117,9 @@ class ContactsActivityTests :
 
   @Test
   fun contact_appears_when_broker_adds_a_card_message_and_a_location_message() {
-    setupTestActivity({
+    setupTestActivity {
       configureMQTTConnectionToLocalWithGeneratedPassword(saveConfigurationIdlingResource)
-    })
+    }
 
     val contactName = "TestName"
     val messages =
@@ -152,9 +152,9 @@ class ContactsActivityTests :
 
   @Test
   fun contact_appears_when_broker_adds_a_location_message() {
-    setupTestActivity({
+    setupTestActivity {
       configureMQTTConnectionToLocalWithGeneratedPassword(saveConfigurationIdlingResource)
-    })
+    }
     (baristaRule.activityTestRule.activity as ContactsActivity)
         .contactsCountingIdlingResource
         .increment()
@@ -178,9 +178,9 @@ class ContactsActivityTests :
 
   @Test
   fun multiple_contacts_displayed_in_time_stamp_order() {
-    setupTestActivity({
+    setupTestActivity {
       configureMQTTConnectionToLocalWithGeneratedPassword(saveConfigurationIdlingResource)
-    })
+    }
 
     val baseTimeStamp = Instant.ofEpochSecond(1695137000)
 
@@ -238,9 +238,9 @@ class ContactsActivityTests :
 
   @Test
   fun contact_removed_when_clear_message_is_sent() {
-    setupTestActivity({
+    setupTestActivity {
       configureMQTTConnectionToLocalWithGeneratedPassword(saveConfigurationIdlingResource)
-    })
+    }
     (baristaRule.activityTestRule.activity as ContactsActivity)
         .contactsCountingIdlingResource
         .increment()

@@ -5,8 +5,6 @@ import java.io.InputStream
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.serialization.SerializationException
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.modules.SerializersModule
@@ -30,12 +28,15 @@ import org.owntracks.android.model.messages.MessageWaypoint
 import org.owntracks.android.model.messages.MessageWaypointCollectionSerializer
 import org.owntracks.android.model.messages.MessageWaypoints
 import timber.log.Timber
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
+@OptIn(ExperimentalTime::class)
 @Singleton
 class Parser @Inject constructor(private val encryptionProvider: EncryptionProvider?) {
   private val serializersModule = SerializersModule {
     contextual(MessageWaypointCollectionSerializer)
-    contextual(kotlinx.datetime.Instant::class, InstantEpochSecondsSerializer)
+    contextual(Instant::class, InstantEpochSecondsSerializer)
     polymorphic(MessageBase::class) {
       subclass(MessageCard::class)
       subclass(MessageClear::class)
@@ -211,7 +212,5 @@ class Parser @Inject constructor(private val encryptionProvider: EncryptionProvi
   }
 
   class EncryptionException internal constructor(s: String, cause: Throwable?) :
-      Exception(s, cause) {
-    constructor(s: String) : this(s, null)
-  }
+      Exception(s, cause)
 }

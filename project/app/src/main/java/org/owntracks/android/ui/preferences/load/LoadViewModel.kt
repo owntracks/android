@@ -42,13 +42,13 @@ import timber.log.Timber
 class LoadViewModel
 @Inject
 constructor(
-    private val preferences: Preferences,
-    private val parser: Parser,
-    private val waypointsRepo: WaypointsRepo,
-    @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    @Named("saveConfigurationIdlingResource")
+  private val preferences: Preferences,
+  private val parser: Parser,
+  private val waypointsRepo: WaypointsRepo,
+  @param:CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+  @param:Named("saveConfigurationIdlingResource")
     private val saveConfigurationIdlingResource: SimpleIdlingResource,
-    @ApplicationContext private val context: Context
+  @param:ApplicationContext private val context: Context
 ) : ViewModel() {
   private var configuration: MessageConfiguration? = null
 
@@ -239,7 +239,7 @@ constructor(
                                           response)))
                               return
                             }
-                            setConfiguration(responseBody?.string() ?: "")
+                            setConfiguration(responseBody.string())
                           }
                         } catch (e: EncryptionException) {
                           configurationImportFailed(e)

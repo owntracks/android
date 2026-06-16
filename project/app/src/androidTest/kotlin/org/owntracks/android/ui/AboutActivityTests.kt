@@ -11,7 +11,7 @@ import androidx.test.filters.SmallTest
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import dagger.hilt.android.testing.HiltAndroidTest
-import org.hamcrest.CoreMatchers.allOf
+import org.hamcrest.Matchers.allOf
 import org.junit.Test
 import org.owntracks.android.R
 import org.owntracks.android.testutils.TestWithAnActivity

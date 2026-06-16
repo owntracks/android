@@ -2,19 +2,21 @@
 
 package org.owntracks.android.model.messages
 
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import org.owntracks.android.preferences.Preferences
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 @Serializable
 @SerialName(MessageWaypoint.TYPE)
 class MessageWaypoint(@Transient private val messageWithId: MessageWithId = MessageWithRandomId()) :
     MessageBase(), MessageWithId {
-  @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.ALWAYS)
+  @EncodeDefault(EncodeDefault.Mode.ALWAYS)
   @SerialName("_id")
   override var messageId: MessageId = messageWithId.messageId
   @SerialName("desc") var description: String? = null

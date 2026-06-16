@@ -10,8 +10,10 @@ import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
-import com.adevinta.android.barista.interaction.BaristaSleepInteractions.sleep
 import dagger.hilt.android.testing.HiltAndroidTest
+import io.github.davidepianca98.mqtt.broker.Broker
+import io.github.davidepianca98.mqtt.broker.interfaces.Authentication
+import io.github.davidepianca98.socket.tls.TLSSettings
 import java.net.ConnectException
 import java.net.InetSocketAddress
 import java.net.Socket
@@ -20,12 +22,9 @@ import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.seconds
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
-import mqtt.broker.Broker
-import mqtt.broker.interfaces.Authentication
 import org.junit.Test
 import org.owntracks.android.R
 import org.owntracks.android.preferences.Preferences
@@ -36,7 +35,7 @@ import org.owntracks.android.testutils.use
 import org.owntracks.android.testutils.waitUntilViewContains
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import org.owntracks.android.ui.status.StatusActivity
-import socket.tls.TLSSettings
+
 import timber.log.Timber
 
 @OptIn(ExperimentalEncodingApi::class)
@@ -193,14 +192,15 @@ private fun getBroker(
         authentication =
             object : Authentication {
               override fun authenticate(
-                  clientId: String,
-                  givenUsername: String?,
-                  givenPassword: UByteArray?
+                clientId: String,
+                givenUsername: String?,
+                givenPassword: UByteArray?
               ): Boolean {
                 return givenUsername == username &&
                     givenPassword.contentEquals(password.toByteArray().toUByteArray())
               }
-            })
+            }
+    )
 
 @ExperimentalEncodingApi
 private fun encodeConfig(config: Map<String, Any>): String {

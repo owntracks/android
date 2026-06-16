@@ -5,11 +5,13 @@ import android.location.Address
 import java.math.BigDecimal
 import java.util.Locale
 import kotlin.time.Duration.Companion.minutes
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
+import kotlin.time.Clock
+import kotlin.time.Instant
 import org.owntracks.android.location.LatLng
 import timber.log.Timber
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 class DeviceGeocoder internal constructor(context: Context) : CachingGeocoder() {
   private val geocoder: android.location.Geocoder =
       android.location.Geocoder(context, Locale.getDefault())

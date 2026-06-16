@@ -10,11 +10,13 @@ import android.content.Intent
 import androidx.core.content.getSystemService
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.milliseconds
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import org.eclipse.paho.client.mqttv3.MqttPingSender
 import org.eclipse.paho.client.mqttv3.internal.ClientComms
 import timber.log.Timber
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 class AlarmPingSender(private val applicationContext: Context) : MqttPingSender {
   private val alarmManager: AlarmManager = applicationContext.getSystemService()!!
   private lateinit var comms: ClientComms

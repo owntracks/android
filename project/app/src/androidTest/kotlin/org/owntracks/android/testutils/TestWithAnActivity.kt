@@ -20,7 +20,7 @@ import java.lang.reflect.ParameterizedType
 import javax.inject.Inject
 import javax.inject.Named
 import kotlin.time.Duration.Companion.seconds
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 import leakcanary.DetectLeaksAfterTestSuccess
 import leakcanary.LeakCanary
 import org.junit.After
@@ -42,7 +42,9 @@ import org.owntracks.android.ui.map.MapActivity
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import shark.AndroidReferenceMatchers
 import timber.log.Timber
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 abstract class TestWithAnActivity<T : Activity>(private val startActivity: Boolean = true) :
     TestWithCoverageEnabled() {
   @Suppress("UNCHECKED_CAST")
