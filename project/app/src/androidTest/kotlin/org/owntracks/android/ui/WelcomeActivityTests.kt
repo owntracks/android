@@ -4,12 +4,16 @@ import android.Manifest
 import androidx.test.espresso.Espresso.pressBack
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
+import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.PermissionGranter.allowPermissionsIfNeeded
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Assert.assertTrue
+import org.junit.Assume
 import org.junit.Test
 import org.owntracks.android.R
 import org.owntracks.android.testutils.TestWithAnActivity
@@ -165,6 +169,15 @@ class WelcomeActivityTests : TestWithAnActivity<WelcomeActivity>() {
   @Test
   @SdkSuppress(minSdkVersion = 24, maxSdkVersion = 33)
   fun welcome_activity_displays_correct_fragments() {
+    // On AOSP images without GMS, PlayFragment blocks navigation and the Done fragment is
+    // unreachable. Skip rather than fail on such devices.
+    Assume.assumeTrue(
+        "Google Play Services not available",
+        GoogleApiAvailability.getInstance()
+            .isGooglePlayServicesAvailable(
+                InstrumentationRegistry.getInstrumentation().targetContext) ==
+            ConnectionResult.SUCCESS)
+
     // Intro fragment
     assertDisplayed(R.string.welcome_heading)
     R.id.btn_next.run {

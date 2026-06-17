@@ -44,6 +44,10 @@ small-espresso:
 single-espresso:
     {{gradlec}} clean createGmsDebugCoverageReport -Pandroid.testInstrumentationRunnerArguments.annotation=org.owntracks.android.testutils.JustThisTestPlease
 
+[group('testing')]
+managed-device-test:
+    {{gradlec}} app:phoneAtdGmsDebugAndroidTest
+
 [group('formatting')]
 ktfmt:
     {{gradlec}} ktfmtFormat

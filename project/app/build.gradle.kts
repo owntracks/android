@@ -157,8 +157,24 @@ android {
     animationsDisabled = true
     unitTests { isIncludeAndroidResources = true }
     managedDevices {
-      localDevices {}
-      groups {}
+      val pixel2api27 =
+          localDevices.create("pixel2api27") {
+            device = "Pixel 2"
+            apiLevel = 27
+            systemImageSource = "aosp"
+          }
+      val pixel8api34 =
+          localDevices.create("pixel8api34") {
+            device = "Pixel 8"
+            apiLevel = 34
+            systemImageSource = "google-atd"
+          }
+      groups {
+        create("phoneAtd") {
+          targetDevices.add(pixel2api27)
+          targetDevices.add(pixel8api34)
+        }
+      }
     }
   }
 
@@ -211,6 +227,8 @@ tasks.withType<Test> {
 }
 
 tasks.withType<JavaCompile>().configureEach { options.isFork = true }
+
+tasks.matching { it.name.endsWith("AndroidTest") }.configureEach { outputs.upToDateWhen { false } }
 
 dependencies {
   implementation(libs.bundles.kotlin)
