@@ -41,6 +41,12 @@
             app:key="pegLocatorFastestIntervalToInterval"
             app:summary="@string/preferencesPegLocatorFastestIntervalToIntervalSummary"
             app:title="@string/preferencesPegLocatorFastestIntervalToInterval" />
+        <androidx.preference.SwitchPreferenceCompat
+            app:iconSpaceReserved="false"
+            app:key="useGnss"
+            app:persistent="false"
+            app:summary="@string/preferencesGnssInSignificantModeSummary"
+            app:title="@string/preferencesGnssInSignificantMode" />
     </androidx.preference.PreferenceCategory>
     <androidx.preference.PreferenceCategory
         app:iconSpaceReserved="false"

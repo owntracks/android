@@ -18,7 +18,7 @@ class ExportedLogContentProvider : ContentProvider() {
 
   private fun logForUri(uri: Uri): ByteArray? =
       Timber.forest()
-          .filterIsInstance(TimberInMemoryLogTree::class.java)
+          .filterIsInstance<TimberInMemoryLogTree>()
           .firstOrNull()
           ?.logLines()
           ?.filter {

@@ -21,10 +21,10 @@ import org.owntracks.android.test.ThresholdIdlingResourceInterface
 class WaypointsViewModel
 @Inject
 constructor(
-    private val waypointsRepo: WaypointsRepo,
-    private val locationProcessor: LocationProcessor,
-    @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    @Named("waypointsEventCountingIdlingResource")
+  private val waypointsRepo: WaypointsRepo,
+  private val locationProcessor: LocationProcessor,
+  @param:CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+  @param:Named("waypointsEventCountingIdlingResource")
     private val waypointsEventCountingIdlingResource: ThresholdIdlingResourceInterface
 ) : ViewModel() {
 

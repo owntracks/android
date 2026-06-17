@@ -730,7 +730,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
     fun logPowerState(action: String) {
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
         Timber.d(
-            "triggeringAction=$action " +
+            "%snull", "triggeringAction=$action " +
                 "isPowerSaveMode=${powerManager.isPowerSaveMode} " +
                 "locationPowerSaveMode=${powerManager.locationPowerSaveMode} " +
                 "isDeviceIdleMode=${powerManager.isDeviceIdleMode} " +
@@ -739,8 +739,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
                 } else {
                   ""
                 } +
-                "isInteractive=${powerManager.isInteractive} " +
-                "isIgnoringBatteryOptimizations=${powerManager.isIgnoringBatteryOptimizations(applicationContext.packageName)}")
+                "isInteractive=${powerManager.isInteractive} ")
       }
     }
   }

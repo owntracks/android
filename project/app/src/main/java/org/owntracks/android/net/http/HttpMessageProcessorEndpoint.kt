@@ -38,14 +38,14 @@ import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
 import timber.log.Timber
 
 class HttpMessageProcessorEndpoint(
-    messageProcessor: MessageProcessor,
-    private val parser: Parser,
-    private val preferences: Preferences,
-    private val applicationContext: Context,
-    private val endpointStateRepo: EndpointStateRepo,
-    private val caKeyStore: KeyStore,
-    @ApplicationScope private val scope: CoroutineScope,
-    @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher
+  messageProcessor: MessageProcessor,
+  private val parser: Parser,
+  private val preferences: Preferences,
+  private val applicationContext: Context,
+  private val endpointStateRepo: EndpointStateRepo,
+  private val caKeyStore: KeyStore,
+  @param:ApplicationScope private val scope: CoroutineScope,
+  @param:CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ) : MessageProcessorEndpoint(messageProcessor), Preferences.OnPreferenceChangeListener {
   override val modeId: ConnectionMode = ConnectionMode.HTTP
   internal var httpClientAndConfiguration: HttpClientAndConfiguration? = null
@@ -132,44 +132,35 @@ class HttpMessageProcessorEndpoint(
             messageProcessor.onMessageDeliveryFailed(message)
             Result.failure(OutgoingMessageSendingException(httpException))
           } else {
-            if (response.body != null) {
-              try {
-                val responseString = response.body!!.string()
-                Timber.d("HTTP response body: ${responseString.take(1000)}")
-                val responseStream = ByteArrayInputStream(responseString.toByteArray())
-                val result = parser.fromJson(responseStream)
-                // TODO apply i18n here
-                scope.launch {
-                  endpointStateRepo.setState(
-                      EndpointState.IDLE.withMessage(
-                          String.format(
-                              Locale.ROOT,
-                              "Response %d, (%d msgs received)",
-                              response.code,
-                              result.size,
-                          ),
-                      ),
-                  )
-                  result.forEach { onMessageReceived(it) }
-                }
-                return Result.success(Unit)
-              } catch (e: IOException) {
-                Timber.w(e, "HTTP response body could not be parsed, ignoring")
+            try {
+              val responseString = response.body.string()
+              Timber.d("HTTP response body: ${responseString.take(1000)}")
+              val responseStream = ByteArrayInputStream(responseString.toByteArray())
+              val result = parser.fromJson(responseStream)
+              // TODO apply i18n here
+              scope.launch {
                 endpointStateRepo.setState(
                     EndpointState.IDLE.withMessage(
                         String.format(
-                            Locale.ROOT, "Response %d (response not parseable)", response.code),
+                            Locale.ROOT,
+                            "Response %d, (%d msgs received)",
+                            response.code,
+                            result.size,
+                        ),
                     ),
                 )
-                return Result.success(Unit)
+                result.forEach { onMessageReceived(it) }
               }
-            } else {
+              return Result.success(Unit)
+            } catch (e: IOException) {
+              Timber.w(e, "HTTP response body could not be parsed, ignoring")
               endpointStateRepo.setState(
                   EndpointState.IDLE.withMessage(
-                      String.format(Locale.ROOT, "Response %d", response.code),
+                      String.format(
+                          Locale.ROOT, "Response %d (response not parseable)", response.code),
                   ),
               )
-              Result.success(Unit)
+              return Result.success(Unit)
             }
           }
         }

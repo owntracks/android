@@ -273,6 +273,8 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesParameters">"Parameters"</string>
     <string name="preferencesPegLocatorFastestIntervalToInterval">"Limit max locator frequency"</string>
     <string name="preferencesPegLocatorFastestIntervalToIntervalSummary">"Request that the location provider deliver updates no faster than the requested locator interval"</string>
+    <string name="preferencesGnssInSignificantMode">"Use GNSS in significant mode"</string>
+    <string name="preferencesGnssInSignificantModeSummary">"Request GPS-level accuracy in significant monitoring mode. Required for accurate location on Android 16 and later. Disable to save battery at the cost of accuracy."</string>
     <string name="preferencesPort">"Port"</string>
     <string name="preferencesPortValidationError">"Port must be a number between 1 and 65535"</string>
     <string name="preferencesProfileId">"Mode"</string>
