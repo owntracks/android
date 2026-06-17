@@ -14,7 +14,7 @@ import org.hamcrest.Matchers
  * @property desiredState
  * @constructor Create empty Bottom sheet set state action
  */
-class BottomSheetSetStateAction(@BottomSheetBehavior.State private val desiredState: Int) :
+class BottomSheetSetStateAction(@param:BottomSheetBehavior.State private val desiredState: Int) :
     ViewAction {
 
   override fun getConstraints(): Matcher<View> {
