@@ -36,10 +36,10 @@ import timber.log.Timber
 class RoomWaypointsRepo
 @Inject
 constructor(
-    @ApplicationContext private val applicationContext: Context,
-    @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    @ApplicationScope private val scope: CoroutineScope,
-    @Named("waypointsMigrationIdlingResource")
+  @param:ApplicationContext private val applicationContext: Context,
+  @param:CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+  @param:ApplicationScope private val scope: CoroutineScope,
+  @param:Named("waypointsMigrationIdlingResource")
     private val migrationIdlingResource: SimpleIdlingResource
 ) : WaypointsRepo(applicationContext, migrationIdlingResource) {
   @Dao
