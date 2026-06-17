@@ -216,7 +216,7 @@ internal constructor(
         this.binding.osmMapView.apply {
           minZoomLevel = MIN_ZOOM_LEVEL
           maxZoomLevel = MAX_ZOOM_LEVEL
-          viewModel.mapLayerStyle.value?.run { setMapLayerType(this) }
+          viewModel.mapLayerStyle.value.run { setMapLayerType(this) }
           zoomController.setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT)
           addMapListener(mapListener)
           zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)

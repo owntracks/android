@@ -28,9 +28,9 @@ import timber.log.Timber
 class SharedPreferencesStore
 @Inject
 constructor(
-    @ApplicationContext private val context: Context,
-    private val notificationManager: NotificationManagerCompat,
-    private val notificationStash: NotificationsStash
+  @param:ApplicationContext private val context: Context,
+  private val notificationManager: NotificationManagerCompat,
+  private val notificationStash: NotificationsStash
 ) : PreferencesStore() {
 
   private val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
@@ -53,16 +53,17 @@ constructor(
 
     if (shouldNotify) {
       // Delete local files
-      setOf("tlsClientCrt", "tlsCaCrt").forEach {
+      setOf("tlsClientCrt", "tlsCaCrt").forEach { preference ->
         sharedPreferences
-            .getString(it, "")
+            .getString(preference, "")
             .also { Timber.i("Deleting legacy cert from app storage: $it") }
             .run(context::deleteFile)
       }
       // Notify user
       NotificationCompat.Builder(context, GeocoderProvider.ERROR_NOTIFICATION_CHANNEL_ID)
           .setContentTitle(
-              context.getString(R.string.certificateMigrationRequiredNotificationTitle))
+              context.getString(R.string.certificateMigrationRequiredNotificationTitle),
+          )
           .setAutoCancel(true)
           .setSmallIcon(R.drawable.ic_owntracks_80)
           .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -75,16 +76,21 @@ constructor(
                   Intent(context, PreferencesActivity::class.java)
                       .addFlags(FLAG_ACTIVITY_NEW_TASK)
                       .putExtra(START_FRAGMENT_KEY, ConnectionFragment::class.java.name),
-                  PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT))
+                  PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+              ),
+          )
           .setStyle(
               NotificationCompat.BigTextStyle()
                   .bigText(
-                      context.getString(R.string.certificateMigrationRequiredNotificationText)))
+                      context.getString(R.string.certificateMigrationRequiredNotificationText),
+                  ),
+          )
           .setSilent(true)
           .build()
           .run {
             if (ActivityCompat.checkSelfPermission(
-                context, Manifest.permission.POST_NOTIFICATIONS) ==
+                  context, Manifest.permission.POST_NOTIFICATIONS,
+              ) ==
                 PackageManager.PERMISSION_GRANTED) {
               notificationManager.notify("CertificateManagementNotification", 0, this).also {
                 Timber.d("Notifying user of certificate migration")
@@ -92,7 +98,8 @@ constructor(
             } else {
               notificationStash.add(this).also {
                 Timber.d(
-                    "Notifying user of certificate migration: delaying until user grants notification permissions")
+                    "Notifying user of certificate migration: delaying until user grants notification permissions",
+                )
               }
             }
           }
@@ -105,7 +112,8 @@ constructor(
   private fun migrateToSingleSharedPreferences() {
     val oldSharedPreferenceNames =
         listOf(
-            "org.owntracks.android.preferences.private", "org.owntracks.android.preferences.http")
+            "org.owntracks.android.preferences.private", "org.owntracks.android.preferences.http",
+        )
     with(sharedPreferences.edit()) {
       if (sharedPreferences.contains("setupNotCompleted")) {
         val oldValue = sharedPreferences.getBoolean("setupNotCompleted", true)
@@ -135,7 +143,7 @@ constructor(
           /* Running edit / clear / apply will actually create the preference file, which we don't want to do
           if they didn't exist in the first place */
           oldSharedPreferenceNames.forEach {
-            context.getSharedPreferences(it, Context.MODE_PRIVATE).edit().clear().apply()
+            context.getSharedPreferences(it, Context.MODE_PRIVATE).edit { clear() }
           }
         }
         oldSharedPreferenceNames.forEach {
@@ -154,7 +162,7 @@ constructor(
       sharedPreferences.run {
         if (contains(key) && getString(key, "") == value) false
         else {
-          edit().putString(key, value).apply()
+          edit {putString(key, value).apply()}
           true
         }
       }
@@ -162,7 +170,7 @@ constructor(
   override fun getString(key: String, default: String): String? =
       sharedPreferences.getString(key, default)
 
-  override fun remove(key: String) = sharedPreferences.edit().remove(key).apply()
+  override fun remove(key: String) = sharedPreferences.edit { remove(key) }
 
   override fun getBoolean(key: String, default: Boolean): Boolean =
       sharedPreferences.getBoolean(key, default)
@@ -173,7 +181,7 @@ constructor(
       sharedPreferences.run {
         if (contains(key) && getBoolean(key, false) == value) false
         else {
-          edit().putBoolean(key, value).apply()
+          edit {putBoolean(key, value).apply()}
           true
         }
       }
@@ -184,7 +192,7 @@ constructor(
       sharedPreferences.run {
         if (contains(key) && getFloat(key, Float.MIN_VALUE) == value) false
         else {
-          edit().putFloat(key, value).apply()
+          edit { putFloat(key, value).apply() }
           true
         }
       }
@@ -196,7 +204,7 @@ constructor(
       sharedPreferences.run {
         if (contains(key) && getInt(key, Int.MIN_VALUE) == value) false
         else {
-          edit().putInt(key, value).apply()
+          edit { putInt(key, value).apply() }
           true
         }
       }
@@ -205,7 +213,7 @@ constructor(
       sharedPreferences.run {
         if (contains(key) && getStringSet(key, emptySet()) == values) false
         else {
-          edit().putStringSet(key, values).apply()
+          edit { putStringSet(key, values).apply() }
           true
         }
       }

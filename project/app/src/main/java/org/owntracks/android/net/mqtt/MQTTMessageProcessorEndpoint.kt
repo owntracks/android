@@ -64,16 +64,16 @@ import org.owntracks.android.test.SimpleIdlingResource
 import timber.log.Timber
 
 class MQTTMessageProcessorEndpoint(
-    messageProcessor: MessageProcessor,
-    private val endpointStateRepo: EndpointStateRepo,
-    private val scheduler: Scheduler,
-    private val preferences: Preferences,
-    private val parser: Parser,
-    private val caKeyStore: KeyStore,
-    @ApplicationScope private val scope: CoroutineScope,
-    @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    @ApplicationContext private val applicationContext: Context,
-    private val mqttConnectionIdlingResource: SimpleIdlingResource
+  messageProcessor: MessageProcessor,
+  private val endpointStateRepo: EndpointStateRepo,
+  private val scheduler: Scheduler,
+  private val preferences: Preferences,
+  private val parser: Parser,
+  private val caKeyStore: KeyStore,
+  @param:ApplicationScope private val scope: CoroutineScope,
+  @param:CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+  @param:ApplicationContext private val applicationContext: Context,
+  private val mqttConnectionIdlingResource: SimpleIdlingResource
 ) :
     MessageProcessorEndpoint(messageProcessor),
     StatefulServiceMessageProcessor,
@@ -167,7 +167,7 @@ class MQTTMessageProcessorEndpoint(
               try {
                 pingAlarmReceiver?.run(applicationContext::unregisterReceiver)
                 Timber.d("Unregistered ping alarm receiver")
-              } catch (e: IllegalArgumentException) {
+              } catch (_: IllegalArgumentException) {
                 Timber.d("Ping alarm receiver already unregistered")
               }
             }
@@ -316,9 +316,9 @@ class MQTTMessageProcessorEndpoint(
                         this.qos = message.qos
                       }
                       .also { Timber.d("Parsed message: $it") })
-            } catch (e: Parser.EncryptionException) {
+            } catch (_: Parser.EncryptionException) {
               Timber.e("Unable to decrypt received message ${message.id} on $topic")
-            } catch (e: SerializationException) {
+            } catch (_: SerializationException) {
               Timber.w("Malformed JSON message received ${message.id} on $topic")
             }
           }
