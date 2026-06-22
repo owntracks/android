@@ -60,28 +60,28 @@ import timber.log.Timber
 class MessageProcessor
 @Inject
 constructor(
-    @ApplicationContext private val applicationContext: Context,
-    private val contactsRepo: ContactsRepo,
-    private val preferences: Preferences,
-    private val waypointsRepo: WaypointsRepo,
-    private val parser: Parser,
-    private val scheduler: Scheduler,
-    private val endpointStateRepo: EndpointStateRepo,
-    @Named("outgoingQueueIdlingResource")
+  @param:ApplicationContext private val applicationContext: Context,
+  private val contactsRepo: ContactsRepo,
+  private val preferences: Preferences,
+  private val waypointsRepo: WaypointsRepo,
+  private val parser: Parser,
+  private val scheduler: Scheduler,
+  private val endpointStateRepo: EndpointStateRepo,
+  @param:Named("outgoingQueueIdlingResource")
     private val outgoingQueueIdlingResource: ThresholdIdlingResourceInterface,
-    @Named("importConfigurationIdlingResource")
+  @param:Named("importConfigurationIdlingResource")
     private val importConfigurationIdlingResource: SimpleIdlingResource,
-    @Named("messageReceivedIdlingResource")
+  @param:Named("messageReceivedIdlingResource")
     private val messageReceivedIdlingResource: IdlingResourceWithData<MessageBase>,
-    @Named("CAKeyStore") private val caKeyStore: KeyStore,
-    private val locationProcessorLazy: Lazy<LocationProcessor>,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    @ApplicationScope private val scope: CoroutineScope,
-    @Named("mqttConnectionIdlingResource")
+  @param:Named("CAKeyStore") private val caKeyStore: KeyStore,
+  private val locationProcessorLazy: Lazy<LocationProcessor>,
+  @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+  @param:ApplicationScope private val scope: CoroutineScope,
+  @param:Named("mqttConnectionIdlingResource")
     private val mqttConnectionIdlingResource: SimpleIdlingResource,
-    private val outgoingQueue: RoomBackedMessageQueue
+  private val outgoingQueue: RoomBackedMessageQueue
 ) : Preferences.OnPreferenceChangeListener {
-  private var endpoint: MessageProcessorEndpoint? = null
+  private var messageProcessorEndpoint: MessageProcessorEndpoint? = null
   private val queueInitJob: Job =
       scope.launch(ioDispatcher) {
         outgoingQueue.initialize(applicationContext.filesDir)
@@ -139,13 +139,13 @@ constructor(
   suspend fun reconnect(): Result<Unit> {
     Timber.v("reconnect")
     return try {
-      when (endpoint) {
+      when (messageProcessorEndpoint) {
         null -> {
           loadOutgoingMessageProcessor() // The processor should take care of the reconnect on init
           Result.success(Unit)
         }
         is MQTTMessageProcessorEndpoint -> {
-          (endpoint as MQTTMessageProcessorEndpoint).reconnect()
+          (messageProcessorEndpoint as MQTTMessageProcessorEndpoint).reconnect()
         }
         else -> {
           Result.success(Unit)
@@ -159,11 +159,11 @@ constructor(
   val isEndpointReady: Boolean
     get() {
       try {
-        if (endpoint != null) {
-          endpoint!!.getEndpointConfiguration()
+        if (messageProcessorEndpoint != null) {
+          messageProcessorEndpoint!!.getEndpointConfiguration()
           return true
         }
-      } catch (e: ConfigurationIncompleteException) {
+      } catch (_: ConfigurationIncompleteException) {
         return false
       }
       return false
@@ -172,12 +172,12 @@ constructor(
   private fun loadOutgoingMessageProcessor() {
     runBlocking { queueInitJob.join() }
     Timber.d("Reloading outgoing message processor")
-    endpoint?.deactivate().also { Timber.d("Destroying previous endpoint") }
-    endpoint = getEndpoint(preferences.mode)
+    messageProcessorEndpoint?.deactivate().also { Timber.d("Destroying previous endpoint") }
+    messageProcessorEndpoint = getEndpoint(preferences.mode)
 
     dequeueAndSenderJob =
         scope.launch(ioDispatcher) {
-          endpoint?.activate()
+          messageProcessorEndpoint?.activate()
           sendAvailableMessages()
         }
   }
@@ -268,7 +268,7 @@ constructor(
             }
             // Let's try to send the message
             try {
-              endpoint.let {
+              messageProcessorEndpoint.let { it ->
                 if (it == null) {
                   Timber.d("Endpoint not ready yet. Re-queueing")
                   reQueueMessage(message)
@@ -364,7 +364,7 @@ constructor(
    * Launches a delay job, and then blocks waiting for it to either finish or be cancelled
    *
    * @param waitFor how long to wait for
-   * @return whether or not the wait job was cancelled
+   * @return whether the wait job was cancelled
    */
   private suspend fun resendDelayWait(waitFor: Duration): Boolean =
       scope

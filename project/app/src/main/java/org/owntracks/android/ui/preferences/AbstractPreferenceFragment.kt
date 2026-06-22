@@ -1,6 +1,10 @@
 package org.owntracks.android.ui.preferences
 
 import android.os.Bundle
+import android.view.View
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.preference.PreferenceFragmentCompat
 import javax.inject.Inject
 import org.owntracks.android.R
@@ -15,6 +19,16 @@ abstract class AbstractPreferenceFragment : PreferenceFragmentCompat() {
 
   override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
     preferenceManager.preferenceDataStore = preferenceDataStore
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    ViewCompat.setOnApplyWindowInsetsListener(listView) { v, insets ->
+      val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+      v.updatePadding(bottom = systemBarsInsets.bottom)
+      insets
+    }
+    ViewCompat.requestApplyInsets(view)
   }
 
   protected val connectionMode: String

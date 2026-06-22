@@ -3,7 +3,7 @@ package org.owntracks.android.ui.preferences.load
 import androidx.annotation.StringRes
 
 sealed class ConfigItem {
-  data class Header(@StringRes val labelRes: Int) : ConfigItem()
+  data class Header(@param:StringRes val labelRes: Int) : ConfigItem()
 
   /**
    * A preference key/value pair that is changing. [oldValue] is the current preference value, or
@@ -11,10 +11,10 @@ sealed class ConfigItem {
    * being loaded.
    */
   data class KeyValue(
-      val key: String,
-      val newValue: String,
-      val oldValue: String? = null,
-      @StringRes val labelRes: Int? = null,
+    val key: String,
+    val newValue: String,
+    val oldValue: String? = null,
+    @param:StringRes val labelRes: Int? = null,
   ) : ConfigItem()
 
   data class Waypoint(

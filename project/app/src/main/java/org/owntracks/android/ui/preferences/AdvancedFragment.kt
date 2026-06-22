@@ -6,6 +6,7 @@ import android.widget.TextView
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
+import org.owntracks.android.location.LocatorPriority
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -59,6 +60,15 @@ class AdvancedFragment @Inject constructor() :
     findPreference<Preference>("autostartWarning")?.isVisible =
         !requirementsChecker.hasBackgroundLocationPermission()
 
+    findPreference<SwitchPreferenceCompat>("useGnss")?.apply {
+      isChecked = preferences.locatorPriority == LocatorPriority.HighAccuracy
+      onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
+        preferences.locatorPriority =
+            if (newValue as Boolean) LocatorPriority.HighAccuracy else null
+        true
+      }
+    }
+
     findPreference<ListPreference>(Preferences::reverseGeocodeProvider.name)
         ?.onPreferenceChangeListener =
         Preference.OnPreferenceChangeListener { preference, newValue ->
@@ -93,6 +103,10 @@ class AdvancedFragment @Inject constructor() :
   override fun onPreferenceChanged(properties: Set<String>) {
     if (properties.contains(Preferences::reverseGeocodeProvider.name)) {
       setOpenCageAPIKeyPreferenceVisibility()
+    }
+    if (properties.contains(Preferences::locatorPriority.name)) {
+      findPreference<SwitchPreferenceCompat>("useGnss")?.isChecked =
+          preferences.locatorPriority == LocatorPriority.HighAccuracy
     }
   }
 }

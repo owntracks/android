@@ -34,8 +34,8 @@ import timber.log.Timber
 class Preferences
 @Inject
 constructor(
-    private val preferencesStore: PreferencesStore,
-    @Named("importConfigurationIdlingResource")
+  private val preferencesStore: PreferencesStore,
+  @param:Named("importConfigurationIdlingResource")
     private val importConfigurationIdlingResource: SimpleIdlingResource
 ) {
   val allConfigKeys =
@@ -111,7 +111,7 @@ constructor(
                 // preference is
                 // actually an enum
                 importPreference(it, configValue)
-              } catch (e: java.lang.IllegalArgumentException) {
+              } catch (_: java.lang.IllegalArgumentException) {
                 Timber.w(
                     "Trying to import wrong type of preference for ${it.name}. " +
                         "Expected ${it.getter.returnType} but given ${configValue.javaClass}. Ignoring.")
@@ -129,7 +129,7 @@ constructor(
               Timber.d("Importing configuration key $key -> $configValue")
               try {
                 importPreference(property, configValue)
-              } catch (e: java.lang.IllegalArgumentException) {
+              } catch (_: java.lang.IllegalArgumentException) {
                 Timber.w(
                     "Trying to import wrong type of preference for $key. " +
                         "Expected ${property.getter.returnType} but given ${configValue.javaClass}. Ignoring.")

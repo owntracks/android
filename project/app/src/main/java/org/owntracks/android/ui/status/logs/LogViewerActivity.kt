@@ -12,8 +12,10 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ShareCompat
 import androidx.core.net.toUri
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Lifecycle
@@ -57,9 +59,14 @@ class LogViewerActivity : AppCompatActivity() {
               setSupportActionBar(appbar.toolbar)
 
               // Handle window insets for edge-to-edge
+              val fabBaseMarginBottom =
+                  (shareFab.layoutParams as CoordinatorLayout.LayoutParams).bottomMargin
               ViewCompat.setOnApplyWindowInsetsListener(frame) { _, windowInsets ->
                 val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
                 appbar.root.updatePadding(top = insets.top)
+                shareFab.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+                  bottomMargin = fabBaseMarginBottom + insets.bottom
+                }
                 WindowInsetsCompat.CONSUMED
               }
             }

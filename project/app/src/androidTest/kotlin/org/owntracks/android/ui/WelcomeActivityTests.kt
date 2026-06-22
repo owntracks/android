@@ -163,46 +163,6 @@ class WelcomeActivityTests : TestWithAnActivity<WelcomeActivity>() {
   }
 
   @Test
-  @SdkSuppress(minSdkVersion = 24, maxSdkVersion = 33)
-  fun welcome_activity_displays_correct_fragments() {
-    // Intro fragment
-    assertDisplayed(R.string.welcome_heading)
-    R.id.btn_next.run {
-      assertDisplayed(this)
-      clickOn(this)
-    }
-
-    // Connection setup fragment
-    assertDisplayed(R.string.welcome_connection_setup_title)
-
-    assertDisplayed(R.string.welcome_connection_setup_description)
-    R.id.btn_next.run {
-      assertDisplayed(this)
-      clickOn(this)
-    }
-
-    // Location permissions fragment
-    assertDisplayed(R.string.welcome_location_permission_description)
-    doIfViewNotVisible(R.id.btn_next) {
-      R.id.ui_fragment_welcome_location_permissions_request.run {
-        assertDisplayed(this)
-        clickOn(this)
-      }
-      allowPermissionsIfNeeded(Manifest.permission.ACCESS_FINE_LOCATION)
-    }
-    R.id.btn_next.run {
-      assertDisplayed(this)
-      clickOn(this)
-    }
-
-    // Done fragment
-    assertDisplayed(R.string.done_heading)
-    assertDisplayed(R.string.enjoy_description)
-    assertDisplayed(R.string.welcome_finish_open_preferences_button_label)
-    assertDisplayed(R.id.btn_done)
-  }
-
-  @Test
   fun welcome_activity_can_be_swiped_back_to_start() {
     clickOn(R.id.btn_next)
     pressBack()

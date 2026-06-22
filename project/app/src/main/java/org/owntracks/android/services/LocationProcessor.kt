@@ -38,17 +38,17 @@ import timber.log.Timber
 class LocationProcessor
 @Inject
 constructor(
-    private val messageProcessor: MessageProcessor,
-    private val preferences: Preferences,
-    private val locationRepo: LocationRepo,
-    private val waypointsRepo: WaypointsRepo,
-    private val deviceMetricsProvider: DeviceMetricsProvider,
-    private val wifiInfoProvider: WifiInfoProvider,
-    @ApplicationScope private val scope: CoroutineScope,
-    @CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    @Named("publishResponseMessageIdlingResource")
+  private val messageProcessor: MessageProcessor,
+  private val preferences: Preferences,
+  private val locationRepo: LocationRepo,
+  private val waypointsRepo: WaypointsRepo,
+  private val deviceMetricsProvider: DeviceMetricsProvider,
+  private val wifiInfoProvider: WifiInfoProvider,
+  @param:ApplicationScope private val scope: CoroutineScope,
+  @param:CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+  @param:Named("publishResponseMessageIdlingResource")
     private val publishResponseMessageIdlingResource: SimpleIdlingResource,
-    @Named("mockLocationIdlingResource")
+  @param:Named("mockLocationIdlingResource")
     private val mockLocationIdlingResource: SimpleIdlingResource
 ) {
   private fun locationIsWithAccuracyThreshold(l: Location): Boolean =

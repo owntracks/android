@@ -39,9 +39,8 @@ class StartBackgroundServiceReceiver : BroadcastReceiver() {
           } catch (e: ForegroundServiceStartNotAllowedException) {
             Timber.e(
                 e,
-                "Unable to start foreground service, because Android has prevented it. " +
-                    "This should not happen if intent action is ${Intent.ACTION_MY_PACKAGE_REPLACED} or " +
-                    "${Intent.ACTION_BOOT_COMPLETED}. intent action was ${intent.action}")
+                "Unable to start foreground service, because Android has prevented it. This should not happen if intent action is ${Intent.ACTION_MY_PACKAGE_REPLACED} or ${Intent.ACTION_BOOT_COMPLETED}. intent action was ${intent.action}"
+                    )
           }
         } else {
           context.startForegroundService(startIntent)

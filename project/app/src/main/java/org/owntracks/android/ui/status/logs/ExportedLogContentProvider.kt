@@ -18,7 +18,7 @@ class ExportedLogContentProvider : ContentProvider() {
 
   private fun logForUri(uri: Uri): ByteArray? =
       Timber.forest()
-          .filterIsInstance(TimberInMemoryLogTree::class.java)
+          .filterIsInstance<TimberInMemoryLogTree>()
           .firstOrNull()
           ?.logLines()
           ?.filter {
@@ -44,7 +44,7 @@ class ExportedLogContentProvider : ContentProvider() {
   ): Cursor? =
       logForUri(uri)?.let {
         val m = MatrixCursor(arrayOf(OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE), 1)
-        m.addRow(arrayOf("owntracks-log.txt", it.size.toLong()))
+        m.addRow(arrayOf<Any>("owntracks-log.txt", it.size.toLong()))
         m
       }
 

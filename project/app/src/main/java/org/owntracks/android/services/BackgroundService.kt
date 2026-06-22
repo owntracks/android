@@ -536,7 +536,10 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
         MonitoringMode.Significant -> {
           interval = Duration.ofSeconds(preferences.locatorInterval.toLong())
           smallestDisplacement = preferences.locatorDisplacement.toFloat()
-          priority = preferences.locatorPriority ?: LocatorPriority.BalancedPowerAccuracy
+          priority = preferences.locatorPriority ?: if(Build.VERSION.SDK_INT>Build.VERSION_CODES.Q) {
+            LocatorPriority.BalancedPowerAccuracy}
+            else  {LocatorPriority.BalancedPowerAccuracy
+          }
         }
 
         MonitoringMode.Move -> {
@@ -739,8 +742,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
                 } else {
                   ""
                 } +
-                "isInteractive=${powerManager.isInteractive} " +
-                "isIgnoringBatteryOptimizations=${powerManager.isIgnoringBatteryOptimizations(applicationContext.packageName)}")
+                "isInteractive=${powerManager.isInteractive} isIgnoringBatteryOptimizations=${powerManager.isIgnoringBatteryOptimizations(applicationContext.packageName)}")
       }
     }
   }

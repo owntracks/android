@@ -25,7 +25,7 @@ import timber.log.Timber
 @Singleton
 class DeviceMetricsProvider
 @Inject
-internal constructor(@ApplicationContext private val context: Context) {
+internal constructor(@param:ApplicationContext private val context: Context) {
   val batteryLevel: Int?
     get() {
       return context
