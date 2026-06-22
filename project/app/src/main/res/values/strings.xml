@@ -180,6 +180,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesInfo">"MQTT info"</string>
     <string name="preferencesLocatorPriority">"Locator priority"</string>
     <string name="preferencesMapLayerStyle">"Map layer"</string>
+    <string name="preferencesMaxImplausibleSpeedKmh">"Maximum plausible speed"</string>
     <string name="preferencesMonitoring">"Monitoring mode"</string>
     <string name="preferencesMqttProtocolLevel">"MQTT protocol level"</string>
     <string name="preferencesNotificationHigherPriority">"High priority notification"</string>
