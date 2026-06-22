@@ -276,6 +276,10 @@ constructor(
 
   @Preference var mapLayerStyle: MapLayerStyle by preferencesStore
 
+  // Maximum plausible ground speed in km/h between consecutive published fixes. 0 disables the
+  // implausible-speed (teleport) filter.
+  @Preference var maxImplausibleSpeedKmh: Int by preferencesStore
+
   @Preference var mode: ConnectionMode by preferencesStore
 
   @Preference var monitoring: MonitoringMode by preferencesStore
