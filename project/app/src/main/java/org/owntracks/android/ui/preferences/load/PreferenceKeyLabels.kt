@@ -65,6 +65,8 @@ val PREFERENCE_KEY_LABELS: Map<String, Int> =
         "tlsClientCertInstall" to R.string.preferencesClientCrtInstall,
         "tlsClientCrt" to R.string.preferencesClientCrt,
         "url" to R.string.preferencesUrl,
+        "useGNSSInSignificantMonitoringMode" to
+            R.string.preferencesUseGNSSInSignificantMonitoringMode,
         "username" to R.string.preferencesUsername,
         "ws" to R.string.preferencesWebsocket,
     )

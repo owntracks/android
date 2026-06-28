@@ -536,10 +536,18 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
         MonitoringMode.Significant -> {
           interval = Duration.ofSeconds(preferences.locatorInterval.toLong())
           smallestDisplacement = preferences.locatorDisplacement.toFloat()
-          priority = preferences.locatorPriority ?: if(Build.VERSION.SDK_INT>Build.VERSION_CODES.Q) {
-            LocatorPriority.BalancedPowerAccuracy}
-            else  {LocatorPriority.BalancedPowerAccuracy
-          }
+          // QPR1 (where balanced-accuracy stopped using GNSS, per #2155) isn't separately
+          // detectable from the Android 16 GA release, so we gate on Android 16+ generally.
+          val useGnss =
+              Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA &&
+                  preferences.useGNSSInSignificantMonitoringMode
+          priority =
+              preferences.locatorPriority
+                  ?: if (useGnss) {
+                    LocatorPriority.HighAccuracy
+                  } else {
+                    LocatorPriority.BalancedPowerAccuracy
+                  }
         }
 
         MonitoringMode.Move -> {

@@ -73,5 +73,9 @@ mqtt-subscribe:
     mosquitto_sub -v -L mqtt://localhost/owntracks/# -u test -P test
 
 [group('device')]
+install: (gradle "app:assembleGmsDebug")
+    adb install -r project/app/build/outputs/apk/gms/debug/app-gms-debug.apk
+
+[group('device')]
 wipe-device:
     adb uninstall org.owntracks.android; adb uninstall org.owntracks.android.debug; adb uninstall androidx.test.orchestrator ; adb uninstall androidx.test.services; adb uninstall androidx.test.tools.crawler; adb uninstall androidx.test.tools.crawler.stubapp; echo "done"

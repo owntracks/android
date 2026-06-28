@@ -20,7 +20,7 @@ This release addresses a security advisory covering several intent-handling vuln
 - New **Remote Control** preferences screen showing the intent auth key (with a copy-to-clipboard button) for use with automation apps such as Tasker
 - Config import screen now shows a structured diff of what is changing, with human-readable preference names, highlighting new values alongside the current values — unchanged settings are summarised rather than listed in full
 - Waypoints in an imported config are listed individually in the import review screen
-- Preference setting to allow user to enable GNSS location source for Significant Monitoring mode (#2155)
+- Preference setting (Android 16 and later only) to allow user to enable GNSS location source for Significant Monitoring mode (#2155)
 
 ### Bug fixes
 
