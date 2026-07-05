@@ -43,6 +43,13 @@ class WaypointActivity : AppCompatActivity() {
     enableEdgeToEdge()
     super.onCreate(savedInstanceState)
 
+    // Loading an existing waypoint is async, so kick it off before the DataBinding layout below
+    // binds to the ViewModel - that way the very first bound state is already the "loading"
+    // placeholder, not a "new waypoint at the current location" default (#2130).
+    if (intent.hasExtra("waypointId")) {
+      viewModel.loadWaypoint(intent.getLongExtra("waypointId", 0))
+    }
+
     binding =
         DataBindingUtil.setContentView<UiWaypointBinding>(this, R.layout.ui_waypoint).apply {
           textFields = listOf(description, radius, latitude, longitude)
@@ -73,10 +80,15 @@ class WaypointActivity : AppCompatActivity() {
     }
 
     if (intent.hasExtra("waypointId")) {
-      viewModel.loadWaypoint(intent.getLongExtra("waypointId", 0))
       lifecycleScope.launch {
         repeatOnLifecycle(Lifecycle.State.STARTED) {
-          viewModel.waypoint.collect { setDeleteButtonEnabledStatus() }
+          launch { viewModel.waypoint.collect { setDeleteButtonEnabledStatus() } }
+          launch {
+            viewModel.isLoading.collect {
+              setSaveButtonEnabledStatus()
+              setDeleteButtonEnabledStatus()
+            }
+          }
         }
       }
     }
@@ -130,13 +142,15 @@ class WaypointActivity : AppCompatActivity() {
 
   private fun setSaveButtonEnabledStatus() =
       saveButton?.run {
-        isEnabled = !textFields.any { it.text.isNullOrBlank() || it.error != null }
+        isEnabled =
+            !viewModel.isLoading.value &&
+                !textFields.any { it.text.isNullOrBlank() || it.error != null }
         icon?.alpha = if (isEnabled) 255 else 130
       }
 
   private fun setDeleteButtonEnabledStatus() =
       deleteButton?.apply {
-        isEnabled = viewModel.canDeleteWaypoint()
+        isEnabled = !viewModel.isLoading.value && viewModel.canDeleteWaypoint()
         icon?.alpha = if (isEnabled) 255 else 130
       }
 }

@@ -17,9 +17,7 @@ class InMemoryWaypointsRepo(
         applicationContext, SimpleIdlingResource("waypointsMigrationIdlingResource", false)) {
   private val waypoints = mutableListOf<WaypointModel>()
 
-  override suspend fun get(id: Long): WaypointModel? {
-    TODO("Not yet implemented")
-  }
+  override suspend fun get(id: Long): WaypointModel? = waypoints.firstOrNull { it.id == id }
 
   override suspend fun getByTst(instant: Instant): WaypointModel? =
       waypoints.firstOrNull { it.tst == instant }

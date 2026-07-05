@@ -32,11 +32,24 @@ constructor(private val waypointsRepo: WaypointsRepo, locationRepo: LocationRepo
               geofenceRadius = 20))
   val waypoint: StateFlow<WaypointModel> = mutableWaypoint
 
+  private val mutableIsLoading = MutableStateFlow(false)
+  val isLoading: StateFlow<Boolean> = mutableIsLoading
+
+  /**
+   * Loading an existing waypoint is async (it comes from Room), so until it completes, the
+   * placeholder here deliberately does *not* carry the current device location: it only holds the
+   * real id, so nothing renders/saves a live GPS reading in place of the waypoint's real
+   * coordinates while the load is in flight (#2130). Callers must gate editing/saving on
+   * [isLoading].
+   */
   fun loadWaypoint(id: Long) {
+    mutableIsLoading.value = true
+    mutableWaypoint.value = WaypointModel(id = id)
     viewModelScope.launch {
       Timber.d("Loading waypoint $id")
       waypointsRepo.get(id)?.apply { mutableWaypoint.value = this }
-          ?: run { Timber.w("Waypoint $id not found in the repo") }
+          ?: Timber.w("Waypoint $id not found in the repo")
+      mutableIsLoading.value = false
     }
   }
 
