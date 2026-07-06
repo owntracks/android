@@ -30,6 +30,6 @@ class MonitoringModeBottomSheetDialog : BottomSheetDialogFragment() {
             dismiss()
           }
         }
-    return binding.root
+    return insetAwareMapBottomSheetContent(binding.root)
   }
 }

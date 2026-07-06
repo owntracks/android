@@ -13,6 +13,7 @@ import android.view.Surface
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.Insets
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.lifecycleScope
@@ -96,6 +97,7 @@ internal constructor(
       }
 
   private var mapView: MapView? = null
+  private var mapViewportPadding: Insets = Insets.NONE
 
   override fun onCreateView(
       inflater: LayoutInflater,
@@ -254,12 +256,10 @@ internal constructor(
             overlays.add(RotationGestureOverlayWithDeadZone(this))
           }
           if (!overlays.any { it is CopyrightOverlay }) {
-            overlays.add(CopyrightOverlay(context))
+            overlays.add(CopyrightOverlay(context).apply { setAlignBottom(true) })
           }
           if (!overlays.any { it is CompassOverlay } && preferences.enableMapRotation) {
             addMapListener(compassOrientationMapListener)
-
-            val compassMargin = 35f
 
             overlays.add(
                 ClickableCompassOverlay(
@@ -270,7 +270,6 @@ internal constructor(
                     .apply {
                       isPointerMode = false
                       enableCompass()
-                      setCompassCenter(compassMargin, compassMargin)
                     },
             )
           }
@@ -283,9 +282,33 @@ internal constructor(
           viewModel.initMapStartingLocation().run {
             controller.animateTo(latLng.toGeoPoint(), zoom, 0, rotation)
           }
+          applyMapViewportPadding()
         }
     setMapStyle()
     drawAllContactsAndRegions()
+  }
+
+  override fun setMapViewportPadding(insets: Insets) {
+    mapViewportPadding = insets
+    applyMapViewportPadding()
+  }
+
+  private fun applyMapViewportPadding() {
+    val padding = mapViewportPadding
+    mapView?.run {
+      setPadding(padding.left, padding.top, padding.right, padding.bottom)
+      overlays.filterIsInstance<CompassOverlay>().forEach {
+        val compassMargin = resources.displayMetrics.density * 35f
+        it.setCompassCenter(padding.left + compassMargin, padding.top + compassMargin)
+      }
+      overlays.filterIsInstance<CopyrightOverlay>().forEach {
+        val copyrightMargin = (resources.displayMetrics.density * 8).roundToInt()
+        it.setAlignBottom(true)
+        it.setAlignRight(false)
+        it.setOffset(padding.left + copyrightMargin, padding.bottom + copyrightMargin)
+      }
+      invalidate()
+    }
   }
 
   override fun updateCamera(latLng: LatLng) {
