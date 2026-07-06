@@ -33,22 +33,26 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.appcompat.widget.TooltipCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.graphics.Insets
 import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.setPadding
 import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import androidx.core.widget.ImageViewCompat
 import androidx.databinding.BindingAdapter
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
+import androidx.core.widget.NestedScrollView
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import java.time.Instant
@@ -81,6 +85,13 @@ import org.owntracks.android.ui.mixins.WorkManagerInitExceptionNotifier
 import org.owntracks.android.ui.welcome.WelcomeActivity
 import timber.log.Timber
 
+private data class Edges(
+    val left: Int = 0,
+    val top: Int = 0,
+    val right: Int = 0,
+    val bottom: Int = 0,
+)
+
 @AndroidEntryPoint
 class MapActivity :
     AppCompatActivity(),
@@ -107,7 +118,13 @@ class MapActivity :
       )
   private var service: BackgroundService? = null
   private var bottomSheetBehavior: BottomSheetBehavior<LinearLayoutCompat>? = null
-  private var navBarInset: Int = 0
+  private var systemBarInsets: Insets = Insets.NONE
+  private var mapViewportPadding: Insets = Insets.NONE
+  private var bottomSheetBasePeekHeight: Int = 0
+  private var bottomSheetBasePadding = Edges()
+  private var mapFragmentBaseMargins = Edges()
+  private var fabMapLayersBaseMargins = Edges()
+  private var fabMyLocationBaseMargins = Edges()
   private var menu: Menu? = null
   private var sensorManager: SensorManager? = null
   private var orientationSensor: Sensor? = null
@@ -180,29 +197,11 @@ class MapActivity :
 
           bottomSheetBehavior =
               BottomSheetBehavior.from(bottomSheetLayout).apply {
-                addBottomSheetCallback(
-                    object : BottomSheetBehavior.BottomSheetCallback() {
-                      override fun onStateChanged(bottomSheet: View, newState: Int) {
-                        updateFabMyLocationPosition(newState)
-                        updateMapPaddingForBottomSheet(newState)
-
-                        ViewCompat.getRootWindowInsets(bottomSheetLayout)?.run {
-                          val insets =
-                              getInsetsIgnoringVisibility(WindowInsetsCompat.Type.systemBars())
-                          val topPadding =
-                              when (newState) {
-                                BottomSheetBehavior.STATE_EXPANDED,
-                                BottomSheetBehavior.STATE_SETTLING -> insets.top
-                                else -> 0
-                              }
-                          bottomSheetLayout.setPadding(
-                              bottomSheetLayout.paddingLeft,
-                              topPadding,
-                              bottomSheetLayout.paddingRight,
-                              bottomSheetLayout.paddingBottom,
-                          )
+                  addBottomSheetCallback(
+                      object : BottomSheetBehavior.BottomSheetCallback() {
+                        override fun onStateChanged(bottomSheet: View, newState: Int) {
+                          updateMapLayoutForInsets(newState)
                         }
-                      }
 
                       override fun onSlide(bottomSheet: View, slideOffset: Float) {
                         // No-op
@@ -297,26 +296,13 @@ class MapActivity :
 
           applyAppBarEdgeToEdgeInsets(drawerLayout, appbar.root, navigationView)
 
-          // Apply bottom insets to FABs to avoid navigation bar
           ViewCompat.setOnApplyWindowInsetsListener(mapCoordinatorLayout) { _, windowInsets ->
-            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-            val fabMargin = resources.getDimensionPixelSize(R.dimen.fab_margin)
-
-            navBarInset = insets.bottom
-
-            fabMapLayers.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-              bottomMargin = insets.bottom + fabMargin
-            }
-
-            fabMyLocation.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-              marginEnd = insets.right + fabMargin
-            }
-
-            bottomSheetBehavior?.state?.let { updateFabMyLocationPosition(it) }
-
+            systemBarInsets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            updateMapLayoutForInsets()
             windowInsets
           }
         }
+    captureMapBaseSpacing()
 
     backPressedCallback =
         onBackPressedDispatcher.addCallback(this, false) {
@@ -795,9 +781,83 @@ class MapActivity :
     return true
   }
 
+  @Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
+  override fun onAttachFragment(fragment: Fragment) {
+    super.onAttachFragment(fragment)
+    if (fragment is MapFragment<*>) {
+      fragment.setMapViewportPadding(mapViewportPadding)
+    }
+  }
+
+  private fun captureMapBaseSpacing() {
+    bottomSheetBasePadding = binding.bottomSheetLayout.paddingEdges()
+    mapFragmentBaseMargins = binding.mapFragment.marginEdges()
+    fabMapLayersBaseMargins = binding.fabMapLayers.marginEdges()
+    fabMyLocationBaseMargins = binding.fabMyLocation.marginEdges()
+    bottomSheetBasePeekHeight = bottomSheetBehavior?.peekHeight ?: 0
+  }
+
+  private fun updateMapLayoutForInsets(
+      bottomSheetState: Int = bottomSheetBehavior?.state ?: BottomSheetBehavior.STATE_HIDDEN
+  ) {
+    val fabMargin = resources.getDimensionPixelSize(R.dimen.fab_margin)
+
+    binding.mapFragment.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+      topMargin = mapFragmentBaseMargins.top + systemBarInsets.top
+      leftMargin = mapFragmentBaseMargins.left
+      rightMargin = mapFragmentBaseMargins.right
+      bottomMargin = mapFragmentBaseMargins.bottom
+    }
+
+    bottomSheetBehavior?.peekHeight = bottomSheetBasePeekHeight + systemBarInsets.bottom
+    updatePersistentBottomSheetPadding(bottomSheetState)
+
+    binding.fabMapLayers.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+      marginEnd = fabMapLayersBaseMargins.right + systemBarInsets.right + fabMargin
+      bottomMargin = fabMapLayersBaseMargins.bottom + fabMargin
+    }
+
+    updateFabMyLocationPosition(bottomSheetState, fabMargin)
+    updateMapPaddingForBottomSheet(bottomSheetState)
+  }
+
+  private fun updatePersistentBottomSheetPadding(bottomSheetState: Int) {
+    val topPadding =
+        when (bottomSheetState) {
+          BottomSheetBehavior.STATE_EXPANDED,
+          BottomSheetBehavior.STATE_SETTLING -> bottomSheetBasePadding.top + systemBarInsets.top
+          else -> bottomSheetBasePadding.top
+        }
+    binding.bottomSheetLayout.updatePadding(
+        left = bottomSheetBasePadding.left + systemBarInsets.left,
+        top = topPadding,
+        right = bottomSheetBasePadding.right + systemBarInsets.right,
+        bottom = bottomSheetBasePadding.bottom + systemBarInsets.bottom,
+    )
+  }
+
+  private fun updateMapPaddingForBottomSheet(bottomSheetState: Int) {
+    val bottomSheetPadding =
+        when (bottomSheetState) {
+          BottomSheetBehavior.STATE_EXPANDED,
+          BottomSheetBehavior.STATE_SETTLING -> binding.bottomSheetLayout.height
+          BottomSheetBehavior.STATE_COLLAPSED -> bottomSheetBehavior?.peekHeight ?: 0
+          else -> 0
+        }
+    mapViewportPadding =
+        Insets.of(
+            systemBarInsets.left,
+            0,
+            systemBarInsets.right,
+            bottomSheetPadding.takeIf { it > 0 } ?: systemBarInsets.bottom,
+        )
+    (supportFragmentManager.findFragmentById(R.id.mapFragment) as? MapFragment<*>)
+        ?.setMapViewportPadding(mapViewportPadding)
+  }
+
   private fun setBottomSheetExpanded() {
     bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_EXPANDED
-    binding.mapFragment.setPaddingRelative(0, 0, 0, binding.bottomSheetLayout.height)
+    updateMapLayoutForInsets(BottomSheetBehavior.STATE_EXPANDED)
     orientationSensor?.let {
       sensorManager?.registerListener(viewModel.orientationSensorEventListener, it, SENSOR_DELAY_UI)
     }
@@ -811,42 +871,31 @@ class MapActivity :
 
   private fun setBottomSheetCollapsed() {
     bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_COLLAPSED
-    binding.mapFragment.setPaddingRelative(0, 0, 0, bottomSheetBehavior?.peekHeight ?: 0)
+    updateMapLayoutForInsets(BottomSheetBehavior.STATE_COLLAPSED)
     sensorManager?.unregisterListener(viewModel.orientationSensorEventListener)
     backPressedCallback.isEnabled = true
   }
 
   private fun setBottomSheetHidden() {
     bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_HIDDEN
-    binding.mapFragment.setPadding(0)
+    updateMapLayoutForInsets(BottomSheetBehavior.STATE_HIDDEN)
     menu?.run { close() }
     sensorManager?.unregisterListener(viewModel.orientationSensorEventListener)
     backPressedCallback.isEnabled = false
   }
 
-  private fun updateFabMyLocationPosition(bottomSheetState: Int) {
+  private fun updateFabMyLocationPosition(bottomSheetState: Int, fabMargin: Int) {
     binding.fabMyLocation.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+      marginEnd = fabMyLocationBaseMargins.right + systemBarInsets.right + fabMargin
       bottomMargin =
-          when (bottomSheetState) {
-            BottomSheetBehavior.STATE_COLLAPSED -> {
-              (bottomSheetBehavior?.peekHeight ?: 0) + navBarInset
-            }
-            else -> navBarInset
-          }
-    }
-  }
-
-  private fun updateMapPaddingForBottomSheet(bottomSheetState: Int) {
-    when (bottomSheetState) {
-      BottomSheetBehavior.STATE_EXPANDED -> {
-        binding.mapFragment.setPaddingRelative(0, 0, 0, binding.bottomSheetLayout.height)
-      }
-      BottomSheetBehavior.STATE_COLLAPSED -> {
-        binding.mapFragment.setPaddingRelative(0, 0, 0, bottomSheetBehavior?.peekHeight ?: 0)
-      }
-      else -> {
-        binding.mapFragment.setPadding(0)
-      }
+          fabMyLocationBaseMargins.bottom +
+              fabMargin +
+              when (bottomSheetState) {
+                BottomSheetBehavior.STATE_COLLAPSED -> {
+                  bottomSheetBehavior?.peekHeight ?: 0
+                }
+                else -> systemBarInsets.bottom
+              }
     }
   }
 
@@ -886,4 +935,38 @@ class MapActivity :
       ImageViewCompat.setImageTintList(this, ColorStateList.valueOf(tint))
     }
   }
+}
+
+private fun View.paddingEdges() = Edges(paddingLeft, paddingTop, paddingRight, paddingBottom)
+
+private fun View.marginEdges(): Edges =
+    (layoutParams as ViewGroup.MarginLayoutParams).run {
+      Edges(leftMargin, topMargin, rightMargin, bottomMargin)
+    }
+
+internal fun BottomSheetDialogFragment.insetAwareMapBottomSheetContent(content: View): View {
+  val scrollView =
+      NestedScrollView(content.context).apply {
+        clipToPadding = false
+        isFillViewport = false
+        addView(
+            content,
+            ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+            ),
+        )
+      }
+  val basePadding = scrollView.paddingEdges()
+  ViewCompat.setOnApplyWindowInsetsListener(scrollView) { view, windowInsets ->
+    val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+    view.updatePadding(
+        left = basePadding.left + insets.left,
+        top = basePadding.top,
+        right = basePadding.right + insets.right,
+        bottom = basePadding.bottom + insets.bottom,
+    )
+    windowInsets
+  }
+  return scrollView
 }

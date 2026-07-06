@@ -37,6 +37,6 @@ class MapLayerBottomSheetDialog : BottomSheetDialogFragment() {
         dismiss()
       }
     }
-    return binding.root
+    return insetAwareMapBottomSheetContent(binding.root)
   }
 }
