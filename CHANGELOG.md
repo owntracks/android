@@ -28,6 +28,7 @@ This release addresses a security advisory covering several intent-handling vuln
 - HTTP mode no longer treats an unparsable or empty response body as a send failure. A `200 OK` response is sufficient to confirm a message was delivered successfully; response body parse errors are logged as warnings and ignored (#2242)
 - Fix geofences silently failing to register with Google Play Services on devices with significant uptime, due to a `Long.MAX_VALUE` overflow when computing the expiration time (#2245, thanks [@Cooad](https://github.com/Cooad))
 - Waypoint editing had a race when loading the existing waypoint from Room, causing UI overwrites and other inconsistent behaviour. Fixed by only enabling the UI once the waypoint is loaded (#2130)
+- Set the en locale'd strings.xml to be the same as the generic fallback. Hopefully this fixes weirdness on devices with an en-US fallback locale (#2112).
 
 
 ## Version 2.5.10
