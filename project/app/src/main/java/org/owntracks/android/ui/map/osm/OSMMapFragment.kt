@@ -25,7 +25,6 @@ import org.osmdroid.events.DelayedMapListener
 import org.osmdroid.events.MapListener
 import org.osmdroid.events.ScrollEvent
 import org.osmdroid.events.ZoomEvent
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.TileSystemWebMercator
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
@@ -440,13 +439,7 @@ internal constructor(
   }
 
   override fun setMapLayerType(mapLayerStyle: MapLayerStyle) {
-    when (mapLayerStyle) {
-      MapLayerStyle.OpenStreetMapNormal ->
-          binding.osmMapView.setTileSource(TileSourceFactory.MAPNIK)
-      MapLayerStyle.OpenStreetMapWikimedia ->
-          binding.osmMapView.setTileSource(TileSourceFactory.WIKIMEDIA)
-      else -> Timber.w("Unsupported map layer type $mapLayerStyle")
-    }
+    binding.osmMapView.setTileSource(mapLayerStyle.getTileSource())
   }
 
   fun createPolygon(mapView: MapView, waypoint: WaypointModel): Polygon {

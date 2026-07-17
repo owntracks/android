@@ -108,6 +108,8 @@
     <string name="mapLayerGoogleMapTerrainLabel">"Google 地形"</string>
     <string name="mapLayerOpenStreetMapLabel">"OpenStreetMap"</string>
     <string name="mapLayerOpenStreetMapWikimediaLabel">"维基媒体"</string>
+    <string name="mapLayerAmapVectorLabel">"高德地图"</string>
+    <string name="mapLayerAmapSatelliteLabel">"高德卫星图"</string>
     <string name="menuClear">"清除"</string>
     <string name="menuContactNavigate">"导航"</string>
     <string name="mode_heading">"模式"</string>
