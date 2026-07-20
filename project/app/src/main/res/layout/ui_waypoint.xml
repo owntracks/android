@@ -41,6 +41,7 @@
                         android:id="@+id/description"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:enabled="@{!vm.isLoading}"
                         android:inputType="textVisiblePassword"
                         android:text="@{vm.waypoint.description}" />
 
@@ -58,6 +59,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:digits="-0123456789."
+                        android:enabled="@{!vm.isLoading}"
                         android:inputType="numberDecimal|numberSigned"
                         android:text="@{vm.waypoint.geofenceLatitude}" />
 
@@ -75,7 +77,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:digits="-0123456789."
-                        android:enabled="true"
+                        android:enabled="@{!vm.isLoading}"
                         android:inputType="numberDecimal|numberSigned"
                         android:text="@{vm.waypoint.geofenceLongitude}" />
 
@@ -94,6 +96,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:digits="0123456789"
+                        android:enabled="@{!vm.isLoading}"
                         android:inputType="numberDecimal"
                         android:text="@{String.valueOf(vm.waypoint.geofenceRadius)}" />
                 </com.google.android.material.textfield.TextInputLayout>

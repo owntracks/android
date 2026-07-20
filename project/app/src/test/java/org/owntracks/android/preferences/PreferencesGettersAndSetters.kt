@@ -135,6 +135,7 @@ class PreferencesGettersAndSetters(private val parameter: Parameter) {
                   LocatorPriority::class,
                   false,
                   preferenceValueInConfiguration = "HighAccuracy"),
+              Parameter("useGNSSInSignificantMonitoringMode", true, Boolean::class, false),
               Parameter(
                   "mode",
                   ConnectionMode.HTTP,

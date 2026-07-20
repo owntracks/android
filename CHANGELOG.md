@@ -20,12 +20,15 @@ This release addresses a security advisory covering several intent-handling vuln
 - New **Remote Control** preferences screen showing the intent auth key (with a copy-to-clipboard button) for use with automation apps such as Tasker
 - Config import screen now shows a structured diff of what is changing, with human-readable preference names, highlighting new values alongside the current values — unchanged settings are summarised rather than listed in full
 - Waypoints in an imported config are listed individually in the import review screen
-- Preference setting to allow user to enable GNSS location source for Significant Monitoring mode (#2155)
+- Preference setting (Android 16 and later only) to allow user to enable GNSS location source for Significant Monitoring mode (#2155)
 
 ### Bug fixes
 
 - DEBUG and VERBOSE log messages are no longer emitted to the system Logcat in release builds, preventing potential PII (e.g. coordinates) leakage via `TimberInMemoryLogTree` (CWE-532)
 - HTTP mode no longer treats an unparsable or empty response body as a send failure. A `200 OK` response is sufficient to confirm a message was delivered successfully; response body parse errors are logged as warnings and ignored (#2242)
+- Fix geofences silently failing to register with Google Play Services on devices with significant uptime, due to a `Long.MAX_VALUE` overflow when computing the expiration time (#2245, thanks [@Cooad](https://github.com/Cooad))
+- Waypoint editing had a race when loading the existing waypoint from Room, causing UI overwrites and other inconsistent behaviour. Fixed by only enabling the UI once the waypoint is loaded (#2130)
+- Set the en locale'd strings.xml to be the same as the generic fallback. Hopefully this fixes weirdness on devices with an en-US fallback locale (#2112).
 
 
 ## Version 2.5.10

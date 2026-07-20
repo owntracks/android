@@ -272,6 +272,8 @@ constructor(
 
   @Preference var locatorPriority: LocatorPriority? by preferencesStore
 
+  @Preference var useGNSSInSignificantMonitoringMode: Boolean by preferencesStore
+
   @Preference var mapLayerStyle: MapLayerStyle by preferencesStore
 
   @Preference var mode: ConnectionMode by preferencesStore

@@ -61,6 +61,9 @@ enum class EndpointState {
         }
         is SocketTimeoutException ->
             context.getString(R.string.statusEndpointStateMessageSocketTimeout)
+        // DNS fail
+        is UnknownHostException ->
+            context.getString(R.string.statusEndpointStateMessageUnknownHost)
         // Client cert errors show up like this
         is SSLProtocolException ->
             if (e.message != null && e.message!!.contains("TLSV1_ALERT_CERTIFICATE_REQUIRED")) {

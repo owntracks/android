@@ -24,7 +24,15 @@ fun Geofence.toGMSGeofence(): com.google.android.gms.location.Geofence {
       }
     }
   }
-  this.expirationDuration?.run(builder::setExpirationDuration)
+
+  this.expirationDuration?.run {
+    builder.setExpirationDuration(
+      if (this == org.owntracks.android.location.geofencing.Geofence.NEVER_EXPIRE)
+        com.google.android.gms.location.Geofence.NEVER_EXPIRE
+      else
+        this
+    )
+  }
   this.transitionTypes?.run(builder::setTransitionTypes)
   this.notificationResponsiveness?.run(builder::setNotificationResponsiveness)
   this.loiteringDelay?.run(builder::setLoiteringDelay)

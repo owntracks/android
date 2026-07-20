@@ -128,9 +128,9 @@ abstract class PreferencesStore :
                     "Trying to get property ${property.name} has type ${property.returnType}")
           }
               as T
-        } catch (e: java.lang.ClassCastException) {
+        } catch (_: java.lang.ClassCastException) {
           getAndSetDefault(preferences, property)
-        } catch (e: java.lang.IllegalArgumentException) {
+        } catch (_: java.lang.IllegalArgumentException) {
           getAndSetDefault(preferences, property)
         }
       } else {
@@ -147,8 +147,10 @@ abstract class PreferencesStore :
    */
   private fun <T> getAndSetDefault(preferences: Preferences, property: KProperty<*>): T {
     return getDefaultValue<T>(preferences, property).also {
-      Timber.i("Setting default preference value for ${property.name} to $it")
-      setValueWithoutNotifying(preferences, property, it)
+      if (it != null ) {
+        Timber.d("Setting default preference value for ${property.name} to $it")
+        setValueWithoutNotifying(preferences, property, it)
+      }
     }
   }
 

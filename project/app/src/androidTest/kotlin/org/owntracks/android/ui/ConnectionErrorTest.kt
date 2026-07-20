@@ -77,6 +77,25 @@ class ConnectionErrorTest : TestWithAnActivity<StatusActivity>(startActivity = t
   }
 
   @Test
+  fun given_a_config_with_http_mode_and_an_unknown_host_when_viewing_the_connecting_status_then_a_DNS_fail_message_is_shown() {
+    val username = "user"
+    val password = "password"
+    val port = Random.nextInt(10000, 20000)
+
+    val config =
+        encodeConfig(
+            getConfig(port, username, password).apply {
+              this[Preferences::mode.name] = ConnectionMode.HTTP.value
+              this[Preferences::url.name] = "https://unknown/"
+              remove(Preferences::host.name)
+              remove(Preferences::port.name)
+            })
+    setupActivity(config)
+    waitUntilViewContains(
+        R.id.connectedStatusMessage, R.string.statusEndpointStateMessageUnknownHost, 15.seconds)
+  }
+
+  @Test
   fun given_a_config_with_the_wrong_host_when_viewing_the_connecting_status_then_a_DNS_fail_message_is_shown() {
     val username = "user"
     val password = "password"
