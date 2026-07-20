@@ -7,6 +7,7 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.graphics.Insets
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
@@ -48,6 +49,8 @@ internal constructor(
    * waypoints and the contacts on the map.
    */
   abstract fun initMap()
+
+  abstract fun setMapViewportPadding(insets: Insets)
 
   abstract fun reDrawRegions(regions: Set<WaypointModel>)
 

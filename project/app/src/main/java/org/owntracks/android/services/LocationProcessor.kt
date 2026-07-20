@@ -2,6 +2,7 @@ package org.owntracks.android.services
 
 import android.location.Location
 import android.os.Build
+import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -34,6 +35,33 @@ import org.owntracks.android.support.MessageWaypointCollection
 import org.owntracks.android.test.SimpleIdlingResource
 import timber.log.Timber
 
+/**
+ * A waypoint transition candidate that has been observed but not yet committed, because it hasn't
+ * persisted for long enough to rule out a fix landing right on the waypoint boundary.
+ */
+internal data class PendingWaypointTransition(val transition: Int, val since: Instant)
+
+/**
+ * Debounces a waypoint transition candidate against previously-pending state. A candidate is only
+ * committed once it has been observed consistently for at least [dwell]; a candidate that differs
+ * from the currently-pending one resets the dwell timer.
+ *
+ * @return a pair of (transition to commit, if any) to (new pending state, if any)
+ */
+internal fun resolveTransitionDebounce(
+    pending: PendingWaypointTransition?,
+    candidate: Int,
+    now: Instant,
+    dwell: Duration
+): Pair<Int?, PendingWaypointTransition?> =
+    if (pending == null || pending.transition != candidate) {
+      null to PendingWaypointTransition(candidate, now)
+    } else if (Duration.between(pending.since, now) >= dwell) {
+      candidate to null
+    } else {
+      null to pending
+    }
+
 @Singleton
 class LocationProcessor
 @Inject
@@ -49,7 +77,8 @@ constructor(
   @param:Named("publishResponseMessageIdlingResource")
     private val publishResponseMessageIdlingResource: SimpleIdlingResource,
   @param:Named("mockLocationIdlingResource")
-    private val mockLocationIdlingResource: SimpleIdlingResource
+    private val mockLocationIdlingResource: SimpleIdlingResource,
+  @param:Named("nativeGeofencingAvailable") private val nativeGeofencingAvailable: Boolean
 ) {
   private fun locationIsWithAccuracyThreshold(l: Location): Boolean =
       preferences.ignoreInaccurateLocations
@@ -65,6 +94,11 @@ constructor(
       locationRepo.currentPublishedLocation.value?.run { publishLocationMessage(trigger, this) }
 
   private val highAccuracyProviders = setOf("gps", "fused")
+
+  // Matches the notificationResponsiveness used for native GMS geofencing, so both flavors have
+  // comparable real-world hysteresis around a waypoint boundary.
+  private val transitionDebounceDwell: Duration = Duration.ofMinutes(2)
+  private val pendingWaypointTransitions = mutableMapOf<Long, PendingWaypointTransition>()
 
   private suspend fun publishLocationMessage(
       trigger: MessageLocation.ReportType,
@@ -91,24 +125,48 @@ constructor(
     val loadedWaypoints = withContext(ioDispatcher) { waypointsRepo.getAll() }
     Timber.d("publishLocationMessage for $location triggered by $trigger")
 
-    // Check if publish would trigger a region if fusedRegionDetection is enabled
+    // Check if publish would trigger a region if fusedRegionDetection is enabled. Skipped entirely
+    // where native OS geofencing is available (e.g. gms) - that's a purpose-built mechanism with its
+    // own hysteresis, and running this alongside it causes the two to race and flip-flop on the same
+    // waypoint state. Where it isn't available (e.g. oss), a transition candidate must instead be
+    // observed consistently for transitionDebounceDwell before being committed, for the same reason.
     Timber.d(
-        "Checking if location triggers waypoint transitions. waypoints: $loadedWaypoints, trigger=$trigger, fusedRegionDetection: ${preferences.fusedRegionDetection}")
+        "Checking if location triggers waypoint transitions. waypoints: $loadedWaypoints, trigger=$trigger, fusedRegionDetection: ${preferences.fusedRegionDetection}, nativeGeofencingAvailable: $nativeGeofencingAvailable")
     if (loadedWaypoints.isNotEmpty() &&
         preferences.fusedRegionDetection &&
+        !nativeGeofencingAvailable &&
         trigger != MessageLocation.ReportType.CIRCULAR) {
+      pendingWaypointTransitions.keys.retainAll(loadedWaypoints.map { it.id }.toSet())
       loadedWaypoints.forEach { waypoint ->
-        Timber.d("onWaypointTransition triggered by location waypoint intersection event")
-        onWaypointTransition(
-            waypoint,
-            location,
+        val candidate =
             if (location.distanceTo(waypoint.getLocation()) <=
                 waypoint.geofenceRadius + location.accuracy) {
               Geofence.GEOFENCE_TRANSITION_ENTER
             } else {
               Geofence.GEOFENCE_TRANSITION_EXIT
-            },
-            MessageTransition.TRIGGER_LOCATION)
+            }
+        if (candidate == waypoint.lastTransition) {
+          pendingWaypointTransitions.remove(waypoint.id)
+          Timber.d("onWaypointTransition triggered by location waypoint intersection event")
+          onWaypointTransition(waypoint, location, candidate, MessageTransition.TRIGGER_LOCATION)
+        } else {
+          val (transitionToCommit, newPending) =
+              resolveTransitionDebounce(
+                  pendingWaypointTransitions[waypoint.id],
+                  candidate,
+                  Instant.ofEpochMilli(location.time),
+                  transitionDebounceDwell)
+          if (newPending == null) {
+            pendingWaypointTransitions.remove(waypoint.id)
+          } else {
+            pendingWaypointTransitions[waypoint.id] = newPending
+          }
+          if (transitionToCommit != null) {
+            Timber.d("onWaypointTransition triggered by location waypoint intersection event")
+            onWaypointTransition(
+                waypoint, location, transitionToCommit, MessageTransition.TRIGGER_LOCATION)
+          }
+        }
       }
     }
     if (preferences.monitoring === MonitoringMode.Quiet &&
