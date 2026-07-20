@@ -29,6 +29,7 @@ This release addresses a security advisory covering several intent-handling vuln
 - Fix geofences silently failing to register with Google Play Services on devices with significant uptime, due to a `Long.MAX_VALUE` overflow when computing the expiration time (#2245, thanks [@Cooad](https://github.com/Cooad))
 - Waypoint editing had a race when loading the existing waypoint from Room, causing UI overwrites and other inconsistent behaviour. Fixed by only enabling the UI once the waypoint is loaded (#2130)
 - Set the en locale'd strings.xml to be the same as the generic fallback. Hopefully this fixes weirdness on devices with an en-US fallback locale (#2112).
+- Waypoint region state no longer flips back and forth ("bouncing") when a location fix lands near the boundary. GMS builds now rely solely on the native Play Services geofencing API, which already has its own hysteresis, instead of racing it against the app's own per-fix distance check; OSS builds (which have no native geofencing to fall back on) now require a region transition candidate to persist for 2 minutes before it's committed
 
 
 ## Version 2.5.10
