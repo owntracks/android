@@ -21,6 +21,7 @@ This release addresses a security advisory covering several intent-handling vuln
 - Config import screen now shows a structured diff of what is changing, with human-readable preference names, highlighting new values alongside the current values — unchanged settings are summarised rather than listed in full
 - Waypoints in an imported config are listed individually in the import review screen
 - Preference setting (Android 16 and later only) to allow user to enable GNSS location source for Significant Monitoring mode (#2155)
+- New opt-in, config-import-only `maxImplausibleSpeedKmh` preference: drops a published location fix if it implies travel faster than the configured maximum ground speed relative to the last published fix, to filter out occasional wildly-inaccurate network-provider locations (#2034)
 
 ### Bug fixes
 
@@ -30,6 +31,7 @@ This release addresses a security advisory covering several intent-handling vuln
 - Waypoint editing had a race when loading the existing waypoint from Room, causing UI overwrites and other inconsistent behaviour. Fixed by only enabling the UI once the waypoint is loaded (#2130)
 - Set the en locale'd strings.xml to be the same as the generic fallback. Hopefully this fixes weirdness on devices with an en-US fallback locale (#2112).
 - Waypoint region state no longer flips back and forth ("bouncing") when a location fix lands near the boundary. GMS builds now rely solely on the native Play Services geofencing API, which already has its own hysteresis, instead of racing it against the app's own per-fix distance check; OSS builds (which have no native geofencing to fall back on) now require a region transition candidate to persist for 2 minutes before it's committed
+- Remote "reportLocation" requests are no longer silently dropped by the new (opt-in) implausible-speed filter
 
 
 ## Version 2.5.10

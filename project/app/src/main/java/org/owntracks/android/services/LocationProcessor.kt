@@ -62,6 +62,9 @@ internal fun resolveTransitionDebounce(
       null to pending
     }
 
+internal fun impliedSpeedKmh(distanceMeters: Double, timeDeltaMillis: Long): Double =
+    (distanceMeters / (timeDeltaMillis / 1000.0)) * 3.6
+
 internal fun isImplausibleSpeed(
     distanceMeters: Double,
     timeDeltaMillis: Long,
@@ -70,8 +73,7 @@ internal fun isImplausibleSpeed(
   if (maxSpeedKmh <= 0 || timeDeltaMillis <= 0) {
     return false
   }
-  val speedKmh = (distanceMeters / (timeDeltaMillis / 1000.0)) * 3.6
-  return speedKmh > maxSpeedKmh
+  return impliedSpeedKmh(distanceMeters, timeDeltaMillis) > maxSpeedKmh
 }
 
 @Singleton
@@ -135,16 +137,14 @@ constructor(
     }
 
     val maxImplausibleSpeedKmh = preferences.maxImplausibleSpeedKmh
-    if (maxImplausibleSpeedKmh > 0 &&
-        trigger != MessageLocation.ReportType.USER &&
-        trigger != MessageLocation.ReportType.CIRCULAR) {
+    if (maxImplausibleSpeedKmh > 0 && trigger !in responseMessageTypes) {
       locationRepo.currentPublishedLocation.value?.let { lastLocation ->
         val timeDeltaMillis = location.time - lastLocation.time
         if (timeDeltaMillis > 0) {
           val distanceMeters = location.distanceTo(lastLocation)
-          val speedKmh = (distanceMeters.toDouble() / (timeDeltaMillis / 1000.0)) * 3.6
           if (isImplausibleSpeed(
               distanceMeters.toDouble(), timeDeltaMillis, maxImplausibleSpeedKmh)) {
+            val speedKmh = impliedSpeedKmh(distanceMeters.toDouble(), timeDeltaMillis)
             Timber.d(
                 "Ignoring location from ${location.provider}, implied speed ${speedKmh.roundToInt()}km/h exceeds plausible maximum ${maxImplausibleSpeedKmh}km/h")
             return Result.failure(Exception("Ignoring location due to implausible speed"))
