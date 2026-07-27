@@ -27,31 +27,54 @@
             layout="@layout/appbar" />
 
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fabMapLayers"
+        <!--
+        Each FAB is wrapped in a plain FrameLayout rather than being a direct CoordinatorLayout
+        child. Material's FloatingActionButton has a default CoordinatorLayout.Behavior that
+        silently repositions it to dodge a sibling Snackbar - no combination of
+        layout_dodgeInsetEdges, a custom Behavior override, or disabling shadow padding stops
+        this. A plain FrameLayout has no Behavior, so CoordinatorLayout never invokes any
+        dependent-view repositioning for it; our own margins on the wrapper are the only thing
+        that ever moves it.
+        -->
+        <FrameLayout
+            android:id="@+id/fabMapLayersContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|end"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:padding="@dimen/fab_shadow_room"
+            android:elevation="@dimen/fab_container_elevation">
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabMapLayers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/mapLayerDialogTitle"
+                android:src="@drawable/ic_baseline_layers_24"
+                app:fabSize="normal"
+                tools:targetApi="o" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/fabMyLocationContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
-            android:contentDescription="@string/mapLayerDialogTitle"
-            android:src="@drawable/ic_baseline_layers_24"
-            app:fabSize="normal"
-            app:layout_anchor="@+id/appbar"
-            app:layout_anchorGravity="bottom|end"
-            app:useCompatPadding="true"
-            tools:targetApi="o" />
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:padding="@dimen/fab_shadow_room"
+            android:elevation="@dimen/fab_container_elevation">
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fabMyLocation"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top"
-            android:contentDescription="@string/currentLocationButtonLabel"
-            app:backgroundTint="@color/fabMyLocationBackground"
-            app:borderWidth="1dp"
-            app:layout_anchor="@+id/bottomSheetLayout"
-            app:layout_anchorGravity="end|bottom"
-            app:locationIcon="@{vm.myLocationStatus}"
-            app:useCompatPadding="true" />
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabMyLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/currentLocationButtonLabel"
+                app:backgroundTint="@color/fabMyLocationBackground"
+                app:borderWidth="1dp"
+                app:locationIcon="@{vm.myLocationStatus}" />
+        </FrameLayout>
 
 
         <androidx.fragment.app.FragmentContainerView

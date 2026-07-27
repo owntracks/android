@@ -767,12 +767,13 @@ class MapActivity :
   }
 
   private fun disableLocationMenus() {
-    binding.fabMyLocation.isEnabled = false
+    // fabMyLocation is left enabled - its icon already reflects MyLocationStatus.DISABLED via
+    // the locationIcon binding, and disabling it here made it render fully invisible rather
+    // than just dimmed, hiding the button entirely whenever there's no location fix yet.
     menu?.run { findItem(R.id.menu_report).setEnabled(false).icon?.alpha = 128 }
   }
 
   private fun enableLocationMenus() {
-    binding.fabMyLocation.isEnabled = true
     menu?.run { findItem(R.id.menu_report).setEnabled(true).icon?.alpha = 255 }
   }
 
@@ -792,8 +793,8 @@ class MapActivity :
   private fun captureMapBaseSpacing() {
     bottomSheetBasePadding = binding.bottomSheetLayout.paddingEdges()
     mapFragmentBaseMargins = binding.mapFragment.marginEdges()
-    fabMapLayersBaseMargins = binding.fabMapLayers.marginEdges()
-    fabMyLocationBaseMargins = binding.fabMyLocation.marginEdges()
+    fabMapLayersBaseMargins = binding.fabMapLayersContainer.marginEdges()
+    fabMyLocationBaseMargins = binding.fabMyLocationContainer.marginEdges()
     bottomSheetBasePeekHeight = bottomSheetBehavior?.peekHeight ?: 0
   }
 
@@ -812,9 +813,13 @@ class MapActivity :
     bottomSheetBehavior?.peekHeight = bottomSheetBasePeekHeight + systemBarInsets.bottom
     updatePersistentBottomSheetPadding(bottomSheetState)
 
-    binding.fabMapLayers.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-      marginEnd = fabMapLayersBaseMargins.right + systemBarInsets.right + fabMargin
-      bottomMargin = fabMapLayersBaseMargins.bottom + fabMargin
+    // The wrapper carries fab_shadow_room padding on every side, so its margins are inset by
+    // that much to leave the FAB itself sitting where fabMargin says it should.
+    val shadowRoom = resources.getDimensionPixelSize(R.dimen.fab_shadow_room)
+
+    binding.fabMapLayersContainer.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+      marginEnd = fabMapLayersBaseMargins.right + systemBarInsets.right + fabMargin - shadowRoom
+      topMargin = mapFragmentBaseMargins.top + systemBarInsets.top + fabMargin - shadowRoom
     }
 
     updateFabMyLocationPosition(bottomSheetState, fabMargin)
@@ -885,17 +890,19 @@ class MapActivity :
   }
 
   private fun updateFabMyLocationPosition(bottomSheetState: Int, fabMargin: Int) {
-    binding.fabMyLocation.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-      marginEnd = fabMyLocationBaseMargins.right + systemBarInsets.right + fabMargin
-      bottomMargin =
-          fabMyLocationBaseMargins.bottom +
-              fabMargin +
-              when (bottomSheetState) {
-                BottomSheetBehavior.STATE_COLLAPSED -> {
-                  bottomSheetBehavior?.peekHeight ?: 0
-                }
-                else -> systemBarInsets.bottom
+    val shadowRoom = resources.getDimensionPixelSize(R.dimen.fab_shadow_room)
+    val computedBottomMargin =
+        fabMyLocationBaseMargins.bottom +
+            fabMargin - shadowRoom +
+            when (bottomSheetState) {
+              BottomSheetBehavior.STATE_COLLAPSED -> {
+                bottomSheetBehavior?.peekHeight ?: 0
               }
+              else -> systemBarInsets.bottom
+            }
+    binding.fabMyLocationContainer.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+      marginEnd = fabMyLocationBaseMargins.right + systemBarInsets.right + fabMargin - shadowRoom
+      bottomMargin = computedBottomMargin
     }
   }
 
