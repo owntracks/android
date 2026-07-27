@@ -12,13 +12,23 @@ class ClickableCompassOverlay(
     orientationProvider: IOrientationProvider?,
     mapView: MapView?
 ) : CompassOverlay(context, orientationProvider, mapView) {
+  private var compassCenterXDp = 35f
+  private var compassCenterYDp = 35f
+
+  override fun setCompassCenter(x: Float, y: Float) {
+    compassCenterXDp = x
+    compassCenterYDp = y
+    super.setCompassCenter(x, y)
+  }
+
   private fun getCompassRectangle(): Rect {
-    val center = 35f * mScale
+    val centerX = compassCenterXDp * mScale
+    val centerY = compassCenterYDp * mScale
     return Rect(
-        ((center - mCompassFrameCenterX).toInt()),
-        ((center - mCompassFrameCenterY).toInt()),
-        ((center + mCompassFrameCenterX).toInt()),
-        ((center + mCompassFrameCenterY).toInt()))
+        ((centerX - mCompassFrameCenterX).toInt()),
+        ((centerY - mCompassFrameCenterY).toInt()),
+        ((centerX + mCompassFrameCenterX).toInt()),
+        ((centerY + mCompassFrameCenterY).toInt()))
   }
 
   /**

@@ -298,8 +298,11 @@ internal constructor(
     mapView?.run {
       setPadding(padding.left, padding.top, padding.right, padding.bottom)
       overlays.filterIsInstance<CompassOverlay>().forEach {
-        val compassMargin = resources.displayMetrics.density * 35f
-        it.setCompassCenter(padding.left + compassMargin, padding.top + compassMargin)
+        // CompassOverlay.setCompassCenter takes dp, not pixels - it multiplies by density
+        // internally. padding.left/top are real pixel insets, so convert them down to dp here.
+        val density = resources.displayMetrics.density
+        val compassMarginDp = 35f
+        it.setCompassCenter(padding.left / density + compassMarginDp, padding.top / density + compassMarginDp)
       }
       overlays.filterIsInstance<CopyrightOverlay>().forEach {
         val copyrightMargin = (resources.displayMetrics.density * 8).roundToInt()
