@@ -9,7 +9,7 @@ This release addresses a security advisory covering several intent-handling vuln
 - External configuration loading (via `owntracks://` URLs and config files) is now disabled by default and must be explicitly enabled in Settings → Advanced
 - A confirmation dialog is shown when enabling external configuration, warning that any config URL can fully reconfigure the app
 - The `allowIntentControl` intent receiver now requires a shared secret (`intentAuthKey`) in every intent, preventing unauthorised apps from triggering location publishes or changing monitoring mode
-- `BackgroundService` is no longer exported; only explicit intents from within the app are accepted
+- `BackgroundService` is no longer exported; only explicit intents from within the app are accepted. The `SEND_LOCATION_USER` and `CHANGE_MONITORING` actions have moved to a new exported `ExternalIntentReceiver`. N.B. automations sending these (e.g. Tasker) must now target a **broadcast receiver** rather than a service, and must set the **package** to `org.owntracks.android` — an action-only broadcast is silently dropped by Android's background execution limits
 - `EXIT` and `SEND_EVENT_CIRCULAR` intent actions have been removed
 - `OngoingNotification` service intents are now explicit
 - Security-related preferences (`allowConfigurationByURIAndConfigFile`, `allowIntentControl`, `intentAuthKey`) cannot be changed via imported config files or URLs
