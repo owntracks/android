@@ -5,6 +5,7 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
+import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.annotation.RequiresPermission
@@ -65,9 +66,21 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient(
       looper: Looper
   ) {
     locationManager?.run {
-      val listener = LocationListener { location ->
-        clientCallBack.onLocationResult(LocationResult(location))
-      }
+      // Explicit overrides, not a SAM lambda: these three methods are only default on API 31+,
+      // so a lambda here throws AbstractMethodError on older devices when the OS calls them.
+      val listener =
+          object : LocationListener {
+            override fun onLocationChanged(location: Location) {
+              clientCallBack.onLocationResult(LocationResult(location))
+            }
+
+            override fun onProviderEnabled(provider: String) {}
+
+            override fun onProviderDisabled(provider: String) {}
+
+            @Suppress("DEPRECATION")
+            override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
+          }
       callbacks[clientCallBack] = listener
       locationSourcesForPriority(locationRequest.priority)
           .apply {
