@@ -32,6 +32,7 @@ This release addresses a security advisory covering several intent-handling vuln
 - Set the en locale'd strings.xml to be the same as the generic fallback. Hopefully this fixes weirdness on devices with an en-US fallback locale (#2112).
 - Waypoint region state no longer flips back and forth ("bouncing") when a location fix lands near the boundary. GMS builds now rely solely on the native Play Services geofencing API, which already has its own hysteresis, instead of racing it against the app's own per-fix distance check; OSS builds (which have no native geofencing to fall back on) now require a region transition candidate to persist for 2 minutes before it's committed
 - Remote "reportLocation" requests are no longer silently dropped by the new (opt-in) implausible-speed filter
+- `discardNetworkLocationThresholdSeconds` had its check the wrong way round, discarding a high-accuracy gps/fused fix that arrived shortly after a network one, rather than the other way about. It now behaves as documented. Only affects users who had set this preference; it is disabled by default (#2289)
 
 
 ## Version 2.5.10

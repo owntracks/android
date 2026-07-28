@@ -125,14 +125,15 @@ constructor(
     // If this location has come from the network *and* the most recent location was both recent and
     // high-accuracy, then it's probably not usefully accurate. Drop it.
     locationRepo.currentPublishedLocation.value?.let { lastLocation ->
-      if (highAccuracyProviders.contains(location.provider) &&
-          lastLocation.provider == "network" &&
+      if (location.provider == "network" &&
+          highAccuracyProviders.contains(lastLocation.provider) &&
           location.time - lastLocation.time <
               preferences.discardNetworkLocationThresholdSeconds * 1000) {
         Timber.d(
-            "Ignoring location from ${location.provider}, last was from gps, and time difference is less than 1s")
+            "Ignoring location from ${location.provider}, last was from ${lastLocation.provider} within ${preferences.discardNetworkLocationThresholdSeconds}s")
         return Result.failure(
-            Exception("Ignoring location from ${location.provider}, last was recent and from gps"))
+            Exception(
+                "Ignoring location from ${location.provider}, last was recent and high-accuracy"))
       }
     }
 
