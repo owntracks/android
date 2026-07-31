@@ -7,11 +7,9 @@ import android.content.ServiceConnection
 import android.os.IBinder
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
-import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import javax.inject.Inject
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.owntracks.android.model.messages.MessageLocation
@@ -69,15 +67,5 @@ constructor(
       Timber.w("Unable to bind to service")
       return Result.failure()
     }
-  }
-
-  class Factory
-  @Inject
-  constructor(
-      private val preferences: Preferences,
-      private val locationProcessor: LocationProcessor
-  ) : ChildWorkerFactory {
-    override fun create(appContext: Context, params: WorkerParameters): ListenableWorker =
-        SendLocationPingWorker(appContext, params, preferences, locationProcessor)
   }
 }
