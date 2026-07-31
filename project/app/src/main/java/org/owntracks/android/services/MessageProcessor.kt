@@ -25,6 +25,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import org.owntracks.android.data.EndpointState
 import org.owntracks.android.data.repos.AsyncDeQueue
 import org.owntracks.android.data.repos.ContactsRepo
@@ -51,6 +52,7 @@ import org.owntracks.android.preferences.Preferences.Companion.PREFERENCES_THAT_
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
+import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor
 import org.owntracks.android.test.IdlingResourceWithData
 import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.test.ThresholdIdlingResourceInterface
@@ -177,6 +179,19 @@ constructor(
     startSendingMessages()
     return result
   }
+
+  /**
+   * Whether the endpoint's connection is genuinely usable, as opposed to merely believed to be.
+   *
+   * Endpoints that hold no persistent connection have nothing to verify and always report healthy;
+   * for them a failure is a per-message concern rather than a connection-wide one.
+   */
+  suspend fun checkConnection(): Boolean =
+      when (val endpoint = messageProcessorEndpoint) {
+        is StatefulServiceMessageProcessor ->
+            withContext(ioDispatcher) { endpoint.checkConnection() }
+        else -> true
+      }
 
   val isEndpointReady: Boolean
     get() {

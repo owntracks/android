@@ -3,6 +3,7 @@ package org.owntracks.android.services.worker
 import android.content.Context
 import androidx.work.BackoffPolicy
 import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
@@ -54,8 +55,36 @@ constructor(
   fun cancelAllTasks() {
     Timber.d("Cancelling task tag (all mqtt tasks) $ONETIME_TASK_MQTT_RECONNECT")
     workManager.cancelUniqueWork(ONETIME_TASK_MQTT_RECONNECT)
+    workManager.cancelUniqueWork(PERIODIC_TASK_MQTT_CONNECTION_WATCHDOG)
     workManager.cancelAllWorkByTag(PERIODIC_TASK_SEND_LOCATION_PING)
     resetMqttReconnectBackoff()
+  }
+
+  /**
+   * Starts the periodic check that the MQTT connection is still alive, reconnecting it if not.
+   *
+   * Every other trigger for a reconnect is reactive — a connectivity callback, a dropped
+   * connection, a failed publish — so anything they collectively fail to notice is never noticed at
+   * all. The most important such case is a connection that is dead but still believed to be up,
+   * which produces no event of any kind.
+   *
+   * Enqueued with [ExistingPeriodicWorkPolicy.KEEP] so that repeatedly re-activating the endpoint
+   * cannot keep pushing the next run into the future and starve the check entirely.
+   */
+  fun scheduleMqttConnectionWatchdog() {
+    PeriodicWorkRequest.Builder(
+            MQTTConnectionWatchdogWorker::class.java,
+            CONNECTION_WATCHDOG_INTERVAL.inWholeMinutes,
+            TimeUnit.MINUTES)
+        .addTag(PERIODIC_TASK_MQTT_CONNECTION_WATCHDOG)
+        .setConstraints(anyNetworkConstraint)
+        .build()
+        .run {
+          workManager.enqueueUniquePeriodicWork(
+              PERIODIC_TASK_MQTT_CONNECTION_WATCHDOG, ExistingPeriodicWorkPolicy.KEEP, this)
+        }
+    Timber.i(
+        "Scheduled $PERIODIC_TASK_MQTT_CONNECTION_WATCHDOG every $CONNECTION_WATCHDOG_INTERVAL")
   }
 
   /** How many consecutive reconnect attempts have been scheduled without an intervening success. */
@@ -105,6 +134,15 @@ constructor(
   companion object {
     private const val PERIODIC_TASK_SEND_LOCATION_PING = "PERIODIC_TASK_SEND_LOCATION_PING"
     private const val ONETIME_TASK_MQTT_RECONNECT = "ONETIME_TASK_MQTT_RECONNECT"
+    private const val PERIODIC_TASK_MQTT_CONNECTION_WATCHDOG =
+        "PERIODIC_TASK_MQTT_CONNECTION_WATCHDOG"
+
+    /**
+     * How often to verify the connection. WorkManager will not run periodic work more frequently
+     * than [PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS], which is fifteen minutes, so asking
+     * for less would achieve nothing.
+     */
+    internal val CONNECTION_WATCHDOG_INTERVAL = 15.minutes
 
     /** Delay before the first reconnect attempt of a run. */
     internal val RECONNECT_INITIAL_DELAY = 10.seconds

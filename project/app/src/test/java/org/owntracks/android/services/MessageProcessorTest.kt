@@ -18,6 +18,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.doReturn
@@ -214,6 +215,19 @@ class MessageProcessorTest {
           "a second sender loop should not have been started",
           withTimeoutOrNull(SETTLE) { detector.await() })
     }
+  }
+
+  /**
+   * The watchdog asks this on every run, including in HTTP mode where there is no persistent
+   * connection to check. Reporting unhealthy there would have it reconnect an endpoint that was
+   * never connected in the first place, every fifteen minutes, forever.
+   */
+  @Test
+  fun `checkConnection reports healthy for an endpoint with no persistent connection`() {
+    messageProcessor.initialize() // preferences.mode is HTTP
+    assertLoopRunning(queue.armLoopDetector(), "sender loop should be running after initialize")
+
+    runBlocking { assertTrue(messageProcessor.checkConnection()) }
   }
 
   companion object {

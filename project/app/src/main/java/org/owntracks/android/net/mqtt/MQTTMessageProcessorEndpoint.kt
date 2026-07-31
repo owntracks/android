@@ -14,6 +14,7 @@ import java.net.ConnectException
 import java.net.UnknownHostException
 import java.security.KeyStore
 import java.util.concurrent.ScheduledThreadPoolExecutor
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.stream.Collectors
 import javax.net.ssl.SSLHandshakeException
 import kotlin.time.Duration.Companion.milliseconds
@@ -107,6 +108,9 @@ class MQTTMessageProcessorEndpoint(
     preferences.registerOnPreferenceChangedListener(this)
     networkChangeCallback.reset()
     connectivityManager.registerDefaultNetworkCallback(networkChangeCallback)
+    // Backstop for everything the connectivity callbacks and the reconnect worker between them
+    // fail to notice — most importantly a connection that is dead but still believed to be up.
+    scheduler.scheduleMqttConnectionWatchdog()
     scope.launch {
       try {
         val configuration = getEndpointConfiguration()
@@ -469,31 +473,48 @@ class MQTTMessageProcessorEndpoint(
         }
       }
 
-  override fun checkConnection(): Boolean {
-    return mqttClientAndConfiguration?.mqttClient?.run {
-      var success = false
-      val token =
-          checkPing(
-              null,
-              object : IMqttActionListener {
-                override fun onSuccess(asyncActionToken: IMqttToken?) {
-                  success = true
-                }
+  /**
+   * Round-trips an MQTT PINGREQ to establish whether the connection is actually usable, rather than
+   * merely believed to be. A TCP connection that has gone away without a FIN — routine when a mobile
+   * network drops or a NAT entry expires — stays readable as "connected" until something is written
+   * to it, so the endpoint state on its own is not evidence of a working link.
+   *
+   * Blocking, and called from the connection watchdog off the main thread.
+   */
+  override fun checkConnection(): Boolean =
+      mqttClientAndConfiguration?.mqttClient?.let { client ->
+        // The listener is invoked on a Paho thread, so this cannot be a plain captured var.
+        val success = AtomicBoolean(false)
+        try {
+          client
+              .checkPing(
+                  null,
+                  object : IMqttActionListener {
+                    override fun onSuccess(asyncActionToken: IMqttToken?) {
+                      success.set(true)
+                    }
 
-                override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-                  success = false
-                }
-              })
-      if (token != null) {
-        token.waitForCompletion()
-      } else {
-        Timber.w("MQTT checkPing token was null")
-      }
-      return success
-    } ?: false
-  }
+                    override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
+                      success.set(false)
+                    }
+                  })
+              ?.waitForCompletion(PING_CHECK_TIMEOUT.inWholeMilliseconds)
+              ?: Timber.w("MQTT checkPing token was null")
+          success.get()
+        } catch (e: Exception) {
+          // Both a timeout waiting for the PINGRESP and a client that already knows it is
+          // disconnected arrive here. Either way the connection is not usable.
+          Timber.w(e, "MQTT connection check failed")
+          false
+        }
+      } ?: false
 
   class NotConnectedException : Exception()
+
+  companion object {
+    /** Bounded so the watchdog cannot be parked indefinitely on an unresponsive broker. */
+    private val PING_CHECK_TIMEOUT = 10.seconds
+  }
 
   data class MqttClientAndConfiguration(
       val mqttClient: MqttAsyncClient,
