@@ -46,8 +46,8 @@ class NetworkTrackingCallback(
       Timber.v("Default network changed from $currentNetwork to $network, reconnecting")
       currentNetwork = network
       reconnectFunction()
-    } else if (endpointState() == EndpointState.DISCONNECTED) {
-      Timber.v("Currently disconnected on same network, attempting reconnect")
+    } else if (endpointState() !in STATES_NOT_NEEDING_A_RECONNECT) {
+      Timber.v("Not connected (${endpointState()}) on same network, attempting reconnect")
       reconnectFunction()
     }
   }
@@ -64,5 +64,23 @@ class NetworkTrackingCallback(
       // to avoid racing with that in-flight reconnect.
       Timber.v("Non-current network $network lost, ignoring")
     }
+  }
+
+  companion object {
+    /**
+     * States for which a repeat [onAvailable] on the network we're already on should *not* trigger
+     * a reconnect.
+     *
+     * Everything else — notably [EndpointState.ERROR], which is where a failed connect leaves us —
+     * must retry. A Wi-Fi association delivers [onAvailable] before DNS is necessarily usable, so
+     * the first connect attempt often fails with UnknownHostException; the framework then hands out
+     * no new [Network] once the link settles, so this is the only signal we get.
+     *
+     * [EndpointState.CONNECTING] is excluded because an attempt is genuinely in flight and will
+     * settle on CONNECTED or ERROR by itself — reconnecting would tear down a connect that may be
+     * about to succeed.
+     */
+    private val STATES_NOT_NEEDING_A_RECONNECT =
+        setOf(EndpointState.CONNECTED, EndpointState.CONNECTING)
   }
 }

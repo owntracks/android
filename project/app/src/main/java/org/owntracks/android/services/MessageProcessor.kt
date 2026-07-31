@@ -24,7 +24,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import org.owntracks.android.data.EndpointState
 import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.data.repos.EndpointStateRepo
@@ -121,6 +120,7 @@ constructor(
    */
   fun initialize() {
     if (!initialized) {
+      initialized = true
       Timber.d("Initializing MessageProcessor")
       scope.launch {
         applicationContext.bindService(
@@ -129,9 +129,18 @@ constructor(
             Context.BIND_AUTO_CREATE)
         endpointStateRepo.setState(EndpointState.INITIAL)
         queueInitJob.join()
-        reconnect()
-        initialized = true
+        reconnect() // which arms the sender loop for us
       }
+    } else {
+      /*
+      This class is a @Singleton, but the BackgroundService that calls us is not: the service can
+      be destroyed and recreated while the process (and therefore this instance) survives. onDestroy
+      cancels the sender loop via stopSendingMessages, so a subsequent service start has to re-arm
+      it. Without this the outgoing queue grows forever and nothing is ever published again until
+      the process is killed.
+       */
+      Timber.d("MessageProcessor already initialized, re-arming the sender loop")
+      startSendingMessages()
     }
   }
 
@@ -139,21 +148,29 @@ constructor(
   suspend fun reconnect(): Result<Unit> {
     Timber.v("reconnect")
     return try {
-      when (messageProcessorEndpoint) {
-        null -> {
-          loadOutgoingMessageProcessor() // The processor should take care of the reconnect on init
-          Result.success(Unit)
+          when (messageProcessorEndpoint) {
+            null -> {
+              // The processor should take care of the reconnect on init
+              loadOutgoingMessageProcessor()
+              Result.success(Unit)
+            }
+            is MQTTMessageProcessorEndpoint -> {
+              (messageProcessorEndpoint as MQTTMessageProcessorEndpoint).reconnect()
+            }
+            else -> {
+              Result.success(Unit)
+            }
+          }
+        } catch (e: Exception) {
+          Result.failure(e)
         }
-        is MQTTMessageProcessorEndpoint -> {
-          (messageProcessorEndpoint as MQTTMessageProcessorEndpoint).reconnect()
-        }
-        else -> {
-          Result.success(Unit)
-        }
-      }
-    } catch (e: Exception) {
-      Result.failure(e)
-    }
+        /*
+        A reconnect is only useful if something is alive to drain the queue afterwards. This has to
+        run *after* the branch above: loadOutgoingMessageProcessor() launches (and takes ownership
+        of) the sender job itself, so starting one first would leave that loop orphaned, holding
+        outboundMessageQueueMutex but no longer reachable by stopSendingMessages.
+         */
+        .also { startSendingMessages() }
   }
 
   val isEndpointReady: Boolean
@@ -175,11 +192,31 @@ constructor(
     messageProcessorEndpoint?.deactivate().also { Timber.d("Destroying previous endpoint") }
     messageProcessorEndpoint = getEndpoint(preferences.mode)
 
+    // Cancel before replacing, otherwise a still-running loop is orphaned: it would keep hold of
+    // outboundMessageQueueMutex (making the replacement bail out immediately) while no longer being
+    // reachable by stopSendingMessages.
+    dequeueAndSenderJob?.cancel()
     dequeueAndSenderJob =
         scope.launch(ioDispatcher) {
           messageProcessorEndpoint?.activate()
           sendAvailableMessages()
         }
+  }
+
+  /**
+   * Launches the outbound message loop, unless one is already running.
+   *
+   * Safe and cheap to call from any path that wants messages flowing again. [stopSendingMessages]
+   * cancels the loop when the background service goes away, so this is what brings it back.
+   */
+  @Synchronized
+  private fun startSendingMessages() {
+    if (dequeueAndSenderJob?.isActive == true) {
+      Timber.v("Outbound message loop already running")
+      return
+    }
+    Timber.i("Starting outbound message loop job")
+    dequeueAndSenderJob = scope.launch(ioDispatcher) { sendAvailableMessages() }
   }
 
   private fun getEndpoint(mode: ConnectionMode): MessageProcessorEndpoint {
@@ -243,11 +280,18 @@ constructor(
 
   // Should be on the background thread here, because we block
   private suspend fun sendAvailableMessages() {
-    if (outboundMessageQueueMutex.isLocked) {
+    /*
+    tryLock rather than checking isLocked and then taking the lock: the latter is TOCTOU-racy, and
+    a loop that loses that race would block here forever holding nothing useful. Bailing out is
+    correct — whoever holds the lock is the live loop.
+     */
+    if (!outboundMessageQueueMutex.tryLock()) {
       Timber.d("Outbound message loop already running. Skipping.")
       return
     }
-    outboundMessageQueueMutex.withLock {
+    try {
+      // The loop can be started before the queue has finished loading off disk.
+      queueInitJob.join()
       try {
         Timber.d("Starting outbound message loop.")
         var lastMessageStatus: LastMessageStatus = LastMessageStatus.Success
@@ -354,9 +398,10 @@ constructor(
         }
       } catch (e: Exception) {
         Timber.e(e, "Outgoing message loop failed")
-      } finally {
-        Timber.i("finishing outbound message loop")
       }
+    } finally {
+      Timber.i("finishing outbound message loop")
+      outboundMessageQueueMutex.unlock()
     }
   }
 

@@ -33,6 +33,7 @@ This release addresses a security advisory covering several intent-handling vuln
 - Waypoint region state no longer flips back and forth ("bouncing") when a location fix lands near the boundary. GMS builds now rely solely on the native Play Services geofencing API, which already has its own hysteresis, instead of racing it against the app's own per-fix distance check; OSS builds (which have no native geofencing to fall back on) now require a region transition candidate to persist for 2 minutes before it's committed
 - Remote "reportLocation" requests are no longer silently dropped by the new (opt-in) implausible-speed filter
 - `discardNetworkLocationThresholdSeconds` had its check the wrong way round, discarding a high-accuracy gps/fused fix that arrived shortly after a network one, rather than the other way about. It now behaves as documented. Only affects users who had set this preference; it is disabled by default (#2289)
+- MQTT mode could get permanently stuck after a network change, queueing messages indefinitely until the app was force-stopped and reopened. A connect attempt that failed while the new network was still settling (typically a DNS failure moments after WiFi associated) left the endpoint in an error state that no later network event would retry, and a background service restart could silently kill the outgoing message loop for the remaining lifetime of the process (#2294, thanks [@tobru](https://github.com/tobru))
 
 
 ## Version 2.5.10
