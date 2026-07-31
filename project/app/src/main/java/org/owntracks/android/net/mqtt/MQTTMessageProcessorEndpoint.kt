@@ -386,6 +386,9 @@ class MQTTMessageProcessorEndpoint(
                       Timber.i(
                           "MQTT Connected. Subscribing to ${mqttConnectionConfiguration.topicsToSubscribeTo}")
                       endpointStateRepo.setState(EndpointState.CONNECTED)
+                      // This run of failures is over, so the next one starts from the short delay
+                      // again rather than inheriting however far this one had backed off.
+                      scheduler.resetMqttReconnectBackoff()
                       setCallback(mqttCallback)
                       subscribe(
                               mqttConnectionConfiguration.topicsToSubscribeTo.toTypedArray(),
