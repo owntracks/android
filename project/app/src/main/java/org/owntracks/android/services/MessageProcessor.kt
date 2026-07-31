@@ -24,10 +24,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.owntracks.android.data.EndpointState
+import org.owntracks.android.data.repos.AsyncDeQueue
 import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.data.repos.EndpointStateRepo
-import org.owntracks.android.data.repos.RoomBackedMessageQueue
 import org.owntracks.android.data.waypoints.WaypointsRepo
 import org.owntracks.android.di.ApplicationScope
 import org.owntracks.android.di.CoroutineScopes.IoDispatcher
@@ -78,7 +79,7 @@ constructor(
   @param:ApplicationScope private val scope: CoroutineScope,
   @param:Named("mqttConnectionIdlingResource")
     private val mqttConnectionIdlingResource: SimpleIdlingResource,
-  private val outgoingQueue: RoomBackedMessageQueue
+  private val outgoingQueue: AsyncDeQueue
 ) : Preferences.OnPreferenceChangeListener {
   private var messageProcessorEndpoint: MessageProcessorEndpoint? = null
   private val queueInitJob: Job =
@@ -147,7 +148,8 @@ constructor(
   /** Called either by the connection activity user button, or by receiving a RECONNECT message */
   suspend fun reconnect(): Result<Unit> {
     Timber.v("reconnect")
-    return try {
+    val result =
+        try {
           when (messageProcessorEndpoint) {
             null -> {
               // The processor should take care of the reconnect on init
@@ -164,13 +166,16 @@ constructor(
         } catch (e: Exception) {
           Result.failure(e)
         }
-        /*
-        A reconnect is only useful if something is alive to drain the queue afterwards. This has to
-        run *after* the branch above: loadOutgoingMessageProcessor() launches (and takes ownership
-        of) the sender job itself, so starting one first would leave that loop orphaned, holding
-        outboundMessageQueueMutex but no longer reachable by stopSendingMessages.
-         */
-        .also { startSendingMessages() }
+    /*
+    A reconnect is only useful if something is alive to drain the queue afterwards. Deliberately
+    *after* the branch above: loadOutgoingMessageProcessor() launches (and takes ownership of) the
+    sender job itself, so starting one first would leave that loop orphaned, still holding
+    outboundMessageQueueMutex but no longer reachable by stopSendingMessages. It also runs
+    regardless of the result, because a failed endpoint reconnect is exactly when the loop most
+    needs to be alive to keep re-queueing and backing off.
+     */
+    startSendingMessages()
+    return result
   }
 
   val isEndpointReady: Boolean
@@ -192,22 +197,19 @@ constructor(
     messageProcessorEndpoint?.deactivate().also { Timber.d("Destroying previous endpoint") }
     messageProcessorEndpoint = getEndpoint(preferences.mode)
 
-    // Cancel before replacing, otherwise a still-running loop is orphaned: it would keep hold of
-    // outboundMessageQueueMutex (making the replacement bail out immediately) while no longer being
-    // reachable by stopSendingMessages.
-    dequeueAndSenderJob?.cancel()
-    dequeueAndSenderJob =
-        scope.launch(ioDispatcher) {
-          messageProcessorEndpoint?.activate()
-          sendAvailableMessages()
-        }
+    // Activation is launched separately from the sender loop. The loop coping with an endpoint that
+    // isn't ready is a normal, handled case (it re-queues and backs off), so it must not be
+    // prevented from starting just because activation threw.
+    scope.launch(ioDispatcher) { messageProcessorEndpoint?.activate() }
+    startSendingMessages()
   }
 
   /**
    * Launches the outbound message loop, unless one is already running.
    *
-   * Safe and cheap to call from any path that wants messages flowing again. [stopSendingMessages]
-   * cancels the loop when the background service goes away, so this is what brings it back.
+   * The sole launcher of that loop, so that [dequeueAndSenderJob] is always a truthful record of
+   * whether one is alive and [stopSendingMessages] can always reach it. Safe and cheap to call from
+   * any path that wants messages flowing again.
    */
   @Synchronized
   private fun startSendingMessages() {
@@ -281,15 +283,14 @@ constructor(
   // Should be on the background thread here, because we block
   private suspend fun sendAvailableMessages() {
     /*
-    tryLock rather than checking isLocked and then taking the lock: the latter is TOCTOU-racy, and
-    a loop that loses that race would block here forever holding nothing useful. Bailing out is
-    correct — whoever holds the lock is the live loop.
+    Whether a loop is alive is tracked by dequeueAndSenderJob in startSendingMessages, which is the
+    only thing that launches this — that, not the mutex, is the liveness check. The previous
+    `if (mutex.isLocked) return` was both TOCTOU-racy and the wrong question: a loop that lost the
+    race silently gave up and was never restarted. The mutex now only serialises the handover, so a
+    replacement loop cannot start consuming the queue before a cancelled one has finished
+    unwinding.
      */
-    if (!outboundMessageQueueMutex.tryLock()) {
-      Timber.d("Outbound message loop already running. Skipping.")
-      return
-    }
-    try {
+    outboundMessageQueueMutex.withLock {
       // The loop can be started before the queue has finished loading off disk.
       queueInitJob.join()
       try {
@@ -398,10 +399,9 @@ constructor(
         }
       } catch (e: Exception) {
         Timber.e(e, "Outgoing message loop failed")
+      } finally {
+        Timber.i("finishing outbound message loop")
       }
-    } finally {
-      Timber.i("finishing outbound message loop")
-      outboundMessageQueueMutex.unlock()
     }
   }
 
