@@ -122,16 +122,10 @@ constructor(
    * service, and then try and connect to the endpoint.
    */
   fun initialize() {
-    if (!initialized) {
-      initialized = true
+    if (claimInitialization()) {
       Timber.d("Initializing MessageProcessor")
       scope.launch {
-        applicationContext.bindService(
-            Intent(applicationContext, BackgroundService::class.java),
-            serviceConnection,
-            Context.BIND_AUTO_CREATE)
-        endpointStateRepo.setState(EndpointState.INITIAL)
-        queueInitJob.join()
+        bindToBackgroundService()
         reconnect() // which arms the sender loop for us
       }
     } else {
@@ -145,6 +139,53 @@ constructor(
       Timber.d("MessageProcessor already initialized, re-arming the sender loop")
       startSendingMessages()
     }
+  }
+
+  /**
+   * Makes this process capable of holding a connection, then connects.
+   *
+   * For workers, which is the one place that cannot assume any of that has happened yet: WorkManager
+   * starts the process to run a job, so a reconnect job can be the very first thing to run in it,
+   * with nothing bound to the background service and no endpoint built. Both are normally the work
+   * of [initialize], which only the background service calls, so a worker that skips this connects
+   * nowhere and — having never bound anything — is in a process the system is free to kill the
+   * moment the job returns.
+   *
+   * Everything it does is idempotent, so the common case of a process that is already up and merely
+   * disconnected costs nothing beyond the reconnect itself.
+   */
+  suspend fun initializeAndReconnect(): Result<Unit> {
+    if (claimInitialization()) {
+      Timber.d("Initializing MessageProcessor from a worker")
+      bindToBackgroundService()
+    }
+    return reconnect()
+  }
+
+  /**
+   * Marks initialization as ours to perform, returning whether it was.
+   *
+   * Synchronized and claim-then-act, because the background service starting and a worker running
+   * are unrelated events that can land on this at the same time, and initializing twice would bind
+   * the service twice.
+   */
+  @Synchronized
+  private fun claimInitialization(): Boolean =
+      if (initialized) {
+        false
+      } else {
+        initialized = true
+        true
+      }
+
+  /** Binds the background service into this process and waits for the outgoing queue to be usable. */
+  private suspend fun bindToBackgroundService() {
+    applicationContext.bindService(
+        Intent(applicationContext, BackgroundService::class.java),
+        serviceConnection,
+        Context.BIND_AUTO_CREATE)
+    endpointStateRepo.setState(EndpointState.INITIAL)
+    queueInitJob.join()
   }
 
   /** Called either by the connection activity user button, or by receiving a RECONNECT message */
@@ -193,6 +234,14 @@ constructor(
         else -> true
       }
 
+  /**
+   * Whether there is an endpoint with a complete configuration.
+   *
+   * Note that this is false when no endpoint has been *loaded* yet, which is the normal state of a
+   * process that has only just been started to run a worker, and says nothing about whether the
+   * configuration is complete. Anything that wants to connect should just call
+   * [initializeAndReconnect] and let it report what happened.
+   */
   val isEndpointReady: Boolean
     get() {
       try {

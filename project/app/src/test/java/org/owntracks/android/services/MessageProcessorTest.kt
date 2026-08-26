@@ -1,6 +1,8 @@
 package org.owntracks.android.services
 
 import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import dagger.Lazy
 import java.io.File
 import java.security.KeyStore
@@ -21,8 +23,11 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.owntracks.android.data.repos.AsyncDeQueue
 import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.data.repos.EndpointStateRepo
@@ -109,14 +114,16 @@ class MessageProcessorTest {
       CoroutineScope(SupervisorJob() + testDispatcher + CoroutineExceptionHandler { _, _ -> })
 
   private lateinit var queue: LoopDetectingQueue
+  private lateinit var applicationContext: Context
   private lateinit var messageProcessor: MessageProcessor
 
   @Before
   fun setUp() {
     queue = LoopDetectingQueue()
+    applicationContext = mock<Context> { on { filesDir } doReturn File("/tmp") }
     messageProcessor =
         MessageProcessor(
-            applicationContext = mock<Context> { on { filesDir } doReturn File("/tmp") },
+            applicationContext = applicationContext,
             contactsRepo = mock {},
             preferences = mock { on { mode } doReturn ConnectionMode.HTTP },
             waypointsRepo = mock {},
@@ -228,6 +235,39 @@ class MessageProcessorTest {
     assertLoopRunning(queue.armLoopDetector(), "sender loop should be running after initialize")
 
     runBlocking { assertTrue(messageProcessor.checkConnection()) }
+  }
+
+  /**
+   * The regression behind connections that stayed dead for hours: a worker runs in whatever process
+   * WorkManager started for it, which for a reconnect after a process death is a brand new one where
+   * nothing has loaded an endpoint. Asking [MessageProcessor.isEndpointReady] there answers "no" —
+   * not because the configuration is incomplete, but because nothing has built anything yet — so
+   * every attempt rescheduled itself and none ever connected.
+   */
+  @Test
+  fun `initializeAndReconnect loads an endpoint in a process that has never initialized`() {
+    val detector = queue.armLoopDetector()
+
+    runBlocking { messageProcessor.initializeAndReconnect() }
+
+    assertLoopRunning(
+        detector, "a worker's reconnect should have loaded the endpoint and armed the sender loop")
+  }
+
+  /**
+   * A worker and the background service starting are unrelated events, and either can be first in a
+   * given process. Whichever gets there, the process ends up bound exactly once.
+   */
+  @Test
+  fun `initializeAndReconnect and initialize bind the background service once between them`() {
+    runBlocking { messageProcessor.initializeAndReconnect() }
+    assertLoopRunning(
+        queue.armLoopDetector(), "sender loop should be running after initializeAndReconnect")
+
+    messageProcessor.initialize() // the background service starts later in the same process
+
+    verify(applicationContext, times(1))
+        .bindService(any<Intent>(), any<ServiceConnection>(), any<Int>())
   }
 
   companion object {

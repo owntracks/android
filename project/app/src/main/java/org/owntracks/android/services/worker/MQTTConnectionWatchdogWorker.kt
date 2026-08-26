@@ -8,6 +8,8 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import org.owntracks.android.data.EndpointState
 import org.owntracks.android.data.repos.EndpointStateRepo
+import org.owntracks.android.preferences.Preferences
+import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.services.MessageProcessor
 import timber.log.Timber
 
@@ -26,12 +28,17 @@ constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
     private val messageProcessor: MessageProcessor,
-    private val endpointStateRepo: EndpointStateRepo
+    private val endpointStateRepo: EndpointStateRepo,
+    private val preferences: Preferences
 ) : CoroutineWorker(context, workerParams) {
 
   override suspend fun doWork(): Result {
-    if (!messageProcessor.isEndpointReady) {
-      Timber.d("Connection watchdog: endpoint not configured, nothing to check")
+    if (preferences.mode != ConnectionMode.MQTT) {
+      // Only MQTT holds a connection to watch. The check is on the mode rather than on whether an
+      // endpoint has been loaded: in a process WorkManager has just started for this job, nothing
+      // has loaded one yet, and treating that as "nothing to check" is how the backstop came to do
+      // nothing in precisely the situation it exists for.
+      Timber.d("Connection watchdog: not in MQTT mode, nothing to check")
       return Result.success()
     }
     val state = endpointStateRepo.endpointState.value
@@ -46,7 +53,9 @@ constructor(
     // Logged at WARN deliberately: this firing at all means every reactive path missed something,
     // and that is exactly what is worth having in an exported log.
     Timber.w("Connection watchdog: endpoint unhealthy in state $state, reconnecting")
-    messageProcessor.reconnect()
+    // Binds the background service and builds the endpoint first if this process has neither, which
+    // is the case whenever this job is what started it.
+    messageProcessor.initializeAndReconnect()
     return Result.success()
   }
 

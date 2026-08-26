@@ -29,14 +29,17 @@ constructor(
    */
   override suspend fun doWork(): Result {
     Timber.i("MQTT reconnect worker job started")
-    if (!messageProcessor.isEndpointReady) {
-      // The endpoint can become ready later — the user finishes configuring it, or a mode change
-      // completes — so keep asking rather than giving up permanently.
-      Timber.d("Unable to reconnect as endpoint is not ready")
-      scheduler.scheduleMqttReconnect()
-      return Result.success()
-    }
-    if (messageProcessor.reconnect().isFailure) {
+    // initializeAndReconnect rather than reconnect, because WorkManager may well have started this
+    // process to run this very job, in which case nothing has bound the background service or built
+    // the endpoint yet. Guarding on MessageProcessor.isEndpointReady here instead — as this used to
+    // — is worse than useless: an endpoint that has not been loaded reports "not ready" no matter
+    // how complete its configuration is, so a reconnect after a process death rescheduled itself
+    // forever without ever attempting a connection.
+    if (messageProcessor.initializeAndReconnect().isFailure) {
+      // Covers an incomplete configuration as well as a failed connection: the endpoint can become
+      // configured later — the user finishes setting it up, or a mode change completes — so keep
+      // asking rather than giving up permanently.
+      //
       // The endpoint's own connect-failure path also schedules a retry. Doing it here as well is
       // harmless: the work is unique, so at most one attempt is ever pending, and the only effect
       // of counting the failure twice is reaching the delay ceiling slightly sooner.
