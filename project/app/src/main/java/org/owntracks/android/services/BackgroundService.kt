@@ -2,6 +2,7 @@ package org.owntracks.android.services
 
 import android.Manifest
 import android.app.ActivityManager
+import android.app.AlarmManager
 import android.app.ForegroundServiceStartNotAllowedException
 import android.app.Notification
 import android.app.PendingIntent
@@ -17,6 +18,7 @@ import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
+import android.os.SystemClock
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.StyleSpan
@@ -40,6 +42,7 @@ import java.util.stream.Collectors
 import javax.inject.Inject
 import javax.inject.Named
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -133,6 +136,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
   private val activityManager by lazy {
     this.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
   }
+  private val alarmManager by lazy { this.getSystemService(Context.ALARM_SERVICE) as AlarmManager }
   private val powerStateLogger by lazy { PowerStateLogger(this.applicationContext) }
   private val powerBroadcastReceiver =
       object : BroadcastReceiver() {
@@ -261,6 +265,56 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
   }
 
   /**
+   * Asks to be started again shortly after the user swipes the app off the Recents screen.
+   *
+   * On AOSP this callback is informational: a started service with an ongoing notification survives
+   * task removal, and nothing here is needed. It is for the manufacturers who treat a swipe as
+   * something close to a force-stop, killing the process and dropping the [START_STICKY] restart
+   * that would otherwise bring the service — and the MQTT connection with it — back. On those
+   * devices this is the difference between reconnecting seconds later and staying disconnected
+   * until the user next opens the app.
+   *
+   * Deliberately not conditional on any preference: the service was running when the task was
+   * removed, and on a stock device it would still be running afterwards. This only restores that.
+   *
+   * The alarm is what makes it work at all — it lives in the system, so it survives the process
+   * being killed a moment later, and [AlarmManager.setAndAllowWhileIdle] puts the app briefly on
+   * the temporary power exemption list when it fires, which is what allows the resulting start to
+   * promote itself to the foreground. Best-effort even so: a manufacturer that really does treat a
+   * swipe as a force-stop cancels the app's alarms along with everything else, and nothing this
+   * process can do before it dies will survive that.
+   */
+  override fun onTaskRemoved(rootIntent: Intent?) {
+    Timber.i("Task removed, scheduling a service restart in $TASK_REMOVED_RESTART_DELAY")
+    try {
+      alarmManager.setAndAllowWhileIdle(
+          AlarmManager.ELAPSED_REALTIME_WAKEUP,
+          SystemClock.elapsedRealtime() + TASK_REMOVED_RESTART_DELAY.inWholeMilliseconds,
+          restartAfterTaskRemovedIntent())
+    } catch (e: Exception) {
+      // Nothing here is worth taking the process down for on the way out.
+      Timber.e(e, "Unable to schedule a service restart after task removal")
+    }
+    super.onTaskRemoved(rootIntent)
+  }
+
+  /**
+   * A start request for this service, deliverable by the system on our behalf once this process is
+   * gone.
+   */
+  private fun restartAfterTaskRemovedIntent(): PendingIntent =
+      Intent(applicationContext, BackgroundService::class.java)
+          .setAction(INTENT_ACTION_RESTART_AFTER_TASK_REMOVED)
+          .let {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+              PendingIntent.getForegroundService(
+                  applicationContext, 0, it, UPDATE_CURRENT_INTENT_FLAGS)
+            } else {
+              PendingIntent.getService(applicationContext, 0, it, UPDATE_CURRENT_INTENT_FLAGS)
+            }
+          }
+
+  /**
    * We've been sent a start command with an intent, which usually means we've got to do something
    * depending on the action
    *
@@ -312,6 +366,14 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
           }
           hasBeenStartedExplicitly = true
           notificationManagerCompat.cancel(BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG, 0)
+          return
+        }
+        // The restart we asked for in onTaskRemoved. Sets the service up from scratch, because the
+        // usual reason for getting here is that the process was killed and this one is new. Doing
+        // it again in the process that scheduled it — a device where the swipe did not kill
+        // anything — is harmless: everything setupAndStartService does can be repeated.
+        INTENT_ACTION_RESTART_AFTER_TASK_REMOVED -> {
+          setupAndStartService()
           return
         }
         INTENT_ACTION_BOOT_COMPLETED,
@@ -700,8 +762,16 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
         "org.owntracks.android.CLEAR_EVENT_NOTIFICATIONS"
     private const val INTENT_ACTION_CLEAR_CONTACTS = "org.owntracks.android.CLEAR_CONTACTS"
     const val INTENT_ACTION_CHANGE_MONITORING = "org.owntracks.android.CHANGE_MONITORING"
+    private const val INTENT_ACTION_RESTART_AFTER_TASK_REMOVED =
+        "org.owntracks.android.RESTART_AFTER_TASK_REMOVED"
     private const val INTENT_ACTION_BOOT_COMPLETED = "android.intent.action.BOOT_COMPLETED"
     private const val INTENT_ACTION_PACKAGE_REPLACED = "android.intent.action.MY_PACKAGE_REPLACED"
+    /**
+     * Long enough that a manufacturer's task-removal cleanup has finished tearing the process down
+     * before the restart lands, short enough that the connection is only briefly gone.
+     */
+    private val TASK_REMOVED_RESTART_DELAY = 5.seconds
+
     const val UPDATE_CURRENT_INTENT_FLAGS =
         PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
   }
