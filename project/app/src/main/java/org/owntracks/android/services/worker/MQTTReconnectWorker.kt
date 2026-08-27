@@ -6,6 +6,8 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import org.owntracks.android.data.EndpointState
+import org.owntracks.android.data.repos.EndpointStateRepo
 import org.owntracks.android.services.MessageProcessor
 import timber.log.Timber
 
@@ -16,7 +18,8 @@ constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
     private val messageProcessor: MessageProcessor,
-    private val scheduler: Scheduler
+    private val scheduler: Scheduler,
+    private val endpointStateRepo: EndpointStateRepo
 ) : CoroutineWorker(context, workerParams) {
   /**
    * Always reports [Result.success], because whether another attempt is needed is not WorkManager's
@@ -29,6 +32,24 @@ constructor(
    */
   override suspend fun doWork(): Result {
     Timber.i("MQTT reconnect worker job started")
+    /*
+    Nothing cancels this job when a different, faster path — most commonly the connectivity
+    callback's immediate reconnect on a network becoming available — restores the connection before
+    this scheduled attempt runs: WorkManager offers no way to cancel a job's own unique work from
+    inside itself without risking cancelling this very execution mid-flight (a real hazard here,
+    since a cancellation landing during the subscribe call a successful connect makes right
+    afterwards would be caught by connectToBroker's own catch block and misreported as a failure).
+    So this checks whether the connection already looks healthy before touching it at all, rather
+    than assuming a scheduled reconnect is still needed just because it was once scheduled. Reuses
+    the watchdog's policy: the two ask the same question, "is this connection actually fine",
+    just prompted by different triggers.
+     */
+    val state = endpointStateRepo.endpointState.value
+    val connectionCheckPassed = state == EndpointState.CONNECTED && messageProcessor.checkConnection()
+    if (!MQTTConnectionWatchdogWorker.shouldReconnect(state, connectionCheckPassed)) {
+      Timber.d("Connection already healthy, nothing to do")
+      return Result.success()
+    }
     // initializeAndReconnect rather than reconnect, because WorkManager may well have started this
     // process to run this very job, in which case nothing has bound the background service or built
     // the endpoint yet. Guarding on MessageProcessor.isEndpointReady here instead — as this used to

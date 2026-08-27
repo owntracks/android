@@ -61,15 +61,19 @@ constructor(
 
   companion object {
     /**
-     * Whether the watchdog should force a reconnect, given what the endpoint state claims and
-     * whether a connection check actually succeeded.
+     * Whether an endpoint in this state, with this connection check result, is worth reconnecting.
+     * Shared with [MQTTReconnectWorker]: both ask the same question, "is this connection actually
+     * fine", just prompted by different triggers.
      *
      * Extracted so the policy can be tested without a [CoroutineWorker]'s Android dependencies.
      *
      * Note that [EndpointState.CONNECTING] is treated as unhealthy, unlike in the connectivity
-     * callback where an in-flight attempt is left alone: the watchdog only runs every fifteen
-     * minutes, and a connect attempt still outstanding on that timescale is stuck rather than
-     * progressing.
+     * callback where an in-flight attempt is left alone: on the watchdog's fifteen-minute cadence a
+     * connect attempt still outstanding is stuck rather than progressing. [MQTTReconnectWorker]
+     * inherits that same call for a state it can also see much sooner after a disconnect, where a
+     * CONNECTING it finds is more likely still genuinely in progress — unchanged from its
+     * pre-existing behaviour of reconnecting regardless of state, not a guarantee this policy was
+     * built to make.
      */
     internal fun shouldReconnect(state: EndpointState, connectionCheckPassed: Boolean): Boolean =
         state != EndpointState.CONNECTED || !connectionCheckPassed
