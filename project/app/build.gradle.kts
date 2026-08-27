@@ -256,8 +256,8 @@ dependencies {
   implementation(libs.kotlin.datetime)
   implementation(libs.kotlinx.serialization.json)
 
-  // The BC version shipped under com.android is half-broken. Weird certificate issues etc.
-  // To solve, we bring in our own version of BC
+  // Used directly for its lightweight XSalsa20/Poly1305 primitives (EncryptionProvider); not
+  // registered as a JCA Security provider, so only those specific classes end up in the app.
   implementation(libs.bouncycastle)
 
   // Widget libraries

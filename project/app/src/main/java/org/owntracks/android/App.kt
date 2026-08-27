@@ -25,7 +25,6 @@ import javax.inject.Provider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.time.Instant
-import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.conscrypt.Conscrypt
 import org.owntracks.android.di.CustomBindingComponentBuilder
 import org.owntracks.android.di.CustomBindingEntryPoint
@@ -96,10 +95,6 @@ open class BaseApp :
   override fun onCreate() {
     // Make sure we use Conscrypt for advanced TLS features on all devices.
     Security.insertProviderAt(Conscrypt.newProviderBuilder().provideTrustManager(true).build(), 1)
-
-    // Bring in a real version of BC and don't use the device version.
-    Security.removeProvider("BC")
-    Security.addProvider(BouncyCastleProvider())
 
     super.onCreate()
 

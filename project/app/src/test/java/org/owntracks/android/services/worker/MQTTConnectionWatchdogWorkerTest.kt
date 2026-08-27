@@ -7,12 +7,15 @@ import org.junit.Test
 import org.owntracks.android.data.EndpointState
 
 /**
- * Tests for the connection watchdog's reconnect policy.
+ * Tests for [MQTTConnectionWatchdogWorker.shouldReconnect], the "is this connection actually fine"
+ * policy shared by the connection watchdog and [MQTTReconnectWorker] — the latter uses it to skip
+ * reconnecting a connection a faster path already restored, rather than tearing down a healthy one
+ * (issue #2294).
  *
- * The watchdog exists because every other reconnect trigger in the app is reactive, so anything
- * they collectively miss is missed permanently (issue #2294). The case that motivates it is a
- * connection that is dead but still believed to be up, which produces no event of any kind — so
- * that is the case most worth pinning down here.
+ * The watchdog itself exists because every other reconnect trigger in the app is reactive, so
+ * anything they collectively miss is missed permanently. The case that motivates it is a connection
+ * that is dead but still believed to be up, which produces no event of any kind — so that is the
+ * case most worth pinning down here.
  */
 class MQTTConnectionWatchdogWorkerTest {
 

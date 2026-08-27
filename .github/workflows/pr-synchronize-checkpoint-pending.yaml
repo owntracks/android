@@ -1,0 +1,54 @@
+---
+# When a new commit is pushed to an already-open PR, the real test suite (build-test-lint.yaml) is
+# NOT re-run automatically — that's deliberately comment-gated (see pull-request-comment.yaml) to
+# avoid burning CI minutes, and Espresso emulator time in particular, on every fixup commit during
+# active PR iteration.
+#
+# Without this workflow, that means a new commit's SHA has no "PR Checkpoint Status" posted for it
+# at all until someone remembers to comment /run-tests, which can silently let an unvalidated commit
+# sit mergeable (or only blockable via an admin's manual judgement) rather than visibly blocked.
+#
+# This posts a pending status for the new SHA instead, so the PR is not mergeable until it is
+# explicitly re-validated. It deliberately uses the Commit Status API rather than the Checks API
+# used elsewhere in this repo: multiple statuses posted under the same context for the same commit
+# simply supersede one another, so the real conclusion posted later by pull-request-comment.yaml
+# (once someone comments /run-tests) cleanly replaces this pending marker rather than sitting
+# alongside it as a second, permanently-unresolved check with the same name.
+name: PR Synchronized (Pending Checkpoint)
+
+"on":
+  pull_request:
+    types: [synchronize]
+    branches:
+      - master
+    paths:
+      - ".github/workflows/**"
+      - "project/app/src/**"
+      - "project/app/*.pro"
+      - "project/buildSrc/src/**"
+      - "project/*.gradle.kts"
+      - "project/app/*.gradle.kts"
+      - "project/gradle.properties"
+      - "project/gradle/wrapper/gradle-wrapper.properties"
+      - "project/gradle/libs.versions.toml"
+
+jobs:
+  mark-pending:
+    name: "Mark PR Checkpoint Status pending"
+    runs-on: ubuntu-latest
+    permissions:
+      statuses: write
+    steps:
+      - name: Set pending status
+        uses: actions/github-script@v9
+        with:
+          script: |
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.payload.pull_request.head.sha,
+              state: 'pending',
+              context: 'PR Checkpoint Status',
+              description: 'New commits pushed — comment /run-tests to validate before merging',
+              target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+            });

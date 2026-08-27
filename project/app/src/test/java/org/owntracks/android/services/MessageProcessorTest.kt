@@ -260,9 +260,13 @@ class MessageProcessorTest {
    */
   @Test
   fun `initializeAndReconnect and initialize bind the background service once between them`() {
+    // Armed before initializeAndReconnect runs, not after: awaitMessage is only ever called once
+    // per loop start and then parks forever on the empty channel, so a detector armed afterwards
+    // can miss it entirely if the loop reaches awaitMessage first — a real race, not a hypothetical
+    // one, since the loop starts on a separate dispatcher thread than this one.
+    val detector = queue.armLoopDetector()
     runBlocking { messageProcessor.initializeAndReconnect() }
-    assertLoopRunning(
-        queue.armLoopDetector(), "sender loop should be running after initializeAndReconnect")
+    assertLoopRunning(detector, "sender loop should be running after initializeAndReconnect")
 
     messageProcessor.initialize() // the background service starts later in the same process
 
