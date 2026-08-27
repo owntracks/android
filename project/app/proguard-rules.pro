@@ -47,10 +47,6 @@
 -dontwarn org.openjsse.javax.net.ssl.SSLSocket
 -dontwarn org.openjsse.net.ssl.OpenJSSE
 
-# Bouncycastle
--keep class org.bouncycastle.jcajce.** { *; }
--keep class org.bouncycastle.jce.** { *; }
-
 -dontwarn javax.naming.**
 
 # From https://raw.githubusercontent.com/JetBrains/kotlin/v1.6.21/core/reflection.jvm/resources/META-INF/proguard/kotlin-reflect.pro
