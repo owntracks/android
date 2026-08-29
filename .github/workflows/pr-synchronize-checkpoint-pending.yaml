@@ -8,12 +8,13 @@
 # at all until someone remembers to comment /run-tests, which can silently let an unvalidated commit
 # sit mergeable (or only blockable via an admin's manual judgement) rather than visibly blocked.
 #
-# This posts a pending status for the new SHA instead, so the PR is not mergeable until it is
-# explicitly re-validated. It deliberately uses the Commit Status API rather than the Checks API
-# used elsewhere in this repo: multiple statuses posted under the same context for the same commit
-# simply supersede one another, so the real conclusion posted later by pull-request-comment.yaml
-# (once someone comments /run-tests) cleanly replaces this pending marker rather than sitting
-# alongside it as a second, permanently-unresolved check with the same name.
+# This posts an in-progress check for the new SHA instead, so the PR is not mergeable until it is
+# explicitly re-validated. It uses the same Checks API (LouisBrunner/checks-action) as
+# pull-request-comment.yaml rather than the Commit Status API: GitHub's required-status-check
+# matching does not dedupe a Checks API run against a Commit Status API entry of the same name, so
+# mixing the two left an unresolvable "PR Checkpoint Status: pending" commit status sitting
+# alongside the real, later "success" check run and permanently blocking merge. Keeping both on the
+# Checks API means the later run (from /run-tests) is simply the more recent check with this name.
 name: PR Synchronized (Pending Checkpoint)
 
 "on":
@@ -37,18 +38,15 @@ jobs:
     name: "Mark PR Checkpoint Status pending"
     runs-on: ubuntu-latest
     permissions:
-      statuses: write
+      checks: write
     steps:
-      - name: Set pending status
-        uses: actions/github-script@v9
+      - name: Set pending check
+        uses: LouisBrunner/checks-action@v3.1.0
         with:
-          script: |
-            await github.rest.repos.createCommitStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              sha: context.payload.pull_request.head.sha,
-              state: 'pending',
-              context: 'PR Checkpoint Status',
-              description: 'New commits pushed — comment /run-tests to validate before merging',
-              target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
-            });
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: PR Checkpoint Status
+          sha: ${{ github.event.pull_request.head.sha }}
+          status: in_progress
+          details_url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          output: |
+            {"title":"Awaiting validation", "summary":"New commits pushed — comment /run-tests to validate before merging", "text":"New commits pushed — comment /run-tests to validate before merging"}
