@@ -53,6 +53,13 @@ import org.owntracks.android.test.ThresholdIdlingResourceInterface
  * The loop itself is private, so these tests observe it through the queue: a live loop parks in
  * [AsyncDeQueue.awaitMessage] waiting for work, so reaching that call is the signal that the loop is
  * running.
+ *
+ * Every detector must be armed *before* the action that's expected to trigger it, never after:
+ * `awaitMessage` is called once per loop start and then parks forever on an empty channel, so a
+ * detector armed too late can miss a loop that reaches it first on its own dispatcher thread —
+ * nothing will ever call `awaitMessage` again to satisfy a detector that showed up afterwards. This
+ * bit the setup steps in several tests here, not just the assertion under test, because a lost race
+ * in setup still fails the test — just with a less obvious message.
  */
 class MessageProcessorTest {
 
@@ -158,8 +165,9 @@ class MessageProcessorTest {
 
   @Test
   fun `stopSendingMessages stops the outbound sender loop`() {
+    val startDetector = queue.armLoopDetector()
     messageProcessor.initialize()
-    assertLoopRunning(queue.armLoopDetector(), "sender loop should be running after initialize")
+    assertLoopRunning(startDetector, "sender loop should be running after initialize")
 
     messageProcessor.stopSendingMessages()
 
@@ -178,8 +186,9 @@ class MessageProcessorTest {
    */
   @Test
   fun `initialize re-arms the sender loop after the background service is destroyed and recreated`() {
+    val startDetector = queue.armLoopDetector()
     messageProcessor.initialize() // service starts
-    assertLoopRunning(queue.armLoopDetector(), "sender loop should be running after initialize")
+    assertLoopRunning(startDetector, "sender loop should be running after initialize")
 
     messageProcessor.stopSendingMessages() // BackgroundService.onDestroy
 
@@ -192,8 +201,9 @@ class MessageProcessorTest {
   /** Whatever triggered the reconnect, the queue still needs something alive to drain it. */
   @Test
   fun `reconnect re-arms the sender loop`() {
+    val startDetector = queue.armLoopDetector()
     messageProcessor.initialize()
-    assertLoopRunning(queue.armLoopDetector(), "sender loop should be running after initialize")
+    assertLoopRunning(startDetector, "sender loop should be running after initialize")
 
     messageProcessor.stopSendingMessages()
 
@@ -209,8 +219,9 @@ class MessageProcessorTest {
    */
   @Test
   fun `repeated initialize calls do not start a second loop`() {
+    val startDetector = queue.armLoopDetector()
     messageProcessor.initialize()
-    assertLoopRunning(queue.armLoopDetector(), "sender loop should be running after initialize")
+    assertLoopRunning(startDetector, "sender loop should be running after initialize")
 
     // Already-running loop is parked in awaitMessage; a second loop would have to call it again.
     val detector = queue.armLoopDetector()
@@ -231,8 +242,9 @@ class MessageProcessorTest {
    */
   @Test
   fun `checkConnection reports healthy for an endpoint with no persistent connection`() {
+    val startDetector = queue.armLoopDetector()
     messageProcessor.initialize() // preferences.mode is HTTP
-    assertLoopRunning(queue.armLoopDetector(), "sender loop should be running after initialize")
+    assertLoopRunning(startDetector, "sender loop should be running after initialize")
 
     runBlocking { assertTrue(messageProcessor.checkConnection()) }
   }

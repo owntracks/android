@@ -346,14 +346,6 @@ constructor(
 
   // Should be on the background thread here, because we block
   private suspend fun sendAvailableMessages() {
-    /*
-    Whether a loop is alive is tracked by dequeueAndSenderJob in startSendingMessages, which is the
-    only thing that launches this — that, not the mutex, is the liveness check. The previous
-    `if (mutex.isLocked) return` was both TOCTOU-racy and the wrong question: a loop that lost the
-    race silently gave up and was never restarted. The mutex now only serialises the handover, so a
-    replacement loop cannot start consuming the queue before a cancelled one has finished
-    unwinding.
-     */
     outboundMessageQueueMutex.withLock {
       // The loop can be started before the queue has finished loading off disk.
       queueInitJob.join()
@@ -672,10 +664,12 @@ constructor(
   suspend fun publishLocationMessage(trigger: MessageLocation.ReportType) {
     locationProcessorLazy.get().publishLocationMessage(trigger)
   }
-
   fun stopSendingMessages() {
     Timber.d("Interrupting background sending thread")
-    dequeueAndSenderJob?.cancel()
+    dequeueAndSenderJob?.also { job ->
+      job.cancel()
+      runBlocking { job.join() }
+    }
   }
 
   override fun onPreferenceChanged(properties: Set<String>) {
