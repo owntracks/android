@@ -50,6 +50,8 @@ jobs:
     permissions:
       contents: read
       checks: write
+      pull-requests: write
+      issues: write
     steps:
       - name: "Checkout"
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
@@ -66,6 +68,11 @@ jobs:
           report_paths: "**/TEST-*.xml"
           detailed_summary: true
           include_passed: false # Lots of test, much output.
+          # Only pull_request and issue_comment (/run-tests) runs have a PR to comment on;
+          # merge_group runs don't, so this harmlessly no-ops there.
+          comment: ${{ github.event_name == 'pull_request' || github.event_name == 'issue_comment' }}
+          updateComment: true
+          pr_id: ${{ github.event.pull_request.number || github.event.issue.number }}
       - name: Upload coverage
         uses: codecov/codecov-action@v7
         with:
