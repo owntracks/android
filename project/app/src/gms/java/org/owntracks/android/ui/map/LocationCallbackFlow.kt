@@ -22,6 +22,13 @@ import timber.log.Timber
     anyOf =
         ["android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_COARSE_LOCATION"])
 fun locationCallbackFlow(client: FusedLocationProviderClient): Flow<Location> = callbackFlow {
+  // Seed with whatever fix the device already has: requestLocationUpdates only emits once a new
+  // fix arrives, which can be several seconds out, so without this a fresh subscription (e.g.
+  // opening the map) reports no location at all in the meantime, even though the device already
+  // has a perfectly good last-known one.
+  client.lastLocation
+      .addOnSuccessListener { location -> location?.let { trySend(it) } }
+      .addOnFailureListener { e -> Timber.w(e, "locationCallbackFlow getLastLocation failed") }
   val callback =
       object : LocationCallback() {
         override fun onLocationResult(result: LocationResult) {
