@@ -44,7 +44,9 @@ class PreferencesActivityTests : TestWithAnActivity<PreferencesActivity>() {
     writeToPreference(R.string.preferencesHost, "mqtt.example.com")
     writeToPreference(R.string.preferencesPort, "1234")
     writeToPreference(
-        R.string.preferencesClientId, "test-clientId") // This hyphen will get squelched
+        R.string.preferencesClientId,
+        "test-clientId",
+    ) // This hyphen will get squelched
 
     clickOnPreference(R.string.preferencesWebsocket)
 
@@ -183,9 +185,14 @@ class PreferencesActivityTests : TestWithAnActivity<PreferencesActivity>() {
               .getDefaultValue<ReverseGeocodeProvider>(
                   Preferences(
                       SharedPreferencesStore(
-                          it, NotificationManagerCompat.from(app), NotificationsStash()),
-                      SimpleIdlingResource("unused", true)),
-                  Preferences::reverseGeocodeProvider)
+                          it,
+                          NotificationManagerCompat.from(app),
+                          NotificationsStash(),
+                      ),
+                      SimpleIdlingResource("unused", true),
+                  ),
+                  Preferences::reverseGeocodeProvider,
+              )
         }
     val expected =
         baristaRule.activityTestRule.activity.resources.run {

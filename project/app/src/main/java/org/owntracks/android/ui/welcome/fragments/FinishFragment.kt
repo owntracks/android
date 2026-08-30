@@ -19,7 +19,7 @@ class FinishFragment @Inject constructor() : WelcomeFragment() {
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
-      savedInstanceState: Bundle?
+      savedInstanceState: Bundle?,
   ): View {
     return UiWelcomeFinishBinding.inflate(inflater, container, false)
         .apply {
@@ -28,7 +28,8 @@ class FinishFragment @Inject constructor() : WelcomeFragment() {
             startActivity(
                 Intent(requireContext(), PreferencesActivity::class.java).apply {
                   flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                })
+                }
+            )
           }
         }
         .root

@@ -5,7 +5,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 abstract class BaseRecyclerViewHolder<T>(
     private val binding: ViewDataBinding,
-    private val bindingVariable: Int
+    private val bindingVariable: Int,
 ) : RecyclerView.ViewHolder(binding.root) {
   fun bind(item: T, clickListenerRecyclerView: ClickListener<T>) {
     binding.setVariable(bindingVariable, item)

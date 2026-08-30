@@ -13,7 +13,7 @@ import timber.log.Timber
 class LocationPermissionRequester(
     caller: ActivityResultCaller,
     private val permissionGrantedCallback: (code: Int) -> Unit,
-    private val permissionDeniedCallback: (code: Int) -> Unit
+    private val permissionDeniedCallback: (code: Int) -> Unit,
 ) {
 
   private val permissionRequest =
@@ -41,7 +41,7 @@ class LocationPermissionRequester(
   fun requestLocationPermissions(
       code: Int = 0,
       context: Context,
-      showPermissionRationale: (permissions: String) -> Boolean
+      showPermissionRationale: (permissions: String) -> Boolean,
   ) {
     Timber.d("Requesting Location Permissions with code=$code ")
     this.code = code

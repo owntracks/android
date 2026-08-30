@@ -45,7 +45,8 @@ class CALeafCertMatchingHostnameVerifierTest {
             .generateCertificate(ByteArrayInputStream(letsEncryptSignedLeaf))
     val sslSession = TestSSLSession(listOf(testLeaf, testCA))
     assertTrue(
-        CALeafCertMatchingHostnameVerifier().verify("valid-isrgrootx1.letsencrypt.org", sslSession))
+        CALeafCertMatchingHostnameVerifier().verify("valid-isrgrootx1.letsencrypt.org", sslSession)
+    )
   }
 
   @Test
@@ -206,7 +207,7 @@ class CALeafCertMatchingHostnameVerifierTest {
         alias: String?,
         key: Key?,
         password: CharArray?,
-        chain: Array<out Certificate>?
+        chain: Array<out Certificate>?,
     ) {
       TODO("Not yet implemented")
     }
@@ -214,7 +215,7 @@ class CALeafCertMatchingHostnameVerifierTest {
     override fun engineSetKeyEntry(
         alias: String?,
         key: ByteArray?,
-        chain: Array<out Certificate>?
+        chain: Array<out Certificate>?,
     ) {
       TODO("Not yet implemented")
     }

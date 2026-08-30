@@ -40,6 +40,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.core.widget.ImageViewCompat
+import androidx.core.widget.NestedScrollView
 import androidx.databinding.BindingAdapter
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -52,7 +53,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
-import androidx.core.widget.NestedScrollView
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import java.time.Instant
@@ -197,11 +197,11 @@ class MapActivity :
 
           bottomSheetBehavior =
               BottomSheetBehavior.from(bottomSheetLayout).apply {
-                  addBottomSheetCallback(
-                      object : BottomSheetBehavior.BottomSheetCallback() {
-                        override fun onStateChanged(bottomSheet: View, newState: Int) {
-                          updateMapLayoutForInsets(newState)
-                        }
+                addBottomSheetCallback(
+                    object : BottomSheetBehavior.BottomSheetCallback() {
+                      override fun onStateChanged(bottomSheet: View, newState: Int) {
+                        updateMapLayoutForInsets(newState)
+                      }
 
                       override fun onSlide(bottomSheet: View, slideOffset: Float) {
                         // No-op
@@ -248,8 +248,9 @@ class MapActivity :
             TooltipCompat.setTooltipText(this, getString(R.string.currentLocationButtonLabel))
 
             setOnClickListener {
-              if (checkAndRequestLocationPermissions(true) ==
-                  CheckPermissionsResult.HAS_PERMISSIONS) {
+              if (
+                  checkAndRequestLocationPermissions(true) == CheckPermissionsResult.HAS_PERMISSIONS
+              ) {
                 checkAndRequestLocationServicesEnabled(true)
               }
               if (viewModel.myLocationStatus.value != MyLocationStatus.DISABLED) {
@@ -400,10 +401,13 @@ class MapActivity :
                 .scheme("geo")
                 .authority("")
                 .appendPath(
-                    "${latitude.value.roundForDisplay()},${longitude.value.roundForDisplay()}")
+                    "${latitude.value.roundForDisplay()},${longitude.value.roundForDisplay()}"
+                )
         viewModel.zoomLevel?.let { builder.appendQueryParameter("z", it.roundToInt().toString()) }
         builder.appendQueryParameter(
-            "q", "${latitude.value.roundForDisplay()},${longitude.value.roundForDisplay()}")
+            "q",
+            "${latitude.value.roundForDisplay()},${longitude.value.roundForDisplay()}",
+        )
         val intent =
             Intent(
                 Intent.ACTION_VIEW,
@@ -570,7 +574,7 @@ class MapActivity :
   enum class CheckPermissionsResult {
     HAS_PERMISSIONS,
     NO_PERMISSIONS_LAUNCHED_REQUEST,
-    NO_PERMISSIONS_NOT_LAUNCHED_REQUEST
+    NO_PERMISSIONS_NOT_LAUNCHED_REQUEST,
   }
 
   private fun checkAndRequestNotificationPermissions(): CheckPermissionsResult {
@@ -644,8 +648,10 @@ class MapActivity :
     Timber.d("Checking and requesting background location permissions")
     return if (!requirementsChecker.hasBackgroundLocationPermission()) {
       Timber.d("No background location permission")
-      if (!preferences.userDeclinedEnableBackgroundLocationPermissions &&
-          Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+      if (
+          !preferences.userDeclinedEnableBackgroundLocationPermissions &&
+              Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+      ) {
         Timber.d("Requesting background location permissions")
         backgroundLocationPermissionRequester.requestLocationPermissions(this) { true }
         CheckPermissionsResult.NO_PERMISSIONS_LAUNCHED_REQUEST
@@ -678,18 +684,24 @@ class MapActivity :
     viewModel.updateMyLocationStatus()
     drawerProvider.updateHighlight()
 
-    if (checkAndRequestNotificationPermissions() ==
-        CheckPermissionsResult.NO_PERMISSIONS_LAUNCHED_REQUEST) {
+    if (
+        checkAndRequestNotificationPermissions() ==
+            CheckPermissionsResult.NO_PERMISSIONS_LAUNCHED_REQUEST
+    ) {
       Timber.d("Launched notification permission request")
       return
     }
-    if (checkAndRequestLocationPermissions(false) ==
-        CheckPermissionsResult.NO_PERMISSIONS_LAUNCHED_REQUEST) {
+    if (
+        checkAndRequestLocationPermissions(false) ==
+            CheckPermissionsResult.NO_PERMISSIONS_LAUNCHED_REQUEST
+    ) {
       Timber.d("Launched location permission request")
       return
     }
-    if (checkAndRequestBackgroundLocationPermissions() ==
-        CheckPermissionsResult.NO_PERMISSIONS_LAUNCHED_REQUEST) {
+    if (
+        checkAndRequestBackgroundLocationPermissions() ==
+            CheckPermissionsResult.NO_PERMISSIONS_LAUNCHED_REQUEST
+    ) {
       Timber.d("Launched background location permission request")
       return
     }
@@ -892,8 +904,7 @@ class MapActivity :
   private fun updateFabMyLocationPosition(bottomSheetState: Int, fabMargin: Int) {
     val shadowRoom = resources.getDimensionPixelSize(R.dimen.fab_shadow_room)
     val computedBottomMargin =
-        fabMyLocationBaseMargins.bottom +
-            fabMargin - shadowRoom +
+        fabMyLocationBaseMargins.bottom + fabMargin - shadowRoom +
             when (bottomSheetState) {
               BottomSheetBehavior.STATE_COLLAPSED -> {
                 bottomSheetBehavior?.peekHeight ?: 0

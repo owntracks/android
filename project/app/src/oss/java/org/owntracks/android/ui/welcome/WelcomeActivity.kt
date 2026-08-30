@@ -11,6 +11,7 @@ class WelcomeActivity : BaseWelcomeActivity() {
         connectionSetupFragment,
         locationPermissionFragment,
         notificationPermissionFragment,
-        finishFragment)
+        finishFragment,
+    )
   }
 }

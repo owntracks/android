@@ -13,7 +13,7 @@ import timber.log.Timber
 class BackgroundLocationPermissionRequester(
     caller: ActivityResultCaller,
     private val permissionGrantedCallback: () -> Unit,
-    private val permissionDeniedCallback: () -> Unit
+    private val permissionDeniedCallback: () -> Unit,
 ) {
 
   private val permissionRequest =
@@ -30,7 +30,7 @@ class BackgroundLocationPermissionRequester(
   @RequiresApi(Build.VERSION_CODES.Q)
   fun requestLocationPermissions(
       context: Context,
-      showPermissionRationale: (permissions: String) -> Boolean
+      showPermissionRationale: (permissions: String) -> Boolean,
   ) {
     Timber.d("Requesting Background Location Permissions")
     if (showPermissionRationale(ACCESS_BACKGROUND_LOCATION)) {

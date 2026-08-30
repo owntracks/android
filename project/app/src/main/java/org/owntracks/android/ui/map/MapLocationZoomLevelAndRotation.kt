@@ -13,5 +13,5 @@ import org.owntracks.android.location.LatLng
 data class MapLocationZoomLevelAndRotation(
     val latLng: LatLng,
     val zoom: Double,
-    val rotation: Float = 0f
+    val rotation: Float = 0f,
 )

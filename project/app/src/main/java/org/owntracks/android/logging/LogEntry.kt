@@ -10,7 +10,7 @@ data class LogEntry(
     val tag: String?,
     val message: String,
     val threadName: String,
-    val time: Date = Date(System.currentTimeMillis())
+    val time: Date = Date(System.currentTimeMillis()),
 ) {
   private val priorityChar =
       when (priority) {

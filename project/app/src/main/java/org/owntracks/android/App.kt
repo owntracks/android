@@ -22,9 +22,10 @@ import dagger.hilt.android.HiltAndroidApp
 import dagger.hilt.components.SingletonComponent
 import java.security.Security
 import javax.inject.Provider
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlin.time.Instant
 import org.conscrypt.Conscrypt
 import org.owntracks.android.di.CustomBindingComponentBuilder
 import org.owntracks.android.di.CustomBindingEntryPoint
@@ -36,7 +37,6 @@ import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.support.RunThingsOnOtherThreads
 import org.owntracks.android.support.receiver.StartBackgroundServiceReceiver
 import timber.log.Timber
-import kotlin.time.ExperimentalTime
 
 @HiltAndroidApp
 class App : BaseApp() {
@@ -126,14 +126,16 @@ open class BaseApp :
               .detectNetwork()
               .penaltyFlashScreen()
               .penaltyDialog()
-              .build())
+              .build()
+      )
       StrictMode.setVmPolicy(
           StrictMode.VmPolicy.Builder()
               .detectLeakedSqlLiteObjects()
               .detectLeakedClosableObjects()
               .detectFileUriExposure()
               .penaltyLog()
-              .build())
+              .build()
+      )
     }
 
     preferences.registerOnPreferenceChangedListener(this)
@@ -150,7 +152,8 @@ open class BaseApp :
           .firstOrNull()
           ?.run {
             Timber.i(
-                "Historical process exited at ${Instant.fromEpochMilliseconds(timestamp)}. reason: $description, status: $status, reason: $reason")
+                "Historical process exited at ${Instant.fromEpochMilliseconds(timestamp)}. reason: $description, status: $status, reason: $reason"
+            )
           }
     }
     applicationContext.noBackupFilesDir.resolve("crash.log").run {
@@ -174,7 +177,8 @@ open class BaseApp :
           |Stacktrace:
           |${e.stackTrace.joinToString("\n\t")}
           """
-                    .trimMargin())
+                    .trimMargin()
+            )
       } catch (e: Exception) {
         Timber.e(e, "Error writing crash log")
       }
@@ -205,7 +209,8 @@ open class BaseApp :
       NotificationChannel(
               NOTIFICATION_CHANNEL_ONGOING,
               ongoingNotificationChannelName,
-              NotificationManager.IMPORTANCE_LOW)
+              NotificationManager.IMPORTANCE_LOW,
+          )
           .apply {
             lockscreenVisibility = Notification.VISIBILITY_PUBLIC
             description = getString(R.string.notificationChannelOngoingDescription)
@@ -225,7 +230,8 @@ open class BaseApp :
       NotificationChannel(
               NOTIFICATION_CHANNEL_EVENTS,
               eventsNotificationChannelName,
-              NotificationManager.IMPORTANCE_HIGH)
+              NotificationManager.IMPORTANCE_HIGH,
+          )
           .apply {
             lockscreenVisibility = Notification.VISIBILITY_PUBLIC
             description = getString(R.string.notificationChannelEventsDescription)
@@ -245,7 +251,8 @@ open class BaseApp :
       NotificationChannel(
               GeocoderProvider.ERROR_NOTIFICATION_CHANNEL_ID,
               errorNotificationChannelName,
-              NotificationManager.IMPORTANCE_LOW)
+              NotificationManager.IMPORTANCE_LOW,
+          )
           .apply { lockscreenVisibility = Notification.VISIBILITY_PRIVATE }
           .run { notificationManager.createNotificationChannel(this) }
     }
@@ -262,13 +269,15 @@ open class BaseApp :
 
   override fun onTrimMemory(level: Int) {
     Timber.w(
-        "onTrimMemory notified ${getAvailableMemory().run { "isLowMemory: $lowMemory availMem: ${android.text.format.Formatter.formatShortFileSize(applicationContext,availMem)}, threshold: ${android.text.format.Formatter.formatShortFileSize(applicationContext,threshold)} totalMemory: ${android.text.format.Formatter.formatShortFileSize(applicationContext,totalMem)} " }}")
+        "onTrimMemory notified ${getAvailableMemory().run { "isLowMemory: $lowMemory availMem: ${android.text.format.Formatter.formatShortFileSize(applicationContext,availMem)}, threshold: ${android.text.format.Formatter.formatShortFileSize(applicationContext,threshold)} totalMemory: ${android.text.format.Formatter.formatShortFileSize(applicationContext,totalMem)} " }}"
+    )
     super.onTrimMemory(level)
   }
 
   override fun onLowMemory() {
     Timber.w(
-        "onLowMemory notified ${getAvailableMemory().run { "isLowMemory: $lowMemory availMem: ${android.text.format.Formatter.formatShortFileSize(applicationContext,availMem)}, threshold: ${android.text.format.Formatter.formatShortFileSize(applicationContext,threshold)} totalMemory: ${android.text.format.Formatter.formatShortFileSize(applicationContext,totalMem)} " }}")
+        "onLowMemory notified ${getAvailableMemory().run { "isLowMemory: $lowMemory availMem: ${android.text.format.Formatter.formatShortFileSize(applicationContext,availMem)}, threshold: ${android.text.format.Formatter.formatShortFileSize(applicationContext,threshold)} totalMemory: ${android.text.format.Formatter.formatShortFileSize(applicationContext,totalMem)} " }}"
+    )
     super.onLowMemory()
   }
 

@@ -24,7 +24,7 @@ interface AppBarInsetHandler {
   fun AppCompatActivity.applyAppBarEdgeToEdgeInsets(
       drawerLayout: DrawerLayout,
       appBarView: View,
-      navigationView: NavigationView
+      navigationView: NavigationView,
   ) {
     val appBarBasePaddingLeft = appBarView.paddingLeft
     val appBarBasePaddingTop = appBarView.paddingTop

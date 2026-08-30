@@ -22,7 +22,7 @@ import timber.log.Timber
 class SocketFactory(
     options: SocketFactoryOptions,
     caKeyStore: KeyStore,
-    @ApplicationContext context: Context
+    @ApplicationContext context: Context,
 ) : SSLSocketFactory() {
   private val factory: SSLSocketFactory
   private val protocols = arrayOf("TLSv1.2", "TLSv1.3")
@@ -31,7 +31,7 @@ class SocketFactory(
 
   data class SocketFactoryOptions(
       var clientCertificateAlias: String = "",
-      var socketTimeout: Int = 0
+      var socketTimeout: Int = 0,
   )
 
   // This needs to be init off the main thread, as KeyChain operations are blocking
@@ -101,7 +101,7 @@ class SocketFactory(
       host: String,
       port: Int,
       localHost: InetAddress,
-      localPort: Int
+      localPort: Int,
   ): Socket =
       (factory.createSocket(host, port, localHost, localPort) as SSLSocket).apply {
         enabledProtocols = protocols
@@ -120,7 +120,7 @@ class SocketFactory(
       address: InetAddress,
       port: Int,
       localAddress: InetAddress,
-      localPort: Int
+      localPort: Int,
   ): Socket =
       (factory.createSocket(address, port, localAddress, localPort) as SSLSocket).apply {
         enabledProtocols = protocols
@@ -135,7 +135,7 @@ class SocketFactory(
 private class ClientCertificateKeyManager(
     private val alias: String,
     private val privateKey: PrivateKey,
-    private val certificateChain: Array<X509Certificate>
+    private val certificateChain: Array<X509Certificate>,
 ) : X509ExtendedKeyManager() {
   override fun getPrivateKey(alias: String?): PrivateKey = privateKey
 
@@ -147,13 +147,13 @@ private class ClientCertificateKeyManager(
   override fun chooseClientAlias(
       keyType: Array<out String>?,
       issuers: Array<out Principal>?,
-      socket: Socket?
+      socket: Socket?,
   ): String = alias
 
   override fun chooseEngineClientAlias(
       keyType: Array<out String>?,
       issuers: Array<out Principal>?,
-      engine: SSLEngine?
+      engine: SSLEngine?,
   ): String = alias
 
   // This KeyManager only ever presents a client identity, never a server one.
@@ -163,6 +163,6 @@ private class ClientCertificateKeyManager(
   override fun chooseServerAlias(
       keyType: String?,
       issuers: Array<out Principal>?,
-      socket: Socket?
+      socket: Socket?,
   ): String? = null
 }

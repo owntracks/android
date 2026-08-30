@@ -11,16 +11,19 @@ import org.owntracks.android.test.SimpleIdlingResource
 class InMemoryWaypointsRepo(
     @Suppress("UNUSED_PARAMETER") scope: CoroutineScope,
     applicationContext: Context,
-    @Suppress("UNUSED_PARAMETER") ioDispatcher: CoroutineDispatcher
+    @Suppress("UNUSED_PARAMETER") ioDispatcher: CoroutineDispatcher,
 ) :
     WaypointsRepo(
-        applicationContext, SimpleIdlingResource("waypointsMigrationIdlingResource", false)) {
+        applicationContext,
+        SimpleIdlingResource("waypointsMigrationIdlingResource", false),
+    ) {
   private val waypoints = mutableListOf<WaypointModel>()
 
   override suspend fun get(id: Long): WaypointModel? = waypoints.firstOrNull { it.id == id }
 
-  override suspend fun getByTst(instant: Instant): WaypointModel? =
-      waypoints.firstOrNull { it.tst == instant }
+  override suspend fun getByTst(instant: Instant): WaypointModel? = waypoints.firstOrNull {
+    it.tst == instant
+  }
 
   override suspend fun getAll(): List<WaypointModel> = waypoints
 

@@ -60,8 +60,7 @@ class AdvancedFragment @Inject constructor() :
     findPreference<Preference>("autostartWarning")?.isVisible =
         !requirementsChecker.hasBackgroundLocationPermission()
 
-    findPreference<SwitchPreferenceCompat>(
-            Preferences::useGNSSInSignificantMonitoringMode.name)
+    findPreference<SwitchPreferenceCompat>(Preferences::useGNSSInSignificantMonitoringMode.name)
         ?.isVisible = Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA
 
     findPreference<ListPreference>(Preferences::reverseGeocodeProvider.name)

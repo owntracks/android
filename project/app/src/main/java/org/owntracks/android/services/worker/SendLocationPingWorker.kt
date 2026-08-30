@@ -25,7 +25,7 @@ constructor(
     @Assisted private val context: Context,
     @Assisted workerParams: WorkerParameters,
     private val preferences: Preferences,
-    private val locationProcessor: LocationProcessor
+    private val locationProcessor: LocationProcessor,
 ) : CoroutineWorker(context, workerParams) {
   override suspend fun doWork(): Result {
     Timber.d("SendLocationPingWorker started")
@@ -50,11 +50,15 @@ constructor(
         context.bindService(
             Intent(context, BackgroundService::class.java),
             serviceConnection,
-            Context.BIND_AUTO_CREATE)
+            Context.BIND_AUTO_CREATE,
+        )
     if (result) {
       mutex.withLock {
-        if (preferences.experimentalFeatures.contains(
-            Preferences.EXPERIMENTAL_FEATURE_LOCATION_PING_USES_HIGH_ACCURACY_LOCATION_REQUEST)) {
+        if (
+            preferences.experimentalFeatures.contains(
+                Preferences.EXPERIMENTAL_FEATURE_LOCATION_PING_USES_HIGH_ACCURACY_LOCATION_REQUEST
+            )
+        ) {
           backgroundService?.requestOnDemandLocationUpdate(MessageLocation.ReportType.PING)
               ?: run { Timber.w("No service bound, unable to ping location") }
         } else {

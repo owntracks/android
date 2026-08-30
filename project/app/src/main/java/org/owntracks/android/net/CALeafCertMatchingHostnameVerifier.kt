@@ -37,7 +37,8 @@ class CALeafCertMatchingHostnameVerifier(
 
     return if (caStoreContains(fingerprint)) {
       Timber.i(
-          "CA Fingerprint matches server leaf cert: $fingerprint. Skipping hostname verification")
+          "CA Fingerprint matches server leaf cert: $fingerprint. Skipping hostname verification"
+      )
       true
     } else {
       OkHostnameVerifier.INSTANCE.verify(emptyArray(), hostname, session)

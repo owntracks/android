@@ -40,7 +40,7 @@ class ExportedLogContentProvider : ContentProvider() {
       projection: Array<out String>?,
       selection: String?,
       selectionArgs: Array<out String>?,
-      sortOrder: String?
+      sortOrder: String?,
   ): Cursor? =
       logForUri(uri)?.let {
         val m = MatrixCursor(arrayOf(OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE), 1)
@@ -54,7 +54,7 @@ class ExportedLogContentProvider : ContentProvider() {
       uri: Uri,
       values: ContentValues?,
       selection: String?,
-      selectionArgs: Array<out String>?
+      selectionArgs: Array<out String>?,
   ): Int {
     return 0
   }

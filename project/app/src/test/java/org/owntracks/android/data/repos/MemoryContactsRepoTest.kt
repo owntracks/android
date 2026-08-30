@@ -149,7 +149,9 @@ class MemoryContactsRepoTest {
           assertEquals(1, values.count())
           assert(values[0] is ContactsRepoChange.ContactLocationUpdated)
           assertEquals(
-              CONTACT_ID, (values[0] as ContactsRepoChange.ContactLocationUpdated).contact.id)
+              CONTACT_ID,
+              (values[0] as ContactsRepoChange.ContactLocationUpdated).contact.id,
+          )
         }
       }
 
@@ -222,7 +224,9 @@ class MemoryContactsRepoTest {
       runTest {
         contactsRepo!!.run {
           contactBitmapAndNameMemoryCache.put(
-              CONTACT_ID, ContactBitmapAndName.CardBitmap("TESTNAME", null))
+              CONTACT_ID,
+              ContactBitmapAndName.CardBitmap("TESTNAME", null),
+          )
           update(CONTACT_ID, messageLocation)
           assertEquals("TESTNAME", getById(CONTACT_ID)!!.displayName)
         }
@@ -234,7 +238,9 @@ class MemoryContactsRepoTest {
         contactsRepo!!.run {
           update(CONTACT_ID, messageLocation)
           contactBitmapAndNameMemoryCache.put(
-              CONTACT_ID, ContactBitmapAndName.CardBitmap("TESTNAME", null))
+              CONTACT_ID,
+              ContactBitmapAndName.CardBitmap("TESTNAME", null),
+          )
           update(CONTACT_ID, messageCard)
           assertNull(contactBitmapAndNameMemoryCache.get(CONTACT_ID))
         }

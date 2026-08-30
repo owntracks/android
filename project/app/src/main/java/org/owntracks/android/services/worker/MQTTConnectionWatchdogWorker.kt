@@ -29,7 +29,7 @@ constructor(
     @Assisted workerParams: WorkerParameters,
     private val messageProcessor: MessageProcessor,
     private val endpointStateRepo: EndpointStateRepo,
-    private val preferences: Preferences
+    private val preferences: Preferences,
 ) : CoroutineWorker(context, workerParams) {
 
   override suspend fun doWork(): Result {

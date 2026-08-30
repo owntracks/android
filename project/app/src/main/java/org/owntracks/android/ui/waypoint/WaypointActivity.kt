@@ -110,7 +110,8 @@ class WaypointActivity : AppCompatActivity() {
             binding.description.text.toString(),
             Latitude(binding.latitude.text.toString().toDouble()),
             Longitude(binding.longitude.text.toString().toDouble()),
-            binding.radius.text.toString().toIntOrNull() ?: 1)
+            binding.radius.text.toString().toIntOrNull() ?: 1,
+        )
         finish()
         true
       }
@@ -140,19 +141,17 @@ class WaypointActivity : AppCompatActivity() {
     }
   }
 
-  private fun setSaveButtonEnabledStatus() =
-      saveButton?.run {
-        isEnabled =
-            !viewModel.isLoading.value &&
-                !textFields.any { it.text.isNullOrBlank() || it.error != null }
-        icon?.alpha = if (isEnabled) 255 else 130
-      }
+  private fun setSaveButtonEnabledStatus() = saveButton?.run {
+    isEnabled =
+        !viewModel.isLoading.value &&
+            !textFields.any { it.text.isNullOrBlank() || it.error != null }
+    icon?.alpha = if (isEnabled) 255 else 130
+  }
 
-  private fun setDeleteButtonEnabledStatus() =
-      deleteButton?.apply {
-        isEnabled = !viewModel.isLoading.value && viewModel.canDeleteWaypoint()
-        icon?.alpha = if (isEnabled) 255 else 130
-      }
+  private fun setDeleteButtonEnabledStatus() = deleteButton?.apply {
+    isEnabled = !viewModel.isLoading.value && viewModel.canDeleteWaypoint()
+    icon?.alpha = if (isEnabled) 255 else 130
+  }
 }
 
 @BindingAdapter("relativeTimeSpanString")

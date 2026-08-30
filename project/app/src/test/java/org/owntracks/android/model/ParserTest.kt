@@ -2,6 +2,7 @@ package org.owntracks.android.model
 
 import java.io.ByteArrayInputStream
 import java.io.IOException
+import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
@@ -38,7 +39,6 @@ import org.owntracks.android.model.messages.MessageWaypoint
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.preferences.types.MqttQos
-import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 class ParserTest {
@@ -485,23 +485,30 @@ class ParserTest {
     assertTrue(jsonNode["waypoints"]?.jsonArray?.get(0)?.jsonObject?.isNotEmpty() == true)
     assertEquals(
         "waypoint",
-        jsonNode["waypoints"]?.jsonArray?.get(0)?.jsonObject?.get("_type")?.jsonPrimitive?.content)
+        jsonNode["waypoints"]?.jsonArray?.get(0)?.jsonObject?.get("_type")?.jsonPrimitive?.content,
+    )
     assertEquals(
         "Test waypoint",
-        jsonNode["waypoints"]?.jsonArray?.get(0)?.jsonObject?.get("desc")?.jsonPrimitive?.content)
+        jsonNode["waypoints"]?.jsonArray?.get(0)?.jsonObject?.get("desc")?.jsonPrimitive?.content,
+    )
     assertEquals(
         51.0,
         jsonNode["waypoints"]?.jsonArray?.get(0)?.jsonObject?.get("lat")?.jsonPrimitive?.double!!,
-        0.00001)
+        0.00001,
+    )
     assertEquals(
         -20.0,
         jsonNode["waypoints"]?.jsonArray?.get(0)?.jsonObject?.get("lon")?.jsonPrimitive?.double!!,
-        0.00001)
+        0.00001,
+    )
     assertEquals(
-        45, jsonNode["waypoints"]?.jsonArray?.get(0)?.jsonObject?.get("rad")?.jsonPrimitive?.int)
+        45,
+        jsonNode["waypoints"]?.jsonArray?.get(0)?.jsonObject?.get("rad")?.jsonPrimitive?.int,
+    )
     assertEquals(
         123456789,
-        jsonNode["waypoints"]?.jsonArray?.get(0)?.jsonObject?.get("tst")?.jsonPrimitive?.int)
+        jsonNode["waypoints"]?.jsonArray?.get(0)?.jsonObject?.get("tst")?.jsonPrimitive?.int,
+    )
     assertTrue(jsonNode["TestBoolKey"]?.jsonPrimitive?.boolean ?: false)
     assertEquals(13487.0, jsonNode["TestFloatKey"]?.jsonPrimitive?.double ?: 0.0, 0.0001)
     assertEquals(13487, jsonNode["TestIntKey"]?.jsonPrimitive?.int)
@@ -573,18 +580,24 @@ class ParserTest {
     assertEquals("status", jsonNode["_type"]?.jsonPrimitive?.content)
     assertEquals(
         message.android?.wifistate,
-        jsonNode["android"]?.jsonObject?.get("wifi")?.jsonPrimitive?.int)
+        jsonNode["android"]?.jsonObject?.get("wifi")?.jsonPrimitive?.int,
+    )
     assertEquals(
-        message.android?.powerSave, jsonNode["android"]?.jsonObject?.get("ps")?.jsonPrimitive?.int)
+        message.android?.powerSave,
+        jsonNode["android"]?.jsonObject?.get("ps")?.jsonPrimitive?.int,
+    )
     assertEquals(
         message.android?.batteryOptimizations,
-        jsonNode["android"]?.jsonObject?.get("bo")?.jsonPrimitive?.int)
+        jsonNode["android"]?.jsonObject?.get("bo")?.jsonPrimitive?.int,
+    )
     assertEquals(
         message.android?.appHibernation,
-        jsonNode["android"]?.jsonObject?.get("hib")?.jsonPrimitive?.int)
+        jsonNode["android"]?.jsonObject?.get("hib")?.jsonPrimitive?.int,
+    )
     assertEquals(
         message.android?.locationPermission,
-        jsonNode["android"]?.jsonObject?.get("loc")?.jsonPrimitive?.int)
+        jsonNode["android"]?.jsonObject?.get("loc")?.jsonPrimitive?.int,
+    )
   }
 
   // endregion

@@ -26,7 +26,7 @@ class Scheduler
 @Inject
 constructor(
     private val preferences: Preferences,
-    @param:ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context,
 ) : Preferences.OnPreferenceChangeListener {
   init {
     preferences.registerOnPreferenceChangedListener(this)
@@ -40,13 +40,17 @@ constructor(
   fun scheduleLocationPing() {
     val pingWorkRequest: WorkRequest =
         PeriodicWorkRequest.Builder(
-                SendLocationPingWorker::class.java, preferences.ping.toLong(), TimeUnit.MINUTES)
+                SendLocationPingWorker::class.java,
+                preferences.ping.toLong(),
+                TimeUnit.MINUTES,
+            )
             .addTag(PERIODIC_TASK_SEND_LOCATION_PING)
             .setConstraints(anyNetworkConstraint)
             .build()
     Timber.d(
         "WorkManager queue task $PERIODIC_TASK_SEND_LOCATION_PING as ${pingWorkRequest.id} " +
-            "with interval ${preferences.ping} minutes")
+            "with interval ${preferences.ping} minutes"
+    )
     workManager.cancelAllWorkByTag(PERIODIC_TASK_SEND_LOCATION_PING)
     workManager.enqueue(pingWorkRequest)
   }
@@ -75,16 +79,21 @@ constructor(
     PeriodicWorkRequest.Builder(
             MQTTConnectionWatchdogWorker::class.java,
             CONNECTION_WATCHDOG_INTERVAL.inWholeMinutes,
-            TimeUnit.MINUTES)
+            TimeUnit.MINUTES,
+        )
         .addTag(PERIODIC_TASK_MQTT_CONNECTION_WATCHDOG)
         .setConstraints(anyNetworkConstraint)
         .build()
         .run {
           workManager.enqueueUniquePeriodicWork(
-              PERIODIC_TASK_MQTT_CONNECTION_WATCHDOG, ExistingPeriodicWorkPolicy.KEEP, this)
+              PERIODIC_TASK_MQTT_CONNECTION_WATCHDOG,
+              ExistingPeriodicWorkPolicy.KEEP,
+              this,
+          )
         }
     Timber.i(
-        "Scheduled $PERIODIC_TASK_MQTT_CONNECTION_WATCHDOG every $CONNECTION_WATCHDOG_INTERVAL")
+        "Scheduled $PERIODIC_TASK_MQTT_CONNECTION_WATCHDOG every $CONNECTION_WATCHDOG_INTERVAL"
+    )
   }
 
   /** How many consecutive reconnect attempts have been scheduled without an intervening success. */
@@ -93,9 +102,9 @@ constructor(
   /**
    * Schedules an attempt to reconnect to the MQTT broker.
    *
-   * Successive attempts back off exponentially, but never further apart than
-   * [RECONNECT_MAX_DELAY], so a broker that has been unreachable for a long time is still retried
-   * promptly once it comes back.
+   * Successive attempts back off exponentially, but never further apart than [RECONNECT_MAX_DELAY],
+   * so a broker that has been unreachable for a long time is still retried promptly once it comes
+   * back.
    *
    * The backoff is computed here rather than handed to WorkManager via [BackoffPolicy]: WorkManager
    * clamps its own backoff to [WorkRequest.MAX_BACKOFF_MILLIS], which is five hours, and a run of
@@ -113,7 +122,10 @@ constructor(
         .build()
         .run {
           workManager.enqueueUniqueWork(
-              ONETIME_TASK_MQTT_RECONNECT, ExistingWorkPolicy.REPLACE, this)
+              ONETIME_TASK_MQTT_RECONNECT,
+              ExistingWorkPolicy.REPLACE,
+              this,
+          )
         }
     // Logged at INFO: when this goes wrong the connection is dead for hours, and at DEBUG the
     // evidence has long since rolled out of the in-memory log buffer by the time anyone looks.
@@ -162,7 +174,9 @@ constructor(
       return (RECONNECT_INITIAL_DELAY * (1 shl doublings)).coerceAtMost(RECONNECT_MAX_DELAY)
     }
 
-    /** Enough doublings to comfortably exceed [RECONNECT_MAX_DELAY] without overflowing the shift. */
+    /**
+     * Enough doublings to comfortably exceed [RECONNECT_MAX_DELAY] without overflowing the shift.
+     */
     private const val MAX_BACKOFF_DOUBLINGS = 16
   }
 

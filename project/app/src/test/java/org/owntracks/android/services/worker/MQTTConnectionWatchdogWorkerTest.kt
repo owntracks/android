@@ -23,7 +23,10 @@ class MQTTConnectionWatchdogWorkerTest {
   fun `a connected endpoint that passes its connection check is left alone`() {
     assertFalse(
         MQTTConnectionWatchdogWorker.shouldReconnect(
-            EndpointState.CONNECTED, connectionCheckPassed = true))
+            EndpointState.CONNECTED,
+            connectionCheckPassed = true,
+        )
+    )
   }
 
   @Test
@@ -32,7 +35,10 @@ class MQTTConnectionWatchdogWorkerTest {
     // nothing can actually be published. Without this check it is never noticed at all.
     assertTrue(
         MQTTConnectionWatchdogWorker.shouldReconnect(
-            EndpointState.CONNECTED, connectionCheckPassed = false))
+            EndpointState.CONNECTED,
+            connectionCheckPassed = false,
+        )
+    )
   }
 
   @Test
@@ -45,7 +51,8 @@ class MQTTConnectionWatchdogWorkerTest {
               // connectionCheckPassed cannot be true unless the state is CONNECTED, but assert
               // against both so the state alone is demonstrably sufficient.
               MQTTConnectionWatchdogWorker.shouldReconnect(it, connectionCheckPassed = false) &&
-                  MQTTConnectionWatchdogWorker.shouldReconnect(it, connectionCheckPassed = true))
+                  MQTTConnectionWatchdogWorker.shouldReconnect(it, connectionCheckPassed = true),
+          )
         }
   }
 
@@ -55,7 +62,10 @@ class MQTTConnectionWatchdogWorkerTest {
     // only every fifteen minutes: a connect still outstanding on that timescale is stuck.
     assertTrue(
         MQTTConnectionWatchdogWorker.shouldReconnect(
-            EndpointState.CONNECTING, connectionCheckPassed = false))
+            EndpointState.CONNECTING,
+            connectionCheckPassed = false,
+        )
+    )
     assertTrue(Scheduler.CONNECTION_WATCHDOG_INTERVAL >= 15.minutes)
   }
 
@@ -64,6 +74,7 @@ class MQTTConnectionWatchdogWorkerTest {
     // Guards the ceiling on how long a silently-dead connection can persist unnoticed.
     assertTrue(
         "watchdog interval of ${Scheduler.CONNECTION_WATCHDOG_INTERVAL} is too infrequent",
-        Scheduler.CONNECTION_WATCHDOG_INTERVAL <= 30.minutes)
+        Scheduler.CONNECTION_WATCHDOG_INTERVAL <= 30.minutes,
+    )
   }
 }

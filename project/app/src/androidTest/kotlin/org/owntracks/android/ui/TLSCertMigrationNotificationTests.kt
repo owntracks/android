@@ -48,7 +48,8 @@ class TLSCertMigrationNotificationTests : TestWithAnActivity<MapActivity>(false)
                   app.getString(R.string.certificateMigrationRequiredNotificationTitle) &&
                   notification.extras.getString(Notification.EXTRA_BIG_TEXT) ==
                       app.getString(R.string.certificateMigrationRequiredNotificationText)
-            })
+            },
+    )
   }
 
   @Test
@@ -74,6 +75,7 @@ class TLSCertMigrationNotificationTests : TestWithAnActivity<MapActivity>(false)
                   app.getString(R.string.certificateMigrationRequiredNotificationTitle) &&
                   notification.extras.getString(Notification.EXTRA_BIG_TEXT) ==
                       app.getString(R.string.certificateMigrationRequiredNotificationText)
-            })
+            },
+    )
   }
 }

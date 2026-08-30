@@ -20,17 +20,17 @@ fun Geofence.toGMSGeofence(): com.google.android.gms.location.Geofence {
             this.circularLatitude.value,
             this.circularLongitude.value,
             // GMS geofences need to have a radius of at least 1
-            if (this.circularRadius < 1) 1f else this.circularRadius)
+            if (this.circularRadius < 1) 1f else this.circularRadius,
+        )
       }
     }
   }
 
   this.expirationDuration?.run {
     builder.setExpirationDuration(
-      if (this == org.owntracks.android.location.geofencing.Geofence.NEVER_EXPIRE)
-        com.google.android.gms.location.Geofence.NEVER_EXPIRE
-      else
-        this
+        if (this == org.owntracks.android.location.geofencing.Geofence.NEVER_EXPIRE)
+            com.google.android.gms.location.Geofence.NEVER_EXPIRE
+        else this
     )
   }
   this.transitionTypes?.run(builder::setTransitionTypes)

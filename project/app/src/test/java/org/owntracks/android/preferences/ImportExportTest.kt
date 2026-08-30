@@ -232,7 +232,8 @@ class ImportExportTest {
     assertTrue(jsonNode["remoteConfiguration"]?.jsonPrimitive?.boolean == true)
     assertEquals(
         defaultReverseGeocodeProvider.name,
-        jsonNode["reverseGeocodeProvider"]?.jsonPrimitive?.content)
+        jsonNode["reverseGeocodeProvider"]?.jsonPrimitive?.content,
+    )
     assertFalse(jsonNode["showRegionsOnMap"]?.jsonPrimitive?.boolean == true)
     assertTrue(jsonNode["sub"]?.jsonPrimitive?.boolean == true)
     assertEquals(2, jsonNode["subQos"]?.jsonPrimitive?.int)

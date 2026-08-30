@@ -23,5 +23,9 @@ enum class ConnectionMode(val value: Int) {
 
   object ConnectionModeSerializer :
       KSerializer<ConnectionMode> by intValueEnumSerializer(
-          "ConnectionMode", entries, { it.value }, MQTT)
+          "ConnectionMode",
+          entries,
+          { it.value },
+          MQTT,
+      )
 }

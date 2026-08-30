@@ -17,7 +17,9 @@ class TimberInMemoryLogTree(private val debugBuild: Boolean) : DebugTree() {
 
   private val mutableLogFlow =
       MutableSharedFlow<LogEntry>(
-          replay = MAX_LOG_ENTRIES, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+          replay = MAX_LOG_ENTRIES,
+          onBufferOverflow = BufferOverflow.DROP_OLDEST,
+      )
   val liveLogs: SharedFlow<LogEntry> = mutableLogFlow
 
   override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {

@@ -28,9 +28,9 @@ import timber.log.Timber
 class SharedPreferencesStore
 @Inject
 constructor(
-  @param:ApplicationContext private val context: Context,
-  private val notificationManager: NotificationManagerCompat,
-  private val notificationStash: NotificationsStash
+    @param:ApplicationContext private val context: Context,
+    private val notificationManager: NotificationManagerCompat,
+    private val notificationStash: NotificationsStash,
 ) : PreferencesStore() {
 
   private val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
@@ -46,10 +46,9 @@ constructor(
 
   private fun detectIfCertsInConfig() {
     val legacyTlsCrtKeys = setOf("tlsCaCrt", "tlsClientCrtPassword")
-    val shouldNotify =
-        legacyTlsCrtKeys.any {
-          sharedPreferences.contains(it) && !sharedPreferences.getString(it, "").isNullOrEmpty()
-        }
+    val shouldNotify = legacyTlsCrtKeys.any {
+      sharedPreferences.contains(it) && !sharedPreferences.getString(it, "").isNullOrEmpty()
+    }
 
     if (shouldNotify) {
       // Delete local files
@@ -88,10 +87,12 @@ constructor(
           .setSilent(true)
           .build()
           .run {
-            if (ActivityCompat.checkSelfPermission(
-                  context, Manifest.permission.POST_NOTIFICATIONS,
-              ) ==
-                PackageManager.PERMISSION_GRANTED) {
+            if (
+                ActivityCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.POST_NOTIFICATIONS,
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
               notificationManager.notify("CertificateManagementNotification", 0, this).also {
                 Timber.d("Notifying user of certificate migration")
               }
@@ -112,7 +113,8 @@ constructor(
   private fun migrateToSingleSharedPreferences() {
     val oldSharedPreferenceNames =
         listOf(
-            "org.owntracks.android.preferences.private", "org.owntracks.android.preferences.http",
+            "org.owntracks.android.preferences.private",
+            "org.owntracks.android.preferences.http",
         )
     with(sharedPreferences.edit()) {
       if (sharedPreferences.contains("setupNotCompleted")) {
@@ -158,14 +160,13 @@ constructor(
     }
   }
 
-  override fun putString(key: String, value: String): Boolean =
-      sharedPreferences.run {
-        if (contains(key) && getString(key, "") == value) false
-        else {
-          edit {putString(key, value).apply()}
-          true
-        }
-      }
+  override fun putString(key: String, value: String): Boolean = sharedPreferences.run {
+    if (contains(key) && getString(key, "") == value) false
+    else {
+      edit { putString(key, value).apply() }
+      true
+    }
+  }
 
   override fun getString(key: String, default: String): String? =
       sharedPreferences.getString(key, default)
@@ -177,46 +178,42 @@ constructor(
 
   override fun getSharedPreferencesName(): String = sharedPreferences.toString()
 
-  override fun putBoolean(key: String, value: Boolean) =
-      sharedPreferences.run {
-        if (contains(key) && getBoolean(key, false) == value) false
-        else {
-          edit {putBoolean(key, value).apply()}
-          true
-        }
-      }
+  override fun putBoolean(key: String, value: Boolean) = sharedPreferences.run {
+    if (contains(key) && getBoolean(key, false) == value) false
+    else {
+      edit { putBoolean(key, value).apply() }
+      true
+    }
+  }
 
   override fun getInt(key: String, default: Int): Int = sharedPreferences.getInt(key, default)
 
-  override fun putFloat(key: String, value: Float): Boolean =
-      sharedPreferences.run {
-        if (contains(key) && getFloat(key, Float.MIN_VALUE) == value) false
-        else {
-          edit { putFloat(key, value).apply() }
-          true
-        }
-      }
+  override fun putFloat(key: String, value: Float): Boolean = sharedPreferences.run {
+    if (contains(key) && getFloat(key, Float.MIN_VALUE) == value) false
+    else {
+      edit { putFloat(key, value).apply() }
+      true
+    }
+  }
 
   override fun getFloat(key: String, default: Float): Float =
       sharedPreferences.getFloat(key, default)
 
-  override fun putInt(key: String, value: Int): Boolean =
-      sharedPreferences.run {
-        if (contains(key) && getInt(key, Int.MIN_VALUE) == value) false
-        else {
-          edit { putInt(key, value).apply() }
-          true
-        }
-      }
+  override fun putInt(key: String, value: Int): Boolean = sharedPreferences.run {
+    if (contains(key) && getInt(key, Int.MIN_VALUE) == value) false
+    else {
+      edit { putInt(key, value).apply() }
+      true
+    }
+  }
 
-  override fun putStringSet(key: String, values: Set<String>): Boolean =
-      sharedPreferences.run {
-        if (contains(key) && getStringSet(key, emptySet()) == values) false
-        else {
-          edit { putStringSet(key, values).apply() }
-          true
-        }
-      }
+  override fun putStringSet(key: String, values: Set<String>): Boolean = sharedPreferences.run {
+    if (contains(key) && getStringSet(key, emptySet()) == values) false
+    else {
+      edit { putStringSet(key, values).apply() }
+      true
+    }
+  }
 
   override fun getStringSet(key: String, defaultValues: Set<String>): Set<String> =
       sharedPreferences.getStringSet(key, defaultValues)?.toSortedSet()

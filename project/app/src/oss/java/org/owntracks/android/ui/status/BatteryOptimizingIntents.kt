@@ -11,5 +11,6 @@ class BatteryOptimizingIntents(context: Context) {
   val directPackageIntent =
       Intent(
           Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
-          "package:${context.packageName}".toUri())
+          "package:${context.packageName}".toUri(),
+      )
 }

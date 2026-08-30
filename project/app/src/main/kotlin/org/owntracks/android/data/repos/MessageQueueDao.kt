@@ -15,7 +15,8 @@ interface MessageQueueDao {
     WHERE isHeadSlot = 1
     ORDER BY sequenceNumber ASC
     LIMIT 1
-  """)
+  """
+  )
   suspend fun getNextHeadSlotMessage(): MessageQueueEntity?
 
   @Query(
@@ -24,7 +25,8 @@ interface MessageQueueDao {
     WHERE isHeadSlot = 0
     ORDER BY sequenceNumber ASC
     LIMIT 1
-  """)
+  """
+  )
   suspend fun getNextRegularMessage(): MessageQueueEntity?
 
   @Query("DELETE FROM MessageQueue WHERE id = :id") suspend fun deleteById(id: Long)

@@ -25,6 +25,8 @@ class GMSLocationCallback(private val clientCallBack: LocationCallback) :
     super.onLocationAvailability(locationAvailability)
     clientCallBack.onLocationAvailability(
         org.owntracks.android.location.LocationAvailability(
-            locationAvailability.isLocationAvailable))
+            locationAvailability.isLocationAvailable
+        )
+    )
   }
 }

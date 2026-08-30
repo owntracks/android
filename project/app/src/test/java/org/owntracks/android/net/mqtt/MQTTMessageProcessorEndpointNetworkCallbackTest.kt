@@ -46,7 +46,8 @@ class MQTTMessageProcessorEndpointNetworkCallbackTest {
       CoroutineScope(
           SupervisorJob() +
               testDispatcher +
-              CoroutineExceptionHandler { _, _ -> /* swallow expected reconnect failures */ })
+              CoroutineExceptionHandler { _, _ -> /* swallow expected reconnect failures */ }
+      )
 
   private val endpointStateRepo = EndpointStateRepo()
 
@@ -72,7 +73,8 @@ class MQTTMessageProcessorEndpointNetworkCallbackTest {
             scope = testScope,
             ioDispatcher = testDispatcher,
             applicationContext = mockContext,
-            mqttConnectionIdlingResource = SimpleIdlingResource("test", true))
+            mqttConnectionIdlingResource = SimpleIdlingResource("test", true),
+        )
   }
 
   // ── justRegistered bootstrap ───────────────────────────────────────────────
@@ -182,7 +184,8 @@ class MQTTMessageProcessorEndpointNetworkCallbackTest {
         NetworkTrackingCallback(
             endpointState = { state },
             reconnectFunction = { reconnects++ },
-            disconnectFunction = {})
+            disconnectFunction = {},
+        )
     cb.onAvailable(network) // bootstrap: records network, clears justRegistered
     reconnects = 0
 
@@ -205,8 +208,11 @@ class MQTTMessageProcessorEndpointNetworkCallbackTest {
             EndpointState.IDLE,
             EndpointState.DISCONNECTED,
             EndpointState.ERROR,
-            EndpointState.ERROR_CONFIGURATION)
-        .forEach { assertEquals("state $it should reconnect", 1, reconnectsOnRepeatOnAvailable(it)) }
+            EndpointState.ERROR_CONFIGURATION,
+        )
+        .forEach {
+          assertEquals("state $it should reconnect", 1, reconnectsOnRepeatOnAvailable(it))
+        }
   }
 
   @Test

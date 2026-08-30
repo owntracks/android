@@ -99,7 +99,10 @@ class ContactsActivity :
     startActivity(
         Intent(this, MapActivity::class.java)
             .putExtra(
-                "_args", Bundle().apply { putString(MapActivity.BUNDLE_KEY_CONTACT_ID, item.id) }))
+                "_args",
+                Bundle().apply { putString(MapActivity.BUNDLE_KEY_CONTACT_ID, item.id) },
+            )
+    )
   }
 
   override fun onResume() {

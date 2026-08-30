@@ -22,7 +22,8 @@ class EndpointStateRepo @Inject constructor() {
             Thread.currentThread().stackTrace[3].run {
                 "$className: $methodName"
             }
-            }")
+            }"
+    )
     endpointState.emit(newEndpointState)
   }
 

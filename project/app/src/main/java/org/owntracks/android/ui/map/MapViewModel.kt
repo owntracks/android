@@ -56,7 +56,7 @@ constructor(
     private val locationRepo: LocationRepo,
     private val waypointsRepo: WaypointsRepo,
     application: Application,
-    private val requirementsChecker: RequirementsChecker
+    private val requirementsChecker: RequirementsChecker,
 ) : AndroidViewModel(application) {
   // Reused buffers for Location.distanceBetween() calls. Two separate instances are required
   // because the two call-sites run on different threads (main thread vs sensor callback thread).
@@ -141,8 +141,10 @@ constructor(
    */
   fun updateMyLocationStatus() {
     mutableMyLocationStatus.value =
-        if (requirementsChecker.hasLocationPermissions() &&
-            requirementsChecker.isLocationServiceEnabled()) {
+        if (
+            requirementsChecker.hasLocationPermissions() &&
+                requirementsChecker.isLocationServiceEnabled()
+        ) {
           if (viewMode == ViewMode.Device) {
             MyLocationStatus.FOLLOWING
           } else {
@@ -301,7 +303,8 @@ constructor(
           MessageCmd().apply {
             topic = it.id + preferences.commandTopicSuffix
             action = CommandAction.REPORT_LOCATION
-          })
+          }
+      )
       mutableLocationRequestContactCommandFlow.tryEmit(it)
     }
   }
@@ -323,7 +326,8 @@ constructor(
           currentLocation.longitude,
           latitude.value,
           longitude.value,
-          locationDistanceResult)
+          locationDistanceResult,
+      )
       mutableContactDistance.value = locationDistanceResult[0]
       mutableContactBearing.value = locationDistanceResult[1]
       mutableRelativeContactBearing.value = locationDistanceResult[1]
@@ -384,7 +388,8 @@ constructor(
       if (viewMode == ViewMode.Contact(true) && currentContact.value?.latLng != null) {
         MapLocationZoomLevelAndRotation(
             currentContact.value!!.latLng!!,
-            locationRepo.mapViewWindowLocationAndZoom?.zoom ?: STARTING_ZOOM)
+            locationRepo.mapViewWindowLocationAndZoom?.zoom ?: STARTING_ZOOM,
+        )
       } else {
         locationRepo.mapViewWindowLocationAndZoom
             ?: locationRepo.currentBlueDotOnMapLocation?.let {
@@ -394,7 +399,9 @@ constructor(
               MapLocationZoomLevelAndRotation(it.toLatLng(), STARTING_ZOOM)
             }
             ?: MapLocationZoomLevelAndRotation(
-                LatLng(STARTING_LATITUDE, STARTING_LONGITUDE), STARTING_ZOOM)
+                LatLng(STARTING_LATITUDE, STARTING_LONGITUDE),
+                STARTING_ZOOM,
+            )
       }
 
   /**
@@ -413,7 +420,9 @@ constructor(
           MapLocationZoomLevelAndRotation(it.toLatLng(), currentZoom)
         }
         ?: MapLocationZoomLevelAndRotation(
-            LatLng(STARTING_LATITUDE, STARTING_LONGITUDE), currentZoom)
+            LatLng(STARTING_LATITUDE, STARTING_LONGITUDE),
+            currentZoom,
+        )
   }
 
   val orientationSensorEventListener =
@@ -429,7 +438,8 @@ constructor(
                     currentLocation.longitude,
                     contactLatLng.latitude.value,
                     contactLatLng.longitude.value,
-                    sensorDistanceResult)
+                    sensorDistanceResult,
+                )
                 mutableRelativeContactBearing.value = sensorDistanceResult[1] + azimuth.toFloat()
               }
             }

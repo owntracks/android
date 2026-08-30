@@ -28,13 +28,15 @@ class LocationPermissionFragment @Inject constructor() : WelcomeFragment() {
       LocationPermissionRequester(
           this,
           { preferences.userDeclinedEnableLocationPermissions = false },
-          { preferences.userDeclinedEnableLocationPermissions = true })
+          { preferences.userDeclinedEnableLocationPermissions = true },
+      )
 
   private val backgroundLocationPermissionRequester =
       BackgroundLocationPermissionRequester(
           this,
           { preferences.userDeclinedEnableBackgroundLocationPermissions = false },
-          { preferences.userDeclinedEnableBackgroundLocationPermissions = true })
+          { preferences.userDeclinedEnableBackgroundLocationPermissions = true },
+      )
 
   override fun shouldBeDisplayed(context: Context): Boolean = true
 
@@ -42,7 +44,7 @@ class LocationPermissionFragment @Inject constructor() : WelcomeFragment() {
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
-      savedInstanceState: Bundle?
+      savedInstanceState: Bundle?,
   ): View {
     binding =
         UiWelcomeLocationPermissionBinding.inflate(inflater, container, false).apply {
@@ -69,15 +71,20 @@ class LocationPermissionFragment @Inject constructor() : WelcomeFragment() {
           WelcomeViewModel.ProgressState.PERMITTED
         } else {
           WelcomeViewModel.ProgressState.NOT_PERMITTED
-        })
+        }
+    )
 
-    if (requirementsChecker.hasLocationPermissions() &&
-        !requirementsChecker.hasBackgroundLocationPermission()) {
+    if (
+        requirementsChecker.hasLocationPermissions() &&
+            !requirementsChecker.hasBackgroundLocationPermission()
+    ) {
       binding.uiFragmentWelcomeLocationBackgroundPermissionsRequest.visibility = View.VISIBLE
       binding.uiFragmentWelcomeLocationPermissionsRequest.visibility = View.INVISIBLE
       binding.uiFragmentWelcomeLocationPermissionsMessage.visibility = View.INVISIBLE
-    } else if (requirementsChecker.hasLocationPermissions() &&
-        requirementsChecker.hasBackgroundLocationPermission()) {
+    } else if (
+        requirementsChecker.hasLocationPermissions() &&
+            requirementsChecker.hasBackgroundLocationPermission()
+    ) {
       binding.uiFragmentWelcomeLocationBackgroundPermissionsRequest.visibility = View.INVISIBLE
       binding.uiFragmentWelcomeLocationPermissionsRequest.visibility = View.INVISIBLE
       binding.uiFragmentWelcomeLocationPermissionsMessage.visibility = View.VISIBLE

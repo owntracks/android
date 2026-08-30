@@ -21,8 +21,10 @@ class MqttConnectionConfigurationTest {
             "owntracks/+/+/event",
             "owntracks/+/+/info",
             "owntracks/+/+/status",
-            "owntracks/user/unknown/cmd"),
-        topics)
+            "owntracks/user/unknown/cmd",
+        ),
+        topics,
+    )
   }
 
   @Test

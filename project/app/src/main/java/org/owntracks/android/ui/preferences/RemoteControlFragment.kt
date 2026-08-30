@@ -32,18 +32,15 @@ class RemoteControlFragment @Inject constructor() : AbstractPreferenceFragment()
 
     findPreference<Preference>(Preferences::intentAuthKey.name)?.apply {
       summary = preferences.intentAuthKey
-      onPreferenceClickListener =
-          Preference.OnPreferenceClickListener {
-            val clipboard =
-                requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            clipboard.setPrimaryClip(
-                ClipData.newPlainText("intentAuthKey", preferences.intentAuthKey))
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-              Toast.makeText(requireContext(), R.string.intentAuthKeyCopied, Toast.LENGTH_SHORT)
-                  .show()
-            }
-            true
-          }
+      onPreferenceClickListener = Preference.OnPreferenceClickListener {
+        val clipboard =
+            requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        clipboard.setPrimaryClip(ClipData.newPlainText("intentAuthKey", preferences.intentAuthKey))
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+          Toast.makeText(requireContext(), R.string.intentAuthKeyCopied, Toast.LENGTH_SHORT).show()
+        }
+        true
+      }
     }
 
     findPreference<SwitchPreferenceCompat>(Preferences::allowConfigurationByURIAndConfigFile.name)

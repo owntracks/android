@@ -18,7 +18,7 @@ class MapLayerBottomSheetDialog : BottomSheetDialogFragment() {
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
-      savedInstanceState: Bundle?
+      savedInstanceState: Bundle?,
   ): View {
     binding = MapLayerBottomSheetDialogBinding.inflate(inflater, container, false)
     mapLayerSelectorButtonsToStyles.forEach {
@@ -30,7 +30,9 @@ class MapLayerBottomSheetDialog : BottomSheetDialogFragment() {
           // Replace the map fragment
           val mapFragment =
               parentFragmentManager.fragmentFactory.instantiate(
-                  requireActivity().classLoader, MapFragment::class.java.name)
+                  requireActivity().classLoader,
+                  MapFragment::class.java.name,
+              )
           parentFragmentManager.commit(true) { replace(R.id.mapFragment, mapFragment, "map") }
         }
 

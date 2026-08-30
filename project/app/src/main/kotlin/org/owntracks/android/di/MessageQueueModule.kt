@@ -23,7 +23,7 @@ object MessageQueueModule {
   fun provideMessageQueue(
       @ApplicationContext applicationContext: Context,
       parser: Parser,
-      @IoDispatcher ioDispatcher: CoroutineDispatcher
+      @IoDispatcher ioDispatcher: CoroutineDispatcher,
   ): AsyncDeQueue {
     return RoomBackedMessageQueue(QUEUE_CAPACITY, applicationContext, parser, ioDispatcher)
   }

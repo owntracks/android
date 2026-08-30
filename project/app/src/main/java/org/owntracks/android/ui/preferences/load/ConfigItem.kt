@@ -11,17 +11,17 @@ sealed class ConfigItem {
    * being loaded.
    */
   data class KeyValue(
-    val key: String,
-    val newValue: String,
-    val oldValue: String? = null,
-    @param:StringRes val labelRes: Int? = null,
+      val key: String,
+      val newValue: String,
+      val oldValue: String? = null,
+      @param:StringRes val labelRes: Int? = null,
   ) : ConfigItem()
 
   data class Waypoint(
       val description: String,
       val latitude: Double,
       val longitude: Double,
-      val radius: Int?
+      val radius: Int?,
   ) : ConfigItem()
 
   /** Footer row summarising how many settings are already at the incoming value. */

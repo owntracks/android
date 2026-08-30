@@ -16,7 +16,11 @@ class WaypointsAdapter(private val clickListener: ClickListener<WaypointModel>) 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WaypointViewHolder {
     val binding =
         DataBindingUtil.inflate<UiRowWaypointBinding>(
-            LayoutInflater.from(parent.context), R.layout.ui_row_waypoint, parent, false)
+            LayoutInflater.from(parent.context),
+            R.layout.ui_row_waypoint,
+            parent,
+            false,
+        )
     return WaypointViewHolder(binding, clickListener)
   }
 
@@ -26,7 +30,7 @@ class WaypointsAdapter(private val clickListener: ClickListener<WaypointModel>) 
 
   class WaypointViewHolder(
       private val binding: UiRowWaypointBinding,
-      private val clickListener: ClickListener<WaypointModel>
+      private val clickListener: ClickListener<WaypointModel>,
   ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(waypoint: WaypointModel) {
       binding.waypoint = waypoint

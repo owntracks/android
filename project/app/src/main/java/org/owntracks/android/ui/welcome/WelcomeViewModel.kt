@@ -52,6 +52,6 @@ class WelcomeViewModel @Inject constructor(private val preferences: Preferences)
   enum class ProgressState {
     PERMITTED,
     NOT_PERMITTED,
-    FINISHED
+    FINISHED,
   }
 }

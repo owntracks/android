@@ -46,7 +46,8 @@ class TestGeocoderProvider {
                 notificationManager,
                 this,
                 UnconfinedTestDispatcher(),
-                OkHttpClient())
+                OkHttpClient(),
+            )
         val result = provider.resolve(LatLng(50.0, 0.0))
         advanceUntilIdle()
         assertEquals("50.0000, 0.0000", result)
@@ -66,7 +67,8 @@ class TestGeocoderProvider {
                 notificationManager,
                 this,
                 UnconfinedTestDispatcher(),
-                OkHttpClient())
+                OkHttpClient(),
+            )
         val backgroundService: BackgroundService = spy {}
         val latLng = LatLng(50.0, 0.0)
         provider.resolve(latLng, backgroundService)
@@ -101,7 +103,8 @@ class TestGeocoderProvider {
                 notificationManager,
                 this,
                 UnconfinedTestDispatcher(),
-                mockHttpClient)
+                mockHttpClient,
+            )
         val result = provider.resolve(LatLng(50.0, 0.0))
         advanceUntilIdle()
         assertEquals("Friedrich-Ebert-Straße 7, 48153 Münster, Germany", result)

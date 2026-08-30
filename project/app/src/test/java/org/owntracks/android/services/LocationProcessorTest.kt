@@ -77,7 +77,8 @@ class LocationProcessorTest {
             Dispatchers.Unconfined,
             SimpleIdlingResource("publishResponseMessageIdlingResource", false),
             SimpleIdlingResource("mockLocationIdlingResource", false),
-            false)
+            false,
+        )
 
     val firstLocation =
         mock<Location> {
@@ -101,12 +102,14 @@ class LocationProcessorTest {
     val captor = argumentCaptor<MessageBase>()
     verify(messageProcessor, times(2)).queueMessageForSending(captor.capture())
     assertEquals(
-        MessageLocation.ReportType.RESPONSE, (captor.secondValue as MessageLocation).trigger)
+        MessageLocation.ReportType.RESPONSE,
+        (captor.secondValue as MessageLocation).trigger,
+    )
   }
 
   private fun TestScope.buildLocationProcessor(
       messageProcessor: MessageProcessor,
-      discardThresholdSeconds: Int
+      discardThresholdSeconds: Int,
   ): LocationProcessor {
     val preferences =
         mock<Preferences> {
@@ -128,7 +131,8 @@ class LocationProcessorTest {
         Dispatchers.Unconfined,
         SimpleIdlingResource("publishResponseMessageIdlingResource", false),
         SimpleIdlingResource("mockLocationIdlingResource", false),
-        false)
+        false,
+    )
   }
 
   /**
