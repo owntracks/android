@@ -74,7 +74,10 @@ class MessageConfiguration(
               put(
                   k,
                   jsonEncoder.json.encodeToJsonElement(
-                      serializer(v::class.createType()) as KSerializer<Any>, v))
+                      serializer(v::class.createType()) as KSerializer<Any>,
+                      v,
+                  ),
+              )
             }
             is Set<*> -> put(k, JsonArray(v.map { JsonPrimitive(it?.toString() ?: "") }))
             null -> put(k, JsonNull)
@@ -92,7 +95,9 @@ class MessageConfiguration(
                         .jsonObject
                         .forEach { (k, v) -> put(k, v) }
                   }
-                }))
+                }
+            ),
+        )
       }
       jsonEncoder.encodeJsonElement(obj)
     }
@@ -111,7 +116,10 @@ class MessageConfiguration(
                   try {
                     waypoints.add(
                         jsonDecoder.json.decodeFromJsonElement(
-                            MessageWaypoint.serializer(), waypointJson))
+                            MessageWaypoint.serializer(),
+                            waypointJson,
+                        )
+                    )
                   } catch (e: SerializationException) {
                     Timber.w("Failed to deserialize waypoint: $e")
                   }

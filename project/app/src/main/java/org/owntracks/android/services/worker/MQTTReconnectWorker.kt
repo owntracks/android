@@ -19,7 +19,7 @@ constructor(
     @Assisted workerParams: WorkerParameters,
     private val messageProcessor: MessageProcessor,
     private val scheduler: Scheduler,
-    private val endpointStateRepo: EndpointStateRepo
+    private val endpointStateRepo: EndpointStateRepo,
 ) : CoroutineWorker(context, workerParams) {
   /**
    * Always reports [Result.success], because whether another attempt is needed is not WorkManager's
@@ -45,7 +45,8 @@ constructor(
     just prompted by different triggers.
      */
     val state = endpointStateRepo.endpointState.value
-    val connectionCheckPassed = state == EndpointState.CONNECTED && messageProcessor.checkConnection()
+    val connectionCheckPassed =
+        state == EndpointState.CONNECTED && messageProcessor.checkConnection()
     if (!MQTTConnectionWatchdogWorker.shouldReconnect(state, connectionCheckPassed)) {
       Timber.d("Connection already healthy, nothing to do")
       return Result.success()

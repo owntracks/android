@@ -30,7 +30,7 @@ class SignificantMotionSensor(
     private val locationProviderClient: LocationProviderClient,
     private val requirementsChecker: RequirementsChecker,
     private val locationCallback: LocationCallback,
-    private val looper: Looper
+    private val looper: Looper,
 ) {
   private val sensorManager by lazy {
     context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
@@ -56,14 +56,18 @@ class SignificantMotionSensor(
    * significant movement is detected.
    */
   fun setup() {
-    if (!preferences.experimentalFeatures.contains(
-        Preferences.EXPERIMENTAL_FEATURE_REQUEST_LOCATION_ON_SIGNIFICANT_MOTION)) {
+    if (
+        !preferences.experimentalFeatures.contains(
+            Preferences.EXPERIMENTAL_FEATURE_REQUEST_LOCATION_ON_SIGNIFICANT_MOTION
+        )
+    ) {
       Timber.d("Significant motion sensor disabled (experimental feature not enabled)")
       return
     }
     significantMotionSensor?.let { sensor ->
       Timber.d(
-          "Found significant motion sensor: ${sensor.name} (vendor: ${sensor.vendor}, isWakeUpSensor: ${sensor.isWakeUpSensor})")
+          "Found significant motion sensor: ${sensor.name} (vendor: ${sensor.vendor}, isWakeUpSensor: ${sensor.isWakeUpSensor})"
+      )
       // Cancel any existing registration before requesting a new one
       // (requestTriggerSensor fails if listener is already registered)
       sensorManager.cancelTriggerSensor(significantMotionTriggerListener, sensor)
@@ -77,14 +81,14 @@ class SignificantMotionSensor(
         ?: run {
           // Log available sensors to help diagnose issues
           val allSensors = sensorManager.getSensorList(Sensor.TYPE_ALL)
-          val motionRelatedSensors =
-              allSensors.filter {
-                it.type == Sensor.TYPE_SIGNIFICANT_MOTION ||
-                    it.name.contains("motion", ignoreCase = true) ||
-                    it.name.contains("movement", ignoreCase = true)
-              }
+          val motionRelatedSensors = allSensors.filter {
+            it.type == Sensor.TYPE_SIGNIFICANT_MOTION ||
+                it.name.contains("motion", ignoreCase = true) ||
+                it.name.contains("movement", ignoreCase = true)
+          }
           Timber.i(
-              "Significant motion sensor not available. Motion-related sensors found: ${motionRelatedSensors.map { "${it.name} (type=${it.type})" }}")
+              "Significant motion sensor not available. Motion-related sensors found: ${motionRelatedSensors.map { "${it.name} (type=${it.type})" }}"
+          )
         }
   }
 
@@ -129,7 +133,8 @@ class SignificantMotionSensor(
     if (timeSinceLastRequest < minIntervalMs) {
       Timber.d(
           "Significant motion detected but rate limited. " +
-              "Time since last request: ${timeSinceLastRequest}ms, min interval: ${minIntervalMs}ms")
+              "Time since last request: ${timeSinceLastRequest}ms, min interval: ${minIntervalMs}ms"
+      )
       return
     }
 

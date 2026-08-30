@@ -1,9 +1,10 @@
 package org.owntracks.android.geocoding
 
-import kotlin.time.Duration.Companion.minutes
-import kotlinx.coroutines.test.runTest
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
+import kotlinx.coroutines.test.runTest
 import okhttp3.Call
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
@@ -19,7 +20,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.owntracks.android.location.LatLng
-import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 class TestOpenCageGeocoder {
@@ -67,7 +67,8 @@ class TestOpenCageGeocoder {
         assert(response is GeocodeResult.Formatted)
         assertEquals(
             "Friedrich-Ebert-Straße 7, 48153 Münster, Germany",
-            (response as GeocodeResult.Formatted).text)
+            (response as GeocodeResult.Formatted).text,
+        )
       }
 
   @Test
@@ -173,6 +174,7 @@ class TestOpenCageGeocoder {
         assert(response is GeocodeResult.Fault.RateLimited)
         assertEquals(
             Instant.parse("2021-03-05T00:00:00Z"),
-            (response as GeocodeResult.Fault.RateLimited).until)
+            (response as GeocodeResult.Fault.RateLimited).until,
+        )
       }
 }

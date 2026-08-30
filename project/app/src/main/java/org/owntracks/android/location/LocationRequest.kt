@@ -9,5 +9,5 @@ data class LocationRequest(
     var expirationDuration: Duration? = null,
     var priority: LocatorPriority = LocatorPriority.BalancedPowerAccuracy,
     val interval: Duration,
-    var waitForAccurateLocation: Boolean? = null
+    var waitForAccurateLocation: Boolean? = null,
 )

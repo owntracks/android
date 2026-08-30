@@ -12,12 +12,13 @@ import androidx.core.app.NotificationManagerCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.time.Instant
 import kotlinx.datetime.format
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.Padding
@@ -32,19 +33,18 @@ import org.owntracks.android.preferences.types.ReverseGeocodeProvider
 import org.owntracks.android.services.BackgroundService
 import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber
-import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 @Singleton
 class GeocoderProvider
 @Inject
 constructor(
-  @param:ApplicationContext private val context: Context,
-  private val preferences: Preferences,
-  private val notificationManager: NotificationManagerCompat,
-  @param:ApplicationScope private val scope: CoroutineScope,
-  @param:CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-  private val httpClient: OkHttpClient
+    @param:ApplicationContext private val context: Context,
+    private val preferences: Preferences,
+    private val notificationManager: NotificationManagerCompat,
+    @param:ApplicationScope private val scope: CoroutineScope,
+    @param:CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val httpClient: OkHttpClient,
 ) {
   private var lastRateLimitedNotificationTime: Instant? = null
   private var geocoder: Geocoder = GeocoderNone()
@@ -53,18 +53,17 @@ constructor(
 
   private fun setGeocoderProvider(context: Context, preferences: Preferences) {
     Timber.i("Setting geocoding provider to ${preferences.reverseGeocodeProvider}")
-    job =
-        scope.launch {
-          withContext(ioDispatcher) {
-            geocoder =
-                when (preferences.reverseGeocodeProvider) {
-                  ReverseGeocodeProvider.OpenCage ->
-                      OpenCageGeocoder(preferences.opencageApiKey, httpClient)
-                  ReverseGeocodeProvider.Device -> DeviceGeocoder(context)
-                  ReverseGeocodeProvider.None -> GeocoderNone()
-                }
-          }
-        }
+    job = scope.launch {
+      withContext(ioDispatcher) {
+        geocoder =
+            when (preferences.reverseGeocodeProvider) {
+              ReverseGeocodeProvider.OpenCage ->
+                  OpenCageGeocoder(preferences.opencageApiKey, httpClient)
+              ReverseGeocodeProvider.Device -> DeviceGeocoder(context)
+              ReverseGeocodeProvider.None -> GeocoderNone()
+            }
+      }
+    }
   }
 
   private suspend fun geocoderResolve(latLng: LatLng): GeocodeResult {
@@ -85,7 +84,9 @@ constructor(
   suspend fun resolve(latLng: LatLng, backgroundService: BackgroundService) {
     val result = geocoderResolve(latLng)
     backgroundService.onGeocodingProviderResult(
-        latLng, geocodeResultToText(result) ?: latLng.toDisplayString())
+        latLng,
+        geocodeResultToText(result) ?: latLng.toDisplayString(),
+    )
     maybeCreateErrorNotification(result)
   }
 
@@ -96,9 +97,11 @@ constructor(
       }
 
   private fun maybeCreateErrorNotification(result: GeocodeResult) {
-    if (result is GeocodeResult.Formatted ||
-        result is GeocodeResult.Empty ||
-        !preferences.notificationGeocoderErrors) {
+    if (
+        result is GeocodeResult.Formatted ||
+            result is GeocodeResult.Empty ||
+            !preferences.notificationGeocoderErrors
+    ) {
       notificationManager.cancel(GEOCODE_ERROR_NOTIFICATION_TAG, 0)
       return
     }
@@ -124,7 +127,9 @@ constructor(
                         hour()
                         char(':')
                         minute()
-                      }))
+                      }
+                  ),
+              )
           is GeocodeResult.Fault.Unavailable -> context.getString(R.string.geocoderUnavailable)
           else -> ""
         }
@@ -156,15 +161,19 @@ constructor(
                     context,
                     0,
                     activityLaunchIntent,
-                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT))
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+                )
+            )
             .setPriority(PRIORITY_LOW)
             .setSilent(true)
             .build()
 
-    if (ActivityCompat.checkSelfPermission(
-          this.context,
-          Manifest.permission.POST_NOTIFICATIONS
-      ) != PackageManager.PERMISSION_GRANTED) {
+    if (
+        ActivityCompat.checkSelfPermission(
+            this.context,
+            Manifest.permission.POST_NOTIFICATIONS,
+        ) != PackageManager.PERMISSION_GRANTED
+    ) {
       // TODO: Consider calling
       //    ActivityCompat#requestPermissions
       // here to request the missing permissions, and then overriding
@@ -180,9 +189,9 @@ constructor(
   private val preferenceChangeListener =
       object : Preferences.OnPreferenceChangeListener {
         override fun onPreferenceChanged(properties: Set<String>) {
-          if (properties
-              .intersect(setOf("reverseGeocodeProvider", "opencageApiKey"))
-              .isNotEmpty()) {
+          if (
+              properties.intersect(setOf("reverseGeocodeProvider", "opencageApiKey")).isNotEmpty()
+          ) {
             setGeocoderProvider(context, preferences)
           }
         }

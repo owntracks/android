@@ -18,7 +18,7 @@ import timber.log.Timber
 abstract class WaypointsRepo
 protected constructor(
     private val applicationContext: Context,
-    private val migrationIdlingResource: SimpleIdlingResource
+    private val migrationIdlingResource: SimpleIdlingResource,
 ) {
   sealed class WaypointOperation {
     data class Insert(val waypoint: WaypointModel) : WaypointOperation()

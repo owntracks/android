@@ -29,12 +29,9 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.owntracks.android.data.repos.AsyncDeQueue
-import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.data.repos.EndpointStateRepo
-import org.owntracks.android.data.waypoints.WaypointsRepo
 import org.owntracks.android.model.Parser
 import org.owntracks.android.model.messages.MessageBase
-import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.test.IdlingResourceWithData
@@ -51,8 +48,8 @@ import org.owntracks.android.test.ThresholdIdlingResourceInterface
  * until the app was force-stopped (see issue #2294).
  *
  * The loop itself is private, so these tests observe it through the queue: a live loop parks in
- * [AsyncDeQueue.awaitMessage] waiting for work, so reaching that call is the signal that the loop is
- * running.
+ * [AsyncDeQueue.awaitMessage] waiting for work, so reaching that call is the signal that the loop
+ * is running.
  *
  * Every detector must be armed *before* the action that's expected to trigger it, never after:
  * `awaitMessage` is called once per loop start and then parks forever on an empty channel, so a
@@ -146,13 +143,15 @@ class MessageProcessorTest {
             ioDispatcher = testDispatcher,
             scope = testScope,
             mqttConnectionIdlingResource = SimpleIdlingResource("mqtt", true),
-            outgoingQueue = queue)
+            outgoingQueue = queue,
+        )
   }
 
   /** Fails the test if no sender loop reaches [AsyncDeQueue.awaitMessage] in time. */
-  private fun assertLoopRunning(detector: CompletableDeferred<Unit>, message: String) = runBlocking {
-    assertNotNull(message, withTimeoutOrNull(TIMEOUT) { detector.await() })
-  }
+  private fun assertLoopRunning(detector: CompletableDeferred<Unit>, message: String) =
+      runBlocking {
+        assertNotNull(message, withTimeoutOrNull(TIMEOUT) { detector.await() })
+      }
 
   @Test
   fun `initialize starts the outbound sender loop`() {
@@ -175,7 +174,9 @@ class MessageProcessorTest {
     val detector = queue.armLoopDetector()
     runBlocking {
       assertNull(
-          "sender loop should be stopped", withTimeoutOrNull(SETTLE) { detector.await() })
+          "sender loop should be stopped",
+          withTimeoutOrNull(SETTLE) { detector.await() },
+      )
     }
   }
 
@@ -231,7 +232,8 @@ class MessageProcessorTest {
     runBlocking {
       assertNull(
           "a second sender loop should not have been started",
-          withTimeoutOrNull(SETTLE) { detector.await() })
+          withTimeoutOrNull(SETTLE) { detector.await() },
+      )
     }
   }
 
@@ -251,10 +253,10 @@ class MessageProcessorTest {
 
   /**
    * The regression behind connections that stayed dead for hours: a worker runs in whatever process
-   * WorkManager started for it, which for a reconnect after a process death is a brand new one where
-   * nothing has loaded an endpoint. Asking [MessageProcessor.isEndpointReady] there answers "no" —
-   * not because the configuration is incomplete, but because nothing has built anything yet — so
-   * every attempt rescheduled itself and none ever connected.
+   * WorkManager started for it, which for a reconnect after a process death is a brand new one
+   * where nothing has loaded an endpoint. Asking [MessageProcessor.isEndpointReady] there answers
+   * "no" — not because the configuration is incomplete, but because nothing has built anything yet
+   * — so every attempt rescheduled itself and none ever connected.
    */
   @Test
   fun `initializeAndReconnect loads an endpoint in a process that has never initialized`() {
@@ -263,7 +265,9 @@ class MessageProcessorTest {
     runBlocking { messageProcessor.initializeAndReconnect() }
 
     assertLoopRunning(
-        detector, "a worker's reconnect should have loaded the endpoint and armed the sender loop")
+        detector,
+        "a worker's reconnect should have loaded the endpoint and armed the sender loop",
+    )
   }
 
   /**

@@ -30,7 +30,8 @@ object MessageWaypointCollectionSerializer : KSerializer<MessageWaypointCollecti
                     .jsonObject
                     .forEach { (k, v) -> put(k, v) }
               }
-            })
+            }
+        )
     jsonEncoder.encodeJsonElement(jsonArray)
   }
 

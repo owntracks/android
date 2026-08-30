@@ -28,7 +28,7 @@ class StatusViewModel
 constructor(
     application: Application,
     endpointStateRepo: EndpointStateRepo,
-    locationRepo: LocationRepo
+    locationRepo: LocationRepo,
 ) : AndroidViewModel(application) {
   val endpointState: StateFlow<EndpointState> = endpointStateRepo.endpointState
   val endpointQueueLength: StateFlow<Int> = endpointStateRepo.endpointQueueLength
@@ -87,6 +87,7 @@ constructor(
 
   private fun isIgnoringBatteryOptimizations(): Boolean {
     return powerManager.isIgnoringBatteryOptimizations(
-        getApplication<Application>().applicationContext.packageName)
+        getApplication<Application>().applicationContext.packageName
+    )
   }
 }

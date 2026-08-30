@@ -12,6 +12,7 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import io.github.davidepianca98.mqtt.packets.Qos
 import io.github.davidepianca98.mqtt.packets.mqtt.MQTTPublish
 import io.github.davidepianca98.mqtt.packets.mqttv5.MQTT5Properties
+import java.time.Instant
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -32,7 +33,6 @@ import org.owntracks.android.testutils.use
 import org.owntracks.android.ui.map.MapActivity
 import org.owntracks.android.ui.waypoints.WaypointsActivity
 import timber.log.Timber
-import java.time.Instant
 
 @ExperimentalUnsignedTypes
 @LargeTest
@@ -206,7 +206,11 @@ class MQTTTransitionEventTests :
     openDrawer()
     clickOn(R.string.title_activity_waypoints)
     addWaypoint(
-        waypointDescription, waypointLatitude.toString(), waypointLongitude.toString(), "100")
+        waypointDescription,
+        waypointLatitude.toString(),
+        waypointLongitude.toString(),
+        "100",
+    )
 
     waitUntilActivityVisible(WaypointsActivity::class.java)
     reportLocationFromMap(mockLocationIdlingResource) {

@@ -7,7 +7,7 @@ data class GeofencingEvent(
     val errorCode: Int?,
     val geofenceTransition: Int?,
     val triggeringGeofences: List<Geofence>?,
-    val triggeringLocation: Location?
+    val triggeringLocation: Location?,
 ) {
   fun hasError(): Boolean = errorCode != null && errorCode >= 0
 
@@ -27,9 +27,11 @@ data class GeofencingEvent(
                 Longitude(it.longitude),
                 it.radius,
                 it.expirationTime,
-                it.loiteringDelay)
+                it.loiteringDelay,
+            )
           },
-          gmsGeofencingEvent?.triggeringLocation)
+          gmsGeofencingEvent?.triggeringLocation,
+      )
     }
   }
 }

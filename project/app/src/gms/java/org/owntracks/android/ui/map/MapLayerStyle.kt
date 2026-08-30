@@ -46,4 +46,5 @@ val mapLayerSelectorButtonsToStyles =
         R.id.fabMapLayerGoogleHybrid to MapLayerStyle.GoogleMapHybrid,
         R.id.fabMapLayerGoogleTerrain to MapLayerStyle.GoogleMapTerrain,
         R.id.fabMapLayerOpenStreetMap to MapLayerStyle.OpenStreetMapNormal,
-        R.id.fabMapLayerOpenStreetMapWikimedia to MapLayerStyle.OpenStreetMapWikimedia)
+        R.id.fabMapLayerOpenStreetMapWikimedia to MapLayerStyle.OpenStreetMapWikimedia,
+    )

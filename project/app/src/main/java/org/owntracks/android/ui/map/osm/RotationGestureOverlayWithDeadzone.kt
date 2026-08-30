@@ -66,7 +66,7 @@ class RotationGestureOverlayWithDeadZone(private var mapView: MapView) :
   override fun onOptionsItemSelected(
       menuItem: MenuItem,
       menuIdOffset: Int,
-      mapView: MapView
+      mapView: MapView,
   ): Boolean {
     return false
   }

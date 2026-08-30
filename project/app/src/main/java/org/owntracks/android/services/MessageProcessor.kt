@@ -62,26 +62,26 @@ import timber.log.Timber
 class MessageProcessor
 @Inject
 constructor(
-  @param:ApplicationContext private val applicationContext: Context,
-  private val contactsRepo: ContactsRepo,
-  private val preferences: Preferences,
-  private val waypointsRepo: WaypointsRepo,
-  private val parser: Parser,
-  private val scheduler: Scheduler,
-  private val endpointStateRepo: EndpointStateRepo,
-  @param:Named("outgoingQueueIdlingResource")
+    @param:ApplicationContext private val applicationContext: Context,
+    private val contactsRepo: ContactsRepo,
+    private val preferences: Preferences,
+    private val waypointsRepo: WaypointsRepo,
+    private val parser: Parser,
+    private val scheduler: Scheduler,
+    private val endpointStateRepo: EndpointStateRepo,
+    @param:Named("outgoingQueueIdlingResource")
     private val outgoingQueueIdlingResource: ThresholdIdlingResourceInterface,
-  @param:Named("importConfigurationIdlingResource")
+    @param:Named("importConfigurationIdlingResource")
     private val importConfigurationIdlingResource: SimpleIdlingResource,
-  @param:Named("messageReceivedIdlingResource")
+    @param:Named("messageReceivedIdlingResource")
     private val messageReceivedIdlingResource: IdlingResourceWithData<MessageBase>,
-  @param:Named("CAKeyStore") private val caKeyStore: KeyStore,
-  private val locationProcessorLazy: Lazy<LocationProcessor>,
-  @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-  @param:ApplicationScope private val scope: CoroutineScope,
-  @param:Named("mqttConnectionIdlingResource")
+    @param:Named("CAKeyStore") private val caKeyStore: KeyStore,
+    private val locationProcessorLazy: Lazy<LocationProcessor>,
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @param:ApplicationScope private val scope: CoroutineScope,
+    @param:Named("mqttConnectionIdlingResource")
     private val mqttConnectionIdlingResource: SimpleIdlingResource,
-  private val outgoingQueue: AsyncDeQueue
+    private val outgoingQueue: AsyncDeQueue,
 ) : Preferences.OnPreferenceChangeListener {
   private var messageProcessorEndpoint: MessageProcessorEndpoint? = null
   private val queueInitJob: Job =
@@ -144,12 +144,12 @@ constructor(
   /**
    * Makes this process capable of holding a connection, then connects.
    *
-   * For workers, which is the one place that cannot assume any of that has happened yet: WorkManager
-   * starts the process to run a job, so a reconnect job can be the very first thing to run in it,
-   * with nothing bound to the background service and no endpoint built. Both are normally the work
-   * of [initialize], which only the background service calls, so a worker that skips this connects
-   * nowhere and — having never bound anything — is in a process the system is free to kill the
-   * moment the job returns.
+   * For workers, which is the one place that cannot assume any of that has happened yet:
+   * WorkManager starts the process to run a job, so a reconnect job can be the very first thing to
+   * run in it, with nothing bound to the background service and no endpoint built. Both are
+   * normally the work of [initialize], which only the background service calls, so a worker that
+   * skips this connects nowhere and — having never bound anything — is in a process the system is
+   * free to kill the moment the job returns.
    *
    * Everything it does is idempotent, so the common case of a process that is already up and merely
    * disconnected costs nothing beyond the reconnect itself.
@@ -178,12 +178,15 @@ constructor(
         true
       }
 
-  /** Binds the background service into this process and waits for the outgoing queue to be usable. */
+  /**
+   * Binds the background service into this process and waits for the outgoing queue to be usable.
+   */
   private suspend fun bindToBackgroundService() {
     applicationContext.bindService(
         Intent(applicationContext, BackgroundService::class.java),
         serviceConnection,
-        Context.BIND_AUTO_CREATE)
+        Context.BIND_AUTO_CREATE,
+    )
     endpointStateRepo.setState(EndpointState.INITIAL)
     queueInitJob.join()
   }
@@ -299,7 +302,8 @@ constructor(
               scope,
               ioDispatcher,
               applicationContext,
-              mqttConnectionIdlingResource)
+              mqttConnectionIdlingResource,
+          )
       ConnectionMode.HTTP ->
           HttpMessageProcessorEndpoint(
               this,
@@ -309,7 +313,8 @@ constructor(
               endpointStateRepo,
               caKeyStore,
               scope,
-              ioDispatcher)
+              ioDispatcher,
+          )
     }
   }
 
@@ -360,8 +365,10 @@ constructor(
             val message: MessageBase = outgoingQueue.awaitMessage()
             Timber.d("Taken message off queue: $message")
             // reset the retry logic if the last message succeeded
-            if (lastMessageStatus is LastMessageStatus.Success ||
-                lastMessageStatus is LastMessageStatus.PermanentFailure) {
+            if (
+                lastMessageStatus is LastMessageStatus.Success ||
+                    lastMessageStatus is LastMessageStatus.PermanentFailure
+            ) {
               retriesToGo = message.numberOfRetries
               retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT
             } else {
@@ -376,7 +383,9 @@ constructor(
                   resendDelayWait(SEND_FAILURE_NOT_READY_WAIT)
                   lastMessageStatus =
                       LastMessageStatus.RetryableFailure(
-                          message.numberOfRetries, SEND_FAILURE_BACKOFF_INITIAL_WAIT)
+                          message.numberOfRetries,
+                          SEND_FAILURE_BACKOFF_INITIAL_WAIT,
+                      )
                 } else {
                   it.sendMessage(message).exceptionOrNull()?.run {
                     when (this) {
@@ -386,7 +395,9 @@ constructor(
                         resendDelayWait(SEND_FAILURE_NOT_READY_WAIT)
                         lastMessageStatus =
                             LastMessageStatus.RetryableFailure(
-                                message.numberOfRetries, SEND_FAILURE_BACKOFF_INITIAL_WAIT)
+                                message.numberOfRetries,
+                                SEND_FAILURE_BACKOFF_INITIAL_WAIT,
+                            )
                       }
 
                       is MessageProcessorEndpoint.OutgoingMessageSendingException,
@@ -412,7 +423,8 @@ constructor(
                                   retriesToGo - 1,
                                   (retryWait * 2).coerceAtMost(SEND_FAILURE_BACKOFF_MAX_WAIT).also {
                                     Timber.v("Increasing failure retry wait to $it")
-                                  })
+                                  },
+                              )
                             }
                       }
 
@@ -437,8 +449,10 @@ constructor(
               lastMessageStatus = LastMessageStatus.PermanentFailure
             }
 
-            if (lastMessageStatus is LastMessageStatus.Success ||
-                lastMessageStatus is LastMessageStatus.PermanentFailure) {
+            if (
+                lastMessageStatus is LastMessageStatus.Success ||
+                    lastMessageStatus is LastMessageStatus.PermanentFailure
+            ) {
               try {
                 if (!outgoingQueueIdlingResource.isIdleNow) {
                   Timber.v("Decrementing outgoingQueueIdlingResource")
@@ -517,13 +531,15 @@ constructor(
   fun onMessageDeliveryFailed(message: MessageBase) {
     scope.launch {
       Timber.e(
-          "Message delivery failed. queueLength: ${outgoingQueue.size() + 1}, message=$message")
+          "Message delivery failed. queueLength: ${outgoingQueue.size() + 1}, message=$message"
+      )
     }
   }
 
   fun processIncomingMessage(message: MessageBase) {
     Timber.d(
-        "Received incoming message: ${message.javaClass.simpleName} on ${message.topic} with id=${message.messageId}")
+        "Received incoming message: ${message.javaClass.simpleName} on ${message.topic} with id=${message.messageId}"
+    )
     when (message) {
       is MessageClear -> {
         processIncomingMessage(message)
@@ -557,19 +573,23 @@ constructor(
 
   private fun processIncomingMessage(message: MessageLocation) {
     // do not use TimeUnit.DAYS.toMillis to avoid long/double conversion issues...
-    if (preferences.ignoreStaleLocations > 0 &&
-        System.currentTimeMillis() - message.timestamp * 1000 >
-            preferences.ignoreStaleLocations.toDouble().days.inWholeMilliseconds) {
+    if (
+        preferences.ignoreStaleLocations > 0 &&
+            System.currentTimeMillis() - message.timestamp * 1000 >
+                preferences.ignoreStaleLocations.toDouble().days.inWholeMilliseconds
+    ) {
       Timber.d("discarding stale location from ${message.getContactId()} at ${message.timestamp}")
       messageReceivedIdlingResource.remove(message)
     } else {
       scope.launch {
         if (message.topic == preferences.pubTopicLocations) {
           Timber.d(
-              "Received our own location update ${message.latitude},${message.longitude} at ${message.timestamp}")
+              "Received our own location update ${message.latitude},${message.longitude} at ${message.timestamp}"
+          )
         } else {
           Timber.d(
-              "Contact ${message.getContactId()} moved to ${message.latitude},${message.longitude} at ${message.timestamp}")
+              "Contact ${message.getContactId()} moved to ${message.latitude},${message.longitude} at ${message.timestamp}"
+          )
         }
         contactsRepo.update(message.getContactId(), message)
         /*
@@ -584,15 +604,18 @@ constructor(
   }
 
   private fun processIncomingMessage(message: MessageTransition) {
-    if (preferences.ignoreStaleLocations > 0 &&
-        System.currentTimeMillis() - message.timestamp * 1000 >
-            preferences.ignoreStaleLocations.toDouble().days.inWholeMilliseconds) {
+    if (
+        preferences.ignoreStaleLocations > 0 &&
+            System.currentTimeMillis() - message.timestamp * 1000 >
+                preferences.ignoreStaleLocations.toDouble().days.inWholeMilliseconds
+    ) {
       Timber.d("discarding stale transition from $message.topic at $message.timestamp")
       messageReceivedIdlingResource.remove(message)
     } else {
       scope.launch {
         Timber.d(
-            "Contact ${message.getContactId()} transitioned waypoint ${message.description} (${message.event}) at ${message.timestamp}")
+            "Contact ${message.getContactId()} transitioned waypoint ${message.description} (${message.event}) at ${message.timestamp}"
+        )
         contactsRepo.update(message.getContactId(), message)
         service?.sendEventNotification(message)
         messageReceivedIdlingResource.remove(message)
@@ -612,10 +635,12 @@ constructor(
     if (!preferences.cmd) {
       Timber.w("remote commands are disabled")
       messageReceivedIdlingResource.remove(message)
-    } else if (message.modeId !== ConnectionMode.HTTP &&
-        preferences.receivedCommandsTopic != message.topic &&
-        preferences.subTopic ==
-            DEFAULT_SUB_TOPIC // If we're not using the default subtopic, we receive commands from
+    } else if (
+        message.modeId !== ConnectionMode.HTTP &&
+            preferences.receivedCommandsTopic != message.topic &&
+            preferences.subTopic ==
+                DEFAULT_SUB_TOPIC // If we're not using the default subtopic, we receive commands
+    // from
     // anywhere
     ) {
       Timber.e("cmd message received on wrong topic")
@@ -635,7 +660,8 @@ constructor(
           CommandAction.SET_CONFIGURATION -> {
             if (!preferences.remoteConfiguration) {
               Timber.w(
-                  "Received a remote configuration command but remote config setting is disabled")
+                  "Received a remote configuration command but remote config setting is disabled"
+              )
             } else {
               if (message.configuration != null) {
                 preferences.importConfiguration(message.configuration!!)
@@ -664,6 +690,7 @@ constructor(
   suspend fun publishLocationMessage(trigger: MessageLocation.ReportType) {
     locationProcessorLazy.get().publishLocationMessage(trigger)
   }
+
   fun stopSendingMessages() {
     Timber.d("Interrupting background sending thread")
     dequeueAndSenderJob?.also { job ->

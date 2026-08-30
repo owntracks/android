@@ -66,7 +66,8 @@ class LoadViewModelTest {
           InMemoryWaypointsRepo(this, mockContext, StandardTestDispatcher()),
           UnconfinedTestDispatcher(),
           SimpleIdlingResource("", true),
-          mockContext)
+          mockContext,
+      )
 
   @Test
   fun `Given allowConfigurationByURIAndConfigFile is false, when loading an owntracks scheme URI, then the import fails`() =
@@ -75,7 +76,8 @@ class LoadViewModelTest {
         // allowConfigurationByURIAndConfigFile defaults to false
         val vm = makeVm(preferences)
         vm.extractPreferencesFromUri(
-            "owntracks:///config?inline=eyJfdHlwZSI6ImNvbmZpZ3VyYXRpb24ifQ==")
+            "owntracks:///config?inline=eyJfdHlwZSI6ImNvbmZpZ3VyYXRpb24ifQ=="
+        )
         assertEquals(ImportStatus.FAILED, vm.configurationImportStatus.value)
         assertEquals("External configuration loading is disabled", vm.importError.value)
       }
@@ -99,7 +101,9 @@ class LoadViewModelTest {
         vm.extractPreferencesFromUri("owntracks:///config?{}")
         assertEquals(ImportStatus.FAILED, vm.configurationImportStatus.value)
         assertEquals(
-            "Illegal character in query at index 20: owntracks:///config?{}", vm.importError.value)
+            "Illegal character in query at index 20: owntracks:///config?{}",
+            vm.importError.value,
+        )
       }
 
   @Test
@@ -121,7 +125,8 @@ class LoadViewModelTest {
         val vm = makeVm(preferences)
         // {"_type":"configuration"} — no keys, no waypoints
         vm.extractPreferencesFromUri(
-            "owntracks:///config?inline=eyJfdHlwZSI6ImNvbmZpZ3VyYXRpb24ifQ==")
+            "owntracks:///config?inline=eyJfdHlwZSI6ImNvbmZpZ3VyYXRpb24ifQ=="
+        )
         advanceUntilIdle()
         assertEquals(ImportStatus.SUCCESS, vm.configurationImportStatus.value)
         val json = Json.parseToJsonElement(vm.displayedConfiguration.value).jsonObject
@@ -141,7 +146,8 @@ class LoadViewModelTest {
         // {"_type":"waypoints","waypoints":[{"_type":"waypoint","desc":"Test
         // Waypoint","lat":51,"lon":0,"rad":450,"tst":1598451372}]}
         vm.extractPreferencesFromUri(
-            "owntracks:///config?inline=eyJfdHlwZSI6IndheXBvaW50cyIsIndheXBvaW50cyI6W3siX3R5cGUiOiJ3YXlwb2ludCIsImRlc2MiOiJUZXN0IFdheXBvaW50IiwibGF0Ijo1MSwibG9uIjowLCJyYWQiOjQ1MCwidHN0IjoxNTk4NDUxMzcyfV19")
+            "owntracks:///config?inline=eyJfdHlwZSI6IndheXBvaW50cyIsIndheXBvaW50cyI6W3siX3R5cGUiOiJ3YXlwb2ludCIsImRlc2MiOiJUZXN0IFdheXBvaW50IiwibGF0Ijo1MSwibG9uIjowLCJyYWQiOjQ1MCwidHN0IjoxNTk4NDUxMzcyfV19"
+        )
         val displayedConfig = vm.displayedConfiguration.value
         val json = Json.parseToJsonElement(displayedConfig).jsonObject
         assertTrue(json.isNotEmpty())
@@ -156,28 +162,35 @@ class LoadViewModelTest {
         assertTrue(json["waypoints"]?.jsonArray?.get(0)?.jsonObject?.containsKey("_type") == true)
         assertEquals(
             "waypoint",
-            json["waypoints"]?.jsonArray?.get(0)?.jsonObject?.get("_type")?.jsonPrimitive?.content)
+            json["waypoints"]?.jsonArray?.get(0)?.jsonObject?.get("_type")?.jsonPrimitive?.content,
+        )
         assertTrue(json["waypoints"]?.jsonArray?.get(0)?.jsonObject?.containsKey("desc") == true)
         assertEquals(
             "Test Waypoint",
-            json["waypoints"]?.jsonArray?.get(0)?.jsonObject?.get("desc")?.jsonPrimitive?.content)
+            json["waypoints"]?.jsonArray?.get(0)?.jsonObject?.get("desc")?.jsonPrimitive?.content,
+        )
         assertTrue(json["waypoints"]?.jsonArray?.get(0)?.jsonObject?.containsKey("lat") == true)
         assertEquals(
             51.0,
             json["waypoints"]?.jsonArray?.get(0)?.jsonObject?.get("lat")?.jsonPrimitive?.double!!,
-            0.000001)
+            0.000001,
+        )
         assertTrue(json["waypoints"]?.jsonArray?.get(0)?.jsonObject?.containsKey("lon") == true)
         assertEquals(
             0.0,
             json["waypoints"]?.jsonArray?.get(0)?.jsonObject?.get("lon")?.jsonPrimitive?.double!!,
-            0.000001)
+            0.000001,
+        )
         assertTrue(json["waypoints"]?.jsonArray?.get(0)?.jsonObject?.containsKey("rad") == true)
         assertEquals(
-            450, json["waypoints"]?.jsonArray?.get(0)?.jsonObject?.get("rad")?.jsonPrimitive?.int)
+            450,
+            json["waypoints"]?.jsonArray?.get(0)?.jsonObject?.get("rad")?.jsonPrimitive?.int,
+        )
         assertTrue(json["waypoints"]?.jsonArray?.get(0)?.jsonObject?.containsKey("tst") == true)
         assertEquals(
             1598451372L,
-            json["waypoints"]?.jsonArray?.get(0)?.jsonObject?.get("tst")?.jsonPrimitive?.long)
+            json["waypoints"]?.jsonArray?.get(0)?.jsonObject?.get("tst")?.jsonPrimitive?.long,
+        )
         advanceUntilIdle()
         assertEquals(ImportStatus.SUCCESS, vm.configurationImportStatus.value)
       }
@@ -195,7 +208,8 @@ class LoadViewModelTest {
                 waypointsRepo,
                 UnconfinedTestDispatcher(),
                 SimpleIdlingResource("", true),
-                mockContext)
+                mockContext,
+            )
         val config =
             """
             {
@@ -235,7 +249,8 @@ class LoadViewModelTest {
                 waypointsRepo,
                 UnconfinedTestDispatcher(),
                 SimpleIdlingResource("", true),
-                mockContext)
+                mockContext,
+            )
         val config =
             """
             {
@@ -263,7 +278,8 @@ class LoadViewModelTest {
                 waypointsRepo,
                 UnconfinedTestDispatcher(),
                 SimpleIdlingResource("", true),
-                mockContext)
+                mockContext,
+            )
         val config =
             """
             {

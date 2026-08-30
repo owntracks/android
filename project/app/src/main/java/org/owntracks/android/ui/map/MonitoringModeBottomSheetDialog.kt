@@ -16,14 +16,15 @@ class MonitoringModeBottomSheetDialog : BottomSheetDialogFragment() {
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
-      savedInstanceState: Bundle?
+      savedInstanceState: Bundle?,
   ): View {
     binding = ModeBottomSheetDialogBinding.inflate(inflater, container, false)
     mapOf(
             binding.fabMonitoringModeQuiet to MonitoringMode.Quiet,
             binding.fabMonitoringModeManual to MonitoringMode.Manual,
             binding.fabMonitoringModeSignificantChanges to MonitoringMode.Significant,
-            binding.fabMonitoringModeMove to MonitoringMode.Move)
+            binding.fabMonitoringModeMove to MonitoringMode.Move,
+        )
         .forEach {
           it.key.setOnClickListener { _ ->
             viewModel.setMonitoringMode(it.value)

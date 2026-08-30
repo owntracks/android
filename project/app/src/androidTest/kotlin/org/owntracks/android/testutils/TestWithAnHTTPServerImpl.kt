@@ -55,9 +55,11 @@ class TestWithAnHTTPServerImpl : TestWithAnHTTPServer {
             }
             """
                 .trimIndent()
-                .toByteArray())
+                .toByteArray()
+        )
     PreferenceManager.getDefaultSharedPreferences(
-            InstrumentationRegistry.getInstrumentation().targetContext)
+            InstrumentationRegistry.getInstrumentation().targetContext
+        )
         .edit()
         .putBoolean(Preferences::allowConfigurationByURIAndConfigFile.name, true)
         .commit()
@@ -67,7 +69,8 @@ class TestWithAnHTTPServerImpl : TestWithAnHTTPServer {
             Intent(Intent.ACTION_VIEW).apply {
               data = "owntracks:///config?inline=$config".toUri()
               flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            })
+            }
+        )
     ViewIdlingResource(withId(R.id.applyButton), isDisplayed()).use { clickOn(R.id.applyButton) }
   }
 

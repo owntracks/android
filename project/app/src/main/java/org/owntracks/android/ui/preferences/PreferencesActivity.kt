@@ -52,7 +52,8 @@ open class PreferencesActivity :
           setToolbarTitle(
               (supportFragmentManager.fragments[0] as PreferenceFragmentCompat)
                   .preferenceScreen
-                  .title)
+                  .title
+          )
         }
       }
       beginTransaction().replace(R.id.content_frame, startFragment, null).commit()
@@ -75,7 +76,7 @@ open class PreferencesActivity :
 
   override fun onPreferenceStartFragment(
       caller: PreferenceFragmentCompat,
-      pref: Preference
+      pref: Preference,
   ): Boolean {
     val args = pref.extras
     val fragment = supportFragmentManager.fragmentFactory.instantiate(classLoader, pref.fragment!!)

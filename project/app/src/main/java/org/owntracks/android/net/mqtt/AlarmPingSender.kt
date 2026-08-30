@@ -10,11 +10,11 @@ import android.content.Intent
 import androidx.core.content.getSystemService
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 import org.eclipse.paho.client.mqttv3.MqttPingSender
 import org.eclipse.paho.client.mqttv3.internal.ClientComms
 import timber.log.Timber
-import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 class AlarmPingSender(private val applicationContext: Context) : MqttPingSender {
@@ -52,12 +52,14 @@ class AlarmPingSender(private val applicationContext: Context) : MqttPingSender 
                 this,
                 Intent().setAction(PING_INTENT_ACTION).putExtra("requestCode", this),
                 FLAG_UPDATE_CURRENT or FLAG_IMMUTABLE,
-            ))
+            ),
+        )
         Timber.v("MQTT ping alarm intent requestcode=$this")
       }
     } catch (_: SecurityException) {
       Timber.w(
-          "Unable to schedule MQTT ping alarm, looks like we don't have the necessary permissions")
+          "Unable to schedule MQTT ping alarm, looks like we don't have the necessary permissions"
+      )
     }
   }
 

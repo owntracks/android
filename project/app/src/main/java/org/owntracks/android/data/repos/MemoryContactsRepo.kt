@@ -38,43 +38,43 @@ constructor(
   override suspend fun clearAll() {
     Timber.i("Clearing all contacts. Waiting for lock")
     measureTime {
-          repoLock.withLock {
-            Timber.v("Lock acquired")
-            contacts.clear()
-            contactBitmapAndNameMemoryCache.evictAll()
-            mutableRepoChangedEvent.emit(ContactsRepoChange.AllCleared)
-          }
-        }
+      repoLock.withLock {
+        Timber.v("Lock acquired")
+        contacts.clear()
+        contactBitmapAndNameMemoryCache.evictAll()
+        mutableRepoChangedEvent.emit(ContactsRepoChange.AllCleared)
+      }
+    }
         .also { Timber.d("Cleared all contacts in $it") }
   }
 
   override suspend fun remove(id: String) {
     Timber.v("removing contact: $id. waiting for lock")
     measureTime {
-          repoLock.withLock {
-            Timber.v("Lock acquired")
-            contacts.remove(id)?.run {
-              mutableRepoChangedEvent.emit(ContactsRepoChange.ContactRemoved(this))
-            }
-          }
+      repoLock.withLock {
+        Timber.v("Lock acquired")
+        contacts.remove(id)?.run {
+          mutableRepoChangedEvent.emit(ContactsRepoChange.ContactRemoved(this))
         }
+      }
+    }
         .also { Timber.d("remove contact $id took $it") }
   }
 
   override suspend fun update(id: String, messageCard: MessageCard) {
     measureTime {
-          Timber.v("updating contact card for contact $id. waiting for repoLock")
-          repoLock.withLock {
-            Timber.v("Lock acquired")
+      Timber.v("updating contact card for contact $id. waiting for repoLock")
+      repoLock.withLock {
+        Timber.v("Lock acquired")
 
-            getById(id)?.apply {
-              // We just received new contact details, so invalidate the cache entry.
-              contactBitmapAndNameMemoryCache.remove(id)
-              this.setMessageCard(messageCard)
-              mutableRepoChangedEvent.emit(ContactsRepoChange.ContactCardUpdated(this))
-            } ?: run { Contact(id).apply { setMessageCard(messageCard) }.also { put(id, it) } }
-          }
-        }
+        getById(id)?.apply {
+          // We just received new contact details, so invalidate the cache entry.
+          contactBitmapAndNameMemoryCache.remove(id)
+          this.setMessageCard(messageCard)
+          mutableRepoChangedEvent.emit(ContactsRepoChange.ContactCardUpdated(this))
+        } ?: run { Contact(id).apply { setMessageCard(messageCard) }.also { put(id, it) } }
+      }
+    }
         .also { Timber.d("update contact card for contact $id took $it") }
   }
 
@@ -95,30 +95,30 @@ constructor(
   private suspend fun updateContactLocation(id: String, updateLocation: (Contact) -> Boolean) {
 
     measureTime {
-          repoLock.withLock {
-            getById(id)?.apply {
-              // If timestamp of last location message is <= the new location message, skip update.
-              // We either received an old or already known message.
-              if (updateLocation(this)) {
-                mutableRepoChangedEvent.emit(ContactsRepoChange.ContactLocationUpdated(this))
-              }
-            }
-                ?: run { // If getById is null, we have not seen this contact id before
-                  Contact(id)
-                      .apply {
-                        updateLocation(this)
-                        // We may have seen this contact id before, and it may have been removed
-                        // from the repo Check the cache to see if we have a name
-                        contactBitmapAndNameMemoryCache[id]?.also {
-                          if (it is ContactBitmapAndName.CardBitmap && it.name != null) {
-                            setMessageCard(MessageCard().apply { name = it.name })
-                          }
-                        }
-                      }
-                      .also { put(id, it) }
-                }
+      repoLock.withLock {
+        getById(id)?.apply {
+          // If timestamp of last location message is <= the new location message, skip update.
+          // We either received an old or already known message.
+          if (updateLocation(this)) {
+            mutableRepoChangedEvent.emit(ContactsRepoChange.ContactLocationUpdated(this))
           }
         }
+            ?: run { // If getById is null, we have not seen this contact id before
+              Contact(id)
+                  .apply {
+                    updateLocation(this)
+                    // We may have seen this contact id before, and it may have been removed
+                    // from the repo Check the cache to see if we have a name
+                    contactBitmapAndNameMemoryCache[id]?.also {
+                      if (it is ContactBitmapAndName.CardBitmap && it.name != null) {
+                        setMessageCard(MessageCard().apply { name = it.name })
+                      }
+                    }
+                  }
+                  .also { put(id, it) }
+            }
+      }
+    }
         .also { Timber.d("update location for contact $id took $it") }
   }
 

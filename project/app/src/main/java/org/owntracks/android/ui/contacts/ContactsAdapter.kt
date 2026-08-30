@@ -14,7 +14,7 @@ import timber.log.Timber
 
 internal class ContactsAdapter(
     private val clickListener: AdapterClickListener<Contact>,
-    private val coroutineScope: CoroutineScope
+    private val coroutineScope: CoroutineScope,
 ) : RecyclerView.Adapter<ContactsAdapter.ContactViewHolder>() {
 
   private val sortedListCallback =
@@ -50,7 +50,11 @@ internal class ContactsAdapter(
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
     val binding =
         DataBindingUtil.inflate<ViewDataBinding>(
-            LayoutInflater.from(parent.context), R.layout.ui_row_contact, parent, false)
+            LayoutInflater.from(parent.context),
+            R.layout.ui_row_contact,
+            parent,
+            false,
+        )
     return ContactViewHolder(binding, coroutineScope)
   }
 
@@ -100,7 +104,7 @@ internal class ContactsAdapter(
 
   class ContactViewHolder(
       private val binding: ViewDataBinding,
-      private val coroutineScope: CoroutineScope
+      private val coroutineScope: CoroutineScope,
   ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(contact: Contact, clickListener: AdapterClickListener<Contact>) {
       contact.run {

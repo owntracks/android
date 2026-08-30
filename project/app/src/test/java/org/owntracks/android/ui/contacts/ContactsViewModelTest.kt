@@ -15,7 +15,8 @@ class ContactsViewModelTest {
           Pair("testContact2", Contact("testContact2")),
           Pair("testContact3", Contact("testContact3")),
           Pair("testContact4", Contact("testContact4")),
-          Pair("testContact5", Contact("testContact5")))
+          Pair("testContact5", Contact("testContact5")),
+      )
 
   private val mockContactsRepo: ContactsRepo = mock { on { all } doReturn testContacts }
   private val mockGeocoderProvider: GeocoderProvider = mock {}

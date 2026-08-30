@@ -107,7 +107,7 @@ class FbWaypointModel : Table() {
         geofenceRadius: Int,
         lastTriggered: Long,
         lastTransition: Int,
-        tst: Long
+        tst: Long,
     ): Int {
       builder.startTable(8)
       addTst(builder, tst)

@@ -41,7 +41,10 @@ class EncryptionProvider @Inject constructor(private val preferences: Preference
     val mac = Arrays.copyOfRange(nonceMacCiphertext, NONCEBYTES, NONCEBYTES + poly1305.macSize)
     val ciphertext =
         Arrays.copyOfRange(
-            nonceMacCiphertext, NONCEBYTES + poly1305.macSize, nonceMacCiphertext.size)
+            nonceMacCiphertext,
+            NONCEBYTES + poly1305.macSize,
+            nonceMacCiphertext.size,
+        )
 
     val xSalsa20Engine =
         XSalsa20Engine().apply { init(false, ParametersWithIV(KeyParameter(key), nonce)) }

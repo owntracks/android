@@ -49,12 +49,20 @@ class LogViewerActivityTests : TestWithAnActivity<LogViewerActivity>() {
                     hasEntry(
                         EXTRA_TITLE,
                         baristaRule.activityTestRule.activity.getString(
-                            R.string.exportLogFilePrompt)),
+                            R.string.exportLogFilePrompt
+                        ),
+                    ),
                     hasEntry(
                         `is`(EXTRA_INTENT),
                         allOf(
                             hasAction(ACTION_SEND),
                             hasFlag(FLAG_GRANT_READ_URI_PERMISSION),
-                            hasType("text/plain")))))))
+                            hasType("text/plain"),
+                        ),
+                    ),
+                )
+            ),
+        )
+    )
   }
 }

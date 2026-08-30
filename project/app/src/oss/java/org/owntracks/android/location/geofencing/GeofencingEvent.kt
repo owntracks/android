@@ -7,7 +7,7 @@ data class GeofencingEvent(
     val errorCode: Int?,
     val geofenceTransition: Int?,
     val triggeringGeofences: List<Geofence>?,
-    val triggeringLocation: Location?
+    val triggeringLocation: Location?,
 ) {
   fun hasError(): Boolean = true
 

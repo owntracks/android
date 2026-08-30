@@ -33,16 +33,14 @@ class AsyncPingSender(private val scope: CoroutineScope) : MqttPingSender {
 
   override fun schedule(delayInMilliseconds: Long) {
     Timber.v("MQTT keepalive scheduled in ${delayInMilliseconds.milliseconds}")
-    keepaliveJob =
-        scope.launch {
-          delay(delayInMilliseconds)
-          Timber.v("Sending keepalive")
-          try {
-            comms.checkForActivity()?.waitForCompletion()
-                ?: Timber.d("MQTT keepalive token was null")
-          } catch (e: Exception) {
-            Timber.w(e, "Unable to send MQTT ping")
-          }
-        }
+    keepaliveJob = scope.launch {
+      delay(delayInMilliseconds)
+      Timber.v("Sending keepalive")
+      try {
+        comms.checkForActivity()?.waitForCompletion() ?: Timber.d("MQTT keepalive token was null")
+      } catch (e: Exception) {
+        Timber.w(e, "Unable to send MQTT ping")
+      }
+    }
   }
 }

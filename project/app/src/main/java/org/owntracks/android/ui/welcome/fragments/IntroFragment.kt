@@ -17,7 +17,7 @@ class IntroFragment @Inject constructor() : WelcomeFragment() {
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
-      savedInstanceState: Bundle?
+      savedInstanceState: Bundle?,
   ): View {
     return UiWelcomeIntroBinding.inflate(inflater, container, false).root
   }

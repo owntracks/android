@@ -46,7 +46,7 @@ import timber.log.Timber
 class GoogleMapFragment
 internal constructor(
     private val preferences: Preferences,
-    contactImageBindingAdapter: ContactImageBindingAdapter
+    contactImageBindingAdapter: ContactImageBindingAdapter,
 ) :
     MapFragment<GoogleMapFragmentBinding>(contactImageBindingAdapter, preferences),
     OnMapReadyCallback,
@@ -89,7 +89,7 @@ internal constructor(
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
-      savedInstanceState: Bundle?
+      savedInstanceState: Bundle?,
   ): View {
     val root = super.onCreateView(inflater, container, savedInstanceState)
     binding.googleMapView.onCreate(savedInstanceState)
@@ -103,10 +103,13 @@ internal constructor(
   }
 
   private fun setMapStyle() {
-    if (resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK) ==
-        Configuration.UI_MODE_NIGHT_YES) {
+    if (
+        resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK) ==
+            Configuration.UI_MODE_NIGHT_YES
+    ) {
       googleMap?.setMapStyle(
-          MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.google_maps_night_theme))
+          MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.google_maps_night_theme)
+      )
     }
   }
 
@@ -120,8 +123,10 @@ internal constructor(
                     convertBetweenStandardRotationAndBearing(this.rotation)
                   } else {
                     0f
-                  })
-              .build())
+                  }
+              )
+              .build()
+      )
 
   override fun initMap() {
     MapsInitializer.initialize(requireContext(), MapsInitializer.Renderer.LATEST, this)
@@ -172,8 +177,10 @@ internal constructor(
               MapLocationZoomLevelAndRotation(
                   LatLng(Latitude(target.latitude), Longitude(target.longitude)),
                   convertGoogleZoomToStandardZoom(zoom.toDouble()),
-                  convertBetweenStandardRotationAndBearing(bearing))
-            })
+                  convertBetweenStandardRotationAndBearing(bearing),
+              )
+            }
+        )
       }
 
       setMapLayerType(viewModel.mapLayerStyle.value)
@@ -205,10 +212,8 @@ internal constructor(
       markersOnMap
           .getOrPut(id) {
             addMarker(
-                    MarkerOptions()
-                        .position(latLng.toGMSLatLng())
-                        .anchor(0.5f, 0.5f)
-                        .visible(false))!!
+                    MarkerOptions().position(latLng.toGMSLatLng()).anchor(0.5f, 0.5f).visible(false)
+                )!!
                 .also { it.tag = id }
           }
           .run {
@@ -285,7 +290,8 @@ internal constructor(
                       fillColor(getRegionColor())
                       strokeWidth(1.0f)
                     }
-                    .let { addCircle(it) })
+                    .let { addCircle(it) },
+            )
             .run { regionsOnMap.put(waypoint.id, this) }
       }
     }
@@ -355,7 +361,8 @@ internal constructor(
       linearConversion(
           OSMMapFragment.MIN_ZOOM_LEVEL..OSMMapFragment.MAX_ZOOM_LEVEL,
           MIN_ZOOM_LEVEL..MAX_ZOOM_LEVEL,
-          inputZoom)
+          inputZoom,
+      )
 
   /**
    * Converts Google Maps zoom to Standard (OSM) zoom level. Simple linear conversion
@@ -367,7 +374,8 @@ internal constructor(
       linearConversion(
           MIN_ZOOM_LEVEL..MAX_ZOOM_LEVEL,
           OSMMapFragment.MIN_ZOOM_LEVEL..OSMMapFragment.MAX_ZOOM_LEVEL,
-          inputZoom)
+          inputZoom,
+      )
 
   /**
    * Linear conversion of a point in a range to the equivalent point in another range
@@ -380,7 +388,7 @@ internal constructor(
   fun linearConversion(
       fromRange: ClosedRange<Double>,
       toRange: ClosedRange<Double>,
-      point: Double
+      point: Double,
   ): Double {
     if (!fromRange.contains(point)) {
       throw Exception("Given point $point is not in fromRange $fromRange")

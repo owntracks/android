@@ -16,7 +16,8 @@ class WelcomeActivity : BaseWelcomeActivity() {
         locationPermissionFragment,
         notificationPermissionFragment,
         playFragment,
-        finishFragment)
+        finishFragment,
+    )
   }
 
   @Deprecated("Deprecated in Java")

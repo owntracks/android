@@ -38,14 +38,14 @@ import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
 import timber.log.Timber
 
 class HttpMessageProcessorEndpoint(
-  messageProcessor: MessageProcessor,
-  private val parser: Parser,
-  private val preferences: Preferences,
-  private val applicationContext: Context,
-  private val endpointStateRepo: EndpointStateRepo,
-  private val caKeyStore: KeyStore,
-  @param:ApplicationScope private val scope: CoroutineScope,
-  @param:CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    messageProcessor: MessageProcessor,
+    private val parser: Parser,
+    private val preferences: Preferences,
+    private val applicationContext: Context,
+    private val endpointStateRepo: EndpointStateRepo,
+    private val caKeyStore: KeyStore,
+    @param:ApplicationScope private val scope: CoroutineScope,
+    @param:CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : MessageProcessorEndpoint(messageProcessor), Preferences.OnPreferenceChangeListener {
   override val modeId: ConnectionMode = ConnectionMode.HTTP
   internal var httpClientAndConfiguration: HttpClientAndConfiguration? = null
@@ -63,7 +63,7 @@ class HttpMessageProcessorEndpoint(
 
   private fun createHttpClient(
       socketFactory: SocketFactory,
-      hostnameVerifier: HostnameVerifier?
+      hostnameVerifier: HostnameVerifier?,
   ): OkHttpClient =
       OkHttpClient.Builder()
           .followRedirects(true)
@@ -157,7 +157,10 @@ class HttpMessageProcessorEndpoint(
               endpointStateRepo.setState(
                   EndpointState.IDLE.withMessage(
                       String.format(
-                          Locale.ROOT, "Response %d (response not parseable)", response.code),
+                          Locale.ROOT,
+                          "Response %d (response not parseable)",
+                          response.code,
+                      ),
                   ),
               )
               return Result.success(Unit)
@@ -206,7 +209,7 @@ class HttpMessageProcessorEndpoint(
 
   private fun setClientAndConfiguration(
       context: Context,
-      preferences: Preferences
+      preferences: Preferences,
   ): HttpClientAndConfiguration {
     Timber.v("Creating new HTTP client and configuration")
     val httpConfiguration = getEndpointConfiguration()
@@ -257,7 +260,7 @@ class HttpMessageProcessorEndpoint(
 
   data class HttpClientAndConfiguration(
       val client: OkHttpClient,
-      val configuration: HttpConfiguration
+      val configuration: HttpConfiguration,
   )
 
   companion object {
