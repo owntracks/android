@@ -14,6 +14,11 @@ jobs:
     permissions:
       contents: read
       checks: write
+      # The Test job's permissions block requests these unconditionally (the comment step itself
+      # is gated to only fire on pull_request/issue_comment events, but GitHub validates the
+      # permission ceiling statically regardless of whether a step would actually use it).
+      pull-requests: write
+      issues: write
     uses: ./.github/workflows/build-test-lint.yaml
     with:
       ref: ${{ github.event.merge_group.head_sha }}
