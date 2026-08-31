@@ -16,7 +16,7 @@ androidx-test-runner = "1.7.0"
 androidx-test-services = "1.6.0"
 androidx-work = "2.11.2"
 barista = "4.3.0"
-bouncycastle = "1.84"
+bouncycastle = "1.85.2"
 conscrypt = "2.7.0"
 desguar-jdk = "2.1.5"
 #noinspection NewerVersionAvailable
