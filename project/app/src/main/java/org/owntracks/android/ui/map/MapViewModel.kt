@@ -13,6 +13,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.math.asin
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,6 +21,8 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -264,12 +267,32 @@ constructor(
     updateMyLocationStatus()
   }
 
+  // Tracks the wait for a first location below, so a repeat call (e.g. tapping the MyLocation
+  // FAB again) doesn't leave a stale wait racing a fresh one.
+  private var awaitFirstLocationJob: Job? = null
+
   private fun setViewModeDevice() {
     Timber.d("setting view mode: VIEW_DEVICE")
     locationRepo.viewMode = ViewMode.Device
     clearActiveContact()
-    currentLocation.value?.apply { mutableMapCenter.tryEmit(this.toLatLng()) }
-        ?: run { Timber.w("no location available") }
+    awaitFirstLocationJob?.cancel()
+    val location = currentLocation.value
+    if (location != null) {
+      mutableMapCenter.tryEmit(location.toLatLng())
+    } else {
+      // currentLocation is a snapshot: at this point in startup the location flow has often not
+      // even been armed yet (that happens once requestLocationUpdatesForBlueDot runs, later in
+      // the same startup sequence), so there is nothing to fall back to here yet. Wait for
+      // whatever the flow eventually produces and center then instead, unless the user has since
+      // moved on to a different view mode.
+      Timber.w("no location available yet, will center once one arrives")
+      awaitFirstLocationJob = viewModelScope.launch {
+        val firstLocation = currentLocation.filterNotNull().first()
+        if (locationRepo.viewMode is ViewMode.Device) {
+          mutableMapCenter.tryEmit(firstLocation.toLatLng())
+        }
+      }
+    }
     updateMyLocationStatus()
   }
 
