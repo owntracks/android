@@ -432,11 +432,12 @@ class MQTTMessageProcessorEndpoint(
             when (e) {
               is MqttException -> {
                 when (e.reasonCode) {
-                  REASON_CODE_CONNECTION_LOST.toInt() ->
-                      Timber.w(
-                          e.cause,
-                          "MQTT client unable to connect to endpoint because the connection was lost",
-                      )
+                  REASON_CODE_CONNECTION_LOST.toInt() -> {
+                    Timber.d(e.cause)
+                    Timber.w(
+                        "MQTT client unable to connect to endpoint because the connection was lost",
+                    )
+                  }
                   REASON_CODE_CLIENT_EXCEPTION.toInt() ->
                       when (e.cause) {
                         is SSLHandshakeException ->
@@ -560,7 +561,6 @@ private suspend fun <T> Semaphore.withPermitLogged(label: String, function: susp
         try {
           function()
         } catch (e: Exception) {
-          Timber.e(e, "BOO")
           throw e
         } finally {
           Timber.v("lock released label=$label")
