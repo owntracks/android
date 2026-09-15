@@ -73,7 +73,7 @@ jobs:
       - uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v6
         with:
           distribution: "temurin" # See 'Supported distributions' for available options
-          java-version: "21"
+          java-version: "21.0.12+101.0.LTS"
       - name: Gradle setup
         uses: gradle/actions/setup-gradle@v6
         with:
