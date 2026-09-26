@@ -95,7 +95,8 @@ class HttpMessageProcessorEndpointTest {
             endpointStateRepo,
             mock {},
             this,
-            StandardTestDispatcher())
+            StandardTestDispatcher(),
+        )
     val configuration = httpMessageProcessorEndpoint.getEndpointConfiguration()
     configuration.validate()
     val request = httpMessageProcessorEndpoint.getRequest(configuration, messageLocation)
@@ -120,7 +121,8 @@ class HttpMessageProcessorEndpointTest {
             endpointStateRepo,
             mock {},
             this,
-            StandardTestDispatcher())
+            StandardTestDispatcher(),
+        )
     val configuration = httpMessageProcessorEndpoint.getEndpointConfiguration()
     configuration.validate()
     val request = httpMessageProcessorEndpoint.getRequest(configuration, messageLocation)
@@ -142,14 +144,16 @@ class HttpMessageProcessorEndpointTest {
             endpointStateRepo,
             mock {},
             this,
-            StandardTestDispatcher())
+            StandardTestDispatcher(),
+        )
     val configuration = httpMessageProcessorEndpoint.getEndpointConfiguration()
     configuration.validate()
     val request = httpMessageProcessorEndpoint.getRequest(configuration, messageLocation)
     assertNotNull(request)
     assertEquals(
         "Basic dXNlcm5hbWU6cGFzc3dvcmQ=",
-        request.header(HttpMessageProcessorEndpoint.HEADER_AUTHORIZATION))
+        request.header(HttpMessageProcessorEndpoint.HEADER_AUTHORIZATION),
+    )
     assertEquals("username", request.header(HttpMessageProcessorEndpoint.HEADER_USERNAME))
   }
 
@@ -170,18 +174,22 @@ class HttpMessageProcessorEndpointTest {
             endpointStateRepo,
             mock {},
             this,
-            StandardTestDispatcher())
+            StandardTestDispatcher(),
+        )
     val configuration = httpMessageProcessorEndpoint.getEndpointConfiguration()
     configuration.validate()
     val request = httpMessageProcessorEndpoint.getRequest(configuration, messageLocation)
     assertNotNull(request)
     assertEquals(
         "Basic dXNlcm5hbWVfdXJsOnBhc3N3b3JkX3VybA==",
-        request.header(HttpMessageProcessorEndpoint.HEADER_AUTHORIZATION))
+        request.header(HttpMessageProcessorEndpoint.HEADER_AUTHORIZATION),
+    )
     assertEquals("username_url", request.header(HttpMessageProcessorEndpoint.HEADER_USERNAME))
     assertEquals("device_preferences", request.header(HttpMessageProcessorEndpoint.HEADER_DEVICE))
     assertEquals(
-        "http://username_url:password_url@example.com/owntracks/test", request.url.toString())
+        "http://username_url:password_url@example.com/owntracks/test",
+        request.url.toString(),
+    )
   }
 
   @Test
@@ -195,7 +203,8 @@ class HttpMessageProcessorEndpointTest {
             endpointStateRepo,
             mock {},
             this,
-            StandardTestDispatcher())
+            StandardTestDispatcher(),
+        )
     val configuration = httpMessageProcessorEndpoint.getEndpointConfiguration()
     configuration.validate()
     val request = httpMessageProcessorEndpoint.getRequest(configuration, messageLocation)
@@ -217,7 +226,8 @@ class HttpMessageProcessorEndpointTest {
               endpointStateRepo,
               mock {},
               this,
-              StandardTestDispatcher())
+              StandardTestDispatcher(),
+          )
       httpMessageProcessorEndpoint.getEndpointConfiguration()
     }
   }
@@ -234,7 +244,8 @@ class HttpMessageProcessorEndpointTest {
                 endpointStateRepo,
                 mock {},
                 this,
-                StandardTestDispatcher())
+                StandardTestDispatcher(),
+            )
         val messageCard = MessageCard().apply { trackerId = "testTrackerId" }
         httpMessageProcessorEndpoint.onMessageReceived(messageCard)
         assertEquals("owntracks/http/testTrackerId", messageCard.getContactId())
@@ -252,7 +263,8 @@ class HttpMessageProcessorEndpointTest {
                 endpointStateRepo,
                 mock {},
                 this,
-                StandardTestDispatcher())
+                StandardTestDispatcher(),
+            )
         val messageLocation = MessageLocation().apply { trackerId = "testTrackerId" }
         httpMessageProcessorEndpoint.onMessageReceived(messageLocation)
         assertEquals("owntracks/http/testTrackerId", messageLocation.getContactId())
@@ -270,7 +282,8 @@ class HttpMessageProcessorEndpointTest {
                 endpointStateRepo,
                 mock {},
                 this,
-                StandardTestDispatcher())
+                StandardTestDispatcher(),
+            )
         val messageCmd = MessageCmd()
         httpMessageProcessorEndpoint.onMessageReceived(messageCmd)
         assertEquals("NOKEY", messageCmd.getContactId())
@@ -290,7 +303,8 @@ class HttpMessageProcessorEndpointTest {
                 endpointStateRepo,
                 mock {},
                 this,
-                dispatcher)
+                dispatcher,
+            )
         endpoint.httpClientAndConfiguration =
             HttpMessageProcessorEndpoint.HttpClientAndConfiguration(
                 OkHttpClient(),
@@ -314,7 +328,8 @@ class HttpMessageProcessorEndpointTest {
             endpointStateRepo,
             mock {},
             this,
-            dispatcher)
+            dispatcher,
+        )
     endpoint.httpClientAndConfiguration =
         HttpMessageProcessorEndpoint.HttpClientAndConfiguration(
             OkHttpClient(),

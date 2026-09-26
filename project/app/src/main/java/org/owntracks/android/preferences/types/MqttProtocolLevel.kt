@@ -24,5 +24,9 @@ enum class MqttProtocolLevel(val value: Int) {
 
   object MqttProtocolLevelSerializer :
       KSerializer<MqttProtocolLevel> by intValueEnumSerializer(
-          "MqttProtocolLevel", entries, { it.value }, MQTT_3_1)
+          "MqttProtocolLevel",
+          entries,
+          { it.value },
+          MQTT_3_1,
+      )
 }

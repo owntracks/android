@@ -8,7 +8,7 @@ data class HttpConfiguration(
     val url: String,
     val username: String,
     val password: String,
-    val deviceId: String
+    val deviceId: String,
 ) : ConnectionConfiguration {
   override fun validate() {
     try {

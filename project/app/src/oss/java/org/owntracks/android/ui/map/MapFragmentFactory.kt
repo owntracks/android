@@ -16,7 +16,7 @@ class MapFragmentFactory
 @Inject
 constructor(
     private val preferences: Preferences,
-    private val contactImageBindingAdapter: ContactImageBindingAdapter
+    private val contactImageBindingAdapter: ContactImageBindingAdapter,
 ) : FragmentFactory() {
   override fun instantiate(classLoader: ClassLoader, className: String): Fragment {
     return if (MapFragment::class.java.isAssignableFrom(classLoader.loadClass(className))) {

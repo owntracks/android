@@ -22,7 +22,7 @@ class AutoResizingTextViewWithListener : AppCompatTextView {
   constructor(
       context: Context,
       attrs: AttributeSet,
-      defStyleAttr: Int
+      defStyleAttr: Int,
   ) : super(context, attrs, defStyleAttr)
 
   constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
@@ -56,7 +56,11 @@ class AutoResizingTextViewWithListener : AppCompatTextView {
   override fun onConfigurationChanged(newConfig: Configuration?) {
     super.onConfigurationChanged(newConfig)
     setAutoSizeTextTypeUniformWithConfiguration(
-        originalAutoSizeMinTextSize, originalAutoSizeMaxTextSize, 1, TypedValue.COMPLEX_UNIT_PX)
+        originalAutoSizeMinTextSize,
+        originalAutoSizeMaxTextSize,
+        1,
+        TypedValue.COMPLEX_UNIT_PX,
+    )
     configurationChangedFlag = true
     previousTextSize = 0f
   }

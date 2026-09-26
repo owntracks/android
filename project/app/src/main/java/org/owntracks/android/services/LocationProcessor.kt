@@ -2,6 +2,7 @@ package org.owntracks.android.services
 
 import android.location.Location
 import android.os.Build
+import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -34,22 +35,64 @@ import org.owntracks.android.support.MessageWaypointCollection
 import org.owntracks.android.test.SimpleIdlingResource
 import timber.log.Timber
 
+/**
+ * A waypoint transition candidate that has been observed but not yet committed, because it hasn't
+ * persisted for long enough to rule out a fix landing right on the waypoint boundary.
+ */
+internal data class PendingWaypointTransition(val transition: Int, val since: Instant)
+
+/**
+ * Debounces a waypoint transition candidate against previously-pending state. A candidate is only
+ * committed once it has been observed consistently for at least [dwell]; a candidate that differs
+ * from the currently-pending one resets the dwell timer.
+ *
+ * @return a pair of (transition to commit, if any) to (new pending state, if any)
+ */
+internal fun resolveTransitionDebounce(
+    pending: PendingWaypointTransition?,
+    candidate: Int,
+    now: Instant,
+    dwell: Duration,
+): Pair<Int?, PendingWaypointTransition?> =
+    if (pending == null || pending.transition != candidate) {
+      null to PendingWaypointTransition(candidate, now)
+    } else if (Duration.between(pending.since, now) >= dwell) {
+      candidate to null
+    } else {
+      null to pending
+    }
+
+internal fun impliedSpeedKmh(distanceMeters: Double, timeDeltaMillis: Long): Double =
+    (distanceMeters / (timeDeltaMillis / 1000.0)) * 3.6
+
+internal fun isImplausibleSpeed(
+    distanceMeters: Double,
+    timeDeltaMillis: Long,
+    maxSpeedKmh: Int,
+): Boolean {
+  if (maxSpeedKmh <= 0 || timeDeltaMillis <= 0) {
+    return false
+  }
+  return impliedSpeedKmh(distanceMeters, timeDeltaMillis) > maxSpeedKmh
+}
+
 @Singleton
 class LocationProcessor
 @Inject
 constructor(
-  private val messageProcessor: MessageProcessor,
-  private val preferences: Preferences,
-  private val locationRepo: LocationRepo,
-  private val waypointsRepo: WaypointsRepo,
-  private val deviceMetricsProvider: DeviceMetricsProvider,
-  private val wifiInfoProvider: WifiInfoProvider,
-  @param:ApplicationScope private val scope: CoroutineScope,
-  @param:CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-  @param:Named("publishResponseMessageIdlingResource")
+    private val messageProcessor: MessageProcessor,
+    private val preferences: Preferences,
+    private val locationRepo: LocationRepo,
+    private val waypointsRepo: WaypointsRepo,
+    private val deviceMetricsProvider: DeviceMetricsProvider,
+    private val wifiInfoProvider: WifiInfoProvider,
+    @param:ApplicationScope private val scope: CoroutineScope,
+    @param:CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @param:Named("publishResponseMessageIdlingResource")
     private val publishResponseMessageIdlingResource: SimpleIdlingResource,
-  @param:Named("mockLocationIdlingResource")
-    private val mockLocationIdlingResource: SimpleIdlingResource
+    @param:Named("mockLocationIdlingResource")
+    private val mockLocationIdlingResource: SimpleIdlingResource,
+    @param:Named("nativeGeofencingAvailable") private val nativeGeofencingAvailable: Boolean,
 ) {
   private fun locationIsWithAccuracyThreshold(l: Location): Boolean =
       preferences.ignoreInaccurateLocations
@@ -57,7 +100,8 @@ constructor(
           .also {
             if (!it) {
               Timber.d(
-                  "Location accuracy ${l.accuracy} is outside accuracy threshold of ${preferences.ignoreInaccurateLocations}")
+                  "Location accuracy ${l.accuracy} is outside accuracy threshold of ${preferences.ignoreInaccurateLocations}"
+              )
             }
           }
 
@@ -66,9 +110,14 @@ constructor(
 
   private val highAccuracyProviders = setOf("gps", "fused")
 
+  // Matches the notificationResponsiveness used for native GMS geofencing, so both flavors have
+  // comparable real-world hysteresis around a waypoint boundary.
+  private val transitionDebounceDwell: Duration = Duration.ofMinutes(2)
+  private val pendingWaypointTransitions = mutableMapOf<Long, PendingWaypointTransition>()
+
   private suspend fun publishLocationMessage(
       trigger: MessageLocation.ReportType,
-      location: Location
+      location: Location,
   ): Result<Unit> {
     Timber.v("Maybe publishing $location with trigger $trigger")
     if (!locationIsWithAccuracyThreshold(location))
@@ -77,48 +126,118 @@ constructor(
     // If this location has come from the network *and* the most recent location was both recent and
     // high-accuracy, then it's probably not usefully accurate. Drop it.
     locationRepo.currentPublishedLocation.value?.let { lastLocation ->
-      if (highAccuracyProviders.contains(location.provider) &&
-          lastLocation.provider == "network" &&
-          location.time - lastLocation.time <
-              preferences.discardNetworkLocationThresholdSeconds * 1000) {
+      if (
+          location.provider == "network" &&
+              highAccuracyProviders.contains(lastLocation.provider) &&
+              location.time - lastLocation.time <
+                  preferences.discardNetworkLocationThresholdSeconds * 1000
+      ) {
         Timber.d(
-            "Ignoring location from ${location.provider}, last was from gps, and time difference is less than 1s")
+            "Ignoring location from ${location.provider}, last was from ${lastLocation.provider} within ${preferences.discardNetworkLocationThresholdSeconds}s"
+        )
         return Result.failure(
-            Exception("Ignoring location from ${location.provider}, last was recent and from gps"))
+            Exception(
+                "Ignoring location from ${location.provider}, last was recent and high-accuracy"
+            )
+        )
+      }
+    }
+
+    val maxImplausibleSpeedKmh = preferences.maxImplausibleSpeedKmh
+    if (maxImplausibleSpeedKmh > 0 && trigger !in responseMessageTypes) {
+      locationRepo.currentPublishedLocation.value?.let { lastLocation ->
+        val timeDeltaMillis = location.time - lastLocation.time
+        if (timeDeltaMillis > 0) {
+          val distanceMeters = location.distanceTo(lastLocation)
+          if (
+              isImplausibleSpeed(
+                  distanceMeters.toDouble(),
+                  timeDeltaMillis,
+                  maxImplausibleSpeedKmh,
+              )
+          ) {
+            val speedKmh = impliedSpeedKmh(distanceMeters.toDouble(), timeDeltaMillis)
+            Timber.d(
+                "Ignoring location from ${location.provider}, implied speed ${speedKmh.roundToInt()}km/h exceeds plausible maximum ${maxImplausibleSpeedKmh}km/h"
+            )
+            return Result.failure(Exception("Ignoring location due to implausible speed"))
+          }
+        }
       }
     }
 
     val loadedWaypoints = withContext(ioDispatcher) { waypointsRepo.getAll() }
     Timber.d("publishLocationMessage for $location triggered by $trigger")
 
-    // Check if publish would trigger a region if fusedRegionDetection is enabled
+    // Check if publish would trigger a region if fusedRegionDetection is enabled. Skipped entirely
+    // where native OS geofencing is available (e.g. gms) - that's a purpose-built mechanism with
+    // its
+    // own hysteresis, and running this alongside it causes the two to race and flip-flop on the
+    // same
+    // waypoint state. Where it isn't available (e.g. oss), a transition candidate must instead be
+    // observed consistently for transitionDebounceDwell before being committed, for the same
+    // reason.
     Timber.d(
-        "Checking if location triggers waypoint transitions. waypoints: $loadedWaypoints, trigger=$trigger, fusedRegionDetection: ${preferences.fusedRegionDetection}")
-    if (loadedWaypoints.isNotEmpty() &&
-        preferences.fusedRegionDetection &&
-        trigger != MessageLocation.ReportType.CIRCULAR) {
+        "Checking if location triggers waypoint transitions. waypoints: $loadedWaypoints, trigger=$trigger, fusedRegionDetection: ${preferences.fusedRegionDetection}, nativeGeofencingAvailable: $nativeGeofencingAvailable"
+    )
+    if (
+        loadedWaypoints.isNotEmpty() &&
+            preferences.fusedRegionDetection &&
+            !nativeGeofencingAvailable &&
+            trigger != MessageLocation.ReportType.CIRCULAR
+    ) {
+      pendingWaypointTransitions.keys.retainAll(loadedWaypoints.map { it.id }.toSet())
       loadedWaypoints.forEach { waypoint ->
-        Timber.d("onWaypointTransition triggered by location waypoint intersection event")
-        onWaypointTransition(
-            waypoint,
-            location,
-            if (location.distanceTo(waypoint.getLocation()) <=
-                waypoint.geofenceRadius + location.accuracy) {
+        val candidate =
+            if (
+                location.distanceTo(waypoint.getLocation()) <=
+                    waypoint.geofenceRadius + location.accuracy
+            ) {
               Geofence.GEOFENCE_TRANSITION_ENTER
             } else {
               Geofence.GEOFENCE_TRANSITION_EXIT
-            },
-            MessageTransition.TRIGGER_LOCATION)
+            }
+        if (candidate == waypoint.lastTransition) {
+          pendingWaypointTransitions.remove(waypoint.id)
+          Timber.d("onWaypointTransition triggered by location waypoint intersection event")
+          onWaypointTransition(waypoint, location, candidate, MessageTransition.TRIGGER_LOCATION)
+        } else {
+          val (transitionToCommit, newPending) =
+              resolveTransitionDebounce(
+                  pendingWaypointTransitions[waypoint.id],
+                  candidate,
+                  Instant.ofEpochMilli(location.time),
+                  transitionDebounceDwell,
+              )
+          if (newPending == null) {
+            pendingWaypointTransitions.remove(waypoint.id)
+          } else {
+            pendingWaypointTransitions[waypoint.id] = newPending
+          }
+          if (transitionToCommit != null) {
+            Timber.d("onWaypointTransition triggered by location waypoint intersection event")
+            onWaypointTransition(
+                waypoint,
+                location,
+                transitionToCommit,
+                MessageTransition.TRIGGER_LOCATION,
+            )
+          }
+        }
       }
     }
-    if (preferences.monitoring === MonitoringMode.Quiet &&
-        MessageLocation.ReportType.USER != trigger) {
+    if (
+        preferences.monitoring === MonitoringMode.Quiet &&
+            MessageLocation.ReportType.USER != trigger
+    ) {
       Timber.d("message suppressed by monitoring settings: quiet")
       return Result.failure(Exception("message suppressed by monitoring settings: quiet"))
     }
-    if (preferences.monitoring === MonitoringMode.Manual &&
-        MessageLocation.ReportType.USER != trigger &&
-        MessageLocation.ReportType.CIRCULAR != trigger) {
+    if (
+        preferences.monitoring === MonitoringMode.Manual &&
+            MessageLocation.ReportType.USER != trigger &&
+            MessageLocation.ReportType.CIRCULAR != trigger
+    ) {
       Timber.d("message suppressed by monitoring settings: manual")
       return Result.failure(Exception("message suppressed by monitoring settings: manual"))
     }
@@ -153,7 +272,8 @@ constructor(
       listOf(
           MessageLocation.ReportType.RESPONSE,
           MessageLocation.ReportType.USER,
-          MessageLocation.ReportType.CIRCULAR)
+          MessageLocation.ReportType.CIRCULAR,
+      )
 
   private fun calculateInRegions(loadedWaypoints: List<WaypointModel>): List<String> =
       loadedWaypoints
@@ -169,8 +289,10 @@ constructor(
    */
   suspend fun onLocationChanged(location: Location, reportType: MessageLocation.ReportType) {
     Timber.v("OnLocationChanged $location $reportType")
-    if (location.time > locationRepo.currentLocationTime ||
-        reportType != MessageLocation.ReportType.DEFAULT) {
+    if (
+        location.time > locationRepo.currentLocationTime ||
+            reportType != MessageLocation.ReportType.DEFAULT
+    ) {
       if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || location.isMock) {
         Timber.v("Idling location")
         mockLocationIdlingResource.setIdleState(true)
@@ -191,18 +313,21 @@ constructor(
       waypointModel: WaypointModel,
       location: Location,
       transition: Int,
-      trigger: String
+      trigger: String,
   ) {
     if (!locationIsWithAccuracyThreshold(location)) {
       Timber.d(
-          "ignoring transition for $location, transition=$transition, trigger=$trigger: low accuracy")
+          "ignoring transition for $location, transition=$transition, trigger=$trigger: low accuracy"
+      )
       return
     }
     Timber.d("OnWaypointTransition $waypointModel $location $transition $trigger")
     scope.launch {
       // If the transition hasn't changed, or has moved from unknown to exit, don't notify.
-      if (transition == waypointModel.lastTransition ||
-          (waypointModel.isUnknown() && transition == Geofence.GEOFENCE_TRANSITION_EXIT)) {
+      if (
+          transition == waypointModel.lastTransition ||
+              (waypointModel.isUnknown() && transition == Geofence.GEOFENCE_TRANSITION_EXIT)
+      ) {
         waypointModel.lastTransition = transition
         waypointsRepo.update(waypointModel, false)
       } else {
@@ -229,7 +354,7 @@ constructor(
       waypointModel: WaypointModel,
       triggeringLocation: Location,
       transition: Int,
-      trigger: String
+      trigger: String,
   ) {
     messageProcessor.queueMessageForSending(
         MessageTransition().apply {
@@ -242,7 +367,8 @@ constructor(
           timestamp = TimeUnit.MILLISECONDS.toSeconds(triggeringLocation.time)
           waypointTimestamp = waypointModel.tst.epochSecond
           description = waypointModel.description
-        })
+        }
+    )
   }
 
   suspend fun publishWaypointsMessage() {
@@ -260,10 +386,12 @@ constructor(
                           radius = it.geofenceRadius
                           timestamp = it.tst.epochSecond
                         }
-                      })
+                      }
+                  )
                 }
               }
-        })
+        }
+    )
     publishResponseMessageIdlingResource.setIdleState(true)
   }
 
@@ -280,7 +408,8 @@ constructor(
                   appHibernation = deviceMetricsProvider.appHibernation
                   locationPermission = deviceMetricsProvider.locationPermission
                 }
-          })
+          }
+      )
       publishResponseMessageIdlingResource.setIdleState(true)
     }
   }

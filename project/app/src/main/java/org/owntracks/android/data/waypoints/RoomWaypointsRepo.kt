@@ -36,11 +36,11 @@ import timber.log.Timber
 class RoomWaypointsRepo
 @Inject
 constructor(
-  @param:ApplicationContext private val applicationContext: Context,
-  @param:CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-  @param:ApplicationScope private val scope: CoroutineScope,
-  @param:Named("waypointsMigrationIdlingResource")
-    private val migrationIdlingResource: SimpleIdlingResource
+    @param:ApplicationContext private val applicationContext: Context,
+    @param:CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @param:ApplicationScope private val scope: CoroutineScope,
+    @param:Named("waypointsMigrationIdlingResource")
+    private val migrationIdlingResource: SimpleIdlingResource,
 ) : WaypointsRepo(applicationContext, migrationIdlingResource) {
   @Dao
   interface WaypointDao {
@@ -66,7 +66,10 @@ constructor(
 
   @Database(entities = [WaypointModel::class], version = 1)
   @TypeConverters(
-      LocalDateTimeConverter::class, LatitudeTypeConverter::class, LongitudeTypeConverter::class)
+      LocalDateTimeConverter::class,
+      LatitudeTypeConverter::class,
+      LongitudeTypeConverter::class,
+  )
   abstract class WaypointDatabase : RoomDatabase() {
     abstract fun waypointDao(): WaypointDao
   }

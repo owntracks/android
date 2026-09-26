@@ -7,7 +7,7 @@ class GeocoderLRUCache(maxSize: Int) :
     LruCache<Pair<BigDecimal, BigDecimal>, GeocodeResult>(maxSize) {
   fun computeAndOnlyStoreNonErrors(
       key: Pair<BigDecimal, BigDecimal>,
-      resolverFunction: ((BigDecimal, BigDecimal) -> GeocodeResult)
+      resolverFunction: ((BigDecimal, BigDecimal) -> GeocodeResult),
   ): GeocodeResult {
     if (this[key] != null) {
       return this[key]!!

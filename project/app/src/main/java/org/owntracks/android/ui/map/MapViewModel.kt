@@ -13,6 +13,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.math.asin
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,6 +21,8 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -56,7 +59,7 @@ constructor(
     private val locationRepo: LocationRepo,
     private val waypointsRepo: WaypointsRepo,
     application: Application,
-    private val requirementsChecker: RequirementsChecker
+    private val requirementsChecker: RequirementsChecker,
 ) : AndroidViewModel(application) {
   // Reused buffers for Location.distanceBetween() calls. Two separate instances are required
   // because the two call-sites run on different threads (main thread vs sensor callback thread).
@@ -141,8 +144,10 @@ constructor(
    */
   fun updateMyLocationStatus() {
     mutableMyLocationStatus.value =
-        if (requirementsChecker.hasLocationPermissions() &&
-            requirementsChecker.isLocationServiceEnabled()) {
+        if (
+            requirementsChecker.hasLocationPermissions() &&
+                requirementsChecker.isLocationServiceEnabled()
+        ) {
           if (viewMode == ViewMode.Device) {
             MyLocationStatus.FOLLOWING
           } else {
@@ -262,12 +267,32 @@ constructor(
     updateMyLocationStatus()
   }
 
+  // Tracks the wait for a first location below, so a repeat call (e.g. tapping the MyLocation
+  // FAB again) doesn't leave a stale wait racing a fresh one.
+  private var awaitFirstLocationJob: Job? = null
+
   private fun setViewModeDevice() {
     Timber.d("setting view mode: VIEW_DEVICE")
     locationRepo.viewMode = ViewMode.Device
     clearActiveContact()
-    currentLocation.value?.apply { mutableMapCenter.tryEmit(this.toLatLng()) }
-        ?: run { Timber.w("no location available") }
+    awaitFirstLocationJob?.cancel()
+    val location = currentLocation.value
+    if (location != null) {
+      mutableMapCenter.tryEmit(location.toLatLng())
+    } else {
+      // currentLocation is a snapshot: at this point in startup the location flow has often not
+      // even been armed yet (that happens once requestLocationUpdatesForBlueDot runs, later in
+      // the same startup sequence), so there is nothing to fall back to here yet. Wait for
+      // whatever the flow eventually produces and center then instead, unless the user has since
+      // moved on to a different view mode.
+      Timber.w("no location available yet, will center once one arrives")
+      awaitFirstLocationJob = viewModelScope.launch {
+        val firstLocation = currentLocation.filterNotNull().first()
+        if (locationRepo.viewMode is ViewMode.Device) {
+          mutableMapCenter.tryEmit(firstLocation.toLatLng())
+        }
+      }
+    }
     updateMyLocationStatus()
   }
 
@@ -301,7 +326,8 @@ constructor(
           MessageCmd().apply {
             topic = it.id + preferences.commandTopicSuffix
             action = CommandAction.REPORT_LOCATION
-          })
+          }
+      )
       mutableLocationRequestContactCommandFlow.tryEmit(it)
     }
   }
@@ -323,7 +349,8 @@ constructor(
           currentLocation.longitude,
           latitude.value,
           longitude.value,
-          locationDistanceResult)
+          locationDistanceResult,
+      )
       mutableContactDistance.value = locationDistanceResult[0]
       mutableContactBearing.value = locationDistanceResult[1]
       mutableRelativeContactBearing.value = locationDistanceResult[1]
@@ -384,7 +411,8 @@ constructor(
       if (viewMode == ViewMode.Contact(true) && currentContact.value?.latLng != null) {
         MapLocationZoomLevelAndRotation(
             currentContact.value!!.latLng!!,
-            locationRepo.mapViewWindowLocationAndZoom?.zoom ?: STARTING_ZOOM)
+            locationRepo.mapViewWindowLocationAndZoom?.zoom ?: STARTING_ZOOM,
+        )
       } else {
         locationRepo.mapViewWindowLocationAndZoom
             ?: locationRepo.currentBlueDotOnMapLocation?.let {
@@ -394,7 +422,9 @@ constructor(
               MapLocationZoomLevelAndRotation(it.toLatLng(), STARTING_ZOOM)
             }
             ?: MapLocationZoomLevelAndRotation(
-                LatLng(STARTING_LATITUDE, STARTING_LONGITUDE), STARTING_ZOOM)
+                LatLng(STARTING_LATITUDE, STARTING_LONGITUDE),
+                STARTING_ZOOM,
+            )
       }
 
   /**
@@ -413,7 +443,9 @@ constructor(
           MapLocationZoomLevelAndRotation(it.toLatLng(), currentZoom)
         }
         ?: MapLocationZoomLevelAndRotation(
-            LatLng(STARTING_LATITUDE, STARTING_LONGITUDE), currentZoom)
+            LatLng(STARTING_LATITUDE, STARTING_LONGITUDE),
+            currentZoom,
+        )
   }
 
   val orientationSensorEventListener =
@@ -429,7 +461,8 @@ constructor(
                     currentLocation.longitude,
                     contactLatLng.latitude.value,
                     contactLatLng.longitude.value,
-                    sensorDistanceResult)
+                    sensorDistanceResult,
+                )
                 mutableRelativeContactBearing.value = sensorDistanceResult[1] + azimuth.toFloat()
               }
             }

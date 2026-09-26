@@ -21,7 +21,8 @@ class PreferencesFragment : AbstractPreferenceFragment() {
     findPreference<Preference>(UI_PREFERENCE_SCREEN_EXPERIMENTAL)?.run {
       this.isVisible =
           preferences.experimentalFeatures.contains(
-              EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI)
+              EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI
+          )
     }
   }
 
@@ -31,7 +32,8 @@ class PreferencesFragment : AbstractPreferenceFragment() {
     findPreference<Preference>(UI_PREFERENCE_SCREEN_EXPERIMENTAL)?.run {
       this.isVisible =
           preferences.experimentalFeatures.contains(
-              EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI)
+              EXPERIMENTAL_FEATURE_SHOW_EXPERIMENTAL_PREFERENCE_UI
+          )
     }
   }
 

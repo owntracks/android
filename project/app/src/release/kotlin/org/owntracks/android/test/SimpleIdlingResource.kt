@@ -12,7 +12,7 @@ import androidx.test.espresso.IdlingResource.ResourceCallback
  */
 class SimpleIdlingResource(
     private val resourceName: String,
-    @Suppress("unused_parameter") initialIdlingState: Boolean
+    @Suppress("unused_parameter") initialIdlingState: Boolean,
 ) : IdlingResource {
 
   override fun getName(): String = resourceName

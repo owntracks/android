@@ -83,7 +83,8 @@ class WaypointsActivity :
         emptyView = placeholder
         viewTreeObserver.addOnGlobalLayoutListener {
           Timber.d(
-              "WaypointsActivity: RecyclerView layout took ${recyclerViewStartLayoutInstant!!.elapsedNow()} and has ${recyclerViewAdapter.itemCount} items")
+              "WaypointsActivity: RecyclerView layout took ${recyclerViewStartLayoutInstant!!.elapsedNow()} and has ${recyclerViewAdapter.itemCount} items"
+          )
           waypointsRecyclerViewIdlingResource.set(recyclerViewAdapter.itemCount)
         }
       }

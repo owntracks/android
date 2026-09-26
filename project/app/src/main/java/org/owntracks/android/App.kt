@@ -22,10 +22,10 @@ import dagger.hilt.android.HiltAndroidApp
 import dagger.hilt.components.SingletonComponent
 import java.security.Security
 import javax.inject.Provider
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlin.time.Instant
-import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.conscrypt.Conscrypt
 import org.owntracks.android.di.CustomBindingComponentBuilder
 import org.owntracks.android.di.CustomBindingEntryPoint
@@ -34,11 +34,9 @@ import org.owntracks.android.logging.TimberInMemoryLogTree
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.AppTheme
 import org.owntracks.android.services.MessageProcessor
-import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.RunThingsOnOtherThreads
 import org.owntracks.android.support.receiver.StartBackgroundServiceReceiver
 import timber.log.Timber
-import kotlin.time.ExperimentalTime
 
 @HiltAndroidApp
 class App : BaseApp() {
@@ -62,8 +60,6 @@ open class BaseApp :
 
     fun workerFactory(): HiltWorkerFactory
 
-    fun scheduler(): Scheduler
-
     fun bindingComponentProvider(): Provider<CustomBindingComponentBuilder>
 
     fun messageProcessor(): MessageProcessor
@@ -79,10 +75,6 @@ open class BaseApp :
 
   private val workerFactory: HiltWorkerFactory by lazy {
     EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).workerFactory()
-  }
-
-  private val scheduler: Scheduler by lazy {
-    EarlyEntryPoints.get(this, ApplicationEntrypoint::class.java).scheduler()
   }
 
   private val bindingComponentProvider: Provider<CustomBindingComponentBuilder> by lazy {
@@ -104,10 +96,6 @@ open class BaseApp :
     // Make sure we use Conscrypt for advanced TLS features on all devices.
     Security.insertProviderAt(Conscrypt.newProviderBuilder().provideTrustManager(true).build(), 1)
 
-    // Bring in a real version of BC and don't use the device version.
-    Security.removeProvider("BC")
-    Security.addProvider(BouncyCastleProvider())
-
     super.onCreate()
 
     setGlobalExceptionHandler()
@@ -118,7 +106,16 @@ open class BaseApp :
 
     DataBindingUtil.setDefaultComponent(dataBindingEntryPoint)
 
-    scheduler.cancelAllTasks()
+    /*
+    Deliberately does not cancel any scheduled work here. WorkManager starts the process itself to
+    run a job, which means this runs *before* that job does: cancelling here threw away the pending
+    MQTT reconnect, and the periodic connection watchdog along with it, every time the app was woken
+    up to recover a dead connection. Since the watchdog is only re-scheduled when the endpoint is
+    activated, and nothing activates it in a process started for a worker, a single process death
+    was enough to lose it permanently. Stale work is handled where it is scheduled instead: the
+    reconnect and the watchdog are unique work, and the location ping is cancelled by tag before it
+    is re-enqueued.
+     */
     Timber.plant(TimberInMemoryLogTree(BuildConfig.DEBUG))
 
     if (BuildConfig.DEBUG) {
@@ -129,14 +126,16 @@ open class BaseApp :
               .detectNetwork()
               .penaltyFlashScreen()
               .penaltyDialog()
-              .build())
+              .build()
+      )
       StrictMode.setVmPolicy(
           StrictMode.VmPolicy.Builder()
               .detectLeakedSqlLiteObjects()
               .detectLeakedClosableObjects()
               .detectFileUriExposure()
               .penaltyLog()
-              .build())
+              .build()
+      )
     }
 
     preferences.registerOnPreferenceChangedListener(this)
@@ -153,7 +152,8 @@ open class BaseApp :
           .firstOrNull()
           ?.run {
             Timber.i(
-                "Historical process exited at ${Instant.fromEpochMilliseconds(timestamp)}. reason: $description, status: $status, reason: $reason")
+                "Historical process exited at ${Instant.fromEpochMilliseconds(timestamp)}. reason: $description, status: $status, reason: $reason"
+            )
           }
     }
     applicationContext.noBackupFilesDir.resolve("crash.log").run {
@@ -177,7 +177,8 @@ open class BaseApp :
           |Stacktrace:
           |${e.stackTrace.joinToString("\n\t")}
           """
-                    .trimMargin())
+                    .trimMargin()
+            )
       } catch (e: Exception) {
         Timber.e(e, "Error writing crash log")
       }
@@ -208,7 +209,8 @@ open class BaseApp :
       NotificationChannel(
               NOTIFICATION_CHANNEL_ONGOING,
               ongoingNotificationChannelName,
-              NotificationManager.IMPORTANCE_LOW)
+              NotificationManager.IMPORTANCE_LOW,
+          )
           .apply {
             lockscreenVisibility = Notification.VISIBILITY_PUBLIC
             description = getString(R.string.notificationChannelOngoingDescription)
@@ -228,7 +230,8 @@ open class BaseApp :
       NotificationChannel(
               NOTIFICATION_CHANNEL_EVENTS,
               eventsNotificationChannelName,
-              NotificationManager.IMPORTANCE_HIGH)
+              NotificationManager.IMPORTANCE_HIGH,
+          )
           .apply {
             lockscreenVisibility = Notification.VISIBILITY_PUBLIC
             description = getString(R.string.notificationChannelEventsDescription)
@@ -248,7 +251,8 @@ open class BaseApp :
       NotificationChannel(
               GeocoderProvider.ERROR_NOTIFICATION_CHANNEL_ID,
               errorNotificationChannelName,
-              NotificationManager.IMPORTANCE_LOW)
+              NotificationManager.IMPORTANCE_LOW,
+          )
           .apply { lockscreenVisibility = Notification.VISIBILITY_PRIVATE }
           .run { notificationManager.createNotificationChannel(this) }
     }
@@ -265,13 +269,15 @@ open class BaseApp :
 
   override fun onTrimMemory(level: Int) {
     Timber.w(
-        "onTrimMemory notified ${getAvailableMemory().run { "isLowMemory: $lowMemory availMem: ${android.text.format.Formatter.formatShortFileSize(applicationContext,availMem)}, threshold: ${android.text.format.Formatter.formatShortFileSize(applicationContext,threshold)} totalMemory: ${android.text.format.Formatter.formatShortFileSize(applicationContext,totalMem)} " }}")
+        "onTrimMemory notified ${getAvailableMemory().run { "isLowMemory: $lowMemory availMem: ${android.text.format.Formatter.formatShortFileSize(applicationContext,availMem)}, threshold: ${android.text.format.Formatter.formatShortFileSize(applicationContext,threshold)} totalMemory: ${android.text.format.Formatter.formatShortFileSize(applicationContext,totalMem)} " }}"
+    )
     super.onTrimMemory(level)
   }
 
   override fun onLowMemory() {
     Timber.w(
-        "onLowMemory notified ${getAvailableMemory().run { "isLowMemory: $lowMemory availMem: ${android.text.format.Formatter.formatShortFileSize(applicationContext,availMem)}, threshold: ${android.text.format.Formatter.formatShortFileSize(applicationContext,threshold)} totalMemory: ${android.text.format.Formatter.formatShortFileSize(applicationContext,totalMem)} " }}")
+        "onLowMemory notified ${getAvailableMemory().run { "isLowMemory: $lowMemory availMem: ${android.text.format.Formatter.formatShortFileSize(applicationContext,availMem)}, threshold: ${android.text.format.Formatter.formatShortFileSize(applicationContext,threshold)} totalMemory: ${android.text.format.Formatter.formatShortFileSize(applicationContext,totalMem)} " }}"
+    )
     super.onLowMemory()
   }
 

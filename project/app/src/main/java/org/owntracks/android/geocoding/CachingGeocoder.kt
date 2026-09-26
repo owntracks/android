@@ -13,8 +13,10 @@ abstract class CachingGeocoder : Geocoder {
         cache.computeAndOnlyStoreNonErrors(
             Pair(
                 latLng.latitude.value.toBigDecimal().setScale(4, RoundingMode.HALF_EVEN),
-                latLng.longitude.value.toBigDecimal().setScale(4, RoundingMode.HALF_EVEN)),
-            ::doLookup)
+                latLng.longitude.value.toBigDecimal().setScale(4, RoundingMode.HALF_EVEN),
+            ),
+            ::doLookup,
+        )
     Timber.v("Geocode cache: hits=${cache.hitCount()}, misses=${cache.missCount()}")
     return result
   }

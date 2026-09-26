@@ -25,10 +25,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import org.owntracks.android.data.EndpointState
+import org.owntracks.android.data.repos.AsyncDeQueue
 import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.data.repos.EndpointStateRepo
-import org.owntracks.android.data.repos.RoomBackedMessageQueue
 import org.owntracks.android.data.waypoints.WaypointsRepo
 import org.owntracks.android.di.ApplicationScope
 import org.owntracks.android.di.CoroutineScopes.IoDispatcher
@@ -51,6 +52,7 @@ import org.owntracks.android.preferences.Preferences.Companion.PREFERENCES_THAT_
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
+import org.owntracks.android.support.interfaces.StatefulServiceMessageProcessor
 import org.owntracks.android.test.IdlingResourceWithData
 import org.owntracks.android.test.SimpleIdlingResource
 import org.owntracks.android.test.ThresholdIdlingResourceInterface
@@ -60,26 +62,26 @@ import timber.log.Timber
 class MessageProcessor
 @Inject
 constructor(
-  @param:ApplicationContext private val applicationContext: Context,
-  private val contactsRepo: ContactsRepo,
-  private val preferences: Preferences,
-  private val waypointsRepo: WaypointsRepo,
-  private val parser: Parser,
-  private val scheduler: Scheduler,
-  private val endpointStateRepo: EndpointStateRepo,
-  @param:Named("outgoingQueueIdlingResource")
+    @param:ApplicationContext private val applicationContext: Context,
+    private val contactsRepo: ContactsRepo,
+    private val preferences: Preferences,
+    private val waypointsRepo: WaypointsRepo,
+    private val parser: Parser,
+    private val scheduler: Scheduler,
+    private val endpointStateRepo: EndpointStateRepo,
+    @param:Named("outgoingQueueIdlingResource")
     private val outgoingQueueIdlingResource: ThresholdIdlingResourceInterface,
-  @param:Named("importConfigurationIdlingResource")
+    @param:Named("importConfigurationIdlingResource")
     private val importConfigurationIdlingResource: SimpleIdlingResource,
-  @param:Named("messageReceivedIdlingResource")
+    @param:Named("messageReceivedIdlingResource")
     private val messageReceivedIdlingResource: IdlingResourceWithData<MessageBase>,
-  @param:Named("CAKeyStore") private val caKeyStore: KeyStore,
-  private val locationProcessorLazy: Lazy<LocationProcessor>,
-  @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-  @param:ApplicationScope private val scope: CoroutineScope,
-  @param:Named("mqttConnectionIdlingResource")
+    @param:Named("CAKeyStore") private val caKeyStore: KeyStore,
+    private val locationProcessorLazy: Lazy<LocationProcessor>,
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @param:ApplicationScope private val scope: CoroutineScope,
+    @param:Named("mqttConnectionIdlingResource")
     private val mqttConnectionIdlingResource: SimpleIdlingResource,
-  private val outgoingQueue: RoomBackedMessageQueue
+    private val outgoingQueue: AsyncDeQueue,
 ) : Preferences.OnPreferenceChangeListener {
   private var messageProcessorEndpoint: MessageProcessorEndpoint? = null
   private val queueInitJob: Job =
@@ -120,42 +122,129 @@ constructor(
    * service, and then try and connect to the endpoint.
    */
   fun initialize() {
-    if (!initialized) {
+    if (claimInitialization()) {
       Timber.d("Initializing MessageProcessor")
       scope.launch {
-        applicationContext.bindService(
-            Intent(applicationContext, BackgroundService::class.java),
-            serviceConnection,
-            Context.BIND_AUTO_CREATE)
-        endpointStateRepo.setState(EndpointState.INITIAL)
-        queueInitJob.join()
-        reconnect()
-        initialized = true
+        bindToBackgroundService()
+        reconnect() // which arms the sender loop for us
       }
+    } else {
+      /*
+      This class is a @Singleton, but the BackgroundService that calls us is not: the service can
+      be destroyed and recreated while the process (and therefore this instance) survives. onDestroy
+      cancels the sender loop via stopSendingMessages, so a subsequent service start has to re-arm
+      it. Without this the outgoing queue grows forever and nothing is ever published again until
+      the process is killed.
+       */
+      Timber.d("MessageProcessor already initialized, re-arming the sender loop")
+      startSendingMessages()
     }
+  }
+
+  /**
+   * Makes this process capable of holding a connection, then connects.
+   *
+   * For workers, which is the one place that cannot assume any of that has happened yet:
+   * WorkManager starts the process to run a job, so a reconnect job can be the very first thing to
+   * run in it, with nothing bound to the background service and no endpoint built. Both are
+   * normally the work of [initialize], which only the background service calls, so a worker that
+   * skips this connects nowhere and — having never bound anything — is in a process the system is
+   * free to kill the moment the job returns.
+   *
+   * Everything it does is idempotent, so the common case of a process that is already up and merely
+   * disconnected costs nothing beyond the reconnect itself.
+   */
+  suspend fun initializeAndReconnect(): Result<Unit> {
+    if (claimInitialization()) {
+      Timber.d("Initializing MessageProcessor from a worker")
+      bindToBackgroundService()
+    }
+    return reconnect()
+  }
+
+  /**
+   * Marks initialization as ours to perform, returning whether it was.
+   *
+   * Synchronized and claim-then-act, because the background service starting and a worker running
+   * are unrelated events that can land on this at the same time, and initializing twice would bind
+   * the service twice.
+   */
+  @Synchronized
+  private fun claimInitialization(): Boolean =
+      if (initialized) {
+        false
+      } else {
+        initialized = true
+        true
+      }
+
+  /**
+   * Binds the background service into this process and waits for the outgoing queue to be usable.
+   */
+  private suspend fun bindToBackgroundService() {
+    applicationContext.bindService(
+        Intent(applicationContext, BackgroundService::class.java),
+        serviceConnection,
+        Context.BIND_AUTO_CREATE,
+    )
+    endpointStateRepo.setState(EndpointState.INITIAL)
+    queueInitJob.join()
   }
 
   /** Called either by the connection activity user button, or by receiving a RECONNECT message */
   suspend fun reconnect(): Result<Unit> {
     Timber.v("reconnect")
-    return try {
-      when (messageProcessorEndpoint) {
-        null -> {
-          loadOutgoingMessageProcessor() // The processor should take care of the reconnect on init
-          Result.success(Unit)
+    val result =
+        try {
+          when (messageProcessorEndpoint) {
+            null -> {
+              // The processor should take care of the reconnect on init
+              loadOutgoingMessageProcessor()
+              Result.success(Unit)
+            }
+            is MQTTMessageProcessorEndpoint -> {
+              (messageProcessorEndpoint as MQTTMessageProcessorEndpoint).reconnect()
+            }
+            else -> {
+              Result.success(Unit)
+            }
+          }
+        } catch (e: Exception) {
+          Result.failure(e)
         }
-        is MQTTMessageProcessorEndpoint -> {
-          (messageProcessorEndpoint as MQTTMessageProcessorEndpoint).reconnect()
-        }
-        else -> {
-          Result.success(Unit)
-        }
-      }
-    } catch (e: Exception) {
-      Result.failure(e)
-    }
+    /*
+    A reconnect is only useful if something is alive to drain the queue afterwards. Deliberately
+    *after* the branch above: loadOutgoingMessageProcessor() launches (and takes ownership of) the
+    sender job itself, so starting one first would leave that loop orphaned, still holding
+    outboundMessageQueueMutex but no longer reachable by stopSendingMessages. It also runs
+    regardless of the result, because a failed endpoint reconnect is exactly when the loop most
+    needs to be alive to keep re-queueing and backing off.
+     */
+    startSendingMessages()
+    return result
   }
 
+  /**
+   * Whether the endpoint's connection is genuinely usable, as opposed to merely believed to be.
+   *
+   * Endpoints that hold no persistent connection have nothing to verify and always report healthy;
+   * for them a failure is a per-message concern rather than a connection-wide one.
+   */
+  suspend fun checkConnection(): Boolean =
+      when (val endpoint = messageProcessorEndpoint) {
+        is StatefulServiceMessageProcessor ->
+            withContext(ioDispatcher) { endpoint.checkConnection() }
+        else -> true
+      }
+
+  /**
+   * Whether there is an endpoint with a complete configuration.
+   *
+   * Note that this is false when no endpoint has been *loaded* yet, which is the normal state of a
+   * process that has only just been started to run a worker, and says nothing about whether the
+   * configuration is complete. Anything that wants to connect should just call
+   * [initializeAndReconnect] and let it report what happened.
+   */
   val isEndpointReady: Boolean
     get() {
       try {
@@ -175,11 +264,28 @@ constructor(
     messageProcessorEndpoint?.deactivate().also { Timber.d("Destroying previous endpoint") }
     messageProcessorEndpoint = getEndpoint(preferences.mode)
 
-    dequeueAndSenderJob =
-        scope.launch(ioDispatcher) {
-          messageProcessorEndpoint?.activate()
-          sendAvailableMessages()
-        }
+    // Activation is launched separately from the sender loop. The loop coping with an endpoint that
+    // isn't ready is a normal, handled case (it re-queues and backs off), so it must not be
+    // prevented from starting just because activation threw.
+    scope.launch(ioDispatcher) { messageProcessorEndpoint?.activate() }
+    startSendingMessages()
+  }
+
+  /**
+   * Launches the outbound message loop, unless one is already running.
+   *
+   * The sole launcher of that loop, so that [dequeueAndSenderJob] is always a truthful record of
+   * whether one is alive and [stopSendingMessages] can always reach it. Safe and cheap to call from
+   * any path that wants messages flowing again.
+   */
+  @Synchronized
+  private fun startSendingMessages() {
+    if (dequeueAndSenderJob?.isActive == true) {
+      Timber.v("Outbound message loop already running")
+      return
+    }
+    Timber.i("Starting outbound message loop job")
+    dequeueAndSenderJob = scope.launch(ioDispatcher) { sendAvailableMessages() }
   }
 
   private fun getEndpoint(mode: ConnectionMode): MessageProcessorEndpoint {
@@ -196,7 +302,8 @@ constructor(
               scope,
               ioDispatcher,
               applicationContext,
-              mqttConnectionIdlingResource)
+              mqttConnectionIdlingResource,
+          )
       ConnectionMode.HTTP ->
           HttpMessageProcessorEndpoint(
               this,
@@ -206,7 +313,8 @@ constructor(
               endpointStateRepo,
               caKeyStore,
               scope,
-              ioDispatcher)
+              ioDispatcher,
+          )
     }
   }
 
@@ -243,11 +351,9 @@ constructor(
 
   // Should be on the background thread here, because we block
   private suspend fun sendAvailableMessages() {
-    if (outboundMessageQueueMutex.isLocked) {
-      Timber.d("Outbound message loop already running. Skipping.")
-      return
-    }
     outboundMessageQueueMutex.withLock {
+      // The loop can be started before the queue has finished loading off disk.
+      queueInitJob.join()
       try {
         Timber.d("Starting outbound message loop.")
         var lastMessageStatus: LastMessageStatus = LastMessageStatus.Success
@@ -259,8 +365,10 @@ constructor(
             val message: MessageBase = outgoingQueue.awaitMessage()
             Timber.d("Taken message off queue: $message")
             // reset the retry logic if the last message succeeded
-            if (lastMessageStatus is LastMessageStatus.Success ||
-                lastMessageStatus is LastMessageStatus.PermanentFailure) {
+            if (
+                lastMessageStatus is LastMessageStatus.Success ||
+                    lastMessageStatus is LastMessageStatus.PermanentFailure
+            ) {
               retriesToGo = message.numberOfRetries
               retryWait = SEND_FAILURE_BACKOFF_INITIAL_WAIT
             } else {
@@ -275,7 +383,9 @@ constructor(
                   resendDelayWait(SEND_FAILURE_NOT_READY_WAIT)
                   lastMessageStatus =
                       LastMessageStatus.RetryableFailure(
-                          message.numberOfRetries, SEND_FAILURE_BACKOFF_INITIAL_WAIT)
+                          message.numberOfRetries,
+                          SEND_FAILURE_BACKOFF_INITIAL_WAIT,
+                      )
                 } else {
                   it.sendMessage(message).exceptionOrNull()?.run {
                     when (this) {
@@ -285,7 +395,9 @@ constructor(
                         resendDelayWait(SEND_FAILURE_NOT_READY_WAIT)
                         lastMessageStatus =
                             LastMessageStatus.RetryableFailure(
-                                message.numberOfRetries, SEND_FAILURE_BACKOFF_INITIAL_WAIT)
+                                message.numberOfRetries,
+                                SEND_FAILURE_BACKOFF_INITIAL_WAIT,
+                            )
                       }
 
                       is MessageProcessorEndpoint.OutgoingMessageSendingException,
@@ -311,7 +423,8 @@ constructor(
                                   retriesToGo - 1,
                                   (retryWait * 2).coerceAtMost(SEND_FAILURE_BACKOFF_MAX_WAIT).also {
                                     Timber.v("Increasing failure retry wait to $it")
-                                  })
+                                  },
+                              )
                             }
                       }
 
@@ -336,8 +449,10 @@ constructor(
               lastMessageStatus = LastMessageStatus.PermanentFailure
             }
 
-            if (lastMessageStatus is LastMessageStatus.Success ||
-                lastMessageStatus is LastMessageStatus.PermanentFailure) {
+            if (
+                lastMessageStatus is LastMessageStatus.Success ||
+                    lastMessageStatus is LastMessageStatus.PermanentFailure
+            ) {
               try {
                 if (!outgoingQueueIdlingResource.isIdleNow) {
                   Timber.v("Decrementing outgoingQueueIdlingResource")
@@ -416,13 +531,15 @@ constructor(
   fun onMessageDeliveryFailed(message: MessageBase) {
     scope.launch {
       Timber.e(
-          "Message delivery failed. queueLength: ${outgoingQueue.size() + 1}, message=$message")
+          "Message delivery failed. queueLength: ${outgoingQueue.size() + 1}, message=$message"
+      )
     }
   }
 
   fun processIncomingMessage(message: MessageBase) {
     Timber.d(
-        "Received incoming message: ${message.javaClass.simpleName} on ${message.topic} with id=${message.messageId}")
+        "Received incoming message: ${message.javaClass.simpleName} on ${message.topic} with id=${message.messageId}"
+    )
     when (message) {
       is MessageClear -> {
         processIncomingMessage(message)
@@ -456,19 +573,23 @@ constructor(
 
   private fun processIncomingMessage(message: MessageLocation) {
     // do not use TimeUnit.DAYS.toMillis to avoid long/double conversion issues...
-    if (preferences.ignoreStaleLocations > 0 &&
-        System.currentTimeMillis() - message.timestamp * 1000 >
-            preferences.ignoreStaleLocations.toDouble().days.inWholeMilliseconds) {
+    if (
+        preferences.ignoreStaleLocations > 0 &&
+            System.currentTimeMillis() - message.timestamp * 1000 >
+                preferences.ignoreStaleLocations.toDouble().days.inWholeMilliseconds
+    ) {
       Timber.d("discarding stale location from ${message.getContactId()} at ${message.timestamp}")
       messageReceivedIdlingResource.remove(message)
     } else {
       scope.launch {
         if (message.topic == preferences.pubTopicLocations) {
           Timber.d(
-              "Received our own location update ${message.latitude},${message.longitude} at ${message.timestamp}")
+              "Received our own location update ${message.latitude},${message.longitude} at ${message.timestamp}"
+          )
         } else {
           Timber.d(
-              "Contact ${message.getContactId()} moved to ${message.latitude},${message.longitude} at ${message.timestamp}")
+              "Contact ${message.getContactId()} moved to ${message.latitude},${message.longitude} at ${message.timestamp}"
+          )
         }
         contactsRepo.update(message.getContactId(), message)
         /*
@@ -483,15 +604,18 @@ constructor(
   }
 
   private fun processIncomingMessage(message: MessageTransition) {
-    if (preferences.ignoreStaleLocations > 0 &&
-        System.currentTimeMillis() - message.timestamp * 1000 >
-            preferences.ignoreStaleLocations.toDouble().days.inWholeMilliseconds) {
+    if (
+        preferences.ignoreStaleLocations > 0 &&
+            System.currentTimeMillis() - message.timestamp * 1000 >
+                preferences.ignoreStaleLocations.toDouble().days.inWholeMilliseconds
+    ) {
       Timber.d("discarding stale transition from $message.topic at $message.timestamp")
       messageReceivedIdlingResource.remove(message)
     } else {
       scope.launch {
         Timber.d(
-            "Contact ${message.getContactId()} transitioned waypoint ${message.description} (${message.event}) at ${message.timestamp}")
+            "Contact ${message.getContactId()} transitioned waypoint ${message.description} (${message.event}) at ${message.timestamp}"
+        )
         contactsRepo.update(message.getContactId(), message)
         service?.sendEventNotification(message)
         messageReceivedIdlingResource.remove(message)
@@ -511,10 +635,12 @@ constructor(
     if (!preferences.cmd) {
       Timber.w("remote commands are disabled")
       messageReceivedIdlingResource.remove(message)
-    } else if (message.modeId !== ConnectionMode.HTTP &&
-        preferences.receivedCommandsTopic != message.topic &&
-        preferences.subTopic ==
-            DEFAULT_SUB_TOPIC // If we're not using the default subtopic, we receive commands from
+    } else if (
+        message.modeId !== ConnectionMode.HTTP &&
+            preferences.receivedCommandsTopic != message.topic &&
+            preferences.subTopic ==
+                DEFAULT_SUB_TOPIC // If we're not using the default subtopic, we receive commands
+    // from
     // anywhere
     ) {
       Timber.e("cmd message received on wrong topic")
@@ -534,7 +660,8 @@ constructor(
           CommandAction.SET_CONFIGURATION -> {
             if (!preferences.remoteConfiguration) {
               Timber.w(
-                  "Received a remote configuration command but remote config setting is disabled")
+                  "Received a remote configuration command but remote config setting is disabled"
+              )
             } else {
               if (message.configuration != null) {
                 preferences.importConfiguration(message.configuration!!)
@@ -566,7 +693,10 @@ constructor(
 
   fun stopSendingMessages() {
     Timber.d("Interrupting background sending thread")
-    dequeueAndSenderJob?.cancel()
+    dequeueAndSenderJob?.also { job ->
+      job.cancel()
+      runBlocking { job.join() }
+    }
   }
 
   override fun onPreferenceChanged(properties: Set<String>) {

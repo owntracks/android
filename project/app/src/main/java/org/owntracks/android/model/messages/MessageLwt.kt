@@ -2,12 +2,12 @@
 
 package org.owntracks.android.model.messages
 
+import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.UseSerializers
-import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 @Serializable
@@ -20,9 +20,7 @@ class MessageLwt(
 
   @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.ALWAYS)
   @SerialName("created_at")
-  override var createdAt:
-      @Serializable(with = InstantEpochSecondsSerializer::class)
-      Instant =
+  override var createdAt: @Serializable(with = InstantEpochSecondsSerializer::class) Instant =
       messageWithCreatedAtImpl.createdAt
 
   @SerialName("tst") var timestamp: Long = messageWithCreatedAtImpl.createdAt.epochSeconds

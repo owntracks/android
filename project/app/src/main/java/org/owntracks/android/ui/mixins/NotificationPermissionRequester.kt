@@ -11,7 +11,7 @@ import timber.log.Timber
 class NotificationPermissionRequester(
     private val caller: ActivityResultCaller,
     private val permissionGrantedCallback: () -> Unit,
-    private val permissionDeniedCallback: () -> Unit
+    private val permissionDeniedCallback: () -> Unit,
 ) {
   fun hasPermission(): Boolean =
       NotificationManagerCompat.from(caller as Context).areNotificationsEnabled()

@@ -8,7 +8,7 @@ data class Geofence(
     val circularLongitude: Longitude? = null,
     val circularRadius: Float? = null,
     val expirationDuration: Long? = null,
-    val loiteringDelay: Int? = null
+    val loiteringDelay: Int? = null,
 ) {
   companion object {
     const val GEOFENCE_TRANSITION_UNKNOWN = 0

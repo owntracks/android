@@ -19,8 +19,9 @@ import dagger.hilt.android.testing.HiltAndroidRule
 import java.lang.reflect.ParameterizedType
 import javax.inject.Inject
 import javax.inject.Named
-import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.ExperimentalTime
 import leakcanary.DetectLeaksAfterTestSuccess
 import leakcanary.LeakCanary
 import org.junit.After
@@ -42,7 +43,6 @@ import org.owntracks.android.ui.map.MapActivity
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import shark.AndroidReferenceMatchers
 import timber.log.Timber
-import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 abstract class TestWithAnActivity<T : Activity>(private val startActivity: Boolean = true) :
@@ -80,27 +80,34 @@ abstract class TestWithAnActivity<T : Activity>(private val startActivity: Boole
                     AndroidReferenceMatchers.instanceFieldLeak(
                         className = "android.permission.PermissionUsageHelper",
                         fieldName = "mContext",
-                        description = "Android API31 leaks contexts") +
+                        description = "Android API31 leaks contexts",
+                    ) +
                     AndroidReferenceMatchers.instanceFieldLeak(
                         className = "android.permission.PermissionUsageHelper",
                         fieldName = "mPackageManager",
-                        description = "Android API31 leaks contexts") +
+                        description = "Android API31 leaks contexts",
+                    ) +
                     AndroidReferenceMatchers.instanceFieldLeak(
                         className = "android.permission.PermissionUsageHelper",
                         fieldName = "mUserContexts",
-                        description = "Android API31 leaks contexts") +
+                        description = "Android API31 leaks contexts",
+                    ) +
                     AndroidReferenceMatchers.instanceFieldLeak(
                         className = "android.app.AppOpsManager",
                         fieldName = "mContext",
-                        description = "Android API31 leaks contexts") +
+                        description = "Android API31 leaks contexts",
+                    ) +
                     AndroidReferenceMatchers.instanceFieldLeak(
                         className = "android.app.ApplicationPackageManager",
                         fieldName = "mContext",
-                        description = "Android API31 leaks contexts") +
+                        description = "Android API31 leaks contexts",
+                    ) +
                     AndroidReferenceMatchers.instanceFieldLeak(
                         className = "android.app.ApplicationPackageManager",
                         fieldName = "mPermissionManager",
-                        description = "Android API31 leaks contexts"))
+                        description = "Android API31 leaks contexts",
+                    )
+        )
   }
 
   @get:Rule
@@ -166,7 +173,8 @@ abstract class TestWithAnActivity<T : Activity>(private val startActivity: Boole
         app,
         Intent(app, BackgroundService::class.java).apply {
           action = "org.owntracks.android.CLEAR_CONTACTS"
-        })
+        },
+    )
     Timber.v("Waiting for contacts to be cleared")
     contactsClearedIdlingResource.use { Espresso.onIdle() }
     Timber.v("Test setup complete")
@@ -211,7 +219,7 @@ abstract class TestWithAnActivity<T : Activity>(private val startActivity: Boole
 
   fun reportLocationFromMap(
       locationIdlingResource: IdlingResource?,
-      mockLocationFunction: () -> Unit = {}
+      mockLocationFunction: () -> Unit = {},
   ) {
     if (getCurrentActivity() !is MapActivity && getCurrentActivity() !is LoadActivity) {
       openDrawer()

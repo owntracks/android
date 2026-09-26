@@ -14,7 +14,7 @@ import timber.log.Timber
  */
 class IdlingResourceWithDataImpl<T : MessageBase>(
     private val resourceName: String,
-    private val comparator: Comparator<in T>
+    private val comparator: Comparator<in T>,
 ) : IdlingResource, IdlingResourceWithData<T>(resourceName, comparator) {
   private var callback: IdlingResource.ResourceCallback? = null
   private val sent = mutableListOf<T>()
@@ -50,7 +50,8 @@ class IdlingResourceWithDataImpl<T : MessageBase>(
 
   override fun reconcile() {
     Timber.v(
-        "Contents: sent=${sent.joinToString(",") { it.messageId }}, received=${received.joinToString(","){it.messageId}}")
+        "Contents: sent=${sent.joinToString(",") { it.messageId }}, received=${received.joinToString(","){it.messageId}}"
+    )
     sent.intersectByComparator(received.toSet(), comparator).let { sentToRemove ->
       received.intersectByComparator((sent.toSet()), comparator).let { receivedToRemove ->
         sent.removeAll(sentToRemove).also {
@@ -69,7 +70,7 @@ class IdlingResourceWithDataImpl<T : MessageBase>(
 
   private fun Collection<T>.intersectByComparator(
       another: Collection<T>,
-      comparator: Comparator<in T>
+      comparator: Comparator<in T>,
   ): Set<T> {
     return this.filter { a -> another.any { b -> comparator.compare(a, b) == 0 } }.toSet()
   }

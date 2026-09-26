@@ -31,7 +31,7 @@ class WifiInfoProvider @Inject constructor(@ApplicationContext context: Context)
           object : ConnectivityManager.NetworkCallback(FLAG_INCLUDE_LOCATION_INFO) {
             override fun onCapabilitiesChanged(
                 network: Network,
-                networkCapabilities: NetworkCapabilities
+                networkCapabilities: NetworkCapabilities,
             ) {
               if (networkCapabilities.transportInfo is WifiInfo) {
                 ssid = (networkCapabilities.transportInfo as WifiInfo).getUnquotedSSID()
@@ -42,7 +42,8 @@ class WifiInfoProvider @Inject constructor(@ApplicationContext context: Context)
               }
               super.onCapabilitiesChanged(network, networkCapabilities)
             }
-          })
+          }
+      )
     }
   }
 

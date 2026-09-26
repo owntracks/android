@@ -35,7 +35,8 @@ class GMSLocationProviderClient(
 
   @RequiresPermission(
       anyOf =
-          ["android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_COARSE_LOCATION"])
+          ["android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_COARSE_LOCATION"]
+  )
   override fun singleHighAccuracyLocation(clientCallBack: LocationCallback, looper: Looper) {
     fusedLocationProviderClient
         .getCurrentLocation(
@@ -44,7 +45,8 @@ class GMSLocationProviderClient(
                 .setGranularity(GRANULARITY_PERMISSION_LEVEL)
                 .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
                 .build(),
-            null)
+            null,
+        )
         .addOnSuccessListener { location: Location? ->
           // Turns out location can be null! Especially if there's no location available or if
           // locations are turned off on the device.
@@ -52,7 +54,8 @@ class GMSLocationProviderClient(
             clientCallBack.onLocationResult(LocationResult(location))
           } else {
             Timber.w(
-                "No location available for single high accuracy request. Device location disabled?")
+                "No location available for single high accuracy request. Device location disabled?"
+            )
           }
         }
   }
@@ -69,15 +72,17 @@ class GMSLocationProviderClient(
    */
   @RequiresPermission(
       anyOf =
-          ["android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_COARSE_LOCATION"])
+          ["android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_COARSE_LOCATION"]
+  )
   override fun actuallyRequestLocationUpdates(
       locationRequest: LocationRequest,
       clientCallBack: LocationCallback,
-      looper: Looper
+      looper: Looper,
   ) {
     Timber.d(
         "Requesting location updates priority=${locationRequest.priority}, " +
-            "interval=${locationRequest.interval} clientCallback=${clientCallBack.hashCode()}")
+            "interval=${locationRequest.interval} clientCallback=${clientCallBack.hashCode()}"
+    )
     val gmsCallBack = GMSLocationCallback(clientCallBack)
     callbackMap[clientCallBack] = gmsCallBack
     val gmsLocationRequest = locationRequest.toGMSLocationRequest()
@@ -87,7 +92,8 @@ class GMSLocationProviderClient(
         .addOnCompleteListener {
           Timber.d(
               "GMS Background location update request completed: " +
-                  "Success=${it.isSuccessful} Cancelled=${it.isCanceled}")
+                  "Success=${it.isSuccessful} Cancelled=${it.isCanceled}"
+          )
         }
   }
 
@@ -105,7 +111,8 @@ class GMSLocationProviderClient(
 
   @RequiresPermission(
       anyOf =
-          ["android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_COARSE_LOCATION"])
+          ["android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_COARSE_LOCATION"]
+  )
   override fun getLastLocation(): Location? {
     return try {
       Tasks.await(fusedLocationProviderClient.lastLocation)

@@ -2,6 +2,7 @@
 
 package org.owntracks.android.model.messages
 
+import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -9,7 +10,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import org.owntracks.android.preferences.Preferences
-import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 @Serializable

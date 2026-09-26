@@ -7,6 +7,7 @@ import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import dagger.hilt.android.testing.HiltAndroidTest
 import io.github.davidepianca98.mqtt.packets.mqtt.MQTTPublish
+import kotlin.random.Random
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -20,7 +21,6 @@ import org.owntracks.android.testutils.TestWithAnMQTTBrokerImpl
 import org.owntracks.android.testutils.di.setLocation
 import org.owntracks.android.testutils.use
 import org.owntracks.android.ui.map.MapActivity
-import kotlin.random.Random
 
 @ExperimentalUnsignedTypes
 @LargeTest

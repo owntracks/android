@@ -65,7 +65,8 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
     return Color.rgb(
         (SHADE_FACTOR * Color.red(color)).toInt(),
         (SHADE_FACTOR * Color.green(color)).toInt(),
-        (SHADE_FACTOR * Color.blue(color)).toInt())
+        (SHADE_FACTOR * Color.blue(color)).toInt(),
+    )
   }
 
   override fun draw(canvas: Canvas) {
@@ -88,7 +89,8 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
         text,
         (width / 2).toFloat(),
         height.toFloat() / 2 - (textPaint.descent() + textPaint.ascent()) / 2,
-        textPaint)
+        textPaint,
+    )
     canvas.restoreToCount(count)
   }
 
@@ -117,7 +119,9 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
   }
 
   @Deprecated(
-      "Deprecated in Java", ReplaceWith("PixelFormat.TRANSLUCENT", "android.graphics.PixelFormat"))
+      "Deprecated in Java",
+      ReplaceWith("PixelFormat.TRANSLUCENT", "android.graphics.PixelFormat"),
+  )
   override fun getOpacity(): Int {
     return PixelFormat.TRANSLUCENT
   }
@@ -166,7 +170,8 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
               radius.toFloat(),
               radius.toFloat(),
               radius.toFloat(),
-              radius.toFloat())
+              radius.toFloat(),
+          )
       shape = RoundRectShape(radii, null, null)
       return this
     }
@@ -214,7 +219,9 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
                   -0x2ab1,
                   -0x48b3,
                   -0x5e7781,
-                  -0x6f5b52))
+                  -0x6f5b52,
+              )
+          )
 
       fun create(colorList: List<Int>): ColorGenerator {
         return ColorGenerator(colorList)

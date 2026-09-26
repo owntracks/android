@@ -8,6 +8,10 @@ import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assert
 import dagger.hilt.android.testing.HiltAndroidTest
 import io.github.davidepianca98.mqtt.packets.Qos
 import io.github.davidepianca98.mqtt.packets.mqttv5.MQTT5Properties
+import java.time.Instant
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
+import kotlin.random.Random
 import org.junit.Test
 import org.owntracks.android.R
 import org.owntracks.android.model.Parser
@@ -22,10 +26,6 @@ import org.owntracks.android.testutils.string
 import org.owntracks.android.testutils.use
 import org.owntracks.android.ui.contacts.ContactsActivity
 import timber.log.Timber
-import java.time.Instant
-import kotlin.io.encoding.Base64
-import kotlin.io.encoding.ExperimentalEncodingApi
-import kotlin.random.Random
 
 @OptIn(ExperimentalUnsignedTypes::class)
 @LargeTest

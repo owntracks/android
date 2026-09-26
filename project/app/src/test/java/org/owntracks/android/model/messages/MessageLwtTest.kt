@@ -1,9 +1,9 @@
 package org.owntracks.android.model.messages
 
+import kotlin.time.ExperimentalTime
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.owntracks.android.model.FakeFixedClock
-import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 class MessageLwtTest {

@@ -13,7 +13,7 @@ runs:
   using: "composite"
   steps:
     - name: "Java setup"
-      uses: actions/setup-java@1bcf9fb12cf4aa7d266a90ae39939e61372fe520 # v5
+      uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v6
       with:
         distribution: "temurin"
         java-version: "21"

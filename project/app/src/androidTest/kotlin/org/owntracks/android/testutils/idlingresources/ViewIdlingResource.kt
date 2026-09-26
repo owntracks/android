@@ -10,7 +10,7 @@ import org.hamcrest.Matcher
 // https://stackoverflow.com/a/60458739/352740
 class ViewIdlingResource(
     private val viewMatcher: Matcher<View?>?,
-    private val idleMatcher: Matcher<View?>?
+    private val idleMatcher: Matcher<View?>?,
 ) : IdlingResource {
 
   private var resourceCallback: IdlingResource.ResourceCallback? = null

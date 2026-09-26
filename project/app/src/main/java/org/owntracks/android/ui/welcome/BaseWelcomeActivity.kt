@@ -52,7 +52,8 @@ abstract class BaseWelcomeActivity : AppCompatActivity() {
     super.onCreate(savedInstanceState)
     if (preferences.setupCompleted) {
       startActivity(
-          Intent(this, MapActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK })
+          Intent(this, MapActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK }
+      )
       finish()
       return
     }
@@ -69,13 +70,15 @@ abstract class BaseWelcomeActivity : AppCompatActivity() {
                   viewModel.moveToPage(position)
                   super.onPageSelected(position)
                 }
-              })
+              }
+          )
           btnNext.setOnClickListener { viewModel.nextPage() }
           btnDone.setOnClickListener {
             startActivity(
                 Intent(this@BaseWelcomeActivity, MapActivity::class.java).apply {
                   flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-                })
+                }
+            )
           }
 
           // Handle window insets for edge-to-edge
@@ -133,10 +136,13 @@ abstract class BaseWelcomeActivity : AppCompatActivity() {
     for (i in 0 until itemCount) {
       val circle = ImageView(this)
       circle.setImageDrawable(
-          ContextCompat.getDrawable(this, R.drawable.ic_baseline_fiber_manual_record_24))
+          ContextCompat.getDrawable(this, R.drawable.ic_baseline_fiber_manual_record_24)
+      )
       circle.layoutParams =
           ViewGroup.LayoutParams(
-              ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+              ViewGroup.LayoutParams.WRAP_CONTENT,
+              ViewGroup.LayoutParams.WRAP_CONTENT,
+          )
       circle.adjustViewBounds = true
       circle.setPadding(padding, 0, padding, 0)
       binding.circles.addView(circle)

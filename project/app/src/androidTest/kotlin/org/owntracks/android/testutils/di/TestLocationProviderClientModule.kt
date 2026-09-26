@@ -11,7 +11,9 @@ import org.owntracks.android.di.LocationProviderClientModule
 import org.owntracks.android.location.LocationProviderClient
 
 @TestInstallIn(
-    components = [SingletonComponent::class], replaces = [LocationProviderClientModule::class])
+    components = [SingletonComponent::class],
+    replaces = [LocationProviderClientModule::class],
+)
 @Module
 class TestLocationProviderClientModule {
   @Provides

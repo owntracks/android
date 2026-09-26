@@ -29,7 +29,9 @@ constructor(private val waypointsRepo: WaypointsRepo, locationRepo: LocationRepo
           WaypointModel(
               geofenceLatitude = initialLocation.latitude,
               geofenceLongitude = initialLocation.longitude,
-              geofenceRadius = 20))
+              geofenceRadius = 20,
+          )
+      )
   val waypoint: StateFlow<WaypointModel> = mutableWaypoint
 
   private val mutableIsLoading = MutableStateFlow(false)
@@ -69,7 +71,8 @@ constructor(private val waypointsRepo: WaypointsRepo, locationRepo: LocationRepo
             this.geofenceLatitude = latitude
             this.geofenceLongitude = longitude
             this.geofenceRadius = radius
-          })
+          }
+      )
     }
   }
 }

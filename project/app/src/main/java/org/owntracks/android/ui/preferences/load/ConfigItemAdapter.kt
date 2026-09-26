@@ -24,16 +24,20 @@ class ConfigItemAdapter : ListAdapter<ConfigItem, RecyclerView.ViewHolder>(DIFF_
     return when (viewType) {
       VIEW_TYPE_HEADER ->
           HeaderViewHolder(
-              inflater.inflate(R.layout.ui_preferences_load_item_header, parent, false))
+              inflater.inflate(R.layout.ui_preferences_load_item_header, parent, false)
+          )
       VIEW_TYPE_KEY_VALUE ->
           KeyValueViewHolder(
-              inflater.inflate(R.layout.ui_preferences_load_item_keyvalue, parent, false))
+              inflater.inflate(R.layout.ui_preferences_load_item_keyvalue, parent, false)
+          )
       VIEW_TYPE_WAYPOINT ->
           WaypointViewHolder(
-              inflater.inflate(R.layout.ui_preferences_load_item_waypoint, parent, false))
+              inflater.inflate(R.layout.ui_preferences_load_item_waypoint, parent, false)
+          )
       else ->
           SummaryViewHolder(
-              inflater.inflate(R.layout.ui_preferences_load_item_summary, parent, false))
+              inflater.inflate(R.layout.ui_preferences_load_item_summary, parent, false)
+          )
     }
   }
 
@@ -71,7 +75,10 @@ class ConfigItemAdapter : ListAdapter<ConfigItem, RecyclerView.ViewHolder>(DIFF_
     fun bind(item: ConfigItem.Summary) {
       text.text =
           text.resources.getQuantityString(
-              R.plurals.loadActivityUnchangedSettingsCount, item.count, item.count)
+              R.plurals.loadActivityUnchangedSettingsCount,
+              item.count,
+              item.count,
+          )
     }
   }
 

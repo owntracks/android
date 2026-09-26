@@ -19,7 +19,7 @@ data class WaypointModel(
     var geofenceRadius: Int = 0,
     var lastTriggered: Instant? = null,
     var lastTransition: Int = 0,
-    val tst: Instant = Instant.now()
+    val tst: Instant = Instant.now(),
 ) {
   fun getLocation(): Location =
       Location("waypoint").apply {

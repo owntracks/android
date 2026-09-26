@@ -13,7 +13,7 @@ interface ConnectionConfiguration {
       tls: Boolean,
       tlsClientCrt: String,
       context: Context,
-      caKeyStore: KeyStore
+      caKeyStore: KeyStore,
   ): SocketFactory =
       SocketFactory(
           SocketFactory.SocketFactoryOptions().apply {
@@ -23,5 +23,6 @@ interface ConnectionConfiguration {
             }
           },
           caKeyStore,
-          context)
+          context,
+      )
 }

@@ -124,7 +124,9 @@ class ConfigEditorActivityTests : TestWithAnActivity<EditorActivity>(startActivi
     writeTo(R.id.inputValue, "not a float")
     clickDialogPositiveButton()
     assertContains(
-        com.google.android.material.R.id.snackbar_text, R.string.preferencesEditorValueError)
+        com.google.android.material.R.id.snackbar_text,
+        R.string.preferencesEditorValueError,
+    )
   }
 
   @Test
@@ -136,7 +138,9 @@ class ConfigEditorActivityTests : TestWithAnActivity<EditorActivity>(startActivi
     writeTo(R.id.inputValue, "not a float")
     clickDialogPositiveButton()
     assertContains(
-        com.google.android.material.R.id.snackbar_text, R.string.preferencesEditorKeyError)
+        com.google.android.material.R.id.snackbar_text,
+        R.string.preferencesEditorKeyError,
+    )
   }
 
   @Test
@@ -154,6 +158,9 @@ class ConfigEditorActivityTests : TestWithAnActivity<EditorActivity>(startActivi
     clickOn(R.string.exportConfiguration)
     intended(
         allOf(
-            hasAction(Intent.ACTION_CREATE_DOCUMENT), hasExtra(Intent.EXTRA_TITLE, "config.otrc")))
+            hasAction(Intent.ACTION_CREATE_DOCUMENT),
+            hasExtra(Intent.EXTRA_TITLE, "config.otrc"),
+        )
+    )
   }
 }

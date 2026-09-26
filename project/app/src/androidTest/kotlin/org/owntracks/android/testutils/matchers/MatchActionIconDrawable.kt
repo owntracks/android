@@ -30,7 +30,8 @@ fun withActionIconDrawable(@DrawableRes resourceId: Int): Matcher<View?> {
           actionMenuItemView.context,
           actionMenuItemView.itemData.icon!!,
           resourceId,
-          actionMenuItemView)
+          actionMenuItemView,
+      )
     }
   }
 }
@@ -48,7 +49,9 @@ private fun sameBitmap(context: Context, drawable: Drawable, resourceId: Int, vi
                   .java
                   .getMethod("getStateDrawable", Int::class.javaPrimitiveType)
           getStateDrawable.invoke(
-              drawable, getStateDrawableIndex.invoke(drawable, view.drawableState)) as Drawable
+              drawable,
+              getStateDrawableIndex.invoke(drawable, view.drawableState),
+          ) as Drawable
         }
         else -> drawable
       }

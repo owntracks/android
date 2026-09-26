@@ -51,16 +51,17 @@ class LogEntryAdapter(private val logPalette: LogPalette) :
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
     return ViewHolder(
-        LayoutInflater.from(parent.context).inflate(R.layout.log_viewer_entry, parent, false))
+        LayoutInflater.from(parent.context).inflate(R.layout.log_viewer_entry, parent, false)
+    )
   }
 
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
     logLines.run {
       val line = this[position]
       val spannable =
-          if (position > 0 &&
-              this[position - 1].tag == line.tag &&
-              line.message.startsWith("\tat ")) {
+          if (
+              position > 0 && this[position - 1].tag == line.tag && line.message.startsWith("\tat ")
+          ) {
             SpannableString(line.message.prependIndent())
           } else {
             SpannableString(line.toString()).apply {
@@ -69,12 +70,14 @@ class LogEntryAdapter(private val logPalette: LogPalette) :
                     StyleSpan(Typeface.BOLD),
                     it.first,
                     it.second,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                )
                 setSpan(
                     ForegroundColorSpan(levelToColor(line.priority)),
                     it.first,
                     it.second,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                )
               }
             }
           }

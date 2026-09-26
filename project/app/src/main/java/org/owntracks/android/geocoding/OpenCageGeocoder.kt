@@ -1,5 +1,12 @@
 package org.owntracks.android.geocoding
 
+import java.math.BigDecimal
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import okhttp3.HttpUrl
@@ -8,13 +15,6 @@ import okhttp3.Request
 import org.owntracks.android.model.messages.InstantEpochSecondsSerializer
 import org.owntracks.android.net.http.HttpMessageProcessorEndpoint
 import timber.log.Timber
-import java.math.BigDecimal
-import java.net.SocketTimeoutException
-import java.net.UnknownHostException
-import kotlin.time.Clock
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
 
 @OptIn(ExperimentalTime::class)
 class OpenCageGeocoder
@@ -74,7 +74,8 @@ internal constructor(private val apiKey: String, private val httpClient: OkHttpC
               tripResetTimestamp = Clock.System.now().plus(1.minutes)
               GeocodeResult.Fault.Error(
                   deserializedOpenCageResponse.status?.message ?: "No error message provided",
-                  tripResetTimestamp)
+                  tripResetTimestamp,
+              )
             }
             402 -> {
               val deserializedOpenCageResponse =
@@ -106,7 +107,9 @@ internal constructor(private val apiKey: String, private val httpClient: OkHttpC
               tripResetTimestamp = Clock.System.now().plus(1.minutes)
               Timber.e("Unexpected response from Opencage: $response")
               GeocodeResult.Fault.Error(
-                  "status: ${response.code} $responseBody", tripResetTimestamp)
+                  "status: ${response.code} $responseBody",
+                  tripResetTimestamp,
+              )
             }
           }
         } catch (e: Exception) {

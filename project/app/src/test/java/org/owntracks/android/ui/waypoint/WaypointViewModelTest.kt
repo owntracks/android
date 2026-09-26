@@ -48,11 +48,11 @@ class WaypointViewModelTest {
                 description = "Home",
                 geofenceLatitude = Latitude(51.5),
                 geofenceLongitude = Longitude(-0.1),
-                geofenceRadius = 100)
+                geofenceRadius = 100,
+            )
         val waypointsRepo = InMemoryWaypointsRepo(this, mockContext, testDispatcher)
         waypointsRepo.insert(existingWaypoint)
-        val locationRepo =
-            LocationRepo().apply { currentBlueDotOnMapLocation = LatLng(1.23, 4.56) }
+        val locationRepo = LocationRepo().apply { currentBlueDotOnMapLocation = LatLng(1.23, 4.56) }
 
         val viewModel = WaypointViewModel(waypointsRepo, locationRepo)
         viewModel.loadWaypoint(existingWaypoint.id)

@@ -37,7 +37,7 @@ class RoomBackedMessageQueue(
     private val capacity: Int,
     private val applicationContext: Context,
     private val parser: Parser,
-    private val ioDispatcher: CoroutineDispatcher
+    private val ioDispatcher: CoroutineDispatcher,
 ) : AsyncDeQueue {
   private val db: MessageQueueDatabase =
       Room.databaseBuilder(applicationContext, MessageQueueDatabase::class.java, "message_queue")
@@ -172,7 +172,8 @@ class RoomBackedMessageQueue(
                   parser.fromUnencryptedJson(source)
                 } catch (exception: Exception) {
                   Timber.w(
-                      "Unable to recover message from $description: ${source.toString(Charsets.UTF_8)}")
+                      "Unable to recover message from $description: ${source.toString(Charsets.UTF_8)}"
+                  )
                   MessageUnknown
                 }
 
@@ -228,7 +229,8 @@ class RoomBackedMessageQueue(
               sequenceNumber = sequenceNumber,
               messageJson = messageJson,
               topic = message.topic,
-              isHeadSlot = false)
+              isHeadSlot = false,
+          )
 
       dao.insert(entity)
       _queueSize.value = dao.getCount()
@@ -263,7 +265,8 @@ class RoomBackedMessageQueue(
                   sequenceNumber = sequenceNumber,
                   messageJson = messageJson,
                   topic = message.topic,
-                  isHeadSlot = true)
+                  isHeadSlot = true,
+              )
 
           dao.insert(entity)
           _queueSize.value = dao.getCount()

@@ -9,7 +9,7 @@ This release addresses a security advisory covering several intent-handling vuln
 - External configuration loading (via `owntracks://` URLs and config files) is now disabled by default and must be explicitly enabled in Settings → Advanced
 - A confirmation dialog is shown when enabling external configuration, warning that any config URL can fully reconfigure the app
 - The `allowIntentControl` intent receiver now requires a shared secret (`intentAuthKey`) in every intent, preventing unauthorised apps from triggering location publishes or changing monitoring mode
-- `BackgroundService` is no longer exported; only explicit intents from within the app are accepted
+- `BackgroundService` is no longer exported; only explicit intents from within the app are accepted. The `SEND_LOCATION_USER` and `CHANGE_MONITORING` actions have moved to a new exported `ExternalIntentReceiver`. N.B. automations sending these (e.g. Tasker) must now target a **broadcast receiver** rather than a service, and must set the **package** to `org.owntracks.android` — an action-only broadcast is silently dropped by Android's background execution limits
 - `EXIT` and `SEND_EVENT_CIRCULAR` intent actions have been removed
 - `OngoingNotification` service intents are now explicit
 - Security-related preferences (`allowConfigurationByURIAndConfigFile`, `allowIntentControl`, `intentAuthKey`) cannot be changed via imported config files or URLs
@@ -21,6 +21,7 @@ This release addresses a security advisory covering several intent-handling vuln
 - Config import screen now shows a structured diff of what is changing, with human-readable preference names, highlighting new values alongside the current values — unchanged settings are summarised rather than listed in full
 - Waypoints in an imported config are listed individually in the import review screen
 - Preference setting (Android 16 and later only) to allow user to enable GNSS location source for Significant Monitoring mode (#2155)
+- New opt-in, config-import-only `maxImplausibleSpeedKmh` preference: drops a published location fix if it implies travel faster than the configured maximum ground speed relative to the last published fix, to filter out occasional wildly-inaccurate network-provider locations (#2034)
 
 ### Bug fixes
 
@@ -29,6 +30,14 @@ This release addresses a security advisory covering several intent-handling vuln
 - Fix geofences silently failing to register with Google Play Services on devices with significant uptime, due to a `Long.MAX_VALUE` overflow when computing the expiration time (#2245, thanks [@Cooad](https://github.com/Cooad))
 - Waypoint editing had a race when loading the existing waypoint from Room, causing UI overwrites and other inconsistent behaviour. Fixed by only enabling the UI once the waypoint is loaded (#2130)
 - Set the en locale'd strings.xml to be the same as the generic fallback. Hopefully this fixes weirdness on devices with an en-US fallback locale (#2112).
+- Waypoint region state no longer flips back and forth ("bouncing") when a location fix lands near the boundary. GMS builds now rely solely on the native Play Services geofencing API, which already has its own hysteresis, instead of racing it against the app's own per-fix distance check; OSS builds (which have no native geofencing to fall back on) now require a region transition candidate to persist for 2 minutes before it's committed
+- Remote "reportLocation" requests are no longer silently dropped by the new (opt-in) implausible-speed filter
+- `discardNetworkLocationThresholdSeconds` had its check the wrong way round, discarding a high-accuracy gps/fused fix that arrived shortly after a network one, rather than the other way about. It now behaves as documented. Only affects users who had set this preference; it is disabled by default (#2289)
+- MQTT mode could get permanently stuck after a network change, queueing messages indefinitely until the app was force-stopped and reopened. A connect attempt that failed while the new network was still settling (typically a DNS failure moments after WiFi associated) left the endpoint in an error state that no later network event would retry, and a background service restart could silently kill the outgoing message loop for the remaining lifetime of the process (#2294, thanks [@tobru](https://github.com/tobru))
+- A periodic check now verifies that the MQTT connection is genuinely alive, and reconnects if it isn't. Previously every reconnect was triggered by an event — a connectivity change, a dropped connection, a failed publish — so a connection that had died silently (common when a mobile network drops, since the socket stays readable until something is written to it) was reported as connected indefinitely and never repaired (#2294)
+- The gap between MQTT reconnection attempts is now capped at 10 minutes. It previously doubled without limit up to WorkManager's five-hour maximum, which a run of failures reached in well under a day — after which a broker that had become reachable again might not be noticed for hours. Reconnection is also no longer abandoned outright when the endpoint is not yet configured (#2294)
+- A scheduled MQTT reconnection attempt no longer disconnects an already-healthy connection when a faster path (typically the network becoming available again) restores it first. Previously the scheduled attempt ran regardless, occasionally turning a connection that never needed fixing into a brief real outage if the unnecessary reconnect happened to hit a transient failure of its own (#2294)
+- MQTT client-certificate connections no longer route through a PKCS12 `KeyStore`, working around the `InvalidKeyException` some devices' vendored BouncyCastle threw loading one (#1225) at the source rather than by installing a full replacement crypto provider app-wide. Also shrinks the app: that provider's `-keep` rules alone accounted for over a quarter of the app's classes
 
 
 ## Version 2.5.10

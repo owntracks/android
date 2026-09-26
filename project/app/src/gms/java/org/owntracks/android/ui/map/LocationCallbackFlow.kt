@@ -19,9 +19,16 @@ import org.owntracks.android.location.LocatorPriority
 import timber.log.Timber
 
 @RequiresPermission(
-    anyOf =
-        ["android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_COARSE_LOCATION"])
+    anyOf = ["android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_COARSE_LOCATION"]
+)
 fun locationCallbackFlow(client: FusedLocationProviderClient): Flow<Location> = callbackFlow {
+  // Seed with whatever fix the device already has: requestLocationUpdates only emits once a new
+  // fix arrives, which can be several seconds out, so without this a fresh subscription (e.g.
+  // opening the map) reports no location at all in the meantime, even though the device already
+  // has a perfectly good last-known one.
+  client.lastLocation
+      .addOnSuccessListener { location -> location?.let { trySend(it) } }
+      .addOnFailureListener { e -> Timber.w(e, "locationCallbackFlow getLastLocation failed") }
   val callback =
       object : LocationCallback() {
         override fun onLocationResult(result: LocationResult) {
@@ -38,10 +45,12 @@ fun locationCallbackFlow(client: FusedLocationProviderClient): Flow<Location> = 
                   smallestDisplacement = 1f,
                   priority = LocatorPriority.HighAccuracy,
                   interval = Duration.ofSeconds(2),
-                  waitForAccurateLocation = false)
+                  waitForAccurateLocation = false,
+              )
               .toGMSLocationRequest(),
           callback,
-          Looper.getMainLooper())
+          Looper.getMainLooper(),
+      )
       .addOnFailureListener { e ->
         Timber.e(e, "locationCallbackFlow requestLocationUpdates failed")
       }
@@ -52,7 +61,7 @@ fun locationCallbackFlow(client: FusedLocationProviderClient): Flow<Location> = 
 }
 
 @RequiresPermission(
-    anyOf =
-        ["android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_COARSE_LOCATION"])
+    anyOf = ["android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_COARSE_LOCATION"]
+)
 fun locationCallbackFlow(context: Context): Flow<Location> =
     locationCallbackFlow(LocationServices.getFusedLocationProviderClient(context))

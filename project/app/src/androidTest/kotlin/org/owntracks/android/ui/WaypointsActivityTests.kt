@@ -52,7 +52,7 @@ class WaypointsActivityTests :
       longitude: Double,
       radius: Int,
       expectedLatitude: Double = latitude,
-      expectedLongitude: Double = longitude
+      expectedLongitude: Double = longitude,
   ) {
     clickOn(R.id.add)
     writeTo(R.id.description, waypointName)
@@ -191,9 +191,15 @@ class WaypointsActivityTests :
     assertEquals(1, waypoints.size)
     assertEquals(waypointName, waypoints[0].jsonObject["desc"]!!.jsonPrimitive.content)
     assertEquals(
-        latitude, waypoints[0].jsonObject["lat"]!!.jsonPrimitive.content.toDouble(), 0.0001)
+        latitude,
+        waypoints[0].jsonObject["lat"]!!.jsonPrimitive.content.toDouble(),
+        0.0001,
+    )
     assertEquals(
-        longitude, waypoints[0].jsonObject["lon"]!!.jsonPrimitive.content.toDouble(), 0.0001)
+        longitude,
+        waypoints[0].jsonObject["lon"]!!.jsonPrimitive.content.toDouble(),
+        0.0001,
+    )
     assertEquals(radius, waypoints[0].jsonObject["rad"]!!.jsonPrimitive.content.toInt())
   }
 }

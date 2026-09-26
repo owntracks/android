@@ -10,15 +10,26 @@ import org.osmdroid.views.overlay.compass.IOrientationProvider
 class ClickableCompassOverlay(
     context: Context?,
     orientationProvider: IOrientationProvider?,
-    mapView: MapView?
+    mapView: MapView?,
 ) : CompassOverlay(context, orientationProvider, mapView) {
+  private var compassCenterXDp = 35f
+  private var compassCenterYDp = 35f
+
+  override fun setCompassCenter(x: Float, y: Float) {
+    compassCenterXDp = x
+    compassCenterYDp = y
+    super.setCompassCenter(x, y)
+  }
+
   private fun getCompassRectangle(): Rect {
-    val center = 35f * mScale
+    val centerX = compassCenterXDp * mScale
+    val centerY = compassCenterYDp * mScale
     return Rect(
-        ((center - mCompassFrameCenterX).toInt()),
-        ((center - mCompassFrameCenterY).toInt()),
-        ((center + mCompassFrameCenterX).toInt()),
-        ((center + mCompassFrameCenterY).toInt()))
+        ((centerX - mCompassFrameCenterX).toInt()),
+        ((centerY - mCompassFrameCenterY).toInt()),
+        ((centerX + mCompassFrameCenterX).toInt()),
+        ((centerY + mCompassFrameCenterY).toInt()),
+    )
   }
 
   /**
@@ -53,7 +64,7 @@ class ClickableCompassOverlay(
   private inline fun <T1 : Any, T2 : Any, R : Any> letBoth(
       p1: T1?,
       p2: T2?,
-      block: (T1, T2) -> R?
+      block: (T1, T2) -> R?,
   ): R? {
     return if (p1 != null && p2 != null) block(p1, p2) else null
   }

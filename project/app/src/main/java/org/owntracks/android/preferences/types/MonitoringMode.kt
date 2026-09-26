@@ -34,5 +34,9 @@ enum class MonitoringMode(val value: Int) {
 
   object MonitoringModeSerializer :
       KSerializer<MonitoringMode> by intValueEnumSerializer(
-          "MonitoringMode", entries, { it.value }, Significant)
+          "MonitoringMode",
+          entries,
+          { it.value },
+          Significant,
+      )
 }

@@ -13,13 +13,16 @@ import org.mockito.kotlin.mock
 class GoogleMapFragmentConversionTests(
     private val range1: ClosedRange<Double>,
     private val range2: ClosedRange<Double>,
-    private val startingPoint: Double
+    private val startingPoint: Double,
 ) {
   @Test
   fun `given a starting point in a range, when running a linear conversion twice, then we should end up back in the same place`() {
     val fn = GoogleMapFragment(mock {}, mock {})::linearConversion
     assertEquals(
-        startingPoint, fn(range1, range2, startingPoint).run { fn(range2, range1, this) }, 0.001)
+        startingPoint,
+        fn(range1, range2, startingPoint).run { fn(range2, range1, this) },
+        0.001,
+    )
   }
 
   companion object {

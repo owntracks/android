@@ -9,14 +9,14 @@ class IntListPreference : ListPreference {
       context: Context,
       attrs: AttributeSet?,
       defStyleAttr: Int,
-      defStyleRes: Int
+      defStyleRes: Int,
   ) : super(context, attrs, defStyleAttr, defStyleRes)
 
   @Suppress("unused")
   constructor(
       context: Context,
       attrs: AttributeSet?,
-      defStyleAttr: Int
+      defStyleAttr: Int,
   ) : super(context, attrs, defStyleAttr)
 
   @Suppress("unused") constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)

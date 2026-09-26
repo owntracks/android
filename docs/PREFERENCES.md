@@ -251,7 +251,7 @@ These settings apply only when using HTTP mode (`mode=3`).
 
 ### `discardNetworkLocationThresholdSeconds`
 - **Type**: Integer (seconds)
-- **Default**: `30`
+- **Default**: `0` (disabled)
 - **MQTT**: ✓ | **HTTP**: ✓
 - **Description**: Number of seconds that must elapse after receiving a GPS location before accepting network-based locations again. Prevents less accurate network locations from overriding fresh GPS data.
 

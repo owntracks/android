@@ -14,6 +14,9 @@ import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDr
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.testing.HiltAndroidTest
 import io.github.davidepianca98.mqtt.packets.mqtt.MQTTPublish
+import java.time.Instant
+import javax.inject.Inject
+import javax.inject.Named
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -38,9 +41,6 @@ import org.owntracks.android.testutils.setNotFirstStartPreferences
 import org.owntracks.android.testutils.use
 import org.owntracks.android.testutils.waitAndClickWithMinVisibility
 import org.owntracks.android.ui.map.MapActivity
-import java.time.Instant
-import javax.inject.Inject
-import javax.inject.Named
 
 @ExperimentalUnsignedTypes
 @LargeTest

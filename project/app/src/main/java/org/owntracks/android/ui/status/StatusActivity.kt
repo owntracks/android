@@ -79,8 +79,10 @@ class StatusActivity :
                   },
               )
             }
-            if (viewModel.locationPermissions.value !=
-                R.string.statusLocationPermissionsFineBackground) {
+            if (
+                viewModel.locationPermissions.value !=
+                    R.string.statusLocationPermissionsFineBackground
+            ) {
               MaterialAlertDialogBuilder(this@StatusActivity)
                   .setTitle(R.string.statusLocationPermissionsPromptTitle)
                   .setMessage(R.string.statusLocationPermissionsPromptText)

@@ -52,7 +52,8 @@ class TestLatitude(private val parameter: Parameter) {
           Parameter(-585.0, 45.0),
           Parameter(-630.0, 90.0),
           Parameter(-675.0, 45.0),
-          Parameter(-720.0, 0.0))
+          Parameter(-720.0, 0.0),
+      )
     }
   }
 }

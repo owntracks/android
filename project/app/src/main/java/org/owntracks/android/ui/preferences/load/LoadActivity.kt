@@ -58,7 +58,8 @@ class LoadActivity : AppCompatActivity() {
                     left = basePaddingPx,
                     top = basePaddingPx,
                     right = basePaddingPx,
-                    bottom = basePaddingPx + insets.bottom)
+                    bottom = basePaddingPx + insets.bottom,
+                )
                 configRecyclerView.updatePadding(bottom = recyclerBasePaddingPx + insets.bottom)
                 WindowInsetsCompat.CONSUMED
               }
@@ -127,23 +128,23 @@ class LoadActivity : AppCompatActivity() {
         Timber.v("uri: %s", uri)
         if (ContentResolver.SCHEME_CONTENT == uri.scheme) {
           importJob?.cancel()
-          importJob =
-              lifecycleScope.launch {
-                try {
-                  val content = withContext(Dispatchers.IO) { getContentFromURI(uri) }
-                  viewModel.extractPreferences(content)
-                } catch (e: IOException) {
-                  viewModel.configurationImportFailed(e)
-                } catch (e: SecurityException) {
-                  viewModel.configurationImportFailed(e)
-                }
-              }
+          importJob = lifecycleScope.launch {
+            try {
+              val content = withContext(Dispatchers.IO) { getContentFromURI(uri) }
+              viewModel.extractPreferences(content)
+            } catch (e: IOException) {
+              viewModel.configurationImportFailed(e)
+            } catch (e: SecurityException) {
+              viewModel.configurationImportFailed(e)
+            }
+          }
         } else {
           viewModel.extractPreferencesFromUri(uri.toString())
         }
       } else {
         viewModel.configurationImportFailed(
-            Exception(getString(R.string.preferencesImportNoURIGiven)))
+            Exception(getString(R.string.preferencesImportNoURIGiven))
+        )
       }
     } else {
       val pickerIntent = Intent(Intent.ACTION_GET_CONTENT)
@@ -151,7 +152,8 @@ class LoadActivity : AppCompatActivity() {
       pickerIntent.type = "*/*"
       try {
         filePickerResultLauncher.launch(
-            Intent.createChooser(pickerIntent, getString(R.string.loadActivitySelectAFile)))
+            Intent.createChooser(pickerIntent, getString(R.string.loadActivitySelectAFile))
+        )
       } catch (ex: ActivityNotFoundException) {
         Snackbar.make(binding.root, R.string.loadActivityNoFileExplorerFound, Snackbar.LENGTH_SHORT)
             .show()
@@ -164,24 +166,23 @@ class LoadActivity : AppCompatActivity() {
         if (it.resultCode == RESULT_OK) {
           val uri = it.data?.data
           importJob?.cancel()
-          importJob =
-              lifecycleScope.launch {
-                val content =
-                    if (uri != null) {
-                      try {
-                        withContext(Dispatchers.IO) { getContentFromURI(uri) }
-                      } catch (e: IOException) {
-                        Timber.e(e, "Could not extract content from $uri")
-                        ByteArray(0)
-                      } catch (e: SecurityException) {
-                        Timber.e(e, "Could not extract content from $uri")
-                        ByteArray(0)
-                      }
-                    } else {
-                      ByteArray(0)
-                    }
-                viewModel.extractPreferences(content)
-              }
+          importJob = lifecycleScope.launch {
+            val content =
+                if (uri != null) {
+                  try {
+                    withContext(Dispatchers.IO) { getContentFromURI(uri) }
+                  } catch (e: IOException) {
+                    Timber.e(e, "Could not extract content from $uri")
+                    ByteArray(0)
+                  } catch (e: SecurityException) {
+                    Timber.e(e, "Could not extract content from $uri")
+                    ByteArray(0)
+                  }
+                } else {
+                  ByteArray(0)
+                }
+            viewModel.extractPreferences(content)
+          }
         } else {
           finish()
         }

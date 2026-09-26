@@ -7,6 +7,7 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.graphics.Insets
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
@@ -29,7 +30,7 @@ import timber.log.Timber
 abstract class MapFragment<V : ViewDataBinding>
 internal constructor(
     private val contactImageBindingAdapter: ContactImageBindingAdapter,
-    preferences: Preferences
+    preferences: Preferences,
 ) : Fragment() {
   protected abstract val layout: Int
   protected lateinit var binding: V
@@ -48,6 +49,8 @@ internal constructor(
    * waypoints and the contacts on the map.
    */
   abstract fun initMap()
+
+  abstract fun setMapViewportPadding(insets: Insets)
 
   abstract fun reDrawRegions(regions: Set<WaypointModel>)
 
@@ -91,7 +94,7 @@ internal constructor(
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
-      savedInstanceState: Bundle?
+      savedInstanceState: Bundle?,
   ): View {
     binding =
         DataBindingUtil.inflate<V>(inflater, layout, container, false).apply {
@@ -116,8 +119,10 @@ internal constructor(
                 }
                 is ContactsRepoChange.ContactLocationUpdated -> {
                   updateMarkerForContact(it.contact)
-                  if (viewMode == MapViewModel.ViewMode.Contact(true) &&
-                      currentContact.value == it.contact) {
+                  if (
+                      viewMode == MapViewModel.ViewMode.Contact(true) &&
+                          currentContact.value == it.contact
+                  ) {
                     it.contact.latLng?.run(this@MapFragment::updateCamera)
                   }
                 }

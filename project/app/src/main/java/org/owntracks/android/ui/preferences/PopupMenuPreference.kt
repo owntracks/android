@@ -20,7 +20,7 @@ class PopupMenuPreference : Preference {
       context: Context,
       attrs: AttributeSet?,
       defStyleAttr: Int,
-      defStyleRes: Int
+      defStyleRes: Int,
   ) : super(context, attrs, defStyleAttr, defStyleRes) {
     summaryProvider = SimpleSummaryProvider
   }
@@ -29,7 +29,7 @@ class PopupMenuPreference : Preference {
   constructor(
       context: Context,
       attrs: AttributeSet?,
-      defStyleAttr: Int
+      defStyleAttr: Int,
   ) : this(context, attrs, defStyleAttr, 0)
 
   @Suppress("unused")

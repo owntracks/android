@@ -45,6 +45,7 @@ interface DefaultsProvider {
       Preferences::locatorInterval -> 60
       Preferences::locatorPriority -> null
       Preferences::useGNSSInSignificantMonitoringMode -> false
+      Preferences::maxImplausibleSpeedKmh -> 0
       Preferences::mode -> ConnectionMode.MQTT
       Preferences::monitoring -> MonitoringMode.Significant
       Preferences::moveModeLocatorInterval -> 10

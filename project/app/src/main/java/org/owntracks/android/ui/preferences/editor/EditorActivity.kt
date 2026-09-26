@@ -108,7 +108,8 @@ class EditorActivity : AppCompatActivity() {
     // Set autocomplete items
     val inputKeyView = layout.findViewById<MaterialAutoCompleteTextView>(R.id.inputKey)
     inputKeyView.setAdapter(
-        ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, viewModel.preferenceKeys))
+        ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, viewModel.preferenceKeys)
+    )
     builder
         .setTitle(R.string.preferencesEditor)
         .setPositiveButton(R.string.accept) { dialog: DialogInterface, _: Int ->
@@ -146,7 +147,8 @@ class EditorActivity : AppCompatActivity() {
                   Snackbar.make(
                           findViewById(R.id.effectiveConfiguration),
                           R.string.preferencesExportSuccess,
-                          Snackbar.LENGTH_SHORT)
+                          Snackbar.LENGTH_SHORT,
+                      )
                       .show()
                 }
               }
@@ -156,7 +158,8 @@ class EditorActivity : AppCompatActivity() {
                   Snackbar.make(
                           findViewById(R.id.effectiveConfiguration),
                           R.string.preferencesExportError,
-                          Snackbar.LENGTH_SHORT)
+                          Snackbar.LENGTH_SHORT,
+                      )
                       .show()
                 }
           }
@@ -165,7 +168,8 @@ class EditorActivity : AppCompatActivity() {
             Snackbar.make(
                     findViewById(R.id.effectiveConfiguration),
                     R.string.preferencesExportError,
-                    Snackbar.LENGTH_SHORT)
+                    Snackbar.LENGTH_SHORT,
+                )
                 .show()
           }
         }
@@ -184,7 +188,8 @@ class EditorActivity : AppCompatActivity() {
     Snackbar.make(
             findViewById(R.id.effectiveConfiguration),
             R.string.preferencesLoadFailed,
-            Snackbar.LENGTH_SHORT)
+            Snackbar.LENGTH_SHORT,
+        )
         .show()
   }
 
@@ -192,7 +197,8 @@ class EditorActivity : AppCompatActivity() {
     Snackbar.make(
             findViewById(R.id.effectiveConfiguration),
             R.string.preferencesEditorKeyError,
-            Snackbar.LENGTH_SHORT)
+            Snackbar.LENGTH_SHORT,
+        )
         .show()
   }
 
@@ -200,7 +206,8 @@ class EditorActivity : AppCompatActivity() {
     Snackbar.make(
             findViewById(R.id.effectiveConfiguration),
             R.string.preferencesEditorValueError,
-            Snackbar.LENGTH_SHORT)
+            Snackbar.LENGTH_SHORT,
+        )
         .show()
   }
 }

@@ -12,7 +12,7 @@ import org.owntracks.android.model.messages.MessageBase
  */
 open class IdlingResourceWithData<T : MessageBase>(
     private val resourceName: String,
-    @Suppress("unused_parameter") comparator: Comparator<in T>
+    @Suppress("unused_parameter") comparator: Comparator<in T>,
 ) : IdlingResource {
   private var callback: IdlingResource.ResourceCallback? = null
   private val sent = mutableListOf<T>()

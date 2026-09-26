@@ -34,18 +34,25 @@ interface WorkManagerInitExceptionNotifier {
                   .setIcon(R.drawable.ic_baseline_warning_24)
                   .setTitle(
                       appCompatActivity.getString(
-                          R.string.workmanagerInitializationErrorDialogTitle))
+                          R.string.workmanagerInitializationErrorDialogTitle
+                      )
+                  )
                   .setMessage(
                       appCompatActivity.getString(
-                          R.string.workmanagerInitializationErrorDialogMessage))
+                          R.string.workmanagerInitializationErrorDialogMessage
+                      )
+                  )
                   .setPositiveButton(
                       appCompatActivity.getString(
-                          R.string.workmanagerInitializationErrorDialogOpenSettingsLabel)) { _, _ ->
-                        appCompatActivity.startActivity(
-                            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                              data = Uri.fromParts("package", appCompatActivity.packageName, "")
-                            })
-                      }
+                          R.string.workmanagerInitializationErrorDialogOpenSettingsLabel
+                      )
+                  ) { _, _ ->
+                    appCompatActivity.startActivity(
+                        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                          data = Uri.fromParts("package", appCompatActivity.packageName, "")
+                        }
+                    )
+                  }
                   .setCancelable(true)
                   .show()
             }

@@ -5,6 +5,7 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
+import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.annotation.RequiresPermission
@@ -18,7 +19,7 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient(
     GPS,
     FUSED,
     NETWORK,
-    PASSIVE
+    PASSIVE,
   }
 
   private val locationManager =
@@ -41,7 +42,8 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient(
 
   @RequiresPermission(
       anyOf =
-          ["android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_COARSE_LOCATION"])
+          ["android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_COARSE_LOCATION"]
+  )
   override fun singleHighAccuracyLocation(clientCallBack: LocationCallback, looper: Looper) {
     Timber.d("Getting single high-accuracy location, posting to $clientCallBack")
     locationManager?.run {
@@ -49,25 +51,39 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient(
           this,
           LocationSources.GPS.name.lowercase(),
           android.os.CancellationSignal(),
-          ExecutorCompat.create(Handler(looper))) { location: Location? ->
-            location?.run { clientCallBack.onLocationResult(LocationResult(this)) }
-                ?: Timber.w("Got null location from getCurrentLocation")
-          }
+          ExecutorCompat.create(Handler(looper)),
+      ) { location: Location? ->
+        location?.run { clientCallBack.onLocationResult(LocationResult(this)) }
+            ?: Timber.w("Got null location from getCurrentLocation")
+      }
     }
   }
 
   @RequiresPermission(
       anyOf =
-          ["android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_COARSE_LOCATION"])
+          ["android.permission.ACCESS_FINE_LOCATION", "android.permission.ACCESS_COARSE_LOCATION"]
+  )
   override fun actuallyRequestLocationUpdates(
       locationRequest: LocationRequest,
       clientCallBack: LocationCallback,
-      looper: Looper
+      looper: Looper,
   ) {
     locationManager?.run {
-      val listener = LocationListener { location ->
-        clientCallBack.onLocationResult(LocationResult(location))
-      }
+      // Explicit overrides, not a SAM lambda: these three methods are only default on API 31+,
+      // so a lambda here throws AbstractMethodError on older devices when the OS calls them.
+      val listener =
+          object : LocationListener {
+            override fun onLocationChanged(location: Location) {
+              clientCallBack.onLocationResult(LocationResult(location))
+            }
+
+            override fun onProviderEnabled(provider: String) {}
+
+            override fun onProviderDisabled(provider: String) {}
+
+            @Suppress("DEPRECATION")
+            override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
+          }
       callbacks[clientCallBack] = listener
       locationSourcesForPriority(locationRequest.priority)
           .apply {
@@ -79,7 +95,8 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient(
                 locationRequest.interval.toMillis(),
                 locationRequest.smallestDisplacement ?: 10f,
                 listener,
-                looper)
+                looper,
+            )
           }
     }
   }
@@ -101,7 +118,8 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient(
         } catch (e: IllegalArgumentException) {
           if (e.message == "unregistered listener cannot be flushed") {
             Timber.d(
-                "Unable to flush locations for ${it.second} callback, as provider ${it.second} is not registered")
+                "Unable to flush locations for ${it.second} callback, as provider ${it.second} is not registered"
+            )
           } else {
             Timber.e(e, "Unable to flush locations for ${it.second} callback")
           }
@@ -109,20 +127,21 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient(
       }
     } else {
       Timber.w(
-          "Can't flush locations, Android device API needs to be 31, is actually ${Build.VERSION.SDK_INT}")
+          "Can't flush locations, Android device API needs to be 31, is actually ${Build.VERSION.SDK_INT}"
+      )
     }
   }
 
   @Suppress("MissingPermission")
-  override fun getLastLocation(): Location? =
-      locationManager?.run {
-        LocationSources.entries
-            .map { getLastKnownLocation(it.name.lowercase()) }
-            .maxByOrNull { it?.time ?: 0 }
-      }
+  override fun getLastLocation(): Location? = locationManager?.run {
+    LocationSources.entries
+        .map { getLastKnownLocation(it.name.lowercase()) }
+        .maxByOrNull { it?.time ?: 0 }
+  }
 
   init {
     Timber.i(
-        "Using AOSP as a location provider. Available providers are ${locationManager?.allProviders}")
+        "Using AOSP as a location provider. Available providers are ${locationManager?.allProviders}"
+    )
   }
 }

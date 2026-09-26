@@ -8,6 +8,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
+import org.owntracks.android.data.repos.AsyncDeQueue
 import org.owntracks.android.data.repos.RoomBackedMessageQueue
 import org.owntracks.android.di.CoroutineScopes.IoDispatcher
 import org.owntracks.android.model.Parser
@@ -22,8 +23,8 @@ object MessageQueueModule {
   fun provideMessageQueue(
       @ApplicationContext applicationContext: Context,
       parser: Parser,
-      @IoDispatcher ioDispatcher: CoroutineDispatcher
-  ): RoomBackedMessageQueue {
+      @IoDispatcher ioDispatcher: CoroutineDispatcher,
+  ): AsyncDeQueue {
     return RoomBackedMessageQueue(QUEUE_CAPACITY, applicationContext, parser, ioDispatcher)
   }
 }

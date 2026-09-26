@@ -15,7 +15,7 @@ import timber.log.Timber
  */
 class TestThresholdIdlingResource(
     private val name: String,
-    private val enableLog: Boolean = false
+    private val enableLog: Boolean = false,
 ) : ThresholdIdlingResourceInterface {
   init {
     if (enableLog) {
@@ -41,7 +41,8 @@ class TestThresholdIdlingResource(
           .also {
             if (enableLog) {
               Timber.d(
-                  "Being asked if $name@${this.hashCode()} idle state: $it current value is ${this.value} threshold is $threshold")
+                  "Being asked if $name@${this.hashCode()} idle state: $it current value is ${this.value} threshold is $threshold"
+              )
             }
           }
 

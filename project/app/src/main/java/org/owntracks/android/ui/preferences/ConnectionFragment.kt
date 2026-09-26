@@ -72,7 +72,8 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
             Preferences::keepalive.name to
                 { input: String ->
                   input.toIntOrNull() != null && input.toInt() >= 0
-                })
+                },
+        )
         .forEach { (preferenceName, validator) ->
           findPreference<ValidatingEditTextPreference>(preferenceName)?.apply {
             validationFunction = validator
@@ -90,7 +91,8 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
                 KeyChain.getCertificateChain(requireActivity(), preferences.tlsClientCrt)
             if (certChain.isNullOrEmpty()) {
               Timber.w(
-                  "Client cert for ${preferences.tlsClientCrt} no longer exists in device store.")
+                  "Client cert for ${preferences.tlsClientCrt} no longer exists in device store."
+              )
               true
             } else {
               false
@@ -112,7 +114,8 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
       }
       setOnPreferenceClickListener {
         certificateInstallerLauncher.launch(
-            KeyChain.createInstallIntent().apply { putExtra(EXTRA_NAME, "owntracks-client-cert") })
+            KeyChain.createInstallIntent().apply { putExtra(EXTRA_NAME, "owntracks-client-cert") }
+        )
         true
       }
     }
@@ -136,7 +139,8 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
               null,
               null,
               null,
-              null)
+              null,
+          )
         }
         if (preferences.tlsClientCrt.isBlank()) {
           choosePrivateKeyLaunch()
@@ -182,7 +186,8 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
                     R.string.preferencesNotSet
                   } else {
                     R.string.preferencesSet
-                  })
+                  }
+              )
     }
   }
 
@@ -207,7 +212,8 @@ class ConnectionFragment : AbstractPreferenceFragment(), Preferences.OnPreferenc
             Preferences::host.name,
             Preferences::port.name,
             Preferences::clientId.name,
-            Preferences::ws.name)
+            Preferences::ws.name,
+        )
         .map { findPreference<Preference>(it)?.isVisible = preferences.mode == ConnectionMode.MQTT }
     listOf(Preferences::url.name).map {
       findPreference<Preference>(it)?.isVisible = preferences.mode == ConnectionMode.HTTP

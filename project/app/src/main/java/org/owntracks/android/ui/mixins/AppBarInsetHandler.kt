@@ -24,12 +24,22 @@ interface AppBarInsetHandler {
   fun AppCompatActivity.applyAppBarEdgeToEdgeInsets(
       drawerLayout: DrawerLayout,
       appBarView: View,
-      navigationView: NavigationView
+      navigationView: NavigationView,
   ) {
+    val appBarBasePaddingLeft = appBarView.paddingLeft
+    val appBarBasePaddingTop = appBarView.paddingTop
+    val appBarBasePaddingRight = appBarView.paddingRight
+    val appBarBasePaddingBottom = appBarView.paddingBottom
+
     ViewCompat.setOnApplyWindowInsetsListener(drawerLayout) { _, windowInsets ->
       val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
 
-      appBarView.updatePadding(top = insets.top)
+      appBarView.updatePadding(
+          left = appBarBasePaddingLeft + insets.left,
+          top = appBarBasePaddingTop + insets.top,
+          right = appBarBasePaddingRight + insets.right,
+          bottom = appBarBasePaddingBottom,
+      )
 
       windowInsets
     }

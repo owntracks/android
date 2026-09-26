@@ -33,7 +33,7 @@ data class MqttConnectionConfiguration(
     val willTopic: String,
     val topicsToSubscribeTo: Set<String>,
     val subQos: MqttQos,
-    val maxInFlight: Int = 500
+    val maxInFlight: Int = 500,
 ) : ConnectionConfiguration {
   private val scheme =
       if (ws) {
@@ -73,12 +73,18 @@ data class MqttConnectionConfiguration(
             willTopic,
             JSONObject().apply { put("_type", "lwt") }.toString().toByteArray(),
             0,
-            false)
+            false,
+        )
         maxInflight = maxInFlight
         if (tls) {
           socketFactory =
               getSocketFactory(
-                  timeout.inWholeSeconds.toInt(), true, tlsClientCertAlias, context, caKeyStore)
+                  timeout.inWholeSeconds.toInt(),
+                  true,
+                  tlsClientCertAlias,
+                  context,
+                  caKeyStore,
+              )
 
           /* The default for paho is to validate hostnames as per the HTTPS spec. However, this causes
           a bit of a breakage for some users using self-signed certificates, where the verification of
@@ -121,11 +127,13 @@ fun Preferences.toMqttConnectionConfiguration(): MqttConnectionConfiguration =
                 subTopic + infoTopicSuffix,
                 subTopic + eventTopicSuffix,
                 subTopic + statusTopicSuffix,
-                receivedCommandsTopic)
+                receivedCommandsTopic,
+            )
           } else {
             sortedSetOf(subTopic, subTopic + eventTopicSuffix, receivedCommandsTopic)
           }
         } else {
           sortedSetOf(subTopic)
         },
-        subQos)
+        subQos,
+    )

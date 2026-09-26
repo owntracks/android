@@ -23,7 +23,7 @@ class ConnectionSetupFragment @Inject constructor() : WelcomeFragment() {
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
-      savedInstanceState: Bundle?
+      savedInstanceState: Bundle?,
   ): View {
     return UiWelcomeConnectionSetupBinding.inflate(inflater, container, false)
         .apply {

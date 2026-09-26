@@ -13,7 +13,8 @@ class MapViewModelTest {
   @Test
   fun `MapLayerStyle provider test asserts that same OSM style is the same`() {
     assertTrue(
-        MapLayerStyle.OpenStreetMapNormal.isSameProviderAs(MapLayerStyle.OpenStreetMapNormal))
+        MapLayerStyle.OpenStreetMapNormal.isSameProviderAs(MapLayerStyle.OpenStreetMapNormal)
+    )
   }
 
   @Test

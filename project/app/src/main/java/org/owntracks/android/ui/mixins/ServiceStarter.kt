@@ -17,7 +17,8 @@ interface ServiceStarter {
           context,
           (intent ?: Intent()).setClass(context, BackgroundService::class.java).apply {
             action?.also { this.action = it }
-          })
+          },
+      )
     }
   }
 }

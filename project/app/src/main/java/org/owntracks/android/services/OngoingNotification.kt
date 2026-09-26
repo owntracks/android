@@ -9,6 +9,8 @@ import android.media.AudioManager
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 import org.owntracks.android.BaseApp.Companion.NOTIFICATION_CHANNEL_ONGOING
 import org.owntracks.android.BaseApp.Companion.NOTIFICATION_ID_ONGOING
 import org.owntracks.android.R
@@ -16,8 +18,6 @@ import org.owntracks.android.data.EndpointState
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 class OngoingNotification(private val context: Context, initialMode: MonitoringMode) {
@@ -25,7 +25,7 @@ class OngoingNotification(private val context: Context, initialMode: MonitoringM
       val title: String,
       val content: String,
       val subText: String,
-      val notificationHigherPriority: Boolean
+      val notificationHigherPriority: Boolean,
   )
 
   private val notificationManagerCompat = NotificationManagerCompat.from(context)
@@ -37,7 +37,11 @@ class OngoingNotification(private val context: Context, initialMode: MonitoringM
   }
   private val resultPendingIntent by lazy {
     PendingIntent.getActivity(
-        context, 0, resultIntent, BackgroundService.UPDATE_CURRENT_INTENT_FLAGS)
+        context,
+        0,
+        resultIntent,
+        BackgroundService.UPDATE_CURRENT_INTENT_FLAGS,
+    )
   }
   private val publishPendingIntent by lazy {
     PendingIntent.getService(
@@ -45,7 +49,8 @@ class OngoingNotification(private val context: Context, initialMode: MonitoringM
         0,
         Intent(context, BackgroundService::class.java)
             .setAction(BackgroundService.INTENT_ACTION_SEND_LOCATION_USER),
-        BackgroundService.UPDATE_CURRENT_INTENT_FLAGS)
+        BackgroundService.UPDATE_CURRENT_INTENT_FLAGS,
+    )
   }
   private val changeMonitoringPendingIntent by lazy {
     PendingIntent.getService(
@@ -53,11 +58,16 @@ class OngoingNotification(private val context: Context, initialMode: MonitoringM
         0,
         Intent(context, BackgroundService::class.java)
             .setAction(BackgroundService.INTENT_ACTION_CHANGE_MONITORING),
-        BackgroundService.UPDATE_CURRENT_INTENT_FLAGS)
+        BackgroundService.UPDATE_CURRENT_INTENT_FLAGS,
+    )
   }
   private var serviceNotificationState =
       ServiceNotificationState(
-          context.getString(R.string.app_name), "", getMonitoringLabel(initialMode), false)
+          context.getString(R.string.app_name),
+          "",
+          getMonitoringLabel(initialMode),
+          false,
+      )
 
   private val notificationBuilder =
       NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ONGOING)
@@ -67,11 +77,13 @@ class OngoingNotification(private val context: Context, initialMode: MonitoringM
           .addAction(
               R.drawable.ic_baseline_publish_24,
               context.getString(R.string.publish),
-              publishPendingIntent)
+              publishPendingIntent,
+          )
           .addAction(
               R.drawable.ic_owntracks_80,
               context.getString(R.string.notificationChangeMonitoring),
-              changeMonitoringPendingIntent)
+              changeMonitoringPendingIntent,
+          )
           .setSmallIcon(R.drawable.ic_owntracks_80)
           .setSound(null, AudioManager.STREAM_NOTIFICATION)
           .setColor(context.getColor(R.color.OTPrimaryBlue))
@@ -89,16 +101,20 @@ class OngoingNotification(private val context: Context, initialMode: MonitoringM
                 NotificationCompat.PRIORITY_DEFAULT
               } else {
                 NotificationCompat.PRIORITY_MIN
-              })
+              }
+          )
           .build()
 
   private fun updateNotification() {
-    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) ==
-        PackageManager.PERMISSION_GRANTED) {
+    if (
+        ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) ==
+            PackageManager.PERMISSION_GRANTED
+    ) {
       notificationManagerCompat.notify(NOTIFICATION_ID_ONGOING, getNotification())
     } else {
       Timber.w(
-          "Tried to update ongoing notification with $this but notification permissions were missing")
+          "Tried to update ongoing notification with $this but notification permissions were missing"
+      )
     }
   }
 
@@ -110,7 +126,8 @@ class OngoingNotification(private val context: Context, initialMode: MonitoringM
               context.getString(
                   R.string.notificationEndpointStateConnected,
                   context.resources.getString(R.string.CONNECTED),
-                  host)
+                  host,
+              )
           EndpointState.ERROR ->
               if (endpointState.error != null)
                   "${endpointState.getLabel(context)}: ${endpointState.getErrorLabel(context)}"
@@ -121,15 +138,14 @@ class OngoingNotification(private val context: Context, initialMode: MonitoringM
     updateNotification()
   }
 
-  private fun getMonitoringLabel(monitoringMode: MonitoringMode) =
-      context.run {
-        when (monitoringMode) {
-          MonitoringMode.Quiet -> getString(R.string.monitoring_quiet)
-          MonitoringMode.Manual -> getString(R.string.monitoring_manual)
-          MonitoringMode.Significant -> getString(R.string.monitoring_significant)
-          MonitoringMode.Move -> getString(R.string.monitoring_move)
-        }
-      }
+  private fun getMonitoringLabel(monitoringMode: MonitoringMode) = context.run {
+    when (monitoringMode) {
+      MonitoringMode.Quiet -> getString(R.string.monitoring_quiet)
+      MonitoringMode.Manual -> getString(R.string.monitoring_manual)
+      MonitoringMode.Significant -> getString(R.string.monitoring_significant)
+      MonitoringMode.Move -> getString(R.string.monitoring_move)
+    }
+  }
 
   fun setMonitoringMode(monitoringMode: MonitoringMode) {
     serviceNotificationState =

@@ -20,7 +20,7 @@ class EditorViewModel
 constructor(
     private val preferences: Preferences,
     private val parser: Parser,
-    private val waypointsRepo: WaypointsRepo
+    private val waypointsRepo: WaypointsRepo,
 ) : ViewModel(), Preferences.OnPreferenceChangeListener {
   private val mutableEffectiveConfiguration = MutableStateFlow("")
   val effectiveConfiguration: StateFlow<String> = mutableEffectiveConfiguration

@@ -98,7 +98,8 @@ class PreferenceTest {
           "tid",
           "username",
           "showRegionsOnMap",
-          "_build")
+          "_build",
+      )
   private val httpOnlyPreferenceKeys = listOf("dontReuseHttpClient", "url")
   private val mqttOnlyPreferenceKeys =
       listOf(
@@ -116,7 +117,8 @@ class PreferenceTest {
           "port",
           "pubTopicBase",
           "tls",
-          "tlsClientCrt")
+          "tlsClientCrt",
+      )
 
   @Test
   fun `given an MQTT configuration message containing remapped values, when imported and exported the remapped values are present`() {
@@ -149,7 +151,9 @@ class PreferenceTest {
     }
     httpOnlyPreferenceKeys.forEach {
       assertFalse(
-          "Exported message doesn't contain $it", exportedMessageConfiguration.containsKey(it))
+          "Exported message doesn't contain $it",
+          exportedMessageConfiguration.containsKey(it),
+      )
     }
   }
 
@@ -172,7 +176,9 @@ class PreferenceTest {
     }
     mqttOnlyPreferenceKeys.forEach {
       assertFalse(
-          "Exported message doesn't contain $it", exportedMessageConfiguration.containsKey(it))
+          "Exported message doesn't contain $it",
+          exportedMessageConfiguration.containsKey(it),
+      )
     }
   }
 

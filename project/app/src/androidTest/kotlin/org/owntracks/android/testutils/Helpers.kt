@@ -48,17 +48,17 @@ import java.io.InputStream
 import java.util.concurrent.TimeUnit
 import junit.framework.AssertionFailedError
 import kotlin.random.Random
+import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
-import kotlin.time.Clock
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.not
 import org.hamcrest.Matcher
 import org.owntracks.android.R
 import org.owntracks.android.preferences.Preferences
 import timber.log.Timber
-import kotlin.time.ExperimentalTime
 
 fun scrollToPreferenceWithText(textResource: Int) {
   onView(withId(androidx.preference.R.id.recycler_view))
@@ -146,7 +146,8 @@ inline fun IdlingResource?.use(timeout: Duration = 15.seconds, block: () -> Unit
       Timber.i("${this.name}@${this.hashCode()} is now idle after $time")
     }
     Timber.i(
-        "Currently waiting on ${IdlingRegistry.getInstance().resources.map { it.name + "@" + it.hashCode() }}")
+        "Currently waiting on ${IdlingRegistry.getInstance().resources.map { it.name + "@" + it.hashCode() }}"
+    )
     Timber.i("Unregistering idling resource ${this?.name}")
     IdlingRegistry.getInstance().unregister(this)
     block()
@@ -328,7 +329,7 @@ fun clickOnDrawerAndWait(text: Int) {
  * (e.g. BottomSheetBehavior using SpringAnimation).
  */
 fun waitUntilViewDisplayed(@IdRes viewId: Int, timeout: Duration = TIMEOUT) {
-  val deadline =  Clock.System.now().plus(timeout)
+  val deadline = Clock.System.now().plus(timeout)
   var lastError: Throwable? = null
   while (Clock.System.now() < deadline) {
     try {
@@ -385,7 +386,7 @@ fun waitUntilViewNotDisplayed(@IdRes viewId: Int, timeout: Duration = TIMEOUT) {
 fun waitUntilViewFullyVisible(
     @IdRes viewId: Int,
     areaPercentage: Int = 90,
-    timeout: Duration = TIMEOUT
+    timeout: Duration = TIMEOUT,
 ) {
   val deadline = Clock.System.now().plus(timeout)
   var lastError: Throwable? = null
@@ -400,7 +401,8 @@ fun waitUntilViewFullyVisible(
   }
   throw lastError
       ?: AssertionError(
-          "Timed out waiting for view $viewId to be at least $areaPercentage% visible")
+          "Timed out waiting for view $viewId to be at least $areaPercentage% visible"
+      )
 }
 
 /**
@@ -414,7 +416,7 @@ fun waitUntilViewFullyVisible(
 fun waitAndClickWithMinVisibility(
     @IdRes viewId: Int,
     minVisibility: Int = 80,
-    timeout: Duration = TIMEOUT
+    timeout: Duration = TIMEOUT,
 ) {
   waitUntilViewFullyVisible(viewId, minVisibility, timeout)
   onView(withId(viewId))
@@ -428,7 +430,8 @@ fun waitAndClickWithMinVisibility(
               view.performClick()
               uiController.loopMainThreadUntilIdle()
             }
-          })
+          }
+      )
 }
 
 /**
@@ -439,7 +442,7 @@ fun waitAndClickWithMinVisibility(
 fun waitUntilViewContains(
     @IdRes viewId: Int,
     @StringRes stringId: Int,
-    timeout: Duration = TIMEOUT
+    timeout: Duration = TIMEOUT,
 ) {
   val text = getInstrumentation().targetContext.getString(stringId)
   val deadline = Clock.System.now().plus(timeout)

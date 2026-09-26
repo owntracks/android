@@ -7,11 +7,9 @@ import android.content.ServiceConnection
 import android.os.IBinder
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
-import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import javax.inject.Inject
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.owntracks.android.model.messages.MessageLocation
@@ -27,7 +25,7 @@ constructor(
     @Assisted private val context: Context,
     @Assisted workerParams: WorkerParameters,
     private val preferences: Preferences,
-    private val locationProcessor: LocationProcessor
+    private val locationProcessor: LocationProcessor,
 ) : CoroutineWorker(context, workerParams) {
   override suspend fun doWork(): Result {
     Timber.d("SendLocationPingWorker started")
@@ -52,11 +50,15 @@ constructor(
         context.bindService(
             Intent(context, BackgroundService::class.java),
             serviceConnection,
-            Context.BIND_AUTO_CREATE)
+            Context.BIND_AUTO_CREATE,
+        )
     if (result) {
       mutex.withLock {
-        if (preferences.experimentalFeatures.contains(
-            Preferences.EXPERIMENTAL_FEATURE_LOCATION_PING_USES_HIGH_ACCURACY_LOCATION_REQUEST)) {
+        if (
+            preferences.experimentalFeatures.contains(
+                Preferences.EXPERIMENTAL_FEATURE_LOCATION_PING_USES_HIGH_ACCURACY_LOCATION_REQUEST
+            )
+        ) {
           backgroundService?.requestOnDemandLocationUpdate(MessageLocation.ReportType.PING)
               ?: run { Timber.w("No service bound, unable to ping location") }
         } else {
@@ -69,15 +71,5 @@ constructor(
       Timber.w("Unable to bind to service")
       return Result.failure()
     }
-  }
-
-  class Factory
-  @Inject
-  constructor(
-      private val preferences: Preferences,
-      private val locationProcessor: LocationProcessor
-  ) : ChildWorkerFactory {
-    override fun create(appContext: Context, params: WorkerParameters): ListenableWorker =
-        SendLocationPingWorker(appContext, params, preferences, locationProcessor)
   }
 }

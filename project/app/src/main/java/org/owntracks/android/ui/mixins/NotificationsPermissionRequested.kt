@@ -19,7 +19,7 @@ interface NotificationsPermissionRequested {
     override fun postNotificationsPermissionInit(
         context: AppCompatActivity,
         preferences: Preferences,
-        notificationsStash: NotificationsStash
+        notificationsStash: NotificationsStash,
     ) {
       this.context = context
       this.preferences = preferences
@@ -33,9 +33,11 @@ interface NotificationsPermissionRequested {
     }
 
     override fun requestNotificationsPermission() {
-      if (!NotificationManagerCompat.from(context).areNotificationsEnabled() &&
-          !preferences.userDeclinedEnableNotificationPermissions &&
-          Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      if (
+          !NotificationManagerCompat.from(context).areNotificationsEnabled() &&
+              !preferences.userDeclinedEnableNotificationPermissions &&
+              Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+      ) {
         launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
       }
     }
@@ -44,7 +46,7 @@ interface NotificationsPermissionRequested {
   fun postNotificationsPermissionInit(
       context: AppCompatActivity,
       preferences: Preferences,
-      notificationsStash: NotificationsStash
+      notificationsStash: NotificationsStash,
   )
 
   fun requestNotificationsPermission()

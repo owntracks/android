@@ -7,4 +7,13 @@
     <dimen name="welcome_content_min_height">96dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    <!-- Lifts the FAB wrapper FrameLayouts above their elevation-0 siblings (notably the map
+         fragment, which is later in document order and would otherwise draw over them). Matches
+         the FAB's own default resting elevation. -->
+    <dimen name="fab_container_elevation">6dp</dimen>
+    <!-- Slack inside the FAB wrapper FrameLayouts so the FAB's elevation shadow has somewhere to
+         draw. A wrap_content wrapper is exactly FAB-sized and clips the shadow away entirely
+         (clipChildren/clipToPadding alone do not rescue it). This padding is subtracted back off
+         the wrapper margins in MapActivity so the FAB's on-screen position is unchanged. -->
+    <dimen name="fab_shadow_room">12dp</dimen>
 </resources>

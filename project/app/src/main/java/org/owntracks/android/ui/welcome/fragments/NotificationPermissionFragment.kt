@@ -31,7 +31,7 @@ class NotificationPermissionFragment @Inject constructor() : WelcomeFragment() {
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
-      savedInstanceState: Bundle?
+      savedInstanceState: Bundle?,
   ): View {
     binding =
         UiWelcomeNotificationPermissionBinding.inflate(inflater, container, false).apply {
@@ -68,6 +68,7 @@ class NotificationPermissionFragment @Inject constructor() : WelcomeFragment() {
           WelcomeViewModel.ProgressState.PERMITTED
         } else {
           WelcomeViewModel.ProgressState.NOT_PERMITTED
-        })
+        }
+    )
   }
 }

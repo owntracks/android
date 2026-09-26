@@ -33,6 +33,7 @@ val PREFERENCE_KEY_LABELS: Map<String, Int> =
         "locatorInterval" to R.string.preferencesLocatorInterval,
         "locatorPriority" to R.string.preferencesLocatorPriority,
         "mapLayerStyle" to R.string.preferencesMapLayerStyle,
+        "maxImplausibleSpeedKmh" to R.string.preferencesMaxImplausibleSpeedKmh,
         "mode" to R.string.preferencesProfileId,
         "monitoring" to R.string.preferencesMonitoring,
         "moveModeLocatorInterval" to R.string.preferencesMoveModeLocatorInterval,

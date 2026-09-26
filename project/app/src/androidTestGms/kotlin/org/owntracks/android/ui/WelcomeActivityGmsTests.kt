@@ -30,8 +30,9 @@ class WelcomeActivityGmsTests : TestWithAnActivity<WelcomeActivity>() {
         "Google Play Services not available",
         GoogleApiAvailability.getInstance()
             .isGooglePlayServicesAvailable(
-                InstrumentationRegistry.getInstrumentation().targetContext) ==
-            ConnectionResult.SUCCESS)
+                InstrumentationRegistry.getInstrumentation().targetContext
+            ) == ConnectionResult.SUCCESS,
+    )
 
     // Intro fragment
     assertDisplayed(R.string.welcome_heading)

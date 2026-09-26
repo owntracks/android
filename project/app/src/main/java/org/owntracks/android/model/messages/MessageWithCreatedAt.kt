@@ -2,6 +2,7 @@
 
 package org.owntracks.android.model.messages
 
+import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
@@ -10,7 +11,6 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlin.time.ExperimentalTime
 
 interface MessageWithCreatedAt {
   @SerialName("created_at") var createdAt: Instant
@@ -22,8 +22,7 @@ class MessageCreatedAtNow(clock: Clock) : MessageWithCreatedAt {
 }
 
 interface Clock {
-  @OptIn(ExperimentalTime::class)
-  val time: Instant
+  @OptIn(ExperimentalTime::class) val time: Instant
 }
 
 class RealClock : Clock {

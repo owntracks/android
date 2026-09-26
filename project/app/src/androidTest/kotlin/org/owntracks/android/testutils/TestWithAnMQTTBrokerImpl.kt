@@ -45,7 +45,8 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
   override fun MessageBase.sendFromBroker(broker: Broker, topicName: String, retain: Boolean) {
     val actualTopic = topicName + this@sendFromBroker.baseTopicSuffix
     Timber.i(
-        "Publishing ${this::class.java.simpleName} message to $actualTopic with retain=$retain")
+        "Publishing ${this::class.java.simpleName} message to $actualTopic with retain=$retain"
+    )
     this.toJsonBytes(Parser(null)).run {
       broker.publish(retain, actualTopic, Qos.AT_MOST_ONCE, MQTT5Properties(), toUByteArray()).run {
         Timber.d("MQTT Publish result to $actualTopic is $this")
@@ -94,7 +95,7 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
                 override fun authenticate(
                     clientId: String,
                     username: String?,
-                    password: UByteArray?
+                    password: UByteArray?,
                 ): Boolean {
                   return username == mqttUsername &&
                       password.contentEquals(mqttTestPassword.toByteArray().toUByteArray())
@@ -106,7 +107,7 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
                     clientId: String,
                     username: String?,
                     password: UByteArray?,
-                    packet: MQTTPacket
+                    packet: MQTTPacket,
                 ) {
                   synchronized(mqttPacketsReceived) {
                     val packetString = String(packet.toByteArray().toByteArray())
@@ -119,7 +120,8 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
                     }
                   }
                 }
-              })
+              },
+      )
 
   override fun stopBroker() {
     if (::brokerThread.isInitialized) {
@@ -157,9 +159,11 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
             }
             """
                 .trimIndent()
-                .toByteArray())
+                .toByteArray()
+        )
     PreferenceManager.getDefaultSharedPreferences(
-            InstrumentationRegistry.getInstrumentation().targetContext)
+            InstrumentationRegistry.getInstrumentation().targetContext
+        )
         .edit()
         .putBoolean(Preferences::allowConfigurationByURIAndConfigFile.name, true)
         .commit()
@@ -169,7 +173,8 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
             Intent(Intent.ACTION_VIEW).apply {
               data = "owntracks:///config?inline=$config".toUri()
               flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            })
+            }
+        )
     // Wait for the save button to become visible before clicking.
     // The save button is hidden until LoadActivity parses the config (ImportStatus.SUCCESS),
     // which triggers an async invalidateOptionsMenu() → onPrepareOptionsMenu(). Without

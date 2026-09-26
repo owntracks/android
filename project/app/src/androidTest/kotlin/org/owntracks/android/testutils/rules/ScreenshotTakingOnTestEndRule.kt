@@ -36,11 +36,14 @@ class ScreenshotTakingOnTestEndRule : TestWatcher() {
   @Throws(IOException::class)
   fun Bitmap.writeToTestStorage(testStorage: TestStorage, name: String) {
     testStorage.openOutputFile("$name.png").use {
-      if (!this.compress(
-          Bitmap.CompressFormat.PNG,
-          /** PNG is lossless, so quality is ignored. */
-          0,
-          it)) {
+      if (
+          !this.compress(
+              Bitmap.CompressFormat.PNG,
+              /** PNG is lossless, so quality is ignored. */
+              0,
+              it,
+          )
+      ) {
         throw IOException("Failed to compress bitmap")
       }
     }

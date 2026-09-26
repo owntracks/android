@@ -11,6 +11,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import dagger.hilt.android.testing.HiltAndroidTest
 import io.github.davidepianca98.mqtt.packets.mqtt.MQTTPublish
+import kotlin.time.Duration.Companion.seconds
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,7 +31,6 @@ import org.owntracks.android.testutils.use
 import org.owntracks.android.testutils.waitAndClickWithMinVisibility
 import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber
-import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalUnsignedTypes::class)
 @HiltAndroidTest
@@ -135,7 +135,8 @@ class IntentTests :
         Intent(app, ExternalIntentReceiver::class.java).apply {
           action = BackgroundService.INTENT_ACTION_CHANGE_MONITORING
           putExtra(ExternalIntentReceiver.INTENT_EXTRA_AUTH_KEY, authKey)
-        })
+        }
+    )
 
     // Allow time for broadcast delivery → receiver → service → UI update
     Thread.sleep(500)
@@ -163,7 +164,8 @@ class IntentTests :
         Intent(app, ExternalIntentReceiver::class.java).apply {
           action = BackgroundService.INTENT_ACTION_CHANGE_MONITORING
           putExtra(ExternalIntentReceiver.INTENT_EXTRA_AUTH_KEY, "wrong-key")
-        })
+        }
+    )
 
     Thread.sleep(500)
 
@@ -186,7 +188,8 @@ class IntentTests :
     app.sendBroadcast(
         Intent(app, ExternalIntentReceiver::class.java).apply {
           action = BackgroundService.INTENT_ACTION_CHANGE_MONITORING
-        })
+        }
+    )
 
     // Give the broadcast time to be delivered and rejected by the receiver
     Thread.sleep(500)
@@ -224,7 +227,8 @@ class IntentTests :
         Intent(app, ExternalIntentReceiver::class.java).apply {
           action = BackgroundService.INTENT_ACTION_SEND_LOCATION_USER
           putExtra(ExternalIntentReceiver.INTENT_EXTRA_AUTH_KEY, authKey)
-        })
+        }
+    )
     packetReceivedIdlingResource.use(10.seconds) { Espresso.onIdle() }
 
     Assert.assertTrue(
@@ -259,7 +263,8 @@ class IntentTests :
     app.sendBroadcast(
         Intent(app, ExternalIntentReceiver::class.java).apply {
           action = BackgroundService.INTENT_ACTION_SEND_LOCATION_USER
-        })
+        }
+    )
 
     // Give the broadcast time to be delivered and rejected
     Thread.sleep(2000)

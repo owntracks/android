@@ -67,6 +67,8 @@ jobs:
     permissions:
       contents: read
       checks: write
+      pull-requests: write
+      issues: write
     uses: ./.github/workflows/build-test-lint.yaml
     with:
       ref: ${{ needs.check-comment.outputs.sha }}
@@ -121,12 +123,3 @@ jobs:
           conclusion: ${{ (needs.build-test-lint.result == 'success' && (needs.espresso-test.result == 'success' || needs.espresso-test.result == 'skipped')) && 'success' || 'failure' }}
           output: |
             {"title":"Testing", "summary":"Build & Test complete", "text":"Build & Test complete"}
-      - name: Add a comment linking to the workflow
-        uses: peter-evans/create-or-update-comment@v5
-        with:
-          issue-number: ${{ github.event.issue.number }}
-          body: |
-            Build & Test complete. :sparkles:
-            [View workflow run][1]
-
-            [1]: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

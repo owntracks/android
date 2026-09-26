@@ -68,7 +68,8 @@ class WaypointsMigrationFromObjectboxTest(private val parameter: Parameter) {
           Parameter("10-waypoints", 10),
           Parameter("5000-waypoints", 5000),
           Parameter("empty", 0),
-          Parameter("3-created-by-real-device", 3))
+          Parameter("3-created-by-real-device", 3),
+      )
     }
   }
 }

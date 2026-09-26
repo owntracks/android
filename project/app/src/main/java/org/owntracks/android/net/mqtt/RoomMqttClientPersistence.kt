@@ -22,7 +22,7 @@ import org.eclipse.paho.client.mqttv3.internal.MqttPersistentData
 /** Implementation of [MqttClientPersistence] that stores data in a Room database */
 class RoomMqttClientPersistence(
     private val applicationContext: Context,
-    private val forTesting: Boolean = false
+    private val forTesting: Boolean = false,
 ) : MqttClientPersistence {
 
   private var db: MqttPersistableDatabase? = null
@@ -30,7 +30,7 @@ class RoomMqttClientPersistence(
   @Entity
   data class MqttPersistableForClient(
       @PrimaryKey val clientId: String,
-      @ColumnInfo(name = "persistable", typeAffinity = ColumnInfo.BLOB) val persistable: ByteArray?
+      @ColumnInfo(name = "persistable", typeAffinity = ColumnInfo.BLOB) val persistable: ByteArray?,
   ) {
     override fun equals(other: Any?): Boolean {
       if (this === other) return true
@@ -81,7 +81,10 @@ class RoomMqttClientPersistence(
               .build()
         } else {
           Room.databaseBuilder(
-                  applicationContext, MqttPersistableDatabase::class.java, "pahoMqttPersistence")
+                  applicationContext,
+                  MqttPersistableDatabase::class.java,
+                  "pahoMqttPersistence",
+              )
               .build()
         }
   }

@@ -62,8 +62,7 @@ enum class EndpointState {
         is SocketTimeoutException ->
             context.getString(R.string.statusEndpointStateMessageSocketTimeout)
         // DNS fail
-        is UnknownHostException ->
-            context.getString(R.string.statusEndpointStateMessageUnknownHost)
+        is UnknownHostException -> context.getString(R.string.statusEndpointStateMessageUnknownHost)
         // Client cert errors show up like this
         is SSLProtocolException ->
             if (e.message != null && e.message!!.contains("TLSV1_ALERT_CERTIFICATE_REQUIRED")) {
@@ -89,8 +88,10 @@ enum class EndpointState {
               is SSLHandshakeException -> {
                 if (mqttExceptionCause.cause?.cause is CertPathValidatorException) {
                   context.getString(R.string.statusEndpointStateMessageTLSEndpointCANotTrustedError)
-                } else if (mqttExceptionCause.message != null &&
-                    mqttExceptionCause.message!!.contains("connection closed")) {
+                } else if (
+                    mqttExceptionCause.message != null &&
+                        mqttExceptionCause.message!!.contains("connection closed")
+                ) {
                   context.getString(R.string.statusEndpointStateMessageTLSConnectionClosed)
                 } else {
                   context.getString(R.string.statusEndpointStateMessageTLSError, e.message)
@@ -98,10 +99,13 @@ enum class EndpointState {
               }
               // Client cert errors show up like this
               is SSLProtocolException ->
-                  if (mqttExceptionCause.message != null &&
-                      mqttExceptionCause.message!!.contains("TLSV1_ALERT_CERTIFICATE_REQUIRED")) {
+                  if (
+                      mqttExceptionCause.message != null &&
+                          mqttExceptionCause.message!!.contains("TLSV1_ALERT_CERTIFICATE_REQUIRED")
+                  ) {
                     context.getString(
-                        R.string.statusEndpointStateMessageTLSEndpointClientCertsRequired)
+                        R.string.statusEndpointStateMessageTLSEndpointClientCertsRequired
+                    )
                   } else {
                     context.getString(R.string.statusEndpointStateMessageTLSError, e.message)
                   }
@@ -113,7 +117,8 @@ enum class EndpointState {
               is IOException ->
                   if (mqttExceptionCause.message?.startsWith("WebSocket Response header") == true) {
                     context.getString(
-                        R.string.statusEndpointStateMessageEndpointDoesNotSupportWebsockets)
+                        R.string.statusEndpointStateMessageEndpointDoesNotSupportWebsockets
+                    )
                   } else {
                     mqttExceptionCause.message ?: mqttExceptionCause.toString()
                   }
@@ -141,7 +146,8 @@ enum class EndpointState {
                     MqttException.REASON_CODE_CONNECTION_LOST ->
                         context.getString(
                             R.string.statusEndpointStateMessageConnectionLost,
-                            mqttExceptionCause.toString())
+                            mqttExceptionCause.toString(),
+                        )
                     else -> mqttExceptionCause.toString()
                   }
             }

@@ -23,7 +23,9 @@ internal class DeviceMetricsProviderTest {
       on { getSystemService(Context.CONNECTIVITY_SERVICE) } doReturn connectivityManager
     }
     assertEquals(
-        MessageLocation.ConnectionType.OFFLINE, DeviceMetricsProvider(mockContext).connectionType)
+        MessageLocation.ConnectionType.OFFLINE,
+        DeviceMetricsProvider(mockContext).connectionType,
+    )
   }
 
   @Test
@@ -36,7 +38,9 @@ internal class DeviceMetricsProviderTest {
       on { getSystemService(Context.CONNECTIVITY_SERVICE) } doReturn connectivityManager
     }
     assertEquals(
-        MessageLocation.ConnectionType.OFFLINE, DeviceMetricsProvider(mockContext).connectionType)
+        MessageLocation.ConnectionType.OFFLINE,
+        DeviceMetricsProvider(mockContext).connectionType,
+    )
   }
 
   @Test
@@ -54,7 +58,9 @@ internal class DeviceMetricsProviderTest {
       on { getSystemService(Context.CONNECTIVITY_SERVICE) } doReturn connectivityManager
     }
     assertEquals(
-        MessageLocation.ConnectionType.WIFI, DeviceMetricsProvider(mockContext).connectionType)
+        MessageLocation.ConnectionType.WIFI,
+        DeviceMetricsProvider(mockContext).connectionType,
+    )
   }
 
   @Test
@@ -72,7 +78,9 @@ internal class DeviceMetricsProviderTest {
       on { getSystemService(Context.CONNECTIVITY_SERVICE) } doReturn connectivityManager
     }
     assertEquals(
-        MessageLocation.ConnectionType.MOBILE, DeviceMetricsProvider(mockContext).connectionType)
+        MessageLocation.ConnectionType.MOBILE,
+        DeviceMetricsProvider(mockContext).connectionType,
+    )
   }
 
   @Test
@@ -89,6 +97,8 @@ internal class DeviceMetricsProviderTest {
       on { getSystemService(Context.CONNECTIVITY_SERVICE) } doReturn connectivityManager
     }
     assertEquals(
-        MessageLocation.ConnectionType.OFFLINE, DeviceMetricsProvider(mockContext).connectionType)
+        MessageLocation.ConnectionType.OFFLINE,
+        DeviceMetricsProvider(mockContext).connectionType,
+    )
   }
 }

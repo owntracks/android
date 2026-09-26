@@ -35,7 +35,6 @@ import org.owntracks.android.testutils.use
 import org.owntracks.android.testutils.waitUntilViewContains
 import org.owntracks.android.ui.preferences.load.LoadActivity
 import org.owntracks.android.ui.status.StatusActivity
-
 import timber.log.Timber
 
 @OptIn(ExperimentalEncodingApi::class)
@@ -56,10 +55,13 @@ class ConnectionErrorTest : TestWithAnActivity<StatusActivity>(startActivity = t
               this[Preferences::url.name] = "not a url"
               remove(Preferences::host.name)
               remove(Preferences::port.name)
-            })
+            }
+        )
     setupActivity(config)
     assertContains(
-        R.id.connectedStatusMessage, R.string.statusEndpointStateMessageMalformedHostPort)
+        R.id.connectedStatusMessage,
+        R.string.statusEndpointStateMessageMalformedHostPort,
+    )
   }
 
   @Test
@@ -70,7 +72,8 @@ class ConnectionErrorTest : TestWithAnActivity<StatusActivity>(startActivity = t
     getBroker(port, username, password).use {
       val config =
           encodeConfig(
-              getConfig(port, username, password).apply { this.remove(Preferences::host.name) })
+              getConfig(port, username, password).apply { this.remove(Preferences::host.name) }
+          )
       setupActivity(config)
       assertContains(R.id.connectedStatusMessage, R.string.statusEndpointStateMessageMissingHost)
     }
@@ -89,10 +92,14 @@ class ConnectionErrorTest : TestWithAnActivity<StatusActivity>(startActivity = t
               this[Preferences::url.name] = "https://unknown/"
               remove(Preferences::host.name)
               remove(Preferences::port.name)
-            })
+            }
+        )
     setupActivity(config)
     waitUntilViewContains(
-        R.id.connectedStatusMessage, R.string.statusEndpointStateMessageUnknownHost, 15.seconds)
+        R.id.connectedStatusMessage,
+        R.string.statusEndpointStateMessageUnknownHost,
+        15.seconds,
+    )
   }
 
   @Test
@@ -103,12 +110,14 @@ class ConnectionErrorTest : TestWithAnActivity<StatusActivity>(startActivity = t
     getBroker(port, username, password).use {
       val config =
           encodeConfig(
-              getConfig(port, username, password).apply {
-                this[Preferences::host.name] = "unknown"
-              })
+              getConfig(port, username, password).apply { this[Preferences::host.name] = "unknown" }
+          )
       setupActivity(config)
       waitUntilViewContains(
-          R.id.connectedStatusMessage, R.string.statusEndpointStateMessageUnknownHost, 15.seconds)
+          R.id.connectedStatusMessage,
+          R.string.statusEndpointStateMessageUnknownHost,
+          15.seconds,
+      )
     }
   }
 
@@ -120,11 +129,14 @@ class ConnectionErrorTest : TestWithAnActivity<StatusActivity>(startActivity = t
     getBroker(port, username, password).use {
       val config =
           encodeConfig(
-              getConfig(port, username, password).apply { this[Preferences::port.name] = 1234 })
+              getConfig(port, username, password).apply { this[Preferences::port.name] = 1234 }
+          )
       setupActivity(config)
       mqttConnectionIdlingResource.use { Espresso.onIdle() }
       assertContains(
-          R.id.connectedStatusMessage, R.string.statusEndpointStateMessageConnectionRefused)
+          R.id.connectedStatusMessage,
+          R.string.statusEndpointStateMessageConnectionRefused,
+      )
     }
   }
 
@@ -138,7 +150,10 @@ class ConnectionErrorTest : TestWithAnActivity<StatusActivity>(startActivity = t
       val config = encodeConfig(getConfig(port, username, password))
       setupActivity(config)
       waitUntilViewContains(
-          R.id.connectedStatusMessage, R.string.statusEndpointStateMessageEOFError, 15.seconds)
+          R.id.connectedStatusMessage,
+          R.string.statusEndpointStateMessageEOFError,
+          15.seconds,
+      )
     }
   }
 
@@ -151,12 +166,14 @@ class ConnectionErrorTest : TestWithAnActivity<StatusActivity>(startActivity = t
     getBroker(port, username, password, tlsSettings).use {
       val config =
           encodeConfig(
-              getConfig(port, username, password).apply { this[Preferences::tls.name] = true })
+              getConfig(port, username, password).apply { this[Preferences::tls.name] = true }
+          )
       setupActivity(config)
       waitUntilViewContains(
           R.id.connectedStatusMessage,
           R.string.statusEndpointStateMessageTLSEndpointCANotTrustedError,
-          15.seconds)
+          15.seconds,
+      )
     }
   }
 
@@ -168,18 +185,21 @@ class ConnectionErrorTest : TestWithAnActivity<StatusActivity>(startActivity = t
     getBroker(port, username, password).use {
       val config =
           encodeConfig(
-              getConfig(port, username, password).apply { this[Preferences::ws.name] = true })
+              getConfig(port, username, password).apply { this[Preferences::ws.name] = true }
+          )
       setupActivity(config)
       mqttConnectionIdlingResource.use { Espresso.onIdle() }
       assertContains(
           R.id.connectedStatusMessage,
-          R.string.statusEndpointStateMessageEndpointDoesNotSupportWebsockets)
+          R.string.statusEndpointStateMessageEndpointDoesNotSupportWebsockets,
+      )
     }
   }
 
   private fun setupActivity(config: String) {
     PreferenceManager.getDefaultSharedPreferences(
-            InstrumentationRegistry.getInstrumentation().targetContext)
+            InstrumentationRegistry.getInstrumentation().targetContext
+        )
         .edit()
         .putBoolean(Preferences::allowConfigurationByURIAndConfigFile.name, true)
         .commit()
@@ -189,7 +209,8 @@ class ConnectionErrorTest : TestWithAnActivity<StatusActivity>(startActivity = t
             Intent(Intent.ACTION_VIEW).apply {
               data = "owntracks:///config?inline=$config".toUri()
               flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            })
+            }
+        )
     waitUntilActivityVisible(LoadActivity::class.java)
     ViewIdlingResource(withId(R.id.applyButton), isDisplayed()).use { clickOn(R.id.applyButton) }
     waitUntilActivityVisible()
@@ -202,7 +223,7 @@ private fun getBroker(
     mqttPort: Int,
     username: String,
     password: String,
-    tlsSettings: TLSSettings? = null
+    tlsSettings: TLSSettings? = null,
 ) =
     Broker(
         host = "127.0.0.1",
@@ -211,14 +232,14 @@ private fun getBroker(
         authentication =
             object : Authentication {
               override fun authenticate(
-                clientId: String,
-                givenUsername: String?,
-                givenPassword: UByteArray?
+                  clientId: String,
+                  givenUsername: String?,
+                  givenPassword: UByteArray?,
               ): Boolean {
                 return givenUsername == username &&
                     givenPassword.contentEquals(password.toByteArray().toUByteArray())
               }
-            }
+            },
     )
 
 @ExperimentalEncodingApi
@@ -249,7 +270,10 @@ private fun getTLSSettings(connectionErrorTest: ConnectionErrorTest): TLSSetting
           .resolve("rootCA.p12")
           .absolutePath
   return TLSSettings(
-      keyStoreFilePath = keyStorePath, keyStorePassword = "aaaa", requireClientCertificate = true)
+      keyStoreFilePath = keyStorePath,
+      keyStorePassword = "aaaa",
+      requireClientCertificate = true,
+  )
 }
 
 @Suppress("SameParameterValue")
@@ -264,7 +288,8 @@ private fun getConfig(mqttPort: Int, username: String, password: String): Mutabl
         "tls" to false,
         "keepalive" to 5,
         "connectionTimeoutSeconds" to 1,
-        "reverseGeocodeProvider" to "None")
+        "reverseGeocodeProvider" to "None",
+    )
 
 private fun Broker.use(block: () -> Unit) {
   var shouldBeRunning = true

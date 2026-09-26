@@ -42,13 +42,13 @@ import timber.log.Timber
 class LoadViewModel
 @Inject
 constructor(
-  private val preferences: Preferences,
-  private val parser: Parser,
-  private val waypointsRepo: WaypointsRepo,
-  @param:CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-  @param:Named("saveConfigurationIdlingResource")
+    private val preferences: Preferences,
+    private val parser: Parser,
+    private val waypointsRepo: WaypointsRepo,
+    @param:CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @param:Named("saveConfigurationIdlingResource")
     private val saveConfigurationIdlingResource: SimpleIdlingResource,
-  @param:ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context,
 ) : ViewModel() {
   private var configuration: MessageConfiguration? = null
 
@@ -100,7 +100,8 @@ constructor(
                   key,
                   incoming?.toString() ?: "",
                   oldValue = null,
-                  labelRes = PREFERENCE_KEY_LABELS[key])
+                  labelRes = PREFERENCE_KEY_LABELS[key],
+              )
         } else {
           val (currentStr, newStr) = pair
           if (currentStr == newStr) {
@@ -108,7 +109,11 @@ constructor(
           } else {
             changedItems +=
                 ConfigItem.KeyValue(
-                    key, newStr ?: "", oldValue = currentStr, labelRes = PREFERENCE_KEY_LABELS[key])
+                    key,
+                    newStr ?: "",
+                    oldValue = currentStr,
+                    labelRes = PREFERENCE_KEY_LABELS[key],
+                )
           }
         }
       }
@@ -129,7 +134,8 @@ constructor(
                 description = waypoint.description ?: "",
                 latitude = waypoint.latitude,
                 longitude = waypoint.longitude,
-                radius = waypoint.radius)
+                radius = waypoint.radius,
+            )
       }
     }
     return items
@@ -224,7 +230,8 @@ constructor(
                     object : Callback {
                       override fun onFailure(call: Call, e: IOException) {
                         configurationImportFailed(
-                            Exception(context.getString(R.string.loadActivityErrorFetchFailed), e))
+                            Exception(context.getString(R.string.loadActivityErrorFetchFailed), e)
+                        )
                       }
 
                       @Throws(IOException::class)
@@ -236,7 +243,10 @@ constructor(
                                   IOException(
                                       context.getString(
                                           R.string.loadActivityErrorUnexpectedStatusCode,
-                                          response)))
+                                          response,
+                                      )
+                                  )
+                              )
                               return
                             }
                             setConfiguration(responseBody.string())
@@ -245,7 +255,8 @@ constructor(
                           configurationImportFailed(e)
                         }
                       }
-                    })
+                    }
+                )
             // This is async, so result handled on the callback
           }
           else -> {
