@@ -15,17 +15,18 @@
             android:text="@string/mapLayerDialogTitle"
             android:textStyle="bold" />
 
-
-        <androidx.appcompat.widget.LinearLayoutCompat
+        <GridLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
-            android:orientation="horizontal">
+            android:columnCount="2"
+            android:rowCount="2">
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill_horizontal"
                 android:orientation="vertical">
 
                 <androidx.appcompat.widget.AppCompatImageButton
@@ -48,7 +49,8 @@
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill_horizontal"
                 android:orientation="vertical">
 
                 <androidx.appcompat.widget.AppCompatImageButton
@@ -68,8 +70,55 @@
                     android:textAlignment="center" />
             </androidx.appcompat.widget.LinearLayoutCompat>
 
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill_horizontal"
+                android:orientation="vertical">
 
-        </androidx.appcompat.widget.LinearLayoutCompat>
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/fabMapLayerAmapVector"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:layout_gravity="center"
+                    android:layout_margin="12dp"
+                    android:background="@drawable/round_button"
+                    android:backgroundTint="@color/primary_dark"
+                    android:src="@drawable/ic_amap_logo" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/mapLayerAmapVectorLabel"
+                    android:textAlignment="center" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill_horizontal"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/fabMapLayerAmapSatellite"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:layout_gravity="center"
+                    android:layout_margin="12dp"
+                    android:background="@drawable/round_button"
+                    android:backgroundTint="@color/primary_dark"
+                    android:src="@drawable/ic_amap_logo" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/mapLayerAmapSatelliteLabel"
+                    android:textAlignment="center" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+        </GridLayout>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
