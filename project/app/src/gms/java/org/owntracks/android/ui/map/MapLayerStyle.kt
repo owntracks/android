@@ -19,10 +19,11 @@ enum class MapLayerStyle {
   OpenStreetMapNormal,
   OpenStreetMapWikimedia,
   AmapVector,
-  AmapSatellite;
+  AmapSatellite,
+  NoMap;
 
   fun isSameProviderAs(mapLayerStyle: MapLayerStyle): Boolean {
-    return setOf("GoogleMap", "OpenStreetMap", "Amap").any {
+    return setOf("GoogleMap", "OpenStreetMap", "Amap", "NoMap").any {
       name.startsWith(it) && mapLayerStyle.name.startsWith(it)
     }
   }
@@ -32,7 +33,8 @@ enum class MapLayerStyle {
       GoogleMapDefault,
       GoogleMapHybrid,
       GoogleMapSatellite,
-      GoogleMapTerrain -> GoogleMapFragment::class.java
+      GoogleMapTerrain,
+      NoMap -> GoogleMapFragment::class.java
       OpenStreetMapNormal,
       OpenStreetMapWikimedia,
       AmapVector,
@@ -49,7 +51,8 @@ enum class MapLayerStyle {
         GoogleMapDefault,
         GoogleMapHybrid,
         GoogleMapSatellite,
-        GoogleMapTerrain -> TileSourceFactory.MAPNIK
+        GoogleMapTerrain,
+        NoMap -> TileSourceFactory.MAPNIK
       }
 
   companion object {
@@ -115,4 +118,5 @@ val mapLayerSelectorButtonsToStyles =
         R.id.fabMapLayerOpenStreetMapWikimedia to MapLayerStyle.OpenStreetMapWikimedia,
         R.id.fabMapLayerAmapVector to MapLayerStyle.AmapVector,
         R.id.fabMapLayerAmapSatellite to MapLayerStyle.AmapSatellite,
+        R.id.fabMapLayerNoMap to MapLayerStyle.NoMap,
     )

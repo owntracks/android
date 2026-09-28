@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
             android:columnCount="2"
-            android:rowCount="2">
+            android:rowCount="3">
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="0dp"
@@ -115,6 +115,31 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:text="@string/mapLayerAmapSatelliteLabel"
+                    android:textAlignment="center" />
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnSpan="2"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill_horizontal"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/fabMapLayerNoMap"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:layout_gravity="center"
+                    android:layout_margin="12dp"
+                    android:background="@drawable/round_button"
+                    android:backgroundTint="@color/primary_dark"
+                    android:src="@drawable/ic_baseline_layers_clear_24" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/mapLayerNoMapLabel"
                     android:textAlignment="center" />
             </androidx.appcompat.widget.LinearLayoutCompat>
 

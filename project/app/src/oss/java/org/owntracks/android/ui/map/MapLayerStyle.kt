@@ -13,7 +13,8 @@ enum class MapLayerStyle {
   OpenStreetMapNormal,
   OpenStreetMapWikimedia,
   AmapVector,
-  AmapSatellite;
+  AmapSatellite,
+  NoMap;
 
   fun isSameProviderAs(mapLayerStyle: MapLayerStyle): Boolean {
     return providerGroup() == mapLayerStyle.providerGroup()
@@ -25,6 +26,7 @@ enum class MapLayerStyle {
         OpenStreetMapWikimedia -> "OpenStreetMap"
         AmapVector,
         AmapSatellite -> "Amap"
+        NoMap -> "NoMap"
       }
 
   fun getTileSource(): ITileSource =
@@ -33,6 +35,7 @@ enum class MapLayerStyle {
         OpenStreetMapWikimedia -> TileSourceFactory.WIKIMEDIA
         AmapVector -> AMAP_VECTOR
         AmapSatellite -> AMAP_SATELLITE
+        NoMap -> NO_MAP_TILES
       }
 
   companion object {
@@ -98,10 +101,18 @@ private val AMAP_SATELLITE: ITileSource =
       override fun getCopyrightNotice(): String = "© Amap.com"
     }
 
+private val NO_MAP_TILES: ITileSource =
+    object : XYTileSource("NoMap", 1, 18, 256, ".png", arrayOf("")) {
+      override fun getTileURLString(pMapTileIndex: Long): String = ""
+
+      override fun getCopyrightNotice(): String = ""
+    }
+
 val mapLayerSelectorButtonsToStyles =
     mapOf(
         R.id.fabMapLayerOpenStreetMap to MapLayerStyle.OpenStreetMapNormal,
         R.id.fabMapLayerOpenStreetMapWikimedia to MapLayerStyle.OpenStreetMapWikimedia,
         R.id.fabMapLayerAmapVector to MapLayerStyle.AmapVector,
         R.id.fabMapLayerAmapSatellite to MapLayerStyle.AmapSatellite,
+        R.id.fabMapLayerNoMap to MapLayerStyle.NoMap,
     )

@@ -13,6 +13,7 @@ import com.google.android.gms.maps.CameraUpdate
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.MAP_TYPE_HYBRID
+import com.google.android.gms.maps.GoogleMap.MAP_TYPE_NONE
 import com.google.android.gms.maps.GoogleMap.MAP_TYPE_NORMAL
 import com.google.android.gms.maps.GoogleMap.MAP_TYPE_SATELLITE
 import com.google.android.gms.maps.GoogleMap.MAP_TYPE_TERRAIN
@@ -410,6 +411,9 @@ internal constructor(
       }
       MapLayerStyle.GoogleMapTerrain -> {
         googleMap?.mapType = MAP_TYPE_TERRAIN
+      }
+      MapLayerStyle.NoMap -> {
+        googleMap?.mapType = MAP_TYPE_NONE
       }
       else -> {
         Timber.w("Unsupported map layer type $mapLayerStyle")

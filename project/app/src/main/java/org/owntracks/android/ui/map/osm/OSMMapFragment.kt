@@ -475,6 +475,8 @@ internal constructor(
 
   override fun setMapLayerType(mapLayerStyle: MapLayerStyle) {
     binding.osmMapView.setTileSource(mapLayerStyle.getTileSource())
+    binding.osmMapView.overlayManager.tilesOverlay.isEnabled =
+        mapLayerStyle != MapLayerStyle.NoMap
   }
 
   fun createPolygon(mapView: MapView, waypoint: WaypointModel): Polygon {
