@@ -16,7 +16,9 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.Insets
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.graphics.drawable.toDrawable
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.preference.PreferenceManager
 import kotlin.math.roundToInt
 import kotlinx.coroutines.Job
@@ -69,12 +71,16 @@ internal constructor(
 
         override fun startLocationProvider(myLocationConsumer: IMyLocationConsumer?): Boolean {
           val locationProvider: IMyLocationProvider = this
+          // Only collect while started: the subscription keeps the high-accuracy blue-dot
+          // location request alive, which shouldn't outlive the map being visible.
           locationJob =
               viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.currentLocation.collect { location ->
-                  if (location != null) {
-                    onLocationObserved(location) {
-                      myLocationConsumer?.onLocationChanged(location, locationProvider)
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                  viewModel.currentLocation.collect { location ->
+                    if (location != null) {
+                      onLocationObserved(location) {
+                        myLocationConsumer?.onLocationChanged(location, locationProvider)
+                      }
                     }
                   }
                 }

@@ -8,7 +8,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.graphics.Insets
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.gms.maps.CameraUpdate
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -62,12 +64,17 @@ internal constructor(
       private var locationJob: Job? = null
 
       override fun activate(onLocationChangedListener: LocationSource.OnLocationChangedListener) {
+        // Only collect while started: the subscription keeps the high-accuracy blue-dot location
+        // request alive, and the map isn't guaranteed to deactivate its LocationSource when the
+        // app goes to the background.
         locationJob =
             viewLifecycleOwner.lifecycleScope.launch {
-              viewModel.currentLocation.collect { location ->
-                if (location != null) {
-                  onLocationObserved(location) {
-                    onLocationChangedListener.onLocationChanged(location)
+              viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.currentLocation.collect { location ->
+                  if (location != null) {
+                    onLocationObserved(location) {
+                      onLocationChangedListener.onLocationChanged(location)
+                    }
                   }
                 }
               }
