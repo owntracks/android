@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.os.Build
+import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -33,6 +34,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.SerializationException
 import org.eclipse.paho.client.mqttv3.IMqttActionListener
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken
@@ -85,7 +87,9 @@ class MQTTMessageProcessorEndpoint(
   private val connectingLock = Semaphore(1)
   private val connectivityManager: ConnectivityManager = applicationContext.getSystemService()!!
   private val alarmManager: AlarmManager = applicationContext.getSystemService()!!
-  private var mqttClientAndConfiguration: MqttClientAndConfiguration? = null
+  @Volatile
+  @VisibleForTesting
+  internal var mqttClientAndConfiguration: MqttClientAndConfiguration? = null
 
   private var pingAlarmReceiver: BroadcastReceiver? = null
 
@@ -193,18 +197,21 @@ class MQTTMessageProcessorEndpoint(
 
   override suspend fun sendMessage(message: MessageBase): Result<Unit> {
     Timber.d("Sending message $message")
-    if (mqttClientAndConfiguration == null) {
-      return Result.failure(NotReadyException())
-    }
+    val clientAndConfiguration =
+        mqttClientAndConfiguration ?: return Result.failure(NotReadyException())
     if (endpointStateRepo.endpointState.value != EndpointState.CONNECTED) {
       return Result.failure(NotConnectedException())
     }
     // Updates the message data + metadata with things that are in our preferences
     message.annotateFromPreferences(preferences)
 
+    if (!awaitInFlightCapacity(clientAndConfiguration)) {
+      return Result.failure(NotConnectedException())
+    }
+
     // We want to block until this completes off-thread, because we've been called sync by the
     // outgoing message loop
-    return mqttClientAndConfiguration!!.run {
+    return clientAndConfiguration.run {
       runBlocking {
         var sendMessageThrowable: Throwable? = null
         val handler = CoroutineExceptionHandler { _, throwable -> sendMessageThrowable = throwable }
@@ -213,12 +220,6 @@ class MQTTMessageProcessorEndpoint(
               try {
                 Timber.d("Publishing message $message")
                 measureTime {
-                  while (
-                      mqttClient.inFlightMessageCount >= mqttConnectionConfiguration.maxInFlight
-                  ) {
-                    Timber.v("Pausing to wait for inflight to drop below max")
-                    delay(100.milliseconds)
-                  }
                   mqttClient
                       .publish(
                           message.topic,
@@ -253,6 +254,48 @@ class MQTTMessageProcessorEndpoint(
         sendMessageThrowable?.run { Result.failure(this) } ?: Result.success(Unit)
       }
     }
+  }
+
+  /**
+   * Waits for the client's in-flight message count to drop below the configured max.
+   *
+   * Bounded, and gives up as soon as [clientAndConfiguration] stops being the current, connected
+   * client: a client that's been replaced by a reconnect never gets its in-flight messages acked,
+   * so waiting on it would wedge the outbound message loop forever while the new client sits idle.
+   *
+   * @return true if there's capacity to publish on this client, false if the message should be
+   *   re-queued
+   */
+  private suspend fun awaitInFlightCapacity(
+      clientAndConfiguration: MqttClientAndConfiguration
+  ): Boolean {
+    val (client, configuration) = clientAndConfiguration
+    if (client.inFlightMessageCount < configuration.maxInFlight) {
+      return true
+    }
+    Timber.d(
+        "MQTT in-flight count ${client.inFlightMessageCount} is at max " +
+            "${configuration.maxInFlight}, waiting for it to drop"
+    )
+    return withTimeoutOrNull(IN_FLIGHT_WAIT_TIMEOUT) {
+      while (client.inFlightMessageCount >= configuration.maxInFlight) {
+        if (
+            mqttClientAndConfiguration !== clientAndConfiguration ||
+                endpointStateRepo.endpointState.value != EndpointState.CONNECTED
+        ) {
+          Timber.w("MQTT client replaced or disconnected while waiting for in-flight to drop")
+          return@withTimeoutOrNull false
+        }
+        delay(100.milliseconds)
+      }
+      true
+    }
+        ?: false.also {
+          Timber.w(
+              "Timed out after $IN_FLIGHT_WAIT_TIMEOUT waiting for MQTT in-flight count " +
+                  "${client.inFlightMessageCount} to drop below ${configuration.maxInFlight}"
+          )
+        }
   }
 
   override fun onPreferenceChanged(properties: Set<String>) {
@@ -536,6 +579,9 @@ class MQTTMessageProcessorEndpoint(
   companion object {
     /** Bounded so the watchdog cannot be parked indefinitely on an unresponsive broker. */
     private val PING_CHECK_TIMEOUT = 10.seconds
+
+    /** Bounded so the outbound message loop cannot be parked indefinitely on a stuck client. */
+    private val IN_FLIGHT_WAIT_TIMEOUT = 30.seconds
   }
 
   data class MqttClientAndConfiguration(
