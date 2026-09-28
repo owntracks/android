@@ -15,9 +15,9 @@
         <HorizontalScrollView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginTop="?attr/actionBarSize"
             android:fillViewport="true"
-            android:scrollbars="horizontal">
+            android:scrollbars="horizontal"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <RelativeLayout
                 android:layout_width="wrap_content"
@@ -28,7 +28,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scrollbars="vertical"
-                    app:layout_behavior="@string/appbar_scrolling_view_behavior"
                     tools:listitem="@layout/log_viewer_entry" />
             </RelativeLayout>
         </HorizontalScrollView>
