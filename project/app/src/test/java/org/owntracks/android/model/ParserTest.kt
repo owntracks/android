@@ -731,4 +731,39 @@ class ParserTest {
     val input: String = MessageFixtures.INVALID_LOCATION_MESSAGE_MISSING_TID_AND_TOPIC
     parser.fromJson(input) as MessageLocation
   }
+
+  @Test
+  fun `a location message on the equator and the prime meridian survives a round trip`() {
+    val parser = Parser(null)
+    val input =
+        MessageLocation().apply {
+          latitude = 0.0
+          longitude = 0.0
+          timestamp = 123456789L
+          trackerId = "aa"
+        }
+    val serialized = parser.toJsonPlain(input)
+    val jsonElement = json.parseToJsonElement(serialized).jsonObject
+    assertEquals(0.0, jsonElement["lat"]?.jsonPrimitive?.double!!, 0.0)
+    assertEquals(0.0, jsonElement["lon"]?.jsonPrimitive?.double!!, 0.0)
+
+    val deserialized = parser.fromJson(serialized) as MessageLocation
+    assertEquals(0.0, deserialized.latitude, 0.0)
+    assertEquals(0.0, deserialized.longitude, 0.0)
+  }
+
+  @Test
+  fun `a transition message on the equator and the prime meridian keeps its coordinates`() {
+    val parser = Parser(null)
+    val input =
+        MessageTransition().apply {
+          latitude = 0.0
+          longitude = 0.0
+          timestamp = 123456789L
+          setTransition(Geofence.GEOFENCE_TRANSITION_ENTER)
+        }
+    val jsonElement = json.parseToJsonElement(parser.toJsonPlain(input)).jsonObject
+    assertEquals(0.0, jsonElement["lat"]?.jsonPrimitive?.double!!, 0.0)
+    assertEquals(0.0, jsonElement["lon"]?.jsonPrimitive?.double!!, 0.0)
+  }
 }

@@ -52,9 +52,14 @@ class MessageTransition(
 
   @SerialName("acc") var accuracy = 0
 
-  @SerialName("lon") var longitude = 0.0
+  // Always written out, even at their 0.0 defaults: the equator and prime meridian are real places.
+  @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.ALWAYS)
+  @SerialName("lon")
+  var longitude = 0.0
 
-  @SerialName("lat") var latitude = 0.0
+  @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.ALWAYS)
+  @SerialName("lat")
+  var latitude = 0.0
 
   override fun annotateFromPreferences(preferences: Preferences) {
     topic = preferences.pubTopicEvents

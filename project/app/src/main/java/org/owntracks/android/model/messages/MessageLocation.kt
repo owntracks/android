@@ -88,9 +88,15 @@ open class MessageLocation(
 
   @SerialName("vac") @Serializable(with = LenientIntSerializer::class) var verticalAccuracy = 0
 
-  @SerialName("lat") var latitude: Double = 0.0
+  // Always written out, even at their 0.0 defaults: a fix on the equator or the prime meridian is
+  // a real coordinate, and a location message without both fails validation when read back.
+  @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.ALWAYS)
+  @SerialName("lat")
+  var latitude: Double = 0.0
 
-  @SerialName("lon") var longitude: Double = 0.0
+  @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.ALWAYS)
+  @SerialName("lon")
+  var longitude: Double = 0.0
 
   @SerialName("alt") @Serializable(with = LenientIntSerializer::class) var altitude = 0
 
