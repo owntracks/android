@@ -91,7 +91,7 @@ androidx-concurrent-futures = { module = "androidx.concurrent:concurrent-futures
 
 # Cryptography
 conscrypt = { module = "org.conscrypt:conscrypt-android", version.ref = "conscrypt" }
-bouncycastle = { module = "org.bouncycastle:bcprov-jdk14", version.ref = "bouncycastle" }
+bouncycastle = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bouncycastle" }
 
 # Migration
 lmdb-kt = { module = "com.growse:lmdb-kt", version.ref = "lmdb-kt" }
