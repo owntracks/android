@@ -8,6 +8,7 @@ import androidx.test.espresso.Espresso
 import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.intent.Intents
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.work.WorkManager
 import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.adevinta.android.barista.rule.BaristaRule
@@ -128,6 +129,12 @@ abstract class TestWithAnActivity<T : Activity>(private val startActivity: Boole
   fun setUp() {
 
     hiltRule.inject()
+    // clearPackageData is off, so work enqueued by a previous test (MQTT reconnects, the connection
+    // watchdog, location pings) survives into this one's process and would otherwise fire mid-test.
+    WorkManager.getInstance(InstrumentationRegistry.getInstrumentation().targetContext)
+        .cancelAllWork()
+        .result
+        .get()
     Intents.init()
     if (startActivity) {
       launchActivity()
