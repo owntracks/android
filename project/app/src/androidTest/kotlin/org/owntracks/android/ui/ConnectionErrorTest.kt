@@ -17,6 +17,7 @@ import io.github.davidepianca98.socket.tls.TLSSettings
 import java.net.ConnectException
 import java.net.InetSocketAddress
 import java.net.Socket
+import javax.inject.Inject
 import kotlin.concurrent.thread
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -27,8 +28,10 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.junit.Test
 import org.owntracks.android.R
+import org.owntracks.android.model.messages.MessageStatus
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.ConnectionMode
+import org.owntracks.android.services.MessageProcessor
 import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.idlingresources.ViewIdlingResource
 import org.owntracks.android.testutils.use
@@ -41,6 +44,7 @@ import timber.log.Timber
 @MediumTest
 @HiltAndroidTest
 class ConnectionErrorTest : TestWithAnActivity<StatusActivity>(startActivity = true) {
+  @Inject lateinit var messageProcessor: MessageProcessor
 
   @Test
   fun given_a_config_with_http_mode_and_invalid_url_when_viewing_the_connecting_status_then_a_config_incomplete_message_is_shown() {
@@ -95,6 +99,9 @@ class ConnectionErrorTest : TestWithAnActivity<StatusActivity>(startActivity = t
             }
         )
     setupActivity(config)
+    // HTTP holds no connection: nothing touches the network (or DNS) until there's a message to
+    // send.
+    messageProcessor.queueMessageForSending(MessageStatus())
     waitUntilViewContains(
         R.id.connectedStatusMessage,
         R.string.statusEndpointStateMessageUnknownHost,
