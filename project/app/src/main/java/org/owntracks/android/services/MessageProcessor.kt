@@ -20,6 +20,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -563,8 +564,36 @@ constructor(
     }
   }
 
-  private fun processIncomingMessage(message: MessageClear) {
+  /*
+  Incoming messages are processed one at a time, in the order they arrived. Each used to be launched
+  as its own coroutine on a multi-threaded scope, so two arriving together could be processed in
+  either order - e.g. a contact's transition processed before the location that precedes it, so the
+  event notification is titled before the contact has its name.
+   */
+  private val incomingMessageHandlers = Channel<suspend () -> Unit>(Channel.UNLIMITED)
+
+  private val incomingMessageConsumer by lazy {
     scope.launch {
+      for (handler in incomingMessageHandlers) {
+        try {
+          handler()
+        } catch (e: CancellationException) {
+          throw e
+        } catch (e: Exception) {
+          // Don't let one bad message stop every later one from being processed.
+          Timber.e(e, "Error processing incoming message")
+        }
+      }
+    }
+  }
+
+  private fun processInOrder(handler: suspend () -> Unit) {
+    incomingMessageConsumer.start()
+    incomingMessageHandlers.trySend(handler)
+  }
+
+  private fun processIncomingMessage(message: MessageClear) {
+    processInOrder {
       Timber.d("Received clear message for ${message.getContactId()}")
       contactsRepo.remove(message.getContactId())
       messageReceivedIdlingResource.remove(message)
@@ -581,7 +610,7 @@ constructor(
       Timber.d("discarding stale location from ${message.getContactId()} at ${message.timestamp}")
       messageReceivedIdlingResource.remove(message)
     } else {
-      scope.launch {
+      processInOrder {
         if (message.topic == preferences.pubTopicLocations) {
           Timber.d(
               "Received our own location update ${message.latitude},${message.longitude} at ${message.timestamp}"
@@ -612,7 +641,7 @@ constructor(
       Timber.d("discarding stale transition from $message.topic at $message.timestamp")
       messageReceivedIdlingResource.remove(message)
     } else {
-      scope.launch {
+      processInOrder {
         Timber.d(
             "Contact ${message.getContactId()} transitioned waypoint ${message.description} (${message.event}) at ${message.timestamp}"
         )
@@ -624,7 +653,7 @@ constructor(
   }
 
   private fun processIncomingMessage(message: MessageCard) {
-    scope.launch {
+    processInOrder {
       Timber.d("Received card message from ${message.topic}")
       contactsRepo.update(message.getContactId(), message)
       messageReceivedIdlingResource.remove(message)
@@ -649,7 +678,7 @@ constructor(
       Timber.e("Invalid action message received")
       messageReceivedIdlingResource.remove(message)
     } else {
-      scope.launch {
+      processInOrder {
         when (message.action) {
           CommandAction.REPORT_LOCATION -> {
             service?.requestOnDemandLocationUpdate(MessageLocation.ReportType.RESPONSE)

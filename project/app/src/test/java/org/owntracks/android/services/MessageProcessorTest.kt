@@ -6,6 +6,7 @@ import android.content.ServiceConnection
 import dagger.Lazy
 import java.io.File
 import java.security.KeyStore
+import java.util.Collections
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CompletableDeferred
@@ -14,10 +15,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -25,13 +28,17 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.owntracks.android.data.repos.AsyncDeQueue
+import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.data.repos.EndpointStateRepo
 import org.owntracks.android.model.Parser
 import org.owntracks.android.model.messages.MessageBase
+import org.owntracks.android.model.messages.MessageLocation
+import org.owntracks.android.model.messages.MessageTransition
 import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.services.worker.Scheduler
 import org.owntracks.android.test.IdlingResourceWithData
@@ -125,27 +132,29 @@ class MessageProcessorTest {
   fun setUp() {
     queue = LoopDetectingQueue()
     applicationContext = mock<Context> { on { filesDir } doReturn File("/tmp") }
-    messageProcessor =
-        MessageProcessor(
-            applicationContext = applicationContext,
-            contactsRepo = mock {},
-            preferences = mock { on { mode } doReturn ConnectionMode.HTTP },
-            waypointsRepo = mock {},
-            parser = mock<Parser> {},
-            scheduler = mock<Scheduler> {},
-            endpointStateRepo = EndpointStateRepo(),
-            outgoingQueueIdlingResource =
-                mock<ThresholdIdlingResourceInterface> { on { isIdleNow } doReturn true },
-            importConfigurationIdlingResource = SimpleIdlingResource("import", true),
-            messageReceivedIdlingResource = mock<IdlingResourceWithData<MessageBase>> {},
-            caKeyStore = KeyStore.getInstance(KeyStore.getDefaultType()).also { it.load(null) },
-            locationProcessorLazy = mock<Lazy<LocationProcessor>> {},
-            ioDispatcher = testDispatcher,
-            scope = testScope,
-            mqttConnectionIdlingResource = SimpleIdlingResource("mqtt", true),
-            outgoingQueue = queue,
-        )
+    messageProcessor = buildMessageProcessor()
   }
+
+  private fun buildMessageProcessor(contactsRepo: ContactsRepo = mock {}) =
+      MessageProcessor(
+          applicationContext = applicationContext,
+          contactsRepo = contactsRepo,
+          preferences = mock { on { mode } doReturn ConnectionMode.HTTP },
+          waypointsRepo = mock {},
+          parser = mock<Parser> {},
+          scheduler = mock<Scheduler> {},
+          endpointStateRepo = EndpointStateRepo(),
+          outgoingQueueIdlingResource =
+              mock<ThresholdIdlingResourceInterface> { on { isIdleNow } doReturn true },
+          importConfigurationIdlingResource = SimpleIdlingResource("import", true),
+          messageReceivedIdlingResource = mock<IdlingResourceWithData<MessageBase>> {},
+          caKeyStore = KeyStore.getInstance(KeyStore.getDefaultType()).also { it.load(null) },
+          locationProcessorLazy = mock<Lazy<LocationProcessor>> {},
+          ioDispatcher = testDispatcher,
+          scope = testScope,
+          mqttConnectionIdlingResource = SimpleIdlingResource("mqtt", true),
+          outgoingQueue = queue,
+      )
 
   /** Fails the test if no sender loop reaches [AsyncDeQueue.awaitMessage] in time. */
   private fun assertLoopRunning(detector: CompletableDeferred<Unit>, message: String) =
@@ -295,5 +304,32 @@ class MessageProcessorTest {
     private val TIMEOUT = 10.seconds
     /** Time given to a loop that should *not* start, to prove it doesn't. */
     private val SETTLE = 500.milliseconds
+  }
+
+  @Test
+  fun `incoming messages are processed in the order they arrived`() {
+    val processed = Collections.synchronizedList(mutableListOf<String>())
+    val contactsRepo =
+        mock<ContactsRepo> {
+          // Slow enough that, processed concurrently, the transition would overtake the location.
+          onBlocking { update(any(), any<MessageLocation>()) } doSuspendableAnswer
+              {
+                delay(200)
+                processed.add("location")
+                Unit
+              }
+          onBlocking { update(any(), any<MessageTransition>()) } doSuspendableAnswer
+              {
+                processed.add("transition")
+                Unit
+              }
+        }
+    val messageProcessor = buildMessageProcessor(contactsRepo)
+
+    messageProcessor.processIncomingMessage(MessageLocation().apply { topic = "owntracks/a/b" })
+    messageProcessor.processIncomingMessage(MessageTransition().apply { topic = "owntracks/a/b" })
+
+    runBlocking { withTimeoutOrNull(TIMEOUT) { while (processed.size < 2) delay(10) } }
+    assertEquals(listOf("location", "transition"), processed.toList())
   }
 }
