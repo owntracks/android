@@ -52,19 +52,20 @@ class MockLocationProviderClient : LocationProviderClient() {
   override fun getLastLocation(): Location? = lastLocation
 }
 
+@OptIn(ExperimentalTime::class)
 fun LocationProviderClient.setLocation(
     latitude: Double,
     longitude: Double,
     altitude: Double = 0.0,
     accuracy: Float = 5.0f,
     speed: Float = 0.0f,
+    time: Long = Clock.System.now().toEpochMilliseconds(),
 ) {
   (this as MockLocationProviderClient).setLocation(
       Location("test").apply {
         this.latitude = latitude
         this.longitude = longitude
-        @OptIn(ExperimentalTime::class)
-        this.time = Clock.System.now().toEpochMilliseconds()
+        this.time = time
         this.altitude = altitude
         this.accuracy = accuracy
         this.speed = speed
