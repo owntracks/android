@@ -74,6 +74,11 @@ constructor(
    *
    * Enqueued with [ExistingPeriodicWorkPolicy.KEEP] so that repeatedly re-activating the endpoint
    * cannot keep pushing the next run into the future and starve the check entirely.
+   *
+   * The first run is delayed by a full interval. WorkManager otherwise runs a newly-enqueued
+   * periodic job straight away, and the endpoint activation that enqueues it is by definition still
+   * CONNECTING (or not yet configured), which the watchdog treats as unhealthy: it would tear down
+   * the very connection attempt that scheduled it.
    */
   fun scheduleMqttConnectionWatchdog() {
     PeriodicWorkRequest.Builder(
@@ -82,6 +87,7 @@ constructor(
             TimeUnit.MINUTES,
         )
         .addTag(PERIODIC_TASK_MQTT_CONNECTION_WATCHDOG)
+        .setInitialDelay(CONNECTION_WATCHDOG_INTERVAL.inWholeMinutes, TimeUnit.MINUTES)
         .setConstraints(anyNetworkConstraint)
         .build()
         .run {
