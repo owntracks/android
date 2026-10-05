@@ -1,6 +1,7 @@
 package org.owntracks.android.ui
 
 import android.Manifest
+import android.os.Build
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
@@ -62,6 +63,22 @@ class WelcomeActivityGmsTests : TestWithAnActivity<WelcomeActivity>() {
     R.id.btn_next.run {
       assertDisplayed(this)
       clickOn(this)
+    }
+
+    // Notification permissions fragment, only shown on Android 13+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      assertDisplayed(R.string.welcome_notification_permission_description)
+      doIfViewNotVisible(R.id.btn_next) {
+        R.id.ui_fragment_welcome_notification_permissions_request.run {
+          assertDisplayed(this)
+          clickOn(this)
+        }
+        allowPermissionsIfNeeded(Manifest.permission.POST_NOTIFICATIONS)
+      }
+      R.id.btn_next.run {
+        assertDisplayed(this)
+        clickOn(this)
+      }
     }
 
     // Done fragment
