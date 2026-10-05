@@ -16,6 +16,7 @@ import org.owntracks.android.net.mqtt.MqttConnectionConfiguration
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
 import timber.log.Timber
 
+/** The kind of state the endpoint is in. Carries no data: see [EndpointStatus] for that. */
 enum class EndpointState {
   INITIAL,
   IDLE,
@@ -24,15 +25,6 @@ enum class EndpointState {
   DISCONNECTED,
   ERROR,
   ERROR_CONFIGURATION;
-
-  var message: String? = null
-  var error: Throwable? = null
-    private set
-
-  fun withMessage(message: String): EndpointState {
-    this.message = message
-    return this
-  }
 
   fun getLabel(context: Context): String =
       when (this) {
@@ -44,6 +36,26 @@ enum class EndpointState {
         ERROR -> context.resources.getString(R.string.ERROR)
         ERROR_CONFIGURATION -> context.resources.getString(R.string.ERROR_CONFIGURATION)
       }
+
+  fun withMessage(message: String): EndpointStatus = EndpointStatus(this, message = message)
+
+  fun withError(error: Throwable): EndpointStatus = EndpointStatus(this, error = error)
+}
+
+/**
+ * The endpoint's state, with whatever message or error accompanies it.
+ *
+ * Immutable, so a message or error belongs to exactly one state change. (They used to be mutable
+ * fields on the [EndpointState] constants themselves, so one set on, say, ERROR stuck to every
+ * later ERROR and was shown in place of whatever came after - and setting ERROR again with a new
+ * error emitted the same object, which a StateFlow drops as unchanged.)
+ */
+data class EndpointStatus(
+    val state: EndpointState,
+    val message: String? = null,
+    val error: Throwable? = null,
+) {
+  fun getLabel(context: Context): String = state.getLabel(context)
 
   fun getErrorLabel(context: Context): String =
       when (val e = error) {
@@ -154,16 +166,10 @@ enum class EndpointState {
         else -> e.toString()
       }.also { Timber.v(error, "Rendering error as $it") }
 
-  fun withError(error: Throwable): EndpointState {
-    this.error = error
-    return this
-  }
-
-  override fun toString(): String {
-    return if (message != null) {
-      "${super.toString()} ($message)"
-    } else {
-      super.toString()
-    }
-  }
+  override fun toString(): String =
+      if (message != null) {
+        "$state ($message)"
+      } else {
+        state.toString()
+      }
 }

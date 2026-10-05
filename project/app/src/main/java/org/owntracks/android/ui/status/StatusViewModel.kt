@@ -18,7 +18,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.owntracks.android.R
-import org.owntracks.android.data.EndpointState
+import org.owntracks.android.data.EndpointStatus
 import org.owntracks.android.data.repos.EndpointStateRepo
 import org.owntracks.android.data.repos.LocationRepo
 
@@ -30,7 +30,7 @@ constructor(
     endpointStateRepo: EndpointStateRepo,
     locationRepo: LocationRepo,
 ) : AndroidViewModel(application) {
-  val endpointState: StateFlow<EndpointState> = endpointStateRepo.endpointState
+  val endpointState: StateFlow<EndpointStatus> = endpointStateRepo.endpointState
   val endpointQueueLength: StateFlow<Int> = endpointStateRepo.endpointQueueLength
   val serviceStarted: StateFlow<Instant> = endpointStateRepo.serviceStartedDate
   val currentLocation: StateFlow<Location?> = locationRepo.currentPublishedLocation

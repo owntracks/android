@@ -18,6 +18,7 @@ import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.owntracks.android.data.EndpointState
+import org.owntracks.android.data.EndpointStatus
 import org.owntracks.android.data.repos.EndpointStateRepo
 import org.owntracks.android.model.Parser
 import org.owntracks.android.services.worker.Scheduler
@@ -96,14 +97,14 @@ class MQTTMessageProcessorEndpointNetworkCallbackTest {
     // Reconnect is handled by activate() for the initial callback; onAvailable must not
     // double-trigger it on first registration.
     val network: Network = mock {}
-    endpointStateRepo.endpointState.value = EndpointState.DISCONNECTED
+    endpointStateRepo.endpointState.value = EndpointStatus(EndpointState.DISCONNECTED)
     val cb = endpoint.networkChangeCallback
     cb.reset()
 
     cb.onAvailable(network)
 
     // State must not have changed (no reconnect was launched)
-    assertEquals(EndpointState.DISCONNECTED, endpointStateRepo.endpointState.value)
+    assertEquals(EndpointState.DISCONNECTED, endpointStateRepo.endpointState.value.state)
   }
 
   // ── network switch (WiFi → mobile): the primary bug scenario ──────────────
@@ -117,7 +118,7 @@ class MQTTMessageProcessorEndpointNetworkCallbackTest {
     val cb = endpoint.networkChangeCallback
     cb.reset()
     cb.onAvailable(wifiNetwork) // bootstrap: records wifi, clears justRegistered
-    endpointStateRepo.endpointState.value = EndpointState.CONNECTED
+    endpointStateRepo.endpointState.value = EndpointStatus(EndpointState.CONNECTED)
 
     cb.onAvailable(mobileNetwork)
 
@@ -131,7 +132,7 @@ class MQTTMessageProcessorEndpointNetworkCallbackTest {
     val cb = endpoint.networkChangeCallback
     cb.reset()
     cb.onAvailable(network) // bootstrap: records network, clears justRegistered
-    endpointStateRepo.endpointState.value = EndpointState.CONNECTED
+    endpointStateRepo.endpointState.value = EndpointStatus(EndpointState.CONNECTED)
 
     cb.onAvailable(network)
 
@@ -147,7 +148,7 @@ class MQTTMessageProcessorEndpointNetworkCallbackTest {
     val cb = endpoint.networkChangeCallback
     cb.reset()
     cb.onAvailable(oldNetwork) // bootstrap: records oldNetwork, clears justRegistered
-    endpointStateRepo.endpointState.value = EndpointState.DISCONNECTED
+    endpointStateRepo.endpointState.value = EndpointStatus(EndpointState.DISCONNECTED)
 
     cb.onAvailable(newNetwork)
 
@@ -160,7 +161,7 @@ class MQTTMessageProcessorEndpointNetworkCallbackTest {
     val cb = endpoint.networkChangeCallback
     cb.reset()
     cb.onAvailable(network) // bootstrap: records network, clears justRegistered
-    endpointStateRepo.endpointState.value = EndpointState.DISCONNECTED
+    endpointStateRepo.endpointState.value = EndpointStatus(EndpointState.DISCONNECTED)
 
     cb.onAvailable(network)
 

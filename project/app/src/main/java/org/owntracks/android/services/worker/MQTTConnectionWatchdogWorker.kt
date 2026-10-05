@@ -41,7 +41,7 @@ constructor(
       Timber.d("Connection watchdog: not in MQTT mode, nothing to check")
       return Result.success()
     }
-    val state = endpointStateRepo.endpointState.value
+    val state = endpointStateRepo.endpointState.value.state
     // Only worth spending a broker round-trip when we believe we are up; in any other state we
     // already know we are not, and the answer would not change what happens next.
     val connectionCheckPassed =

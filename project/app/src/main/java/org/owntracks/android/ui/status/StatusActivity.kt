@@ -16,7 +16,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import org.owntracks.android.R
-import org.owntracks.android.data.EndpointState
+import org.owntracks.android.data.EndpointStatus
 import org.owntracks.android.databinding.UiStatusBinding
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.ui.DrawerProvider
@@ -120,12 +120,12 @@ class StatusActivity :
 }
 
 @BindingAdapter("endpointState")
-fun LinearLayout.setVisibility(endpointState: EndpointState) {
+fun LinearLayout.setVisibility(endpointState: EndpointStatus) {
   isVisible = !(endpointState.error == null && endpointState.message == null)
 }
 
 @BindingAdapter("endpointState")
-fun TextView.setText(endpointState: EndpointState) {
+fun TextView.setText(endpointState: EndpointStatus) {
   text =
       if (endpointState.error != null) {
         endpointState.getErrorLabel(context)

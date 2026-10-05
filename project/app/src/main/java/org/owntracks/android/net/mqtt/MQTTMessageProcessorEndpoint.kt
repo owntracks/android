@@ -95,7 +95,7 @@ class MQTTMessageProcessorEndpoint(
 
   internal val networkChangeCallback =
       NetworkTrackingCallback(
-          { endpointStateRepo.endpointState.value },
+          { endpointStateRepo.endpointState.value.state },
           { scope.launch { reconnect() } },
           {
             scope.launch {
@@ -199,7 +199,7 @@ class MQTTMessageProcessorEndpoint(
     Timber.d("Sending message $message")
     val clientAndConfiguration =
         mqttClientAndConfiguration ?: return Result.failure(NotReadyException())
-    if (endpointStateRepo.endpointState.value != EndpointState.CONNECTED) {
+    if (endpointStateRepo.endpointState.value.state != EndpointState.CONNECTED) {
       return Result.failure(NotConnectedException())
     }
     // Updates the message data + metadata with things that are in our preferences
@@ -281,7 +281,7 @@ class MQTTMessageProcessorEndpoint(
       while (client.inFlightMessageCount >= configuration.maxInFlight) {
         if (
             mqttClientAndConfiguration !== clientAndConfiguration ||
-                endpointStateRepo.endpointState.value != EndpointState.CONNECTED
+                endpointStateRepo.endpointState.value.state != EndpointState.CONNECTED
         ) {
           Timber.w("MQTT client replaced or disconnected while waiting for in-flight to drop")
           return@withTimeoutOrNull false

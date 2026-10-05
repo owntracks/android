@@ -15,6 +15,7 @@ import org.owntracks.android.BaseApp.Companion.NOTIFICATION_CHANNEL_ONGOING
 import org.owntracks.android.BaseApp.Companion.NOTIFICATION_ID_ONGOING
 import org.owntracks.android.R
 import org.owntracks.android.data.EndpointState
+import org.owntracks.android.data.EndpointStatus
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.ui.map.MapActivity
 import timber.log.Timber
@@ -118,9 +119,9 @@ class OngoingNotification(private val context: Context, initialMode: MonitoringM
     }
   }
 
-  fun setEndpointState(endpointState: EndpointState, host: String) {
+  fun setEndpointState(endpointState: EndpointStatus, host: String) {
     val notificationContent =
-        when (endpointState) {
+        when (endpointState.state) {
           EndpointState.CONNECTED,
           EndpointState.IDLE ->
               context.getString(

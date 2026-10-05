@@ -5,18 +5,22 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.owntracks.android.data.EndpointState
+import org.owntracks.android.data.EndpointStatus
 import timber.log.Timber
 
 @Singleton
 class EndpointStateRepo @Inject constructor() {
 
-  val endpointState: MutableStateFlow<EndpointState> = MutableStateFlow(EndpointState.IDLE)
+  val endpointState: MutableStateFlow<EndpointStatus> =
+      MutableStateFlow(EndpointStatus(EndpointState.IDLE))
 
   val endpointQueueLength: MutableStateFlow<Int> = MutableStateFlow(0)
 
   val serviceStartedDate: MutableStateFlow<Instant> = MutableStateFlow(Instant.now())
 
-  suspend fun setState(newEndpointState: EndpointState) {
+  suspend fun setState(newEndpointState: EndpointState) = setState(EndpointStatus(newEndpointState))
+
+  suspend fun setState(newEndpointState: EndpointStatus) {
     Timber.v(
         "Setting endpoint state $newEndpointState called from: ${
             Thread.currentThread().stackTrace[3].run {

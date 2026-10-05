@@ -44,7 +44,7 @@ constructor(
     the watchdog's policy: the two ask the same question, "is this connection actually fine",
     just prompted by different triggers.
      */
-    val state = endpointStateRepo.endpointState.value
+    val state = endpointStateRepo.endpointState.value.state
     val connectionCheckPassed =
         state == EndpointState.CONNECTED && messageProcessor.checkConnection()
     if (!MQTTConnectionWatchdogWorker.shouldReconnect(state, connectionCheckPassed)) {

@@ -26,6 +26,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.owntracks.android.data.EndpointState
+import org.owntracks.android.data.EndpointStatus
 import org.owntracks.android.data.repos.EndpointStateRepo
 import org.owntracks.android.model.Parser
 import org.owntracks.android.model.messages.MessageBase
@@ -93,7 +94,7 @@ class MQTTMessageProcessorEndpointSendMessageTest {
             applicationContext = mockContext,
             mqttConnectionIdlingResource = SimpleIdlingResource("test", true),
         )
-    endpointStateRepo.endpointState.value = EndpointState.CONNECTED
+    endpointStateRepo.endpointState.value = EndpointStatus(EndpointState.CONNECTED)
   }
 
   private fun clientWithInFlight(vararg counts: Int): MqttAsyncClient = mock {
@@ -143,7 +144,7 @@ class MQTTMessageProcessorEndpointSendMessageTest {
     connectWith(client)
     launch {
       delay(1.seconds)
-      endpointStateRepo.endpointState.value = EndpointState.DISCONNECTED
+      endpointStateRepo.endpointState.value = EndpointStatus(EndpointState.DISCONNECTED)
     }
 
     val result = endpoint.sendMessage(message)
