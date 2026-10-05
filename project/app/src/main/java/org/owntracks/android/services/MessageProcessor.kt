@@ -263,6 +263,8 @@ constructor(
     runBlocking { queueInitJob.join() }
     Timber.d("Reloading outgoing message processor")
     messageProcessorEndpoint?.deactivate().also { Timber.d("Destroying previous endpoint") }
+    // Whatever the previous endpoint last reported (an error, say) is no longer about this one.
+    runBlocking { endpointStateRepo.setState(EndpointState.INITIAL) }
     messageProcessorEndpoint = getEndpoint(preferences.mode)
 
     // Activation is launched separately from the sender loop. The loop coping with an endpoint that

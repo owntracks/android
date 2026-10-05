@@ -21,6 +21,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.conscrypt.Conscrypt
 import org.owntracks.android.BuildConfig
 import org.owntracks.android.data.EndpointState
+import org.owntracks.android.data.EndpointStatus
 import org.owntracks.android.data.repos.EndpointStateRepo
 import org.owntracks.android.di.ApplicationScope
 import org.owntracks.android.di.CoroutineScopes
@@ -57,7 +58,7 @@ class HttpMessageProcessorEndpoint(
       httpClientAndConfiguration = setClientAndConfiguration(applicationContext, preferences)
     } catch (e: ConfigurationIncompleteException) {
       Timber.e(e)
-      scope.launch { endpointStateRepo.setState(EndpointState.ERROR_CONFIGURATION.withError(e)) }
+      scope.launch { setEndpointState(EndpointState.ERROR_CONFIGURATION.withError(e)) }
     }
   }
 
@@ -117,14 +118,14 @@ class HttpMessageProcessorEndpoint(
     message.setTopicVisible()
 
     httpClientAndConfiguration!!.run {
-      endpointStateRepo.setState(EndpointState.CONNECTING)
+      setEndpointState(EndpointState.CONNECTING)
       return try {
         client.newCall(getRequest(configuration, message)).execute().use { response ->
           Timber.d("HTTP response received: $response")
           if (!response.isSuccessful) {
             val httpException = Exception("HTTP request failed. Status: ${response.code}")
             Timber.e("HTTP request failed. Status: ${response.code}")
-            endpointStateRepo.setState(
+            setEndpointState(
                 EndpointState.ERROR.withMessage(
                     String.format(Locale.ROOT, "HTTP code %d", response.code),
                 ),
@@ -139,7 +140,7 @@ class HttpMessageProcessorEndpoint(
               val result = parser.fromJson(responseStream)
               // TODO apply i18n here
               scope.launch {
-                endpointStateRepo.setState(
+                setEndpointState(
                     EndpointState.IDLE.withMessage(
                         String.format(
                             Locale.ROOT,
@@ -154,7 +155,7 @@ class HttpMessageProcessorEndpoint(
               return Result.success(Unit)
             } catch (e: IOException) {
               Timber.w(e, "HTTP response body could not be parsed, ignoring")
-              endpointStateRepo.setState(
+              setEndpointState(
                   EndpointState.IDLE.withMessage(
                       String.format(
                           Locale.ROOT,
@@ -168,7 +169,7 @@ class HttpMessageProcessorEndpoint(
           }
         }
       } catch (e: Exception) {
-        endpointStateRepo.setState(EndpointState.ERROR.withError(e))
+        setEndpointState(EndpointState.ERROR.withError(e))
         Timber.d(e, "Execute call failed")
         // Sometimes we get an exception just on the execute() call
         Result.failure(OutgoingMessageSendingException(e))
@@ -176,7 +177,26 @@ class HttpMessageProcessorEndpoint(
     }
   }
 
+  /*
+  Set when this endpoint is replaced. It may still be winding down (an MQTT disconnect finishes
+  asynchronously) or get late callbacks, and none of that should overwrite the state of the endpoint
+  that replaced it.
+   */
+  @Volatile private var deactivated = false
+
+  private suspend fun setEndpointState(status: EndpointStatus) {
+    if (deactivated) {
+      Timber.v("Ignoring endpoint state $status from a deactivated endpoint")
+      return
+    }
+    endpointStateRepo.setState(status)
+  }
+
+  private suspend fun setEndpointState(state: EndpointState) =
+      setEndpointState(EndpointStatus(state))
+
   override fun deactivate() {
+    deactivated = true
     preferences.unregisterOnPreferenceChangedListener(this)
   }
 

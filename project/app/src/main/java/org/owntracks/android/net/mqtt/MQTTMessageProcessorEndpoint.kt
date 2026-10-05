@@ -48,6 +48,7 @@ import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_CONNECTION_LOST
 import org.eclipse.paho.client.mqttv3.MqttException.REASON_CODE_SERVER_CONNECT_ERROR
 import org.eclipse.paho.client.mqttv3.MqttMessage
 import org.owntracks.android.data.EndpointState
+import org.owntracks.android.data.EndpointStatus
 import org.owntracks.android.data.repos.EndpointStateRepo
 import org.owntracks.android.di.ApplicationScope
 import org.owntracks.android.di.CoroutineScopes
@@ -126,12 +127,31 @@ class MQTTMessageProcessorEndpoint(
               Timber.e("MQTT Configuration not complete because host is missing, cannot activate")
           else -> Timber.e(e, "MQTT Configuration not complete, cannot activate")
         }
-        endpointStateRepo.setState(EndpointState.ERROR_CONFIGURATION.withError(e))
+        setEndpointState(EndpointState.ERROR_CONFIGURATION.withError(e))
       }
     }
   }
 
+  /*
+  Set when this endpoint is replaced. It may still be winding down (an MQTT disconnect finishes
+  asynchronously) or get late callbacks, and none of that should overwrite the state of the endpoint
+  that replaced it.
+   */
+  @Volatile private var deactivated = false
+
+  private suspend fun setEndpointState(status: EndpointStatus) {
+    if (deactivated) {
+      Timber.v("Ignoring endpoint state $status from a deactivated endpoint")
+      return
+    }
+    endpointStateRepo.setState(status)
+  }
+
+  private suspend fun setEndpointState(state: EndpointState) =
+      setEndpointState(EndpointStatus(state))
+
   override fun deactivate() {
+    deactivated = true
     preferences.unregisterOnPreferenceChangedListener(this)
     connectivityManager.unregisterNetworkCallback(networkChangeCallback)
     scope.launch {
@@ -169,7 +189,7 @@ class MQTTMessageProcessorEndpoint(
               }
             }
           }
-          endpointStateRepo.setState(EndpointState.DISCONNECTED)
+          setEndpointState(EndpointState.DISCONNECTED)
           try {
             mqttClient.close(true)
           } catch (e: Exception) {
@@ -332,8 +352,8 @@ class MQTTMessageProcessorEndpoint(
         } catch (e: Exception) {
           when (e) {
             is ConfigurationIncompleteException ->
-                endpointStateRepo.setState(EndpointState.ERROR_CONFIGURATION.withError(e))
-            else -> endpointStateRepo.setState(EndpointState.ERROR.withError(e))
+                setEndpointState(EndpointState.ERROR_CONFIGURATION.withError(e))
+            else -> setEndpointState(EndpointState.ERROR.withError(e))
           }
         }
       }
@@ -348,7 +368,7 @@ class MQTTMessageProcessorEndpoint(
             is IOException -> Timber.w("Connection Lost: ${cause.message}")
             else -> Timber.w(cause, "Connection Lost")
           }
-          scope.launch { endpointStateRepo.setState(EndpointState.DISCONNECTED) }
+          scope.launch { setEndpointState(EndpointState.DISCONNECTED) }
           scheduler.scheduleMqttReconnect()
         }
 
@@ -404,7 +424,7 @@ class MQTTMessageProcessorEndpoint(
       withContext(ioDispatcher) {
         Timber.v("MQTT connect to Broker")
         measureTimedValue {
-          endpointStateRepo.setState(EndpointState.CONNECTING)
+          setEndpointState(EndpointState.CONNECTING)
           try {
             val executorService = ScheduledThreadPoolExecutor(8)
             val pingSender =
@@ -449,7 +469,7 @@ class MQTTMessageProcessorEndpoint(
                   Timber.i(
                       "MQTT Connected. Subscribing to ${mqttConnectionConfiguration.topicsToSubscribeTo}"
                   )
-                  endpointStateRepo.setState(EndpointState.CONNECTED)
+                  setEndpointState(EndpointState.CONNECTED)
                   // This run of failures is over, so the next one starts from the short delay
                   // again rather than inheriting however far this one had backed off.
                   scheduler.resetMqttReconnectBackoff()
@@ -505,7 +525,7 @@ class MQTTMessageProcessorEndpoint(
                 Timber.e(e, errorLog)
               }
             }
-            endpointStateRepo.setState(EndpointState.ERROR.withError(e))
+            setEndpointState(EndpointState.ERROR.withError(e))
             scheduler.scheduleMqttReconnect()
             Result.failure(e)
           }
@@ -520,7 +540,7 @@ class MQTTMessageProcessorEndpoint(
             reconnect(getEndpointConfiguration())
           } catch (e: ConfigurationIncompleteException) {
             Timber.w("MQTT not configured, skipping reconnect: ${e.message}")
-            endpointStateRepo.setState(EndpointState.ERROR_CONFIGURATION.withError(e))
+            setEndpointState(EndpointState.ERROR_CONFIGURATION.withError(e))
             Result.failure(e)
           }
 

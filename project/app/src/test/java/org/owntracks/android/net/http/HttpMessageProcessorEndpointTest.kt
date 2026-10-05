@@ -21,6 +21,8 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.owntracks.android.data.EndpointState
+import org.owntracks.android.data.EndpointStatus
 import org.owntracks.android.data.repos.EndpointStateRepo
 import org.owntracks.android.model.EncryptionProvider
 import org.owntracks.android.model.Parser
@@ -338,5 +340,33 @@ class HttpMessageProcessorEndpointTest {
     val result = endpoint.sendMessage(messageLocation)
     assertTrue(result.isSuccess)
     verify(messageProcessor, never()).onMessageDeliveryFailed(messageLocation)
+  }
+
+  @Test
+  fun `A deactivated endpoint does not overwrite the endpoint state`() = runTest {
+    mockWebServer.enqueue(MockResponse().setResponseCode(500))
+    val endpoint =
+        HttpMessageProcessorEndpoint(
+            messageProcessor,
+            parser,
+            testPreferences,
+            application,
+            endpointStateRepo,
+            mock {},
+            this,
+            StandardTestDispatcher(testScheduler),
+        )
+    endpoint.httpClientAndConfiguration =
+        HttpMessageProcessorEndpoint.HttpClientAndConfiguration(
+            OkHttpClient(),
+            HttpConfiguration(mockWebServer.url("/owntracks/test").toString(), "", "", ""),
+        )
+    endpoint.deactivate()
+    endpointStateRepo.setState(EndpointState.INITIAL)
+
+    // A send already in flight when the endpoint was replaced, failing afterwards
+    endpoint.sendMessage(messageLocation)
+
+    assertEquals(EndpointStatus(EndpointState.INITIAL), endpointStateRepo.endpointState.value)
   }
 }
