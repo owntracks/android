@@ -20,16 +20,20 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import java.io.IOException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.owntracks.android.R
 import org.owntracks.android.databinding.UiPreferencesLoadBinding
+import org.owntracks.android.preferences.Preferences
 import timber.log.Timber
+import java.io.IOException
+import javax.inject.Inject
+
 
 @SuppressLint("GoogleAppIndexingApiWarning")
 @AndroidEntryPoint
@@ -37,7 +41,7 @@ class LoadActivity : AppCompatActivity() {
   private val viewModel: LoadViewModel by viewModels()
   private lateinit var binding: UiPreferencesLoadBinding
   private var importJob: Job? = null
-
+  @Inject lateinit var preferences: Preferences
   override fun onCreate(savedInstanceState: Bundle?) {
     enableEdgeToEdge()
     super.onCreate(savedInstanceState)
@@ -138,6 +142,23 @@ class LoadActivity : AppCompatActivity() {
               viewModel.configurationImportFailed(e)
             }
           }
+        } else if (
+          uri.scheme == "owntracks" &&
+          !preferences.allowConfigurationByURIAndConfigFile
+        ) {
+          MaterialAlertDialogBuilder(this)
+              .setTitle(R.string.loadActivityExternalConfigDialogTitle)
+              .setMessage(R.string.loadActivityExternalConfigDialogMessage)
+              .setPositiveButton(R.string.loadActivityExternalConfigDialogAllow) { _, _ ->
+                viewModel.extractPreferencesFromUri(
+                    uri.toString(),
+                    externalConfigurationAuthorized = true,
+                )
+              }
+              .setNegativeButton(R.string.cancel) { _, _ ->
+                finish()
+              }
+              .show()
         } else {
           viewModel.extractPreferencesFromUri(uri.toString())
         }
