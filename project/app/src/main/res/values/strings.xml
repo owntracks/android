@@ -167,6 +167,9 @@ To allow this, please enable Location in the device settings."</string>
     <string name="preferencesAllowConfigurationByURIAndConfigFileSummary">"Allow loading configuration from owntracks: scheme URIs and config files"</string>
     <string name="preferencesAllowConfigurationByURIAndConfigFileWarningTitle">"Allow external configuration?"</string>
     <string name="preferencesAllowConfigurationByURIAndConfigFileWarningMessage">"Any owntracks: URL or config file can completely reconfigure this app, including changing the broker, credentials, and tracking settings. Only enable this if you trust all sources that can send such URLs to this device."</string>
+    <string name="loadActivityExternalConfigDialogTitle">"Allow external configuration?"</string>
+    <string name="loadActivityExternalConfigDialogMessage">"An external link wants to configure OwnTracks. Do you want to allow this?"</string>
+    <string name="loadActivityExternalConfigDialogAllow">"Allow"</string>
     <string name="enable">"Enable"</string>
     <string name="preferencesAutostart">"Autostart"</string>
     <string name="preferencesAutostartSummary">"Automatically start on device boot"</string>
