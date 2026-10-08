@@ -123,17 +123,22 @@ constructor(
       location: Location,
   ): Result<Unit> {
     Timber.v("Maybe publishing $location with trigger $trigger")
-    // A static location is reported instead of the real one, unless the user explicitly asked for
-    // their location. Real locations can still turn up, e.g. one already on its way.
-    if (
-        contextProfileManager.locatorSettings.value.staticLocation != null &&
-            location.provider != StaticLocation.PROVIDER &&
-            trigger != MessageLocation.ReportType.USER
-    ) {
-      Timber.d("Not publishing a real location while a static location is being reported")
-      return Result.failure(Exception("a static location is being reported instead"))
+    val isStaticLocation = location.provider == StaticLocation.PROVIDER
+    // Real locations are only published when the user explicitly asks for their location while a
+    // static location might be reported instead: until it's known which profile applies, and while
+    // one is. They can still turn up then, e.g. one already on its way, or on demand.
+    if (!isStaticLocation && trigger != MessageLocation.ReportType.USER) {
+      if (!contextProfileManager.ready.value) {
+        Timber.d("Not publishing a real location until it's known which context profile applies")
+        return Result.failure(Exception("context profiles aren't known yet"))
+      }
+      if (contextProfileManager.locatorSettings.value.staticLocation != null) {
+        Timber.d("Not publishing a real location while a static location is being reported")
+        return Result.failure(Exception("a static location is being reported instead"))
+      }
     }
-    if (!locationIsWithAccuracyThreshold(location))
+    // A static location's accuracy is configured rather than measured
+    if (!isStaticLocation && !locationIsWithAccuracyThreshold(location))
         return Result.failure(Exception("location accuracy too low"))
 
     // If this location has come from the network *and* the most recent location was both recent and
@@ -371,14 +376,16 @@ constructor(
       transition: Int,
       trigger: String,
   ) {
+    // While a static location is being reported, it's reported here too rather than where we are
+    val staticLocation = contextProfileManager.locatorSettings.value.staticLocation
     messageProcessor.queueMessageForSending(
         MessageTransition().apply {
           setTransition(transition)
           this.trigger = trigger
           trackerId = preferences.tid.toString()
-          latitude = triggeringLocation.latitude
-          longitude = triggeringLocation.longitude
-          accuracy = triggeringLocation.accuracy.roundToInt()
+          latitude = staticLocation?.latitude ?: triggeringLocation.latitude
+          longitude = staticLocation?.longitude ?: triggeringLocation.longitude
+          accuracy = staticLocation?.accuracy ?: triggeringLocation.accuracy.roundToInt()
           timestamp = TimeUnit.MILLISECONDS.toSeconds(triggeringLocation.time)
           waypointTimestamp = waypointModel.tst.epochSecond
           description = waypointModel.description

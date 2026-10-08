@@ -5,6 +5,7 @@ import android.location.Location
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -19,11 +20,14 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.data.waypoints.InMemoryWaypointsRepo
+import org.owntracks.android.data.waypoints.WaypointModel
+import org.owntracks.android.location.geofencing.Geofence
 import org.owntracks.android.location.profiles.ContextProfileManager
 import org.owntracks.android.location.profiles.LocatorSettings
 import org.owntracks.android.location.profiles.StaticLocation
 import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.model.messages.MessageLocation
+import org.owntracks.android.model.messages.MessageTransition
 import org.owntracks.android.net.WifiInfoProvider
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.MonitoringMode
@@ -35,18 +39,25 @@ class LocationProcessorTest {
   private fun contextProfileManagerWith(
       monitoring: MonitoringMode,
       staticLocation: StaticLocation? = null,
+      ready: Boolean = true,
   ) =
       mock<ContextProfileManager> {
         on { locatorSettings } doReturn
             MutableStateFlow(LocatorSettings(monitoring, 60, 10, 500, null, 15, staticLocation))
+        on { this.ready } doReturn MutableStateFlow(ready)
       }
 
-  private fun TestScope.locationProcessorWithStaticLocation(messageProcessor: MessageProcessor) =
+  private fun TestScope.locationProcessorWithStaticLocation(
+      messageProcessor: MessageProcessor,
+      ignoreInaccurateLocations: Int = 0,
+      staticLocation: StaticLocation? = StaticLocation(40.0, -111.0),
+      ready: Boolean = true,
+  ) =
       LocationProcessor(
           messageProcessor,
           mock<Preferences> {
             on { maxImplausibleSpeedKmh } doReturn 0
-            on { ignoreInaccurateLocations } doReturn 0
+            on { this.ignoreInaccurateLocations } doReturn ignoreInaccurateLocations
             on { discardNetworkLocationThresholdSeconds } doReturn 0
             on { fusedRegionDetection } doReturn false
             on { tid } doReturn StringMaxTwoAlphaNumericChars("AB")
@@ -55,7 +66,7 @@ class LocationProcessorTest {
           InMemoryWaypointsRepo(this, mock<Context>(), Dispatchers.Unconfined),
           mock<DeviceMetricsProvider>(),
           mock<WifiInfoProvider>(),
-          contextProfileManagerWith(MonitoringMode.Significant, StaticLocation(40.0, -111.0)),
+          contextProfileManagerWith(MonitoringMode.Significant, staticLocation, ready),
           this,
           Dispatchers.Unconfined,
           SimpleIdlingResource("publishResponseMessageIdlingResource", false),
@@ -63,12 +74,52 @@ class LocationProcessorTest {
           false,
       )
 
-  private fun location(provider: String) =
+  private fun location(provider: String, accuracy: Float = 5f) =
       mock<Location> {
         on { time } doReturn 1_000_000L
         on { this.provider } doReturn provider
-        on { accuracy } doReturn 5f
+        on { this.accuracy } doReturn accuracy
+        on { latitude } doReturn 51.5
+        on { longitude } doReturn -0.12
       }
+
+  @Test
+  fun `the static location is published whatever the accuracy threshold`() = runTest {
+    val messageProcessor = mock<MessageProcessor>()
+    locationProcessorWithStaticLocation(messageProcessor, ignoreInaccurateLocations = 10)
+        .onLocationChanged(
+            location(StaticLocation.PROVIDER, accuracy = 10f),
+            MessageLocation.ReportType.DEFAULT,
+        )
+    verify(messageProcessor, times(1)).queueMessageForSending(any())
+  }
+
+  @Test
+  fun `a real location isn't published before it's known which profile applies`() = runTest {
+    val messageProcessor = mock<MessageProcessor>()
+    locationProcessorWithStaticLocation(messageProcessor, staticLocation = null, ready = false)
+        .onLocationChanged(location("gps"), MessageLocation.ReportType.DEFAULT)
+    verify(messageProcessor, never()).queueMessageForSending(any())
+  }
+
+  @Test
+  fun `a region transition is reported at the static location while one is in use`() = runTest {
+    val messageProcessor = mock<MessageProcessor>()
+    locationProcessorWithStaticLocation(messageProcessor)
+        .onWaypointTransition(
+            WaypointModel(description = "Home"),
+            location("gps"),
+            Geofence.GEOFENCE_TRANSITION_ENTER,
+            MessageTransition.TRIGGER_CIRCULAR,
+        )
+    advanceUntilIdle()
+    val captor = argumentCaptor<MessageBase>()
+    verify(messageProcessor, times(1)).queueMessageForSending(captor.capture())
+    (captor.firstValue as MessageTransition).run {
+      assertEquals(40.0, latitude, 0.0)
+      assertEquals(-111.0, longitude, 0.0)
+    }
+  }
 
   @Test
   fun `a real location isn't published while a static location is in use`() = runTest {
