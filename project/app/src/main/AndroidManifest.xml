@@ -26,6 +26,9 @@
     <!-- To handle connectivity changes and reconnect -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
+    <!-- To scan for nearby Wi-Fi networks when choosing them for a context profile -->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+
     <!-- To prevent the device from sleeping while handling MQTT traffic -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
