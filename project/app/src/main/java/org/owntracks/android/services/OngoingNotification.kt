@@ -148,9 +148,15 @@ class OngoingNotification(private val context: Context, initialMode: MonitoringM
     }
   }
 
-  fun setMonitoringMode(monitoringMode: MonitoringMode) {
+  fun setMonitoringMode(monitoringMode: MonitoringMode, contextProfileName: String? = null) {
+    val monitoringLabel = getMonitoringLabel(monitoringMode)
     serviceNotificationState =
-        serviceNotificationState.copy(subText = getMonitoringLabel(monitoringMode))
+        serviceNotificationState.copy(
+            subText =
+                contextProfileName?.let {
+                  context.getString(R.string.monitoringModeWithContextProfile, monitoringLabel, it)
+                } ?: monitoringLabel
+        )
     updateNotification()
   }
 

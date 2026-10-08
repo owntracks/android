@@ -3,6 +3,7 @@ package org.owntracks.android.services
 import android.content.Context
 import android.location.Location
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -13,10 +14,14 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.data.waypoints.InMemoryWaypointsRepo
+import org.owntracks.android.location.profiles.ContextProfileManager
+import org.owntracks.android.location.profiles.LocatorSettings
+import org.owntracks.android.location.profiles.StaticLocation
 import org.owntracks.android.model.messages.MessageBase
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.net.WifiInfoProvider
@@ -27,6 +32,107 @@ import org.owntracks.android.support.DeviceMetricsProvider
 import org.owntracks.android.test.SimpleIdlingResource
 
 class LocationProcessorTest {
+  private fun contextProfileManagerWith(
+      monitoring: MonitoringMode,
+      staticLocation: StaticLocation? = null,
+  ) =
+      mock<ContextProfileManager> {
+        on { locatorSettings } doReturn
+            MutableStateFlow(LocatorSettings(monitoring, 60, 10, 500, null, 15, staticLocation))
+      }
+
+  private fun TestScope.locationProcessorWithStaticLocation(messageProcessor: MessageProcessor) =
+      LocationProcessor(
+          messageProcessor,
+          mock<Preferences> {
+            on { maxImplausibleSpeedKmh } doReturn 0
+            on { ignoreInaccurateLocations } doReturn 0
+            on { discardNetworkLocationThresholdSeconds } doReturn 0
+            on { fusedRegionDetection } doReturn false
+            on { tid } doReturn StringMaxTwoAlphaNumericChars("AB")
+          },
+          LocationRepo(),
+          InMemoryWaypointsRepo(this, mock<Context>(), Dispatchers.Unconfined),
+          mock<DeviceMetricsProvider>(),
+          mock<WifiInfoProvider>(),
+          contextProfileManagerWith(MonitoringMode.Significant, StaticLocation(40.0, -111.0)),
+          this,
+          Dispatchers.Unconfined,
+          SimpleIdlingResource("publishResponseMessageIdlingResource", false),
+          SimpleIdlingResource("mockLocationIdlingResource", false),
+          false,
+      )
+
+  private fun location(provider: String) =
+      mock<Location> {
+        on { time } doReturn 1_000_000L
+        on { this.provider } doReturn provider
+        on { accuracy } doReturn 5f
+      }
+
+  @Test
+  fun `a real location isn't published while a static location is in use`() = runTest {
+    val messageProcessor = mock<MessageProcessor>()
+    locationProcessorWithStaticLocation(messageProcessor)
+        .onLocationChanged(location("gps"), MessageLocation.ReportType.DEFAULT)
+    verify(messageProcessor, never()).queueMessageForSending(any())
+  }
+
+  @Test
+  fun `the static location is published while it's in use`() = runTest {
+    val messageProcessor = mock<MessageProcessor>()
+    locationProcessorWithStaticLocation(messageProcessor)
+        .onLocationChanged(location(StaticLocation.PROVIDER), MessageLocation.ReportType.DEFAULT)
+    verify(messageProcessor, times(1)).queueMessageForSending(any())
+  }
+
+  @Test
+  fun `a location the user asks for is published even while a static location is in use`() =
+      runTest {
+        val messageProcessor = mock<MessageProcessor>()
+        locationProcessorWithStaticLocation(messageProcessor)
+            .onLocationChanged(location("gps"), MessageLocation.ReportType.USER)
+        verify(messageProcessor, times(1)).queueMessageForSending(any())
+      }
+
+  @Test
+  fun `the monitoring mode of the active profile is used to suppress publishing`() = runTest {
+    val preferences =
+        mock<Preferences> {
+          on { maxImplausibleSpeedKmh } doReturn 0
+          on { ignoreInaccurateLocations } doReturn 0
+          on { discardNetworkLocationThresholdSeconds } doReturn 0
+          on { fusedRegionDetection } doReturn false
+          on { monitoring } doReturn MonitoringMode.Significant
+          on { tid } doReturn StringMaxTwoAlphaNumericChars("AB")
+        }
+    val messageProcessor = mock<MessageProcessor>()
+    val locationProcessor =
+        LocationProcessor(
+            messageProcessor,
+            preferences,
+            LocationRepo(),
+            InMemoryWaypointsRepo(this, mock<Context>(), Dispatchers.Unconfined),
+            mock<DeviceMetricsProvider>(),
+            mock<WifiInfoProvider>(),
+            contextProfileManagerWith(MonitoringMode.Quiet),
+            this,
+            Dispatchers.Unconfined,
+            SimpleIdlingResource("publishResponseMessageIdlingResource", false),
+            SimpleIdlingResource("mockLocationIdlingResource", false),
+            false,
+        )
+    val location =
+        mock<Location> {
+          on { time } doReturn 1_000_000L
+          on { provider } doReturn "gps"
+          on { accuracy } doReturn 5f
+        }
+    locationProcessor.onLocationChanged(location, MessageLocation.ReportType.DEFAULT)
+
+    verify(messageProcessor, never()).queueMessageForSending(any())
+  }
+
   @Test
   fun `given disabled threshold, speed is not implausible`() {
     assertFalse(isImplausibleSpeed(100000.0, 1000, 0))
@@ -73,6 +179,7 @@ class LocationProcessorTest {
             InMemoryWaypointsRepo(this, mock<Context>(), Dispatchers.Unconfined),
             mock<DeviceMetricsProvider>(),
             mock<WifiInfoProvider>(),
+            contextProfileManagerWith(MonitoringMode.Significant),
             this,
             Dispatchers.Unconfined,
             SimpleIdlingResource("publishResponseMessageIdlingResource", false),
@@ -127,6 +234,7 @@ class LocationProcessorTest {
         InMemoryWaypointsRepo(this, mock<Context>(), Dispatchers.Unconfined),
         mock<DeviceMetricsProvider>(),
         mock<WifiInfoProvider>(),
+        contextProfileManagerWith(MonitoringMode.Significant),
         this,
         Dispatchers.Unconfined,
         SimpleIdlingResource("publishResponseMessageIdlingResource", false),

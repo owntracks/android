@@ -1,0 +1,35 @@
+package org.owntracks.android.location.profiles
+
+import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.time.Duration
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.launch
+
+/** Source of the current [DeviceContext] */
+interface DeviceContextProvider {
+  /**
+   * The current [DeviceContext], kept up to date as the device state changes. The device is only
+   * watched while this is being collected, and the first context isn't emitted until every part of
+   * it is known, so that profiles aren't matched against a context that isn't real yet.
+   */
+  val deviceContext: Flow<DeviceContext>
+}
+
+/**
+ * Emits [fallback] if nothing has been emitted within [timeout], so that one source that never
+ * reports can't hold up the others for ever.
+ */
+internal fun <T> Flow<T>.orFallbackAfter(timeout: Duration, fallback: T): Flow<T> = channelFlow {
+  val emitted = AtomicBoolean(false)
+  val fallbackJob = launch {
+    delay(timeout)
+    if (emitted.compareAndSet(false, true)) send(fallback)
+  }
+  collect {
+    emitted.set(true)
+    fallbackJob.cancel()
+    send(it)
+  }
+}

@@ -18,42 +18,92 @@ import javax.inject.Singleton
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-import org.owntracks.android.preferences.Preferences
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.launch
+import org.owntracks.android.di.ApplicationScope
+import org.owntracks.android.location.profiles.ContextProfileManager
+import org.owntracks.android.location.profiles.LocatorSettings
 import timber.log.Timber
 
+@OptIn(FlowPreview::class)
 @Singleton
 class Scheduler
 @Inject
 constructor(
-    private val preferences: Preferences,
+    private val contextProfileManager: ContextProfileManager,
     @param:ApplicationContext private val context: Context,
-) : Preferences.OnPreferenceChangeListener {
-  init {
-    preferences.registerOnPreferenceChangedListener(this)
-  }
-
+    @ApplicationScope scope: CoroutineScope,
+) {
   private val anyNetworkConstraint =
       Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
   private val workManager = WorkManager.getInstance(context)
 
+  /**
+   * Whether the location ping has been asked for, as it isn't scheduled until profiles are known
+   */
+  @Volatile private var locationPingRequested = false
+
+  /** The settings that the location ping is currently scheduled with */
+  @Volatile private var scheduledPingSettings: LocatorSettings? = null
+
+  init {
+    // The ping can change either from the preferences or from a context profile
+    scope.launch {
+      var first = true
+      combine(contextProfileManager.ready, contextProfileManager.locatorSettings) { ready, settings
+            ->
+            settings.takeIf { ready }
+          }
+          .filterNotNull()
+          .distinctUntilChanged { old, new -> old.pingKey() == new.pingKey() }
+          // So that e.g. Wi-Fi briefly dropping out doesn't send a ping each way
+          .debounce { if (first) Duration.ZERO.also { first = false } else PING_CHANGE_DEBOUNCE }
+          .collect { settings ->
+            if (locationPingRequested && settings.pingKey() != scheduledPingSettings?.pingKey()) {
+              scheduleLocationPing(settings)
+            }
+          }
+    }
+  }
+
   /** Used by the background service to periodically ping a location */
   fun scheduleLocationPing() {
+    locationPingRequested = true
+    if (contextProfileManager.ready.value) {
+      scheduleLocationPing(contextProfileManager.locatorSettings.value)
+    } else {
+      Timber.d("Not scheduling the location ping until it's known which context profile applies")
+    }
+  }
+
+  private fun scheduleLocationPing(settings: LocatorSettings) {
+    val schedule = pingScheduleFor(settings)
     val pingWorkRequest: WorkRequest =
         PeriodicWorkRequest.Builder(
                 SendLocationPingWorker::class.java,
-                preferences.ping.toLong(),
+                schedule.interval.inWholeMinutes,
                 TimeUnit.MINUTES,
             )
+            .setInitialDelay(schedule.initialDelay.inWholeMinutes, TimeUnit.MINUTES)
             .addTag(PERIODIC_TASK_SEND_LOCATION_PING)
             .setConstraints(anyNetworkConstraint)
             .build()
     Timber.d(
         "WorkManager queue task $PERIODIC_TASK_SEND_LOCATION_PING as ${pingWorkRequest.id} " +
-            "with interval ${preferences.ping} minutes"
+            "with interval ${schedule.interval} after ${schedule.initialDelay}"
     )
+    scheduledPingSettings = settings
     workManager.cancelAllWorkByTag(PERIODIC_TASK_SEND_LOCATION_PING)
     workManager.enqueue(pingWorkRequest)
   }
+
+  /** The parts of the settings that the ping's schedule depends on */
+  private fun LocatorSettings.pingKey() = ping to staticLocation
 
   /** Cancels all WorkManager tasks. Called on app exit */
   fun cancelAllTasks() {
@@ -149,7 +199,23 @@ constructor(
     }
   }
 
+  data class PingSchedule(val interval: Duration, val initialDelay: Duration)
+
   companion object {
+    private val PING_CHANGE_DEBOUNCE = 30.seconds
+
+    /**
+     * Periodic work runs once as soon as it's scheduled, which sends a ping straight away. Except
+     * for a static location, which has just been sent on arriving at it, so the first ping waits.
+     */
+    internal fun pingScheduleFor(settings: LocatorSettings): PingSchedule {
+      val interval = settings.ping.minutes
+      return PingSchedule(
+          interval,
+          if (settings.staticLocation != null) interval else Duration.ZERO,
+      )
+    }
+
     private const val PERIODIC_TASK_SEND_LOCATION_PING = "PERIODIC_TASK_SEND_LOCATION_PING"
     private const val ONETIME_TASK_MQTT_RECONNECT = "ONETIME_TASK_MQTT_RECONNECT"
     private const val PERIODIC_TASK_MQTT_CONNECTION_WATCHDOG =
@@ -184,12 +250,5 @@ constructor(
      * Enough doublings to comfortably exceed [RECONNECT_MAX_DELAY] without overflowing the shift.
      */
     private const val MAX_BACKOFF_DOUBLINGS = 16
-  }
-
-  override fun onPreferenceChanged(properties: Set<String>) {
-    if (properties.contains(Preferences::ping.name)) {
-      workManager.cancelAllWorkByTag(PERIODIC_TASK_SEND_LOCATION_PING)
-      scheduleLocationPing()
-    }
   }
 }

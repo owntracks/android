@@ -8,6 +8,8 @@ import org.owntracks.android.data.repos.ContactsRepo
 import org.owntracks.android.data.repos.MemoryContactsRepo
 import org.owntracks.android.data.waypoints.RoomWaypointsRepo
 import org.owntracks.android.data.waypoints.WaypointsRepo
+import org.owntracks.android.location.profiles.AndroidDeviceContextProvider
+import org.owntracks.android.location.profiles.DeviceContextProvider
 import org.owntracks.android.preferences.PreferencesStore
 import org.owntracks.android.preferences.SharedPreferencesStore
 
@@ -20,6 +22,11 @@ abstract class ReposAndContextModule {
   ): PreferencesStore
 
   @Binds abstract fun bindWaypointsRepo(waypointsRepo: RoomWaypointsRepo): WaypointsRepo
+
+  @Binds
+  abstract fun bindDeviceContextProvider(
+      androidDeviceContextProvider: AndroidDeviceContextProvider
+  ): DeviceContextProvider
 
   @Binds abstract fun bindMemoryContactsRepo(memoryContactsRepo: MemoryContactsRepo): ContactsRepo
 }

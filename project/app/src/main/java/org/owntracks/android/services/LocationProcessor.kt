@@ -19,6 +19,8 @@ import org.owntracks.android.data.waypoints.WaypointsRepo
 import org.owntracks.android.di.ApplicationScope
 import org.owntracks.android.di.CoroutineScopes
 import org.owntracks.android.location.geofencing.Geofence
+import org.owntracks.android.location.profiles.ContextProfileManager
+import org.owntracks.android.location.profiles.StaticLocation
 import org.owntracks.android.model.messages.AddMessageStatus
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.model.messages.MessageLocation.Companion.fromLocation
@@ -86,6 +88,7 @@ constructor(
     private val waypointsRepo: WaypointsRepo,
     private val deviceMetricsProvider: DeviceMetricsProvider,
     private val wifiInfoProvider: WifiInfoProvider,
+    private val contextProfileManager: ContextProfileManager,
     @param:ApplicationScope private val scope: CoroutineScope,
     @param:CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @param:Named("publishResponseMessageIdlingResource")
@@ -120,6 +123,16 @@ constructor(
       location: Location,
   ): Result<Unit> {
     Timber.v("Maybe publishing $location with trigger $trigger")
+    // A static location is reported instead of the real one, unless the user explicitly asked for
+    // their location. Real locations can still turn up, e.g. one already on its way.
+    if (
+        contextProfileManager.locatorSettings.value.staticLocation != null &&
+            location.provider != StaticLocation.PROVIDER &&
+            trigger != MessageLocation.ReportType.USER
+    ) {
+      Timber.d("Not publishing a real location while a static location is being reported")
+      return Result.failure(Exception("a static location is being reported instead"))
+    }
     if (!locationIsWithAccuracyThreshold(location))
         return Result.failure(Exception("location accuracy too low"))
 
@@ -184,6 +197,9 @@ constructor(
         loadedWaypoints.isNotEmpty() &&
             preferences.fusedRegionDetection &&
             !nativeGeofencingAvailable &&
+            // Where we are isn't known while reporting a static location, so it can't tell us
+            // whether we've left a region (which may be what put us there)
+            location.provider != StaticLocation.PROVIDER &&
             trigger != MessageLocation.ReportType.CIRCULAR
     ) {
       pendingWaypointTransitions.keys.retainAll(loadedWaypoints.map { it.id }.toSet())
@@ -226,15 +242,13 @@ constructor(
         }
       }
     }
-    if (
-        preferences.monitoring === MonitoringMode.Quiet &&
-            MessageLocation.ReportType.USER != trigger
-    ) {
+    val monitoring = contextProfileManager.locatorSettings.value.monitoring
+    if (monitoring === MonitoringMode.Quiet && MessageLocation.ReportType.USER != trigger) {
       Timber.d("message suppressed by monitoring settings: quiet")
       return Result.failure(Exception("message suppressed by monitoring settings: quiet"))
     }
     if (
-        preferences.monitoring === MonitoringMode.Manual &&
+        monitoring === MonitoringMode.Manual &&
             MessageLocation.ReportType.USER != trigger &&
             MessageLocation.ReportType.CIRCULAR != trigger
     ) {
@@ -249,7 +263,7 @@ constructor(
                 battery = deviceMetricsProvider.batteryLevel
                 batteryStatus = deviceMetricsProvider.batteryStatus
                 conn = deviceMetricsProvider.connectionType.value
-                monitoringMode = preferences.monitoring
+                monitoringMode = monitoring
                 source = location.provider
               }
             } else {
@@ -334,8 +348,9 @@ constructor(
         waypointModel.lastTransition = transition
         waypointModel.lastTriggered = Instant.now()
         waypointsRepo.update(waypointModel, false)
-        if (preferences.monitoring === MonitoringMode.Quiet) {
-          Timber.d("message suppressed by monitoring settings: ${preferences.monitoring}")
+        val monitoring = contextProfileManager.locatorSettings.value.monitoring
+        if (monitoring === MonitoringMode.Quiet) {
+          Timber.d("message suppressed by monitoring settings: $monitoring")
         } else {
           publishTransitionMessage(waypointModel, location, transition, trigger)
           if (trigger == MessageTransition.TRIGGER_CIRCULAR) {

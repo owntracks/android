@@ -133,6 +133,7 @@ To allow this, please enable Location in the device settings."</string>
     <string name="monitoringModeDialogSignificantDescription">"Balanced power usage and accuracy / frequency"</string>
     <string name="monitoringModeDialogSignificantTitle">"Significant Changes"</string>
     <string name="monitoringModeDialogTitle">"Monitoring Mode"</string>
+    <string name="monitoringModeWithContextProfile">"%1$s · %2$s"</string>
     <string name="na">"Not available"</string>
     <string name="next">"Next"</string>
     <string name="noBrowserInstalled">"No suitable browser installed"</string>

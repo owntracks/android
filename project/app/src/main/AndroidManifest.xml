@@ -29,6 +29,12 @@
     <!-- To scan for nearby Wi-Fi networks when choosing them for a context profile -->
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
 
+    <!-- To switch context profiles when connecting to a Bluetooth device -->
+    <uses-permission
+        android:name="android.permission.BLUETOOTH"
+        android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+
     <!-- To prevent the device from sleeping while handling MQTT traffic -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
