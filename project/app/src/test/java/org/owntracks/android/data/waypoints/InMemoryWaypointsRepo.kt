@@ -41,11 +41,12 @@ class InMemoryWaypointsRepo(
   }
 
   override suspend fun updateImpl(waypointModel: WaypointModel): Long {
-    TODO("Not yet implemented")
+    waypoints.replaceAll { if (it.id == waypointModel.id) waypointModel else it }
+    return waypointModel.id
   }
 
   override suspend fun deleteImpl(waypointModel: WaypointModel) {
-    TODO("Not yet implemented")
+    waypoints.removeAll { it.id == waypointModel.id }
   }
 
   override val migrationCompleteFlow: StateFlow<Boolean>
