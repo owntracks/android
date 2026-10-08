@@ -259,7 +259,7 @@ These settings apply only when using HTTP mode (`mode=3`).
 
 ## Context Profiles
 
-Context profiles change the location tracking settings automatically, depending on what the device is connected to or doing. Profiles are kept in priority order, and the first enabled profile that matches is applied. While a profile is applied, any setting it doesn't override keeps its normal value. The device is only watched while context profiles are enabled.
+Context profiles change the location tracking settings automatically, depending on what the device is connected to or doing. Profiles are kept in priority order, and the first enabled profile that matches is applied. While a profile is applied, any setting it doesn't override keeps its normal value. The device is only watched while context profiles are enabled, and a change (e.g. connecting to a Wi-Fi network) has to last 10 seconds before profiles are matched again, so that a momentary drop-out doesn't switch profiles.
 
 Choosing a monitoring mode by hand, or changing a setting the applied profile overrides, takes precedence over that profile until a different profile (or no profile) matches, including across restarts.
 
