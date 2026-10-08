@@ -74,4 +74,29 @@ class WifiInfoProviderTest {
         nearbySSIDsBySignal(listOf("" to -40, "<unknown ssid>" to -45, "Home" to -50)),
     )
   }
+
+  @Test
+  fun `losing one Wi-Fi network leaves another that's still connected`() {
+    val networks = ConnectedWifiNetworks<String>()
+    networks.connected("old", "Home")
+    networks.connected("new", "Office")
+    networks.lost("old")
+    assertEquals("Office", networks.ssid)
+  }
+
+  @Test
+  fun `losing the only Wi-Fi network leaves none`() {
+    val networks = ConnectedWifiNetworks<String>()
+    networks.connected("a", "Home")
+    networks.lost("a")
+    assertNull(networks.ssid)
+  }
+
+  @Test
+  fun `a network whose SSID isn't known doesn't hide one that is`() {
+    val networks = ConnectedWifiNetworks<String>()
+    networks.connected("a", null)
+    networks.connected("b", "Home")
+    assertEquals("Home", networks.ssid)
+  }
 }

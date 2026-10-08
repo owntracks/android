@@ -65,6 +65,8 @@ class WifiInfoProvider @Inject constructor(@ApplicationContext context: Context)
               awaitClose()
               return@callbackFlow
             }
+    // There can briefly be more than one, e.g. while switching networks
+    val networks = ConnectedWifiNetworks<Network>()
     val callback =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
           object : ConnectivityManager.NetworkCallback(FLAG_INCLUDE_LOCATION_INFO) {
@@ -73,12 +75,14 @@ class WifiInfoProvider @Inject constructor(@ApplicationContext context: Context)
                 networkCapabilities: NetworkCapabilities,
             ) {
               (networkCapabilities.transportInfo as? WifiInfo)?.run {
-                trySend(getUnquotedSSID().takeIfKnownSSID())
+                networks.connected(network, getUnquotedSSID().takeIfKnownSSID())
+                trySend(networks.ssid)
               }
             }
 
             override fun onLost(network: Network) {
-              trySend(null)
+              networks.lost(network)
+              trySend(networks.ssid)
             }
           }
         } else {
@@ -88,11 +92,13 @@ class WifiInfoProvider @Inject constructor(@ApplicationContext context: Context)
                 network: Network,
                 networkCapabilities: NetworkCapabilities,
             ) {
-              trySend(getSSID()?.takeIfKnownSSID())
+              networks.connected(network, getSSID()?.takeIfKnownSSID())
+              trySend(networks.ssid)
             }
 
             override fun onLost(network: Network) {
-              trySend(null)
+              networks.lost(network)
+              trySend(networks.ssid)
             }
           }
         }
@@ -202,3 +208,22 @@ internal fun nearbySSIDsBySignal(networks: List<Pair<String, Int>>): List<String
         .sortedByDescending { (_, level) -> level }
         .map { (ssid, _) -> ssid }
         .distinct()
+
+/** The SSIDs of the connected Wi-Fi networks, by network */
+internal class ConnectedWifiNetworks<N> {
+  private val ssids = mutableMapOf<N, String?>()
+
+  /** An SSID of a connected network, if any are known */
+  val ssid: String?
+    @Synchronized get() = ssids.values.firstNotNullOfOrNull { it }
+
+  @Synchronized
+  fun connected(network: N, ssid: String?) {
+    ssids[network] = ssid
+  }
+
+  @Synchronized
+  fun lost(network: N) {
+    ssids.remove(network)
+  }
+}
