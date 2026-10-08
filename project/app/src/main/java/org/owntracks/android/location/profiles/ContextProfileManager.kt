@@ -117,29 +117,35 @@ constructor(
     update()
   }
 
-  private fun update() =
-      synchronized(this) {
-        val profiles =
-            if (preferences.contextProfilesEnabled && deviceContextKnown) {
-              decodeContextProfiles(preferences.contextProfiles)
-            } else {
-              emptyList()
-            }
-        // Until the device is known, nothing is matched, but any suspension is kept for when it is
-        if (deviceContextKnown)
+  private fun update() {
+    val suspendedProfileId =
+        synchronized(this) {
+          val profiles =
+              if (preferences.contextProfilesEnabled && deviceContextKnown) {
+                decodeContextProfiles(preferences.contextProfiles)
+              } else {
+                emptyList()
+              }
+          // Nothing is matched until the device is known, but any suspension is kept until then
+          if (deviceContextKnown) {
             selection = selection.withMatched(profiles.firstMatching(deviceContext))
-        (selection.suspendedProfileId ?: "").let {
-          if (it != preferences.suspendedContextProfileId)
-              preferences.suspendedContextProfileId = it
+          }
+          val effective = selection.effective.takeIf { deviceContextKnown }
+          if (effective?.id != mutableActiveProfile.value?.id) {
+            Timber.i("Active context profile is now ${effective?.name ?: "none"}")
+          }
+          mutableMatchedProfile.value = selection.matched.takeIf { deviceContextKnown }
+          mutableActiveProfile.value = effective
+          mutableLocatorSettings.value = LocatorSettings.from(preferences, effective?.overrides)
+          selection.suspendedProfileId ?: ""
         }
-        val effective = selection.effective.takeIf { deviceContextKnown }
-        if (effective?.id != mutableActiveProfile.value?.id) {
-          Timber.i("Active context profile is now ${effective?.name ?: "none"}")
-        }
-        mutableMatchedProfile.value = selection.matched.takeIf { deviceContextKnown }
-        mutableActiveProfile.value = effective
-        mutableLocatorSettings.value = LocatorSettings.from(preferences, effective?.overrides)
-      }
+    // Saved without holding the lock: saving notifies the preference listeners while holding their
+    // lock, and onPreferenceChanged is called with that held and takes this one, so holding both
+    // the other way round could deadlock
+    if (suspendedProfileId != preferences.suspendedContextProfileId) {
+      preferences.suspendedContextProfileId = suspendedProfileId
+    }
+  }
 
   companion object {
     private val PROFILE_PREFERENCES =

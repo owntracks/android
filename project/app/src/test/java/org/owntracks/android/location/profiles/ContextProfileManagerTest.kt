@@ -282,4 +282,30 @@ class ContextProfileManagerTest {
         preferences.locatorPriority = LocatorPriority.LowPower
         assertNull(manager.activeProfile.value)
       }
+
+  /**
+   * Writing a preference notifies its listeners while holding the preferences' listener lock, and
+   * the manager is one of those listeners, so it mustn't write one while holding its own lock.
+   */
+  @Test
+  fun `the suspension is saved without holding the manager's lock`() =
+      runTest(UnconfinedTestDispatcher()) {
+        val manager = buildManager()
+        val heldWhileSaving = mutableListOf<Boolean>()
+        val listener =
+            object : Preferences.OnPreferenceChangeListener {
+              override fun onPreferenceChanged(properties: Set<String>) {
+                if (Preferences::suspendedContextProfileId.name in properties) {
+                  heldWhileSaving += Thread.holdsLock(manager)
+                }
+              }
+            }
+        preferences.registerOnPreferenceChangedListener(listener)
+        deviceContextProvider.deviceContext.tryEmit(
+            DeviceContext(chargingSource = ChargingSource.Cable)
+        )
+        manager.setMonitoringModeManually(MonitoringMode.Manual)
+        deviceContextProvider.deviceContext.tryEmit(DeviceContext())
+        assertEquals(listOf(false, false), heldWhileSaving)
+      }
 }
