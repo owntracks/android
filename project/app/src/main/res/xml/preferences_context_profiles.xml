@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:title="@string/preferencesContextProfiles">
+    <androidx.preference.SwitchPreferenceCompat
+        app:iconSpaceReserved="false"
+        app:key="contextProfilesEnabled"
+        app:summary="@string/preferencesContextProfilesEnabledSummary"
+        app:title="@string/preferencesContextProfilesEnabled" />
+    <androidx.preference.Preference
+        app:iconSpaceReserved="false"
+        app:key="status"
+        app:selectable="false"
+        app:title="@string/preferencesContextProfilesStatus" />
+    <androidx.preference.PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:key="profiles"
+        app:summary="@string/preferencesContextProfilesCategorySummary"
+        app:title="@string/preferencesContextProfilesCategory" />
+    <androidx.preference.Preference
+        app:fragment="org.owntracks.android.ui.preferences.ContextProfileFragment"
+        app:iconSpaceReserved="false"
+        app:key="addProfile"
+        app:title="@string/preferencesContextProfilesAdd" />
+</PreferenceScreen>

@@ -96,6 +96,9 @@
             android:label="@string/title_activity_waypoints"
             android:launchMode="singleTop" />
         <activity
+            android:name=".ui.map.picker.LocationPickerActivity"
+            android:label="@string/locationPickerTitle" />
+        <activity
             android:name=".ui.waypoint.WaypointActivity"
             android:label="@string/title_activity_waypoint"
             android:launchMode="singleTop">

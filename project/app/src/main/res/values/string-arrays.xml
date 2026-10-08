@@ -4,6 +4,25 @@
         <item>MQTT</item>
         <item>HTTP</item>
     </string-array>
+    <string-array name="contextProfileLocatorPriorityLabels">
+        <item>@string/preferencesContextProfileNotChanged</item>
+        <item>@string/locatorPriorityHighAccuracy</item>
+        <item>@string/locatorPriorityBalancedPowerAccuracy</item>
+        <item>@string/locatorPriorityLowPower</item>
+        <item>@string/locatorPriorityNoPower</item>
+    </string-array>
+    <string-array name="contextProfileMatchLabels">
+        <item>@string/contextProfileMatchAny</item>
+        <item>@string/contextProfileMatchAll</item>
+        <item>@string/contextProfileMatchNone</item>
+    </string-array>
+    <string-array name="contextProfileMonitoringLabels">
+        <item>@string/preferencesContextProfileNotChanged</item>
+        <item>@string/monitoringModeDialogQuietTitle</item>
+        <item>@string/monitoringModeDialogManualTitle</item>
+        <item>@string/monitoringModeDialogSignificantTitle</item>
+        <item>@string/monitoringModeDialogMoveTitle</item>
+    </string-array>
     <string-array name="geocoders">
         <item>None</item>
         <item>Device (Google)</item>

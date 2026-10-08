@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.preference.EditTextPreference
+        app:iconSpaceReserved="false"
+        app:key="name"
+        app:persistent="false"
+        app:title="@string/preferencesContextProfileName"
+        app:useSimpleSummaryProvider="true" />
+    <androidx.preference.SwitchPreferenceCompat
+        app:iconSpaceReserved="false"
+        app:key="enabled"
+        app:persistent="false"
+        app:title="@string/preferencesContextProfileEnabled" />
+    <androidx.preference.ListPreference
+        app:entries="@array/contextProfileMatchLabels"
+        app:entryValues="@array/contextProfileMatchValues"
+        app:iconSpaceReserved="false"
+        app:key="match"
+        app:persistent="false"
+        app:title="@string/preferencesContextProfileMatch"
+        app:useSimpleSummaryProvider="true" />
+    <androidx.preference.PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:key="conditions" />
+    <androidx.preference.Preference
+        app:iconSpaceReserved="false"
+        app:key="addCondition"
+        app:title="@string/preferencesContextProfileAddCondition" />
+    <androidx.preference.PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="@string/preferencesContextProfileCategoryOverrides">
+        <androidx.preference.Preference
+            app:iconSpaceReserved="false"
+            app:key="staticLocation"
+            app:title="@string/preferencesContextProfileStaticLocation" />
+        <androidx.preference.ListPreference
+            app:entries="@array/contextProfileMonitoringLabels"
+            app:entryValues="@array/contextProfileMonitoringValues"
+            app:iconSpaceReserved="false"
+            app:key="monitoring"
+            app:persistent="false"
+            app:title="@string/preferencesMonitoring"
+            app:useSimpleSummaryProvider="true" />
+        <androidx.preference.ListPreference
+            app:entries="@array/contextProfileLocatorPriorityLabels"
+            app:entryValues="@array/contextProfileLocatorPriorityValues"
+            app:iconSpaceReserved="false"
+            app:key="locatorPriority"
+            app:persistent="false"
+            app:title="@string/preferencesLocatorPriority"
+            app:useSimpleSummaryProvider="true" />
+        <androidx.preference.EditTextPreference
+            android:inputType="number"
+            app:dialogMessage="@string/preferencesLocatorIntervalDialog"
+            app:iconSpaceReserved="false"
+            app:key="locatorInterval"
+            app:persistent="false"
+            app:title="@string/preferencesLocatorInterval" />
+        <androidx.preference.EditTextPreference
+            android:inputType="number"
+            app:dialogMessage="@string/preferencesMoveModeLocatorIntervalDialog"
+            app:iconSpaceReserved="false"
+            app:key="moveModeLocatorInterval"
+            app:persistent="false"
+            app:title="@string/preferencesMoveModeLocatorInterval" />
+        <androidx.preference.EditTextPreference
+            android:inputType="number"
+            app:dialogMessage="@string/preferencesLocatorDisplacementDialog"
+            app:iconSpaceReserved="false"
+            app:key="locatorDisplacement"
+            app:persistent="false"
+            app:title="@string/preferencesLocatorDisplacement" />
+        <androidx.preference.EditTextPreference
+            android:inputType="number"
+            app:iconSpaceReserved="false"
+            app:key="ping"
+            app:persistent="false"
+            app:title="@string/preferencesContextProfilePing" />
+    </androidx.preference.PreferenceCategory>
+    <androidx.preference.Preference
+        app:iconSpaceReserved="false"
+        app:key="delete"
+        app:title="@string/preferencesContextProfileDelete" />
+</PreferenceScreen>
