@@ -34,7 +34,6 @@ import org.osmdroid.views.overlay.CopyrightOverlay
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polygon
 import org.osmdroid.views.overlay.ScaleBarOverlay
-import org.osmdroid.views.overlay.TilesOverlay
 import org.osmdroid.views.overlay.compass.CompassOverlay
 import org.osmdroid.views.overlay.compass.IOrientationConsumer
 import org.osmdroid.views.overlay.compass.IOrientationProvider
@@ -115,14 +114,7 @@ internal constructor(
   }
 
   private fun setMapStyle() {
-    if (
-        resources.configuration.uiMode.and(android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
-            android.content.res.Configuration.UI_MODE_NIGHT_YES
-    ) {
-      mapView?.run { overlayManager.tilesOverlay.setColorFilter(TilesOverlay.INVERT_COLORS) }
-    } else {
-      mapView?.run { overlayManager.tilesOverlay.setColorFilter(null) }
-    }
+    mapView?.setTilesForUiMode(resources.configuration)
   }
 
   private val mapListener =

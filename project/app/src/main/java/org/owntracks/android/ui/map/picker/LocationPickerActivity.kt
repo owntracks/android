@@ -25,11 +25,6 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.osmdroid.events.MapListener
-import org.osmdroid.events.ScrollEvent
-import org.osmdroid.events.ZoomEvent
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory
-import org.osmdroid.views.CustomZoomButtonsController
 import org.owntracks.android.R
 import org.owntracks.android.data.repos.LocationRepo
 import org.owntracks.android.databinding.UiLocationPickerBinding
@@ -37,15 +32,13 @@ import org.owntracks.android.di.CoroutineScopes
 import org.owntracks.android.location.LatLng
 import org.owntracks.android.location.LocationProviderClient
 import org.owntracks.android.location.parseLatLng
-import org.owntracks.android.location.toGeoPoint
 import org.owntracks.android.location.toLatLng
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.RequirementsChecker
-import org.owntracks.android.ui.map.osm.configureOsmdroid
 
 /**
- * Lets the user pick a location by moving a map under a pin, or typing in its coordinates. Uses
- * OpenStreetMap, so that it works the same in every flavour.
+ * Lets the user pick a location by moving a map under a pin, or typing in its coordinates. The map
+ * is the same kind as the user has chosen for the main map.
  */
 @AndroidEntryPoint
 class LocationPickerActivity : AppCompatActivity() {
@@ -74,10 +67,12 @@ class LocationPickerActivity : AppCompatActivity() {
 
   private lateinit var binding: UiLocationPickerBinding
 
+  private lateinit var pickerMap: PickerMap
+
   override fun onCreate(savedInstanceState: Bundle?) {
     enableEdgeToEdge()
     super.onCreate(savedInstanceState)
-    configureOsmdroid(this)
+    pickerMap = pickerMapFor(this, preferences)
     binding =
         DataBindingUtil.setContentView<UiLocationPickerBinding>(this, R.layout.ui_location_picker)
             .apply {
@@ -92,25 +87,11 @@ class LocationPickerActivity : AppCompatActivity() {
                 controls.updatePadding(bottom = controlsPadding + insets.bottom)
                 WindowInsetsCompat.CONSUMED
               }
-              mapView.apply {
-                setTileSource(TileSourceFactory.MAPNIK)
-                setMultiTouchControls(true)
-                zoomController.setVisibility(CustomZoomButtonsController.Visibility.NEVER)
-                minZoomLevel = MIN_ZOOM_LEVEL
-                maxZoomLevel = MAX_ZOOM_LEVEL
-                tilesScaleFactor = preferences.osmTileScaleFactor
-                controller.setZoom(MIN_ZOOM_LEVEL)
-                addMapListener(
-                    object : MapListener {
-                      override fun onScroll(event: ScrollEvent?): Boolean {
-                        showMapCenter()
-                        return false
-                      }
-
-                      override fun onZoom(event: ZoomEvent?): Boolean = false
-                    }
-                )
-              }
+              mapContainer.addView(pickerMap.view)
+              pickerMap.onCreate(savedInstanceState)
+              pickerMap.setOnMoveListener(::showMapCenter)
+              // Moving the map hands control of the coordinates back from the text field to the map
+              pickerMap.setOnUserMoveListener(::stopEditingCoordinates)
               coordinates.doAfterTextChanged { text ->
                 // Only follow the text while the user is typing it, not when the map is setting it
                 if (coordinates.hasFocus()) {
@@ -126,12 +107,6 @@ class LocationPickerActivity : AppCompatActivity() {
                 if (actionId == EditorInfo.IME_ACTION_DONE) stopEditingCoordinates()
                 false
               }
-              // Moving the map hands control of the coordinates back from the text field to the map
-              @Suppress("ClickableViewAccessibility")
-              mapView.setOnTouchListener { _, _ ->
-                stopEditingCoordinates()
-                false
-              }
               myLocation.setOnClickListener {
                 stopEditingCoordinates()
                 centerOnCurrentLocation()
@@ -142,12 +117,12 @@ class LocationPickerActivity : AppCompatActivity() {
                 finish()
               }
               save.setOnClickListener {
-                val center = mapView.mapCenter
+                val center = pickerMap.center
                 setResult(
                     Activity.RESULT_OK,
                     Intent()
-                        .putExtra(EXTRA_LATITUDE, center.latitude)
-                        .putExtra(EXTRA_LONGITUDE, center.longitude),
+                        .putExtra(EXTRA_LATITUDE, center.latitude.value)
+                        .putExtra(EXTRA_LONGITUDE, center.longitude.value),
                 )
                 finish()
               }
@@ -159,29 +134,26 @@ class LocationPickerActivity : AppCompatActivity() {
     if (savedInstanceState == null) {
       intent.latLng()?.run(::centerOn) ?: centerOnCurrentLocation()
     } else {
-      // The map doesn't keep where it was itself, e.g. when the screen rotates
-      binding.mapView.controller.setZoom(
-          savedInstanceState.getDouble(STATE_ZOOM, PICKING_ZOOM_LEVEL)
-      )
-      savedInstanceState.latLng()?.run { binding.mapView.controller.setCenter(toGeoPoint()) }
+      // Not every map keeps where it was itself, e.g. when the screen rotates
+      savedInstanceState.latLng()?.let {
+        pickerMap.moveTo(it, savedInstanceState.getDouble(STATE_ZOOM, PICKING_ZOOM_LEVEL))
+      }
       showMapCenter()
     }
   }
 
   override fun onSaveInstanceState(outState: Bundle) {
     super.onSaveInstanceState(outState)
-    binding.mapView.run {
-      outState.putDouble(EXTRA_LATITUDE, mapCenter.latitude)
-      outState.putDouble(EXTRA_LONGITUDE, mapCenter.longitude)
-      outState.putDouble(STATE_ZOOM, zoomLevelDouble)
+    pickerMap.onSaveInstanceState(outState)
+    pickerMap.center.run {
+      outState.putDouble(EXTRA_LATITUDE, latitude.value)
+      outState.putDouble(EXTRA_LONGITUDE, longitude.value)
     }
+    outState.putDouble(STATE_ZOOM, pickerMap.zoom)
   }
 
   private fun centerOn(latLng: LatLng) {
-    binding.mapView.controller.run {
-      if (binding.mapView.zoomLevelDouble < PICKING_ZOOM_LEVEL) setZoom(PICKING_ZOOM_LEVEL)
-      setCenter(latLng.toGeoPoint())
-    }
+    pickerMap.moveTo(latLng, maxOf(pickerMap.zoom, PICKING_ZOOM_LEVEL))
     showMapCenter()
   }
 
@@ -211,7 +183,7 @@ class LocationPickerActivity : AppCompatActivity() {
   private fun showMapCenter() {
     binding.run {
       if (!coordinates.hasFocus()) {
-        coordinates.setText(mapView.mapCenter.run { LatLng(latitude, longitude) }.toDisplayString())
+        coordinates.setText(pickerMap.center.toDisplayString())
         coordinatesLayout.error = null
         save.isEnabled = true
       }
@@ -225,12 +197,17 @@ class LocationPickerActivity : AppCompatActivity() {
 
   override fun onResume() {
     super.onResume()
-    binding.mapView.onResume()
+    pickerMap.onResume()
   }
 
   override fun onPause() {
-    binding.mapView.onPause()
+    pickerMap.onPause()
     super.onPause()
+  }
+
+  override fun onDestroy() {
+    pickerMap.onDestroy()
+    super.onDestroy()
   }
 
   /** What was picked, or that the location should be cleared */
@@ -270,8 +247,6 @@ class LocationPickerActivity : AppCompatActivity() {
     private const val EXTRA_CAN_CLEAR = "canClear"
     private const val EXTRA_CLEARED = "cleared"
     private const val STATE_ZOOM = "zoom"
-    private const val MIN_ZOOM_LEVEL = 3.0
-    private const val MAX_ZOOM_LEVEL = 21.0
     private const val PICKING_ZOOM_LEVEL = 17.0
 
     private fun Intent.latLng(): LatLng? = extras?.latLng()
