@@ -187,7 +187,7 @@ fun WifiInfo.getUnquotedSSID(): String = this.ssid.unquoteSSID()
 
 private val quotedSSID = Regex("^\"(.*)\"$")
 
-private fun String.unquoteSSID(): String = replace(quotedSSID, "$1")
+internal fun String.unquoteSSID(): String = replace(quotedSSID, "$1")
 
 /** The SSID, unless it's been redacted (or is otherwise unknown) */
 internal fun String.takeIfKnownSSID(): String? = takeUnless { it.isBlank() || it == UNKNOWN_SSID }

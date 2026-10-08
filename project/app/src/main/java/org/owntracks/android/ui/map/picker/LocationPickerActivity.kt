@@ -249,9 +249,9 @@ class LocationPickerActivity : AppCompatActivity() {
     private const val STATE_ZOOM = "zoom"
     private const val PICKING_ZOOM_LEVEL = 17.0
 
-    private fun Intent.latLng(): LatLng? = extras?.latLng()
+    internal fun Intent.latLng(): LatLng? = extras?.latLng()
 
-    private fun Bundle.latLng(): LatLng? =
+    internal fun Bundle.latLng(): LatLng? =
         if (containsKey(EXTRA_LATITUDE) && containsKey(EXTRA_LONGITUDE)) {
           LatLng(getDouble(EXTRA_LATITUDE), getDouble(EXTRA_LONGITUDE))
         } else {

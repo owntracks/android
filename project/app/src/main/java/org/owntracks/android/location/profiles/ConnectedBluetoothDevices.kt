@@ -82,7 +82,10 @@ constructor(@param:ApplicationContext private val context: Context) {
           addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED)
           addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
         },
-        ContextCompat.RECEIVER_NOT_EXPORTED,
+        // These are sent by the Bluetooth stack rather than the system, so a not exported receiver
+        // (which before T means one requiring a permission of ours) wouldn't get them. They're
+        // protected broadcasts, so other apps can't send them.
+        ContextCompat.RECEIVER_EXPORTED,
     )
     findConnectedDevices { connected -> addresses.update { it.orEmpty() + connected } }
     val forwarding = launch { addresses.filterNotNull().collect { send(it) } }
@@ -163,7 +166,7 @@ constructor(@param:ApplicationContext private val context: Context) {
     }
   }
 
-  private fun Intent.bluetoothDevice(): BluetoothDevice? =
+  internal fun Intent.bluetoothDevice(): BluetoothDevice? =
       IntentCompat.getParcelableExtra(
           this,
           BluetoothDevice.EXTRA_DEVICE,

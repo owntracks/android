@@ -2,7 +2,6 @@ package org.owntracks.android.ui.preferences
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.os.Build
 import android.os.Bundle
 import android.text.InputType
 import android.widget.EditText
@@ -266,9 +265,10 @@ class ContextProfileFragment @Inject constructor() : AbstractPreferenceFragment(
             R.string.contextProfileConditionTypeAnyWifi to { addCondition(Condition.AnyWifi) },
             R.string.contextProfileConditionTypeBluetooth to
                 {
+                  // The permission is only missing on S and later, where it exists
                   if (connectedBluetoothDevices.hasPermission()) {
                     chooseBluetoothDevice()
-                  } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                  } else {
                     bluetoothPermissionRequest.launch(Manifest.permission.BLUETOOTH_CONNECT)
                   }
                 },
