@@ -235,4 +235,22 @@ class ContextProfileTest {
     assertEquals(ChargingSource.Wireless, chargingSourceFromPlugged(4))
     assertEquals(ChargingSource.Dock, chargingSourceFromPlugged(8))
   }
+
+  private val fromNewerVersion =
+      """{"id":"new","name":"New","conditions":[{"type":"cellTower","id":1}],"overrides":{}}"""
+
+  @Test
+  fun `a profile that can't be decoded doesn't stop the others from being decoded`() {
+    val json =
+        "[$fromNewerVersion,${encodeContextProfiles(listOf(car)).removeSurrounding("[", "]")}]"
+    assertEquals(listOf(car), decodeContextProfiles(json))
+  }
+
+  @Test
+  fun `profiles that can't be decoded are kept when the others are saved`() {
+    val stored = "[$fromNewerVersion]"
+    val saved = encodeContextProfiles(listOf(car), keepingUndecodableFrom = stored)
+    assertEquals(listOf(car), decodeContextProfiles(saved))
+    assertTrue(saved.contains("cellTower"))
+  }
 }

@@ -5,6 +5,11 @@ import android.os.SystemClock
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.jsonArray
 import org.owntracks.android.location.LatLng
 import org.owntracks.android.location.LocatorPriority
 import org.owntracks.android.preferences.Preferences
@@ -151,19 +156,44 @@ fun List<ContextProfile>.firstMatching(context: DeviceContext): ContextProfile? 
 
 private val contextProfilesJson = Json { ignoreUnknownKeys = true }
 
-internal fun encodeContextProfiles(profiles: List<ContextProfile>): String =
-    contextProfilesJson.encodeToString(profiles)
+/**
+ * Encodes [profiles], keeping any profiles in [keepingUndecodableFrom] that couldn't be decoded
+ * (e.g. ones from a newer version), so that saving the others doesn't lose them.
+ */
+internal fun encodeContextProfiles(
+    profiles: List<ContextProfile>,
+    keepingUndecodableFrom: String = "",
+): String =
+    JsonArray(
+            profiles.map { contextProfilesJson.encodeToJsonElement(it) } +
+                profileElements(keepingUndecodableFrom).filter { decodeProfile(it) == null }
+        )
+        .toString()
 
-/** Decodes stored profiles, falling back to none so that a bad config can't break locating. */
+/**
+ * Decodes stored profiles. One that can't be decoded is left out rather than failing them all, so
+ * that a bad config can't break locating.
+ */
 internal fun decodeContextProfiles(json: String): List<ContextProfile> =
+    profileElements(json).mapNotNull(::decodeProfile)
+
+private fun profileElements(json: String): List<JsonElement> =
     if (json.isBlank()) {
       emptyList()
     } else {
       try {
-        contextProfilesJson.decodeFromString<List<ContextProfile>>(json)
+        contextProfilesJson.parseToJsonElement(json).jsonArray
       } catch (e: IllegalArgumentException) {
         // Including the SerializationException that bad JSON gives
         Timber.w(e, "Unable to decode context profiles, ignoring them")
         emptyList()
       }
+    }
+
+private fun decodeProfile(element: JsonElement): ContextProfile? =
+    try {
+      contextProfilesJson.decodeFromJsonElement<ContextProfile>(element)
+    } catch (e: IllegalArgumentException) {
+      Timber.w(e, "Unable to decode context profile, ignoring it")
+      null
     }

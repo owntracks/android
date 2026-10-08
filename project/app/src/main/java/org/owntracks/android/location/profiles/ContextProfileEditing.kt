@@ -6,7 +6,7 @@ import org.owntracks.android.preferences.Preferences
 var Preferences.contextProfileList: List<ContextProfile>
   get() = decodeContextProfiles(contextProfiles)
   set(value) {
-    contextProfiles = encodeContextProfiles(value)
+    contextProfiles = encodeContextProfiles(value, keepingUndecodableFrom = contextProfiles)
   }
 
 /** Replaces the profile with the same id, or adds it to the end if there isn't one */
