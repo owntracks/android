@@ -19,11 +19,9 @@ import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.preference.PreferenceManager
 import kotlin.math.roundToInt
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import org.osmdroid.config.Configuration
 import org.osmdroid.events.DelayedMapListener
 import org.osmdroid.events.MapListener
 import org.osmdroid.events.ScrollEvent
@@ -110,15 +108,7 @@ internal constructor(
       container: ViewGroup?,
       savedInstanceState: Bundle?,
   ): View {
-    Configuration.getInstance().apply {
-      load(requireContext(), PreferenceManager.getDefaultSharedPreferences(requireContext()))
-      osmdroidBasePath.resolve("tiles").run {
-        if (exists()) {
-          deleteRecursively()
-        }
-      }
-      osmdroidTileCache = requireContext().noBackupFilesDir.resolve("osmdroid/tiles")
-    }
+    configureOsmdroid(requireContext())
     val view = super.onCreateView(inflater, container, savedInstanceState)
     initMap()
     return view
