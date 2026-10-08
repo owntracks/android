@@ -2,10 +2,14 @@ package org.owntracks.android.location.profiles
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
@@ -22,7 +26,7 @@ import timber.log.Timber
  * Changing one of the locator preferences while a profile is active (e.g. the user picking a
  * monitoring mode) suspends that profile until the context changes and a different one matches.
  */
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @Singleton
 class ContextProfileManager
 @Inject
@@ -34,6 +38,9 @@ constructor(
   private var deviceContext = DeviceContext()
   /** No profile is matched until the device context is known, which it isn't to begin with */
   private var deviceContextKnown = false
+
+  /** How long a change in the device context must last before it's applied */
+  internal var deviceContextSettleTime = DEVICE_CONTEXT_SETTLE_TIME
   // Restored, so that a manual change still wins after the app has been restarted
   private var selection =
       ProfileSelection(
@@ -71,6 +78,15 @@ constructor(
       enabled
           .flatMapLatest { enabled ->
             if (enabled) deviceContextProvider.deviceContext else flowOf(DeviceContext())
+          }
+          // Once known, a change has to last a little while before it's applied, so that e.g. Wi-Fi
+          // dropping out for a moment doesn't switch profiles, nor undo the user's manual change
+          .debounce {
+            if (synchronized(this@ContextProfileManager) { deviceContextKnown }) {
+              deviceContextSettleTime
+            } else {
+              Duration.ZERO
+            }
           }
           .collect {
             Timber.d("Device context changed: $it")
@@ -148,6 +164,8 @@ constructor(
   }
 
   companion object {
+    private val DEVICE_CONTEXT_SETTLE_TIME = 10.seconds
+
     private val PROFILE_PREFERENCES =
         setOf(Preferences::contextProfiles.name, Preferences::contextProfilesEnabled.name)
 

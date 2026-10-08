@@ -1,9 +1,12 @@
 package org.owntracks.android.location.profiles
 
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -49,8 +52,11 @@ class ContextProfileManagerTest {
       }
   private val deviceContextProvider = FakeDeviceContextProvider()
 
-  private fun TestScope.buildManager() =
-      ContextProfileManager(preferences, deviceContextProvider, backgroundScope)
+  /** Changes in context apply straight away, unless a test is about them settling */
+  private fun TestScope.buildManager(settleTime: Duration = Duration.ZERO) =
+      ContextProfileManager(preferences, deviceContextProvider, backgroundScope).apply {
+        deviceContextSettleTime = settleTime
+      }
 
   @Test
   fun `with no matching profile the settings are the preferences`() =
@@ -307,5 +313,48 @@ class ContextProfileManagerTest {
         manager.setMonitoringModeManually(MonitoringMode.Manual)
         deviceContextProvider.deviceContext.tryEmit(DeviceContext())
         assertEquals(listOf(false, false), heldWhileSaving)
+      }
+
+  @Test
+  fun `a brief change in context doesn't undo a manual change`() =
+      runTest(UnconfinedTestDispatcher()) {
+        val manager = buildManager(settleTime = 10.seconds)
+        deviceContextProvider.deviceContext.tryEmit(
+            DeviceContext(chargingSource = ChargingSource.Cable)
+        )
+        manager.setMonitoringModeManually(MonitoringMode.Manual)
+        // e.g. the charger's connection blipping
+        deviceContextProvider.deviceContext.tryEmit(DeviceContext())
+        advanceTimeBy(2.seconds)
+        deviceContextProvider.deviceContext.tryEmit(
+            DeviceContext(chargingSource = ChargingSource.Cable)
+        )
+        advanceTimeBy(20.seconds)
+        assertEquals(car, manager.matchedProfile.value)
+        assertNull(manager.activeProfile.value)
+      }
+
+  @Test
+  fun `a lasting change in context applies once it's settled`() =
+      runTest(UnconfinedTestDispatcher()) {
+        val manager = buildManager(settleTime = 10.seconds)
+        deviceContextProvider.deviceContext.tryEmit(DeviceContext())
+        deviceContextProvider.deviceContext.tryEmit(
+            DeviceContext(chargingSource = ChargingSource.Cable)
+        )
+        advanceTimeBy(5.seconds)
+        assertNull(manager.activeProfile.value)
+        advanceTimeBy(6.seconds)
+        assertEquals(car, manager.activeProfile.value)
+      }
+
+  @Test
+  fun `the first context applies straight away`() =
+      runTest(UnconfinedTestDispatcher()) {
+        val manager = buildManager(settleTime = 10.seconds)
+        deviceContextProvider.deviceContext.tryEmit(
+            DeviceContext(chargingSource = ChargingSource.Cable)
+        )
+        assertEquals(car, manager.activeProfile.value)
       }
 }
