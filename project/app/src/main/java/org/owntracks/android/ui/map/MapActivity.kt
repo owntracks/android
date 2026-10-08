@@ -739,7 +739,7 @@ class MapActivity :
 
   private fun updateMonitoringModeMenu() {
     menu?.findItem(R.id.menu_monitoring)?.run {
-      when (preferences.monitoring) {
+      when (viewModel.currentMonitoringMode.value) {
         MonitoringMode.Quiet -> {
           setIcon(R.drawable.ic_baseline_stop_36)
           setTitle(R.string.monitoring_quiet)

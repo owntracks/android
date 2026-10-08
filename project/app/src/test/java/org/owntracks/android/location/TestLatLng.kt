@@ -1,6 +1,7 @@
 package org.owntracks.android.location
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class TestLatLng {
@@ -69,5 +70,31 @@ class TestLatLng {
     val latLng = LatLng(lat, long)
     assertEquals(15.0, latLng.latitude.value, 0.0)
     assertEquals(10.0, latLng.longitude.value, 0.0)
+  }
+
+  @Test
+  fun `a LatLng is parsed from a latitude and longitude`() {
+    assertEquals(LatLng(51.5, -0.12), parseLatLng("51.5, -0.12"))
+    assertEquals(LatLng(51.5, -0.12), parseLatLng(" 51.5,-0.12 "))
+  }
+
+  @Test
+  fun `a LatLng outside the valid range is not parsed`() {
+    assertNull(parseLatLng("91, 0"))
+    assertNull(parseLatLng("0, -181"))
+  }
+
+  @Test
+  fun `a LatLng that isn't two numbers is not parsed`() {
+    assertNull(parseLatLng(""))
+    assertNull(parseLatLng("51.5"))
+    assertNull(parseLatLng("north, south"))
+    assertNull(parseLatLng("1, 2, 3"))
+  }
+
+  @Test
+  fun `a LatLng's display string parses back`() {
+    val latLng = LatLng(51.5, -0.1234)
+    assertEquals(latLng, parseLatLng(latLng.toDisplayString()))
   }
 }

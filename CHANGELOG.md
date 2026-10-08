@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### New features
+
+- New **Context profiles**: automatically change location reporting settings depending on the connected Wi-Fi network or Bluetooth device, charging, or current region, including reporting a static location instead of tracking (e.g. while at home). Off by default; see [PREFERENCES.md](docs/PREFERENCES.md#context-profiles)
+
 ## Version 2.6.0
 
 ### Security

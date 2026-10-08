@@ -257,6 +257,40 @@ These settings apply only when using HTTP mode (`mode=3`).
 
 ---
 
+## Context Profiles
+
+Context profiles change the location tracking settings automatically, depending on what the device is connected to or doing. Profiles are kept in priority order, and the first enabled profile that matches is applied. While a profile is applied, any setting it doesn't override keeps its normal value. The device is only watched while context profiles are enabled, and a change (e.g. connecting to a Wi-Fi network) has to last 10 seconds before profiles are matched again, so that a momentary drop-out doesn't switch profiles.
+
+Choosing a monitoring mode by hand, or changing a setting the applied profile overrides, takes precedence over that profile until a different profile (or no profile) matches, including across restarts.
+
+While a static location is being reported, real locations are only sent when explicitly requested from the device itself; remote `reportLocation` requests are answered with the static location. Region conditions depend on geofencing, which isn't available in the `oss` flavour without real locations, so combining a region condition with a static location only works in the `gms` flavour.
+
+### `contextProfilesEnabled`
+- **Type**: Boolean
+- **Default**: `false`
+- **MQTT**: ✓ | **HTTP**: ✓
+- **Description**: Whether context profiles are applied at all. When disabled, location tracking only uses the normal settings.
+
+### `contextProfiles`
+- **Type**: String (JSON array)
+- **Default**: `[]`
+- **MQTT**: ✓ | **HTTP**: ✓
+- **Description**: The context profiles, in priority order. Each profile has:
+  - `id`: unique identifier
+  - `name`: display name, shown in the ongoing notification while the profile is applied
+  - `enabled`: whether the profile is considered (default `true`)
+  - `match`: how many of the `conditions` must match for the profile to apply: `any` (default), `all` or `none`. A profile with no conditions never applies
+  - `conditions`:
+    - `{"type": "wifi", "ssid": "MyHome"}`: connected to this Wi-Fi network
+    - `{"type": "anyWifi"}`: connected to any Wi-Fi network
+    - `{"type": "bluetooth", "address": "AA:BB:CC:DD:EE:FF", "name": "Car"}`: connected to this Bluetooth device
+    - `{"type": "charging"}`: the device is charging
+    - `{"type": "chargingFrom", "source": "wireless"}`: the device is charging from `cable` (mains or USB), `wireless` or `dock`
+    - `{"type": "region", "tst": 1700000000}`: inside the region of the waypoint with this `tst` (its creation timestamp, as in exported waypoints)
+  - `overrides`: any of `monitoring`, `locatorInterval`, `moveModeLocatorInterval`, `locatorDisplacement`, `locatorPriority`, `ping` and `staticLocation`. `staticLocation` (`{"latitude": 51.5, "longitude": -0.1, "accuracy": 10}`) stops location updates entirely and reports that location instead, once when the profile is applied and then every `ping` minutes.
+
+---
+
 ## Geofencing & Regions
 
 ### `fusedRegionDetection`

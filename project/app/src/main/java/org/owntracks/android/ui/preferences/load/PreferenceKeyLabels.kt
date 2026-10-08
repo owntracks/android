@@ -13,6 +13,8 @@ val PREFERENCE_KEY_LABELS: Map<String, Int> =
         "clientId" to R.string.preferencesClientId,
         "cmd" to R.string.preferencesRemoteCommand,
         "connectionTimeoutSeconds" to R.string.preferencesConnectionTimeoutSeconds,
+        "contextProfiles" to R.string.preferencesContextProfiles,
+        "contextProfilesEnabled" to R.string.preferencesContextProfilesEnabled,
         "debugLog" to R.string.preferencesDebugLog,
         "deviceId" to R.string.preferencesDeviceName,
         "discardNetworkLocationThresholdSeconds" to

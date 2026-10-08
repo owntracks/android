@@ -75,6 +75,8 @@ class PreferenceTest {
       listOf(
           "autostartOnBoot",
           "connectionTimeoutSeconds",
+          "contextProfiles",
+          "contextProfilesEnabled",
           "debugLog",
           "deviceId",
           "fusedRegionDetection",
@@ -196,5 +198,14 @@ class PreferenceTest {
   fun `given an empty Preferences object, when asking for a value, then the default value is returned`() {
     val preferences = Preferences(preferencesStore, mockIdlingresource)
     assertEquals(false, preferences.debugLog)
+  }
+
+  @Test
+  fun `the context profile the user has overridden is not exported`() {
+    val preferences = Preferences(preferencesStore, mockIdlingresource)
+    preferences.suspendedContextProfileId = "home"
+    assertFalse(
+        preferences.exportToMessage().containsKey(Preferences::suspendedContextProfileId.name)
+    )
   }
 }

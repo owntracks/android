@@ -229,6 +229,10 @@ constructor(
 
   @Preference var connectionTimeoutSeconds: Int by preferencesStore
 
+  @Preference var contextProfiles: String by preferencesStore
+
+  @Preference var contextProfilesEnabled: Boolean by preferencesStore
+
   @Preference var debugLog: Boolean by preferencesStore
 
   @Preference var deviceId: String by preferencesStore
@@ -361,6 +365,8 @@ constructor(
   // Preferences we store but don't export / import
   var firstStart: Boolean by preferencesStore
   var setupCompleted: Boolean by preferencesStore
+  /** The context profile the user has manually overridden, or empty if there isn't one */
+  var suspendedContextProfileId: String by preferencesStore
 
   // Needs to be after all the preferences are declared, otherwise the delegates are null.
   init {
@@ -434,10 +440,6 @@ constructor(
     get() {
       return pubTopicBaseWithUserDetails + statusTopicSuffix
     }
-
-  fun setMonitoringNext() {
-    monitoring = monitoring.next()
-  }
 
   // SharedPreferencesImpl stores its listeners as a list of WeakReferences. So we shouldn't use a
   // lambda as a listener, as that'll just get GC'd and then mysteriously disappear

@@ -27,6 +27,11 @@
         app:fragment="org.owntracks.android.ui.preferences.ReportingFragment"
         app:icon="@drawable/ic_baseline_send_24" />
     <Preference
+        android:key="contextProfilesScreen"
+        android:title="@string/preferencesContextProfiles"
+        app:fragment="org.owntracks.android.ui.preferences.ContextProfilesFragment"
+        app:icon="@drawable/ic_baseline_autorenew_24" />
+    <Preference
         android:key="notificationScreen"
         android:title="@string/preferencesNotification"
         app:fragment="org.owntracks.android.ui.preferences.NotificationFragment"

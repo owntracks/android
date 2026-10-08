@@ -44,6 +44,8 @@ import javax.inject.Named
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
@@ -70,9 +72,12 @@ import org.owntracks.android.location.geofencing.GeofencingClient
 import org.owntracks.android.location.geofencing.GeofencingEvent
 import org.owntracks.android.location.geofencing.GeofencingEvent.Companion.fromIntent
 import org.owntracks.android.location.geofencing.GeofencingRequest
+import org.owntracks.android.location.profiles.ContextProfileManager
+import org.owntracks.android.location.profiles.LocatorSettings
 import org.owntracks.android.location.toLatLng
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.model.messages.MessageTransition
+import org.owntracks.android.net.WifiInfoProvider
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.Preferences.Companion.PREFERENCES_THAT_WIPE_QUEUE_AND_CONTACTS
 import org.owntracks.android.preferences.types.ConnectionMode
@@ -118,6 +123,10 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
 
   @Inject lateinit var requirementsChecker: RequirementsChecker
 
+  @Inject lateinit var contextProfileManager: ContextProfileManager
+
+  @Inject lateinit var wifiInfoProvider: WifiInfoProvider
+
   @Inject
   @Named("contactsClearedIdlingResource")
   lateinit var contactsClearedIdlingResource: SimpleIdlingResource
@@ -131,7 +140,9 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
         }
       }
 
-  private val ongoingNotification by lazy { OngoingNotification(this, preferences.monitoring) }
+  private val ongoingNotification by lazy {
+    OngoingNotification(this, contextProfileManager.locatorSettings.value.monitoring)
+  }
   private val notificationManagerCompat by lazy { NotificationManagerCompat.from(this) }
   private val activityManager by lazy {
     this.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
@@ -147,6 +158,9 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
 
   // Significant motion sensor for triggering location requests when device movement is detected
   private lateinit var significantMotionSensor: SignificantMotionSensor
+
+  /** The [LocatorSettings] that the current location request was set up with */
+  private var appliedLocatorSettings: LocatorSettings? = null
 
   @EntryPoint
   @InstallIn(SingletonComponent::class)
@@ -187,6 +201,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
         SignificantMotionSensor(
             this,
             preferences,
+            contextProfileManager.locatorSettings,
             locationProviderClient,
             requirementsChecker,
             callbackForReportType[MessageLocation.ReportType.SIGNIFICANT_MOTION]!!.value,
@@ -238,6 +253,32 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
               }
             }
           }
+        }
+        launch {
+          // Profiles changing, or the preferences they override changing, both land here. Nothing
+          // is requested until it's known which profile applies.
+          combine(contextProfileManager.ready, contextProfileManager.locatorSettings) {
+                  ready,
+                  settings ->
+                settings.takeIf { ready }
+              }
+              .filterNotNull()
+              .collect {
+                if (it != appliedLocatorSettings) {
+                  Timber.d("Locator settings changed. Resetting location request.")
+                  setupLocationRequest()
+                }
+              }
+        }
+        launch {
+          combine(contextProfileManager.locatorSettings, contextProfileManager.activeProfile) {
+                  settings,
+                  profile ->
+                settings.monitoring to profile?.name
+              }
+              .collect { (monitoring, profileName) ->
+                ongoingNotification.setMonitoringMode(monitoring, profileName)
+              }
         }
         launch {
           endpointStateRepo.endpointState.collect {
@@ -370,13 +411,15 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
           return
         }
         INTENT_ACTION_CHANGE_MONITORING -> {
-          if (intent.hasExtra("monitoring")) {
-            val newMode = getByValue(intent.getIntExtra("monitoring", preferences.monitoring.value))
-            preferences.monitoring = newMode
-          } else {
-            // Step monitoring mode if no mode is specified
-            preferences.setMonitoringNext()
-          }
+          val currentMode = contextProfileManager.locatorSettings.value.monitoring
+          contextProfileManager.setMonitoringModeManually(
+              if (intent.hasExtra("monitoring")) {
+                getByValue(intent.getIntExtra("monitoring", currentMode.value))
+              } else {
+                // Step monitoring mode if no mode is specified
+                currentMode.next()
+              }
+          )
           hasBeenStartedExplicitly = true
           notificationManagerCompat.cancel(BACKGROUND_LOCATION_RESTRICTION_NOTIFICATION_TAG, 0)
           return
@@ -441,6 +484,8 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
   private fun setupAndStartService() {
     Timber.v("setupAndStartService")
     startForegroundService()
+    // We may only just have been given location permission, which the SSID needs
+    wifiInfoProvider.refreshConnectedSSID()
     setupLocationRequest()
     scheduler.scheduleLocationPing()
     significantMotionSensor.setup()
@@ -617,6 +662,15 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
   }
 
   fun requestOnDemandLocationUpdate(reportType: MessageLocation.ReportType) {
+    // Only the user asking for their location gets the real one while a static one is reported
+    val staticLocation = contextProfileManager.locatorSettings.value.staticLocation
+    if (staticLocation != null && reportType != MessageLocation.ReportType.USER) {
+      Timber.d("On demand location request answered with the static location")
+      lifecycleScope.launch {
+        locationProcessor.onLocationChanged(staticLocation.toLocation(), reportType)
+      }
+      return
+    }
     if (requirementsChecker.hasLocationPermissions()) {
       Timber.d("On demand location request")
       locationProviderClient.singleHighAccuracyLocation(
@@ -630,29 +684,49 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
 
   private fun setupLocationRequest(): Result<Unit> {
     Timber.v("setupLocationRequest")
+    if (!contextProfileManager.ready.value) {
+      Timber.d("Not requesting locations until it's known which context profile applies")
+      return Result.success(Unit)
+    }
     if (requirementsChecker.hasLocationPermissions()) {
-      val monitoring = preferences.monitoring
+      val settings = contextProfileManager.locatorSettings.value
+      val previousStaticLocation = appliedLocatorSettings?.staticLocation
+      appliedLocatorSettings = settings
+      settings.staticLocation?.run {
+        Timber.d("Reporting static location $this instead of requesting location updates")
+        locationProviderClient.removeLocationUpdates(
+            callbackForReportType[MessageLocation.ReportType.DEFAULT]!!.value
+        )
+        // Report it straight away when we arrive at it. After that, the location ping repeats it.
+        if (this != previousStaticLocation) {
+          lifecycleScope.launch {
+            locationProcessor.onLocationChanged(toLocation(), MessageLocation.ReportType.DEFAULT)
+          }
+        }
+        return Result.success(Unit)
+      }
+      val monitoring = settings.monitoring
       var interval: Duration? = null
       var smallestDisplacement: Float? = null
       val priority: LocatorPriority
       when (monitoring) {
         MonitoringMode.Quiet,
         MonitoringMode.Manual -> {
-          interval = Duration.ofSeconds(preferences.locatorInterval.toLong())
-          smallestDisplacement = preferences.locatorDisplacement.toFloat()
-          priority = preferences.locatorPriority ?: LocatorPriority.LowPower
+          interval = Duration.ofSeconds(settings.locatorInterval.toLong())
+          smallestDisplacement = settings.locatorDisplacement.toFloat()
+          priority = settings.locatorPriority ?: LocatorPriority.LowPower
         }
 
         MonitoringMode.Significant -> {
-          interval = Duration.ofSeconds(preferences.locatorInterval.toLong())
-          smallestDisplacement = preferences.locatorDisplacement.toFloat()
+          interval = Duration.ofSeconds(settings.locatorInterval.toLong())
+          smallestDisplacement = settings.locatorDisplacement.toFloat()
           // QPR1 (where balanced-accuracy stopped using GNSS, per #2155) isn't separately
           // detectable from the Android 16 GA release, so we gate on Android 16+ generally.
           val useGnss =
               Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA &&
                   preferences.useGNSSInSignificantMonitoringMode
           priority =
-              preferences.locatorPriority
+              settings.locatorPriority
                   ?: if (useGnss) {
                     LocatorPriority.HighAccuracy
                   } else {
@@ -661,8 +735,8 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
         }
 
         MonitoringMode.Move -> {
-          interval = Duration.ofSeconds(preferences.moveModeLocatorInterval.toLong())
-          priority = preferences.locatorPriority ?: LocatorPriority.HighAccuracy
+          interval = Duration.ofSeconds(settings.moveModeLocatorInterval.toLong())
+          priority = settings.locatorPriority ?: LocatorPriority.HighAccuracy
         }
       }
       val fastestInterval =
@@ -746,12 +820,8 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
   override fun onPreferenceChanged(properties: Set<String>) {
     val propertiesWeCareAbout =
         listOf(
-            Preferences::locatorInterval.name,
-            Preferences::locatorDisplacement.name,
-            Preferences::moveModeLocatorInterval.name,
             Preferences::pegLocatorFastestIntervalToInterval.name,
             Preferences::notificationHigherPriority.name,
-            Preferences::locatorPriority.name,
             Preferences::useGNSSInSignificantMonitoringMode.name,
         )
     if (
@@ -763,10 +833,6 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
     ) {
       Timber.d("locator preferences changed. Resetting location request.")
       setupLocationRequest()
-    }
-    if (properties.contains("monitoring")) {
-      setupLocationRequest()
-      ongoingNotification.setMonitoringMode(preferences.monitoring)
     }
     if (properties.intersect(PREFERENCES_THAT_WIPE_QUEUE_AND_CONTACTS).isNotEmpty()) {
       lifecycleScope.launch { contactsRepo.clearAll() }
@@ -789,6 +855,7 @@ class BackgroundService : LifecycleService(), Preferences.OnPreferenceChangeList
 
   fun reInitializeLocationRequests() {
     Timber.v("Reinitializing location requests")
+    wifiInfoProvider.refreshConnectedSSID()
     runThingsOnOtherThreads.postOnServiceHandlerDelayed(
         {
           if (setupLocationRequest().isSuccess) {
