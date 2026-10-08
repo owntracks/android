@@ -1,11 +1,12 @@
 package org.owntracks.android.location.profiles
 
-import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.Duration
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 /** Source of the current [DeviceContext] */
 interface DeviceContextProvider {
@@ -22,14 +23,24 @@ interface DeviceContextProvider {
  * reports can't hold up the others for ever.
  */
 internal fun <T> Flow<T>.orFallbackAfter(timeout: Duration, fallback: T): Flow<T> = channelFlow {
-  val emitted = AtomicBoolean(false)
+  // Checking whether anything's been emitted and sending happen together, so that the fallback
+  // can't be sent after a value it lost the race to
+  val sending = Mutex()
+  var emitted = false
   val fallbackJob = launch {
     delay(timeout)
-    if (emitted.compareAndSet(false, true)) send(fallback)
+    sending.withLock {
+      if (!emitted) {
+        emitted = true
+        send(fallback)
+      }
+    }
   }
   collect {
-    emitted.set(true)
-    fallbackJob.cancel()
-    send(it)
+    sending.withLock {
+      emitted = true
+      fallbackJob.cancel()
+      send(it)
+    }
   }
 }
