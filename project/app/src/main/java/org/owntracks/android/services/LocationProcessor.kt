@@ -108,7 +108,7 @@ constructor(
   suspend fun publishLocationMessage(trigger: MessageLocation.ReportType) =
       locationRepo.currentPublishedLocation.value?.run { publishLocationMessage(trigger, this) }
 
-  private val highAccuracyProviders = setOf("gps", "fused")
+  private val highAccuracyProviders = setOf("gps", "fused", "external_gnss")
 
   // Matches the notificationResponsiveness used for native GMS geofencing, so both flavors have
   // comparable real-world hysteresis around a waypoint boundary.
