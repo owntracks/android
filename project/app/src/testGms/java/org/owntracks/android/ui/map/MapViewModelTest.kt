@@ -26,4 +26,14 @@ class MapViewModelTest {
   fun `MapLayerStyle provider test asserts that OSM is different to Google Map style`() {
     assertFalse(MapLayerStyle.GoogleMapHybrid.isSameProviderAs(MapLayerStyle.OpenStreetMapNormal))
   }
+
+  @Test
+  fun `MapLayerStyle provider test asserts that same No Map style is the same`() {
+    assertTrue(MapLayerStyle.NoMap.isSameProviderAs(MapLayerStyle.NoMap))
+  }
+
+  @Test
+  fun `MapLayerStyle provider test asserts that No Map is different to Google Map style`() {
+    assertFalse(MapLayerStyle.NoMap.isSameProviderAs(MapLayerStyle.GoogleMapDefault))
+  }
 }
