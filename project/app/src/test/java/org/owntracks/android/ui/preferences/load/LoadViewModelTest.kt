@@ -83,6 +83,23 @@ class LoadViewModelTest {
       }
 
   @Test
+  fun `Given allowConfigurationByURIAndConfigFile is false and external configuration is authorized, when loading an owntracks scheme URI, then the import succeeds`() =
+    runTest {
+      val preferences = Preferences(preferencesStore, mockIdlingResource)
+      // allowConfigurationByURIAndConfigFile defaults to false
+      val vm = makeVm(preferences)
+
+      vm.extractPreferencesFromUri(
+          "owntracks:///config?inline=eyJfdHlwZSI6ImNvbmZpZ3VyYXRpb24ifQ==",
+          externalConfigurationAuthorized = true,
+      )
+
+      advanceUntilIdle()
+
+      assertEquals(ImportStatus.SUCCESS, vm.configurationImportStatus.value)
+    }
+
+  @Test
   fun `Given allowConfigurationByURIAndConfigFile is false, when loading a file URI, then the import fails`() =
       runTest {
         val preferences = Preferences(preferencesStore, mockIdlingResource)

@@ -175,7 +175,10 @@ constructor(
    * @param uriString a string containing maybe a URI
    */
   @OptIn(ExperimentalEncodingApi::class)
-  fun extractPreferencesFromUri(uriString: String) {
+  fun extractPreferencesFromUri(
+    uriString: String,
+    externalConfigurationAuthorized: Boolean = false,
+  ) {
     val uri =
         try {
           URI(uriString)
@@ -184,7 +187,7 @@ constructor(
           return
         }
     try {
-      if (!preferences.allowConfigurationByURIAndConfigFile) {
+      if (!preferences.allowConfigurationByURIAndConfigFile && !externalConfigurationAuthorized) {
         throw IOException(context.getString(R.string.loadActivityErrorExternalConfigDisabled))
       }
       if (ContentResolver.SCHEME_FILE == uri.scheme) {
