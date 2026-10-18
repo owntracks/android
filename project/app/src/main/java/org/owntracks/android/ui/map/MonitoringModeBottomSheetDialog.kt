@@ -19,18 +19,24 @@ class MonitoringModeBottomSheetDialog : BottomSheetDialogFragment() {
       savedInstanceState: Bundle?,
   ): View {
     binding = ModeBottomSheetDialogBinding.inflate(inflater, container, false)
-    mapOf(
+    val monitoringModeButtonsToModes =
+        mapOf(
             binding.fabMonitoringModeQuiet to MonitoringMode.Quiet,
             binding.fabMonitoringModeManual to MonitoringMode.Manual,
             binding.fabMonitoringModeSignificantChanges to MonitoringMode.Significant,
             binding.fabMonitoringModeMove to MonitoringMode.Move,
         )
-        .forEach {
-          it.key.setOnClickListener { _ ->
-            viewModel.setMonitoringMode(it.value)
-            dismiss()
-          }
-        }
+    monitoringModeButtonsToModes.forEach {
+      it.key.setOnClickListener { _ ->
+        viewModel.setMonitoringMode(it.value)
+        dismiss()
+      }
+    }
+    monitoringModeButtonsToModes
+        .filterValues { it == viewModel.currentMonitoringMode.value }
+        .keys
+        .firstOrNull()
+        ?.showAsSelected()
     return insetAwareMapBottomSheetContent(binding.root)
   }
 }
