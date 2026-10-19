@@ -57,12 +57,20 @@ class WaypointActivity : AppCompatActivity() {
           lifecycleOwner = this@WaypointActivity
           setSupportActionBar(appbar.toolbar)
           latitude.addTextChangedListener {
-            it.toString().toDoubleOrNull()
-                ?: run { latitude.error = getString(R.string.invalidLatitudeError) }
+            latitude.error =
+                if (it.toString().toDoubleOrNull() == null) {
+                  getString(R.string.invalidLatitudeError)
+                } else {
+                  null
+                }
           }
           longitude.addTextChangedListener {
-            it.toString().toDoubleOrNull()
-                ?: run { longitude.error = getString(R.string.invalidLongitudeError) }
+            longitude.error =
+                if (it.toString().toDoubleOrNull() == null) {
+                  getString(R.string.invalidLongitudeError)
+                } else {
+                  null
+                }
           }
           textFields.forEach { it.addTextChangedListener { setSaveButtonEnabledStatus() } }
 
