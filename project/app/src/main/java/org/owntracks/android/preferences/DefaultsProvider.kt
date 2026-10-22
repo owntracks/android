@@ -21,6 +21,8 @@ interface DefaultsProvider {
               .replace("\\W".toRegex(), "")
               .lowercase(Locale.getDefault())
       Preferences::connectionTimeoutSeconds -> 30
+      Preferences::contextProfiles -> "[]"
+      Preferences::contextProfilesEnabled -> false
       Preferences::debugLog -> false
       Preferences::deviceId ->
           Build.DEVICE?.replace(" ", "-")
@@ -72,6 +74,7 @@ interface DefaultsProvider {
       Preferences::sub -> true
       Preferences::subQos -> MqttQos.Two
       Preferences::subTopic -> DEFAULT_SUB_TOPIC
+      Preferences::suspendedContextProfileId -> ""
       Preferences::theme -> AppTheme.Auto
       Preferences::tls -> true
       Preferences::tlsClientCrt -> ""

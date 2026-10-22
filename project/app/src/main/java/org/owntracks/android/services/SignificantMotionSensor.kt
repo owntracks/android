@@ -10,8 +10,10 @@ import android.hardware.TriggerEventListener
 import android.os.Looper
 import android.os.SystemClock
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.flow.StateFlow
 import org.owntracks.android.location.LocationCallback
 import org.owntracks.android.location.LocationProviderClient
+import org.owntracks.android.location.profiles.LocatorSettings
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.MonitoringMode
 import org.owntracks.android.support.RequirementsChecker
@@ -27,6 +29,7 @@ import timber.log.Timber
 class SignificantMotionSensor(
     private val context: Context,
     private val preferences: Preferences,
+    private val locatorSettings: StateFlow<LocatorSettings>,
     private val locationProviderClient: LocationProviderClient,
     private val requirementsChecker: RequirementsChecker,
     private val locationCallback: LocationCallback,
@@ -114,13 +117,19 @@ class SignificantMotionSensor(
     // We do this regardless of rate limiting so we don't miss future motion events
     setup()
 
+    val settings = locatorSettings.value
+    if (settings.staticLocation != null) {
+      Timber.d("Significant motion detected but a static location is being reported. Ignoring.")
+      return
+    }
+
     // Rate limit: use the same interval logic as BackgroundService location requests
     val now = SystemClock.elapsedRealtime()
     val intervalSeconds =
-        if (preferences.monitoring == MonitoringMode.Move) {
-          preferences.moveModeLocatorInterval
+        if (settings.monitoring == MonitoringMode.Move) {
+          settings.moveModeLocatorInterval
         } else {
-          preferences.locatorInterval
+          settings.locatorInterval
         }
     val minIntervalMs =
         if (preferences.pegLocatorFastestIntervalToInterval) {

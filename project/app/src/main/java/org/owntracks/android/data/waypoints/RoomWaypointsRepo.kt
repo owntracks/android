@@ -138,6 +138,7 @@ constructor(
     }
     scope.launch(ioDispatcher + handler) {
       migrateFromLegacyStorage()
+      loadEnteredWaypointTsts()
       _migrationCompleteFlow.value = true
     }
   }

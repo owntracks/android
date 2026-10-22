@@ -93,6 +93,13 @@ class PreferencesGettersAndSetters(private val parameter: Parameter) {
                   false,
                   preferenceValueExpected = 1,
               ),
+              Parameter(
+                  "contextProfiles",
+                  """[{"id":"a","name":"A","conditions":[{"type":"charging"}],"overrides":{}}]""",
+                  String::class,
+                  false,
+              ),
+              Parameter("contextProfilesEnabled", true, Boolean::class, false),
               Parameter("debugLog", true, Boolean::class, false),
               Parameter("deviceId", "deviceId", String::class, false),
               Parameter("dontReuseHttpClient", true, Boolean::class, true),

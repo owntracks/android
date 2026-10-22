@@ -10,8 +10,10 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import org.owntracks.android.location.profiles.ContextProfileManager
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.services.BackgroundService
@@ -26,6 +28,7 @@ constructor(
     @Assisted workerParams: WorkerParameters,
     private val preferences: Preferences,
     private val locationProcessor: LocationProcessor,
+    private val contextProfileManager: ContextProfileManager,
 ) : CoroutineWorker(context, workerParams) {
   override suspend fun doWork(): Result {
     Timber.d("SendLocationPingWorker started")
@@ -54,7 +57,15 @@ constructor(
         )
     if (result) {
       mutex.withLock {
-        if (
+        // Don't ping with settings that are about to change
+        contextProfileManager.ready.first { it }
+        val staticLocation = contextProfileManager.locatorSettings.value.staticLocation
+        if (staticLocation != null) {
+          locationProcessor.onLocationChanged(
+              staticLocation.toLocation(),
+              MessageLocation.ReportType.PING,
+          )
+        } else if (
             preferences.experimentalFeatures.contains(
                 Preferences.EXPERIMENTAL_FEATURE_LOCATION_PING_USES_HIGH_ACCURACY_LOCATION_REQUEST
             )

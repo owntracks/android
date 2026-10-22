@@ -19,11 +19,9 @@ import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.preference.PreferenceManager
 import kotlin.math.roundToInt
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import org.osmdroid.config.Configuration
 import org.osmdroid.events.DelayedMapListener
 import org.osmdroid.events.MapListener
 import org.osmdroid.events.ScrollEvent
@@ -36,7 +34,6 @@ import org.osmdroid.views.overlay.CopyrightOverlay
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polygon
 import org.osmdroid.views.overlay.ScaleBarOverlay
-import org.osmdroid.views.overlay.TilesOverlay
 import org.osmdroid.views.overlay.compass.CompassOverlay
 import org.osmdroid.views.overlay.compass.IOrientationConsumer
 import org.osmdroid.views.overlay.compass.IOrientationProvider
@@ -110,29 +107,14 @@ internal constructor(
       container: ViewGroup?,
       savedInstanceState: Bundle?,
   ): View {
-    Configuration.getInstance().apply {
-      load(requireContext(), PreferenceManager.getDefaultSharedPreferences(requireContext()))
-      osmdroidBasePath.resolve("tiles").run {
-        if (exists()) {
-          deleteRecursively()
-        }
-      }
-      osmdroidTileCache = requireContext().noBackupFilesDir.resolve("osmdroid/tiles")
-    }
+    configureOsmdroid(requireContext())
     val view = super.onCreateView(inflater, container, savedInstanceState)
     initMap()
     return view
   }
 
   private fun setMapStyle() {
-    if (
-        resources.configuration.uiMode.and(android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
-            android.content.res.Configuration.UI_MODE_NIGHT_YES
-    ) {
-      mapView?.run { overlayManager.tilesOverlay.setColorFilter(TilesOverlay.INVERT_COLORS) }
-    } else {
-      mapView?.run { overlayManager.tilesOverlay.setColorFilter(null) }
-    }
+    mapView?.setTilesForUiMode(resources.configuration)
   }
 
   private val mapListener =

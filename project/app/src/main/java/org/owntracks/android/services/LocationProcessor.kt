@@ -19,6 +19,8 @@ import org.owntracks.android.data.waypoints.WaypointsRepo
 import org.owntracks.android.di.ApplicationScope
 import org.owntracks.android.di.CoroutineScopes
 import org.owntracks.android.location.geofencing.Geofence
+import org.owntracks.android.location.profiles.ContextProfileManager
+import org.owntracks.android.location.profiles.StaticLocation
 import org.owntracks.android.model.messages.AddMessageStatus
 import org.owntracks.android.model.messages.MessageLocation
 import org.owntracks.android.model.messages.MessageLocation.Companion.fromLocation
@@ -86,6 +88,7 @@ constructor(
     private val waypointsRepo: WaypointsRepo,
     private val deviceMetricsProvider: DeviceMetricsProvider,
     private val wifiInfoProvider: WifiInfoProvider,
+    private val contextProfileManager: ContextProfileManager,
     @param:ApplicationScope private val scope: CoroutineScope,
     @param:CoroutineScopes.IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @param:Named("publishResponseMessageIdlingResource")
@@ -120,7 +123,22 @@ constructor(
       location: Location,
   ): Result<Unit> {
     Timber.v("Maybe publishing $location with trigger $trigger")
-    if (!locationIsWithAccuracyThreshold(location))
+    val isStaticLocation = location.provider == StaticLocation.PROVIDER
+    // Real locations are only published when the user explicitly asks for their location while a
+    // static location might be reported instead: until it's known which profile applies, and while
+    // one is. They can still turn up then, e.g. one already on its way, or on demand.
+    if (!isStaticLocation && trigger != MessageLocation.ReportType.USER) {
+      if (!contextProfileManager.ready.value) {
+        Timber.d("Not publishing a real location until it's known which context profile applies")
+        return Result.failure(Exception("context profiles aren't known yet"))
+      }
+      if (contextProfileManager.locatorSettings.value.staticLocation != null) {
+        Timber.d("Not publishing a real location while a static location is being reported")
+        return Result.failure(Exception("a static location is being reported instead"))
+      }
+    }
+    // A static location's accuracy is configured rather than measured
+    if (!isStaticLocation && !locationIsWithAccuracyThreshold(location))
         return Result.failure(Exception("location accuracy too low"))
 
     // If this location has come from the network *and* the most recent location was both recent and
@@ -184,6 +202,9 @@ constructor(
         loadedWaypoints.isNotEmpty() &&
             preferences.fusedRegionDetection &&
             !nativeGeofencingAvailable &&
+            // Where we are isn't known while reporting a static location, so it can't tell us
+            // whether we've left a region (which may be what put us there)
+            location.provider != StaticLocation.PROVIDER &&
             trigger != MessageLocation.ReportType.CIRCULAR
     ) {
       pendingWaypointTransitions.keys.retainAll(loadedWaypoints.map { it.id }.toSet())
@@ -226,15 +247,13 @@ constructor(
         }
       }
     }
-    if (
-        preferences.monitoring === MonitoringMode.Quiet &&
-            MessageLocation.ReportType.USER != trigger
-    ) {
+    val monitoring = contextProfileManager.locatorSettings.value.monitoring
+    if (monitoring === MonitoringMode.Quiet && MessageLocation.ReportType.USER != trigger) {
       Timber.d("message suppressed by monitoring settings: quiet")
       return Result.failure(Exception("message suppressed by monitoring settings: quiet"))
     }
     if (
-        preferences.monitoring === MonitoringMode.Manual &&
+        monitoring === MonitoringMode.Manual &&
             MessageLocation.ReportType.USER != trigger &&
             MessageLocation.ReportType.CIRCULAR != trigger
     ) {
@@ -249,7 +268,7 @@ constructor(
                 battery = deviceMetricsProvider.batteryLevel
                 batteryStatus = deviceMetricsProvider.batteryStatus
                 conn = deviceMetricsProvider.connectionType.value
-                monitoringMode = preferences.monitoring
+                monitoringMode = monitoring
                 source = location.provider
               }
             } else {
@@ -334,8 +353,9 @@ constructor(
         waypointModel.lastTransition = transition
         waypointModel.lastTriggered = Instant.now()
         waypointsRepo.update(waypointModel, false)
-        if (preferences.monitoring === MonitoringMode.Quiet) {
-          Timber.d("message suppressed by monitoring settings: ${preferences.monitoring}")
+        val monitoring = contextProfileManager.locatorSettings.value.monitoring
+        if (monitoring === MonitoringMode.Quiet) {
+          Timber.d("message suppressed by monitoring settings: $monitoring")
         } else {
           publishTransitionMessage(waypointModel, location, transition, trigger)
           if (trigger == MessageTransition.TRIGGER_CIRCULAR) {
@@ -356,14 +376,16 @@ constructor(
       transition: Int,
       trigger: String,
   ) {
+    // While a static location is being reported, it's reported here too rather than where we are
+    val staticLocation = contextProfileManager.locatorSettings.value.staticLocation
     messageProcessor.queueMessageForSending(
         MessageTransition().apply {
           setTransition(transition)
           this.trigger = trigger
           trackerId = preferences.tid.toString()
-          latitude = triggeringLocation.latitude
-          longitude = triggeringLocation.longitude
-          accuracy = triggeringLocation.accuracy.roundToInt()
+          latitude = staticLocation?.latitude ?: triggeringLocation.latitude
+          longitude = staticLocation?.longitude ?: triggeringLocation.longitude
+          accuracy = staticLocation?.accuracy ?: triggeringLocation.accuracy.roundToInt()
           timestamp = TimeUnit.MILLISECONDS.toSeconds(triggeringLocation.time)
           waypointTimestamp = waypointModel.tst.epochSecond
           description = waypointModel.description

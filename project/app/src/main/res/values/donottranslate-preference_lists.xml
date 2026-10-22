@@ -4,6 +4,25 @@
         <item>0</item>
         <item>3</item>
     </string-array>
+    <string-array name="contextProfileLocatorPriorityValues" translatable="false">
+        <item />
+        <item>HighAccuracy</item>
+        <item>BalancedPowerAccuracy</item>
+        <item>LowPower</item>
+        <item>NoPower</item>
+    </string-array>
+    <string-array name="contextProfileMatchValues" translatable="false">
+        <item>Any</item>
+        <item>All</item>
+        <item>None</item>
+    </string-array>
+    <string-array name="contextProfileMonitoringValues" translatable="false">
+        <item />
+        <item>-1</item>
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
     <string-array name="geocoderValues" translatable="false">
         <item>None</item>
         <item>Device</item>

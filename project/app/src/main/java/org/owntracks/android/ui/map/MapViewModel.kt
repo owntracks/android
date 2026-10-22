@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.owntracks.android.BR
@@ -34,6 +35,7 @@ import org.owntracks.android.data.waypoints.WaypointModel
 import org.owntracks.android.data.waypoints.WaypointsRepo
 import org.owntracks.android.geocoding.GeocoderProvider
 import org.owntracks.android.location.LatLng
+import org.owntracks.android.location.profiles.ContextProfileManager
 import org.owntracks.android.location.toLatLng
 import org.owntracks.android.model.CommandAction
 import org.owntracks.android.model.Contact
@@ -60,6 +62,7 @@ constructor(
     private val waypointsRepo: WaypointsRepo,
     application: Application,
     private val requirementsChecker: RequirementsChecker,
+    private val contextProfileManager: ContextProfileManager,
 ) : AndroidViewModel(application) {
   // Reused buffers for Location.distanceBetween() calls. Two separate instances are required
   // because the two call-sites run on different threads (main thread vs sensor callback thread).
@@ -127,10 +130,15 @@ constructor(
   val scope: CoroutineScope
     get() = viewModelScope
 
-  private val mutableCurrentMonitoringMode = MutableStateFlow(preferences.monitoring)
-
-  val currentMonitoringMode: StateFlow<MonitoringMode>
-    get() = mutableCurrentMonitoringMode
+  // The mode in effect, which may come from a context profile rather than the preference
+  val currentMonitoringMode: StateFlow<MonitoringMode> =
+      contextProfileManager.locatorSettings
+          .map { it.monitoring }
+          .stateIn(
+              viewModelScope,
+              SharingStarted.Eagerly,
+              contextProfileManager.locatorSettings.value.monitoring,
+          )
 
   val viewMode: ViewMode by locationRepo::viewMode
 
@@ -163,9 +171,6 @@ constructor(
   private val preferenceChangeListener =
       object : Preferences.OnPreferenceChangeListener {
         override fun onPreferenceChanged(properties: Set<String>) {
-          if (properties.contains("monitoring")) {
-            mutableCurrentMonitoringMode.value = preferences.monitoring
-          }
           if (properties.contains("mode")) {
             clearActiveContact()
           }
@@ -475,7 +480,7 @@ constructor(
       }
 
   fun setMonitoringMode(mode: MonitoringMode) {
-    preferences.monitoring = mode
+    contextProfileManager.setMonitoringModeManually(mode)
   }
 
   fun setMapLayerStyle(mapLayerStyle: MapLayerStyle) {

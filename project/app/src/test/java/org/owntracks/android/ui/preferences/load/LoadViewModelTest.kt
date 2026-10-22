@@ -11,6 +11,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.double
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonArray
@@ -26,6 +27,11 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.owntracks.android.R
 import org.owntracks.android.data.waypoints.InMemoryWaypointsRepo
+import org.owntracks.android.location.profiles.Condition
+import org.owntracks.android.location.profiles.ContextProfile
+import org.owntracks.android.location.profiles.LocatorOverrides
+import org.owntracks.android.location.profiles.decodeContextProfiles
+import org.owntracks.android.location.profiles.encodeContextProfiles
 import org.owntracks.android.model.Parser
 import org.owntracks.android.preferences.InMemoryPreferencesStore
 import org.owntracks.android.preferences.Preferences
@@ -295,5 +301,54 @@ class LoadViewModelTest {
         advanceUntilIdle()
         assertEquals(ImportStatus.SAVED, vm.configurationImportStatus.value)
         assertEquals("te", preferences.tid.toString())
+      }
+
+  @Test
+  fun `Given a configuration with waypoints and a context profile for one of their regions, when loading and then saving it, then the profile's region is that waypoint`() =
+      runTest {
+        val preferences = Preferences(preferencesStore, mockIdlingResource)
+        val waypointsRepo = InMemoryWaypointsRepo(this, mockContext, StandardTestDispatcher())
+        val vm =
+            LoadViewModel(
+                preferences,
+                Parser(null),
+                waypointsRepo,
+                UnconfinedTestDispatcher(),
+                SimpleIdlingResource("", true),
+                mockContext,
+            )
+        val profile =
+            ContextProfile(
+                "work",
+                "Work",
+                listOf(Condition.InRegion(1598451372)),
+                LocatorOverrides(),
+            )
+        val config =
+            """
+            {
+              "_type":"configuration",
+              "waypoints":[
+                {
+                  "_type":"waypoint",
+                  "desc":"Work",
+                  "lat":51.0,
+                  "lon":0.0,
+                  "rad":450,
+                  "tst":1598451372
+                }
+              ],
+              "contextProfiles": ${JsonPrimitive(encodeContextProfiles(listOf(profile)))}
+            }
+            """
+                .trimIndent()
+        vm.extractPreferences(config.toByteArray())
+        vm.saveConfiguration()
+        advanceUntilIdle()
+        val region = decodeContextProfiles(preferences.contextProfiles).single().conditions.single()
+        assertEquals(
+            waypointsRepo.getAll().single().tst.epochSecond,
+            (region as Condition.InRegion).tst,
+        )
       }
 }

@@ -6,8 +6,11 @@ import java.nio.ByteBuffer
 import java.time.Instant
 import kotlin.time.measureTimedValue
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
+import org.owntracks.android.location.geofencing.Geofence
 import org.owntracks.android.location.geofencing.Latitude
 import org.owntracks.android.location.geofencing.Longitude
 import org.owntracks.android.model.messages.MessageWaypoint
@@ -41,9 +44,40 @@ protected constructor(
   private val mutableRepoChangedEvent = MutableSharedFlow<WaypointOperation>()
   val repoChangedEvent: SharedFlow<WaypointOperation> = mutableRepoChangedEvent
 
+  private val mutableEnteredWaypointTsts = MutableStateFlow<Set<Long>>(emptySet())
+  /**
+   * The [WaypointModel.tst]s (in epoch seconds) of the waypoints whose regions were last entered
+   * rather than exited. Unlike [repoChangedEvent], this also follows updates that aren't notified,
+   * such as transitions.
+   */
+  val enteredWaypointTsts: StateFlow<Set<Long>> = mutableEnteredWaypointTsts
+
+  /** Reads which waypoints are entered from scratch, e.g. once the repo is ready to be read */
+  protected suspend fun loadEnteredWaypointTsts() {
+    val waypoints = getAll()
+    mutableEnteredWaypointTsts.value = followTransitions(waypoints, emptySet())
+  }
+
+  /**
+   * Applies just the given waypoints' transitions. Atomic, so that concurrent transitions (e.g.
+   * leaving one region and entering another) can't overwrite each other.
+   */
+  private fun followTransitions(waypoints: List<WaypointModel>) =
+      mutableEnteredWaypointTsts.update {
+        followTransitions(waypoints, it)
+      }
+
+  private fun followTransitions(waypoints: List<WaypointModel>, entered: Set<Long>): Set<Long> {
+    val (enteredNow, notEntered) =
+        waypoints.partition { it.lastTransition == Geofence.GEOFENCE_TRANSITION_ENTER }
+    return entered - notEntered.map { it.tst.epochSecond }.toSet() +
+        enteredNow.map { it.tst.epochSecond }
+  }
+
   suspend fun insert(waypointModel: WaypointModel) {
     waypointModel.run {
       waypointModel.id = insertImpl(this@run)
+      followTransitions(listOf(this@run))
       mutableRepoChangedEvent.emit(WaypointOperation.Insert(this@run)).also {
         Timber.d("Inserted waypoint $this")
       }
@@ -53,6 +87,7 @@ protected constructor(
   private suspend fun insertAll(waypoints: List<WaypointModel>) {
     waypoints.apply {
       insertAllImpl(this)
+      followTransitions(this)
       mutableRepoChangedEvent.emit(WaypointOperation.InsertMany(this)).also {
         Timber.d("Inserted waypoints $this")
       }
@@ -62,6 +97,7 @@ protected constructor(
   suspend fun update(waypointModel: WaypointModel, notify: Boolean) {
     waypointModel.run {
       updateImpl(this@run)
+      followTransitions(listOf(this@run))
       if (notify) {
         mutableRepoChangedEvent.emit(WaypointOperation.Update(this@run)).also {
           Timber.d("Updated waypoint $this")
@@ -73,12 +109,14 @@ protected constructor(
   suspend fun delete(waypointModel: WaypointModel) {
     waypointModel.run {
       deleteImpl(this@run)
+      mutableEnteredWaypointTsts.update { it - tst.epochSecond }
       mutableRepoChangedEvent.emit(WaypointOperation.Delete(this@run))
     }
   }
 
   suspend fun clearAll() {
     clearImpl()
+    mutableEnteredWaypointTsts.value = emptySet()
     mutableRepoChangedEvent.emit(WaypointOperation.Clear).also { Timber.d("clearall waypoints") }
   }
 

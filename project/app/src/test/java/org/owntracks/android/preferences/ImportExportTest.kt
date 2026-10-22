@@ -2,6 +2,7 @@ package org.owntracks.android.preferences
 
 import android.content.Context
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.double
 import kotlinx.serialization.json.int
@@ -15,6 +16,12 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.owntracks.android.location.LocatorPriority
+import org.owntracks.android.location.profiles.Condition
+import org.owntracks.android.location.profiles.ContextProfile
+import org.owntracks.android.location.profiles.LocatorOverrides
+import org.owntracks.android.location.profiles.StaticLocation
+import org.owntracks.android.location.profiles.decodeContextProfiles
+import org.owntracks.android.location.profiles.encodeContextProfiles
 import org.owntracks.android.model.Parser
 import org.owntracks.android.model.messages.MessageConfiguration
 import org.owntracks.android.preferences.types.ConnectionMode
@@ -257,5 +264,48 @@ class ImportExportTest {
     val jsonNode = Json.parseToJsonElement(json).jsonObject
     assertTrue(jsonNode.containsKey("locatorPriority"))
     assertEquals("HighAccuracy", jsonNode["locatorPriority"]?.jsonPrimitive?.content)
+  }
+
+  private val home =
+      ContextProfile(
+          "home",
+          "Home",
+          listOf(Condition.WifiSsid("MyHome"), Condition.InRegion(1558351273)),
+          LocatorOverrides(ping = 30, staticLocation = StaticLocation(53.6, -1.5)),
+      )
+
+  @Test
+  fun `given a configuration with context profiles, when importing it, then they're set`() {
+    val input =
+        """
+        {
+          "_type": "configuration",
+          "contextProfilesEnabled": true,
+          "contextProfiles": ${JsonPrimitive(encodeContextProfiles(listOf(home)))}
+        }
+        """
+            .trimIndent()
+    val preferences = Preferences(preferencesStore, mockIdlingResource)
+    preferences.importConfiguration(Parser(null).fromJson(input) as MessageConfiguration)
+    assertTrue(preferences.contextProfilesEnabled)
+    assertEquals(listOf(home), decodeContextProfiles(preferences.contextProfiles))
+  }
+
+  @Test
+  fun `given context profiles, when exporting them, then they can be imported again`() {
+    val exporting = Preferences(preferencesStore, mockIdlingResource)
+    exporting.contextProfiles = encodeContextProfiles(listOf(home))
+    val exported = Parser(null).toJsonPlain(exporting.exportToMessage())
+    val importing = Preferences(InMemoryPreferencesStore(), mockIdlingResource)
+    importing.importConfiguration(Parser(null).fromJson(exported) as MessageConfiguration)
+    assertEquals(listOf(home), decodeContextProfiles(importing.contextProfiles))
+  }
+
+  @Test
+  fun `given a configuration with malformed context profiles, when importing it, then there are none`() {
+    val input = """{"_type": "configuration", "contextProfiles": "not profiles"}"""
+    val preferences = Preferences(preferencesStore, mockIdlingResource)
+    preferences.importConfiguration(Parser(null).fromJson(input) as MessageConfiguration)
+    assertEquals(emptyList<ContextProfile>(), decodeContextProfiles(preferences.contextProfiles))
   }
 }

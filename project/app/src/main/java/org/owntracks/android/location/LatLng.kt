@@ -46,3 +46,17 @@ fun MessageLocation.toLatLng() = LatLng(latitude, longitude)
 fun MessageTransition.toLatLng() = LatLng(latitude, longitude)
 
 fun Double.roundForDisplay(): String = BigDecimal(this).setScale(4, RoundingMode.HALF_UP).toString()
+
+/** Parses a "latitude, longitude" pair, or returns null if it isn't a valid one */
+fun parseLatLng(text: String): LatLng? {
+  val parts = text.split(",").map { it.trim().toDoubleOrNull() }
+  if (parts.size != 2) return null
+  val (latitude, longitude) = parts
+  return if (
+      latitude != null && longitude != null && latitude in -90.0..90.0 && longitude in -180.0..180.0
+  ) {
+    LatLng(latitude, longitude)
+  } else {
+    null
+  }
+}
