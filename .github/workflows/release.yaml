@@ -83,6 +83,7 @@ jobs:
         env:
           KEYSTORE_PASSPHRASE: ${{ secrets.KEYSTORE_PASSPHRASE }}
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
+          GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
 
       - name: Extract changelog
         run: awk '/^## / { if (p) {exit}; { p=1; next} } p' CHANGELOG.md > fastlane/metadata/android/en-US/changelogs/${{ env.VERSION_CODE}}.txt
