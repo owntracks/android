@@ -4,12 +4,16 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isEnabled
 import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.filters.SmallTest
 import com.adevinta.android.barista.interaction.BaristaEditTextInteractions.writeTo
+import dagger.hilt.android.testing.HiltAndroidTest
 import org.hamcrest.CoreMatchers.not
 import org.junit.Test
 import org.owntracks.android.R
 import org.owntracks.android.testutils.TestWithAnActivity
 
+@SmallTest
+@HiltAndroidTest
 class WaypointActivityTests : TestWithAnActivity<WaypointActivity>(true) {
   @Test
   fun saveButtonIsDisabledWhileCoordinateIsInvalidAndRecoversWhenItIsFixed() {
