@@ -15,7 +15,7 @@ jobs:
         with:
           stale-issue-message: "Marking issue with request for more data as stale, due to no updates."
           stale-issue-label: stale
-          only-labels: needs-more-info
+          only-labels: waiting-for-submitter
           debug-only: false
           days-before-close: 30
           days-before-pr-close: -1
