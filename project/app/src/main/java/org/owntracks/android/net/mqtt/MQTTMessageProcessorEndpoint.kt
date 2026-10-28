@@ -15,9 +15,9 @@ import java.net.ConnectException
 import java.net.UnknownHostException
 import java.security.KeyStore
 import java.util.concurrent.ScheduledThreadPoolExecutor
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.stream.Collectors
 import javax.net.ssl.SSLHandshakeException
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
@@ -36,9 +36,7 @@ import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.SerializationException
-import org.eclipse.paho.client.mqttv3.IMqttActionListener
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken
-import org.eclipse.paho.client.mqttv3.IMqttToken
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended
 import org.eclipse.paho.client.mqttv3.MqttException
@@ -558,47 +556,67 @@ class MQTTMessageProcessorEndpoint(
       }
 
   /**
-   * Round-trips an MQTT PINGREQ to establish whether the connection is actually usable, rather than
-   * merely believed to be. A TCP connection that has gone away without a FIN — routine when a
-   * mobile network drops or a NAT entry expires — stays readable as "connected" until something is
-   * written to it, so the endpoint state on its own is not evidence of a working link.
+   * Establishes whether the connection is actually usable, rather than merely believed to be. A TCP
+   * connection that has gone away without a FIN — routine when a mobile network drops or a NAT
+   * entry expires — stays readable as "connected" until something is written to it, so the endpoint
+   * state on its own is not evidence of a working link.
+   *
+   * Paho's `checkPing` sends a PINGREQ (and returns its token) only when a keepalive ping is due;
+   * with traffic inside the keepalive interval it returns null. Reading that null as "dead" made
+   * the watchdog tear down a healthy connection on nearly every run. So: a due ping must come back;
+   * with none due, the link is healthy if Paho believes it is connected and nothing it sent is
+   * still awaiting the broker's acknowledgement (a dead link with traffic keeps messages in
+   * flight).
    *
    * Blocking, and called from the connection watchdog off the main thread.
    */
   override fun checkConnection(): Boolean =
       mqttClientAndConfiguration?.mqttClient?.let { client ->
-        // The listener is invoked on a Paho thread, so this cannot be a plain captured var.
-        val success = AtomicBoolean(false)
         try {
-          client
-              .checkPing(
-                  null,
-                  object : IMqttActionListener {
-                    override fun onSuccess(asyncActionToken: IMqttToken?) {
-                      success.set(true)
-                    }
-
-                    override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-                      success.set(false)
-                    }
-                  },
-              )
-              ?.waitForCompletion(PING_CHECK_TIMEOUT.inWholeMilliseconds)
-              ?: Timber.w("MQTT checkPing token was null")
-          success.get()
+          val token = client.checkPing(null, null)
+          if (token == null) {
+            // No ping due. Healthy if connected and what was sent gets acknowledged: a publish may
+            // be in flight right now (a ping batched with this run, a backlog draining), so give
+            // acknowledgements [inFlightGrace] to arrive.
+            client.isConnected && inFlightDrains(client)
+          } else {
+            // Completing without an exception means the PINGRESP arrived.
+            token.waitForCompletion(PING_CHECK_TIMEOUT.inWholeMilliseconds)
+            true
+          }
         } catch (e: Exception) {
-          // Both a timeout waiting for the PINGRESP and a client that already knows it is
-          // disconnected arrive here. Either way the connection is not usable.
+          // A timeout waiting for the PINGRESP arrives here (a keepalive failure inside checkPing
+          // is handled by Paho, which shuts the connection down and returns null). Either way the
+          // connection is not usable.
           Timber.w(e, "MQTT connection check failed")
           false
         }
       } ?: false
+
+  /** How long [checkConnection] waits for in-flight messages to be acknowledged. */
+  @VisibleForTesting internal var inFlightGrace: Duration = PING_CHECK_TIMEOUT
+
+  /**
+   * Whether the in-flight count drops to zero within [inFlightGrace]. `<= 0` counts as drained:
+   * Paho's count can go negative after a resumed QoS 2 flow.
+   */
+  private fun inFlightDrains(client: MqttAsyncClient): Boolean {
+    val deadline = System.nanoTime() + inFlightGrace.inWholeNanoseconds
+    while (client.inFlightMessageCount > 0) {
+      if (System.nanoTime() >= deadline) return false
+      Thread.sleep(IN_FLIGHT_POLL.inWholeMilliseconds)
+    }
+    return true
+  }
 
   class NotConnectedException : Exception()
 
   companion object {
     /** Bounded so the watchdog cannot be parked indefinitely on an unresponsive broker. */
     private val PING_CHECK_TIMEOUT = 10.seconds
+
+    /** How often [inFlightDrains] re-reads the in-flight count. */
+    private val IN_FLIGHT_POLL = 250.milliseconds
 
     /** Bounded so the outbound message loop cannot be parked indefinitely on a stuck client. */
     private val IN_FLIGHT_WAIT_TIMEOUT = 30.seconds
