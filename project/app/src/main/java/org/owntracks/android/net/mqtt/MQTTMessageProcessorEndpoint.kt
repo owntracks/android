@@ -165,8 +165,29 @@ class MQTTMessageProcessorEndpoint(
       Timber.v("MQTT attempting Disconnect")
       measureTime {
         mqttClientAndConfiguration?.run {
+          // A client is torn down once. disconnect() closes it but keeps the reference
+          // (onPreferenceChanged reads null as "MQTT not active"), so a "network lost" disconnect
+          // followed by reconnect()'s own disconnect used to reach the closed client a second time,
+          // and Paho's disconnectForcibly NPEs on a closed client's nulled internals.
+          if (closed) {
+            Timber.v("MQTT client already torn down")
+            return@run
+          }
+          closed = true
           try {
-            mqttClient.disconnect()
+            // A client that isn't connected (its CONNACK wait timed out, or Paho already shut it
+            // down after losing the connection) is torn down forcibly, which is synchronous.
+            // disconnect() would hand the teardown to Paho's DisconnectBG, which first waits up to
+            // 30 s for outstanding tokens (the stuck connect's included); close() right after it
+            // only marks the client close-pending, and with a close pending Paho's own shutdown
+            // returns early, so the client's socket and WebSocket receiver were never released.
+            // No DISCONNECT is sent over a link that isn't usable: the broker sees the connection
+            // drop, and publishes the will if one is set.
+            if (!mqttClient.isConnected) {
+              mqttClient.disconnectForcibly(0, disconnectTimeout.inWholeMilliseconds, false)
+            } else {
+              mqttClient.disconnect()
+            }
           } catch (e: MqttException) {
             when (e.reasonCode.toShort()) {
               REASON_CODE_CLIENT_ALREADY_DISCONNECTED -> Timber.d("Client already disconnected")
@@ -186,6 +207,10 @@ class MQTTMessageProcessorEndpoint(
                 }
               }
             }
+          } catch (e: RuntimeException) {
+            // An unchecked exception from inside Paho must not kill the process; the client is
+            // closed below either way.
+            Timber.w(e, "Paho failed to disconnect the MQTT client. Closing it anyway.")
           }
           setEndpointState(EndpointState.DISCONNECTED)
           try {
@@ -288,6 +313,9 @@ class MQTTMessageProcessorEndpoint(
       clientAndConfiguration: MqttClientAndConfiguration
   ): Boolean {
     val (client, configuration) = clientAndConfiguration
+    // A closed client has no capacity. Reading its in-flight count NPEs (Paho nulls its state on
+    // close), and MessageProcessor drops a message whose send throws; returning false re-queues it.
+    if (clientAndConfiguration.closed) return false
     if (client.inFlightMessageCount < configuration.maxInFlight) {
       return true
     }
@@ -296,9 +324,12 @@ class MQTTMessageProcessorEndpoint(
             "${configuration.maxInFlight}, waiting for it to drop"
     )
     return withTimeoutOrNull(IN_FLIGHT_WAIT_TIMEOUT) {
-      while (client.inFlightMessageCount >= configuration.maxInFlight) {
+      while (
+          clientAndConfiguration.closed || client.inFlightMessageCount >= configuration.maxInFlight
+      ) {
         if (
-            mqttClientAndConfiguration !== clientAndConfiguration ||
+            clientAndConfiguration.closed ||
+                mqttClientAndConfiguration !== clientAndConfiguration ||
                 endpointStateRepo.endpointState.value.state != EndpointState.CONNECTED
         ) {
           Timber.w("MQTT client replaced or disconnected while waiting for in-flight to drop")
@@ -644,7 +675,10 @@ class MQTTMessageProcessorEndpoint(
   data class MqttClientAndConfiguration(
       val mqttClient: MqttAsyncClient,
       val mqttConnectionConfiguration: MqttConnectionConfiguration,
-  )
+  ) {
+    /** Set once [disconnect] has torn this client down (closed it). Never touch it again. */
+    @Volatile var closed: Boolean = false
+  }
 }
 
 /**
