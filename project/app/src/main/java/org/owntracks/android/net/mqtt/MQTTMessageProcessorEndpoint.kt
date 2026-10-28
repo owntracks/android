@@ -103,13 +103,29 @@ class MQTTMessageProcessorEndpoint(
               // Schedule a reconnect in case onAvailable already ran and its reconnect completed
               // before this coroutine acquired the lock — without this, the freshly-established
               // connection is torn down and no further reconnect is ever triggered.
-              scheduler.scheduleMqttReconnect()
+              scheduleReconnectIfActive()
             }
           },
       )
 
+  /**
+   * A replaced endpoint must not schedule reconnects. The reconnect worker acts on whichever
+   * endpoint is current, so a stale schedule could tear down its successor's connection, and would
+   * carry the old back-off over to it.
+   */
+  private fun scheduleReconnectIfActive() {
+    if (deactivated) {
+      Timber.v("Not scheduling a reconnect from a deactivated endpoint")
+    } else {
+      scheduler.scheduleMqttReconnect()
+    }
+  }
+
   override fun activate() {
     Timber.v("MQTT Activate")
+    // A new endpoint starts from the short retry delay, not from however far its predecessor had
+    // backed off.
+    scheduler.resetMqttReconnectBackoff()
     preferences.registerOnPreferenceChangedListener(this)
     networkChangeCallback.reset()
     connectivityManager.registerDefaultNetworkCallback(networkChangeCallback)
@@ -155,7 +171,11 @@ class MQTTMessageProcessorEndpoint(
     connectivityManager.unregisterNetworkCallback(networkChangeCallback)
     scope.launch {
       connectingLock.withPermitLogged("mqtt deactivate") { disconnect() }
-      scheduler.cancelAllTasks()
+      // Not cancelAllTasks(): this teardown usually finishes after the successor's activate() has
+      // scheduled the watchdog, and the location ping belongs to the service, not this endpoint.
+      // Exiting the app cancels its own work (DrawerProvider). Only leaving MQTT mode makes the
+      // MQTT reconnect and watchdog work pointless.
+      if (preferences.mode != ConnectionMode.MQTT) scheduler.cancelMqttTasks()
     }
   }
 
@@ -396,7 +416,8 @@ class MQTTMessageProcessorEndpoint(
     }
   }
 
-  private val mqttCallback =
+  @VisibleForTesting
+  internal val mqttCallback =
       object : MqttCallbackExtended {
 
         override fun connectionLost(cause: Throwable) {
@@ -405,7 +426,7 @@ class MQTTMessageProcessorEndpoint(
             else -> Timber.w(cause, "Connection Lost")
           }
           scope.launch { setEndpointState(EndpointState.DISCONNECTED) }
-          scheduler.scheduleMqttReconnect()
+          scheduleReconnectIfActive()
         }
 
         override fun messageArrived(topic: String, message: MqttMessage) {
@@ -572,7 +593,7 @@ class MQTTMessageProcessorEndpoint(
               }
             }
             setEndpointState(EndpointState.ERROR.withError(e))
-            scheduler.scheduleMqttReconnect()
+            scheduleReconnectIfActive()
             Result.failure(e)
           }
         }
