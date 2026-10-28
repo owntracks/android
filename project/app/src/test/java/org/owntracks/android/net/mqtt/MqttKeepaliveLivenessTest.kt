@@ -34,6 +34,8 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.owntracks.android.data.repos.EndpointStateRepo
 import org.owntracks.android.model.Parser
+import org.owntracks.android.preferences.Preferences
+import org.owntracks.android.preferences.types.ConnectionMode
 import org.owntracks.android.preferences.types.MqttProtocolLevel
 import org.owntracks.android.preferences.types.MqttQos
 import org.owntracks.android.services.worker.Scheduler
@@ -41,8 +43,9 @@ import org.owntracks.android.test.SimpleIdlingResource
 
 /**
  * The keepalive defects that let a connection wedge: a ping alarm per schedule that piled up to
- * Android's 500-per-app cap, whose failure then escaped into Paho's receiver thread; and a
- * connection check that called a healthy link dead on nearly every watchdog run.
+ * Android's 500-per-app cap, whose failure then escaped into Paho's receiver thread; a connection
+ * check that called a healthy link dead on nearly every watchdog run; and an endpoint replacement
+ * that cancelled the location ping and the watchdog.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class MqttKeepaliveLivenessTest {
@@ -153,7 +156,11 @@ class MqttKeepaliveLivenessTest {
 
   private val scheduler: Scheduler = mock {}
 
-  private fun endpointWith(client: MqttAsyncClient): MQTTMessageProcessorEndpoint {
+  private fun endpointWith(
+      client: MqttAsyncClient,
+      connectionMode: ConnectionMode = ConnectionMode.MQTT,
+  ): MQTTMessageProcessorEndpoint {
+    val prefs: Preferences = mock { on { mode } doReturn connectionMode }
     val cm: ConnectivityManager = mock {}
     val am: AlarmManager = mock {}
     val ctx: Context = mock {
@@ -164,7 +171,7 @@ class MqttKeepaliveLivenessTest {
             messageProcessor = mock {},
             endpointStateRepo = EndpointStateRepo(),
             scheduler = scheduler,
-            preferences = mock {},
+            preferences = prefs,
             parser = mock<Parser> {},
             caKeyStore = KeyStore.getInstance(KeyStore.getDefaultType()).also { it.load(null) },
             scope = CoroutineScope(SupervisorJob() + UnconfinedTestDispatcher()),
@@ -238,5 +245,32 @@ class MqttKeepaliveLivenessTest {
     val silent: IMqttToken = mock { on { waitForCompletion(any()) } doThrow MqttException(32000) }
     val dead: MqttAsyncClient = mock { on { checkPing(anyOrNull(), anyOrNull()) } doReturn silent }
     assertFalse(endpointWith(dead).checkConnection())
+  }
+
+  // --- endpoint replacement ---
+
+  @Test
+  fun `replacing the endpoint leaves the ping and the watchdog scheduled`() {
+    val client: MqttAsyncClient = mock { on { isConnected } doReturn true }
+    endpointWith(client).deactivate()
+    verify(scheduler, never()).cancelAllTasks()
+    verify(scheduler, never()).cancelMqttTasks()
+  }
+
+  @Test
+  fun `leaving MQTT mode cancels the MQTT work but not the location ping`() {
+    val client: MqttAsyncClient = mock { on { isConnected } doReturn true }
+    endpointWith(client, ConnectionMode.HTTP).deactivate()
+    verify(scheduler).cancelMqttTasks()
+    verify(scheduler, never()).cancelAllTasks()
+  }
+
+  @Test
+  fun `a replaced endpoint schedules no reconnect when its connection drops`() {
+    val client: MqttAsyncClient = mock { on { isConnected } doReturn true }
+    val endpoint = endpointWith(client)
+    endpoint.deactivate()
+    endpoint.mqttCallback.connectionLost(java.io.IOException("gone"))
+    verify(scheduler, never()).scheduleMqttReconnect()
   }
 }

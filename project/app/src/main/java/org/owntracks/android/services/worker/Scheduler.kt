@@ -65,6 +65,17 @@ constructor(
   }
 
   /**
+   * Cancels the MQTT reconnect and connection watchdog tasks, leaving the location ping alone.
+   * Called when the app leaves MQTT mode.
+   */
+  fun cancelMqttTasks() {
+    Timber.d("Cancelling MQTT reconnect and connection watchdog tasks")
+    workManager.cancelUniqueWork(ONETIME_TASK_MQTT_RECONNECT)
+    workManager.cancelUniqueWork(PERIODIC_TASK_MQTT_CONNECTION_WATCHDOG)
+    resetMqttReconnectBackoff()
+  }
+
+  /**
    * Starts the periodic check that the MQTT connection is still alive, reconnecting it if not.
    *
    * Every other trigger for a reconnect is reactive — a connectivity callback, a dropped
