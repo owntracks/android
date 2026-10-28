@@ -91,6 +91,9 @@ constructor(
       val changedItems = mutableListOf<ConfigItem.KeyValue>()
       var unchangedCount = 0
       keys.forEach { key ->
+        // Security-sensitive preferences are silently dropped on import, so listing them here would
+        // show the user (or a phishing link) a change that is never going to happen.
+        if (key in preferences.nonImportableConfigKeyNames) return@forEach
         val incoming = message[key]
         val pair = preferences.resolvedPreferencePair(key, incoming)
         if (pair == null) {

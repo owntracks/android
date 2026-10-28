@@ -296,4 +296,27 @@ class LoadViewModelTest {
         assertEquals(ImportStatus.SAVED, vm.configurationImportStatus.value)
         assertEquals("te", preferences.tid.toString())
       }
+
+  @Test
+  fun `Given a configuration containing non-importable preferences, when loading it into the LoadViewModel, then only importable changes are listed`() =
+      runTest {
+        val preferences = Preferences(preferencesStore, mockIdlingResource)
+        val vm = makeVm(preferences)
+        val config =
+            """
+            {
+              "_type":"configuration",
+              "tid": "zz",
+              "intentAuthKey": "attacker-key",
+              "allowIntentControl": true,
+              "allowConfigurationByURIAndConfigFile": true
+            }
+            """
+                .trimIndent()
+        vm.extractPreferences(config.toByteArray())
+        advanceUntilIdle()
+        assertEquals(ImportStatus.SUCCESS, vm.configurationImportStatus.value)
+        val listedKeys = vm.configItems.value.filterIsInstance<ConfigItem.KeyValue>().map { it.key }
+        assertEquals(listOf("tid"), listedKeys)
+      }
 }

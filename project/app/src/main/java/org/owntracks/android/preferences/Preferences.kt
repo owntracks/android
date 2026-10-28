@@ -47,6 +47,10 @@ constructor(
     property.annotations.any { annotation -> annotation is Preference && annotation.importable }
   }
 
+  /** Names of preferences that exist but are never changed by [importConfiguration]. */
+  val nonImportableConfigKeyNames: Set<String> =
+      (allConfigKeys - importableConfigKeys.toSet()).map { it.name }.toSet()
+
   private val mqttExportedConfigKeys = allConfigKeys.filter { property ->
     property.annotations.any { annotation -> annotation is Preference && annotation.exportModeMqtt }
   }
