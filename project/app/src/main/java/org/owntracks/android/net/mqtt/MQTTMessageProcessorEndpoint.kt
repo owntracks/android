@@ -486,6 +486,12 @@ class MQTTMessageProcessorEndpoint(
                       MqttClientAndConfiguration(it, mqttConnectionConfiguration, executorService)
                 }
                 .apply {
+                  // The callback goes on before connect. With cleanSession=false the broker sends
+                  // the session's queued messages right behind the CONNACK, and Paho drops
+                  // any that arrive while no callback is set, without acknowledging them.
+                  // Messages sent while this device was offline were lost (QoS 0) or left
+                  // unacknowledged until a later reconnect (QoS 1 and 2).
+                  setCallback(mqttCallback)
                   // Every wait on a broker reply is bounded. Paho has no timeout of its own for the
                   // CONNACK or SUBACK, and this runs under connectingLock, so one unanswered
                   // connect used to park every later reconnect (the watchdog's included) behind
@@ -514,7 +520,6 @@ class MQTTMessageProcessorEndpoint(
                   // This run of failures is over, so the next one starts from the short delay
                   // again rather than inheriting however far this one had backed off.
                   scheduler.resetMqttReconnectBackoff()
-                  setCallback(mqttCallback)
                   subscribe(
                           mqttConnectionConfiguration.topicsToSubscribeTo.toTypedArray(),
                           IntArray(mqttConnectionConfiguration.topicsToSubscribeTo.size) {
