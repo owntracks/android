@@ -8,7 +8,7 @@ import timber.log.Timber
 
 class MQTTPingAlarmReceiver(private val mqttClient: MqttAsyncClient) : BroadcastReceiver() {
   override fun onReceive(context: Context, intent: Intent) {
-    Timber.v("alarm received with requestCode ${intent.getIntExtra("requestCode", -1)}")
+    Timber.v("MQTT ping alarm received")
     mqttClient.checkPing(null, null)
   }
 }
