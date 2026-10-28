@@ -448,6 +448,11 @@ class MQTTMessageProcessorEndpoint(
                       MqttClientAndConfiguration(it, mqttConnectionConfiguration)
                 }
                 .apply {
+                  // Every wait on a broker reply is bounded. Paho has no timeout of its own for the
+                  // CONNACK or SUBACK, and this runs under connectingLock, so one unanswered
+                  // connect used to park every later reconnect (the watchdog's included) behind
+                  // the lock for good.
+                  val replyWait = completionWait(mqttConnectionConfiguration.timeout)
                   mqttConnectionConfiguration
                       .getConnectOptions(applicationContext, caKeyStore)
                       .also {
@@ -455,7 +460,7 @@ class MQTTMessageProcessorEndpoint(
                             "Connecting to ${mqttConnectionConfiguration.connectionString} timeout = ${ it.connectionTimeout.toDuration(DurationUnit.SECONDS)}"
                         )
                       }
-                      .run { connect(this).waitForCompletion() }
+                      .run { connect(this).waitForCompletion(replyWait.inWholeMilliseconds) }
                   pingAlarmReceiver = MQTTPingAlarmReceiver(this)
                   ContextCompat.registerReceiver(
                           applicationContext,
@@ -478,7 +483,7 @@ class MQTTMessageProcessorEndpoint(
                             mqttConnectionConfiguration.subQos.value
                           },
                       )
-                      .waitForCompletion()
+                      .waitForCompletion(replyWait.inWholeMilliseconds)
                   Timber.d("MQTT Subscribed")
 
                   messageProcessor.notifyOutgoingMessageQueue()
@@ -620,6 +625,20 @@ class MQTTMessageProcessorEndpoint(
 
     /** Bounded so the outbound message loop cannot be parked indefinitely on a stuck client. */
     private val IN_FLIGHT_WAIT_TIMEOUT = 30.seconds
+
+    /**
+     * Slack on top of the configured connection timeout before giving up on a broker reply. Paho
+     * applies that timeout to the socket connect and the TLS handshake, not to the CONNACK, so the
+     * whole wait gets a margin rather than the bare value.
+     */
+    private val COMPLETION_WAIT_MARGIN = 30.seconds
+
+    /**
+     * The longest a connect or subscribe may wait for the broker's reply. Never zero: Paho reads a
+     * wait of 0 as "forever".
+     */
+    internal fun completionWait(connectionTimeout: Duration): Duration =
+        connectionTimeout.coerceAtLeast(1.seconds) + COMPLETION_WAIT_MARGIN
   }
 
   data class MqttClientAndConfiguration(
