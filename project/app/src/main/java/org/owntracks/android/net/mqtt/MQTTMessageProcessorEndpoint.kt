@@ -14,6 +14,7 @@ import java.io.IOException
 import java.net.ConnectException
 import java.net.UnknownHostException
 import java.security.KeyStore
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.ScheduledThreadPoolExecutor
 import java.util.stream.Collectors
 import javax.net.ssl.SSLHandshakeException
@@ -218,6 +219,12 @@ class MQTTMessageProcessorEndpoint(
           } catch (e: Exception) {
             Timber.w(e, "Error closing MQTT client. Ignoring.")
           }
+          // Paho never shuts down an executor it was handed (1.2.5 defines
+          // ClientComms.shutdownExecutorService but nothing calls it), so each connect's pool, and
+          // its idle core threads, outlived the client. shutdown(), not shutdownNow(): Paho's own
+          // async disconnect may still be queued on this pool, and dropping it would skip the
+          // DISCONNECT (the broker would then publish the will).
+          executorService?.shutdown()
           try {
             pingAlarmReceiver?.run(applicationContext::unregisterReceiver)
             Timber.d("Unregistered ping alarm receiver")
@@ -476,7 +483,7 @@ class MQTTMessageProcessorEndpoint(
                 )
                 .also {
                   mqttClientAndConfiguration =
-                      MqttClientAndConfiguration(it, mqttConnectionConfiguration)
+                      MqttClientAndConfiguration(it, mqttConnectionConfiguration, executorService)
                 }
                 .apply {
                   // Every wait on a broker reply is bounded. Paho has no timeout of its own for the
@@ -675,6 +682,8 @@ class MQTTMessageProcessorEndpoint(
   data class MqttClientAndConfiguration(
       val mqttClient: MqttAsyncClient,
       val mqttConnectionConfiguration: MqttConnectionConfiguration,
+      /** The pool this client runs on, shut down with it in [disconnect]. */
+      val executorService: ExecutorService? = null,
   ) {
     /** Set once [disconnect] has torn this client down (closed it). Never touch it again. */
     @Volatile var closed: Boolean = false

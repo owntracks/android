@@ -4,6 +4,7 @@ import android.app.AlarmManager
 import android.content.Context
 import android.net.ConnectivityManager
 import java.security.KeyStore
+import java.util.concurrent.ScheduledThreadPoolExecutor
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -13,6 +14,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
@@ -31,7 +33,8 @@ import org.owntracks.android.test.SimpleIdlingResource
 /**
  * A connect whose CONNACK never came used to hold `connectingLock` forever, because the wait for it
  * had no timeout; every later reconnect, the watchdog's included, queued behind it. A client left
- * behind by such a connect has to be torn down forcibly, and only once.
+ * behind by such a connect has to be torn down forcibly, and only once. And each connect's executor
+ * was never shut down (Paho doesn't shut down an executor it is given), so threads piled up.
  *
  * The connect itself builds a real Paho client, so the bound is pinned through [completionWait],
  * the one value both the CONNACK and SUBACK waits use.
@@ -92,6 +95,20 @@ class MQTTMessageProcessorEndpointConnectLivenessTest {
     // rather than trusting it, so Paho's "0 = wait forever" can never reach waitForCompletion.
     assertEquals(31.seconds, MQTTMessageProcessorEndpoint.completionWait(Duration.ZERO))
     assertEquals(31.seconds, MQTTMessageProcessorEndpoint.completionWait(200.milliseconds))
+  }
+
+  @Test
+  fun `disconnecting shuts down the pool the client ran on`() {
+    val endpoint = endpoint()
+    val client: MqttAsyncClient = mock { on { isConnected } doReturn true }
+    val pool = ScheduledThreadPoolExecutor(1)
+    endpoint.mqttClientAndConfiguration =
+        MQTTMessageProcessorEndpoint.MqttClientAndConfiguration(client, configuration, pool)
+
+    endpoint.deactivate()
+
+    verify(client).close(true)
+    assertTrue("the client's pool must not outlive it", pool.isShutdown)
   }
 
   @Test
