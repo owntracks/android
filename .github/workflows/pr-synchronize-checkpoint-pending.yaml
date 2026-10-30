@@ -15,6 +15,11 @@
 # mixing the two left an unresolvable "PR Checkpoint Status: pending" commit status sitting
 # alongside the real, later "success" check run and permanently blocking merge. Keeping both on the
 # Checks API means the later run (from /run-tests) is simply the more recent check with this name.
+#
+# Fork PRs are skipped: their pull_request runs get a read-only GITHUB_TOKEN whatever `permissions`
+# asks for, so creating the check would fail with "Resource not accessible by integration". They
+# don't need it either, as a required check that's missing from a SHA blocks merge just as a pending
+# one does. Don't reach for pull_request_target to get around this.
 name: PR Synchronized (Pending Checkpoint)
 
 "on":
@@ -36,6 +41,7 @@ name: PR Synchronized (Pending Checkpoint)
 jobs:
   mark-pending:
     name: "Mark PR Checkpoint Status pending"
+    if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     permissions:
       checks: write
