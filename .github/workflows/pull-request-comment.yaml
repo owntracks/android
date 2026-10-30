@@ -2,6 +2,10 @@
 # When a comment is made on a pull request starting with '/run-tests' by a org member, this workflow
 # grabs the current PR, creates a checkpoint status for PR head sha and runs a build / test. If
 # successful, it updates the checkpoint status to success, which then allows the PR to be merged.
+#
+# Everything here that tests the PR has to be given check-comment's sha as its ref. This is an
+# issue_comment run, so github.sha is the tip of the default branch rather than anything in the PR,
+# and the needs context only covers direct dependencies, so check-comment must be listed in `needs`.
 name: PR comment trigger
 
 "on":
@@ -77,13 +81,14 @@ jobs:
     name: Espresso Test
     if: ${{ startsWith(github.event.comment.body, '/run-small-espresso-tests') }}
     needs:
+      - check-comment
       - build-test-lint
     permissions:
       contents: read
       checks: write
     uses: ./.github/workflows/espresso.yaml
     with:
-      ref: ${{ github.sha }}
+      ref: ${{ needs.check-comment.outputs.sha }}
       test-annotation: androidx.test.filters.SmallTest
       shards: 1
     secrets: inherit
@@ -95,9 +100,10 @@ jobs:
       checks: write
     uses: ./.github/workflows/espresso.yaml
     with:
-      ref: ${{ github.sha }}
+      ref: ${{ needs.check-comment.outputs.sha }}
     secrets: inherit
     needs:
+      - check-comment
       - build-test-lint
     if: ${{ startsWith(github.event.comment.body, '/run-espresso-tests') }}
   pr-checkpoint-status:
@@ -120,6 +126,6 @@ jobs:
           sha: ${{ needs.check-comment.outputs.sha }}
           check_id: ${{ needs.check-comment.outputs.check-id }}
           status: 'completed'
-          conclusion: ${{ (needs.build-test-lint.result == 'success' && (needs.espresso-test.result == 'success' || needs.espresso-test.result == 'skipped')) && 'success' || 'failure' }}
+          conclusion: ${{ (needs.build-test-lint.result == 'success' && (needs.espresso-test.result == 'success' || needs.espresso-test.result == 'skipped') && (needs.small-espresso-test.result == 'success' || needs.small-espresso-test.result == 'skipped')) && 'success' || 'failure' }}
           output: |
             {"title":"Testing", "summary":"Build & Test complete", "text":"Build & Test complete"}
