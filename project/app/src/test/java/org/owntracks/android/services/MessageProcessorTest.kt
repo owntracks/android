@@ -162,6 +162,23 @@ class MessageProcessorTest {
         assertNotNull(message, withTimeoutOrNull(TIMEOUT) { detector.await() })
       }
 
+  /**
+   * Gets a sender loop running with nothing left in flight, for tests about what happens to it
+   * next.
+   *
+   * Deliberately not [MessageProcessor.initialize], which returns before its background coroutine
+   * has finished. That coroutine starts the loop part way through [MessageProcessor.reconnect] and
+   * tries to start it again at the very end, so stopping the loop as soon as it's seen running can
+   * let that second start land after the stop, bringing back a loop the test thinks is dead.
+   * [MessageProcessor.initializeAndReconnect] does the same work but only returns once it's done,
+   * and leaves the processor initialized, so a later `initialize()` still takes the re-arming path.
+   */
+  private fun startLoopAndSettle() {
+    val detector = queue.armLoopDetector()
+    runBlocking { messageProcessor.initializeAndReconnect() }
+    assertLoopRunning(detector, "sender loop should be running after initializeAndReconnect")
+  }
+
   @Test
   fun `initialize starts the outbound sender loop`() {
     val detector = queue.armLoopDetector()
@@ -173,9 +190,7 @@ class MessageProcessorTest {
 
   @Test
   fun `stopSendingMessages stops the outbound sender loop`() {
-    val startDetector = queue.armLoopDetector()
-    messageProcessor.initialize()
-    assertLoopRunning(startDetector, "sender loop should be running after initialize")
+    startLoopAndSettle()
 
     messageProcessor.stopSendingMessages()
 
@@ -196,9 +211,7 @@ class MessageProcessorTest {
    */
   @Test
   fun `initialize re-arms the sender loop after the background service is destroyed and recreated`() {
-    val startDetector = queue.armLoopDetector()
-    messageProcessor.initialize() // service starts
-    assertLoopRunning(startDetector, "sender loop should be running after initialize")
+    startLoopAndSettle() // service starts
 
     messageProcessor.stopSendingMessages() // BackgroundService.onDestroy
 
@@ -211,9 +224,7 @@ class MessageProcessorTest {
   /** Whatever triggered the reconnect, the queue still needs something alive to drain it. */
   @Test
   fun `reconnect re-arms the sender loop`() {
-    val startDetector = queue.armLoopDetector()
-    messageProcessor.initialize()
-    assertLoopRunning(startDetector, "sender loop should be running after initialize")
+    startLoopAndSettle()
 
     messageProcessor.stopSendingMessages()
 
