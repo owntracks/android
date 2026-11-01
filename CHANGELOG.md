@@ -22,6 +22,7 @@ This release addresses a security advisory covering several intent-handling vuln
 - Waypoints in an imported config are listed individually in the import review screen
 - Preference setting (Android 16 and later only) to allow user to enable GNSS location source for Significant Monitoring mode (#2155)
 - New opt-in, config-import-only `maxImplausibleSpeedKmh` preference: drops a published location fix if it implies travel faster than the configured maximum ground speed relative to the last published fix, to filter out occasional wildly-inaccurate network-provider locations (#2034)
+- The log viewer is much easier to read: entries wrap instead of scrolling sideways, with the date, time, level and tag above the message, and a stack trace stays together as one entry. Logs can now be filtered by level (replacing the "Debug log" menu item) and searched, a button jumps back to the latest entry after scrolling up, and clearing the log asks for confirmation first
 
 ### Bug fixes
 
@@ -41,6 +42,7 @@ This release addresses a security advisory covering several intent-handling vuln
 - The status screen no longer shows a stale message or error. An error stuck to its state for good, so a later update to that state could still show the old error, and a new error on the same state didn't refresh the screen at all. Switching connection mode (e.g. MQTT to HTTP) also kept showing the previous mode's last error until the new one reported something
 - Event notifications for a contact's region transition could show the wrong name. Messages arriving together, typically a contact's location followed by their transition, were processed in either order; they're now processed one at a time in the order they arrive
 - Locations and transitions exactly on the equator or the prime meridian (a latitude or longitude of exactly 0) were sent without that coordinate, and location messages at either were silently dropped from the outgoing queue
+- The last line in the log viewer is no longer hidden behind the navigation bar or the share button
 
 
 ## Version 2.5.10
