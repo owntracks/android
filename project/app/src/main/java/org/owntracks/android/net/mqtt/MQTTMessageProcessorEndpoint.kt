@@ -422,7 +422,8 @@ class MQTTMessageProcessorEndpoint(
 
         override fun connectionLost(cause: Throwable) {
           when (cause) {
-            is IOException -> Timber.w("Connection Lost: ${cause.message}")
+            is IOException,
+            is MqttException -> Timber.w("Connection Lost: ${cause.message}")
             else -> Timber.w(cause, "Connection Lost")
           }
           scope.launch { setEndpointState(EndpointState.DISCONNECTED) }
