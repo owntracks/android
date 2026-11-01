@@ -12,6 +12,13 @@ class LogViewerViewModel @Inject constructor(private val preferences: Preference
   private val timberInMemoryLogTree =
       Timber.forest().filterIsInstance(TimberInMemoryLogTree::class.java).first()
 
+  var filter =
+      LogFilter(
+          levels =
+              LogLevel.entries.toSet().let { if (preferences.debugLog) it else it - LogLevel.DEBUG }
+      )
+    private set
+
   fun logLines() = timberInMemoryLogTree.liveLogs
 
   fun clearLog() {
@@ -20,7 +27,14 @@ class LogViewerViewModel @Inject constructor(private val preferences: Preference
 
   fun isDebugEnabled(): Boolean = preferences.debugLog
 
-  fun enableDebugLogs(enabled: Boolean) {
-    preferences.debugLog = enabled
+  fun setLevelEnabled(level: LogLevel, enabled: Boolean) {
+    filter = filter.copy(levels = if (enabled) filter.levels + level else filter.levels - level)
+    if (level == LogLevel.DEBUG) {
+      preferences.debugLog = enabled
+    }
+  }
+
+  fun setQuery(query: String) {
+    filter = filter.copy(query = query)
   }
 }

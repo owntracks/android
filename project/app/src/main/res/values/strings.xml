@@ -26,6 +26,16 @@
     <string name="certificateMigrationRequiredNotificationText">"OwnTracks now uses TLS certificates from the device certificate store.\n\nIf you were using either a custom CA or TLS client certificates, please add these to the device certificate store."</string>
     <string name="certificateMigrationRequiredNotificationTitle">"Certificate Migration Required"</string>
     <string name="clear_log">"Clear"</string>
+    <string name="logViewerClearMessage">"This also removes them from any logs you share afterwards."</string>
+    <string name="logViewerClearTitle">"Clear all logs?"</string>
+    <string name="logViewerJumpToLatestDescription">"Jump to the latest log entry"</string>
+    <string name="logViewerLevelDebug">"Debug"</string>
+    <string name="logViewerLevelError">"Error"</string>
+    <string name="logViewerLevelInfo">"Info"</string>
+    <string name="logViewerLevelWarning">"Warning"</string>
+    <string name="logViewerNoMatches">"No log entries match these filters"</string>
+    <string name="logViewerSearch">"Search logs"</string>
+    <string name="shareLogs">"Share logs"</string>
     <string name="configurationManagement">"Configuration management"</string>
     <string name="CONNECTED">"Connected"</string>
     <string name="CONNECTING">"Connecting"</string>

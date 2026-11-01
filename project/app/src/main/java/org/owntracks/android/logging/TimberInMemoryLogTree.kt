@@ -12,7 +12,7 @@ import timber.log.Timber.DebugTree
 class TimberInMemoryLogTree(private val debugBuild: Boolean) : DebugTree() {
   companion object {
     const val LOG_PREFIX = "FARTSHOES"
-    private const val MAX_LOG_ENTRIES = 500
+    const val MAX_LOG_ENTRIES = 500
   }
 
   private val mutableLogFlow =

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="ic_launcher_background">#3F72B5</color>
-    <color name="log_debug_tag_color">#888888</color>
-    <color name="log_error_tag_color">#aa0000</color>
-    <color name="log_info_tag_color">#00aa00</color>
-    <color name="log_warning_tag_color">#aaaa00</color>
+    <color name="log_debug_tag_color">#616161</color>
+    <color name="log_error_tag_color">#b00020</color>
+    <color name="log_info_tag_color">#1b7a2f</color>
+    <color name="log_warning_tag_color">#7a6200</color>
     <!-- https://paletton.com/#uid=53D0n0kmN-+hrHfkdDlptylsRwF -->
 
     <color name="OTPrimaryBlue">#3f72b5</color>

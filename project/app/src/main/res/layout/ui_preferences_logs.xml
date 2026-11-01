@@ -12,34 +12,103 @@
             android:id="@+id/appbar"
             layout="@layout/appbar" />
 
-        <HorizontalScrollView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fillViewport="true"
-            android:scrollbars="horizontal"
+            android:orientation="vertical"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none">
+
+                <com.google.android.material.chip.ChipGroup
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="8dp"
+                    app:singleLine="true">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/logLevelError"
+                        style="@style/Widget.MaterialComponents.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/logViewerLevelError"
+                        app:checkedIconTint="?attr/colorOnSurface" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/logLevelWarning"
+                        style="@style/Widget.MaterialComponents.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/logViewerLevelWarning"
+                        app:checkedIconTint="?attr/colorOnSurface" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/logLevelInfo"
+                        style="@style/Widget.MaterialComponents.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/logViewerLevelInfo"
+                        app:checkedIconTint="?attr/colorOnSurface" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/logLevelDebug"
+                        style="@style/Widget.MaterialComponents.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/logViewerLevelDebug"
+                        app:checkedIconTint="?attr/colorOnSurface" />
+                </com.google.android.material.chip.ChipGroup>
+            </HorizontalScrollView>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/logsRecyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:paddingBottom="80dp"
                     android:scrollbars="vertical"
                     tools:listitem="@layout/log_viewer_entry" />
-            </RelativeLayout>
-        </HorizontalScrollView>
 
+                <TextView
+                    android:id="@+id/noMatchingLogs"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="16dp"
+                    android:text="@string/logViewerNoMatches"
+                    android:visibility="gone" />
+            </FrameLayout>
+        </LinearLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/jumpToLatest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="80dp"
+            android:contentDescription="@string/logViewerJumpToLatestDescription"
+            android:visibility="gone"
+            app:backgroundTint="?attr/colorSurface"
+            app:fabSize="mini"
+            app:srcCompat="@drawable/ic_baseline_arrow_downward_24"
+            app:tint="?attr/colorOnSurface" />
+
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/share_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="16dp"
-            android:contentDescription="@string/exportConfiguration"
-            app:srcCompat="@drawable/ic_baseline_share_24" />
+            android:text="@string/shareLogs"
+            app:icon="@drawable/ic_baseline_share_24" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>
