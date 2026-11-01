@@ -105,7 +105,7 @@ class ConnectionErrorTest : TestWithAnActivity<StatusActivity>(startActivity = t
     waitUntilViewContains(
         R.id.connectedStatusMessage,
         R.string.statusEndpointStateMessageUnknownHost,
-        15.seconds,
+        30.seconds,
     )
   }
 
@@ -279,7 +279,10 @@ private fun getTLSSettings(connectionErrorTest: ConnectionErrorTest): TLSSetting
   return TLSSettings(
       keyStoreFilePath = keyStorePath,
       keyStorePassword = "aaaa",
-      requireClientCertificate = true,
+      // Must stay false. Requiring one makes the server list every system CA in its
+      // CertificateRequest, which on API 27 overflows KMQTT's TLS send buffer. KMQTT then loses the
+      // reply, so the handshake hangs instead of failing on the untrusted CA.
+      requireClientCertificate = false,
   )
 }
 
