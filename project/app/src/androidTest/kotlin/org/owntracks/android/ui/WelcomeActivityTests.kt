@@ -16,6 +16,7 @@ import org.owntracks.android.testutils.TestWithAnActivity
 import org.owntracks.android.testutils.doIfViewNotVisible
 import org.owntracks.android.testutils.getCurrentActivity
 import org.owntracks.android.ui.map.MapActivity
+import org.owntracks.android.ui.preferences.PreferencesActivity
 import org.owntracks.android.ui.welcome.WelcomeActivity
 
 @MediumTest
@@ -42,6 +43,24 @@ class WelcomeActivityTests : TestWithAnActivity<WelcomeActivity>() {
   @SdkSuppress(minSdkVersion = 34)
   @Test
   fun welcome_activity_starts_the_map_activity_when_done() {
+    goToFinishPage()
+    clickOn(R.id.btn_done)
+    assertTrue(getCurrentActivity() is MapActivity)
+  }
+
+  @SdkSuppress(minSdkVersion = 34)
+  @Test
+  fun going_back_from_preferences_returns_to_the_finish_page() {
+    goToFinishPage()
+    clickOn(R.id.ui_fragment_welcome_finish_open_preferences)
+    assertTrue(getCurrentActivity() is PreferencesActivity)
+    pressBack()
+    assertDisplayed(R.string.done_heading)
+    clickOn(R.id.btn_done)
+    assertTrue(getCurrentActivity() is MapActivity)
+  }
+
+  private fun goToFinishPage() {
     // Intro fragment
     clickOn(R.id.btn_next)
     // Connection setup fragment
@@ -64,8 +83,6 @@ class WelcomeActivityTests : TestWithAnActivity<WelcomeActivity>() {
       allowPermissionsIfNeeded(Manifest.permission.POST_NOTIFICATIONS)
     }
     clickOn(R.id.btn_next)
-    clickOn(R.id.btn_done)
-    assertTrue(getCurrentActivity() is MapActivity)
   }
 
   @SdkSuppress(minSdkVersion = 29)

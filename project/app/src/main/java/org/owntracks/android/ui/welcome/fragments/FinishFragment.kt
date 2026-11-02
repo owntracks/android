@@ -25,11 +25,7 @@ class FinishFragment @Inject constructor() : WelcomeFragment() {
         .apply {
           uiFragmentWelcomeFinishOpenPreferences.setOnClickListener {
             viewModel.setWelcomeState(WelcomeViewModel.ProgressState.FINISHED)
-            startActivity(
-                Intent(requireContext(), PreferencesActivity::class.java).apply {
-                  flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                }
-            )
+            startActivity(Intent(requireContext(), PreferencesActivity::class.java))
           }
         }
         .root
