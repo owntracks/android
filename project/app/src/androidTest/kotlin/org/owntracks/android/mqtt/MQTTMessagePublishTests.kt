@@ -13,10 +13,16 @@ import com.adevinta.android.barista.interaction.BaristaClickInteractions.clickOn
 import com.adevinta.android.barista.interaction.BaristaDrawerInteractions.openDrawer
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import dagger.hilt.android.testing.HiltAndroidTest
+import io.github.davidepianca98.mqtt.packets.mqtt.MQTTConnect
 import io.github.davidepianca98.mqtt.packets.mqtt.MQTTPublish
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Named
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.long
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -79,6 +85,29 @@ class MQTTMessagePublishTests :
               it is MessageLocation && it.latitude == mockLatitude && it.longitude == mockLongitude
             },
     )
+  }
+
+  @Test
+  fun given_an_MQTT_configured_client_when_it_connects_then_the_broker_receives_a_will_with_a_timestamp() {
+    setupTestActivity {
+      configureMQTTConnectionToLocalWithGeneratedPassword(saveConfigurationIdlingResource)
+    }
+    mqttConnectionIdlingResource.use { Espresso.onIdle() }
+
+    val will =
+        Json.parseToJsonElement(
+                String(
+                    mqttPacketsReceived
+                        .filterIsInstance<MQTTConnect>()
+                        .last()
+                        .willPayload!!
+                        .toByteArray()
+                )
+            )
+            .jsonObject
+    assertEquals("lwt", will["_type"]?.jsonPrimitive?.content)
+    assertTrue("tst in $will", will["tst"]?.jsonPrimitive?.long != null)
+    assertEquals(will["tst"]?.jsonPrimitive?.long, will["created_at"]?.jsonPrimitive?.long)
   }
 
   @Test

@@ -23,7 +23,9 @@ class MessageLwt(
   override var createdAt: @Serializable(with = InstantEpochSecondsSerializer::class) Instant =
       messageWithCreatedAtImpl.createdAt
 
-  @SerialName("tst") var timestamp: Long = messageWithCreatedAtImpl.createdAt.epochSeconds
+  @kotlinx.serialization.EncodeDefault(kotlinx.serialization.EncodeDefault.Mode.ALWAYS)
+  @SerialName("tst")
+  var timestamp: Long = messageWithCreatedAtImpl.createdAt.epochSeconds
 
   override fun toString(): String = "[MessageLwt]"
 

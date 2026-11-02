@@ -1,7 +1,14 @@
 package org.owntracks.android.net.mqtt
 
+import android.content.Context
+import java.security.KeyStore
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.long
 import org.junit.Assert
 import org.junit.Test
+import org.mockito.kotlin.mock
 import org.owntracks.android.preferences.InMemoryPreferencesStore
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.interfaces.ConfigurationIncompleteException
@@ -72,5 +79,23 @@ class MqttConnectionConfigurationTest {
   fun `MQTT Connection Configuration does not validate config with missing hostname`() {
     val preferences = Preferences(InMemoryPreferencesStore(), mockIdlingResource)
     preferences.toMqttConnectionConfiguration().validate()
+  }
+
+  @Test
+  fun `the connect options' will is an lwt message with its timestamps`() {
+    val before = System.currentTimeMillis() / 1000
+    val options =
+        Preferences(InMemoryPreferencesStore(), mockIdlingResource)
+            .apply { tls = false }
+            .toMqttConnectionConfiguration()
+            .getConnectOptions(mock<Context> {}, KeyStore.getInstance(KeyStore.getDefaultType()))
+
+    val will = Json.parseToJsonElement(String(options.willMessage.payload)).jsonObject
+
+    Assert.assertEquals("lwt", will["_type"]?.jsonPrimitive?.content)
+    val tst = will["tst"]?.jsonPrimitive?.long
+    Assert.assertNotNull("tst in $will", tst)
+    Assert.assertTrue("tst in $will is from this connect", tst!! >= before)
+    Assert.assertEquals(tst, will["created_at"]?.jsonPrimitive?.long)
   }
 }

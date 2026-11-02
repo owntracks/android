@@ -7,7 +7,8 @@ import java.security.KeyStore
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions
-import org.json.JSONObject
+import org.owntracks.android.model.Parser
+import org.owntracks.android.model.messages.MessageLwt
 import org.owntracks.android.net.CALeafCertMatchingHostnameVerifier
 import org.owntracks.android.net.ConnectionConfiguration
 import org.owntracks.android.preferences.DefaultsProvider
@@ -69,12 +70,9 @@ data class MqttConnectionConfiguration(
         keepAliveInterval = keepAlive.inWholeSeconds.coerceAtLeast(0).toInt()
         connectionTimeout = timeout.inWholeSeconds.coerceAtLeast(1).toInt()
         isCleanSession = cleanSession
-        setWill(
-            willTopic,
-            JSONObject().apply { put("_type", "lwt") }.toString().toByteArray(),
-            0,
-            false,
-        )
+        // Built once per connect, so `tst` is when this connection was made, not when it dropped:
+        // the broker holds on to this payload and publishes it later. Unencrypted, as ever.
+        setWill(willTopic, Parser(null).toUnencryptedJsonBytes(MessageLwt()), 0, false)
         maxInflight = maxInFlight
         if (tls) {
           socketFactory =
