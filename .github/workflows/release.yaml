@@ -75,6 +75,19 @@ jobs:
             exit 1
           fi
 
+      # F-Droid and IzzyOnDroid read this file at the tag to reproduce the build. It describes the
+      # latest stable release, so betas don't touch it. `just release` keeps it right.
+      - name: Assert that latest-version.yaml matches this release
+        if: ${{ github.ref_name != 'release-test-tag' && !contains(github.ref_name, 'beta') }}
+        run: |
+          EXPECTED_NAME="${GITHUB_REF_NAME#v}"
+          FILE_NAME="$(sed -n 's/^versionName: //p' latest-version.yaml)"
+          FILE_CODE="$(sed -n 's/^versionCode: //p' latest-version.yaml)"
+          if [[ "${FILE_NAME}" != "${EXPECTED_NAME}" || "${FILE_CODE}" != "${VERSION_CODE}" ]]; then
+            echo "::error::latest-version.yaml has ${FILE_NAME}/${FILE_CODE}, expected ${EXPECTED_NAME}/${VERSION_CODE}. Fix it and move the tag."
+            exit 1
+          fi
+
       - name: Build release APKs
         uses: ./.github/actions/gradle-task
         with:

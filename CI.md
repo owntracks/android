@@ -34,4 +34,6 @@ There's 3 GHA workflows that help manage PRs and releases.
 
 ### Android Release
 
+Stable releases are tagged with `just release vX.Y.Z`, which commits the matching `latest-version.yaml` first. This workflow fails a stable tag if that file doesn't match the release, before anything is built or promoted.
+
 Triggered by a version tag, this workflow creates a Github Release, fetches the APKs from the corresponding CircleCI workflow and attaches them to the release, and finally promotes the Play Store build between either internal and beta, beta and production or internal and production (depending on whether it's a beta tag or not).

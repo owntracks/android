@@ -64,6 +64,10 @@ sync-i18n:
 update-all-prs:
      gh pr list --json number|jq -r .[].number|xargs -I{} gh pr update-branch {}
 
+[group('utilities')]
+release tag *args:
+    ./util/release.py "$@"
+
 [group('local infrastructure')]
 local-stack:
     cd util/mqtt-local && podman-compose up
