@@ -616,12 +616,19 @@ class MQTTMessageProcessorEndpoint(
       mqttConnectionConfiguration: MqttConnectionConfiguration
   ): Result<Unit> =
       connectingLock.withPermitLogged("MQTT reconnect") {
-        disconnect()
-        try {
-          mqttConnectionIdlingResource.setIdleState(false)
-          connectToBroker(mqttConnectionConfiguration)
-        } finally {
-          mqttConnectionIdlingResource.setIdleState(true)
+        // This may have been queued on the lock behind deactivate()'s teardown. A client connected
+        // now would have nothing to ever disconnect it.
+        if (deactivated) {
+          Timber.v("Not reconnecting a deactivated endpoint")
+          Result.success(Unit)
+        } else {
+          disconnect()
+          try {
+            mqttConnectionIdlingResource.setIdleState(false)
+            connectToBroker(mqttConnectionConfiguration)
+          } finally {
+            mqttConnectionIdlingResource.setIdleState(true)
+          }
         }
       }
 

@@ -12,6 +12,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -69,7 +70,7 @@ class MQTTMessageProcessorEndpointConnectLivenessTest {
           maxInFlight = 1,
       )
 
-  private fun endpoint() =
+  private fun endpoint(idlingResource: SimpleIdlingResource = SimpleIdlingResource("test", true)) =
       MQTTMessageProcessorEndpoint(
           messageProcessor = mock {},
           endpointStateRepo = EndpointStateRepo(),
@@ -80,8 +81,22 @@ class MQTTMessageProcessorEndpointConnectLivenessTest {
           scope = CoroutineScope(SupervisorJob() + UnconfinedTestDispatcher()),
           ioDispatcher = UnconfinedTestDispatcher(),
           applicationContext = mockContext,
-          mqttConnectionIdlingResource = SimpleIdlingResource("test", true),
+          mqttConnectionIdlingResource = idlingResource,
       )
+
+  @Test
+  fun `a reconnect that was queued behind deactivate connects nothing`() = runTest {
+    // Nothing would ever disconnect a client connected by a replaced endpoint.
+    val idlingResource: SimpleIdlingResource = mock {}
+    val endpoint = endpoint(idlingResource)
+    endpoint.mqttClientAndConfiguration =
+        MQTTMessageProcessorEndpoint.MqttClientAndConfiguration(mock {}, configuration)
+    endpoint.deactivate()
+
+    endpoint.reconnect()
+
+    verify(idlingResource, never()).setIdleState(false)
+  }
 
   @Test
   fun `a broker reply is waited for the connection timeout plus a margin, never unbounded`() {
