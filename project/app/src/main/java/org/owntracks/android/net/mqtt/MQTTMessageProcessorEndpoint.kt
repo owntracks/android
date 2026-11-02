@@ -340,22 +340,20 @@ class MQTTMessageProcessorEndpoint(
       clientAndConfiguration: MqttClientAndConfiguration
   ): Boolean {
     val (client, configuration) = clientAndConfiguration
-    // A closed client has no capacity. Reading its in-flight count NPEs (Paho nulls its state on
-    // close), and MessageProcessor drops a message whose send throws; returning false re-queues it.
+    // A closed client has no capacity, and MessageProcessor drops a message whose send throws;
+    // returning false re-queues it.
     if (clientAndConfiguration.closed) return false
-    if (client.inFlightMessageCount < configuration.maxInFlight) {
+    val count = inFlightCount(client) ?: return false
+    if (count < configuration.maxInFlight) {
       return true
     }
-    Timber.d(
-        "MQTT in-flight count ${client.inFlightMessageCount} is at max " +
-            "${configuration.maxInFlight}, waiting for it to drop"
-    )
+    Timber.d("MQTT in-flight count $count is at max ${configuration.maxInFlight}, waiting")
     return withTimeoutOrNull(IN_FLIGHT_WAIT_TIMEOUT) {
-      while (
-          clientAndConfiguration.closed || client.inFlightMessageCount >= configuration.maxInFlight
-      ) {
+      var current = inFlightCount(client)
+      while (current == null || current >= configuration.maxInFlight) {
         if (
-            clientAndConfiguration.closed ||
+            current == null ||
+                clientAndConfiguration.closed ||
                 mqttClientAndConfiguration !== clientAndConfiguration ||
                 endpointStateRepo.endpointState.value.state != EndpointState.CONNECTED
         ) {
@@ -363,16 +361,30 @@ class MQTTMessageProcessorEndpoint(
           return@withTimeoutOrNull false
         }
         delay(100.milliseconds)
+        current = inFlightCount(client)
       }
       true
     }
         ?: false.also {
           Timber.w(
-              "Timed out after $IN_FLIGHT_WAIT_TIMEOUT waiting for MQTT in-flight count " +
-                  "${client.inFlightMessageCount} to drop below ${configuration.maxInFlight}"
+              "Timed out after $IN_FLIGHT_WAIT_TIMEOUT waiting for MQTT in-flight count to drop " +
+                  "below ${configuration.maxInFlight}"
           )
         }
   }
+
+  /**
+   * The client's in-flight count, or null if it has been closed.
+   * [MqttClientAndConfiguration.closed] can't rule that out: it can be read as false just before
+   * another thread finishes the close, and reading a closed client's count NPEs because Paho nulls
+   * its state.
+   */
+  private fun inFlightCount(client: MqttAsyncClient): Int? =
+      try {
+        client.inFlightMessageCount
+      } catch (_: NullPointerException) {
+        null
+      }
 
   override fun onPreferenceChanged(properties: Set<String>) {
     if (preferences.mode != ConnectionMode.MQTT || mqttClientAndConfiguration == null) {

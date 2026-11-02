@@ -139,6 +139,39 @@ class MQTTMessageProcessorEndpointSendMessageTest {
   }
 
   @Test
+  fun `a client closed during the send has no capacity, so the message is re-queued`() = runTest {
+    // `closed` can be read as false just before another thread finishes closing the client.
+    val client: MqttAsyncClient = mock {
+      on { inFlightMessageCount } doThrow NullPointerException("clientState")
+    }
+    connectWith(client)
+
+    val result = endpoint.sendMessage(message)
+
+    assertTrue(
+        "re-queued as not connected: $result",
+        result.exceptionOrNull() is MQTTMessageProcessorEndpoint.NotConnectedException,
+    )
+    verify(client, never()).publish(anyOrNull(), any<ByteArray>(), any(), any())
+  }
+
+  @Test
+  fun `a client closed while waiting for capacity gives up, so the message is re-queued`() =
+      runTest {
+        val client: MqttAsyncClient = mock {
+          on { inFlightMessageCount } doReturn 1 doThrow NullPointerException("clientState")
+        }
+        connectWith(client)
+
+        val result = endpoint.sendMessage(message)
+
+        assertTrue(
+            "re-queued as not connected: $result",
+            result.exceptionOrNull() is MQTTMessageProcessorEndpoint.NotConnectedException,
+        )
+      }
+
+  @Test
   fun `gives up waiting when a reconnect replaces the client`() = runTest {
     // The old client's in-flight messages will never be acked: it's been replaced.
     val oldClient = clientWithInFlight(1)
