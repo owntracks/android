@@ -33,6 +33,10 @@ class AsyncPingSender(private val scope: CoroutineScope) : MqttPingSender {
 
   override fun schedule(delayInMilliseconds: Long) {
     Timber.v("MQTT keepalive scheduled in ${delayInMilliseconds.milliseconds}")
+    // Paho schedules from inside checkForActivity, so this can cancel the job it's running in.
+    // That's safe: nothing after that call in the job suspends. Without this, every extra schedule
+    // starts a chain of its own.
+    keepaliveJob?.cancel()
     keepaliveJob = scope.launch {
       delay(delayInMilliseconds)
       Timber.v("Sending keepalive")
