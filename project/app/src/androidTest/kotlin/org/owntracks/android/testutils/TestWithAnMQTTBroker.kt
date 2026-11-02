@@ -11,9 +11,16 @@ import org.owntracks.android.testutils.idlingresources.LatchingIdlingResourceWit
 
 @ExperimentalUnsignedTypes
 interface TestWithAnMQTTBroker {
-  fun configureMQTTConnectionToLocal(idlingResource: IdlingResource, password: String)
+  fun configureMQTTConnectionToLocal(
+      idlingResource: IdlingResource,
+      password: String,
+      keepalive: Int = 5,
+  )
 
-  fun configureMQTTConnectionToLocalWithGeneratedPassword(idlingResource: IdlingResource)
+  fun configureMQTTConnectionToLocalWithGeneratedPassword(
+      idlingResource: IdlingResource,
+      keepalive: Int = 5,
+  )
 
   val mqttPacketsReceived: MutableList<MQTTPacket>
   val broker: Broker

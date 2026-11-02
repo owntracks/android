@@ -544,7 +544,7 @@ class MQTTMessageProcessorEndpoint(
                           applicationContext,
                           pingAlarmReceiver,
                           IntentFilter(AlarmPingSender.PING_INTENT_ACTION),
-                          ContextCompat.RECEIVER_EXPORTED,
+                          ContextCompat.RECEIVER_NOT_EXPORTED,
                       )
                       .also { Timber.d("Registered ping alarm receiver") }
                   Timber.i(

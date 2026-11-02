@@ -137,7 +137,11 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
   }
 
   @OptIn(ExperimentalEncodingApi::class)
-  override fun configureMQTTConnectionToLocal(idlingResource: IdlingResource, password: String) {
+  override fun configureMQTTConnectionToLocal(
+      idlingResource: IdlingResource,
+      password: String,
+      keepalive: Int,
+  ) {
     val config =
         Base64.encode(
             // language=JSON
@@ -153,7 +157,7 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
                 "mqttProtocolLevel": 4,
                 "username": "$mqttUsername",
                 "tls": false,
-                "keepalive": 5,
+                "keepalive": $keepalive,
                 "connectionTimeoutSeconds": 2,
                 "reverseGeocodeProvider": "None"
             }
@@ -183,7 +187,10 @@ class TestWithAnMQTTBrokerImpl : TestWithAnMQTTBroker {
   }
 
   // This will use the right password, so we should test for success
-  override fun configureMQTTConnectionToLocalWithGeneratedPassword(idlingResource: IdlingResource) {
-    configureMQTTConnectionToLocal(idlingResource, mqttTestPassword)
+  override fun configureMQTTConnectionToLocalWithGeneratedPassword(
+      idlingResource: IdlingResource,
+      keepalive: Int,
+  ) {
+    configureMQTTConnectionToLocal(idlingResource, mqttTestPassword, keepalive)
   }
 }
