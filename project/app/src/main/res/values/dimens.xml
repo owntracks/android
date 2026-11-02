@@ -16,4 +16,7 @@
          (clipChildren/clipToPadding alone do not rescue it). This padding is subtracted back off
          the wrapper margins in MapActivity so the FAB's on-screen position is unchanged. -->
     <dimen name="fab_shadow_room">12dp</dimen>
+    <!-- Stroke width of the ring drawn around the currently-selected option in the
+         map layer and monitoring mode bottom sheet pickers -->
+    <dimen name="bottom_sheet_selected_option_ring_width">4dp</dimen>
 </resources>
