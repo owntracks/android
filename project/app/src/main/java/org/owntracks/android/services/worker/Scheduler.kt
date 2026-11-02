@@ -57,11 +57,8 @@ constructor(
 
   /** Cancels all WorkManager tasks. Called on app exit */
   fun cancelAllTasks() {
-    Timber.d("Cancelling task tag (all mqtt tasks) $ONETIME_TASK_MQTT_RECONNECT")
-    workManager.cancelUniqueWork(ONETIME_TASK_MQTT_RECONNECT)
-    workManager.cancelUniqueWork(PERIODIC_TASK_MQTT_CONNECTION_WATCHDOG)
+    cancelMqttTasks()
     workManager.cancelAllWorkByTag(PERIODIC_TASK_SEND_LOCATION_PING)
-    resetMqttReconnectBackoff()
   }
 
   /**
