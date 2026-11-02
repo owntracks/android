@@ -90,6 +90,9 @@
     <string name="invalidLatitudeError">"Неверная широта"</string>
     <string name="invalidLongitudeError">"Неверная долгота"</string>
     <string name="latitude">"Широта"</string>
+
+    <!-- Fuzzy -->
+    <string name="loadActivityErrorInvalidConfigUrl">"«Неверный URL конфигурации"</string>
     <string name="loadActivityNoFileExplorerFound">"Менеджер файлов не обнаружен"</string>
     <string name="loadActivitySelectAFile">"Выберите файл"</string>
     <string name="locationPermissionNotGrantedNotification">"Нет доступа к местоположению"</string>
@@ -235,6 +238,9 @@
     <string name="preferencesRemoteCommandSummary">"Разрешить получение команд и настроек от сервера"</string>
     <string name="preferencesRemoteConfiguration">"Удаленное изменение параметров"</string>
     <string name="preferencesRemoteConfigurationSummary">"Разрешить удаленное изменение настроек"</string>
+
+    <!-- Fuzzy -->
+    <string name="preferencesRemoteControl">"Удалённое управление"</string>
     <string name="preferencesReporting">"Отчеты"</string>
     <string name="preferencesRepository">"Исходный код"</string>
     <string name="preferencesRepublishOnReconnect">"Отправлять местоположение при подключении"</string>
@@ -253,9 +259,7 @@
     <string name="publish">"Сообщить местоположение"</string>
     <string name="radius">"Радиус"</string>
     <string name="reconnect">"Переподключение"</string>
-
-    <!-- Fuzzy -->
-    <string name="requestLocationSent">"Запрос на обновление местоположения отправлен"</string>
+    <string name="requestLocationSent">"Запрос на обновление местоположения отправлен на %s"</string>
     <string name="save">"Сохранить"</string>
     <string name="select">"Выбрать"</string>
     <string name="shareContactBody">"%1$s, последнее местоположение: %2$s (%3$s) в %4$s"</string>
@@ -296,8 +300,6 @@
     <string name="statusLocationPermissionsNone">"Нет"</string>
     <string name="statusLocationPermissionsPromptNegativeButton">"Отмена"</string>
     <string name="statusLocationPermissionsPromptPositiveButton">"Настройки"</string>
-
-    <!-- Fuzzy -->
     <string name="statusLocationPermissionsPromptText">"Если вы хотите, чтобы ваше местоположение отслеживалось сразу после перезапуска устройства, дайте разрешение на определение местоположения в варианте «Разрешить в любом режиме»."</string>
     <string name="statusLocationPermissionsPromptTitle">"Фоновое определение местоположения"</string>
     <string name="statusLocationPermissionsUnknown">"Неизвестно"</string>

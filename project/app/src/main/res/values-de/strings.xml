@@ -14,6 +14,10 @@
     <string name="addWaypoint">"Ort hinzufügen"</string>
     <string name="aLocation">"einen Bereich"</string>
     <string name="app_name">"OwnTracks"</string>
+
+    <!-- Fuzzy -->
+    <string name="backgroundLocationPermissionRequestDialogText">"Wenn OwnTracks auch im Hintergrund deinen Standort verfolgen soll, wird eine zusätzliche Berechtigung benötigt, damit OwnTracks dauerhaft auf deinen Standort zugreifen kann."</string>
+    <string name="backgroundLocationPermissionRequestDialogTitle">"Berechtigung für Standortabfrage im Hintergrund"</string>
     <string name="backgroundLocationRestrictionNotificationText">"Diese Version von Android limitiert OwnTracks Standortzugriff im Hintergrund, bis die App geöffnet wird. Antippen dieser Benachrichtigung öffnet die App und fängt an den Standort aufzuzeichnen."</string>
     <string name="backgroundLocationRestrictionNotificationTitle">"Standortverfolgung pausiert"</string>
     <string name="batteryOptimizationWhitelistDialogButtonLabel">"Akkuoptimierungseinstellungen"</string>
@@ -47,6 +51,7 @@
     <string name="contactDetailsTrackerId">"Tracker-ID"</string>
     <string name="contactLocationUnknown">"Kein Standort verfügbar"</string>
     <string name="contactsListPlaceholder">"Keine Kontakte gefunden"</string>
+    <string name="copyText">"Kopieren"</string>
     <string name="currentLocationButtonLabel">"Aktuelle Standort"</string>
     <string name="deleteWaypointConfirmationButtonLabel">"Löschen"</string>
     <string name="deleteWaypointConfirmationText">"Möchtest du diesen Ort löschen?"</string>
@@ -83,6 +88,8 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="IDLE">"Untätig"</string>
     <string name="importConfig">"Import"</string>
     <string name="INITIAL">"Initialisieren"</string>
+    <string name="invalidLatitudeError">"Ungültiger Breitengrad"</string>
+    <string name="invalidLongitudeError">"Ungültiger Längengrad"</string>
     <string name="latitude">"Breitengrad"</string>
     <string name="loadActivityNoFileExplorerFound">"Keine Datei-Explorer-App gefunden"</string>
     <string name="loadActivitySelectAFile">"Wähle eine Datei aus"</string>
@@ -99,6 +106,7 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="mapLayerOpenStreetMapWikimediaLabel">"Wikimedia"</string>
     <string name="menuClear">"Entfernen"</string>
     <string name="menuContactNavigate">"Navigieren"</string>
+    <string name="menuContactRequestLocation">"Standort anfragen"</string>
     <string name="mode_heading">"Modus"</string>
     <string name="mode_http_private_label">"HTTP"</string>
     <string name="mode_mqtt_private_label">"MQTT"</string>
@@ -116,6 +124,8 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
     <string name="monitoringModeDialogSignificantTitle">"Wesentliche Änderungen"</string>
     <string name="monitoringModeDialogTitle">"Monitoring-Modus"</string>
     <string name="na">"Nicht verfügbar"</string>
+    <string name="navigation_drawer_close">"Navigationsmenü schließen"</string>
+    <string name="navigation_drawer_open">"Navigationsmenü öffnen"</string>
     <string name="next">"Nächste"</string>
     <string name="noBrowserInstalled">"Kein geeigneter Browser installiert"</string>
     <string name="noNavigationApp">"keine passende App installiert"</string>
@@ -129,6 +139,7 @@ Um dies zu ermöglichen, aktivieren Sie bitte den Standort in den Geräteeinstel
         <item quantity="one">"%1$d neues Ereignis"</item>
         <item quantity="other">"%1$d neue Ereignisse"</item>
     </plurals>
+    <string name="openInAnotherApp">"In anderer App öffnen"</string>
     <string name="play_services_not_available">"Google Play-Dienste sind nicht verfügbar"</string>
     <string name="play_services_now_available">"Google Play-Dienste sind jetzt verfügbar"</string>
     <string name="play_services_update_required">"Google Play-Dienste muss aktualisiert werden"</string>
@@ -244,6 +255,8 @@ Die OpenCage-Datenschutzerklärung kann auf &lt;a href=\"https://opencagedata.co
     <string name="publish">"Standort melden"</string>
     <string name="radius">"Radius (m)"</string>
     <string name="reconnect">"Neu verbinden"</string>
+    <string name="reconnecting">"Stellt Verbindung wieder her"</string>
+    <string name="requestLocationSent">"Kommando für Standortanfrage an %s geschickt"</string>
     <string name="save">"Speichern"</string>
     <string name="select">"Auswählen"</string>
     <string name="shareContactBody">"%1$s letzter Standort: %2$s (%3$s) um %4$s"</string>
@@ -309,6 +322,7 @@ Die OpenCage-Datenschutzerklärung kann auf &lt;a href=\"https://opencagedata.co
     <string name="waypointMigrationErrorNotificationText">"Beim Migrieren der Orte ist ein Fehler aufgetreten. Einige Orte wurden möglicherweise nicht migriert. Prüfe die Logs und versuche es erneut."</string>
     <string name="waypointMigrationErrorNotificationTitle">"Fehler beim Migrieren der Orte"</string>
     <string name="waypointsImport">"Orte importieren"</string>
+    <string name="welcome_background_location_permission_request">"Hintergrundberechtigung anfragen"</string>
     <string name="welcome_connection_setup_description">"OwnTracks sendet Ihre Standortdaten an einen Server, der Ihnen (oder einer Person Ihres Vertrauens) gehört, so dass Sie die Kontrolle über Ihre Daten behalten.
 
 Vergewissern Sie sich, dass Sie die Verbindungsdetails Ihres Servers kennen, ob er über HTTPS oder MQTT erreichbar ist und welche Anmeldedaten Sie haben.
@@ -337,6 +351,7 @@ Je nach Gerät und Konfiguration kann die Erlaubnis für den Standort im Hinterg
 
 Eine permanente Benachrichtigung wird angezeigt, um die Standortverfolgung und die Verbindung aufrechtzuerhalten, und Sie können auch wählen, ob Sie Benachrichtigungen für Kontakte aktivieren möchten, die zwischen Orten wechseln."</string>
     <string name="welcome_notification_permission_granted">"Benachrichtigungs-Berechtigung gewährt"</string>
+    <string name="welcome_notification_permission_request">"Berechtigung anfragen"</string>
     <string name="welcome_notification_permission_title">"Benachrichtigungs-Berechtigung"</string>
     <string name="welcome_play_description">"OwnTracks benötigt die Google Play-Dienste"</string>
     <string name="welcome_play_heading">"Google Play-Dienste"</string>
