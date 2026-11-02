@@ -539,9 +539,6 @@ class MQTTMessageProcessorEndpoint(
                       "MQTT Connected. Subscribing to ${mqttConnectionConfiguration.topicsToSubscribeTo}"
                   )
                   setEndpointState(EndpointState.CONNECTED)
-                  // This run of failures is over, so the next one starts from the short delay
-                  // again rather than inheriting however far this one had backed off.
-                  scheduler.resetMqttReconnectBackoff()
                   subscribe(
                           mqttConnectionConfiguration.topicsToSubscribeTo.toTypedArray(),
                           IntArray(mqttConnectionConfiguration.topicsToSubscribeTo.size) {
@@ -550,6 +547,11 @@ class MQTTMessageProcessorEndpoint(
                       )
                       .waitForCompletion(replyWait.inWholeMilliseconds)
                   Timber.d("MQTT Subscribed")
+                  // This run of failures is over, so the next one starts from the short delay again
+                  // rather than inheriting however far this one had backed off. Not before the
+                  // SUBACK: a broker that accepts connects but stalls on subscribes has to back
+                  // off.
+                  scheduler.resetMqttReconnectBackoff()
 
                   messageProcessor.notifyOutgoingMessageQueue()
                   if (preferences.publishLocationOnConnect) {
