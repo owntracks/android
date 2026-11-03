@@ -27,6 +27,11 @@
         app:fragment="org.owntracks.android.ui.preferences.ReportingFragment"
         app:icon="@drawable/ic_baseline_send_24" />
     <Preference
+        android:key="externalGnssScreen"
+        android:title="@string/preferencesExternalGnss"
+        app:fragment="org.owntracks.android.ui.preferences.ExternalGnssFragment"
+        app:icon="@drawable/ic_baseline_settings_ethernet_24" />
+    <Preference
         android:key="notificationScreen"
         android:title="@string/preferencesNotification"
         app:fragment="org.owntracks.android.ui.preferences.NotificationFragment"
