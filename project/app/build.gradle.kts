@@ -41,6 +41,24 @@ val packageVersionCode: Int =
 val manuallySetVersion: Boolean = System.getenv("VERSION_CODE") != null
 val enablePlayPublishing: Boolean = !System.getenv("ANDROID_PUBLISHER_CREDENTIALS").isNullOrBlank()
 
+fun gitDescribe(): String =
+    providers
+        .exec {
+          commandLine("git", "describe", "--always", "--dirty", "--abbrev=8", "--exclude=*")
+          isIgnoreExitValue = true
+        }
+        .standardOutput
+        .asText
+        .get()
+        .trim()
+
+/**
+ * The commit this build was made from, shown on the About screen. Always the bare hash, never a tag
+ * name, so a local build and a CI one (checked out without tags) read the same. "-dirty" marks
+ * uncommitted changes. "unknown" when there's no git, or no checkout (a source tarball).
+ */
+val gitCommit: String = runCatching { gitDescribe() }.getOrDefault("").ifEmpty { "unknown" }
+
 android {
   compileSdk = 36
   namespace = "org.owntracks.android"
@@ -60,6 +78,7 @@ android {
         "TRANSLATION_COUNT",
         localeCount.toString(),
     )
+    buildConfigField("String", "GIT_COMMIT", "\"$gitCommit\"")
 
     testInstrumentationRunner = "org.owntracks.android.testutils.hilt.CustomTestRunner"
 
