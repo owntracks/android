@@ -82,6 +82,8 @@ To allow this, please enable Location in the device settings."</string>
     <string name="exportLogFilePrompt">"Export log file"</string>
     <string name="exportLogFileSubject">"OwnTracks Log File"</string>
     <string name="exportWaypointsToEndpoint">"Publish Waypoints"</string>
+    <string name="fitAllButtonLabel">"Show everyone"</string>
+    <string name="fitAllNothingToShow">"No locations to show yet"</string>
     <string name="fixProblemLabel">"Fix"</string>
     <string name="geocoderDisabled">"Geocoder service is disabled"</string>
     <string name="geocoderError">"An error was received from the geocoder service: %s"</string>

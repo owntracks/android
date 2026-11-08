@@ -56,6 +56,26 @@
                 tools:targetApi="o" />
         </FrameLayout>
 
+        <!-- Sits below fabMapLayers: MapActivity sets its top margin from that FAB's. -->
+        <FrameLayout
+            android:id="@+id/fabFitAllContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|end"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:padding="@dimen/fab_shadow_room"
+            android:elevation="@dimen/fab_container_elevation">
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabFitAll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/fitAllButtonLabel"
+                android:src="@drawable/ic_baseline_zoom_out_map_24"
+                app:fabSize="normal" />
+        </FrameLayout>
+
         <FrameLayout
             android:id="@+id/fabMyLocationContainer"
             android:layout_width="wrap_content"

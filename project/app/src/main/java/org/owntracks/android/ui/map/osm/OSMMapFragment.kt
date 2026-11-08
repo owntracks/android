@@ -29,6 +29,7 @@ import org.osmdroid.events.MapListener
 import org.osmdroid.events.ScrollEvent
 import org.osmdroid.events.ZoomEvent
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.TileSystemWebMercator
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
@@ -52,6 +53,7 @@ import org.owntracks.android.location.toGeoPoint
 import org.owntracks.android.location.toLatLng
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.ContactImageBindingAdapter
+import org.owntracks.android.ui.map.FitTarget
 import org.owntracks.android.ui.map.MapFragment
 import org.owntracks.android.ui.map.MapLayerStyle
 import org.owntracks.android.ui.map.MapLocationZoomLevelAndRotation
@@ -333,6 +335,28 @@ internal constructor(
     mapView?.controller?.run { animateTo(latLng.toGeoPoint()) }
   }
 
+  override fun fitCamera(target: FitTarget) {
+    mapView?.run {
+      when (target) {
+        is FitTarget.Point ->
+            controller.animateTo(target.latLng.toGeoPoint(), FitTarget.POINT_ZOOM, null)
+        is FitTarget.Bounds ->
+            zoomToBoundingBox(
+                BoundingBox(
+                    target.northEast.latitude.value,
+                    target.northEast.longitude.value,
+                    target.southWest.latitude.value,
+                    target.southWest.longitude.value,
+                ),
+                true,
+                resources.getDimensionPixelSize(R.dimen.map_fit_padding),
+                MAX_FIT_ZOOM_LEVEL,
+                null,
+            )
+      }
+    }
+  }
+
   override fun updateMarkerOnMap(id: String, latLng: LatLng, image: Bitmap) {
     mapView?.run {
       val existingMarker: Marker? = overlays.firstOrNull { it is Marker && it.id == id } as Marker?
@@ -529,5 +553,8 @@ internal constructor(
   companion object {
     const val MIN_ZOOM_LEVEL: Double = 1.0
     const val MAX_ZOOM_LEVEL: Double = 21.0
+
+    /** Fitting points close together stops short of the closest zoom. */
+    private const val MAX_FIT_ZOOM_LEVEL: Double = 18.0
   }
 }
