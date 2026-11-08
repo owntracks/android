@@ -16,4 +16,7 @@
          (clipChildren/clipToPadding alone do not rescue it). This padding is subtracted back off
          the wrapper margins in MapActivity so the FAB's on-screen position is unchanged. -->
     <dimen name="fab_shadow_room">12dp</dimen>
+    <!-- Space kept around the points when the map is fitted to show everyone, so contact markers
+         (which are drawn centred on their location) stay clear of the edges and the FABs. -->
+    <dimen name="map_fit_padding">72dp</dimen>
 </resources>

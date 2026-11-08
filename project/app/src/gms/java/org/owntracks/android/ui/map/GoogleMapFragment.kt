@@ -27,6 +27,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.Circle
 import com.google.android.gms.maps.model.CircleOptions
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
@@ -212,6 +213,23 @@ internal constructor(
 
   override fun updateCamera(latLng: LatLng) {
     googleMap?.moveCamera(CameraUpdateFactory.newLatLng(latLng.toGMSLatLng()))
+  }
+
+  override fun fitCamera(target: FitTarget) {
+    googleMap?.animateCamera(
+        when (target) {
+          is FitTarget.Point ->
+              CameraUpdateFactory.newLatLngZoom(
+                  target.latLng.toGMSLatLng(),
+                  convertStandardZoomToGoogleZoom(FitTarget.POINT_ZOOM).toFloat(),
+              )
+          is FitTarget.Bounds ->
+              CameraUpdateFactory.newLatLngBounds(
+                  LatLngBounds(target.southWest.toGMSLatLng(), target.northEast.toGMSLatLng()),
+                  resources.getDimensionPixelSize(R.dimen.map_fit_padding),
+              )
+        }
+    )
   }
 
   override fun updateMarkerOnMap(id: String, latLng: LatLng, image: Bitmap) {

@@ -37,6 +37,9 @@ internal constructor(
 
   abstract fun updateCamera(latLng: LatLng)
 
+  /** Moves the camera to show [target], keeping clear of the map's buttons. */
+  abstract fun fitCamera(target: FitTarget)
+
   abstract fun updateMarkerOnMap(id: String, latLng: LatLng, image: Bitmap)
 
   abstract fun removeMarkerFromMap(id: String)
@@ -108,6 +111,7 @@ internal constructor(
         viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
           updateAllMarkers(allContacts.values.toSet())
           launch { mapCenter.collect { updateCamera(it) } }
+          launch { fitTarget.collect { fitCamera(it) } }
           launch {
             contactUpdatedEvent.collect {
               when (it) {
