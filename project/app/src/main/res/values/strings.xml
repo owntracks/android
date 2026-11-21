@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="aboutCommit">"Commit"</string>
+    <string name="aboutCommitCopied">"Commit copied to clipboard"</string>
     <string name="aboutFeedbackCategoryTitle">"Feedback"</string>
     <string name="aboutIssuesSummary">"File on GitHub"</string>
     <string name="aboutIssuesTitle">"Report an issue"</string>
