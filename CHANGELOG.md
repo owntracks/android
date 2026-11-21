@@ -49,6 +49,7 @@ This release addresses a security advisory covering several intent-handling vuln
 - Locations and transitions exactly on the equator or the prime meridian (a latitude or longitude of exactly 0) were sent without that coordinate, and location messages at either were silently dropped from the outgoing queue
 - The last line in the log viewer is no longer hidden behind the navigation bar or the share button
 - MQTT LWT messages now really contain `tst` and `created_at`, both set to when the connection was made. The 2.5.1 fix for this never took effect, as it changed a class that the app's will message wasn't built from (#1766)
+- A message that MQTT failed to publish, typically because the connection had just dropped, was thrown away instead of being queued to send again once reconnected (#2294)
 
 
 ## Version 2.5.10

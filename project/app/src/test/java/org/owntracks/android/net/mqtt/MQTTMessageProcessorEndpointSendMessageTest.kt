@@ -15,6 +15,7 @@ import kotlinx.coroutines.test.currentTime
 import kotlinx.coroutines.test.runTest
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient
+import org.eclipse.paho.client.mqttv3.MqttException
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -31,6 +32,7 @@ import org.owntracks.android.data.EndpointStatus
 import org.owntracks.android.data.repos.EndpointStateRepo
 import org.owntracks.android.model.Parser
 import org.owntracks.android.model.messages.MessageBase
+import org.owntracks.android.net.MessageProcessorEndpoint
 import org.owntracks.android.preferences.types.MqttProtocolLevel
 import org.owntracks.android.preferences.types.MqttQos
 import org.owntracks.android.services.worker.Scheduler
@@ -43,6 +45,9 @@ import org.owntracks.android.test.SimpleIdlingResource
  * If a reconnect replaced that client mid-wait, the old client's in-flight count never dropped, so
  * the outbound message loop wedged forever while the new, healthy client sat idle and the queue
  * grew (issue #2323). The wait must now give up (so the message gets re-queued) rather than hang.
+ *
+ * Also covers how a failed publish is reported: as a failed [Result], which MessageProcessor
+ * re-queues, never as a throw, which it drops (issue #2294).
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class MQTTMessageProcessorEndpointSendMessageTest {
@@ -223,5 +228,39 @@ class MQTTMessageProcessorEndpointSendMessageTest {
     )
     assertTrue("should wait out the timeout first", currentTime >= 30_000)
     verify(client, never()).publish(anyOrNull(), any<ByteArray>(), any(), any())
+  }
+
+  private fun clientThatFailsToPublish(exception: Exception): MqttAsyncClient = mock {
+    on { inFlightMessageCount } doReturn 0
+    on { publish(anyOrNull(), any<ByteArray>(), any(), any()) } doThrow exception
+  }
+
+  @Test
+  fun `a publish that fails because the client is not connected is re-queued, not dropped`() =
+      runTest {
+        connectWith(
+            clientThatFailsToPublish(
+                MqttException(MqttException.REASON_CODE_CLIENT_NOT_CONNECTED.toInt())
+            )
+        )
+
+        val result = endpoint.sendMessage(message)
+
+        assertTrue(
+            "should fail as a sending error so the message is re-queued: $result",
+            result.exceptionOrNull() is MessageProcessorEndpoint.OutgoingMessageSendingException,
+        )
+      }
+
+  @Test
+  fun `a publish that fails unexpectedly is re-queued, not dropped`() = runTest {
+    connectWith(clientThatFailsToPublish(IllegalStateException("boom")))
+
+    val result = endpoint.sendMessage(message)
+
+    assertTrue(
+        "should fail as a sending error so the message is re-queued: $result",
+        result.exceptionOrNull() is MessageProcessorEndpoint.OutgoingMessageSendingException,
+    )
   }
 }

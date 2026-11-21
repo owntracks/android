@@ -26,7 +26,6 @@ import kotlin.time.measureTime
 import kotlin.time.measureTimedValue
 import kotlin.time.toDuration
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -283,45 +282,48 @@ class MQTTMessageProcessorEndpoint(
     // outgoing message loop
     return clientAndConfiguration.run {
       runBlocking {
-        var sendMessageThrowable: Throwable? = null
-        val handler = CoroutineExceptionHandler { _, throwable -> sendMessageThrowable = throwable }
-        val job =
-            launch(ioDispatcher + CoroutineName("MQTT SendMessage") + handler) {
-              try {
-                Timber.d("Publishing message $message")
-                measureTime {
-                  mqttClient
-                      .publish(
-                          message.topic,
-                          message.toJsonBytes(parser),
-                          message.qos,
-                          message.retained,
-                      )
-                      .also { Timber.v("MQTT message sent with messageId=${it.messageId}. ") }
+        withContext(ioDispatcher + CoroutineName("MQTT SendMessage")) {
+          // A failure has to come back as a Result rather than be thrown: MessageProcessor
+          // re-queues a message whose send returns a failure, but drops one whose send throws.
+          // (This used to rely on a CoroutineExceptionHandler on a child of runBlocking, which is
+          // never invoked for a child coroutine, so every publish failure escaped as a throw and
+          // the message was dropped.)
+          try {
+            Timber.d("Publishing message $message")
+            measureTime {
+              mqttClient
+                  .publish(
+                      message.topic,
+                      message.toJsonBytes(parser),
+                      message.qos,
+                      message.retained,
+                  )
+                  .also { Timber.v("MQTT message sent with messageId=${it.messageId}. ") }
+            }
+                .apply { Timber.i("Message $message sent in $this") }
+            Result.success(Unit)
+          } catch (e: Exception) {
+            Timber.w(e, "Error publishing message $message")
+            when (e) {
+              is IOException -> {
+                messageProcessor.onMessageDeliveryFailedFinal(message)
+                Result.success(Unit)
+              }
+              is MqttException -> {
+                if (e.reasonCode.toShort() != MqttException.REASON_CODE_MAX_INFLIGHT) {
+                  messageProcessor.onMessageDeliveryFailed(message)
+                  Timber.w(e, "Error publishing message. Doing a reconnect")
+                  reconnect(mqttConnectionConfiguration)
                 }
-                    .apply { Timber.i("Message $message sent in $this") }
-              } catch (e: Exception) {
-                Timber.w(e, "Error publishing message $message")
-                when (e) {
-                  is IOException -> messageProcessor.onMessageDeliveryFailedFinal(message)
-                  is MqttException -> {
-                    if (e.reasonCode.toShort() != MqttException.REASON_CODE_MAX_INFLIGHT) {
-                      messageProcessor.onMessageDeliveryFailed(message)
-                      Timber.w(e, "Error publishing message. Doing a reconnect")
-                      reconnect(mqttConnectionConfiguration)
-                    }
-                    throw OutgoingMessageSendingException(e)
-                  }
-                  else -> {
-                    messageProcessor.onMessageDeliveryFailed(message)
-                    throw OutgoingMessageSendingException(e)
-                  }
-                }
+                Result.failure(OutgoingMessageSendingException(e))
+              }
+              else -> {
+                messageProcessor.onMessageDeliveryFailed(message)
+                Result.failure(OutgoingMessageSendingException(e))
               }
             }
-        Timber.d("Waiting for sendmessage job for message $message to finish")
-        job.join()
-        sendMessageThrowable?.run { Result.failure(this) } ?: Result.success(Unit)
+          }
+        }
       }
     }
   }
