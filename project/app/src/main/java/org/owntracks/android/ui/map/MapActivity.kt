@@ -266,6 +266,20 @@ class MapActivity :
             }
           }
 
+          fabFitAll.apply {
+            TooltipCompat.setTooltipText(this, getString(R.string.fitAllButtonLabel))
+            setOnClickListener {
+              if (!viewModel.onFitAllClicked()) {
+                Snackbar.make(
+                        binding.root,
+                        getString(R.string.fitAllNothingToShow),
+                        Snackbar.LENGTH_SHORT,
+                    )
+                    .show()
+              }
+            }
+          }
+
           val labels =
               listOf(
                       R.id.contactDetailsAccuracy,
@@ -829,9 +843,22 @@ class MapActivity :
     // that much to leave the FAB itself sitting where fabMargin says it should.
     val shadowRoom = resources.getDimensionPixelSize(R.dimen.fab_shadow_room)
 
+    val fabMapLayersTopMargin =
+        mapFragmentBaseMargins.top + systemBarInsets.top + fabMargin - shadowRoom
     binding.fabMapLayersContainer.updateLayoutParams<ViewGroup.MarginLayoutParams> {
       marginEnd = fabMapLayersBaseMargins.right + systemBarInsets.right + fabMargin - shadowRoom
-      topMargin = mapFragmentBaseMargins.top + systemBarInsets.top + fabMargin - shadowRoom
+      topMargin = fabMapLayersTopMargin
+    }
+    // Stacked under the layers FAB, the usual fabMargin apart. Both wrappers carry the same
+    // shadowRoom, so the offset between them is just one FAB plus the gap.
+    binding.fabFitAllContainer.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+      marginEnd = fabMapLayersBaseMargins.right + systemBarInsets.right + fabMargin - shadowRoom
+      topMargin =
+          fabMapLayersTopMargin +
+              resources.getDimensionPixelSize(
+                  com.google.android.material.R.dimen.design_fab_size_normal
+              ) +
+              fabMargin
     }
 
     updateFabMyLocationPosition(bottomSheetState, fabMargin)
