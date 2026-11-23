@@ -27,6 +27,7 @@ import org.owntracks.android.model.messages.MessageTransition
 import org.owntracks.android.model.messages.MessageWaypoint
 import org.owntracks.android.model.messages.MessageWaypoints
 import org.owntracks.android.model.messages.addWifi
+import org.owntracks.android.model.messages.roundToIntOrZero
 import org.owntracks.android.net.WifiInfoProvider
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.preferences.types.MonitoringMode
@@ -363,7 +364,7 @@ constructor(
           trackerId = preferences.tid.toString()
           latitude = triggeringLocation.latitude
           longitude = triggeringLocation.longitude
-          accuracy = triggeringLocation.accuracy.roundToInt()
+          accuracy = triggeringLocation.accuracy.roundToIntOrZero()
           timestamp = TimeUnit.MILLISECONDS.toSeconds(triggeringLocation.time)
           waypointTimestamp = waypointModel.tst.epochSecond
           description = waypointModel.description

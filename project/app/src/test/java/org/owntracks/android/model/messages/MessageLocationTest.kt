@@ -6,11 +6,17 @@ import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
 import android.net.wifi.WifiManager.UNKNOWN_SSID
 import android.os.Build
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.double
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.owntracks.android.model.Parser
 import org.owntracks.android.net.WifiInfoProvider
 
 class MessageLocationTest {
@@ -32,6 +38,26 @@ class MessageLocationTest {
     assertEquals(10, messageLocation.verticalAccuracy)
     assertNull(messageLocation.bssid)
     assertNull(messageLocation.ssid)
+  }
+
+  @Test
+  fun `given a location with NaN altitude, accuracy and bearing, when serializing a MessageLocation, they are omitted`() {
+    val location: Location = mock {
+      on { latitude } doReturn 51.0
+      on { longitude } doReturn 0.3
+      on { time } doReturn 1_700_000_000_000L
+      on { altitude } doReturn Double.NaN
+      on { accuracy } doReturn Float.NaN
+      on { bearing } doReturn Float.NaN
+    }
+
+    val messageLocation = MessageLocation.fromLocation(location, Build.VERSION_CODES.O)
+    val json = Json.parseToJsonElement(Parser(null).toJsonPlain(messageLocation)).jsonObject
+
+    assertEquals(51.0, json["lat"]!!.jsonPrimitive.double, 0.0)
+    assertFalse(json.containsKey("alt"))
+    assertFalse(json.containsKey("acc"))
+    assertFalse(json.containsKey("cog"))
   }
 
   @Test

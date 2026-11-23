@@ -141,9 +141,9 @@ open class MessageLocation(
         MessageLocation().apply {
           latitude = location.latitude
           longitude = location.longitude
-          altitude = location.altitude.roundToInt()
-          accuracy = location.accuracy.roundToInt()
-          bearing = location.bearing.roundToInt()
+          altitude = location.altitude.roundToIntOrZero()
+          accuracy = location.accuracy.roundToIntOrZero()
+          bearing = location.bearing.roundToIntOrZero()
           timestamp = TimeUnit.MILLISECONDS.toSeconds(location.time)
           // Convert m/s to km/h
           velocity = if (location.hasSpeed()) ((location.speed * 3.6).toInt()) else 0
@@ -209,3 +209,12 @@ fun MessageLocation.addWifi(wifiInfoProvider: @NotNull WifiInfoProvider) {
     ssid = wifiInfoProvider.getSSID()
   }
 }
+
+/**
+ * Rounds to the nearest Int, or 0 if NaN. Some providers report a fix with a NaN field (e.g.
+ * altitude on Sailfish's Android layer, #2368), and [roundToInt] throws on NaN.
+ */
+internal fun Double.roundToIntOrZero(): Int = if (isNaN()) 0 else roundToInt()
+
+/** @see Double.roundToIntOrZero */
+internal fun Float.roundToIntOrZero(): Int = if (isNaN()) 0 else roundToInt()
