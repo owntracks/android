@@ -1,4 +1,4 @@
-# This flow is designed to be used to update the production and beta tracks on the Play store. It does this by promoting the beta track build to production, triggered by the creation of a release tag.
+# This flow is designed to be used to update the production and beta tracks on the Play store, triggered by the creation of a release tag. A beta tag promotes internal to beta; a stable tag promotes the newer of the beta and internal builds to production.
 # As per the beta build, this does not actually do a build / upload, it simply promotes whatever's in beta to production. Best to create the
 name: Tag Triggered Release
 
@@ -44,23 +44,38 @@ jobs:
         with:
           bundler-cache: true
 
-      - name: Get internal track current version code
-        if: ${{ contains(github.ref_name, 'beta') || fromJSON(steps.tagCount.outputs.beta_tag_count) == 0 }}
+      # A beta tag always promotes internal. A stable tag promotes whichever of internal and beta is
+      # newer: the last beta's build if nothing has landed since, otherwise the newer internal build,
+      # so app changes after the last beta can ship without another beta. util/release.py makes the
+      # same choice when it writes latest-version.yaml.
+      - name: Choose the track and version code to promote
+        id: source
         env:
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
+          IS_BETA_TAG: ${{ contains(github.ref_name, 'beta') }}
+          BETA_TAG_COUNT: ${{ steps.tagCount.outputs.beta_tag_count }}
         run: |
-          VERSION_CODE="$(bundle exec fastlane get_version_code track:internal | sed -n "s/.*Found '\([0-9]*\)'.*/\1/p")"
-          echo "Latest version code is: $VERSION_CODE"
+          code_of() {
+            bundle exec fastlane get_version_code "track:$1" | sed -n "s/.*Found '\([0-9]*\)'.*/\1/p"
+          }
+          FROM=internal
+          VERSION_CODE="$(code_of internal)"
+          echo "Internal track version code is: ${VERSION_CODE}"
+          if [[ "${IS_BETA_TAG}" != "true" && "${BETA_TAG_COUNT}" -gt 0 ]]; then
+            BETA_CODE="$(code_of beta)"
+            echo "Beta track version code is: ${BETA_CODE}"
+            if ! [[ "${VERSION_CODE}" =~ ^[0-9]+$ && "${BETA_CODE}" =~ ^[0-9]+$ ]]; then
+              echo "::error::Could not read version codes: internal='${VERSION_CODE}' beta='${BETA_CODE}'"
+              exit 1
+            fi
+            if (( BETA_CODE >= VERSION_CODE )); then
+              FROM=beta
+              VERSION_CODE="${BETA_CODE}"
+            fi
+          fi
+          echo "Promoting ${VERSION_CODE} from ${FROM}"
           echo VERSION_CODE="${VERSION_CODE}" >> "${GITHUB_ENV}"
-
-      - name: Get current version code from beta track
-        if: ${{ !contains(github.ref_name, 'beta') && fromJSON(steps.tagCount.outputs.beta_tag_count) > 0 }}
-        env:
-          ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
-        run: |
-          VERSION_CODE="$(bundle exec fastlane get_version_code track:beta | sed -n "s/.*Found '\([0-9]*\)'.*/\1/p")"
-          echo "Latest version code is: $VERSION_CODE"
-          echo VERSION_CODE="${VERSION_CODE}" >> "${GITHUB_ENV}"
+          echo "from=${FROM}" >> "${GITHUB_OUTPUT}"
 
       - name: Create keystore
         run: |
@@ -130,13 +145,13 @@ jobs:
       - name: Promote play store production from beta
         run: bundle exec fastlane promote_beta_to_production rollout:0.1
         working-directory: fastlane
-        if: ${{ !contains(github.ref_name, 'beta') && steps.tagCount.outputs.beta_tag_count > 0 }}
+        if: ${{ !contains(github.ref_name, 'beta') && steps.source.outputs.from == 'beta' }}
         env:
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}
 
       - name: Promote play store production from internal
         run: bundle exec fastlane promote_internal_to_production rollout:0.1
         working-directory: fastlane
-        if: ${{ !contains(github.ref_name, 'beta') && steps.tagCount.outputs.beta_tag_count == 0 }}
+        if: ${{ !contains(github.ref_name, 'beta') && steps.source.outputs.from == 'internal' }}
         env:
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_CREDENTIALS }}

@@ -7,9 +7,11 @@
 
 F-Droid and IzzyOnDroid read that file at the tag to reproduce the build. The version code only
 exists on the Play store, so it can't be derived from the source. It has to be the code that
-.github/workflows/release.yaml will promote: that of the last beta if this version had any,
-otherwise whatever is newest on the internal track. release.yaml fails the release if the file
-doesn't match, so a wrong answer here costs a re-tag rather than a broken reproducible build.
+.github/workflows/release.yaml will promote: whichever of the last beta and the internal track is
+newer. So with no app changes since the last beta, that beta ships; otherwise the newer internal
+build (built from master) ships without needing another beta. release.yaml fails the release if
+the file doesn't match, so a wrong answer here costs a re-tag rather than a broken reproducible
+build.
 
 Betas are deliberately not supported: the file describes the latest stable release.
 """
@@ -72,9 +74,9 @@ def version_code_of_beta(beta: str) -> str | None:
     return None
 
 
-def version_code_of_internal_track(tag: str) -> str | None:
+def version_code_of_internal_track() -> str | None:
     if not os.environ.get("ANDROID_PUBLISHER_CREDENTIALS"):
-        sys.exit(f"error: no {tag} betas, so the code comes from Play: set ANDROID_PUBLISHER_CREDENTIALS")
+        sys.exit("error: reading the internal track's version code needs ANDROID_PUBLISHER_CREDENTIALS")
     output = run("bundle", "exec", "fastlane", "get_version_code", "track:internal")
     match = re.search(r"Found '(\d+)'", output)
     return match[1] if match else None
@@ -112,17 +114,25 @@ def main() -> None:
     if problem := branch_problem():
         complain(problem)
 
+    internal_code = version_code_of_internal_track()
+    if internal_code is None:
+        sys.exit("error: no version code found on the Play internal track")
+    source = "Play internal track"
+    version_code = internal_code
     if beta := latest_beta(tag):
-        # Promoting a beta ships the beta's build, but F-Droid builds this tag under the same code.
-        if app_code_changed_since(beta):
-            complain(f"app code changed since {beta}: tag a new beta and let it reach the beta track first")
-        source = f"{beta} APK"
-        version_code = version_code_of_beta(beta)
-    else:
-        source = "Play internal track"
-        version_code = version_code_of_internal_track(tag)
-    if version_code is None:
-        sys.exit(f"error: no version code found from {source}")
+        beta_code = version_code_of_beta(beta)
+        if beta_code is None:
+            sys.exit(f"error: no version code found from {beta} APK")
+        # Same rule as release.yaml: the newer build ships, and the beta wins a tie.
+        if int(beta_code) >= int(internal_code):
+            # Promoting the beta ships its build, but F-Droid builds this tag under the same code.
+            if app_code_changed_since(beta):
+                complain(
+                    f"app code changed since {beta} but the internal track has nothing newer: "
+                    "wait for the trunk build to upload master to internal"
+                )
+            source = f"{beta} APK"
+            version_code = beta_code
 
     print(f"{tag}: versionCode {version_code} (from {source})")
     if dry_run:
