@@ -86,6 +86,11 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("tag", help="stable tag, like v2.6.0")
     parser.add_argument("--dry-run", action="store_true", help="report what would happen")
+    parser.add_argument(
+        "--internal-version-code",
+        help="the Play internal track's version code, instead of reading it with fastlane "
+        "(which needs ANDROID_PUBLISHER_CREDENTIALS); release.yaml still checks it",
+    )
     args = parser.parse_args()
     tag: str = args.tag
     dry_run: bool = args.dry_run
@@ -114,9 +119,9 @@ def main() -> None:
     if problem := branch_problem():
         complain(problem)
 
-    internal_code = version_code_of_internal_track()
-    if internal_code is None:
-        sys.exit("error: no version code found on the Play internal track")
+    internal_code = args.internal_version_code or version_code_of_internal_track()
+    if not re.fullmatch(r"\d+", internal_code or ""):
+        sys.exit(f"error: internal track version code '{internal_code}' is not a number")
     source = "Play internal track"
     version_code = internal_code
     if beta := latest_beta(tag):
