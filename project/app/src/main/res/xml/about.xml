@@ -10,6 +10,11 @@
     </Preference>
 
     <Preference
+        android:icon="@drawable/ic_outline_label_24"
+        android:key="commit"
+        android:title="@string/aboutCommit" />
+
+    <Preference
         android:icon="@drawable/ic_baseline_insert_drive_file_24"
         android:key="documentation"
         android:summary="@string/documentationUrl"

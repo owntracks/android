@@ -1,12 +1,17 @@
 package org.owntracks.android.ui.preferences.about
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import org.owntracks.android.BuildConfig.GIT_COMMIT
 import org.owntracks.android.BuildConfig.TRANSLATION_COUNT
 import org.owntracks.android.R
 
@@ -38,6 +43,20 @@ class AboutFragment : PreferenceFragmentCompat() {
       }
     }
 
+    findPreference<Preference>(UI_PREFERENCE_COMMIT)?.apply {
+      summary = GIT_COMMIT
+      setOnPreferenceClickListener {
+        val clipboard =
+            requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        clipboard.setPrimaryClip(ClipData.newPlainText("commit", GIT_COMMIT))
+        // Android 13 and later confirm a copy themselves.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+          Toast.makeText(requireContext(), R.string.aboutCommitCopied, Toast.LENGTH_SHORT).show()
+        }
+        true
+      }
+    }
+
     findPreference<Preference>(UI_PREFERENCE_TRANSLATION)?.setSummaryProvider {
       resources.getQuantityString(
           R.plurals.aboutTranslationsSummary,
@@ -49,6 +68,7 @@ class AboutFragment : PreferenceFragmentCompat() {
 
   companion object {
     const val UI_PREFERENCE_VERSION = "version"
+    const val UI_PREFERENCE_COMMIT = "commit"
     const val UI_PREFERENCE_TRANSLATION = "translation"
   }
 
