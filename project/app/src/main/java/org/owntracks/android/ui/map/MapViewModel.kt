@@ -81,6 +81,11 @@ constructor(
   val mapCenter: SharedFlow<LatLng>
     get() = mutableMapCenter
 
+  // Asks the map to bring everyone on it into view (fire-and-forget event)
+  private val mutableFitTarget = MutableSharedFlow<FitTarget>(extraBufferCapacity = 1)
+  val fitTarget: SharedFlow<FitTarget>
+    get() = mutableFitTarget
+
   // Shows the current distance to the selected contact
   private val mutableContactDistance = MutableStateFlow(0f)
   val contactDistance: StateFlow<Float>
@@ -207,6 +212,22 @@ constructor(
         locationProcessor.publishStatusMessage()
       }
     }
+  }
+
+  /**
+   * User has clicked the "show everyone" FAB: frame every contact with a location, and this device.
+   * The map is left free, so it doesn't snap back to following the device or a contact.
+   *
+   * @return false if there's no one with a location to show
+   */
+  fun onFitAllClicked(): Boolean {
+    val points =
+        allContacts.values.mapNotNull { it.latLng } +
+            listOfNotNull(currentLocation.value?.toLatLng())
+    val target = FitTarget.of(points) ?: return false
+    setViewModeFree()
+    mutableFitTarget.tryEmit(target)
+    return true
   }
 
   /** User has clicked on the MyLocation FAB, so we should set the viewMode to be device. */
