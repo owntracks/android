@@ -2,14 +2,15 @@ package org.owntracks.android.location
 
 import android.content.Context
 import android.location.Location
-import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.annotation.RequiresPermission
+import androidx.core.location.LocationListenerCompat
 import androidx.core.location.LocationManagerCompat
+import androidx.core.location.LocationRequestCompat
 import androidx.core.os.ExecutorCompat
 import java.util.WeakHashMap
 import timber.log.Timber
@@ -30,7 +31,7 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient(
         LocationSources.entries.filter { contains(it.name.lowercase()) }.toSet()
       } ?: emptySet())
 
-  private val callbacks = WeakHashMap<LocationCallback, LocationListener>()
+  private val callbacks = WeakHashMap<LocationCallback, LocationListenerCompat>()
 
   private fun locationSourcesForPriority(priority: LocatorPriority): Set<LocationSources> =
       when (priority) {
@@ -72,7 +73,7 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient(
       // Explicit overrides, not a SAM lambda: these three methods are only default on API 31+,
       // so a lambda here throws AbstractMethodError on older devices when the OS calls them.
       val listener =
-          object : LocationListener {
+          object : LocationListenerCompat {
             override fun onLocationChanged(location: Location) {
               clientCallBack.onLocationResult(LocationResult(location))
             }
@@ -82,7 +83,7 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient(
             override fun onProviderDisabled(provider: String) {}
 
             @Suppress("DEPRECATION")
-            override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
+            override fun onStatusChanged(provider: String, status: Int, extras: Bundle?) {}
           }
       callbacks[clientCallBack] = listener
       locationSourcesForPriority(locationRequest.priority)
@@ -90,12 +91,15 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient(
             Timber.v("Requested location updates for sources $this to callback $clientCallBack")
           }
           .forEach {
-            requestLocationUpdates(
+            LocationManagerCompat.requestLocationUpdates(
+                this,
                 it.name.lowercase(),
-                locationRequest.interval.toMillis(),
-                locationRequest.smallestDisplacement ?: 10f,
+                LocationRequestCompat.Builder(locationRequest.interval.toMillis())
+                    .setQuality(qualityForPriority(locationRequest.priority))
+                    .setMinUpdateDistanceMeters(locationRequest.smallestDisplacement ?: 10f)
+                    .build(),
+                ExecutorCompat.create(Handler(looper)),
                 listener,
-                looper,
             )
           }
     }
@@ -104,7 +108,7 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient(
   override fun removeLocationUpdates(clientCallBack: LocationCallback) {
     Timber.v("removeLocationUpdates for $clientCallBack")
     callbacks.getOrDefault(clientCallBack, null)?.apply {
-      locationManager?.removeUpdates(this)
+      locationManager?.let { LocationManagerCompat.removeUpdates(it, this) }
       callbacks.remove(clientCallBack)
     } ?: run { Timber.w("No current location updates found for $clientCallBack") }
   }
@@ -145,3 +149,13 @@ class AospLocationProviderClient(val context: Context) : LocationProviderClient(
     )
   }
 }
+
+// Without an explicit quality, LocationManager requests BALANCED, which the fused provider can
+// serve with GNSS. The priority must reach the provider for LowPower to mean network-only.
+internal fun qualityForPriority(priority: LocatorPriority): Int =
+    when (priority) {
+      LocatorPriority.HighAccuracy -> LocationRequestCompat.QUALITY_HIGH_ACCURACY
+      LocatorPriority.BalancedPowerAccuracy -> LocationRequestCompat.QUALITY_BALANCED_POWER_ACCURACY
+      LocatorPriority.LowPower,
+      LocatorPriority.NoPower -> LocationRequestCompat.QUALITY_LOW_POWER
+    }
