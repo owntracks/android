@@ -13,7 +13,8 @@ enum class LocatorPriority(private val value: Int) {
   companion object {
     @JvmStatic
     @FromConfiguration
-    fun getByValue(value: Int): LocatorPriority = entries.getOrElse(value) { BalancedPowerAccuracy }
+    fun getByValue(value: Int): LocatorPriority =
+        entries.firstOrNull { it.value == value } ?: BalancedPowerAccuracy
 
     @JvmStatic
     @FromConfiguration
