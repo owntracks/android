@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:title="@string/preferencesExternalGnss">
+    <androidx.preference.PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="@string/preferencesExternalGnssUsb">
+        <androidx.preference.SwitchPreferenceCompat
+            app:defaultValue="false"
+            app:iconSpaceReserved="false"
+            app:key="external_gnss_enabled"
+            app:summary="@string/preferencesExternalGnssEnabledSummary"
+            app:title="@string/preferencesExternalGnssEnabled" />
+        <androidx.preference.Preference
+            app:iconSpaceReserved="false"
+            app:key="external_gnss_connect"
+            app:summary="@string/preferencesExternalGnssConnectSummary"
+            app:title="@string/preferencesExternalGnssConnect" />
+    </androidx.preference.PreferenceCategory>
+    <androidx.preference.PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="@string/preferencesExternalGnssNtripCaster">
+        <androidx.preference.SwitchPreferenceCompat
+            app:defaultValue="false"
+            app:iconSpaceReserved="false"
+            app:key="ntrip_enabled"
+            app:summary="@string/preferencesExternalGnssNtripEnabledSummary"
+            app:title="@string/preferencesExternalGnssNtripEnabled" />
+        <androidx.preference.EditTextPreference
+            app:iconSpaceReserved="false"
+            app:key="ntrip_host"
+            app:title="@string/preferencesExternalGnssNtripHost"
+            app:useSimpleSummaryProvider="true" />
+        <androidx.preference.EditTextPreference
+            android:inputType="number"
+            app:defaultValue="2101"
+            app:iconSpaceReserved="false"
+            app:key="ntrip_port"
+            app:title="@string/preferencesExternalGnssNtripPort"
+            app:useSimpleSummaryProvider="true" />
+        <androidx.preference.EditTextPreference
+            app:iconSpaceReserved="false"
+            app:key="ntrip_mountpoint"
+            app:title="@string/preferencesExternalGnssNtripMountpoint"
+            app:useSimpleSummaryProvider="true" />
+        <androidx.preference.EditTextPreference
+            app:iconSpaceReserved="false"
+            app:key="ntrip_user"
+            app:title="@string/preferencesExternalGnssNtripUser"
+            app:useSimpleSummaryProvider="true" />
+        <androidx.preference.EditTextPreference
+            app:iconSpaceReserved="false"
+            app:key="ntrip_password"
+            app:summary="@string/preferencesExternalGnssNtripPasswordSummary"
+            app:title="@string/preferencesExternalGnssNtripPassword" />
+    </androidx.preference.PreferenceCategory>
+</PreferenceScreen>
