@@ -66,6 +66,7 @@ class Contact(id: String) : BaseObservable() {
     altitude = messageLocation.altitude
     velocity = messageLocation.velocity
     battery = messageLocation.battery
+    inregions = messageLocation.inregions ?: emptyList()
     return true
   }
 
@@ -114,6 +115,19 @@ class Contact(id: String) : BaseObservable() {
       field = value
       notifyPropertyChanged(BR.geocodedLocation)
     }
+
+  @get:Bindable
+  var inregions: List<String> = emptyList()
+    private set(value) {
+      field = value
+      notifyPropertyChanged(BR.inregions)
+      notifyPropertyChanged(BR.inRegionsDisplay)
+    }
+
+  /** Comma-separated region names the contact is currently in, or null if not in any. */
+  @get:Bindable
+  val inRegionsDisplay: String?
+    get() = inregions.takeIf { it.isNotEmpty() }?.joinToString(", ")
 
   @get:Bindable
   var trackerId: String = id.takeLast(2)
