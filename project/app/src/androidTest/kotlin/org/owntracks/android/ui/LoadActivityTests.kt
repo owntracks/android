@@ -4,15 +4,17 @@ import android.content.Intent
 import androidx.core.net.toUri
 import androidx.preference.PreferenceManager
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.filters.MediumTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertContains
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertDisplayed
 import com.adevinta.android.barista.assertion.BaristaVisibilityAssertions.assertNotDisplayed
 import dagger.hilt.android.testing.HiltAndroidTest
-import java.io.File
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.double
@@ -39,6 +41,7 @@ import org.owntracks.android.testutils.idlingresources.ViewIdlingResource
 import org.owntracks.android.testutils.use
 import org.owntracks.android.testutils.writeFileToDevice
 import org.owntracks.android.ui.preferences.load.LoadActivity
+import java.io.File
 
 @MediumTest
 @HiltAndroidTest
@@ -217,6 +220,72 @@ class LoadActivityTests : TestWithAnActivity<LoadActivity>(false) {
     }
     assertDisplayed(R.id.applyButton)
     assertDisplayed(R.id.cancelButton)
+  }
+
+  @Test
+  fun load_activity_shows_confirmation_when_external_configuration_is_disabled() {
+    PreferenceManager.getDefaultSharedPreferences(app)
+        .edit()
+        .putBoolean(Preferences::allowConfigurationByURIAndConfigFile.name, false)
+        .commit()
+
+    launchActivity(
+        Intent(
+            Intent.ACTION_VIEW,
+            "owntracks:///config?inline=eyJfdHlwZSI6ImNvbmZpZ3VyYXRpb24ifQ==".toUri(),
+        )
+    )
+
+    onView(withText(R.string.loadActivityExternalConfigDialogAllow))
+        .check(matches(isDisplayed()))
+  }
+
+  @Test
+  fun load_activity_closes_when_external_configuration_is_denied() {
+    PreferenceManager.getDefaultSharedPreferences(app)
+        .edit()
+        .putBoolean(Preferences::allowConfigurationByURIAndConfigFile.name, false)
+        .commit()
+
+    launchActivity(
+        Intent(
+            Intent.ACTION_VIEW,
+            "owntracks:///config?inline=eyJfdHlwZSI6ImNvbmZpZ3VyYXRpb24ifQ==".toUri(),
+        )
+    )
+
+    onView(withText(R.string.loadActivityExternalConfigDialogAllow))
+        .check(matches(isDisplayed()))
+
+    onView(withText(R.string.cancel))
+        .perform(click())
+  }
+
+  @Test
+  fun load_activity_loads_configuration_when_external_configuration_is_allowed() {
+    PreferenceManager.getDefaultSharedPreferences(app)
+        .edit()
+        .putBoolean(Preferences::allowConfigurationByURIAndConfigFile.name, false)
+        .commit()
+
+    launchActivity(
+        Intent(
+            Intent.ACTION_VIEW,
+            "owntracks:///config?inline=eyJfdHlwZSI6ImNvbmZpZ3VyYXRpb24ifQ==".toUri(),
+        )
+    )
+
+    onView(withText(R.string.loadActivityExternalConfigDialogAllow))
+        .check(matches(isDisplayed()))
+
+    onView(withText(R.string.loadActivityExternalConfigDialogAllow))
+        .perform(click())
+
+    onView(withId(R.id.applyButton))
+        .check(matches(isDisplayed()))
+
+    onView(withId(R.id.cancelButton))
+        .check(matches(isDisplayed()))
   }
 
   @Test
