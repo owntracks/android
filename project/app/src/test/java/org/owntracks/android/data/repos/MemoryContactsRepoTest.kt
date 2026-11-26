@@ -21,6 +21,7 @@ import org.mockito.kotlin.mock
 import org.owntracks.android.location.toLatLng
 import org.owntracks.android.model.messages.MessageCard
 import org.owntracks.android.model.messages.MessageLocation
+import org.owntracks.android.model.messages.MessageTransition
 import org.owntracks.android.preferences.InMemoryPreferencesStore
 import org.owntracks.android.preferences.Preferences
 import org.owntracks.android.support.ContactBitmapAndName
@@ -243,6 +244,54 @@ class MemoryContactsRepoTest {
           )
           update(CONTACT_ID, messageCard)
           assertNull(contactBitmapAndNameMemoryCache.get(CONTACT_ID))
+        }
+      }
+
+  @Test
+  fun `given a contact with a location, when a newer transition arrives, then the contact location is updated`() =
+      runTest {
+        contactsRepo!!.run {
+          update(CONTACT_ID, messageLocation)
+          val messageTransition =
+              MessageTransition().apply {
+                accuracy = 5
+                latitude = 51.0
+                longitude = 61.0
+                timestamp = messageLocation.timestamp + 60
+              }
+          update(CONTACT_ID, messageTransition)
+          getById(CONTACT_ID)!!.let { c ->
+            assertEquals(messageTransition.toLatLng(), c.latLng)
+            assertEquals(messageTransition.timestamp, c.locationTimestamp)
+            assertEquals(messageTransition.accuracy, c.locationAccuracy)
+          }
+        }
+      }
+
+  @Test
+  fun `given a contact with a location, when an older transition arrives, then it is ignored`() =
+      runTest {
+        contactsRepo!!.run {
+          update(CONTACT_ID, messageLocation)
+          val values = mutableListOf<ContactsRepoChange>()
+          backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            repoChangedEvent.toList(values)
+          }
+          update(
+              CONTACT_ID,
+              MessageTransition().apply {
+                accuracy = 5
+                latitude = 51.0
+                longitude = 61.0
+                timestamp = messageLocation.timestamp - 60
+              },
+          )
+          assertTrue(values.isEmpty())
+          getById(CONTACT_ID)!!.let { c ->
+            assertEquals(messageLocation.toLatLng(), c.latLng)
+            assertEquals(messageLocation.timestamp, c.locationTimestamp)
+            assertEquals(messageLocation.accuracy, c.locationAccuracy)
+          }
         }
       }
 
