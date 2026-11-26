@@ -39,6 +39,11 @@ class MapLayerBottomSheetDialog : BottomSheetDialogFragment() {
         dismiss()
       }
     }
+    mapLayerSelectorButtonsToStyles
+        .filterValues { it == viewModel.mapLayerStyle.value }
+        .keys
+        .firstOrNull()
+        ?.let { binding.root.findViewById<AppCompatImageButton>(it).showAsSelected() }
     return insetAwareMapBottomSheetContent(binding.root)
   }
 }
